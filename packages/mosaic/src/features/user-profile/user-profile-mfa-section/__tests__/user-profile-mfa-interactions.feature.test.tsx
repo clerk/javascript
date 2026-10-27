@@ -248,23 +248,17 @@ describe('User profile MFA interaction boundaries', () => {
       .spyOn(navigator.clipboard, 'writeText')
       .mockRejectedValueOnce(new Error('Clipboard unavailable'))
       .mockResolvedValue();
-    try {
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      const codes = await screen.findByRole('list', { name: 'Backup codes' });
-      expect(within(codes).getByText('CODE0001')).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() =>
-        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
-      );
-      expect(screen.queryByText('Clipboard unavailable')).toBeNull();
-      expect(within(codes).getByText('CODE0001')).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      expect(write).toHaveBeenCalledTimes(2);
-    } finally {
-      write.mockRestore();
-    }
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    const codes = await screen.findByRole('list', { name: 'Backup codes' });
+    expect(within(codes).getByText('CODE0001')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    expect(screen.queryByText('Clipboard unavailable')).toBeNull();
+    expect(within(codes).getByText('CODE0001')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(write).toHaveBeenCalledTimes(2);
   });
 });

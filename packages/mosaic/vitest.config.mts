@@ -7,6 +7,7 @@ import { defineConfig } from 'vitest/config';
 const mosaicPath = resolve(import.meta.dirname, 'src');
 const featureTests = 'src/**/*.feature.test.tsx';
 const webkitTests = 'src/**/*.webkit.test.tsx';
+const browserTests = 'src/**/*.browser.test.tsx';
 
 export default defineConfig({
   plugins: [
@@ -22,6 +23,8 @@ export default defineConfig({
       },
     },
     globals: false,
+    restoreMocks: true,
+    unstubGlobals: true,
     exclude: ['node_modules/**', 'dist/**'],
     testTimeout: 5000,
     // Primitives ran as their own package on happy-dom with no setup beyond matchers, so they
@@ -35,7 +38,7 @@ export default defineConfig({
           name: 'primitives',
           environment: 'happy-dom',
           include: ['src/primitives/**/*.test.?(c|m)[jt]s?(x)', 'src/primitives/**/*.spec.?(c|m)[jt]s?(x)'],
-          exclude: [webkitTests],
+          exclude: [webkitTests, browserTests],
           setupFiles: ['./src/primitives/test-utils/vitest.setup.ts'],
         },
       },
@@ -44,7 +47,7 @@ export default defineConfig({
         test: {
           name: 'mosaic',
           include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
-          exclude: ['src/primitives/**', featureTests, webkitTests],
+          exclude: ['src/primitives/**', featureTests, webkitTests, browserTests],
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
         },
       },
@@ -84,6 +87,19 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             instances: [{ browser: 'webkit' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'browser',
+          include: [browserTests],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
           },
         },
       },

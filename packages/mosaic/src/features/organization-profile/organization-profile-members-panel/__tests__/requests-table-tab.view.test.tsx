@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { MosaicProvider } from '../../../../mosaic-provider';
@@ -44,10 +44,6 @@ function renderTab(overrides: Partial<RequestsTableTabViewProps> = {}) {
 }
 
 describe('RequestsTableTabView', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it.each(['Accept', 'Decline'] as const)(
     'holds the row while %s is pending and allows retry after failure',
     async action => {

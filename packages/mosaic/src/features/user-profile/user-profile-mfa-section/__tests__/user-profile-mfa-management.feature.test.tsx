@@ -73,17 +73,12 @@ describe('User profile MFA management', () => {
     if (!selectedPhone) {
       throw new Error('Expected the second phone');
     }
-    const changeDefault = vi.spyOn(selectedPhone, 'makeDefaultSecondFactor').mockRejectedValue(cause);
-    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    try {
-      const user = userEvent.setup();
-      await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
-      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
-    } finally {
-      changeDefault.mockRestore();
-      log.mockRestore();
-    }
+    vi.spyOn(selectedPhone, 'makeDefaultSecondFactor').mockRejectedValue(cause);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const user = userEvent.setup();
+    await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
   });
 
   async function renderTwoSmsMethodsNeedingReverification() {
@@ -185,18 +180,12 @@ describe('User profile MFA management', () => {
     if (!clerk.user) {
       throw new Error('Expected the signed-in user');
     }
-    const create = vi.spyOn(clerk.user, 'createTOTP').mockRejectedValue(new Error('Internal authenticator failure'));
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await waitFor(() =>
-        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
-      );
-      expect(screen.queryByText('Internal authenticator failure')).toBeNull();
-    } finally {
-      create.mockRestore();
-    }
+    vi.spyOn(clerk.user, 'createTOTP').mockRejectedValue(new Error('Internal authenticator failure'));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    expect(screen.queryByText('Internal authenticator failure')).toBeNull();
   });
 
   it('keeps localized Clerk errors when removing an authenticator fails', async () => {
@@ -727,18 +716,14 @@ describe('User profile MFA management', () => {
   it('copies server-issued backup codes and closes their one-time surface', async () => {
     const fapi = await renderMfa();
     const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
-      await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(write).toHaveBeenCalledWith(fapi.mfa.codes.join('\n')));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    } finally {
-      write.mockRestore();
-    }
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
+    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
+    await waitFor(() => expect(write).toHaveBeenCalledWith(fapi.mfa.codes.join('\n')));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('downloads the displayed backup codes in a file named after the application', async () => {
@@ -746,35 +731,29 @@ describe('User profile MFA management', () => {
     const create = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:backup-codes');
     const revoke = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
-      await user.click(screen.getByRole('button', { name: 'Download' }));
-      expect(create).toHaveBeenCalledOnce();
-      const saved = create.mock.calls[0]?.[0];
-      if (!(saved instanceof Blob)) {
-        throw new Error('Expected the displayed backup codes to be saved in a blob');
-      }
-      expect(await saved.text()).toBe(
-        [
-          'These are your backup codes for Acme account alice.',
-          'Store them securely and keep them secret. Each code can only be used once.',
-          '',
-          ...fapi.mfa.codes,
-        ].join('\n'),
-      );
-      expect(click).toHaveBeenCalledOnce();
-      expect(click.mock.instances[0]?.download).toBe('Acme_backup_codes.txt');
-      expect(revoke).toHaveBeenCalledWith('blob:backup-codes');
-      expect(screen.getByText('CODE0001')).toBeVisible();
-    } finally {
-      create.mockRestore();
-      revoke.mockRestore();
-      click.mockRestore();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
+    await user.click(screen.getByRole('button', { name: 'Download' }));
+    expect(create).toHaveBeenCalledOnce();
+    const saved = create.mock.calls[0]?.[0];
+    if (!(saved instanceof Blob)) {
+      throw new Error('Expected the displayed backup codes to be saved in a blob');
     }
+    expect(await saved.text()).toBe(
+      [
+        'These are your backup codes for Acme account alice.',
+        'Store them securely and keep them secret. Each code can only be used once.',
+        '',
+        ...fapi.mfa.codes,
+      ].join('\n'),
+    );
+    expect(click).toHaveBeenCalledOnce();
+    expect(click.mock.instances[0]?.download).toBe('Acme_backup_codes.txt');
+    expect(revoke).toHaveBeenCalledWith('blob:backup-codes');
+    expect(screen.getByText('CODE0001')).toBeVisible();
   });
 
   it('keeps newly issued authenticator codes when the follow-up account reload fails', async () => {
@@ -978,7 +957,6 @@ describe('User profile MFA management', () => {
     await user.click(screen.getByRole('button', { name: 'Print' }));
     expect(open).toHaveBeenCalledOnce();
     expect(screen.getByRole('alert')).toHaveTextContent(message);
-    open.mockRestore();
   });
 
   it('prints the codes under a heading naming the application and account', async () => {
@@ -991,21 +969,17 @@ describe('User profile MFA management', () => {
       print: vi.fn(),
       close: vi.fn(),
     };
-    const open = vi.spyOn(window, 'open').mockReturnValue(printable as unknown as Window);
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      expect(await screen.findByText('CODE0001')).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Print' }));
-      expect(printable.print).toHaveBeenCalledOnce();
-      expect(printable.document.title).toBe('Your backup codes for Acme account alice');
-      expect(printable.document.querySelector('h1')?.textContent).toBe('Your backup codes for Acme account alice');
-      expect(printable.document.querySelector('pre')?.textContent).toBe(fapi.mfa.codes.join('\n'));
-      expect(screen.getByRole('alert').textContent).toBe('');
-    } finally {
-      open.mockRestore();
-    }
+    vi.spyOn(window, 'open').mockReturnValue(printable as unknown as Window);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    expect(await screen.findByText('CODE0001')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Print' }));
+    expect(printable.print).toHaveBeenCalledOnce();
+    expect(printable.document.title).toBe('Your backup codes for Acme account alice');
+    expect(printable.document.querySelector('h1')?.textContent).toBe('Your backup codes for Acme account alice');
+    expect(printable.document.querySelector('pre')?.textContent).toBe(fapi.mfa.codes.join('\n'));
+    expect(screen.getByRole('alert').textContent).toBe('');
   });
 });

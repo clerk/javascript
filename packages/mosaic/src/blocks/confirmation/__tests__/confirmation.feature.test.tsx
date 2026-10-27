@@ -2,7 +2,7 @@ import { reverificationError } from '@clerk/shared/authorization-errors';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { clerkApiError } from '../../../__tests__/clerk-errors';
@@ -24,10 +24,6 @@ type User = ReturnType<typeof userEvent.setup>;
 const session = fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) });
 const VERIFY = '/v1/client/sessions/sess_1/verify';
 const TITLE = 'Remove connected account';
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function Host<Payload>({
   options,

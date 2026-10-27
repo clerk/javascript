@@ -297,7 +297,6 @@ describe('Mosaic PhoneInput', () => {
 
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toBeInTheDocument();
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('supports a single form control'));
-    warn.mockRestore();
   });
 
   it('parses a pasted international number', async () => {

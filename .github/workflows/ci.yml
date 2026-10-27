@@ -428,6 +428,9 @@ jobs:
       - name: Run feature tests
         run: pnpm --filter @clerk/mosaic test:feature
 
+      - name: Run browser tests
+        run: pnpm --filter @clerk/mosaic test:browser
+
       - name: Upload failure artifacts
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4.6.2

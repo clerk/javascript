@@ -2,7 +2,7 @@ import type { UserJSON } from '@clerk/shared/types';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   demandReverificationOnce,
@@ -28,8 +28,6 @@ import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-sect
 import { registerWallets, signedInWallets, web3Environment } from './user-profile-web3-wallets.fixtures';
 
 describe('Web3 wallets', () => {
-  afterEach(() => vi.unstubAllGlobals());
-
   const walletFactors = ['web3_metamask_signature', 'web3_solana_signature'] as const;
 
   async function renderWeb3(overrides: Partial<UserJSON> = {}, seed: FakeFapiSeed = {}) {

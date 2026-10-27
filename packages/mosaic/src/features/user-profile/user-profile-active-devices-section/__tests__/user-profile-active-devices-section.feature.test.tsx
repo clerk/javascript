@@ -915,17 +915,13 @@ describe('Sign out an unavailable device', () => {
     });
 
     const logError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
 
-      await waitFor(() =>
-        expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(expectedMessage),
-      );
-      expect(screen.getByRole('dialog')).toBeVisible();
-      expect(screen.queryByText('Unexpected device failure.')).toBeNull();
-      expect(logError).not.toHaveBeenCalled();
-    } finally {
-      logError.mockRestore();
-    }
+    await waitFor(() =>
+      expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(expectedMessage),
+    );
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(screen.queryByText('Unexpected device failure.')).toBeNull();
+    expect(logError).not.toHaveBeenCalled();
   });
 });

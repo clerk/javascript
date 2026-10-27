@@ -241,7 +241,6 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
-    log.mockRestore();
   });
   it('requires confirmation before removing a phone number', async () => {
     const user = userEvent.setup();
