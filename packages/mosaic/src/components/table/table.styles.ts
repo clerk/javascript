@@ -1,6 +1,16 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, scrollFadeVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  focusVars,
+  fontWeightVars,
+  radiusVars,
+  scrollFadeVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
+import { tableStateMarker } from './table.markers.stylex';
 
 const surface = 'var(--_cl-table-surface)';
 const tint = 'var(--_cl-table-row-tint)';
@@ -45,43 +55,52 @@ export const styles = stylex.create({
     '--_cl-table-surface': colorVars['--cl-color-background-subtle'],
     backgroundColor: colorVars['--cl-color-background-subtle'],
   },
-  bodyRow: {
-    borderBlockStartColor: colorVars['--cl-color-border'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: '1px',
-  },
-  interactiveRow: {
+  row: {
     '--_cl-table-row-tint': {
       default: null,
-      '@media (hover: hover)': { ':hover': colorVars['--cl-color-background-subtle'] },
+      ':where([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
+      '@media (hover: hover)': {
+        default: null,
+        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-background-subtle'],
+      },
     },
     backgroundColor: {
       default: null,
-      '@media (hover: hover)': { ':hover': colorVars['--cl-color-background-subtle'] },
+      ':where([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
+      '@media (hover: hover)': {
+        default: null,
+        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-background-subtle'],
+      },
     },
-    cursor: 'pointer',
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+    cursor: { default: null, ':where([data-actionable])': 'pointer' },
+    position: 'relative',
   },
-  selectedRow: {
-    '--_cl-table-row-tint': colorVars['--cl-color-neutral-alpha-100'],
-    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
-  },
-  headerCell: {
+  column: {
     paddingBlock: space['2.5'],
     paddingInline: space['4'],
     color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    position: 'relative',
     verticalAlign: 'middle',
     whiteSpace: 'nowrap',
   },
-  sortableHeaderCell: {
-    paddingBlock: space['1.5'],
-    paddingInline: space['2'],
+  sortableColumn: {
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      '@media (hover: hover)': { default: null, ':hover': colorVars['--cl-color-foreground'] },
+    },
+    cursor: 'pointer',
+    userSelect: 'none',
   },
-  sortButton: {
-    color: 'inherit',
-    fontWeight: 'inherit',
+  sortLabel: {
+    gap: space['1'],
+    alignItems: 'center',
+    display: 'inline-flex',
   },
   cell: {
     paddingBlock: space['3'],
@@ -89,6 +108,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    position: 'relative',
     verticalAlign: 'middle',
   },
   selectCell: {
@@ -103,7 +123,7 @@ export const styles = stylex.create({
     backgroundColor: surface,
     backgroundImage: `linear-gradient(${tint}, ${tint})`,
     position: 'sticky',
-    zIndex: 1,
+    zIndex: { default: 1, ':focus-visible': 2 },
     '::before': {
       insetBlock: 0,
       content: '""',
@@ -112,8 +132,52 @@ export const styles = stylex.create({
       width: scrollFadeVars['--cl-scroll-fade-size'],
     },
   },
-  emptyCell: {
+  focusRing: {
+    outlineOffset: { default: null, ':focus-visible': `calc(-1 * ${focusVars['--cl-focus-outline-width']})` },
+    zIndex: { default: null, ':focus-visible': 2 },
+  },
+  empty: {
     textAlign: 'center',
+  },
+  expandButton: {
+    borderRadius: radiusVars['--cl-radius-sm'],
+    alignItems: 'center',
+    color: colorVars['--cl-color-foreground-secondary'],
+    cursor: 'pointer',
+    display: 'inline-flex',
+    justifyContent: 'center',
+    marginInlineEnd: space['1'],
+    verticalAlign: 'middle',
+  },
+  expandIcon: {
+    transform: {
+      default: null,
+      ':is([dir="rtl"] *):not([data-expanded] *)': 'scaleX(-1)',
+      [stylex.when.ancestor('[data-expanded]', tableStateMarker)]: 'rotate(90deg)',
+    },
+    transitionDuration: durationVars['--cl-duration-fast'],
+    transitionProperty: 'transform',
+  },
+});
+
+export const sortIcons = stylex.create({
+  none: {
+    display: {
+      default: 'block',
+      [stylex.when.ancestor('[data-sort-direction]', tableStateMarker)]: 'none',
+    },
+  },
+  ascending: {
+    display: {
+      default: 'none',
+      [stylex.when.ancestor('[data-sort-direction="ascending"]', tableStateMarker)]: 'block',
+    },
+  },
+  descending: {
+    display: {
+      default: 'none',
+      [stylex.when.ancestor('[data-sort-direction="descending"]', tableStateMarker)]: 'block',
+    },
   },
 });
 

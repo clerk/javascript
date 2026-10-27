@@ -12,7 +12,6 @@ import { Section } from '../../../components/section';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { usePendingAction } from '../../../hooks/use-pending-action';
-import { useServerDataTable } from '../../../hooks/use-server-data-table';
 import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
 import { Plus } from '../../../icons/glyphs/plus';
 import { Users } from '../../../icons/glyphs/users';
@@ -44,20 +43,8 @@ export function RequestsTableTabView({
   onRetry,
 }: RequestsTableTabViewProps) {
   const m = useMessages('requestsTableTab');
-  const { table, pagination } = useServerDataTable({
-    data: requests,
-    totalCount,
-    getRowId,
-    sortableColumns: [],
-    page,
-    pageSize,
-    onPageChange,
-    searchValue: '',
-    onSearchChange: () => {},
-    isFetching,
-  });
+  const showPagination = Math.ceil(totalCount / pageSize) > 1;
   const hasActions = Boolean(onAccept || onDecline);
-  const columnCount = 2 + Number(hasActions) + Number(Boolean(onBulkAction));
   return (
     <div
       {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}
@@ -85,35 +72,23 @@ export function RequestsTableTabView({
         minWidth='33rem'
         aria-label={m.title}
         aria-busy={isFetching}
+        selectionMode={onBulkAction ? 'multiple' : 'none'}
       >
-        <Table.ColumnGroup>
-          {onBulkAction ? <Table.Column /> : null}
-          <Table.Column />
-          <Table.Column width='9rem' />
-          {hasActions ? <Table.Column width='10rem' /> : null}
-        </Table.ColumnGroup>
         <Table.Header>
-          <Table.Row>
-            {onBulkAction ? (
-              <Table.SelectAllCell
-                aria-label={m.selectAll}
-                checked={table.getIsAllRowsSelected()}
-                indeterminate={table.getIsSomeRowsSelected()}
-                onChange={table.toggleAllRowsSelected}
-              />
-            ) : null}
-            <Table.HeaderCell>{m.email}</Table.HeaderCell>
-            <Table.HeaderCell>{m.requestedAt}</Table.HeaderCell>
-            {hasActions ? (
-              <Table.HeaderCell align='end'>
-                <VisuallyHidden>{m.actions}</VisuallyHidden>
-              </Table.HeaderCell>
-            ) : null}
-          </Table.Row>
+          {onBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+          <Table.Column>{m.email}</Table.Column>
+          <Table.Column width='9rem'>{m.requestedAt}</Table.Column>
+          {hasActions ? (
+            <Table.Column
+              align='end'
+              width='10rem'
+            >
+              <VisuallyHidden>{m.actions}</VisuallyHidden>
+            </Table.Column>
+          ) : null}
         </Table.Header>
         <RequestsTableBody
-          rows={table.rows}
-          columnCount={columnCount}
+          requests={isError ? [] : requests}
           isError={isError}
           onRetry={onRetry}
           hasActions={hasActions}
@@ -124,9 +99,13 @@ export function RequestsTableTabView({
           registerDeclineTrigger={registerDeclineTrigger}
         />
       </Table.Root>
-      {pagination ? (
+      {showPagination ? (
         <Pagination
-          {...pagination}
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalCount}
+          disabled={isFetching}
+          onChange={onPageChange}
           label={m.pagination}
           pageSizeLabel={m.pageSize}
           previousPageLabel={m.previousPage}
@@ -138,8 +117,7 @@ export function RequestsTableTabView({
 }
 
 function RequestsTableBody({
-  rows,
-  columnCount,
+  requests,
   isError,
   onRetry,
   hasActions,
@@ -149,13 +127,7 @@ function RequestsTableBody({
   registerAcceptTrigger,
   registerDeclineTrigger,
 }: {
-  rows: Array<{
-    id: string;
-    original: OrganizationProfileRequest;
-    getIsSelected: () => boolean;
-    toggleSelected: () => void;
-  }>;
-  columnCount: number;
+  requests: OrganizationProfileRequest[];
   isError: boolean;
   onRetry?: () => void;
   hasActions: boolean;
@@ -166,10 +138,12 @@ function RequestsTableBody({
   registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('requestsTableTab');
-  if (isError) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
+  return (
+    <Table.Body
+      items={requests}
+      itemToStringValue={getRowId}
+      renderEmptyState={() =>
+        isError ? (
           <EmptyState.Root role='alert'>
             <EmptyState.Icon glyph={ExclamationCircle} />
             <EmptyState.Label>{m.loadError}</EmptyState.Label>
@@ -179,76 +153,54 @@ function RequestsTableBody({
               </EmptyState.Actions>
             ) : null}
           </EmptyState.Root>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  if (rows.length === 0) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
+        ) : (
           <EmptyState.Root role='status'>
             <EmptyState.Icon glyph={Users} />
             <EmptyState.Label>{m.noRequests}</EmptyState.Label>
             <EmptyState.Description>{m.noRequestsDescription}</EmptyState.Description>
           </EmptyState.Root>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  return (
-    <Table.Body>
-      {rows.map(row => {
-        const request = row.original;
-        return (
-          <Table.Row
-            key={request.id}
-            selected={hasBulkAction && row.getIsSelected()}
-          >
-            {hasBulkAction ? (
-              <Table.SelectCell
-                aria-label={fill(m.select, { name: request.email })}
-                checked={row.getIsSelected()}
-                onToggleSelected={row.toggleSelected}
+        )
+      }
+    >
+      {request => (
+        <Table.Row>
+          {hasBulkAction ? <Table.SelectionCell aria-label={fill(m.select, { name: request.email })} /> : null}
+          <Table.Cell>
+            <Entity.Root>
+              <Entity.Media>
+                <Avatar.Root
+                  size='fit'
+                  aria-hidden
+                >
+                  {request.imageUrl ? (
+                    <Avatar.Image
+                      src={request.imageUrl}
+                      alt=''
+                    />
+                  ) : null}
+                  <Avatar.Fallback />
+                </Avatar.Root>
+              </Entity.Media>
+              <Entity.Content>
+                <Entity.Label>{request.name ?? request.email}</Entity.Label>
+                {request.name ? <Entity.Description>{request.email}</Entity.Description> : null}
+              </Entity.Content>
+            </Entity.Root>
+          </Table.Cell>
+          <Table.Cell noWrap>{request.requestedAtLabel}</Table.Cell>
+          {hasActions ? (
+            <Table.Cell align='end'>
+              <RequestActions
+                request={request}
+                onAccept={onAccept ? () => onAccept(request.id) : undefined}
+                onDecline={onDecline ? () => onDecline(request.id) : undefined}
+                registerAcceptTrigger={registerAcceptTrigger}
+                registerDeclineTrigger={registerDeclineTrigger}
               />
-            ) : null}
-            <Table.Cell>
-              <Entity.Root>
-                <Entity.Media>
-                  <Avatar.Root
-                    size='fit'
-                    aria-hidden
-                  >
-                    {request.imageUrl ? (
-                      <Avatar.Image
-                        src={request.imageUrl}
-                        alt=''
-                      />
-                    ) : null}
-                    <Avatar.Fallback />
-                  </Avatar.Root>
-                </Entity.Media>
-                <Entity.Content>
-                  <Entity.Label>{request.name ?? request.email}</Entity.Label>
-                  {request.name ? <Entity.Description>{request.email}</Entity.Description> : null}
-                </Entity.Content>
-              </Entity.Root>
             </Table.Cell>
-            <Table.Cell noWrap>{request.requestedAtLabel}</Table.Cell>
-            {hasActions ? (
-              <Table.Cell align='end'>
-                <RequestActions
-                  request={request}
-                  onAccept={onAccept ? () => onAccept(request.id) : undefined}
-                  onDecline={onDecline ? () => onDecline(request.id) : undefined}
-                  registerAcceptTrigger={registerAcceptTrigger}
-                  registerDeclineTrigger={registerDeclineTrigger}
-                />
-              </Table.Cell>
-            ) : null}
-          </Table.Row>
-        );
-      })}
+          ) : null}
+        </Table.Row>
+      )}
     </Table.Body>
   );
 }
