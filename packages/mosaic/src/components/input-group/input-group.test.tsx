@@ -105,7 +105,6 @@ describe('Mosaic InputGroup', () => {
     const focus = vi.spyOn(input, 'focus');
     fireEvent.click(input);
     expect(focus).not.toHaveBeenCalled();
-    focus.mockRestore();
   });
 
   it.each([

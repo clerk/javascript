@@ -133,6 +133,14 @@ Any new part with an exit transition needs one of the two;
 animated element). Add `cssVars()` to floating-ui middleware **after** `arrow()`,
 or the transform origin won't follow the arrow.
 
+## Reading direction
+
+Read the direction with `useDirection()` from `primitives/direction-provider`, never from the DOM
+`dir` attribute or computed style. It returns `ltr` outside a `DirectionProvider`. Use
+`readingDirectionKeys(direction)` for the previous and next arrow keys, or pass
+`rtl: direction === 'rtl'` to floating-ui's `Composite` or `useListNavigation`
+(`tabs/tabs-list.tsx`). `MosaicProvider` renders the `DirectionProvider` from its `direction` prop.
+
 ## Testing
 
 Primitive tests run on **happy-dom** (the `primitives` project in Mosaic's

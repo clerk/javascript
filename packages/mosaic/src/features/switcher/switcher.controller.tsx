@@ -3,8 +3,8 @@ import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
 import type { SwitcherModel } from './switcher.model';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
+import { switcherBusyKeys } from './switcher.types';
 import type { SwitcherTriggerProps, SwitcherViewProps } from './switcher.view';
-import { switcherBusyKeys } from './switcher.view';
 
 /** The model once Clerk has answered, which is the only shape an action can start from. */
 export type SwitcherReadyModel = Extract<SwitcherModel, { status: 'ready' }>;

@@ -1,6 +1,6 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
@@ -17,10 +17,6 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { OrganizationSwitcherProps } from '../organization-switcher';
 import { OrganizationSwitcher } from '../organization-switcher';
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const other = fapiOrganization({ id: 'org_9', name: 'Other' });
@@ -314,16 +310,16 @@ describe('OrganizationSwitcher custom trigger badges', () => {
   });
 
   it('hides the badge for null and keeps the organization name', async () => {
-    const { rerender } = await renderSwitcher({
-      renderTriggerBadge: () => Promise.resolve({ id: 'pro', label: 'Pro plan' }),
-    });
+    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
+      Promise.resolve(id === 'org_1' ? { id: 'pro', label: 'Pro plan' } : null),
+    );
+    const { clerk } = await renderSwitcher({ renderTriggerBadge });
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
-    const renderTriggerBadge = vi.fn(() => Promise.resolve(null));
-    rerender(tree({ renderTriggerBadge }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalled());
+    await act(() => clerk.setActive({ organization: 'org_9' }));
+    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
-    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
-    expect(trigger()).toHaveAccessibleName('Open organization menu for Acme');
+    expect(within(trigger()).getByText('Other')).toBeInTheDocument();
+    expect(trigger()).toHaveAccessibleName('Open organization menu for Other');
   });
 });

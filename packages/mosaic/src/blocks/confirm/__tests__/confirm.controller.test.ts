@@ -1,6 +1,6 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { createActor } from '../../../machine/create-actor';
@@ -9,9 +9,6 @@ import { confirmMachine, useConfirmController } from '../confirm.controller';
 
 const blocked = new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } });
 const cancelled = new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' });
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function start() {
   const actor = createActor(confirmMachine).start();

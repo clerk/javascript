@@ -107,13 +107,13 @@ export type {
   TableAlign,
   TableBodyProps,
   TableCellProps,
-  TableEmptyProps,
-  TableHeaderCellProps,
+  TableColumnProps,
+  TableExpandButtonProps,
   TableHeaderProps,
-  TableProps,
+  TableRootProps,
   TableRowProps,
-  TableSelectAllCellProps,
-  TableSelectCellProps,
+  TableSelectionCellProps,
+  TableSelectionColumnProps,
   TableSort,
 } from '../components/table';
 export { SegmentedControl } from '../components/segmented-control';

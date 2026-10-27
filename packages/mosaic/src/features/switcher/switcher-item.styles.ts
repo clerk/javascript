@@ -38,8 +38,10 @@ export const styles = stylex.create({
         ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
+    borderStyle: 'none',
+    appearance: 'none',
     backgroundColor: {
-      default: null,
+      default: 'transparent',
       ':active:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],

@@ -1,6 +1,7 @@
 import { createClerkClient } from '@clerk/backend';
 import { expect, test } from '@playwright/test';
 
+import { environmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
@@ -79,6 +80,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     test('with sso, navigate to task on after sign-up', async ({ page, context }) => {
       const u = await createTestUtils({ app, page, context });
+      const providerKeys = await resolveInstanceKeys('oauth-provider');
+      await createTestUtils({
+        app: {
+          ...app,
+          env: environmentConfig()
+            .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', providerKeys.pk)
+            .setEnvVariable('private', 'CLERK_SECRET_KEY', providerKeys.sk),
+        },
+        page,
+        context,
+      });
 
       await u.po.signUp.goTo();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
@@ -89,10 +101,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signUp.waitForMounted();
       await u.po.signUp.setEmailAddress(fakeUserForOAuth.email);
       await u.po.signUp.continue();
-      await u.po.signUp.enterTestOtpCode();
+      const [callback] = await Promise.all([
+        page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+        u.po.signUp.enterTestOtpCode(),
+      ]);
+      expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
 
       // Resolves task
-      await u.po.signUp.waitForMounted();
+      await page.waitForURL(/tasks/);
       const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
         slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-sso',
       });

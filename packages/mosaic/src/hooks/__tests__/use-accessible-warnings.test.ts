@@ -7,7 +7,6 @@ import { useAccessibleNameWarning } from '../use-accessible-name-warning';
 afterEach(() => {
   cleanup();
   document.body.replaceChildren();
-  vi.restoreAllMocks();
   vi.useRealTimers();
 });
 

@@ -1,7 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../../mosaic-provider';
 import type { UserProfileDevice } from '../user-profile-active-devices.types';
@@ -22,10 +22,6 @@ const mobile: UserProfileDevice = {
   description: 'Last seen 2 weeks ago · Orem, UT, United States',
   type: 'mobile',
 };
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function ActiveDevices({ devices, revokeAll }: { devices: UserProfileDevice[]; revokeAll: () => Promise<void> }) {
   const controller = useUserProfileActiveDevicesController({ devices, revokeAll });

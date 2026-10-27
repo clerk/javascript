@@ -17,6 +17,10 @@ import type {
 type ReadyModel = Extract<UserProfileMfaModel, { status: 'ready' }>;
 type MfaSnapshotData = Pick<ReadyModel, 'methods' | 'addableMethods' | 'phones'>;
 
+function reloadUser(user: UserResource): Promise<unknown> {
+  return user.reload().catch(() => undefined);
+}
+
 function configuredFactors(environment: EnvironmentResource | undefined): string[] {
   return Object.values(environment?.userSettings.attributes ?? {}).flatMap(attribute =>
     attribute?.used_for_second_factor ? attribute.second_factors : [],
@@ -111,13 +115,12 @@ function createSmsActions(
   environment: EnvironmentResource,
   userId: string,
   sessionId: string,
-  refresh: () => Promise<void>,
   calls: {
-    makeDefault: (phone: PhoneNumberResource) => Promise<unknown>;
+    makeDefault: (current: UserResource, phone: PhoneNumberResource) => Promise<unknown>;
     createPhone: (current: UserResource, phoneNumber: string) => Promise<PhoneNumberResource>;
-    reservePhone: (phone: PhoneNumberResource) => Promise<PhoneNumberResource>;
+    reservePhone: (current: UserResource, phone: PhoneNumberResource) => Promise<PhoneNumberResource>;
   },
-): Pick<ReadyModel, 'findOrCreatePhone' | 'enrollSms' | 'resendSms' | 'setDefault'> {
+): Pick<ReadyModel, 'enrollPhoneNumber' | 'enrollSms' | 'resendSms' | 'setDefault'> {
   const currentPhone = (phoneId: string) => {
     const current = requireIdentity(clerk, userId, sessionId);
     const phone = current.phoneNumbers.find(item => item.id === phoneId);
@@ -127,31 +130,35 @@ function createSmsActions(
     return phone;
   };
 
+  const enrollSms = async (phoneId: string, code?: string): Promise<SmsEnrollmentResult> => {
+    let phone = currentPhone(phoneId);
+    if (phone.verification.status !== 'verified') {
+      if (!code) {
+        await phone.prepareVerification();
+        return { status: 'needsVerification', phone: summarizePhone(phone) };
+      }
+      await phone.attemptVerification({ code });
+      phone = currentPhone(phoneId);
+    }
+    if (phone.reservedForSecondFactor || !configuredFactors(environment).includes('phone_code')) {
+      throw phoneUnavailable();
+    }
+    const result = await calls.reservePhone(requireIdentity(clerk, userId, sessionId), phone);
+    return { status: 'complete', backupCodes: result.backupCodes ?? [] };
+  };
+
   return {
-    findOrCreatePhone: async phoneNumber => {
+    enrollPhoneNumber: async phoneNumber => {
       const current = requireIdentity(clerk, userId, sessionId);
       const existing = current.phoneNumbers.find(
         phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
       );
-      return summarizePhone(existing ?? (await calls.createPhone(current, phoneNumber)));
-    },
-    enrollSms: async (phoneId, code): Promise<SmsEnrollmentResult> => {
-      let phone = currentPhone(phoneId);
-      if (phone.verification.status !== 'verified') {
-        if (!code) {
-          await phone.prepareVerification();
-          return { status: 'needsVerification', phone: summarizePhone(phone) };
-        }
-        await phone.attemptVerification({ code });
-        phone = currentPhone(phoneId);
+      if (existing) {
+        return enrollSms(existing.id);
       }
-      if (phone.reservedForSecondFactor || !configuredFactors(environment).includes('phone_code')) {
-        throw phoneUnavailable();
-      }
-      const result = await calls.reservePhone(phone);
-      await refresh().catch(() => undefined);
-      return { status: 'complete', backupCodes: result.backupCodes ?? [] };
+      return { status: 'needsVerification', phone: summarizePhone(await calls.createPhone(current, phoneNumber)) };
     },
+    enrollSms,
     resendSms: async phoneId => {
       await currentPhone(phoneId).prepareVerification();
     },
@@ -160,8 +167,7 @@ function createSmsActions(
       if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
         throw phoneUnavailable();
       }
-      await calls.makeDefault(phone);
-      await refresh().catch(() => undefined);
+      await calls.makeDefault(requireIdentity(clerk, userId, sessionId), phone);
     },
   };
 }
@@ -185,7 +191,7 @@ async function removeMfaMethod(
     requireRemovable(current, environment);
     await phone.setReservedForSecondFactor({ reserved: false });
   }
-  await current.reload().catch(() => undefined);
+  await reloadUser(current);
 }
 
 export function useUserProfileMfaModel(): UserProfileMfaModel {
@@ -194,17 +200,30 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const { isLoaded: sessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
   const [removeMethod, removeReverification] = useReverificationFlow(removeMfaMethod);
-  const [makeDefault, setDefaultReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
-    phone.makeDefaultSecondFactor(),
+  const [makeDefault, setDefaultReverification] = useReverificationFlow(
+    async (current: UserResource, phone: PhoneNumberResource) => {
+      await phone.makeDefaultSecondFactor();
+      await reloadUser(current);
+    },
   );
-  const [createBackupCode, backupCodesReverification] = useReverificationFlow((current: UserResource) =>
-    current.createBackupCode(),
+  const [createBackupCode, backupCodesReverification] = useReverificationFlow(async (current: UserResource) => {
+    const result = await current.createBackupCode();
+    await reloadUser(current);
+    return result;
+  });
+  const [createPhone, createPhoneReverification] = useReverificationFlow(
+    async (current: UserResource, phoneNumber: string) => {
+      const phone = await current.createPhoneNumber({ phoneNumber });
+      await phone.prepareVerification();
+      return phone;
+    },
   );
-  const [createPhone, createPhoneReverification] = useReverificationFlow((current: UserResource, phoneNumber: string) =>
-    current.createPhoneNumber({ phoneNumber }),
-  );
-  const [reservePhone, enrollSmsReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
-    phone.setReservedForSecondFactor({ reserved: true }),
+  const [reservePhone, enrollSmsReverification] = useReverificationFlow(
+    async (current: UserResource, phone: PhoneNumberResource) => {
+      const result = await phone.setReservedForSecondFactor({ reserved: true });
+      await reloadUser(current);
+      return result;
+    },
   );
   const [createTotp, authenticatorReverification] = useReverificationFlow((current: UserResource) =>
     current.createTOTP(),
@@ -229,13 +248,9 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const sessionId = session.id;
   const { methods, addableMethods, phones } = describeMfa(user, environment);
   const usableCount = usableFactorCount(user, secondFactors);
-  const refresh = async () => {
-    const current = requireIdentity(clerk, userId, sessionId);
-    await current.reload();
-  };
 
   const smsActions = smsEnabled
-    ? createSmsActions(clerk, environment, userId, sessionId, refresh, { makeDefault, createPhone, reservePhone })
+    ? createSmsActions(clerk, environment, userId, sessionId, { makeDefault, createPhone, reservePhone })
     : {};
 
   return {
@@ -260,10 +275,10 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
       : undefined,
     verifyAuthenticator: totpEnabled
       ? async (code): Promise<MfaEnrollmentResult> => {
-          const result = await requireIdentity(clerk, userId, sessionId).verifyTOTP({ code });
-          const backupCodes = result.backupCodes ?? [];
-          await refresh().catch(() => undefined);
-          return { backupCodes };
+          const current = requireIdentity(clerk, userId, sessionId);
+          const result = await current.verifyTOTP({ code });
+          await reloadUser(current);
+          return { backupCodes: result.backupCodes ?? [] };
         }
       : undefined,
     generateBackupCodes:
@@ -275,7 +290,6 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
               throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
             }
             const result = await createBackupCode(current);
-            await refresh().catch(() => undefined);
             return result.codes;
           }
         : undefined,

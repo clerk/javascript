@@ -16,11 +16,6 @@ export interface APIKey {
   lastUsedAtLabel: string | null;
 }
 
-export interface APIKeysTableSort {
-  column: 'name' | 'createdAt' | 'lastUsed';
-  direction: 'ascending' | 'descending';
-}
-
 export type APIKeysTableSubjectKind = 'user' | 'organization';
 
 type Strings<T> = { readonly [K in keyof T]: T[K] extends string ? string : Strings<T[K]> };
@@ -50,6 +45,4 @@ export interface APIKeysTableViewProps {
   revoke?: ConfirmController<APIKey>;
   finalFocus?: DialogFocusTarget;
   onBulkAction?: (ids: string[]) => void;
-  sort?: APIKeysTableSort | null;
-  onSortChange?: (sort: APIKeysTableSort | null) => void;
 }

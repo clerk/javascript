@@ -221,7 +221,16 @@ describe('User profile MFA', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    const held = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      expect(screen.getByRole('combobox', { name: /Phone number/ })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Verification code' })).toBeNull();
+    } finally {
+      held.release();
+    }
     expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
     expect(fapi.mfa.phoneUpdates).toEqual([]);
@@ -311,7 +320,7 @@ describe('User profile MFA', () => {
       for (let second = 0; second < 30; second++) {
         await act(async () => vi.advanceTimersByTimeAsync(1000));
       }
-      await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 2000 });
+      await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled());
       await user.click(screen.getByRole('button', { name: /Resend/ }));
       await waitFor(() => expect(held.requests).toHaveLength(1));
       expect(code).toHaveAttribute('aria-disabled', 'true');
