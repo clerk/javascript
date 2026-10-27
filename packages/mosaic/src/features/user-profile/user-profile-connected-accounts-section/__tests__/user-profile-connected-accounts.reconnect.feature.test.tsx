@@ -72,6 +72,26 @@ describe('connected accounts', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
   });
 
+  it('holds the menu open with a spinner on Reconnect until the provider redirect', async () => {
+    serveFapi(signedIn([disconnectedGoogle]));
+    const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+    const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
+    const request = holdRequests('post', '/v1/me/external_accounts');
+    const user = userEvent.setup();
+
+    try {
+      await startReconnect(user, 'Google');
+      await waitFor(() => expect(request.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toHaveAttribute('aria-busy', 'true');
+      expect(await screen.findByRole('progressbar', { name: 'Reconnect' })).toBeVisible();
+    } finally {
+      request.release();
+    }
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
+  });
+
   it('reports an unavailable recovery when the account changes during redirect preparation', async () => {
     serveFapi(signedIn([disconnectedGoogle]));
     const redirect = deferred<string>();
@@ -284,6 +304,25 @@ describe('reconnect reverification', () => {
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('holds the Reconnect menu item until session verification opens', async () => {
+    await renderDisconnectedNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    try {
+      await startReconnect(user, 'Google');
+      await waitFor(() => expect(start.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByText('Enter your current password to continue')).toBeNull();
+    } finally {
+      start.release();
+    }
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
   });
 
   it('lets the user cancel verification quietly and retry the reconnect', async () => {

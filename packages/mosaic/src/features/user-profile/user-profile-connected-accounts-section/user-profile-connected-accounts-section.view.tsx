@@ -53,6 +53,7 @@ export function UserProfileConnectedAccountsSectionView({
                   account={account}
                   triggerRef={registerTrigger(account.id)}
                   isDisabled={isBusy}
+                  isReconnecting={pendingId === account.id && !reconnectReverification?.visible}
                   onReconnect={onReconnect}
                   onRemove={remove ? account => remove.open(account) : undefined}
                 />

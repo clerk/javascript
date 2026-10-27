@@ -80,21 +80,28 @@ export function UserProfileConnectedAccountRowView({
   account,
   triggerRef,
   isDisabled = false,
+  isReconnecting = false,
   onReconnect,
   onRemove,
 }: {
   account: UserProfileConnectedAccount;
   triggerRef?: Ref<HTMLButtonElement>;
   isDisabled?: boolean;
+  isReconnecting?: boolean;
   onReconnect?: (id: string) => void;
   onRemove?: (account: UserProfileConnectedAccount) => void;
 }) {
   const m = useMessages('userProfileConnectedAccounts');
   const actions: ActionMenuAction[] = [];
-  if ((account.status === 'reconnect' || account.status === 'error') && onReconnect && !isDisabled) {
+  if (
+    (account.status === 'reconnect' || account.status === 'error') &&
+    onReconnect &&
+    (!isDisabled || isReconnecting)
+  ) {
     actions.push({
       label: account.status === 'reconnect' ? m.reconnect : m.tryAgain,
       onClick: () => onReconnect(account.id),
+      pending: isReconnecting,
     });
   }
   if (onRemove) {
