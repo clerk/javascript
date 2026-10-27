@@ -1027,6 +1027,41 @@ describe('Web3 wallets', () => {
     },
   );
 
+  it('lists the Solana wallets installed when the picker is reopened', async () => {
+    const solanaWallet = (name: string) => ({
+      version: '1.0.0' as const,
+      name,
+      icon: 'data:image/svg+xml;base64,' as const,
+      chains: ['solana:mainnet' as const],
+      accounts: [],
+      features: {
+        'standard:connect': { version: '1.0.0' as const, connect: () => Promise.resolve({ accounts: [] }) },
+        'solana:signMessage': { version: '1.0.0' as const, signMessage: () => Promise.resolve([]) },
+      },
+    });
+    const unregisterPhantom = registerWallets(solanaWallet('Phantom'));
+    let unregisterBackpack = () => {};
+    try {
+      await renderWeb3();
+      const user = userEvent.setup();
+
+      await user.click(await screen.findByRole('button', { name: 'Connect Solana' }));
+      expect(await screen.findByRole('button', { name: 'Phantom' })).toBeVisible();
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+      unregisterPhantom();
+      unregisterBackpack = registerWallets(solanaWallet('Backpack'));
+      await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+
+      expect(await screen.findByRole('button', { name: 'Backpack' })).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Phantom' })).toBeNull();
+    } finally {
+      unregisterPhantom();
+      unregisterBackpack();
+    }
+  });
+
   // TODO: Share Solana discovery and filtering only after verifying parity with the legacy UI.
   // TODO: Share identification sorting only after verifying parity for legacy email, phone, and wallet sections.
   // TODO: Add recovery for abandoned MetaMask connections. In Brave, closing the locked wallet prompt

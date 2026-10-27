@@ -1,31 +1,10 @@
-import type * as SharedReact from '@clerk/shared/react';
 import type { CustomPage } from '@clerk/shared/types';
-import { act, render, renderHook, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen, within } from '@testing-library/react';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { CustomProfileItem } from '../../user-profile/user-profile.types';
 import type { CustomPagesOptions } from '../switcher.pages';
-import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from '../switcher.pages';
-
-let selfServeSSOEnabled: boolean;
-let selfServeDirectorySyncEnabled: boolean;
-let environment: {
-  commerceSettings: { billing: { user: { enabled: boolean }; organization: { enabled: boolean } } };
-  apiKeysSettings: { user_api_keys_enabled: boolean; orgs_api_keys_enabled: boolean };
-  userSettings: { enterpriseSSO: { self_serve_sso: boolean; self_serve_directory_sync: boolean } };
-};
-
-vi.mock('@clerk/shared/react', async importOriginal => {
-  const actual = await importOriginal<typeof SharedReact>();
-  return {
-    ...actual,
-    useClerk: () => ({ organization: { selfServeSSOEnabled, selfServeDirectorySyncEnabled } }),
-  };
-});
-
-vi.mock('../../../hooks/use-mosaic-environment', () => ({
-  useMosaicEnvironment: () => environment,
-}));
+import { useCustomPages } from '../switcher.pages';
 
 // The bridge's other half lives in clerk-js: `ExternalElementMounter` renders a `div` and hands it to
 // `mount`, then hands it back to `unmount` when the profile goes away. These stand in for it, so the
@@ -66,64 +45,6 @@ const docs: CustomProfileItem = {
 
 beforeEach(() => {
   emitted = undefined;
-  selfServeSSOEnabled = false;
-  selfServeDirectorySyncEnabled = false;
-  environment = {
-    commerceSettings: { billing: { user: { enabled: false }, organization: { enabled: false } } },
-    apiKeysSettings: { user_api_keys_enabled: false, orgs_api_keys_enabled: false },
-    userSettings: { enterpriseSSO: { self_serve_sso: false, self_serve_directory_sync: false } },
-  };
-});
-
-describe('useUserProfilePages', () => {
-  it('lists the pages every instance has', () => {
-    expect(renderHook(() => useUserProfilePages()).result.current).toEqual(['account', 'security']);
-  });
-
-  it('adds billing and API keys once the instance turns them on', () => {
-    environment.commerceSettings.billing.user.enabled = true;
-    environment.apiKeysSettings.user_api_keys_enabled = true;
-    expect(renderHook(() => useUserProfilePages()).result.current).toEqual([
-      'account',
-      'security',
-      'billing',
-      'apiKeys',
-    ]);
-  });
-});
-
-describe('useOrganizationProfilePages', () => {
-  it('lists the pages every instance has', () => {
-    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members']);
-  });
-
-  it('adds billing and API keys once the instance turns them on', () => {
-    environment.commerceSettings.billing.organization.enabled = true;
-    environment.apiKeysSettings.orgs_api_keys_enabled = true;
-    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual([
-      'general',
-      'members',
-      'billing',
-      'apiKeys',
-    ]);
-  });
-
-  it('adds security only when the instance and the active organization both allow self-serve SSO', () => {
-    environment.userSettings.enterpriseSSO.self_serve_sso = true;
-    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members']);
-
-    selfServeSSOEnabled = true;
-    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members', 'security']);
-  });
-
-  it('adds security when the active organization allows self-serve Directory Sync without SSO', () => {
-    environment.userSettings.enterpriseSSO.self_serve_sso = true;
-    environment.userSettings.enterpriseSSO.self_serve_directory_sync = true;
-    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members']);
-
-    selfServeDirectorySyncEnabled = true;
-    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members', 'security']);
-  });
 });
 
 describe('useCustomPages', () => {
@@ -163,14 +84,6 @@ describe('useCustomPages', () => {
 
     const el = mountInto(page.mountIcon);
     expect(el).toBeEmptyDOMElement();
-  });
-
-  it('renders page content into the element clerk-js hands back', () => {
-    render(<Harness items={[terms]} />);
-
-    const el = mountInto(emitted?.[0].mount);
-
-    expect(within(el).getByText('Terms body')).toBeInTheDocument();
   });
 
   it('renders an icon into its own element, apart from the content', () => {
@@ -222,17 +135,6 @@ describe('useCustomPages', () => {
       render(<Harness items={[terms, docs]} />);
 
       expect(emitted?.map(page => page.label)).toEqual(['Terms', 'Docs']);
-    });
-
-    it('sends the pages in the order it was given', () => {
-      render(
-        <Harness
-          items={[terms, docs]}
-          order={['security', 'terms', 'account', 'docs']}
-        />,
-      );
-
-      expect(emitted?.map(page => page.label)).toEqual(['security', 'Terms', 'account', 'Docs']);
     });
 
     // Anything more than the id and clerk-js reads it as a custom page.

@@ -602,6 +602,18 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const user = updateActiveUser(state, user => patchUser(user, body));
       return user ? envelope(user, state.client) : missing();
     }),
+    http.post(fapiUrl('/v1/me'), ({ request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const sessions = state.client.sessions.filter(session => session.user.id !== user.id);
+      state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
+      return envelope({ object: 'user', id: user.id, deleted: true }, state.client);
+    }),
     http.post(fapiUrl('/v1/me/profile_image'), async ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') === 'DELETE') {
         const user = updateActiveUser(state, user => ({ ...user, image_url: '', has_image: false }));
