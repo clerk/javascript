@@ -283,6 +283,45 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+      - name: Generate Expo release payload
+        id: expo-release
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          payload="$(jq -c --arg repo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" '
+            first(.[] | select(.name == "@clerk/expo"))
+            | "Clerk Expo SDK \(.version) has been released" as $title
+            | "\(.name)@\(.version)" as $tag
+            | {
+                text: $title,
+                blocks: [
+                  { type: "section", text: { type: "mrkdwn", text: "*\($title)*" } },
+                  { type: "context", elements: [ { type: "mrkdwn", text: "<\($repo)/releases/tag/\($tag | @uri | gsub("%2F"; "/"))|View the GitHub release>" } ] }
+                ]
+              }
+          ' <<<"$PUBLISHED_PACKAGES")"
+          if [ -z "$payload" ]; then
+            echo "@clerk/expo was not published in this release."
+            exit 0
+          fi
+          echo "$payload"
+          {
+            echo 'payload<<__NOTIFY_EOF__'
+            echo "$payload"
+            echo '__NOTIFY_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send Expo release to Slack
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' && steps.expo-release.outputs.payload != '' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v1.27.1
+        with:
+          payload: ${{ steps.expo-release.outputs.payload }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
       - name: Notify Slack on failure
         if: ${{ always() && steps.changesets.outcome == 'failure' }}
         uses: slackapi/slack-github-action@v1.27.1
