@@ -14,6 +14,10 @@ export default [
     files: ['packages/mosaic/src/**/*.{ts,tsx}'],
     ignores: testFiles,
     plugins: { 'code-quality': codeQuality },
-    rules: { 'code-quality/no-accumulator-copy': 'warn', 'code-quality/no-chained-type-assertions': 'warn' },
+    rules: {
+      'code-quality/no-accumulator-copy': 'warn',
+      'code-quality/no-chained-type-assertions': 'warn',
+      'code-quality/no-widen-then-assert': 'warn',
+    },
   },
 ];
