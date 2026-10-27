@@ -1,0 +1,79 @@
+import type { OAuthConsentScope } from '@clerk/shared/types';
+
+import type { SelectItem } from '../../components/select';
+import type { ErrorDescription, MosaicMessages } from '../../localization';
+
+export type OAuthConsentMessages = MosaicMessages['oauthConsent'];
+
+export type OAuthConsentScopeRecord = Pick<OAuthConsentScope, 'scope' | 'description'>;
+
+export interface OAuthConsentKnownData {
+  applicationName: string;
+  identifier: string;
+  redirectUrl: string;
+  redirectDomain: string;
+  actionUrl: string;
+  forwardedParams: [string, string][];
+  renderBranding: boolean;
+  organizations: SelectItem[];
+  defaultOrganizationId: string | null;
+}
+
+export interface OAuthConsentData extends OAuthConsentKnownData {
+  oauthApplicationName: string;
+  scopes: OAuthConsentScopeRecord[];
+  hasOfflineAccess: boolean;
+}
+
+export type OAuthConsentReadyModel = OAuthConsentData & { status: 'ready' };
+
+export type OAuthConsentModel =
+  | { status: 'loading'; known?: OAuthConsentKnownData }
+  | { status: 'hidden' }
+  | { status: 'error'; error: ErrorDescription }
+  | OAuthConsentReadyModel;
+
+export interface OAuthConsentScopeItem {
+  scope: string;
+  label: string;
+  description?: string;
+  required?: boolean;
+}
+
+export interface OAuthConsentScopeSelection {
+  checked: readonly string[];
+  onCheckedChange: (scope: string, checked: boolean) => void;
+}
+
+export type OAuthConsentOrganizationAccess = 'all' | 'selected';
+
+export interface OAuthConsentOrganizationSelection {
+  access: OAuthConsentOrganizationAccess;
+  onAccessChange: (access: OAuthConsentOrganizationAccess) => void;
+  selected: readonly string[];
+  onSelectedChange: (organizationIds: string[]) => void;
+}
+
+export interface OAuthConsentViewProps {
+  messages: OAuthConsentMessages;
+  oauthApplicationName: string;
+  identifier: string;
+  applicationName: string;
+  scopes: OAuthConsentScopeItem[];
+  scopeSelection?: OAuthConsentScopeSelection;
+  hasOfflineAccess: boolean;
+  organizations: SelectItem[];
+  organizationId: string | null;
+  onOrganizationChange: (organizationId: string) => void;
+  organizationSelection?: OAuthConsentOrganizationSelection;
+  redirectUrl: string;
+  redirectDomain: string;
+  isRedirectUrlOpen: boolean;
+  onRedirectUrlOpenChange: (open: boolean) => void;
+  pendingAction?: 'allow' | 'deny';
+  onAllow: () => void;
+  onDeny: () => void;
+  actionUrl: string;
+  forwardedParams: [string, string][];
+  skeleton?: 'clerk' | 'consent';
+}

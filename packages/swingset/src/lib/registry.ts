@@ -151,6 +151,14 @@ import {
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
+  Default as OAuthConsentDefault,
+  ManyScopes as OAuthConsentManyScopes,
+  meta as oauthConsentMeta,
+  MultipleOrganizations as OAuthConsentMultipleOrganizations,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
+import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
   Overlay as OrganizationProfileOverlay,
@@ -976,6 +984,15 @@ const apiKeysTableModule: StoryModule = {
   Empty: APIKeysTableEmpty,
 };
 
+const oauthConsentModule: StoryModule = {
+  meta: oauthConsentMeta,
+  Default: OAuthConsentDefault,
+  ScopeList: OAuthConsentScopeList,
+  ManyScopes: OAuthConsentManyScopes,
+  MultipleOrganizations: OAuthConsentMultipleOrganizations,
+  OfflineAccess: OAuthConsentOfflineAccess,
+};
+
 const reverificationModule: StoryModule = {
   meta: reverificationMeta,
   Default: ReverificationDefault,
@@ -1047,6 +1064,7 @@ export const registry: StoryModule[] = [
   // Misc
   organizationSwitcherModule,
   apiKeysTableModule,
+  oauthConsentModule,
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,

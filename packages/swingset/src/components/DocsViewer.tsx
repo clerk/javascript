@@ -54,6 +54,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   misc: {
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
+    'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
   blocks: {
