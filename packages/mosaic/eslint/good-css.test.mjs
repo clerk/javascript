@@ -2,7 +2,7 @@ import { RuleTester } from 'eslint';
 import tseslint from 'typescript-eslint';
 import { describe, test } from 'vitest';
 
-import { explicitTransitionProperties, preserveFocusOutline, reducedMotion } from './good-css.mjs';
+import { explicitTransitionProperties, logicalSpacing, preserveFocusOutline, reducedMotion } from './good-css.mjs';
 
 RuleTester.describe = describe;
 
@@ -143,5 +143,17 @@ tester.run('preserve-focus-outline', preserveFocusOutline, {
       code: `${stylex}sx.create({ a: { ':focus-visible': { outline: 'none', outlineWidth: 0, outlineStyle: 'solid' } } });`,
       errors: 1,
     },
+  ],
+});
+
+tester.run('logical-spacing', logicalSpacing, {
+  valid: [
+    `${stylex}sx.create({ a: { paddingBlockStart: 4 } });`,
+    'const obj = { marginTop: 4 };',
+    `${stylex}sx.create({ a: { transition: { marginTop: 4 } } });`,
+  ],
+  invalid: [
+    { code: `${stylex}sx.create({ a: { marginTop: 4, paddingBottom: 8 } });`, errors: 2 },
+    { code: `${stylex}sx.create({ a: { marginBottom: { default: 4, ':hover': 8 } } });`, errors: 1 },
   ],
 });

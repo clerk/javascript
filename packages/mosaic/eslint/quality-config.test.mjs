@@ -38,7 +38,12 @@ describe('ported lint policy', () => {
     const styles = await eslint.calculateConfigForFile('packages/mosaic/src/components/button/button.styles.ts');
     const component = await eslint.calculateConfigForFile('packages/mosaic/src/components/button/button.tsx');
 
-    for (const rule of ['explicit-transition-properties', 'reduced-motion', 'preserve-focus-outline']) {
+    for (const rule of [
+      'explicit-transition-properties',
+      'reduced-motion',
+      'preserve-focus-outline',
+      'logical-spacing',
+    ]) {
       expect(styles.rules[`good-css/${rule}`]?.[0]).toBeGreaterThan(0);
       expect(component.rules[`good-css/${rule}`]).toBeUndefined();
     }

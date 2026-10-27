@@ -60,8 +60,8 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
-    paddingBottom: space['3'],
-    paddingTop: space['2.5'],
+    paddingBlockEnd: space['3'],
+    paddingBlockStart: space['2.5'],
   },
   anchor: {
     // eslint-disable-next-line @stylexjs/valid-styles -- `anchor-name`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.

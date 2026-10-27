@@ -108,6 +108,6 @@ export const sizes = stylex.create({
 });
 
 export const firstLine = stylex.create({
-  sm: { marginTop: `max(0px, calc((1lh - ${space['3.5']}) / 2))` },
-  md: { marginTop: `max(0px, calc((1lh - ${space['4.5']}) / 2))` },
+  sm: { marginBlockStart: `max(0px, calc((1lh - ${space['3.5']}) / 2))` },
+  md: { marginBlockStart: `max(0px, calc((1lh - ${space['4.5']}) / 2))` },
 });

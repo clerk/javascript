@@ -9,6 +9,7 @@ export const feedbackStyles = stylex.create({
     overflow: 'clip',
     alignContent: 'end',
     display: 'grid',
+    marginBlockStart: `calc(-1 * ${GAP})`,
     maskImage: `linear-gradient(to bottom, transparent, black ${GAP})`,
     position: 'relative',
     transitionDuration: durationVars['--cl-duration-slow'],
@@ -24,13 +25,13 @@ export const feedbackStyles = stylex.create({
       default: `calc(var(--_cl-feedback-height) + ${GAP})`,
       ':where(:not([data-open]), [data-starting-style])': 0,
     },
-    marginTop: `calc(-1 * ${GAP})`,
   },
   message: {
     inset: { default: null, ':where([data-ending-style])': 'auto 0 0' },
     gap: space['1'],
     alignItems: 'flex-start',
     display: 'flex',
+    marginBlockStart: GAP,
     opacity: { default: 1, ':where([data-starting-style], [data-ending-style])': 0 },
     // Leaves the flow while it exits so the message arriving behind it takes the row.
     position: { default: null, ':where([data-ending-style])': 'absolute' },
@@ -46,7 +47,6 @@ export const feedbackStyles = stylex.create({
       default: easingVars['--cl-ease-enter'],
       ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
-    marginTop: GAP,
   },
   icon: {
     flexShrink: 0,

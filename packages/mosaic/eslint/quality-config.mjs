@@ -35,6 +35,7 @@ export default [
       'good-css/explicit-transition-properties': 'error',
       'good-css/reduced-motion': 'error',
       'good-css/preserve-focus-outline': 'error',
+      'good-css/logical-spacing': 'warn',
     },
   },
 ];
