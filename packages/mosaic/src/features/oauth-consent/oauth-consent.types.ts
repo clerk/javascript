@@ -75,5 +75,4 @@ export interface OAuthConsentViewProps {
   onDeny: () => void;
   actionUrl: string;
   forwardedParams: [string, string][];
-  skeleton?: 'clerk' | 'consent';
 }
