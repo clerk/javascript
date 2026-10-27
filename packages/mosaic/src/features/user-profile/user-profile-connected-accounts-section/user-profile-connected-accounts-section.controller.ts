@@ -23,6 +23,7 @@ export interface UserProfileConnectedAccountsControllerOptions {
   onRemove?: (id: string) => void | Promise<void>;
   removeReverification: ReverificationController;
   reconnectReverification: ReverificationController;
+  connectReverification: ReverificationController;
 }
 
 export interface UserProfileConnectedAccountsController {
@@ -37,6 +38,8 @@ export interface UserProfileConnectedAccountsController {
   finalFocus: DialogFocusTarget;
   reconnectReverification: ReverificationController;
   reconnectFinalFocus: DialogFocusTarget;
+  connectReverification: ReverificationController;
+  connectFinalFocus: DialogFocusTarget;
 }
 
 const OAUTH_REDIRECT_HOLD_MS = 2000;
@@ -49,6 +52,7 @@ export function useUserProfileConnectedAccountsController({
   onRemove,
   removeReverification,
   reconnectReverification,
+  connectReverification,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
   const actions = usePendingAction({ errorFallback: messages.errors.generic });
@@ -90,5 +94,7 @@ export function useUserProfileConnectedAccountsController({
     finalFocus: removalFocus.finalFocus,
     reconnectReverification,
     reconnectFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
+    connectReverification,
+    connectFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
   };
 }

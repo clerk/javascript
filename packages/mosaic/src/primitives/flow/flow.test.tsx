@@ -224,9 +224,7 @@ describe('Flow', () => {
   });
 
   it('publishes the entering step height without enabling initial animation', () => {
-    const offsetHeight = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (
-      this: HTMLElement,
-    ) {
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
       return this.dataset.testid === 'password-step' ? 120 : 240;
     });
     const { rerender } = render(<TestFlow value='password' />);
@@ -250,7 +248,6 @@ describe('Flow', () => {
     rerender(<TestFlow value='password' />);
 
     expect(root).toHaveAttribute('data-height-change', 'shrink');
-    offsetHeight.mockRestore();
   });
   describe('data-transitioning', () => {
     function deferred() {
@@ -351,7 +348,6 @@ describe('Flow', () => {
 
       expect(screen.getByTestId('otp-input')).toHaveFocus();
       expect(focus).toHaveBeenCalledWith({ preventScroll: true });
-      focus.mockRestore();
     });
 
     it('leaves focus alone when it is outside the flow', () => {
@@ -449,6 +445,68 @@ describe('Flow', () => {
 
       expect(screen.queryByTestId('first')).not.toBeInTheDocument();
       expect(screen.getByTestId('second')).toHaveFocus();
+    });
+
+    it('focuses a marked element in a nested flow when the step holding it enters', () => {
+      const outer = (value: string) => (
+        <Flow.Root value={value}>
+          <Flow.Step ids={['form']}>
+            <AutoFocusInput data-testid='form-input' />
+          </Flow.Step>
+          <Flow.Step ids={['reverify']}>
+            <Flow.Root value='password'>
+              <Flow.Step ids={['password']}>
+                <AutoFocusInput data-testid='nested-input' />
+              </Flow.Step>
+            </Flow.Root>
+          </Flow.Step>
+        </Flow.Root>
+      );
+      const { rerender } = render(outer('form'));
+      screen.getByTestId('form-input').focus();
+
+      rerender(outer('reverify'));
+
+      expect(screen.getByTestId('nested-input')).toHaveFocus();
+    });
+
+    it('focuses the active nested step when the outer step re-enters while another nested step leaves', () => {
+      const outer = (value: string, nested: string) => (
+        <Flow.Root value={value}>
+          <Flow.Step ids={['form']}>
+            <AutoFocusInput data-testid='form-input' />
+          </Flow.Step>
+          <Flow.Step
+            ids={['reverify']}
+            data-testid='reverify-step'
+          >
+            <Flow.Root value={nested}>
+              <Flow.Step
+                ids={['password']}
+                data-testid='password-step'
+              >
+                <AutoFocusInput data-testid='password-input' />
+              </Flow.Step>
+              <Flow.Step ids={['code']}>
+                <AutoFocusInput data-testid='code-input' />
+              </Flow.Step>
+            </Flow.Root>
+          </Flow.Step>
+        </Flow.Root>
+      );
+      const pending = () => [{ finished: new Promise(() => {}) }] as unknown as Animation[];
+      const { rerender } = render(outer('reverify', 'password'));
+      screen.getByTestId('password-input').focus();
+      screen.getByTestId('reverify-step').getAnimations = vi.fn(pending);
+      rerender(outer('form', 'password'));
+      screen.getByTestId('form-input').focus();
+      const leavingStep = screen.getByTestId('password-step');
+      leavingStep.getAnimations = vi.fn(pending);
+
+      rerender(outer('reverify', 'code'));
+
+      expect(leavingStep).toHaveAttribute('data-ending-style');
+      expect(screen.getByTestId('code-input')).toHaveFocus();
     });
 
     it('ignores a marked element portaled outside the root', () => {

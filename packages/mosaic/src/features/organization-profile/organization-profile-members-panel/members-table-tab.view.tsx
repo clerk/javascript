@@ -12,10 +12,11 @@ import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
 import { Pagination } from '../../../components/pagination';
 import { Select } from '../../../components/select';
-import { Spinner } from '../../../components/spinner';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
-import { useServerDataTable } from '../../../hooks/use-server-data-table';
+import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
+import { Plus } from '../../../icons/glyphs/plus';
+import { Users } from '../../../icons/glyphs/users';
 import { fill, useMessages } from '../../../localization';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { styles } from './members-table-tab.styles';
@@ -43,7 +44,6 @@ export function MembersTableTabView({
   onSearchChange,
   onPageChange,
   onBulkAction,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
@@ -52,39 +52,19 @@ export function MembersTableTabView({
   roleError,
 }: MembersTableTabViewProps) {
   const m = useMessages('membersTableTab');
-  const { table, pagination } = useServerDataTable({
-    data: members,
-    totalCount,
-    getRowId,
-    isRowSelectable: canManageMember,
-    sortableColumns: [],
-    page,
-    pageSize,
-    onPageChange,
-    searchValue,
-    onSearchChange,
-  });
-  const columnCount = 3 + Number(Boolean(remove)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
-  const removeAndClearSelection = remove
-    ? {
-        ...remove,
-        confirm: (member: OrganizationProfileMember) => {
-          table.setRowSelection({});
-          remove.confirm(member);
-        },
-      }
-    : undefined;
+  const showPagination = Math.ceil(totalCount / pageSize) > 1;
   return (
     <>
       <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(tableTabStyles.root))}>
+        {isError ? null : <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>}
         <Table.Toolbar>
           <Table.Search
             ref={searchInputRef}
             label={m.search}
             clearLabel={m.clearSearch}
-            value={table.globalFilter}
-            onValueChange={table.setGlobalFilter}
+            value={searchValue}
+            onValueChange={onSearchChange}
           />
           {onInvite ? (
             <Button
@@ -93,7 +73,7 @@ export function MembersTableTabView({
               focusableWhenDisabled
               onClick={onInvite}
             >
-              <Icon name='plus' />
+              <Icon glyph={Plus} />
               {m.invite}
             </Button>
           ) : null}
@@ -103,34 +83,29 @@ export function MembersTableTabView({
           roleError={roleError}
         />
         <Table.Root
+          layout='fixed'
+          minWidth='37rem'
           aria-label={m.title}
-          aria-busy={isLoading || isFetching}
+          aria-busy={isFetching}
+          selectionMode={onBulkAction ? 'multiple' : 'none'}
         >
           <Table.Header>
-            <Table.Row>
-              {onBulkAction ? (
-                <Table.SelectAllCell
-                  aria-label={m.selectAll}
-                  checked={table.getIsAllRowsSelected()}
-                  indeterminate={table.getIsSomeRowsSelected()}
-                  onChange={table.toggleAllRowsSelected}
-                />
-              ) : null}
-              <Table.HeaderCell>{m.name}</Table.HeaderCell>
-              <Table.HeaderCell>{m.joinedAt}</Table.HeaderCell>
-              <Table.HeaderCell>{m.role}</Table.HeaderCell>
-              {remove ? (
-                <Table.HeaderCell align='end'>
-                  <VisuallyHidden>{m.actions}</VisuallyHidden>
-                </Table.HeaderCell>
-              ) : null}
-            </Table.Row>
+            {onBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+            <Table.Column>{m.name}</Table.Column>
+            <Table.Column width='9rem'>{m.joinedAt}</Table.Column>
+            <Table.Column width='10rem'>{m.role}</Table.Column>
+            {remove ? (
+              <Table.Column
+                align='end'
+                width='4rem'
+              >
+                <VisuallyHidden>{m.actions}</VisuallyHidden>
+              </Table.Column>
+            ) : null}
           </Table.Header>
           <MembersTableBody
-            rows={table.rows}
-            columnCount={columnCount}
+            members={isError ? [] : members}
             query={query}
-            isLoading={isLoading}
             isError={isError}
             onRetry={onRetry}
             roles={roles}
@@ -141,9 +116,13 @@ export function MembersTableTabView({
             registerTrigger={registerTrigger}
           />
         </Table.Root>
-        {pagination ? (
+        {showPagination ? (
           <Pagination
-            {...pagination}
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalCount}
+            disabled={isFetching}
+            onChange={onPageChange}
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
@@ -151,9 +130,9 @@ export function MembersTableTabView({
           />
         ) : null}
       </div>
-      {removeAndClearSelection ? (
+      {remove ? (
         <Confirmation
-          controller={removeAndClearSelection}
+          controller={remove}
           title={member => fill(m.removeTitle, { name: member.name })}
           description={m.removeDescription}
           actionLabel={m.remove}
@@ -193,10 +172,8 @@ function MembersTableNotices({
 }
 
 function MembersTableBody({
-  rows,
-  columnCount,
+  members,
   query,
-  isLoading,
   isError,
   onRetry,
   roles,
@@ -206,10 +183,8 @@ function MembersTableBody({
   onRemoveClick,
   registerTrigger,
 }: {
-  rows: Array<{ original: OrganizationProfileMember; getIsSelected: () => boolean; toggleSelected: () => void }>;
-  columnCount: number;
+  members: OrganizationProfileMember[];
   query: string;
-  isLoading: boolean;
   isError: boolean;
   onRetry?: () => void;
   roles: MembersTableTabViewProps['roles'];
@@ -220,24 +195,14 @@ function MembersTableBody({
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('membersTableTab');
-  if (isLoading) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
-          <span role='status'>
-            <Spinner />
-            <VisuallyHidden>{m.loading}</VisuallyHidden>
-          </span>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  if (isError) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
+  return (
+    <Table.Body
+      items={members}
+      itemToStringValue={getRowId}
+      renderEmptyState={() =>
+        isError ? (
           <EmptyState.Root role='alert'>
-            <EmptyState.Icon name='exclamation-circle' />
+            <EmptyState.Icon glyph={ExclamationCircle} />
             <EmptyState.Label>{m.loadError}</EmptyState.Label>
             {onRetry ? (
               <EmptyState.Actions>
@@ -245,40 +210,28 @@ function MembersTableBody({
               </EmptyState.Actions>
             ) : null}
           </EmptyState.Root>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  if (rows.length === 0) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
+        ) : (
           <EmptyState.Root role='status'>
-            <EmptyState.Icon name='users' />
+            <EmptyState.Icon glyph={Users} />
             <EmptyState.Label>{query ? m.empty : m.noMembers}</EmptyState.Label>
             <EmptyState.Description>
               {query ? fill(m.emptyDescription, { query }) : m.noMembersDescription}
             </EmptyState.Description>
           </EmptyState.Root>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  return (
-    <Table.Body>
-      {rows.map(row => (
+        )
+      }
+    >
+      {member => (
         <MemberRow
-          key={row.original.id}
-          member={row.original}
+          member={member}
           roles={roles}
-          selected={row.getIsSelected()}
-          onToggleSelected={hasBulkAction ? row.toggleSelected : undefined}
+          hasBulkAction={hasBulkAction}
           onChangeRole={onChangeRole}
           isChangingRole={isChangingRole}
-          onRemoveClick={onRemoveClick ? () => onRemoveClick(row.original) : undefined}
-          triggerRef={registerTrigger(row.original.id)}
+          onRemoveClick={onRemoveClick ? () => onRemoveClick(member) : undefined}
+          triggerRef={registerTrigger(member.id)}
         />
-      ))}
+      )}
     </Table.Body>
   );
 }
@@ -286,8 +239,7 @@ function MembersTableBody({
 function MemberRow({
   member,
   roles,
-  selected,
-  onToggleSelected,
+  hasBulkAction,
   onChangeRole,
   isChangingRole,
   onRemoveClick,
@@ -295,8 +247,7 @@ function MemberRow({
 }: {
   member: OrganizationProfileMember;
   roles: MembersTableTabViewProps['roles'];
-  selected: boolean;
-  onToggleSelected?: () => void;
+  hasBulkAction: boolean;
   onChangeRole?: MembersTableTabViewProps['onChangeRole'];
   isChangingRole: boolean;
   onRemoveClick?: () => void;
@@ -306,18 +257,10 @@ function MemberRow({
   const manageable = canManageMember(member);
   return (
     <Table.Row
-      selected={Boolean(onToggleSelected) && manageable && selected}
-      aria-disabled={member.isDeprovisioned || undefined}
+      disabled={!manageable}
       xstyle={member.isDeprovisioned && styles.deprovisionedRow}
     >
-      {onToggleSelected ? (
-        <Table.SelectCell
-          aria-label={fill(m.select, { name: member.name })}
-          checked={manageable && selected}
-          disabled={!manageable}
-          onToggleSelected={manageable ? onToggleSelected : undefined}
-        />
-      ) : null}
+      {hasBulkAction ? <Table.SelectionCell aria-label={fill(m.select, { name: member.name })} /> : null}
       <Table.Cell>
         <Entity.Root>
           <Entity.Media>

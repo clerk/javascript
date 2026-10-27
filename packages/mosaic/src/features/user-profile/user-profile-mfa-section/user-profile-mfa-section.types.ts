@@ -38,7 +38,7 @@ export type UserProfileMfaModel =
       methods: readonly UserProfileMfaMethod[];
       addableMethods: readonly UserProfileMfaAddableMethod[];
       phones: readonly MfaPhone[];
-      findOrCreatePhone?: (phoneNumber: string) => Promise<MfaPhone>;
+      enrollPhoneNumber?: (phoneNumber: string) => Promise<SmsEnrollmentResult>;
       enrollSms?: (phoneId: string, code?: string) => Promise<SmsEnrollmentResult>;
       resendSms?: (phoneId: string) => Promise<void>;
       createAuthenticator?: () => Promise<{ secret: string; uri: string }>;
@@ -49,4 +49,7 @@ export type UserProfileMfaModel =
       removeReverification: ReverificationController;
       setDefaultReverification: ReverificationController;
       backupCodesReverification: ReverificationController;
+      createPhoneReverification: ReverificationController;
+      enrollSmsReverification: ReverificationController;
+      authenticatorReverification: ReverificationController;
     };

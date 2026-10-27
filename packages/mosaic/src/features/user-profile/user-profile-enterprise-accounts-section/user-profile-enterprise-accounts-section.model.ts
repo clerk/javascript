@@ -1,18 +1,21 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@clerk/shared/react';
-import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { EnterpriseAccountResource, EnterpriseConnectionResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import { useUserProfileOptions } from '../user-profile.provider';
+import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
   UserProfileEnterpriseConnection,
 } from './user-profile-enterprise-accounts-section.types';
 
-type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpriseConnectionId'> & {
+type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpriseConnectionId' | 'provider'> & {
   verification?: { error?: { longMessage?: string | null } | null } | null;
   enterpriseConnection: {
     active: boolean;
@@ -21,7 +24,7 @@ type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpri
   } | null;
 };
 
-type Connection = Pick<EnterpriseConnectionResource, 'id' | 'name' | 'allowOrganizationAccountLinking'> & {
+type Connection = Pick<EnterpriseConnectionResource, 'id' | 'name' | 'provider' | 'allowOrganizationAccountLinking'> & {
   logoPublicUrl?: string | null;
 };
 
@@ -49,12 +52,18 @@ export function projectEnterpriseAccounts({
       id: account.id ?? '',
       name: account.enterpriseConnection?.name ?? '',
       iconUrl: account.enterpriseConnection?.logoPublicUrl ?? undefined,
+      monochromeIcon: isMonochromeProvider(account.provider.replace(/^(oauth_|saml_)/, '').trim()),
       emailAddress: account.emailAddress,
       requiresAction: Boolean(account.verification?.error?.longMessage),
     }));
   const linkableConnections = connections
     .filter(connection => connection.allowOrganizationAccountLinking && !linkedConnectionIds.has(connection.id))
-    .map(connection => ({ id: connection.id, name: connection.name, iconUrl: connection.logoPublicUrl ?? undefined }));
+    .map(connection => ({
+      id: connection.id,
+      name: connection.name,
+      iconUrl: connection.logoPublicUrl ?? undefined,
+      monochromeIcon: isMonochromeProvider(connection.provider.replace(/^(oauth_|saml_)/, '').trim()),
+    }));
 
   return visibleAccounts.length || linkableConnections.length
     ? { status: 'ready', accounts: visibleAccounts, connections: linkableConnections }
@@ -70,12 +79,17 @@ export type UserProfileEnterpriseAccountsModel =
       accounts: UserProfileEnterpriseAccount[];
       connections: UserProfileEnterpriseConnection[];
       connect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
+      connectReverification: ReverificationController;
     };
 
 export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAccountsModel {
   const { mode } = useUserProfileOptions();
   const clerk = useClerk();
   const router = useMosaicRouter();
+  const [createAccount, connectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const { data: connections = [] } = __internal_useUserEnterpriseConnections({
@@ -125,7 +139,7 @@ export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAc
       }
       const url = window.location.href;
       const redirectUrl = mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile' }) : url;
-      const account = await current.createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl });
+      const account = await createAccount(current, { enterpriseConnectionId: connectionId, redirectUrl });
       currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;
       if (!redirect) {
@@ -136,5 +150,6 @@ export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAc
       router.windowNavigate(redirect);
       return 'redirecting';
     },
+    connectReverification,
   };
 }

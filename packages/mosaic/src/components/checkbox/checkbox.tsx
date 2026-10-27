@@ -1,6 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import { Minus } from '../../icons/glyphs/minus';
 import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
@@ -93,7 +95,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         )}
       >
         <Icon
-          name='checkmark'
+          glyph={Checkmark}
           size='inherit'
         />
       </span>
@@ -105,7 +107,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         )}
       >
         <Icon
-          name='minus'
+          glyph={Minus}
           size='inherit'
         />
       </span>

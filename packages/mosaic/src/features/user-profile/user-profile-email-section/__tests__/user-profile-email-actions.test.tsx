@@ -26,6 +26,7 @@ function EmailSection({
   onSetPrimaryEmail = () => Promise.resolve(),
   removeReverification = idleReverification,
   setPrimaryReverification = idleReverification,
+  createReverification = idleReverification,
   ...rest
 }: EmailSectionProps) {
   const controller = useUserProfileEmailSectionController({
@@ -34,6 +35,7 @@ function EmailSection({
     onSetPrimaryEmail,
     removeReverification,
     setPrimaryReverification,
+    createReverification,
     ...rest,
   });
   return <UserProfileEmailSectionView {...controller} />;
@@ -122,7 +124,6 @@ describe('email actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
-    log.mockRestore();
   });
 
   it('keeps removal pending and lets the user retry a failure in the dialog', async () => {

@@ -91,6 +91,10 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
   const [setPrimaryEmail, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
     user.update({ primaryEmailAddressId: id }),
   );
+  const [createEmail, createReverification] = useReverificationFlow(
+    (currentUser: () => UserResource, emailAddress: string) =>
+      currentUser().createEmailAddress({ email: emailAddress }),
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -118,7 +122,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
     username: user.username ?? undefined,
     onCreateEmail: access.canCreate
       ? async emailAddress => {
-          const request = currentUser().createEmailAddress({ email: emailAddress });
+          const request = createEmail(currentUser, emailAddress);
           await save(() => request, ADD_EMAIL_FIELDS);
           return verifierFor(await request);
         }
@@ -128,5 +132,6 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
     onRemoveEmail: access.canRemove ? id => saveAsUser(current => removeEmail(current, id)) : undefined,
     removeReverification,
     setPrimaryReverification,
+    createReverification,
   };
 }

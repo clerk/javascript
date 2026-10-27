@@ -1,7 +1,7 @@
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { isLocalizableError, MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../localization';
 import { save, SaveError, toLocalizableError } from '../errors';
@@ -33,10 +33,6 @@ describe('save', () => {
 });
 
 describe('toLocalizableError', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('reads the global error a save left, code and all', () => {
     const cause = new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } });
     expect(toLocalizableError(cause)).toEqual({ code: 'action_blocked', message: 'Raw server sentence.' });

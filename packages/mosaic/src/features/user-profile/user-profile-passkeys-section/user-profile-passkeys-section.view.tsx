@@ -2,12 +2,15 @@ import type { Ref } from 'react';
 
 import type { ConfirmController } from '../../../blocks/confirm';
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Button } from '../../../components/button';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Plus } from '../../../icons/glyphs/plus';
 import { fill, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
 import { styles } from './user-profile-passkeys-section.styles';
 import type { UserProfilePasskey, UserProfilePasskeyNameValidator } from './user-profile-passkeys-section.types';
@@ -26,6 +29,8 @@ export interface UserProfilePasskeysSectionViewProps {
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<UserProfilePasskey>;
   finalFocus?: DialogFocusTarget;
+  addReverification?: ReverificationController;
+  addFinalFocus?: DialogFocusTarget;
 }
 
 export function UserProfilePasskeysSectionView({
@@ -40,6 +45,8 @@ export function UserProfilePasskeysSectionView({
   registerTrigger,
   remove,
   finalFocus,
+  addReverification,
+  addFinalFocus,
 }: UserProfilePasskeysSectionViewProps) {
   const m = useMessages('userProfilePasskeys');
 
@@ -73,7 +80,7 @@ export function UserProfilePasskeysSectionView({
                   onClick={onAdd}
                 >
                   <Icon
-                    name='plus'
+                    glyph={Plus}
                     placement='inline-start'
                     size='sm'
                   />
@@ -114,6 +121,12 @@ export function UserProfilePasskeysSectionView({
           actionLabel={m.remove}
           cancelLabel={m.cancel}
           finalFocus={finalFocus}
+        />
+      ) : null}
+      {addReverification ? (
+        <ReverificationDialog
+          controller={addReverification}
+          finalFocus={addFinalFocus}
         />
       ) : null}
     </>

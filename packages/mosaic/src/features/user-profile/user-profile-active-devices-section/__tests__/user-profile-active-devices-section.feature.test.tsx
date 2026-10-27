@@ -1,3 +1,4 @@
+import { getClerkQueryClient } from '@clerk/shared/react';
 import type { ActClaim, SessionWithActivitiesJSON } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, screen, waitFor, within } from '@testing-library/react';
@@ -87,26 +88,150 @@ function serveDevices(
 }
 
 describe('Active devices', () => {
-  it('honors the loading fallback, including rendering nothing by default', async () => {
+  it('shows its skeleton under a live title while loading, then the devices', async () => {
+    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
+    const pending = createDeferredPromise();
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async () => {
+        await pending.promise;
+        return undefined;
+      }),
+    );
+    try {
+      await renderWithClerk(<UserProfileActiveDevicesSection />);
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
+      expect(screen.getByRole('heading', { name: 'Active devices' })).toBeVisible();
+      expect(screen.getByText('Chrome on macOS')).not.toBeVisible();
+      expect(screen.queryByText('This device')).toBeNull();
+      expect(screen.queryByRole('button', { name: /^Manage / })).toBeNull();
+    } finally {
+      pending.resolve();
+    }
+    expect(await screen.findByRole('button', { name: 'Manage Safari on iPhone' })).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Active devices loaded');
+  });
+
+  it('shows its skeleton, not the fallback, while the devices load', async () => {
     serveDevices([device('sess_current', 'active')]);
     const pending = createDeferredPromise();
     worker.use(
       http.get(fapiUrl('/v1/me/sessions/active'), async () => {
         await pending.promise;
-        return HttpResponse.json([device('sess_current', 'active')]);
+        return undefined;
       }),
     );
     try {
-      const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
-      expect(view.container).toBeEmptyDOMElement();
-      view.rerender(<UserProfileActiveDevicesSection fallback={<p>Loading devices</p>} />);
-      expect(screen.getByText('Loading devices')).toBeVisible();
+      const view = await renderWithClerk(<UserProfileActiveDevicesSection fallback={<p>Loading devices</p>} />);
+      expect(screen.queryByText('Loading devices')).toBeNull();
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
       view.rerender(<UserProfileActiveDevicesSection fallback={null} />);
-      expect(view.container).toBeEmptyDOMElement();
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
     } finally {
       pending.resolve();
     }
     expect(await screen.findByText('This device')).toBeVisible();
+  });
+
+  it('shows cached devices instead of its skeleton when remounted', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    expect(await screen.findByText('This device')).toBeVisible();
+    view.rerender(<div />);
+
+    const pending = createDeferredPromise();
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async () => {
+        await pending.promise;
+        return undefined;
+      }),
+    );
+    try {
+      view.rerender(<UserProfileActiveDevicesSection />);
+      expect(screen.getByRole('status')).toHaveTextContent('Active devices loaded');
+      expect(screen.getByText('This device')).toBeVisible();
+    } finally {
+      pending.resolve();
+    }
+  });
+
+  it('shows its skeleton instead of the old devices while a new session loads', async () => {
+    const nextUser = fapiUser({ id: 'user_2' });
+    serveFapi({
+      client: fapiClient([
+        fapiSession({ id: 'sess_current', user: alice }),
+        fapiSession({ id: 'sess_next', user: nextUser }),
+      ]),
+      activeDevices: [
+        device('sess_current', 'active'),
+        device('sess_other', 'active', { device_type: 'Old phone' }),
+        { ...device('sess_next', 'active', { device_type: 'Next laptop' }), ownerUserId: nextUser.id },
+      ],
+    });
+    const pending = createDeferredPromise();
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async ({ request }) => {
+        if (new URL(request.url).searchParams.get('_clerk_session_id') === 'sess_next') {
+          await pending.promise;
+        }
+        return undefined;
+      }),
+    );
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    try {
+      expect(await screen.findByRole('button', { name: 'Manage Safari on Old phone' })).toBeVisible();
+      await act(() => view.clerk.setActive({ session: 'sess_next' }));
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
+      expect(screen.queryByRole('button', { name: 'Manage Safari on Old phone' })).toBeNull();
+    } finally {
+      pending.resolve();
+    }
+    expect(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
+  });
+
+  it('refreshes devices on mount only once the cached list is two minutes old', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const view = await renderWithClerk(<div />);
+      const currentUser = view.clerk.user;
+      if (!currentUser) {
+        throw new Error('Expected a signed-in user');
+      }
+      const reads = vi.spyOn(currentUser, 'getSessions');
+      view.rerender(<UserProfileActiveDevicesSection />);
+      expect(await screen.findByText('This device')).toBeVisible();
+      expect(reads).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(Date.now() + 119_000);
+      view.rerender(<div />);
+      view.rerender(<UserProfileActiveDevicesSection />);
+      expect(reads).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(Date.now() + 2_000);
+      view.rerender(<div />);
+      view.rerender(<UserProfileActiveDevicesSection />);
+      await waitFor(() => expect(reads).toHaveBeenCalledTimes(2));
+      expect(screen.getByText('This device')).toBeVisible();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('drops cached devices on sign out', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    expect(await screen.findByText('This device')).toBeVisible();
+    const cachedDevices = () =>
+      getClerkQueryClient()
+        ?.getQueryCache()
+        .getAll()
+        .filter(query => query.state.data !== undefined) ?? [];
+    expect(cachedDevices()).toHaveLength(1);
+
+    await act(() => view.clerk.signOut());
+
+    expect(view.container).toBeEmptyDOMElement();
+    expect(cachedDevices()).toHaveLength(0);
   });
 
   it('shows signed-in sessions and signs out another device inside the security panel', async () => {
@@ -790,17 +915,13 @@ describe('Sign out an unavailable device', () => {
     });
 
     const logError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
 
-      await waitFor(() =>
-        expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(expectedMessage),
-      );
-      expect(screen.getByRole('dialog')).toBeVisible();
-      expect(screen.queryByText('Unexpected device failure.')).toBeNull();
-      expect(logError).not.toHaveBeenCalled();
-    } finally {
-      logError.mockRestore();
-    }
+    await waitFor(() =>
+      expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(expectedMessage),
+    );
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(screen.queryByText('Unexpected device failure.')).toBeNull();
+    expect(logError).not.toHaveBeenCalled();
   });
 });

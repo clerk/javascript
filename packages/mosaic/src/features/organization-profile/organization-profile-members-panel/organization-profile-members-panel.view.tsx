@@ -4,14 +4,14 @@ import { Panel } from '../../../components/panel';
 import { Tabs } from '../../../components/tabs';
 import { useMessages } from '../../../localization';
 import { themeProps } from '../../../props';
+import { InvitationsTableTab } from './invitations-table-tab';
 import type { InvitationsTableTabViewProps } from './invitations-table-tab.types';
-import { InvitationsTableTabView } from './invitations-table-tab.view';
+import { MembersTableTab } from './members-table-tab';
 import type { MembersTableTabViewProps } from './members-table-tab.types';
-import { MembersTableTabView } from './members-table-tab.view';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
 import { OrganizationProfileInviteMembersDialog } from './organization-profile-invite-members.dialog';
+import { RequestsTableTab } from './requests-table-tab';
 import type { RequestsTableTabViewProps } from './requests-table-tab.types';
-import { RequestsTableTabView } from './requests-table-tab.view';
 
 export interface OrganizationProfileMembersPanelViewProps {
   members?: MembersTableTabViewProps;
@@ -39,7 +39,7 @@ export function OrganizationProfileMembersPanelView({
       id: 'members',
       label: membersMessages.title,
       content: members ? (
-        <MembersTableTabView
+        <MembersTableTab
           {...members}
           onInvite={onInvite ?? members.onInvite}
           isInviteDisabled={isInviteDisabled ?? members.isInviteDisabled}
@@ -50,7 +50,7 @@ export function OrganizationProfileMembersPanelView({
       id: 'invitations',
       label: invitationsMessages.title,
       content: invitations ? (
-        <InvitationsTableTabView
+        <InvitationsTableTab
           {...invitations}
           onInvite={onInvite ?? invitations.onInvite}
           isInviteDisabled={isInviteDisabled ?? invitations.isInviteDisabled}
@@ -61,7 +61,7 @@ export function OrganizationProfileMembersPanelView({
       id: 'requests',
       label: requestsMessages.title,
       content: requests ? (
-        <RequestsTableTabView
+        <RequestsTableTab
           {...requests}
           onInvite={onInvite ?? requests.onInvite}
           isInviteDisabled={isInviteDisabled ?? requests.isInviteDisabled}

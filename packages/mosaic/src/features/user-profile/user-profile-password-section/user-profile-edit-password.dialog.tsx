@@ -12,7 +12,10 @@ import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
+import { Eye } from '../../../icons/glyphs/eye';
+import { EyeSlash } from '../../../icons/glyphs/eye-slash';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 import type {
@@ -62,7 +65,7 @@ export function UserProfileEditPasswordDialog({
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={form.id}
             onSubmit={form.handleSubmit}
           />
@@ -231,7 +234,7 @@ function PasswordField({
             aria-label={visible ? m.hidePassword : m.showPassword}
             onClick={() => setVisible(current => !current)}
           >
-            <Icon name={visible ? 'eye-slash' : 'eye'} />
+            <Icon glyph={visible ? EyeSlash : Eye} />
           </Button>
         </InputGroup.End>
       </InputGroup.Root>

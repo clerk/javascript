@@ -11,17 +11,31 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 vi.setConfig({ testTimeout: 15_000 });
 
-const withSecurityPageFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+type FixturesBuilder = Parameters<Parameters<typeof createFixtures>[0]>[0];
+
+const withOrganizationSettings =
+  ({ sso, directorySync }: { sso: boolean; directorySync: boolean }) =>
+  (f: FixturesBuilder) => {
+    f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+    f.withEmailAddress();
+    f.withOrganizations();
+    f.withOrganizationDomains(undefined, 'org:member');
+    f.withUser({
+      email_addresses: ['test@clerk.com'],
+      organization_memberships: [
+        {
+          name: 'Org1',
+          self_serve_sso_enabled: sso,
+          self_serve_directory_sync_enabled: directorySync,
+          permissions: ['org:sys_entconns:manage'],
+        },
+      ],
+    });
+  };
+
+const withSecurityPageFixtures = (f: FixturesBuilder) => {
+  withOrganizationSettings({ sso: true, directorySync: false })(f);
   f.withEnterpriseSso({ selfServeSSO: true });
-  f.withEmailAddress();
-  f.withOrganizations();
-  f.withOrganizationDomains(undefined, 'org:member');
-  f.withUser({
-    email_addresses: ['test@clerk.com'],
-    organization_memberships: [
-      { name: 'Org1', self_serve_sso_enabled: true, permissions: ['org:sys_entconns:manage'] },
-    ],
-  });
 };
 
 const DESCRIPTION_LINE_1 = 'Require members with a matching email domain to sign in through your identity provider.';
@@ -491,10 +505,7 @@ describe('OrganizationSecurityPage', () => {
   });
 
   describe('directory sync section', () => {
-    const withDirectorySyncFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
-      withSecurityPageFixtures(f);
-      f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
-    };
+    const withDirectorySyncFixtures = withOrganizationSettings({ sso: true, directorySync: true });
 
     // The mutations live on the DirectorySyncResource resolved by getDirectorySync.
     const directory = (overrides: Record<string, unknown> = {}) =>
@@ -523,8 +534,23 @@ describe('OrganizationSecurityPage', () => {
       fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [], total_count: 0 } as any);
     };
 
-    it('is hidden when the instance is not flagged into self-serve Directory Sync', async () => {
-      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+    it('is hidden when the organization has self-serve Directory Sync turned off', async () => {
+      const { wrapper, fixtures } = await createFixtures(withOrganizationSettings({ sso: true, directorySync: false }));
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(directory());
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText('Active')).toBeInTheDocument();
+      expect(screen.queryByText('Directory Sync')).not.toBeInTheDocument();
+      expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
+    });
+
+    it('is hidden when the instance has self-serve Directory Sync turned off', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        withOrganizationSettings({ sso: true, directorySync: true })(f);
+        f.withEnterpriseSso({ selfServeSSO: true });
+      });
       withActiveConnection(fixtures);
       fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(directory());
 
@@ -676,6 +702,80 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
 
       await waitFor(() => expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument());
+    });
+  });
+  describe('organization settings', () => {
+    const directory = () =>
+      ({
+        id: 'scimdir_1',
+        enterpriseConnectionId: 'ent_1',
+        endpointUrl: 'https://api.example.com/scim/v2',
+        provider: 'okta',
+        enabled: true,
+        attributeMapping: {},
+        apiKey: null,
+      }) as any;
+
+    const withActiveConnection = (fixtures: any) => {
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
+      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+        data: [],
+        total_count: 0,
+      } as any);
+      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(directory());
+    };
+
+    it('with SSO only, manages connections and hides Directory Sync', async () => {
+      const { wrapper, fixtures } = await createFixtures(withOrganizationSettings({ sso: true, directorySync: false }));
+      withActiveConnection(fixtures);
+
+      renderPage(wrapper);
+
+      expect(await findMenuButtons('sso')).toHaveLength(1);
+      expect(section('sso').getByRole('button', { name: /Add connection/i })).toBeInTheDocument();
+      expect(screen.queryByText('Directory Sync')).not.toBeInTheDocument();
+      expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
+    });
+
+    it('with Directory Sync only, lists connections read-only and manages the directory', async () => {
+      const { wrapper, fixtures } = await createFixtures(withOrganizationSettings({ sso: false, directorySync: true }));
+      withActiveConnection(fixtures);
+
+      renderPage(wrapper);
+
+      expect(await findMenuButtons('directorySync')).toHaveLength(1);
+      expect(section('sso').getByText('Active')).toBeInTheDocument();
+      expect(section('sso').queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+      expect(section('sso').queryByRole('button', { name: /Add connection|Configure/i })).not.toBeInTheDocument();
+      expect(fixtures.clerk.organization?.getEnterpriseConnectionTestRuns).not.toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.getDomains).not.toHaveBeenCalled();
+    });
+
+    it('with both, manages connections and the directory', async () => {
+      const { wrapper, fixtures } = await createFixtures(withOrganizationSettings({ sso: true, directorySync: true }));
+      withActiveConnection(fixtures);
+
+      renderPage(wrapper);
+
+      expect(await findMenuButtons('directorySync')).toHaveLength(1);
+      expect(await findMenuButtons('sso')).toHaveLength(1);
+      expect(section('sso').getByRole('button', { name: /Add connection/i })).toBeInTheDocument();
+    });
+
+    it('with neither, lists connections read-only and hides Directory Sync', async () => {
+      const { wrapper, fixtures } = await createFixtures(
+        withOrganizationSettings({ sso: false, directorySync: false }),
+      );
+      withActiveConnection(fixtures);
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText('Active')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Add connection|Configure/i })).not.toBeInTheDocument();
+      expect(screen.queryByText('Directory Sync')).not.toBeInTheDocument();
+      expect(fixtures.clerk.organization?.getEnterpriseConnectionTestRuns).not.toHaveBeenCalled();
     });
   });
 });

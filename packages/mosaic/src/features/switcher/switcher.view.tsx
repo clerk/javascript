@@ -12,7 +12,17 @@ import { Menu } from '../../components/menu';
 import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Building } from '../../icons/glyphs/building';
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { ChevronRight } from '../../icons/glyphs/chevron-right';
+import { Cog6Teeth } from '../../icons/glyphs/cog-6-teeth';
+import { Plus } from '../../icons/glyphs/plus';
+import { SignOut } from '../../icons/glyphs/sign-out';
+import { SwitchAccount } from '../../icons/glyphs/switch-account';
+import { UserCircle } from '../../icons/glyphs/user-circle';
+import { UsersAddRight } from '../../icons/glyphs/users-add-right';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
@@ -21,7 +31,7 @@ import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { applyOrder } from '../../utils/apply-order';
-import type { SwitcherLayout, SwitcherSlot } from './switcher.layout';
+import type { SwitcherLayout } from './switcher.layout';
 import { resolveSwitcherLayout } from './switcher.layout';
 import { styles } from './switcher.styles';
 import type {
@@ -36,6 +46,7 @@ import type {
   SwitcherSession,
   SwitcherTriggerBadge,
 } from './switcher.types';
+import { switcherBusyKeys } from './switcher.types';
 import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
 import { SwitcherHeader } from './switcher-header.view';
 import {
@@ -55,19 +66,6 @@ import { useSwitcherTriggerController } from './switcher-trigger.controller';
 // The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
 // what the model and the view agree on, so neither file owns them.
 export type * from './switcher.types';
-
-/**
- * Stable keys naming which affordance owns the single in-flight action. Shared by the connected
- * container (which sets `pendingKey`) and the view (which matches against it).
- */
-export const switcherBusyKeys = {
-  selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
-  switchSession: (sessionId: string) => `switch:${sessionId}`,
-  signOutSession: (sessionId: string, from: SwitcherSlot) => `sign-out:${from}:${sessionId}`,
-  signOutAll: () => 'sign-out-all',
-  acceptSuggestion: (suggestionId: string) => `accept-suggestion:${suggestionId}`,
-  acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
-} as const;
 
 type SwitcherContextValue = SwitcherData &
   SwitcherCallbacks &
@@ -276,7 +274,7 @@ function SwitcherRow({
       ) : active ? (
         <SwitcherItemTrailing>
           <Icon
-            name='checkmark'
+            glyph={Checkmark}
             size='sm'
           />
         </SwitcherItemTrailing>
@@ -581,7 +579,7 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
       {active ? (
         <Menu.Media>
           <Icon
-            name='checkmark'
+            glyph={Checkmark}
             size='sm'
           />
         </Menu.Media>
@@ -591,7 +589,7 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
 }
 
 interface FlyoutRowProps {
-  icon: IconName;
+  icon: IconComponent;
   label: string;
   busy?: boolean;
   children: ReactNode;
@@ -621,7 +619,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
             <PendingSpinner />
           ) : (
             <Icon
-              name={icon}
+              glyph={icon}
               size='sm'
             />
           )}
@@ -631,7 +629,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
         </SwitcherItemContent>
         <SwitcherItemTrailing>
           <Icon
-            name='chevron-right'
+            glyph={ChevronRight}
             xstyle={rtl.mirror}
             size='sm'
           />
@@ -660,7 +658,7 @@ function SwitchAccountRow() {
 
   return (
     <FlyoutRow
-      icon='switch-account'
+      icon={SwitchAccount}
       label={m.accounts.switch}
       busy={busy}
     >
@@ -684,7 +682,7 @@ function SwitchAccountRow() {
         >
           <Menu.Media>
             <Icon
-              name='plus'
+              glyph={Plus}
               size='sm'
             />
           </Menu.Media>
@@ -700,7 +698,7 @@ function SwitchAccountRow() {
           >
             <Menu.Media>
               <Icon
-                name='sign-out'
+                glyph={SignOut}
                 size='sm'
                 xstyle={rtl.mirror}
               />
@@ -744,7 +742,7 @@ function OrganizationSection() {
           key='createOrganization'
           icon={
             <Icon
-              name='plus'
+              glyph={Plus}
               size='sm'
             />
           }
@@ -791,7 +789,7 @@ function OrganizationSection() {
 
 interface SettingsTarget {
   label: string;
-  icon: IconName;
+  icon: IconComponent;
   onClick: () => void;
 }
 
@@ -805,7 +803,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
       <ActionRow
         icon={
           <Icon
-            name='cog-6-teeth'
+            glyph={Cog6Teeth}
             size='sm'
           />
         }
@@ -817,7 +815,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
 
   return (
     <FlyoutRow
-      icon='cog-6-teeth'
+      icon={Cog6Teeth}
       label={m.manage.settings}
     >
       {targets.map(target => (
@@ -828,7 +826,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
         >
           <Menu.Media>
             <Icon
-              name={target.icon}
+              glyph={target.icon}
               size='sm'
             />
           </Menu.Media>
@@ -843,10 +841,10 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
 function settingsTargets(data: SwitcherContextValue, lead: LeadSelection, m: Messages): SettingsTarget[] {
   const targets: SettingsTarget[] = [];
   if ((lead.kind !== 'organization' || leadUser(lead)) && data.onManageAccount) {
-    targets.push({ label: m.manage.profile, icon: 'user-circle', onClick: data.onManageAccount });
+    targets.push({ label: m.manage.profile, icon: UserCircle, onClick: data.onManageAccount });
   }
   if (lead.kind === 'organization' && data.onManageOrganization) {
-    targets.push({ label: m.manage.organization, icon: 'building', onClick: data.onManageOrganization });
+    targets.push({ label: m.manage.organization, icon: Building, onClick: data.onManageOrganization });
   }
   return targets;
 }
@@ -875,7 +873,7 @@ function ManageSection() {
           <ActionRow
             icon={
               <Icon
-                name='users-add-right'
+                glyph={UsersAddRight}
                 size='sm'
               />
             }
@@ -935,7 +933,7 @@ function Footer() {
           key='addAccount'
           icon={
             <Icon
-              name='plus'
+              glyph={Plus}
               size='sm'
             />
           }
@@ -950,7 +948,7 @@ function Footer() {
           key='signOut'
           icon={
             <Icon
-              name='sign-out'
+              glyph={SignOut}
               size='sm'
             />
           }
@@ -1095,7 +1093,7 @@ export function SwitcherTrigger({
             </Badge>
           ) : null}
           <Icon
-            name='chevron-down'
+            glyph={ChevronDown}
             size='sm'
             xstyle={styles.triggerCaret}
           />

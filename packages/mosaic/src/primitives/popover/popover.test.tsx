@@ -8,7 +8,6 @@ import { Popover } from './index';
 
 afterEach(() => {
   cleanup();
-  vi.restoreAllMocks();
 });
 
 function renderPopover(props: Partial<React.ComponentProps<typeof Popover.Root>> = {}) {

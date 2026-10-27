@@ -680,31 +680,35 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.#loadInNonStandardBrowser();
       }
-      const telemetry = this.#options.telemetry;
-      const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
-
-      const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
-      const hasClientDebugMode = Boolean(this.environment?.clientDebugMode);
-      const isProd = this.environment?.isProduction?.() ?? false;
-
-      const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
-      const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
-
-      if (shouldEnable) {
-        initDebugLogger({
-          enabled: true,
-          ...(logLevel ? { logLevel } : {}),
-          ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
-        });
-      }
-      this.#protect?.load(this.environment as Environment);
-      debugLogger.info('load() complete', {}, 'clerk');
+      this.#finishLoad();
     } catch (error) {
       this.#publicEventBus.emit(clerkEvents.Status, 'error');
       debugLogger.error('load() failed', { error }, 'clerk');
       // bubble up the error
       throw error;
     }
+  };
+
+  #finishLoad = (): void => {
+    const telemetry = this.#options.telemetry;
+    const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
+
+    const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
+    const hasClientDebugMode = Boolean(this.environment?.clientDebugMode);
+    const isProd = this.environment?.isProduction?.() ?? false;
+
+    const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
+    const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
+
+    if (shouldEnable) {
+      initDebugLogger({
+        enabled: true,
+        ...(logLevel ? { logLevel } : {}),
+        ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
+      });
+    }
+    this.#protect?.load(this.environment as Environment);
+    debugLogger.info('load() complete', {}, 'clerk');
   };
 
   #isCombinedSignInOrUpFlow(): boolean {
@@ -3684,8 +3688,10 @@ export class Clerk implements ClerkInterface {
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
-  // This is used by @clerk/expo
+  // This is used by @clerk/expo. When `load()` failed, such as while the app version was unsupported, a successful
+  // reload finishes loading this instance instead of the app having to create a new one.
   __internal_reloadInitialResources = async (): Promise<void> => {
+    const finishesFailedLoad = this.#status === 'error';
     const [environment, client] = await Promise.all([
       Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
       Client.getOrCreateInstance().fetch({ fetchMaxTries: 1 }),
@@ -3693,6 +3699,12 @@ export class Clerk implements ClerkInterface {
 
     this.updateClient(client);
     this.updateEnvironment(environment);
+
+    // An overlapping reload may have finished loading first.
+    if (finishesFailedLoad && this.#status === 'error') {
+      this.#finishLoad();
+      this.#publicEventBus.emit(clerkEvents.Status, 'ready');
+    }
 
     this.#emit();
   };

@@ -1,6 +1,7 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { useToastManager } from '@clerk/mosaic/components/toast';
+import { Clipboard } from '@clerk/mosaic/icons/glyphs/clipboard';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -77,7 +78,7 @@ export function Anchored() {
           })
         }
       >
-        <Icon name='clipboard' />
+        <Icon glyph={Clipboard} />
       </Button>
     </div>
   );

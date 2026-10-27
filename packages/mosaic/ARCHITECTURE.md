@@ -74,7 +74,7 @@ State styling uses real class + attribute-selector specificity — no `&&` boost
 
 ## MosaicProvider
 
-Mosaic components need no provider to render or to be styled — the stylesheet and the `--cl-*` tokens do that work. `MosaicProvider` exists for three things: per-name icon glyph overrides, localization, and the toast region (it mounts `ToastProvider`).
+Mosaic components need no provider to render or to be styled — the stylesheet and the `--cl-*` tokens do that work. `MosaicProvider` exists for four things: per-name icon glyph overrides, localization, the reading direction keyboard navigation follows (it mounts `DirectionProvider`), and the toast region (it mounts `ToastProvider`).
 
 ```tsx
 import { MosaicProvider } from './mosaic-provider';
@@ -82,7 +82,7 @@ import { MosaicProvider } from './mosaic-provider';
 <MosaicProvider icons={{ 'chevron-right': <MyChevron /> }}>{children}</MosaicProvider>;
 ```
 
-`<Icon name='chevron-right' />` renders the override in place of the built-in glyph and applies Mosaic's own sizing props to it, so a swapped glyph stays visually consistent with the rest. Outside a provider, `useMosaicIcons()` returns `{}` and every icon falls back to `iconRegistry`.
+`<Icon glyph={ChevronRight} />` looks the override up by the glyph's `iconName`, renders it in place of the built-in glyph and applies Mosaic's own sizing props to it, so a swapped glyph stays visually consistent with the rest. Outside a provider, `useMosaicIcons()` returns `{}` and every icon renders the glyph it was passed. Callers import each glyph directly so the bundle carries only the glyphs in use; `iconRegistry` holds every glyph for catalogs and tests and must not be imported from shipped code.
 
 ## Component authoring pattern
 

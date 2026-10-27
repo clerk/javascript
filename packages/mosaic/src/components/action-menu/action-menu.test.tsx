@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Pen } from '../../icons/glyphs/pen';
 import { MosaicProvider } from '../../mosaic-provider';
 import { ActionMenu } from './action-menu';
 
@@ -27,7 +28,7 @@ describe('Mosaic ActionMenu', () => {
     const onClick = vi.fn();
     const user = userEvent.setup();
     renderMenu([
-      { label: 'Rename', icon: 'pen', onClick },
+      { label: 'Rename', icon: Pen, onClick },
       { label: 'Remove', color: 'negative', onClick: vi.fn() },
     ]);
 
@@ -36,6 +37,30 @@ describe('Mosaic ActionMenu', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
   });
+  it('keeps a disabled trigger focusable without allowing pointer or keyboard activation', async () => {
+    const onClick = vi.fn();
+    render(
+      <MosaicProvider>
+        <ActionMenu
+          label='Manage wallet'
+          actions={[{ label: 'Remove', onClick }]}
+          disabled
+          focusableWhenDisabled
+        />
+      </MosaicProvider>,
+    );
+    const user = userEvent.setup();
+    const trigger = screen.getByRole('button', { name: 'Manage wallet' });
+    await user.tab();
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute('aria-disabled', 'true');
+    await user.click(trigger);
+    expect(screen.queryByRole('menu')).toBeNull();
+    await user.keyboard('{Enter} {ArrowDown}');
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it('disables both the trigger and existing menu items while busy', async () => {
     const onClick = vi.fn();
     const actions = [{ label: 'Remove', onClick }];

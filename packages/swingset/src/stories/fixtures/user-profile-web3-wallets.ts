@@ -11,33 +11,37 @@ import { chaosText } from '@/lib/chaos';
 
 import { idleReverification } from './reverification';
 
-interface DemoWallet extends UserProfileWeb3Wallet {
-  providerId?: string;
-}
-
 const providers: UserProfileWeb3Provider[] = [
-  { id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+  {
+    id: 'web3_metamask_signature',
+    provider: 'MetaMask',
+    iconId: 'metamask',
+    iconUrl: 'https://img.clerk.com/static/metamask.svg',
+  },
   {
     id: 'web3_coinbase_wallet_signature',
     provider: 'Coinbase Wallet',
+    iconId: 'coinbase_wallet',
     iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
   },
 ];
 
-export const primaryWallet: DemoWallet = {
+export const primaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_1',
   providerId: 'web3_metamask_signature',
   provider: 'MetaMask',
+  iconId: 'metamask',
   iconUrl: 'https://img.clerk.com/static/metamask.svg',
   address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
   isPrimary: true,
   isVerified: true,
 };
 
-export const secondaryWallet: DemoWallet = {
+export const secondaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_2',
   providerId: 'web3_coinbase_wallet_signature',
   provider: 'Coinbase Wallet',
+  iconId: 'coinbase_wallet',
   iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
   address: '0x1234567890abcdef1234567890abcdef12345678',
   isVerified: true,
@@ -49,13 +53,17 @@ export function useWeb3WalletsFixture({
   primaryError = false,
   removalState,
 }: {
-  initialWallets?: DemoWallet[];
+  initialWallets?: UserProfileWeb3Wallet[];
   availableProviders?: UserProfileWeb3Provider[];
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
 } = {}) {
   const seedWallets = useChaosFixture(initialWallets, items =>
-    items.map(wallet => ({ ...wallet, provider: chaosText(wallet.provider) })),
+    items.map(wallet => ({
+      ...wallet,
+      provider: chaosText(wallet.provider),
+      canVerify: !wallet.isVerified && wallet.providerId !== undefined,
+    })),
   );
   const seedProviders = useChaosFixture(availableProviders, items =>
     items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
@@ -69,8 +77,9 @@ export function useWeb3WalletsFixture({
     wallets,
     removeReverification: idleReverification,
     setPrimaryReverification: idleReverification,
+    createReverification: idleReverification,
     availableProviders: connectionProviders.filter(
-      provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
+      provider => !wallets.some(wallet => wallet.providerId === provider.id),
     ),
     // eslint-disable-next-line @typescript-eslint/require-await
     connect: async (id: Web3Strategy) => {
@@ -82,22 +91,27 @@ export function useWeb3WalletsFixture({
         current.map(item => (item.id === id ? { ...item, connectError: undefined } : item)),
       );
       setWallets(current => {
-        if (current.some(wallet => wallet.providerId === id && !wallet.isVerified)) {
-          return current.map(wallet => (wallet.providerId === id ? { ...wallet, isVerified: true } : wallet));
-        }
         return [
           ...current,
           {
             provider: provider.provider,
+            iconId: provider.iconId,
             iconUrl: provider.iconUrl,
             id: `wallet_${id}`,
             providerId: id,
             address: '0x1234567890abcdef1234567890abcdef12345678',
             isVerified: true,
+            canVerify: false,
             isPrimary: !current.some(wallet => wallet.isPrimary),
           },
         ];
       });
+    },
+    verify: (id: string) => {
+      setWallets(current =>
+        current.map(wallet => (wallet.id === id ? { ...wallet, isVerified: true, canVerify: false } : wallet)),
+      );
+      return Promise.resolve();
     },
     // eslint-disable-next-line @typescript-eslint/require-await
     setPrimary: async (id: string) => {

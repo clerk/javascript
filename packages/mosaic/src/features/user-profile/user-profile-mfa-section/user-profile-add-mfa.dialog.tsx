@@ -3,12 +3,14 @@ import { type ReactNode, type Ref, useRef } from 'react';
 
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { Dialog } from '../../../components/dialog';
+import { Dialog, type DialogFocusTarget } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
+import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
 
 export interface UserProfileAddMfaDialogProps {
   open: boolean;
+  initialFocus?: DialogFocusTarget;
   onOpenChange: (open: boolean) => void;
   children: ReactNode;
   disabled?: boolean;
@@ -20,6 +22,7 @@ export interface UserProfileAddMfaDialogProps {
 
 export function UserProfileAddMfaDialog({
   open,
+  initialFocus,
   onOpenChange,
   children,
   disabled,
@@ -52,7 +55,7 @@ export function UserProfileAddMfaDialog({
           }
         >
           <Icon
-            name='plus'
+            glyph={Plus}
             placement='inline-start'
             size='sm'
           />
@@ -61,6 +64,7 @@ export function UserProfileAddMfaDialog({
       ) : null}
       <Dialog.Popup
         variant='card'
+        initialFocus={initialFocus}
         finalFocus={addButtonRef}
       >
         <Card.Root

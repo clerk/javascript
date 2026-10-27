@@ -2,21 +2,28 @@ import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
+import { Spinner } from '../../../components/spinner';
+import { ChevronRight } from '../../../icons/glyphs/chevron-right';
+import { Numbers } from '../../../icons/glyphs/numbers';
+import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
+import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import { useMessages } from '../../../localization';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 export interface UserProfileAddMfaViewProps {
+  pendingMethod?: 'authenticator' | 'backup-codes';
+  errorMessage?: string;
   methods: readonly UserProfileMfaAddableMethod[];
   onSelect: (type: UserProfileMfaAddableMethod) => void;
 }
 
 const icons = {
-  sms: 'security-phone',
-  authenticator: 'security-lock-square',
-  'backup-codes': 'numbers',
+  sms: SecurityPhone,
+  authenticator: SecurityLockSquare,
+  'backup-codes': Numbers,
 } as const;
 
-export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaViewProps) {
+export function UserProfileAddMfaView({ methods, onSelect, pendingMethod, errorMessage }: UserProfileAddMfaViewProps) {
   const m = useMessages('userProfileMfa');
   const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
   return (
@@ -26,6 +33,12 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
         <Card.Description>{m.addDialog.description}</Card.Description>
       </Card.Header>
       <Card.Content>
+        <Card.Banner
+          role='alert'
+          color='negative'
+        >
+          {errorMessage}
+        </Card.Banner>
         <Item.Group variant='outline'>
           {methods.map((type, index) => (
             <Item.Root
@@ -35,22 +48,25 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
               render={
                 <button
                   type='button'
+                  disabled={pendingMethod !== undefined}
+                  aria-busy={pendingMethod === type}
                   onClick={() => onSelect(type)}
                 />
               }
             >
               <Item.Media>
-                <IconFrame filled>
-                  <Icon name={icons[type]} />
+                <IconFrame
+                  filled
+                  bordered={false}
+                >
+                  <Icon glyph={icons[type]} />
                 </IconFrame>
               </Item.Media>
               <Item.Content>
                 <Item.Label>{m.methods[type]}</Item.Label>
                 <Item.Description>{m.addDialog.methods[type]}</Item.Description>
               </Item.Content>
-              <Item.Actions>
-                <Icon name='chevron-right' />
-              </Item.Actions>
+              <Item.Actions>{pendingMethod === type ? <Spinner /> : <Icon glyph={ChevronRight} />}</Item.Actions>
             </Item.Root>
           ))}
         </Item.Group>

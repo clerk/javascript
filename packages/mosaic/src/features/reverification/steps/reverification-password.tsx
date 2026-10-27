@@ -8,6 +8,9 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
+import { Eye } from '../../../icons/glyphs/eye';
+import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import { Form } from '../../../primitives/form';
 
 export interface ReverificationPasswordMessages {
   title: string;
@@ -45,9 +48,11 @@ export function ReverificationPassword({
   const formId = useId();
   const [visible, setVisible] = useState(false);
 
+  const canSubmit = value !== '';
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isPending) {
+    if (canSubmit && !isPending) {
       onSubmit();
     }
   };
@@ -59,7 +64,7 @@ export function ReverificationPassword({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
         >
@@ -86,7 +91,7 @@ export function ReverificationPassword({
                   aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
                   onClick={() => setVisible(current => !current)}
                 >
-                  <Icon name={visible ? 'eye-slash' : 'eye'} />
+                  <Icon glyph={visible ? EyeSlash : Eye} />
                 </Button>
               </InputGroup.End>
             </InputGroup.Root>
@@ -94,7 +99,7 @@ export function ReverificationPassword({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
           </Field.Root>
-        </form>
+        </Form>
       </Card.Content>
       <Card.Footer>
         {onCancel ? (
@@ -112,6 +117,7 @@ export function ReverificationPassword({
         <SubmitButton
           form={formId}
           fullWidth
+          disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

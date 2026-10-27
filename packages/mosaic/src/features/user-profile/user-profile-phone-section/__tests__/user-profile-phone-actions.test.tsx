@@ -146,7 +146,7 @@ describe('phone actions', () => {
     expect(onRemovePhone).not.toHaveBeenCalled();
   });
 
-  it('keeps the phone when removal is canceled with Escape', async () => {
+  it('keeps the phone when removal opened from the keyboard is canceled with Escape', async () => {
     const user = userEvent.setup();
     const onRemovePhone = vi.fn();
     renderPhone({
@@ -241,7 +241,6 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
-    log.mockRestore();
   });
   it('requires confirmation before removing a phone number', async () => {
     const user = userEvent.setup();

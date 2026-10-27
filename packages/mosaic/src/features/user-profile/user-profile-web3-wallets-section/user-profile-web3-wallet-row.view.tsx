@@ -5,10 +5,12 @@ import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
-import { Icon, IconFrame } from '../../../components/icon';
+import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
+import { UserProfileProviderMedia } from '../user-profile-provider-media';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.types';
 
@@ -18,6 +20,7 @@ export function UserProfileWeb3WalletRowView({
   isPending = false,
   isDisabled = false,
   onConnect,
+  onVerify,
   onSetPrimary,
   onRemove,
 }: {
@@ -26,16 +29,19 @@ export function UserProfileWeb3WalletRowView({
   isPending?: boolean;
   isDisabled?: boolean;
   onConnect?: (id: string) => void;
+  onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
   const m = useMessages('userProfileWeb3Wallets');
-  const iconUrl = wallet.iconUrl?.trim();
   const linkedWallet = 'address' in wallet ? wallet : undefined;
   const address = linkedWallet?.address;
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
   const actions: ActionMenuAction[] = [];
 
+  if (linkedWallet?.canVerify && onVerify) {
+    actions.push({ label: m.verify, onClick: () => onVerify(wallet.id) });
+  }
   if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
@@ -46,26 +52,13 @@ export function UserProfileWeb3WalletRowView({
   return (
     <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>
-        {wallet.provider || iconUrl ? (
-          <Section.Media size='lg'>
-            <IconFrame>
-              {iconUrl ? (
-                <img
-                  src={iconUrl}
-                  alt=''
-                  aria-hidden
-                  {...stylex.props(styles.icon)}
-                />
-              ) : (
-                <span
-                  aria-hidden
-                  {...stylex.props(styles.fallback)}
-                >
-                  {wallet.provider?.trim().charAt(0).toUpperCase()}
-                </span>
-              )}
-            </IconFrame>
-          </Section.Media>
+        {wallet.provider ? (
+          <UserProfileProviderMedia
+            provider={wallet.provider}
+            iconId={wallet.iconId}
+            iconUrl={wallet.iconUrl}
+            monochromeIcon={wallet.monochromeIcon}
+          />
         ) : null}
         <Section.Content>
           <Section.Label>
@@ -76,7 +69,9 @@ export function UserProfileWeb3WalletRowView({
               {wallet.provider || shortAddress}
             </span>
             {linkedWallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
-            {linkedWallet && !linkedWallet.isVerified ? <Badge color='warning'>{m.unverified}</Badge> : null}
+            {linkedWallet && !linkedWallet.isVerified ? (
+              <Badge color='warning'>{isPending ? m.verifying : m.unverified}</Badge>
+            ) : null}
           </Section.Label>
           {wallet.provider && address ? (
             <Section.Description
@@ -87,37 +82,42 @@ export function UserProfileWeb3WalletRowView({
             </Section.Description>
           ) : null}
         </Section.Content>
-        {onConnect ? (
+        {onConnect || actions.length > 0 ? (
           <Section.Actions>
-            <SubmitButton
-              color='neutral'
-              size='sm'
-              variant='outline'
-              isPending={isPending}
-              disabled={isDisabled && !isPending}
-              aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
-              onClick={() => onConnect(wallet.id)}
-            >
-              {m.connect}
-              <Icon
-                name='arrow-up-right'
-                placement='inline-end'
+            {onConnect ? (
+              <SubmitButton
+                ref={triggerRef}
+                color='neutral'
                 size='sm'
+                variant='outline'
+                isPending={isPending}
+                disabled={isDisabled && !isPending}
+                aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
+                onClick={() => onConnect(wallet.id)}
+              >
+                {m.connect}
+                <Icon
+                  glyph={ArrowUpRight}
+                  placement='inline-end'
+                  size='sm'
+                />
+              </SubmitButton>
+            ) : null}
+            {actions.length > 0 ? (
+              <ActionMenu
+                triggerRef={triggerRef}
+                actions={actions}
+                disabled={isDisabled}
+                focusableWhenDisabled
+                label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
               />
-            </SubmitButton>
-          </Section.Actions>
-        ) : actions.length > 0 ? (
-          <Section.Actions>
-            <ActionMenu
-              triggerRef={triggerRef}
-              actions={actions}
-              label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
-            />
+            ) : null}
           </Section.Actions>
         ) : null}
       </Section.Item>
       <Section.Error>{'connectError' in wallet ? wallet.connectError : undefined}</Section.Error>
       <Section.Error>{linkedWallet?.primaryError}</Section.Error>
+      <Section.Error>{linkedWallet?.verifyError}</Section.Error>
     </Section.Row>
   );
 }

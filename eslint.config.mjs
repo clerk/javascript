@@ -332,6 +332,7 @@ export default tseslint.config([
       '**/build/*',
       '**/coverage/*',
       '**/dist/*',
+      '**/integration/expo-native/**/*',
       '**/integration/templates/**/*',
       '**/node_modules/**',
       '*.snap',
@@ -663,6 +664,10 @@ export default tseslint.config([
           message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
         },
         noLeakedConditionalJsx,
+        {
+          selector: "JSXOpeningElement[name.name='form']",
+          message: 'Use `Form` from mosaic/primitives/form, which turns off the browser validation popup.',
+        },
         {
           selector: "Property > Literal.key[value='@media (hover: hover)']",
           message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",

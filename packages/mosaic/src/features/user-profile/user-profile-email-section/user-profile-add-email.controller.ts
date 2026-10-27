@@ -9,6 +9,7 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
 import type {
   UserProfileEmail,
   UserProfileEmailVerification,
@@ -22,6 +23,7 @@ export interface UserProfileAddEmailControllerOptions {
   initialEmailAddress?: string;
   username?: string;
   onCreate?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
+  reverification: ReverificationController;
 }
 
 export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
@@ -159,10 +161,13 @@ const machine = createMachine({
   },
 });
 
+const CODE_LENGTH = 6;
+
 export function useUserProfileAddEmailController({
   initialEmailAddress = '',
   username,
   onCreate,
+  reverification,
 }: UserProfileAddEmailControllerOptions): UserProfileAddEmailController {
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
@@ -170,7 +175,7 @@ export function useUserProfileAddEmailController({
   const { resendSeconds, error, verification } = snapshot.context;
   const emailForm = useForm({
     initialValues: { emailAddress: initialEmailAddress },
-    canSubmit: values => !username || values.emailAddress !== username,
+    canSubmit: values => values.emailAddress !== '' && values.emailAddress !== username,
     onSubmit: async ({ emailAddress }) => {
       if (onCreate) {
         send({ type: 'START', emailAddress, verifier: await onCreate(emailAddress) });
@@ -179,6 +184,7 @@ export function useUserProfileAddEmailController({
   });
   const codeForm = useForm({
     initialValues: { code: '' },
+    canSubmit: values => values.code.length === CODE_LENGTH,
     onSubmit: async ({ code }) => {
       const { verifier } = actor.getSnapshot().context;
       if (verifier) {
@@ -199,9 +205,10 @@ export function useUserProfileAddEmailController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const step = toStep(state, verification);
-  const form = step === 'email' ? emailForm : codeForm;
-  const formError = step === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
+  const isReverifying = emailForm.isSubmitting && reverification.visible;
+  const step = isReverifying ? 'reverify' : toStep(state, verification);
+  const form = state === 'email' ? emailForm : codeForm;
+  const formError = state === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
@@ -210,14 +217,19 @@ export function useUserProfileAddEmailController({
     isResending: state === 'sending',
     open,
     step,
-    emailAddress: step === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
+    reverification,
+    emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
     canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
     code: codeForm.values.code,
+    canSubmitCode: codeForm.canSubmit || codeForm.isSubmitting,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {
       if (form.isSubmitting) {
-        return;
+        if (open || state !== 'email' || !reverification.onCancel) {
+          return;
+        }
+        reverification.onCancel();
       }
       if (open) {
         emailForm.reset();
@@ -258,7 +270,7 @@ export function useUserProfileAddEmailController({
 function toStep(
   state: string,
   verification: UserProfileEmailVerification | undefined,
-): UserProfileAddEmailDialogProps['step'] {
+): Exclude<UserProfileAddEmailDialogProps['step'], 'reverify'> {
   if (state === 'email') {
     return 'email';
   }

@@ -14,20 +14,26 @@
  * - A sheet stays flush to the bottom edge and pads its popup by it instead, so the sheet reaches
  *   down to the keyboard with no gap where iOS floats its address bar, which `visualViewport`
  *   counts as part of the keyboard.
+ *
+ * While the keyboard is up, iOS can also pan the visual viewport down to reveal a field, which
+ * moves the top of the visible band below the top of the overlay. That pan is published as
+ * `--_cl-keyboard-offset`, and the track pads its top edge by it, so the whole dialog stays inside
+ * the band and scrolls within it rather than leaving its top out of reach above the screen.
  */
 
 const PROPERTY = '--_cl-keyboard-inset';
+const OFFSET_PROPERTY = '--_cl-keyboard-offset';
 
 // Keyboard-sized changes only: browser toolbars collapsing and expanding stay below this.
 const KEYBOARD_THRESHOLD = 60;
 
 let listeners = 0;
 let detach: (() => void) | null = null;
-let frame = 0;
 // A fixed `100svh` box. Chrome on iOS shrinks `svh` to the keyboard before it resizes the layout
 // viewport to match, so a box that already fits the visible band means the browser is moving fixed
 // content itself, and an inset would lift the dialog twice. Safari leaves `svh` alone.
 let smallViewportProbe: HTMLElement | null = null;
+let fixedBoxProbe: HTMLElement | null = null;
 
 /**
  * The gap between the bottom of the layout viewport and the bottom of the visual viewport — which
@@ -36,7 +42,7 @@ let smallViewportProbe: HTMLElement | null = null;
  * `offsetTop` is part of it because iOS scrolls the visual viewport to bring a focused field into
  * view, so the visible band moves as well as shrinks.
  */
-function measure(): number {
+export function measureKeyboardInset(): number {
   const viewport = window.visualViewport;
   if (!viewport) {
     return 0;
@@ -49,21 +55,15 @@ function measure(): number {
   if (smallViewportProbe && smallViewportProbe.offsetHeight - viewport.height <= KEYBOARD_THRESHOLD) {
     return 0;
   }
-  return Math.max(0, Math.round(document.documentElement.clientHeight - (viewport.height + viewport.offsetTop)));
+  const layoutHeight = fixedBoxProbe?.offsetHeight ?? document.documentElement.clientHeight;
+  return Math.max(0, Math.round(layoutHeight - (viewport.height + viewport.offsetTop)));
 }
 
 function publish(): void {
-  document.documentElement.style.setProperty(PROPERTY, `${measure()}px`);
-}
-
-function schedulePublish(): void {
-  if (frame) {
-    return;
-  }
-  frame = requestAnimationFrame(() => {
-    frame = 0;
-    publish();
-  });
+  const inset = measureKeyboardInset();
+  const offset = inset > 0 ? Math.round(Math.max(0, window.visualViewport?.offsetTop ?? 0)) : 0;
+  document.documentElement.style.setProperty(PROPERTY, `${inset}px`);
+  document.documentElement.style.setProperty(OFFSET_PROPERTY, `${offset}px`);
 }
 
 /**
@@ -83,17 +83,21 @@ export function acquireKeyboardInset(): () => void {
     smallViewportProbe.style.cssText =
       'position:fixed;top:0;height:100svh;width:0;visibility:hidden;pointer-events:none';
     document.body.appendChild(smallViewportProbe);
+    fixedBoxProbe = document.createElement('div');
+    fixedBoxProbe.style.cssText = 'position:fixed;top:0;bottom:0;width:0;visibility:hidden;pointer-events:none';
+    document.body.appendChild(fixedBoxProbe);
     publish();
-    viewport.addEventListener('resize', schedulePublish);
-    viewport.addEventListener('scroll', schedulePublish);
+    viewport.addEventListener('resize', publish);
+    viewport.addEventListener('scroll', publish);
     detach = () => {
-      viewport.removeEventListener('resize', schedulePublish);
-      viewport.removeEventListener('scroll', schedulePublish);
-      cancelAnimationFrame(frame);
-      frame = 0;
+      viewport.removeEventListener('resize', publish);
+      viewport.removeEventListener('scroll', publish);
       smallViewportProbe?.remove();
       smallViewportProbe = null;
+      fixedBoxProbe?.remove();
+      fixedBoxProbe = null;
       document.documentElement.style.removeProperty(PROPERTY);
+      document.documentElement.style.removeProperty(OFFSET_PROPERTY);
     };
   }
 

@@ -58,7 +58,6 @@ function servePasskeys(passkeys: PasskeyJSON[] = [fapiPasskey({ id: 'pk_1' })], 
 
 afterEach(() => {
   vi.useRealTimers();
-  vi.restoreAllMocks();
 });
 
 function fakeAuthenticator() {
@@ -273,27 +272,62 @@ describe('Adding a passkey', () => {
     expect(add).toBeEnabled();
   });
 
-  it.each(['session_reverification_required', 'form_param_invalid'])(
-    'shows %s and allows a manual retry',
-    async code => {
-      const fapi = servePasskeys([]);
-      fakeAuthenticator();
-      await renderWithClerk(<UserProfilePasskeysSection />);
-      const creation = holdRequests('post', '/v1/me/passkeys');
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-      await waitFor(() => expect(creation.requests).toHaveLength(1));
-      creation.fail(code);
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(code));
-      expect(screen.queryByRole('dialog')).toBeNull();
-      expect(creation.requests).toHaveLength(1);
-      const retried = serveFapi(fapi);
-      await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-      expect(await screen.findByText('Chrome on macOS')).toBeVisible();
-      expect(retried.client.sessions[0]?.user.passkeys).toHaveLength(1);
-      expect(screen.queryByRole('alert')).toBeNull();
-    },
-  );
+  it('shows a creation error and allows a manual retry', async () => {
+    const fapi = servePasskeys([]);
+    fakeAuthenticator();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    const creation = holdRequests('post', '/v1/me/passkeys');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    await waitFor(() => expect(creation.requests).toHaveLength(1));
+    creation.fail('form_param_invalid');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_param_invalid'));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(creation.requests).toHaveLength(1);
+    const retried = serveFapi(fapi);
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
+    expect(retried.client.sessions[0]?.user.passkeys).toHaveLength(1);
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('verifies the session before adding a passkey, then creates it', async () => {
+    const fapi = servePasskeys([], { verification: { secrets: { password: 'hunter2' } } });
+    const authenticator = fakeAuthenticator();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    demandReverificationOnce('/v1/me/passkeys');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
+    expect(authenticator).toHaveBeenCalledOnce();
+  });
+
+  it('lets the user cancel passkey verification quietly and add one again', async () => {
+    const fapi = servePasskeys([], { verification: { secrets: { password: 'hunter2' } } });
+    const authenticator = fakeAuthenticator();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    demandReverificationOnce('/v1/me/passkeys');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(0);
+    expect(authenticator).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
+  });
 
   it('uses the localized fallback when FAPI rejects creation without a message', async () => {
     servePasskeys([]);

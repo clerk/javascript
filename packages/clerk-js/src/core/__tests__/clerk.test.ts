@@ -1106,6 +1106,84 @@ describe('Clerk singleton', () => {
           expect(sut.__internal_getCachedResources).not.toHaveBeenCalled();
         });
       });
+
+      describe('__internal_reloadInitialResources after a failed load', () => {
+        const unsupportedAppVersion = () =>
+          new ClerkAPIResponseError('Unsupported app version', { data: [], status: 403 });
+
+        const loadFailingSut = async () => {
+          const sut = new Clerk(productionPublishableKey);
+          mockClientFetch.mockRejectedValueOnce(unsupportedAppVersion());
+          await expect(sut.load({ standardBrowser: false })).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          const statuses: string[] = [];
+          sut.on('status', status => statuses.push(status));
+          return { sut, statuses };
+        };
+
+        it('finishes loading the same instance once the reload succeeds', async () => {
+          const { sut, statuses } = await loadFailingSut();
+          const client = { signedInSessions: [] };
+          mockClientFetch.mockResolvedValueOnce(client);
+
+          await sut.__internal_reloadInitialResources();
+
+          expect(sut.status).toBe('ready');
+          expect(sut.loaded).toBe(true);
+          expect(sut.client).toBe(client);
+          expect(statuses).toEqual(['ready']);
+        });
+
+        it('stays failed while the reload is rejected, and finishes on a later reload', async () => {
+          const { sut, statuses } = await loadFailingSut();
+          mockClientFetch.mockRejectedValueOnce(unsupportedAppVersion());
+
+          await expect(sut.__internal_reloadInitialResources()).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          expect(sut.status).toBe('error');
+
+          mockClientFetch.mockResolvedValueOnce({ signedInSessions: [] });
+          await sut.__internal_reloadInitialResources();
+
+          expect(sut.status).toBe('ready');
+          expect(statuses).toEqual(['ready']);
+        });
+
+        it('finishes loading once when reloads overlap', async () => {
+          const { sut, statuses } = await loadFailingSut();
+          mockClientFetch.mockResolvedValue({ signedInSessions: [] });
+
+          await Promise.all([sut.__internal_reloadInitialResources(), sut.__internal_reloadInitialResources()]);
+
+          expect(sut.status).toBe('ready');
+          expect(statuses).toEqual(['ready']);
+        });
+
+        it('leaves a load that is still running to report its own result', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          const firstClientFetch = createDeferredPromise();
+          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockResolvedValueOnce({ signedInSessions: [] });
+
+          const load = sut.load({ standardBrowser: false });
+          await sut.__internal_reloadInitialResources();
+          expect(sut.status).toBe('loading');
+
+          firstClientFetch.reject(unsupportedAppVersion());
+          await expect(load).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          expect(sut.status).toBe('error');
+        });
+
+        it('does not report ready again after a load that succeeded', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          mockClientFetch.mockResolvedValue({ signedInSessions: [] });
+          await sut.load({ standardBrowser: false });
+          const statuses: string[] = [];
+          sut.on('status', status => statuses.push(status));
+
+          await sut.__internal_reloadInitialResources();
+
+          expect(sut.status).toBe('ready');
+          expect(statuses).toEqual([]);
+        });
+      });
     });
   });
 

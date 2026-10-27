@@ -12,9 +12,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
-  'organization-switcher': {
-    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
-  },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
@@ -54,10 +51,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
   },
-  'api-keys': {
+  misc: {
+    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
-  },
-  reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
   blocks: {
@@ -94,6 +90,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
     radio: dynamic(() => import('../stories/radio.mdx')),
+    reveal: dynamic(() => import('../stories/reveal.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
     'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
@@ -123,6 +120,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.mdx')),
     portal: dynamic(() => import('../stories/portal.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
+    table: dynamic(() => import('../stories/table.primitive.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     'tag-input': dynamic(() => import('../stories/tag-input.mdx')),
     toast: dynamic(() => import('../stories/toast.primitive.mdx')),
@@ -134,9 +132,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   hooks: {
     // Headless hooks — alphabetical.
-    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
     'use-form': dynamic(() => import('../stories/use-form.mdx')),
-    'use-server-data-table': dynamic(() => import('../stories/use-server-data-table.mdx')),
   },
   localization: {
     localization: dynamic(() => import('../stories/localization.mdx')),

@@ -1,7 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../../mosaic-provider';
 import type { UserProfileDevice } from '../user-profile-active-devices.types';
@@ -22,10 +22,6 @@ const mobile: UserProfileDevice = {
   description: 'Last seen 2 weeks ago · Orem, UT, United States',
   type: 'mobile',
 };
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function ActiveDevices({ devices, revokeAll }: { devices: UserProfileDevice[]; revokeAll: () => Promise<void> }) {
   const controller = useUserProfileActiveDevicesController({ devices, revokeAll });
@@ -114,37 +110,5 @@ describe('signing out of all other devices', () => {
       await signOutAll.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  });
-});
-
-describe('loading', () => {
-  function Section({ skeleton }: { skeleton: boolean }) {
-    const controller = useUserProfileActiveDevicesController({ devices: [current, mobile] });
-    return (
-      <UserProfileActiveDevicesSectionView
-        {...controller}
-        skeleton={skeleton}
-      />
-    );
-  }
-
-  it('announces the start and the end of loading from the same status message', () => {
-    const { rerender } = render(
-      <MosaicProvider>
-        <Section skeleton />
-      </MosaicProvider>,
-    );
-    const status = screen.getByRole('status');
-    expect(status).toHaveTextContent('Loading active devices');
-    expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument();
-
-    rerender(
-      <MosaicProvider>
-        <Section skeleton={false} />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('status')).toBe(status);
-    expect(status).toHaveTextContent('Active devices loaded');
-    expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
   });
 });

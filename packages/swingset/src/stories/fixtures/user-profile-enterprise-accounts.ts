@@ -13,6 +13,7 @@ export const accounts: UserProfileEnterpriseAccount[] = [
     name: 'Acme Okta',
     emailAddress: 'alex@acme.com',
     iconUrl: 'https://img.clerk.com/static/okta.svg',
+    monochromeIcon: true,
   },
   { id: 'account_custom', name: 'Internal SSO', emailAddress: 'alex@internal.acme.com' },
 ];
@@ -57,7 +58,7 @@ export function useEnterpriseAccountsFixture({
       setTimeout(() => {
         setLinkedAccounts(current => [
           ...current,
-          { id: `account_${id}`, name: connection.name, iconUrl: connection.iconUrl, emailAddress: 'alex@acme.com' },
+          { ...connection, id: `account_${id}`, connectError: undefined, emailAddress: 'alex@acme.com' },
         ]);
         setAvailableConnections(current => current.filter(item => item.id !== id));
         setPendingId(undefined);

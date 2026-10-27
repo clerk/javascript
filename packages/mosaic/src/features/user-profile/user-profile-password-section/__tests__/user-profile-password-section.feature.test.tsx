@@ -134,27 +134,21 @@ describe('Changing a password', () => {
     if (!clerk.user) {
       throw new Error('Expected a signed-in user');
     }
-    const update = vi.spyOn(clerk.user, 'updatePassword').mockRejectedValueOnce(new Error('Connection interrupted'));
-    try {
-      const user = await fillPassword();
-      const dialog = screen.getByRole('dialog');
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    vi.spyOn(clerk.user, 'updatePassword').mockRejectedValueOnce(new Error('Connection interrupted'));
+    const user = await fillPassword();
+    const dialog = screen.getByRole('dialog');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      await waitFor(() =>
-        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
-      );
-      expect(dialog).not.toHaveTextContent('Connection interrupted');
-      expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
-      expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
-      expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
-      expect(fapi.passwordUpdates).toHaveLength(0);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    expect(dialog).not.toHaveTextContent('Connection interrupted');
+    expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+    expect(fapi.passwordUpdates).toHaveLength(0);
 
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      expect(fapi.passwordUpdates).toHaveLength(1);
-    } finally {
-      update.mockRestore();
-    }
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(1);
   });
 
   it('shows feedback when the password strength checker cannot load', async () => {
@@ -166,21 +160,17 @@ describe('Changing a password', () => {
     if (!modules) {
       throw new Error('Expected a module manager');
     }
-    const load = vi.spyOn(modules, 'import').mockRejectedValue(new Error('Failed to load password strength checker'));
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Change password' }));
-      await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
-      await user.type(screen.getByLabelText('New password'), 'new-password-123');
+    vi.spyOn(modules, 'import').mockRejectedValue(new Error('Failed to load password strength checker'));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
+    await user.type(screen.getByLabelText('New password'), 'new-password-123');
 
-      await waitFor(() =>
-        expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
-          'Something went wrong. Please try again.',
-        ),
-      );
-    } finally {
-      load.mockRestore();
-    }
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Something went wrong. Please try again.',
+      ),
+    );
   });
 
   it('sends the update to Clerk and closes after it succeeds', async () => {
@@ -222,7 +212,7 @@ describe('Changing a password', () => {
     expect(fapi.passwordUpdates).toHaveLength(0);
     await user.type(field, 'hunter2{Enter}');
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.passwordUpdates).toHaveLength(1);
   });
 
@@ -271,7 +261,7 @@ describe('Changing a password', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('form_password_pwned', undefined, 'new_password');
 
-    const field = await screen.findByLabelText('New password', undefined, { timeout: 3000 });
+    const field = await screen.findByLabelText('New password');
     expect(field).toHaveValue('new-password-123');
     await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
     await waitFor(() => expect(field).toHaveFocus());
@@ -535,12 +525,10 @@ describe('Changing a password', () => {
     await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
     await user.type(screen.getByLabelText('New password'), 'longpassword');
 
-    await waitFor(
-      () =>
-        expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
-          'Your password must contain a number and an uppercase letter.',
-        ),
-      { timeout: 2500 },
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain a number and an uppercase letter.',
+      ),
     );
   });
 

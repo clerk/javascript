@@ -6,7 +6,6 @@ import type { DialogFocusTarget } from '../../../components/dialog';
 export interface OrganizationProfileInvitation {
   id: string;
   email: string;
-  imageUrl?: string;
   invitedAtLabel: string;
   roleLabel: string;
 }

@@ -367,10 +367,34 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           }
           this.#eventBus.emit(clerkEvents.Status, 'error');
           this.emitLoaded();
+          this.replayWhenLoadIsFinished(clerk);
         });
     } else {
       onLoaded();
     }
+  }
+
+  /**
+   * clerk-js can finish a failed load on the same instance, such as when `@clerk/expo` reloads its initial resources
+   * once Clerk stops rejecting the app's version.
+   */
+  private replayWhenLoadIsFinished(clerk: HeadlessBrowserClerk | BrowserClerk): void {
+    if (clerk.loaded || typeof clerk.on !== 'function') {
+      return;
+    }
+    let finished = false;
+    const onStatus = (status: ClerkStatus) => {
+      if (finished || (status !== 'ready' && status !== 'degraded')) {
+        return;
+      }
+      finished = true;
+      // Unsubscribing while the event bus dispatches would skip the next listener.
+      queueMicrotask(() => {
+        clerk.off('status', onStatus);
+        this.replayInterceptedInvocations(clerk);
+      });
+    };
+    clerk.on('status', onStatus);
   }
 
   get sdkMetadata() {

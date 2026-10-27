@@ -2,7 +2,7 @@ import * as EmptyStateStories from './empty-state.stories';
 
 # EmptyState
 
-EmptyState explains why a surface has nothing in it and, optionally, what to do about it. It's composed from parts via dot syntax: `EmptyState.Root` centers its children in whatever container holds it, `EmptyState.Icon` renders a named icon in a filled frame, and `EmptyState.Label`, `EmptyState.Description`, and `EmptyState.Actions` stack below it. Drop it inside [Table](/components/table)'s `Table.Empty` row, a card, or a section.
+EmptyState explains why a surface has nothing in it and, optionally, what to do about it. It's composed from parts via dot syntax: `EmptyState.Root` centers its children in whatever container holds it, `EmptyState.Icon` renders a named icon in a filled frame, and `EmptyState.Label`, `EmptyState.Description`, and `EmptyState.Actions` stack below it. Drop it inside [Table](/components/table)'s `renderEmptyState`, a card, or a section.
 
 ## Example
 
@@ -15,9 +15,10 @@ EmptyState explains why a surface has nothing in it and, optionally, what to do 
 
 ```tsx
 import { EmptyState } from '@clerk/mosaic/components/empty-state';
+import { MagnifyingGlass } from '@clerk/mosaic/icons/glyphs/magnifying-glass';
 
 <EmptyState.Root>
-  <EmptyState.Icon name='magnifying-glass' />
+  <EmptyState.Icon glyph={MagnifyingGlass} />
   <EmptyState.Label>No results</EmptyState.Label>
   <EmptyState.Description>Try a different search.</EmptyState.Description>
 </EmptyState.Root>;

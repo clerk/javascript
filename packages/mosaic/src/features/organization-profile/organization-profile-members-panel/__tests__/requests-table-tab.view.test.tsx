@@ -1,9 +1,10 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { RequestsTableTab } from '../requests-table-tab';
 import type { RequestsTableTabViewProps } from '../requests-table-tab.types';
 import { RequestsTableTabView } from '../requests-table-tab.view';
 
@@ -30,11 +31,19 @@ function renderView(overrides: Partial<RequestsTableTabViewProps> = {}) {
   };
 }
 
-describe('RequestsTableTabView', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
+function renderTab(overrides: Partial<RequestsTableTabViewProps> = {}) {
+  const props = propsFor(overrides);
+  return {
+    props,
+    ...render(
+      <MosaicProvider>
+        <RequestsTableTab {...props} />
+      </MosaicProvider>,
+    ),
+  };
+}
 
+describe('RequestsTableTabView', () => {
   it.each(['Accept', 'Decline'] as const)(
     'holds the row while %s is pending and allows retry after failure',
     async action => {
@@ -71,12 +80,24 @@ describe('RequestsTableTabView', () => {
     },
   );
 
+  it('locks paging while a page loads', () => {
+    renderView({ totalCount: 25, page: 2, isFetching: true });
+    expect(screen.getByRole('button', { name: 'Previous requests page' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next requests page' })).toBeDisabled();
+  });
+
+  it('does not report requests as loaded when they fail to load', () => {
+    renderView({ isError: true, onRetry: vi.fn() });
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load requests');
+    expect(screen.queryByText('Requests loaded')).toBeNull();
+  });
+
   it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
-    const { props, rerender } = renderView({ requests: [], totalCount: 0, isLoading: true });
+    const { props, rerender } = renderTab({ requests: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...props}
           isLoading={false}
           isFetching
@@ -86,16 +107,16 @@ describe('RequestsTableTabView', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...props}
           isLoading={false}
         />
       </MosaicProvider>,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No pending requests');
+    expect(within(screen.getByRole('table')).getByRole('status')).toHaveTextContent('No pending requests');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...propsFor()}
           isFetching
         />
@@ -105,7 +126,7 @@ describe('RequestsTableTabView', () => {
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...propsFor()}
           isError
           onRetry={vi.fn()}

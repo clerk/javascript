@@ -8,6 +8,7 @@ export type ConnectedAccountActionResult = 'redirecting' | void;
 
 export interface ConnectedAccountProviderDisplay {
   provider: string;
+  iconId?: string;
   iconUrl?: string;
   monochromeIcon?: boolean;
 }
@@ -37,4 +38,6 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   finalFocus?: DialogFocusTarget;
   reconnectReverification?: ReverificationController;
   reconnectFinalFocus?: DialogFocusTarget;
+  connectReverification?: ReverificationController;
+  connectFinalFocus?: DialogFocusTarget;
 }

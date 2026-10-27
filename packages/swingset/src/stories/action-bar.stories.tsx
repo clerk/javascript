@@ -6,7 +6,9 @@ import { Menu } from '@clerk/mosaic/components/menu';
 import { Panel } from '@clerk/mosaic/components/panel';
 import { Profile } from '@clerk/mosaic/components/profile';
 import { Table } from '@clerk/mosaic/components/table';
-import { useDataTable } from '@clerk/mosaic/primitives/hooks';
+import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
+import { Trash } from '@clerk/mosaic/icons/glyphs/trash';
+import { Users } from '@clerk/mosaic/icons/glyphs/users';
 import type { ComponentProps } from 'react';
 import { useId, useRef, useState } from 'react';
 
@@ -47,44 +49,39 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
   const tableId = useId();
   const tableRef = useRef<HTMLTableElement>(null);
   const selectAllRef = useRef<HTMLInputElement>(null);
-  const table = useDataTable({ data: members.slice(0, rows), getRowId: row => row.id });
-  const count = Object.values(table.rowSelection).filter(Boolean).length;
-  const clearSelection = () => table.setRowSelection({});
+  const [selection, setSelection] = useState<string[]>([]);
+  const count = selection.length;
+  const clearSelection = () => setSelection([]);
 
   return (
     <>
       <Table.Root
         ref={tableRef}
         id={tableId}
+        aria-label='Members'
+        selectionMode='multiple'
+        selection={selection}
+        onSelectionChange={setSelection}
       >
         <Table.Header>
-          <Table.Row>
-            <Table.SelectAllCell
-              ref={selectAllRef}
-              aria-label='Select all members'
-              checked={table.getIsAllRowsSelected()}
-              indeterminate={table.getIsSomeRowsSelected()}
-              onChange={() => table.toggleAllRowsSelected()}
-            />
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Role</Table.HeaderCell>
-          </Table.Row>
+          <Table.SelectionColumn
+            ref={selectAllRef}
+            aria-label='Select all members'
+          />
+          <Table.Column rowHeader>Name</Table.Column>
+          <Table.Column>Role</Table.Column>
         </Table.Header>
-        <Table.Body>
-          {table.rows.map(row => (
-            <Table.Row
-              key={row.id}
-              selected={row.getIsSelected()}
-            >
-              <Table.SelectCell
-                aria-label={`Select ${row.original.name}`}
-                checked={row.getIsSelected()}
-                onToggleSelected={row.toggleSelected}
-              />
-              <Table.Cell>{row.original.name}</Table.Cell>
-              <Table.Cell>{row.original.role}</Table.Cell>
+        <Table.Body
+          items={members.slice(0, rows)}
+          itemToStringValue={member => member.id}
+        >
+          {member => (
+            <Table.Row>
+              <Table.SelectionCell aria-label='Select' />
+              <Table.Cell>{member.name}</Table.Cell>
+              <Table.Cell>{member.role}</Table.Cell>
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
       <ActionBar.Root
@@ -103,7 +100,7 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
           <Menu.Trigger render={<ActionBar.Action />}>
             Change role
             <Icon
-              name='chevron-down'
+              glyph={ChevronDown}
               placement='inline-end'
             />
           </Menu.Trigger>
@@ -129,7 +126,7 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
           aria-label='Remove selected'
           onClick={clearSelection}
         >
-          <Icon name='trash' />
+          <Icon glyph={Trash} />
         </ActionBar.Action>
         <ActionBar.Separator />
         <ActionBar.Dismiss onClick={clearSelection} />
@@ -162,7 +159,7 @@ function MembersProfile({
           value='members'
           icon={
             <Icon
-              name='users'
+              glyph={Users}
               size='sm'
             />
           }
