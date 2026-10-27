@@ -397,18 +397,6 @@ describe('createClerkInstance', () => {
     await expect(tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('fresh-token');
   });
 
-  test('creates a new Clerk instance after the current one is discarded', async () => {
-    const mod = await import('../createClerkInstance');
-    const getClerkInstance = mod.createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const first = getClerkInstance({ publishableKey: 'pk_test_123' });
-
-    mod.discardClerkInstance();
-    const second = getClerkInstance({ publishableKey: 'pk_test_123' });
-
-    expect(second).not.toBe(first);
-    expect(getClerkInstance({ publishableKey: 'pk_test_123' })).toBe(second);
-  });
-
   test('identifies the app without changing the API version', async () => {
     const { beforeRequest, requestInit } = await setUpBeforeRequest({
       getToken: vi.fn().mockResolvedValue(null),

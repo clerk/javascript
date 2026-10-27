@@ -108,10 +108,6 @@ function getUpdatedClerkOptions(
   };
 }
 
-export function discardClerkInstance(): void {
-  __internal_clerk = undefined;
-}
-
 export function createClerkInstance(ClerkClass: typeof Clerk) {
   return (options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk => {
     const { __experimental_resourceCache: createResourceCache } = options || {};

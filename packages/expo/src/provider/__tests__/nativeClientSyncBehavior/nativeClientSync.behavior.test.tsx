@@ -43,7 +43,7 @@ vi.mock('@clerk/react/internal', async () => {
 
 vi.mock('../../singleton', async () => {
   const { getClerkInstanceForActiveEnvironment } = await import('./environment');
-  return { discardClerkInstance: () => {}, getClerkInstance: getClerkInstanceForActiveEnvironment };
+  return { getClerkInstance: getClerkInstanceForActiveEnvironment };
 });
 
 vi.mock('../../../specs/NativeClerkModule', async () => {

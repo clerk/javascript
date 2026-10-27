@@ -5,14 +5,13 @@ import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/rea
 import { useEffect, useMemo, useRef } from 'react';
 
 import { getNativeAppIdentity } from '../app-version/nativeAppIdentity';
-import { useClerkRestartWhenSupported } from '../app-version/useClerkRestartWhenSupported';
 import type { TokenCache } from '../cache/types';
 import { UpdateRequiredModal } from '../update-required/UpdateRequiredModal';
 import { ClerkExpoModule } from '../utils/native-module';
 import { isNative, isWeb } from '../utils/runtime';
 import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
 import { createNativeClientSync, type SyncableClerk } from './nativeClientSync';
-import { discardClerkInstance, getClerkInstance } from './singleton';
+import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
 export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderProps<TUi>, 'publishableKey'> & {
@@ -112,8 +111,6 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       })
     : null;
 
-  const clerkRestarts = useClerkRestartWhenSupported(clerkInstance as { status?: string } | null, discardClerkInstance);
-
   useEffect(
     () =>
       nativeClientSync && clerkInstance
@@ -134,7 +131,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     <ClerkReactProvider
       // Force reset the state when the provided key changes, this ensures that the provider does not retain stale state.
       // See JS-598 for additional context.
-      key={`${pk}:${clerkRestarts}`}
+      key={pk}
       {...rest}
       publishableKey={pk}
       proxyUrl={proxyUrl}

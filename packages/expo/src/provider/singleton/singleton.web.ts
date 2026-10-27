@@ -15,5 +15,3 @@ declare global {
  */
 export const getClerkInstance = (_options?: BuildClerkOptions): HeadlessBrowserClerk | BrowserClerk | undefined =>
   globalThis?.window?.Clerk;
-
-export const discardClerkInstance = (): void => {};
