@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Accept a successful Frontend API response with an empty body. The request now resolves with a `null` payload and runs its response callbacks, as it does for a `204 No Content` response, instead of failing to parse the empty body as JSON.
+Let a Frontend API request opt in to an empty successful response. With the internal `allowEmptyBody` option, an empty body resolves with a `null` payload and runs the response callbacks, as a `204 No Content` response does, even when a proxy drops `Content-Length`. Every other request parses its response as before.
