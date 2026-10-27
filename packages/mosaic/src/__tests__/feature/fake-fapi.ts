@@ -500,11 +500,11 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         : missing();
     }),
     http.post(fapiUrl('/v1/client/sessions/:id/touch'), async ({ params, request }) => {
+      const body = new URLSearchParams(await request.text());
       const session = findSession(state, params.id);
       if (!session) {
         return missing();
       }
-      const body = new URLSearchParams(await request.text());
       const organizationId = body.get('active_organization_id') || null;
       const touched = {
         ...session,
