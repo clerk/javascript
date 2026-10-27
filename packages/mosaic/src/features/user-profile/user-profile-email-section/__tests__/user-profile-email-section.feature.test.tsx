@@ -68,6 +68,31 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile email section', () => {
+  it('closes the menu and blocks conflicting actions while setting an address as primary', async () => {
+    const other = fapiEmailAddress({ id: 'idn_other', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, other]));
+    const primary = holdRequests('post', '/v1/me');
+    try {
+      await manageEmail(actor, 'bob@example.com', 'Set as primary');
+      await waitFor(() => expect(primary.requests).toHaveLength(1));
+      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+      const manage = screen.getByRole('button', { name: 'Manage bob@example.com' });
+      expect(manage).toHaveAttribute('aria-disabled', 'true');
+      await actor.click(manage);
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
+      expect(await screen.findByRole('status', { name: 'Set as primary' })).toBeVisible();
+    } finally {
+      primary.release();
+      await waitFor(() =>
+        expect(within(emailRow()).getByText('bob@example.com').parentElement).toHaveTextContent('Primary'),
+      );
+    }
+    expect(screen.getByRole('button', { name: 'Manage bob@example.com' })).not.toHaveAttribute('aria-disabled', 'true');
+    expect(screen.queryByRole('status', { name: 'Set as primary' })).toBeNull();
+  });
+
   it('adds an address and verifies the code it was sent', async () => {
     const { actor } = await renderSection(signedInWithEmails([]));
     expect(emailRow()).toHaveTextContent('No email addresses added');

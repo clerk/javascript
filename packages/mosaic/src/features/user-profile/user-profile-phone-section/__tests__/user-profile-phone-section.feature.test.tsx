@@ -92,6 +92,28 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile phone section', () => {
+  it('closes the menu and blocks conflicting actions while setting a number as primary', async () => {
+    const { actor } = await renderSection(signedIn([HOME, WORK]));
+    const primary = holdRequests('post', '/v1/me');
+    try {
+      await manage(actor, WORK_LABEL, 'Set as primary');
+      await waitFor(() => expect(primary.requests).toHaveLength(1));
+      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+      const manageWork = screen.getByRole('button', { name: `Manage ${WORK_LABEL}` });
+      expect(manageWork).toHaveAttribute('aria-disabled', 'true');
+      await actor.click(manageWork);
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Add phone number' })).toBeDisabled();
+      expect(await screen.findByRole('status', { name: 'Set as primary' })).toBeVisible();
+    } finally {
+      primary.release();
+      await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
+    }
+    expect(screen.getByRole('button', { name: `Manage ${WORK_LABEL}` })).not.toHaveAttribute('aria-disabled', 'true');
+    expect(screen.queryByRole('status', { name: 'Set as primary' })).toBeNull();
+  });
+
   it('lists the primary number first and marks it', async () => {
     await renderSection(signedIn([HOME, WORK]));
 
