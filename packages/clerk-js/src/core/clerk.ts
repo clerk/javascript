@@ -31,6 +31,7 @@ import {
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
 import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
+import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '@clerk/shared/internal/clerk-js/localStorage';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -174,7 +175,6 @@ import {
   stripOrigin,
   web3,
 } from '../utils';
-import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
