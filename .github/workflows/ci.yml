@@ -474,18 +474,24 @@ jobs:
 
       - name: Run visual tests
         id: visual
-        continue-on-error: true
-        run: bash packages/mosaic/scripts/test-visual.sh compare
+        run: |
+          status=0
+          bash packages/mosaic/scripts/test-visual.sh compare || status=$?
+          if [[ "$status" -ne 0 ]] && find packages/mosaic/.vitest/attachments -name '*.png' -print -quit 2>/dev/null | grep -q .; then
+            echo "differences=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$status" -ne 0 ]]; then
+            exit "$status"
+          fi
 
       - name: Report visual differences
-        if: ${{ steps.visual.outcome == 'failure' }}
+        if: ${{ steps.visual.outputs.differences == 'true' }}
         run: |
           echo "::warning title=Mosaic visual differences::Screenshots differ from baselines. Download mosaic-visual-failure-artifacts-${{ github.run_id }}-${{ github.run_attempt }} to review."
           echo "### Mosaic screenshots differ from baselines" >> "$GITHUB_STEP_SUMMARY"
           find packages/mosaic/.vitest/attachments -name '*.png' -printf '- %P\n' >> "$GITHUB_STEP_SUMMARY" || true
 
       - name: Upload failure artifacts
-        if: ${{ steps.visual.outcome == 'failure' }}
+        if: ${{ steps.visual.outputs.differences == 'true' }}
         uses: actions/upload-artifact@v4.6.2
         with:
           name: mosaic-visual-failure-artifacts-${{ github.run_id }}-${{ github.run_attempt }}
