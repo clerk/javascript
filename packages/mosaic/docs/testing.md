@@ -106,7 +106,7 @@ jsdom and happy-dom have no layout engine, so every rect is 0 and a test that
 asserts on position, size or scrolling always passes there. Name such a test
 `*.browser.test.tsx` so it runs in Chromium, in the same CI job.
 
-Feature tests need Chromium: run `pnpm playwright install chromium` once. They
+Feature and browser tests need Chromium: run `pnpm playwright install chromium` once. They
 import the built `@clerk/clerk-js`, so run `pnpm turbo build --filter=@clerk/clerk-js`
 after changing it. Failure screenshots land in `packages/mosaic/.vitest/`.
 Console output from passing tests only shows with `--reporter=verbose`.

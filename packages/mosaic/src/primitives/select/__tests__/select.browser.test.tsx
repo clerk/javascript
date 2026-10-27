@@ -59,7 +59,7 @@ describe('Select in a real browser', () => {
     const selectedOption = document.querySelector<HTMLElement>('[role="option"][data-selected]');
     expect(selectedOption).not.toBeNull();
     expect(top(selectedOption) - top(screen.getByTestId('select-popup'))).toBeGreaterThan(50);
-    await expect.poll(() => Math.abs(top(selectedOption) - trigger.getBoundingClientRect().top)).toBeLessThan(50);
+    await expect.poll(() => Math.abs(top(selectedOption) - top(trigger))).toBeLessThan(1);
   });
 
   it('repositions when ancestor scrolls', async () => {
@@ -73,14 +73,17 @@ describe('Select in a real browser', () => {
       </div>,
     );
 
-    await userEvent.click(screen.getByRole('combobox'));
+    const trigger = screen.getByRole('combobox');
+    await userEvent.click(trigger);
 
     const positioner = screen.getByTestId('select-positioner');
-    const initialTop = positioner.getBoundingClientRect().top;
+    const initialTriggerTop = top(trigger);
+    const gap = top(positioner) - initialTriggerTop;
 
     screen.getByTestId('scroll-container').scrollTop += 100;
 
-    await expect.poll(() => positioner.getBoundingClientRect().top).not.toBe(initialTop);
+    expect(top(trigger)).toBeLessThan(initialTriggerTop - 50);
+    await expect.poll(() => Math.abs(top(positioner) - top(trigger) - gap)).toBeLessThan(1);
   });
 });
 
