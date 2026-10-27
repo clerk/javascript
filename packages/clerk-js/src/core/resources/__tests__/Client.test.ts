@@ -226,6 +226,44 @@ describe('Client Singleton', () => {
     expect(client.signIn.id).toBe('test_sign_in_id_v2');
   });
 
+  it('preserves sign in identity after resetSignIn when fromJSON receives a new attempt', () => {
+    const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
+    const initialClientJSON: ClientJSON = {
+      object: 'client',
+      id: 'test_id',
+      status: 'active',
+      last_active_session_id: null,
+      sign_in: createSignIn({ id: 'test_sign_in_id', status: 'needs_first_factor' }, user),
+      sign_up: null,
+      sessions: [],
+      created_at: Date.now() - 1000,
+      updated_at: Date.now(),
+    } as any;
+
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
+    const client = new Client(initialClientJSON);
+    client.resetSignIn();
+    const resetSignIn = client.signIn;
+
+    client.fromJSON({
+      ...initialClientJSON,
+      sign_in: createSignIn(
+        {
+          id: 'test_sign_in_id_v2',
+          status: 'needs_second_factor',
+          identifier: 'updated@example.com',
+        },
+        user,
+      ),
+      updated_at: Date.now() + 1000,
+    });
+
+    expect(client.signIn).toBe(resetSignIn);
+    expect(client.signIn.id).toBe('test_sign_in_id_v2');
+    expect(client.signIn.identifier).toBe('updated@example.com');
+    expect(client.signIn.status).toBe('needs_second_factor');
+  });
+
   it('has the same initial properties', () => {
     const clientJSON = {
       object: 'client',
