@@ -12,6 +12,7 @@ import { http, HttpResponse } from 'msw';
 import { useRef, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import type { FakeVerificationSeed } from '../../../__tests__/feature/fake-fapi/verification';
 import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
@@ -29,6 +30,14 @@ const alice = fapiUser({
 });
 
 const aliceSession = fapiSession({ id: 'sess_1', user: alice });
+const bobSession = fapiSession({
+  id: 'sess_2',
+  user: fapiUser({
+    id: 'user_2',
+    first_name: 'Bob',
+    email_addresses: [fapiEmailAddress({ id: 'idn_bob', email_address: 'bob@example.com' })],
+  }),
+});
 
 const VERIFY = '/v1/client/sessions/sess_1/verify';
 const PREPARE_FIRST = `${VERIFY}/prepare_first_factor`;
@@ -109,11 +118,15 @@ function errorCode(error: unknown) {
   return 'unknown';
 }
 
-function Host({ action }: { action: () => Promise<unknown> }) {
+function Host({ action, onOutcome }: { action: () => Promise<unknown>; onOutcome?: (outcome: string) => void }) {
   const [run, reverification] = useReverificationFlow(action);
   const [outcome, setOutcome] = useState('');
   const [running, setRunning] = useState(false);
   const inFlight = useRef(false);
+  const report = (value: string) => {
+    setOutcome(value);
+    onOutcome?.(value);
+  };
 
   return (
     <>
@@ -127,8 +140,8 @@ function Host({ action }: { action: () => Promise<unknown> }) {
           }
           void run()
             .then(
-              () => setOutcome('resolved'),
-              (error: unknown) => setOutcome(`rejected: ${errorCode(error)}`),
+              () => report('resolved'),
+              (error: unknown) => report(`rejected: ${errorCode(error)}`),
             )
             .finally(() => {
               if (owner) {
@@ -196,11 +209,13 @@ function renderReverification(
   action = guardedAction(),
   seed: FakeFapiSeed = signedIn(),
   localization?: MosaicLocalization,
+  options?: Parameters<typeof renderWithClerk>[1],
 ) {
   const fapi = serveFapi(seed);
   const host = <Host action={action} />;
   return renderWithClerk(
     localization ? <MosaicProvider localization={localization}>{host}</MosaicProvider> : host,
+    options,
   ).then(view => ({ ...view, fapi, action }));
 }
 
@@ -1060,7 +1075,32 @@ describe('Reverification', () => {
         // Email support opens a mail to support@ the Frontend API host
         await user.click(await screen.findByRole('button', { name: 'Email support' }));
         await waitFor(() => expect(navigations.urls).toHaveLength(1));
-        expect(navigations.urls[0]).toMatch(/^mailto:support@/);
+        expect(navigations.urls[0]).toMatch(/^mailto:support@run\d+\.12345\.prod\.lclclerk\.com$/);
+      } finally {
+        navigations.stop();
+      }
+    });
+
+    it('emails the support address from the supportEmail option over the environment', async () => {
+      await renderReverification(
+        guardedAction(),
+        verificationSeed(
+          { firstFactors: [passwordFactor, emailFactor] },
+          { environment: fapiEnvironment({ display_config: { support_email: 'help@acme.test' } }) },
+        ),
+        undefined,
+        { supportEmail: 'option@acme.test' },
+      );
+      const navigations = captureNavigations();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Get help' }));
+
+        await user.click(await screen.findByRole('button', { name: 'Email support' }));
+        await waitFor(() => expect(navigations.urls).toEqual(['mailto:option@acme.test']));
       } finally {
         navigations.stop();
       }
@@ -1127,6 +1167,7 @@ describe('Reverification', () => {
       // A second call rejects with request_already_in_progress
       await user.click(screen.getByRole('button', { name: 'Run action' }));
       await waitFor(() => expect(outcome()).toBe('rejected: request_already_in_progress'));
+      expect(action).toHaveBeenCalledTimes(2);
       expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
       expect(passwordField()).toHaveAttribute('readonly');
 
@@ -1369,8 +1410,26 @@ describe('Reverification', () => {
   });
 
   describe('action lifecycle', () => {
+    it('rejects a second call while the first request is in flight', async () => {
+      const response = deferred<{ done: true }>();
+      const action = vi.fn(() => response.promise);
+      await renderReverification(action);
+      const user = await startVerification();
+
+      await user.click(screen.getByRole('button', { name: 'Run action' }));
+
+      await waitFor(() => expect(outcome()).toBe('rejected: request_already_in_progress'));
+      expect(action).toHaveBeenCalledOnce();
+
+      response.resolve({ done: true });
+      await untilResolved();
+    });
+
     it('rejects a second call while a challenge is open', async () => {
-      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const { action } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+      );
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), 'typed');
 
@@ -1380,6 +1439,7 @@ describe('Reverification', () => {
       await waitFor(() => expect(outcome()).toBe('rejected: request_already_in_progress'));
 
       // The open challenge is unaffected
+      expect(action).toHaveBeenCalledOnce();
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(passwordField()).toHaveValue('typed');
     });
@@ -1399,6 +1459,134 @@ describe('Reverification', () => {
 
       // The action is rejected as cancelled
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+    });
+
+    it('cancels the challenge when the active session changes', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }, { client: fapiClient([aliceSession, bobSession]) }),
+      );
+      await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+
+      await act(() => clerk.setActive({ session: 'sess_2' }));
+
+      await untilClosed();
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+    });
+
+    it('keeps the challenge open while the session is briefly unset during a navigation', async () => {
+      const { clerk, navigate } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+      );
+      const navigation = deferred<undefined>();
+      navigate.mockImplementationOnce(() => navigation.promise);
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+
+      let switching: Promise<void> = Promise.resolve();
+      act(() => {
+        switching = clerk.setActive({ session: 'sess_1', redirectUrl: '/elsewhere' });
+      });
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/elsewhere'));
+      expect(clerk.session).toBeUndefined();
+      navigation.resolve(undefined);
+      await act(() => switching);
+
+      expect(clerk.session?.id).toBe('sess_1');
+      expect(screen.getByText(STEP.password)).toBeVisible();
+      expect(outcome()).toBe('');
+
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+    });
+
+    it('lets a retry finish when the session changes or signs out', async () => {
+      const retry = deferred<{ done: true }>();
+      const action = vi
+        .fn()
+        .mockResolvedValueOnce(reverificationError())
+        .mockImplementationOnce(() => retry.promise);
+      const { clerk } = await renderReverification(
+        action,
+        verificationSeed({ firstFactors: [passwordFactor] }, { client: fapiClient([aliceSession, bobSession]) }),
+      );
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+
+      await act(() => clerk.setActive({ session: 'sess_2' }));
+      await act(() => clerk.signOut());
+      await settle();
+      expect(outcome()).toBe('');
+
+      retry.resolve({ done: true });
+      await untilResolved();
+    });
+
+    it('cancels the challenge when its owner unmounts', async () => {
+      serveFapi(verificationSeed({ firstFactors: [passwordFactor] }));
+      const onOutcome = vi.fn();
+      const { rerender } = await renderWithClerk(
+        <Host
+          action={guardedAction()}
+          onOutcome={onOutcome}
+        />,
+      );
+      await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+
+      rerender(<p>Gone</p>);
+
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: reverification_cancelled'));
+    });
+
+    it('cancels the challenge when its owner unmounts before the action asks for reverification', async () => {
+      serveFapi(signedIn());
+      const response = deferred<unknown>();
+      const action = vi.fn(() => response.promise);
+      const onOutcome = vi.fn();
+      const { rerender } = await renderWithClerk(
+        <Host
+          action={action}
+          onOutcome={onOutcome}
+        />,
+      );
+      await startVerification();
+      await waitFor(() => expect(action).toHaveBeenCalledOnce());
+
+      rerender(<p>Gone</p>);
+      response.resolve(reverificationError());
+
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: reverification_cancelled'));
+      expect(action).toHaveBeenCalledOnce();
+    });
+
+    it('lets a retry finish when its owner unmounts', async () => {
+      serveFapi(verificationSeed({ firstFactors: [passwordFactor] }));
+      const retry = deferred<{ done: true }>();
+      const action = vi
+        .fn()
+        .mockResolvedValueOnce(reverificationError())
+        .mockImplementationOnce(() => retry.promise);
+      const onOutcome = vi.fn();
+      const { rerender } = await renderWithClerk(
+        <Host
+          action={action}
+          onOutcome={onOutcome}
+        />,
+      );
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+
+      rerender(<p>Gone</p>);
+      await settle();
+      expect(onOutcome).not.toHaveBeenCalled();
+
+      retry.resolve({ done: true });
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('resolved'));
     });
 
     it('passes through an error that is unrelated to reverification', async () => {
