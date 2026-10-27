@@ -8,12 +8,12 @@ const root = path.resolve(import.meta.dirname, '../../..');
 const eslint = new ESLint({ cwd: root });
 
 describe('ported lint policy', () => {
-  test('checks Mosaic implementation code without rejecting test assertions', async () => {
+  test('uses the existing assertion policy and excludes tests from internal condition checks', async () => {
     const implementation = await eslint.calculateConfigForFile('packages/mosaic/src/utils/apply-order.ts');
     const tests = await eslint.calculateConfigForFile('packages/mosaic/src/__tests__/object.test.ts');
 
-    expect(implementation.rules['e18e/no-spread-in-reduce']?.[0]).toBe(1);
-    expect(tests.rules['e18e/no-spread-in-reduce']).toBeUndefined();
+    expect(implementation.rules['@typescript-eslint/no-unnecessary-condition']?.[0]).toBe(1);
+    expect(tests.rules['@typescript-eslint/no-unnecessary-condition']).toBeUndefined();
     expect(implementation.rules['@typescript-eslint/consistent-type-assertions']).toEqual([
       2,
       { assertionStyle: 'never' },
@@ -34,7 +34,7 @@ describe('ported lint policy', () => {
 
     expect(config.rules['react-hooks/rules-of-hooks'][0]).toBe(1);
     expect(config.rules['no-restricted-syntax']).toBeUndefined();
-    expect(Object.keys(config.rules).filter(rule => /^(e18e|code-quality|good-css)\//.test(rule))).toEqual([]);
+    expect(Object.keys(config.rules).filter(rule => rule.startsWith('good-css/'))).toEqual([]);
   });
 
   test('checks authored Mosaic styles despite the selector override', async () => {

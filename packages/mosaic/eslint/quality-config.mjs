@@ -1,4 +1,3 @@
-import e18e from '@e18e/eslint-plugin';
 import tseslint from 'typescript-eslint';
 
 import goodCss from './good-css.mjs';
@@ -8,15 +7,6 @@ export default [
     ...tseslint.configs.disableTypeChecked,
     name: 'packages/mosaic - lint tooling',
     files: ['packages/mosaic/eslint/*.mjs'],
-  },
-  {
-    name: 'packages/mosaic - code quality',
-    files: ['packages/mosaic/src/**/*.{ts,tsx}'],
-    ignores: testFiles,
-    plugins: { e18e },
-    rules: {
-      'e18e/no-spread-in-reduce': 'warn',
-    },
   },
   {
     name: 'packages/mosaic - internal conditions',
