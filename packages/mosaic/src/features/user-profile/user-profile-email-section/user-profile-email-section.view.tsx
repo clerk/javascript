@@ -59,6 +59,7 @@ export function UserProfileEmailSectionView({
         onRemove={remove ? email => remove.open(email) : undefined}
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
+        pendingVerifyId={verification.pendingVerifyId}
       >
         <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>

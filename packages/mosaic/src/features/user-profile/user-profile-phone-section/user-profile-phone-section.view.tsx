@@ -60,6 +60,7 @@ export function UserProfilePhoneSectionView({
         onRemove={remove ? phone => remove.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
+        pendingVerifyId={verification.pendingVerifyId}
       >
         <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>

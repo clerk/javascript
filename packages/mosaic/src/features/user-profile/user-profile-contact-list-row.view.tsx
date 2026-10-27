@@ -22,6 +22,7 @@ export interface UserProfileContactListRowViewProps {
   items: UserProfileContact[];
   onAdd?: () => void;
   onVerify?: (id: string) => void;
+  pendingVerifyId?: string;
   onSetPrimary?: (id: string) => void;
   onRemove?: (item: UserProfileContact) => void;
   children?: ReactNode;
@@ -33,6 +34,7 @@ export function UserProfileContactListRowView({
   items,
   onAdd,
   onVerify,
+  pendingVerifyId,
   onSetPrimary,
   onRemove,
   addAction,
@@ -89,6 +91,7 @@ export function UserProfileContactListRowView({
                 actions.push({
                   label: item.isDefault ? m.completeVerification : m[kind].verify,
                   onClick: () => onVerify(item.id),
+                  pending: pendingVerifyId === item.id,
                 });
               } else if (item.isVerified && !item.isDefault && onSetPrimary) {
                 actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });

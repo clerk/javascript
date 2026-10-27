@@ -155,6 +155,27 @@ describe('the user profile phone section', () => {
     await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).not.toHaveTextContent('Unverified'));
   });
 
+  it('holds the menu open with a spinner on Verify until the code is sent', async () => {
+    const pending = fapiPhoneNumber({ id: 'idn_new', phone_number: '+18015550199' });
+    const { actor } = await renderSection(signedIn([HOME, pending]));
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await manage(actor, WORK_LABEL, 'Verify phone number');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Verify phone number' })).toHaveAttribute('aria-busy', 'true');
+      expect(await screen.findByRole('progressbar', { name: 'Verify phone number' })).toBeVisible();
+      expect(screen.queryByRole('dialog')).toBeNull();
+    } finally {
+      prepare.release();
+    }
+
+    await enterCode(actor, VERIFICATION_CODE);
+    expect(screen.queryByRole('menu')).toBeNull();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
   it('makes another verified number the primary one', async () => {
     const { actor } = await renderSection(signedIn([HOME, WORK]));
 
