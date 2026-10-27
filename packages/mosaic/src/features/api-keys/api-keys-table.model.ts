@@ -2,6 +2,7 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import { useAPIKeys, useClerk, useSession } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
+import { useEffect, useRef } from 'react';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { save } from '../../utils/errors';
@@ -40,6 +41,11 @@ export function useAPIKeysTableModel(subject: string, pageSize: number, query: s
     keepPreviousData: true,
     enabled: isAvailable && canRead,
   });
+  const fetchPage = useRef(apiKeys.fetchPage);
+  fetchPage.current = apiKeys.fetchPage;
+  useEffect(() => {
+    fetchPage.current(1);
+  }, [query]);
 
   return {
     isLoaded,
