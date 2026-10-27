@@ -14,6 +14,7 @@ import { setNativeAppIdentityHeaders } from './nativeAppIdentity';
 const UNSUPPORTED_APP_VERSION_CODE = 'unsupported_app_version';
 const APP_VERSION_STATUS_HEADER = 'x-clerk-app-version-status';
 const ENVIRONMENT_PATH = '/environment';
+const FOREGROUND_CHECK_INTERVAL_MS = 30_000;
 
 type AppVersionRequest = {
   path?: string;
@@ -28,7 +29,7 @@ type AppVersionResponse = {
 };
 
 type AppVersionRequestHooks = {
-  refreshOnForegroundWhileUnsupported: (refresh: () => Promise<unknown>) => void;
+  checkOnForeground: (requests: { reload: () => Promise<unknown>; check: () => Promise<unknown> }) => void;
   beforeRequest: (requestInit: AppVersionRequest) => void;
   afterResponse: (requestInit: AppVersionRequest, response: AppVersionResponse) => void;
 };
@@ -42,11 +43,23 @@ export function createAppVersionRequestHooks(): AppVersionRequestHooks {
   const requests = new WeakMap<AppVersionRequest, number>();
 
   return {
-    refreshOnForegroundWhileUnsupported(refresh: () => Promise<unknown>) {
+    // The native SDKs refresh on every foreground, but Expo turns that off, so a supported app asks again here.
+    // While it's unsupported, it reloads instead, so a block that lifts also finishes a load the block failed.
+    checkOnForeground({ reload, check }) {
+      let lastCheck = Date.now();
       foregroundSubscription = AppState.addEventListener('change', state => {
-        if (state === 'active' && !getAppVersionSupportStatus().isSupported) {
-          void refresh().catch(() => {});
+        if (state !== 'active') {
+          return;
         }
+        if (!getAppVersionSupportStatus().isSupported) {
+          void reload().catch(() => {});
+          return;
+        }
+        if (Date.now() - lastCheck < FOREGROUND_CHECK_INTERVAL_MS) {
+          return;
+        }
+        lastCheck = Date.now();
+        void check().catch(() => {});
       });
     },
     beforeRequest(requestInit: AppVersionRequest) {

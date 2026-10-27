@@ -13,7 +13,7 @@ vi.mock('react-native', () => ({
 
 vi.mock('../../../app-version/appVersionRequestHooks', () => ({
   createAppVersionRequestHooks: () => ({
-    refreshOnForegroundWhileUnsupported: () => {},
+    checkOnForeground: () => {},
     beforeRequest: () => {},
     afterResponse: () => {},
   }),

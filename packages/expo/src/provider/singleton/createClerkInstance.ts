@@ -146,7 +146,12 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
       const clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
       __internal_clerk = clerk;
-      appVersionRequestHooks?.refreshOnForegroundWhileUnsupported(() => clerk.__internal_reloadInitialResources());
+      appVersionRequestHooks?.checkOnForeground({
+        reload: () => clerk.__internal_reloadInitialResources(),
+        // `GET /v1/` only passes Clerk's app version check, and never reads or creates a client.
+        // @ts-expect-error - This is an internal API
+        check: () => clerk.getFapiClient().request({ method: 'GET', path: '/' }),
+      });
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API

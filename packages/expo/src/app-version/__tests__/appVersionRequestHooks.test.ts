@@ -59,6 +59,7 @@ const loadModules = async () => {
 describe('createAppVersionRequestHooks', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.restoreAllMocks();
     appState.listeners.clear();
   });
 
@@ -158,34 +159,97 @@ describe('createAppVersionRequestHooks', () => {
     expect(status().isSupported).toBe(true);
   });
 
-  test('reloads when the app returns to the foreground while unsupported', async () => {
-    const { createAppVersionRequestHooks } = await loadModules();
-    const hooks = createAppVersionRequestHooks();
-    const refresh = vi.fn().mockResolvedValue(undefined);
-    hooks.refreshOnForegroundWhileUnsupported(refresh);
-
-    appState.emit('active');
-    expect(refresh).not.toHaveBeenCalled();
-
+  const block = (hooks: ReturnType<Awaited<ReturnType<typeof loadModules>>['createAppVersionRequestHooks']>) => {
     const rejectedRequest = { path: '/client', headers: new Headers() };
     hooks.beforeRequest(rejectedRequest);
     hooks.afterResponse(rejectedRequest, unsupportedAppVersion);
+  };
+
+  const foregroundAt = (now: number) => {
+    vi.spyOn(Date, 'now').mockReturnValue(now);
     appState.emit('background');
     appState.emit('active');
-    expect(refresh).toHaveBeenCalledTimes(1);
+  };
+
+  test('reloads instead of checking when the app returns to the foreground while unsupported', async () => {
+    const { createAppVersionRequestHooks } = await loadModules();
+    vi.spyOn(Date, 'now').mockReturnValue(0);
+    const hooks = createAppVersionRequestHooks();
+    const reload = vi.fn().mockResolvedValue(undefined);
+    const check = vi.fn().mockResolvedValue(undefined);
+    hooks.checkOnForeground({ reload, check });
+    block(hooks);
+
+    foregroundAt(1_000);
+    foregroundAt(2_000);
+
+    expect(reload).toHaveBeenCalledTimes(2);
+    expect(check).not.toHaveBeenCalled();
   });
 
-  test('stops reloading for a Clerk instance that was replaced', async () => {
+  test('checks the app version on foreground at most every 30 seconds while supported', async () => {
     const { createAppVersionRequestHooks } = await loadModules();
-    const staleRefresh = vi.fn().mockResolvedValue(undefined);
-    createAppVersionRequestHooks().refreshOnForegroundWhileUnsupported(staleRefresh);
+    vi.spyOn(Date, 'now').mockReturnValue(0);
     const hooks = createAppVersionRequestHooks();
-    const rejectedRequest = { path: '/client', headers: new Headers() };
-    hooks.beforeRequest(rejectedRequest);
-    hooks.afterResponse(rejectedRequest, unsupportedAppVersion);
+    const reload = vi.fn().mockResolvedValue(undefined);
+    const check = vi.fn().mockResolvedValue(undefined);
+    hooks.checkOnForeground({ reload, check });
 
-    appState.emit('active');
+    foregroundAt(10_000);
+    expect(check).not.toHaveBeenCalled();
 
-    expect(staleRefresh).not.toHaveBeenCalled();
+    foregroundAt(30_000);
+    foregroundAt(45_000);
+    expect(check).toHaveBeenCalledTimes(1);
+
+    foregroundAt(60_000);
+    expect(check).toHaveBeenCalledTimes(2);
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  test('a foreground check that Clerk rejects blocks the app', async () => {
+    const { createAppVersionRequestHooks, status } = await loadModules();
+    vi.spyOn(Date, 'now').mockReturnValue(0);
+    const hooks = createAppVersionRequestHooks();
+    const check = vi.fn(() => {
+      const checkRequest = { path: '/', headers: new Headers() };
+      hooks.beforeRequest(checkRequest);
+      hooks.afterResponse(checkRequest, unsupportedAppVersion);
+      return Promise.resolve();
+    });
+    hooks.checkOnForeground({ reload: vi.fn().mockResolvedValue(undefined), check });
+
+    foregroundAt(30_000);
+    await vi.waitFor(() => expect(status().isSupported).toBe(false));
+  });
+
+  test('a foreground check that fails leaves the app supported', async () => {
+    const { createAppVersionRequestHooks, status } = await loadModules();
+    vi.spyOn(Date, 'now').mockReturnValue(0);
+    const hooks = createAppVersionRequestHooks();
+    const check = vi.fn().mockRejectedValue(new Error('Network request failed'));
+    hooks.checkOnForeground({ reload: vi.fn().mockResolvedValue(undefined), check });
+
+    foregroundAt(30_000);
+    await Promise.resolve();
+
+    expect(check).toHaveBeenCalledTimes(1);
+    expect(status().isSupported).toBe(true);
+  });
+
+  test('stops checking for a Clerk instance that was replaced', async () => {
+    const { createAppVersionRequestHooks } = await loadModules();
+    vi.spyOn(Date, 'now').mockReturnValue(0);
+    const staleReload = vi.fn().mockResolvedValue(undefined);
+    const staleCheck = vi.fn().mockResolvedValue(undefined);
+    createAppVersionRequestHooks().checkOnForeground({ reload: staleReload, check: staleCheck });
+    const hooks = createAppVersionRequestHooks();
+    block(hooks);
+
+    foregroundAt(1_000);
+    foregroundAt(60_000);
+
+    expect(staleReload).not.toHaveBeenCalled();
+    expect(staleCheck).not.toHaveBeenCalled();
   });
 });
