@@ -1,7 +1,7 @@
 import tseslint from 'typescript-eslint';
 
 import codeQuality from './code-quality.mjs';
-
+import goodCss from './good-css.mjs';
 const testFiles = ['**/__tests__/**', '**/*.test.*', '**/*.spec.*', '**/*.test-d.ts'];
 export default [
   {
@@ -25,5 +25,12 @@ export default [
     files: ['packages/mosaic/src/{utils,machine}/**/*.{ts,tsx}'],
     ignores: testFiles,
     rules: { '@typescript-eslint/no-unnecessary-condition': 'warn' },
+  },
+  {
+    name: 'packages/mosaic - css conventions',
+    files: ['packages/mosaic/src/**/*.styles.ts'],
+    ignores: testFiles,
+    plugins: { 'good-css': goodCss },
+    rules: { 'good-css/explicit-transition-properties': 'error' },
   },
 ];

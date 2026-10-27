@@ -34,6 +34,16 @@ describe('ported lint policy', () => {
     expect(Object.keys(config.rules).filter(rule => /^(code-quality|good-css)\//.test(rule))).toEqual([]);
   });
 
+  test('checks authored Mosaic styles despite the selector override', async () => {
+    const styles = await eslint.calculateConfigForFile('packages/mosaic/src/components/button/button.styles.ts');
+    const component = await eslint.calculateConfigForFile('packages/mosaic/src/components/button/button.tsx');
+
+    for (const rule of ['explicit-transition-properties']) {
+      expect(styles.rules[`good-css/${rule}`]?.[0]).toBeGreaterThan(0);
+      expect(component.rules[`good-css/${rule}`]).toBeUndefined();
+    }
+  });
+
   test('limits unnecessary-condition checks to internal Mosaic logic', async () => {
     const internal = await eslint.calculateConfigForFile('packages/mosaic/src/utils/apply-order.ts');
     const boundary = await eslint.calculateConfigForFile('packages/shared/src/object.ts');
