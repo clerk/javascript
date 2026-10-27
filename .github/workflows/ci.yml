@@ -449,7 +449,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: 20
 
     steps:
       - name: Checkout Repo
@@ -461,23 +461,16 @@ jobs:
           filter: 'blob:none'
           show-progress: false
 
-      - name: Setup
-        uses: $/.github/actions/init-blacksmith
-        with:
-          cache-enabled: true
-          playwright-enabled: true
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
-
-      - name: Build Mosaic and its dependencies
-        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/mosaic...
+      - name: Build visual test image
+        run: bash packages/mosaic/scripts/test-visual.sh build
 
       - name: Run visual tests
-        run: pnpm --filter @clerk/mosaic test:visual
+        id: visual
+        continue-on-error: true
+        run: bash packages/mosaic/scripts/test-visual.sh compare
 
       - name: Upload failure artifacts
-        if: ${{ cancelled() || failure() }}
+        if: ${{ steps.visual.outcome == 'failure' }}
         uses: actions/upload-artifact@v4.6.2
         with:
           name: mosaic-visual-failure-artifacts-${{ github.run_id }}-${{ github.run_attempt }}

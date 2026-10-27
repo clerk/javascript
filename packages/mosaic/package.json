@@ -62,8 +62,8 @@
     "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
-    "test:visual": "pnpm build:css && vitest run --project visual --update=none",
-    "test:visual:update": "pnpm build:css && vitest run --project visual --update=all",
+    "test:visual": "bash ./scripts/test-visual.sh build && bash ./scripts/test-visual.sh compare",
+    "test:visual:update": "bash ./scripts/test-visual.sh build && bash ./scripts/test-visual.sh update",
     "test:webkit": "vitest run --project webkit",
     "typecheck": "tsc --noEmit"
   },

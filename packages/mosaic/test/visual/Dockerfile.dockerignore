@@ -1,0 +1,8 @@
+.git
+**/.audit
+**/.env*
+**/node_modules
+**/dist
+**/dist-css
+**/.turbo
+**/.vitest
