@@ -63,6 +63,7 @@
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
     "test:visual": "bash ./scripts/test-visual.sh compare",
+    "test:visual:pull": "bash ./scripts/test-visual.sh pull",
     "test:webkit": "vitest run --project webkit",
     "typecheck": "tsc --noEmit"
   },
