@@ -15,8 +15,29 @@ case "${1:-}" in
       --volume "$root:/repo" --workdir /repo/packages/mosaic \
       "$image" node /repo/node_modules/vitest/vitest.mjs run --project visual --update none
     ;;
+  pull)
+    run="${2:?Usage: $0 pull <run-id>}"
+    download=$(mktemp -d)
+    trap 'rm -rf "$download"' EXIT
+    gh run download "$run" --pattern 'mosaic-visual-failure-artifacts-*' --dir "$download"
+    count=0
+    while IFS= read -r actual; do
+      relative=${actual#*/.vitest/attachments/}
+      test_file=$(dirname "$relative")
+      name=$(basename "$relative")
+      baseline="$root/packages/mosaic/$(dirname "$test_file")/__screenshots__/$(basename "$test_file")/${name/-actual-/-}"
+      mkdir -p "$(dirname "$baseline")"
+      cp "$actual" "$baseline"
+      printf 'updated %s\n' "${baseline#"$root"/}"
+      count=$((count + 1))
+    done < <(find "$download" -path '*/.vitest/attachments/*' -name '*-actual-*.png')
+    if [[ "$count" -eq 0 ]]; then
+      printf 'Run %s has no changed screenshots.\n' "$run" >&2
+      exit 1
+    fi
+    ;;
   *)
-    printf 'Usage: %s compare\n' "$0" >&2
+    printf 'Usage: %s compare | pull <run-id>\n' "$0" >&2
     exit 2
     ;;
 esac

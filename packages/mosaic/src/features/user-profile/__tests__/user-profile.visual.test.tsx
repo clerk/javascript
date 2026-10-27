@@ -18,6 +18,7 @@ async function renderProfile(profile = shortProfile) {
   await screen.findByRole('heading', { name: 'Email' });
   await screen.findByText('Google');
   await document.fonts.ready;
+  await page.viewport(window.innerWidth, document.documentElement.scrollHeight);
   return container;
 }
 
