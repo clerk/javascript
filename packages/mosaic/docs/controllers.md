@@ -104,13 +104,12 @@ section. The dialog opens once `visible` is true, so it skips the loading card, 
 dismissal only while the controller has a cancel callback. Return focus with the hook's
 `lastKey`, which outlives the run, unlike `pendingKey`.
 
-For a direct action in `ActionMenu`, derive its `progress` from the pending
-action and whether its dialog is open. Pass `idle` before activation, `pending`
-while the request or verification preparation is running, and `handoff` when the
-dialog becomes visible. The menu keeps its selected item and trailing spinner
-visible while pending, disables its actions, and blocks dismissal until handoff
-or settlement. Ordinary failures close the menu and use the section's existing
-error. Actions without `progress` still close immediately.
+For a direct action in `ActionMenu`, set `pending` while its request runs and
+no dialog is open yet. Set it in the same event as the click, since the menu
+closes on the next render unless an action is pending. The menu keeps its
+trailing spinner visible while pending, disables its actions, and blocks
+dismissal. It closes once `pending` turns false, whether a dialog opened or the
+request settled. Ordinary failures use the section's existing error.
 
 A single open boolean earns nothing. A two-state machine with one event is a
 boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in

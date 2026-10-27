@@ -588,7 +588,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
     methods: [...model.methods],
     addableMethods: model.addableMethods,
     onRegenerateBackupCodes: model.generateBackupCodes ? generateBackupCodes : undefined,
-    regenerateProgress: context.pending === 'generate' ? (dialogOpen ? 'handoff' : 'pending') : 'idle',
+    regeneratePending: context.pending === 'generate' && !dialogOpen,
     regenerateError: flow.kind === 'closed' && flow.error ? errorText(flow.error) : undefined,
     onRemove: model.remove,
     onSetDefault: model.setDefault,

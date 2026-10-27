@@ -11,7 +11,7 @@ export interface ActionMenuAction {
   color?: 'neutral' | 'negative';
   icon?: IconComponent;
   onClick: () => void;
-  progress?: 'idle' | 'pending' | 'handoff';
+  pending?: boolean;
 }
 
 export interface ActionMenuProps {
@@ -25,8 +25,7 @@ export interface ActionMenuProps {
 export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhenDisabled }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const [activated, setActivated] = useState(false);
-  const pending = actions.some(action => action.progress === 'pending');
-  const handoff = actions.some(action => action.progress === 'handoff');
+  const pending = actions.some(action => action.pending);
   const showSpinner = useSpinDelay(pending ? true : null);
 
   if (activated && !pending) {
@@ -41,9 +40,9 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
   return (
     <Menu.Root
       placement='bottom-end'
-      open={open && !handoff}
+      open={open}
       onOpenChange={nextOpen => {
-        if (!pending && !handoff) {
+        if (!pending) {
           setOpen(nextOpen);
         }
       }}
@@ -61,14 +60,12 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
             color={action.color}
             label={action.label}
             onClick={() => {
-              if (action.progress !== undefined) {
-                setActivated(true);
-              }
+              setActivated(true);
               action.onClick();
             }}
-            closeOnClick={action.progress === undefined}
-            aria-busy={action.progress === 'pending' || undefined}
-            disabled={disabled || pending || handoff}
+            closeOnClick={false}
+            aria-busy={action.pending || undefined}
+            disabled={disabled || pending}
           >
             {action.icon ? (
               <Menu.Media>
@@ -76,18 +73,16 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
               </Menu.Media>
             ) : null}
             <Menu.Label>{action.label}</Menu.Label>
-            {action.progress !== undefined ? (
-              <Menu.Indicator>
-                {action.progress === 'pending' && showSpinner ? (
-                  <Spinner
-                    size='sm'
-                    role='progressbar'
-                    aria-hidden={undefined}
-                    aria-label={action.label}
-                  />
-                ) : null}
-              </Menu.Indicator>
-            ) : null}
+            <Menu.Indicator>
+              {action.pending && showSpinner ? (
+                <Spinner
+                  size='sm'
+                  role='progressbar'
+                  aria-hidden={undefined}
+                  aria-label={action.label}
+                />
+              ) : null}
+            </Menu.Indicator>
           </Menu.Item>
         ))}
       </Menu.Popup>

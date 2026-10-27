@@ -37,10 +37,10 @@ describe('Mosaic ActionMenu', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
   });
-  it('closes a progress action that settles before pending renders', async () => {
+  it('closes after an action that does not report pending', async () => {
     const onClick = vi.fn();
     const user = userEvent.setup();
-    renderMenu([{ label: 'Make default', progress: 'idle', onClick }]);
+    renderMenu([{ label: 'Make default', onClick }]);
 
     await user.click(screen.getByRole('button', { name: 'Manage passkey' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Make default' }));
