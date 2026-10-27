@@ -18,7 +18,7 @@ case "$mode" in
     ;;
 esac
 
-container=$(docker create --init --ipc=host "$image" sleep infinity)
+container=$(docker create --platform linux/amd64 --init --ipc=host "$image" sleep infinity)
 trap 'docker rm --force "$container" >/dev/null' EXIT
 docker start "$container" >/dev/null
 
