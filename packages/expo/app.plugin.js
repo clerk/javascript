@@ -7,7 +7,7 @@
  * 3. If @clerk/expo-native-components is installed, its config plugin is applied for the Clerk native SDKs
  */
 const { AndroidConfig, withAndroidManifest, withEntitlementsPlist, withInfoPlist } = require('@expo/config-plugins');
-const { logClerkAgentRulesResult, writeClerkAgentRules } = require('@clerk/shared/agentRules');
+const { logClerkAgentRulesError, logClerkAgentRulesResult, writeClerkAgentRules } = require('@clerk/shared/agentRules');
 const { isClerkAgentRulesWriteAllowed } = require('@clerk/shared/utils');
 
 const fs = require('fs');
@@ -27,8 +27,8 @@ const maybeWriteAgentRules = config => {
   try {
     const projectRoot = config?._internal?.projectRoot || process.cwd();
     logClerkAgentRulesResult(writeClerkAgentRules({ cwd: projectRoot, fs, path, sdks: ['expo'] }));
-  } catch {
-    // Writing agent hints must never break Expo config evaluation.
+  } catch (error) {
+    logClerkAgentRulesError(error);
   }
 };
 

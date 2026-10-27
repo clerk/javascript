@@ -1,4 +1,4 @@
-import { logClerkAgentRulesResult, writeClerkAgentRules } from '@clerk/shared/agentRules';
+import { logClerkAgentRulesError, logClerkAgentRulesResult, writeClerkAgentRules } from '@clerk/shared/agentRules';
 import { isClerkAgentRulesWriteAllowed } from '@clerk/shared/utils';
 
 import { nodeCwdOrThrow, nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
@@ -21,7 +21,7 @@ export function writeAgentRulesOnce() {
         sdks: ['nextjs'],
       }),
     );
-  } catch {
-    // Writing agent hints must never break a dev server.
+  } catch (error) {
+    logClerkAgentRulesError(error);
   }
 }

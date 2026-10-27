@@ -77,11 +77,15 @@ describe('createClerkAgentRulesWriter', () => {
     expect(writeClerkAgentRules).not.toHaveBeenCalled();
   });
 
-  it('does not throw when writing fails', () => {
+  it('warns instead of throwing when writing fails', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     vi.mocked(writeClerkAgentRules).mockImplementation(() => {
       throw new Error('EACCES');
     });
 
     expect(() => createClerkAgentRulesWriter('react-router')()).not.toThrow();
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('Could not update AGENTS.md for AI coding agents: EACCES'),
+    );
   });
 });

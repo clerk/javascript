@@ -1,6 +1,7 @@
 import {
   type ClerkAgentRulesSdk,
   type FileSystemAdapter,
+  logClerkAgentRulesError,
   logClerkAgentRulesResult,
   type PathAdapter,
   writeClerkAgentRules,
@@ -31,8 +32,8 @@ export function createClerkAgentRulesWriter(sdk: ClerkAgentRulesSdk) {
 
     try {
       logClerkAgentRulesResult(writeClerkAgentRules({ cwd: cwd ?? nodeProcess.cwd(), fs, path, sdks: [sdk] }));
-    } catch {
-      return;
+    } catch (error) {
+      logClerkAgentRulesError(error);
     }
   };
 }

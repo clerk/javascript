@@ -312,3 +312,10 @@ export function logClerkAgentRulesResult({ files }: WriteClerkAgentRulesResult) 
     );
   }
 }
+
+export function logClerkAgentRulesError(error: unknown) {
+  const reason = error instanceof Error ? error.message : String(error);
+  console.warn(
+    `[Clerk]: Could not update AGENTS.md for AI coding agents: ${reason}. Set CLERK_AGENTS_MD=false to turn this off.`,
+  );
+}
