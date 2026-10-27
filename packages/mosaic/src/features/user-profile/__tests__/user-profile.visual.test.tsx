@@ -66,6 +66,11 @@ describe('UserProfile visual states', () => {
     await page.viewport(390, 844);
     await renderProfile(true);
     await screen.findByText('alexandria.montgomery@longcompanydomain.example');
+    const viewport = screen.getByRole('dialog', { name: 'User profile' }).querySelector('.cl-profile-content-viewport');
+    if (!viewport) {
+      throw new Error('User profile content viewport is missing');
+    }
+    expect(viewport.scrollWidth).toBeLessThanOrEqual(viewport.clientWidth);
 
     await expect(page).toMatchScreenshot('user-profile-account-narrow-light');
   });

@@ -124,15 +124,16 @@ pnpm --filter @clerk/mosaic test:visual
 pnpm --filter @clerk/mosaic test:visual:update
 ```
 
-Both commands build and load Mosaic's compiled stylesheet before running tests.
-The first command compares screenshots without creating or updating baselines.
-The second explicitly creates or replaces them. Review the images and commit
-the expected baselines under each test's `__screenshots__/` directory.
+Both commands build the same pinned Linux image that CI uses. They require
+Docker and include Mosaic's compiled stylesheet. The first command compares
+screenshots without changing baselines. The second replaces Linux baselines.
+Review the images and commit the expected baselines under each test's
+`__screenshots__/` directory.
 Failed comparisons write actual, expected, and diff images under
 `packages/mosaic/.vitest/attachments/`.
 
 Use these package commands for screenshots. Calling Vitest directly bypasses
-the stylesheet build and the command's explicit snapshot update policy.
+the pinned image and the command's explicit snapshot update policy.
 
 Start with six baselines: the open combined UserButton, the open
 OrganizationSwitcher, the UserProfile Account overlay in light and dark modes,
@@ -140,23 +141,21 @@ the same overlay at a narrow viewport with long content, and an edit-name form
 showing banner and field errors. Add a screenshot only when it covers a distinct
 layout or visual state that these compositions miss.
 
-The suite fixes the default viewport, font family, color scheme, locale, time
-zone, and device scale. The browser setup disables motion. Use deterministic
+The suite fixes the default viewport, bundled Inter font, color scheme, locale,
+time zone, and device scale. The browser setup disables motion and hides carets. Use deterministic
 fixture data and avatar fallbacks, and wait for content before capturing the
 page so portaled menus and overlays are included.
 
 Baselines include the browser and operating system in their filenames. The
-`Mosaic Visual Tests` job compares screenshots on Linux with the repository's
-pinned Playwright version. On a failed run, download
+`Mosaic Visual Tests` job compares screenshots on the same pinned Linux image
+as the local commands. Its comparison is advisory, so visual differences do
+not block the rest of CI. On a failed comparison, download
 `mosaic-visual-failure-artifacts-<run-id>-<run-attempt>` from the GitHub Actions
 run and review the images in `.vitest/attachments/`.
 
-The first Linux run fails until Linux baselines exist. Review each captured
-`*-reference-chromium-linux.png` image, then copy it into the matching test's
-`__screenshots__/` directory without `-reference` in the filename. For later
-changes, review the actual, expected, and diff images from the Linux job, then
-copy each approved actual image over its Linux baseline. Commit the reviewed
-baselines and rerun the job. A macOS update does not update Linux baselines.
+Review the actual, expected, and diff images, then run
+`pnpm --filter @clerk/mosaic test:visual:update` and commit the approved
+baselines. Rerun the CI job at the same commit to verify the result.
 
 ## Feature tests
 
