@@ -114,6 +114,27 @@ describe('the user profile email section', () => {
     );
   });
 
+  it('holds the menu open with a spinner on Verify until the code is sent', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending]));
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+
+    try {
+      await manageEmail(actor, 'pending@example.com', 'Verify');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Verify' })).toHaveAttribute('aria-busy', 'true');
+      expect(await screen.findByRole('progressbar', { name: 'Verify' })).toBeVisible();
+      expect(screen.queryByRole('dialog')).toBeNull();
+    } finally {
+      prepare.release();
+    }
+
+    await enterCode(actor, VERIFICATION_CODE);
+    expect(screen.queryByRole('menu')).toBeNull();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
   it('waits for the emailed link when the instance verifies by link, then closes once it is opened', async () => {
     const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
     const { actor, fapi } = await renderSection(signedInWithEmails([PRIMARY, pending], verifiesByLink));
