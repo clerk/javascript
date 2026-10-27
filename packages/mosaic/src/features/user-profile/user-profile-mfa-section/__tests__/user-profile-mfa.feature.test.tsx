@@ -320,7 +320,7 @@ describe('User profile MFA', () => {
       for (let second = 0; second < 30; second++) {
         await act(async () => vi.advanceTimersByTimeAsync(1000));
       }
-      await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 2000 });
+      await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled());
       await user.click(screen.getByRole('button', { name: /Resend/ }));
       await waitFor(() => expect(held.requests).toHaveLength(1));
       expect(code).toHaveAttribute('aria-disabled', 'true');

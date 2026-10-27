@@ -362,40 +362,50 @@ describe('Reverification', () => {
         ),
       );
 
-      const user = await startVerification();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      try {
+        const user = await startVerification();
 
-      // The error card stays on screen without the server's message
-      expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
-      expect(screen.getByText('Please try again.')).toBeVisible();
-      expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
-      expect(screen.queryByText('Nope')).toBeNull();
-      await settle();
-      expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible();
-      expect(outcome()).toBe('');
+        // The error card stays on screen without the server's message
+        expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
+        expect(screen.getByText('Please try again.')).toBeVisible();
+        expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+        expect(screen.queryByText('Nope')).toBeNull();
+        await act(() => vi.advanceTimersByTimeAsync(60_000));
+        expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible();
+        expect(outcome()).toBe('');
 
-      // Closing it rejects the action as cancelled
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-      await untilClosed();
-      expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
+        // Closing it rejects the action as cancelled
+        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await untilClosed();
+        expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('keeps showing the no factors card until it is dismissed when none of the factors are supported', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [enterpriseSsoFactor] }));
 
-      const user = await startVerification();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      try {
+        const user = await startVerification();
 
-      expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
-      expect(screen.getByText(/No suitable authentication factor is configured/)).toBeVisible();
-      expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
-      await settle();
-      expect(screen.getByText(NO_FACTORS_TITLE)).toBeVisible();
-      expect(outcome()).toBe('');
+        expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
+        expect(screen.getByText(/No suitable authentication factor is configured/)).toBeVisible();
+        expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
+        await act(() => vi.advanceTimersByTimeAsync(60_000));
+        expect(screen.getByText(NO_FACTORS_TITLE)).toBeVisible();
+        expect(outcome()).toBe('');
 
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-      await untilClosed();
-      expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await untilClosed();
+        expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -550,11 +560,12 @@ describe('Reverification', () => {
 
       expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
       await user.type(passwordField(), '{Enter}');
-      await settle();
-      expect(attempt.requests).toHaveLength(0);
 
       await user.type(passwordField(), PASSWORD);
       expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(new URLSearchParams(await attempt.requests[0]?.text()).get('password')).toBe(PASSWORD);
       attempt.release();
     });
   });
@@ -624,8 +635,10 @@ describe('Reverification', () => {
       await pasteCode(user, CODE.slice(0, 3));
       expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
       await user.keyboard('{Enter}');
-      await settle();
-      expect(attempt.requests).toHaveLength(0);
+
+      await user.keyboard(CODE.slice(3));
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(new URLSearchParams(await attempt.requests[0]?.text()).get('code')).toBe(CODE);
       attempt.release();
     });
 
@@ -671,12 +684,12 @@ describe('Reverification', () => {
 
     it('resends a code once the cooldown has passed', async () => {
       const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
-      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
 
       try {
         const user = await startVerification();
         expect(await screen.findByText(STEP.emailCode)).toBeVisible();
-        await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+        await vi.waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
 
         // Resend is disabled and shows the countdown while the cooldown runs
         const resend = await screen.findByRole('button', { name: /Resend \(\d+\)/ });
@@ -684,7 +697,8 @@ describe('Reverification', () => {
 
         // Resend is enabled again after the cooldown
         vi.setSystemTime(Date.now() + 30_000);
-        await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 3000 });
+        await act(() => vi.advanceTimersByTimeAsync(1000));
+        expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
         expect(screen.getByRole('button', { name: /Resend/ }).textContent).not.toMatch(/\(\d+\)/);
 
         // Resending sends a new code and clears the typed value
@@ -693,7 +707,7 @@ describe('Reverification', () => {
         expect(slotValues()).toEqual(['1', '2', '3', '', '', '']);
         const prepare = holdRequests('post', PREPARE_FIRST);
         await user.click(screen.getByRole('button', { name: /Resend/ }));
-        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+        await vi.waitFor(() => expect(prepare.requests).toHaveLength(1));
         expect(slotValues()).toEqual(['', '', '', '', '', '']);
         expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
 
@@ -703,7 +717,7 @@ describe('Reverification', () => {
         await settle();
         expect(attempt.requests).toHaveLength(0);
         prepare.release();
-        await waitFor(() => expect(attempt.requests).toHaveLength(1));
+        await vi.waitFor(() => expect(attempt.requests).toHaveLength(1));
         attempt.release();
         await untilResolved();
       } finally {
@@ -802,11 +816,12 @@ describe('Reverification', () => {
 
       expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
       await user.type(screen.getByLabelText('Backup code'), '{Enter}');
-      await settle();
-      expect(attempt.requests).toHaveLength(0);
 
       await user.type(screen.getByLabelText('Backup code'), BACKUP_CODE);
       expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(new URLSearchParams(await attempt.requests[0]?.text()).get('code')).toBe(BACKUP_CODE);
       attempt.release();
     });
   });

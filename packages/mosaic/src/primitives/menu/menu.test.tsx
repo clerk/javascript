@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -884,8 +884,8 @@ describe('Menu', () => {
       expect(await screen.findByText('Cut')).toBeInTheDocument();
     });
 
-    it('does not open on hover without openOnHover', async () => {
-      const user = userEvent.setup();
+    it('does not open on hover without openOnHover', () => {
+      vi.useFakeTimers();
       render(
         <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
@@ -897,10 +897,16 @@ describe('Menu', () => {
         </Menu.Root>,
       );
 
-      await user.hover(screen.getByText('Actions'));
-      await new Promise(r => setTimeout(r, 150));
+      try {
+        fireEvent.mouseEnter(screen.getByText('Actions'));
+        act(() => {
+          vi.runAllTimers();
+        });
 
-      expect(screen.queryByText('Cut')).toBeNull();
+        expect(screen.queryByText('Cut')).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('stays open as the mouse moves from the trigger into the menu', async () => {
