@@ -1,8 +1,8 @@
 import { Card } from '@clerk/mosaic/components/card';
 import { Flow } from '@clerk/mosaic/components/flow';
 import { SegmentedControl } from '@clerk/mosaic/components/segmented-control';
-import type { OAuthConsentOrganizationAccess } from '@clerk/mosaic/features/oauth-consent/oauth-consent.types';
 import { OAuthConsentSkeleton } from '@clerk/mosaic/features/oauth-consent/oauth-consent.skeleton';
+import type { OAuthConsentOrganizationAccess } from '@clerk/mosaic/features/oauth-consent/oauth-consent.types';
 import { OAuthConsentError, OAuthConsentView } from '@clerk/mosaic/features/oauth-consent/oauth-consent.view';
 import { useState } from 'react';
 
