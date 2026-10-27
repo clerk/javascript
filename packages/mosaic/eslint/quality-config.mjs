@@ -20,4 +20,10 @@ export default [
       'code-quality/no-widen-then-assert': 'warn',
     },
   },
+  {
+    name: 'packages/mosaic - internal conditions',
+    files: ['packages/mosaic/src/{utils,machine}/**/*.{ts,tsx}'],
+    ignores: testFiles,
+    rules: { '@typescript-eslint/no-unnecessary-condition': 'warn' },
+  },
 ];

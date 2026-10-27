@@ -33,4 +33,12 @@ describe('ported lint policy', () => {
     expect(config.rules['no-restricted-syntax']).toBeUndefined();
     expect(Object.keys(config.rules).filter(rule => /^(code-quality|good-css)\//.test(rule))).toEqual([]);
   });
+
+  test('limits unnecessary-condition checks to internal Mosaic logic', async () => {
+    const internal = await eslint.calculateConfigForFile('packages/mosaic/src/utils/apply-order.ts');
+    const boundary = await eslint.calculateConfigForFile('packages/shared/src/object.ts');
+
+    expect(internal.rules['@typescript-eslint/no-unnecessary-condition']?.[0]).toBe(1);
+    expect(boundary.rules['@typescript-eslint/no-unnecessary-condition']).toBeUndefined();
+  });
 });
