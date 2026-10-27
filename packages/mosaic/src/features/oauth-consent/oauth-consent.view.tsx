@@ -13,11 +13,12 @@ import { Input } from '../../components/input';
 import { Radio } from '../../components/radio';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Select, type SelectItem } from '../../components/select';
-import { Skeleton, SkeletonContext } from '../../components/skeleton';
 import { Text } from '../../components/text';
 import { Tooltip } from '../../components/tooltip';
 import { VisuallyHidden } from '../../components/visually-hidden';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { fill, plural, rich, useLocale } from '../../localization';
+import { Form } from '../../primitives/form';
 import { useTransition } from '../../primitives/hooks';
 import { Freeze } from '../../primitives/utils';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -32,10 +33,7 @@ import type {
 } from './oauth-consent.types';
 
 export function OAuthConsentView(props: OAuthConsentViewProps) {
-  const { messages: m, oauthApplicationName, organizationId, skeleton } = props;
-  const loading = skeleton !== undefined;
-  const awaitingClerk = skeleton === 'clerk';
-  const hidden = loading ? { ...inertProps(true), 'aria-hidden': true } : {};
+  const { messages: m, oauthApplicationName, organizationId } = props;
   const scopeListTitleId = useId();
   const postedOrganizationIds = props.organizations.length === 0 ? [] : organizationIdsToPost(props);
   const openRedirectUrl = () => props.onRedirectUrlOpenChange(true);
@@ -48,45 +46,24 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
   );
 
   return (
-    <SkeletonContext.Provider value={loading}>
-      <VisuallyHidden role='status'>{loading ? m.loading : m.loaded}</VisuallyHidden>
-      <Card.Header
-        xstyle={styles.centered}
-        {...hidden}
-      >
-        <Card.Title>
-          {rich(m.title, {
-            values: {
-              oauthApplicationName: <Skeleton inline>{oauthApplicationName}</Skeleton>,
-              applicationName: (
-                <Skeleton
-                  inline
-                  show={awaitingClerk}
-                >
-                  {props.applicationName}
-                </Skeleton>
-              ),
-            },
-          })}
-        </Card.Title>
+    <>
+      <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>
+      <Card.Header xstyle={styles.centered}>
+        <Card.Title>{fill(m.title, { oauthApplicationName, applicationName: props.applicationName })}</Card.Title>
         <Card.Description>
           {rich(m.subtitle, {
-            values: {
-              oauthApplicationName: <Skeleton inline>{oauthApplicationName}</Skeleton>,
-              domain: <Skeleton inline>{props.redirectDomain}</Skeleton>,
-            },
+            values: { oauthApplicationName, domain: props.redirectDomain },
             components: { nowrap: renderNowrap },
           })}
         </Card.Description>
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             method='post'
             action={props.actionUrl}
           />
         }
-        {...hidden}
       >
         {props.organizations.length > 0 && props.organizationSelection ? (
           <OrganizationAccess
@@ -109,9 +86,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
                 }
               }}
             >
-              <Skeleton xstyle={styles.skeletonFill}>
-                <Select.Trigger />
-              </Skeleton>
+              <Select.Trigger />
               <OrganizationPopup organizations={props.organizations} />
             </Select.Root>
           </Field.Root>
@@ -123,7 +98,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
               size='sm'
               xstyle={styles.scopesTitle}
             >
-              <Skeleton visible={false}>{fill(m.scopeListTitle, { applicationName: oauthApplicationName })}</Skeleton>
+              {fill(m.scopeListTitle, { applicationName: oauthApplicationName })}
             </Text>
             <ul
               aria-labelledby={scopeListTitleId}
@@ -140,13 +115,11 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
                       selection={props.scopeSelection}
                       disabled={props.pendingAction !== undefined}
                       requiredLabel={m.required}
-                      skeleton={loading}
                     />
                   ) : (
                     <ScopeText
                       item={item}
                       requiredLabel={m.required}
-                      skeleton={loading}
                     />
                   )}
                 </li>
@@ -201,43 +174,27 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           xstyle={styles.centered}
         >
           {rich(m.redirectNotice, {
-            values: { domain: loading ? <Skeleton inline>{props.redirectDomain}</Skeleton> : domain },
+            values: { domain },
           })}
           {props.hasOfflineAccess ? ` ${m.offlineAccessNotice}` : null}
         </Text>
       </Card.Content>
-      <Card.Footer
-        xstyle={styles.centered}
-        {...hidden}
-      >
+      <Card.Footer xstyle={styles.centered}>
         <Text
           size='sm'
           color='foreground-secondary'
         >
-          {rich(m.signedInAs, {
-            values: {
-              identifier: (
-                <Skeleton
-                  inline
-                  show={awaitingClerk}
-                >
-                  {props.identifier}
-                </Skeleton>
-              ),
-            },
-          })}
+          {fill(m.signedInAs, { identifier: props.identifier })}
         </Text>
       </Card.Footer>
-      {loading ? null : (
-        <RedirectUrlDialog
-          messages={m}
-          oauthApplicationName={oauthApplicationName}
-          redirectUrl={props.redirectUrl}
-          open={props.isRedirectUrlOpen}
-          onOpenChange={props.onRedirectUrlOpenChange}
-        />
-      )}
-    </SkeletonContext.Provider>
+      <RedirectUrlDialog
+        messages={m}
+        oauthApplicationName={oauthApplicationName}
+        redirectUrl={props.redirectUrl}
+        open={props.isRedirectUrlOpen}
+        onOpenChange={props.onRedirectUrlOpenChange}
+      />
+    </>
   );
 }
 
@@ -427,65 +384,45 @@ function ScopeOption({
   selection,
   requiredLabel,
   disabled,
-  skeleton,
 }: {
   item: OAuthConsentScopeItem;
   selection: OAuthConsentScopeSelection;
   requiredLabel: string;
   disabled: boolean;
-  skeleton: boolean;
 }) {
   return (
     <Field.Root
       orientation='horizontal'
       disabled={item.required === true || disabled}
     >
-      <Skeleton>
-        <Checkbox
-          checked={item.required === true || selection.checked.includes(item.scope)}
-          onChange={event => selection.onCheckedChange(item.scope, event.currentTarget.checked)}
-        />
-      </Skeleton>
+      <Checkbox
+        checked={item.required === true || selection.checked.includes(item.scope)}
+        onChange={event => selection.onCheckedChange(item.scope, event.currentTarget.checked)}
+      />
       <Field.Content>
         <div {...stylex.props(styles.scopeLabel)}>
-          <Field.Label>
-            <Skeleton>{item.label}</Skeleton>
-          </Field.Label>
-          {item.required && !skeleton ? <Badge color='neutral'>{requiredLabel}</Badge> : null}
+          <Field.Label>{item.label}</Field.Label>
+          {item.required ? <Badge color='neutral'>{requiredLabel}</Badge> : null}
         </div>
-        {item.description ? (
-          <Field.Description>
-            <Skeleton>{item.description}</Skeleton>
-          </Field.Description>
-        ) : null}
+        {item.description ? <Field.Description>{item.description}</Field.Description> : null}
       </Field.Content>
     </Field.Root>
   );
 }
 
-function ScopeText({
-  item,
-  requiredLabel,
-  skeleton,
-}: {
-  item: OAuthConsentScopeItem;
-  requiredLabel: string;
-  skeleton: boolean;
-}) {
+function ScopeText({ item, requiredLabel }: { item: OAuthConsentScopeItem; requiredLabel: string }) {
   return (
     <div {...stylex.props(styles.scopeText)}>
       <div {...stylex.props(styles.scopeLabel)}>
-        <Text>
-          <Skeleton>{item.label}</Skeleton>
-        </Text>
-        {item.required && !skeleton ? <Badge color='neutral'>{requiredLabel}</Badge> : null}
+        <Text>{item.label}</Text>
+        {item.required ? <Badge color='neutral'>{requiredLabel}</Badge> : null}
       </div>
       {item.description ? (
         <Text
           size='xs'
           color='foreground-secondary'
         >
-          <Skeleton>{item.description}</Skeleton>
+          {item.description}
         </Text>
       ) : null}
     </div>
@@ -520,7 +457,7 @@ export function OAuthConsentError({ message }: { message: string }) {
   return (
     <Card.Content>
       <EmptyState.Root role='alert'>
-        <EmptyState.Icon name='exclamation-circle' />
+        <EmptyState.Icon glyph={ExclamationCircle} />
         <EmptyState.Label>{message}</EmptyState.Label>
       </EmptyState.Root>
     </Card.Content>

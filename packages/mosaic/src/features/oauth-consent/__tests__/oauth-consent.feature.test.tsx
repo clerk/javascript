@@ -444,7 +444,7 @@ describe('OAuthConsent', () => {
       await renderConsent();
 
       expect(await screen.findByRole('status')).toHaveTextContent('Loading consent information');
-      expect(screen.queryByRole('button', { name: 'Allow' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Allow' })).toBeDisabled();
       held.release();
       await ready();
       expect(screen.getByRole('status')).toHaveTextContent('Consent information loaded');
