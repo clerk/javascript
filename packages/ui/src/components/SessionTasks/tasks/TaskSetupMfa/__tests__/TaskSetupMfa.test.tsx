@@ -44,6 +44,20 @@ describe('TaskSetupMFA', () => {
     });
   });
 
+  it('passes the final destination when signing out the last account', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        tasks: [{ key: 'setup-mfa' }],
+      });
+      f.withAuthenticatorApp({ enabled: true });
+      f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+    });
+    const { getByRole, userEvent } = render(<TaskSetupMFA />, { wrapper });
+    await userEvent.click(getByRole('link', { name: /sign out/i }));
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl: '/' });
+  });
+
   describe('main flow', () => {
     it('should render SMS code and TOTP items on the first screen if both are enabled', async () => {
       const { wrapper } = await createFixtures(f => {

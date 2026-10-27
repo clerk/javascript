@@ -125,11 +125,11 @@ const TaskChooseOrganizationCardFooter = () => {
   const { user } = useUser();
   const { session } = useSession();
   const { otherSessions } = useMultipleSessions({ user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
+      return signOut({ redirectUrl: afterSignOutUrl });
     }
 
     return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });

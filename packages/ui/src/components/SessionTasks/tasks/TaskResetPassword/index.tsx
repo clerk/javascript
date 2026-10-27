@@ -26,7 +26,7 @@ const TaskResetPasswordInternal = () => {
   const { t, locale } = useLocalizations();
   const { redirectUrlComplete } = useTaskResetPasswordContext();
   const { otherSessions } = useMultipleSessions({ user: clerk.user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const updatePasswordWithReverification = useReverification(
     (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
   );
@@ -34,7 +34,7 @@ const TaskResetPasswordInternal = () => {
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return clerk?.signOut(navigateAfterSignOut);
+      return clerk?.signOut({ redirectUrl: afterSignOutUrl });
     }
 
     return clerk?.signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: clerk.session?.id });

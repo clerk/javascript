@@ -1,6 +1,6 @@
 import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
@@ -68,24 +68,26 @@ describe('UserButton', () => {
     expect(fixtures.clerk.openUserProfile).toHaveBeenCalled();
   });
 
-  it('signs out user when "Sign out" is clicked', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({
-        first_name: 'First',
-        last_name: 'Last',
-        username: 'username1',
-        email_addresses: ['test@clerk.com'],
+  it.each(['/', '/signed-out?tab=security#settings'])(
+    'passes destination %s when signing out the last account',
+    async redirectUrl => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
       });
-    });
 
-    fixtures.clerk.signOut.mockImplementationOnce(callback => callback());
+      vi.spyOn(fixtures.clerk, 'buildAfterSignOutUrl').mockReturnValue(redirectUrl);
+      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+      await userEvent.click(getByText('Sign out'));
 
-    const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Open user menu' }));
-    await userEvent.click(getByText('Sign out'));
-
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-  });
+      expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl });
+    },
+  );
 
   it.todo('navigates to sign in url when "Add account" is clicked');
 
@@ -182,19 +184,17 @@ describe('UserButton', () => {
       });
     });
 
-    it('signs out of all currently active session when clicking "Sign out of all accounts"', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
-      fixtures.clerk.signOut.mockImplementationOnce(callback => {
-        return Promise.resolve(callback());
-      });
-      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
-      await userEvent.click(getByText('Sign out of all accounts'));
-      await waitFor(() => {
-        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function));
-        expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-      });
-    });
+    it.each(['/', 'https://satellite.test/signed-out?tab=security#settings'])(
+      'passes destination %s when signing out all accounts',
+      async redirectUrl => {
+        const { wrapper, fixtures } = await createFixtures(initConfig);
+        vi.spyOn(fixtures.clerk, 'buildAfterSignOutUrl').mockReturnValue(redirectUrl);
+        const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+        await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+        await userEvent.click(getByText('Sign out of all accounts'));
+        expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl });
+      },
+    );
   });
 
   describe('Accessibility', () => {

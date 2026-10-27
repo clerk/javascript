@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createSession, createSignIn, createSignUp, createUser } from '@/test/core-fixtures';
 
+import { SessionTokenCache } from '../../tokenCache';
 import { BaseResource, Client } from '../internal';
 
 const FIXED_DATE = new Date('2025-01-01T00:00:00Z');
@@ -145,6 +146,77 @@ describe('Client Singleton', () => {
     expect(BaseResource._fetch).toHaveBeenCalledWith({
       method: 'DELETE',
       path: `/client`,
+    });
+  });
+
+  describe('__internal_signOut', () => {
+    it.each([true, false])(
+      'returns the response URL and clears sessions with persistClient=%s',
+      async persistClient => {
+        const user = createUser({ id: 'user_1' });
+        const initial: ClientJSON = {
+          object: 'client',
+          id: 'client_before',
+          sessions: [createSession({ id: 'session_1' }, user)],
+          sign_in: createSignIn({ id: 'sign_in_before' }, user),
+          sign_up: createSignUp({ id: 'sign_up_before' }),
+          last_active_session_id: 'session_1',
+          last_authentication_strategy: 'password',
+          cookie_expires_at: Date.now() + 30 * 24 * 60 * 60 * 1000,
+          created_at: Date.now() - 1000,
+          updated_at: Date.now(),
+        };
+        const response = { ...initial, id: 'client_after', sessions: [], last_active_session_id: null };
+        const request = vi.fn().mockResolvedValue({ response, sign_out_url: 'https://primary.test/sign-out' });
+        BaseResource._fetch = request;
+        const clearCache = vi.spyOn(SessionTokenCache, 'clear');
+        const client = Client.getOrCreateInstance().fromJSON(initial);
+        const result = await client.__internal_signOut({
+          persistClient,
+          redirectUrl: 'https://satellite.test/after?tab=security#settings',
+        });
+
+        expect(request).toHaveBeenCalledWith({
+          method: 'DELETE',
+          path: persistClient ? '/client/sessions' : '/client',
+          search: { sign_out_redirect_url: 'https://satellite.test/after?tab=security#settings' },
+        });
+        expect(result).toEqual({ signOutUrl: 'https://primary.test/sign-out' });
+        expect(clearCache).toHaveBeenCalledOnce();
+        expect(client.sessions).toEqual([]);
+        expect(client.id).toBe(persistClient ? 'client_after' : '');
+        expect(client.signIn.id).toBe(persistClient ? 'sign_in_before' : undefined);
+        expect(client.signUp.id).toBe(persistClient ? 'sign_up_before' : undefined);
+        expect(client.lastActiveSessionId).toBeNull();
+        expect(client.lastAuthenticationStrategy).toBe(persistClient ? 'password' : null);
+        expect(client.cookieExpiresAt).toEqual(persistClient ? new Date(initial.cookie_expires_at!) : null);
+        expect(client.createdAt).toEqual(persistClient ? new Date(initial.created_at!) : null);
+        expect(client.updatedAt).toEqual(persistClient ? new Date(initial.updated_at!) : null);
+        clearCache.mockRestore();
+      },
+    );
+
+    it.each([null, { response: null }])('accepts a response without a sign-out URL', async response => {
+      BaseResource._fetch = vi.fn().mockResolvedValue(response);
+      const result = await Client.getOrCreateInstance().__internal_signOut({
+        persistClient: true,
+        redirectUrl: 'https://satellite.test/',
+      });
+      expect(result).toEqual({ signOutUrl: undefined });
+    });
+
+    it('does not reuse the URL from an earlier request', async () => {
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce({ response: null, sign_out_url: 'https://primary.test/sign-out' })
+        .mockResolvedValueOnce(null);
+      const client = Client.getOrCreateInstance();
+      expect(await client.__internal_signOut({ persistClient: true, redirectUrl: 'https://satellite.test/' })).toEqual({
+        signOutUrl: 'https://primary.test/sign-out',
+      });
+      expect(await client.__internal_signOut({ persistClient: true, redirectUrl: 'https://satellite.test/' })).toEqual({
+        signOutUrl: undefined,
+      });
     });
   });
 
