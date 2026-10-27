@@ -1127,8 +1127,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@faker-js/faker':
-        specifier: ^9.9.0
-        version: 9.9.0
+        specifier: ^10.0.0
+        version: 10.6.0
       '@floating-ui/react':
         specifier: catalog:repo
         version: 0.27.20(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3202,10 +3202,6 @@ packages:
   '@faker-js/faker@10.6.0':
     resolution: {integrity: sha512-3RQHgEtvL1Frl/d1cSreo7qhJ3Gk1OdNUai/CtZ8G+wYeRQnJih3s9xJ9/kgYekPQRdwgh0HXRPqMlzWGwivIQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
-
-  '@faker-js/faker@9.9.0':
-    resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
-    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@fastify/ajv-compiler@4.0.5':
     resolution: {integrity: sha512-KoWKW+MhvfTRWL4qrhUwAAZoaChluo0m0vbiJlGMt2GXvL4LVPQEjt8kSpHI3IBq5Rez8fg+XeH3cneztq+C7A==}
@@ -17669,8 +17665,6 @@ snapshots:
       js-yaml: 4.3.2
 
   '@faker-js/faker@10.6.0': {}
-
-  '@faker-js/faker@9.9.0': {}
 
   '@fastify/ajv-compiler@4.0.5':
     dependencies:
