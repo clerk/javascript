@@ -426,7 +426,16 @@ jobs:
         run: pnpm turbo build $TURBO_ARGS --filter=@clerk/mosaic...
 
       - name: Run feature tests
-        run: pnpm --filter @clerk/mosaic test:feature
+        run: pnpm --filter @clerk/mosaic test:feature --reporter=default --reporter=junit --outputFile.junit=.vitest/feature-tests.junit.xml
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: mosaic-feature-test-results-${{ github.run_id }}-${{ github.run_attempt }}
+          path: packages/mosaic/.vitest/feature-tests.junit.xml
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Upload failure artifacts
         if: ${{ cancelled() || failure() }}
