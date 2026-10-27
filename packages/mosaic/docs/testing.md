@@ -119,23 +119,27 @@ The `visual` project runs `*.visual.test.tsx` in Chromium, using the feature
 project's Clerk and MSW setup. Tests and their fixtures live in Mosaic, beside
 the feature they cover. They do not import Swingset stories or fixtures.
 
-Baselines come from CI, not from your machine. Fonts and Chromium draw slightly
-differently on each operating system, so every baseline is captured in one
-digest-pinned Playwright image. The `Mosaic Visual Tests` job builds the
-workspace on the runner, then runs the `visual` project inside that image.
-
-To add or change a baseline, push the change and wait for the job. When
-screenshots differ, it uploads
-`mosaic-visual-failure-artifacts-<run-id>-<run-attempt>` with actual, expected,
-and diff images under `.vitest/attachments/`. Review them, then copy the actual
-images into place and commit them:
+Screenshots are generated and compared only inside one digest-pinned Playwright
+image, locally and in CI, because fonts and Chromium draw slightly differently
+on each operating system.
 
 ```bash
-pnpm --filter @clerk/mosaic test:visual:pull <run-id>
+pnpm --filter @clerk/mosaic test:visual
+pnpm --filter @clerk/mosaic test:visual:update
 ```
 
-`test:visual` runs the comparison itself. It needs a Linux x64 install of the
-workspace, so it only runs in CI.
+Both commands require Docker. Locally, they mount your checkout into the image
+and install Linux dependencies into Docker volumes, so your own `node_modules`
+is untouched and later runs reuse the install. The first command compares
+screenshots without changing baselines. The second deletes the Linux baselines,
+lets Vitest write every screenshot again, and restores the old ones if the run
+fails, so new screenshots are created and ones no test produces are removed.
+Review the changed images and commit them under each test's `__screenshots__/`
+directory. Failed comparisons write actual, expected, and diff images under
+`packages/mosaic/.vitest/attachments/`.
+
+Use these package commands for screenshots. Calling Vitest directly bypasses
+the pinned image.
 
 Add a screenshot only when it covers a distinct layout or visual state that the
 existing ones miss. Capture the element under test (a dialog, a popup, or the
@@ -150,10 +154,14 @@ fixture data and avatar fallbacks, and wait for content before capturing the
 page so portaled menus and overlays are included.
 
 Baselines include the browser and operating system in their filenames. The
-job's comparison is advisory: screenshot differences appear as a warning and in
-the job summary without blocking the rest of CI. A failed build or a comparison
-that crashes before producing images still fails the job. Rerun the job after
-pulling baselines to confirm it reports no differences.
+`Mosaic Visual Tests` job builds the workspace on the runner, then compares in
+the same pinned image. Its comparison is advisory: screenshot differences
+appear as a warning and in the job summary without blocking the rest of CI. A
+failed build, or a comparison that crashes before writing images, still fails
+the job. On a difference, download
+`mosaic-visual-failure-artifacts-<run-id>-<run-attempt>` from the run and review
+the images in `.vitest/attachments/`, then run `test:visual:update` locally and
+commit the approved baselines.
 
 ## Feature tests
 
