@@ -12,10 +12,16 @@ import { chaosText } from '@/lib/chaos';
 import { idleReverification } from './reverification';
 
 const providers: UserProfileWeb3Provider[] = [
-  { id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+  {
+    id: 'web3_metamask_signature',
+    provider: 'MetaMask',
+    iconId: 'metamask',
+    iconUrl: 'https://img.clerk.com/static/metamask.svg',
+  },
   {
     id: 'web3_coinbase_wallet_signature',
     provider: 'Coinbase Wallet',
+    iconId: 'coinbase_wallet',
     iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
   },
 ];
@@ -24,6 +30,7 @@ export const primaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_1',
   providerId: 'web3_metamask_signature',
   provider: 'MetaMask',
+  iconId: 'metamask',
   iconUrl: 'https://img.clerk.com/static/metamask.svg',
   address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
   isPrimary: true,
@@ -34,6 +41,7 @@ export const secondaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_2',
   providerId: 'web3_coinbase_wallet_signature',
   provider: 'Coinbase Wallet',
+  iconId: 'coinbase_wallet',
   iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
   address: '0x1234567890abcdef1234567890abcdef12345678',
   isVerified: true,
@@ -87,6 +95,7 @@ export function useWeb3WalletsFixture({
           ...current,
           {
             provider: provider.provider,
+            iconId: provider.iconId,
             iconUrl: provider.iconUrl,
             id: `wallet_${id}`,
             providerId: id,

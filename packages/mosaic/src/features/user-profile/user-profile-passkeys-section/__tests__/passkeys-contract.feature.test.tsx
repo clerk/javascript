@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
@@ -32,8 +32,6 @@ function serveRegistration(passkeys = { name: 'Chrome on macOS', authenticatorNa
   };
   return serveFapi(seed);
 }
-
-afterEach(() => vi.restoreAllMocks());
 
 describe('Registering passkeys against the backend contract', () => {
   it('rejects another user verifying a pending registration without changing either account', async () => {

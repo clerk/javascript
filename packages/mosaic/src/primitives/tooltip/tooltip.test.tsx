@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -318,8 +318,8 @@ describe('Tooltip', () => {
       expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
     });
 
-    it('applies the group delay to its members and switches between them instantly', async () => {
-      const user = userEvent.setup();
+    it('applies the group delay to its members and switches between them instantly', () => {
+      vi.useFakeTimers();
       render(
         <Tooltip.Group delay={{ open: 500, close: 0 }}>
           <Tooltip.Root>
@@ -337,15 +337,27 @@ describe('Tooltip', () => {
         </Tooltip.Group>,
       );
 
-      await user.hover(screen.getByRole('button', { name: 'Button A' }));
-      await new Promise(resolve => setTimeout(resolve, 350));
-      expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
-      await waitFor(() => expect(screen.getByText('Tooltip A')).toBeInTheDocument(), { timeout: 1000 });
+      try {
+        fireEvent.mouseEnter(screen.getByRole('button', { name: 'Button A' }));
+        act(() => {
+          vi.advanceTimersByTime(499);
+        });
+        expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
+        act(() => {
+          vi.advanceTimersByTime(1);
+        });
+        expect(screen.getByText('Tooltip A')).toBeInTheDocument();
 
-      await user.hover(screen.getByRole('button', { name: 'Button B' }));
-      await new Promise(resolve => setTimeout(resolve, 100));
-      expect(screen.getByText('Tooltip B')).toBeInTheDocument();
-      expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
+        fireEvent.mouseLeave(screen.getByRole('button', { name: 'Button A' }));
+        fireEvent.mouseEnter(screen.getByRole('button', { name: 'Button B' }));
+        act(() => {
+          vi.advanceTimersByTime(1);
+        });
+        expect(screen.getByText('Tooltip B')).toBeInTheDocument();
+        expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

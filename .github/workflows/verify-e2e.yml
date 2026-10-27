@@ -123,10 +123,25 @@ jobs:
       - name: Wait for the device image
         wait: device-image
 
+      - name: Install simslim
+        if: matrix.platform == 'ios'
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/simslim.tar.gz"
+          curl --fail --silent --show-error --location --retry 3 --output "$archive" \
+            https://github.com/MobAI-App/simslim/releases/download/v0.12.2/simslim-v0.12.2-macos-arm64.tar.gz
+          echo "b47302da6fb83b8b4c21f4fdd61507469770c07b0ff07fd1f48207bda4270887  $archive" | shasum -a 256 -c -
+          mkdir -p "$RUNNER_TEMP/bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/bin" simslim
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
       - name: Build the fixture and boot a device
         timeout-minutes: 30
         env:
           CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+          VERIFY_SIMSLIM: ${{ matrix.platform == 'ios' && '1' || '' }}
+          SIMSLIM_BOOT_TIMEOUT: 15m
+          SIMSLIM_SPAWN_TIMEOUT: 5m
         run: |
           "$CLI" up --platform "$PLATFORM" --backend local
 

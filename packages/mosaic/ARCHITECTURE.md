@@ -76,7 +76,7 @@ State styling uses real class + attribute-selector specificity — no `&&` boost
 
 ## MosaicProvider
 
-Mosaic components need no provider to render or to be styled — the stylesheet and the `--cl-*` tokens do that work. `MosaicProvider` exists for three things: per-name icon glyph overrides, localization, and the toast region (it mounts `ToastProvider`).
+Mosaic components need no provider to render or to be styled — the stylesheet and the `--cl-*` tokens do that work. `MosaicProvider` exists for four things: per-name icon glyph overrides, localization, the reading direction keyboard navigation follows (it mounts `DirectionProvider`), and the toast region (it mounts `ToastProvider`).
 
 ```tsx
 import { MosaicProvider } from './mosaic-provider';

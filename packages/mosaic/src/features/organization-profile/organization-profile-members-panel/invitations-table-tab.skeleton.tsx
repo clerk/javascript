@@ -65,46 +65,31 @@ export function InvitationsTableTabSkeleton({
         minWidth='35rem'
         aria-label={m.title}
         aria-busy
+        selectionMode={hasBulkAction ? 'multiple' : 'none'}
       >
-        <Table.ColumnGroup>
-          {hasBulkAction ? <Table.Column /> : null}
-          <Table.Column />
-          <Table.Column width='9rem' />
-          <Table.Column width='8rem' />
-          {hasRevoke ? <Table.Column width='4rem' /> : null}
-        </Table.ColumnGroup>
         <Table.Header>
-          <Table.Row>
-            {hasBulkAction ? (
-              <Table.SelectAllCell
-                aria-label={m.selectAll}
-                checked={false}
-                disabled
-              />
-            ) : null}
-            <Table.HeaderCell>{m.email}</Table.HeaderCell>
-            <Table.HeaderCell>{m.invitedAt}</Table.HeaderCell>
-            <Table.HeaderCell>{m.roleLabel}</Table.HeaderCell>
-            {hasRevoke ? (
-              <Table.HeaderCell align='end'>
-                <VisuallyHidden>{m.actions}</VisuallyHidden>
-              </Table.HeaderCell>
-            ) : null}
-          </Table.Row>
+          {hasBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+          <Table.Column>{m.email}</Table.Column>
+          <Table.Column width='9rem'>{m.invitedAt}</Table.Column>
+          <Table.Column width='8rem'>{m.roleLabel}</Table.Column>
+          {hasRevoke ? (
+            <Table.Column
+              align='end'
+              width='4rem'
+            >
+              <VisuallyHidden>{m.actions}</VisuallyHidden>
+            </Table.Column>
+          ) : null}
         </Table.Header>
         <Table.Body
           aria-hidden
           {...inertProps(true)}
+          items={PLACEHOLDER_INVITATIONS}
+          itemToStringValue={invitation => invitation.id}
         >
-          {PLACEHOLDER_INVITATIONS.map(invitation => (
-            <Table.Row key={invitation.id}>
-              {hasBulkAction ? (
-                <Table.SelectCell
-                  aria-label={invitation.email}
-                  checked={false}
-                  disabled
-                />
-              ) : null}
+          {invitation => (
+            <Table.Row disabled>
+              {hasBulkAction ? <Table.SelectionCell aria-label={invitation.email} /> : null}
               <Table.Cell>
                 <Entity.Root>
                   <Entity.Content>
@@ -135,7 +120,7 @@ export function InvitationsTableTabSkeleton({
                 </Table.Cell>
               ) : null}
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
     </div>

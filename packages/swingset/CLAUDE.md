@@ -22,14 +22,14 @@ Swingset has no tests, and none should be added. Don't add test files, a Vitest 
 
 These require reading several files together; the `README.md` covers the step-by-step "add a component" workflow.
 
-- **Consumes Mosaic from source, not build.** `@clerk/mosaic` is aliased to `../mosaic/src` in *two* places that must stay in sync: `next.config.mjs` (webpack `resolve.alias`) and `tsconfig.json` (`paths`). Editing Mosaic source in `packages/mosaic` reflects live in swingset's dev server — no rebuild of `@clerk/mosaic` needed.
+- **Consumes Mosaic from source, not build.** `@clerk/mosaic` is aliased to `../mosaic/src` in _two_ places that must stay in sync: `next.config.mjs` (webpack `resolve.alias`) and `tsconfig.json` (`paths`). Editing Mosaic source in `packages/mosaic` reflects live in swingset's dev server — no rebuild of `@clerk/mosaic` needed.
 
 - **Knobs are generated from a story's declared variant surface.** A story's `meta.styles` is a hand-written `{ _variants, _defaultVariants }` object describing the component's variant props — StyleX compiles its styles away, so there is no runtime recipe to derive this from. `lib/generateKnobs.ts` turns each variant into a control: variants whose keys are only `true`/`false` become boolean toggles, everything else becomes a select. Knob values are passed as props straight into the story component. This is why story functions take `Record<string, unknown>` and cast to the real prop type.
 
-- **`lib/registry.ts` is the single source of truth for which components exist**, and they are imported *explicitly* (never `import *`) so sidebar order is deterministic. `getSidebarGroups`, `getModuleBySlug`, and slugging (`lib/slug.ts`, from `meta.title`) read from it. Adding a component touches up to three wiring points: `registry.ts` (sidebar entry + per-page playground lookup), `DocsViewer.tsx`'s `docModules` map (MDX docs), and the hardcoded redirect in `app/(explorer)/page.tsx`.
-  - ⚠️ **Add each new import and its first usage in the same edit.** The on-save lint-fix (`unused-imports/no-unused-imports` is an `error`) deletes any import that isn't referenced yet, so importing a story export in `registry.ts` (or a component in a `*.stories.tsx`) *before* the code that uses it silently drops the import and you get `X is not defined` at runtime. After wiring, `grep` the new symbol to confirm both the import and its use survived. (Repo-wide footgun; see `clerk-monorepo` skill `references/setup-and-footguns.md`.)
+- **`lib/registry.ts` is the single source of truth for which components exist**, and they are imported _explicitly_ (never `import *`) so sidebar order is deterministic. `getSidebarGroups`, `getModuleBySlug`, and slugging (`lib/slug.ts`, from `meta.title`) read from it. Adding a component touches up to three wiring points: `registry.ts` (sidebar entry + per-page playground lookup), `DocsViewer.tsx`'s `docModules` map (MDX docs), and the hardcoded redirect in `app/(explorer)/page.tsx`.
+  - ⚠️ **Add each new import and its first usage in the same edit.** The on-save lint-fix (`unused-imports/no-unused-imports` is an `error`) deletes any import that isn't referenced yet, so importing a story export in `registry.ts` (or a component in a `*.stories.tsx`) _before_ the code that uses it silently drops the import and you get `X is not defined` at runtime. After wiring, `grep` the new symbol to confirm both the import and its use survived. (Repo-wide footgun; see `clerk-monorepo` skill `references/setup-and-footguns.md`.)
 
-- **Routing.** Route groups split the app: `(explorer)` is the component playground, `(clerk)` is the Live Sandbox (`/live`, `/sign-in`, `/sign-up`) and needs keys from `packages/swingset/.env.local`. Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/(explorer)/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
+- **Routing.** Route groups split the app: `(explorer)` is the component playground, `(clerk)` is the Live Sandbox (`/live`, `/sign-in`, `/sign-up`) and needs keys from `packages/swingset/.env.local`. Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives _inside_ the overview. `app/(explorer)/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
 
 - **Live Sandbox pages.** Every `app/(clerk)/live/*/page.tsx` opens with `LivePageHeader` (`app/(clerk)/live-page-header.tsx`), which renders the page's `h1` and, beside it, the entry's status badge (`StatusBadge`) looked up from the live route map in `lib/live-navigation.ts`. The badge belongs in the title row, where the reader is looking, mirroring the docs pages' `DocTitle` — never in the sticky header chrome. Don't hand-write an `h1` on a live page; pass the title and description to `LivePageHeader` so the badge stays attached. The live sidebar is also the inventory for the User Profile and Organization Profile groups: every Panels/Sections entry from the registry appears there, and one without a route in `liveRoutes` renders as a gray `todo` placeholder (`live/todo/[group]/[component]`, a dashed gray box labelled TODO). When you add a live harness for one, add its route to `liveRoutes` and the placeholder disappears.
 
@@ -43,14 +43,14 @@ These require reading several files together; the `README.md` covers the step-by
 
 - **MDX.** `mdx-components.tsx` injects custom components into all MDX: `<Preview>` (→ `StoryPreview`), `<Story>` (→ `StoryEmbed`, static), `<PropTable>` (→ interactive `PropTable`), `<Usage>` (→ `UsageBlock`, a live code snippet that reflects the current knob values), and a `<pre>` override routing fenced code through Shiki (`CodeBlock`). `next.config.mjs` configures `remark-gfm` and `rehype-raw` (with MDX node pass-through) so raw HTML in tables works.
 
-- **`<Story>` examples can show their source in a collapsible code footer.** When a story module exposes its own source as `__source` — via a `?raw` self-import (`export { default as __source } from './x.stories?raw'`) — `StoryEmbed` runs `extractStorySource` (`lib/extractStorySource.ts`) to pull the *previewed story function's* source out of that raw text, then `toUsageSnippet` (`lib/exampleSnippet.ts`) to reduce that knob harness to a clean usage snippet (unwraps `export function …() { return (…) }` down to the returned JSX and strips the `{...knobsAsProps(props)}` / `{...props}` knob plumbing), and renders a `CodeFooter` (`CodeFooter.tsx`): a "View code" toggle that's collapsed by default and reveals the snippet with a height animation (Base UI's `--collapsible-panel-height` + `data-starting/ending-style`). It's **opt-in per module** — only modules that export `__source` get a footer, and it's keyed to whichever story `name` the `<Story>` renders, so each example shows its own code. Shiki highlighting is shared with the `<pre>`/`CodeBlock` path through the `useShikiHtml` hook. A `<Story>` can carry both a code footer and a `composition` footer; they stack under the preview.
-  - The `?raw` query is wired in `next.config.mjs`: an `asset/source` rule handles `?raw` imports, and — crucially — a recursive `excludeRawQuery` pass adds `resourceQuery: { not: [/raw/] }` to every *other* loader so Next's SWC loader doesn't compile the file first (otherwise `__source` would contain `_jsxDEV(…)` output instead of the authored source).
+- **`<Story>` examples can show their source in a collapsible code footer.** When a story module exposes its own source as `__source` — via a `?raw` self-import (`export { default as __source } from './x.stories?raw'`) — `StoryEmbed` runs `extractStorySource` (`lib/extractStorySource.ts`) to pull the _previewed story function's_ source out of that raw text, then `toUsageSnippet` (`lib/exampleSnippet.ts`) to reduce that knob harness to a clean usage snippet (unwraps `export function …() { return (…) }` down to the returned JSX and strips the `{...knobsAsProps(props)}` / `{...props}` knob plumbing), and renders a `CodeFooter` (`CodeFooter.tsx`): a "View code" toggle that's collapsed by default and reveals the snippet with a height animation (Base UI's `--collapsible-panel-height` + `data-starting/ending-style`). It's **opt-in per module** — only modules that export `__source` get a footer, and it's keyed to whichever story `name` the `<Story>` renders, so each example shows its own code. Shiki highlighting is shared with the `<pre>`/`CodeBlock` path through the `useShikiHtml` hook. A `<Story>` can carry both a code footer and a `composition` footer; they stack under the preview.
+  - The `?raw` query is wired in `next.config.mjs`: an `asset/source` rule handles `?raw` imports, and — crucially — a recursive `excludeRawQuery` pass adds `resourceQuery: { not: [/raw/] }` to every _other_ loader so Next's SWC loader doesn't compile the file first (otherwise `__source` would contain `_jsxDEV(…)` output instead of the authored source).
 
-- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/mosaic`. Don't confuse the two.
+- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's _own_ chrome (sidebar, tabs, inputs). The components being _documented_ come from `@clerk/mosaic`. Don't confuse the two.
 
 ## Documenting Mosaic components
 
-The facts above explain *how the app works* and `README.md` covers the *mechanical wiring* of adding a component (registry, `docModules`, redirect). This section is the **house style** — *what to write* once the wiring is in place, so every component page reads consistently.
+The facts above explain _how the app works_ and `README.md` covers the _mechanical wiring_ of adding a component (registry, `docModules`, redirect). This section is the **house style** — _what to write_ once the wiring is in place, so every component page reads consistently.
 
 A component's docs are two files in `src/stories/`:
 
@@ -63,25 +63,25 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 `meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `Organization Switcher`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
-| Group        | What lives here                                                | Archetype |
-| ------------ | -------------------------------------------------------------- | --------- |
-| `User Button` | Composed flow UI (e.g. `UserButton`)                          | C         |
-| `Organization Switcher` | Composed flow UI (e.g. `OrganizationSwitcher`)      | C         |
-| `User Profile` | Composed flow UI (e.g. `UserProfileProfilePanel`)             | C         |
-| `Components` | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A         |
-| `Primitives` | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`) | B         |
-| `Styles`     | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`) | B (adapted) |
-| `Hooks`      | Headless hooks (`useDataTable`)                                | B (adapted) |
-| `Localization` | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers | B (adapted) |
+| Group                   | What lives here                                                                                                                      | Archetype   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `User Button`           | Composed flow UI (e.g. `UserButton`)                                                                                                 | C           |
+| `Organization Switcher` | Composed flow UI (e.g. `OrganizationSwitcher`)                                                                                       | C           |
+| `User Profile`          | Composed flow UI (e.g. `UserProfileProfilePanel`)                                                                                    | C           |
+| `Components`            | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A           |
+| `Primitives`            | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`)                                                           | B           |
+| `Styles`                | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`)                                                              | B (adapted) |
+| `Hooks`                 | Headless hooks (`useForm`)                                                                                                           | B (adapted) |
+| `Localization`          | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers                                    | B (adapted) |
 
 `User Button` / `User Profile` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
 
 `Styles` and `Hooks` are the non-component layers: there is no element to knob, so they follow
 archetype B's shape (Example → Usage → Parts → Styling) with `Props` replaced by whatever the export
 actually surfaces — an argument table for a style function, a return-value table for a hook. A
-`Styles` entry documents the tokens its atoms read, since those tokens _are_ its API; the
-`Hooks` entry (`use-data-table.stories.tsx`) is `meta` alone, with no story exports at all, which is
-the minimum a section entry needs.
+`Styles` entry documents the tokens its atoms read, since those tokens _are_ its API; a
+`Hooks` entry needs only `meta`, with no story exports at all, which is the minimum a section entry
+needs.
 
 Archetype A has two forms, chosen by whether the component exposes a single flat set of variant props: **simple** components (`Button`, `Input`) are knob-driven; **compound** components (`Card`, `Field`, `Menu`, `Popover`) have no flat variant props to knob, so they're documented like a primitive but themed. Both are detailed under Archetype A below.
 
@@ -104,7 +104,7 @@ export const meta: StoryMeta = {
 
 - `title` is the component's export name; it produces the slug and is what readers match against code. Set `label` only when the sidebar should read differently (the slug and page heading still come from `title`).
 - `status` marks the entry's maturity — `'stable'`, `'wip'`, or `'todo'` (planned, not yet implemented; e.g. `Table`) — rendered as a colored dot (green / amber / gray) to the left of the entry in the sidebar, and as a dot-plus-label badge to the right of the page's `# Title` h1. It is explicit: omitting it displays no status anywhere (not every entry carries one, e.g. `Scroll Area`). A todo entry is `meta` alone plus a one-paragraph MDX page; it skips its archetype's required sections (and `source`) until the component exists.
-- `substatus` optionally says *why* a wip entry is wip — one of `'needs wire-up'` (view runs on mock data, not yet connected to its model/controller), `'needs reverification'` (wired to FAPI, but a sensitive action still runs without session reverification), `'needs design'`, `'needs a11y'`, `'needs docs'`, `'needs polish'`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
+- `substatus` optionally says _why_ a wip entry is wip — one of `'needs wire-up'` (view runs on mock data, not yet connected to its model/controller), `'needs reverification'` (wired to FAPI, but a sensitive action still runs without session reverification), `'needs design'`, `'needs a11y'`, `'needs docs'`, `'needs polish'`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
 - `source` is always a path **relative to the monorepo root**, pointing at the file that exports the documented component. Always set it — it powers the "View source" link.
 - `styles` declares the component's variant props and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Keep it in sync with the component's real prop union by hand — StyleX compiles its styles away, so nothing derives it for you. Omit it for compound A components, and for B and C.
 
@@ -194,7 +194,10 @@ import * as PopoverStories from './popover.component.stories';
 
 ## Example
 
-<Story name='Default' storyModule={PopoverStories} />
+<Story
+  name='Default'
+  storyModule={PopoverStories}
+/>
 
 ## Usage
 

@@ -69,44 +69,30 @@ export function RequestsTableTabSkeleton({
         minWidth='33rem'
         aria-label={m.title}
         aria-busy
+        selectionMode={hasBulkAction ? 'multiple' : 'none'}
       >
-        <Table.ColumnGroup>
-          {hasBulkAction ? <Table.Column /> : null}
-          <Table.Column />
-          <Table.Column width='9rem' />
-          {hasActions ? <Table.Column width='10rem' /> : null}
-        </Table.ColumnGroup>
         <Table.Header>
-          <Table.Row>
-            {hasBulkAction ? (
-              <Table.SelectAllCell
-                aria-label={m.selectAll}
-                checked={false}
-                disabled
-              />
-            ) : null}
-            <Table.HeaderCell>{m.email}</Table.HeaderCell>
-            <Table.HeaderCell>{m.requestedAt}</Table.HeaderCell>
-            {hasActions ? (
-              <Table.HeaderCell align='end'>
-                <VisuallyHidden>{m.actions}</VisuallyHidden>
-              </Table.HeaderCell>
-            ) : null}
-          </Table.Row>
+          {hasBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+          <Table.Column>{m.email}</Table.Column>
+          <Table.Column width='9rem'>{m.requestedAt}</Table.Column>
+          {hasActions ? (
+            <Table.Column
+              align='end'
+              width='10rem'
+            >
+              <VisuallyHidden>{m.actions}</VisuallyHidden>
+            </Table.Column>
+          ) : null}
         </Table.Header>
         <Table.Body
           aria-hidden
           {...inertProps(true)}
+          items={PLACEHOLDER_REQUESTS}
+          itemToStringValue={request => request.id}
         >
-          {PLACEHOLDER_REQUESTS.map(request => (
-            <Table.Row key={request.id}>
-              {hasBulkAction ? (
-                <Table.SelectCell
-                  aria-label={request.email}
-                  checked={false}
-                  disabled
-                />
-              ) : null}
+          {request => (
+            <Table.Row disabled>
+              {hasBulkAction ? <Table.SelectionCell aria-label={request.email} /> : null}
               <Table.Cell>
                 <Entity.Root>
                   <Skeleton
@@ -165,7 +151,7 @@ export function RequestsTableTabSkeleton({
                 </Table.Cell>
               ) : null}
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
     </div>

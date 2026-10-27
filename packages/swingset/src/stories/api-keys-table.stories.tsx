@@ -21,7 +21,7 @@ const styles = stylex.create({
 
 export const meta: StoryMeta = {
   group: 'Misc',
-  status: 'wip',
+  status: 'stable',
   title: 'APIKeysTable',
   label: 'API keys table',
   source: 'packages/mosaic/src/features/api-keys/api-keys-table.view.tsx',
@@ -54,7 +54,7 @@ export function Empty() {
 }
 
 export function ProposedTable() {
-  const props = useAPIKeysTableFixture({ enableSorting: true });
+  const props = useAPIKeysTableFixture();
   return (
     <APIKeysTableView
       {...props}

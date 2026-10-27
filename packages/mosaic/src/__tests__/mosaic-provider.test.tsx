@@ -6,6 +6,7 @@ import type { MosaicIconOverrides } from '../icons/overrides';
 import { useMosaicIcons } from '../icons/overrides';
 import { useLocale, useMessages } from '../localization';
 import { MosaicProvider } from '../mosaic-provider';
+import { useDirection } from '../primitives/direction-provider';
 
 describe('MosaicProvider icons', () => {
   it('exposes the icon overrides via useMosaicIcons', () => {
@@ -47,5 +48,21 @@ describe('MosaicProvider localization', () => {
       wrapper: ({ children }) => React.createElement(MosaicProvider, { localization: { locale: 'de' } }, children),
     });
     expect(result.current).toBe('de');
+  });
+});
+
+describe('MosaicProvider direction', () => {
+  it('passes the direction prop to useDirection', () => {
+    const { result } = renderHook(() => useDirection(), {
+      wrapper: ({ children }) => React.createElement(MosaicProvider, { direction: 'rtl' }, children),
+    });
+    expect(result.current).toBe('rtl');
+  });
+
+  it('defaults to ltr', () => {
+    const { result } = renderHook(() => useDirection(), {
+      wrapper: ({ children }) => React.createElement(MosaicProvider, {}, children),
+    });
+    expect(result.current).toBe('ltr');
   });
 });

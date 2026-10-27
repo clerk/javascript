@@ -423,8 +423,15 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
-      params || {};
+    const {
+      strategy,
+      redirectUrlComplete,
+      identifier,
+      oidcPrompt,
+      slackTeamIdHint,
+      continueSignIn,
+      enterpriseConnectionId,
+    } = params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -450,13 +457,15 @@ export class SignIn extends BaseResource implements SignInResource {
     // provider first" and the challenge runs on the way back, where the callback routes to it.
     let challengedCreateHandOff: URL | null = null;
 
-    if (!this.id || !continueSignIn) {
+    const shouldCreateSignIn = !this.id || !continueSignIn;
+    if (shouldCreateSignIn) {
       await this.create({
         strategy,
         identifier,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        slackTeamIdHint,
       });
 
       if (isChallengePending()) {
@@ -467,14 +476,16 @@ export class SignIn extends BaseResource implements SignInResource {
       }
     }
 
-    if (strategy === 'enterprise_sso') {
-      await this.prepareFirstFactor({
+    if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
+      const prepareParams = {
         strategy,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        slackTeamIdHint,
         enterpriseConnectionId,
-      });
+      };
+      await this._basePost({ body: prepareParams, action: 'prepare_first_factor', coalesce: true });
 
       // A challenged prepare builds no verification, so any redirect left on the sign-in is from an
       // earlier attempt and may be for another connection. Only this call's create hand-off is safe
@@ -1366,8 +1377,16 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: ClerkError | null }> {
-    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId, identifier } =
-      params;
+    const {
+      strategy,
+      redirectUrl,
+      redirectCallbackUrl,
+      popup,
+      oidcPrompt,
+      slackTeamIdHint,
+      enterpriseConnectionId,
+      identifier,
+    } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       let actionCompleteRedirectUrl = redirectUrl;
       try {
@@ -1388,13 +1407,12 @@ class SignInFuture implements SignInFutureResource {
 
       // Reuse the existing sign-in by default so any state already attached to it carries
       // into the SSO attempt (e.g. a ticket from `signIn.create({ strategy: 'ticket' })`,
-      // or a discovered identifier). OAuth is the exception: its redirect URL only comes
-      // back from `_create` and cannot be refreshed in place, so any redirect already
-      // lingering on the resource is stale. Reusing it would replay a previous attempt's
-      // redirect, including a retry of the same provider after an abandoned redirect
-      // (SDK-75), so whenever an OAuth call finds a pending redirect we start fresh.
-      // `enterprise_sso` is always safe to reuse because the `prepare_first_factor` call
-      // below refreshes its redirect against the existing sign-in.
+      // or a discovered identifier). For OAuth, a pending redirect may belong to an
+      // abandoned attempt, including a retry of the same provider (SDK-75), so start
+      // fresh rather than replay it. `enterprise_sso` can reuse the sign-in because
+      // `prepare_first_factor` below refreshes its redirect. When reusing a sign-in
+      // without a pending redirect, an explicit `slackTeamIdHint` also triggers preparation
+      // so the hint is applied to the existing attempt.
       const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
       const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
       const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
@@ -1415,6 +1433,7 @@ class SignInFuture implements SignInFutureResource {
             ...routes,
             identifier,
             oidcPrompt,
+            slackTeamIdHint,
           },
           { resolveProtectCheck: false },
         );
@@ -1427,15 +1446,16 @@ class SignInFuture implements SignInFutureResource {
         }
       }
 
-      if (strategy === 'enterprise_sso') {
+      if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
         const prepare = (options?: { resolveProtectCheck?: boolean }) =>
           this.#resource.__internal_basePost(
             {
               body: {
                 ...routes,
                 oidcPrompt,
+                slackTeamIdHint,
                 enterpriseConnectionId,
-                strategy: 'enterprise_sso',
+                strategy,
               },
               action: 'prepare_first_factor',
               coalesce: true,

@@ -8,17 +8,21 @@ import React from 'react';
 
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { Button } from '../../primitives/button';
+import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useFormattedInput } from '../../primitives/hooks';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
-import { Button } from '../button';
-import { Combobox } from '../combobox';
+import { styles as buttonStyles } from '../button/button.styles';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
+import { sizes as inputSizes, styles as inputStyles } from '../input/input.styles';
 import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
+import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
 import { styles } from './phone-input.styles';
 
@@ -75,7 +79,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     defaultCountry,
     onCountryChange,
     size = 'md',
-    countrySearchPlaceholder = 'Search country or code',
+    countrySearchPlaceholder = 'Search',
     noResultsMessage = 'No countries found',
     disabled: disabledProp,
     required: requiredProp,
@@ -201,13 +205,20 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           placement='bottom-start'
           sideOffset={8}
         >
-          <InputGroup.Start>
+          <InputGroup.Start xstyle={styles.triggerStart}>
             <Popover.Trigger
               render={
                 <Button
-                  size='xs'
-                  shape='default'
-                  {...themeProps('phone-input-country-trigger')}
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-trigger'),
+                    stylex.props(
+                      reset.base,
+                      focusOutline.visible,
+                      buttonStyles.touchTarget,
+                      styles.trigger,
+                      disabled && buttonStyles.disabled,
+                    ),
+                  )}
                 />
               }
               type='button'
@@ -217,10 +228,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               <span {...stylex.props(reset.base, styles.triggerContent)}>
                 <span
                   aria-hidden='true'
-                  {...mergeStyleProps(
-                    themeProps('phone-input-flag'),
-                    stylex.props(reset.base, styles.flag, styles.triggerFlag),
-                  )}
+                  {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
                 >
                   {getFlagEmojiFromCountryIso(country.iso)}
                 </span>
@@ -238,7 +246,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
             {...themeProps('phone-input-popup')}
             xstyle={[reset.base, styles.popup]}
           >
-            <Combobox.Root
+            <HeadlessCombobox.Root
               open
               inputValue={query}
               onInputValueChange={setQuery}
@@ -250,51 +258,73 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 }
               }}
             >
-              <Field.Root xstyle={styles.countrySearchContainer}>
-                <InputGroup.Root
-                  size='md'
-                  {...themeProps('phone-input-country-search')}
+              <Field.Root>
+                <label
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-search'),
+                    stylex.props(reset.base, styles.countrySearchRow),
+                  )}
                 >
-                  <InputGroup.Start>
+                  <span {...stylex.props(reset.base, styles.countrySearchIcon)}>
                     <Icon
                       glyph={MagnifyingGlass}
-                      size='sm'
+                      size='md'
                     />
-                  </InputGroup.Start>
-                  <Combobox.Input
+                  </span>
+                  <HeadlessCombobox.Input
                     aria-label='Search countries'
                     placeholder={countrySearchPlaceholder}
                     spellCheck={false}
+                    {...mergeStyleProps(
+                      themeProps('combobox-input', { size: 'md', variant: 'ghost' }),
+                      themeProps('input', { size: 'md', variant: 'ghost', disabled: false }),
+                      stylex.props(
+                        reset.base,
+                        inputStyles.base,
+                        inputSizes.md,
+                        inputStyles.ghost,
+                        styles.countrySearchInput,
+                      ),
+                    )}
                   />
-                </InputGroup.Root>
+                </label>
               </Field.Root>
-              <Combobox.List {...themeProps('phone-input-country-list')}>
+              <HeadlessCombobox.List
+                {...mergeStyleProps(
+                  themeProps('combobox-list'),
+                  themeProps('phone-input-country-list'),
+                  stylex.props(reset.base, scrollAreaRoot, ...scrollAreaViewport(), styles.countryList),
+                )}
+              >
                 {filteredCountries.length > 0 ? (
                   filteredCountries.map(option => (
-                    <Combobox.Option
+                    <HeadlessCombobox.Option
                       key={option.iso}
                       value={option.iso}
                       label={option.name}
-                      {...themeProps('phone-input-country-option')}
+                      {...mergeStyleProps(
+                        themeProps('combobox-option'),
+                        themeProps('phone-input-country-option'),
+                        stylex.props(reset.base, styles.option),
+                      )}
                     >
                       <span
                         aria-hidden='true'
-                        {...stylex.props(reset.base, styles.flag)}
+                        {...stylex.props(reset.base, styles.optionFlag)}
                       >
-                        {getFlagEmojiFromCountryIso(option.iso)}
+                        <span {...stylex.props(reset.base, styles.flag)}>{getFlagEmojiFromCountryIso(option.iso)}</span>
                       </span>
                       <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
                       <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                      <span {...stylex.props(styles.indicatorSlot)}>
-                        <Combobox.OptionIndicator />
-                      </span>
-                    </Combobox.Option>
+                    </HeadlessCombobox.Option>
                   ))
                 ) : (
-                  <Combobox.Empty>{noResultsMessage}</Combobox.Empty>
+                  <p {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty))}>
+                    {noResultsMessage}
+                  </p>
                 )}
-              </Combobox.List>
-            </Combobox.Root>
+              </HeadlessCombobox.List>
+            </HeadlessCombobox.Root>
           </Popover.Popup>
         </Popover.Root>
 

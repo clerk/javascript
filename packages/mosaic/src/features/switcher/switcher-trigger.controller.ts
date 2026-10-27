@@ -16,20 +16,17 @@ export function useSwitcherTriggerController({
   renderTriggerBadge: SwitcherTriggerBadge;
   renderTriggerLabel: boolean;
 }) {
-  const request = useMemo(() => {
-    const shouldRequestBadge = renderTriggerLabel && kind !== 'none' && id && typeof renderTriggerBadge === 'function';
+  const shouldRequestBadge = renderTriggerLabel && typeof renderTriggerBadge === 'function';
+  const request = useMemo(
+    () => (kind !== 'none' && id ? { options: { kind, id }, sessionId } : undefined),
+    [kind, id, sessionId],
+  );
 
-    if (!shouldRequestBadge) {
-      return undefined;
-    }
-
-    return { options: { kind, id }, resolve: renderTriggerBadge, sessionId };
-  }, [kind, id, renderTriggerBadge, renderTriggerLabel, sessionId]);
-
-  const result = useDebouncedAsync(request, async value => value?.resolve(value.options), {
-    delayMs: 0,
-    enabled: request !== undefined,
-  });
+  const result = useDebouncedAsync(
+    request,
+    async value => (value && typeof renderTriggerBadge === 'function' ? renderTriggerBadge(value.options) : undefined),
+    { delayMs: 0, enabled: shouldRequestBadge && request !== undefined },
+  );
 
   return { badge: result.isPending ? undefined : result.data };
 }

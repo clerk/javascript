@@ -1,36 +1,27 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../blocks/confirm';
+import { useDebouncedAsync } from '../../hooks/use-debounced-async';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { useNow } from '../../hooks/use-now';
 import { useLocale } from '../../localization';
 import { formatDate } from '../../utils/format-date';
 import { formatRelativeTime } from './api-keys-table.format';
-import { useAPIKeysTableModel } from './api-keys-table.model';
+import type { APIKeysTableModel } from './api-keys-table.model';
 import type { APIKey, APIKeyRecord, APIKeysTableMessages } from './api-keys-table.types';
 import { useCreateAPIKeyController } from './create-api-key.controller';
 
-const SEARCH_DEBOUNCE_MS = 500;
-
 export interface APIKeysTableControllerOptions {
-  subject: string;
-  pageSize: number;
   showDescription: boolean;
   messages: APIKeysTableMessages;
 }
 
-export function useAPIKeysTableController({
-  subject,
-  pageSize,
-  showDescription,
-  messages,
-}: APIKeysTableControllerOptions) {
-  const [query, setQuery] = useState('');
-  const model = useAPIKeysTableModel(subject, pageSize, query);
+export function useAPIKeysTableController(
+  model: APIKeysTableModel,
+  { showDescription, messages }: APIKeysTableControllerOptions,
+) {
   const locale = useLocale();
   const now = useNow({ updateInterval: 60_000 });
-  const [searchValue, setSearchValue] = useState('');
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const create = useCreateAPIKeyController({ messages, showDescription, onCreate: model.create });
   const apiKeys = model.data.map(key => toAPIKey(key, locale, now));
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -53,8 +44,6 @@ export function useAPIKeysTableController({
     errorFallback: messages.revokeError,
   });
 
-  useEffect(() => () => clearTimeout(timer.current), []);
-
   return {
     isLoaded: model.isLoaded,
     isAvailable: model.isAvailable,
@@ -65,22 +54,19 @@ export function useAPIKeysTableController({
     finalFocus: removalFocus.finalFocus,
     totalCount: model.count,
     page: model.page,
-    searchValue,
     isLoading: model.isLoading,
     isFetching: model.isFetching,
     isError: model.isError,
     onRetry: () => void model.revalidate(),
     onPageChange: model.fetchPage,
-    onSearchChange: (value: string) => {
-      setSearchValue(value);
-      clearTimeout(timer.current);
-      timer.current = setTimeout(() => {
-        setQuery(value.trim());
-        model.fetchPage(1);
-      }, SEARCH_DEBOUNCE_MS);
-    },
     manage: model.canManage ? { onCreate: create.onOpen, createDialog: create.dialog, revoke } : undefined,
   };
+}
+
+export function useAPIKeysTableSearchController() {
+  const [searchValue, setSearchValue] = useState('');
+  const query = useDebouncedAsync(searchValue, value => Promise.resolve(value.trim()), { delayMs: 500 });
+  return { searchValue, onSearchChange: setSearchValue, query: query.data ?? '' };
 }
 
 function toAPIKey(key: APIKeyRecord, locale: string, now: Date): APIKey {

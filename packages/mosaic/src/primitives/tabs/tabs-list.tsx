@@ -1,8 +1,9 @@
 'use client';
 
 import { Composite } from '@floating-ui/react';
-import React, { useState } from 'react';
+import React from 'react';
 
+import { useDirection } from '../direction-provider';
 import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
@@ -11,18 +12,15 @@ export type TabsListProps = ComponentProps<'div'>;
 export function TabsList(props: TabsListProps) {
   const { render, children, ...otherProps } = props;
   const { orientation } = useTabsContext();
-  const [rtl, setRtl] = useState(false);
+  const direction = useDirection();
 
   return (
     <Composite
       orientation={orientation}
-      rtl={orientation === 'horizontal' && rtl}
+      rtl={orientation === 'horizontal' && direction === 'rtl'}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
           role: 'tablist' as const,
-          onFocus: (event: React.FocusEvent<HTMLElement>) => {
-            setRtl((event.currentTarget.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl');
-          },
           onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
             if (event.key !== 'Home' && event.key !== 'End') {
               return;

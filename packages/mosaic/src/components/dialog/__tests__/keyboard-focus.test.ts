@@ -51,7 +51,6 @@ beforeEach(() => {
 
 afterEach(() => {
   release();
-  vi.restoreAllMocks();
   if (initialScrollY) {
     Object.defineProperty(window, 'scrollY', initialScrollY);
   }

@@ -2,6 +2,7 @@
 
 import React, { useCallback } from 'react';
 
+import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useOtpContext } from './otp-context';
 import { inputModeForPattern, removeAt, replaceAt, sanitize } from './otp-utils';
@@ -31,6 +32,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     onSlotFocus,
     onSlotBlur,
   } = useOtpContext();
+  const { previousKey, nextKey } = readingDirectionKeys(useDirection());
 
   const char = value[index] ?? '';
 
@@ -125,13 +127,6 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
       const endIndex = Math.min(value.length, lastIndex);
       // Ctrl/Cmd (without Alt) turns navigation and delete into boundary actions.
       const boundaryModifier = (event.ctrlKey || event.metaKey) && !event.altKey;
-
-      // Resolve direction from the nearest ancestor with an explicit `dir` so
-      // arrow keys follow reading order: in RTL, Left moves to the next slot and
-      // Right to the previous one.
-      const isRtl = (event.currentTarget.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl';
-      const previousKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
-      const nextKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
 
       if (event.key === previousKey) {
         event.preventDefault();
