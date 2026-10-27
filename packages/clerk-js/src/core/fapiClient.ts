@@ -322,18 +322,18 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       clerkNetworkError(urlStr, e);
     }
 
-    // 204 No Content responses do not have a body so we should not try to parse it.
+    // 204 No Content responses, and successful responses that declare an empty body, have nothing to parse.
     // Gateway errors may not be JSON (e.g. a proxy's HTML 502); they resolve to `undefined` so they keep their
     // status instead of throwing a parse error, and skip the after response callbacks since they did not come from FAPI.
-    const json: FapiResponseJSON<T> | null | undefined =
-      response.status === 204
-        ? null
-        : await response.json().catch(e => {
-            if (response.status >= 500) {
-              return undefined;
-            }
-            throw e;
-          });
+    const hasEmptyBody = response.status === 204 || (response.ok && response.headers?.get?.('content-length') === '0');
+    const json: FapiResponseJSON<T> | null | undefined = hasEmptyBody
+      ? null
+      : await response.json().catch(e => {
+          if (response.status >= 500) {
+            return undefined;
+          }
+          throw e;
+        });
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json ?? null });
     if (!response.ok) {
       debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');

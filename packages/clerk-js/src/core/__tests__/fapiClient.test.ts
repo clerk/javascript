@@ -244,6 +244,40 @@ describe('request', () => {
     expect(resp.payload).toEqual(null);
   });
 
+  it('returns a null payload and runs the after response callbacks on a successful response with an empty body', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    const afterResponse = vi.fn();
+    client.onAfterResponse(afterResponse);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 200,
+        ok: true,
+        headers: { get: (name: string) => (name.toLowerCase() === 'content-length' ? '0' : null) },
+        json: () => Promise.reject(new SyntaxError('Unexpected end of JSON input')),
+      }),
+    );
+
+    const resp = await client.request({ path: '/' });
+
+    expect(resp.status).toBe(200);
+    expect(resp.payload).toEqual(null);
+    expect(afterResponse).toHaveBeenCalledTimes(1);
+  });
+
+  it('still rejects a successful response whose body is not JSON', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 200,
+        ok: true,
+        headers: { get: (name: string) => (name.toLowerCase() === 'content-length' ? '12' : null) },
+        json: () => Promise.reject(new SyntaxError('Unexpected token < in JSON')),
+      }),
+    );
+
+    await expect(client.request({ path: '/foo' })).rejects.toBeInstanceOf(SyntaxError);
+  });
+
   it('returns a null payload and skips the after response callbacks on a non-JSON 5xx response', async () => {
     const client = createFapiClient(baseFapiClientOptions);
     const afterResponse = vi.fn();
