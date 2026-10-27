@@ -34,21 +34,35 @@ describe('ported lint policy', () => {
 
     expect(config.rules['react-hooks/rules-of-hooks'][0]).toBe(1);
     expect(config.rules['no-restricted-syntax']).toBeUndefined();
-    expect(Object.keys(config.rules).filter(rule => /^(code-quality|good-css)\//.test(rule))).toEqual([]);
+    expect(Object.keys(config.rules).filter(rule => /^(e18e|code-quality|good-css)\//.test(rule))).toEqual([]);
   });
 
   test('checks authored Mosaic styles despite the selector override', async () => {
     const styles = await eslint.calculateConfigForFile('packages/mosaic/src/components/button/button.styles.ts');
     const component = await eslint.calculateConfigForFile('packages/mosaic/src/components/button/button.tsx');
 
-    for (const rule of [
-      'explicit-transition-properties',
-      'reduced-motion',
-      'preserve-focus-outline',
-      'logical-spacing',
-    ]) {
+    for (const rule of ['explicit-transition-properties', 'reduced-motion', 'preserve-focus-outline']) {
       expect(styles.rules[`good-css/${rule}`]?.[0]).toBeGreaterThan(0);
       expect(component.rules[`good-css/${rule}`]).toBeUndefined();
+    }
+  });
+
+  test.each([
+    ['marginTop', 'marginBlockStart'],
+    ['marginBottom', 'marginBlockEnd'],
+    ['paddingTop', 'paddingBlockStart'],
+    ['paddingBottom', 'paddingBlockEnd'],
+  ])('uses StyleX to reject %s and accept %s', async (physical, logical) => {
+    for (const [property, expected] of [
+      [physical, 1],
+      [logical, 0],
+    ]) {
+      const [result] = await eslint.lintText(
+        `import * as stylex from '@stylexjs/stylex'; export const styles = stylex.create({base: {${property}: 4}});`,
+        { filePath: 'packages/mosaic/src/components/button/button.styles.ts' },
+      );
+      expect(result.messages.filter(message => message.fatal)).toEqual([]);
+      expect(result.messages.filter(message => message.ruleId === '@stylexjs/valid-styles')).toHaveLength(expected);
     }
   });
 

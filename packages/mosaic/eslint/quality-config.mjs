@@ -33,7 +33,17 @@ export default [
       'good-css/explicit-transition-properties': 'error',
       'good-css/reduced-motion': 'error',
       'good-css/preserve-focus-outline': 'error',
-      'good-css/logical-spacing': 'warn',
+      '@stylexjs/valid-styles': [
+        'error',
+        {
+          propLimits: {
+            marginTop: { limit: null, reason: 'Use marginBlockStart instead.' },
+            marginBottom: { limit: null, reason: 'Use marginBlockEnd instead.' },
+            paddingTop: { limit: null, reason: 'Use paddingBlockStart instead.' },
+            paddingBottom: { limit: null, reason: 'Use paddingBlockEnd instead.' },
+          },
+        },
+      ],
     },
   },
 ];

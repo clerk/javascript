@@ -381,26 +381,10 @@ export const preserveFocusOutline = {
   },
 };
 
-const physicalSpacing = new Set(['marginTop', 'marginBottom', 'paddingTop', 'paddingBottom']);
-
-export const logicalSpacing = {
-  meta: { ...transitionMeta, messages: { logical: 'Use the block-axis logical spacing property.' } },
-  create(context) {
-    return styleObjects(context, style => {
-      for (const property of entries(style)) {
-        if (physicalSpacing.has(propertyName(property))) {
-          context.report({ node: property, messageId: 'logical' });
-        }
-      }
-    });
-  },
-};
-
 export default {
   rules: {
     'explicit-transition-properties': explicitTransitionProperties,
     'reduced-motion': reducedMotion,
     'preserve-focus-outline': preserveFocusOutline,
-    'logical-spacing': logicalSpacing,
   },
 };
