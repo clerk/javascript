@@ -1,6 +1,5 @@
+import { SafeLocalStorage } from '@clerk/shared/internal/clerk-js/localStorage';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { SafeLocalStorage } from '../localStorage';
 
 describe('SafeLocalStorage', () => {
   let mockStorage: { [key: string]: string } = {};
