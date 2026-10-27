@@ -476,9 +476,8 @@ describe('Otp', () => {
         Otp.useOtp();
         return null;
       }
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => render(<Orphan />)).toThrow(/within <Otp.Root>/);
-      spy.mockRestore();
     });
   });
 

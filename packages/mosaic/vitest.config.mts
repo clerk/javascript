@@ -22,6 +22,8 @@ export default defineConfig({
       },
     },
     globals: false,
+    restoreMocks: true,
+    unstubGlobals: true,
     exclude: ['node_modules/**', 'dist/**'],
     testTimeout: 5000,
     // Primitives ran as their own package on happy-dom with no setup beyond matchers, so they

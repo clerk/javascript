@@ -833,17 +833,9 @@ describe('Menu', () => {
       vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
     });
 
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
-
     beforeEach(() => {
       vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
       vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
-    });
-
-    afterEach(() => {
-      vi.restoreAllMocks();
     });
 
     function renderHoverMenu(children?: React.ReactNode) {

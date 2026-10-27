@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
 import { assign } from '../assign';
@@ -177,10 +177,6 @@ describe('useSelector — re-renders only on the selected slice', () => {
 });
 
 describe('subscription cleanup', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('unsubscribes from the actor on unmount', () => {
     const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
     actor.start();

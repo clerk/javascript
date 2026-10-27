@@ -149,7 +149,6 @@ describe('useForm', () => {
       expect(result.current.error).toBe('Something went wrong. Please try again.');
       expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
     }
-    log.mockRestore();
   });
 
   it('returns to editing with the draft and no message when a reverification is cancelled', async () => {
@@ -180,11 +179,10 @@ describe('useForm', () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.values).toEqual({ username: 'alex' });
     expect(log).not.toHaveBeenCalled();
-    log.mockRestore();
   });
 
   it('shows errorFallback instead of the generic message', async () => {
-    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const rejections = [new Error('Nope'), new SaveError({})];
     for (const rejection of rejections) {
       const { result } = renderHook(() =>
@@ -200,7 +198,6 @@ describe('useForm', () => {
       });
       expect(result.current.error).toBe('Could not save the username.');
     }
-    log.mockRestore();
   });
 
   it('falls back to the generic message when a submit error has nothing to show', async () => {

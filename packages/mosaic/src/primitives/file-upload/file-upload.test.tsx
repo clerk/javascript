@@ -356,9 +356,8 @@ describe('FileUpload', () => {
 
   describe('context guards', () => {
     it('throws when a part is used outside Root', () => {
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => render(<FileUpload.Trigger>x</FileUpload.Trigger>)).toThrow(/must be used within <FileUpload.Root>/);
-      spy.mockRestore();
     });
   });
 

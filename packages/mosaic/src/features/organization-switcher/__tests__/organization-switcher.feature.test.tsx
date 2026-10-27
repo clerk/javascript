@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
@@ -17,10 +17,6 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { OrganizationSwitcherProps } from '../organization-switcher';
 import { OrganizationSwitcher } from '../organization-switcher';
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const other = fapiOrganization({ id: 'org_9', name: 'Other' });

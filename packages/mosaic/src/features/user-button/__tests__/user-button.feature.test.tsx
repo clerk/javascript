@@ -1,7 +1,7 @@
 import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -22,10 +22,6 @@ import { renderWithClerk } from '../../../__tests__/feature/render';
 import { PortalProvider } from '../../../primitives/portal';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const other = fapiOrganization({ id: 'org_9', name: 'Other' });
