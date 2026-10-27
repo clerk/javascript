@@ -6,18 +6,19 @@ import { page } from 'vitest/browser';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { SaveError } from '../../../utils/errors';
+import { UserProfile } from '../user-profile';
 import { useUserProfileEditNameController } from '../user-profile-profile-section/user-profile-edit-name.controller';
 import { UserProfileEditNameDialog } from '../user-profile-profile-section/user-profile-edit-name.dialog';
-import { longProfile, serveVisualProfile, shortProfile, VisualProfileOverlay } from './user-profile.visual.fixtures';
+import { longProfile, serveVisualProfile, shortProfile } from './user-profile.visual.fixtures';
 
 async function renderProfile(profile = shortProfile) {
   serveVisualProfile(profile);
-  await renderWithClerk(<VisualProfileOverlay />);
-  const dialog = await screen.findByRole('dialog', { name: 'User profile' });
+  const { container } = await renderWithClerk(<UserProfile />);
   await screen.findByRole('heading', { name: 'Profile' });
   await screen.findByRole('heading', { name: 'Email' });
+  await screen.findByText('Google');
   await document.fonts.ready;
-  return dialog;
+  return container;
 }
 
 function FailedEditName() {
@@ -48,32 +49,30 @@ afterEach(() => {
 });
 
 describe('UserProfile visual states', () => {
-  it('shows the account overlay on desktop in light mode', async () => {
-    const dialog = await renderProfile();
-    expect(screen.getByRole('tab', { name: 'Billing' })).toBeVisible();
+  it('shows the account page on desktop in light mode', async () => {
+    const profile = await renderProfile();
 
-    await expect(page.elementLocator(dialog)).toMatchScreenshot('user-profile-account-desktop-light');
+    await expect(page.elementLocator(profile)).toMatchScreenshot('user-profile-account-desktop-light');
   });
 
-  it('shows the account overlay on desktop in dark mode', async () => {
+  it('shows the account page on desktop in dark mode', async () => {
     document.documentElement.style.colorScheme = 'dark';
-    const dialog = await renderProfile();
-    expect(screen.getByRole('tab', { name: 'Billing' })).toBeVisible();
+    const profile = await renderProfile();
 
-    await expect(page.elementLocator(dialog)).toMatchScreenshot('user-profile-account-desktop-dark');
+    await expect(page.elementLocator(profile)).toMatchScreenshot('user-profile-account-desktop-dark');
   });
 
-  it('shows long names and several contacts in the narrow account overlay', async () => {
+  it('shows long names and several contacts in the narrow account page', async () => {
     await page.viewport(390, 844);
-    const dialog = await renderProfile(longProfile);
-    await screen.findByText('alexandria.montgomery@longcompanydomain.example');
-    const viewport = dialog.querySelector('.cl-profile-content-viewport');
+    const profile = await renderProfile(longProfile);
+    await screen.findAllByText('alexandria.montgomery@longcompanydomain.example');
+    const viewport = profile.querySelector('.cl-profile-content-viewport');
     if (!viewport) {
       throw new Error('User profile content viewport is missing');
     }
     expect(viewport.scrollWidth).toBeLessThanOrEqual(viewport.clientWidth);
 
-    await expect(page.elementLocator(dialog)).toMatchScreenshot('user-profile-account-narrow-light');
+    await expect(page.elementLocator(profile)).toMatchScreenshot('user-profile-account-narrow-light');
   });
 
   it('shows a failed edit with its banner and last name field error', async () => {
