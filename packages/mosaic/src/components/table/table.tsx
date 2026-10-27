@@ -241,9 +241,20 @@ const Column = React.forwardRef<HTMLTableCellElement, TableColumnProps>(function
   );
 });
 
-function Body<Item>({ xstyle, renderEmptyState, ...rest }: TableBodyProps<Item>) {
+type TableBodyComponent = <Item>(
+  props: TableBodyProps<Item> & React.RefAttributes<HTMLTableSectionElement>,
+) => React.ReactElement;
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- forwardRef drops the Item type parameter; React 18 support rules out a generic ref prop.
+const Body = React.forwardRef(BodyImpl) as TableBodyComponent;
+
+function BodyImpl<Item>(
+  { xstyle, renderEmptyState, ...rest }: TableBodyProps<Item>,
+  ref: React.ForwardedRef<HTMLTableSectionElement>,
+) {
   return (
     <Primitive.Body
+      ref={ref}
       renderEmptyState={
         renderEmptyState
           ? () => (

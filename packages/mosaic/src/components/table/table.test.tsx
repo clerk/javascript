@@ -204,6 +204,29 @@ describe('Mosaic Table', () => {
     expect(ref.current).toHaveClass('cl-table', stylex.props(atoms.spaced).className ?? '');
   });
 
+  it('forwards the body ref to the rendered tbody', () => {
+    const ref = React.createRef<HTMLTableSectionElement>();
+    const { container } = render(
+      <Table.Root aria-label='Keys'>
+        <Table.Header>
+          <Table.Column>Name</Table.Column>
+        </Table.Header>
+        <Table.Body
+          ref={ref}
+          items={keys}
+          itemToStringValue={key => key.id}
+        >
+          {key => (
+            <Table.Row>
+              <Table.Cell>{key.name}</Table.Cell>
+            </Table.Row>
+          )}
+        </Table.Body>
+      </Table.Root>,
+    );
+    expect(ref.current).toBe(container.querySelector('tbody'));
+  });
+
   it('renders row header cells with cell styling', () => {
     render(
       <Table.Root>
