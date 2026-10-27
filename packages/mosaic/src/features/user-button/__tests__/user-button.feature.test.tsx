@@ -1103,7 +1103,7 @@ describe('UserButton', () => {
     });
   });
 
-  describe('while an action is in flight', () => {
+  describe('while an action is in flight, beside the busy row', () => {
     it.each(['Other', 'Personal account', 'Sign out'])(
       'holds "%s" in place, aria-disabled and still focusable',
       async label => {

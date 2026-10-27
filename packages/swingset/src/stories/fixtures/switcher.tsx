@@ -1,5 +1,5 @@
+import { switcherBusyKeys } from '@clerk/mosaic/features/switcher/switcher.types';
 import {
-  switcherBusyKeys,
   type SwitcherInvitation,
   type SwitcherMembership,
   type SwitcherSession,

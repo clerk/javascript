@@ -501,7 +501,7 @@ describe('Menu', () => {
     });
   });
 
-  describe('ARIA attributes', () => {
+  describe('ARIA roles and states', () => {
     it('trigger has aria-expanded', async () => {
       const user = userEvent.setup();
       render(
