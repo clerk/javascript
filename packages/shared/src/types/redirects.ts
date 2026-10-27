@@ -79,7 +79,7 @@ export type AuthenticateWithRedirectParams = {
   /**
    * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
    */
-  slackTeamId?: string;
+  slackTeamIdHint?: string;
 
   /**
    * Internal OAuth callback context, consumed only when an OAuth transport completes the

@@ -148,7 +148,7 @@ export type SignInCreateParams = (
       /**
        * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
        */
-      slackTeamId?: string;
+      slackTeamIdHint?: string;
     }
   | {
       strategy: TicketStrategy;

@@ -38,7 +38,7 @@ export interface SignInFutureCreateParams {
   /**
    * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
    */
-  slackTeamId?: string;
+  slackTeamIdHint?: string;
   /**
    * The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in.
    */
@@ -250,7 +250,7 @@ export interface SignInFutureSSOParams {
   /**
    * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
    */
-  slackTeamId?: string;
+  slackTeamIdHint?: string;
   /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental

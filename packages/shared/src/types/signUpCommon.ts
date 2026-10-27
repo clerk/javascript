@@ -82,7 +82,7 @@ export type PrepareVerificationParams =
       /**
        * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
        */
-      slackTeamId?: string;
+      slackTeamIdHint?: string;
     }
   | {
       strategy: EnterpriseSSOStrategy;
@@ -141,7 +141,7 @@ export type SignUpCreateParams = Partial<
     /**
      * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
      */
-    slackTeamId?: string;
+    slackTeamIdHint?: string;
     channel: PhoneCodeChannel;
     locale?: string;
     /**

@@ -2545,12 +2545,17 @@ describe('SignUp Slack workspace hint requests', () => {
       if (method !== 'create') {
         signUp.id = 'signup_slack';
       }
-      for (const slackTeamId of ['T123ABC', 'T456DEF', '', undefined]) {
-        await signUp[method]({ strategy: 'oauth_slack', redirectUrl: 'https://example.com/callback', slackTeamId });
+      for (const slackTeamIdHint of ['T123ABC', 'T456DEF', '', undefined]) {
+        await signUp[method]({ strategy: 'oauth_slack', redirectUrl: 'https://example.com/callback', slackTeamIdHint });
       }
       expect(fetchMock).toHaveBeenCalledTimes(4);
-      expect([0, 1, 2, 3].map(index => fields(index).get('slack_team_id'))).toEqual(['T123ABC', 'T456DEF', '', null]);
-      expect(fetchMock.mock.calls.every((_, index) => !fields(index).has('slackTeamId'))).toBe(true);
+      expect([0, 1, 2, 3].map(index => fields(index).get('slack_team_id_hint'))).toEqual([
+        'T123ABC',
+        'T456DEF',
+        '',
+        null,
+      ]);
+      expect(fetchMock.mock.calls.every((_, index) => !fields(index).has('slackTeamIdHint'))).toBe(true);
       const expectedPath =
         method === 'create'
           ? '/v1/client/sign_ups'
@@ -2575,7 +2580,7 @@ describe('SignUp Slack workspace hint requests', () => {
       strategy: 'oauth_slack' as const,
       redirectUrl: 'https://example.com/callback',
       redirectUrlComplete: 'https://example.com/dashboard',
-      slackTeamId: 'T123ABC',
+      slackTeamIdHint: 'T123ABC',
       continueSignUp,
     };
     if (popup) {
@@ -2584,7 +2589,7 @@ describe('SignUp Slack workspace hint requests', () => {
       await signUp.authenticateWithRedirect(params);
     }
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fields().get('slack_team_id')).toBe('T123ABC');
+    expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
     expect(fetchMock.mock.calls[0][0].pathname).toBe(
       continueSignUp ? '/v1/client/sign_ups/signup_existing' : '/v1/client/sign_ups',
     );
@@ -2593,17 +2598,17 @@ describe('SignUp Slack workspace hint requests', () => {
 
   it('forwards unified create and update hints without retaining the previous workspace', async () => {
     const signUp = new SignUp();
-    for (const slackTeamId of ['T123ABC', 'T456DEF', undefined]) {
+    for (const slackTeamIdHint of ['T123ABC', 'T456DEF', undefined]) {
       const { error } = await signUp.__internal_future.sso({
         strategy: 'oauth_slack',
         redirectUrl: 'https://example.com/dashboard',
         redirectCallbackUrl: 'https://example.com/callback',
-        slackTeamId,
+        slackTeamIdHint,
       });
       expect(error).toBeNull();
     }
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect([0, 1, 2].map(index => fields(index).get('slack_team_id'))).toEqual(['T123ABC', 'T456DEF', null]);
+    expect([0, 1, 2].map(index => fields(index).get('slack_team_id_hint'))).toEqual(['T123ABC', 'T456DEF', null]);
     expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
       '/v1/client/sign_ups',
       '/v1/client/sign_ups/signup_slack',
@@ -2619,11 +2624,11 @@ describe('SignUp Slack workspace hint requests', () => {
       strategy: 'oauth_slack',
       redirectUrl: 'https://example.com/dashboard',
       redirectCallbackUrl: 'https://example.com/callback',
-      slackTeamId: 'T123ABC',
+      slackTeamIdHint: 'T123ABC',
       popup,
     });
     expect(error).toBeNull();
-    expect(fields().get('slack_team_id')).toBe('T123ABC');
+    expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
     expect(_futureAuthenticateWithPopup).toHaveBeenCalledWith(SignUp.clerk, expect.objectContaining({ popup }));
   });
 
@@ -2632,12 +2637,12 @@ describe('SignUp Slack workspace hint requests', () => {
       strategy,
       redirectUrl: 'https://example.com/dashboard',
       redirectCallbackUrl: 'https://example.com/callback',
-      slackTeamId: 'T123ABC',
+      slackTeamIdHint: 'T123ABC',
     });
     expect(error).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fields().get('strategy')).toBe(strategy);
-    expect(fields().get('slack_team_id')).toBe('T123ABC');
+    expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
   });
 
   it('preserves a unified hint when an environment change requires a retry', async () => {
@@ -2651,12 +2656,12 @@ describe('SignUp Slack workspace hint requests', () => {
       strategy: 'oauth_slack',
       redirectUrl: 'https://example.com/dashboard',
       redirectCallbackUrl: 'https://example.com/callback',
-      slackTeamId: 'T123ABC',
+      slackTeamIdHint: 'T123ABC',
     });
     expect(error).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fields(0).get('slack_team_id')).toBe('T123ABC');
-    expect(fields(1).get('slack_team_id')).toBe('T123ABC');
+    expect(fields(0).get('slack_team_id_hint')).toBe('T123ABC');
+    expect(fields(1).get('slack_team_id_hint')).toBe('T123ABC');
     expect(SignUp.clerk.__internal_environment?.reload).toHaveBeenCalledTimes(1);
   });
 });

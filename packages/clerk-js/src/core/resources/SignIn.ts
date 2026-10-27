@@ -428,7 +428,7 @@ export class SignIn extends BaseResource implements SignInResource {
       redirectUrlComplete,
       identifier,
       oidcPrompt,
-      slackTeamId,
+      slackTeamIdHint,
       continueSignIn,
       enterpriseConnectionId,
     } = params || {};
@@ -465,7 +465,7 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
-        slackTeamId,
+        slackTeamIdHint,
       });
 
       if (isChallengePending()) {
@@ -476,13 +476,13 @@ export class SignIn extends BaseResource implements SignInResource {
       }
     }
 
-    if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamId !== undefined)) {
+    if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
       const prepareParams = {
         strategy,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
-        slackTeamId,
+        slackTeamIdHint,
         enterpriseConnectionId,
       };
       await this._basePost({ body: prepareParams, action: 'prepare_first_factor', coalesce: true });
@@ -1383,7 +1383,7 @@ class SignInFuture implements SignInFutureResource {
       redirectCallbackUrl,
       popup,
       oidcPrompt,
-      slackTeamId,
+      slackTeamIdHint,
       enterpriseConnectionId,
       identifier,
     } = params;
@@ -1411,7 +1411,7 @@ class SignInFuture implements SignInFutureResource {
       // abandoned attempt, including a retry of the same provider (SDK-75), so start
       // fresh rather than replay it. `enterprise_sso` can reuse the sign-in because
       // `prepare_first_factor` below refreshes its redirect. When reusing a sign-in
-      // without a pending redirect, an explicit `slackTeamId` also triggers preparation
+      // without a pending redirect, an explicit `slackTeamIdHint` also triggers preparation
       // so the hint is applied to the existing attempt.
       const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
       const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
@@ -1433,7 +1433,7 @@ class SignInFuture implements SignInFutureResource {
             ...routes,
             identifier,
             oidcPrompt,
-            slackTeamId,
+            slackTeamIdHint,
           },
           { resolveProtectCheck: false },
         );
@@ -1446,14 +1446,14 @@ class SignInFuture implements SignInFutureResource {
         }
       }
 
-      if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamId !== undefined)) {
+      if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
         const prepare = (options?: { resolveProtectCheck?: boolean }) =>
           this.#resource.__internal_basePost(
             {
               body: {
                 ...routes,
                 oidcPrompt,
-                slackTeamId,
+                slackTeamIdHint,
                 enterpriseConnectionId,
                 strategy,
               },
