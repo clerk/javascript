@@ -3,7 +3,6 @@ import type { ReactNode, Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { ReverificationDialog } from '../../../blocks/reverification';
-import type { ActionMenuAction } from '../../../components/action-menu';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
@@ -23,7 +22,7 @@ export interface UserProfileMfaSectionViewProps {
   addControl?: ReactNode;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
-  regenerateProgress?: ActionMenuAction['progress'];
+  regeneratePending?: boolean;
   regenerateError?: string;
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
@@ -38,7 +37,7 @@ export function UserProfileMfaSectionView({
   addControl,
   onAdd,
   onRegenerateBackupCodes,
-  regenerateProgress,
+  regeneratePending,
   regenerateError,
   onRemove,
   onSetDefault,
@@ -86,7 +85,7 @@ export function UserProfileMfaSectionView({
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
-            regenerateProgress={regenerateProgress}
+            regeneratePending={regeneratePending}
           />
         ))}
       </UserProfileSecurityList>

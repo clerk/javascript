@@ -15,8 +15,8 @@ export function UserProfileMfaRowView({
   onRemove,
   onSetDefault,
   onRegenerateBackupCodes,
-  regenerateProgress,
-}: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes' | 'regenerateProgress'> & {
+  regeneratePending,
+}: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes' | 'regeneratePending'> & {
   method: UserProfileMfaMethod;
   triggerRef?: Ref<HTMLButtonElement>;
   onRemove?: () => void;
@@ -38,7 +38,7 @@ export function UserProfileMfaRowView({
 
   if (method.type === 'backup-codes') {
     if (onRegenerateBackupCodes) {
-      actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes, progress: regenerateProgress });
+      actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes, pending: regeneratePending });
     }
   } else if (onRemove && method.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: onRemove });
