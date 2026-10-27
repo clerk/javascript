@@ -344,7 +344,7 @@ describe('UserVerificationFactorOne', () => {
       await screen.findByText('Enter the code sent to your email address to set your new password');
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
 
-      await waitFor(() => expect(afterVerification).toHaveBeenCalledWith({ passwordReset: true }));
+      await waitFor(() => expect(afterVerification).toHaveBeenCalled());
       expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledOnce();
       expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledWith(resetFactor);
       expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenLastCalledWith({
@@ -414,11 +414,44 @@ describe('UserVerificationFactorOne', () => {
       screen.getByText('Enter the code sent to your email address to save your new password');
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
 
-      await waitFor(() => expect(afterVerification).toHaveBeenCalledWith({ passwordReset: true }));
+      await waitFor(() => expect(afterVerification).toHaveBeenCalled());
       expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenLastCalledWith({
         strategy: 'reset_password_email_code',
         code: '123456',
         password: 'from-the-form-123',
+        signOutOfOtherSessions: false,
+      });
+    });
+
+    it('reports a new password picked in the modal after the caller password was rejected', async () => {
+      const onPasswordChange = vi.fn();
+      const { userEvent, fixtures, afterVerification } = await submitPwnedPassword({
+        resetPassword: { password: 'from-the-form-123', signOutOfOtherSessions: false, onPasswordChange },
+        resetButtonText: 'Email code to xxx@hello.com',
+      });
+      fixtures.session?.attemptFirstFactorVerification
+        .mockRejectedValueOnce(apiError('form_password_pwned'))
+        .mockResolvedValueOnce(completeWithReset);
+
+      // The caller's password is rejected with the code
+      await userEvent.click(screen.getByText('Email code to xxx@hello.com'));
+      await screen.findByText('Check your email');
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      await screen.findByText('Set new password');
+
+      // The user picks another password in the modal
+      await userEvent.clear(screen.getByLabelText(/^new password/i));
+      await userEvent.clear(screen.getByLabelText(/^confirm password/i));
+      await setNewPassword(userEvent, 'another-better-password-456');
+      expect(onPasswordChange).toHaveBeenCalledWith('another-better-password-456');
+
+      await screen.findByText('Enter the code sent to your email address to save your new password');
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      await waitFor(() => expect(afterVerification).toHaveBeenCalled());
+      expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenLastCalledWith({
+        strategy: 'reset_password_email_code',
+        code: '123456',
+        password: 'another-better-password-456',
         signOutOfOtherSessions: false,
       });
     });

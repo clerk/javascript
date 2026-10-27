@@ -169,6 +169,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
         initialError={error}
         onSubmit={values => {
           setNewPassword(values);
+          resetPassword?.onPasswordChange?.(values.password);
           setResetStep({ step: 'code', reason });
         }}
         onBackLinkClick={() => setResetStep({ step: 'methods', reason })}

@@ -7,7 +7,6 @@ import type {
   __internal_ProtectCheckModalProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
-  __internal_UserVerificationResult,
   Clerk,
   ClerkOptions,
   CreateOrganizationModalProps,
@@ -469,8 +468,8 @@ const Components = (props: ComponentsProps) => {
             /**
              * When a UserVerification flow is completed, we need to close the modal without trigger a cancellation callback
              */
-            afterVerification(result?: __internal_UserVerificationResult) {
-              props.afterVerification?.(result);
+            afterVerification() {
+              props.afterVerification?.();
               componentsControls.closeModal(name, { notify: false });
             },
           },

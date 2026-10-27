@@ -43,27 +43,23 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   // The new password the form is about to set. If reverification asks the user
   // to reset a breached password, the modal uses it instead of asking again.
   const pendingPasswordRef = useRef<UserVerificationResetPassword>();
-  // Set when the modal already changed the password, so the retry doesn't
-  // change it a second time.
-  const passwordResetDuringVerificationRef = useRef(false);
   const updatePasswordWithReverification = useReverification(
-    (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => {
-      if (passwordResetDuringVerificationRef.current) {
-        passwordResetDuringVerificationRef.current = false;
-        // The password already changed, so a failed refresh isn't a failed change.
-        return user.reload().catch(() => user);
-      }
-      return user.updatePassword(...opts);
-    },
+    (user: UserResource, [params]: Parameters<UserResource['updatePassword']>) =>
+      // The retry after reverification must send the password the modal set,
+      // which differs from the form's when the modal rejected it.
+      user.updatePassword({ ...params, newPassword: pendingPasswordRef.current?.password ?? params.newPassword }),
     {
       onNeedsReverification: ({ level, complete, cancel }) => {
+        const pending = pendingPasswordRef.current;
         clerk.__internal_openReverification({
           level,
-          resetPassword: pendingPasswordRef.current,
-          afterVerification: result => {
-            passwordResetDuringVerificationRef.current = !!result?.passwordReset;
-            complete();
+          resetPassword: pending && {
+            ...pending,
+            onPasswordChange: password => {
+              pendingPasswordRef.current = { ...pending, password };
+            },
           },
+          afterVerification: complete,
           afterVerificationCancelled: cancel,
         });
       },

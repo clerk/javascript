@@ -365,7 +365,6 @@ describe('PasswordSection', () => {
         });
         const { wrapper, fixtures } = await createFixtures(config);
         fixtures.clerk.user?.updatePassword.mockRejectedValueOnce(reverificationRequired()).mockResolvedValue({});
-        const reload = vi.spyOn(fixtures.clerk.user!, 'reload').mockResolvedValue({} as any);
         const openReverification = vi
           .spyOn(fixtures.clerk, '__internal_openReverification')
           .mockImplementation(() => {});
@@ -378,39 +377,56 @@ describe('PasswordSection', () => {
         await userEvent.click(getByRole('button', { name: /save$/i }));
 
         await waitFor(() => expect(openReverification).toHaveBeenCalledTimes(1));
-        return { fixtures, reload, modalProps: openReverification.mock.calls[0][0]! };
+        return { fixtures, modalProps: openReverification.mock.calls[0][0]! };
       };
 
-      it('passes the new password to the modal and skips the retry once the modal reset it', async () => {
-        const { fixtures, reload, modalProps } = await submitAndOpenReverification();
-        expect(modalProps.resetPassword).toEqual({ password: 'testtest', signOutOfOtherSessions: true });
-
-        await act(() => modalProps.afterVerification?.({ passwordReset: true }));
-
-        await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
-        expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(1);
-      });
-
-      it('shows success when the modal reset the password but refreshing the user fails', async () => {
-        const { fixtures, reload, modalProps } = await submitAndOpenReverification();
-        reload.mockRejectedValueOnce(new Error('network'));
-
-        await act(() => modalProps.afterVerification?.({ passwordReset: true }));
-
-        // Success closes the form instead of showing the refresh error on it
-        await waitFor(() =>
-          expect(screen.queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument(),
-        );
-        expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(1);
-      });
-
-      it('retries the password change when the modal verified another way', async () => {
-        const { fixtures, reload, modalProps } = await submitAndOpenReverification();
+      // The retry sends the same password; the backend treats it as already done.
+      it('passes the new password to the modal and retries the change after verification', async () => {
+        const { fixtures, modalProps } = await submitAndOpenReverification();
+        expect(modalProps.resetPassword).toMatchObject({ password: 'testtest', signOutOfOtherSessions: true });
 
         await act(() => modalProps.afterVerification?.());
 
         await waitFor(() => expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(2));
-        expect(reload).not.toHaveBeenCalled();
+        expect(fixtures.clerk.user?.updatePassword).toHaveBeenLastCalledWith({
+          newPassword: 'testtest',
+          signOutOfOtherSessions: true,
+        });
+      });
+
+      it('retries with the password the modal set after it rejected the form password', async () => {
+        const { fixtures, modalProps } = await submitAndOpenReverification();
+
+        // The modal rejected 'testtest' and the user picked another password there
+        act(() => modalProps.resetPassword?.onPasswordChange?.('picked-in-the-modal-456'));
+        await act(() => modalProps.afterVerification?.());
+
+        await waitFor(() => expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(2));
+        expect(fixtures.clerk.user?.updatePassword).toHaveBeenLastCalledWith({
+          newPassword: 'picked-in-the-modal-456',
+          signOutOfOtherSessions: true,
+        });
+      });
+
+      it('keeps the form open with the error when the retry fails', async () => {
+        const { fixtures, modalProps } = await submitAndOpenReverification();
+        fixtures.clerk.user?.updatePassword.mockReset().mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            status: 500,
+            data: [
+              {
+                code: 'internal_clerk_error',
+                message: 'Something went wrong',
+                long_message: 'Something went wrong',
+              },
+            ],
+          }),
+        );
+
+        await act(() => modalProps.afterVerification?.());
+
+        await screen.findByText('Something went wrong');
+        screen.getByRole('heading', { name: /update password/i });
       });
     });
 
