@@ -71,6 +71,7 @@ title. See [Panel](/components/panel) and [Heading](/components/heading).
 | `Section.Header`      | `<div>`     | `.cl-section-header`      | Content and optional actions.                                   |
 | `Section.Title`       | heading     | `.cl-section-title`       | The group's heading.                                            |
 | `Section.Body`        | `<div>`     | `.cl-section-body`        | The card under the header.                                      |
+| `Section.Footer`      | `<div>`     | `.cl-section-footer`      | A strip on `--cl-color-surface-subtle` tucked under the body.   |
 | `Section.Row`         | `<div>`     | `.cl-section-row`         | One setting.                                                    |
 | `Section.Items`       | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
 | `Section.Item`        | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
@@ -99,6 +100,15 @@ inside `Section.Items` reflect `data-nested`.
 
 <Story
   name='Cards'
+  storyModule={SectionStories}
+/>
+
+### Footer
+
+`Section.Footer` follows `Section.Body` in the group. It sits on `--cl-color-surface-subtle` and tucks under the card, so the page, `--cl-color-surface` and the faded surface stack in that order.
+
+<Story
+  name='Subscription'
   storyModule={SectionStories}
 />
 

@@ -24,9 +24,10 @@ import * as stylex from '@stylexjs/stylex';
 // =============================================================================
 
 // Every achromatic token is `--cl-color-neutral` mixed into `--cl-color-surface`, so
-// retinting neutral (a warm gray, say) retints the whole ramp. The percentages reproduce
-// the Figma gray scale: grays have zero chroma, so an oklab mix is linear in lightness.
-// Dark mode needs its own percentage because its surface is a 900, not black.
+// retinting neutral (a warm gray, say) retints the whole ramp. Each tier sits about one 1.09:1
+// contrast step from the one below it. Light mode mixes toward black, which holds that ratio at a
+// fixed percentage; dark mode mixes toward white, so its percentages shrink as the tiers rise
+// (surface 6, subtle 4.5, border 2.5).
 const neutralMix = (light: number, dark: number) =>
   `light-dark(color-mix(in oklab, var(--cl-color-neutral) ${light}%, var(--cl-color-surface)), color-mix(in oklab, var(--cl-color-neutral) ${dark}%, var(--cl-color-surface)))`;
 
@@ -36,17 +37,18 @@ const colorDefaults = {
   '--cl-color-neutral-alpha-200': 'color-mix(in oklab, var(--cl-color-neutral) 8%, transparent)',
   '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
 
-  '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.133 0 0))',
-  '--cl-color-background-subtle': neutralMix(3, 4.25),
+  '--cl-color-page': 'light-dark(oklch(1 0 0), oklch(0.16 0 0))',
   '--cl-color-surface':
-    'light-dark(var(--cl-color-background), color-mix(in oklab, var(--cl-color-neutral) 6.5%, var(--cl-color-background)))',
+    'light-dark(color-mix(in oklab, oklch(1 0 0) 60%, var(--cl-color-page)), color-mix(in oklab, var(--cl-color-neutral) 6%, var(--cl-color-page)))',
+  '--cl-color-surface-subtle': neutralMix(3, 4.5),
 
   '--cl-color-foreground': neutralMix(79.5, 98),
   '--cl-color-foreground-secondary': neutralMix(50, 64.25),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border': neutralMix(5.5, 8),
-  '--cl-color-border-subtle': neutralMix(3, 4.25),
+  '--cl-color-border':
+    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 2.5%, var(--cl-color-surface-subtle)), color-mix(in oklab, var(--cl-color-neutral) 2.5%, var(--cl-color-surface-subtle)))',
+  '--cl-color-border-subtle': neutralMix(3, 4.5),
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
   '--cl-color-brand-secondary': 'light-dark(oklch(0.4017 0 0), oklch(0.7025 0 0))',

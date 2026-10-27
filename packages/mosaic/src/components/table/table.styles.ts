@@ -52,8 +52,8 @@ export const styles = stylex.create({
     width: '100%',
   },
   header: {
-    '--_cl-table-surface': colorVars['--cl-color-background-subtle'],
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    '--_cl-table-surface': colorVars['--cl-color-surface-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
   },
   row: {
     '--_cl-table-row-tint': {
@@ -61,7 +61,7 @@ export const styles = stylex.create({
       ':where([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
         default: null,
-        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-background-subtle'],
+        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-surface-subtle'],
       },
     },
     backgroundColor: {
@@ -69,7 +69,7 @@ export const styles = stylex.create({
       ':where([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
         default: null,
-        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-background-subtle'],
+        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-surface-subtle'],
       },
     },
     borderBlockStartColor: colorVars['--cl-color-border'],

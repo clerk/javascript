@@ -22,6 +22,7 @@ export type SectionGroupProps = MosaicComponentProps<'div'>;
 export type SectionHeaderProps = MosaicComponentProps<'div'>;
 export type SectionTitleProps = Omit<HeadingProps, 'size'>;
 export type SectionBodyProps = MosaicComponentProps<'div'>;
+export type SectionFooterProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'ul'>;
 export type SectionItemProps = MosaicComponentProps<'div'> & { wrap?: boolean };
@@ -126,6 +127,22 @@ const Body = React.forwardRef<HTMLDivElement, SectionBodyProps>(function Section
     render,
     ref,
     props: mergeStyleProps(themeProps('section-body'), stylex.props(reset.base, styles.body, xstyle), rest),
+  });
+});
+
+/**
+ * A strip on the faded surface tucked under `Section.Body`, for a summary or a link that belongs to
+ * the card above it. Place it directly after `Section.Body` in the group.
+ */
+const Footer = React.forwardRef<HTMLDivElement, SectionFooterProps>(function SectionFooter(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('section-footer'), stylex.props(reset.base, styles.footer, xstyle), rest),
   });
 });
 
@@ -358,6 +375,7 @@ export const Section = {
   Header,
   Title,
   Body,
+  Footer,
   Row,
   Items,
   Item,

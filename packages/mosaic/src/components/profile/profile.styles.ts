@@ -72,7 +72,7 @@ export const styles = stylex.create({
     },
     // `clip`, not `hidden`: a scroll container here would scroll the surface instead of the column.
     overflow: 'clip',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-page'],
     blockSize: {
       [compact]: '100dvh',
       default: '45rem',
@@ -104,10 +104,7 @@ export const styles = stylex.create({
   },
 
   layoutInDialog: {
-    borderWidth: {
-      [compact]: '0px',
-      default: '1px',
-    },
+    borderWidth: '0px',
     blockSize: 'auto',
     boxShadow: {
       [compact]: 'none',
@@ -123,7 +120,6 @@ export const styles = stylex.create({
 
   layoutFullscreen: {
     borderRadius: 0,
-    borderWidth: '0px',
     boxShadow: 'none',
   },
 
@@ -133,7 +129,7 @@ export const styles = stylex.create({
 
   nav: {
     padding: space['4'],
-    borderInlineEndColor: colorVars['--cl-color-border'],
+    borderInlineEndColor: colorVars['--cl-color-border-subtle'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: '1px',
     // Hidden in CSS too, so the column never shows on a phone before measuring.
