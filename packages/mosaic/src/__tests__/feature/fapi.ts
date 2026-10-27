@@ -12,6 +12,7 @@ import type {
   EnterpriseConnectionJSON,
   EnvironmentJSON,
   ExternalAccountJSON,
+  OAuthConsentInfoJSON,
   OAuthProviders,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -588,6 +589,22 @@ export function fapiApiKey(overrides: Partial<ApiKeyJSON> & Pick<ApiKeyJSON, 'id
     last_used_at: null,
     created_at: createdAt,
     updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+export function fapiOAuthConsentInfo(
+  overrides: Partial<OAuthConsentInfoJSON> & Pick<OAuthConsentInfoJSON, 'client_id'>,
+): OAuthConsentInfoJSON {
+  return {
+    object: 'oauth_consent_info',
+    id: overrides.client_id,
+    oauth_application_name: 'Linear',
+    oauth_application_logo_url: '',
+    oauth_application_url: 'https://linear.app',
+    state: '',
+    redirect_domain: null,
+    scopes: [],
     ...overrides,
   };
 }
