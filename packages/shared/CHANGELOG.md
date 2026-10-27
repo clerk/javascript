@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.43.0
+
+### Minor Changes
+
+- Add the optional `slackTeamIdHint` workspace hint to Slack sign-in and sign-up attempts, including redirect, popup, and unified SSO flows. ([#10402](https://github.com/clerk/javascript/pull/10402)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 4.42.0
 
 ### Minor Changes
