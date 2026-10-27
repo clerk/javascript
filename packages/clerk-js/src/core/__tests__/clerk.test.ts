@@ -1157,14 +1157,33 @@ describe('Clerk singleton', () => {
           expect(statuses).toEqual(['ready']);
         });
 
-        it('leaves a load that is still running to report its own result', async () => {
+        it('finishes a load that fails after a reload succeeded while it was running', async () => {
           const sut = new Clerk(productionPublishableKey);
           const firstClientFetch = createDeferredPromise();
-          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockResolvedValueOnce({ signedInSessions: [] });
+          const client = { signedInSessions: [] };
+          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockResolvedValueOnce(client);
+          const statuses: string[] = [];
+          sut.on('status', status => statuses.push(status));
 
           const load = sut.load({ standardBrowser: false });
           await sut.__internal_reloadInitialResources();
           expect(sut.status).toBe('loading');
+
+          firstClientFetch.reject(unsupportedAppVersion());
+          await expect(load).resolves.toBeUndefined();
+          expect(sut.status).toBe('ready');
+          expect(sut.client).toBe(client);
+          expect(statuses.filter(status => status === 'ready')).toHaveLength(1);
+          expect(statuses).not.toContain('error');
+        });
+
+        it('lets a load fail when no reload succeeded while it was running', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          const firstClientFetch = createDeferredPromise();
+          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockRejectedValueOnce(unsupportedAppVersion());
+
+          const load = sut.load({ standardBrowser: false });
+          await expect(sut.__internal_reloadInitialResources()).rejects.toBeInstanceOf(ClerkAPIResponseError);
 
           firstClientFetch.reject(unsupportedAppVersion());
           await expect(load).rejects.toBeInstanceOf(ClerkAPIResponseError);

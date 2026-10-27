@@ -279,6 +279,7 @@ export class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
   #status: ClerkInterface['status'] = 'loading';
+  #initialResourcesReloadedDuringLoad = false;
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
@@ -682,6 +683,12 @@ export class Clerk implements ClerkInterface {
       }
       this.#finishLoad();
     } catch (error) {
+      // A reload that succeeded while this load was running already applied newer resources, so the load finishes.
+      if (this.#initialResourcesReloadedDuringLoad && this.#status === 'loading') {
+        this.#finishLoad();
+        this.#publicEventBus.emit(clerkEvents.Status, 'ready');
+        return;
+      }
       this.#publicEventBus.emit(clerkEvents.Status, 'error');
       debugLogger.error('load() failed', { error }, 'clerk');
       // bubble up the error
@@ -3699,11 +3706,13 @@ export class Clerk implements ClerkInterface {
     this.updateClient(client);
     this.updateEnvironment(environment);
 
-    // Only a load that has already failed is finished here. A load that is still running reports its own result, and
-    // an overlapping reload may have finished loading first.
+    // A load that is still running finishes with these resources if it fails. An overlapping reload may have finished
+    // loading first.
     if (this.#status === 'error') {
       this.#finishLoad();
       this.#publicEventBus.emit(clerkEvents.Status, 'ready');
+    } else if (this.#status === 'loading') {
+      this.#initialResourcesReloadedDuringLoad = true;
     }
 
     this.#emit();
