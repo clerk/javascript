@@ -19,7 +19,7 @@ import type {
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
-import type { SnakeToCamel, Without } from './utils';
+import type { SnakeToCamel } from './utils';
 import type { VerificationResource } from './verification';
 
 /** @inline */
@@ -58,7 +58,7 @@ export interface ProtectCheckResource {
   uiHints?: Record<string, string>;
 }
 
-export type PrepareVerificationParams = (
+export type PrepareVerificationParams =
   | {
       strategy: EmailCodeStrategy;
     }
@@ -79,23 +79,16 @@ export type PrepareVerificationParams = (
       actionCompleteRedirectUrl?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      /**
+       * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+       */
+      slackTeamIdHint?: string;
     }
   | {
       strategy: EnterpriseSSOStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
-    }
-) &
-  (
-    | {
-        strategy: 'oauth_slack';
-        /**
-         * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
-         */
-        slackTeamIdHint?: string;
-      }
-    | { slackTeamIdHint?: never }
-  );
+    };
 
 export type AttemptVerificationParams =
   | {
@@ -145,6 +138,10 @@ export type SignUpCreateParams = Partial<
     legalAccepted: boolean;
     oidcPrompt: string;
     oidcLoginHint: string;
+    /**
+     * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+     */
+    slackTeamIdHint?: string;
     channel: PhoneCodeChannel;
     locale?: string;
     /**
@@ -152,19 +149,9 @@ export type SignUpCreateParams = Partial<
      */
     timezone?: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
-> &
-  (
-    | {
-        strategy: 'oauth_slack';
-        /**
-         * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
-         */
-        slackTeamIdHint?: string;
-      }
-    | { slackTeamIdHint?: never }
-  );
+>;
 
-export type SignUpUpdateParams = Without<SignUpCreateParams, 'timezone'>;
+export type SignUpUpdateParams = Omit<SignUpCreateParams, 'timezone'>;
 
 /**
  * @deprecated Use `SignUpAuthenticateWithWeb3Params` instead.

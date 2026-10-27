@@ -217,7 +217,7 @@ export interface SignUpFuturePhoneCodeVerifyParams {
 }
 
 /** @generateWithEmptyComment */
-export type SignUpFutureSSOParams = SignUpFutureAdditionalParams & {
+export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
    * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#oauthstrategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/sso#enterprisessostrategy).
    */
@@ -249,6 +249,10 @@ export type SignUpFutureSSOParams = SignUpFutureAdditionalParams & {
    */
   oidcPrompt?: string;
   /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
+  /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental
    */
@@ -257,16 +261,7 @@ export type SignUpFutureSSOParams = SignUpFutureAdditionalParams & {
    * The email address to use for targeting an enterprise connection at sign-up.
    */
   emailAddress?: string;
-} & (
-    | {
-        strategy: 'oauth_slack';
-        /**
-         * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
-         */
-        slackTeamIdHint?: string;
-      }
-    | { slackTeamIdHint?: never }
-  );
+}
 
 /** @generateWithEmptyComment */
 export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {

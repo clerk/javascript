@@ -460,13 +460,12 @@ export class SignIn extends BaseResource implements SignInResource {
     const shouldCreateSignIn = !this.id || !continueSignIn;
     if (shouldCreateSignIn) {
       await this.create({
+        strategy,
         identifier,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
-        ...(params.strategy === 'oauth_slack'
-          ? { strategy: 'oauth_slack' as const, slackTeamIdHint: params.slackTeamIdHint }
-          : { strategy: params.strategy, slackTeamIdHint: params.slackTeamIdHint }),
+        slackTeamIdHint,
       });
 
       if (isChallengePending()) {
@@ -1430,12 +1429,11 @@ class SignInFuture implements SignInFutureResource {
       if (shouldCreateSignIn) {
         await this._create(
           {
+            strategy,
             ...routes,
             identifier,
             oidcPrompt,
-            ...(params.strategy === 'oauth_slack'
-              ? { strategy: 'oauth_slack' as const, slackTeamIdHint: params.slackTeamIdHint }
-              : { strategy: params.strategy, slackTeamIdHint: params.slackTeamIdHint }),
+            slackTeamIdHint,
           },
           { resolveProtectCheck: false },
         );
