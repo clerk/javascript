@@ -1297,6 +1297,7 @@ describe('Clerk singleton', () => {
 
     describe('satellite sign-out', () => {
       beforeEach(() => {
+        Object.defineProperty(window, 'location', { value: new URL('https://satellite.test') });
         vi.mocked(Client.isClientResource).mockReturnValue(true);
         mockClientSignOut.mockResolvedValue({ signOutUrl: 'https://primary.test/v1/client/sign_out' });
         mockClientFetch.mockResolvedValue({
@@ -1310,21 +1311,88 @@ describe('Clerk singleton', () => {
         });
       });
 
+      it('uses the backend URL even with a long-lived cookie', async () => {
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ redirectUrl: '/after-sign-out?tab=security#settings' });
+
+        expect(mockClientSignOut).toHaveBeenCalledWith({
+          persistClient: true,
+          redirectUrl: 'https://satellite.test/after-sign-out?tab=security#settings',
+        });
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+      });
+
+      it.each([false, true])(
+        'does not request repair when persistence is disabled and callback=%s',
+        async withCallback => {
+          const callback = withCallback ? vi.fn() : undefined;
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, experimental: { persistClient: false } });
+          const options = { __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out' };
+          await (callback ? sut.signOut(callback, options) : sut.signOut(options));
+
+          expect(mockClientDestroy).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+          if (callback) {
+            expect(callback).toHaveBeenCalledExactlyOnceWith();
+            expect(sut.navigate).not.toHaveBeenCalled();
+          } else {
+            expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+          }
+        },
+      );
+
+      it.each(['http://satellite.test/signed-out', 'my-app://signed-out', 'https://user:password@satellite.test/'])(
+        'keeps unsupported destination %s on the existing sign-out path',
+        async redirectUrl => {
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true });
+          await sut.signOut({ redirectUrl });
+
+          expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith(redirectUrl);
+        },
+      );
+
       it.each([true, false])(
-        'uses the backend URL even with a long-lived cookie and persistClient=%s',
+        'removes sessions before malformed destination navigation fails with persistClient=%s',
         async persistClient => {
+          const error = new TypeError('Invalid navigation URL');
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn().mockRejectedValue(error);
+          await sut.load({ isSatellite: true, experimental: { persistClient } });
+          await expect(sut.signOut({ redirectUrl: 'https://' })).rejects.toBe(error);
+
+          expect(persistClient ? mockClientRemoveSessions : mockClientDestroy).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://');
+        },
+      );
+
+      it.each([true, false])(
+        'preserves callbacks with malformed redirect options and persistClient=%s',
+        async persistClient => {
+          const callback = vi.fn();
           const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
           sut.navigate = vi.fn();
           await sut.load({ isSatellite: true, experimental: { persistClient } });
-          await sut.signOut({ redirectUrl: '/after-sign-out?tab=security#settings' });
-
-          expect(mockClientSignOut).toHaveBeenCalledWith({
-            persistClient,
-            redirectUrl: 'http://test.host/after-sign-out?tab=security#settings',
+          await sut.signOut(callback, {
+            redirectUrl: 'https://',
+            __internal_satelliteSignOutRedirectUrl: 'https://',
           });
-          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
-          expect(mockClientRemoveSessions).not.toHaveBeenCalled();
-          expect(mockClientDestroy).not.toHaveBeenCalled();
+
+          expect(persistClient ? mockClientRemoveSessions : mockClientDestroy).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(callback).toHaveBeenCalledExactlyOnceWith();
+          expect(sut.navigate).not.toHaveBeenCalled();
         },
       );
 
@@ -1364,7 +1432,9 @@ describe('Clerk singleton', () => {
       it.each([true, false])(
         'completes local sign-out after a network error with persistClient=%s',
         async persistClient => {
-          mockClientSignOut.mockRejectedValue(new ClerkRuntimeError('Offline', { code: 'network_error' }));
+          (persistClient ? mockClientSignOut : mockClientDestroy).mockRejectedValue(
+            new ClerkRuntimeError('Offline', { code: 'network_error' }),
+          );
           const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
           sut.navigate = vi.fn();
           await sut.load({ isSatellite: true, experimental: { persistClient } });
@@ -1375,17 +1445,17 @@ describe('Clerk singleton', () => {
         },
       );
 
-      it.each([true, false])('repairs a built-in callback sign-out with persistClient=%s', async persistClient => {
+      it('repairs a built-in callback sign-out', async () => {
         const callback = vi.fn();
         const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
         sut.navigate = vi.fn();
-        await sut.load({ isSatellite: true, experimental: { persistClient } });
+        await sut.load({ isSatellite: true });
         await sut.signOut(callback, {
           __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out?tab=security#settings',
         });
 
         expect(mockClientSignOut).toHaveBeenCalledExactlyOnceWith({
-          persistClient,
+          persistClient: true,
           redirectUrl: 'https://satellite.test/signed-out?tab=security#settings',
         });
         expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');

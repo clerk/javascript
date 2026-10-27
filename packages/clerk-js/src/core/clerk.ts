@@ -749,12 +749,18 @@ export class Clerk implements ClerkInterface {
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
+    let debugRedirectUrl: string | undefined;
+    try {
+      debugRedirectUrl = stripOrigin(redirectUrl);
+    } catch {
+      debugRedirectUrl = undefined;
+    }
     debugLogger.debug(
       'signOut() start',
       {
         hasClient: Boolean(this.client),
         multiSessionCount: this.client?.signedInSessions.length ?? 0,
-        redirectUrl,
+        redirectUrl: debugRedirectUrl,
         sessionTarget: opts?.sessionId ?? null,
       },
       'clerk',
@@ -798,25 +804,34 @@ export class Clerk implements ClerkInterface {
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       this.#setTransitiveState();
 
+      const persistClient = this.#options.experimental?.persistClient ?? true;
+      let repairRedirectUrl: URL | undefined;
+      if (
+        persistClient &&
+        (!signOutCallback || !!opts.__internal_satelliteSignOutRedirectUrl) &&
+        this.#instanceType === 'production' &&
+        this.#options.standardBrowser &&
+        inBrowser() &&
+        typeof window.location !== 'undefined' &&
+        this.isSatellite
+      ) {
+        try {
+          const target = new URL(opts.__internal_satelliteSignOutRedirectUrl || redirectUrl, window.location.href);
+          if (target.protocol === 'https:' && !target.username && !target.password) {
+            repairRedirectUrl = target;
+          }
+        } catch {
+          repairRedirectUrl = undefined;
+        }
+      }
       let signOutUrl: string | undefined;
       try {
-        if (
-          (!signOutCallback || !!opts.__internal_satelliteSignOutRedirectUrl) &&
-          Client.isClientResource(this.client) &&
-          this.#instanceType === 'production' &&
-          this.#options.standardBrowser &&
-          inBrowser() &&
-          typeof window.location !== 'undefined' &&
-          this.isSatellite
-        ) {
+        if (repairRedirectUrl && Client.isClientResource(this.client)) {
           ({ signOutUrl } = await this.client.__internal_signOut({
-            persistClient: this.#options.experimental?.persistClient ?? true,
-            redirectUrl: new URL(
-              opts.__internal_satelliteSignOutRedirectUrl || redirectUrl,
-              window.location.href,
-            ).toString(),
+            persistClient,
+            redirectUrl: repairRedirectUrl.href,
           }));
-        } else if (this.#options.experimental?.persistClient ?? true) {
+        } else if (persistClient) {
           await this.client.removeSessions();
         } else {
           await this.client.destroy();
@@ -830,7 +845,7 @@ export class Clerk implements ClerkInterface {
       const repairUrl = isValidUrl(signOutUrl) && signOutUrl?.startsWith('https://') ? signOutUrl : undefined;
       await executeSignOut(repairUrl);
 
-      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
+      debugLogger.info('signOut() complete', { redirectUrl: debugRedirectUrl }, 'clerk');
       return;
     }
 
@@ -842,7 +857,7 @@ export class Clerk implements ClerkInterface {
       this.#setTransitiveState();
       await session?.remove();
       await executeSignOut();
-      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
+      debugLogger.info('signOut() complete', { redirectUrl: debugRedirectUrl }, 'clerk');
     } else {
       await session?.remove();
     }
