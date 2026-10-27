@@ -12,7 +12,12 @@ describe('allowsIdentificationCreation', () => {
     expect(allowsIdentificationCreation(blocked, enterpriseSSO)).toBe(false);
   });
 
-  it('allows creation when the enterprise connection is inactive or enterprise SSO is off', () => {
+  it('allows creation when the enterprise connection permits it, is inactive, or enterprise SSO is off', () => {
+    const permitted = {
+      enterpriseAccounts: [{ active: true, enterpriseConnection: { disableAdditionalIdentifications: false } }],
+    };
+    expect(allowsIdentificationCreation(permitted, enterpriseSSO)).toBe(true);
+
     const inactive = {
       enterpriseAccounts: [{ active: false, enterpriseConnection: { disableAdditionalIdentifications: true } }],
     };
