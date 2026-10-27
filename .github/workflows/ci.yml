@@ -441,7 +441,7 @@ jobs:
           if-no-files-found: ignore
 
   mosaic-visual-tests:
-    needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     name: Mosaic Visual Tests
     permissions:
       contents: read
@@ -461,13 +461,17 @@ jobs:
           filter: 'blob:none'
           show-progress: false
 
-      - name: Build visual test image
-        run: bash packages/mosaic/scripts/test-visual.sh build
-
       - name: Run visual tests
         id: visual
         continue-on-error: true
         run: bash packages/mosaic/scripts/test-visual.sh compare
+
+      - name: Report visual differences
+        if: ${{ steps.visual.outcome == 'failure' }}
+        run: |
+          echo "::warning title=Mosaic visual differences::Screenshots differ from baselines. Download mosaic-visual-failure-artifacts-${{ github.run_id }}-${{ github.run_attempt }} to review."
+          echo "### Mosaic screenshots differ from baselines" >> "$GITHUB_STEP_SUMMARY"
+          find packages/mosaic/.vitest/attachments -name '*.png' -printf '- %P\n' >> "$GITHUB_STEP_SUMMARY" || true
 
       - name: Upload failure artifacts
         if: ${{ steps.visual.outcome == 'failure' }}

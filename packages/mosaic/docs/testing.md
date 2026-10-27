@@ -124,9 +124,10 @@ pnpm --filter @clerk/mosaic test:visual
 pnpm --filter @clerk/mosaic test:visual:update
 ```
 
-Both commands build the same pinned Linux image that CI uses. They require
-Docker and include Mosaic's compiled stylesheet. The first command compares
-screenshots without changing baselines. The second replaces Linux baselines.
+Both commands build and run the same pinned Linux image that CI uses, so they
+require Docker. Dependencies are cached in an image layer keyed on the lockfile,
+so a rerun after a source change only rebuilds the packages. The first command compares
+screenshots without changing baselines. The second replaces Linux baselines and deletes ones no test produced.
 Review the images and commit the expected baselines under each test's
 `__screenshots__/` directory.
 Failed comparisons write actual, expected, and diff images under
@@ -135,21 +136,21 @@ Failed comparisons write actual, expected, and diff images under
 Use these package commands for screenshots. Calling Vitest directly bypasses
 the pinned image and the command's explicit snapshot update policy.
 
-Start with six baselines: the open combined UserButton, the open
-OrganizationSwitcher, the UserProfile Account overlay in light and dark modes,
-the same overlay at a narrow viewport with long content, and an edit-name form
-showing banner and field errors. Add a screenshot only when it covers a distinct
-layout or visual state that these compositions miss.
+Add a screenshot only when it covers a distinct layout or visual state that the
+existing ones miss. Capture the dialog or popup locator, not `page`, so page
+padding and unrelated content stay out of the baseline.
 
-The suite fixes the default viewport, bundled Inter font, color scheme, locale,
-time zone, and device scale. The browser setup disables motion and hides carets. Use deterministic
+The suite fixes the viewport before each test, the bundled Inter font, color
+scheme, locale, time zone, and device scale, and compares with zero mismatched
+pixels allowed. The browser setup disables motion and hides carets. Use deterministic
 fixture data and avatar fallbacks, and wait for content before capturing the
 page so portaled menus and overlays are included.
 
 Baselines include the browser and operating system in their filenames. The
 `Mosaic Visual Tests` job compares screenshots on the same pinned Linux image
 as the local commands. Its comparison is advisory, so visual differences do
-not block the rest of CI. On a failed comparison, download
+not block the rest of CI; they appear as a warning and in the job summary. On a
+failed comparison, download
 `mosaic-visual-failure-artifacts-<run-id>-<run-attempt>` from the GitHub Actions
 run and review the images in `.vitest/attachments/`.
 

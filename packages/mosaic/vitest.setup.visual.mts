@@ -12,7 +12,6 @@ styles.textContent = `
     font-weight: 100 900;
   }
   :root {
-    color-scheme: light;
     font-family: 'Inter Visual', sans-serif;
     background: light-dark(white, #171717);
     color: light-dark(black, white);
@@ -28,7 +27,6 @@ styles.textContent = `
 document.head.append(styles);
 
 beforeEach(async () => {
-  document.documentElement.style.colorScheme = 'light';
   await page.viewport(1280, 900);
   for (const weight of [400, 500, 600]) {
     const faces = await document.fonts.load(`${weight} 16px "Inter Visual"`);

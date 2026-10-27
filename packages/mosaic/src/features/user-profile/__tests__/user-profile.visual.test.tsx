@@ -8,15 +8,16 @@ import { MosaicProvider } from '../../../mosaic-provider';
 import { SaveError } from '../../../utils/errors';
 import { useUserProfileEditNameController } from '../user-profile-profile-section/user-profile-edit-name.controller';
 import { UserProfileEditNameDialog } from '../user-profile-profile-section/user-profile-edit-name.dialog';
-import { serveVisualProfile, VisualProfileOverlay } from './user-profile.visual.fixtures';
+import { longProfile, serveVisualProfile, shortProfile, VisualProfileOverlay } from './user-profile.visual.fixtures';
 
-async function renderProfile(longContent = false) {
-  serveVisualProfile(longContent);
+async function renderProfile(profile = shortProfile) {
+  serveVisualProfile(profile);
   await renderWithClerk(<VisualProfileOverlay />);
-  await screen.findByRole('dialog', { name: 'User profile' });
+  const dialog = await screen.findByRole('dialog', { name: 'User profile' });
   await screen.findByRole('heading', { name: 'Profile' });
   await screen.findByRole('heading', { name: 'Email' });
   await document.fonts.ready;
+  return dialog;
 }
 
 function FailedEditName() {
@@ -48,31 +49,31 @@ afterEach(() => {
 
 describe('UserProfile visual states', () => {
   it('shows the account overlay on desktop in light mode', async () => {
-    await renderProfile();
+    const dialog = await renderProfile();
     expect(screen.getByRole('tab', { name: 'Billing' })).toBeVisible();
 
-    await expect(page).toMatchScreenshot('user-profile-account-desktop-light');
+    await expect(page.elementLocator(dialog)).toMatchScreenshot('user-profile-account-desktop-light');
   });
 
   it('shows the account overlay on desktop in dark mode', async () => {
     document.documentElement.style.colorScheme = 'dark';
-    await renderProfile();
+    const dialog = await renderProfile();
     expect(screen.getByRole('tab', { name: 'Billing' })).toBeVisible();
 
-    await expect(page).toMatchScreenshot('user-profile-account-desktop-dark');
+    await expect(page.elementLocator(dialog)).toMatchScreenshot('user-profile-account-desktop-dark');
   });
 
   it('shows long names and several contacts in the narrow account overlay', async () => {
     await page.viewport(390, 844);
-    await renderProfile(true);
+    const dialog = await renderProfile(longProfile);
     await screen.findByText('alexandria.montgomery@longcompanydomain.example');
-    const viewport = screen.getByRole('dialog', { name: 'User profile' }).querySelector('.cl-profile-content-viewport');
+    const viewport = dialog.querySelector('.cl-profile-content-viewport');
     if (!viewport) {
       throw new Error('User profile content viewport is missing');
     }
     expect(viewport.scrollWidth).toBeLessThanOrEqual(viewport.clientWidth);
 
-    await expect(page).toMatchScreenshot('user-profile-account-narrow-light');
+    await expect(page.elementLocator(dialog)).toMatchScreenshot('user-profile-account-narrow-light');
   });
 
   it('shows a failed edit with its banner and last name field error', async () => {
@@ -90,6 +91,6 @@ describe('UserProfile visual states', () => {
     );
     await document.fonts.ready;
 
-    await expect(page).toMatchScreenshot('user-profile-edit-name-error');
+    await expect(page.elementLocator(screen.getByRole('dialog'))).toMatchScreenshot('user-profile-edit-name-error');
   });
 });
