@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
 import { usePanelTitle } from '../../../components/panel';
+import { useActionLock } from '../../../hooks/use-action-lock';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
@@ -45,7 +46,8 @@ export function useUserProfileWeb3WalletsController({
   | 'createReverification'
 >) {
   const messages = useMessages('userProfileWeb3Wallets');
-  const action = usePendingAction({ errorFallback: messages.errors.generic });
+  const actionLock = useActionLock();
+  const action = usePendingAction({ actionLock, errorFallback: messages.errors.generic });
   const [picker, setPicker] = useState<SolanaPicker>({ open: false });
   const [owner, setOwner] = useState<WalletAction>();
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -58,8 +60,8 @@ export function useUserProfileWeb3WalletsController({
       sectionRef.current ??
       panelTitle(),
   });
-  // TODO: Share the action lock during removal while preserving errors for the confirmation dialog.
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
+    actionLock,
     onConfirm: wallet => removalFocus.remove(wallet.id),
     reverification: removeReverification,
   });
@@ -170,6 +172,8 @@ export function useUserProfileWeb3WalletsController({
         ? action.error
         : undefined,
     pendingId,
+    pendingPrimaryId: owner?.kind === 'primary' ? pendingId : undefined,
+    isDisabled: actionLock.isPending,
     sectionRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: remove ? removeWallet : undefined,
