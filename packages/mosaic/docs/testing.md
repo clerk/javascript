@@ -36,8 +36,10 @@ Rule of thumb: **test each behavior once, at the boundary that owns it.**
 | Feature | `*.feature.test.tsx`        | Chromium (`pnpm test:feature`)                | A feature end to end: real `Clerk`, real layers, FAPI faked with MSW    |
 | E2E     | `/integration` (Playwright) | Real apps against a real Clerk backend        | Framework wiring, redirects, real sessions. Not written per Mosaic flow |
 
-Visual states (loading, empty, every error, every variant) are swingset stories
-with plain props, reviewed by eye. Don't duplicate them as view tests.
+Most visual states (loading, empty, every error, every variant) are swingset
+stories with plain props, reviewed by eye. A small screenshot suite covers
+representative compositions, as described in [Screenshot tests](#screenshot-tests).
+Don't duplicate every story as a view or screenshot test.
 
 Each behavior lives in one tier. A feature test owns everything the feature
 does on screen, including edge cases, busy states, and errors. E2E only proves
@@ -110,6 +112,43 @@ Feature and browser tests need Chromium: run `pnpm playwright install chromium` 
 import the built `@clerk/clerk-js`, so run `pnpm turbo build --filter=@clerk/clerk-js`
 after changing it. Failure screenshots land in `packages/mosaic/.vitest/`.
 Console output from passing tests only shows with `--reporter=verbose`.
+
+## Screenshot tests
+
+The `visual` project runs `*.visual.test.tsx` in Chromium, using the feature
+project's Clerk and MSW setup. Tests and their fixtures live in Mosaic, beside
+the feature they cover. They do not import Swingset stories or fixtures.
+
+```bash
+pnpm --filter @clerk/mosaic test:visual
+pnpm --filter @clerk/mosaic test:visual:update
+```
+
+Both commands build and load Mosaic's compiled stylesheet before running tests.
+The first command compares screenshots without creating or updating baselines.
+The second explicitly creates or replaces them. Review the images and commit
+the expected baselines under each test's `__screenshots__/` directory.
+Failed comparisons write actual, expected, and diff images under
+`packages/mosaic/.vitest/attachments/`.
+
+Use these package commands for screenshots. Calling Vitest directly bypasses
+the stylesheet build and the command's explicit snapshot update policy.
+
+Start with six baselines: the open combined UserButton, the open
+OrganizationSwitcher, the UserProfile Account overlay in light and dark modes,
+the same overlay at a narrow viewport with long content, and an edit-name form
+showing banner and field errors. Add a screenshot only when it covers a distinct
+layout or visual state that these compositions miss.
+
+The suite fixes the default viewport, font family, color scheme, locale, time
+zone, and device scale. The browser setup disables motion. Use deterministic
+fixture data and avatar fallbacks, and wait for content before capturing the
+page so portaled menus and overlays are included.
+
+Baselines include the browser and operating system in their filenames. Generate
+and compare them on the same operating system with the repository's pinned
+Playwright version. macOS baselines do not establish a Linux CI baseline; review
+Linux images separately before adding this command to the Linux CI job.
 
 ## Feature tests
 
