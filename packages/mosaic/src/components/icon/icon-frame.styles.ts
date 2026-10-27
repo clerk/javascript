@@ -20,7 +20,7 @@ export const styles = stylex.create({
     borderColor: colorVars['--cl-color-border'],
   },
   filled: {
-    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
   },
 });
 

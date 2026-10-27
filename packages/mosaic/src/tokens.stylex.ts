@@ -27,7 +27,7 @@ import * as stylex from '@stylexjs/stylex';
 // retinting neutral (a warm gray, say) retints the whole ramp. Each tier sits about one 1.09:1
 // contrast step from the one below it. Light mode mixes toward black, which holds that ratio at a
 // fixed percentage; dark mode mixes toward white, so its percentages shrink as the tiers rise
-// (surface 6, subtle 4.5, border 2.5).
+// (surface 5, subtle 4.5). The border is a wash, so it keeps the same step on any tier.
 const neutralMix = (light: number, dark: number) =>
   `light-dark(color-mix(in oklab, var(--cl-color-neutral) ${light}%, var(--cl-color-surface)), color-mix(in oklab, var(--cl-color-neutral) ${dark}%, var(--cl-color-surface)))`;
 
@@ -39,15 +39,14 @@ const colorDefaults = {
 
   '--cl-color-page': 'light-dark(oklch(1 0 0), oklch(0.16 0 0))',
   '--cl-color-surface':
-    'light-dark(color-mix(in oklab, oklch(1 0 0) 60%, var(--cl-color-page)), color-mix(in oklab, var(--cl-color-neutral) 6%, var(--cl-color-page)))',
-  '--cl-color-surface-subtle': neutralMix(3, 4.5),
+    'light-dark(color-mix(in oklab, oklch(1 0 0) 60%, var(--cl-color-page)), color-mix(in oklab, var(--cl-color-neutral) 5%, var(--cl-color-page)))',
+  '--cl-color-surface-subtle': neutralMix(3.5, 4.5),
 
   '--cl-color-foreground': neutralMix(79.5, 98),
   '--cl-color-foreground-secondary': neutralMix(50, 64.25),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border':
-    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 2.5%, var(--cl-color-surface-subtle)), color-mix(in oklab, var(--cl-color-neutral) 2.5%, var(--cl-color-surface-subtle)))',
+  '--cl-color-border': 'light-dark(var(--cl-color-neutral-alpha-200), var(--cl-color-neutral-alpha-300))',
   '--cl-color-border-subtle': neutralMix(3, 4.5),
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
