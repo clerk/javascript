@@ -69,8 +69,8 @@ props (ARIA attributes, click and keyboard handlers) to spread.
 
 ### Items
 
-`label` names the item for typeahead and for assistive technology. What the row shows is composed
-from `Menu.Media`, `Menu.Label` and `Menu.Indicator`, and those children are required: text dropped straight into the
+`label` names the item for typeahead and for assistive technology. Compose the row with
+`Menu.Label` and optional `Menu.Media` and `Menu.Indicator` parts. Text dropped straight into the
 item is not a flex child the row can size, so it neither lines up with the other rows nor
 truncates. A row with nothing to lead it is `Menu.Label` alone. Use
 `color='negative'` for destructive actions; the color is inherited by the children. `disabled` items

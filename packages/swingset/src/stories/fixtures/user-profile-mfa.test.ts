@@ -52,7 +52,7 @@ describe('MFA playground', () => {
     expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.pendingAction).toBe('generate');
     expect(result.current.section.methods.map(method => method.type)).toEqual(['sms']);
-    expect(result.current.section.onRegenerateBackupCodes).toBeUndefined();
+    expect(result.current.section.regenerate).toBeUndefined();
 
     await act(async () => {
       request.resolve(regeneratedCodes);
@@ -63,7 +63,7 @@ describe('MFA playground', () => {
     expect(result.current.backupCodes.codes).toEqual(regeneratedCodes);
     expect(result.current.backupCodes.pendingAction).toBeUndefined();
     expect(result.current.section.addableMethods).not.toContain('backup-codes');
-    expect(result.current.section.onRegenerateBackupCodes).toBeDefined();
+    expect(result.current.section.regenerate).toBeDefined();
     expect(onGenerateBackupCodes).toHaveBeenCalledOnce();
   });
 
@@ -101,7 +101,7 @@ describe('MFA playground', () => {
       expect(result.current.backupCodes.codes).toEqual([]);
       expect(result.current.section.methods.map(method => method.type)).toEqual(['sms']);
       expect(result.current.section.addableMethods).toContain('backup-codes');
-      expect(result.current.section.onRegenerateBackupCodes).toBeUndefined();
+      expect(result.current.section.regenerate).toBeUndefined();
 
       await complete(() => result.current.backupCodes.onRetry());
       expect(result.current.backupCodes.codes).toEqual(regeneratedCodes);
@@ -111,7 +111,7 @@ describe('MFA playground', () => {
       await complete(() => result.current.backupCodes.onCopy());
       expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
 
-      await complete(() => result.current.section.onRegenerateBackupCodes?.());
+      await complete(() => result.current.section.regenerate?.onClick());
       expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
       expect(result.current.section.methods.filter(method => method.type === 'backup-codes')).toHaveLength(1);
       expect(onGenerateBackupCodes).toHaveBeenCalledTimes(3);
@@ -130,7 +130,7 @@ describe('MFA playground', () => {
     await complete(() => result.current.section.onAdd?.('backup-codes'));
     act(() => result.current.setup.onOpenChange(false));
     onGenerateBackupCodes.mockRejectedValueOnce(new Error('Regeneration failed'));
-    await complete(() => result.current.section.onRegenerateBackupCodes?.());
+    await complete(() => result.current.section.regenerate?.onClick());
     expect(result.current.backupCodes.onBack).toBeUndefined();
     act(() => result.current.setup.onOpenChange(false));
     expect(result.current.setup.open).toBe(false);
@@ -155,7 +155,7 @@ describe('MFA playground', () => {
     await complete(() => result.current.backupCodes.onCopy());
     expect(onCopy).toHaveBeenCalledExactlyOnceWith(codes);
     expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
-    await complete(() => result.current.section.onRegenerateBackupCodes?.());
+    await complete(() => result.current.section.regenerate?.onClick());
     expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.codes).toEqual(regeneratedCodes);
     expect(onGenerateBackupCodes).toHaveBeenCalledOnce();
@@ -284,7 +284,7 @@ describe('MFA playground', () => {
     expect(result.current.section.methods).toEqual([]);
     expect(result.current.backupCodes.codes).toEqual([]);
     expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
-    expect(result.current.section.onRegenerateBackupCodes).toBeUndefined();
+    expect(result.current.section.regenerate).toBeUndefined();
     expect(result.current.section.addableMethods).toEqual(['sms', 'authenticator']);
 
     act(() => result.current.section.onAdd?.('authenticator'));
@@ -310,7 +310,7 @@ describe('MFA playground', () => {
       expect(result.current.section.addableMethods).toContain('backup-codes');
       expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
       expect(result.current.backupCodes.codes).toEqual([]);
-      expect(result.current.section.onRegenerateBackupCodes).toBeUndefined();
+      expect(result.current.section.regenerate).toBeUndefined();
     },
   );
 
@@ -326,7 +326,7 @@ describe('MFA playground', () => {
       } else {
         onGenerateBackupCodes.mockResolvedValueOnce([]);
       }
-      await complete(() => result.current.section.onRegenerateBackupCodes?.());
+      await complete(() => result.current.section.regenerate?.onClick());
       expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
       expect(result.current.backupCodes.codes).toEqual([]);
       expect(result.current.backupCodes.errorMessage).toContain('Unable to generate');

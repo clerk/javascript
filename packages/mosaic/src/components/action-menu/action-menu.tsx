@@ -11,7 +11,7 @@ export interface ActionMenuAction {
   color?: 'neutral' | 'negative';
   icon?: IconComponent;
   onClick: () => void;
-  pending?: boolean;
+  status?: 'idle' | 'pending';
 }
 
 export interface ActionMenuProps {
@@ -25,8 +25,8 @@ export interface ActionMenuProps {
 export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhenDisabled }: ActionMenuProps) {
   const [open, setOpen] = useState(false);
   const [activated, setActivated] = useState(false);
-  const pending = actions.some(action => action.pending);
-  const showSpinner = useSpinDelay(pending ? true : null);
+  const pending = actions.some(action => action.status === 'pending');
+  const showSpinner = useSpinDelay(pending ? true : null, { minDuration: 0 });
 
   if (activated && !pending) {
     setActivated(false);
@@ -60,11 +60,13 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
             color={action.color}
             label={action.label}
             onClick={() => {
-              setActivated(true);
+              if (action.status !== undefined) {
+                setActivated(true);
+              }
               action.onClick();
             }}
-            closeOnClick={false}
-            aria-busy={action.pending || undefined}
+            closeOnClick={action.status === undefined}
+            aria-busy={action.status === 'pending' || undefined}
             disabled={disabled || pending}
           >
             {action.icon ? (
@@ -73,14 +75,12 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
               </Menu.Media>
             ) : null}
             <Menu.Label>{action.label}</Menu.Label>
-            {action.pending !== undefined ? (
+            {action.status !== undefined ? (
               <Menu.Indicator>
-                {action.pending && showSpinner ? (
+                {action.status === 'pending' && showSpinner ? (
                   <Spinner
                     size='sm'
-                    role='progressbar'
-                    aria-hidden={undefined}
-                    aria-label={action.label}
+                    label={action.label}
                   />
                 ) : null}
               </Menu.Indicator>

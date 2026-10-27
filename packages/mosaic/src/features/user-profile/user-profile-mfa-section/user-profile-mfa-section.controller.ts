@@ -587,9 +587,13 @@ export function useUserProfileMfaController(model: ReadyModel) {
   const sectionProps: UserProfileMfaSectionViewProps = {
     methods: [...model.methods],
     addableMethods: model.addableMethods,
-    onRegenerateBackupCodes: model.generateBackupCodes ? generateBackupCodes : undefined,
-    regeneratePending: context.pending === 'generate' && !dialogOpen,
-    regenerateError: flow.kind === 'closed' && flow.error ? errorText(flow.error) : undefined,
+    regenerate: model.generateBackupCodes
+      ? {
+          onClick: generateBackupCodes,
+          status: context.pending === 'generate' && !dialogOpen ? 'pending' : 'idle',
+          error: flow.kind === 'closed' && flow.error ? errorText(flow.error) : undefined,
+        }
+      : undefined,
     onRemove: model.remove,
     onSetDefault: model.setDefault,
     removeReverification: model.removeReverification,
