@@ -1,4 +1,3 @@
-import { logClerkAgentRulesError } from '@clerk/shared/agentRules';
 import { createClerkAgentRulesWriter } from '@clerk/shared/agentRulesWriter';
 import { app } from 'electron';
 
@@ -11,7 +10,7 @@ export function writeAgentRulesOnce() {
 
   try {
     writeAgentRules(app.getAppPath());
-  } catch (error) {
-    logClerkAgentRulesError(error);
+  } catch {
+    return;
   }
 }
