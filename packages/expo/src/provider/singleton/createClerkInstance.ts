@@ -149,8 +149,9 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       appVersionRequestHooks?.checkOnForeground({
         reload: () => clerk.__internal_reloadInitialResources(),
         // `GET /v1/` only passes Clerk's app version check, and never reads or creates a client.
-        // @ts-expect-error - This is an internal API
-        check: () => clerk.getFapiClient().request({ method: 'GET', path: '/' }),
+        check: () =>
+          // @ts-expect-error - This is an internal API
+          clerk.getFapiClient().request({ method: 'GET', path: '/' }, { allowEmptyBody: true, fetchMaxTries: 1 }),
       });
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
