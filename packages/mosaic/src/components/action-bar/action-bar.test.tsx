@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PortalProvider } from '../../primitives/portal';
 import { Dialog } from '../dialog';
@@ -63,10 +63,6 @@ beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 100, 40));
   vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
   vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
 });
 
 describe('Mosaic ActionBar', () => {

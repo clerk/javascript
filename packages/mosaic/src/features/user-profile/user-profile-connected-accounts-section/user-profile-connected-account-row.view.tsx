@@ -36,6 +36,7 @@ export function UserProfileConnectProviderRowView({
       <Section.Item>
         <UserProfileProviderMedia
           provider={provider.provider}
+          iconId={provider.iconId}
           iconUrl={provider.iconUrl}
           monochromeIcon={provider.monochromeIcon}
         />
@@ -104,6 +105,7 @@ export function UserProfileConnectedAccountRowView({
       <Section.Item>
         <UserProfileProviderMedia
           provider={account.provider}
+          iconId={account.iconId}
           iconUrl={account.iconUrl}
           monochromeIcon={account.monochromeIcon}
         />

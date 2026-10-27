@@ -120,6 +120,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.mdx')),
     portal: dynamic(() => import('../stories/portal.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
+    table: dynamic(() => import('../stories/table.primitive.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     'tag-input': dynamic(() => import('../stories/tag-input.mdx')),
     toast: dynamic(() => import('../stories/toast.primitive.mdx')),
@@ -131,9 +132,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   hooks: {
     // Headless hooks — alphabetical.
-    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
     'use-form': dynamic(() => import('../stories/use-form.mdx')),
-    'use-server-data-table': dynamic(() => import('../stories/use-server-data-table.mdx')),
   },
   localization: {
     localization: dynamic(() => import('../stories/localization.mdx')),

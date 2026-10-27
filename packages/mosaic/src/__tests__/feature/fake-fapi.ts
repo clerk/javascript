@@ -500,11 +500,11 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         : missing();
     }),
     http.post(fapiUrl('/v1/client/sessions/:id/touch'), async ({ params, request }) => {
+      const body = new URLSearchParams(await request.text());
       const session = findSession(state, params.id);
       if (!session) {
         return missing();
       }
-      const body = new URLSearchParams(await request.text());
       const organizationId = body.get('active_organization_id') || null;
       const touched = {
         ...session,
@@ -601,6 +601,18 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const body = new URLSearchParams(await request.text());
       const user = updateActiveUser(state, user => patchUser(user, body));
       return user ? envelope(user, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me'), ({ request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const sessions = state.client.sessions.filter(session => session.user.id !== user.id);
+      state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
+      return envelope({ object: 'user', id: user.id, deleted: true }, state.client);
     }),
     http.post(fapiUrl('/v1/me/profile_image'), async ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') === 'DELETE') {

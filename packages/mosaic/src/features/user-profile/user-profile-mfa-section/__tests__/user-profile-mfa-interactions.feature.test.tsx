@@ -45,8 +45,8 @@ describe('User profile MFA interaction boundaries', () => {
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Please try again.'));
-    const retry = screen.getByRole('button', { name: 'Try again' });
-    await waitFor(() => expect(retry).toHaveFocus());
+    const retry = screen.getByRole('button', { name: /Authenticator app/ });
+    expect(retry).toBeEnabled();
     await user.click(retry);
     expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
     const code = screen.getByRole('textbox', { name: 'Verification code' });
@@ -74,7 +74,7 @@ describe('User profile MFA interaction boundaries', () => {
     expect(fapi.mfa.totpCreations).toBe(1);
   });
 
-  it('disables Back while authenticator preparation is pending', async () => {
+  it('disables method choices and prevents duplicate authenticator preparation', async () => {
     await renderMfa();
     const held = holdRequests('post', '/v1/me/totp');
     const user = userEvent.setup();
@@ -83,9 +83,12 @@ describe('User profile MFA interaction boundaries', () => {
     await waitFor(() => expect(held.requests).toHaveLength(1));
     try {
       await waitFor(() => {
-        expect(screen.getByRole('status', { name: 'Preparing authenticator…' })).toBeVisible();
-        expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /Authenticator app/ })).toHaveAttribute('aria-busy', 'true');
+        expect(screen.getByRole('button', { name: /Authenticator app/ })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /SMS verification/ })).toBeDisabled();
       });
+      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+      expect(held.requests).toHaveLength(1);
     } finally {
       held.release();
     }
@@ -202,9 +205,39 @@ describe('User profile MFA interaction boundaries', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Please try again.'));
     expect(screen.queryByRole('button', { name: 'Copy and close' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Download' })).toBeNull();
-    const retry = screen.getByRole('button', { name: 'Try again' });
-    await waitFor(() => expect(retry).toHaveFocus());
+    const retry = screen.getByRole('button', { name: /Backup codes/ });
+    expect(retry).toBeEnabled();
+    const held = holdRequests('post', '/v1/me/backup_codes/');
     await user.click(retry);
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      expect(retry).toBeDisabled();
+      expect(retry).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
+      await user.click(retry);
+      expect(held.requests).toHaveLength(1);
+    } finally {
+      held.release();
+    }
+    expect(await screen.findByText('CODE0100')).toBeVisible();
+  });
+
+  it('keeps the selected backup choice while the account refresh completes', async () => {
+    await renderMfa(fapiUser({ id: 'user_1', totp_enabled: true, two_factor_enabled: true }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    const held = holdRequests('get', '/v1/me');
+    await user.click(screen.getByRole('button', { name: /Backup codes/ }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      expect(within(screen.getByRole('dialog')).getByRole('button', { name: /Backup codes/ })).toHaveAttribute(
+        'aria-busy',
+        'true',
+      );
+      expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
+    } finally {
+      held.release();
+    }
     expect(await screen.findByText('CODE0100')).toBeVisible();
   });
 
@@ -215,23 +248,17 @@ describe('User profile MFA interaction boundaries', () => {
       .spyOn(navigator.clipboard, 'writeText')
       .mockRejectedValueOnce(new Error('Clipboard unavailable'))
       .mockResolvedValue();
-    try {
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      const codes = await screen.findByRole('list', { name: 'Backup codes' });
-      expect(within(codes).getByText('CODE0001')).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() =>
-        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
-      );
-      expect(screen.queryByText('Clipboard unavailable')).toBeNull();
-      expect(within(codes).getByText('CODE0001')).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      expect(write).toHaveBeenCalledTimes(2);
-    } finally {
-      write.mockRestore();
-    }
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    const codes = await screen.findByRole('list', { name: 'Backup codes' });
+    expect(within(codes).getByText('CODE0001')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    expect(screen.queryByText('Clipboard unavailable')).toBeNull();
+    expect(within(codes).getByText('CODE0001')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(write).toHaveBeenCalledTimes(2);
   });
 });

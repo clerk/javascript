@@ -5,6 +5,8 @@ import * as React from 'react';
 
 import { chaosLocalization } from '@/lib/chaos';
 
+import { useDirection } from './DirectionProvider';
+
 interface ChaosContextValue {
   chaos: boolean;
   setChaos: (chaos: boolean) => void;
@@ -29,9 +31,11 @@ export function useChaosFixture<T>(data: T, toChaos: (data: T) => T): T {
 
 export function StoryMosaicProvider({ children }: { children: React.ReactNode }) {
   const { chaos } = useChaos();
+  const { direction } = useDirection();
   return (
     <MosaicProvider
       key={String(chaos)}
+      direction={direction}
       localization={chaos ? chaosLocalization : undefined}
     >
       {children}

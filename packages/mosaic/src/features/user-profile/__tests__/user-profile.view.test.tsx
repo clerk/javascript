@@ -193,6 +193,5 @@ describe('UserProfileView', () => {
     renderView({ pages: {} });
 
     expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
-    warn.mockRestore();
   });
 });

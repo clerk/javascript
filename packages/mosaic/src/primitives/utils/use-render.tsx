@@ -79,7 +79,9 @@ type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
 /**
  * Merges two props objects. Event handlers are chained (both fire),
  * `style` is shallow-merged, `className` is concatenated, and
- * everything else is overwritten by the second argument.
+ * everything else is overwritten by the second argument. An `undefined`
+ * handler or an empty `style`/`className` in the second argument keeps the
+ * first argument's value.
  */
 export function mergeProps<Tag extends keyof React.JSX.IntrinsicElements>(
   a: PropsInput<Tag>,
@@ -89,33 +91,70 @@ export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown
   const merged: Record<string, unknown> = { ...a };
 
   for (const key of Object.keys(b)) {
-    const bVal = b[key];
-
-    if (
-      key.charCodeAt(0) === 111 /* o */ &&
-      key.charCodeAt(1) === 110 /* n */ &&
-      key.charCodeAt(2) >= 65 /* A */ &&
-      key.charCodeAt(2) <= 90 /* Z */ &&
-      typeof a[key] === 'function' &&
-      typeof bVal === 'function'
-    ) {
-      // Chain event handlers — internal fires first, consumer fires second
-      const aHandler = a[key] as (...args: unknown[]) => void;
-      const bHandler = bVal as (...args: unknown[]) => void;
-      merged[key] = (...args: unknown[]) => {
-        aHandler(...args);
-        bHandler(...args);
-      };
-    } else if (key === 'style' && a.style && bVal) {
-      merged.style = { ...(a.style as object), ...(bVal as object) };
-    } else if (key === 'className' && typeof a.className === 'string' && typeof bVal === 'string') {
-      merged.className = `${a.className} ${bVal}`;
-    } else {
-      merged[key] = bVal;
-    }
+    merged[key] = mergeValue(key, a[key], b[key]);
   }
 
   return merged;
+}
+
+function mergeValue(key: string, aVal: unknown, bVal: unknown): unknown {
+  if (isEventHandlerKey(key)) {
+    return mergeEventHandlers(aVal, bVal);
+  }
+  if (key === 'style') {
+    return mergeStyles(aVal, bVal);
+  }
+  if (key === 'className') {
+    return mergeClassNames(aVal, bVal);
+  }
+  return bVal;
+}
+
+function mergeEventHandlers(aVal: unknown, bVal: unknown): unknown {
+  if (bVal === undefined) {
+    return aVal;
+  }
+  if (!isHandler(aVal) || !isHandler(bVal)) {
+    return bVal;
+  }
+  // Chain event handlers — internal fires first, consumer fires second
+  return (...args: unknown[]) => {
+    aVal(...args);
+    bVal(...args);
+  };
+}
+
+function mergeStyles(aVal: unknown, bVal: unknown): unknown {
+  if (!bVal) {
+    return aVal;
+  }
+  if (!aVal) {
+    return bVal;
+  }
+  return { ...(aVal as object), ...(bVal as object) };
+}
+
+function mergeClassNames(aVal: unknown, bVal: unknown): unknown {
+  if (!bVal) {
+    return aVal;
+  }
+  if (typeof aVal === 'string' && typeof bVal === 'string') {
+    return `${aVal} ${bVal}`;
+  }
+  return bVal;
+}
+
+function isEventHandlerKey(key: string): boolean {
+  return (
+    key.charCodeAt(0) === 111 /* o */ &&
+    key.charCodeAt(1) === 110 /* n */ &&
+    key.charCodeAt(2) >= 65 /* A */ &&
+    key.charCodeAt(2) <= 90 /* Z */
+  );
+}
+
+function isHandler(value: unknown): value is (...args: unknown[]) => void {
+  return typeof value === 'function';
 }
 
 // ---------------------------------------------------------------------------

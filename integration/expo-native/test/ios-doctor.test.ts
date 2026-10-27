@@ -4,7 +4,7 @@ import { chmodSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
-import { localIosBackend } from '../src/platform/ios/local.ts';
+import { laneBoot, localIosBackend } from '../src/platform/ios/local.ts';
 
 describe('iOS doctor', () => {
   it('reports the missing Xcode rather than failing when xcrun simctl cannot run', async () => {
@@ -17,10 +17,18 @@ describe('iOS doctor', () => {
     process.env.PATH = bin;
     try {
       const { toolchain, device } = await localIosBackend({ os: 'darwin' }).doctorChecks({ live: false, worktree: '/nowhere', progress: () => undefined });
-      assert.deepEqual(toolchain.map(({ id, ok }) => ({ id, ok })), [{ id: 'xcode', ok: false }]);
+      assert.deepEqual(toolchain.map(({ id, ok }) => ({ id, ok })), [{ id: 'xcode', ok: false }, { id: 'simslim', ok: true }]);
+      assert.deepEqual(toolchain[1], { id: 'simslim', ok: true, state: 'warning', detail: 'not installed; lanes boot stock (brew install mobai-app/tap/simslim)' });
       assert.deepEqual(device.find((check) => check.id === 'lane-ports'), { id: 'lane-ports', ok: true, state: 'not-run', detail: 'not run: needs xcode' });
     } finally {
       process.env.PATH = path;
     }
+  });
+
+  it('slims a lane whenever simslim is installed, unless VERIFY_SIMSLIM says otherwise', () => {
+    assert.equal(laneBoot(undefined, true), 'slim');
+    assert.equal(laneBoot(undefined, false), 'stock');
+    assert.equal(laneBoot('0', true), 'stock');
+    assert.equal(laneBoot('1', false), 'slim');
   });
 });

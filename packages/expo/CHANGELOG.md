@@ -1,5 +1,25 @@
 # Change Log
 
+## 4.14.3
+
+### Patch Changes
+
+- Fix native components such as `UserButton` occasionally staying signed out after a JS sign-in. When the sign-in finished while the SDK was syncing a change from the native SDK, the native SDK was never refreshed with the new session. ([#10431](https://github.com/clerk/javascript/pull/10431)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`eec2699`](https://github.com/clerk/javascript/commit/eec2699f2050084f0bd1059efee95b5e94fe9607)]:
+  - @clerk/clerk-js@6.41.1
+
+## 4.14.2
+
+### Patch Changes
+
+- Fix an intermittent `No session was found with id sess_...` error right after signing in when native components are installed. A request that the JS or native SDK sent with the client token from before the sign-in could leave both SDKs on a new, empty client. The SDK now keeps the client that the sign-in created, and no longer briefly reports the user as signed out while it recovers. ([#10407](https://github.com/clerk/javascript/pull/10407)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/clerk-js@6.41.0
+  - @clerk/shared@4.42.0
+  - @clerk/react@6.18.2
+
 ## 4.14.1
 
 ### Patch Changes
