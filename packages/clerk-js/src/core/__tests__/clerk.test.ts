@@ -1171,6 +1171,24 @@ describe('Clerk singleton', () => {
           expect(sut.status).toBe('error');
         });
 
+        it('finishes a load that failed while the reload was running', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          const firstClientFetch = createDeferredPromise();
+          const reloadClientFetch = createDeferredPromise();
+          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockReturnValueOnce(reloadClientFetch.promise);
+
+          const load = sut.load({ standardBrowser: false });
+          const reload = sut.__internal_reloadInitialResources();
+          firstClientFetch.reject(unsupportedAppVersion());
+          await expect(load).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          expect(sut.status).toBe('error');
+
+          reloadClientFetch.resolve({ signedInSessions: [] });
+          await reload;
+
+          expect(sut.status).toBe('ready');
+        });
+
         it('does not report ready again after a load that succeeded', async () => {
           const sut = new Clerk(productionPublishableKey);
           mockClientFetch.mockResolvedValue({ signedInSessions: [] });

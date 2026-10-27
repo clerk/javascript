@@ -292,7 +292,7 @@ describe('isomorphicClerk', () => {
   });
 
   describe('a headless Clerk instance whose load failed', () => {
-    function createFailingHeadlessClerk({ finishesBeforeLoadRejects = false } = {}) {
+    function createFailingHeadlessClerk({ finishesBeforeLoadRejects = false, throwingListener = false } = {}) {
       const eventBus = createClerkEventBus();
       let status = 'loading';
       eventBus.prioritizedOn(clerkEvents.Status, next => (status = next));
@@ -312,7 +312,11 @@ describe('isomorphicClerk', () => {
         }),
         on: eventBus.on,
         off: eventBus.off,
-        addListener: vi.fn(),
+        addListener: vi.fn(() => {
+          if (throwingListener) {
+            throw new Error('listener failed');
+          }
+        }),
         finishLoad: (next: 'ready' | 'degraded' = 'ready') => eventBus.emit(clerkEvents.Status, next),
       };
       const isomorphicClerk = new IsomorphicClerk({
@@ -383,6 +387,28 @@ describe('isomorphicClerk', () => {
       await vi.advanceTimersByTimeAsync(0);
 
       expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([
+      ['after the failure was handled', false],
+      ['before the failure was handled', true],
+    ])('reports an error when the replay throws for a load that finished %s', async (_, finishesBeforeLoadRejects) => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk({
+        finishesBeforeLoadRejects,
+        throwingListener: true,
+      });
+      const statuses: string[] = [];
+      isomorphicClerk.on('status', status => statuses.push(status));
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      if (!finishesBeforeLoadRejects) {
+        clerkjs.finishLoad();
+        await vi.advanceTimersByTimeAsync(0);
+      }
+
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+      expect(statuses.at(-1)).toBe('error');
     });
 
     it('waits while clerk-js is still failing', async () => {
