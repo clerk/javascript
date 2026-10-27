@@ -141,6 +141,40 @@ function conditionalLeaves(node, conditions = [], sourceCode) {
   );
 }
 
+function isPreference(conditions, preference) {
+  return conditions.some(condition => {
+    if (!condition.startsWith('@media ') || /,|\bor\b|\bnot\b/i.test(condition)) {
+      return false;
+    }
+    return condition
+      .slice(7)
+      .split(/\s+and\s+/i)
+      .some(part => part.trim() === `(prefers-reduced-motion: ${preference})`);
+  });
+}
+
+function conditionParts(conditions) {
+  return conditions.flatMap(condition =>
+    condition === 'default'
+      ? []
+      : condition.startsWith('@media ') && !/,|\bor\b|\bnot\b/i.test(condition)
+        ? condition
+            .slice(7)
+            .split(/\s+and\s+/i)
+            .map(part => `@media ${part.trim()}`)
+        : [condition],
+  );
+}
+
+function covers(override, target, feature) {
+  const overrideParts = conditionParts(override);
+  const targetParts = conditionParts(target);
+  if (!overrideParts.includes(`@media (${feature})`)) {
+    return false;
+  }
+  return overrideParts.filter(part => part !== `@media (${feature})`).every(part => targetParts.includes(part));
+}
+
 function splitTransitions(text) {
   const parts = [];
   let depth = 0;
@@ -168,6 +202,28 @@ function transitionProperty(part) {
       !/^(?:-?\d*\.?\d+m?s|ease(?:-in|-out|-in-out)?|linear|step-start|step-end|steps\(|cubic-bezier\(|allow-discrete$|normal$)/i.test(
         token,
       ),
+  );
+}
+
+function hasMovement(text, shorthand = false) {
+  if (!text) {
+    return false;
+  }
+  const properties = splitTransitions(text).map(part => (shorthand ? transitionProperty(part) : part.trim()));
+  return properties.some(property =>
+    /^(?:all|transform|translate|rotate|scale|width|height|inline-size|block-size|min-width|max-width|min-height|max-height)$/i.test(
+      property ?? '',
+    ),
+  );
+}
+
+function zeroTransition(text) {
+  return (
+    text !== null &&
+    splitTransitions(text).every(part => {
+      const duration = part.match(/(?:^|\s)(-?\d*\.?\d+m?s)(?=\s|$)/i);
+      return duration && /^0(?:\.0+)?m?s$/i.test(duration[1]);
+    })
   );
 }
 
@@ -210,4 +266,65 @@ export const explicitTransitionProperties = {
   },
 };
 
-export default { rules: { 'explicit-transition-properties': explicitTransitionProperties } };
+export const reducedMotion = {
+  meta: {
+    ...transitionMeta,
+    messages: { motion: 'Gate movement transitions behind no-preference or remove them under reduced motion.' },
+  },
+  create(context) {
+    return styleObjects(context, (style, outerConditions) => {
+      for (const property of entries(style)) {
+        const name = propertyName(property);
+        if (name !== 'transition' && name !== 'transitionProperty') {
+          continue;
+        }
+        const shorthand = name === 'transition';
+        const leaves = conditionalLeaves(property.value, [], context.sourceCode);
+        const reducedLeaves = leaves.filter(leaf => isPreference([...outerConditions, ...leaf.conditions], 'reduce'));
+        const duration = entry(style, 'transitionDuration');
+        const durationLeaves = duration ? conditionalLeaves(duration.value, [], context.sourceCode) : [];
+        const unsafe = leaves.some(leaf => {
+          const text = valueText(leaf.node);
+          if (!hasMovement(text, shorthand) || (shorthand && zeroTransition(text))) {
+            return false;
+          }
+          const conditions = [...outerConditions, ...leaf.conditions];
+          if (isPreference(conditions, 'no-preference')) {
+            return false;
+          }
+          if (isPreference(conditions, 'reduce')) {
+            return true;
+          }
+          if (
+            reducedLeaves.some(
+              reduced =>
+                valueText(reduced.node) !== null &&
+                covers([...outerConditions, ...reduced.conditions], conditions, 'prefers-reduced-motion: reduce') &&
+                (!hasMovement(valueText(reduced.node), shorthand) ||
+                  (shorthand && zeroTransition(valueText(reduced.node)))),
+            )
+          ) {
+            return false;
+          }
+          if (
+            durationLeaves.some(
+              reduced =>
+                covers([...outerConditions, ...reduced.conditions], conditions, 'prefers-reduced-motion: reduce') &&
+                /^0(?:\.0+)?m?s$/.test(valueText(reduced.node) ?? ''),
+            )
+          ) {
+            return false;
+          }
+          return true;
+        });
+        if (unsafe) {
+          context.report({ node: property, messageId: 'motion' });
+        }
+      }
+    });
+  },
+};
+
+export default {
+  rules: { 'explicit-transition-properties': explicitTransitionProperties, 'reduced-motion': reducedMotion },
+};

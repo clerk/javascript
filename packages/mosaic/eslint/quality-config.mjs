@@ -31,6 +31,6 @@ export default [
     files: ['packages/mosaic/src/**/*.styles.ts'],
     ignores: testFiles,
     plugins: { 'good-css': goodCss },
-    rules: { 'good-css/explicit-transition-properties': 'error' },
+    rules: { 'good-css/explicit-transition-properties': 'error', 'good-css/reduced-motion': 'error' },
   },
 ];
