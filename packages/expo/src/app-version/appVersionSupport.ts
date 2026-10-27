@@ -193,7 +193,7 @@ function warnIfExpoApplicationIsMissing(appHasMinimums: boolean): void {
   }
   missingExpoApplicationWarned = true;
   console.warn(
-    'Clerk: This instance sets minimum app versions, but Clerk cannot read your app version without expo-application, so it will not block outdated versions.\nInstall it with: npx expo install expo-application',
+    'Clerk: This instance sets minimum app versions, but Clerk cannot read your app version without expo-application. Until you install it, useAppVersionSupport() always reports the app as supported, requests from JavaScript are not blocked, and <ClerkProvider> shows no update screen. Clerk native components still block outdated versions and show their own screen.\nInstall it with: npx expo install expo-application',
   );
 }
 

@@ -6,4 +6,4 @@ Support the minimum app versions set in the Clerk Dashboard. When your iOS or An
 
 To show your own screen instead, set `updateRequiredViewEnabled={false}` on `<ClerkProvider>` and read the new `useAppVersionSupport()` hook, which returns `isSupported`, `currentVersion`, `minimumVersion`, and `updateUrl`.
 
-Minimum versions need `expo-application` (`npx expo install expo-application`), which Clerk uses to read your app's bundle ID or package name and its version. Apps without `expo-application`, apps in Expo Go, and web apps are never blocked.
+Install `expo-application` (`npx expo install expo-application`), which Clerk uses to read your app's bundle ID or package name and its version. Without it, `useAppVersionSupport()` always reports the app as supported, Clerk doesn't block requests made from JavaScript, and `<ClerkProvider>` shows no update screen. If you use `@clerk/expo-native-components`, the native iOS and Android SDKs still identify the app themselves, so their requests are blocked and they show their own update screen. Apps in Expo Go and web apps are never blocked.
