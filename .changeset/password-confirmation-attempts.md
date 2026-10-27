@@ -9,3 +9,4 @@ Show how many password attempts remain when a user enters the wrong current pass
 
 - `ClerkAPIError.meta.remainingAttempts` holds the attempts left in the current session. `0` means the session has ended, and Clerk signs the user out of the current tab and notifies other tabs.
 - Customize the messages with the `unstable__errors.password_confirmation_attempt_remaining`, `unstable__errors.password_confirmation_attempts_remaining` (receives `{{remainingAttempts}}`), and `unstable__errors.password_confirmation_session_ended` localization keys.
+- After the attempt limit signs a user out, the next prebuilt sign-in form explains why their session ended, including after a page reload.

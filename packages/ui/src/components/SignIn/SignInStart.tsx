@@ -2,6 +2,10 @@ import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePh
 import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
+import {
+  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
+  SafeLocalStorage,
+} from '@clerk/shared/internal/clerk-js/localStorage';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type {
@@ -90,7 +94,16 @@ const useAutoFillPasskey = () => {
 
 function SignInStartInternal(): JSX.Element {
   const card = useCardState();
+  const { setError } = card;
   const clerk = useClerk();
+  useEffect(() => {
+    const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${clerk.publishableKey}`;
+    const error = SafeLocalStorage.getItem<ClerkAPIError | null>(key, null);
+    if (error) {
+      SafeLocalStorage.removeItem(key);
+      setError(error);
+    }
+  }, [clerk.publishableKey, setError]);
   const status = useLoadingStatus();
   const { userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();

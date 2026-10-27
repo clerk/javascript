@@ -1,5 +1,9 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
+import {
+  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
+  SafeLocalStorage,
+} from '@clerk/shared/internal/clerk-js/localStorage';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type {
   ClerkAPIErrorJSON,
@@ -128,6 +132,17 @@ export abstract class BaseResource {
     }
 
     const { payload, status, statusText, headers } = fapiResponse;
+    const errors = payload?.errors ?? [];
+    const sessionEnded = status === 422 && errors?.[0]?.meta?.remaining_attempts === 0;
+
+    if (sessionEnded) {
+      const error = new ClerkAPIResponseError(statusText, { data: errors, status }).errors[0];
+      SafeLocalStorage.setItem(
+        `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.clerk.publishableKey}`,
+        error,
+        5 * 60 * 1000,
+      );
+    }
 
     if (headers) {
       const country = headers.get('x-country');
@@ -145,7 +160,6 @@ export abstract class BaseResource {
     }
 
     if (status >= 400) {
-      const errors = payload?.errors as ClerkAPIErrorJSON[];
       const message = errors?.[0]?.long_message;
       const code = errors?.[0]?.code;
 
@@ -157,7 +171,7 @@ export abstract class BaseResource {
         await BaseResource.clerk.__internal_handleUnauthenticatedDevBrowser();
       } else if (status === 401 && code !== 'requires_captcha') {
         await BaseResource.clerk.handleUnauthenticated();
-      } else if (status === 422 && errors?.[0]?.meta?.remaining_attempts === 0) {
+      } else if (sessionEnded) {
         // The password confirmation limit ended the session and invalidated this client.
         await BaseResource.clerk.__internal_handleSessionEnded();
       }

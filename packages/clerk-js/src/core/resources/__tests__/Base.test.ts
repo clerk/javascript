@@ -1,4 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import {
+  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
+  SafeLocalStorage,
+} from '@clerk/shared/internal/clerk-js/localStorage';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';
 
@@ -21,6 +25,9 @@ class TestResource extends BaseResource {
 }
 
 describe('BaseResource', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
   it('populates retryAfter on 429 error responses', async () => {
     BaseResource.clerk = {
       // @ts-expect-error - We're not about to mock the entire FapiClient
@@ -105,10 +112,18 @@ describe('BaseResource', () => {
   ])(
     'completes the sign-out when a password confirmation ends the session (remaining attempts: %i)',
     async (remainingAttempts, expectedCalls) => {
-      const updateClient = vi.fn();
+      const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:pk_test_confirmation`;
+      const updateClient = vi.fn(() => {
+        expect(SafeLocalStorage.getItem(key, null)).toEqual(
+          remainingAttempts === 0
+            ? expect.objectContaining({ meta: expect.objectContaining({ remainingAttempts: 0 }) })
+            : null,
+        );
+      });
       const handleSessionEnded = vi.fn().mockResolvedValue(undefined);
 
       BaseResource.clerk = {
+        publishableKey: 'pk_test_confirmation',
         getFapiClient: () => ({
           request: vi.fn().mockResolvedValue({
             payload: {
