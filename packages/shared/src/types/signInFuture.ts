@@ -8,7 +8,7 @@ import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';
 
 /** @generateWithEmptyComment */
-export interface SignInFutureCreateParams {
+export type SignInFutureCreateParams = {
   /** The timezone to assign to the user. If omitted, defaults to the browser's timezone. */
   timezone?: string;
   /**
@@ -36,10 +36,6 @@ export interface SignInFutureCreateParams {
    */
   oidcLoginHint?: string;
   /**
-   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
-   */
-  slackTeamIdHint?: string;
-  /**
    * The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in.
    */
   actionCompleteRedirectUrl?: string;
@@ -55,7 +51,16 @@ export interface SignInFutureCreateParams {
    * When set to `true`, if a user does not exist, the sign-up will prepare a transfer to sign up a new account. If bot sign-up protection is enabled, captcha will also be required on sign in.
    */
   signUpIfMissing?: boolean;
-}
+} & (
+  | {
+      strategy: 'oauth_slack';
+      /**
+       * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+       */
+      slackTeamIdHint?: string;
+    }
+  | { slackTeamIdHint?: never }
+);
 
 /** Parameters for submitting a password to sign-in. */
 export type SignInFuturePasswordParams = {
@@ -216,7 +221,7 @@ export interface SignInFutureResetPasswordPhoneCodeVerifyParams {
 }
 
 /** @generateWithEmptyComment */
-export interface SignInFutureSSOParams {
+export type SignInFutureSSOParams = {
   /**
    * The strategy to use for authentication.
    */
@@ -248,10 +253,6 @@ export interface SignInFutureSSOParams {
    */
   oidcPrompt?: string;
   /**
-   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
-   */
-  slackTeamIdHint?: string;
-  /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental
    */
@@ -260,7 +261,16 @@ export interface SignInFutureSSOParams {
    * The unique identifier of the user. Only supported with the `enterprise_sso` strategy.
    */
   identifier?: string;
-}
+} & (
+  | {
+      strategy: 'oauth_slack';
+      /**
+       * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+       */
+      slackTeamIdHint?: string;
+    }
+  | { slackTeamIdHint?: never }
+);
 
 /** @generateWithEmptyComment */
 export interface SignInFutureMFAPhoneCodeVerifyParams {

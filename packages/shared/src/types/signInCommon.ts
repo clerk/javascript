@@ -145,10 +145,6 @@ export type SignInCreateParams = (
       identifier?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
-      /**
-       * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
-       */
-      slackTeamIdHint?: string;
     }
   | {
       strategy: TicketStrategy;
@@ -202,7 +198,16 @@ export type SignInCreateParams = (
    * An IANA timezone for this sign-in. Defaults to the browser's timezone when omitted, if available.
    */
   timezone?: string;
-};
+} & (
+    | {
+        strategy: 'oauth_slack';
+        /**
+         * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+         */
+        slackTeamIdHint?: string;
+      }
+    | { slackTeamIdHint?: never }
+  );
 
 export type ResetPasswordParams = {
   password: string;

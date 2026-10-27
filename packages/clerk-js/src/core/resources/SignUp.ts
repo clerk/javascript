@@ -446,13 +446,11 @@ export class SignUp extends BaseResource implements SignUpResource {
     const {
       redirectUrl,
       redirectUrlComplete,
-      strategy,
       continueSignUp = false,
       unsafeMetadata,
       emailAddress,
       legalAccepted,
       oidcPrompt,
-      slackTeamIdHint,
       enterpriseConnectionId,
     } = params;
 
@@ -460,14 +458,15 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     const authenticateFn = () => {
       const authParams = {
-        strategy,
         redirectUrl: redirectUrlWithAuthToken,
         actionCompleteRedirectUrl: redirectUrlComplete,
         unsafeMetadata,
         emailAddress,
         legalAccepted,
         oidcPrompt,
-        slackTeamIdHint,
+        ...(params.strategy === 'oauth_slack'
+          ? { strategy: 'oauth_slack' as const, slackTeamIdHint: params.slackTeamIdHint }
+          : { strategy: params.strategy, slackTeamIdHint: params.slackTeamIdHint }),
         enterpriseConnectionId,
       };
       return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
