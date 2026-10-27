@@ -380,7 +380,6 @@ async function readInlineToken(cid: string, rid: string, deadline?: number): Pro
     return 'no_token';
   }
 
-  // No deadline means a late read, which waits for `ready` however long it takes.
   const resolved =
     deadline === undefined ? await Promise.resolve(ready).catch(() => null) : await settleWithin(ready, deadline);
   if (resolved === DEADLINE) {
@@ -715,7 +714,6 @@ export class ProtectSession {
     return 'ok';
   }
 
-  /** A token that lands after the deadline was still minted for this page, so keep it for the next sign-in. */
   async #keepLateToken(): Promise<void> {
     if (this.#tokenUrl) {
       return;
@@ -730,7 +728,6 @@ export class ProtectSession {
           return Promise.resolve(true);
         }
         const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor);
-        // Keep whichever token is better: a newer invalidation floor first, then the later expiry.
         if (!stored || (stored.floor <= this.#floor && stored.exp < late.exp)) {
           writeStoredToken(this.#tokenStorageKey, late, this.#floor);
           this.#consecutiveFailures = 0;
