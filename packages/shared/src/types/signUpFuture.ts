@@ -66,6 +66,10 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
     | AppleIdTokenStrategy
     | PhoneCodeStrategy;
   /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
+  /**
    * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
    */
   emailAddress?: string;
