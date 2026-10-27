@@ -47,6 +47,7 @@ export function createAppVersionRequestHooks(): AppVersionRequestHooks {
     // While it's unsupported, it reloads instead, so a block that lifts also finishes a load the block failed.
     checkOnForeground({ reload, check }) {
       let lastCheck = Date.now();
+      let checking = false;
       foregroundSubscription = AppState.addEventListener('change', state => {
         if (state !== 'active') {
           return;
@@ -55,11 +56,16 @@ export function createAppVersionRequestHooks(): AppVersionRequestHooks {
           void reload().catch(() => {});
           return;
         }
-        if (Date.now() - lastCheck < FOREGROUND_CHECK_INTERVAL_MS) {
+        if (checking || Date.now() - lastCheck < FOREGROUND_CHECK_INTERVAL_MS) {
           return;
         }
         lastCheck = Date.now();
-        void check().catch(() => {});
+        checking = true;
+        void check()
+          .catch(() => {})
+          .finally(() => {
+            checking = false;
+          });
       });
     },
     beforeRequest(requestInit: AppVersionRequest) {

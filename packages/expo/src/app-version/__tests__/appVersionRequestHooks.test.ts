@@ -165,6 +165,9 @@ describe('createAppVersionRequestHooks', () => {
     hooks.afterResponse(rejectedRequest, unsupportedAppVersion);
   };
 
+  // Lets a check that already resolved finish, as the app does between two returns to the foreground.
+  const settle = () => new Promise(resolve => setTimeout(resolve, 0));
+
   const foregroundAt = (now: number) => {
     vi.spyOn(Date, 'now').mockReturnValue(now);
     appState.emit('background');
@@ -201,10 +204,34 @@ describe('createAppVersionRequestHooks', () => {
     foregroundAt(30_000);
     foregroundAt(45_000);
     expect(check).toHaveBeenCalledTimes(1);
+    await settle();
 
     foregroundAt(60_000);
     expect(check).toHaveBeenCalledTimes(2);
     expect(reload).not.toHaveBeenCalled();
+  });
+
+  test('skips the foreground check while the previous one is still pending', async () => {
+    const { createAppVersionRequestHooks } = await loadModules();
+    vi.spyOn(Date, 'now').mockReturnValue(0);
+    const hooks = createAppVersionRequestHooks();
+    let finishCheck = () => {};
+    const check = vi.fn(
+      () =>
+        new Promise<void>(resolve => {
+          finishCheck = resolve;
+        }),
+    );
+    hooks.checkOnForeground({ reload: vi.fn().mockResolvedValue(undefined), check });
+
+    foregroundAt(30_000);
+    foregroundAt(70_000);
+    expect(check).toHaveBeenCalledTimes(1);
+
+    finishCheck();
+    await settle();
+    foregroundAt(110_000);
+    expect(check).toHaveBeenCalledTimes(2);
   });
 
   test('a foreground check that Clerk rejects blocks the app', async () => {
