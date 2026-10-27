@@ -1401,7 +1401,10 @@ describe('UserButton custom trigger badges', () => {
 
   it('hides the badge while pending and for null without changing the name', async () => {
     const badge = deferred<{ id: string; label: string } | null>();
-    const { rerender } = await renderUserButton({ renderTriggerBadge: () => badge.promise });
+    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
+      id === 'org_1' ? badge.promise : Promise.resolve(null),
+    );
+    const { clerk } = await renderUserButton({ renderTriggerBadge });
 
     expect(trigger()).toHaveTextContent('Acme');
     expect(trigger()).not.toHaveTextContent('Pro plan');
@@ -1409,11 +1412,10 @@ describe('UserButton custom trigger badges', () => {
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
     expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
 
-    const renderTriggerBadge = vi.fn(() => Promise.resolve(null));
-    rerender(tree({ renderTriggerBadge }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalled());
+    await act(() => clerk.setActive({ organization: 'org_9' }));
+    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
-    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+    expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
   it('discards the previous workspace badge after switching organizations', async () => {
@@ -1432,29 +1434,51 @@ describe('UserButton custom trigger badges', () => {
     expect(trigger()).not.toHaveTextContent('Previous plan');
   });
 
-  it('refreshes the badge when the callback changes and hides it on failure or false', async () => {
-    const { rerender } = await renderUserButton({
-      renderTriggerBadge: () => Promise.resolve({ id: 'pro', label: 'Pro plan' }),
+  it('keeps the badge mounted when opened with an inline callback', async () => {
+    const calls = vi.fn();
+    const inline = () => {
+      calls();
+      return Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' });
+    };
+    const { rerender } = await renderUserButton({ renderTriggerBadge: () => inline() });
+    await waitFor(() => expect(within(trigger()).getByText('Enterprise plan')).toBeInTheDocument());
+
+    let dropped = false;
+    const observer = new MutationObserver(() => {
+      dropped ||= !trigger().textContent?.includes('Enterprise plan');
     });
+    observer.observe(trigger(), { childList: true, subtree: true, characterData: true });
+    onTestFinished(() => observer.disconnect());
+
+    await open();
+    rerender(tree({ renderTriggerBadge: () => inline() }));
+    expect(within(trigger()).getByText('Enterprise plan')).toBeInTheDocument();
+    await act(() => Promise.resolve());
+
+    expect(dropped).toBe(false);
+    expect(calls).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides the badge for false or on failure', async () => {
+    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
+      id === 'org_1'
+        ? Promise.resolve({ id: 'pro', label: 'Pro plan' })
+        : Promise.reject(new Error('Plan unavailable')),
+    );
+    const { clerk, rerender } = await renderUserButton({ renderTriggerBadge });
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
-    rerender(tree({ renderTriggerBadge: () => Promise.resolve({ id: 'business', label: 'Business plan' }) }));
-    await waitFor(() => expect(within(trigger()).getByText('Business plan')).toBeInTheDocument());
-    expect(within(trigger()).getByText('Business plan').closest('.cl-badge')).toHaveAttribute(
-      'data-badge-id',
-      'business',
-    );
-    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
-
-    const fail = vi.fn().mockRejectedValue(new Error('Plan unavailable'));
-    rerender(tree({ renderTriggerBadge: fail }));
-    await waitFor(() => expect(fail).toHaveBeenCalled());
-    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
-    expect(trigger()).not.toHaveTextContent('Business plan');
-
     rerender(tree({ renderTriggerBadge: false }));
+    expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
-    expect(trigger()).not.toHaveTextContent('Business plan');
+
+    rerender(tree({ renderTriggerBadge }));
+    await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
+
+    await act(() => clerk.setActive({ organization: 'org_9' }));
+    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
+    expect(trigger()).not.toHaveTextContent('Pro plan');
+    expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
   it('does not request a badge when the trigger label is hidden', async () => {
