@@ -174,8 +174,8 @@ describe('UserButton', () => {
       expect(trigger()).toBeInTheDocument();
     });
 
-    it('renders nothing when nobody is signed in', async () => {
-      await renderUserButton({ mode }, signedIn({ client: fapiClient() }));
+    it('renders nothing, not even its fallback, when nobody is signed in', async () => {
+      await renderUserButton({ mode, fallback: <output>Loading</output> }, signedIn({ client: fapiClient() }));
 
       expect(host()).toBeEmptyDOMElement();
     });
@@ -290,6 +290,19 @@ describe('UserButton', () => {
       expect(popup()).toBeInTheDocument();
     });
 
+    it('lands a switched account where the instance sends it', async () => {
+      const { navigate } = await renderUserButton(
+        {},
+        signedIn({ environment: fapiEnvironment({ display_config: { after_switch_session_url: '/switched' } }) }),
+      );
+      const user = await open();
+
+      const menu = await openAccounts(user);
+      await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringMatching(/\/switched$/)));
+    });
+
     it('signs out of the active account alone while another stays signed in', async () => {
       const { fapi, navigate } = await renderUserButton();
       const user = await open();
@@ -397,6 +410,39 @@ describe('UserButton', () => {
       await waitFor(() => expect(screen.queryByRole('button', { name: 'Join' })).toBeNull());
       await waitFor(() => expect(waiting()).toBe(false));
       expect(popup()).toBeInTheDocument();
+    });
+
+    it('reports a failed accept, and drops an invitation that is no longer pending', async () => {
+      const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { fapi } = await renderUserButton({}, noOffers({ invitations: [fapiInvitation('inv_1', gamma)] }));
+      const user = await openWithList();
+      const accept = holdRequests('post', '/v1/me/organization_invitations/:id/accept');
+
+      await user.click(screen.getByRole('button', { name: 'Accept' }));
+      fapi.invitations = [fapiInvitation('inv_1', gamma, { status: 'revoked' })];
+      accept.fail('organization_invitation_not_pending');
+
+      await waitFor(() => expect(screen.queryByRole('button', { name: 'Accept' })).toBeNull());
+      expect(reading('Gamma')).toEqual([]);
+      expect(log).toHaveBeenCalledWith(
+        '[Clerk] User button action failed',
+        expect.objectContaining({ errors: [expect.objectContaining({ code: 'organization_invitation_not_pending' })] }),
+      );
+      expect(popup()).toBeInTheDocument();
+    });
+
+    it('shows a suggestion as requested when a failed join finds it already accepted', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { fapi } = await renderUserButton({}, noOffers({ suggestions: [fapiSuggestion('sug_1', beta)] }));
+      const user = await openWithList();
+      const join = holdRequests('post', '/v1/me/organization_suggestions/:id/accept');
+
+      await user.click(screen.getByRole('button', { name: 'Join' }));
+      fapi.suggestions = [fapiSuggestion('sug_1', beta, { status: 'accepted' })];
+      join.fail('organization_suggestion_already_accepted');
+
+      await waitFor(() => expect(reading('Beta', 'Requested')).toEqual(['Beta', 'Requested']));
+      expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
     });
 
     it('spins inside the join button while the suggestion is joined', async () => {
@@ -575,6 +621,21 @@ describe('UserButton', () => {
       expect(openInviteMembers).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
       await waitFor(() => expect(popup()).toBeNull());
+    });
+
+    it('offers no invite to a member who cannot manage memberships', async () => {
+      const plain = [fapiMembership(acme), fapiMembership(other)];
+      await renderUserButton(
+        {},
+        signedIn({
+          client: fapiClient([fapiSession({ ...aliceSession, user: { ...alice, organization_memberships: plain } })]),
+          memberships: plain,
+        }),
+      );
+      await open();
+
+      expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Invite members' })).toBeNull();
     });
 
     it('opens the CreateOrganization modal and closes', async () => {
@@ -811,6 +872,19 @@ describe('UserButton', () => {
     last.scrollIntoView();
 
     expect(await screen.findByRole('button', { name: 'Org 15' })).toBeInTheDocument();
+  });
+
+  it('loads the next page of invitations when the end of the list scrolls into view', async () => {
+    const many = Array.from({ length: 15 }, (_, i) =>
+      fapiInvitation(`inv_p${i + 1}`, fapiOrganization({ id: `org_i${i + 1}`, name: `Invited ${i + 1}` })),
+    );
+    await renderUserButton({}, noOffers({ invitations: many }));
+    await open();
+
+    const last = await screen.findByText('Invited 10');
+    last.scrollIntoView();
+
+    expect(await screen.findByText('Invited 15')).toBeInTheDocument();
   });
 
   it('lists the active organization where its page puts it, and lists it once', async () => {
@@ -1075,25 +1149,6 @@ describe('UserButton', () => {
 
       expect(await screen.findByRole('button', { name: 'Accept' })).toBeInTheDocument();
       expect(reading('Gamma', 'Personal account')).toEqual(['Personal account', 'Gamma']);
-    });
-
-    it('drops revoked and expired invitations, which have nothing to accept', async () => {
-      await renderUserButton(
-        {},
-        noOffers({
-          invitations: [
-            fapiInvitation('inv_1', gamma, { status: 'revoked' }),
-            fapiInvitation('inv_2', beta, { status: 'expired' }),
-          ],
-        }),
-      );
-      await openWithList();
-
-      expect(reading('Gamma', 'Beta', 'Personal account', 'Acme', 'Other')).toEqual([
-        'Personal account',
-        'Acme',
-        'Other',
-      ]);
     });
 
     it('reports an accepted suggestion instead of offering to join it again', async () => {
