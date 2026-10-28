@@ -810,6 +810,7 @@ describe('UserButton', () => {
         const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
         const menu = await openAccounts(user);
         await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+        await waitFor(() => expect(touch.requests).toHaveLength(1));
         expect(waiting()).toBe(true);
 
         await user.click(trigger());
