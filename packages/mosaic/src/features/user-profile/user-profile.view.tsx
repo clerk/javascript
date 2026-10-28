@@ -24,9 +24,9 @@ export interface UserProfileViewProps extends Omit<
   label?: string;
   /**
    * The open page: a built-in page's id, or a custom page's `path`. An organization page's id is
-   * prefixed with `organization.`.
+   * prefixed with `organization/`.
    */
-  activePage: UserProfilePageId | `organization.${OrganizationProfilePageId}` | (string & {});
+  activePage: UserProfilePageId | `organization/${OrganizationProfilePageId}` | (string & {});
   pages: UserProfilePages;
   /** Pages of the consumer's own, added to the navigation after the built-ins. */
   customPages?: readonly CustomProfilePage[];

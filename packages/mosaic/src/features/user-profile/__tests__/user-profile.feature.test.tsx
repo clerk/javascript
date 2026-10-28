@@ -199,7 +199,7 @@ describe('UserProfile with an active organization', () => {
     const fapi = serveWithOrganization();
     const { navigate } = await renderWithClerk(
       <UserProfile
-        defaultPage='organization.general'
+        defaultPage='organization/general'
         organizationProfileProps={{ afterLeaveOrganizationUrl: '/organizations' }}
       />,
     );
@@ -229,7 +229,7 @@ describe('UserProfile with an active organization', () => {
 
   it('opens on an organization page by its prefixed id', async () => {
     serveWithOrganization();
-    await renderWithClerk(<UserProfile defaultPage='organization.members' />);
+    await renderWithClerk(<UserProfile defaultPage='organization/members' />);
     expect(screen.getByRole('tab', { name: 'Members', description: 'Organization' })).toHaveAttribute(
       'aria-selected',
       'true',
