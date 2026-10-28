@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useId } from 'react';
+import React, { createContext, useContext, useId } from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 
@@ -9,7 +9,7 @@ const SelectGroupContext = createContext<string | undefined>(undefined);
 export type SelectGroupProps = ComponentProps<'div'>;
 
 /** A labelled set of options in the listbox, named by the `Select.GroupLabel` inside it. */
-export function SelectGroup(props: SelectGroupProps) {
+export const SelectGroup = React.forwardRef<HTMLDivElement, SelectGroupProps>(function SelectGroup(props, ref) {
   const { render, ...otherProps } = props;
   const labelId = useId();
 
@@ -23,25 +23,29 @@ export function SelectGroup(props: SelectGroupProps) {
       {useRender({
         defaultTagName: 'div',
         render,
+        ref,
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}
     </SelectGroupContext.Provider>
   );
-}
+});
 
 export type SelectGroupLabelProps = ComponentProps<'div'>;
 
 /** Names the `Select.Group` it sits in. Throws outside one. */
-export function SelectGroupLabel(props: SelectGroupLabelProps) {
-  const { render, ...otherProps } = props;
-  const labelId = useContext(SelectGroupContext);
-  if (labelId === undefined) {
-    throw new Error('Select.GroupLabel must be used within <Select.Group>');
-  }
+export const SelectGroupLabel = React.forwardRef<HTMLDivElement, SelectGroupLabelProps>(
+  function SelectGroupLabel(props, ref) {
+    const { render, ...otherProps } = props;
+    const labelId = useContext(SelectGroupContext);
+    if (labelId === undefined) {
+      throw new Error('Select.GroupLabel must be used within <Select.Group>');
+    }
 
-  return useRender({
-    defaultTagName: 'div',
-    render,
-    props: mergeProps<'div'>({ id: labelId }, otherProps),
-  });
-}
+    return useRender({
+      defaultTagName: 'div',
+      render,
+      ref,
+      props: mergeProps<'div'>({ id: labelId }, otherProps),
+    });
+  },
+);

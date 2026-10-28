@@ -1027,6 +1027,19 @@ describe('Select.Group', () => {
     expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
   });
 
+  it('forwards refs to the group and its label', () => {
+    const groupRef = createRef<HTMLDivElement>();
+    const labelRef = createRef<HTMLDivElement>();
+    render(
+      <Select.Group ref={groupRef}>
+        <Select.GroupLabel ref={labelRef}>Pome</Select.GroupLabel>
+      </Select.Group>,
+    );
+
+    expect(groupRef.current).toBe(screen.getByRole('group', { name: 'Pome' }));
+    expect(labelRef.current).toHaveTextContent('Pome');
+  });
+
   it('throws when the label is used outside <Select.Group>', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Select.GroupLabel>Fruits</Select.GroupLabel>)).toThrow(/within <Select.Group>/);
