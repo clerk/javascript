@@ -1,5 +1,5 @@
 import { getClerkQueryClient } from '@clerk/shared/react';
-import type { ActClaim, SessionWithActivitiesJSON } from '@clerk/shared/types';
+import type { ActClaim } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -13,7 +13,13 @@ import {
   serveFapi,
   worker,
 } from '../../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import {
+  type FapiActiveSession,
+  fapiClient,
+  fapiSession,
+  type FapiSessionActivity,
+  fapiUser,
+} from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicNowProvider } from '../../../../hooks/use-now';
@@ -25,14 +31,21 @@ const alice = fapiUser({ id: 'user_1' });
 
 function device(
   id: string,
-  status: SessionWithActivitiesJSON['status'],
-  activity: Partial<SessionWithActivitiesJSON['latest_activity']> = {},
+  status: ActiveDeviceRecord['status'],
+  activity: Partial<FapiSessionActivity> = {},
 ): ActiveDeviceRecord {
+  return { ...activeSession(id, status, activity), ownerUserId: alice.id };
+}
+
+function activeSession(
+  id: string,
+  status: FapiActiveSession['status'],
+  activity: Partial<FapiSessionActivity> = {},
+): FapiActiveSession {
   const { user: _user, ...session } = fapiSession({ id, user: alice });
   return {
     ...session,
     user: null,
-    ownerUserId: alice.id,
     status,
     latest_activity: {
       object: 'session_activity',
@@ -40,12 +53,13 @@ function device(
       browser_name: 'Safari',
       browser_version: '18',
       device_type: 'MacBook Pro',
+      is_mobile: false,
       city: 'Paris',
       country: 'France',
       ip_address: '192.0.2.1',
       ...activity,
     },
-  } satisfies ActiveDeviceRecord;
+  };
 }
 
 function serveDevices(
@@ -70,14 +84,26 @@ function serveDevices(
       if (params.id === options.failOnceId && !failed) {
         failed = true;
         return HttpResponse.json(
-          { errors: [{ code: 'revoke_failed', message: 'Could not revoke device' }] },
+          {
+            errors: [
+              { code: 'revoke_failed', message: 'Could not revoke device', long_message: 'Could not revoke device' },
+            ],
+          },
           { status: 400 },
         );
       }
       if (params.id === options.reverifyOnceId && !failed) {
         failed = true;
         return HttpResponse.json(
-          { errors: [{ code: 'session_reverification_required', message: 'Verification required' }] },
+          {
+            errors: [
+              {
+                code: 'session_reverification_required',
+                message: 'Verification required',
+                long_message: 'Verification required',
+              },
+            ],
+          },
           { status: 400 },
         );
       }
@@ -276,10 +302,12 @@ describe('Active devices', () => {
   });
 
   it('filters an expired row even if a stale list response includes it', async () => {
-    const expired = device('sess_expired', 'expired', { device_type: 'Expired laptop' });
+    const expired = activeSession('sess_expired', 'expired', { device_type: 'Expired laptop' });
     serveDevices([device('sess_current', 'active')]);
     worker.use(
-      http.get(fapiUrl('/v1/me/sessions/active'), () => HttpResponse.json([device('sess_current', 'active'), expired])),
+      http.get(fapiUrl('/v1/me/sessions/active'), () =>
+        HttpResponse.json([activeSession('sess_current', 'active'), expired]),
+      ),
     );
 
     await renderWithClerk(<UserProfileActiveDevicesSection />);
@@ -292,7 +320,10 @@ describe('Active devices', () => {
     serveDevices([device('sess_current', 'active')]);
     worker.use(
       http.get(fapiUrl('/v1/me/sessions/active'), () =>
-        HttpResponse.json({ errors: [{ code: 'internal_clerk_error', message: 'Unavailable' }] }, { status: 500 }),
+        HttpResponse.json(
+          { errors: [{ code: 'internal_clerk_error', message: 'Unavailable', long_message: 'Unavailable' }] },
+          { status: 500 },
+        ),
       ),
     );
 
@@ -451,8 +482,8 @@ describe('Active devices', () => {
         oldRequests += 1;
         await pending.promise;
         return HttpResponse.json([
-          device('sess_current', 'active'),
-          device('sess_other', 'active', { device_type: 'Old phone' }),
+          activeSession('sess_current', 'active'),
+          activeSession('sess_other', 'active', { device_type: 'Old phone' }),
         ]);
       }),
     );
@@ -490,7 +521,7 @@ describe('Active devices', () => {
       http.get(fapiUrl('/v1/me/sessions/active'), async () => {
         requests += 1;
         await pending.promise;
-        return HttpResponse.json([device('sess_current', 'active')]);
+        return HttpResponse.json([activeSession('sess_current', 'active')]);
       }),
     );
     const view = await renderWithClerk(<div />);
@@ -539,8 +570,11 @@ describe('Active devices', () => {
       http.get(fapiUrl('/v1/me/sessions/active'), () =>
         HttpResponse.json(
           fapi.client.last_active_session_id === 'sess_next'
-            ? [device('sess_next', 'active', { device_type: 'Next laptop' })]
-            : [device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'Old phone' })],
+            ? [activeSession('sess_next', 'active', { device_type: 'Next laptop' })]
+            : [
+                activeSession('sess_current', 'active'),
+                activeSession('sess_other', 'active', { device_type: 'Old phone' }),
+              ],
         ),
       ),
       http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), async () => {
@@ -714,7 +748,14 @@ describe('Active devices', () => {
     serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
     worker.use(
       http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), () =>
-        HttpResponse.json({ errors: [{ code: 'revoke_failed', message: 'Could not revoke device' }] }, { status: 400 }),
+        HttpResponse.json(
+          {
+            errors: [
+              { code: 'revoke_failed', message: 'Could not revoke device', long_message: 'Could not revoke device' },
+            ],
+          },
+          { status: 400 },
+        ),
       ),
     );
     await renderWithClerk(<UserProfileActiveDevicesSection />);

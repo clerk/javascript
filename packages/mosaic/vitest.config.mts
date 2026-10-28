@@ -69,6 +69,8 @@ export default defineConfig({
             '@testing-library/user-event',
             'msw',
             'msw/browser',
+            'ajv/dist/2019',
+            'yaml',
           ],
         },
         test: {

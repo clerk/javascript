@@ -1,4 +1,3 @@
-import type { OrganizationInvitationJSON, RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -11,6 +10,9 @@ import {
   fapiEnvironment,
   fapiMembership,
   fapiOrganization,
+  type FapiOrganizationInvitation,
+  type FapiRole,
+  fapiRole,
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
@@ -20,7 +22,7 @@ import { MosaicLocalizationProvider, resolveLocalization } from '../../../../loc
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
 
 const organization = fapiOrganization({ id: 'org_invitations', name: 'Acme' });
-const invitation: OrganizationInvitationJSON = {
+const invitation: FapiOrganizationInvitation = {
   object: 'organization_invitation',
   id: 'orginv_ada',
   email_address: 'ada@example.com',
@@ -29,6 +31,8 @@ const invitation: OrganizationInvitationJSON = {
   status: 'pending',
   role: 'org:member',
   role_name: 'Member',
+  url: null,
+  expires_at: null,
   created_at: 1_785_000_000_000,
   updated_at: 1_785_000_000_000,
 };
@@ -386,17 +390,8 @@ describe('connected organization invitations', () => {
   });
 });
 
-const adminRole: RoleJSON = {
-  object: 'role',
-  id: 'role_admin',
-  key: 'org:admin',
-  name: 'Admin',
-  description: '',
-  permissions: [],
-  created_at: 0,
-  updated_at: 0,
-};
-const memberRole: RoleJSON = { ...adminRole, id: 'role_member', key: 'org:member', name: 'Member' };
+const adminRole = fapiRole('org:admin', 'Admin');
+const memberRole = fapiRole('org:member', 'Member');
 const bob = fapiMembership(organization, {
   id: 'orgmem_bob',
   public_user_data: {
@@ -413,12 +408,12 @@ const MANAGE = ['org:sys_memberships:read', 'org:sys_memberships:manage'];
 function serveInvite({
   permissions = MANAGE,
   roles = [adminRole, memberRole],
-  defaultRole = null,
+  defaultRole = '',
   maxAllowedMemberships = 0,
 }: {
   permissions?: string[];
-  roles?: RoleJSON[];
-  defaultRole?: string | null;
+  roles?: FapiRole[];
+  defaultRole?: string;
   maxAllowedMemberships?: number;
 } = {}) {
   const org = { ...organization, max_allowed_memberships: maxAllowedMemberships };
@@ -553,7 +548,7 @@ describe('inviting members', () => {
     fapi.environment = fapiEnvironment({
       organization_settings: {
         ...fapiEnvironment().organization_settings,
-        domains: { enabled: true, enrollment_modes: [], default_role: null },
+        domains: { enabled: true, enrollment_modes: [], default_role: '' },
       },
     });
     await renderWithClerk(<OrganizationProfileMembersPanel />);

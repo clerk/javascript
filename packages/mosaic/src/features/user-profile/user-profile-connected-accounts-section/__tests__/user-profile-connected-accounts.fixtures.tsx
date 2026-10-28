@@ -7,6 +7,7 @@ import {
   fapiEnvironment,
   fapiExternalAccount,
   fapiSession,
+  fapiSocial,
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
@@ -32,22 +33,8 @@ export function signedIn(accounts = [google], overrides: FakeFapiSeed = {}) {
     environment: fapiEnvironment({
       user_settings: {
         social: {
-          oauth_google: {
-            enabled: true,
-            required: false,
-            authenticatable: true,
-            strategy: 'oauth_google',
-            name: 'Google',
-            logo_url: null,
-          },
-          oauth_github: {
-            enabled: true,
-            required: false,
-            authenticatable: true,
-            strategy: 'oauth_github',
-            name: 'GitHub',
-            logo_url: null,
-          },
+          oauth_google: fapiSocial('oauth_google', 'Google'),
+          oauth_github: fapiSocial('oauth_github', 'GitHub'),
         },
       },
     }),

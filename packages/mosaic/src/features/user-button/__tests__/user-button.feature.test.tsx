@@ -1,4 +1,4 @@
-import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
+import type { CustomPage } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
@@ -15,7 +15,9 @@ import {
   fapiPhoneNumber,
   fapiSession,
   fapiSuggestion,
+  type FapiUser,
   fapiUser,
+  fapiWeb3Wallet,
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
@@ -990,15 +992,10 @@ describe('UserButton', () => {
 
   describe('naming the account', () => {
     const phone = fapiPhoneNumber({ id: 'idn_phone', phone_number: '+15550100' });
-    const wallet: Web3WalletJSON = {
-      object: 'web3_wallet',
-      id: 'idn_wallet',
-      web3_wallet: '0xabc',
-      verification: null,
-    };
+    const wallet = fapiWeb3Wallet({ id: 'idn_wallet', web3_wallet: '0xabc', verification: null });
     const noEmail = { username: null, email_addresses: [], primary_email_address_id: null };
 
-    const signedInAs = (overrides: Partial<UserJSON>) =>
+    const signedInAs = (overrides: Partial<FapiUser>) =>
       signedIn({ client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ ...alice, ...overrides }) })]) });
 
     it.each([

@@ -108,7 +108,11 @@ describe('the user profile profile section', () => {
 
   it('says why an upload was refused', async () => {
     const { actor, container } = await renderSection();
-    failsWith('/v1/me/profile_image', { code: 'avatar_file_size_exceeded', message: 'Too large' }, 413);
+    failsWith(
+      '/v1/me/profile_image',
+      { code: 'avatar_file_size_exceeded', message: 'Too large', long_message: 'Too large' },
+      413,
+    );
 
     await actor.upload(fileInput(container), new File(['x'], 'me.png', { type: 'image/png' }));
 
@@ -149,7 +153,7 @@ describe('the user profile profile section', () => {
     await actor.upload(fileInput(container), oversized());
     expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
 
-    failsWith('/v1/me/profile_image', { code: 'action_blocked', message: 'Blocked' }, 403);
+    failsWith('/v1/me/profile_image', { code: 'action_blocked', message: 'Blocked', long_message: 'Blocked' }, 403);
     await openMenu(actor, screen.getByRole('button', { name: 'Manage profile picture' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 

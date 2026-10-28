@@ -5,6 +5,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
 import {
   startWorker,
+  takeContractViolations,
   takeUnhandledRequests,
   takeUnsettledHolds,
   switchFapiHost,
@@ -64,7 +65,7 @@ beforeEach(() => {
   window.focus();
 });
 
-afterEach(() => {
+afterEach(async () => {
   cleanup();
   __resetClerkQueryClientForTest();
   for (const channel of [...openChannels]) {
@@ -78,8 +79,10 @@ afterEach(() => {
   worker.resetHandlers();
   const unhandled = takeUnhandledRequests();
   const unsettled = takeUnsettledHolds();
+  const violations = await takeContractViolations();
   expect(unhandled, 'Frontend API requests without a handler').toEqual([]);
   expect(unsettled, 'Held Frontend API requests never released or failed').toEqual([]);
+  expect(violations, 'Fake Frontend API responses that do not match the spec').toEqual([]);
 });
 
 afterAll(() => {

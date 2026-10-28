@@ -1,9 +1,10 @@
-import type { ExternalAccountJSON, VerificationJSON } from '@clerk/shared/types';
+import type { VerificationJSON } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
+import { type FapiExternalAccount, fapiSamlLinking } from '../fapi';
 
-export type EnterpriseExternalAccount = Omit<ExternalAccountJSON, 'provider'> & { provider: string };
+export type EnterpriseExternalAccount = Omit<FapiExternalAccount, 'provider'> & { provider: string };
 
 export type EnterprisePreparation =
   | { kind: 'saml'; verification: VerificationJSON }
@@ -17,8 +18,9 @@ export interface FakeEnterpriseLinking {
 }
 
 function rejected(code: 'resource_not_found' | 'feature_not_enabled') {
+  const message = code === 'resource_not_found' ? 'not found' : 'Feature not enabled';
   return HttpResponse.json(
-    { errors: [{ code, message: code === 'resource_not_found' ? 'not found' : 'Feature not enabled' }] },
+    { errors: [{ code, message, long_message: message }] },
     { status: code === 'resource_not_found' ? 404 : 403 },
   );
 }
@@ -107,7 +109,7 @@ export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => 
           );
         }
         return HttpResponse.json({
-          response: { object: 'external_account', verification: preparation.verification },
+          response: fapiSamlLinking(preparation.verification),
           client: state.client,
         });
       }

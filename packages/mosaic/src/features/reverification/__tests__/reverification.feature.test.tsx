@@ -373,7 +373,10 @@ describe('Reverification', () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
       worker.use(
         http.post(fapiUrl(VERIFY), () =>
-          HttpResponse.json({ errors: [{ code: 'some_new_error', message: 'Nope' }] }, { status: 400 }),
+          HttpResponse.json(
+            { errors: [{ code: 'some_new_error', message: 'Nope', long_message: 'Nope' }] },
+            { status: 400 },
+          ),
         ),
       );
 
@@ -1651,7 +1654,10 @@ describe('Reverification', () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
       worker.use(
         http.post(fapiUrl(ATTEMPT_FIRST), () =>
-          HttpResponse.json({ errors: [{ code: 'some_new_error', message: 'Short message' }] }, { status: 422 }),
+          HttpResponse.json(
+            { errors: [{ code: 'some_new_error', message: 'Short message', long_message: 'Short message' }] },
+            { status: 422 },
+          ),
         ),
       );
       const user = await startVerification();

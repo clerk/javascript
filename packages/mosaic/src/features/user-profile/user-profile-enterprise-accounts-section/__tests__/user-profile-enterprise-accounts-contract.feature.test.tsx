@@ -26,7 +26,7 @@ describe('enterprise linking server contract', () => {
     serveMember([
       okta,
       fapiEnterpriseConnection({ id: 'inactive', active: false, organization_id: 'org_acme' }),
-      fapiEnterpriseConnection({ id: 'unscoped', organization_id: null }),
+      fapiEnterpriseConnection({ id: 'unscoped' }),
       fapiEnterpriseConnection({ id: 'nonmember', organization_id: 'org_other' }),
       fapiEnterpriseConnection({
         id: 'disabled',
@@ -49,7 +49,8 @@ describe('enterprise linking server contract', () => {
       if (change === 'inactive') {
         fapi.enterpriseConnections = [{ ...okta, active: false }];
       } else if (change === 'unscoped') {
-        fapi.enterpriseConnections = [{ ...okta, organization_id: null }];
+        const { organization_id: _organizationId, ...unscoped } = okta;
+        fapi.enterpriseConnections = [unscoped];
       } else if (change === 'linking disabled') {
         fapi.enterpriseConnections = [{ ...okta, allow_organization_account_linking: false }];
       } else if (change === 'nonmember') {
@@ -109,7 +110,7 @@ describe('enterprise linking server contract', () => {
     const account = await create.mock.results[0]?.value;
     expect(account?.verification?.strategy).toBe('saml');
     expect(account?.provider).toBe('');
-    expect(account?.id).toBeUndefined();
+    expect(account?.id).toBe('');
     expect(fapi.client.sessions[0]?.user.external_accounts).toEqual([]);
     expect(fapi.client.sessions[0]?.user.enterprise_accounts).toEqual([]);
   });

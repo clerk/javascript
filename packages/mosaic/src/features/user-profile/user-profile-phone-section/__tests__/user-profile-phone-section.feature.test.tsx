@@ -1,4 +1,4 @@
-import type { EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
+import type { EnterpriseAccountConnectionJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -10,7 +10,7 @@ import {
   serveFapi,
   VERIFICATION_CODE,
 } from '../../../../__tests__/feature/fake-fapi';
-import type { FapiAttributeOverrides } from '../../../../__tests__/feature/fapi';
+import type { FapiAttributeOverrides, FapiPhoneNumber } from '../../../../__tests__/feature/fapi';
 import {
   fapiClient,
   fapiEmailAddress,
@@ -38,7 +38,7 @@ const WORK = fapiPhoneNumber({
 const HOME_LABEL = '+1 (801) 555-0100';
 const WORK_LABEL = '+1 (801) 555-0199';
 
-function signedIn(phones: PhoneNumberJSON[] = [], overrides: Partial<FakeFapiSeed> = {}): FakeFapiSeed {
+function signedIn(phones: FapiPhoneNumber[] = [], overrides: Partial<FakeFapiSeed> = {}): FakeFapiSeed {
   const user = fapiUser({
     id: 'user_1',
     first_name: 'Alice',

@@ -188,6 +188,42 @@ handler**, or on a `holdRequests` hold never released or failed. When a
 feature needs a new endpoint, add a handler to `serveFapi` that mirrors what
 FAPI returns.
 
+### Matching the backend
+
+Every mocked response is checked against the FAPI OpenAPI spec, vendored as
+`fapi-spec.yml`. The check is strict: a field the spec doesn't list fails, and
+so does a missing required field or a wrong type. It reads the status and the
+`_method` override, and checks a 4xx or 5xx the spec doesn't document against
+`ClerkErrors`. A violation fails the test from the `afterEach`, with the
+request and the JSON pointer of the bad field.
+
+When a test fails here, fix the builder or the handler so it sends what FAPI
+sends. A builder can make a backend quirk part of its name, for example
+`fapiSamlLinking(verification)` for the bare account that SAML linking
+returns.
+
+When FAPI sends something the spec gets wrong, add an entry to
+`fapi-spec-gaps.ts`:
+
+- `at` and `property` name the spec schema and the field.
+- `schema` is what FAPI really sends. `replaces` is the spec's current schema,
+  when the gap widens a field the spec already has.
+- `sentBy` names the `clerk_go` code that sends it.
+
+The list prunes itself. Once the spec adds the field, or changes the schema
+that `replaces` records, the gap's test fails and the entry should go.
+
+A test that sends a response the spec forbids on purpose, such as a broken
+server response, calls `allowSpecViolation(message)` with the exact violation.
+The test also fails if that violation is never sent.
+
+To pick up backend changes, run the sync, then the feature tests:
+
+```bash
+pnpm --filter @clerk/mosaic sync:fapi-spec   # fetch the spec for SUPPORTED_FAPI_VERSION
+pnpm --filter @clerk/mosaic test:feature
+```
+
 ### Order matters
 
 Call `serveFapi`, then any `holdRequests`, then `renderWithClerk`. Handlers
