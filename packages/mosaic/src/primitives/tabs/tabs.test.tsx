@@ -4,6 +4,7 @@ import { createRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { axe } from '../test-utils/axe';
 import { Tabs } from './index';
 
@@ -209,7 +210,7 @@ describe('Tabs', () => {
     it('follows the visual order of arrow keys in RTL', async () => {
       const user = userEvent.setup();
       render(
-        <div dir='rtl'>
+        <DirectionProvider direction='rtl'>
           <Tabs.Root defaultValue='tab2'>
             <Tabs.List>
               <Tabs.Tab value='tab1'>Account</Tabs.Tab>
@@ -220,7 +221,7 @@ describe('Tabs', () => {
             <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
             <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
           </Tabs.Root>
-        </div>,
+        </DirectionProvider>,
       );
 
       await user.click(screen.getByText('Settings'));
@@ -229,6 +230,28 @@ describe('Tabs', () => {
 
       await user.keyboard('{ArrowRight}');
       expect(document.activeElement).toBe(screen.getByText('Settings'));
+    });
+
+    it('follows a direction change while a tab has focus', async () => {
+      const user = userEvent.setup();
+      const tabs = (direction: 'ltr' | 'rtl') => (
+        <DirectionProvider direction={direction}>
+          <Tabs.Root defaultValue='tab2'>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.Root>
+        </DirectionProvider>
+      );
+      const { rerender } = render(tabs('ltr'));
+
+      await user.click(screen.getByText('Settings'));
+      rerender(tabs('rtl'));
+      await user.keyboard('{ArrowLeft}');
+
+      expect(document.activeElement).toBe(screen.getByText('Billing'));
     });
 
     it('uses ArrowDown/ArrowUp for vertical orientation', async () => {

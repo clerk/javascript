@@ -78,10 +78,53 @@ describe('the user profile profile section', () => {
     const dialog = screen.getByRole('dialog', { name: 'Edit name' });
     await actor.clear(within(dialog).getByLabelText('First name'));
     await actor.type(within(dialog).getByLabelText('First name'), 'Alicia');
+    await actor.clear(within(dialog).getByLabelText('Last name'));
+    await actor.type(within(dialog).getByLabelText('Last name'), 'Jones');
     await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(screen.getByText('Alicia Smith')).toBeInTheDocument();
+    expect(screen.getByText('Alicia Jones')).toBeInTheDocument();
+  });
+
+  it('puts a last name the server rejects on the last name field', async () => {
+    const { actor } = await renderSection();
+    failsWith(
+      '/v1/me',
+      {
+        code: 'form_param_format_invalid',
+        message: 'Invalid',
+        long_message: 'Last name contains invalid characters.',
+        meta: { param_name: 'last_name' },
+      },
+      422,
+    );
+
+    await actor.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    await actor.type(within(dialog).getByLabelText('Last name'), '!');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    const lastName = within(dialog).getByLabelText('Last name');
+    await waitFor(() => expect(lastName).toHaveAccessibleDescription('Last name contains invalid characters.'));
+    expect(lastName).toHaveAttribute('aria-invalid', 'true');
+    expect(within(dialog).getByLabelText('First name')).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('keeps Save disabled while a required half of the name is empty', async () => {
+    const { actor } = await renderSection(
+      signedIn(fapiEnvironment({ attributes: { first_name: { required: true }, last_name: { required: true } } })),
+    );
+
+    await actor.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    const save = within(dialog).getByRole('button', { name: 'Save changes' });
+    await actor.clear(within(dialog).getByLabelText(/^First name/));
+    expect(save).toHaveAttribute('aria-disabled', 'true');
+    await actor.type(within(dialog).getByLabelText(/^First name/), 'Alicia');
+    await actor.clear(within(dialog).getByLabelText(/^Last name/));
+    expect(save).toHaveAttribute('aria-disabled', 'true');
+    await actor.type(within(dialog).getByLabelText(/^Last name/), 'Jones');
+    expect(save).not.toHaveAttribute('aria-disabled', 'true');
   });
 
   it('leaves the name out when the instance collects neither half of it', async () => {
@@ -223,6 +266,39 @@ describe('the user profile profile section', () => {
     expect(profile()).toHaveTextContent('alicia');
   });
 
+  it('keeps Save disabled while a required username is empty', async () => {
+    const { actor } = await renderSection(withUsername('alicesmith', { required: true }));
+
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    await actor.clear(within(dialog).getByLabelText(/^Username/));
+
+    expect(within(dialog).getByRole('button', { name: 'Save changes' })).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('tells the user the username length the instance allows', async () => {
+    const { actor } = await renderSection({
+      ...withUsername('alicesmith'),
+      environment: fapiEnvironment({ user_settings: { username_settings: { min_length: 5, max_length: 20 } } }),
+    });
+    failsWith(
+      '/v1/me',
+      { code: 'form_username_invalid_length', message: 'Invalid length', meta: { param_name: 'username' } },
+      422,
+    );
+
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    await actor.type(within(dialog).getByLabelText('Username'), '2');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() =>
+      expect(within(dialog).getByLabelText('Username')).toHaveAccessibleDescription(
+        'Your username must be between 5 and 20 characters long.',
+      ),
+    );
+  });
+
   it('offers to set a username the user has not picked yet', async () => {
     await renderSection(withUsername(null));
 
@@ -308,7 +384,7 @@ describe('username reverification', () => {
     expect(savedUsername(fapi)).toBe('alicesmith');
     await actor.type(field, 'hunter2{Enter}');
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(savedUsername(fapi)).toBe('alicia');
     expect(profile()).toHaveTextContent('alicia');
   });
@@ -338,7 +414,7 @@ describe('username reverification', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
 
-    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    const field = await screen.findByLabelText('Username');
     expect(field).toHaveValue('alicia');
     await waitFor(() => expect(field).toHaveAccessibleDescription(/That username is taken/));
     expect(savedUsername(fapi)).toBe('alicesmith');
@@ -364,7 +440,7 @@ describe('username reverification', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
 
-    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    const field = await screen.findByLabelText('Username');
     await waitFor(() => expect(field).toHaveFocus());
   });
 

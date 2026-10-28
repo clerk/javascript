@@ -20,11 +20,3 @@ export function mergeRenderList(previous: string[], value: string[]): string[] {
   });
   return result;
 }
-
-export function readingDirectionKeys(element: Element) {
-  const isRtl = (element.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl';
-  return {
-    previousKey: isRtl ? 'ArrowRight' : 'ArrowLeft',
-    nextKey: isRtl ? 'ArrowLeft' : 'ArrowRight',
-  };
-}

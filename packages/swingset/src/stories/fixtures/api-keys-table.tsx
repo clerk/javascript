@@ -3,7 +3,6 @@ import { Panel } from '@clerk/mosaic/components/panel';
 import { resolveAPIKeysTableMessages } from '@clerk/mosaic/features/api-keys/api-keys-table.messages';
 import type {
   APIKey,
-  APIKeysTableSort,
   APIKeysTableSubjectKind,
   APIKeysTableViewProps,
 } from '@clerk/mosaic/features/api-keys/api-keys-table.types';
@@ -14,7 +13,7 @@ import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosRows, chaosText } from '@/lib/chaos';
+import { chaosPick, chaosRows } from '@/lib/chaos';
 
 interface FixtureAPIKey {
   id: string;
@@ -25,6 +24,15 @@ interface FixtureAPIKey {
 }
 
 const exampleTime = Date.now();
+
+const chaosAPIKeyNames = [
+  'Production webhook ingestion for the EU billing reconciliation pipeline',
+  'Nightly data warehouse export (Snowflake to BigQuery)',
+  'Customer support dashboard, read-only access',
+  'Legacy v1 API: do not revoke until the mobile migration ships',
+  'Zapier',
+  'Internal tooling for the Growth and Lifecycle Marketing team',
+];
 
 export const exampleAPIKeys: FixtureAPIKey[] = [
   'Web app',
@@ -47,28 +55,6 @@ export const exampleAPIKeys: FixtureAPIKey[] = [
   lastUsedAt: index % 3 === 0 ? exampleTime - (index + 2) * 60_000 : null,
 }));
 
-function sortAPIKeys(items: FixtureAPIKey[], sort: APIKeysTableSort | null) {
-  if (!sort) {
-    return items;
-  }
-  const direction = sort.direction === 'ascending' ? 1 : -1;
-  return [...items].sort((a, b) => {
-    if (sort.column === 'name') {
-      return direction * a.name.localeCompare(b.name);
-    }
-    if (sort.column === 'createdAt') {
-      return direction * (a.createdAt - b.createdAt);
-    }
-    if (a.lastUsedAt === null) {
-      return b.lastUsedAt === null ? 0 : 1;
-    }
-    if (b.lastUsedAt === null) {
-      return -1;
-    }
-    return direction * (a.lastUsedAt - b.lastUsedAt);
-  });
-}
-
 async function createExampleAPIKey() {
   await new Promise<void>(resolve => setTimeout(resolve, 600));
   return { id: `ak_demo_${crypto.randomUUID()}`, secret: `ak_demo_${crypto.randomUUID()}` };
@@ -80,25 +66,22 @@ async function revokeExampleAPIKey() {
 
 export function useAPIKeysTableFixture({
   initialKeys = exampleAPIKeys,
-  enableSorting = false,
   subjectKind = 'user',
   showDescription = false,
 }: {
   initialKeys?: FixtureAPIKey[];
-  enableSorting?: boolean;
   subjectKind?: APIKeysTableSubjectKind;
   showDescription?: boolean;
 } = {}): APIKeysTableViewProps {
   const locale = useLocale();
   const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
   const seed = useChaosFixture(initialKeys, items =>
-    chaosRows(items).map(key => ({ ...key, name: chaosText(key.name) })),
+    chaosRows(items).map((key, index) => ({ ...key, name: chaosPick(chaosAPIKeyNames, index) })),
   );
   const [items, setItems] = useState(seed);
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<APIKeysTableSort | null>(null);
   const [pageSize, setPageSize] = useState(10);
   const dateLabel = (date: Date | number) =>
     new Intl.DateTimeFormat(locale, {
@@ -141,14 +124,13 @@ export function useAPIKeysTableFixture({
   }, [searchValue, query]);
 
   const filtered = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
-  const sorted = sortAPIKeys(filtered, sort);
   const pageCount = Math.ceil(filtered.length / pageSize);
   useEffect(() => {
     if (page > Math.max(1, pageCount)) {
       setPage(Math.max(1, pageCount));
     }
   }, [page, pageCount]);
-  const apiKeys = sorted.slice((page - 1) * pageSize, page * pageSize).map(item => ({
+  const apiKeys = filtered.slice((page - 1) * pageSize, page * pageSize).map(item => ({
     id: item.id,
     name: item.name,
     createdAtLabel: dateLabel(item.createdAt),
@@ -190,13 +172,6 @@ export function useAPIKeysTableFixture({
     onSearchChange: setSearchValue,
     onPageChange: setPage,
     onPageSizeChange: setPageSize,
-    sort: enableSorting ? sort : undefined,
-    onSortChange: enableSorting
-      ? next => {
-          setSort(next);
-          setPage(1);
-        }
-      : undefined,
   };
 }
 

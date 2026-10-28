@@ -659,9 +659,218 @@ describe('actor restart — StrictMode start/stop/start cycle', () => {
     // Stopped mid-invoke (e.g. Suspense remount) then restarted.
     actor.stop();
     actor.start();
-    expect(actor.getSnapshot().status).toBe('active');
+    expect(actor.getSnapshot()).toMatchObject({ value: 'deleting', status: 'active' });
     // The invoke must not fire a second time.
     expect(invokeCount).toBe(1);
+  });
+});
+
+describe('actor restart — stop/start resumes the current state', () => {
+  it('stays in a state without an invoke', () => {
+    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
+    actor.start();
+    actor.send({ type: 'OPEN' });
+    actor.send({ type: 'TYPE', value: 'Acme' });
+
+    actor.stop();
+    actor.start();
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'confirming', status: 'active' });
+    expect(actor.getSnapshot().context.confirmValue).toBe('Acme');
+    actor.send({ type: 'CANCEL' });
+    expect(actor.getSnapshot().value).toBe('idle');
+  });
+
+  it('applies an invoke that resolved while stopped once started again', async () => {
+    const gate = deferred<string>();
+    const actor = createActor(createLoaderMachine(() => gate.promise));
+    actor.start();
+    actor.send({ type: 'FETCH' });
+
+    actor.stop();
+    gate.resolve('loaded');
+    await tick();
+    expect(actor.getSnapshot()).toMatchObject({ value: 'loading', status: 'stopped' });
+
+    actor.start();
+    expect(actor.getSnapshot()).toMatchObject({ value: 'success', status: 'done' });
+    expect(actor.getSnapshot().context.data).toBe('loaded');
+  });
+
+  it('applies an invoke that rejected while stopped once started again', async () => {
+    const gate = deferred<string>();
+    const actor = createActor(createLoaderMachine(() => gate.promise));
+    actor.start();
+    actor.send({ type: 'FETCH' });
+
+    actor.stop();
+    gate.reject('boom');
+    await tick();
+    actor.start();
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'failure', status: 'active' });
+    expect(actor.getSnapshot().context.error).toBe('boom');
+  });
+
+  it('handles an invoke that settles after the restart exactly once', async () => {
+    const gate = deferred<string>();
+    const seen: string[] = [];
+    const actor = createActor(createLoaderMachine(() => gate.promise));
+    actor.start();
+    actor.send({ type: 'FETCH' });
+
+    actor.stop();
+    actor.start();
+    actor.subscribe(snapshot => seen.push(snapshot.value));
+    gate.resolve('late');
+    await tick();
+
+    expect(actor.getSnapshot().value).toBe('success');
+    expect(actor.getSnapshot().context.data).toBe('late');
+    expect(seen).toEqual(['success']);
+  });
+
+  it('runs entry actions and the invoke once across a StrictMode start/stop/start', async () => {
+    const entry = vi.fn();
+    const src = vi.fn(() => Promise.resolve('ok'));
+    const machine = createMachine<{ out: string }, { type: 'never' }>({
+      initial: 'working',
+      context: { out: '' },
+      states: {
+        working: {
+          entry,
+          invoke: {
+            src,
+            onDone: {
+              target: 'done',
+              actions: assign<{ out: string }, DoneInvokeEvent<string>>((_, event) => ({ out: event.output })),
+            },
+          },
+        },
+        done: { type: 'final' },
+      },
+    });
+    const actor = createActor(machine);
+
+    actor.start();
+    actor.stop();
+    actor.start();
+    await tick();
+
+    expect(entry).toHaveBeenCalledTimes(1);
+    expect(src).toHaveBeenCalledTimes(1);
+    expect(actor.getSnapshot()).toMatchObject({ value: 'done', status: 'done', context: { out: 'ok' } });
+  });
+
+  it('never notifies or schedules work once stopped for good', async () => {
+    vi.useFakeTimers();
+    try {
+      const gate = deferred<string>();
+      const machine = createMachine<Record<string, never>, { type: 'never' }>({
+        initial: 'working',
+        states: {
+          working: { invoke: { src: () => gate.promise, onDone: 'done' }, after: { 1000: 'done' } },
+          done: {},
+        },
+      });
+      const actor = createActor(machine);
+      actor.start();
+      const listener = vi.fn();
+      actor.subscribe(listener);
+
+      actor.stop();
+      listener.mockClear();
+      expect(vi.getTimerCount()).toBe(0);
+
+      gate.resolve('ignored');
+      await vi.runAllTimersAsync();
+
+      expect(listener).not.toHaveBeenCalled();
+      expect(actor.getSnapshot()).toMatchObject({ value: 'working', status: 'stopped' });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('queues events sent while stopped and applies them in order on start', () => {
+    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
+    actor.start();
+    actor.stop();
+    const listener = vi.fn();
+    actor.subscribe(listener);
+
+    actor.send({ type: 'OPEN' });
+    actor.send({ type: 'TYPE', value: 'Acme' });
+    expect(actor.getSnapshot()).toMatchObject({ value: 'idle', status: 'stopped' });
+    expect(listener).not.toHaveBeenCalled();
+
+    actor.start();
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'confirming', status: 'active' });
+    expect(actor.getSnapshot().context.confirmValue).toBe('Acme');
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies an invoke result and events in the order they arrived while stopped', async () => {
+    const gate = deferred<void>();
+    const actor = createActor(createDeleteOrgMachine(() => gate.promise));
+    actor.start();
+    actor.send({ type: 'OPEN' });
+    actor.send({ type: 'TYPE', value: 'Acme Inc' });
+    actor.send({ type: 'CONFIRM' });
+
+    actor.stop();
+    gate.reject('boom');
+    await tick();
+    actor.send({ type: 'TYPE', value: 'retry' });
+    actor.start();
+
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'confirming',
+      context: { error: 'boom', confirmValue: 'retry' },
+    });
+  });
+
+  it('drops an invoke result when an event queued before it leaves the invoking state', async () => {
+    const gate = deferred<string>();
+    const machine = createMachine<Record<string, never>, { type: 'GO' } | { type: 'CANCEL' }>({
+      initial: 'idle',
+      states: {
+        idle: { on: { GO: 'working' } },
+        working: { invoke: { src: () => gate.promise, onDone: 'done' }, on: { CANCEL: 'idle' } },
+        done: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    actor.send({ type: 'GO' });
+
+    actor.stop();
+    actor.send({ type: 'CANCEL' });
+    gate.resolve('late');
+    await tick();
+    actor.start();
+
+    expect(actor.getSnapshot().value).toBe('idle');
+  });
+
+  it('ignores send before the first start', () => {
+    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
+    actor.send({ type: 'OPEN' });
+    actor.start();
+
+    expect(actor.getSnapshot().value).toBe('idle');
+  });
+
+  it('keeps a teleported actor inert across a restart', () => {
+    const src = vi.fn(() => Promise.resolve());
+    const actor = mockActor(createDeleteOrgMachine(src), { value: 'deleting', context: { error: 'shown' } });
+
+    actor.stop();
+    actor.start();
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'deleting', status: 'active', context: { error: 'shown' } });
+    expect(src).not.toHaveBeenCalled();
   });
 });
 
@@ -845,6 +1054,30 @@ describe('createActor — after (delayed transitions)', () => {
 
     actor.start(); // StrictMode remount — must reschedule the timer
     vi.advanceTimersByTime(60_000);
+    expect(actor.getSnapshot().value).toBe('expired');
+  });
+
+  it('does not fire while stopped and re-arms the timer of the current state on start', () => {
+    const machine = createMachine<Record<string, never>, { type: 'SEND' }>({
+      initial: 'idle',
+      states: {
+        idle: { on: { SEND: 'codeSent' } },
+        codeSent: { after: { 60_000: 'expired' } },
+        expired: {},
+      },
+    });
+    const actor = createActor(machine);
+    actor.start();
+    actor.send({ type: 'SEND' });
+
+    actor.stop();
+    vi.advanceTimersByTime(120_000);
+    expect(actor.getSnapshot()).toMatchObject({ value: 'codeSent', status: 'stopped' });
+
+    actor.start();
+    vi.advanceTimersByTime(59_999);
+    expect(actor.getSnapshot().value).toBe('codeSent');
+    vi.advanceTimersByTime(1);
     expect(actor.getSnapshot().value).toBe('expired');
   });
 });
@@ -1034,10 +1267,6 @@ describe('createActor — inline transition functions (TransitionFn)', () => {
 });
 
 describe('createActor — unknown states', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('warns when a transition targets a state the machine does not define', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'ghost' } } } }));

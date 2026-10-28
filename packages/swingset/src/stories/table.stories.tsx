@@ -11,16 +11,9 @@ import { Table } from '@clerk/mosaic/components/table';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import { MagnifyingGlass } from '@clerk/mosaic/icons/glyphs/magnifying-glass';
 import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
-import type { OnChangeFn, SortingState } from '@clerk/mosaic/primitives/hooks';
-import { useDataTable } from '@clerk/mosaic/primitives/hooks';
-import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
-
-const styles = stylex.create({
-  columnWidthsTable: { minWidth: '36rem' },
-});
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -89,114 +82,76 @@ const sortKeys = {
   created: (key: ApiKey) => key.createdAt,
 };
 
-type SortableColumn = keyof typeof sortKeys;
-
-const isSortableColumn = (id: string): id is SortableColumn => id in sortKeys;
+const isSortableColumn = (column: string): column is keyof typeof sortKeys => column in sortKeys;
 
 function compare(a: string | number, b: string | number) {
   return typeof a === 'string' || typeof b === 'string' ? String(a).localeCompare(String(b)) : a - b;
 }
 
-function sortFor(sorting: SortingState, column: SortableColumn): TableSort {
-  const current = sorting[0];
-  if (!current || current.id !== column) {
-    return 'none';
-  }
-  return current.desc ? 'descending' : 'ascending';
-}
-
-function cycleSort(setSorting: OnChangeFn<SortingState>, column: SortableColumn) {
-  setSorting(sorting => {
-    const current = sorting[0];
-    if (!current || current.id !== column) {
-      return [{ id: column, desc: false }];
-    }
-    return current.desc ? [] : [{ id: column, desc: true }];
-  });
-}
-
-function sortRows(rows: ApiKey[], sorting: SortingState) {
-  const current = sorting[0];
-  if (!current || !isSortableColumn(current.id)) {
+function sortRows(rows: ApiKey[], sort: TableSort | null) {
+  if (!sort || !isSortableColumn(sort.column)) {
     return rows;
   }
-  const key = sortKeys[current.id];
+  const key = sortKeys[sort.column];
   const sorted = [...rows].sort((a, b) => compare(key(a), key(b)));
-  return current.desc ? sorted.reverse() : sorted;
+  return sort.direction === 'descending' ? sorted.reverse() : sorted;
 }
 
-function useSortedApiKeys(data: ApiKey[]) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const sorted = React.useMemo(() => sortRows(data, sorting), [data, sorting]);
-  return { sorting, setSorting, sorted };
-}
+const keyValue = (key: ApiKey) => key.id;
 
 export function Default() {
-  const { sorting, setSorting, sorted } = useSortedApiKeys(apiKeys);
-  const table = useDataTable({
-    data: sorted,
-    getRowId: row => row.id,
-    sorting,
-    onSortingChange: setSorting,
-  });
+  const [sort, setSort] = React.useState<TableSort | null>(null);
 
   return (
-    <Table.Root>
+    <Table.Root
+      aria-label='API keys'
+      selectionMode='multiple'
+      sort={sort}
+      onSortChange={setSort}
+    >
       <Table.Header>
-        <Table.Row>
-          <Table.SelectAllCell
-            aria-label='Select all keys'
-            checked={table.getIsAllRowsSelected()}
-            indeterminate={table.getIsSomeRowsSelected()}
-            onChange={() => table.toggleAllRowsSelected()}
-          />
-          <Table.HeaderCell
-            sort={sortFor(table.sorting, 'name')}
-            onSort={() => cycleSort(table.setSorting, 'name')}
-          >
-            Name
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sort={sortFor(table.sorting, 'lastUsed')}
-            onSort={() => cycleSort(table.setSorting, 'lastUsed')}
-          >
-            Last used
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sort={sortFor(table.sorting, 'created')}
-            onSort={() => cycleSort(table.setSorting, 'created')}
-          >
-            Created
-          </Table.HeaderCell>
-          <Table.HeaderCell align='end'>
-            <VisuallyHidden>Actions</VisuallyHidden>
-          </Table.HeaderCell>
-        </Table.Row>
+        <Table.SelectionColumn aria-label='Select all keys' />
+        <Table.Column
+          value='name'
+          sortable
+          rowHeader
+        >
+          Name
+        </Table.Column>
+        <Table.Column
+          value='lastUsed'
+          sortable
+        >
+          Last used
+        </Table.Column>
+        <Table.Column
+          value='created'
+          sortable
+        >
+          Created
+        </Table.Column>
+        <Table.Column align='end'>
+          <VisuallyHidden>Actions</VisuallyHidden>
+        </Table.Column>
       </Table.Header>
-      <Table.Body>
-        {table.rows.map(row => (
-          <Table.Row
-            key={row.id}
-            selected={row.getIsSelected()}
-          >
-            <Table.SelectCell
-              aria-label={`Select ${row.original.name}`}
-              checked={row.getIsSelected()}
-              onToggleSelected={row.toggleSelected}
-            />
+      <Table.Body
+        items={sortRows(apiKeys, sort)}
+        itemToStringValue={keyValue}
+      >
+        {key => (
+          <Table.Row>
+            <Table.SelectionCell aria-label='Select' />
             <Table.Cell>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                {row.original.name}
-                <Badge color={row.original.environment === 'Production' ? 'positive' : 'neutral'}>
-                  {row.original.environment}
-                </Badge>
+                {key.name}
+                <Badge color={key.environment === 'Production' ? 'positive' : 'neutral'}>{key.environment}</Badge>
               </span>
             </Table.Cell>
-            <Table.Cell>{row.original.lastUsed}</Table.Cell>
-            <Table.Cell>{row.original.created}</Table.Cell>
+            <Table.Cell>{key.lastUsed}</Table.Cell>
+            <Table.Cell>{key.created}</Table.Cell>
             <Table.Cell align='end'>
               <Menu.Root placement='bottom-end'>
-                <Menu.Trigger aria-label={`Manage ${row.original.name}`} />
+                <Menu.Trigger aria-label={`Manage ${key.name}`} />
                 <Menu.Popup>
                   <Menu.Item label='Revoke'>
                     <Menu.Label>Revoke</Menu.Label>
@@ -205,7 +160,7 @@ export function Default() {
               </Menu.Root>
             </Table.Cell>
           </Table.Row>
-        ))}
+        )}
       </Table.Body>
     </Table.Root>
   );
@@ -227,25 +182,23 @@ export function Search() {
       </Table.Toolbar>
       <Table.Root aria-label='API keys'>
         <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Created</Table.HeaderCell>
-          </Table.Row>
+          <Table.Column>Name</Table.Column>
+          <Table.Column>Created</Table.Column>
         </Table.Header>
-        <Table.Body>
-          {filtered.length ? (
-            filtered.map(key => (
-              <Table.Row key={key.id}>
-                <Table.Cell>{key.name}</Table.Cell>
-                <Table.Cell noWrap>{key.created}</Table.Cell>
-              </Table.Row>
-            ))
-          ) : (
-            <Table.Empty>
-              <EmptyState.Root role='status'>
-                <EmptyState.Label>No API keys found</EmptyState.Label>
-              </EmptyState.Root>
-            </Table.Empty>
+        <Table.Body
+          items={filtered}
+          itemToStringValue={keyValue}
+          renderEmptyState={() => (
+            <EmptyState.Root role='status'>
+              <EmptyState.Label>No API keys found</EmptyState.Label>
+            </EmptyState.Root>
+          )}
+        >
+          {key => (
+            <Table.Row>
+              <Table.Cell>{key.name}</Table.Cell>
+              <Table.Cell noWrap>{key.created}</Table.Cell>
+            </Table.Row>
           )}
         </Table.Body>
       </Table.Root>
@@ -254,72 +207,67 @@ export function Search() {
 }
 
 export function Sorting() {
-  const { sorting, setSorting, sorted } = useSortedApiKeys(apiKeys);
+  const [sort, setSort] = React.useState<TableSort | null>(null);
 
   return (
-    <Table.Root>
+    <Table.Root
+      aria-label='API keys'
+      sort={sort}
+      onSortChange={setSort}
+    >
       <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell
-            sort={sortFor(sorting, 'name')}
-            onSort={() => cycleSort(setSorting, 'name')}
-          >
-            Name
-          </Table.HeaderCell>
-          <Table.HeaderCell
-            sort={sortFor(sorting, 'created')}
-            onSort={() => cycleSort(setSorting, 'created')}
-          >
-            Created
-          </Table.HeaderCell>
-          <Table.HeaderCell>Environment</Table.HeaderCell>
-        </Table.Row>
+        <Table.Column
+          value='name'
+          sortable
+        >
+          Name
+        </Table.Column>
+        <Table.Column
+          value='created'
+          sortable
+        >
+          Created
+        </Table.Column>
+        <Table.Column>Environment</Table.Column>
       </Table.Header>
-      <Table.Body>
-        {sorted.map(key => (
-          <Table.Row key={key.id}>
+      <Table.Body
+        items={sortRows(apiKeys, sort)}
+        itemToStringValue={keyValue}
+      >
+        {key => (
+          <Table.Row>
             <Table.Cell>{key.name}</Table.Cell>
             <Table.Cell>{key.created}</Table.Cell>
             <Table.Cell>{key.environment}</Table.Cell>
           </Table.Row>
-        ))}
+        )}
       </Table.Body>
     </Table.Root>
   );
 }
 
 export function Selection() {
-  const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
-
   return (
-    <Table.Root>
+    <Table.Root
+      aria-label='API keys'
+      selectionMode='multiple'
+    >
       <Table.Header>
-        <Table.Row>
-          <Table.SelectAllCell
-            aria-label='Select all keys'
-            checked={table.getIsAllRowsSelected()}
-            indeterminate={table.getIsSomeRowsSelected()}
-            onChange={() => table.toggleAllRowsSelected()}
-          />
-          <Table.HeaderCell>Name</Table.HeaderCell>
-          <Table.HeaderCell>Last used</Table.HeaderCell>
-        </Table.Row>
+        <Table.SelectionColumn aria-label='Select all keys' />
+        <Table.Column rowHeader>Name</Table.Column>
+        <Table.Column>Last used</Table.Column>
       </Table.Header>
-      <Table.Body>
-        {table.rows.map(row => (
-          <Table.Row
-            key={row.id}
-            selected={row.getIsSelected()}
-          >
-            <Table.SelectCell
-              aria-label={`Select ${row.original.name}`}
-              checked={row.getIsSelected()}
-              onToggleSelected={row.toggleSelected}
-            />
-            <Table.Cell>{row.original.name}</Table.Cell>
-            <Table.Cell>{row.original.lastUsed}</Table.Cell>
+      <Table.Body
+        items={apiKeys}
+        itemToStringValue={keyValue}
+      >
+        {key => (
+          <Table.Row disabled={key.id === 'k4'}>
+            <Table.SelectionCell aria-label='Select' />
+            <Table.Cell>{key.name}</Table.Cell>
+            <Table.Cell>{key.lastUsed}</Table.Cell>
           </Table.Row>
-        ))}
+        )}
       </Table.Body>
     </Table.Root>
   );
@@ -327,16 +275,16 @@ export function Selection() {
 
 export function Empty() {
   return (
-    <Table.Root>
+    <Table.Root aria-label='API keys'>
       <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Name</Table.HeaderCell>
-          <Table.HeaderCell>Last used</Table.HeaderCell>
-          <Table.HeaderCell>Created</Table.HeaderCell>
-        </Table.Row>
+        <Table.Column>Name</Table.Column>
+        <Table.Column>Last used</Table.Column>
+        <Table.Column>Created</Table.Column>
       </Table.Header>
-      <Table.Body>
-        <Table.Empty>
+      <Table.Body
+        items={[]}
+        itemToStringValue={keyValue}
+        renderEmptyState={() => (
           <EmptyState.Root>
             <EmptyState.Icon glyph={MagnifyingGlass} />
             <EmptyState.Label>No API keys</EmptyState.Label>
@@ -353,7 +301,72 @@ export function Empty() {
               </Button>
             </EmptyState.Actions>
           </EmptyState.Root>
-        </Table.Empty>
+        )}
+      >
+        {key => (
+          <Table.Row>
+            <Table.Cell>{key.name}</Table.Cell>
+            <Table.Cell>{key.lastUsed}</Table.Cell>
+            <Table.Cell>{key.created}</Table.Cell>
+          </Table.Row>
+        )}
+      </Table.Body>
+    </Table.Root>
+  );
+}
+
+type Endpoint = { path: string; requests: string; children?: Endpoint[] };
+
+const endpoints: Endpoint[] = [
+  {
+    path: '/v1/users',
+    requests: '18,204',
+    children: [
+      { path: '/v1/users/{id}', requests: '12,880' },
+      { path: '/v1/users/{id}/sessions', requests: '3,410' },
+    ],
+  },
+  {
+    path: '/v1/organizations',
+    requests: '4,129',
+    children: [{ path: '/v1/organizations/{id}/members', requests: '2,006' }],
+  },
+  { path: '/v1/jwks', requests: '913' },
+];
+
+export function TreeRows() {
+  return (
+    <Table.Root
+      aria-label='Endpoints'
+      defaultExpanded={['/v1/users']}
+    >
+      <Table.Header>
+        <Table.Column rowHeader>Endpoint</Table.Column>
+        <Table.Column align='end'>Requests</Table.Column>
+      </Table.Header>
+      <Table.Body
+        items={endpoints}
+        itemToStringValue={endpoint => endpoint.path}
+        itemToChildren={endpoint => endpoint.children}
+      >
+        {endpoint => (
+          <Table.Row>
+            <Table.Cell>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  paddingInlineStart: 'calc(var(--table-row-depth) * 1.5rem)',
+                }}
+              >
+                <Table.ExpandButton aria-label='Expand' />
+                {endpoint.path}
+              </span>
+            </Table.Cell>
+            <Table.Cell align='end'>{endpoint.requests}</Table.Cell>
+          </Table.Row>
+        )}
       </Table.Body>
     </Table.Root>
   );
@@ -364,17 +377,18 @@ export function Overflow() {
 
   return (
     <div style={{ maxWidth: 480 }}>
-      <Table.Root>
+      <Table.Root aria-label='API keys'>
         <Table.Header>
-          <Table.Row>
-            {columns.map(column => (
-              <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
-            ))}
-          </Table.Row>
+          {columns.map(column => (
+            <Table.Column key={column}>{column}</Table.Column>
+          ))}
         </Table.Header>
-        <Table.Body>
-          {apiKeys.map(key => (
-            <Table.Row key={key.id}>
+        <Table.Body
+          items={apiKeys}
+          itemToStringValue={keyValue}
+        >
+          {key => (
+            <Table.Row>
               <Table.Cell>{key.name}</Table.Cell>
               <Table.Cell>{key.environment}</Table.Cell>
               <Table.Cell>{key.lastUsed}</Table.Cell>
@@ -384,7 +398,7 @@ export function Overflow() {
               <Table.Cell>read, write</Table.Cell>
               <Table.Cell align='end'>12,408</Table.Cell>
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
     </div>
@@ -396,24 +410,26 @@ export function StickyColumn() {
 
   return (
     <div style={{ maxWidth: 480 }}>
-      <Table.Root>
+      <Table.Root
+        aria-label='API keys'
+        selectionMode='multiple'
+        defaultSelection={['k2']}
+      >
         <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            {columns.map(column => (
-              <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
-            ))}
-            <Table.HeaderCell sticky='end'>
-              <VisuallyHidden>Actions</VisuallyHidden>
-            </Table.HeaderCell>
-          </Table.Row>
+          <Table.Column>Name</Table.Column>
+          {columns.map(column => (
+            <Table.Column key={column}>{column}</Table.Column>
+          ))}
+          <Table.Column sticky='end'>
+            <VisuallyHidden>Actions</VisuallyHidden>
+          </Table.Column>
         </Table.Header>
-        <Table.Body>
-          {apiKeys.map(key => (
-            <Table.Row
-              key={key.id}
-              selected={key.id === 'k2'}
-            >
+        <Table.Body
+          items={apiKeys}
+          itemToStringValue={keyValue}
+        >
+          {key => (
+            <Table.Row>
               <Table.Cell noWrap>{key.name}</Table.Cell>
               <Table.Cell>{key.environment}</Table.Cell>
               <Table.Cell noWrap>{key.lastUsed}</Table.Cell>
@@ -435,7 +451,7 @@ export function StickyColumn() {
                 </Menu.Root>
               </Table.Cell>
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
     </div>
@@ -443,53 +459,38 @@ export function StickyColumn() {
 }
 
 export function ColumnWidths() {
-  const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
-
   return (
     <Table.Root
+      aria-label='API keys'
       layout='fixed'
-      xstyle={styles.columnWidthsTable}
+      minWidth='36rem'
+      selectionMode='multiple'
     >
-      <Table.ColumnGroup>
-        <Table.Column />
-        <Table.Column />
-        <Table.Column width='9rem' />
-        <Table.Column width='9rem' />
-        <Table.Column width='4rem' />
-      </Table.ColumnGroup>
       <Table.Header>
-        <Table.Row>
-          <Table.SelectAllCell
-            aria-label='Select all keys'
-            checked={table.getIsAllRowsSelected()}
-            indeterminate={table.getIsSomeRowsSelected()}
-            onChange={() => table.toggleAllRowsSelected()}
-          />
-          <Table.HeaderCell>Name</Table.HeaderCell>
-          <Table.HeaderCell>Last used</Table.HeaderCell>
-          <Table.HeaderCell>Created</Table.HeaderCell>
-          <Table.HeaderCell align='end'>
-            <VisuallyHidden>Actions</VisuallyHidden>
-          </Table.HeaderCell>
-        </Table.Row>
+        <Table.SelectionColumn aria-label='Select all keys' />
+        <Table.Column rowHeader>Name</Table.Column>
+        <Table.Column width='9rem'>Last used</Table.Column>
+        <Table.Column width='9rem'>Created</Table.Column>
+        <Table.Column
+          align='end'
+          width='4rem'
+        >
+          <VisuallyHidden>Actions</VisuallyHidden>
+        </Table.Column>
       </Table.Header>
-      <Table.Body>
-        {table.rows.map(row => (
-          <Table.Row
-            key={row.id}
-            selected={row.getIsSelected()}
-          >
-            <Table.SelectCell
-              aria-label={`Select ${row.original.name}`}
-              checked={row.getIsSelected()}
-              onToggleSelected={row.toggleSelected}
-            />
-            <Table.Cell>{row.original.name}</Table.Cell>
-            <Table.Cell noWrap>{row.original.lastUsed}</Table.Cell>
-            <Table.Cell noWrap>{row.original.created}</Table.Cell>
+      <Table.Body
+        items={apiKeys}
+        itemToStringValue={keyValue}
+      >
+        {key => (
+          <Table.Row>
+            <Table.SelectionCell aria-label='Select' />
+            <Table.Cell>{key.name}</Table.Cell>
+            <Table.Cell noWrap>{key.lastUsed}</Table.Cell>
+            <Table.Cell noWrap>{key.created}</Table.Cell>
             <Table.Cell align='end'>
               <Menu.Root placement='bottom-end'>
-                <Menu.Trigger aria-label={`Manage ${row.original.name}`} />
+                <Menu.Trigger aria-label={`Manage ${key.name}`} />
                 <Menu.Popup>
                   <Menu.Item label='Revoke'>
                     <Menu.Label>Revoke</Menu.Label>
@@ -498,7 +499,7 @@ export function ColumnWidths() {
               </Menu.Root>
             </Table.Cell>
           </Table.Row>
-        ))}
+        )}
       </Table.Body>
     </Table.Root>
   );
@@ -509,24 +510,20 @@ const keyDetails = Dialog.createHandle<ApiKey>();
 export function ClickableRows() {
   return (
     <>
-      <Table.Root>
+      <Table.Root aria-label='API keys'>
         <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Environment</Table.HeaderCell>
-            <Table.HeaderCell>Last used</Table.HeaderCell>
-            <Table.HeaderCell align='end'>
-              <VisuallyHidden>Actions</VisuallyHidden>
-            </Table.HeaderCell>
-          </Table.Row>
+          <Table.Column>Name</Table.Column>
+          <Table.Column>Environment</Table.Column>
+          <Table.Column>Last used</Table.Column>
+          <Table.Column align='end'>
+            <VisuallyHidden>Actions</VisuallyHidden>
+          </Table.Column>
         </Table.Header>
-        <Table.Body>
-          {apiKeys.map(key => (
-            <ClickableKeyRow
-              key={key.id}
-              apiKey={key}
-            />
-          ))}
+        <Table.Body
+          items={apiKeys}
+          itemToStringValue={keyValue}
+        >
+          {key => <ClickableKeyRow apiKey={key} />}
         </Table.Body>
       </Table.Root>
       <Dialog.Root handle={keyDetails}>

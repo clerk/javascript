@@ -1,5 +1,5 @@
+import { switcherBusyKeys } from '@clerk/mosaic/features/switcher/switcher.types';
 import {
-  switcherBusyKeys,
   type SwitcherInvitation,
   type SwitcherMembership,
   type SwitcherSession,
@@ -9,7 +9,7 @@ import {
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosName, chaosText } from '@/lib/chaos';
+import { chaosCompany, chaosEmail, chaosName } from '@/lib/chaos';
 
 // The data behind the design frames: one account, Cameron Walker, signed in three times over, and
 // the organizations each frame lists. Only the flagship organizations carry the Clerk mark; the rest wear
@@ -109,14 +109,20 @@ function chaosAccounts(accounts: Account[]): Account[] {
   return accounts.map((account, index) => ({
     ...account,
     session: { ...account.session, name: chaosName(index), identifier: chaosEmail(index) },
-    memberships: account.memberships.map(m => ({
+    memberships: account.memberships.map((m, membershipIndex) => ({
       ...m,
-      name: chaosText(m.name),
-      planLabel: chaosText(m.planLabel),
+      name: chaosCompany(index * 10 + membershipIndex),
+      planLabel: 'Enterprise (annual, invoiced)',
       membersCount: 1_234_567,
     })),
-    suggestions: account.suggestions.map(s => ({ ...s, name: chaosText(s.name) })),
-    invitations: account.invitations.map(i => ({ ...i, organizationName: chaosText(i.organizationName) })),
+    suggestions: account.suggestions.map((s, suggestionIndex) => ({
+      ...s,
+      name: chaosCompany(index * 10 + suggestionIndex + 4),
+    })),
+    invitations: account.invitations.map((i, invitationIndex) => ({
+      ...i,
+      organizationName: chaosCompany(index * 10 + invitationIndex + 7),
+    })),
   }));
 }
 

@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
@@ -73,17 +73,12 @@ describe('User profile MFA management', () => {
     if (!selectedPhone) {
       throw new Error('Expected the second phone');
     }
-    const changeDefault = vi.spyOn(selectedPhone, 'makeDefaultSecondFactor').mockRejectedValue(cause);
-    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    try {
-      const user = userEvent.setup();
-      await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
-      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
-    } finally {
-      changeDefault.mockRestore();
-      log.mockRestore();
-    }
+    vi.spyOn(selectedPhone, 'makeDefaultSecondFactor').mockRejectedValue(cause);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const user = userEvent.setup();
+    await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
   });
 
   async function renderTwoSmsMethodsNeedingReverification() {
@@ -185,18 +180,12 @@ describe('User profile MFA management', () => {
     if (!clerk.user) {
       throw new Error('Expected the signed-in user');
     }
-    const create = vi.spyOn(clerk.user, 'createTOTP').mockRejectedValue(new Error('Internal authenticator failure'));
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await waitFor(() =>
-        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
-      );
-      expect(screen.queryByText('Internal authenticator failure')).toBeNull();
-    } finally {
-      create.mockRestore();
-    }
+    vi.spyOn(clerk.user, 'createTOTP').mockRejectedValue(new Error('Internal authenticator failure'));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    expect(screen.queryByText('Internal authenticator failure')).toBeNull();
   });
 
   it('keeps localized Clerk errors when removing an authenticator fails', async () => {
@@ -355,7 +344,7 @@ describe('User profile MFA management', () => {
     expect(clerk.user?.id).toBe('user_2');
   });
 
-  it('opens the backup-code surface while regeneration is pending', async () => {
+  it('keeps the profile visible until regenerated backup codes are ready', async () => {
     await renderMfa(
       fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
     );
@@ -364,20 +353,44 @@ describe('User profile MFA management', () => {
     await openMenu(user, screen.getByRole('button', { name: 'Manage Backup codes' }));
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
-    await waitFor(() => expect(screen.getByRole('status', { name: 'Generating backup codes' })).toBeVisible());
-    for (const name of ['Print', 'Download']) {
-      expect(screen.getByRole('button', { name })).toBeVisible();
-      expect(screen.getByRole('button', { name })).toBeDisabled();
+    try {
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Add verification method' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Manage Backup codes' })).toBeVisible();
+    } finally {
+      held.release();
     }
-    expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
-    held.release();
     await waitFor(() => expect(screen.getByText('CODE0100')).toBeVisible());
     expect(screen.getByRole('button', { name: 'Close' })).toBeVisible();
     for (const name of ['Print', 'Download', 'Copy and close']) {
       expect(screen.getByRole('button', { name })).toBeEnabled();
     }
+  });
+
+  it('returns failed regeneration to the section and retries from the menu', async () => {
+    const fapi = await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+    );
+    const handlers = worker.listHandlers();
+    const held = holdRequests('post', '/v1/me/backup_codes/');
+    const user = userEvent.setup();
+    const trigger = screen.getByRole('button', { name: 'Manage Backup codes' });
+    await openMenu(user, trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    held.fail('action_blocked', 'Unable to create backup codes.');
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        "This action couldn't be completed. Please try again later or contact support if this persists.",
+      ),
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    worker.resetHandlers(...handlers);
+    await openMenu(user, trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    expect(await screen.findByText('CODE0100')).toBeVisible();
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
   it('uses fresh server codes for explicit regeneration', async () => {
@@ -391,6 +404,49 @@ describe('User profile MFA management', () => {
     expect(within(list).getAllByRole('listitem')).toHaveLength(10);
     expect(within(list).queryByText('CODE0001')).toBeNull();
     expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  it('holds the menu open with a spinner on Regenerate until the backup codes are ready', async () => {
+    await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+      mfaEnvironment(),
+    );
+    const generate = holdRequests('post', '/v1/me/backup_codes/');
+    const user = userEvent.setup();
+
+    try {
+      await regenerate(user);
+      await waitFor(() => expect(generate.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
+      expect(await screen.findByRole('progressbar', { name: 'Regenerate' })).toBeVisible();
+      expect(screen.queryByRole('dialog')).toBeNull();
+    } finally {
+      generate.release();
+    }
+
+    const list = await screen.findByRole('list', { name: 'Backup codes' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(10);
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+  });
+
+  it('holds the Regenerate menu item until session verification opens', async () => {
+    await renderBackupCodesNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    try {
+      await regenerate(user);
+      await waitFor(() => expect(start.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByText('Enter your current password to continue')).toBeNull();
+    } finally {
+      start.release();
+    }
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
   });
 
   async function renderBackupCodesNeedingReverification() {
@@ -414,7 +470,21 @@ describe('User profile MFA management', () => {
 
     await regenerate(user);
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    const refresh = holdRequests('get', '/v1/me');
+    try {
+      await user.keyboard('hunter2{Enter}');
+      await act(async () => {
+        await waitFor(() => expect(refresh.requests).toHaveLength(1));
+      });
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-open');
+      expect(screen.getByText('Enter your current password to continue')).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+    } finally {
+      refresh.release();
+    }
 
     const list = await screen.findByRole('list', { name: 'Backup codes' });
     expect(within(list).getAllByRole('listitem')).toHaveLength(10);
@@ -445,6 +515,7 @@ describe('User profile MFA management', () => {
     await regenerate(user);
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
+    const handlers = worker.listHandlers();
     const replay = holdRequests('post', '/v1/me/backup_codes/');
     await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
     await waitFor(() => expect(replay.requests).toHaveLength(1));
@@ -454,47 +525,53 @@ describe('User profile MFA management', () => {
     expect(dialog).toBeVisible();
 
     replay.fail('action_blocked', 'Unable to create backup codes.');
-    await waitFor(() => expect(within(screen.getByRole('dialog')).getByRole('alert')).toBeVisible());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      "This action couldn't be completed. Please try again later or contact support if this persists.",
+    );
     expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
     expect(fapi.mfa.backupCodeCreations).toBe(0);
+    worker.resetHandlers(...handlers);
+    await regenerate(user);
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
-  it('cancels a loading verification when the backup-code dialog closes so regeneration can start again', async () => {
+  it('keeps the profile visible until verification preparation is ready', async () => {
     const fapi = await renderBackupCodesNeedingReverification();
     const start = holdRequests('post', '/v1/client/sessions/:id/verify');
     const user = userEvent.setup();
 
     await regenerate(user);
     await waitFor(() => expect(start.requests).toHaveLength(1));
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    start.release();
-
-    await regenerate(user);
+    try {
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Manage Backup codes' })).toBeVisible();
+    } finally {
+      start.release();
+    }
+    await screen.findByText('Enter your current password to continue');
+    await waitFor(() => expect(screen.getByRole('dialog')).toContainElement(document.activeElement));
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
     await screen.findByRole('list', { name: 'Backup codes' });
     expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
-  it('keeps the backup-code dialog open until the first response so a verification can appear', async () => {
-    const fapi = await renderBackupCodesNeedingReverification();
+  it('keeps the profile visible until the first response can request verification', async () => {
+    await renderBackupCodesNeedingReverification();
     const first = holdRequests('post', '/v1/me/backup_codes/');
     const user = userEvent.setup();
 
     await regenerate(user);
     await waitFor(() => expect(first.requests).toHaveLength(1));
-    const dialog = screen.getByRole('dialog');
     try {
-      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
-      await user.keyboard('{Escape}');
-      expect(dialog).toBeVisible();
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Manage Backup codes' })).toBeVisible();
     } finally {
       first.release();
     }
 
-    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
-    await screen.findByRole('list', { name: 'Backup codes' });
-    expect(fapi.mfa.backupCodeCreations).toBe(1);
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
   });
 
   const startSms = async (user: ReturnType<typeof userEvent.setup>) => {
@@ -515,6 +592,34 @@ describe('User profile MFA management', () => {
 
     expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: true, default: undefined });
+  });
+
+  it('keeps session verification on screen until the SMS reservation refresh completes', async () => {
+    await renderMfa(undefined, mfaEnvironment(), { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_1');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    const refresh = holdRequests('get', '/v1/me');
+    try {
+      await user.keyboard('hunter2{Enter}');
+      await act(async () => {
+        await waitFor(() => expect(refresh.requests).toHaveLength(1));
+      });
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-open');
+      expect(screen.getByText('Enter your current password to continue')).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByText('CODE0001')).toBeNull();
+    } finally {
+      refresh.release();
+    }
+
+    expect(await screen.findByText('CODE0001')).toBeVisible();
   });
 
   it('keeps SMS code verification open until its reservation challenge can be cancelled', async () => {
@@ -565,6 +670,36 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(fapi.mfa.phonePreparations).toHaveLength(1));
     expect(fapi.mfa.phoneCreations).toHaveLength(1);
     expect(await screen.findByRole('button', { name: 'Verify' })).toBeVisible();
+  });
+
+  it('keeps session verification on screen until the new phone code is sent', async () => {
+    const fapi = await renderMfa(fapiUser({ id: 'user_1' }), mfaEnvironment(), {
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/phone_numbers');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.type(screen.getByRole('textbox', { name: 'Phone' }), '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+    try {
+      await user.keyboard('hunter2{Enter}');
+      await act(async () => {
+        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      });
+      expect(screen.getByText('Enter your current password to continue')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Phone' })).toBeNull();
+    } finally {
+      prepare.release();
+    }
+
+    expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
+    expect(screen.queryByRole('textbox', { name: 'Phone' })).toBeNull();
+    expect(fapi.mfa.phonePreparations).toHaveLength(1);
   });
 
   it('lets the user cancel SMS MFA verification quietly and add the method again', async () => {
@@ -624,18 +759,14 @@ describe('User profile MFA management', () => {
   it('copies server-issued backup codes and closes their one-time surface', async () => {
     const fapi = await renderMfa();
     const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
-      await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(write).toHaveBeenCalledWith(fapi.mfa.codes.join('\n')));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    } finally {
-      write.mockRestore();
-    }
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
+    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
+    await waitFor(() => expect(write).toHaveBeenCalledWith(fapi.mfa.codes.join('\n')));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('downloads the displayed backup codes in a file named after the application', async () => {
@@ -643,35 +774,29 @@ describe('User profile MFA management', () => {
     const create = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:backup-codes');
     const revoke = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
-      await user.click(screen.getByRole('button', { name: 'Download' }));
-      expect(create).toHaveBeenCalledOnce();
-      const saved = create.mock.calls[0]?.[0];
-      if (!(saved instanceof Blob)) {
-        throw new Error('Expected the displayed backup codes to be saved in a blob');
-      }
-      expect(await saved.text()).toBe(
-        [
-          'These are your backup codes for Acme account alice.',
-          'Store them securely and keep them secret. Each code can only be used once.',
-          '',
-          ...fapi.mfa.codes,
-        ].join('\n'),
-      );
-      expect(click).toHaveBeenCalledOnce();
-      expect(click.mock.instances[0]?.download).toBe('Acme_backup_codes.txt');
-      expect(revoke).toHaveBeenCalledWith('blob:backup-codes');
-      expect(screen.getByText('CODE0001')).toBeVisible();
-    } finally {
-      create.mockRestore();
-      revoke.mockRestore();
-      click.mockRestore();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
+    await user.click(screen.getByRole('button', { name: 'Download' }));
+    expect(create).toHaveBeenCalledOnce();
+    const saved = create.mock.calls[0]?.[0];
+    if (!(saved instanceof Blob)) {
+      throw new Error('Expected the displayed backup codes to be saved in a blob');
     }
+    expect(await saved.text()).toBe(
+      [
+        'These are your backup codes for Acme account alice.',
+        'Store them securely and keep them secret. Each code can only be used once.',
+        '',
+        ...fapi.mfa.codes,
+      ].join('\n'),
+    );
+    expect(click).toHaveBeenCalledOnce();
+    expect(click.mock.instances[0]?.download).toBe('Acme_backup_codes.txt');
+    expect(revoke).toHaveBeenCalledWith('blob:backup-codes');
+    expect(screen.getByText('CODE0001')).toBeVisible();
   });
 
   it('keeps newly issued authenticator codes when the follow-up account reload fails', async () => {
@@ -875,7 +1000,6 @@ describe('User profile MFA management', () => {
     await user.click(screen.getByRole('button', { name: 'Print' }));
     expect(open).toHaveBeenCalledOnce();
     expect(screen.getByRole('alert')).toHaveTextContent(message);
-    open.mockRestore();
   });
 
   it('prints the codes under a heading naming the application and account', async () => {
@@ -888,21 +1012,17 @@ describe('User profile MFA management', () => {
       print: vi.fn(),
       close: vi.fn(),
     };
-    const open = vi.spyOn(window, 'open').mockReturnValue(printable as unknown as Window);
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
-      expect(await screen.findByText('CODE0001')).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Print' }));
-      expect(printable.print).toHaveBeenCalledOnce();
-      expect(printable.document.title).toBe('Your backup codes for Acme account alice');
-      expect(printable.document.querySelector('h1')?.textContent).toBe('Your backup codes for Acme account alice');
-      expect(printable.document.querySelector('pre')?.textContent).toBe(fapi.mfa.codes.join('\n'));
-      expect(screen.getByRole('alert').textContent).toBe('');
-    } finally {
-      open.mockRestore();
-    }
+    vi.spyOn(window, 'open').mockReturnValue(printable as unknown as Window);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    expect(await screen.findByText('CODE0001')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Print' }));
+    expect(printable.print).toHaveBeenCalledOnce();
+    expect(printable.document.title).toBe('Your backup codes for Acme account alice');
+    expect(printable.document.querySelector('h1')?.textContent).toBe('Your backup codes for Acme account alice');
+    expect(printable.document.querySelector('pre')?.textContent).toBe(fapi.mfa.codes.join('\n'));
+    expect(screen.getByRole('alert').textContent).toBe('');
   });
 });

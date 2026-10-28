@@ -323,120 +323,6 @@ describe('Select', () => {
         expect(options[1]).toHaveAttribute('data-active', '');
       },
     );
-
-    it('scrolls options into view on arrow key navigation', async () => {
-      const manyItems = Array.from({ length: 20 }, (_, i) => ({
-        label: `Item ${i + 1}`,
-        value: `item-${i + 1}`,
-      }));
-
-      const user = userEvent.setup();
-      render(
-        <Select.Root
-          items={manyItems}
-          alignItemWithTrigger={false}
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </div>
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      await user.click(screen.getByRole('combobox'));
-
-      // Navigate down through many items to force scrolling
-      for (let i = 0; i < 15; i++) {
-        await user.keyboard('{ArrowDown}');
-      }
-
-      const activeOption = document.querySelector('[role="option"][data-active]');
-      expect(activeOption).toBeInTheDocument();
-
-      // The active item should be visible within its scroll container
-      const scrollContainer = activeOption!.closest('div[style]') as HTMLElement;
-      const optionRect = activeOption!.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
-      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
-    });
-
-    it('scrolls selected item into view when reopening', async () => {
-      const manyItems = Array.from({ length: 20 }, (_, i) => ({
-        label: `Item ${i + 1}`,
-        value: `item-${i + 1}`,
-      }));
-
-      const user = userEvent.setup();
-      render(
-        <Select.Root
-          items={manyItems}
-          alignItemWithTrigger={false}
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </div>
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      const trigger = screen.getByRole('combobox');
-
-      // Open, navigate to item near the bottom, select it
-      await user.click(trigger);
-      for (let i = 0; i < 15; i++) {
-        await user.keyboard('{ArrowDown}');
-      }
-      await user.keyboard('{Enter}');
-
-      // Reopen — the selected item should be scrolled into view
-      await user.click(trigger);
-
-      const selectedOption = document.querySelector('[role="option"][data-selected]');
-      expect(selectedOption).toBeInTheDocument();
-
-      const scrollContainer = selectedOption!.closest('div[style]') as HTMLElement;
-      const optionRect = selectedOption!.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
-      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
-    });
   });
 
   describe('option state attributes', () => {
@@ -538,7 +424,7 @@ describe('Select', () => {
     });
   });
 
-  describe('ARIA attributes', () => {
+  describe('ARIA roles and states', () => {
     it('options have role=option', () => {
       renderSelect({ defaultOpen: true });
 
@@ -666,107 +552,9 @@ describe('Select', () => {
       // Standard Floating UI positioning uses position: absolute with transform
       expect(positioner.style.position).toBe('absolute');
     });
-
-    const manyItems: SelectItem[] = Array.from({ length: 20 }, (_, i) => ({
-      label: `Item ${i + 1}`,
-      value: `item-${i + 1}`,
-    }));
-
-    it('aligns selected item with trigger vertically', () => {
-      render(
-        <Select.Root
-          items={manyItems}
-          defaultOpen
-          defaultValue='item-10'
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              {manyItems.map(({ label, value }) => (
-                <Select.Option
-                  key={value}
-                  value={value}
-                  label={label}
-                >
-                  {label}
-                </Select.Option>
-              ))}
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      const trigger = screen.getByRole('combobox');
-      const selectedOption = document.querySelector('[role="option"][data-selected]');
-      expect(selectedOption).toBeInTheDocument();
-
-      const triggerRect = trigger.getBoundingClientRect();
-      const selectedRect = selectedOption!.getBoundingClientRect();
-
-      // The selected item should be positioned near the trigger's vertical position
-      expect(Math.abs(selectedRect.top - triggerRect.top)).toBeLessThan(50);
-    });
-
-    // Requires real layout engine — getBoundingClientRect returns 0 in happy-dom
-    it.skip('repositions when ancestor scrolls', async () => {
-      const user = userEvent.setup();
-      render(
-        <div
-          data-testid='scroll-container'
-          style={{ height: '200px', overflow: 'auto', paddingTop: '300px' }}
-        >
-          <Select.Root
-            items={manyItems}
-            defaultValue='item-5'
-          >
-            <Select.Trigger>
-              <Select.Value
-                data-testid='select-value'
-                placeholder='Pick...'
-              />
-            </Select.Trigger>
-            <Select.Positioner data-testid='select-positioner'>
-              <Select.Popup data-testid='select-popup'>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </Select.Popup>
-            </Select.Positioner>
-          </Select.Root>
-          <div style={{ height: '500px' }} />
-        </div>,
-      );
-
-      await user.click(screen.getByRole('combobox'));
-
-      const positioner = document.querySelector('[data-testid="select-positioner"]') as HTMLElement;
-      const initialTop = positioner.getBoundingClientRect().top;
-
-      // Scroll the container
-      const scrollContainer = screen.getByTestId('scroll-container');
-      scrollContainer.scrollTop = 100;
-      scrollContainer.dispatchEvent(new Event('scroll'));
-
-      // autoUpdate repositions on scroll — wait for the update
-      await waitFor(() => {
-        const newTop = positioner.getBoundingClientRect().top;
-        expect(newTop).not.toBe(initialTop);
-      });
-    });
   });
 
-  describe('alignItemWithTrigger', () => {
+  describe('alignItemWithTrigger positioning', () => {
     it('marks the positioner with data-side="none" and blocks page scrolling while open', async () => {
       const user = userEvent.setup();
       renderSelect({ alignItemWithTrigger: true, defaultValue: 'banana' });

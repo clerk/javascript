@@ -23,6 +23,7 @@ export interface UserProfileAddPhoneControllerOptions {
 export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialogProps {
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
+  pendingVerifyId: string | undefined;
   onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => void;
 }
 
@@ -63,6 +64,13 @@ const start = {
   })),
 };
 
+const sendCode = {
+  invoke: fromPromise((context: Context) => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
+    onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
+    onError: { target: 'verify', actions: fail },
+  }),
+};
+
 const machine = createMachine({
   id: 'addPhone',
   initial: 'idle',
@@ -80,18 +88,14 @@ const machine = createMachine({
           target: 'phone',
           actions: assign(() => ({ verifyingId: undefined, verifier: undefined, error: undefined, resendSeconds: 0 })),
         },
-        START: start,
+        START: { ...start, target: 'preparing' },
       },
     },
     phone: {
       on: { CANCEL: 'idle', START: start },
     },
-    sending: {
-      invoke: fromPromise(context => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
-        onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
-        onError: { target: 'verify', actions: fail },
-      }),
-    },
+    preparing: sendCode,
+    sending: sendCode,
     verify: {
       on: {
         CANCEL: 'idle',
@@ -134,7 +138,7 @@ export function useUserProfileAddPhoneController({
     },
   });
   const state = snapshot.value;
-  const open = state !== 'idle';
+  const open = state !== 'idle' && state !== 'preparing';
   useEffect(() => {
     if (!open || resendSeconds === 0) {
       return;
@@ -195,6 +199,7 @@ export function useUserProfileAddPhoneController({
       }
     },
     verifyingId: snapshot.context.verifyingId,
+    pendingVerifyId: state === 'preparing' ? snapshot.context.verifyingId : undefined,
     onVerifyPhone: (phone, verifier) => {
       codeForm.reset();
       send({ type: 'START', id: phone.id, phoneNumber: phone.value, verifier });

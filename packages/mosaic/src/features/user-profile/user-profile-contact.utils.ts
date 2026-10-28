@@ -1,4 +1,4 @@
-import type { AttributeData, UserResource, VerificationResource } from '@clerk/shared/types';
+import type { AttributeData, VerificationResource } from '@clerk/shared/types';
 
 import { isAttributeAvailable } from './user-profile.utils';
 import type { UserProfileContact } from './user-profile-contact.types';
@@ -18,15 +18,6 @@ export function toContactAccess(
   const mutable = available && !attribute?.immutable;
   const canCreate = mutable && canAddIdentifications;
   return { show: available && (canCreate || count > 0), canCreate, canRemove: mutable };
-}
-
-export function canAddIdentifications(user: UserResource, enterpriseSSOEnabled: boolean): boolean {
-  return (
-    !enterpriseSSOEnabled ||
-    !user.enterpriseAccounts.some(
-      account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
-    )
-  );
 }
 
 export function byId<T extends { id: string }>(items: T[], id: string, kind: string): T {

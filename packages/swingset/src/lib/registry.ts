@@ -303,6 +303,7 @@ import {
   States as SwitchStates,
   WithField as SwitchWithField,
 } from '../stories/switch.stories';
+import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
@@ -337,12 +338,7 @@ import {
   Placement as TooltipComponentPlacement,
 } from '../stories/tooltip.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
-import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
-import {
-  Default as UseServerDataTableDefault,
-  meta as useServerDataTableMeta,
-} from '../stories/use-server-data-table.stories';
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
@@ -774,6 +770,7 @@ const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const portalModule: StoryModule = { meta: portalMeta };
 const selectModule: StoryModule = { meta: selectMeta };
+const tablePrimitiveModule: StoryModule = { meta: tablePrimitiveMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tagInputModule: StoryModule = { meta: tagInputMeta };
 const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
@@ -790,11 +787,7 @@ const scrollAreaModule: StoryModule = {
   ShadowIndicators: ScrollAreaShadowIndicators,
 };
 
-const useDataTableModule: StoryModule = { meta: useDataTableMeta };
-
 const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
-
-const useServerDataTableModule: StoryModule = { meta: useServerDataTableMeta, Default: UseServerDataTableDefault };
 
 const localizationModule: StoryModule = {
   meta: localizationMeta,
@@ -1116,6 +1109,7 @@ export const registry: StoryModule[] = [
   popoverModule,
   portalModule,
   selectModule,
+  tablePrimitiveModule,
   tabsModule,
   tagInputModule,
   toastPrimitiveModule,
@@ -1123,9 +1117,7 @@ export const registry: StoryModule[] = [
   // Styles — atomic styles that ship as StyleX atoms rather than components.
   scrollAreaModule,
   // Hooks
-  useDataTableModule,
   useFormModule,
-  useServerDataTableModule,
   // Localization
   localizationModule,
 ];

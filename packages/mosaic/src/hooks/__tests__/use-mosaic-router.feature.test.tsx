@@ -81,7 +81,6 @@ describe('Mosaic router', () => {
       expect(navigate).not.toHaveBeenCalled();
       expect(warning).toHaveBeenCalledWith(expect.stringContaining('Aborting navigation'));
     } finally {
-      warning.mockRestore();
       window.removeEventListener('clerk:beforeunload', beforeUnload);
       if (older && descriptor) {
         Object.defineProperty(clerk, '__internal_windowNavigate', descriptor);

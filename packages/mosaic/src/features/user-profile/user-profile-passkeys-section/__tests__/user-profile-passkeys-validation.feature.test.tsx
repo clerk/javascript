@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { openDialog } from '../../../../__tests__/feature/dialog';
 import { fapiUrl, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
@@ -10,8 +10,6 @@ import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
-
-afterEach(() => vi.restoreAllMocks());
 
 function servePasskeys() {
   const environment = fapiEnvironment();
@@ -95,7 +93,7 @@ describe('Validating a passkey name', () => {
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     const save = screen.getByRole('button', { name: 'Save' });
     await user.clear(input);
-    await user.type(input, '😀'.repeat(65));
+    await user.type(input, `${'😀'.repeat(64)}a`);
     await user.tab();
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(save).toHaveAttribute('aria-disabled', 'true');
