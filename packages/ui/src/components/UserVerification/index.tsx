@@ -6,11 +6,12 @@ import { Flow } from '@/customizables';
 import type { WithInternalRouting } from '@/internal';
 import { Route, Switch } from '@/router';
 
+import { UserVerificationEmailLinkVerify } from './UserVerificationEmailLinkVerify';
 import { UserVerificationFactorOne } from './UserVerificationFactorOne';
 import { UserVerificationFactorTwo } from './UserVerificationFactorTwo';
 import { useUserVerificationSession } from './useUserVerificationSession';
 
-function UserVerificationRoutes(): JSX.Element {
+function UserVerificationFlow(): JSX.Element {
   const { invalidate } = useUserVerificationSession();
   useEffect(() => {
     return () => {
@@ -18,13 +19,26 @@ function UserVerificationRoutes(): JSX.Element {
     };
   }, []);
   return (
+    <Switch>
+      <Route path='factor-two'>
+        <UserVerificationFactorTwo />
+      </Route>
+      <Route index>
+        <UserVerificationFactorOne />
+      </Route>
+    </Switch>
+  );
+}
+
+function UserVerificationRoutes(): JSX.Element {
+  return (
     <Flow.Root flow='userVerification'>
       <Switch>
-        <Route path='factor-two'>
-          <UserVerificationFactorTwo />
+        <Route path='verify'>
+          <UserVerificationEmailLinkVerify />
         </Route>
-        <Route index>
-          <UserVerificationFactorOne />
+        <Route>
+          <UserVerificationFlow />
         </Route>
       </Switch>
     </Flow.Root>

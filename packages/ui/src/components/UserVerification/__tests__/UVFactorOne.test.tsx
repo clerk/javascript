@@ -1,5 +1,5 @@
 import { waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -10,11 +10,18 @@ import { UserVerificationFactorOne } from '../UserVerificationFactorOne';
 const { createFixtures } = bindCreateFixtures('UserVerification');
 
 describe('UserVerificationFactorOne', () => {
+  let initialUrl: string;
+
   /**
    * `<UserVerificationFactorOne/>` internally uses useFetch which caches the results, be sure to clear the cache before each test
    */
   beforeEach(() => {
+    initialUrl = window.location.href;
     clearFetchCache();
+  });
+
+  afterEach(() => {
+    window.history.replaceState({}, '', initialUrl);
   });
 
   it('renders the component for with strategy:password', async () => {
@@ -72,6 +79,69 @@ describe('UserVerificationFactorOne', () => {
     });
 
     expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledOnce();
+  });
+
+  it('prepares email-link reverification and preserves the protected action URL', async () => {
+    window.history.replaceState({}, '', '/account/billing?return=plans');
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ username: 'clerkuser' });
+    });
+    const startEmailLinkFlow = vi.fn().mockResolvedValue({
+      status: 'complete',
+      session: { id: 'session_1' },
+      firstFactorVerification: { status: 'verified' },
+    });
+    fixtures.session?.startVerification.mockResolvedValue({
+      status: 'needs_first_factor',
+      supportedFirstFactors: [
+        {
+          strategy: 'email_link',
+          emailAddressId: 'idn_email',
+          safeIdentifier: 'user@example.com',
+        },
+      ],
+    });
+    fixtures.session?.createEmailLinkFlow.mockReturnValue({
+      startEmailLinkFlow,
+      cancelEmailLinkFlow: vi.fn(),
+    });
+
+    const { getByText } = render(<UserVerificationFactorOne />, { wrapper });
+    await waitFor(() => getByText('Check your email'));
+    await waitFor(() => expect(startEmailLinkFlow).toHaveBeenCalledOnce());
+
+    const redirectUrl = new URL(startEmailLinkFlow.mock.calls[0][0].redirectUrl);
+    expect(redirectUrl.pathname).toBe('/account/billing');
+    expect(redirectUrl.searchParams.get('return')).toBe('plans');
+    const modalState = JSON.parse(atob(redirectUrl.searchParams.get('__clerk_modal_state')!));
+    expect(modalState).toMatchObject({
+      componentName: 'UserVerification',
+      path: '/verify',
+      startPath: '/user-verification',
+    });
+    await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalledWith({ session: 'session_1' }));
+  });
+
+  it('offers email links to another address as an alternative', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ username: 'clerkuser' });
+    });
+    fixtures.session?.startVerification.mockResolvedValue({
+      status: 'needs_first_factor',
+      supportedFirstFactors: [
+        { strategy: 'email_link', emailAddressId: 'idn_primary', safeIdentifier: 'primary@example.com', primary: true },
+        { strategy: 'email_link', emailAddressId: 'idn_other', safeIdentifier: 'other@example.com', primary: false },
+      ],
+    });
+    fixtures.session?.createEmailLinkFlow.mockReturnValue({
+      startEmailLinkFlow: vi.fn(() => new Promise(() => {})),
+      cancelEmailLinkFlow: vi.fn(),
+    });
+
+    const { userEvent, getByText } = render(<UserVerificationFactorOne />, { wrapper });
+    await waitFor(() => getByText('Check your email'));
+    await userEvent.click(getByText('Use another method'));
+    await waitFor(() => getByText('Email link to other@example.com'));
   });
 
   describe('Submitting', () => {

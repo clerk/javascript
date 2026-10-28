@@ -5,7 +5,9 @@ import React from 'react';
 
 export const useClerkModalStateParams = () => {
   const [state, setState] = React.useState({ startPath: '', path: '', componentName: '', socialProvider: '' });
-  const decodedRedirectParams = readStateParam();
+  const redirectParams = readStateParam();
+  const decodedRedirectParams =
+    redirectParams?.componentName === 'UserVerification' && redirectParams.path !== '/verify' ? null : redirectParams;
 
   React.useLayoutEffect(() => {
     if (decodedRedirectParams) {

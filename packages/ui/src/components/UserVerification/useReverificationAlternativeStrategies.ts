@@ -11,7 +11,10 @@ const firstFactorsAreEqual = (a: SignInFactor | null | undefined, b: SignInFacto
     return false;
   }
 
-  if (a.strategy === 'email_code' && b.strategy === 'email_code') {
+  if (
+    (a.strategy === 'email_code' && b.strategy === 'email_code') ||
+    (a.strategy === 'email_link' && b.strategy === 'email_link')
+  ) {
     return a.emailAddressId === b.emailAddressId;
   }
 
