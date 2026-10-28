@@ -4,6 +4,7 @@ import { colorVars, durationVars, easingVars, fontWeightVars, radiusVars, space 
 
 export const styles = stylex.create({
   skeletonFill: { width: '100%' },
+  skeletonCentered: { marginInline: 'auto' },
   organizationAccess: { gap: space['3'], display: 'flex', flexDirection: 'column' },
   organizationPicker: {
     display: 'grid',
@@ -53,6 +54,6 @@ export const styles = stylex.create({
   scopeLabel: { gap: space['2'], alignItems: 'center', display: 'flex' },
   centered: { justifyContent: 'center', textAlign: 'center' },
   actions: { gap: space['3'], display: 'flex' },
-  inlineLink: { fontSize: 'inherit', lineHeight: 'inherit', verticalAlign: 'baseline' },
+  inlineLink: { borderWidth: 0, fontSize: 'inherit', lineHeight: 'inherit', verticalAlign: 'baseline' },
   nowrap: { whiteSpace: 'nowrap' },
 });

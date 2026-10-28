@@ -1,5 +1,4 @@
 import * as stylex from '@stylexjs/stylex';
-import type { ReactNode } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
@@ -8,7 +7,7 @@ import { Select } from '../../components/select';
 import { Skeleton } from '../../components/skeleton';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { fill, rich } from '../../localization';
+import { fill } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { styles } from './oauth-consent.styles';
@@ -38,32 +37,20 @@ export function OAuthConsentSkeleton({
   const { applicationName, identifier, redirectDomain, organizations, defaultOrganizationId } =
     known ?? PLACEHOLDER_KNOWN;
   const awaitingClerk = known === undefined;
-  const domain = <Skeleton inline>{redirectDomain}</Skeleton>;
 
   return (
     <>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
       <Card.Header xstyle={styles.centered}>
         <Card.Title>
-          {rich(m.title, {
-            values: {
-              oauthApplicationName: <Skeleton inline>{PLACEHOLDER_OAUTH_APPLICATION_NAME}</Skeleton>,
-              applicationName: (
-                <Skeleton
-                  inline
-                  show={awaitingClerk}
-                >
-                  {applicationName}
-                </Skeleton>
-              ),
-            },
-          })}
+          <Skeleton xstyle={styles.skeletonCentered}>
+            {fill(m.title, { oauthApplicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME, applicationName })}
+          </Skeleton>
         </Card.Title>
         <Card.Description>
-          {rich(m.subtitle, {
-            values: { oauthApplicationName: <Skeleton inline>{PLACEHOLDER_OAUTH_APPLICATION_NAME}</Skeleton>, domain },
-            components: { nowrap: renderNowrap },
-          })}
+          <Skeleton xstyle={styles.skeletonCentered}>
+            {fill(m.subtitle, { oauthApplicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME, domain: redirectDomain })}
+          </Skeleton>
         </Card.Description>
       </Card.Header>
       <Card.Content>
@@ -127,7 +114,7 @@ export function OAuthConsentSkeleton({
           color='foreground-secondary'
           xstyle={styles.centered}
         >
-          {rich(m.redirectNotice, { values: { domain } })}
+          <Skeleton xstyle={styles.skeletonCentered}>{fill(m.redirectNotice, { domain: redirectDomain })}</Skeleton>
         </Text>
       </Card.Content>
       <Card.Footer xstyle={styles.centered}>
@@ -135,24 +122,14 @@ export function OAuthConsentSkeleton({
           size='sm'
           color='foreground-secondary'
         >
-          {rich(m.signedInAs, {
-            values: {
-              identifier: (
-                <Skeleton
-                  inline
-                  show={awaitingClerk}
-                >
-                  {identifier}
-                </Skeleton>
-              ),
-            },
-          })}
+          <Skeleton
+            show={awaitingClerk}
+            xstyle={styles.skeletonCentered}
+          >
+            {fill(m.signedInAs, { identifier })}
+          </Skeleton>
         </Text>
       </Card.Footer>
     </>
   );
-}
-
-function renderNowrap(children: ReactNode) {
-  return <span {...stylex.props(styles.nowrap)}>{children}</span>;
 }
