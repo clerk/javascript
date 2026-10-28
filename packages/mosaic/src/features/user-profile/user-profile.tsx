@@ -29,7 +29,9 @@ export type UserProfileMode = Exclude<SwitcherMode, 'organization'>;
 
 /** Everything `<UserProfile />` takes: your own pages and their order, the page it opens on, and the OAuth scopes it asks for. */
 export interface UserProfileProps
-  extends Pick<UserProfileViewProps, 'customPages' | 'pageOrder'>, Pick<UserProfileOptions, 'additionalOAuthScopes'> {
+  extends
+    Pick<UserProfileViewProps, 'customPages' | 'pageOrder' | 'showSearch'>,
+    Pick<UserProfileOptions, 'additionalOAuthScopes'> {
   /**
    * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
    * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
@@ -106,6 +108,12 @@ export interface UserProfileProps
  * ```
  *
  * @example
+ * `showSearch` adds a search field above the navigation that finds pages, and the sections on them.
+ * ```tsx
+ * <UserProfile showSearch />
+ * ```
+ *
+ * @example
  * `customPages` adds your own pages; `pageOrder` places them among the built-in ones.
  * ```tsx
  * <UserProfile
@@ -138,6 +146,7 @@ export function UserProfileSurface({
   pageOrder,
   defaultPage,
   additionalOAuthScopes,
+  showSearch,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
 }: UserProfileProps & { presentation: NonNullable<UserProfileOptions['mode']> }) {
@@ -156,6 +165,7 @@ export function UserProfileSurface({
     initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
     customPages,
     pageOrder,
+    showSearch,
     pages: {
       account: <UserProfileProfilePanel />,
       security: <UserProfileSecurityPanel />,

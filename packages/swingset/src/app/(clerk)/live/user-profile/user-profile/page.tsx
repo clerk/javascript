@@ -31,6 +31,7 @@ export default function UserProfileLivePage() {
           </p>
         ) : null}
         <UserProfile
+          showSearch
           fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}
           customPages={[
             {

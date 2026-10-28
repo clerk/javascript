@@ -108,6 +108,7 @@ describe('UserProfile', () => {
     const user = userEvent.setup();
     await renderWithClerk(
       <UserProfile
+        showSearch
         customPages={[
           {
             path: 'usage',
@@ -143,6 +144,7 @@ describe('UserProfile', () => {
     const user = userEvent.setup();
     await renderWithClerk(
       <UserProfile
+        showSearch
         customPages={[
           {
             path: 'usage',
@@ -177,6 +179,15 @@ describe('UserProfile', () => {
     expect(drawn.height).toBeCloseTo(around.height + 24);
   });
 
+  it.each([
+    { showSearch: undefined, shown: false },
+    { showSearch: true, shown: true },
+  ])('shows the search only when asked: $showSearch', async ({ showSearch, shown }) => {
+    serve();
+    await renderWithClerk(<UserProfile showSearch={showSearch} />);
+    expect(screen.queryByRole('combobox', { name: 'Search' }) !== null).toBe(shown);
+  });
+
   it('leaves the page where it is when the found target is already in view', async () => {
     serve();
     const user = userEvent.setup();
@@ -185,7 +196,7 @@ describe('UserProfile', () => {
         data-testid='scroller'
         style={{ height: 400, overflowY: 'auto' }}
       >
-        <UserProfile />
+        <UserProfile showSearch />
       </div>,
     );
     const scroller = screen.getByTestId('scroller');
