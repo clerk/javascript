@@ -47,8 +47,10 @@ const colorDefaults = {
   '--cl-color-foreground-secondary': neutralMix(55, 64.25),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border': 'var(--cl-color-neutral-alpha-300)',
-  '--cl-color-border-subtle': 'var(--cl-color-neutral-alpha-200)',
+  '--cl-color-border':
+    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 7%, transparent), var(--cl-color-neutral-alpha-300))',
+  '--cl-color-border-subtle':
+    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 4%, transparent), var(--cl-color-neutral-alpha-200))',
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
   '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
@@ -58,7 +60,7 @@ const colorDefaults = {
   '--cl-color-brand-alpha-200': 'color-mix(in oklab, var(--cl-color-brand) 8%, transparent)',
   '--cl-color-brand-alpha-300': 'color-mix(in oklab, var(--cl-color-brand) 12%, transparent)',
 
-  '--cl-color-negative': 'light-dark(oklch(0.577 0.2161 26.11), oklch(0.68 0.2 26.11))',
+  '--cl-color-negative': 'light-dark(oklch(0.56 0.2161 26.11), oklch(0.68 0.2 26.11))',
   '--cl-color-negative-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
   '--cl-color-negative-subtle': 'light-dark(var(--cl-color-negative-alpha-200), var(--cl-color-negative-alpha-300))',
   '--cl-color-negative-border': 'var(--cl-color-negative-alpha-300)',
@@ -66,7 +68,7 @@ const colorDefaults = {
   '--cl-color-negative-alpha-200': 'color-mix(in oklab, var(--cl-color-negative) 8%, transparent)',
   '--cl-color-negative-alpha-300': 'color-mix(in oklab, var(--cl-color-negative) 12%, transparent)',
 
-  '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
+  '--cl-color-positive': 'light-dark(oklch(0.55 0.15 148), oklch(0.7227 0.192 149.58))',
   '--cl-color-positive-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
   '--cl-color-positive-subtle': 'light-dark(var(--cl-color-positive-alpha-200), var(--cl-color-positive-alpha-300))',
   '--cl-color-positive-border': 'var(--cl-color-positive-alpha-300)',
@@ -74,7 +76,7 @@ const colorDefaults = {
   '--cl-color-positive-alpha-200': 'color-mix(in oklab, var(--cl-color-positive) 8%, transparent)',
   '--cl-color-positive-alpha-300': 'color-mix(in oklab, var(--cl-color-positive) 12%, transparent)',
 
-  '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
+  '--cl-color-warning': 'light-dark(oklch(0.6 0.16 48), oklch(0.7576 0.159 55.93))',
   '--cl-color-warning-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
   '--cl-color-warning-subtle': 'light-dark(var(--cl-color-warning-alpha-200), var(--cl-color-warning-alpha-300))',
   '--cl-color-warning-border': 'var(--cl-color-warning-alpha-300)',
@@ -83,7 +85,7 @@ const colorDefaults = {
   '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
 
   '--cl-color-input': 'var(--cl-color-surface)',
-  '--cl-color-input-placeholder': 'var(--cl-color-foreground-secondary)',
+  '--cl-color-input-placeholder': neutralMix(45, 64.25),
 
   '--cl-color-ring': neutralMix(80, 90),
 } as const;
