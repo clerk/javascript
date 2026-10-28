@@ -1,6 +1,6 @@
 # Swingset
 
-Component explorer for the Mosaic design system. Runs at http://localhost:6006.
+Component explorer for the Mosaic design system. Runs at http://localhost:6006, or the next free port if 6006 is taken.
 
 ## Dev
 
