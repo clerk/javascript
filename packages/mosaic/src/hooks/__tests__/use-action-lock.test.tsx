@@ -34,9 +34,9 @@ describe('shared action admission', () => {
     expect(onConfirm).not.toHaveBeenCalled();
     expect(result.current.remove.isOpen).toBe(true);
     expect(result.current.remove.isPending).toBe(false);
-    expect(result.current.remove.canConfirm).toBe(false);
+    expect(result.current.actionLock.isPending).toBe(true);
     await act(() => pending.resolve());
-    expect(result.current.remove.canConfirm).toBe(true);
+    expect(result.current.actionLock.isPending).toBe(false);
     await act(() => result.current.remove.confirm());
     expect(onConfirm).toHaveBeenCalledOnce();
     expect(result.current.remove.isOpen).toBe(false);

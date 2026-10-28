@@ -80,6 +80,7 @@ export function UserProfileEmailSectionView({
       {remove ? (
         <Confirmation
           controller={remove}
+          disabled={isDisabled}
           title={m.removeDialog.title}
           description={email =>
             fill(email.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
