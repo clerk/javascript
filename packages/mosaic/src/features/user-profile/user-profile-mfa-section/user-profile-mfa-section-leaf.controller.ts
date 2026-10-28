@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
+import { useActionLock } from '../../../hooks/use-action-lock';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
@@ -9,12 +10,15 @@ import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.
 
 export function useUserProfileMfaSectionLeafController({
   methods,
+  actionLock,
   onAdd,
   onRemove,
   onSetDefault,
   removeReverification,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
+  const localActionLock = useActionLock();
+  const lock = actionLock ?? localActionLock;
   const sectionRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: methods.map(method => method.id),
@@ -23,11 +27,12 @@ export function useUserProfileMfaSectionLeafController({
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
   });
   const remove = useConfirmController<UserProfileMfaMethod>({
+    actionLock: lock,
     onConfirm: method => removalFocus.remove(method.id),
     reverification: removeReverification,
   });
   const [pickerOpen, setPickerOpen] = useState(false);
-  const defaultAction = usePendingAction({ errorFallback: m.setDefaultError });
+  const defaultAction = usePendingAction({ actionLock: lock, errorFallback: m.setDefaultError });
 
   const setDefault = (id: string) => {
     const method = methods.find(method => method.id === id);
@@ -39,6 +44,7 @@ export function useUserProfileMfaSectionLeafController({
 
   return {
     sectionRef,
+    isDisabled: lock.isPending,
     pickerOpen,
     onPickerOpenChange: setPickerOpen,
     addMethod: onAdd
@@ -49,7 +55,7 @@ export function useUserProfileMfaSectionLeafController({
       : undefined,
     registerTrigger: removalFocus.registerTrigger,
     openRemoval: (method: UserProfileMfaMethod) => {
-      if (defaultAction.isPending) {
+      if (lock.isPending) {
         return;
       }
       defaultAction.reset();
@@ -59,6 +65,6 @@ export function useUserProfileMfaSectionLeafController({
     finalRemovalFocus: removalFocus.finalFocus,
     setDefaultFinalFocus: () => (defaultAction.lastKey ? removalFocus.trigger(defaultAction.lastKey) : null),
     defaultError: defaultAction.error,
-    setDefault: onSetDefault && !defaultAction.isPending ? setDefault : undefined,
+    setDefault: onSetDefault ? setDefault : undefined,
   };
 }

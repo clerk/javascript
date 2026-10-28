@@ -1,6 +1,7 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useEffect } from 'react';
 
+import { useActionLock } from '../../../hooks/use-action-lock';
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
@@ -504,6 +505,7 @@ function createSetupProps(
 }
 
 export function useUserProfileMfaController(model: ReadyModel) {
+  const actionLock = useActionLock();
   const errorText = useErrorText();
   const backupCodeMessages = useMessages('userProfileBackupCodes');
   const [{ context, value }, send] = useMachine(mfaMachine);
@@ -512,9 +514,14 @@ export function useUserProfileMfaController(model: ReadyModel) {
     if (isBusy) {
       return Promise.resolve();
     }
-    return new Promise<void>((resolve, reject) => {
-      send({ type: 'RUN', key, methods: model.addableMethods, run: action, resolve, reject });
-    });
+    return (
+      actionLock.tryRun(
+        () =>
+          new Promise<void>((resolve, reject) => {
+            send({ type: 'RUN', key, methods: model.addableMethods, run: action, resolve, reject });
+          }),
+      ) ?? Promise.resolve()
+    );
   };
   const { resendSeconds } = context;
   const flow = context.flow;
@@ -585,6 +592,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
   );
 
   const sectionProps: UserProfileMfaSectionViewProps = {
+    actionLock,
     methods: [...model.methods],
     addableMethods: model.addableMethods,
     regenerate: model.generateBackupCodes
@@ -607,7 +615,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
     dialogOpen,
     showAddTrigger,
     showAddControl: showAddTrigger || dialogOpen,
-    isPending: isBusy,
+    isPending: actionLock.isPending,
     reverifying,
     onDialogOpenChange: (open: boolean) => {
       if (!open && !canClose) {

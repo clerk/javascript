@@ -11,12 +11,14 @@ import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from './use
 
 export function UserProfileMfaRowView({
   method,
+  isDisabled,
   triggerRef,
   onRemove,
   onSetDefault,
   regenerate,
 }: Pick<UserProfileMfaSectionViewProps, 'regenerate'> & {
   method: UserProfileMfaMethod;
+  isDisabled?: boolean;
   triggerRef?: Ref<HTMLButtonElement>;
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
@@ -56,6 +58,8 @@ export function UserProfileMfaRowView({
       {actions.length > 0 ? (
         <Section.Actions>
           <ActionMenu
+            disabled={isDisabled}
+            focusableWhenDisabled
             triggerRef={triggerRef}
             actions={actions}
             label={manageLabel}

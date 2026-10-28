@@ -4,6 +4,7 @@ import type { ReactNode, Ref } from 'react';
 import { Confirmation } from '../../../blocks/confirmation';
 import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
+import type { ActionLock } from '../../../hooks/use-action-lock';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
 import { UserProfileSecurityList } from '../user-profile-security-list';
@@ -17,6 +18,7 @@ export type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-p
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
+  actionLock?: ActionLock;
   addableMethods?: readonly UserProfileMfaAddableMethod[];
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
@@ -30,6 +32,7 @@ export interface UserProfileMfaSectionViewProps {
 
 export function UserProfileMfaSectionView({
   methods,
+  actionLock,
   addableMethods,
   addButtonRef,
   addControl,
@@ -43,6 +46,7 @@ export function UserProfileMfaSectionView({
   const m = useMessages('userProfileMfa');
   const controller = useUserProfileMfaSectionLeafController({
     methods,
+    actionLock,
     onAdd,
     onRemove,
     onSetDefault,
@@ -57,6 +61,7 @@ export function UserProfileMfaSectionView({
           addControl ??
           (controller.addMethod && addableMethods?.length ? (
             <UserProfileAddMfaDialog
+              disabled={controller.isDisabled}
               triggerRef={addButtonRef}
               open={controller.pickerOpen}
               onOpenChange={controller.onPickerOpenChange}
@@ -77,6 +82,7 @@ export function UserProfileMfaSectionView({
           <UserProfileMfaRowView
             key={method.id}
             method={method}
+            isDisabled={controller.isDisabled}
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}
@@ -88,6 +94,7 @@ export function UserProfileMfaSectionView({
       {controller.remove ? (
         <Confirmation
           controller={controller.remove}
+          disabled={controller.isDisabled}
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
