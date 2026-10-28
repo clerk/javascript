@@ -5,20 +5,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useTransition } from '../use-transition';
 
 describe('useTransition', () => {
-  let rafCallbacks: Array<FrameRequestCallback>;
+  let rafCallbacks: Map<number, FrameRequestCallback>;
+  let nextRafId: number;
   let originalRaf: typeof requestAnimationFrame;
   let originalCaf: typeof cancelAnimationFrame;
 
   beforeEach(() => {
-    rafCallbacks = [];
+    rafCallbacks = new Map();
+    nextRafId = 0;
     originalRaf = globalThis.requestAnimationFrame;
     originalCaf = globalThis.cancelAnimationFrame;
     globalThis.requestAnimationFrame = vi.fn(cb => {
-      rafCallbacks.push(cb);
-      return rafCallbacks.length;
+      const id = ++nextRafId;
+      rafCallbacks.set(id, cb);
+      return id;
     });
     globalThis.cancelAnimationFrame = vi.fn(id => {
-      rafCallbacks[id - 1] = () => {};
+      rafCallbacks.delete(id);
     });
   });
 
@@ -28,8 +31,8 @@ describe('useTransition', () => {
   });
 
   function flushRaf() {
-    const cbs = [...rafCallbacks];
-    rafCallbacks = [];
+    const cbs = [...rafCallbacks.values()];
+    rafCallbacks.clear();
     cbs.forEach(cb => cb(performance.now()));
   }
 

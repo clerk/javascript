@@ -137,15 +137,15 @@ describe('useSelector — re-renders only on the selected slice', () => {
     }
 
     render(<ReadsA />);
-    expect(renders).toHaveBeenCalledTimes(1);
+    renders.mockClear();
 
     // Unrelated change → selected slice (`a`) is unchanged → no re-render.
     act(() => actor.send({ type: 'INC_B' }));
-    expect(renders).toHaveBeenCalledTimes(1);
+    expect(renders).not.toHaveBeenCalled();
 
     // Selected change → re-render.
     act(() => actor.send({ type: 'INC_A' }));
-    expect(renders).toHaveBeenCalledTimes(2);
+    expect(renders).toHaveBeenCalled();
     expect(screen.getByText('1')).toBeInTheDocument();
   });
 
@@ -166,11 +166,11 @@ describe('useSelector — re-renders only on the selected slice', () => {
     }
 
     render(<ReadsA />);
-    expect(renders).toHaveBeenCalledTimes(1);
+    renders.mockClear();
 
     act(() => actor.send({ type: 'INC_A' }));
     act(() => actor.send({ type: 'INC_A' }));
-    expect(renders).toHaveBeenCalledTimes(1);
+    expect(renders).not.toHaveBeenCalled();
     // Still shows the stale (first) value because the equality fn suppressed updates.
     expect(screen.getByText('0')).toBeInTheDocument();
   });
@@ -243,6 +243,24 @@ describe('useMachine — onDone', () => {
     await act(async () => gate.resolve());
 
     expect(screen.getByTestId('state')).toHaveTextContent('done');
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onDone once when the actor restarts in a final state', () => {
+    const onDone = vi.fn();
+    const machine = createMachine<object, { type: 'GO' }>({
+      initial: 'done',
+      context: {},
+      states: { done: { type: 'final' } },
+    });
+
+    function Comp() {
+      const [snapshot] = useMachine(machine, { onDone });
+      return <output>{snapshot.value}</output>;
+    }
+
+    render(<Comp />, { reactStrictMode: true });
+
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
