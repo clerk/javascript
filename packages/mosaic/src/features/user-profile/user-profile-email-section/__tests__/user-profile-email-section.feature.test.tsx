@@ -68,21 +68,24 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile email section', () => {
-  it('closes the menu and blocks conflicting actions while setting an address as primary', async () => {
+  it('holds the menu and row order while setting an address as primary', async () => {
     const other = fapiEmailAddress({ id: 'idn_other', email_address: 'bob@example.com', verification: VERIFIED });
     const { actor } = await renderSection(signedInWithEmails([PRIMARY, other]));
+    const initialOrder = emailsListed();
     const primary = holdRequests('post', '/v1/me');
     try {
       await manageEmail(actor, 'bob@example.com', 'Set as primary');
       await waitFor(() => expect(primary.requests).toHaveLength(1));
-      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+      const menu = screen.getByRole('menu');
+      const item = within(menu).getByRole('menuitem', { name: 'Set as primary' });
+      expect(item).toHaveAttribute('aria-busy', 'true');
       const manage = screen.getByRole('button', { name: 'Manage bob@example.com' });
       expect(manage).toHaveAttribute('aria-disabled', 'true');
-      await actor.click(manage);
-      expect(screen.queryByRole('menu')).toBeNull();
+      expect(within(menu).getByRole('menuitem', { name: 'Remove email' })).toHaveAttribute('aria-disabled', 'true');
       expect(screen.queryByRole('alertdialog')).toBeNull();
       expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
-      expect(await screen.findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(await within(item).findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(emailsListed()).toEqual(initialOrder);
     } finally {
       primary.release();
       await waitFor(() =>
@@ -90,6 +93,8 @@ describe('the user profile email section', () => {
       );
     }
     expect(screen.getByRole('button', { name: 'Manage bob@example.com' })).not.toHaveAttribute('aria-disabled', 'true');
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(emailsListed()).toEqual(initialOrder);
     expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
   });
 
@@ -339,6 +344,7 @@ describe('email reverification', () => {
     expect(within(emailRow()).queryByRole('alert')).toBeNull();
     expect(within(emailRow()).getByRole('button', { name: 'Manage bob@example.com' })).toHaveFocus();
 
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
     await manageEmail(actor, 'bob@example.com', 'Set as primary');
     await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_second'));
   });
@@ -452,7 +458,7 @@ describe('email reverification', () => {
     await screen.findByRole('dialog', { name: 'Verify your email' });
     await enterCode(actor, VERIFICATION_CODE);
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(emailsListed()).toEqual(['alice@example.com', 'new@example.com']);
+    expect(emailsListed()).toEqual(['new@example.com', 'alice@example.com']);
   });
 
   it('closes quietly when confirmation is dismissed and starts clean on reopen', async () => {

@@ -121,7 +121,7 @@ describe('Web3 wallet projection', () => {
     }
   });
 
-  it('WEB3-04 orders primary, verified, then unverified wallets without mutating the input', () => {
+  it('WEB3-04 orders verified, then unverified wallets without moving the primary or mutating the input', () => {
     const wallets = Object.freeze([
       {
         ...metamask,
@@ -133,7 +133,7 @@ describe('Web3 wallet projection', () => {
       {
         ...metamask,
         id: 'primary',
-        verification: { ...metamask.verification, status: 'unverified' as const },
+        verification: { ...metamask.verification, status: null },
       },
       {
         ...metamask,
@@ -147,16 +147,27 @@ describe('Web3 wallet projection', () => {
       enabledStrategies: ['web3_metamask_signature'],
       allowCreation: false,
     });
+    const changedPrimary = projectWeb3Wallets({
+      wallets,
+      primaryId: 'unverified_later',
+      enabledStrategies: ['web3_metamask_signature'],
+      allowCreation: false,
+    });
     expect(result.status).toBe('ready');
     if (result.status === 'ready') {
       expect(result.wallets.map(wallet => wallet.id)).toEqual([
-        'primary',
         'verified_a',
         'verified_z',
         'unverified_earlier',
         'unverified_later',
+        'primary',
       ]);
       expect(result.availableProviders).toEqual([]);
+    }
+    if (result.status === 'ready' && changedPrimary.status === 'ready') {
+      expect(changedPrimary.wallets.map(wallet => wallet.id)).toEqual(result.wallets.map(wallet => wallet.id));
+      expect(changedPrimary.wallets.find(wallet => wallet.id === 'unverified_later')?.isPrimary).toBe(true);
+      expect(changedPrimary.wallets.find(wallet => wallet.id === 'primary')?.isPrimary).toBe(false);
     }
     expect(wallets.map(wallet => wallet.id)).toEqual([
       'unverified_later',
