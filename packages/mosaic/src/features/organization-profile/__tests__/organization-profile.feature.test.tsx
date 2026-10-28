@@ -136,6 +136,36 @@ describe('OrganizationProfile', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'API Keys' })).toBeVisible();
   });
 
+  it('finds a search target on a page of your own, and brings it into view', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(
+      <OrganizationProfile
+        customPages={[
+          {
+            path: 'usage',
+            label: 'Usage',
+            content: (
+              <OrganizationProfile.SearchTarget
+                label='Quota'
+                render={<section />}
+              >
+                <h3>Quota</h3>
+              </OrganizationProfile.SearchTarget>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'quota');
+    await user.click(screen.getByRole('option', { name: 'Quota' }));
+
+    const quota = screen.getByRole('heading', { name: 'Quota' });
+    expect(quota).toBeVisible();
+    expect(quota.parentElement).toHaveFocus();
+  });
+
   it('adds custom pages in the requested order and opens on the first', async () => {
     serve();
     await renderWithClerk(

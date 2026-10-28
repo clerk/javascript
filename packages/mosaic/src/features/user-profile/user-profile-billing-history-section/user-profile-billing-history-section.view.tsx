@@ -42,7 +42,7 @@ export function UserProfileBillingHistorySectionView({
   onView,
 }: UserProfileBillingHistorySectionViewProps) {
   return (
-    <Section.Root>
+    <Section.Root search={{ label: 'History' }}>
       <Section.Group>
         <Section.Header>
           <Section.Content>

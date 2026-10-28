@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { SearchTarget } from '../../components/profile';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import { organizationProfilePanels } from '../organization-profile/organization-profile';
@@ -220,3 +221,5 @@ function CombinedUserProfileView({
     </OrganizationProfileProvider>
   );
 }
+
+UserProfile.SearchTarget = SearchTarget;

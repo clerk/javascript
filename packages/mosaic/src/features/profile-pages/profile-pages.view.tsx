@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import React from 'react';
 
-import type { ProfileRootProps } from '../../components/profile';
+import type { ProfileRootProps, ProfileSearchPage } from '../../components/profile';
 import { Profile } from '../../components/profile';
 
 /** One destination in a profile's navigation, with the page it opens. */
@@ -9,6 +9,7 @@ export interface ProfilePage {
   id: string;
   label: string;
   icon: ReactNode;
+  keywords?: readonly string[];
   content: ReactNode;
 }
 
@@ -36,6 +37,12 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
 ) {
   const pages = groups.flatMap(group => group.pages);
   const activeEntry = pages.find(page => page.id === activePage) ?? pages[0];
+  const searchPages: ProfileSearchPage[] = pages.map(page => ({
+    value: page.id,
+    label: page.label,
+    icon: page.icon,
+    keywords: page.keywords,
+  }));
 
   return (
     <Profile.Root
@@ -45,7 +52,7 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
       {...rest}
     >
       <Profile.Title>{label}</Profile.Title>
-      <Profile.Nav>
+      <Profile.Nav search={searchPages}>
         {groups.map((group, index) =>
           group.label === undefined ? (
             <NavItems

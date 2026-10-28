@@ -37,6 +37,8 @@ export interface CustomProfilePage {
   path: string;
   href?: never;
   icon?: ReactNode;
+  /** Other words that find the page in the profile's search. */
+  keywords?: readonly string[];
   /** Rendered as the page itself. */
   content: ReactNode;
 }

@@ -205,6 +205,10 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
 
+  navListHidden: {
+    display: 'none',
+  },
+
   navItem: {
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-md'],
