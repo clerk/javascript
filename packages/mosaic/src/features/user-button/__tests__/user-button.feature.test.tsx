@@ -431,7 +431,7 @@ describe('UserButton', () => {
       expect(popup()).toBeInTheDocument();
     });
 
-    it('shows a suggestion as requested when a failed join finds it already joined', async () => {
+    it('shows a suggestion as requested when a failed join finds it already accepted', async () => {
       vi.spyOn(console, 'error').mockImplementation(() => {});
       const { fapi } = await renderUserButton({}, noOffers({ suggestions: [fapiSuggestion('sug_1', beta)] }));
       const user = await openWithList();
