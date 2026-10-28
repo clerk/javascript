@@ -50,7 +50,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A value turned into kebab case, e.g. for a `data-*` attribute            | `kebabCase` (`src/utils/kebab-case.ts`)                                                                           |
 | Current time for display labels                                          | `useNow` (`src/hooks/`)                                                                                           |
 | Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                    |
-| An inline message row that animates open and closed                      | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts` |
+| An inline message row; height is undefined until measured                | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts` |
 | Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)                  |
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                                  |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                    |
