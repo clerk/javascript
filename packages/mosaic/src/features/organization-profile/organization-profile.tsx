@@ -112,6 +112,10 @@ export function OrganizationProfile({
   );
 }
 
+/**
+ * The organization's built-in panels, for the pages the instance has turned on. `apiKeysProps.hide`
+ * leaves the API keys panel out; the rest of `apiKeysProps` goes to it.
+ */
 export function organizationProfilePanels(
   available: readonly OrganizationProfilePageId[],
   { hide: hideAPIKeys = false, ...apiKeysProps }: APIKeysPageProps = {},
