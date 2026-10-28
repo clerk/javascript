@@ -73,7 +73,7 @@ The viewports render these slots for each toast:
 | `.cl-toast-description`         | —                                                                                         |
 | `.cl-toast-icon`                | `data-type`: `success` \| `error` \| `loading`                                            |
 
-The stacked toast reads `--cl-color-background`, `--cl-color-foreground`, `--cl-shadow-lg`, and `--cl-radius-lg`; its icon is tinted from `--cl-color-positive` or `--cl-color-negative`. The anchored toast shares the tooltip surface: `--cl-color-foreground` fill with `--cl-color-background` text.
+The stacked toast reads `--cl-color-surface`, `--cl-color-foreground`, `--cl-shadow-lg`, and `--cl-radius-lg`; its icon is tinted from `--cl-color-positive` or `--cl-color-negative`. The anchored toast shares the tooltip surface: `--cl-color-foreground` fill with `--cl-color-surface` text.
 
 ```css
 @import '@clerk/mosaic/styles.css' layer(components);

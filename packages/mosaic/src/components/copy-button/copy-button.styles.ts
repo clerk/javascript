@@ -10,7 +10,7 @@ export const styles = stylex.create({
     paddingInline: space['1.5'],
     alignItems: 'center',
     backgroundColor: colorVars['--cl-color-foreground'],
-    color: colorVars['--cl-color-background'],
+    color: colorVars['--cl-color-surface'],
     // A copy while one is still showing queues behind the `limit`; only the newest is wanted.
     display: { default: 'flex', ':where([data-limited])': 'none' },
     fontSize: typeScaleVars['--cl-text-sm-size'],

@@ -30,7 +30,7 @@ export const styles = stylex.create({
     paddingBlock: space['1'],
     paddingInline: space['1'],
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     blockSize: space['10'],
     boxShadow: shadowVars['--cl-shadow-lg'],
     display: 'flex',

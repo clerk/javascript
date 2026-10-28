@@ -72,7 +72,7 @@ export const styles = stylex.create({
     },
     // `clip`, not `hidden`: a scroll container here would scroll the surface instead of the column.
     overflow: 'clip',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-page'],
     blockSize: {
       [compact]: '100dvh',
       default: '45rem',

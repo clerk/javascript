@@ -1,0 +1,7 @@
+---
+'@clerk/mosaic': minor
+---
+
+Dark mode gives the profile its own shell color. `--cl-color-background` is replaced by `--cl-color-page`, the base layer (near-black in dark mode, white in light), which backs the profile shell. A new `--cl-color-surface` backs everything raised on it, such as cards, sections, menus, popovers and controls, and the gray ramp mixes into it. The surface is derived from the page (neutral mixed 5 percent into it in dark mode, white mixed 60 percent into it in light mode), so retinting `--cl-color-page` retints the shell, the surface and the ramp together, and light mode is unchanged with the default white page. `--cl-color-background-subtle` is renamed `--cl-color-surface-subtle`.
+
+Brand and the negative, positive and warning colors now share one set of derived tokens: `-foreground`, `-subtle`, `-border` and `-alpha-100|200|300`, so overriding a seed retints its companions. `-foreground` flips to dark text in dark mode where white would fail, and the dark negative is a little lighter. `--cl-color-brand-secondary` is removed. `--cl-color-neutral-subtle` is new. `--cl-color-border` and `--cl-color-border-subtle` are now neutral washes (12 and 8 percent), so they stay visible on the surface and faded fills, and `--cl-color-input-placeholder` follows `--cl-color-foreground-secondary`, which is slightly darker in light mode.
