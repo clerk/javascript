@@ -191,6 +191,7 @@ describe('the user profile email section', () => {
     });
     const { actor, clerk } = await renderSection(signedInWithEmails([PRIMARY, sso], verifiesByLink));
     const windowNavigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
 
     await manageEmail(actor, 'alice@acme.co', 'Verify');
     const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
@@ -198,6 +199,11 @@ describe('the user profile email section', () => {
     expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
     await actor.click(within(dialog).getByRole('button', { name: 'Connect' }));
 
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    const body = new URLSearchParams(await prepare.requests[0]?.text());
+    expect(body.get('strategy')).toBe('enterprise_sso');
+    expect(body.get('redirect_url')).toBe(window.location.href);
+    prepare.release();
     await waitFor(() => expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.acme.co/sso')));
   });
 
@@ -231,6 +237,26 @@ describe('the user profile email section', () => {
     );
 
     expect(screen.queryByRole('group', { name: 'Email' })).not.toBeInTheDocument();
+  });
+
+  it('lists addresses but does not let the user remove them when it is immutable', async () => {
+    const secondary = fapiEmailAddress({
+      id: 'idn_secondary',
+      email_address: 'work@example.com',
+      verification: VERIFIED,
+    });
+    const { actor } = await renderSection(
+      signedInWithEmails(
+        [PRIMARY, secondary],
+        fapiEnvironment({ attributes: { email_address: { enabled: true, immutable: true } } }),
+      ),
+    );
+
+    expect(emailsListed()).toEqual(['alice@example.com', 'work@example.com']);
+    expect(screen.queryByRole('button', { name: 'Add email' })).not.toBeInTheDocument();
+    await openMenu(actor, within(emailRow()).getByRole('button', { name: 'Manage work@example.com' }));
+    expect(screen.getByRole('menuitem', { name: 'Set as primary' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Remove email' })).not.toBeInTheDocument();
   });
 });
 
