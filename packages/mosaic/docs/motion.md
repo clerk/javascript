@@ -231,6 +231,12 @@ over: the wrapper is its own clip layer (no padding, `align-content: end`), the 
 message leaves the flow pinned to the **bottom** (`inset: auto 0 0`) so it rides the
 moving edge, and the mask is the same static top fade.
 
+`useMessageHeight` returns `undefined` until the first measurement.
+`feedbackHeight.measured` leaves the height variable unset in that state so an
+initially visible row uses natural layout instead of transitioning from a false
+zero height. Once measured, the hook retains the last numeric height, including
+zero, while the content exits.
+
 The spacing above a message is the parent's gap, which a closed row must not cost.
 Cancel the parent's gap on the wrapper and put it back inside the clip as the
 message's margin: one constant that is also the fade's length (`GAP` in

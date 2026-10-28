@@ -1,6 +1,6 @@
 'use client';
 
-import { type CSSProperties, type RefObject, useEffect, useMemo, useState } from 'react';
+import { type CSSProperties, type RefObject, useEffect, useMemo } from 'react';
 
 import { useAnimationsFinished } from './use-animations-finished';
 import { type TransitionStatus, useTransitionStatus } from './use-transition-status';
@@ -33,18 +33,15 @@ export interface UseTransitionReturn {
  * - `transitionProps`: spread onto the element. Exposes
  *   `data-open` / `data-closed` / `data-starting-style` /
  *   `data-ending-style` data attributes and an inline `transition: none` on
- *   the first mount frame.
+ *   the first frame of an entrance. Initially open content only enters when
+ *   `animateOnMount` is true.
  *
  * Consumers drive all animation via CSS — no durations in JS. Works with CSS
  * transitions (via `[data-starting-style]` / `[data-ending-style]`) and
  * CSS keyframe animations (via `[data-open]` / `[data-closed]`).
  */
-export function useTransition({ open, ref, animateOnMount = true }: UseTransitionOptions): UseTransitionReturn {
-  const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
-  const [skipEnter, setSkipEnter] = useState(open && !animateOnMount);
-  if (skipEnter && transitionStatus !== 'starting') {
-    setSkipEnter(false);
-  }
+export function useTransition({ open, ref, animateOnMount }: UseTransitionOptions): UseTransitionReturn {
+  const { mounted, transitionStatus, setMounted } = useTransitionStatus({ open, animateOnMount });
   const runOnAnimationsFinished = useAnimationsFinished(ref, open);
 
   useEffect(() => {
@@ -67,15 +64,13 @@ export function useTransition({ open, ref, animateOnMount = true }: UseTransitio
       props['data-closed'] = '';
     }
     if (transitionStatus === 'starting') {
-      if (!skipEnter) {
-        props['data-starting-style'] = '';
-      }
+      props['data-starting-style'] = '';
       props.style = { transition: 'none' };
     } else if (transitionStatus === 'ending') {
       props['data-ending-style'] = '';
     }
     return props;
-  }, [open, mounted, transitionStatus, skipEnter]);
+  }, [open, mounted, transitionStatus]);
 
   return { mounted, transitionStatus, transitionProps };
 }

@@ -308,7 +308,7 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
   const element = React.useRef<HTMLElement | null>(null);
   const [messageElement, setMessageElement] = React.useState<HTMLElement | null>(null);
   const height = useMessageHeight(messageElement);
-  const { mounted, transitionProps } = useTransition({ open, ref: element, animateOnMount: false });
+  const { mounted, transitionProps } = useTransition({ open, ref: element });
   const message = useHeldMessage(children, open);
   const messageProps = stylex.props(reset.base, feedbackStyles.message, feedbackStyles.error);
 
