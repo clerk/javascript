@@ -1598,6 +1598,7 @@ export const idID: LocalizationResource = {
       actionText: 'Tidak memiliki salah satu dari ini?',
       blockButton__backupCode: 'Gunakan kode cadangan',
       blockButton__emailCode: 'Kirim kode ke {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Lanjutkan dengan kata sandi Anda',
       blockButton__phoneCode: 'Kirim kode SMS ke {{identifier}}',
@@ -1620,6 +1621,10 @@ export const idID: LocalizationResource = {
       resendButton: 'Tidak menerima kode? Kirim ulang',
       subtitle: 'Masukkan kode yang dikirim ke email Anda untuk melanjutkan',
       title: 'Verifikasi diperlukan',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Tidak dapat melanjutkan verifikasi. Tidak ada faktor autentikasi yang sesuai dikonfigurasi',

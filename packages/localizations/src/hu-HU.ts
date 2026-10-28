@@ -1606,6 +1606,7 @@ export const huHU: LocalizationResource = {
       actionText: 'Nincs ezekből egyik sem?',
       blockButton__backupCode: 'Tartalék kód használata',
       blockButton__emailCode: 'Email kód küldése: {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'Passkey használata',
       blockButton__password: 'Folytatás jelszóval',
       blockButton__phoneCode: 'SMS kód küldése: {{identifier}}',
@@ -1628,6 +1629,10 @@ export const huHU: LocalizationResource = {
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
       subtitle: 'Írd be az e-mail címedre küldött kódot a folytatáshoz',
       title: 'Ellenőrzés szükséges',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Nem lehet folytatni az ellenőrzést. Nincs konfigurált hitelesítési módszer.',

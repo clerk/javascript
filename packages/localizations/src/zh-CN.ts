@@ -1586,6 +1586,7 @@ export const zhCN: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
@@ -1605,6 +1606,10 @@ export const zhCN: LocalizationResource = {
     emailCode: {
       formTitle: undefined,
       resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    enterpriseSSO: {
       subtitle: undefined,
       title: undefined,
     },

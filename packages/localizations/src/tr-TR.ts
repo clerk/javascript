@@ -1596,6 +1596,7 @@ export const trTR: LocalizationResource = {
       actionText: 'Alternatif doğrulama yöntemlerini kullanmak ister misiniz?',
       blockButton__backupCode: 'Yedek kodu kullan',
       blockButton__emailCode: 'E-posta kodu gönder',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Şifreyi gir',
       blockButton__phoneCode: 'Telefon kodu gönder',
@@ -1617,6 +1618,10 @@ export const trTR: LocalizationResource = {
       resendButton: 'Tekrar gönder',
       subtitle: 'E-posta adresinize gönderilen doğrulama kodunu girin.',
       title: 'E-posta Kodunu Girin',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Alternatif doğrulama yöntemleri mevcut değil.',
