@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
@@ -280,5 +280,53 @@ describe('UserProfile with an active organization', () => {
       />,
     );
     expect(tabsDescribedBy('Organization')).toEqual(['Audit log', 'General', 'Members']);
+  });
+
+  it('keeps the shown page after the open organization page leaves the navigation', async () => {
+    const globex = fapiOrganization({ id: 'org_2', name: 'Globex' });
+    const memberships = [
+      fapiMembership(acme, { permissions: ['org:sys_memberships:read'] }),
+      fapiMembership(globex, { permissions: [] }),
+    ];
+    const user = fapiUser({ id: 'user_1', organization_memberships: memberships });
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: acme.id })]),
+      memberships,
+    });
+    const { clerk } = await renderWithClerk(<UserProfile defaultPage='organization/members' />);
+
+    await act(() => clerk.setActive({ organization: globex.id }));
+    await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General']));
+    await act(() => clerk.setActive({ organization: acme.id }));
+    await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General', 'Members']));
+
+    expect(screen.getByRole('tab', { name: 'Account', description: 'Account' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  it('stays on the organization page when the next organization lists it too', async () => {
+    const globex = fapiOrganization({ id: 'org_2', name: 'Globex' });
+    const memberships = [
+      fapiMembership(acme, { permissions: ['org:sys_memberships:read'] }),
+      fapiMembership(globex, { permissions: ['org:sys_memberships:read'] }),
+    ];
+    const user = fapiUser({ id: 'user_1', organization_memberships: memberships });
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: acme.id })]),
+      memberships,
+    });
+    const { clerk } = await renderWithClerk(<UserProfile defaultPage='organization/members' />);
+
+    await act(() => clerk.setActive({ organization: globex.id }));
+    await waitFor(() => expect(clerk.organization?.id).toBe(globex.id));
+
+    expect(screen.getByRole('tab', { name: 'Members', description: 'Organization' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
   });
 });
