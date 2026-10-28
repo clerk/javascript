@@ -1,3 +1,5 @@
+import { logger } from '@clerk/shared/logger';
+
 import type { IconComponent } from '../../icons/glyph';
 import { Code } from '../../icons/glyphs/code';
 import { CreditCard } from '../../icons/glyphs/credit-card';
@@ -54,4 +56,16 @@ export function resolveUserProfilePages(
     ...uniqueCustomPages.filter(page => !builtInIds.has(page.path)).map(page => ({ id: page.path, custom: page })),
   ];
   return applyOrder(order, entries, entry => entry.id);
+}
+
+export function withoutOrganizationPaths(customPages: readonly CustomProfilePage[] = []): CustomProfilePage[] {
+  return customPages.filter(page => {
+    if (!page.path.startsWith(ORGANIZATION_PAGE_PREFIX)) {
+      return true;
+    }
+    logger.warnOnce(
+      `[Clerk] UserProfile custom page "${page.path}" uses the reserved "${ORGANIZATION_PAGE_PREFIX}" prefix and was skipped.`,
+    );
+    return false;
+  });
 }

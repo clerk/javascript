@@ -5,11 +5,17 @@ import { useState } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
-import { organizationProfilePanels } from '../organization-profile/organization-profile';
+import { organizationProfilePageIds, organizationProfilePanels } from '../organization-profile/organization-profile';
 import { useOrganizationProfileModel } from '../organization-profile/organization-profile.model';
 import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
 import { useUserProfilePages } from '../switcher/switcher.pages';
 import type { SwitcherMode } from '../switcher/switcher.types';
+import {
+  getAvailableUserProfilePages,
+  ORGANIZATION_PAGE_PREFIX,
+  resolveUserProfilePages,
+  withoutOrganizationPaths,
+} from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
 import type { UserProfileViewProps } from './user-profile.view';
@@ -130,9 +136,6 @@ export function UserProfile({
 }: UserProfileProps) {
   const model = useUserProfileUserModel();
   const builtInPages = useUserProfilePages();
-  const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>(
-    defaultPage ?? pageOrder?.[0] ?? 'account',
-  );
 
   if (model.status === 'loading') {
     return fallback ?? null;
@@ -141,10 +144,9 @@ export function UserProfile({
     return null;
   }
 
-  const viewProps: UserProfileViewProps = {
+  const viewProps: AccountViewProps = {
     elevation: 'flush',
-    activePage,
-    onPageChange: setActivePage,
+    initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
     customPages,
     pageOrder,
     pages: {
@@ -161,7 +163,7 @@ export function UserProfile({
       mode='mounted'
     >
       {mode === 'user' ? (
-        <UserProfileView {...viewProps} />
+        <AccountUserProfileView {...viewProps} />
       ) : (
         <CombinedUserProfileView
           {...viewProps}
@@ -172,21 +174,56 @@ export function UserProfile({
   );
 }
 
+type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange'> & {
+  initialPage: UserProfileViewProps['activePage'];
+};
+
+function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
+  const [activePage, setActivePage] = useState(initialPage);
+
+  return (
+    <UserProfileView
+      {...viewProps}
+      activePage={activePage}
+      onPageChange={setActivePage}
+    />
+  );
+}
+
 function CombinedUserProfileView({
+  initialPage,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
-}: UserProfileViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
+}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
   const model = useOrganizationProfileModel();
+  const [activePage, setActivePage] = useState(initialPage);
+  const organization =
+    model.status === 'ready'
+      ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
+      : undefined;
+
+  if (model.status !== 'loading' && activePage.startsWith(ORGANIZATION_PAGE_PREFIX)) {
+    const organizationPageIds = organization
+      ? organizationProfilePageIds(organization).map(id => `${ORGANIZATION_PAGE_PREFIX}${id}`)
+      : [];
+    if (!organizationPageIds.includes(activePage)) {
+      setActivePage(
+        resolveUserProfilePages(
+          getAvailableUserProfilePages(viewProps.pages),
+          withoutOrganizationPaths(viewProps.customPages),
+          viewProps.pageOrder,
+        )[0]?.id ?? 'account',
+      );
+    }
+  }
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <UserProfileView
         {...viewProps}
-        organization={
-          model.status === 'ready'
-            ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
-            : undefined
-        }
+        activePage={activePage}
+        onPageChange={setActivePage}
+        organization={organization}
       />
     </OrganizationProfileProvider>
   );

@@ -13,6 +13,7 @@ import {
   ORGANIZATION_PAGE_PREFIX,
   resolveUserProfilePages,
   USER_PROFILE_PAGE_ICONS,
+  withoutOrganizationPaths,
 } from './user-profile.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
@@ -52,16 +53,10 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
 ) {
   const m = useMessages('userProfile');
   const organizationLabels = useMessages('organizationProfile').pages;
-  const accountCustomPages = customPages?.filter(page => {
-    if (!page.path.startsWith(ORGANIZATION_PAGE_PREFIX)) {
-      return true;
-    }
-    logger.warnOnce(
-      `[Clerk] UserProfile custom page "${page.path}" uses the reserved "${ORGANIZATION_PAGE_PREFIX}" prefix and was skipped.`,
-    );
-    return false;
-  });
-  const accountPages = userProfilePageList({ pages, customPages: accountCustomPages, pageOrder }, m.pages);
+  const accountPages = userProfilePageList(
+    { pages, customPages: withoutOrganizationPaths(customPages), pageOrder },
+    m.pages,
+  );
   const groups: ProfilePageGroup[] = organization
     ? [
         { label: m.accountGroup, pages: accountPages },
