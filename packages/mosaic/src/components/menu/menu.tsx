@@ -226,13 +226,17 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
 export type MenuSeparatorProps = Omit<PrimitiveMenuSeparatorProps, 'className' | 'style'> & MosaicStyleProps;
 
 /** A full-bleed divider between groups of items. */
-export function MenuSeparator({ xstyle, ...rest }: MenuSeparatorProps): React.ReactElement {
+export const MenuSeparator = React.forwardRef<HTMLDivElement, MenuSeparatorProps>(function MosaicMenuSeparator(
+  { xstyle, ...rest },
+  ref,
+) {
   return (
     <Primitive.Separator
+      ref={ref}
       {...mergeStyleProps(themeProps('menu-separator'), stylex.props(reset.base, slots.separator.base, xstyle), rest)}
     />
   );
-}
+});
 
 export const Menu = {
   // Renders no element of its own; re-exported unchanged so the state provider sits

@@ -371,4 +371,19 @@ describe('Mosaic Menu', () => {
     );
     expect(ref.current).toBe(screen.getByRole('button'));
   });
+
+  it('forwards a ref to the separator', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Popup>
+          <Menu.Item>Cut</Menu.Item>
+          <Menu.Separator ref={ref} />
+          <Menu.Item>Copy</Menu.Item>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('separator'));
+  });
 });
