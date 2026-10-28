@@ -81,6 +81,7 @@ export function UserProfilePhoneSectionView({
       {remove ? (
         <Confirmation
           controller={remove}
+          disabled={isDisabled}
           title={m.phone.removeDialog.title}
           description={phone =>
             fill(phone.isVerified ? m.phone.removeDialog.verifiedDescription : m.phone.removeDialog.description, {

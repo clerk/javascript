@@ -74,7 +74,6 @@ export interface ConfirmController<Payload = void> {
   isPending: boolean;
   /** Whether the dialog can close right now. False while the action is past the point of cancelling */
   canClose: boolean;
-  canConfirm: boolean;
   errorMessage: string | undefined;
   /** Which card the dialog shows: the confirm step, or the reverification the action was interrupted by. */
   step: ConfirmStep;
@@ -124,7 +123,6 @@ export function useConfirmController<Payload = void>({
     isOpen: snapshot.value !== 'idle',
     isPending,
     canClose,
-    canConfirm: snapshot.value === 'confirming' && !actionLock?.isPending,
     errorMessage: error ? errorText(error, errorFallback) : undefined,
     step: isPending && reverification?.visible ? 'verify' : 'confirm',
     reverification,
