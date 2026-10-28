@@ -2,9 +2,9 @@
 
 import { Button } from '@clerk/mosaic/components/button';
 import { Waitlist } from '@clerk/mosaic/features/waitlist/waitlist';
+import { useMosaicEnvironment } from '@clerk/mosaic/hooks/use-mosaic-environment';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useClerk } from '@clerk/nextjs';
-import type { EnvironmentResource } from '@clerk/shared/types';
 import { useState } from 'react';
 
 import { LivePageHeader } from '../../../live-page-header';
@@ -13,8 +13,7 @@ export default function WaitlistLivePage() {
   const clerk = useClerk();
   const [redirect, setRedirect] = useState(false);
   const [demoKey, setDemoKey] = useState(0);
-  const environment = (clerk as unknown as { __internal_environment?: EnvironmentResource | null })
-    .__internal_environment;
+  const environment = useMosaicEnvironment();
   const signUpMode = environment?.userSettings.signUp.mode;
 
   return (

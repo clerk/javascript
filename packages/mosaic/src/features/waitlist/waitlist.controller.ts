@@ -1,8 +1,8 @@
-import type { UseFormResult } from '../../components/form';
 import { useForm } from '../../components/form';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
-import type { WaitlistModel, WaitlistStep, WaitlistValues } from './waitlist.types';
+import type { WaitlistModel } from './waitlist.types';
+import type { WaitlistViewProps } from './waitlist.view';
 
 export const WAITLIST_REDIRECT_DELAY_MS = 2000;
 
@@ -25,27 +25,17 @@ const waitlistMachine = createMachine({
     joined: {
       after: {
         [WAITLIST_REDIRECT_DELAY_MS]: {
-          target: 'redirected',
           guard: context => context.onRedirect !== undefined,
           actions: context => context.onRedirect?.(),
         },
       },
     },
-    redirected: { type: 'final' },
   },
 });
 
 export type WaitlistReadyModel = Extract<WaitlistModel, { status: 'ready' }>;
 
-export interface WaitlistController {
-  step: WaitlistStep;
-  form: UseFormResult<WaitlistValues>;
-  renderBranding: boolean;
-  isRedirecting: boolean;
-  onSignIn: () => void;
-}
-
-export function useWaitlistController(model: WaitlistReadyModel): WaitlistController {
+export function useWaitlistController(model: WaitlistReadyModel): WaitlistViewProps {
   const { initialEmailAddress, renderBranding, onJoinWaitlist, onSignIn, onRedirect } = model;
   const [snapshot, send] = useMachine(waitlistMachine, { context: { onRedirect } });
   const form = useForm({

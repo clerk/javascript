@@ -10,10 +10,6 @@ export type WaitlistModelOptions = Pick<WaitlistProps, 'afterJoinWaitlistUrl' | 
 
 const WAITLIST_FIELDS: readonly WaitlistField[] = ['emailAddress'];
 
-function emailAddressFromQuery(): string {
-  return new URLSearchParams(window.location.search).get('email_address') ?? '';
-}
-
 export function useWaitlistModel(options: WaitlistModelOptions = {}): WaitlistModel {
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
@@ -29,7 +25,7 @@ export function useWaitlistModel(options: WaitlistModelOptions = {}): WaitlistMo
 
   return {
     status: 'ready',
-    initialEmailAddress: emailAddressFromQuery(),
+    initialEmailAddress: router.getSearchParams().get('email_address') ?? '',
     renderBranding: displayConfig.branded,
     onJoinWaitlist: emailAddress => save(() => clerk.joinWaitlist({ emailAddress }), WAITLIST_FIELDS),
     onSignIn: () => void router.navigate(clerk.buildUrlWithAuth(signInUrl)),
