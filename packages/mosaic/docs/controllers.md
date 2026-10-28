@@ -56,19 +56,32 @@ operations one `usePendingAction` owner:
 
 ```ts
 const actions = usePendingAction();
-const remove = useConfirmController({
-  runAction: actions.runExternal,
+const remove = useConfirmController<UserProfileEmail>({
   onConfirm: contact => removalFocus.remove(contact.id),
 });
+
+return {
+  isDisabled: actions.isPending,
+  pendingPrimaryId: actions.pendingKey,
+  remove: {
+    ...remove,
+    confirm: async contact => (await actions.runExternal(() => remove.confirm(contact))) ?? false,
+  },
+};
 ```
 
-Run direct actions with `actions.run(key, action)`. Pass `actions.isPending` to
-the section controls' `disabled` props, including `Confirmation.disabled`.
-`runExternal` returns the accepted promise, or `undefined` while another action
-runs. It leaves row keys and inline errors unchanged and preserves rejections
-for the confirmation dialog to handle. Both paths block overlapping calls before
-React renders and stay pending until the accepted promise settles. Closing a
-verification dialog does not release pending while cancellation is still settling.
+Keep this coordination in the section controller. Run direct actions with
+`actions.run(key, action)` and wrap the returned confirmation's `confirm` callback
+with `actions.runExternal`. Pass `actions.isPending` to the section controls'
+`disabled` props, including `Confirmation.disabled`.
+
+`confirm` resolves `true` when the operation succeeds, or `false` when it fails or
+the dialog ignores the call. Its promise follows the operation even if the
+dialog closes during cancellation. The shared pending owner waits for that
+promise, so closing the dialog does not enable another action before cancellation
+settles. Removal keeps its dialog errors, and inline row errors and focus keys
+stay unchanged. Views receive the pending and disabled props without coordinating
+the operations.
 
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the

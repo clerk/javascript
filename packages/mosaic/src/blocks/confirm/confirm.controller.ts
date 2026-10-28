@@ -80,12 +80,11 @@ export interface ConfirmController<Payload = void> {
   /** Opens the dialog about `payload` */
   open: (payload: Payload) => void;
   onOpenChange: (open: boolean) => void;
-  /** Runs the action for `payload`. The dialog closes when it resolves and shows why when it rejects. */
-  confirm: (payload: Payload) => void;
+  /** Runs the action for `payload`. The dialog closes when it resolves and shows why when it rejects. Resolves whether the action succeeded. */
+  confirm: (payload: Payload) => Promise<boolean>;
 }
 
 export interface ConfirmControllerOptions<Payload = void> {
-  runAction?: (action: () => Promise<void>) => Promise<void> | undefined;
   /** The action the dialog confirms. Resolve to close; reject to keep the dialog open showing why. */
   onConfirm: (payload: Payload) => Promise<unknown> | void;
   /** The flow `onConfirm` runs under, when the action may need step-up verification. */
@@ -108,7 +107,6 @@ export function useConfirmController<Payload = void>({
   onConfirm,
   reverification,
   errorFallback,
-  runAction,
 }: ConfirmControllerOptions<Payload>): ConfirmController<Payload> {
   const handle = useMemo(() => Dialog.createHandle<Payload>(), []);
   const [snapshot, send] = useMachine(confirmMachine);
@@ -138,20 +136,21 @@ export function useConfirmController<Payload = void>({
       send({ type: 'CANCEL' });
     },
     confirm: payload => {
-      if (snapshot.value !== 'confirming') {
-        return;
-      }
-      const run = async () => {
-        await onConfirm(payload);
-      };
-      if (runAction) {
-        const accepted = runAction(run);
-        if (accepted) {
-          send({ type: 'CONFIRM', run: () => accepted });
-        }
-        return;
-      }
-      send({ type: 'CONFIRM', run });
+      let completion: Promise<boolean> | undefined;
+      send({
+        type: 'CONFIRM',
+        run: () => {
+          const operation = (async () => {
+            await onConfirm(payload);
+          })();
+          completion = operation.then(
+            () => true,
+            () => false,
+          );
+          return operation;
+        },
+      });
+      return completion ?? Promise.resolve(false);
     },
   };
 }

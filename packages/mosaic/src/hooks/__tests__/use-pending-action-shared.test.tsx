@@ -9,11 +9,16 @@ import { usePendingAction } from '../use-pending-action';
 function useOwners(onConfirm: () => Promise<void>) {
   const actions = usePendingAction();
   const remove = useConfirmController({
-    runAction: actions.runExternal,
     onConfirm,
     reverification: { status: 'loading', visible: true, onCancel: vi.fn() },
   });
-  return { actions, remove };
+  return {
+    actions,
+    remove: {
+      ...remove,
+      confirm: async () => (await actions.runExternal(() => remove.confirm())) ?? false,
+    },
+  };
 }
 
 describe('shared action admission', () => {
@@ -26,7 +31,7 @@ describe('shared action admission', () => {
 
     act(() => {
       void owners.actions.run('primary', () => pending.promise);
-      owners.remove.confirm();
+      void owners.remove.confirm();
     });
 
     expect(onConfirm).not.toHaveBeenCalled();
@@ -48,7 +53,7 @@ describe('shared action admission', () => {
     const owners = result.current;
 
     await act(async () => {
-      owners.remove.confirm();
+      void owners.remove.confirm();
       expect(await owners.actions.run('primary', primary)).toBe(false);
     });
 
@@ -75,7 +80,7 @@ describe('shared action admission', () => {
 
     act(() => {
       void result.current.actions.run('primary', () => pending.promise);
-      result.current.remove.confirm();
+      void result.current.remove.confirm();
     });
 
     expect(onConfirm).toHaveBeenCalledOnce();
@@ -94,7 +99,9 @@ describe('shared action admission', () => {
     expect(error).toBeDefined();
 
     act(() => result.current.remove.onOpenChange(true));
-    act(() => result.current.remove.confirm());
+    act(() => {
+      void result.current.remove.confirm();
+    });
 
     expect(result.current.actions.isPending).toBe(true);
     expect(result.current.actions.pendingKey).toBeUndefined();
@@ -111,7 +118,9 @@ describe('shared action admission', () => {
     const primary = vi.fn();
     const { result } = renderHook(() => useOwners(() => pending.promise));
     act(() => result.current.remove.onOpenChange(true));
-    act(() => result.current.remove.confirm());
+    act(() => {
+      void result.current.remove.confirm();
+    });
     act(() => result.current.remove.onOpenChange(false));
     expect(result.current.remove.isOpen).toBe(false);
     await act(async () => expect(await result.current.actions.run('primary', primary)).toBe(false));
