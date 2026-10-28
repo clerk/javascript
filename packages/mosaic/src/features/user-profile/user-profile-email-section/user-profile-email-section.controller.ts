@@ -31,7 +31,6 @@ export function useUserProfileEmailSectionController({
     fallback: () => rowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? rowRef.current,
   });
   const remove = useConfirmController<UserProfileEmail>({
-    runAction: actions.runExternal,
     onConfirm: email => removalFocus.remove(email.id),
     reverification: removeReverification,
   });
@@ -45,7 +44,12 @@ export function useUserProfileEmailSectionController({
     pendingPrimaryId: actions.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: onRemoveEmail ? remove : undefined,
+    remove: onRemoveEmail
+      ? {
+          ...remove,
+          confirm: async email => (await actions.runExternal(() => remove.confirm(email))) ?? false,
+        }
+      : undefined,
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     setPrimaryReverification,

@@ -59,7 +59,6 @@ export function useUserProfileWeb3WalletsController({
       panelTitle(),
   });
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
-    runAction: action.runExternal,
     onConfirm: wallet => removalFocus.remove(wallet.id),
     reverification: removeReverification,
   });
@@ -174,7 +173,13 @@ export function useUserProfileWeb3WalletsController({
     isDisabled: action.isPending,
     sectionRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: remove ? removeWallet : undefined,
+    remove: remove
+      ? {
+          ...removeWallet,
+          confirm: async (wallet: UserProfileWeb3Wallet) =>
+            (await action.runExternal(() => removeWallet.confirm(wallet))) ?? false,
+        }
+      : undefined,
     finalFocus: removalFocus.finalFocus,
     setPrimaryReverification,
     createReverification,

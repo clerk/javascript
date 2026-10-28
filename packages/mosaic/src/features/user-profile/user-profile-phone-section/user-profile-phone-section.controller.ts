@@ -31,7 +31,6 @@ export function useUserProfilePhoneSectionController({
     fallback: () => rowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? rowRef.current,
   });
   const remove = useConfirmController<UserProfilePhone>({
-    runAction: actions.runExternal,
     onConfirm: phone => removalFocus.remove(phone.id),
     reverification: removeReverification,
   });
@@ -46,7 +45,12 @@ export function useUserProfilePhoneSectionController({
     pendingPrimaryId: actions.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: onRemovePhone ? remove : undefined,
+    remove: onRemovePhone
+      ? {
+          ...remove,
+          confirm: async phone => (await actions.runExternal(() => remove.confirm(phone))) ?? false,
+        }
+      : undefined,
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     setPrimaryReverification,
