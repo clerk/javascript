@@ -61,21 +61,24 @@ describe('useTransition', () => {
     expect(result.current.transitionProps).toEqual({});
   });
 
-  it('returns mounted=true with starting-style props on open', () => {
+  it('mounts initially open content without starting style by default', () => {
     const ref = createElementRef();
     const { result } = renderHook(() => useTransition({ open: true, ref }));
 
     expect(result.current.mounted).toBe(true);
+    expect(result.current.transitionStatus).toBeUndefined();
+    expect(result.current.transitionProps).toEqual({ 'data-open': '' });
+  });
+
+  it('clears opted-in starting style after first frame, keeps data-open', () => {
+    const ref = createElementRef();
+    const { result } = renderHook(() => useTransition({ open: true, ref, animateOnMount: true }));
+
     expect(result.current.transitionProps).toEqual({
       'data-open': '',
       'data-starting-style': '',
       style: { transition: 'none' },
     });
-  });
-
-  it('clears starting-style after first frame, keeps data-open', () => {
-    const ref = createElementRef();
-    const { result } = renderHook(() => useTransition({ open: true, ref }));
 
     act(() => flushRaf());
 
@@ -83,6 +86,58 @@ describe('useTransition', () => {
       'data-open': '',
     });
   });
+
+  it('animates a later opening and a reopen with the default mount policy', async () => {
+    const ref = createElementRef();
+    const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
+      initialProps: { open: false },
+    });
+
+    rerender({ open: true });
+    expect(result.current.transitionProps['data-starting-style']).toBe('');
+    act(() => flushRaf());
+
+    await act(async () => {
+      rerender({ open: false });
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    expect(result.current.mounted).toBe(false);
+
+    rerender({ open: true });
+    expect(result.current.transitionProps['data-starting-style']).toBe('');
+  });
+
+  it('does not replay an entrance when the mount option changes', () => {
+    const ref = createElementRef();
+    const { result, rerender } = renderHook(
+      ({ animateOnMount }) => useTransition({ open: true, ref, animateOnMount }),
+      { initialProps: { animateOnMount: false } },
+    );
+
+    rerender({ animateOnMount: true });
+    expect(result.current.transitionProps).toEqual({ 'data-open': '' });
+  });
+
+  it.each([undefined, false, true])(
+    'animates reopen after an initially open instance closes (%s)',
+    async animateOnMount => {
+      const ref = createElementRef();
+      const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref, animateOnMount }), {
+        initialProps: { open: true },
+      });
+
+      expect(result.current.transitionStatus).toBe(animateOnMount ? 'starting' : undefined);
+      act(() => flushRaf());
+      await act(async () => {
+        rerender({ open: false });
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect(result.current.mounted).toBe(false);
+
+      rerender({ open: true });
+      expect(result.current.transitionProps['data-starting-style']).toBe('');
+    },
+  );
 
   it('sets closing props while animations are running', async () => {
     const { ref, el, resolveAnim } = createAnimatingRef();

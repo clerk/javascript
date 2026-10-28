@@ -43,6 +43,15 @@ describe('loadConfig', () => {
     expect(config.needsUpgrade).toBe(true);
   });
 
+  it('flags Expo versions below 53, including caret ranges', async () => {
+    const config = await loadConfig('expo', 2);
+    const { matcher } = config.changes.find(change => change.docsAnchor === 'expo-min-version');
+
+    expect('"expo": "^52.1.0"'.match(matcher)).not.toBeNull();
+    expect('"expo": "~52.0.0"'.match(matcher)).not.toBeNull();
+    expect('"expo": "~53.0.0"'.match(matcher)).toBeNull();
+  });
+
   it('returns null for unsupported SDK version (too old)', async () => {
     const config = await loadConfig('nextjs', 4);
 
