@@ -691,7 +691,11 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
             aria-labelledby={`${pageTitleId}-label`}
             // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
             {...(compact ? { role: 'group', tabIndex: undefined } : null)}
-            {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
+            {...mergeStyleProps(
+              themeProps('profile-content-panel', { value }),
+              stylex.props(styles.contentPanel, xstyle),
+              rest,
+            )}
           >
             {children}
           </Tabs.Panel>

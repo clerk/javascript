@@ -469,7 +469,7 @@ describe('Profile search', () => {
 
     await user.type(search, 'phone');
     await user.click(screen.getByRole('option', { name: 'Phone numbers' }));
-    expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: 'smooth', block: 'start' });
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: 'smooth', block: 'nearest' });
     expect(focus).toHaveBeenLastCalledWith({ preventScroll: true });
 
     vi.stubGlobal(
@@ -478,7 +478,7 @@ describe('Profile search', () => {
     );
     await user.type(search, 'email');
     await user.click(screen.getByRole('option', { name: 'Email addresses' }));
-    expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: 'auto', block: 'start' });
+    expect(scrollIntoView).toHaveBeenLastCalledWith({ behavior: 'auto', block: 'nearest' });
   });
 
   it('makes the element passed as `render` the target', async () => {

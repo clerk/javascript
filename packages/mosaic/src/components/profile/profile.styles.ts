@@ -326,6 +326,13 @@ export const styles = stylex.create({
   contentBody: {
     marginInline: 'auto',
     maxInlineSize: CONTENT_MAX_WIDTH,
+    position: 'relative',
+  },
+
+  contentPanel: {
+    insetInline: 0,
+    insetBlockStart: 0,
+    position: { default: null, ':where([data-closed])': 'absolute' },
   },
 });
 

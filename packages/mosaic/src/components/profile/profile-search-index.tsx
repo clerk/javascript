@@ -259,7 +259,7 @@ export function useProfileSearch({
       pageTitleRef.current?.focus();
       return;
     }
-    element.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    element.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
     element.focus({ preventScroll: true });
     setHighlightedTarget(key);
   }, [reveal, value, pageTitleRef]);
