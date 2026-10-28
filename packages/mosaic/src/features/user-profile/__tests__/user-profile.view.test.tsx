@@ -218,11 +218,11 @@ describe('UserProfileView', () => {
 
       await user.click(screen.getByRole('tab', { name: 'General' }));
 
-      expect(onPageChange).toHaveBeenCalledWith('organization.general');
+      expect(onPageChange).toHaveBeenCalledWith('organization/general');
     });
 
     it('opens the organization page a shared id names, not the account one', () => {
-      renderView({ organization, activePage: 'organization.apiKeys' });
+      renderView({ organization, activePage: 'organization/apiKeys' });
 
       expect(screen.getByRole('tab', { name: 'API Keys', description: 'Organization' })).toHaveAttribute(
         'aria-selected',
@@ -246,11 +246,11 @@ describe('UserProfileView', () => {
 
       expect(tabs()).toEqual(['Account', 'Security', 'Billing', 'API Keys', 'Audit log', 'General', 'API Keys']);
       await user.click(screen.getByRole('tab', { name: 'Audit log' }));
-      expect(onPageChange).toHaveBeenCalledWith('organization.audit');
+      expect(onPageChange).toHaveBeenCalledWith('organization/audit');
     });
 
     it('falls back to the first page once the organization is gone', () => {
-      renderView({ activePage: 'organization.general' });
+      renderView({ activePage: 'organization/general' });
 
       expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
       expect(document.querySelector('.cl-profile-nav-group')).not.toBeInTheDocument();

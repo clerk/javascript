@@ -79,8 +79,8 @@ function GroupedSurface(rootProps: Partial<ProfileRootProps>) {
           <Profile.NavItem value='security'>Security</Profile.NavItem>
         </Profile.NavGroup>
         <Profile.NavGroup label='Acme Inc'>
-          <Profile.NavItem value='organization.general'>General</Profile.NavItem>
-          <Profile.NavItem value='organization.security'>Security</Profile.NavItem>
+          <Profile.NavItem value='organization/general'>General</Profile.NavItem>
+          <Profile.NavItem value='organization/security'>Security</Profile.NavItem>
         </Profile.NavGroup>
       </Profile.Nav>
       <Profile.Content pageTitle='Account'>

@@ -81,7 +81,7 @@ export interface UserProfileProps
  *
  * @example
  * `defaultPage` picks the page the profile opens on without moving it in the navigation. An
- * organization page's id is prefixed with `organization.`.
+ * organization page's id is prefixed with `organization/`.
  * ```tsx
  * <UserProfile defaultPage='security' />
  * ```
