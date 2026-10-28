@@ -4,6 +4,7 @@ import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
 import {
+  checkingContract,
   startWorker,
   takeContractViolations,
   takeUnhandledRequests,
@@ -30,6 +31,7 @@ disableMotion.textContent = `
 `;
 document.head.append(disableMotion);
 
+const nativeFetch = window.fetch;
 const NativeBroadcastChannel = window.BroadcastChannel;
 const channelNamespace = crypto.randomUUID();
 const openChannels = new Set<IsolatedBroadcastChannel>();
@@ -57,6 +59,7 @@ class IsolatedBroadcastChannel extends NativeBroadcastChannel {
 
 beforeAll(async () => {
   window.BroadcastChannel = IsolatedBroadcastChannel;
+  window.fetch = checkingContract(nativeFetch);
   await startWorker();
 });
 
@@ -87,5 +90,6 @@ afterEach(async () => {
 
 afterAll(() => {
   window.BroadcastChannel = NativeBroadcastChannel;
+  window.fetch = nativeFetch;
   worker.stop();
 });

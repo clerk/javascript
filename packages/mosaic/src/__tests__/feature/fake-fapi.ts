@@ -121,24 +121,17 @@ export function startWorker() {
   });
 }
 
-const CONTRACT_CHECK_GRACE_MS = 1000;
-const pendingChecks = new Map<string, (violations: Promise<string[]>) => void>();
-
-worker.events.on('request:match', ({ request, requestId }) => {
-  if (new URL(request.url).host === fapiHost) {
-    contractChecks.push(new Promise(resolve => pendingChecks.set(requestId, resolve)));
-  }
-});
-
-worker.events.on('response:mocked', ({ request, requestId, response }) => {
-  pendingChecks.get(requestId)?.(fapiContractViolations(request, response));
-  pendingChecks.delete(requestId);
-});
-
-worker.events.on('response:bypass', ({ requestId }) => {
-  pendingChecks.get(requestId)?.(Promise.resolve([]));
-  pendingChecks.delete(requestId);
-});
+export function checkingContract(fetch: typeof window.fetch): typeof window.fetch {
+  return async (input, init) => {
+    const response = await fetch(input, init);
+    const url = input instanceof Request ? input.url : String(input);
+    if (new URL(url).host === fapiHost) {
+      const method = init?.method ?? (input instanceof Request ? input.method : 'GET');
+      contractChecks.push(fapiContractViolations(new Request(url, { method }), response.clone()));
+    }
+    return response;
+  };
+}
 
 export function takeUnhandledRequests(): string[] {
   return unhandled.splice(0);
@@ -151,26 +144,13 @@ export function allowSpecViolation(violation: string) {
 export async function takeContractViolations(): Promise<string[]> {
   const checks = contractChecks.splice(0);
   const allowed = allowedViolations.splice(0);
-  const violations = (await settledWithin(CONTRACT_CHECK_GRACE_MS, checks)).flat();
-  pendingChecks.clear();
+  const violations = (await Promise.all(checks)).flat();
   return [
     ...violations.filter(violation => !allowed.includes(violation)),
     ...allowed
       .filter(violation => !violations.includes(violation))
       .map(violation => `${violation} was allowed but never sent`),
   ];
-}
-
-async function settledWithin(ms: number, checks: Promise<string[]>[]): Promise<string[][]> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const deadline = new Promise<string[]>(resolve => {
-    timer = setTimeout(() => resolve([]), ms);
-  });
-  try {
-    return await Promise.all(checks.map(check => Promise.race([check, deadline])));
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 function page<T>(items: T[], url: URL) {
