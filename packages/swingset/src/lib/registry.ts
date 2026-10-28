@@ -288,6 +288,24 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  BackupCode as SignInBackupCode,
+  Default as SignInDefault,
+  EmailCode as SignInEmailCode,
+  meta as signInMeta,
+  MethodPicker as SignInMethodPicker,
+  Password as SignInPassword,
+  PasswordError as SignInPasswordError,
+  PasswordPending as SignInPasswordPending,
+  SignUp as SignInSignUp,
+  Start as SignInStart,
+  StartError as SignInStartError,
+  StartManyProviders as SignInStartManyProviders,
+  StartProviderPending as SignInStartProviderPending,
+  StartSignInOnly as SignInStartSignInOnly,
+  Totp as SignInTotp,
+  VerifyEmail as SignInVerifyEmail,
+} from '../stories/sign-in.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -997,6 +1015,25 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+
+const signInModule: StoryModule = {
+  meta: signInMeta,
+  Default: SignInDefault,
+  Start: SignInStart,
+  StartSignInOnly: SignInStartSignInOnly,
+  StartManyProviders: SignInStartManyProviders,
+  StartProviderPending: SignInStartProviderPending,
+  StartError: SignInStartError,
+  Password: SignInPassword,
+  PasswordPending: SignInPasswordPending,
+  PasswordError: SignInPasswordError,
+  EmailCode: SignInEmailCode,
+  Totp: SignInTotp,
+  BackupCode: SignInBackupCode,
+  MethodPicker: SignInMethodPicker,
+  SignUp: SignInSignUp,
+  VerifyEmail: SignInVerifyEmail,
+};
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
   Default: OrganizationProfileApiKeysPanelDefault,
@@ -1048,6 +1085,8 @@ export const registry: StoryModule[] = [
   organizationSwitcherModule,
   apiKeysTableModule,
   reverificationModule,
+  // Authentication
+  signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,

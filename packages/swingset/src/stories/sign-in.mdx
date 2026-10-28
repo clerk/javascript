@@ -1,0 +1,101 @@
+import * as Stories from './sign-in.stories';
+
+# SignIn
+
+The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Input Group', href: '/components/input-group', layer: 'Components' },
+    { name: 'OTP', href: '/components/otp', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+The view renders one step at a time inside a `Card.Root` and reports every interaction through plain callbacks. `combined` switches the start card to the sign-in-or-up copy and hides the sign-up link. The code, backup code, method picker, and help steps are the reverification feature's step views.
+
+```tsx
+import { Card } from '@clerk/mosaic/components/card';
+import { SignInView } from '@clerk/mosaic/features/sign-in';
+
+<Card.Root>
+  <SignInView
+    step={step}
+    combined
+    applicationName='Acme'
+    socialProviders={providers}
+    {...callbacks}
+  />
+</Card.Root>;
+```
+
+## Panels
+
+These examples isolate each step and its visual states.
+
+### Start
+
+<Story name='Start' storyModule={Stories} />
+
+#### Sign in only
+
+<Story name='StartSignInOnly' storyModule={Stories} />
+
+#### Many providers
+
+<Story name='StartManyProviders' storyModule={Stories} />
+
+#### Provider pending
+
+<Story name='StartProviderPending' storyModule={Stories} />
+
+#### Error
+
+<Story name='StartError' storyModule={Stories} />
+
+### Password
+
+<Story name='Password' storyModule={Stories} />
+
+#### Pending
+
+<Story name='PasswordPending' storyModule={Stories} />
+
+#### Error
+
+<Story name='PasswordError' storyModule={Stories} />
+
+### Email code
+
+<Story name='EmailCode' storyModule={Stories} />
+
+### Authenticator app
+
+<Story name='Totp' storyModule={Stories} />
+
+### Backup code
+
+<Story name='BackupCode' storyModule={Stories} />
+
+### Method picker
+
+<Story name='MethodPicker' storyModule={Stories} />
+
+### Sign up
+
+<Story name='SignUp' storyModule={Stories} />
+
+### Verify email
+
+<Story name='VerifyEmail' storyModule={Stories} />

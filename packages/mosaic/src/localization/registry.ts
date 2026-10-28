@@ -10,6 +10,7 @@ import { requestsTableTabMessages } from '../features/organization-profile/organ
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
+import { signInMessages } from '../features/sign-in/sign-in.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.messages';
@@ -46,6 +47,7 @@ export const mosaicMessages = {
   organizationProfileInviteMembers: organizationProfileInviteMembersMessages,
   profile: profileMessages,
   reverification: reverificationMessages,
+  signIn: signInMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,
   userProfileActiveDevices: userProfileActiveDevicesMessages,
