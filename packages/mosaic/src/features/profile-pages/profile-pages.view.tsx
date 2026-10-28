@@ -21,9 +21,11 @@ export interface ProfilePageGroup {
 export interface ProfilePagesViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
   /** Names the surface, and the dialog it opens in. */
   label: string;
+  /** The navigation, in order. A group without a label lists its pages without a heading. */
   groups: readonly ProfilePageGroup[];
   /** The open page's id. One the navigation does not list opens the first page instead. */
   activePage: string;
+  /** Called with a page's id when the user picks it from the navigation. */
   onPageChange: (page: string) => void;
 }
 

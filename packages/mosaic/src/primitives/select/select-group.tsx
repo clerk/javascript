@@ -8,6 +8,7 @@ const SelectGroupContext = createContext<string | undefined>(undefined);
 
 export type SelectGroupProps = ComponentProps<'div'>;
 
+/** A labelled set of options in the listbox, named by the `Select.GroupLabel` inside it. */
 export function SelectGroup(props: SelectGroupProps) {
   const { render, ...otherProps } = props;
   const labelId = useId();
@@ -30,6 +31,7 @@ export function SelectGroup(props: SelectGroupProps) {
 
 export type SelectGroupLabelProps = ComponentProps<'div'>;
 
+/** Names the `Select.Group` it sits in. Throws outside one. */
 export function SelectGroupLabel(props: SelectGroupLabelProps) {
   const { render, ...otherProps } = props;
   const labelId = useContext(SelectGroupContext);
