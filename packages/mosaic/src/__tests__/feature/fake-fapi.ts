@@ -755,6 +755,63 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       leaveOrganization(state, membership.organization.id, user.id);
       return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
     }),
+    http.post(fapiUrl('/v1/organizations'), async ({ request }) => {
+      const body = new URLSearchParams(await request.text());
+      const name = body.get('name') ?? '';
+      const slug = body.get('slug');
+      if (!name) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_missing',
+                message: 'name must be included.',
+                long_message: 'Enter name.',
+                meta: { param_name: 'name' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      if (slug && state.memberships.some(m => m.organization.slug === slug)) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_identifier_exists',
+                message: 'is taken',
+                long_message: 'This slug is taken. Please try another.',
+                meta: { param_name: 'slug' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const organizationId = `org_created_${state.memberships.length + 1}`;
+      const organization = fapiOrganization({
+        id: organizationId,
+        name,
+        slug: slug ?? '',
+        max_allowed_memberships: state.environment.organization_settings.max_allowed_memberships,
+      });
+      const membership = fapiMembership(organization, {
+        role: 'org:admin',
+        role_name: 'Admin',
+        permissions: ['org:sys_memberships:manage', 'org:sys_memberships:read', 'org:sys_profile:manage'],
+      });
+      state.memberships = [...state.memberships, membership];
+      updateActiveUser(state, current => ({
+        ...current,
+        organization_memberships: [...current.organization_memberships, membership],
+      }));
+      return envelope(organization, state.client);
+    }),
     http.get(fapiUrl('/v1/organizations/:organizationId'), ({ params }) => {
       const membership = state.memberships.find(m => m.organization.id === params.organizationId);
       return membership ? envelope(membership.organization, null) : missing();

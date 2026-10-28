@@ -1,19 +1,13 @@
-import * as stylex from '@stylexjs/stylex';
 import { useId, useRef } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
-import { Field } from '../../../components/field';
 import type { SelectItem } from '../../../components/select';
-import { Select } from '../../../components/select';
-import { TagInput } from '../../../components/tag-input';
-import { fill, useMessages } from '../../../localization';
+import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles } from './organization-profile-invite-members.styles';
-
-const isEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value);
+import { canSendInvitations, InviteMembersFields } from './organization-profile-invite-members.fields';
 
 export interface OrganizationProfileInviteMembersDialogProps {
   open: boolean;
@@ -49,9 +43,7 @@ export function OrganizationProfileInviteMembersDialog({
   const m = useMessages('organizationProfileInviteMembers');
   const formId = useId();
   const emailInput = useRef<HTMLInputElement>(null);
-  const isValid = (value: string) => isEmail(value) && !rejectedEmailAddresses.includes(value);
-  const hasInvalid = !emailAddresses.every(isValid);
-  const canSubmit = emailAddresses.length > 0 && !hasInvalid && role !== null;
+  const canSubmit = canSendInvitations({ emailAddresses, rejectedEmailAddresses, role });
 
   return (
     <Dialog.Root
@@ -93,42 +85,17 @@ export function OrganizationProfileInviteMembersDialog({
               />
             }
           >
-            <Field.Root
-              required
-              invalid={hasInvalid}
-              disabled={isPending}
-            >
-              <div {...stylex.props(styles.labelRow)}>
-                <Field.Label>{m.emailLabel}</Field.Label>
-                <Field.Description>{m.emailHint}</Field.Description>
-              </div>
-              <TagInput
-                ref={emailInput}
-                name='emailAddresses'
-                delimiters={[',', ' ']}
-                value={emailAddresses}
-                onValueChange={onEmailAddressesChange}
-                validate={isValid}
-                removeLabel={email => fill(m.removeEmail, { email })}
-              />
-              <Field.Message>
-                <Field.Error>{hasInvalid ? m.invalidEmails : undefined}</Field.Error>
-              </Field.Message>
-            </Field.Root>
-            <Field.Root
-              required
-              disabled={isPending || isRoleDisabled}
-            >
-              <Field.Label>{m.roleLabel}</Field.Label>
-              <Select.Root
-                items={roles}
-                value={role ?? undefined}
-                onValueChange={onRoleChange}
-              >
-                <Select.Trigger placeholder={m.rolePlaceholder} />
-                <Select.Popup />
-              </Select.Root>
-            </Field.Root>
+            <InviteMembersFields
+              emailInputRef={emailInput}
+              emailAddresses={emailAddresses}
+              onEmailAddressesChange={onEmailAddressesChange}
+              rejectedEmailAddresses={rejectedEmailAddresses}
+              roles={roles}
+              role={role}
+              onRoleChange={onRoleChange}
+              isRoleDisabled={isRoleDisabled}
+              isPending={isPending}
+            />
           </Card.Content>
           <Card.Footer>
             <Dialog.Close

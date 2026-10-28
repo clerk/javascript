@@ -113,7 +113,7 @@ export interface SwitcherModalProps {
   organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
 }
 
-function resolveAfterUrl<T extends object>(
+export function resolveAfterUrl<T extends object>(
   config: ((entity: T) => string) | string | undefined,
   entity: T,
 ): string | undefined {
