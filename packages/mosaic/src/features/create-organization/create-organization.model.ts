@@ -27,7 +27,7 @@ export type CreateOrganizationModel =
       renderBranding: boolean;
       onCreate: (values: CreateOrganizationValues) => Promise<CreatedOrganization>;
       onInvite: (organizationId: string, input: CreateOrganizationInviteInput) => Promise<void>;
-      onComplete: (organizationId: string) => void;
+      onComplete: (organizationId: string) => Promise<unknown>;
     };
 
 export function useCreateOrganizationModel(options: CreateOrganizationModelOptions = {}): CreateOrganizationModel {
@@ -104,8 +104,6 @@ export function useCreateOrganizationModel(options: CreateOrganizationModelOptio
           throw cause;
         }
       }),
-    onComplete: organizationId => {
-      void afterCreateUrl(organizationId).then(url => (url ? router.navigate(url) : undefined));
-    },
+    onComplete: organizationId => afterCreateUrl(organizationId).then(url => (url ? router.navigate(url) : undefined)),
   };
 }

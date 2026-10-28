@@ -65,7 +65,7 @@ function CreateOrganizationHarness({
       return { organizationId: 'org_1', skipInvitations };
     },
     onInvite: () => settleAfter(1000),
-    onComplete: () => {},
+    onComplete: () => Promise.resolve(),
   };
   const controller = useCreateOrganizationController(model);
   const invite = useCreateOrganizationInviteController({

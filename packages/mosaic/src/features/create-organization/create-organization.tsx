@@ -57,7 +57,13 @@ export function CreateOrganization({ fallback, ...options }: CreateOrganizationP
   return <ConnectedCreateOrganization model={model} />;
 }
 
-function ConnectedCreateOrganization({ model }: { model: CreateOrganizationReadyModel }) {
+export function ConnectedCreateOrganization({
+  model,
+  onCancel,
+}: {
+  model: CreateOrganizationReadyModel;
+  onCancel?: () => void;
+}) {
   const controller = useCreateOrganizationController(model);
   const organizationId = controller.step.step === 'create' ? null : controller.step.organizationId;
   const roles = useMembersPanelRolesModel(controller.step.step === 'invite');
@@ -75,6 +81,7 @@ function ConnectedCreateOrganization({ model }: { model: CreateOrganizationReady
       slugEnabled={model.slugEnabled}
       renderBranding={model.renderBranding}
       invite={invite}
+      onCancel={onCancel}
     />
   );
 }

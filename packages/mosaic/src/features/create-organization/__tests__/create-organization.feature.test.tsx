@@ -81,9 +81,10 @@ describe('CreateOrganization', () => {
       const { fapi } = await renderCreateOrganization();
       const user = userEvent.setup();
 
-      await create(user, 'Acme Inc');
-
+      await user.type(await screen.findByRole('textbox', { name: 'Name' }), 'Acme Inc');
       expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme-inc');
+      await user.click(screen.getByRole('button', { name: 'Create organization' }));
+
       expect(await screen.findByRole('heading', { name: 'Invite new members' })).toBeVisible();
       const [membership] = fapi.memberships;
       expect(membership?.organization).toMatchObject({ name: 'Acme Inc', slug: 'acme-inc' });

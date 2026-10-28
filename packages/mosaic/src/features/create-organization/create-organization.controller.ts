@@ -27,7 +27,7 @@ export function useCreateOrganizationController(model: CreateOrganizationReadyMo
   const [step, setStep] = useState<CreateOrganizationStep>({ step: 'create' });
 
   const finish = (organizationId: string) => {
-    model.onComplete(organizationId);
+    void model.onComplete(organizationId);
     form.reset(initialValues);
     setStep({ step: 'create' });
   };
