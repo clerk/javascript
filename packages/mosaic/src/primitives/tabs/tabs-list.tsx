@@ -9,7 +9,7 @@ import { useTabsContext } from './tabs-context';
 
 export type TabsListProps = ComponentProps<'div'>;
 
-export function TabsList(props: TabsListProps) {
+export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function TabsList(props, ref) {
   const { render, children, ...otherProps } = props;
   const { orientation } = useTabsContext();
   const direction = useDirection();
@@ -42,7 +42,7 @@ export function TabsList(props: TabsListProps) {
         return useRender({
           defaultTagName: 'div',
           render,
-          ref: isRef(compositeRef) ? compositeRef : undefined,
+          ref: [isRef(compositeRef) ? compositeRef : null, ref],
           props: mergedProps,
         });
       }}
@@ -50,4 +50,4 @@ export function TabsList(props: TabsListProps) {
       {children}
     </Composite>
   );
-}
+});

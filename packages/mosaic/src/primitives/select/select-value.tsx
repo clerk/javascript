@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import React from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import type { SelectItem } from './select-context';
@@ -26,7 +27,7 @@ export interface SelectValueProps extends Omit<ComponentProps<'span'>, 'children
   children?: ReactNode | ((value: string[]) => ReactNode);
 }
 
-export function SelectValue(props: SelectValueProps) {
+export const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(function SelectValue(props, ref) {
   const { render, placeholder, children, ...otherProps } = props;
   const { selectedValues, cachedLabels, items, valueToLabelRef } = useSelectContext();
 
@@ -47,7 +48,8 @@ export function SelectValue(props: SelectValueProps) {
 
   return useRender({
     defaultTagName: 'span',
+    ref,
     render,
     props: mergeProps<'span'>(defaultProps, otherProps),
   });
-}
+});
