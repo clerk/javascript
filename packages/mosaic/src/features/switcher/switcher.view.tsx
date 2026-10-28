@@ -197,9 +197,7 @@ function PendingSpinner() {
   const m = useSwitcherMessages();
   return (
     <Spinner
-      role='progressbar'
-      aria-hidden={undefined}
-      aria-label={m.organizations.pending}
+      label={m.organizations.pending}
       size='sm'
     />
   );

@@ -344,8 +344,10 @@ export function useUserProfileMfaFixture({
       methods,
       addableMethods,
       onAdd: open,
-      onRegenerateBackupCodes:
-        account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes('regenerate') : undefined,
+      regenerate:
+        account.hasBackupCodes && onGenerateBackupCodes
+          ? { onClick: () => void generateBackupCodes('regenerate'), status: 'idle' as const }
+          : undefined,
       onSetDefault: async id => {
         await pause();
         setAccount(current => ({ ...current, defaultPhoneId: id }));
