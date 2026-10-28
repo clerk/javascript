@@ -54,6 +54,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   not_a_member_in_organization: 'You are no longer a member of this organization.',
   not_allowed_access: 'Some of these email addresses are not allowed to access this application.',
   oauth_access_denied: 'You did not grant access to your account.',
+  oauth_consent_missing_client_id: 'The client ID is missing.',
+  oauth_consent_missing_redirect_uri: 'The redirect URI is missing.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
   organization_changed: 'The active organization changed. Please try again.',
   organization_invitation_not_unique: 'An invitation is already pending for this email address.',

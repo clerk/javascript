@@ -19,6 +19,12 @@ describe('fill', () => {
   it('ignores inherited object properties', () => {
     expect(fill('{constructor}{toString}', {})).toBe('{constructor}{toString}');
   });
+
+  it('drops tag markers and keeps the text inside them', () => {
+    expect(fill('Trust {name} {#nowrap}({domain}){/nowrap}.{#br/}', { name: 'Acme', domain: 'acme.com' })).toBe(
+      'Trust Acme (acme.com).',
+    );
+  });
 });
 
 describe('plural', () => {
