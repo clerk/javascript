@@ -44,6 +44,7 @@ import {
   States as CheckboxStates,
 } from '../stories/checkbox.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { Default as ColorTokensDefault, meta as colorTokensMeta } from '../stories/color-tokens.stories';
 import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
   Default as ComboboxDefault,
@@ -776,6 +777,8 @@ const tagInputModule: StoryModule = { meta: tagInputMeta };
 const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
+const colorTokensModule: StoryModule = { meta: colorTokensMeta, Default: ColorTokensDefault };
+
 const scrollAreaModule: StoryModule = {
   meta: scrollAreaMeta,
   Default: ScrollAreaDefault,
@@ -1115,6 +1118,7 @@ export const registry: StoryModule[] = [
   toastPrimitiveModule,
   tooltipModule,
   // Styles — atomic styles that ship as StyleX atoms rather than components.
+  colorTokensModule,
   scrollAreaModule,
   // Hooks
   useFormModule,
