@@ -75,10 +75,12 @@ All enter/exit timing lives in **CSS**; the primitives only toggle `data-*`
 attributes and drive unmount off the Web Animations API. Root spreads
 `transitionProps` (from `useTransition`) onto the Popup; the lifecycle:
 
-- **Open** → synchronously `mounted=true`, status `'starting'`: first committed
-  frame carries `data-open` + `data-starting-style` + inline `transition: none`
-  (snapshot frame). One rAF later `data-starting-style` clears → CSS transitions
-  fire toward the resting style.
+- **Initially open** → `mounted=true`, with `data-open` and no starting style by
+  default. Set `animateOnMount: true` to start an entrance on mount.
+- **Open after mount** → synchronously `mounted=true`, status `'starting'`: first
+  committed frame carries `data-open` + `data-starting-style` + inline
+  `transition: none` (snapshot frame). One rAF later `data-starting-style`
+  clears → CSS transitions fire toward the resting style.
 - **Close** → status `'ending'`: `data-closed` + `data-ending-style` applied.
   After all animations on the element finish (`useAnimationsFinished`),
   `mounted` flips false and the element unmounts.

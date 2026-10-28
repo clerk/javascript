@@ -490,7 +490,7 @@ describe('Mosaic Field', () => {
     expect(error?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('mounts through the headless enter transition and animates the message height', () => {
+  it('animates the registered message height while initially present feedback stays at rest', () => {
     const probe = stylex.create({
       message: {
         transitionProperty: {
@@ -525,7 +525,7 @@ describe('Mosaic Field', () => {
     expect(atoms(probe.feedback)).toHaveLength(3);
     expect(error).toHaveClass(...atoms(probe.feedback));
     expect(error).toHaveAttribute('data-open');
-    expect(error).toHaveAttribute('data-starting-style');
+    expect(error).not.toHaveAttribute('data-starting-style');
   });
 
   it('renders nothing without a message', () => {

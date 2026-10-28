@@ -64,5 +64,7 @@ export const feedbackStyles = stylex.create({
 });
 
 export const feedbackHeight = stylex.create({
-  measured: (height: number) => ({ '--_cl-feedback-height': `${height}px` }),
+  measured: (height: number | undefined) => ({
+    '--_cl-feedback-height': height === undefined ? null : `${height}px`,
+  }),
 });

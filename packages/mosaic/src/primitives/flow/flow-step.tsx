@@ -40,14 +40,11 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
   const activeChildrenRef = useRef(children);
-  const hasBeenClosed = useRef(false);
   const focusTargetsRef = useRef(new Set<HTMLElement>());
   const wasOpenRef = useRef(open);
 
   if (open) {
     activeChildrenRef.current = children;
-  } else {
-    hasBeenClosed.current = true;
   }
 
   const { mounted, transitionProps } = useTransition({ open, ref: stepRef });
@@ -97,16 +94,12 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     [open, parentActive, registerFocusTarget, unregisterFocusTarget],
   );
 
-  const effectiveTransitionProps = !hasBeenClosed.current
-    ? { ...transitionProps, 'data-starting-style': undefined, style: undefined }
-    : transitionProps;
-
   const defaultProps = {
-    ...effectiveTransitionProps,
+    ...transitionProps,
     ...inertProps(!open),
     'aria-hidden': !open ? true : undefined,
     style: {
-      ...effectiveTransitionProps.style,
+      ...transitionProps.style,
       '--cl-flow-transition-direction': String(direction),
     },
     children: open ? children : activeChildrenRef.current,
