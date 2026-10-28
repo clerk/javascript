@@ -123,6 +123,14 @@ describe('Mosaic router', () => {
       expect(router.getSearchParams().get('missing')).toBeNull();
     });
 
+    it('reads the latest query after the URL changes', async () => {
+      const router = await renderRouter();
+      window.history.replaceState(null, '', '?step=one');
+      expect(router.getSearchParams().get('step')).toBe('one');
+      window.history.replaceState(null, '', '?step=two');
+      expect(router.getSearchParams().get('step')).toBe('two');
+    });
+
     it('returns a fresh instance on each call', async () => {
       const router = await renderRouter();
       window.history.replaceState(null, '', '?step=one');
