@@ -1,0 +1,49 @@
+import * as WaitlistStories from './waitlist.stories';
+
+# Waitlist
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={WaitlistStories}
+  composition={[
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { Waitlist } from '@clerk/mosaic';
+
+<Waitlist />;
+```
+
+| Prop                   | Type        | Default                       | Description                                       |
+| ---------------------- | ----------- | ----------------------------- | ------------------------------------------------- |
+| `afterJoinWaitlistUrl` | `string`    | —                             | Where the user is sent two seconds after joining. |
+| `signInUrl`            | `string`    | the application's sign-in URL | Where **Sign in** goes.                           |
+| `fallback`             | `ReactNode` | —                             | Rendered while Clerk loads.                       |
+
+## Joined
+
+Once the address is on the waitlist, the card thanks the user and takes focus to its title, so a
+screen reader announces it.
+
+<Story
+  name='Joined'
+  storyModule={WaitlistStories}
+/>
+
+With `afterJoinWaitlistUrl`, the card says the user is about to be redirected, and sends them on two
+seconds later.
+
+<Story
+  name='Redirecting'
+  storyModule={WaitlistStories}
+/>
