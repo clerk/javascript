@@ -128,15 +128,45 @@ function useRenderCalls(fn, visitorKeys) {
   return calls;
 }
 
-function passesRef(call) {
+function includesRef(value, refName, scope) {
+  const node = unwrapExpression(value);
+  if (node?.type === 'Identifier') {
+    if (node.name === refName) {
+      return true;
+    }
+    const variable = findVariable(scope, node.name);
+    const definition = variable?.defs.length === 1 ? variable.defs[0] : undefined;
+    return definition?.node.type === 'VariableDeclarator' && includesRef(definition.node.init, refName, scope);
+  }
+  if (node?.type === 'LogicalExpression') {
+    return includesRef(node.left, refName, scope);
+  }
+  if (node?.type === 'ConditionalExpression') {
+    return includesRef(node.consequent, refName, scope) && includesRef(node.alternate, refName, scope);
+  }
+  return node?.type === 'ArrayExpression' && node.elements.some(element => includesRef(element, refName, scope));
+}
+
+function findVariable(scope, name) {
+  for (let current = scope; current; current = current.upper) {
+    const variable = current.set.get(name);
+    if (variable) {
+      return variable;
+    }
+  }
+  return undefined;
+}
+
+function passesRef(call, refName, scope) {
   const [options] = call.arguments;
   if (options?.type !== 'ObjectExpression') {
     return true;
   }
   return options.properties.some(
     property =>
-      property.type === 'SpreadElement' ||
-      (property.type === 'Property' && propertyName(property.key, property.computed) === 'ref'),
+      property.type === 'Property' &&
+      propertyName(property.key, property.computed) === 'ref' &&
+      includesRef(property.value, refName, scope),
   );
 }
 
@@ -163,7 +193,8 @@ export const forwardRefParts = {
       if (calls.length === 0) {
         return;
       }
-      if (!wrapped || calls.some(call => !passesRef(call))) {
+      const refName = fn.params[1]?.type === 'Identifier' ? fn.params[1].name : undefined;
+      if (!wrapped || calls.some(call => !passesRef(call, refName, context.sourceCode.getScope(call)))) {
         context.report({ node: reportNode, messageId: 'forwardRef' });
       }
     };

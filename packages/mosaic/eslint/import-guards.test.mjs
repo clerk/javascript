@@ -364,6 +364,9 @@ describe('Mosaic parts', { timeout: 30_000 }, () => {
     "export const Part = (props: { render?: never }) => useRender({ defaultTagName: 'div', props });",
     "export function Part(props: { render?: never }) { return <Composite render={() => useRender({ defaultTagName: 'div', props })} />; }",
     "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props) { return useRender({ defaultTagName: 'div', props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { const internalRef = React.useRef(null); return useRender({ defaultTagName: 'div', ref: internalRef, props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { const internalRef = React.useRef(null); return useRender({ defaultTagName: 'div', ref: [internalRef], props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'div', ref: null, props }); });",
   ])('rejects a part that drops the ref: %s', async source => {
     expect(await forwardRefMessages(partFixture, source)).toEqual([
       'Parts that render through useRender must use React.forwardRef and pass the ref to useRender (see primitives/select/select-trigger.tsx).',
@@ -372,6 +375,9 @@ describe('Mosaic parts', { timeout: 30_000 }, () => {
 
   test.each([
     "export const Part = React.forwardRef<HTMLButtonElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'button', ref: [null, ref], props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'div', ref, props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'div', ref: [null, ref ?? null], props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props: { open?: boolean }, ref) { const finalRef = props.open ? ref : [null, ref]; return useRender({ defaultTagName: 'div', ref: finalRef, props }); });",
     'export function Provider(props: { children: React.ReactNode }) { return props.children; }',
   ])('allows parts that forward the ref or render nothing: %s', async source => {
     expect(await forwardRefMessages(partFixture, source)).toEqual([]);
