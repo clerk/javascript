@@ -51,22 +51,24 @@ return {
 };
 ```
 
-When a direct action and a confirmation must not run together, create one
-`useActionLock` (`src/hooks/use-action-lock.ts`) and inject it into both owners:
+When a direct action and a confirmation must not run together, give both
+operations one `usePendingAction` owner:
 
 ```ts
-const actionLock = useActionLock();
-const primary = usePendingAction({ actionLock });
+const actions = usePendingAction();
 const remove = useConfirmController({
-  actionLock,
+  runAction: actions.runExternal,
   onConfirm: contact => removalFocus.remove(contact.id),
 });
 ```
 
-Pass `actionLock.isPending` to the section controls' `disabled` props, including
-`Confirmation.disabled`. The lock prevents overlapping requests even before React
-renders the disabled controls, and stays held until the action settles. Each owner
-keeps its existing error handling. `actionLock` is a hook option, not a per-run option.
+Run direct actions with `actions.run(key, action)`. Pass `actions.isPending` to
+the section controls' `disabled` props, including `Confirmation.disabled`.
+`runExternal` returns the accepted promise, or `undefined` while another action
+runs. It leaves row keys and inline errors unchanged and preserves rejections
+for the confirmation dialog to handle. Both paths block overlapping calls before
+React renders and stay pending until the accepted promise settles. Closing a
+verification dialog does not release pending while cancellation is still settling.
 
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the

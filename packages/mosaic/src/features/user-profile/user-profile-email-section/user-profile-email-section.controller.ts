@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
-import { useActionLock } from '../../../hooks/use-action-lock';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import type { UserProfileEmail } from '../user-profile-contact.types';
@@ -24,8 +23,7 @@ export function useUserProfileEmailSectionController({
     onCreate: onCreateEmail,
     reverification: createReverification,
   });
-  const actionLock = useActionLock();
-  const setPrimary = usePendingAction({ actionLock });
+  const actions = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: emails.map(email => email.id),
@@ -33,7 +31,7 @@ export function useUserProfileEmailSectionController({
     fallback: () => rowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? rowRef.current,
   });
   const remove = useConfirmController<UserProfileEmail>({
-    actionLock,
+    runAction: actions.runExternal,
     onConfirm: email => removalFocus.remove(email.id),
     reverification: removeReverification,
   });
@@ -42,22 +40,22 @@ export function useUserProfileEmailSectionController({
     emails,
     canAdd: Boolean(onCreateEmail),
     verification,
-    error: setPrimary.error,
-    isDisabled: actionLock.isPending,
-    pendingPrimaryId: setPrimary.pendingKey,
+    error: actions.error,
+    isDisabled: actions.isPending,
+    pendingPrimaryId: actions.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemoveEmail ? remove : undefined,
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     setPrimaryReverification,
-    setPrimaryFinalFocus: () => (setPrimary.lastKey ? removalFocus.trigger(setPrimary.lastKey) : null),
+    setPrimaryFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
     onVerify: id => {
       const email = emails.find(email => email.id === id);
       if (email) {
         verification.onVerifyEmail(email, getEmailVerifier(id));
       }
     },
-    onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryEmail(id)),
+    onSetPrimary: id => void actions.run(id, () => onSetPrimaryEmail(id)),
   };
 }

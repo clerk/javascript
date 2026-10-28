@@ -1,23 +1,18 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import type { ErrorDescription } from '../localization';
 import { useErrorText } from '../localization';
 import { toLocalizableError } from '../utils/errors';
-import type { ActionLock } from './use-action-lock';
-import { useActionLock } from './use-action-lock';
 
 export interface PendingActionOptions {
   /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
   errorFallback?: string;
 }
 
-export interface PendingActionHookOptions extends PendingActionOptions {
-  actionLock?: ActionLock;
-}
-
 export interface PendingAction<TKey extends string> {
   run: (key: TKey, action: () => Promise<unknown> | void, options?: PendingActionOptions) => Promise<boolean>;
+  runExternal: <T>(action: () => T | Promise<T>) => Promise<T> | undefined;
   pendingKey: TKey | undefined;
   lastKey: TKey | undefined;
   isPending: boolean;
@@ -32,25 +27,40 @@ interface PendingActionFailure<TKey extends string> {
   errorFallback: string | undefined;
 }
 
+type Pending<TKey> = { kind: 'inline'; key: TKey } | { kind: 'external' };
+
 /**
- * Runs inline actions, such as row buttons, under one lock and tracks which key is pending, which key ran last, and which key last failed.
- * `run` resolves `true` on success and `false` on failure, ignores calls while any run is in flight, and clears the last error when it starts.
+ * Runs inline and external actions under one lock and tracks which inline key is pending, ran last, or last failed.
+ * `run` resolves `true` on success and `false` on failure, ignores calls while any action is in flight, and clears the last error when it starts.
  */
 export function usePendingAction<TKey extends string = string>({
   errorFallback,
-  actionLock,
-}: PendingActionHookOptions = {}): PendingAction<TKey> {
+}: PendingActionOptions = {}): PendingAction<TKey> {
   const errorText = useErrorText();
-  const [pendingKey, setPendingKey] = useState<TKey>();
+  const running = useRef(false);
+  const [pending, setPending] = useState<Pending<TKey>>();
   const [lastKey, setLastKey] = useState<TKey>();
   const [failure, setFailure] = useState<PendingActionFailure<TKey>>();
-  const localLock = useActionLock();
-  const lock = actionLock ?? localLock;
+
+  const claim = <T>(next: Pending<TKey>, action: () => T | Promise<T>): Promise<T> | undefined => {
+    if (running.current) {
+      return undefined;
+    }
+    running.current = true;
+    setPending(next);
+    return (async () => {
+      try {
+        return await action();
+      } finally {
+        running.current = false;
+        setPending(undefined);
+      }
+    })();
+  };
 
   const run = async (key: TKey, action: () => Promise<unknown> | void, options: PendingActionOptions = {}) => {
     return (
-      lock.tryRun(async () => {
-        setPendingKey(key);
+      claim({ kind: 'inline', key }, async () => {
         setLastKey(key);
         setFailure(undefined);
         try {
@@ -61,8 +71,6 @@ export function usePendingAction<TKey extends string = string>({
             setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
           }
           return false;
-        } finally {
-          setPendingKey(undefined);
         }
       }) ?? false
     );
@@ -70,9 +78,10 @@ export function usePendingAction<TKey extends string = string>({
 
   return {
     run,
-    pendingKey,
+    runExternal: action => claim({ kind: 'external' }, action),
+    pendingKey: pending?.kind === 'inline' ? pending.key : undefined,
     lastKey,
-    isPending: pendingKey !== undefined,
+    isPending: pending !== undefined,
     error: failure ? errorText(failure.error, failure.errorFallback ?? errorFallback) : undefined,
     errorKey: failure?.key,
     reset: () => setFailure(undefined),

@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import type { DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import type { ReverificationController } from '../../features/reverification';
-import type { ActionLock } from '../../hooks/use-action-lock';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
@@ -86,7 +85,7 @@ export interface ConfirmController<Payload = void> {
 }
 
 export interface ConfirmControllerOptions<Payload = void> {
-  actionLock?: ActionLock;
+  runAction?: (action: () => Promise<void>) => Promise<void> | undefined;
   /** The action the dialog confirms. Resolve to close; reject to keep the dialog open showing why. */
   onConfirm: (payload: Payload) => Promise<unknown> | void;
   /** The flow `onConfirm` runs under, when the action may need step-up verification. */
@@ -109,7 +108,7 @@ export function useConfirmController<Payload = void>({
   onConfirm,
   reverification,
   errorFallback,
-  actionLock,
+  runAction,
 }: ConfirmControllerOptions<Payload>): ConfirmController<Payload> {
   const handle = useMemo(() => Dialog.createHandle<Payload>(), []);
   const [snapshot, send] = useMachine(confirmMachine);
@@ -145,8 +144,8 @@ export function useConfirmController<Payload = void>({
       const run = async () => {
         await onConfirm(payload);
       };
-      if (actionLock) {
-        const accepted = actionLock.tryRun(run);
+      if (runAction) {
+        const accepted = runAction(run);
         if (accepted) {
           send({ type: 'CONFIRM', run: () => accepted });
         }

@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
 import { usePanelTitle } from '../../../components/panel';
-import { useActionLock } from '../../../hooks/use-action-lock';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
@@ -46,8 +45,7 @@ export function useUserProfileWeb3WalletsController({
   | 'createReverification'
 >) {
   const messages = useMessages('userProfileWeb3Wallets');
-  const actionLock = useActionLock();
-  const action = usePendingAction({ actionLock, errorFallback: messages.errors.generic });
+  const action = usePendingAction({ errorFallback: messages.errors.generic });
   const [picker, setPicker] = useState<SolanaPicker>({ open: false });
   const [owner, setOwner] = useState<WalletAction>();
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -61,7 +59,7 @@ export function useUserProfileWeb3WalletsController({
       panelTitle(),
   });
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
-    actionLock,
+    runAction: action.runExternal,
     onConfirm: wallet => removalFocus.remove(wallet.id),
     reverification: removeReverification,
   });
@@ -173,7 +171,7 @@ export function useUserProfileWeb3WalletsController({
         : undefined,
     pendingId,
     pendingPrimaryId: owner?.kind === 'primary' ? pendingId : undefined,
-    isDisabled: actionLock.isPending,
+    isDisabled: action.isPending,
     sectionRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: remove ? removeWallet : undefined,
