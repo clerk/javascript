@@ -177,6 +177,28 @@ describe('UserProfile', () => {
     expect(drawn.height).toBeCloseTo(around.height + 24);
   });
 
+  it('leaves the page where it is when the found target is already in view', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(
+      <div
+        data-testid='scroller'
+        style={{ height: 400, overflowY: 'auto' }}
+      >
+        <UserProfile />
+      </div>,
+    );
+    const scroller = screen.getByTestId('scroller');
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'password');
+    await user.click(screen.getByRole('option', { name: 'Password' }));
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeVisible();
+    expect(scroller.scrollTop).toBe(0);
+  });
+
   it('adds custom pages in the requested order and opens on the first', async () => {
     serve();
     await renderWithClerk(

@@ -59,6 +59,7 @@ export const styles = stylex.create({
 
   target: {
     outline: 'none',
+    scrollMarginBlockEnd: space['12'],
     scrollMarginBlockStart: space['12'],
   },
 
