@@ -277,7 +277,10 @@ describe('the user profile profile section', () => {
   });
 
   it('tells the user the username length the instance allows', async () => {
-    const { actor } = await renderSection(withUsername('alicesmith'));
+    const { actor } = await renderSection({
+      ...withUsername('alicesmith'),
+      environment: fapiEnvironment({ user_settings: { username_settings: { min_length: 5, max_length: 20 } } }),
+    });
     failsWith(
       '/v1/me',
       { code: 'form_username_invalid_length', message: 'Invalid length', meta: { param_name: 'username' } },
@@ -291,7 +294,7 @@ describe('the user profile profile section', () => {
 
     await waitFor(() =>
       expect(within(dialog).getByLabelText('Username')).toHaveAccessibleDescription(
-        'Your username must be between 4 and 64 characters long.',
+        'Your username must be between 5 and 20 characters long.',
       ),
     );
   });
