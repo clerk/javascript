@@ -76,6 +76,7 @@ export function UserProfileWeb3WalletsSectionView({
       {remove ? (
         <Confirmation
           controller={remove}
+          disabled={isBusy}
           title={m.removeDialog.title}
           description={wallet =>
             fill(wallet.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {

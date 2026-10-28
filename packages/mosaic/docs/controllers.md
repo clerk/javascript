@@ -71,8 +71,8 @@ Opening a dialog does not acquire the lock. The lock owns no errors or row IDs.
 `usePendingAction` keeps its inline errors and boolean result; refused runs
 return `false` without changing metadata. `useConfirmController` keeps removal
 errors in its dialog; refusal leaves the dialog and its error unchanged.
-Its `canConfirm` projection disables only the confirmation submit control.
-Admission still runs through the lock, not the rendered projection. Without an
+Pass the section's pending state to `Confirmation.disabled` to disable its submit
+control while another action runs. Admission still runs through the lock. Without an
 injected lock, each owner retains its existing independent behavior.
 
 `actionLock` is a hook option, not a per-run option. Project its `isPending` to
