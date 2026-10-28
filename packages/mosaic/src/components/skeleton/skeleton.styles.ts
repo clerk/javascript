@@ -14,11 +14,6 @@ export const styles = stylex.create({
     display: 'block',
     whiteSpace: 'nowrap',
   },
-  inline: {
-    overflow: 'visible',
-    display: 'inline-block',
-    verticalAlign: 'baseline',
-  },
   block: {
     overflow: 'hidden',
     display: 'flex',

@@ -12,7 +12,6 @@ export type SkeletonShape = 'rounded' | 'pill' | 'square';
 export interface SkeletonProps extends Omit<MosaicComponentProps<'span'>, 'render'> {
   show?: boolean;
   visible?: boolean;
-  inline?: boolean;
   shape?: SkeletonShape;
   width?: number | string;
   height?: number | string;
@@ -35,7 +34,7 @@ function isText(children: React.ReactNode) {
  * <Section.Label><Skeleton>{device.name}</Skeleton></Section.Label>
  */
 export const Skeleton = React.forwardRef<HTMLSpanElement, SkeletonProps>(function MosaicSkeleton(
-  { show = true, visible = true, inline = false, shape = 'rounded', width, height, xstyle, children, ...rest },
+  { show = true, visible = true, shape = 'rounded', width, height, xstyle, children, ...rest },
   ref,
 ) {
   if (!show) {
@@ -52,7 +51,7 @@ export const Skeleton = React.forwardRef<HTMLSpanElement, SkeletonProps>(functio
         stylex.props(
           reset.base,
           styles.frame,
-          text ? [styles.text, inline && styles.inline] : [styles.block, shapes[shape]],
+          text ? styles.text : [styles.block, shapes[shape]],
           sized && size.fixed(toLength(width, 'fit-content'), toLength(height, 'auto')),
           visible && (text ? skeletonStyles.textBar : [skeletonStyles.fill, skeletonStyles.shimmer]),
           xstyle,
