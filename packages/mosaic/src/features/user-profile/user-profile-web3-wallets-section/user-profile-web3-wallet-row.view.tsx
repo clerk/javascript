@@ -7,7 +7,6 @@ import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
-import { Spinner } from '../../../components/spinner';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
@@ -46,7 +45,11 @@ export function UserProfileWeb3WalletRowView({
     actions.push({ label: m.verify, onClick: () => onVerify(wallet.id) });
   }
   if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
-    actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
+    actions.push({
+      label: m.setPrimary,
+      onClick: () => onSetPrimary(wallet.id),
+      status: isPrimaryPending ? 'pending' : 'idle',
+    });
   }
   if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(linkedWallet) });
@@ -71,14 +74,7 @@ export function UserProfileWeb3WalletRowView({
             >
               {wallet.provider || shortAddress}
             </span>
-            {linkedWallet?.isPrimary ? (
-              <Badge color='neutral'>{m.primary}</Badge>
-            ) : isPrimaryPending ? (
-              <Spinner
-                size='sm'
-                label={m.setPrimary}
-              />
-            ) : null}
+            {linkedWallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
             {linkedWallet && !linkedWallet.isVerified ? (
               <Badge color='warning'>{isPending ? m.verifying : m.unverified}</Badge>
             ) : null}

@@ -1,7 +1,6 @@
 import { Confirmation } from '../../../blocks/confirmation';
 import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
-import { useSpinDelay } from '../../../hooks/use-spin-delay';
 import { fill, useMessages } from '../../../localization';
 import { truncateWithEndVisible } from '../../../utils/truncate-text-with-end-visible';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
@@ -29,7 +28,6 @@ export function UserProfileWeb3WalletsSectionView({
   const m = useMessages('userProfileWeb3Wallets');
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect)) || Boolean(error);
   const isBusy = isDisabled || pendingId !== undefined;
-  const shownPrimaryId = useSpinDelay(pendingPrimaryId ?? null, { minDuration: 0 });
 
   return (
     <>
@@ -51,7 +49,7 @@ export function UserProfileWeb3WalletsSectionView({
                   wallet={wallet}
                   triggerRef={registerTrigger(wallet.id)}
                   isPending={pendingId === wallet.id}
-                  isPrimaryPending={shownPrimaryId === wallet.id}
+                  isPrimaryPending={pendingPrimaryId === wallet.id}
                   isDisabled={isBusy}
                   onVerify={onVerify}
                   onSetPrimary={onSetPrimary}

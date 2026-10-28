@@ -9,26 +9,30 @@ function contact(id: string, status: Contact['verification']['status'], expireAt
 }
 
 describe('toContacts', () => {
-  it('orders primary first, then verified, then pending by expiry, then never started', () => {
+  it('orders verified, then pending by expiry, then never started regardless of primary', () => {
     const items = [
       contact('idn_unstarted', null),
       contact('idn_pending_late', 'unverified', new Date(2026, 0, 2)),
       contact('idn_verified_b', 'verified'),
-      contact('idn_primary', 'verified'),
+      contact('idn_verified_z', 'verified'),
       contact('idn_pending_soon', 'unverified', new Date(2026, 0, 1)),
       contact('idn_verified_a', 'verified'),
     ];
 
-    const contacts = toContacts(items, 'idn_primary', item => item.id);
+    const contacts = toContacts(items, 'idn_verified_z', item => item.id);
+    const changedPrimary = toContacts(items, 'idn_verified_b', item => item.id);
 
     expect(contacts.map(item => item.id)).toEqual([
-      'idn_primary',
       'idn_verified_a',
       'idn_verified_b',
+      'idn_verified_z',
       'idn_pending_soon',
       'idn_pending_late',
       'idn_unstarted',
     ]);
+    expect(changedPrimary.map(item => item.id)).toEqual(contacts.map(item => item.id));
+    expect(changedPrimary.find(item => item.id === 'idn_verified_b')?.isDefault).toBe(true);
+    expect(changedPrimary.find(item => item.id === 'idn_verified_z')?.isDefault).toBe(false);
   });
 
   it('marks which contact is the primary one and which are verified', () => {

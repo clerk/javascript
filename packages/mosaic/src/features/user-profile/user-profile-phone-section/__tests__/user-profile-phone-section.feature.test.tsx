@@ -92,29 +92,37 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile phone section', () => {
-  it('closes the menu and blocks conflicting actions while setting a number as primary', async () => {
+  it('holds the menu and row order while setting a number as primary', async () => {
     const { actor } = await renderSection(signedIn([HOME, WORK]));
+    const initialOrder = listed();
     const primary = holdRequests('post', '/v1/me');
     try {
       await manage(actor, WORK_LABEL, 'Set as primary');
       await waitFor(() => expect(primary.requests).toHaveLength(1));
-      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+      const menu = screen.getByRole('menu');
+      const item = within(menu).getByRole('menuitem', { name: 'Set as primary' });
+      expect(item).toHaveAttribute('aria-busy', 'true');
       const manageWork = screen.getByRole('button', { name: `Manage ${WORK_LABEL}` });
       expect(manageWork).toHaveAttribute('aria-disabled', 'true');
-      await actor.click(manageWork);
-      expect(screen.queryByRole('menu')).toBeNull();
+      expect(within(menu).getByRole('menuitem', { name: 'Remove phone number' })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
       expect(screen.queryByRole('alertdialog')).toBeNull();
       expect(screen.getByRole('button', { name: 'Add phone number' })).toBeDisabled();
-      expect(await screen.findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(await within(item).findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(listed()).toEqual(initialOrder);
     } finally {
       primary.release();
       await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
     }
     expect(screen.getByRole('button', { name: `Manage ${WORK_LABEL}` })).not.toHaveAttribute('aria-disabled', 'true');
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(listed()).toEqual(initialOrder);
     expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
   });
 
-  it('lists the primary number first and marks it', async () => {
+  it('lists verified numbers in order and marks the primary', async () => {
     await renderSection(signedIn([HOME, WORK]));
 
     expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
@@ -203,7 +211,8 @@ describe('the user profile phone section', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
 
-    await waitFor(() => expect(listed()).toEqual([WORK_LABEL, HOME_LABEL]));
+    await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
+    expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
     expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary');
   });
 
@@ -502,6 +511,7 @@ describe('phone reverification', () => {
     expect(within(row()).queryByRole('alert')).toBeNull();
     expect(within(row()).getByRole('button', { name: `Manage ${WORK_LABEL}` })).toHaveFocus();
 
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
     await manage(actor, WORK_LABEL, 'Set as primary');
     await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_work'));
   });
