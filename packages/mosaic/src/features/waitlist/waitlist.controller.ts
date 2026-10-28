@@ -24,14 +24,9 @@ const waitlistMachine = createMachine({
     },
     joined: {
       after: {
-        [WAITLIST_REDIRECT_DELAY_MS]: {
-          target: 'redirected',
-          guard: context => context.onRedirect !== undefined,
-          actions: context => context.onRedirect?.(),
-        },
+        [WAITLIST_REDIRECT_DELAY_MS]: { actions: context => context.onRedirect?.() },
       },
     },
-    redirected: { type: 'final' },
   },
 });
 
