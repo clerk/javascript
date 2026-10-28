@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
@@ -146,12 +146,20 @@ describe('UserProfile with an active organization', () => {
   function serveWithOrganization({
     permissions = ['org:sys_memberships:read'],
     userAPIKeysEnabled = false,
+    orgAPIKeysEnabled = false,
     activeOrganizationId = acme.id,
-  }: { permissions?: string[]; userAPIKeysEnabled?: boolean; activeOrganizationId?: string | null } = {}) {
+  }: {
+    permissions?: string[];
+    userAPIKeysEnabled?: boolean;
+    orgAPIKeysEnabled?: boolean;
+    activeOrganizationId?: string | null;
+  } = {}) {
     const memberships = [fapiMembership(acme, { permissions })];
     const user = fapiUser({ id: 'user_1', organization_memberships: memberships });
     return serveFapi({
-      environment: fapiEnvironment({ api_keys_settings: { user_api_keys_enabled: userAPIKeysEnabled } }),
+      environment: fapiEnvironment({
+        api_keys_settings: { user_api_keys_enabled: userAPIKeysEnabled, orgs_api_keys_enabled: orgAPIKeysEnabled },
+      }),
       client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: activeOrganizationId })]),
       memberships,
     });
@@ -176,6 +184,35 @@ describe('UserProfile with an active organization', () => {
     serveWithOrganization({ permissions: [] });
     await renderWithClerk(<UserProfile />);
     expect(tabsDescribedBy('Organization')).toEqual(['General']);
+  });
+
+  it.each([
+    { hide: true, tabs: ['General'] },
+    { hide: false, tabs: ['General', 'API Keys'] },
+  ])('lists the organization API keys only when they are not hidden: $hide', async ({ hide, tabs }) => {
+    serveWithOrganization({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'] });
+    await renderWithClerk(<UserProfile organizationProfileProps={{ apiKeysProps: { hide } }} />);
+    expect(tabsDescribedBy('Organization')).toEqual(tabs);
+  });
+
+  it('sends the user to afterLeaveOrganizationUrl after leaving the organization', async () => {
+    const fapi = serveWithOrganization();
+    const { navigate } = await renderWithClerk(
+      <UserProfile
+        defaultPage='organization.general'
+        organizationProfileProps={{ afterLeaveOrganizationUrl: '/organizations' }}
+      />,
+    );
+    const user = userEvent.setup();
+    const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
+      role: 'alertdialog',
+    });
+
+    await user.type(within(dialog).getByRole('textbox'), 'Acme');
+    await user.click(within(dialog).getByRole('button', { name: 'Leave organization' }));
+
+    await waitFor(() => expect(fapi.memberships).toHaveLength(0));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'));
   });
 
   it('lists only the account pages in user mode', async () => {
