@@ -13,7 +13,7 @@ import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosRows, chaosText } from '@/lib/chaos';
+import { chaosPick, chaosRows } from '@/lib/chaos';
 
 interface FixtureAPIKey {
   id: string;
@@ -24,6 +24,15 @@ interface FixtureAPIKey {
 }
 
 const exampleTime = Date.now();
+
+const chaosAPIKeyNames = [
+  'Production webhook ingestion for the EU billing reconciliation pipeline',
+  'Nightly data warehouse export (Snowflake to BigQuery)',
+  'Customer support dashboard, read-only access',
+  'Legacy v1 API: do not revoke until the mobile migration ships',
+  'Zapier',
+  'Internal tooling for the Growth and Lifecycle Marketing team',
+];
 
 export const exampleAPIKeys: FixtureAPIKey[] = [
   'Web app',
@@ -67,7 +76,7 @@ export function useAPIKeysTableFixture({
   const locale = useLocale();
   const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
   const seed = useChaosFixture(initialKeys, items =>
-    chaosRows(items).map(key => ({ ...key, name: chaosText(key.name) })),
+    chaosRows(items).map((key, index) => ({ ...key, name: chaosPick(chaosAPIKeyNames, index) })),
   );
   const [items, setItems] = useState(seed);
   const [searchValue, setSearchValue] = useState('');

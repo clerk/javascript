@@ -1126,6 +1126,9 @@ importers:
       '@clerk/shared':
         specifier: workspace:*
         version: link:../shared
+      '@faker-js/faker':
+        specifier: ^10.0.0
+        version: 10.6.0
       '@floating-ui/react':
         specifier: catalog:repo
         version: 0.27.20(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
