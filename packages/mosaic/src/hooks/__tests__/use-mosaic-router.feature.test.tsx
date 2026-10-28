@@ -1,9 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { serveFapi } from '../../__tests__/feature/fake-fapi';
 import { renderWithClerk } from '../../__tests__/feature/render';
+import type { MosaicRouter } from '../use-mosaic-router';
 import { useMosaicRouter } from '../use-mosaic-router';
 
 function Navigation({ to, hard = false }: { to: string; hard?: boolean }) {
@@ -16,6 +17,21 @@ function Navigation({ to, hard = false }: { to: string; hard?: boolean }) {
       Navigate
     </button>
   );
+}
+
+function CaptureRouter({ onRouter }: { onRouter: (router: MosaicRouter) => void }) {
+  onRouter(useMosaicRouter());
+  return null;
+}
+
+async function renderRouter() {
+  serveFapi();
+  let captured: MosaicRouter | undefined;
+  await renderWithClerk(<CaptureRouter onRouter={router => (captured = router)} />);
+  if (!captured) {
+    throw new Error('Router was not rendered');
+  }
+  return captured;
 }
 
 describe('Mosaic router', () => {
@@ -86,5 +102,42 @@ describe('Mosaic router', () => {
         Object.defineProperty(clerk, '__internal_windowNavigate', descriptor);
       }
     }
+  });
+
+  describe('getSearchParams', () => {
+    const originalUrl = window.location.href;
+
+    afterEach(() => {
+      window.history.replaceState(null, '', originalUrl);
+    });
+
+    it('reads the current query with values decoded', async () => {
+      const router = await renderRouter();
+      window.history.replaceState(null, '', '?email_address=bob%40example.com');
+      expect(router.getSearchParams().get('email_address')).toBe('bob@example.com');
+    });
+
+    it('returns null for a key that is not in the query', async () => {
+      const router = await renderRouter();
+      window.history.replaceState(null, '', '?email_address=bob%40example.com');
+      expect(router.getSearchParams().get('missing')).toBeNull();
+    });
+
+    it('reads the latest query after the URL changes', async () => {
+      const router = await renderRouter();
+      window.history.replaceState(null, '', '?step=one');
+      expect(router.getSearchParams().get('step')).toBe('one');
+      window.history.replaceState(null, '', '?step=two');
+      expect(router.getSearchParams().get('step')).toBe('two');
+    });
+
+    it('returns a fresh instance on each call', async () => {
+      const router = await renderRouter();
+      window.history.replaceState(null, '', '?step=one');
+      const first = router.getSearchParams();
+      first.set('step', 'two');
+      first.append('extra', 'value');
+      expect(router.getSearchParams().toString()).toBe('step=one');
+    });
   });
 });
