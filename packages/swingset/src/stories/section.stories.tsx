@@ -7,6 +7,7 @@ import { Section } from '@clerk/mosaic/components/section';
 import { Skeleton } from '@clerk/mosaic/components/skeleton';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import { ArrowUpRight } from '@clerk/mosaic/icons/glyphs/arrow-up-right';
+import { Calendar } from '@clerk/mosaic/icons/glyphs/calendar';
 import { DeviceLaptop } from '@clerk/mosaic/icons/glyphs/device-laptop';
 import { DevicePhone } from '@clerk/mosaic/icons/glyphs/device-phone';
 import { EllipsisHorizontal } from '@clerk/mosaic/icons/glyphs/ellipsis-horizontal';
@@ -427,6 +428,65 @@ export function Destructive() {
             </Section.Item>
           </Section.Row>
         </Section.Body>
+      </Section.Group>
+    </Section.Root>
+  );
+}
+
+export function Subscription() {
+  return (
+    <Section.Root xstyle={styles.rootMax}>
+      <Section.Group>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Subscription</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Frame>
+          <Section.Body>
+            <Section.Row>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>
+                    Basic <Badge color='neutral'>Ends Oct 22</Badge>
+                  </Section.Label>
+                  <Section.Description>$12 / month</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                  >
+                    Change plan
+                  </Button>
+                </Section.Actions>
+              </Section.Item>
+            </Section.Row>
+            <Section.Row>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>Next invoice</Section.Label>
+                  <Section.Description>Due October 22, 2026</Section.Description>
+                </Section.Content>
+                <Section.Actions>$199.00</Section.Actions>
+              </Section.Item>
+            </Section.Row>
+          </Section.Body>
+          <Section.Footer>
+            <span style={{ alignItems: 'center', display: 'inline-flex', gap: 8 }}>
+              <Icon glyph={Calendar} />
+              Changing to the Basic plan on October 22, 2026
+            </span>
+            <Button
+              color='neutral'
+              size='sm'
+              variant='ghost'
+            >
+              View details
+            </Button>
+          </Section.Footer>
+        </Section.Frame>
       </Section.Group>
     </Section.Root>
   );
