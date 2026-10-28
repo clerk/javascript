@@ -5,7 +5,7 @@ import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosText } from '@/lib/chaos';
+import { chaosRole } from '@/lib/chaos';
 
 const exampleRoles = [
   { value: 'member', label: 'Member', description: 'Role with non-privileged permissions in the organization.' },
@@ -20,9 +20,7 @@ export function useInviteMembersFixture(): {
 } {
   const m = useMessages('organizationProfileInviteMembers');
   const locale = useLocale();
-  const roles = useChaosFixture(exampleRoles, items =>
-    items.map(role => ({ ...role, label: chaosText(role.label), description: chaosText(role.description) })),
-  );
+  const roles = useChaosFixture(exampleRoles, items => items.map((role, index) => ({ ...role, ...chaosRole(index) })));
   const toast = useToastManager();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
