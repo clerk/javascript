@@ -1,16 +1,7 @@
-import { useState } from 'react';
-
-import { withCardStateProvider } from '@/ui/elements/contexts';
-import { Form } from '@/ui/elements/Form';
-import { FormButtonContainer } from '@/ui/elements/FormButtons';
-import { FormContainer } from '@/ui/elements/FormContainer';
-import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
-import { Tooltip } from '@/ui/elements/Tooltip';
-import { useFormControl } from '@/ui/utils/useFormControl';
 
 import {
   Badge,
@@ -19,7 +10,6 @@ import {
   Col,
   descriptors,
   Flex,
-  Icon,
   Table,
   Tbody,
   Td,
@@ -28,53 +18,70 @@ import {
   Thead,
   Tr,
 } from '../../../customizables';
-import { Action } from '../../../elements/Action';
-import { useActionContext } from '../../../elements/Action/ActionRoot';
-import { InformationCircle } from '../../../icons';
-import { useRouter } from '../../../router';
+import { Header } from '../../../elements/Header';
 import type { PropsOfComponent } from '../../../styledSystem';
-import { ConfigurePolicyPage } from './ConfigurePolicyPage';
+import { ManageConnectionPage, SetupWizard } from './ConnectionPages';
+import { useAccessNavigation } from './navigation';
+import { borderSx, ContentRefContext, InfoTooltip, smallSx } from './parts';
+import { PolicyPage } from './PolicyPage';
 import type { ProtoConnection, ProtoPolicy, ScenarioKey } from './prototypeState';
 import {
-  connectionFor,
+  activationBlocker,
+  connectionById,
+  draftFromPolicy,
   ENROLLMENT_LABELS,
-  policiesForConnection,
   policyTarget,
   protoKey,
-  PROVIDER_LABELS,
   SCENARIO_LABELS,
-  simulateRequest,
   useAccessPrototype,
 } from './prototypeState';
 import { ProviderMark } from './ProviderMark';
 
 /*
- * Prototype: the Access page in <OrganizationProfile />, built to the Sept
- * 2026 Figma. One route; `?policy=<id>` opens the Configure policy page for
- * that row so the table and the editor share the session-backed store.
+ * Prototype: the Access page in <OrganizationProfile />, built to the Oct
+ * 2026 "MVP" Figma (Organizations file, 13750:22959). One route; the query
+ * params documented in ./navigation pick the view.
  */
-export const AccessOnboardingPage = () => {
-  const { queryParams } = useRouter();
-  const policyId = queryParams.policy;
-  return policyId ? <ConfigurePolicyPage policyId={policyId} /> : <AccessListPage />;
-};
+export const AccessOnboardingPage = ({ contentRef }: { contentRef?: React.RefObject<HTMLDivElement> }) => {
+  const { queryParams } = useAccessNavigation();
+  const { setup, policy, connection } = queryParams as Record<string, string | undefined>;
 
-const openPolicy = (navigate: ReturnType<typeof useRouter>['navigate'], policyId: string, tab?: string) => {
-  const params = new URLSearchParams({ policy: policyId });
-  if (tab) {
-    params.set('tab', tab);
-  }
-  return navigate('../organization-access', { searchParams: params });
+  return (
+    <ContentRefContext.Provider value={contentRef ?? null}>
+      {setup === 'sso' || setup === 'directory' ? (
+        <SetupWizard
+          key={`${setup}:${policy}`}
+          kind={setup}
+          policyId={policy ?? 'new'}
+        />
+      ) : connection ? (
+        <ManageConnectionPage
+          key={connection}
+          connectionId={connection}
+          fromPolicy={policy}
+        />
+      ) : policy ? (
+        <PolicyPage
+          key={policy}
+          policyId={policy}
+        />
+      ) : (
+        <AccessListPage />
+      )}
+    </ContentRefContext.Provider>
+  );
 };
 
 const AccessListPage = () => {
   const store = useAccessPrototype();
+  const nav = useAccessNavigation();
+  const tabIndex = nav.queryParams.tab === 'connections' ? 1 : 0;
 
   return (
     <ProfileCard.Page>
       <Col
         elementDescriptor={descriptors.page}
-        sx={t => ({ gap: t.space.$6 })}
+        sx={t => ({ gap: t.space.$4 })}
       >
         <Flex
           justify='between'
@@ -103,7 +110,7 @@ const AccessListPage = () => {
               <Text
                 as='span'
                 colorScheme='secondary'
-                sx={t => ({ fontSize: t.fontSizes.$sm })}
+                sx={smallSx}
               >
                 {`Prototype: ${SCENARIO_LABELS[store.scenario]}`}
               </Text>
@@ -112,7 +119,10 @@ const AccessListPage = () => {
           </Select>
         </Flex>
 
-        <Tabs>
+        <Tabs
+          value={tabIndex}
+          onChange={index => (index === 1 ? nav.toConnections() : nav.toPolicies())}
+        >
           <TabsList sx={t => ({ gap: t.space.$2 })}>
             <Tab localizationKey={protoKey('Policies')} />
             <Tab localizationKey={protoKey('Connections')} />
@@ -135,171 +145,106 @@ const AccessListPage = () => {
 
 const PoliciesPanel = () => {
   const { policies, access } = useAccessPrototype();
+  const nav = useAccessNavigation();
+  const active = policies.filter(policy => !policy.isCatchAll && policy.status === 'active');
+  const catchAll = policies.filter(policy => policy.isCatchAll);
+  const inactive = policies.filter(policy => !policy.isCatchAll && policy.status !== 'active');
 
   return (
-    // Action.Root renders an animation wrapper with no width of its own; the
-    // tab panel is a row flex, so without this the whole panel shrink-wraps.
-    <Box sx={{ width: '100%' }}>
-      <Action.Root>
-        <Col sx={t => ({ gap: t.space.$4, width: '100%', paddingTop: t.space.$4 })}>
-          <Flex
-            justify='between'
-            align='center'
-            gap={4}
-          >
-            <Col sx={t => ({ gap: t.space.$0x5 })}>
-              <Text variant='subtitle'>Policies</Text>
-              <Text
-                colorScheme='secondary'
-                sx={t => ({ fontSize: t.fontSizes.$sm })}
-              >
-                Configure enrollment, sign-in, SSO, and Directory Sync.
-              </Text>
-            </Col>
-            {access.canManage ? (
-              <Action.Trigger value='add'>
-                <Button
-                  size='sm'
-                  localizationKey={protoKey('Add')}
-                />
-              </Action.Trigger>
-            ) : null}
-          </Flex>
+    <Col sx={t => ({ gap: t.space.$6, width: '100%', paddingTop: t.space.$4 })}>
+      <Col sx={t => ({ gap: t.space.$3 })}>
+        <Flex
+          justify='between'
+          align='center'
+          gap={4}
+        >
+          <Col sx={t => ({ gap: t.space.$0x5 })}>
+            <Text variant='subtitle'>Access policies</Text>
+            <Text
+              colorScheme='secondary'
+              sx={smallSx}
+            >
+              Control access for your organization, including SSO and Directory Sync.
+            </Text>
+          </Col>
+          {access.canManage ? (
+            <Button
+              size='sm'
+              textVariant='buttonSmall'
+              block={false}
+              onClick={() => nav.toPolicy('new')}
+              localizationKey={protoKey('Add policy')}
+            />
+          ) : null}
+        </Flex>
+        <PolicyTable policies={[...active, ...catchAll]} />
+      </Col>
 
-          <Action.Open value='add'>
-            <Action.Card>
-              <AddDomainClose />
-            </Action.Card>
-          </Action.Open>
-
-          <Flex sx={t => ({ overflowX: 'auto', paddingBlock: t.space.$1, width: '100%' })}>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th localizationKey={protoKey('Target')} />
-                  <Th localizationKey={protoKey('Enrollment')} />
-                  <Th localizationKey={protoKey('Authentication')} />
-                  {access.canManage ? <Th localizationKey={protoKey('')} /> : null}
-                </Tr>
-              </Thead>
-              <Tbody>
-                {[
-                  ...policies.filter(policy => !policy.isCatchAll),
-                  ...policies.filter(policy => policy.isCatchAll),
-                ].map(policy => (
-                  <PolicyRow
-                    key={policy.id}
-                    policy={policy}
-                  />
-                ))}
-              </Tbody>
-            </Table>
-          </Flex>
+      {inactive.length > 0 ? (
+        <Col sx={t => ({ gap: t.space.$3 })}>
+          <Text variant='subtitle'>Inactive</Text>
+          <PolicyTable policies={inactive} />
         </Col>
-      </Action.Root>
+      ) : null}
+    </Col>
+  );
+};
+
+const PolicyTable = ({ policies }: { policies: ProtoPolicy[] }) => {
+  const { access } = useAccessPrototype();
+  return (
+    <Box sx={t => ({ ...borderSx(t), overflowX: 'auto', width: '100%' })}>
+      <Table sx={{ tableLayout: 'fixed' }}>
+        <Thead>
+          <Tr>
+            <Th
+              localizationKey={protoKey('Target')}
+              sx={{ width: '31%' }}
+            />
+            <Th
+              localizationKey={protoKey('Enrollment')}
+              sx={{ width: '31%' }}
+            />
+            <Th localizationKey={protoKey('Authentication')} />
+            {access.canManage ? (
+              <Th
+                localizationKey={protoKey('')}
+                sx={t => ({ width: t.sizes.$10 })}
+              />
+            ) : null}
+          </Tr>
+        </Thead>
+        <Tbody>
+          {policies.map(policy => (
+            <PolicyRow
+              key={policy.id}
+              policy={policy}
+            />
+          ))}
+        </Tbody>
+      </Table>
     </Box>
   );
 };
 
-const AddDomainClose = () => {
-  const { close } = useActionContext();
-  return <AddDomainCard onClose={close} />;
-};
-
-/*
- * Adding a domain creates the row at the application's defaults and lands
- * back on the table. Everything else — proof, sign-in, enrollment — is done
- * by editing the policy, the same way the auto-created row is.
- */
-const AddDomainCard = withCardStateProvider(({ onClose }: { onClose: () => void }) => {
-  const { policies, addDomain } = useAccessPrototype();
-  const [isSaving, setIsSaving] = useState(false);
-  const nameField = useFormControl('name', '', {
-    type: 'text',
-    label: protoKey(''),
-    placeholder: protoKey('acme.com'),
-    isRequired: true,
-  });
-
-  const name = nameField.value.trim().toLowerCase();
-  const isDuplicate = policies.some(policy => policy.domains.includes(name));
-  const canSubmit = /^[a-z0-9.-]+\.[a-z]{2,}$/.test(name) && !isDuplicate;
-
-  const onSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    setIsSaving(true);
-    void simulateRequest().then(() => {
-      addDomain(name);
-      setIsSaving(false);
-      onClose();
-    });
-  };
-
-  return (
-    <FormContainer
-      headerTitle={protoKey('Add domain')}
-      headerSubtitle={protoKey('Add your domain to create a new policy')}
-    >
-      <Form.Root onSubmit={onSubmit}>
-        <Form.ControlRow elementId={nameField.id}>
-          <Form.PlainInput {...nameField.props} />
-        </Form.ControlRow>
-        {isDuplicate ? (
-          <Text
-            colorScheme='danger'
-            sx={t => ({ fontSize: t.fontSizes.$sm })}
-          >
-            A policy for this domain already exists.
-          </Text>
-        ) : null}
-        <FormButtonContainer>
-          <Button
-            variant='ghost'
-            textVariant='buttonSmall'
-            block={false}
-            onClick={onClose}
-            localizationKey={protoKey('Cancel')}
-          />
-          <Button
-            type='submit'
-            textVariant='buttonSmall'
-            block={false}
-            isDisabled={!canSubmit}
-            isLoading={isSaving}
-            localizationKey={protoKey('Add domain')}
-          />
-        </FormButtonContainer>
-      </Form.Root>
-    </FormContainer>
-  );
-});
-
-const cellTextSx = (t: Parameters<Extract<PropsOfComponent<typeof Text>['sx'], (...args: any[]) => any>>[0]) => ({
-  fontSize: t.fontSizes.$sm,
-});
-
 const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
-  const { policies, connections, access, removePolicy } = useAccessPrototype();
-  const { navigate } = useRouter();
-  const connection = connectionFor(policy, connections);
-  const open = () => void openPolicy(navigate, policy.id);
+  const { policies, connections, access, updatePolicy, removePolicy } = useAccessPrototype();
+  const nav = useAccessNavigation();
+  const open = () => nav.toPolicy(policy.id);
+  const directory = connectionById(policy.directoryId, connections);
+  const ssoConnections = policy.connectionIds
+    .map(id => connectionById(id, connections))
+    .filter((entry): entry is ProtoConnection => Boolean(entry));
 
-  // A connection chosen but not yet activated never changes the row: sign in
-  // stays what it was. The menu is the only trace, so the setup can be resumed.
-  const ssoInProgress = policy.signIn !== 'sso' && Boolean(connection) && connection?.status !== 'active';
   const actions: PropsOfComponent<typeof ThreeDotsMenu>['actions'] = [
     { label: protoKey('Edit policy'), onClick: open },
   ];
-  if (ssoInProgress) {
-    actions.push({ label: protoKey('Continue SSO setup'), onClick: () => void openPolicy(navigate, policy.id, 'sso') });
+  if (policy.status === 'active') {
+    actions.push({ label: protoKey('Deactivate'), onClick: () => updatePolicy(policy.id, { status: 'inactive' }) });
+  } else if (!activationBlocker(draftFromPolicy(policy), false)) {
+    actions.push({ label: protoKey('Activate'), onClick: () => updatePolicy(policy.id, { status: 'active' }) });
   }
-  if (!policy.isCatchAll) {
-    actions.push({
-      label: protoKey('Remove policy'),
-      isDestructive: true,
-      onClick: () => removePolicy(policy.id),
-    });
-  }
+  actions.push({ label: protoKey('Remove policy'), isDestructive: true, onClick: () => removePolicy(policy.id) });
 
   return (
     <Tr
@@ -313,82 +258,68 @@ const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
       <Td>
         <Flex
           align='center'
-          gap={1}
+          gap={2}
         >
-          <Text variant='subtitle'>{policyTarget(policy, policies)}</Text>
-          {policy.isCatchAll ? <CatchAllTooltip hasDomains={policies.some(other => !other.isCatchAll)} /> : null}
+          <Text
+            variant='subtitle'
+            truncate
+          >
+            {policyTarget(policy, policies)}
+          </Text>
+          {policy.isCatchAll ? (
+            <InfoTooltip
+              text={
+                policies.some(other => !other.isCatchAll && other.status === 'active')
+                  ? 'Applies to anyone whose email does not match an active policy above.'
+                  : 'Applies to everyone until you add a policy.'
+              }
+            />
+          ) : policy.status !== 'active' ? (
+            <Badge colorScheme='primary'>{policy.status === 'draft' ? 'Draft' : 'Inactive'}</Badge>
+          ) : null}
         </Flex>
       </Td>
       <Td>
-        <Text
-          colorScheme='secondary'
-          sx={cellTextSx}
-        >
-          {ENROLLMENT_LABELS[policy.enrollment].short}
-        </Text>
-      </Td>
-      <Td>
-        {policy.signIn === 'sso' && connection?.status === 'active' ? (
+        {policy.enrollment === 'directory_sync' && directory ? (
           <ProviderMark
-            provider={connection.provider}
-            name={connection.name}
-            status={connection.status}
-          />
-        ) : policy.signIn === 'sso' && connection?.status === 'broken' ? (
-          <ProviderMark
-            provider={connection.provider}
-            name={connection.name}
-            status='broken'
+            provider={directory.provider}
+            name={directory.name}
           />
         ) : (
-          <Text
-            colorScheme='secondary'
-            sx={cellTextSx}
+          <Text sx={smallSx}>{ENROLLMENT_LABELS[policy.enrollment].label}</Text>
+        )}
+      </Td>
+      <Td>
+        {policy.signIn === 'sso' && ssoConnections.length > 0 ? (
+          <Flex
+            align='center'
+            gap={2}
           >
-            Default
-          </Text>
+            <ProviderMark
+              provider={ssoConnections[0].provider}
+              name={ssoConnections[0].name}
+              status={ssoConnections[0].status}
+            />
+            {ssoConnections.length > 1 ? <Badge colorScheme='primary'>{`+${ssoConnections.length - 1}`}</Badge> : null}
+          </Flex>
+        ) : (
+          <Flex
+            align='center'
+            gap={2}
+          >
+            <Text sx={smallSx}>Default</Text>
+            <InfoTooltip text="Members sign in with the application's existing sign-in methods." />
+          </Flex>
         )}
       </Td>
       {access.canManage ? (
         <Td onClick={event => event.stopPropagation()}>
-          <ThreeDotsMenu actions={actions} />
+          {policy.isCatchAll ? null : <ThreeDotsMenu actions={actions} />}
         </Td>
       ) : null}
     </Tr>
   );
 };
-
-const CatchAllTooltip = ({ hasDomains }: { hasDomains: boolean }) => (
-  <Tooltip.Root>
-    <Tooltip.Trigger>
-      <Button
-        variant='unstyled'
-        aria-label='Who this applies to'
-        sx={t => ({
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: 0,
-          height: 'fit-content',
-          borderRadius: t.radii.$sm,
-          color: t.colors.$colorMutedForeground,
-        })}
-      >
-        <Icon
-          icon={InformationCircle}
-          aria-hidden
-          sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-        />
-      </Button>
-    </Tooltip.Trigger>
-    <Tooltip.Content
-      text={protoKey(
-        hasDomains
-          ? 'Applies to anyone whose email does not match a domain listed above.'
-          : 'Applies to everyone until you add a domain.',
-      )}
-    />
-  </Tooltip.Root>
-);
 
 /* ---------------------------------------------------------- connections */
 
@@ -396,156 +327,94 @@ const CONNECTION_STATUS: Record<
   ProtoConnection['status'],
   { label: string; colorScheme: PropsOfComponent<typeof Badge>['colorScheme'] }
 > = {
-  active: { label: 'Active', colorScheme: 'success' },
-  pending: { label: 'Pending', colorScheme: 'warning' },
+  active: { label: 'Active', colorScheme: 'primary' },
+  pending: { label: 'Not tested', colorScheme: 'warning' },
   broken: { label: 'Needs attention', colorScheme: 'danger' },
 };
 
 const ConnectionsPanel = () => {
-  const { policies, connections, access, removeConnection } = useAccessPrototype();
-  const { navigate } = useRouter();
-  const directories = policies.filter(policy => policy.directory?.configured);
-
+  const { connections } = useAccessPrototype();
   return (
     <Col sx={t => ({ gap: t.space.$6, width: '100%', paddingTop: t.space.$4 })}>
-      <ConnectionGroup title='SSO'>
-        {connections.length === 0 ? (
-          <Text
-            colorScheme='secondary'
-            sx={cellTextSx}
-          >
-            No single sign-on connections yet.
-          </Text>
-        ) : (
-          connections.map(connection => {
-            const used = policiesForConnection(connection.id, policies);
-            const status = CONNECTION_STATUS[connection.status];
-            return (
-              <ConnectionItem
-                key={connection.id}
-                title={
-                  <ProviderMark
-                    provider={connection.provider}
-                    name={connection.name}
-                    status={connection.status}
-                  />
-                }
-                subtitle={used.flatMap(policy => policy.domains).join(', ') || 'Not used by a policy'}
-                badge={<Badge colorScheme={status.colorScheme}>{status.label}</Badge>}
-                actions={
-                  access.canManage
-                    ? [
-                        ...(used[0]
-                          ? [
-                              {
-                                label: protoKey('Edit connection'),
-                                onClick: () => void openPolicy(navigate, used[0].id, 'sso'),
-                              },
-                            ]
-                          : []),
-                        {
-                          label: protoKey('Remove connection'),
-                          isDestructive: true,
-                          onClick: () => removeConnection(connection.id),
-                        },
-                      ]
-                    : []
-                }
-              />
-            );
-          })
-        )}
-      </ConnectionGroup>
-
-      <ConnectionGroup title='Directory sync'>
-        {directories.length === 0 ? (
-          <Text
-            colorScheme='secondary'
-            sx={cellTextSx}
-          >
-            No directory connected yet.
-          </Text>
-        ) : (
-          directories.map(policy => (
-            <ConnectionItem
-              key={policy.id}
-              title={
-                <Text sx={cellTextSx}>
-                  {policy.directory ? PROVIDER_LABELS[policy.directory.provider].label : 'Directory'}
-                </Text>
-              }
-              subtitle={policy.domains.join(', ')}
-              badge={<Badge colorScheme='success'>Active</Badge>}
-              actions={
-                access.canManage
-                  ? [
-                      {
-                        label: protoKey('Edit directory sync'),
-                        onClick: () => void openPolicy(navigate, policy.id, 'directory'),
-                      },
-                    ]
-                  : []
-              }
-            />
-          ))
-        )}
-      </ConnectionGroup>
+      <ConnectionTable
+        title='SSO'
+        empty='No SSO connections yet. Add one from a policy’s Authentication setting.'
+        connections={connections.filter(connection => connection.kind === 'sso')}
+      />
+      <ConnectionTable
+        title='Directory'
+        empty='No directories yet. Add one from a policy’s Enrollment setting.'
+        connections={connections.filter(connection => connection.kind === 'directory')}
+      />
     </Col>
   );
 };
 
-const ConnectionGroup = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <Flex
-    gap={6}
-    sx={t => ({
-      alignItems: 'flex-start',
-      borderBottomWidth: t.borderWidths.$normal,
-      borderBottomStyle: t.borderStyles.$solid,
-      borderBottomColor: t.colors.$borderAlpha100,
-      paddingBottom: t.space.$4,
-    })}
-  >
-    <Text
-      variant='subtitle'
-      sx={{ width: '30%', flexShrink: 0 }}
-    >
-      {title}
-    </Text>
-    <Col sx={t => ({ gap: t.space.$3, flex: 1, minWidth: 0 })}>{children}</Col>
-  </Flex>
-);
-
-const ConnectionItem = ({
+const ConnectionTable = ({
   title,
-  subtitle,
-  badge,
-  actions,
+  empty,
+  connections,
 }: {
-  title: React.ReactNode;
-  subtitle: string;
-  badge: React.ReactNode;
-  actions: PropsOfComponent<typeof ThreeDotsMenu>['actions'];
-}) => (
-  <Flex
-    justify='between'
-    align='center'
-    gap={3}
-  >
-    <Col sx={t => ({ gap: t.space.$0x5, minWidth: 0 })}>
-      {title}
-      <Text
-        colorScheme='secondary'
-        sx={t => ({ fontSize: t.fontSizes.$xs })}
-      >
-        {subtitle}
-      </Text>
+  title: string;
+  empty: string;
+  connections: ProtoConnection[];
+}) => {
+  const { access } = useAccessPrototype();
+  const nav = useAccessNavigation();
+  return (
+    <Col sx={t => ({ gap: t.space.$3 })}>
+      <Text variant='subtitle'>{title}</Text>
+      <Box sx={t => ({ ...borderSx(t), overflowX: 'auto', width: '100%' })}>
+        <Table sx={{ tableLayout: 'fixed' }}>
+          <Thead>
+            <Tr>
+              <Th
+                localizationKey={protoKey('Connection')}
+                sx={{ width: '50%' }}
+              />
+              <Th localizationKey={protoKey('Status')} />
+            </Tr>
+          </Thead>
+          <Tbody>
+            {connections.length === 0 ? (
+              <Tr>
+                <Td colSpan={2}>
+                  <Text
+                    colorScheme='secondary'
+                    sx={smallSx}
+                  >
+                    {empty}
+                  </Text>
+                </Td>
+              </Tr>
+            ) : (
+              connections.map(connection => (
+                <Tr
+                  key={connection.id}
+                  onClick={access.canManage ? () => nav.toConnection(connection.id) : undefined}
+                  sx={t => ({
+                    cursor: access.canManage ? 'pointer' : 'default',
+                    '&:hover': access.canManage ? { backgroundColor: t.colors.$neutralAlpha50 } : undefined,
+                  })}
+                >
+                  <Td>
+                    <ProviderMark
+                      provider={connection.provider}
+                      name={connection.name}
+                      status={connection.status}
+                    />
+                  </Td>
+                  <Td>
+                    <Badge colorScheme={CONNECTION_STATUS[connection.status].colorScheme}>
+                      {CONNECTION_STATUS[connection.status].label}
+                    </Badge>
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
+        </Table>
+      </Box>
     </Col>
-    <Flex
-      align='center'
-      gap={2}
-    >
-      {badge}
-      {actions.length > 0 ? <ThreeDotsMenu actions={actions} /> : null}
-    </Flex>
-  </Flex>
-);
+  );
+};

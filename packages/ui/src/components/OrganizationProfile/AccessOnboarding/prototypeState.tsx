@@ -6,29 +6,31 @@ import type { LocalizationKey } from '../../../customizables';
 /*
  * Prototype-only state for the Access page in <OrganizationProfile />.
  *
- * The model follows the Sept 2026 design: a policy targets one or more
- * domains (or is the organization's catch-all), and carries enrollment,
- * sign-in, MFA, re-verification, and per-domain proof. Connections (SSO,
- * directory) hang off a policy. Nothing persists beyond the browser tab: a
- * module singleton mirrored to sessionStorage, so navigating between the
- * table and the Configure policy page keeps state, and a refresh does too.
+ * The model follows the Oct 2026 "MVP" Figma: a policy targets one or more
+ * domains (or is the organization's catch-all) and is active, a draft, or
+ * inactive. It carries MFA, sign-in (default or one or more SSO
+ * connections), re-verification, enrollment (optionally from a directory),
+ * and per-domain proof. SSO connections and directories live on the
+ * Connections tab and are shared between policies. Nothing persists beyond
+ * the browser tab: a module singleton mirrored to sessionStorage.
  */
 
-export type ProtoEnrollment = 'invitation_only' | 'request_access' | 'join_automatically' | 'directory_sync';
+export type ProtoEnrollment = 'invitation_only' | 'join_automatically' | 'request_access' | 'directory_sync';
 export type ProtoSignIn = 'default' | 'sso';
+export type ProtoMfa = 'off' | 'optional' | 'required';
+export type ProtoPolicyStatus = 'active' | 'draft' | 'inactive';
 export type ProtoProvider = 'saml_okta' | 'saml_microsoft' | 'saml_google' | 'saml_custom' | 'oidc';
-export type ProtoNonDirectoryFallback = 'request_access' | 'block';
-export type ProtoOwnership = 'unverified' | 'pending' | 'verified' | 'waived';
+export type ProtoNonDirectoryFallback = 'block' | 'request_access';
+export type ProtoOwnership = 'unverified' | 'verified';
 export type ProtoConnectionStatus = 'pending' | 'active' | 'broken';
+export type ProtoConnectionKind = 'sso' | 'directory';
 
 /** Proof for one domain on a policy. */
 export type ProtoProof = {
-  /** Someone with an email at the domain confirmed a code. */
-  affiliation: boolean;
-  /** DNS TXT record, or the application owner vouching ("waived"). */
+  /** Someone with an email at the domain confirmed it. */
+  association: boolean;
+  /** DNS TXT record. Supersedes association. */
   ownership: ProtoOwnership;
-  /** The address the affiliation code went to, for the "sent to" line. */
-  affiliationEmail?: string;
 };
 
 export type ProtoPolicy = {
@@ -36,17 +38,17 @@ export type ProtoPolicy = {
   /** Empty for the catch-all. */
   domains: string[];
   isCatchAll?: boolean;
-  enrollment: ProtoEnrollment;
-  /** Only read when enrollment is directory_sync. */
-  nonDirectoryFallback: ProtoNonDirectoryFallback;
+  status: ProtoPolicyStatus;
+  mfa: ProtoMfa;
   signIn: ProtoSignIn;
-  mfaRequired: boolean;
+  /** SSO connections, in the order the policy lists them. */
+  connectionIds: string[];
   /** null = the application default (24 hours). */
   reverificationHours: number | null;
-  /** The SSO connection when signIn is 'sso'. */
-  connectionId?: string;
-  /** Directory credentials once directory sync is configured. */
-  directory?: { configured: boolean; token: string; provider: ProtoProvider };
+  enrollment: ProtoEnrollment;
+  /** The directory when enrollment is directory_sync. */
+  directoryId?: string;
+  nonDirectoryFallback: ProtoNonDirectoryFallback;
   proofs: Record<string, ProtoProof>;
   createdAt: string;
 };
@@ -60,17 +62,19 @@ export type ProtoTestLog = {
 
 export type ProtoConnection = {
   id: string;
+  kind: ProtoConnectionKind;
   provider: ProtoProvider;
   name: string;
   status: ProtoConnectionStatus;
   logs: ProtoTestLog[];
+  /** Directories only. */
+  token?: string;
 };
 
-export type ScenarioKey = 'work' | 'unverified' | 'personal' | 'configured' | 'view_only' | 'sso_unavailable';
+export type ScenarioKey = 'work' | 'personal' | 'configured' | 'view_only' | 'sso_unavailable';
 
 export const SCENARIO_LABELS: Record<ScenarioKey, string> = {
   work: 'New org, work email',
-  unverified: 'Domain added, nothing verified',
   personal: 'New org, personal email',
   configured: 'Configured org',
   view_only: 'Configured org, view only',
@@ -87,51 +91,48 @@ export type ProtoAccess = {
   ssoUnavailableMessage: string;
 };
 
+/** The Add/Manage policy form, kept outside the page so the setup wizards can hand a new connection back to it. */
+export type PolicyDraft = {
+  /** The policy being edited, or 'new'. */
+  policyId: string;
+  domains: string[];
+  proofs: Record<string, ProtoProof>;
+  status: ProtoPolicyStatus;
+  mfa: ProtoMfa;
+  signIn: ProtoSignIn;
+  connectionIds: string[];
+  reverificationHours: number | null;
+  enrollment: ProtoEnrollment;
+  directoryId?: string;
+  nonDirectoryFallback: ProtoNonDirectoryFallback;
+};
+
 export type ProtoState = {
   scenario: ScenarioKey;
+  /** The signed-in member's email, so Add policy can start from their domain. */
+  userEmail: string;
   policies: ProtoPolicy[];
   connections: ProtoConnection[];
   access: ProtoAccess;
+  draft: PolicyDraft | null;
 };
 
 /* ----------------------------------------------------------------- labels */
 
-export const ENROLLMENT_LABELS: Record<
-  ProtoEnrollment,
-  { label: string; short: string; description: (domain: string) => string }
-> = {
-  join_automatically: {
-    label: 'Join automatically',
-    short: 'Join automatically',
-    description: domain => `Anyone with a verified @${domain} email joins when they sign up.`,
-  },
-  request_access: {
-    label: 'Request access',
-    short: 'Request access',
-    description: domain => `People with an @${domain} email can ask to join. An admin approves them.`,
-  },
-  invitation_only: {
-    label: 'Invitation only',
-    short: 'Invitation',
-    description: () => 'Nobody joins on their own. Admins invite each person.',
-  },
+export const ENROLLMENT_LABELS: Record<ProtoEnrollment, { label: string; description: string }> = {
+  invitation_only: { label: 'Invitation only', description: 'Members can only join through invitation' },
+  join_automatically: { label: 'Join automatically', description: 'Members can join without approval' },
+  request_access: { label: 'Request access', description: 'Members can request to join with approval' },
   directory_sync: {
     label: 'Sync from directory',
-    short: 'Directory sync',
-    description: () => 'Members are created and removed by your directory.',
+    description: 'Members from the directory are automatically provisioned',
   },
 };
 
 export const NON_DIRECTORY_FALLBACK_LABELS: Record<ProtoNonDirectoryFallback, { label: string; description: string }> =
   {
-    request_access: {
-      label: 'Request access',
-      description: 'Users can request access from an admin',
-    },
-    block: {
-      label: 'Block access',
-      description: 'Only directory members can join',
-    },
+    block: { label: 'Block access', description: 'Only directory members can join' },
+    request_access: { label: 'Allow access requests', description: 'Members can request access from an admin' },
   };
 
 export const PROVIDER_LABELS: Record<ProtoProvider, { label: string; iconId: string; kind: 'saml' | 'oidc' }> = {
@@ -150,39 +151,56 @@ export const REVERIFICATION_OPTIONS = [1, 4, 8, 12, 24, 168] as const;
 export const formatReverification = (hours: number) =>
   hours === 1 ? 'Every hour' : hours === 168 ? 'Every 7 days' : `Every ${hours} hours`;
 
+export const DOMAIN_PATTERN = /^[a-z0-9.-]+\.[a-z]{2,}$/;
+
 /** The table's Target column. */
 export const policyTarget = (policy: ProtoPolicy, policies: ProtoPolicy[]) => {
   if (policy.isCatchAll) {
-    return policies.some(other => !other.isCatchAll) ? 'Everyone else' : 'Everyone';
+    return policies.some(other => !other.isCatchAll && other.status === 'active') ? 'Everyone else' : 'Everyone';
   }
   return policy.domains.join(', ');
 };
 
-/*
- * Proof rule (Stephen, Sept 22): SSO or directory sync need ownership of
- * the domain, and ownership supersedes affiliation. Anything else needs
- * affiliation only. A domain the application owner vouched for needs
- * nothing.
- */
+/* SSO or directory sync need ownership of the domain; anything else needs association. */
 export const needsOwnership = (policy: Pick<ProtoPolicy, 'signIn' | 'enrollment'>) =>
   policy.signIn === 'sso' || policy.enrollment === 'directory_sync';
 
-export const isProven = (policy: ProtoPolicy, domain: string) => {
+export const isProven = (policy: Pick<ProtoPolicy, 'signIn' | 'enrollment' | 'proofs'>, domain: string): boolean => {
   const proof = policy.proofs[domain];
   if (!proof) {
     return false;
   }
-  if (proof.ownership === 'verified' || proof.ownership === 'waived') {
+  if (proof.ownership === 'verified') {
     return true;
   }
-  return !needsOwnership(policy) && proof.affiliation;
+  return !needsOwnership(policy) && proof.association;
 };
 
-export const connectionFor = (policy: ProtoPolicy, connections: ProtoConnection[]) =>
-  policy.connectionId ? (connections.find(connection => connection.id === policy.connectionId) ?? null) : null;
+export const connectionById = (id: string | undefined, connections: ProtoConnection[]) =>
+  id ? (connections.find(connection => connection.id === id) ?? null) : null;
 
-export const policiesForConnection = (connectionId: string, policies: ProtoPolicy[]) =>
-  policies.filter(policy => policy.connectionId === connectionId);
+export const policiesUsing = (connectionId: string, policies: ProtoPolicy[]) =>
+  policies.filter(policy => policy.connectionIds.includes(connectionId) || policy.directoryId === connectionId);
+
+/** What stops a draft from going active, or null when nothing does. */
+export const activationBlocker = (draft: PolicyDraft, isCatchAll: boolean): string | null => {
+  if (isCatchAll) {
+    return null;
+  }
+  if (draft.domains.length === 0) {
+    return 'Add a domain';
+  }
+  if (!draft.domains.every(domain => isProven(draft, domain))) {
+    return needsOwnership(draft) ? 'Verify domain ownership' : 'Verify the domain';
+  }
+  if (draft.signIn === 'sso' && draft.connectionIds.length === 0) {
+    return 'Add an SSO connection';
+  }
+  if (draft.enrollment === 'directory_sync' && !draft.directoryId) {
+    return 'Add a directory';
+  }
+  return null;
+};
 
 /* --------------------------------------------------------------- builders */
 
@@ -191,58 +209,82 @@ const nextId = (prefix: string) => `${prefix}_${Date.now().toString(36)}_${(coun
 
 export const txtRecordFor = (domain: string) => ({
   name: `_clerk.${domain}`,
-  value: `domain-verify=${domain.replace(/[^a-z0-9]/gi, '').slice(0, 8)}nasu3yaiosjef`,
+  value: `domain-verify=${domain.replace(/[^a-z0-9]/gi, '').slice(0, 4)}3t26nasu3yaiosjef`,
 });
 
-/** The row a domain starts as: the application's defaults, nothing proven. */
-export const newPolicy = (domain: string, overrides: Partial<ProtoPolicy> = {}): ProtoPolicy => ({
+export const generateToken = () =>
+  Array.from({ length: 18 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 34)]).join('');
+
+const emptyProof = (): ProtoProof => ({ association: false, ownership: 'unverified' });
+
+/** A domain's starting proof: association comes free when it is the member's own email domain. */
+export const proofFor = (domain: string, userEmail: string): ProtoProof => ({
+  ...emptyProof(),
+  association: userEmail.toLowerCase().endsWith(`@${domain}`),
+});
+
+const policy = (domain: string, overrides: Partial<ProtoPolicy> = {}): ProtoPolicy => ({
   id: nextId('pol'),
   domains: [domain],
-  enrollment: 'invitation_only',
-  nonDirectoryFallback: 'request_access',
+  status: 'active',
+  mfa: 'off',
   signIn: 'default',
-  mfaRequired: false,
+  connectionIds: [],
   reverificationHours: null,
-  proofs: { [domain]: { affiliation: false, ownership: 'unverified' } },
+  enrollment: 'invitation_only',
+  nonDirectoryFallback: 'block',
+  proofs: { [domain]: emptyProof() },
   createdAt: new Date().toISOString(),
   ...overrides,
 });
 
 const catchAll = (overrides: Partial<ProtoPolicy> = {}): ProtoPolicy => ({
-  id: 'pol_catch_all',
+  ...policy('', { id: 'pol_catch_all', createdAt: '2026-09-01T09:00:00.000Z' }),
   domains: [],
-  isCatchAll: true,
-  enrollment: 'invitation_only',
-  nonDirectoryFallback: 'request_access',
-  signIn: 'default',
-  mfaRequired: false,
-  reverificationHours: null,
   proofs: {},
-  createdAt: '2026-09-01T09:00:00.000Z',
+  isCatchAll: true,
   ...overrides,
 });
 
+export const draftFromPolicy = (source: ProtoPolicy): PolicyDraft => ({
+  policyId: source.id,
+  domains: source.domains,
+  proofs: source.proofs,
+  status: source.status,
+  mfa: source.mfa,
+  signIn: source.signIn,
+  connectionIds: source.connectionIds,
+  reverificationHours: source.reverificationHours,
+  enrollment: source.enrollment,
+  directoryId: source.directoryId,
+  nonDirectoryFallback: source.nonDirectoryFallback,
+});
+
+/** Add policy starts from the member's own email domain when no policy has it yet. */
+export const newDraft = (state: Pick<ProtoState, 'userEmail' | 'policies'>): PolicyDraft => {
+  const own = state.userEmail.split('@')[1]?.toLowerCase() ?? '';
+  const taken = state.policies.some(entry => entry.domains.includes(own));
+  const domains = own && !taken ? [own] : [];
+  return {
+    policyId: 'new',
+    domains,
+    proofs: Object.fromEntries(domains.map(domain => [domain, proofFor(domain, state.userEmail)])),
+    status: 'draft',
+    mfa: 'required',
+    signIn: 'default',
+    connectionIds: [],
+    reverificationHours: null,
+    enrollment: 'invitation_only',
+    nonDirectoryFallback: 'block',
+  };
+};
+
 const DEFAULT_ACCESS: ProtoAccess = { canManage: true, ssoAllowed: true, ssoUnavailableMessage: '' };
+
+const okLog = (id: string, at: string, detail: string): ProtoTestLog => ({ id, at, detail, status: 'success' });
 
 const scenario = (key: ScenarioKey): ProtoState => {
   switch (key) {
-    // The two states the application owner's settings produce: a member
-    // without the manage permission, and an org the owner has not allowed
-    // SSO for. Both reuse another scenario's rows with the flags flipped.
-    // A second domain added by hand: no affiliation, no ownership, so every
-    // proof step is exercised from the start.
-    case 'unverified': {
-      const base = scenario('work');
-      return {
-        ...base,
-        scenario: key,
-        policies: [
-          ...base.policies.filter(policy => !policy.isCatchAll),
-          newPolicy('acme-labs.com', { id: 'pol_acme_labs_com', createdAt: '2026-09-22T09:30:00.000Z' }),
-          ...base.policies.filter(policy => policy.isCatchAll),
-        ],
-      };
-    }
     case 'view_only':
       return { ...scenario('configured'), scenario: key, access: { ...DEFAULT_ACCESS, canManage: false } };
     case 'sso_unavailable':
@@ -256,90 +298,87 @@ const scenario = (key: ScenarioKey): ProtoState => {
         },
       };
     case 'personal':
-      return { scenario: key, policies: [catchAll()], connections: [], access: DEFAULT_ACCESS };
+      return { ...scenario('work'), scenario: key, userEmail: 'you@gmail.com' };
     case 'work':
       return {
         scenario: key,
-        policies: [
-          newPolicy('acmedev.org', {
-            id: 'pol_acmedev_org',
-            // The creator's own email domain: affiliation came with sign-up.
-            proofs: {
-              'acmedev.org': { affiliation: true, ownership: 'unverified', affiliationEmail: 'you@acmedev.org' },
-            },
-            createdAt: '2026-09-21T15:04:00.000Z',
-          }),
-          catchAll(),
-        ],
+        userEmail: 'you@acmedev.org',
+        policies: [catchAll()],
         connections: [],
         access: DEFAULT_ACCESS,
+        draft: null,
       };
     case 'configured':
       return {
         scenario: key,
+        userEmail: 'you@acmedev.org',
         policies: [
-          newPolicy('acme.com', {
-            id: 'pol_acme_com',
-            enrollment: 'directory_sync',
-            nonDirectoryFallback: 'block',
-            signIn: 'sso',
-            connectionId: 'con_okta_acme_com',
-            directory: { configured: true, token: 'FSLKJG2203498NMF02', provider: 'saml_okta' },
-            proofs: { 'acme.com': { affiliation: true, ownership: 'verified' } },
-            createdAt: '2026-08-12T10:00:00.000Z',
-          }),
-          newPolicy('acme.dev', {
-            id: 'pol_acme_dev',
-            enrollment: 'directory_sync',
-            nonDirectoryFallback: 'request_access',
-            signIn: 'sso',
-            connectionId: 'con_okta_acme_dev',
-            directory: { configured: true, token: 'QWERT9981273LKJH01', provider: 'saml_okta' },
-            proofs: { 'acme.dev': { affiliation: true, ownership: 'verified' } },
-            createdAt: '2026-08-20T10:00:00.000Z',
-          }),
-          newPolicy('acmedev.org', {
+          policy('acmedev.org', {
             id: 'pol_acmedev_org',
-            enrollment: 'join_automatically',
-            proofs: {
-              'acmedev.org': { affiliation: true, ownership: 'unverified', affiliationEmail: 'you@acmedev.org' },
-            },
-            createdAt: '2026-09-02T10:00:00.000Z',
+            mfa: 'required',
+            signIn: 'sso',
+            connectionIds: ['con_okta_engineering'],
+            enrollment: 'directory_sync',
+            directoryId: 'dir_okta',
+            proofs: { 'acmedev.org': { association: true, ownership: 'verified' } },
+            createdAt: '2026-09-12T10:00:00.000Z',
+          }),
+          policy('example.com', {
+            id: 'pol_example_com',
+            status: 'draft',
+            proofs: { 'example.com': { association: false, ownership: 'unverified' } },
+            createdAt: '2026-10-02T10:00:00.000Z',
+          }),
+          policy('exampledev.net', {
+            id: 'pol_exampledev_net',
+            status: 'inactive',
+            mfa: 'required',
+            signIn: 'sso',
+            connectionIds: ['con_okta_marketing'],
+            enrollment: 'directory_sync',
+            directoryId: 'dir_okta',
+            nonDirectoryFallback: 'request_access',
+            proofs: { 'exampledev.net': { association: true, ownership: 'verified' } },
+            createdAt: '2026-09-20T10:00:00.000Z',
           }),
           catchAll(),
         ],
         connections: [
           {
-            id: 'con_okta_acme_com',
+            id: 'con_okta_engineering',
+            kind: 'sso',
             provider: 'saml_okta',
-            name: 'Okta',
+            name: 'Okta Engineering',
             status: 'active',
-            logs: [
-              {
-                id: 'log_1',
-                at: '2026-08-12T10:15:08.000Z',
-                detail: 'Signed in as it-admin@acme.com',
-                status: 'success',
-              },
-            ],
+            logs: [okLog('log_1', '2026-09-22T13:15:08.000Z', 'Signed in as it-admin@acmedev.org')],
           },
           {
-            id: 'con_okta_acme_dev',
+            id: 'con_okta_marketing',
+            kind: 'sso',
             provider: 'saml_okta',
-            name: 'Okta My Custom Name',
-            // Certificate rotated on the IdP side: sign-in from acme.dev fails.
-            status: 'broken',
-            logs: [{ id: 'log_2', at: '2026-09-20T08:02:41.000Z', detail: 'Invalid signature', status: 'failed' }],
+            name: 'Okta Marketing',
+            status: 'active',
+            logs: [okLog('log_2', '2026-09-20T08:02:41.000Z', 'Signed in as marketing@exampledev.net')],
+          },
+          {
+            id: 'dir_okta',
+            kind: 'directory',
+            provider: 'saml_okta',
+            name: 'Okta Directory',
+            status: 'active',
+            logs: [],
+            token: 'FSLKJG2203498NMF02',
           },
         ],
         access: DEFAULT_ACCESS,
+        draft: null,
       };
   }
 };
 
 /* ------------------------------------------------------------------ store */
 
-const STORAGE_KEY = 'clerk-access-prototype';
+const STORAGE_KEY = 'clerk-access-prototype-v2';
 const SERVER_STATE = scenario('work');
 
 let state: ProtoState | null = null;
@@ -385,6 +424,12 @@ const subscribe = (listener: () => void) => {
   };
 };
 
+/** The catch-all is always the last row. */
+const withCatchAllLast = (policies: ProtoPolicy[]) => [
+  ...policies.filter(entry => !entry.isCatchAll),
+  ...policies.filter(entry => entry.isCatchAll),
+];
+
 export const useAccessPrototype = () => {
   const current = useSyncExternalStore(subscribe, load, () => SERVER_STATE);
 
@@ -392,65 +437,63 @@ export const useAccessPrototype = () => {
 
   const setScenario = useCallback((key: ScenarioKey) => commit(scenario(key)), []);
 
-  const setAccess = useCallback(
-    (patch: Partial<ProtoAccess>) => update(previous => ({ ...previous, access: { ...previous.access, ...patch } })),
+  const setDraft = useCallback(
+    (next: PolicyDraft | null | ((previous: PolicyDraft) => PolicyDraft)) =>
+      update(previous => ({
+        ...previous,
+        draft: typeof next === 'function' ? (previous.draft ? next(previous.draft) : previous.draft) : next,
+      })),
     [update],
   );
 
-  // Adding a domain creates the row at the defaults. Configuration happens
-  // by editing the policy afterwards (Stephen, Sept 22).
-  const addDomain = useCallback(
-    (name: string) => {
-      const domain = name.trim().toLowerCase();
-      const policy = newPolicy(domain);
-      // The catch-all is always the last row.
-      update(previous => ({
-        ...previous,
-        policies: [
-          ...previous.policies.filter(entry => !entry.isCatchAll),
-          policy,
-          ...previous.policies.filter(entry => entry.isCatchAll),
-        ],
-      }));
-      return policy;
+  /** Writes the draft to its policy (creating it for 'new') and returns the policy id. */
+  const saveDraft = useCallback(
+    (draft: PolicyDraft, status: ProtoPolicyStatus) => {
+      const id = draft.policyId === 'new' ? nextId('pol') : draft.policyId;
+      const { policyId: _policyId, ...fields } = draft;
+      update(previous => {
+        const existing = previous.policies.find(entry => entry.id === id);
+        const saved: ProtoPolicy = existing
+          ? { ...existing, ...fields, status }
+          : { ...policy(draft.domains[0] ?? ''), ...fields, id, status };
+        return {
+          ...previous,
+          draft: null,
+          policies: withCatchAllLast(
+            existing
+              ? previous.policies.map(entry => (entry.id === id ? saved : entry))
+              : [...previous.policies, saved],
+          ),
+        };
+      });
+      return id;
     },
     [update],
   );
 
   const updatePolicy = useCallback(
-    (id: string, patch: Partial<ProtoPolicy> | ((policy: ProtoPolicy) => Partial<ProtoPolicy>)) =>
+    (id: string, patch: Partial<ProtoPolicy>) =>
       update(previous => ({
         ...previous,
-        policies: previous.policies.map(policy =>
-          policy.id === id ? { ...policy, ...(typeof patch === 'function' ? patch(policy) : patch) } : policy,
-        ),
+        policies: previous.policies.map(entry => (entry.id === id ? { ...entry, ...patch } : entry)),
       })),
     [update],
   );
 
   const removePolicy = useCallback(
-    (id: string) =>
-      update(previous => {
-        const removed = previous.policies.find(policy => policy.id === id);
-        return {
-          ...previous,
-          policies: previous.policies.filter(policy => policy.id !== id),
-          // A connection nothing points at goes with its policy.
-          connections: previous.connections.filter(
-            connection =>
-              connection.id !== removed?.connectionId ||
-              previous.policies.some(policy => policy.id !== id && policy.connectionId === connection.id),
-          ),
-        };
-      }),
+    (id: string) => update(previous => ({ ...previous, policies: previous.policies.filter(entry => entry.id !== id) })),
     [update],
   );
 
   const addConnection = useCallback(
-    (provider: ProtoProvider, name = PROVIDER_LABELS[provider].label): ProtoConnection => {
-      const connection: ProtoConnection = { id: nextId('con'), provider, name, status: 'pending', logs: [] };
-      update(previous => ({ ...previous, connections: [...previous.connections, connection] }));
-      return connection;
+    (connection: Omit<ProtoConnection, 'id' | 'logs'> & { logs?: ProtoTestLog[] }): ProtoConnection => {
+      const created: ProtoConnection = {
+        logs: [],
+        ...connection,
+        id: nextId(connection.kind === 'sso' ? 'con' : 'dir'),
+      };
+      update(previous => ({ ...previous, connections: [...previous.connections, created] }));
+      return created;
     },
     [update],
   );
@@ -468,38 +511,15 @@ export const useAccessPrototype = () => {
     [update],
   );
 
-  // Removing a connection drops the policies that used it back to default
-  // sign-in; the policies themselves stay.
-  const removeConnection = useCallback(
-    (id: string) =>
-      update(previous => ({
-        ...previous,
-        connections: previous.connections.filter(connection => connection.id !== id),
-        policies: previous.policies.map(policy =>
-          policy.connectionId === id
-            ? {
-                ...policy,
-                connectionId: undefined,
-                signIn: 'default',
-                enrollment: policy.enrollment === 'directory_sync' ? 'invitation_only' : policy.enrollment,
-                directory: undefined,
-              }
-            : policy,
-        ),
-      })),
-    [update],
-  );
-
   return {
     ...current,
     setScenario,
-    setAccess,
-    addDomain,
+    setDraft,
+    saveDraft,
     updatePolicy,
     removePolicy,
     addConnection,
     updateConnection,
-    removeConnection,
   };
 };
 

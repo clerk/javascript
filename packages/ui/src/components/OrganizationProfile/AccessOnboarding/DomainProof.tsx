@@ -1,150 +1,262 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { ClipboardInput } from '@/ui/elements/ClipboardInput';
+import { Modal } from '@/ui/elements/Modal';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 
-import { Badge, Button, Col, Flex, Icon, Text } from '../../../customizables';
-import { ExclamationTriangle } from '../../../icons';
-import type { ProtoPolicy } from './prototypeState';
-import { protoKey, simulateRequest, txtRecordFor, useAccessPrototype } from './prototypeState';
-
-/*
- * Domain verification, shared by the tabs that need it. Affiliation (an
- * email code) is asked where enrollment is chosen, on Overview. Ownership
- * (a DNS record) is asked where single sign-on or directory sync is set
- * up. Both write to the same proof on the policy, so the tabs never
- * disagree about a domain's state.
- */
-
-export const smallSx = (t: { fontSizes: { $sm: string } }) => ({ fontSize: t.fontSizes.$sm });
-
-export const WarningLine = ({ children }: { children: string }) => (
-  <Flex
-    align='center'
-    gap={1}
-    sx={t => ({ color: t.colors.$colorMutedForeground })}
-  >
-    <Icon
-      icon={ExclamationTriangle}
-      sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-    />
-    <Text
-      colorScheme='secondary'
-      sx={t => ({ fontSize: t.fontSizes.$xs })}
-    >
-      {children}
-    </Text>
-  </Flex>
-);
-
-/* ------------------------------------------------------------------ proof */
+import { Badge, Button, Col, Flex, Icon, Spinner, Text } from '../../../customizables';
+import { CheckmarkCircle, ExclamationCircle } from '../../../icons';
+import { ContentRefContext, InfoTooltip, smallSx, xsSx } from './parts';
+import type { ProtoProof } from './prototypeState';
+import { protoKey, simulateRequest, txtRecordFor } from './prototypeState';
 
 /*
- * One domain's verification, driven by what the draft needs: ownership
- * (DNS) when sign-in is SSO or enrollment syncs from a directory, otherwise
- * affiliation (an email code). A domain the application owner vouched for
- * is pre-approved and asks for nothing.
+ * One domain in a policy's Target list. Association (someone with an email
+ * there) is always shown; ownership (a DNS record) only when SSO or
+ * directory sync needs it. Verify opens the TXT record dialog, which proves
+ * ownership and so association too.
  */
-export const DomainProof = ({
-  policy,
+export const DomainEntry = ({
   domain,
+  proof,
   ownershipNeeded,
+  compact,
+  canManage,
+  onVerified,
+  onRemove,
 }: {
-  policy: ProtoPolicy;
   domain: string;
+  proof: ProtoProof;
   ownershipNeeded: boolean;
+  /** An active policy whose domain is fully proven: just a check and the name. */
+  compact: boolean;
+  canManage: boolean;
+  onVerified: () => void;
+  onRemove: () => void;
 }) => {
-  const proof = policy.proofs[domain] ?? { affiliation: false, ownership: 'unverified' as const };
+  const [isVerifying, setIsVerifying] = useState(false);
+  const owned = proof.ownership === 'verified';
+  const associated = proof.association || owned;
+  const menu = canManage ? (
+    <ThreeDotsMenu actions={[{ label: protoKey('Remove domain'), isDestructive: true, onClick: onRemove }]} />
+  ) : null;
 
-  if (proof.ownership === 'waived') {
-    return (
-      <ProofLine domain={domain}>
-        <Badge colorScheme='secondary'>Pre-approved</Badge>
-      </ProofLine>
-    );
-  }
-  if (proof.ownership === 'verified') {
-    return (
-      <ProofLine domain={domain}>
-        <Badge colorScheme='success'>Ownership verified</Badge>
-      </ProofLine>
-    );
-  }
-  if (!ownershipNeeded) {
-    // Not "verified": nothing was checked. The state says no proof applies.
-    return (
-      <ProofLine domain={domain}>
-        <Badge colorScheme='secondary'>No proof needed</Badge>
-      </ProofLine>
-    );
-  }
   return (
-    <DnsProof
-      policy={policy}
-      domain={domain}
-    />
+    <Col sx={t => ({ gap: t.space.$1x5 })}>
+      <Flex
+        justify='between'
+        align='center'
+        gap={2}
+      >
+        <Flex
+          align='center'
+          gap={1}
+        >
+          {compact ? <ProofIcon ok /> : null}
+          <Text variant='subtitle'>{domain}</Text>
+        </Flex>
+        {menu}
+      </Flex>
+      {compact ? null : (
+        <>
+          <ProofLine
+            ok={associated}
+            label={`Domain association ${associated ? 'verified' : 'unverified'}`}
+            info='Someone with an email address at this domain has confirmed it.'
+            action={
+              !associated && !ownershipNeeded && canManage ? (
+                <VerifyButton onClick={() => setIsVerifying(true)} />
+              ) : null
+            }
+          />
+          {ownershipNeeded ? (
+            <ProofLine
+              ok={owned}
+              label={`Domain ownership ${owned ? 'verified' : 'unverified'}`}
+              info='Single sign-on and directory sync need a DNS record that proves you own this domain.'
+              action={!owned && canManage ? <VerifyButton onClick={() => setIsVerifying(true)} /> : null}
+            />
+          ) : null}
+        </>
+      )}
+      {isVerifying ? (
+        <DnsDialog
+          domain={domain}
+          onVerified={onVerified}
+          onClose={() => setIsVerifying(false)}
+        />
+      ) : null}
+    </Col>
   );
 };
 
-export const ProofLine = ({ domain, children }: { domain: string; children: React.ReactNode }) => (
+const ProofIcon = ({ ok }: { ok: boolean }) => (
+  <Icon
+    icon={ok ? CheckmarkCircle : ExclamationCircle}
+    sx={t => ({
+      width: t.sizes.$3x5,
+      height: t.sizes.$3x5,
+      color: ok ? t.colors.$success500 : t.colors.$colorMutedForeground,
+    })}
+  />
+);
+
+const ProofLine = ({
+  ok,
+  label,
+  info,
+  action,
+}: {
+  ok: boolean;
+  label: string;
+  info: string;
+  action: React.ReactNode;
+}) => (
   <Flex
+    justify='between'
     align='center'
     gap={2}
   >
-    <Text sx={smallSx}>{domain}</Text>
-    {children}
+    <Flex
+      align='center'
+      gap={1}
+    >
+      <ProofIcon ok={ok} />
+      <Text
+        colorScheme='secondary'
+        sx={xsSx}
+      >
+        {label}
+      </Text>
+      <InfoTooltip text={info} />
+    </Flex>
+    {action}
   </Flex>
 );
 
-export const DnsProof = ({ policy, domain }: { policy: ProtoPolicy; domain: string }) => {
-  const { updatePolicy } = useAccessPrototype();
-  const [isChecking, setIsChecking] = useState(false);
+const VerifyButton = ({ onClick }: { onClick: () => void }) => (
+  <Button
+    variant='outline'
+    size='xs'
+    textVariant='buttonSmall'
+    block={false}
+    onClick={onClick}
+    localizationKey={protoKey('Verify')}
+  />
+);
+
+/*
+ * The TXT record over a blurred form. The prototype "finds" the record a few
+ * seconds after the dialog opens, the way the real check polls.
+ */
+const DnsDialog = ({
+  domain,
+  onVerified,
+  onClose,
+}: {
+  domain: string;
+  onVerified: () => void;
+  onClose: () => void;
+}) => {
+  const contentRef = useContext(ContentRefContext);
+  const [isVerified, setIsVerified] = useState(false);
   const record = txtRecordFor(domain);
 
-  const check = () => {
-    setIsChecking(true);
-    void simulateRequest(900).then(() => {
-      updatePolicy(policy.id, current => ({
-        proofs: {
-          ...current.proofs,
-          [domain]: { ...current.proofs[domain], affiliation: true, ownership: 'verified' },
-        },
-      }));
-      setIsChecking(false);
+  useEffect(() => {
+    let cancelled = false;
+    void simulateRequest(3500).then(() => {
+      if (!cancelled) {
+        setIsVerified(true);
+        onVerified();
+      }
     });
-  };
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <Col sx={t => ({ gap: t.space.$2 })}>
-      <ProofLine domain={domain}>
-        <Badge colorScheme='warning'>Unverified</Badge>
-      </ProofLine>
-      <Text
-        colorScheme='secondary'
-        sx={t => ({ fontSize: t.fontSizes.$xs })}
+    <Modal
+      handleClose={onClose}
+      portalRoot={contentRef ?? undefined}
+      containerSx={t => ({
+        alignItems: 'center',
+        position: 'absolute',
+        inset: 0,
+        width: 'auto',
+        height: 'auto',
+        backgroundColor: 'inherit',
+        backdropFilter: `blur(${t.sizes.$2})`,
+      })}
+    >
+      <Col
+        sx={t => ({
+          gap: t.space.$4,
+          width: '24rem',
+          maxWidth: '100%',
+          padding: t.space.$5,
+          backgroundColor: t.colors.$colorBackground,
+          borderRadius: t.radii.$lg,
+          boxShadow: t.shadows.$cardContentShadow,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$borderAlpha100,
+        })}
       >
-        Add this TXT record to your DNS provider. We’ll verify automatically once the record is live.
-      </Text>
-      <RecordRow
-        label='Type'
-        value='TXT'
-      />
-      <RecordRow
-        label='Host / Name'
-        value={record.name}
-      />
-      <ClipboardInput
-        value={record.value}
-        readOnly
-      />
-      <Button
-        variant='link'
-        textVariant='buttonSmall'
-        sx={{ alignSelf: 'flex-start' }}
-        isLoading={isChecking}
-        onClick={check}
-        localizationKey={protoKey('Check now (prototype: passes)')}
-      />
-    </Col>
+        <Col sx={t => ({ gap: t.space.$1 })}>
+          <Flex
+            justify='between'
+            align='center'
+          >
+            <Flex
+              align='center'
+              gap={2}
+            >
+              <Text variant='subtitle'>{domain}</Text>
+              <Badge colorScheme={isVerified ? 'success' : 'warning'}>{isVerified ? 'Verified' : 'Unverified'}</Badge>
+            </Flex>
+            {isVerified ? null : (
+              <Spinner
+                size='xs'
+                colorScheme='neutral'
+              />
+            )}
+          </Flex>
+          <Text
+            colorScheme='secondary'
+            sx={smallSx}
+          >
+            {isVerified
+              ? 'We found the record. You own this domain.'
+              : 'Add this TXT record to your DNS provider. We’ll verify automatically once the record is live.'}
+          </Text>
+        </Col>
+        <Col sx={t => ({ gap: t.space.$1x5 })}>
+          <RecordRow
+            label='Type'
+            value='TXT'
+          />
+          <RecordRow
+            label='Host / Name'
+            value={record.name}
+          />
+        </Col>
+        <ClipboardInput
+          value={record.value}
+          readOnly
+        />
+        <Flex justify='end'>
+          <Button
+            variant='outline'
+            textVariant='buttonSmall'
+            block={false}
+            onClick={onClose}
+            localizationKey={protoKey('Close')}
+          />
+        </Flex>
+      </Col>
+    </Modal>
   );
 };
 
@@ -159,6 +271,6 @@ const RecordRow = ({ label, value }: { label: string; value: string }) => (
     >
       {label}
     </Text>
-    <Badge colorScheme='secondary'>{value}</Badge>
+    <Badge colorScheme='primary'>{value}</Badge>
   </Flex>
 );

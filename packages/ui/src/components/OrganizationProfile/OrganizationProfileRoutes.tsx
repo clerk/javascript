@@ -191,7 +191,7 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
               <Switch>
                 <Route index>
                   <Suspense fallback={''}>
-                    <AccessOnboardingPage />
+                    <AccessOnboardingPage contentRef={contentRef} />
                   </Suspense>
                 </Route>
               </Switch>
