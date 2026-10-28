@@ -176,7 +176,7 @@ export const separator = stylex.create({
     // Full-bleed across the popup: cancel the viewport's inline padding.
     marginBlock: space['0.5'],
     marginInline: `calc(-1 * ${space['0.5']})`,
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     blockSize: '1px',
     flexShrink: 0,
   },

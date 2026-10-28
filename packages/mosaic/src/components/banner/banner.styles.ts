@@ -39,7 +39,7 @@ export const styles = stylex.create({
 export const rootColors = stylex.create({
   neutral: {
     borderColor: colorVars['--cl-color-border'],
-    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
+    backgroundColor: colorVars['--cl-color-neutral-subtle'],
   },
   warning: {
     borderColor: colorVars['--cl-color-warning-border'],

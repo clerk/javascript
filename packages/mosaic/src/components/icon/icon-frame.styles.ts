@@ -2,6 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
+const filledWash = `light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 3.5%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4.5%, transparent))`;
+
 export const styles = stylex.create({
   base: {
     borderColor: 'transparent',
@@ -17,10 +19,10 @@ export const styles = stylex.create({
     justifyContent: 'center',
   },
   bordered: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
   },
   filled: {
-    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
+    backgroundColor: filledWash,
   },
 });
 

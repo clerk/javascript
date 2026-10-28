@@ -29,7 +29,7 @@ export const styles = stylex.create({
   search: { maxWidth: '100%', width: '17rem' },
   noWrap: { whiteSpace: 'nowrap' },
   shell: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
@@ -72,7 +72,7 @@ export const styles = stylex.create({
         ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-surface-subtle'],
       },
     },
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     cursor: { default: null, ':where([data-actionable])': 'pointer' },
