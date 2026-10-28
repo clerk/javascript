@@ -51,7 +51,7 @@ return {
 };
 ```
 
-When a direct action and a confirmation must share admission, create one
+When a direct action and a confirmation must not run together, create one
 `useActionLock` (`src/hooks/use-action-lock.ts`) and inject it into both owners:
 
 ```ts
@@ -63,24 +63,10 @@ const remove = useConfirmController({
 });
 ```
 
-The lock admits synchronously, so two calls in one event cannot both start.
-Its `tryRun` returns `undefined` without invoking busy work, or a promise that
-preserves the accepted action's result or rejection. It stays held until the
-actual action settles, even if a dialog closes and stops observing the action.
-Opening a dialog does not acquire the lock. The lock owns no errors or row IDs.
-`usePendingAction` keeps its inline errors and boolean result; refused runs
-return `false` without changing metadata. `useConfirmController` keeps removal
-errors in its dialog; refusal leaves the dialog and its error unchanged.
-Pass the section's pending state to `Confirmation.disabled` to disable its submit
-control while another action runs. Admission still runs through the lock. Without an
-injected lock, each owner retains its existing independent behavior.
-
-`actionLock` is a hook option, not a per-run option. Project its `isPending` to
-the controls in the shared section. For contact primary changes, close the menu
-on selection by leaving `ActionMenu.status` undefined, disable Add and keep
-Manage disabled but focusable, and show a delayed row spinner beside the value.
-Use one `useSpinDelay` outside the row map with `minDuration: 0`, so feedback ends
-with the request. The Primary badge replaces the spinner after success.
+Pass `actionLock.isPending` to the section controls' `disabled` props, including
+`Confirmation.disabled`. The lock prevents overlapping requests even before React
+renders the disabled controls, and stays held until the action settles. Each owner
+keeps its existing error handling. `actionLock` is a hook option, not a per-run option.
 
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the
