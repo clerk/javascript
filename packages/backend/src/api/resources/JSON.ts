@@ -33,6 +33,8 @@ export const ObjectType = {
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
+  DirectoryGroup: 'directory_group',
+  DirectoryGroupMembership: 'directory_group_membership',
   Domain: 'domain',
   Email: 'email',
   EnterpriseAccount: 'enterprise_account',
@@ -759,6 +761,52 @@ export interface UserDeletedJSON extends DeletedObjectJSON {
    * The external identifier associated with the deleted user, if one was set.
    */
   external_id?: string;
+}
+
+/**
+ * Directory group webhook event payload: a group as the identity provider reported it to a directory.
+ * Used for `directoryGroup.created`, `directoryGroup.updated` and `directoryGroup.deleted` webhook events.
+ */
+export interface DirectoryGroupWebhookEventJSON {
+  object: typeof ObjectType.DirectoryGroup;
+  /**
+   * The group ID, as assigned by the directory.
+   */
+  id: string;
+  directory_id: string;
+  display_name: string;
+  updated_at: number;
+}
+
+/**
+ * Directory group membership webhook event payload: one user's membership in a directory group.
+ * `user_id` is null until the member has been provisioned into Clerk.
+ * Used for `directoryGroupMembership.created` webhook events.
+ */
+export interface DirectoryGroupMembershipWebhookEventJSON {
+  object: typeof ObjectType.DirectoryGroupMembership;
+  /**
+   * Never set: the payload has no ID. Declared so `event.data.id` keeps the same type across every `WebhookEvent`.
+   */
+  id?: never;
+  directory_id: string;
+  group: {
+    object: typeof ObjectType.DirectoryGroup;
+    id: string;
+    display_name: string;
+  };
+  directory_user_id: string;
+  user_id: string | null;
+  updated_at: number;
+}
+
+/**
+ * Directory group membership deletion webhook event payload that extends `DirectoryGroupMembershipWebhookEventJSON`
+ * with `cause`: `group_deleted` when the whole group is gone, `member_removed` when the identity provider took this
+ * user out of it. Used for `directoryGroupMembership.deleted` webhook events.
+ */
+export interface DeletedDirectoryGroupMembershipWebhookEventJSON extends DirectoryGroupMembershipWebhookEventJSON {
+  cause: 'group_deleted' | 'member_removed';
 }
 
 export interface PaginatedResponseJSON {
