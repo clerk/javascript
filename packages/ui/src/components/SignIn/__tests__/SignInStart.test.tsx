@@ -705,6 +705,19 @@ describe('SignInStart', () => {
       screen.getByDisplayValue(/691 1111111/i);
     });
 
+    it('switches to the email field on the first click when phoneNumber is prefilled', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPhoneNumber();
+      });
+      props.setProps({ initialValues: { phoneNumber: '+306911111111' } });
+
+      render(<SignInStart />, { wrapper });
+      fireEvent.click(screen.getByText(/use email/i));
+
+      expect(screen.getByRole('textbox', { name: /email address/i })).toHaveValue('');
+    });
+
     it('prefills the username field with the correct initial value', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withUsername();

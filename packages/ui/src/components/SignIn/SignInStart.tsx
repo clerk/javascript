@@ -168,7 +168,9 @@ function SignInStartInternal(): JSX.Element {
   // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
   // rest of the card (see the descriptors.main column below).
   const [captchaIsInteractive, setCaptchaIsInteractive] = useState(false);
-  const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
+  // Never seed the text field with the phone number, as a leading "+" would switch back to the phone field.
+  const textIdentifierInitialValue = identifierAttribute === 'phone_number' ? '' : initialValues[identifierAttribute];
+  const textIdentifierField = useFormControl('identifier', textIdentifierInitialValue || '', {
     ...currentIdentifier,
     isRequired: true,
     transformer: value => value.trim(),
