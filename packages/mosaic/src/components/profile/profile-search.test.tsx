@@ -524,12 +524,14 @@ describe('Profile search', () => {
 
     await user.type(screen.getByRole('combobox', { name: 'Search' }), 'phone');
     await user.click(screen.getByRole('option', { name: 'Phone numbers' }));
-    const target = targetOf('Phone numbers');
     act(() => {
-      target.dispatchEvent(new Event('animationend', { bubbles: true }));
+      document
+        .querySelector('.cl-profile-search-highlight')
+        ?.dispatchEvent(new Event('animationend', { bubbles: true }));
     });
 
-    expect(target).not.toHaveAttribute('data-highlighted');
+    expect(targetOf('Phone numbers')).not.toHaveAttribute('data-highlighted');
+    expect(document.querySelector('.cl-profile-search-highlight')).toBeNull();
   });
 
   it('keeps the highlight when an animation inside the target ends', async () => {

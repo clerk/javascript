@@ -30,7 +30,8 @@ import { ContentPanelContext, ProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 import type { ProfileSearchPage } from './profile-search';
 import { ProfileSearch } from './profile-search';
-import { SearchIndexPage, SearchPageContext, useProfileSearch } from './profile-search-index';
+import { styles as searchStyles } from './profile-search.styles';
+import { SearchHighlight, SearchIndexPage, SearchPageContext, useProfileSearch } from './profile-search-index';
 
 // The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
 function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
@@ -643,11 +644,17 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
             ),
           )}
         >
-          <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
+          <div
+            {...mergeStyleProps(
+              themeProps('profile-content-body'),
+              stylex.props(reset.base, styles.contentBody, searchStyles.highlightScope),
+            )}
+          >
             <HeadingLevelProvider>
               <PageTitle title={pageTitle} />
             </HeadingLevelProvider>
             {children}
+            <SearchHighlight />
             {inline && renderBranding && !compact ? (
               <div
                 {...mergeStyleProps(
