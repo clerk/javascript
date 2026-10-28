@@ -27,7 +27,6 @@ export function mfaEnvironment() {
   environment.user_settings.attributes.backup_code.enabled = true;
   environment.user_settings.attributes.backup_code.used_for_second_factor = true;
   environment.user_settings.attributes.backup_code.second_factors = ['backup_code'];
-  environment.user_settings.sign_in.second_factor.enabled = true;
   return environment;
 }
 

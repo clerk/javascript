@@ -35,7 +35,11 @@ describe('User profile MFA interaction boundaries', () => {
         requests += 1;
         return requests === 1
           ? HttpResponse.json(
-              { errors: [{ code: 'service_unavailable', message: 'Please try again.' }] },
+              {
+                errors: [
+                  { code: 'service_unavailable', message: 'Please try again.', long_message: 'Please try again.' },
+                ],
+              },
               { status: 503 },
             )
           : undefined;
@@ -193,7 +197,11 @@ describe('User profile MFA interaction boundaries', () => {
         requests += 1;
         return requests === 1
           ? HttpResponse.json(
-              { errors: [{ code: 'service_unavailable', message: 'Please try again.' }] },
+              {
+                errors: [
+                  { code: 'service_unavailable', message: 'Please try again.', long_message: 'Please try again.' },
+                ],
+              },
               { status: 503 },
             )
           : undefined;

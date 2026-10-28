@@ -5,9 +5,17 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
-import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import {
+  allowSpecViolation,
+  type FakeFapiSeed,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  worker,
+} from '../../../__tests__/feature/fake-fapi';
 import {
   fapiApiKey,
+  fapiApiKeyId,
   fapiClient,
   fapiEmailAddress,
   fapiEnvironment,
@@ -24,10 +32,10 @@ import { APIKeysTable } from '../api-keys-table';
 
 const DAY = 24 * 60 * 60 * 1000;
 
-const acme = fapiOrganization({ id: 'org_1', name: 'Acme' });
+const acme = fapiOrganization({ id: 'org_acme00000000000000000000000', name: 'Acme' });
 
 const alice = fapiUser({
-  id: 'user_1',
+  id: 'user_alice0000000000000000000000',
   first_name: 'Alice',
   email_addresses: [fapiEmailAddress({ id: 'idn_alice', email_address: 'alice@example.com' })],
   organization_memberships: [fapiMembership(acme)],
@@ -36,10 +44,10 @@ const alice = fapiUser({
 const userKey = (id: string, name: string, overrides: Partial<ApiKeyJSON> = {}) =>
   fapiApiKey({ id, name, subject: alice.id, created_at: Date.UTC(2026, 0, 5, 12), ...overrides });
 
-const webApp = userKey('ak_1234567890FKWO', 'Web app', { expiration: Date.UTC(2027, 11, 31, 12) });
-const ciPipeline = userKey('ak_2', 'CI pipeline', { last_used_at: Date.now() - 2 * 60_000 });
+const webApp = userKey(fapiApiKeyId(0xbeef), 'Web app', { expiration: Date.UTC(2027, 11, 31, 12) });
+const ciPipeline = userKey(fapiApiKeyId(2), 'CI pipeline', { last_used_at: Date.now() - 2 * 60_000 });
 
-const manyKeys = Array.from({ length: 11 }, (_, index) => userKey(`ak_${index + 1}`, `Key ${index + 1}`));
+const manyKeys = Array.from({ length: 11 }, (_, index) => userKey(fapiApiKeyId(index + 1), `Key ${index + 1}`));
 
 function signedIn(apiKeys: ApiKeyJSON[] = [webApp, ciPipeline], overrides: FakeFapiSeed = {}): FakeFapiSeed {
   return {
@@ -143,7 +151,7 @@ describe('APIKeysTable', () => {
   describe('listing keys', () => {
     it("shows the user's own keys, not the active organization's", async () => {
       await renderTable(
-        signedIn([webApp, ciPipeline, fapiApiKey({ id: 'ak_org', name: 'Org key', subject: acme.id })]),
+        signedIn([webApp, ciPipeline, fapiApiKey({ id: fapiApiKeyId(0x0a), name: 'Org key', subject: acme.id })]),
       );
 
       expect(await within(await loadedTable()).findByText('Web app')).toBeVisible();
@@ -160,11 +168,11 @@ describe('APIKeysTable', () => {
       expect(within(table()).getByText('Never expires')).toBeVisible();
       expect(within(table()).getByRole('cell', { name: '2 minutes ago' })).toBeVisible();
       expect(within(table()).getByRole('cell', { name: '-' })).toBeVisible();
-      expect(within(table()).getByText('ak_...FKWO', { exact: false })).toBeVisible();
+      expect(within(table()).getByText('ak_...beef', { exact: false })).toBeVisible();
     });
 
     it('describes a key last used after the table read the time as used now', async () => {
-      await renderTable(signedIn([userKey('ak_3', 'Worker', { last_used_at: Date.now() + 5 * 60_000 })]));
+      await renderTable(signedIn([userKey(fapiApiKeyId(3), 'Worker', { last_used_at: Date.now() + 5 * 60_000 })]));
 
       expect(await within(await loadedTable()).findByRole('cell', { name: 'now' })).toBeVisible();
     });
@@ -272,7 +280,10 @@ describe('APIKeysTable', () => {
       worker.use(
         http.get(fapiUrl('/api_keys'), () =>
           failing
-            ? HttpResponse.json({ errors: [{ code: 'internal_error', message: 'internal_error' }] }, { status: 400 })
+            ? HttpResponse.json(
+                { errors: [{ code: 'internal_error', message: 'internal_error', long_message: 'internal_error' }] },
+                { status: 400 },
+              )
             : undefined,
         ),
       );
@@ -612,6 +623,7 @@ describe('APIKeysTable', () => {
     });
 
     it('explains a created key that came back without its secret and lists it', async () => {
+      allowSpecViolation(`POST /api_keys 201: / must have required property 'secret' {"missingProperty":"secret"}`);
       const consoleError = vi.spyOn(console, 'error');
       const { fapi, user } = await renderTable();
       const dialog = await openCreate(user);
@@ -620,9 +632,9 @@ describe('APIKeysTable', () => {
         http.post(
           fapiUrl('/api_keys'),
           () => {
-            const created = userKey('ak_new', 'Deploy');
+            const created = userKey(fapiApiKeyId(0x0e), 'Deploy');
             fapi.apiKeys = [created, ...fapi.apiKeys];
-            return HttpResponse.json(created);
+            return HttpResponse.json(created, { status: 201 });
           },
           { once: true },
         ),
@@ -808,7 +820,7 @@ describe('APIKeysTable', () => {
     const readKeys = 'org:sys_api_keys:read';
     const manageKeys = 'org:sys_api_keys:manage';
     const orgKey = fapiApiKey({
-      id: 'ak_org',
+      id: fapiApiKeyId(0x0a),
       name: 'Org key',
       subject: acme.id,
       created_at: Date.UTC(2026, 0, 5, 12),
@@ -890,7 +902,7 @@ describe('APIKeysTable', () => {
 
     it('starts over on the first page with no search when the subject changes', async () => {
       const orgKeys = Array.from({ length: 11 }, (_, index) =>
-        fapiApiKey({ id: `ak_org_${index + 1}`, name: `Org key ${index + 1}`, subject: acme.id }),
+        fapiApiKey({ id: fapiApiKeyId(0x100 + index), name: `Org key ${index + 1}`, subject: acme.id }),
       );
       const { user, rerender } = await renderTable(memberOfAcme([readKeys], [...orgKeys, ...manyKeys]), {
         subject: acme.id,

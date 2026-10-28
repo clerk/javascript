@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiApiKey,
+  fapiApiKeyId,
   fapiClient,
   fapiEnvironment,
   fapiMembership,
@@ -14,10 +15,10 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { OrganizationProfileApiKeysPanel } from '../organization-profile-api-keys-panel';
 
-const acme = fapiOrganization({ id: 'org_1', name: 'Acme' });
+const acme = fapiOrganization({ id: 'org_acme00000000000000000000000', name: 'Acme' });
 
 const alice = fapiUser({
-  id: 'user_1',
+  id: 'user_alice0000000000000000000000',
   first_name: 'Alice',
   organization_memberships: [fapiMembership(acme, { permissions: ['org:sys_api_keys:read'] })],
 });
@@ -26,7 +27,7 @@ function serve(apiKeysSettings: { user_api_keys_enabled: boolean; orgs_api_keys_
   serveFapi({
     environment: fapiEnvironment({ api_keys_settings: apiKeysSettings }),
     client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: acme.id })]),
-    apiKeys: [fapiApiKey({ id: 'ak_org', name: 'Org key', subject: acme.id })],
+    apiKeys: [fapiApiKey({ id: fapiApiKeyId(0x0a), name: 'Org key', subject: acme.id })],
   });
 }
 

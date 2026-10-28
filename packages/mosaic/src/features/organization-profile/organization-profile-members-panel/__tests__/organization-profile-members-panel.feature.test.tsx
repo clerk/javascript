@@ -1,4 +1,3 @@
-import type { RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -9,6 +8,7 @@ import {
   fapiClient,
   fapiMembership,
   fapiOrganization,
+  fapiRole,
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
@@ -29,17 +29,8 @@ const bob = fapiMembership(organization, {
     has_image: false,
   },
 });
-const adminRole: RoleJSON = {
-  object: 'role',
-  id: 'role_admin',
-  key: 'org:admin',
-  name: 'Admin',
-  description: '',
-  permissions: [],
-  created_at: 0,
-  updated_at: 0,
-};
-const memberRole: RoleJSON = { ...adminRole, id: 'role_member', key: 'org:member', name: 'Member' };
+const adminRole = fapiRole('org:admin', 'Admin');
+const memberRole = fapiRole('org:member', 'Member');
 const manage = ['org:sys_memberships:read', 'org:sys_memberships:manage'];
 
 function serve(permissions: string[] = ['org:sys_memberships:read']) {
@@ -502,7 +493,11 @@ describe('OrganizationProfileMembersPanel', () => {
           fapiUrl('/v1/organizations/:organizationId/roles'),
           () =>
             HttpResponse.json(
-              { errors: [{ code: 'roles_unavailable', message: 'roles_unavailable' }] },
+              {
+                errors: [
+                  { code: 'roles_unavailable', message: 'roles_unavailable', long_message: 'roles_unavailable' },
+                ],
+              },
               { status: 400 },
             ),
           { once: true },

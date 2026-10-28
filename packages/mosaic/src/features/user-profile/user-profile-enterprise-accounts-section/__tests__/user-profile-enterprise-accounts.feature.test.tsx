@@ -16,6 +16,7 @@ import {
   fapiEnterpriseAccount,
   fapiEnterpriseConnection,
   fapiEnvironment,
+  fapiSamlLinking,
   fapiSession,
   fapiUser,
   fapiVerification,
@@ -204,15 +205,12 @@ describe('enterprise accounts', () => {
   });
 
   it('shows a missing redirect error and allows another attempt', async () => {
-    serveFapi(signedIn());
+    const fapi = serveFapi(signedIn());
     worker.use(
       http.post(fapiUrl('/v1/me/external_accounts'), () =>
         HttpResponse.json({
-          response: {
-            object: 'external_account',
-            verification: fapiVerification('saml', { status: 'unverified' }),
-          },
-          client: null,
+          response: fapiSamlLinking(fapiVerification('saml', { status: 'unverified' })),
+          client: fapi.client,
         }),
       ),
     );
@@ -310,7 +308,9 @@ describe('enterprise accounts', () => {
     worker.use(
       http.post(fapiUrl('/v1/me/external_accounts'), () =>
         HttpResponse.json(
-          { errors: [{ code: 'form_param_invalid', message: 'Server fallback', meta }] },
+          {
+            errors: [{ code: 'form_param_invalid', message: 'Server fallback', long_message: 'Server fallback', meta }],
+          },
           { status: 422 },
         ),
       ),
@@ -366,12 +366,12 @@ describe('enterprise accounts', () => {
   });
 
   it('localizes a client-defined missing redirect error', async () => {
-    serveFapi(signedIn());
+    const fapi = serveFapi(signedIn());
     worker.use(
       http.post(fapiUrl('/v1/me/external_accounts'), () =>
         HttpResponse.json({
-          response: { object: 'external_account', verification: fapiVerification('saml', { status: 'unverified' }) },
-          client: null,
+          response: fapiSamlLinking(fapiVerification('saml', { status: 'unverified' })),
+          client: fapi.client,
         }),
       ),
     );

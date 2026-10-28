@@ -1,4 +1,4 @@
-import type { EmailAddressJSON, EnterpriseAccountConnectionJSON } from '@clerk/shared/types';
+import type { EnterpriseAccountConnectionJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -13,6 +13,7 @@ import {
 } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
+  type FapiEmailAddress,
   fapiEmailAddress,
   fapiEnterpriseAccount,
   fapiEnvironment,
@@ -27,7 +28,7 @@ import { UserProfileEmailSection } from '../user-profile-email-section';
 const VERIFIED = fapiVerification('email_code', { status: 'verified' });
 const PRIMARY = fapiEmailAddress({ id: 'idn_primary', email_address: 'alice@example.com', verification: VERIFIED });
 
-function signedInWithEmails(emails: EmailAddressJSON[], environment = fapiEnvironment()): FakeFapiSeed {
+function signedInWithEmails(emails: FapiEmailAddress[], environment = fapiEnvironment()): FakeFapiSeed {
   const user = fapiUser({
     id: 'user_1',
     first_name: 'Alice',

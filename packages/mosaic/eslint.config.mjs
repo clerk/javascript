@@ -5,4 +5,8 @@ import mosaicImportGuards from './eslint/config.mjs';
 
 const root = path.resolve(import.meta.dirname, '../..');
 
-export default [...rootConfig.map(config => ({ ...config, basePath: root })), ...mosaicImportGuards];
+export default [
+  ...rootConfig.map(config => ({ ...config, basePath: root })),
+  ...mosaicImportGuards,
+  { ignores: ['src/__tests__/feature/fapi-spec.yml'] },
+];

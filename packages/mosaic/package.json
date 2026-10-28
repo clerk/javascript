@@ -57,6 +57,7 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
+    "sync:fapi-spec": "node ./scripts/sync-fapi-spec.mjs",
     "test": "vitest run --project primitives --project mosaic",
     "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
@@ -82,6 +83,7 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitest/eslint-plugin": "1.6.28",
+    "ajv": "^8.20.0",
     "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
     "eslint-plugin-boundaries": "7.3.0",
@@ -93,7 +95,8 @@
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "tsdown": "catalog:repo",
-    "vitest-axe": "^0.1.0"
+    "vitest-axe": "^0.1.0",
+    "yaml": "^2.9.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

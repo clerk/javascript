@@ -69,11 +69,14 @@ export default defineConfig({
             '@testing-library/user-event',
             'msw',
             'msw/browser',
+            'ajv/dist/2019',
+            'yaml',
           ],
         },
         test: {
           name: 'feature',
           include: [featureTests],
+          maxWorkers: process.env.CI ? undefined : 2,
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
           browser: {
             enabled: true,

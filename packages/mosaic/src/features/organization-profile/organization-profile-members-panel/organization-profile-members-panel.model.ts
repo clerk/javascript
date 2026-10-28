@@ -34,7 +34,7 @@ export function useMembersPanelRolesModel(canReadRoles: boolean): MembersPanelRo
   const environment = useMosaicEnvironment();
   const { data: result, isLoading } = useOrganizationRolesQuery({ enabled: canReadRoles });
   return {
-    defaultRole: environment?.organizationSettings.domains.defaultRole ?? null,
+    defaultRole: environment?.organizationSettings.domains.defaultRole || null,
     roles: result
       ? {
           roles: result.data.map(({ key, name }) => ({ key, name })),

@@ -1,7 +1,13 @@
-import type { ClientJSON, PhoneNumberJSON, UserJSON } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
-import { type FapiEnvironment, fapiPhoneNumber, fapiVerification } from '../fapi';
+import {
+  type FapiClient,
+  type FapiEnvironment,
+  type FapiPhoneNumber,
+  fapiPhoneNumber,
+  type FapiUser,
+  fapiVerification,
+} from '../fapi';
 import { envelope, missing, requestUser, updateUser, VERIFICATION_CODE } from './shared';
 
 export interface FakeMfaState {
@@ -31,19 +37,19 @@ export function createMfaState(): FakeMfaState {
 }
 
 export function mfaHandlers(
-  state: { client: ClientJSON; environment: FapiEnvironment; mfa: FakeMfaState },
+  state: { client: FapiClient; environment: FapiEnvironment; mfa: FakeMfaState },
   fapiUrl: (path: string) => string,
 ) {
   const backupEnabled = () =>
     state.environment.user_settings.attributes.backup_code.enabled &&
     state.environment.user_settings.attributes.backup_code.used_for_second_factor;
-  const usableFactors = (user: UserJSON) =>
+  const usableFactors = (user: FapiUser) =>
     Number(user.totp_enabled) +
     user.phone_numbers.filter(phone => phone.reserved_for_second_factor && phone.verification?.status === 'verified')
       .length;
   const error = (code: string, message: string, status = 400) =>
     HttpResponse.json({ errors: [{ code, message, long_message: message }] }, { status });
-  const updatePhone = (user: UserJSON, id: string, transform: (phone: PhoneNumberJSON) => PhoneNumberJSON) => {
+  const updatePhone = (user: FapiUser, id: string, transform: (phone: FapiPhoneNumber) => FapiPhoneNumber) => {
     const phone = user.phone_numbers.find(phone => phone.id === id);
     if (!phone) {
       return undefined;
@@ -78,7 +84,7 @@ export function mfaHandlers(
             currentUser.phone_numbers.some(phone => phone.reserved_for_second_factor) &&
             currentUser.backup_code_enabled,
         });
-        return envelope({ object: 'deleted', id: 'totp_1' }, state.client);
+        return envelope({ object: 'totp', id: 'totp_1', deleted: true }, state.client);
       }
       if (
         currentUser.totp_enabled ||
@@ -127,8 +133,10 @@ export function mfaHandlers(
         {
           object: 'totp',
           id: 'totp_1',
+          secret: null,
+          uri: null,
           verified: true,
-          ...(newCodes ? { backup_codes: state.mfa.codes } : {}),
+          backup_codes: newCodes ? state.mfa.codes : null,
           created_at: Date.now(),
           updated_at: Date.now(),
         },

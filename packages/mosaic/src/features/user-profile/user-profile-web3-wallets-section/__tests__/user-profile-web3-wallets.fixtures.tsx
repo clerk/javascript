@@ -1,8 +1,8 @@
-import type { UserJSON, Web3Strategy } from '@clerk/shared/types';
+import type { Web3Strategy } from '@clerk/shared/types';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
 
 import type { FakeFapiSeed } from '../../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { fapiClient, fapiEnvironment, fapiSession, type FapiUser, fapiUser } from '../../../../__tests__/feature/fapi';
 
 export function web3Environment(firstFactors: readonly Web3Strategy[]) {
   const base = fapiEnvironment();
@@ -23,7 +23,7 @@ export function web3Environment(firstFactors: readonly Web3Strategy[]) {
 
 export function signedInWallets(
   firstFactors: readonly Web3Strategy[],
-  user: Partial<UserJSON> = {},
+  user: Partial<FapiUser> = {},
   overrides: FakeFapiSeed = {},
 ): FakeFapiSeed {
   return {

@@ -4,7 +4,9 @@ import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
 import {
+  checkingContract,
   startWorker,
+  takeContractViolations,
   takeUnhandledRequests,
   takeUnsettledHolds,
   switchFapiHost,
@@ -29,6 +31,7 @@ disableMotion.textContent = `
 `;
 document.head.append(disableMotion);
 
+const nativeFetch = window.fetch;
 const NativeBroadcastChannel = window.BroadcastChannel;
 const channelNamespace = crypto.randomUUID();
 const openChannels = new Set<IsolatedBroadcastChannel>();
@@ -56,6 +59,7 @@ class IsolatedBroadcastChannel extends NativeBroadcastChannel {
 
 beforeAll(async () => {
   window.BroadcastChannel = IsolatedBroadcastChannel;
+  window.fetch = checkingContract(nativeFetch);
   await startWorker();
 });
 
@@ -64,7 +68,7 @@ beforeEach(() => {
   window.focus();
 });
 
-afterEach(() => {
+afterEach(async () => {
   cleanup();
   __resetClerkQueryClientForTest();
   for (const channel of [...openChannels]) {
@@ -78,11 +82,14 @@ afterEach(() => {
   worker.resetHandlers();
   const unhandled = takeUnhandledRequests();
   const unsettled = takeUnsettledHolds();
+  const violations = await takeContractViolations();
   expect(unhandled, 'Frontend API requests without a handler').toEqual([]);
   expect(unsettled, 'Held Frontend API requests never released or failed').toEqual([]);
+  expect(violations, 'Frontend API traffic that does not match the spec').toEqual([]);
 });
 
 afterAll(() => {
   window.BroadcastChannel = NativeBroadcastChannel;
+  window.fetch = nativeFetch;
   worker.stop();
 });

@@ -38,7 +38,7 @@ function serve(permissions: string[], domainsEnabled = true) {
   const user = fapiUser({ id: 'user_manager', organization_memberships: [membership] });
   return serveFapi({
     environment: fapiEnvironment({
-      organization_settings: { domains: { enabled: domainsEnabled, enrollment_modes: [], default_role: null } },
+      organization_settings: { domains: { enabled: domainsEnabled, enrollment_modes: [], default_role: '' } },
     }),
     client: fapiClient([fapiSession({ id: 'sess_requests', user, last_active_organization_id: organization.id })]),
     memberships: [membership],
@@ -282,7 +282,7 @@ describe('connected organization requests', () => {
     const user = fapiUser({ id: 'user_manager', organization_memberships: [first, second] });
     const fapi = serveFapi({
       environment: fapiEnvironment({
-        organization_settings: { domains: { enabled: true, enrollment_modes: [], default_role: null } },
+        organization_settings: { domains: { enabled: true, enrollment_modes: [], default_role: '' } },
       }),
       client: fapiClient([fapiSession({ id: 'sess_requests', user, last_active_organization_id: organization.id })]),
       memberships: [first, second],

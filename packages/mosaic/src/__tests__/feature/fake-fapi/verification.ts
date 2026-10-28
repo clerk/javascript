@@ -1,6 +1,4 @@
 import type {
-  ClientJSON,
-  SessionJSON,
   SessionVerificationLevel,
   SessionVerificationStatus,
   SignInFirstFactorJSON,
@@ -9,7 +7,7 @@ import type {
 } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
-import { fapiSessionVerification, fapiVerification } from '../fapi';
+import { type FapiClient, type FapiSession, fapiSessionVerification, fapiVerification } from '../fapi';
 
 export type VerificationSecretStrategy = 'password' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
 
@@ -26,7 +24,7 @@ export interface FakeVerificationState {
 export type FakeVerificationSeed = Partial<Pick<FakeVerificationState, 'firstFactors' | 'secondFactors' | 'secrets'>>;
 
 export interface VerificationHost {
-  client: ClientJSON;
+  client: FapiClient;
   verification: FakeVerificationState;
 }
 
@@ -43,16 +41,19 @@ export function createVerificationState(seed: FakeVerificationSeed = {}): FakeVe
   };
 }
 
-function envelope(response: object, client: ClientJSON) {
+function envelope(response: object, client: FapiClient) {
   return HttpResponse.json({ response, client });
 }
 
-function findSession(state: VerificationHost, id: unknown): SessionJSON | undefined {
+function findSession(state: VerificationHost, id: unknown): FapiSession | undefined {
   return state.client.sessions.find(session => session.id === id);
 }
 
 function missing() {
-  return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
+  return HttpResponse.json(
+    { errors: [{ code: 'resource_not_found', message: 'not found', long_message: 'not found' }] },
+    { status: 404 },
+  );
 }
 
 type Stage = 'first' | 'second';
@@ -127,7 +128,7 @@ const verificationErrors = {
   codeIncorrect: () => apiError(422, 'form_code_incorrect', 'is incorrect', 'Incorrect code', 'code'),
 };
 
-function verificationReply(state: VerificationHost, session: SessionJSON) {
+function verificationReply(state: VerificationHost, session: FapiSession) {
   const { level, status, firstFactors, secondFactors, firstFactorVerification, secondFactorVerification } =
     state.verification;
   const complete = status === 'complete';
@@ -152,7 +153,7 @@ function setStageVerification(state: VerificationHost, stage: Stage, verificatio
 }
 
 export function verificationHandlers(state: VerificationHost, url: (path: string) => string) {
-  const guard = (stage: Stage, action: string, session: SessionJSON | undefined, strategy: string | null) => {
+  const guard = (stage: Stage, action: string, session: FapiSession | undefined, strategy: string | null) => {
     if (!session) {
       return missing();
     }

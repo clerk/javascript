@@ -100,7 +100,8 @@ pnpm --filter @clerk/mosaic exec vitest run           # every project
 ```
 
 CI runs feature tests in their own `Mosaic Feature Tests` job, so the repo-wide
-unit test job never needs a browser.
+unit test job never needs a browser. Locally the feature project runs two test
+files at a time, since each one drives a browser.
 
 jsdom and happy-dom have no layout engine, so every rect is 0 and a test that
 asserts on position, size or scrolling always passes there. Name such a test
@@ -187,6 +188,53 @@ shared query cache, and **fails the test on any FAPI request without a
 handler**, or on a `holdRequests` hold never released or failed. When a
 feature needs a new endpoint, add a handler to `serveFapi` that mirrors what
 FAPI returns.
+
+### Matching the backend
+
+Every FAPI request clerk-js sends, and every mocked response, is checked
+against the FAPI OpenAPI spec, vendored as `fapi-spec.yml`. The check is
+strict: a field the spec doesn't list fails, and so does a missing required
+field or a wrong type. It reads the status and the `_method` override, and
+checks a 4xx or 5xx the spec doesn't document against `ClerkErrors`. A
+violation fails the test from the `afterEach`, with the request and the JSON
+pointer of the bad field.
+
+On the request, the query and the body are checked. Form and multipart values
+are read as the type the spec declares, so `true` passes as a boolean and a
+repeated key as an array. The query params clerk-js adds to every request,
+such as `_clerk_js_version`, pass everywhere. Path parameters and headers are
+not checked.
+
+When a test fails here, fix the builder or the handler so it sends what FAPI
+sends, or the test data so it looks like real data, such as an ID in the
+format a spec `pattern` expects. A builder can make a backend quirk part of its name, for example
+`fapiSamlLinking(verification)` for the bare account that SAML linking
+returns.
+
+When FAPI sends something the spec gets wrong, add an entry to
+`fapi-spec-gaps.ts`:
+
+- `at` and `property` name the spec schema and the field. A request body is
+  the operation's `requestBody` schema. A query is the operation's
+  `x-query-schema`, which the check builds from its parameters.
+- `schema` is what FAPI really sends. `replaces` is the spec's current schema,
+  when the gap widens a field the spec already has.
+- `sentBy` names the `clerk_go` code that sends it, or that reads it for a
+  request field.
+
+The list prunes itself. Once the spec adds the field, or changes the schema
+that `replaces` records, the gap's test fails and the entry should go.
+
+A test that sends a response the spec forbids on purpose, such as a broken
+server response, calls `allowSpecViolation(message)` with the exact violation.
+The test also fails if that violation is never sent.
+
+To pick up backend changes, run the sync, then the feature tests:
+
+```bash
+pnpm --filter @clerk/mosaic sync:fapi-spec   # fetch the spec for SUPPORTED_FAPI_VERSION
+pnpm --filter @clerk/mosaic test:feature
+```
 
 ### Order matters
 

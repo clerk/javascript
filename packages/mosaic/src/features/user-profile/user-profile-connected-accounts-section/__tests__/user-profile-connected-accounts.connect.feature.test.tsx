@@ -195,7 +195,7 @@ describe('connected accounts', () => {
   });
 
   it('shows the OAuth error when FAPI returns no verification URL', async () => {
-    serveFapi(signedIn([]));
+    const fapi = serveFapi(signedIn([]));
     worker.use(
       http.post(fapiUrl('/v1/me/external_accounts'), () =>
         HttpResponse.json({
@@ -204,7 +204,7 @@ describe('connected accounts', () => {
             provider: 'github',
             verification: fapiVerification('oauth_github', { status: 'unverified' }),
           }),
-          client: null,
+          client: fapi.client,
         }),
       ),
     );
@@ -325,7 +325,7 @@ describe('connected accounts', () => {
   });
 
   it('does not open an OAuth response after the active user changes', async () => {
-    serveFapi(
+    const fapi = serveFapi(
       signedIn([], {
         client: fapiClient([
           fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', external_accounts: [] }) }),
@@ -362,7 +362,7 @@ describe('connected accounts', () => {
       }),
     });
     await act(async () => {
-      response.resolve(HttpResponse.json({ response: pending, client: null }));
+      response.resolve(HttpResponse.json({ response: pending, client: fapi.client }));
       await create.mock.results[0]?.value;
     });
 

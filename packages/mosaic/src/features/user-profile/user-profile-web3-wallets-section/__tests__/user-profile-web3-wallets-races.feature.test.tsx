@@ -1,17 +1,17 @@
-import type { UserJSON, Web3Strategy } from '@clerk/shared/types';
+import type { Web3Strategy } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
-import { fapiVerification, fapiWeb3Wallet } from '../../../../__tests__/feature/fapi';
+import { fapiVerification, type FapiWeb3Wallet, fapiWeb3Wallet } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section';
 import { signedInWallets } from './user-profile-web3-wallets.fixtures';
 
-async function renderWallets(wallets: UserJSON['web3_wallets'] = []) {
+async function renderWallets(wallets: FapiWeb3Wallet[] = []) {
   const fapi = serveFapi(
     signedInWallets(
       ['web3_metamask_signature', 'web3_coinbase_wallet_signature'],
@@ -31,7 +31,7 @@ function savedWallet(id: string, address: string, strategy: Web3Strategy = 'web3
 }
 
 describe('Web3 wallet selection races', () => {
-  it.each(['matching', 'null strategy', 'unrelated'] as const)(
+  it.each(['matching', 'no verification', 'unrelated'] as const)(
     'handles a %s saved wallet published during account selection',
     async kind => {
       const selection = deferred<string[]>();
@@ -48,11 +48,11 @@ describe('Web3 wallet selection races', () => {
         throw new Error('Missing user');
       }
       session.user.web3_wallets = [savedWallet('published_wallet', kind === 'unrelated' ? '0x1234' : '0xAbCd')];
-      if (kind === 'null strategy' && session.user.web3_wallets[0]?.verification) {
-        session.user.web3_wallets[0].verification.strategy = null;
+      if (kind === 'no verification' && session.user.web3_wallets[0]) {
+        session.user.web3_wallets[0].verification = null;
       }
       await act(() => clerk.user?.reload());
-      if (kind !== 'null strategy') {
+      if (kind !== 'no verification') {
         expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
       }
       selection.resolve(['0xabcd']);

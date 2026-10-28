@@ -33,7 +33,10 @@ describe('User profile MFA management', () => {
     const { rerender } = await renderWithClerk(section('First localized error'));
     worker.use(
       http.post(fapiUrl('/v1/me/totp'), () =>
-        HttpResponse.json({ errors: [{ code: 'action_blocked', message: 'Server detail' }] }, { status: 403 }),
+        HttpResponse.json(
+          { errors: [{ code: 'action_blocked', message: 'Server detail', long_message: 'Server detail' }] },
+          { status: 403 },
+        ),
       ),
     );
     const user = userEvent.setup();
@@ -201,7 +204,10 @@ describe('User profile MFA management', () => {
     worker.use(
       http.post(fapiUrl('/v1/me/totp'), ({ request }) =>
         new URL(request.url).searchParams.get('_method') === 'DELETE'
-          ? HttpResponse.json({ errors: [{ code: 'action_blocked', message: 'Action blocked' }] }, { status: 403 })
+          ? HttpResponse.json(
+              { errors: [{ code: 'action_blocked', message: 'Action blocked', long_message: 'Action blocked' }] },
+              { status: 403 },
+            )
           : undefined,
       ),
     );
@@ -807,7 +813,10 @@ describe('User profile MFA management', () => {
     await screen.findByRole('textbox', { name: 'Verification code' });
     worker.use(
       http.get(fapiUrl('/v1/me'), () =>
-        HttpResponse.json({ errors: [{ code: 'unexpected_error', message: 'Reload failed' }] }, { status: 503 }),
+        HttpResponse.json(
+          { errors: [{ code: 'unexpected_error', message: 'Reload failed', long_message: 'Reload failed' }] },
+          { status: 503 },
+        ),
       ),
     );
     await user.type(screen.getByRole('textbox', { name: 'Verification code' }), '123456');
@@ -821,7 +830,10 @@ describe('User profile MFA management', () => {
     );
     worker.use(
       http.get(fapiUrl('/v1/me'), () =>
-        HttpResponse.json({ errors: [{ code: 'unexpected_error', message: 'Reload failed' }] }, { status: 503 }),
+        HttpResponse.json(
+          { errors: [{ code: 'unexpected_error', message: 'Reload failed', long_message: 'Reload failed' }] },
+          { status: 503 },
+        ),
       ),
     );
     const user = userEvent.setup();
@@ -887,7 +899,15 @@ describe('User profile MFA management', () => {
         attempts += 1;
         return attempts === 1
           ? HttpResponse.json(
-              { errors: [{ code: 'unexpected_error', message: 'Unable to update default method.' }] },
+              {
+                errors: [
+                  {
+                    code: 'unexpected_error',
+                    message: 'Unable to update default method.',
+                    long_message: 'Unable to update default method.',
+                  },
+                ],
+              },
               { status: 503 },
             )
           : undefined;
@@ -971,7 +991,10 @@ describe('User profile MFA management', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     worker.use(
       http.get(fapiUrl('/v1/me'), () =>
-        HttpResponse.json({ errors: [{ code: 'unexpected_error', message: 'Reload failed' }] }, { status: 503 }),
+        HttpResponse.json(
+          { errors: [{ code: 'unexpected_error', message: 'Reload failed', long_message: 'Reload failed' }] },
+          { status: 503 },
+        ),
       ),
     );
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));

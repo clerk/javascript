@@ -872,6 +872,9 @@ importers:
       '@vitest/eslint-plugin':
         specifier: 1.6.28
         version: 1.6.28(@typescript-eslint/eslint-plugin@8.58.0(@typescript-eslint/parser@8.58.0(eslint@9.31.0(jiti@2.7.0))(typescript@6.0.3))(eslint@9.31.0(jiti@2.7.0))(typescript@6.0.3))(eslint@9.31.0(jiti@2.7.0))(typescript@6.0.3)(vitest@5.0.0)
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       axe-core:
         specifier: ^4.11.3
         version: 4.11.4
@@ -908,6 +911,9 @@ importers:
       vitest-axe:
         specifier: ^0.1.0
         version: 0.1.0(vitest@5.0.0)
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
   packages/msw:
     dependencies:

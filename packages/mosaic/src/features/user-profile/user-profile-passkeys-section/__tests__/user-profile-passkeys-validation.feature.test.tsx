@@ -53,7 +53,7 @@ describe('Validating a passkey name', () => {
     worker.use(
       http.post(fapiUrl('/v1/me/passkeys/pk_1'), () =>
         HttpResponse.json(
-          { errors: [{ code: 'form_param_invalid', message: '', meta: { param_name: 'name' } }] },
+          { errors: [{ code: 'form_param_invalid', message: '', long_message: '', meta: { param_name: 'name' } }] },
           { status: 400 },
         ),
       ),

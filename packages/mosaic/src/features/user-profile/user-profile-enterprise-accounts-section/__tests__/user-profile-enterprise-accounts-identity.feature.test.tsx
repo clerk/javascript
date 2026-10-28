@@ -4,7 +4,13 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { fapiUrl, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiSession, fapiUser, fapiVerification } from '../../../../__tests__/feature/fapi';
+import {
+  fapiClient,
+  fapiSamlLinking,
+  fapiSession,
+  fapiUser,
+  fapiVerification,
+} from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section';
 import { enterpriseAccountSeed, enterpriseMember, okta } from './enterprise-accounts.fixtures';
@@ -31,7 +37,7 @@ function deferred<T>() {
 
 describe('enterprise account identity', () => {
   it.each(['switch', 'sign out'] as const)('does not navigate an old linking response after %s', async change => {
-    serveUsers();
+    const fapi = serveUsers();
     const response = deferred<Response>();
     let received = false;
     worker.use(
@@ -54,14 +60,13 @@ describe('enterprise account identity', () => {
     await act(async () => {
       response.resolve(
         HttpResponse.json({
-          response: {
-            object: 'external_account',
-            verification: fapiVerification('saml', {
+          response: fapiSamlLinking(
+            fapiVerification('saml', {
               status: 'unverified',
               external_verification_redirect_url: 'https://idp.example/old-user-link',
             }),
-          },
-          client: null,
+          ),
+          client: fapi.client,
         }),
       );
       await create.mock.results[0]?.value;
@@ -79,7 +84,7 @@ describe('enterprise account identity', () => {
           nextReceived = true;
           return nextQuery.promise;
         }
-        return HttpResponse.json({ response: [okta], client: null });
+        return HttpResponse.json({ response: [okta], client: fapi.client });
       }),
     );
     const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
@@ -91,7 +96,7 @@ describe('enterprise account identity', () => {
       expect(screen.queryByRole('button', { name: 'Connect Acme Okta' })).toBeNull();
     } finally {
       await act(async () => {
-        nextQuery.resolve(HttpResponse.json({ response: [], client: null }));
+        nextQuery.resolve(HttpResponse.json({ response: [], client: fapi.client }));
         await nextQuery.promise;
       });
     }
@@ -104,7 +109,9 @@ describe('enterprise account identity', () => {
       http.post(fapiUrl('/v1/me/external_accounts'), () => {
         requests++;
         return HttpResponse.json(
-          { errors: [{ code: 'unexpected_request', message: 'Unexpected request' }] },
+          {
+            errors: [{ code: 'unexpected_request', message: 'Unexpected request', long_message: 'Unexpected request' }],
+          },
           { status: 400 },
         );
       }),

@@ -2,7 +2,7 @@ import type { PasskeyJSON } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
-import { fapiPasskey } from '../fapi';
+import { fapiPasskey, fapiVerification } from '../fapi';
 import { envelope, error, missing, requestUser, updateUser } from './shared';
 
 export interface FakePasskeysSeed {
@@ -49,22 +49,15 @@ export function passkeyHandlers(
       const passkey = fapiPasskey({
         id: `passkey_${nextPasskeyId++}`,
         name: seed.name ?? 'Chrome on macOS',
-        verification: {
-          id: 'verification_passkey',
-          object: 'verification',
-          status: 'unverified',
-          verified_at_client: '',
-          strategy: 'passkey',
-          attempts: 0,
+        verification: fapiVerification('passkey', {
           expire_at: expiresAt,
-          error: { code: '', message: '' },
           nonce: JSON.stringify({
             challenge: 'Y2hhbGxlbmdl',
             rp: { name: 'Acme', id: 'localhost' },
             user: { id: 'dXNlcg', name: 'user@example.com', displayName: 'Test user' },
             pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
           }),
-        },
+        }),
       });
       pendingPasskeys.set(passkey.id, { userId: user.id, passkey, expiresAt });
       return envelope(passkey, state.client);
@@ -86,7 +79,15 @@ export function passkeyHandlers(
       const body = new URLSearchParams(await request.text());
       if (body.get('strategy') !== 'passkey' || !body.get('public_key_credential')) {
         return HttpResponse.json(
-          { errors: [{ code: 'form_param_missing', message: 'Passkey credential required.' }] },
+          {
+            errors: [
+              {
+                code: 'form_param_missing',
+                message: 'Passkey credential required.',
+                long_message: 'Passkey credential required.',
+              },
+            ],
+          },
           { status: 400 },
         );
       }
@@ -94,14 +95,12 @@ export function passkeyHandlers(
         ...passkey,
         name: seed.authenticatorName || passkey.name,
         last_used_at: Date.now(),
-        verification: {
-          ...verification,
-          status: 'verified' as const,
+        verification: fapiVerification('passkey', {
+          status: 'verified',
           attempts: verification.attempts + 1,
-          verified_at_client: state.client.id,
+          expire_at: verification.expire_at,
           nonce: undefined,
-          error: undefined,
-        },
+        }),
       };
       pendingPasskeys.delete(passkey.id);
       updateUser(state, { ...user, passkeys: [...user.passkeys, verified] });
@@ -135,6 +134,7 @@ export function passkeyHandlers(
                 {
                   code: 'form_param_max_length_exceeded',
                   message: 'Passkey name is too long.',
+                  long_message: 'Passkey name is too long.',
                   meta: { param_name: 'name' },
                 },
               ],

@@ -1,4 +1,3 @@
-import type { UserJSON } from '@clerk/shared/types';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
@@ -15,6 +14,7 @@ import {
   fapiEnterpriseAccount,
   fapiEnvironment,
   fapiSession,
+  type FapiUser,
   fapiUser,
   fapiVerification,
   fapiWeb3Wallet,
@@ -30,7 +30,7 @@ import { registerWallets, signedInWallets, web3Environment } from './user-profil
 describe('Web3 wallets', () => {
   const walletFactors = ['web3_metamask_signature', 'web3_solana_signature'] as const;
 
-  async function renderWeb3(overrides: Partial<UserJSON> = {}, seed: FakeFapiSeed = {}) {
+  async function renderWeb3(overrides: Partial<FapiUser> = {}, seed: FakeFapiSeed = {}) {
     const fapi = serveFapi(signedInWallets(walletFactors, overrides, seed));
     await renderWithClerk(<UserProfileWeb3WalletsSection />);
     return fapi;
