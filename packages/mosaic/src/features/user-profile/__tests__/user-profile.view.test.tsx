@@ -257,10 +257,26 @@ describe('UserProfileView', () => {
     });
   });
 
+  it('shows the search only when asked', () => {
+    const { rerender, props } = renderView();
+    expect(screen.queryByRole('combobox', { name: 'Search' })).toBeNull();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileView
+          {...props}
+          showSearch
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('combobox', { name: 'Search' })).toBeVisible();
+  });
+
   it('finds a section on a page that is not open, and opens that page', async () => {
     const onPageChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ onPageChange });
+    renderView({ onPageChange, showSearch: true });
 
     await user.type(screen.getByRole('combobox', { name: 'Search' }), 'subscr');
     const billing = screen.getByRole('group', { name: 'Billing' });
@@ -274,6 +290,7 @@ describe('UserProfileView', () => {
   it('finds a page of your own by its keywords', async () => {
     const user = userEvent.setup();
     renderView({
+      showSearch: true,
       customPages: [{ label: 'Usage', path: 'usage', keywords: ['quota'], content: <p>Usage content</p> }],
     });
 

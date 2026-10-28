@@ -24,6 +24,24 @@ it('renders the content given for the active page', () => {
   expect(screen.getByText('Members content')).toBeVisible();
 });
 
+it.each([
+  { showSearch: undefined, shown: false },
+  { showSearch: true, shown: true },
+])('shows the search only when asked: $showSearch', ({ showSearch, shown }) => {
+  render(
+    <MosaicProvider>
+      <OrganizationProfileView
+        activePage='general'
+        onPageChange={vi.fn()}
+        showSearch={showSearch}
+        pages={{ general: <OrganizationProfileGeneralPanelView /> }}
+      />
+    </MosaicProvider>,
+  );
+
+  expect(screen.queryByRole('combobox', { name: 'Search' }) !== null).toBe(shown);
+});
+
 it('warns when there are no pages to show', () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

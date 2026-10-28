@@ -28,11 +28,18 @@ export interface ProfilePagesViewProps extends Omit<ProfileRootProps, 'children'
   activePage: string;
   /** Called with a page's id when the user picks it from the navigation. */
   onPageChange: (page: string) => void;
+  /**
+   * Shows a search field above the navigation that finds pages, and the sections on them. Only the
+   * column layout shows it.
+   *
+   * @default false
+   */
+  showSearch?: boolean;
 }
 
 /** A `Profile` built from groups of pages: their navigation, and the active page beside it. */
 export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesViewProps>(function ProfilePagesView(
-  { label, groups, activePage, onPageChange, ...rest },
+  { label, groups, activePage, onPageChange, showSearch = false, ...rest },
   ref,
 ) {
   const pages = groups.flatMap(group => group.pages);
@@ -52,7 +59,7 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
       {...rest}
     >
       <Profile.Title>{label}</Profile.Title>
-      <Profile.Nav search={searchPages}>
+      <Profile.Nav search={showSearch ? searchPages : undefined}>
         {groups.map((group, index) =>
           group.label === undefined ? (
             <NavItems

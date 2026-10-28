@@ -19,7 +19,7 @@ import { OrganizationProfileMembersPanel } from './organization-profile-members-
 /** Everything `<OrganizationProfile />` takes: your own pages and their order, the page it opens on, and where leaving the organization lands. */
 export interface OrganizationProfileProps
   extends
-    Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder'>,
+    Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder' | 'showSearch'>,
     Pick<OrganizationProfileOptions, 'afterLeaveOrganizationUrl'> {
   /**
    * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
@@ -66,6 +66,12 @@ export interface OrganizationProfileProps
  * ```
  *
  * @example
+ * `showSearch` adds a search field above the navigation that finds pages, and the sections on them.
+ * ```tsx
+ * <OrganizationProfile showSearch />
+ * ```
+ *
+ * @example
  * `customPages` adds your own pages; `pageOrder` places them among the built-in ones.
  * ```tsx
  * <OrganizationProfile
@@ -86,6 +92,7 @@ export function OrganizationProfile({
   defaultPage,
   afterLeaveOrganizationUrl,
   fallback,
+  showSearch,
   apiKeysProps,
 }: OrganizationProfileProps) {
   const model = useOrganizationProfileModel();
@@ -109,6 +116,7 @@ export function OrganizationProfile({
         {...navigation}
         customPages={customPages}
         pageOrder={pageOrder}
+        showSearch={showSearch}
         pages={pages}
       />
     </OrganizationProfileProvider>

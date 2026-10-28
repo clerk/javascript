@@ -106,6 +106,15 @@ describe('OrganizationProfile', () => {
     expect(tabNames()).toEqual(tabs);
   });
 
+  it.each([
+    { showSearch: undefined, shown: false },
+    { showSearch: true, shown: true },
+  ])('shows the search only when asked: $showSearch', async ({ showSearch, shown }) => {
+    serve();
+    await renderWithClerk(<OrganizationProfile showSearch={showSearch} />);
+    expect(screen.queryByRole('combobox', { name: 'Search' }) !== null).toBe(shown);
+  });
+
   it('passes the API keys options to the API keys page', async () => {
     serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read', 'org:sys_api_keys:manage'] });
     await renderWithClerk(
@@ -141,6 +150,7 @@ describe('OrganizationProfile', () => {
     const user = userEvent.setup();
     await renderWithClerk(
       <OrganizationProfile
+        showSearch
         customPages={[
           {
             path: 'usage',
