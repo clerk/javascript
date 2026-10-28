@@ -232,6 +232,8 @@ type NavItemMode = 'tab' | 'option';
 // `Profile.Nav` children render again as the select's options.
 const NavItemModeContext = React.createContext<NavItemMode>('tab');
 
+const NavGroupLabelContext = React.createContext<string | undefined>(undefined);
+
 function BackButton() {
   const m = useMessages('profile');
   return (
@@ -267,7 +269,7 @@ function NavBranding() {
 }
 
 /**
- * Children are `Profile.NavItem`s only. Wide, they render as a tablist; compact, as the options of
+ * Children are `Profile.NavItem`s, or `Profile.NavGroup`s of them. Wide, they render as a tablist; compact, as the options of
  * the page title's select, or a tablist in a sheet on a phone.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
@@ -340,6 +342,87 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   );
 });
 
+export interface ProfileNavGroupProps extends MosaicComponentProps<'div'> {
+  /** Names the group above its items. */
+  label: React.ReactNode;
+}
+
+/**
+ * A labelled run of `Profile.NavItem`s. As tabs, the label describes each item; as options, it names
+ * a listbox group.
+ */
+const NavGroup = React.forwardRef<HTMLDivElement, ProfileNavGroupProps>(function ProfileNavGroup(
+  { label, children, xstyle, ...rest },
+  ref,
+) {
+  const mode = React.useContext(NavItemModeContext);
+  const groupProps = mergeStyleProps(
+    themeProps('profile-nav-group'),
+    stylex.props(reset.base, styles.navGroup, xstyle),
+    rest,
+  );
+  const labelProps = mergeStyleProps(
+    themeProps('profile-nav-group-label'),
+    stylex.props(reset.base, styles.navGroupLabel),
+  );
+  if (mode === 'option') {
+    return (
+      <SelectPrimitive.Group
+        ref={ref}
+        {...groupProps}
+      >
+        <SelectPrimitive.GroupLabel {...labelProps}>{label}</SelectPrimitive.GroupLabel>
+        {children}
+      </SelectPrimitive.Group>
+    );
+  }
+  return (
+    <TabsNavGroup
+      ref={ref}
+      label={label}
+      labelProps={labelProps}
+      {...groupProps}
+    >
+      {children}
+    </TabsNavGroup>
+  );
+});
+
+interface TabsNavGroupProps extends Omit<ProfileNavGroupProps, 'xstyle'> {
+  labelProps: React.ComponentProps<'div'>;
+}
+
+const TabsNavGroup = React.forwardRef<HTMLDivElement, TabsNavGroupProps>(function TabsNavGroup(
+  { label, labelProps, children, render, ...rest },
+  ref,
+) {
+  const labelId = React.useId();
+  return (
+    <NavGroupLabelContext.Provider value={labelId}>
+      {useRender({
+        defaultTagName: 'div',
+        render,
+        ref,
+        props: {
+          ...rest,
+          children: (
+            <>
+              <div
+                id={labelId}
+                aria-hidden
+                {...labelProps}
+              >
+                {label}
+              </div>
+              {children}
+            </>
+          ),
+        },
+      })}
+    </NavGroupLabelContext.Provider>
+  );
+});
+
 export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
   value: string;
   icon?: React.ReactNode;
@@ -355,6 +438,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
 ) {
   const { compact, closeNav } = useProfileContext('Profile.NavItem');
   const mode = React.useContext(NavItemModeContext);
+  const groupLabelId = React.useContext(NavGroupLabelContext);
   const styleProps = mergeStyleProps(
     themeProps('profile-nav-item'),
     stylex.props(reset.base, styles.navItem, focusOutline.visible, mode === 'option' && styles.navItemOption, xstyle),
@@ -405,6 +489,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
       ref={ref}
       value={value}
       disabled={disabled}
+      aria-describedby={groupLabelId}
       render={render}
       onClick={event => {
         onClick?.(event);
@@ -596,4 +681,4 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * </Profile.Root>
  * ```
  */
-export const Profile = { Root, Title, Nav, NavItem, Content, ContentPanel };
+export const Profile = { Root, Title, Nav, NavGroup, NavItem, Content, ContentPanel };

@@ -5,7 +5,14 @@ import { page } from 'vitest/browser';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import {
+  fapiClient,
+  fapiEnvironment,
+  fapiMembership,
+  fapiOrganization,
+  fapiSession,
+  fapiUser,
+} from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfile } from '../user-profile';
@@ -130,5 +137,94 @@ describe('UserProfile', () => {
 
     await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
+  });
+});
+
+describe('UserProfile with an active organization', () => {
+  const acme = fapiOrganization({ id: 'org_1', name: 'Acme' });
+
+  function serveWithOrganization({
+    permissions = ['org:sys_memberships:read'],
+    userAPIKeysEnabled = false,
+    activeOrganizationId = acme.id,
+  }: { permissions?: string[]; userAPIKeysEnabled?: boolean; activeOrganizationId?: string | null } = {}) {
+    const memberships = [fapiMembership(acme, { permissions })];
+    const user = fapiUser({ id: 'user_1', organization_memberships: memberships });
+    return serveFapi({
+      environment: fapiEnvironment({ api_keys_settings: { user_api_keys_enabled: userAPIKeysEnabled } }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: activeOrganizationId })]),
+      memberships,
+    });
+  }
+
+  function tabsDescribedBy(description: string) {
+    return screen
+      .getAllByRole('tab')
+      .filter(tab => tab.getAttribute('aria-describedby') !== null)
+      .filter(tab => document.getElementById(tab.getAttribute('aria-describedby') ?? '')?.textContent === description)
+      .map(tab => tab.textContent);
+  }
+
+  it('lists the organization pages under Organization after the account pages', async () => {
+    serveWithOrganization();
+    await renderWithClerk(<UserProfile />);
+    expect(tabsDescribedBy('Account')).toEqual(['Account', 'Security']);
+    expect(tabsDescribedBy('Organization')).toEqual(['General', 'Members']);
+  });
+
+  it('lists only the organization pages the user may see', async () => {
+    serveWithOrganization({ permissions: [] });
+    await renderWithClerk(<UserProfile />);
+    expect(tabsDescribedBy('Organization')).toEqual(['General']);
+  });
+
+  it('lists only the account pages in user mode', async () => {
+    serveWithOrganization();
+    await renderWithClerk(<UserProfile mode='user' />);
+    expect(tabNames()).toEqual(['Account', 'Security']);
+  });
+
+  it('lists only the account pages without an active organization', async () => {
+    serveWithOrganization({ activeOrganizationId: null });
+    await renderWithClerk(<UserProfile />);
+    expect(tabNames()).toEqual(['Account', 'Security']);
+  });
+
+  it('opens on an organization page by its prefixed id', async () => {
+    serveWithOrganization();
+    await renderWithClerk(<UserProfile defaultPage='organization.members' />);
+    expect(screen.getByRole('tab', { name: 'Members', description: 'Organization' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeVisible();
+  });
+
+  it('opens the organization page that shares an account page name', async () => {
+    serveWithOrganization();
+    await renderWithClerk(
+      <UserProfile
+        organizationProfileProps={{
+          customPages: [{ path: 'security', label: 'Security', content: <p>Organization security</p> }],
+        }}
+      />,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('tab', { name: 'Security', description: 'Organization' }));
+    expect(screen.getByText('Organization security')).toBeVisible();
+  });
+
+  it('passes the organization options to its pages', async () => {
+    serveWithOrganization();
+    await renderWithClerk(
+      <UserProfile
+        organizationProfileProps={{
+          customPages: [{ path: 'audit', label: 'Audit log', content: <p>Audit content</p> }],
+          pageOrder: ['audit'],
+        }}
+      />,
+    );
+    expect(tabsDescribedBy('Organization')).toEqual(['Audit log', 'General', 'Members']);
   });
 });
