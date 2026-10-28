@@ -1,6 +1,6 @@
 'use client';
 
-import { type CSSProperties, type RefObject, useEffect, useMemo } from 'react';
+import { type CSSProperties, type RefObject, useEffect, useMemo, useState } from 'react';
 
 import { useAnimationsFinished } from './use-animations-finished';
 import { type TransitionStatus, useTransitionStatus } from './use-transition-status';
@@ -8,6 +8,7 @@ import { type TransitionStatus, useTransitionStatus } from './use-transition-sta
 export interface UseTransitionOptions {
   open: boolean;
   ref: RefObject<HTMLElement | null>;
+  animateOnMount?: boolean;
 }
 
 export interface TransitionProps {
@@ -38,8 +39,12 @@ export interface UseTransitionReturn {
  * transitions (via `[data-starting-style]` / `[data-ending-style]`) and
  * CSS keyframe animations (via `[data-open]` / `[data-closed]`).
  */
-export function useTransition({ open, ref }: UseTransitionOptions): UseTransitionReturn {
+export function useTransition({ open, ref, animateOnMount = true }: UseTransitionOptions): UseTransitionReturn {
   const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
+  const [skipEnter, setSkipEnter] = useState(open && !animateOnMount);
+  if (skipEnter && transitionStatus !== 'starting') {
+    setSkipEnter(false);
+  }
   const runOnAnimationsFinished = useAnimationsFinished(ref, open);
 
   useEffect(() => {
@@ -62,13 +67,15 @@ export function useTransition({ open, ref }: UseTransitionOptions): UseTransitio
       props['data-closed'] = '';
     }
     if (transitionStatus === 'starting') {
-      props['data-starting-style'] = '';
+      if (!skipEnter) {
+        props['data-starting-style'] = '';
+      }
       props.style = { transition: 'none' };
     } else if (transitionStatus === 'ending') {
       props['data-ending-style'] = '';
     }
     return props;
-  }, [open, mounted, transitionStatus]);
+  }, [open, mounted, transitionStatus, skipEnter]);
 
   return { mounted, transitionStatus, transitionProps };
 }
