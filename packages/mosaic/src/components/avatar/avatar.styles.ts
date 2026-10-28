@@ -67,7 +67,7 @@ export const styles = stylex.create({
   },
 
   icon: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-full'],
     borderStyle: 'solid',
     borderWidth: '1px',

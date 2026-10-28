@@ -13,14 +13,20 @@ import {
 import { iconScope } from '../icon/icon.markers.stylex';
 
 // Neutral fills are the three neutral alpha steps, shared across variants:
-//   100 — `filled-neutral` rest, `outline-*`/`ghost-*` hover
-//   200 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
+//   100 — `filled-neutral` rest, `ghost-*` hover
+//   200 — `filled-neutral` hover, `ghost-*` pressed
 //   300 — `filled-neutral` pressed
 
 // Opaque fills blend toward their own on-fill at the same 12%/18%. Neutral has no fill
 // to blend from, so it rides the opacity ramp above.
+// Outline variants keep the surface as their fill and lay the hover and pressed wash over it as an
+// inset shadow, so the state tint works on any backdrop and still transitions.
 const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 12%)`;
 const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 18%)`;
+const neutralHoverWash = `inset 0 0 0 100vmax ${colorVars['--cl-color-neutral-alpha-100']}`;
+const neutralPressedWash = `inset 0 0 0 100vmax ${colorVars['--cl-color-neutral-alpha-200']}`;
+const negativeHoverWash = `inset 0 0 0 100vmax ${colorVars['--cl-color-negative-alpha-200']}`;
+const negativePressedWash = `inset 0 0 0 100vmax ${colorVars['--cl-color-negative-alpha-300']}`;
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
@@ -75,7 +81,7 @@ export const styles = stylex.create({
       ':not([data-disabled]):active': durationVars['--cl-duration-instant'],
       ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
     },
-    transitionProperty: 'background-color, border-color, color, opacity, text-decoration-color',
+    transitionProperty: 'background-color, border-color, box-shadow, color, opacity, text-decoration-color',
     // Linear, not `--cl-ease-default`: nothing here moves. An ease on already non-uniform
     // color interpolation just drags the midpoint, and the house curve's overshoot would
     // extrapolate past the target color.
@@ -181,39 +187,42 @@ export const variants = stylex.create({
   // fill, and leaves it independently themeable.
   'outline-primary': {
     borderColor: colorVars['--cl-color-border'],
-    backgroundColor: {
-      default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+    backgroundColor: colorVars['--cl-color-surface'],
+    boxShadow: {
+      default: null,
+      ':not([data-disabled]):active': neutralPressedWash,
+      ':not([data-disabled])[data-open]': neutralPressedWash,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralHoverWash,
       },
     },
     color: colorVars['--cl-color-brand'],
   },
   'outline-neutral': {
     borderColor: colorVars['--cl-color-border'],
-    backgroundColor: {
-      default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+    backgroundColor: colorVars['--cl-color-surface'],
+    boxShadow: {
+      default: null,
+      ':not([data-disabled]):active': neutralPressedWash,
+      ':not([data-disabled])[data-open]': neutralPressedWash,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': neutralHoverWash,
       },
     },
     color: colorVars['--cl-color-foreground'],
   },
   'outline-negative': {
     borderColor: colorVars['--cl-color-border'],
-    backgroundColor: {
-      default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+    backgroundColor: colorVars['--cl-color-surface'],
+    boxShadow: {
+      default: null,
+      ':not([data-disabled]):active': negativePressedWash,
+      ':not([data-disabled])[data-open]': negativePressedWash,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': negativeHoverWash,
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -248,11 +257,11 @@ export const variants = stylex.create({
   'ghost-negative': {
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
-      ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled]):active': colorVars['--cl-color-negative-alpha-300'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-negative-alpha-300'],
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-subtle'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-alpha-200'],
       },
     },
     color: colorVars['--cl-color-negative'],

@@ -187,7 +187,7 @@ export const footer = stylex.create({
     flexShrink: 0,
     gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
     justifyContent: 'space-between',
-    borderTopColor: colorVars['--cl-color-border'],
+    borderTopColor: colorVars['--cl-color-border-subtle'],
     borderTopStyle: 'solid',
     borderTopWidth: {
       default: '0px',
@@ -202,7 +202,7 @@ export const branding = stylex.create({
   base: {
     paddingBlock: space['3'],
     paddingInline: space['6'],
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     display: 'flex',
