@@ -1,4 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { buildPopupCallbackUrls } from '@clerk/shared/internal/clerk-js/popupCallback';
 import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
@@ -19,8 +20,6 @@ export async function _authenticateWithPopup(
     return;
   }
 
-  const accountPortalHost = buildAccountsBaseUrl(client.frontendApi);
-
   const { redirectUrl } = params;
 
   // We set the force_redirect_url query parameter to ensure that the user is redirected to the correct page even
@@ -32,10 +31,11 @@ export async function _authenticateWithPopup(
   // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
   const redirectUrlWithForceRedirectUrl = client.buildUrlWithAuth(r.toString());
 
-  const popupRedirectUrlComplete = client.buildUrlWithAuth(`${accountPortalHost}/popup-callback`);
-  const popupRedirectUrl = client.buildUrlWithAuth(
-    `${accountPortalHost}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
-  );
+  const {
+    accountsOrigin: accountPortalHost,
+    redirectUrl: popupRedirectUrl,
+    redirectUrlComplete: popupRedirectUrlComplete,
+  } = buildPopupCallbackUrls(client.frontendApi, url => client.buildUrlWithAuth(url), redirectUrlWithForceRedirectUrl);
 
   const messageHandler = async (event: MessageEvent) => {
     if (event.origin !== accountPortalHost) {
@@ -101,8 +101,6 @@ export function wrapWithPopupRoutes(
     redirectUrl: string;
   },
 ): { redirectCallbackUrl: string; redirectUrl: string } {
-  const accountPortalHost = buildAccountsBaseUrl(client.frontendApi);
-
   // We set the force_redirect_url query parameter to ensure that the user is redirected to the correct page even
   // in situations like a modal transfer flow.
   const r = new URL(redirectCallbackUrl);
@@ -111,9 +109,10 @@ export function wrapWithPopupRoutes(
   // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
   const redirectUrlWithForceRedirectUrl = client.buildUrlWithAuth(r.toString());
 
-  const popupRedirectUrlComplete = client.buildUrlWithAuth(`${accountPortalHost}/popup-callback`);
-  const popupRedirectUrl = client.buildUrlWithAuth(
-    `${accountPortalHost}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
+  const { redirectUrl: popupRedirectUrl, redirectUrlComplete: popupRedirectUrlComplete } = buildPopupCallbackUrls(
+    client.frontendApi,
+    url => client.buildUrlWithAuth(url),
+    redirectUrlWithForceRedirectUrl,
   );
 
   return { redirectCallbackUrl: popupRedirectUrl, redirectUrl: popupRedirectUrlComplete };

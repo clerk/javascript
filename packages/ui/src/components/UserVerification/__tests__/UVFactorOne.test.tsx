@@ -1,5 +1,7 @@
+import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -249,6 +251,302 @@ describe('UserVerificationFactorOne', () => {
         getByText('Verification required');
         expect(container).toHaveTextContent('xxx+1@hello.com');
       });
+    });
+  });
+
+  describe('Enterprise SSO', () => {
+    const oktaFactor = { strategy: 'enterprise_sso', enterpriseConnectionId: 'ec_1', enterpriseConnectionName: 'Okta' };
+    const entraFactor = {
+      strategy: 'enterprise_sso',
+      enterpriseConnectionId: 'ec_2',
+      enterpriseConnectionName: 'Entra',
+    };
+    const redirectUrl = new URL('https://clerk.example.com/v1/verify?token=abc');
+
+    it('renders a button for the connection when enterprise SSO is the only first factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+
+      const { findByText, findByRole, queryByText } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await findByText('Verification required');
+      await findByRole('button', { name: /Okta/ });
+      expect(queryByText('Use another method')).toBeNull();
+    });
+
+    it('renders one button per enterprise connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [oktaFactor, entraFactor],
+      });
+
+      const { findByRole } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await findByRole('button', { name: /Okta/ });
+      await findByRole('button', { name: /Entra/ });
+    });
+
+    it('lists enterprise SSO under use another method when password is the starting factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'password' }, oktaFactor],
+      });
+
+      const { userEvent, findByText, findByRole, getByLabelText } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await findByText('Verification required');
+      getByLabelText(/^password/i);
+
+      await userEvent.click(await findByText('Use another method'));
+      await userEvent.click(await findByText('Continue with Okta'));
+
+      await findByText('Continue with your enterprise account to confirm it’s you');
+      await findByRole('button', { name: /Okta/ });
+    });
+
+    it('redirects the page when the popup is blocked', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+      fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({
+        firstFactorVerification: { externalVerificationRedirectURL: redirectUrl },
+      });
+      vi.spyOn(window, 'open').mockReturnValue(null);
+
+      const { userEvent, findByRole } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await userEvent.click(await findByRole('button', { name: /Okta/ }));
+
+      await waitFor(() => {
+        expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledWith(
+          expect.objectContaining({
+            strategy: 'enterprise_sso',
+            enterpriseConnectionId: 'ec_1',
+            redirectUrl: window.location.href,
+            actionCompleteRedirectUrl: window.location.href,
+          }),
+        );
+        expect(fixtures.clerk.navigate).toHaveBeenCalledWith(redirectUrl.href);
+      });
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    });
+
+    it('sends the email of the enterprise account that belongs to the connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({
+          email_addresses: ['personal@example.com', 'demo@okta-demo.com'],
+          enterprise_accounts: [
+            {
+              object: 'enterprise_account',
+              id: 'eac_1',
+              protocol: 'oauth',
+              provider: 'oauth_custom_okta',
+              email_address: 'demo@okta-demo.com',
+              enterprise_connection_id: '',
+              enterprise_connection: {
+                id: 'copc_1',
+                enterprise_connection_id: '',
+                protocol: 'oauth',
+                provider: 'oauth_custom_okta',
+                name: 'Okta',
+                domain: 'okta-demo.com',
+                active: true,
+              },
+            },
+          ],
+        } as any);
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ ...oktaFactor, enterpriseConnectionProvider: 'oauth_custom_okta' }],
+      });
+      fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({
+        firstFactorVerification: { externalVerificationRedirectURL: redirectUrl },
+      });
+      vi.spyOn(window, 'open').mockReturnValue(null);
+
+      const { userEvent, findByRole } = render(<UserVerificationFactorOne />, { wrapper });
+      await userEvent.click(await findByRole('button', { name: /Okta/ }));
+
+      const enterpriseEmailId = fixtures.session?.user?.emailAddresses.find(
+        e => e.emailAddress === 'demo@okta-demo.com',
+      )?.id;
+      await waitFor(() =>
+        expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledWith(
+          expect.objectContaining({ enterpriseConnectionId: 'ec_1', emailAddressId: enterpriseEmailId }),
+        ),
+      );
+    });
+
+    it('shows the API error when preparing the verification fails', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+      fixtures.session?.prepareFirstFactorVerification.mockRejectedValue(
+        new ClerkAPIResponseError('Unprocessable', {
+          status: 422,
+          data: [
+            {
+              code: 'form_conditional_param_missing',
+              message: 'is required',
+              long_message: 'email_address_id is required when strategy is enterprise_sso',
+              meta: { param_name: 'email_address_id' },
+            },
+          ],
+        }),
+      );
+      const popup = { closed: false, close: vi.fn(), location: { href: '' } };
+      vi.spyOn(window, 'open').mockReturnValue(popup as unknown as Window);
+
+      const { userEvent, findByRole, findByText } = render(<UserVerificationFactorOne />, { wrapper });
+      await userEvent.click(await findByRole('button', { name: /Okta/ }));
+
+      await findByText(/email_address_id is required/);
+      expect(popup.close).toHaveBeenCalled();
+    });
+
+    it('redirects the page without opening a popup when oauthFlow is redirect', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      props.setProps({ oauthFlow: 'redirect' });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+      fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({
+        firstFactorVerification: { externalVerificationRedirectURL: redirectUrl },
+      });
+      const open = vi.spyOn(window, 'open');
+
+      const { userEvent, findByRole } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await userEvent.click(await findByRole('button', { name: /Okta/ }));
+
+      await waitFor(() => expect(fixtures.clerk.navigate).toHaveBeenCalledWith(redirectUrl.href));
+      expect(open).not.toHaveBeenCalled();
+    });
+
+    const openPopupAndStart = async (
+      fixtures: Awaited<ReturnType<typeof createFixtures>>['fixtures'],
+      wrapper: any,
+    ) => {
+      fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({
+        firstFactorVerification: { externalVerificationRedirectURL: redirectUrl },
+      });
+      const popup = { closed: false, close: vi.fn(), location: { href: '' } };
+      vi.spyOn(window, 'open').mockReturnValue(popup as unknown as Window);
+
+      const rendered = render(<UserVerificationFactorOne />, { wrapper });
+      await rendered.userEvent.click(await rendered.findByRole('button', { name: /Okta/ }));
+      await waitFor(() => expect(popup.location.href).toBe(redirectUrl.href));
+      expect(fixtures.clerk.navigate).not.toHaveBeenCalled();
+      return { popup, ...rendered };
+    };
+
+    const popupReportsBack = (fixtures: Awaited<ReturnType<typeof createFixtures>>['fixtures'], data: object) =>
+      window.dispatchEvent(
+        new MessageEvent('message', { origin: buildAccountsBaseUrl(fixtures.clerk.frontendApi), data }),
+      );
+
+    const sessionVerifiesFirstFactorOnReload = (fixtures: Awaited<ReturnType<typeof createFixtures>>['fixtures']) =>
+      vi.spyOn(fixtures.session!, 'reload').mockImplementation(async () => {
+        fixtures.session!.factorVerificationAge = [0, -1];
+        return fixtures.session!;
+      });
+
+    it('completes the verification once the popup reports back and the session confirms it', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        level: 'first_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+      sessionVerifiesFirstFactorOnReload(fixtures);
+
+      await openPopupAndStart(fixtures, wrapper);
+      popupReportsBack(fixtures, { session: fixtures.session?.id });
+
+      await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalledWith({ session: fixtures.session?.id }));
+    });
+
+    it('shows an error when the popup reports back but the session is not verified', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        level: 'first_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+      fixtures.session!.factorVerificationAge = [-1, -1];
+      vi.spyOn(fixtures.session!, 'reload').mockResolvedValue(fixtures.session!);
+
+      const { findByText, getByRole } = await openPopupAndStart(fixtures, wrapper);
+      popupReportsBack(fixtures, { return_url: 'https://app.example.com' });
+
+      await findByText(/Verification with your identity provider did not complete/);
+      expect(getByRole('button', { name: /Okta/ })).toBeEnabled();
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    });
+
+    it('continues to the second factor when the level is multi_factor', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      props.setProps({ level: 'multi_factor' });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        level: 'multi_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+      sessionVerifiesFirstFactorOnReload(fixtures);
+
+      await openPopupAndStart(fixtures, wrapper);
+      popupReportsBack(fixtures, { session: fixtures.session?.id });
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('./factor-two'));
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    });
+
+    it('re-enables the connection button when the popup is closed', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        level: 'first_factor',
+        supportedFirstFactors: [oktaFactor],
+      });
+
+      const { popup, getByRole, queryByText } = await openPopupAndStart(fixtures, wrapper);
+      popup.closed = true;
+
+      await waitFor(() => expect(getByRole('button', { name: /Okta/ })).toBeEnabled(), { timeout: 3000 });
+      expect(popup.close).toHaveBeenCalled();
+      expect(queryByText('The popup was closed before the flow completed')).toBeNull();
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
     });
   });
 

@@ -19,6 +19,10 @@ const firstFactorsAreEqual = (a: SignInFactor | null | undefined, b: SignInFacto
     return a.phoneNumberId === b.phoneNumberId;
   }
 
+  if (a.strategy === 'enterprise_sso' && b.strategy === 'enterprise_sso') {
+    return a.enterpriseConnectionId === b.enterpriseConnectionId;
+  }
+
   return a.strategy === b.strategy;
 };
 
@@ -49,7 +53,7 @@ export function useReverificationAlternativeStrategies<T = SignInFirstFactor>({
       supportedFirstFactors
         ? (supportedFirstFactors
             .filter(f => !f.strategy.startsWith('oauth_'))
-            .filter(factor => factorHasLocalStrategy(factor))
+            .filter(factor => factorHasLocalStrategy(factor) || factor.strategy === 'enterprise_sso')
             .filter(factor => !firstFactorsAreEqual(factor, filterOutFactor))
             // Only include passkey if the device supports it.
             // @ts-ignore Types are not public yet.

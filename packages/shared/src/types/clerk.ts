@@ -1876,6 +1876,11 @@ export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
   | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
+/**
+ * Whether an OAuth or enterprise SSO round trip opens in a popup or navigates the page. `'auto'` opens a popup only where the current origin supports it.
+ */
+export type OAuthFlow = 'auto' | 'redirect' | 'popup';
+
 /** @generateWithEmptyComment */
 export type SignInProps = RoutingOptions & {
   /**
@@ -1931,7 +1936,7 @@ export type SignInProps = RoutingOptions & {
   /**
    * Control whether OAuth flows use redirects or popups.
    */
-  oauthFlow?: 'auto' | 'redirect' | 'popup';
+  oauthFlow?: OAuthFlow;
   /**
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
@@ -1978,6 +1983,13 @@ export type __internal_UserVerificationProps = RoutingOptions & {
    * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
    */
   afterVerificationCancelled?: () => void;
+
+  /**
+   * Control whether enterprise SSO verification uses a popup or a full-page redirect. `'auto'` follows the same heuristic as the sign-in component.
+   *
+   * @default `'popup'`
+   */
+  oauthFlow?: OAuthFlow;
 
   /**
    * Defines the steps of the verification flow.
@@ -2114,7 +2126,7 @@ export type SignUpProps = RoutingOptions & {
   /**
    * Control whether OAuth flows use redirects or popups.
    */
-  oauthFlow?: 'auto' | 'redirect' | 'popup';
+  oauthFlow?: OAuthFlow;
   /**
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
