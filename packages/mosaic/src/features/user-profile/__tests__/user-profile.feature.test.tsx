@@ -252,6 +252,23 @@ describe('UserProfile with an active organization', () => {
     expect(screen.getByText('Organization security')).toBeVisible();
   });
 
+  it('skips an account page whose path is an organization page id', async () => {
+    serveWithOrganization();
+    await renderWithClerk(
+      <UserProfile
+        defaultPage='organization/general'
+        customPages={[{ path: 'organization/general', label: 'Imposter', content: <p>Imposter content</p> }]}
+      />,
+    );
+
+    expect(tabNames()).toEqual(['Account', 'Security', 'General', 'Members']);
+    expect(screen.getByRole('tab', { name: 'General', description: 'Organization' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.queryByText('Imposter content')).not.toBeInTheDocument();
+  });
+
   it('passes the organization options to its pages', async () => {
     serveWithOrganization();
     await renderWithClerk(

@@ -4,6 +4,7 @@ import { CreditCard } from '../../icons/glyphs/credit-card';
 import { ShieldCheck } from '../../icons/glyphs/shield-check';
 import { UserCircle } from '../../icons/glyphs/user-circle';
 import { applyOrder } from '../../utils/apply-order';
+import { withUniquePaths } from '../profile-pages/profile-pages.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
 /** The built-in pages in the order the profile lists them before a consumer reorders anything. */
@@ -42,14 +43,15 @@ export function resolveUserProfilePages(
   customPages: readonly CustomProfilePage[] = [],
   order?: readonly string[],
 ): UserProfileNavEntry[] {
-  const customById = new Map(customPages.map(page => [page.path, page]));
+  const uniqueCustomPages = withUniquePaths(customPages);
+  const customById = new Map(uniqueCustomPages.map(page => [page.path, page]));
   const builtInIds = new Set<string>(builtIn);
   const entries: UserProfileNavEntry[] = [
     ...builtIn.map((id): UserProfileNavEntry => {
       const custom = customById.get(id);
       return custom ? { id, custom } : { id };
     }),
-    ...customPages.filter(page => !builtInIds.has(page.path)).map(page => ({ id: page.path, custom: page })),
+    ...uniqueCustomPages.filter(page => !builtInIds.has(page.path)).map(page => ({ id: page.path, custom: page })),
   ];
   return applyOrder(order, entries, entry => entry.id);
 }
