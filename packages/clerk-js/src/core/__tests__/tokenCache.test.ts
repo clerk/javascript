@@ -51,6 +51,14 @@ const tick = async () => {
 
 const makeToken = (raw: string, id = 'session_123') => new Token({ id, jwt: raw, object: 'token' }) as TokenResource;
 
+const deferred = () => {
+  let resolve!: (token: TokenResource) => void;
+  const promise = new Promise<TokenResource>(r => {
+    resolve = r;
+  });
+  return { promise, resolve };
+};
+
 describe('SessionTokenCache', () => {
   let mockBroadcastChannel: {
     addEventListener: ReturnType<typeof vi.fn>;
@@ -429,21 +437,13 @@ describe('SessionTokenCache', () => {
   describe('same-tab monotonic resolve', () => {
     const tokenId = 'session_123';
 
-    const deferred = () => {
-      let resolve!: (token: TokenResource) => void;
-      const promise = new Promise<TokenResource>(r => {
-        resolve = r;
-      });
-      return { promise, resolve };
-    };
-
     it('keeps the fresher token when a staler set resolves into the slot after it', async () => {
       const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
       const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
 
       // A fresher token is cached and resolved, then a staler set() replaces the slot and resolves.
       // The staler resolve reconciles against the previous token (carried onto the new slot's
-      // baseline at set time) and loses.
+      // freshest token at set time) and loses.
       SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
       await tick();
       SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(lowRaw)) });
@@ -536,8 +536,8 @@ describe('SessionTokenCache', () => {
 
       // Two concurrent sets, both pending. The first (fresher) is replaced by the second (staler)
       // before either resolves. When the fresher one resolves it is now foreign, so it only raises
-      // the live slot's baseline, leaving resolvedToken undefined. The staler live resolve then
-      // reconciles against that baseline and the slot publishes the fresher token.
+      // the live slot's freshest token, leaving resolvedToken undefined. The staler live resolve then
+      // reconciles against that freshest token and the slot publishes the fresher token.
       const dHigh = deferred();
       const dLow = deferred();
       SessionTokenCache.set({ tokenId, tokenResolver: dHigh.promise });
@@ -564,7 +564,7 @@ describe('SessionTokenCache', () => {
       const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
 
       // Inverse ordering of the previous test: the staler set is replaced by the fresher one before
-      // either resolves. The staler foreign resolve lands first and only advances the baseline; the
+      // either resolves. The staler foreign resolve lands first and only advances the freshest token; the
       // fresher live resolve then publishes high directly.
       const dLow = deferred();
       const dHigh = deferred();
@@ -588,7 +588,7 @@ describe('SessionTokenCache', () => {
       // The live slot (d2) resolves staler first and publishes low. The replaced resolver (d1)
       // resolves fresher afterward. Because the slot is no longer pending, the fresher foreign token
       // advances resolvedToken to high and re-derives the slot's timers, rather than only raising the
-      // baseline.
+      // freshest token.
       const dHigh = deferred();
       const dLow = deferred();
       SessionTokenCache.set({ tokenId, tokenResolver: dHigh.promise });
@@ -606,22 +606,22 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(highRaw);
     });
 
-    it('never exposes the baseline while a replacement is pending, then publishes high once it resolves', async () => {
+    it('never exposes the freshest token while a replacement is pending, then publishes high once it resolves', async () => {
       const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
       const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
 
-      // The first set resolves to high, so the slot's resolvedToken and baseline are both high.
+      // The first set resolves to high, so the slot's resolvedToken and freshest token are both high.
       SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
       await tick();
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(highRaw);
 
-      // A replacement whose resolver never settles must not expose the carried baseline: the slot
+      // A replacement whose resolver never settles must not expose the carried freshest token: the slot
       // reads as pending (resolvedToken undefined) so callers keep awaiting the in-flight fetch.
       const pending = deferred();
       SessionTokenCache.set({ tokenId, tokenResolver: pending.promise });
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken).toBeUndefined();
 
-      // When it finally resolves staler, the own resolve reconciles against the baseline and the slot
+      // When it finally resolves staler, the own resolve reconciles against the freshest token and the slot
       // publishes high.
       pending.resolve(makeToken(lowRaw));
       await tick();
@@ -823,6 +823,155 @@ describe('SessionTokenCache', () => {
 
       vi.advanceTimersByTime(11 * 1000);
       expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('keeps the fresher token expiry when it is carried into a later slot', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow, deviceNow, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(stalerRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not extend expiry when the same token is cached again as a new Token', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not extend expiry when the same token is received by broadcast after a local cache', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      await broadcastListener({
+        data: { organizationId: null, sessionId: tokenId, tokenId, tokenRaw: freshRaw, traceId: 'skew' },
+      } as MessageEvent<SessionTokenEvent>);
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('counts a replaced resolver token lifetime from its own set, not the live slot', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow, deviceNow, 60);
+      const dFresh = deferred();
+      const dStaler = deferred();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: dFresh.promise });
+
+      vi.advanceTimersByTime(10 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: dStaler.promise });
+
+      dFresh.resolve(makeToken(freshRaw));
+      await tick();
+      dStaler.resolve(makeToken(stalerRaw));
+      await tick();
+
+      vi.advanceTimersByTime(40 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('gives a fresher token with a different raw string its own lifetime', async () => {
+      const firstRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const fresherRaw = createJwtWithOiat(deviceNow + 30 + deviceLag, deviceNow + 30 + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(firstRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(fresherRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(26 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(fresherRaw);
+
+      vi.advanceTimersByTime(30 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('fires the proactive refresh from the carried token expiry, not the later slot', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow, deviceNow, 60);
+      const onRefresh = vi.fn();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(stalerRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(12 * 1000);
+      expect(onRefresh).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('takes the earlier expiry when a replaced resolver delivers the same token after the slot resolved', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const dFirst = deferred();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: dFirst.promise });
+
+      vi.advanceTimersByTime(10 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      dFirst.resolve(makeToken(freshRaw));
+      await tick();
+
+      vi.advanceTimersByTime(40 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('keeps a pending slot when the token carried into it is close to expiry', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(50 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: deferred().promise });
+
+      vi.advanceTimersByTime(8 * 1000);
+      const result = SessionTokenCache.get({ tokenId });
+      expect(result).toBeDefined();
+      expect(result?.entry.resolvedToken).toBeUndefined();
     });
   });
 
