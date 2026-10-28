@@ -45,11 +45,13 @@ export function projectWeb3Wallets({
       wallet.verification.strategy === 'admin' ||
       WEB3_PROVIDERS.some(provider => provider.strategy === wallet.verification.strategy),
   );
-  const verified = knownWallets.filter(wallet => wallet.verification.status === 'verified');
-  const unverified = knownWallets.filter(
+  const primary = knownWallets.filter(wallet => wallet.id === primaryId);
+  const remaining = knownWallets.filter(wallet => wallet.id !== primaryId);
+  const verified = remaining.filter(wallet => wallet.verification.status === 'verified');
+  const unverified = remaining.filter(
     wallet => wallet.verification.status !== null && wallet.verification.status !== 'verified',
   );
-  const withoutStatus = knownWallets.filter(wallet => wallet.verification.status === null);
+  const withoutStatus = remaining.filter(wallet => wallet.verification.status === null);
 
   verified.sort((first, second) => first.id.localeCompare(second.id));
   unverified.sort((first, second) => {
@@ -58,7 +60,7 @@ export function projectWeb3Wallets({
     return firstExpiry && secondExpiry ? firstExpiry.getTime() - secondExpiry.getTime() : 0;
   });
 
-  const sorted = [...verified, ...unverified, ...withoutStatus];
+  const sorted = [...primary, ...verified, ...unverified, ...withoutStatus];
 
   const connectedStrategies = new Set(wallets.map(wallet => wallet.verification.strategy));
 

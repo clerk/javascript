@@ -90,13 +90,12 @@ describe('shared action admission', () => {
     await act(() => pending.resolve());
   });
 
-  it('preserves the primary error and focus key while removal runs', async () => {
+  it('keeps the focus key and clears the primary error while removal runs', async () => {
     const pending = deferred<void>();
     const failure = new SaveError({ global: { code: 'action_blocked', message: 'Primary refused.' } });
     const { result } = renderHook(() => useOwners(() => pending.promise));
     await act(() => result.current.actions.run('email', () => Promise.reject(failure)));
-    const error = result.current.actions.error;
-    expect(error).toBeDefined();
+    expect(result.current.actions.error).toBeDefined();
 
     act(() => result.current.remove.onOpenChange(true));
     act(() => {
@@ -106,11 +105,11 @@ describe('shared action admission', () => {
     expect(result.current.actions.isPending).toBe(true);
     expect(result.current.actions.pendingKey).toBeUndefined();
     expect(result.current.actions.lastKey).toBe('email');
-    expect(result.current.actions.errorKey).toBe('email');
-    expect(result.current.actions.error).toBe(error);
+    expect(result.current.actions.errorKey).toBeUndefined();
+    expect(result.current.actions.error).toBeUndefined();
     await act(() => pending.resolve());
     expect(result.current.actions.isPending).toBe(false);
-    expect(result.current.actions.error).toBe(error);
+    expect(result.current.actions.lastKey).toBe('email');
   });
 
   it.each(['resolve', 'reject'])('holds pending after cancellation until removal promises %s', async outcome => {

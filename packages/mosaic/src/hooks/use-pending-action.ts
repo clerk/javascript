@@ -31,7 +31,7 @@ type Pending<TKey> = { kind: 'inline'; key: TKey } | { kind: 'external' };
 
 /**
  * Runs inline and external actions under one lock and tracks which inline key is pending, ran last, or last failed.
- * `run` resolves `true` on success and `false` on failure, ignores calls while any action is in flight, and clears the last error when it starts.
+ * `run` resolves `true` on success and `false` on failure, ignores calls while any action is in flight, and clears the last error when any action starts.
  */
 export function usePendingAction<TKey extends string = string>({
   errorFallback,
@@ -48,6 +48,7 @@ export function usePendingAction<TKey extends string = string>({
     }
     running.current = true;
     setPending(next);
+    setFailure(undefined);
     return (async () => {
       try {
         return await action();
@@ -62,7 +63,6 @@ export function usePendingAction<TKey extends string = string>({
     return (
       claim({ kind: 'inline', key }, async () => {
         setLastKey(key);
-        setFailure(undefined);
         try {
           await action();
           return true;
