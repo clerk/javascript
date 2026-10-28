@@ -189,6 +189,22 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
+  navGroup: {
+    gap: NAV_GAP,
+    display: 'flex',
+    flexDirection: 'column',
+    marginBlockStart: { default: null, ':not(:first-child)': space['4'] },
+  },
+
+  navGroupLabel: {
+    paddingBlock: space['1'],
+    paddingInline: space['2.5'],
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+
   navItem: {
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-md'],

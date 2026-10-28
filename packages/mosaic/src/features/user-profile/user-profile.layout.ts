@@ -9,6 +9,9 @@ import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './u
 /** The built-in pages in the order the profile lists them before a consumer reorders anything. */
 export const USER_PROFILE_PAGE_IDS: readonly UserProfilePageId[] = ['account', 'security', 'billing', 'apiKeys'];
 
+/** Sets an organization page's id apart from an account page's when the profile shows both. */
+export const ORGANIZATION_PAGE_PREFIX = 'organization.';
+
 export const USER_PROFILE_PAGE_ICONS: Record<UserProfilePageId, IconComponent> = {
   account: UserCircle,
   security: ShieldCheck,
