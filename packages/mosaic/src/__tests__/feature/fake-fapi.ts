@@ -123,11 +123,10 @@ export function startWorker() {
 
 export function checkingContract(fetch: typeof window.fetch): typeof window.fetch {
   return async (input, init) => {
+    const request = new Request(input instanceof Request ? input.clone() : input, init);
     const response = await fetch(input, init);
-    const url = input instanceof Request ? input.url : String(input);
-    if (new URL(url).host === fapiHost) {
-      const method = init?.method ?? (input instanceof Request ? input.method : 'GET');
-      contractChecks.push(fapiContractViolations(new Request(url, { method }), response.clone()));
+    if (new URL(request.url).host === fapiHost) {
+      contractChecks.push(fapiContractViolations(request, response.clone()));
     }
     return response;
   };

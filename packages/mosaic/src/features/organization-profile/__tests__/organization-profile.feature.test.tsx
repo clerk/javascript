@@ -16,7 +16,7 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { OrganizationProfile } from '../organization-profile';
 
-const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
+const acme = fapiOrganization({ id: 'org_acme00000000000000000000000', name: 'Acme', slug: 'acme' });
 
 function serve({
   permissions = ['org:sys_memberships:read'],

@@ -74,6 +74,25 @@ export const SPEC_GAPS: readonly SpecGap[] = [
     sentBy: 'api/serialize/token.go Token',
   },
   {
+    at: `${operation('/v1/client/sessions/{session_id}/tokens', 'post')}/requestBody/content/application~1x-www-form-urlencoded/schema`,
+    property: 'tab_state',
+    schema: { type: 'string' },
+    sentBy: 'api/fapi/v1/tokens/http.go paramTabState',
+  },
+  {
+    at: `${operation('/v1/me/organization_suggestions', 'get')}/x-query-schema`,
+    property: 'status',
+    schema: { type: 'array', items: { type: 'string' } },
+    replaces: { type: 'string' },
+    sentBy: 'api/fapi/v1/users/http.go ListOrganizationSuggestions',
+  },
+  {
+    at: `${operation('/v1/me/enterprise_connections', 'get')}/x-query-schema`,
+    property: 'with_organization_account_linking',
+    schema: { type: 'boolean' },
+    sentBy: 'api/fapi/v1/enterprise_connections/deprecated_http.go ListEnterpriseConnections',
+  },
+  {
     at: externalAccount,
     property: 'public_metadata',
     schema: { type: 'object', additionalProperties: true, nullable: true },
@@ -100,4 +119,8 @@ export const SPEC_GAPS: readonly SpecGap[] = [
 
 function component(name: string): string {
   return `#/components/schemas/${name}`;
+}
+
+function operation(path: string, method: string): string {
+  return `#/paths/${path.replace(/\//g, '~1')}/${method}`;
 }

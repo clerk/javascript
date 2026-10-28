@@ -11,6 +11,34 @@ function request(method: string, path: string) {
   return new Request(`${FAPI}${path}`, { method });
 }
 
+function formRequest(method: string, path: string, body: string) {
+  return new Request(`${FAPI}${path}`, {
+    method,
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+}
+
+function jsonRequest(method: string, path: string, body: unknown) {
+  return new Request(`${FAPI}${path}`, {
+    method,
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+function multipartRequest(method: string, path: string, fields: Record<string, string | File>) {
+  const body = new FormData();
+  for (const [name, value] of Object.entries(fields)) {
+    body.append(name, value);
+  }
+  return new Request(`${FAPI}${path}`, { method, body });
+}
+
+function rejected() {
+  return HttpResponse.json({ errors: [{ code: 'invalid', message: 'no', long_message: 'no' }] }, { status: 422 });
+}
+
 const user = fapiUser({ id: 'user_1', email_addresses: [fapiEmailAddress({ id: 'idn_1' })] });
 const client = fapiClient([fapiSession({ id: 'sess_1', user })]);
 
@@ -109,6 +137,144 @@ describe('fapiContractViolations', () => {
   });
 });
 
+describe('fapiContractViolations on the request', () => {
+  const enterpriseConnection = '/v1/me/enterprise_connections/ec_1';
+
+  it('accepts a form body that matches the spec', async () => {
+    expect(await fapiContractViolations(formRequest('PATCH', '/v1/me', 'first_name=Ada'), envelope(user))).toEqual([]);
+  });
+
+  it('rejects a body field the spec does not declare', async () => {
+    const violations = await fapiContractViolations(
+      formRequest('PATCH', '/v1/me', 'first_name=Ada&invented_field=1'),
+      envelope(user),
+    );
+    expect(violations).toEqual([expect.stringContaining('invented_field')]);
+  });
+
+  it('rejects a body missing a required field', async () => {
+    const violations = await fapiContractViolations(
+      formRequest('POST', '/v1/me/email_addresses', 'invented_field=1'),
+      rejected(),
+    );
+    expect(violations).toEqual([expect.stringContaining('email_address')]);
+  });
+
+  it('reads form values as the types the spec declares', async () => {
+    const body = 'active=true&domains=a.example&domains=b.example';
+    expect(await fapiContractViolations(formRequest('PATCH', enterpriseConnection, body), rejected())).toEqual([]);
+  });
+
+  it('reads a single form value as a one-item array where the spec declares an array', async () => {
+    const body = 'domains=a.example';
+    expect(await fapiContractViolations(formRequest('PATCH', enterpriseConnection, body), rejected())).toEqual([]);
+  });
+
+  it('rejects a form value that is not the declared type', async () => {
+    const violations = await fapiContractViolations(
+      formRequest('PATCH', enterpriseConnection, 'active=maybe'),
+      rejected(),
+    );
+    expect(violations).toEqual([expect.stringContaining('/active')]);
+  });
+
+  it('checks the body of a POST sent with _method against the operation it stands for', async () => {
+    const violations = await fapiContractViolations(
+      formRequest('POST', '/v1/me?_method=PATCH', 'first_name=Ada'),
+      envelope(user),
+    );
+    expect(violations).toEqual([]);
+  });
+
+  it('rejects a body the operation does not take', async () => {
+    const deleted = HttpResponse.json({ response: { object: 'user', id: 'user_1', deleted: true }, client });
+    const violations = await fapiContractViolations(formRequest('POST', '/v1/me?_method=DELETE', 'x=1'), deleted);
+    expect(violations).toEqual([expect.stringContaining('body')]);
+  });
+
+  it('accepts an empty body on an operation that takes none', async () => {
+    const deleted = HttpResponse.json({ response: { object: 'user', id: 'user_1', deleted: true }, client });
+    expect(await fapiContractViolations(formRequest('POST', '/v1/me?_method=DELETE', ''), deleted)).toEqual([]);
+  });
+
+  it('rejects a missing body the operation requires', async () => {
+    const violations = await fapiContractViolations(request('POST', '/v1/me/profile_image'), rejected());
+    expect(violations).toEqual([expect.stringContaining('body')]);
+  });
+
+  it('rejects a content type the operation does not take', async () => {
+    const violations = await fapiContractViolations(
+      jsonRequest('PATCH', '/v1/me', { first_name: 'Ada' }),
+      envelope(user),
+    );
+    expect(violations).toEqual([expect.stringContaining('application/json')]);
+  });
+
+  it('checks a multipart body', async () => {
+    const file = new File(['image'], 'avatar.png', { type: 'image/png' });
+    const path = '/v1/me/profile_image';
+    expect(await fapiContractViolations(multipartRequest('POST', path, { file }), rejected())).toEqual([]);
+    expect(
+      await fapiContractViolations(multipartRequest('POST', path, { file, invented_field: 'x' }), rejected()),
+    ).toEqual([expect.stringContaining('invented_field')]);
+  });
+
+  it('checks a JSON body without reading strings as other types', async () => {
+    const path = '/api_keys/ak_1';
+    expect(await fapiContractViolations(jsonRequest('PATCH', path, { description: 'ci' }), rejected())).toEqual([]);
+    expect(await fapiContractViolations(jsonRequest('PATCH', path, { description: 5 }), rejected())).toEqual([
+      expect.stringContaining('/description'),
+    ]);
+  });
+
+  it('reads an OpenAPI 3.0 exclusive minimum', async () => {
+    const subject = `user_${'a'.repeat(27)}`;
+    const body = (seconds: number) => ({ name: 'ci key', subject, seconds_until_expiration: seconds });
+    expect(await fapiContractViolations(jsonRequest('POST', '/api_keys', body(1)), rejected())).toEqual([]);
+    expect(await fapiContractViolations(jsonRequest('POST', '/api_keys', body(0)), rejected())).toEqual([
+      expect.stringContaining('/seconds_until_expiration'),
+    ]);
+  });
+
+  it('reads query values as the types the spec declares', async () => {
+    const path = '/v1/me/organization_memberships?limit=10&offset=0&paginated=true';
+    expect(await fapiContractViolations(request('GET', path), rejected())).toEqual([]);
+  });
+
+  it('rejects a query value that is not the declared type', async () => {
+    const path = '/v1/me/organization_memberships?limit=ten';
+    expect(await fapiContractViolations(request('GET', path), rejected())).toEqual([expect.stringContaining('/limit')]);
+  });
+
+  it('rejects a query parameter the spec does not declare', async () => {
+    const violations = await fapiContractViolations(request('GET', '/v1/me?invented_param=1'), envelope(user));
+    expect(violations).toEqual([expect.stringContaining('invented_param')]);
+  });
+
+  it('accepts a body field the spec is known to be missing', async () => {
+    const token = HttpResponse.json({ object: 'token', jwt: 'header.payload.signature' });
+    const tokens = formRequest('POST', '/v1/client/sessions/sess_1/tokens', 'tab_state=active');
+    expect(await fapiContractViolations(tokens, token)).toEqual([]);
+  });
+
+  it('accepts a query parameter the spec is known to type too narrowly', async () => {
+    const path = '/v1/me/organization_suggestions?status=pending&status=accepted';
+    expect(await fapiContractViolations(request('GET', path), rejected())).toEqual([]);
+  });
+
+  it('accepts the transport params clerk-js adds to any request', async () => {
+    const transport = [
+      '__clerk_api_version=2025-11-10',
+      '_clerk_js_version=6.0.0',
+      '_clerk_session_id=sess_1',
+      '_clerk_retry_attempt=1',
+      'rotating_token_nonce=nonce',
+      '__domain=satellite.example',
+    ].join('&');
+    expect(await fapiContractViolations(request('GET', `/v1/me?${transport}`), envelope(user))).toEqual([]);
+  });
+});
+
 describe('staleSpecGaps', () => {
   it('has no known gap that the spec has since closed', () => {
     expect(staleSpecGaps()).toEqual([]);
@@ -147,6 +313,16 @@ describe('takeContractViolations', () => {
   it('reports a mocked response that does not match the spec', async () => {
     await fetchInvalidMe();
     expect(await takeContractViolations()).toEqual([invalidMe]);
+  });
+
+  it('reports a request body that does not match the spec', async () => {
+    worker.use(http.post(fapiUrl('/v1/me'), () => HttpResponse.json({ response: user, client })));
+    await fetch(fapiUrl('/v1/me?_method=PATCH'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: 'invented_field=1',
+    });
+    expect(await takeContractViolations()).toEqual([expect.stringContaining('PATCH /v1/me body')]);
   });
 
   it('drops a violation the test allows', async () => {

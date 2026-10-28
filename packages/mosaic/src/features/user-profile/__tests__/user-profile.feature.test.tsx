@@ -14,7 +14,7 @@ import { signedIn } from '../user-profile-connected-accounts-section/__tests__/u
 function serve({ userAPIKeysEnabled = false } = {}) {
   return serveFapi({
     environment: fapiEnvironment({ api_keys_settings: { user_api_keys_enabled: userAPIKeysEnabled } }),
-    client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_alice0000000000000000000000' }) })]),
   });
 }
 

@@ -14,6 +14,45 @@ export async function fapiContractViolations(request: Request, response: Respons
   if (!operation) {
     return [`${endpoint} is not in the Frontend API spec`];
   }
+  return [
+    ...queryViolations(endpoint, operation, url.searchParams),
+    ...(await bodyViolations(endpoint, operation, request)),
+    ...(await responseViolations(endpoint, operation, response)),
+  ];
+}
+
+function queryViolations(endpoint: string, operation: Operation, query: URLSearchParams): string[] {
+  return violations(`${endpoint} query`, formValidator(`${operation.pointer}/${QUERY_SCHEMA}`), formFields(query));
+}
+
+async function bodyViolations(endpoint: string, operation: Operation, request: Request): Promise<string[]> {
+  const body = await request.clone().text();
+  const requestBody = operation.definition.requestBody;
+  if (!body) {
+    return requestBody?.required ? [`${endpoint} sent no body, which the spec requires`] : [];
+  }
+  if (!requestBody?.content) {
+    return [`${endpoint} sent a body, which the spec does not document`];
+  }
+  const contentType = request.headers.get('content-type')?.split(';')[0] ?? '';
+  if (!(contentType in requestBody.content)) {
+    return [`${endpoint} sent ${contentType || 'a body without a content type'}, which the spec does not document`];
+  }
+  const schema = `${operation.pointer}/requestBody/content/${pointerSegment(contentType)}/schema`;
+  const label = `${endpoint} body`;
+  switch (contentType) {
+    case 'application/json':
+      return violations(label, validator(schema), JSON.parse(body));
+    case 'application/x-www-form-urlencoded':
+      return violations(label, formValidator(schema), formFields(new URLSearchParams(body)));
+    case 'multipart/form-data':
+      return violations(label, formValidator(schema), formFields(await request.clone().formData()));
+    default:
+      return [];
+  }
+}
+
+async function responseViolations(endpoint: string, operation: Operation, response: Response): Promise<string[]> {
   const schema = responseSchemaPointer(operation, response.status);
   if (schema === undefined) {
     return [`${endpoint} answered ${response.status}, which the spec does not document`];
@@ -21,11 +60,24 @@ export async function fapiContractViolations(request: Request, response: Respons
   if (!schema || !response.headers.get('content-type')?.includes('json')) {
     return [];
   }
-  const validate = validator(schema);
-  if (validate(await response.clone().json())) {
+  return violations(`${endpoint} ${response.status}`, validator(schema), await response.clone().json());
+}
+
+function violations(label: string, validate: ValidateFunction, data: unknown): string[] {
+  if (validate(data)) {
     return [];
   }
-  return [`${endpoint} ${response.status}: ${[...new Set((validate.errors ?? []).map(describe))].join('; ')}`];
+  return [`${label}: ${[...new Set((validate.errors ?? []).map(describe))].join('; ')}`];
+}
+
+function formFields(entries: URLSearchParams | FormData): Record<string, string | string[]> {
+  const fields: Record<string, string | string[]> = {};
+  entries.forEach((entry, key) => {
+    const value = typeof entry === 'string' ? entry : entry.name;
+    const existing = fields[key];
+    fields[key] = existing === undefined ? value : [...(Array.isArray(existing) ? existing : [existing]), value];
+  });
+  return fields;
 }
 
 type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
@@ -36,8 +88,19 @@ interface ResponseObject {
   content?: Record<string, unknown>;
 }
 
+interface ParameterObject {
+  $ref?: string;
+  name?: string;
+  in?: string;
+  required?: boolean;
+  schema?: unknown;
+}
+
 interface OperationObject {
+  parameters?: ParameterObject[];
+  requestBody?: { required?: boolean; content?: Record<string, unknown> };
   responses: Record<string, ResponseObject>;
+  [QUERY_SCHEMA]?: unknown;
 }
 
 interface Spec {
@@ -49,42 +112,63 @@ interface Operation {
   method: Method;
   template: string;
   pattern: RegExp;
-  responses: Record<string, ResponseObject>;
+  pointer: string;
+  definition: OperationObject;
 }
 
 const METHODS: readonly Method[] = ['get', 'post', 'put', 'patch', 'delete'];
 const JSON_SCHEMA = 'content/application~1json/schema';
+const QUERY_SCHEMA = 'x-query-schema';
 const CLERK_ERRORS = '#/components/schemas/ClerkErrors';
+const EXCLUSIVE_BOUNDS = [
+  ['exclusiveMinimum', 'minimum'],
+  ['exclusiveMaximum', 'maximum'],
+] as const;
+const TRANSPORT_PARAMS = [
+  '__clerk_api_version',
+  '_clerk_js_version',
+  '_clerk_session_id',
+  '_clerk_retry_attempt',
+  '_method',
+  '__domain',
+  'rotating_token_nonce',
+];
 
 const spec: Spec = parse(specSource);
 
 const operations: Operation[] = Object.entries(spec.paths)
   .flatMap(([template, item]) =>
     METHODS.flatMap(method => {
-      const operation = item[method];
-      return operation ? [{ method, template, pattern: pathPattern(template), responses: operation.responses }] : [];
+      const definition = item[method];
+      const pointer = `#/paths/${pointerSegment(template)}/${method}`;
+      return definition ? [{ method, template, pattern: pathPattern(template), pointer, definition }] : [];
     }),
   )
   .sort((a, b) => parameterCount(a.template) - parameterCount(b.template));
 
-const ajv = new Ajv2019({ strict: false, allErrors: true, validateFormats: false, validateSchema: false });
-ajv.addSchema(closeObjects(withSpecGaps(spec)), 'fapi');
+const specWithQueries = withQuerySchemas(spec);
+const contract = closeObjects(withSpecGaps(specWithQueries));
+const ajvOptions = { strict: false, allErrors: true, validateFormats: false, validateSchema: false };
+const validator = compiler(new Ajv2019(ajvOptions).addSchema(contract, 'fapi'));
+const formValidator = compiler(new Ajv2019({ ...ajvOptions, coerceTypes: 'array' }).addSchema(contract, 'fapi'));
 
-const validators = new Map<string, ValidateFunction>();
-
-function validator(pointer: string): ValidateFunction {
-  const cached = validators.get(pointer);
-  if (cached) {
-    return cached;
-  }
-  const validate = ajv.compile({ $ref: `fapi${pointer}` });
-  validators.set(pointer, validate);
-  return validate;
+function compiler(ajv: Ajv2019): (pointer: string) => ValidateFunction {
+  const validators = new Map<string, ValidateFunction>();
+  return pointer => {
+    const cached = validators.get(pointer);
+    if (cached) {
+      return cached;
+    }
+    const validate = ajv.compile({ $ref: `fapi${pointer}` });
+    validators.set(pointer, validate);
+    return validate;
+  };
 }
 
 function responseSchemaPointer(operation: Operation, status: number): string | null | undefined {
-  const key = [String(status), `${String(status)[0]}XX`, 'default'].find(k => k in operation.responses);
-  const response = key === undefined ? undefined : operation.responses[key];
+  const { responses } = operation.definition;
+  const key = [String(status), `${String(status)[0]}XX`, 'default'].find(k => k in responses);
+  const response = key === undefined ? undefined : responses[key];
   if (!response || key === undefined) {
     return status >= 400 ? CLERK_ERRORS : undefined;
   }
@@ -94,12 +178,12 @@ function responseSchemaPointer(operation: Operation, status: number): string | n
   if (!response.content?.['application/json']) {
     return null;
   }
-  return `#/paths/${pointerSegment(operation.template)}/${operation.method}/responses/${key}/${JSON_SCHEMA}`;
+  return `${operation.pointer}/responses/${key}/${JSON_SCHEMA}`;
 }
 
 export function staleSpecGaps(gaps: readonly SpecGap[] = SPEC_GAPS): string[] {
   return gaps.flatMap(({ at, property, replaces }) => {
-    const schema = resolvePointer(spec, at);
+    const schema = resolvePointer(specWithQueries, at);
     if (!isObject(schema)) {
       return [`${at} is no longer in the spec`];
     }
@@ -120,6 +204,37 @@ function withSpecGaps(source: Spec): Spec {
     }
   }
   return patched;
+}
+
+function withQuerySchemas(source: Spec): Spec {
+  const paths = Object.fromEntries(
+    Object.entries(source.paths).map(([template, item]) => [
+      template,
+      Object.fromEntries(
+        Object.entries(item).map(([method, operation]) => [
+          method,
+          { ...operation, [QUERY_SCHEMA]: querySchema(source, operation.parameters ?? []) },
+        ]),
+      ),
+    ]),
+  );
+  return { ...source, paths };
+}
+
+function querySchema(source: Spec, parameters: ParameterObject[]): unknown {
+  const query = parameters
+    .map(parameter => (parameter.$ref ? resolvePointer(source, parameter.$ref) : parameter))
+    .filter(isObject)
+    .filter(parameter => parameter.in === 'query' && typeof parameter.name === 'string');
+  return {
+    type: 'object',
+    properties: {
+      ...Object.fromEntries(TRANSPORT_PARAMS.map(name => [name, { type: 'string' }])),
+      ...Object.fromEntries(query.map(parameter => [parameter.name, parameter.schema ?? {}])),
+    },
+    required: query.filter(parameter => parameter.required === true).map(parameter => parameter.name),
+    additionalProperties: false,
+  };
 }
 
 function resolvePointer(root: unknown, pointer: string): unknown {
@@ -163,12 +278,29 @@ function closeObjects(source: Spec): Spec {
       Object.fromEntries(
         Object.entries(item).map(([method, operation]) => [
           method,
-          { ...operation, responses: closeResponses(operation.responses) },
+          {
+            ...operation,
+            requestBody: closeRequestBody(operation.requestBody),
+            responses: closeResponses(operation.responses),
+          },
         ]),
       ),
     ]),
   );
   return { ...source, paths, components: { ...source.components, schemas } };
+}
+
+function closeRequestBody(requestBody: OperationObject['requestBody']): OperationObject['requestBody'] {
+  if (!requestBody?.content) {
+    return requestBody;
+  }
+  const content = Object.fromEntries(
+    Object.entries(requestBody.content).map(([type, media]) => [
+      type,
+      isObject(media) ? { ...media, schema: closeSchema(media.schema) } : media,
+    ]),
+  );
+  return { ...requestBody, content };
 }
 
 function closeResponses(responses: Record<string, ResponseObject>): Record<string, ResponseObject> {
@@ -213,6 +345,14 @@ function closeSchema(node: unknown, isAllOfMember = false): unknown {
   const declaresFields = isObject(schema.properties) || (Array.isArray(schema.allOf) && schema.allOf.length > 1);
   if (declaresFields && !isAllOfMember && schema.additionalProperties === undefined) {
     schema.unevaluatedProperties = false;
+  }
+  for (const [exclusive, bound] of EXCLUSIVE_BOUNDS) {
+    if (schema[exclusive] === true) {
+      schema[exclusive] = schema[bound];
+      delete schema[bound];
+    } else if (schema[exclusive] === false) {
+      delete schema[exclusive];
+    }
   }
   if (schema.nullable === true) {
     const { nullable: _nullable, ...nonNull } = schema;

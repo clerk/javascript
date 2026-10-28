@@ -85,7 +85,7 @@ afterEach(async () => {
   const violations = await takeContractViolations();
   expect(unhandled, 'Frontend API requests without a handler').toEqual([]);
   expect(unsettled, 'Held Frontend API requests never released or failed').toEqual([]);
-  expect(violations, 'Fake Frontend API responses that do not match the spec').toEqual([]);
+  expect(violations, 'Frontend API traffic that does not match the spec').toEqual([]);
 });
 
 afterAll(() => {
