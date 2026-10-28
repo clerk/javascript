@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, onTestFinished } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
@@ -132,6 +132,49 @@ describe('UserProfile', () => {
     const quota = screen.getByRole('heading', { name: 'Quota' });
     expect(quota).toBeVisible();
     expect(quota.parentElement).toHaveFocus();
+  });
+
+  it('draws the highlight around a found target without positioning the target', async () => {
+    const slowHighlight = document.createElement('style');
+    slowHighlight.textContent = '.cl-profile-search-highlight { animation-duration: 60s !important; }';
+    document.head.append(slowHighlight);
+    onTestFinished(() => slowHighlight.remove());
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(
+      <UserProfile
+        customPages={[
+          {
+            path: 'usage',
+            label: 'Usage',
+            content: (
+              <UserProfile.SearchTarget
+                label='Quota'
+                render={<section />}
+              >
+                <h3>Quota</h3>
+              </UserProfile.SearchTarget>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'quota');
+    await user.click(screen.getByRole('option', { name: 'Quota' }));
+
+    const target = screen.getByRole('heading', { name: 'Quota' }).closest('section');
+    const highlight = document.querySelector('.cl-profile-search-highlight');
+    if (!target || !highlight) {
+      throw new Error('Expected a highlighted target');
+    }
+    expect(getComputedStyle(target).position).toBe('static');
+    const around = target.getBoundingClientRect();
+    const drawn = highlight.getBoundingClientRect();
+    expect(drawn.left).toBeCloseTo(around.left - 12);
+    expect(drawn.top).toBeCloseTo(around.top - 12);
+    expect(drawn.width).toBeCloseTo(around.width + 24);
+    expect(drawn.height).toBeCloseTo(around.height + 24);
   });
 
   it('adds custom pages in the requested order and opens on the first', async () => {

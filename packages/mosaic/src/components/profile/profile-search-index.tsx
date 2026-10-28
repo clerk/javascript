@@ -79,33 +79,35 @@ export function useSearchTarget(options: SearchTargetOptions | undefined) {
       />
     ) : null;
 
-  function props<Rest extends Record<string, unknown>>(
-    styleProps: ReturnType<typeof stylex.props>,
-    rest: Rest & { onAnimationEnd?: React.AnimationEventHandler<HTMLElement> },
-  ) {
+  function props<Rest extends Record<string, unknown>>(styleProps: ReturnType<typeof stylex.props>, rest: Rest) {
     if (key === null) {
       return mergeStyleProps(styleProps, rest);
     }
-    const { onAnimationEnd, ...others } = rest;
     return mergeStyleProps(
       themeProps('profile-search-target'),
       stylex.props(styles.target, highlighted && styles.targetHighlighted),
       styleProps,
-      {
-        tabIndex: -1,
-        'data-highlighted': highlighted ? '' : undefined,
-        onAnimationEnd: (event: React.AnimationEvent<HTMLElement>) => {
-          onAnimationEnd?.(event);
-          if (event.target === event.currentTarget) {
-            search?.clearHighlight();
-          }
-        },
-      },
-      others,
+      { tabIndex: -1, 'data-highlighted': highlighted ? '' : undefined },
+      rest,
     );
   }
 
   return { marker, ref, props };
+}
+
+export function SearchHighlight() {
+  const search = React.useContext(ProfileContext)?.search;
+  if (!search?.highlightedTarget) {
+    return null;
+  }
+  return (
+    <div
+      key={search.highlightedTarget}
+      aria-hidden
+      onAnimationEnd={search.clearHighlight}
+      {...mergeStyleProps(themeProps('profile-search-highlight'), stylex.props(reset.base, styles.highlight))}
+    />
+  );
 }
 
 export function SearchIndexPage({ value, children }: { value: string; children: React.ReactNode }) {

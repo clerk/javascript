@@ -2,6 +2,11 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
+// Literals: StyleX cannot import them. Must match `tabs.styles.ts`.
+const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
+const targetAnchor = '--_cl-profile-search-target';
+const gap = space['3'];
+
 const fade = stylex.keyframes({
   from: { opacity: 1 },
   to: { opacity: 0 },
@@ -54,24 +59,37 @@ export const styles = stylex.create({
 
   target: {
     outline: 'none',
-    isolation: 'isolate',
-    position: 'relative',
     scrollMarginBlockStart: space['12'],
   },
 
   targetHighlighted: {
-    '::after': {
-      inset: `calc(-1 * ${space['3']})`,
-      borderRadius: `calc(${radiusVars['--cl-radius-xl']} + ${space['3']})`,
-      animationDuration: '1.5s',
-      animationFillMode: 'forwards',
-      animationName: fade,
-      animationTimingFunction: 'linear',
-      backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
-      content: '""',
-      pointerEvents: 'none',
-      position: 'absolute',
-      zIndex: -1,
-    },
+    // eslint-disable-next-line @stylexjs/valid-styles -- `anchor-name`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
+    anchorName: targetAnchor,
+  },
+
+  highlightScope: {
+    // eslint-disable-next-line @stylexjs/valid-styles -- `anchor-scope`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
+    anchorScope: targetAnchor,
+    isolation: 'isolate',
+    position: 'relative',
+  },
+
+  highlight: {
+    // eslint-disable-next-line @stylexjs/valid-styles -- `position-anchor`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
+    positionAnchor: targetAnchor,
+    borderRadius: `calc(${radiusVars['--cl-radius-xl']} + ${gap})`,
+    animationDuration: '1.5s',
+    animationFillMode: 'forwards',
+    animationName: fade,
+    animationTimingFunction: 'linear',
+    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
+    insetBlockEnd: `calc(anchor(end) - ${gap})`,
+    insetBlockStart: `calc(anchor(start) - ${gap})`,
+    insetInlineEnd: `calc(anchor(end) - ${gap})`,
+    insetInlineStart: `calc(anchor(start) - ${gap})`,
+    pointerEvents: 'none',
+    position: 'absolute',
+    visibility: { [anchors]: 'visible', default: 'hidden' },
+    zIndex: -1,
   },
 });
