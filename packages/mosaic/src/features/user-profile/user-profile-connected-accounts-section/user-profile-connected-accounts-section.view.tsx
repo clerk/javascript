@@ -36,7 +36,7 @@ export function UserProfileConnectedAccountsSectionView({
   return (
     <>
       {hasRows ? (
-        <Section.Root>
+        <Section.Root search={{ label: m.title }}>
           <Section.Group
             ref={sectionRef}
             tabIndex={-1}

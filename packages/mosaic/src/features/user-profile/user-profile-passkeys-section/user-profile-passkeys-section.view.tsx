@@ -52,7 +52,7 @@ export function UserProfilePasskeysSectionView({
 
   return (
     <>
-      <Section.Root>
+      <Section.Root search={{ label: m.label }}>
         <Section.Group
           ref={sectionRef}
           tabIndex={-1}

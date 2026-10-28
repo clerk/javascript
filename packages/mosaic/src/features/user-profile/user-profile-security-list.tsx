@@ -25,7 +25,7 @@ export function UserProfileSecurityList({
   children: ReactNode;
 }) {
   return (
-    <Section.Root>
+    <Section.Root search={{ label: label }}>
       <Section.Group
         ref={sectionRef}
         tabIndex={-1}

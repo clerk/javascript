@@ -49,7 +49,7 @@ export function UserProfileEmailSectionView({
   ) : undefined;
 
   return (
-    <Section.Root>
+    <Section.Root search={{ label: m.email.label }}>
       <UserProfileContactListRowView
         rowRef={rowRef}
         triggerRef={registerTrigger}

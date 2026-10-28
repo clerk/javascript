@@ -20,7 +20,7 @@ export function UserProfileProfileSectionView({
   const m = useMessages('userProfile').profile;
 
   return (
-    <Section.Root>
+    <Section.Root search={{ label: m.title }}>
       <Section.Group>
         <Section.Header>
           <Section.Content>

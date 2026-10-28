@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { SearchTarget } from '../../components/profile';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { organizationProfilePageIds } from './organization-profile.layout';
@@ -129,3 +130,5 @@ export function organizationProfilePanels(
       available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
   };
 }
+
+OrganizationProfile.SearchTarget = SearchTarget;

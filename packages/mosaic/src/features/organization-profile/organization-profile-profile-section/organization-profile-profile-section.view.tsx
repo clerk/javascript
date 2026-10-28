@@ -31,7 +31,7 @@ export function OrganizationProfileProfileSectionView({
   const m = useMessages('organizationProfile').profile;
 
   return (
-    <Section.Root>
+    <Section.Root search={{ label: m.sectionTitle }}>
       <Section.Group>
         <Section.Header>
           <Section.Content>

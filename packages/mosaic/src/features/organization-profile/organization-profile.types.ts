@@ -15,6 +15,8 @@ export interface CustomOrganizationProfilePage {
   path: string;
   href?: never;
   icon?: ReactNode;
+  /** Other words that find the page in the profile's search. */
+  keywords?: readonly string[];
   content: ReactNode;
 }
 

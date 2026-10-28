@@ -43,7 +43,13 @@ export function organizationProfilePageList(
 ): ProfilePage[] {
   return organizationProfileNavEntries(options).map(entry =>
     entry.custom
-      ? { id: entry.id, label: entry.custom.label, icon: entry.custom.icon, content: entry.custom.content }
+      ? {
+          id: entry.id,
+          label: entry.custom.label,
+          icon: entry.custom.icon,
+          keywords: entry.custom.keywords,
+          content: entry.custom.content,
+        }
       : {
           id: entry.id,
           label: labels[entry.id],

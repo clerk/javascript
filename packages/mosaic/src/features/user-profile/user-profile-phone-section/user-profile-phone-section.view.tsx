@@ -50,7 +50,7 @@ export function UserProfilePhoneSectionView({
   ) : undefined;
 
   return (
-    <Section.Root>
+    <Section.Root search={{ label: m.phone.label }}>
       <UserProfileContactListRowView
         rowRef={rowRef}
         triggerRef={registerTrigger}

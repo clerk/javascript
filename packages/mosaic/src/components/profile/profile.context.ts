@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type { ProfileSearchState } from './profile-search-index';
+
 export type ProfileNavLayout = 'column' | 'select' | 'sheet';
 
 export type ProfileDismiss = 'back' | 'corner' | 'none';
@@ -21,6 +23,7 @@ export interface ProfileContextValue {
   navTriggerRef: React.MutableRefObject<HTMLButtonElement | null>;
   inline: boolean;
   dismiss: ProfileDismiss;
+  search: ProfileSearchState;
 }
 
 export const ProfileContext = React.createContext<ProfileContextValue | null>(null);
