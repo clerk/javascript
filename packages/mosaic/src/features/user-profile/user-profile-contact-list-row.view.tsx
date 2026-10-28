@@ -7,8 +7,6 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import { Spinner } from '../../components/spinner';
-import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
@@ -51,7 +49,6 @@ export function UserProfileContactListRowView({
   const messages = useMessages('userProfile');
   const m = messages.contact;
   const nouns = messages[kind];
-  const shownPrimaryId = useSpinDelay(pendingPrimaryId ?? null, { minDuration: 0 });
 
   return (
     <Section.Group
@@ -103,7 +100,11 @@ export function UserProfileContactListRowView({
                   status: pendingVerifyId === item.id ? 'pending' : 'idle',
                 });
               } else if (item.isVerified && !item.isDefault && onSetPrimary) {
-                actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
+                actions.push({
+                  label: m.setPrimary,
+                  onClick: () => onSetPrimary(item.id),
+                  status: pendingPrimaryId === item.id ? 'pending' : 'idle',
+                });
               }
 
               if (onRemove) {
@@ -119,14 +120,7 @@ export function UserProfileContactListRowView({
                   <Section.Content>
                     <Section.Description xstyle={styles.contactValue}>
                       <span {...stylex.props(truncationStyles.singleLine, styles.contactText)}>{item.value}</span>
-                      {item.isDefault ? (
-                        <Badge color='neutral'>{m.primary}</Badge>
-                      ) : shownPrimaryId === item.id ? (
-                        <Spinner
-                          size='sm'
-                          label={m.setPrimary}
-                        />
-                      ) : null}
+                      {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
                       {item.isVerified ? null : <Badge color='warning'>{m.unverified}</Badge>}
                     </Section.Description>
                   </Section.Content>
