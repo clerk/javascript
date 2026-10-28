@@ -6,6 +6,7 @@ export {
   OrganizationSwitcher,
   GoogleOneTap,
   OAuthConsent,
+  OAuthDeviceVerification,
   Waitlist,
   // Control components
   ClerkLoaded,

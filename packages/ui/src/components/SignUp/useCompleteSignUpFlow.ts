@@ -15,13 +15,6 @@ type CompleteSignUpFlowParams = {
   handleComplete?: () => Promise<void>;
 };
 
-/**
- * Binds the sign-up context to `completeSignUpFlow` so callers only pass the routing paths.
- *
- * `redirectUrl`, `redirectUrlComplete` and `oidcPrompt` are needed by the `enterprise_sso` branch
- * but are derived identically at every call site, so binding them here is what keeps a caller from
- * silently omitting them.
- */
 export const useCompleteSignUpFlow = () => {
   const { navigate } = useRouter();
   const { setActive } = useClerk();

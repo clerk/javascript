@@ -1,0 +1,574 @@
+import * as stylex from '@stylexjs/stylex';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { describe, expect, it, vi } from 'vitest';
+
+import { Field } from '../field';
+import { Select } from './select';
+
+const roles = [
+  { value: 'all', label: 'All roles' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'member', label: 'Member' },
+];
+
+function renderSelect(props?: Partial<Extract<React.ComponentProps<typeof Select.Root>, { multiple?: false }>>) {
+  return render(
+    <Select.Root
+      items={roles}
+      defaultValue='all'
+      {...props}
+    >
+      <Select.Trigger placeholder='Choose a role' />
+      <Select.Popup />
+    </Select.Root>,
+  );
+}
+
+describe('Mosaic Select', () => {
+  it('renders an outline neutral md Button as the default trigger, showing the selected label', () => {
+    renderSelect();
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toHaveClass('cl-button', 'cl-select-trigger');
+    expect(trigger).toHaveAttribute('data-variant', 'outline');
+    expect(trigger).toHaveAttribute('data-color', 'neutral');
+    expect(trigger).toHaveAttribute('data-size', 'md');
+    expect(trigger).toHaveAttribute('aria-haspopup', 'listbox');
+    expect(trigger.querySelector('.cl-select-value')).toHaveTextContent('All roles');
+    expect(trigger.querySelector('.cl-select-trigger-icon')).toBeInTheDocument();
+  });
+
+  it('shows the placeholder until a value is selected', () => {
+    renderSelect({ defaultValue: undefined });
+    expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Choose a role');
+  });
+
+  it('renders the ghost variant without a border', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'member', label: 'Member' }]}
+        defaultValue='member'
+      >
+        <Select.Trigger variant='ghost' />
+        <Select.Popup>
+          <Select.Option
+            value='member'
+            label='Member'
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toHaveAttribute('data-variant', 'ghost');
+    expect(trigger).toHaveClass('cl-select-trigger');
+  });
+
+  it('renders a consumer trigger passed via render', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'all', label: 'All roles' }]}
+        defaultValue='all'
+      >
+        <Select.Trigger
+          render={props => (
+            <button
+              type='button'
+              {...props}
+            />
+          )}
+        />
+        <Select.Popup>
+          <Select.Option
+            value='all'
+            label='All roles'
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toHaveClass('cl-select-trigger');
+    expect(trigger).not.toHaveClass('cl-button');
+    expect(trigger.querySelector('.cl-select-value')).toHaveTextContent('All roles');
+  });
+
+  it('keeps the listbox closed until the trigger is clicked', async () => {
+    const user = userEvent.setup();
+    renderSelect();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox'));
+
+    // `role="listbox"` sits on the positioner (floating-ui owns it); the popup is the surface inside.
+    expect(screen.getByRole('listbox')).toHaveClass('cl-select-positioner');
+    const popup = screen.getByRole('listbox').querySelector('.cl-select-popup');
+    expect(popup).toBeInTheDocument();
+    expect(popup?.querySelector('.cl-select-viewport')).toBeInTheDocument();
+    expect(screen.getAllByRole('option')).toHaveLength(3);
+  });
+
+  it('marks the selected option and reserves the check on every row', async () => {
+    const user = userEvent.setup();
+    renderSelect();
+
+    await user.click(screen.getByRole('combobox'));
+
+    const selected = screen.getByRole('option', { name: 'All roles' });
+    expect(selected).toHaveAttribute('aria-selected', 'true');
+    expect(selected).toHaveAttribute('data-selected', '');
+    expect(selected.querySelector('.cl-select-option-indicator')).toBeInTheDocument();
+
+    const other = screen.getByRole('option', { name: 'Admin' });
+    expect(other).not.toHaveAttribute('data-selected');
+    expect(other.querySelector('.cl-select-option-indicator')).toBeInTheDocument();
+  });
+
+  it('selects an option on click, closes, and updates the trigger', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    renderSelect({ onValueChange });
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: 'Admin' }));
+
+    expect(onValueChange).toHaveBeenCalledWith('admin');
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin');
+  });
+
+  it('toggles options without closing and lists every selected label when multiple', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Select.Root
+        items={roles}
+        multiple
+        defaultValue={['admin']}
+        onValueChange={onValueChange}
+      >
+        <Select.Trigger placeholder='Choose roles' />
+        <Select.Popup />
+      </Select.Root>,
+    );
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: 'Member' }));
+
+    expect(onValueChange).toHaveBeenCalledWith(['admin', 'member']);
+    expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveAttribute('data-selected', '');
+    expect(screen.getByRole('option', { name: 'Member' })).toHaveAttribute('data-selected', '');
+    expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin, Member');
+  });
+
+  it('renders the value through a function passed as trigger children', () => {
+    render(
+      <Select.Root
+        items={roles}
+        multiple
+        defaultValue={['admin', 'member']}
+      >
+        <Select.Trigger>{value => `${value.length} roles`}</Select.Trigger>
+        <Select.Popup />
+      </Select.Root>,
+    );
+
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.querySelector('.cl-select-value')).toHaveTextContent('2 roles');
+    expect(trigger.querySelector('.cl-select-trigger-icon')).toBeInTheDocument();
+  });
+
+  it('renders one option per item when the popup is given no children', () => {
+    render(
+      <Select.Root
+        items={[
+          { value: 'member', label: 'Member', description: 'Non-privileged' },
+          { value: 'admin', label: 'Admin', disabled: true },
+        ]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup />
+      </Select.Root>,
+    );
+
+    const member = screen.getByRole('option', { name: 'Member' });
+    expect(member).toHaveAttribute('data-described', '');
+    expect(member).toHaveAccessibleDescription('Non-privileged');
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('renders the label and description as separate slots, with the description off the name', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'admin', label: 'Admin' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='admin'
+            label='Admin'
+            description='Can manage members and settings'
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Admin' });
+    expect(option).toHaveAttribute('data-described', '');
+    expect(option.querySelector('.cl-select-option-label')).toHaveTextContent('Admin');
+    expect(option.querySelector('.cl-select-option-description')).toHaveTextContent('Can manage members and settings');
+  });
+
+  it('composes media beside a content column of label and description', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media>
+              <svg data-testid='acme-logo' />
+            </Select.Media>
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+              <Select.Description>Owner</Select.Description>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Acme' });
+    expect(option).toHaveAttribute('data-described', '');
+    expect(option).toHaveAccessibleDescription('Owner');
+
+    const media = screen.getByTestId('acme-logo').parentElement;
+    expect(media?.tagName).toBe('SPAN');
+    expect(media).toHaveClass('cl-select-option-media');
+    expect(media?.parentElement).toBe(option);
+
+    const content = option.querySelector('.cl-select-option-content');
+    expect(content?.previousElementSibling).toBe(media);
+    expect(content?.querySelector('.cl-select-option-label')).toHaveTextContent('Acme');
+    expect(content?.querySelector('.cl-select-option-description')).toHaveTextContent('Owner');
+  });
+
+  it('leaves a composed option without a description undescribed', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media />
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Acme' });
+    expect(option).not.toHaveAttribute('data-described');
+    expect(option).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('keeps the remaining description when another one in the option unmounts', () => {
+    function Options({ showSecond }: { showSecond: boolean }) {
+      return (
+        <Select.Root
+          items={[{ value: 'acme', label: 'Acme' }]}
+          defaultOpen
+        >
+          <Select.Trigger />
+          <Select.Popup>
+            <Select.Option
+              value='acme'
+              label='Acme'
+            >
+              <Select.Content>
+                <Select.Label>Acme</Select.Label>
+                <Select.Description>Owner</Select.Description>
+                {showSecond ? <Select.Description>Billing</Select.Description> : null}
+              </Select.Content>
+            </Select.Option>
+          </Select.Popup>
+        </Select.Root>
+      );
+    }
+
+    const { rerender } = render(<Options showSecond />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner Billing');
+
+    rerender(<Options showSecond={false} />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner');
+  });
+
+  it('forwards the media ref and swaps its element via render', () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media
+              ref={ref}
+              render={<span data-testid='custom-media' />}
+            />
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    expect(ref.current).toBe(screen.getByTestId('custom-media'));
+    expect(ref.current).toHaveClass('cl-select-option-media');
+  });
+
+  it('marks a disabled option as aria-disabled and does not select it', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Select.Root
+        items={[{ value: 'admin', label: 'Admin' }]}
+        defaultOpen
+        onValueChange={onValueChange}
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='admin'
+            label='Admin'
+            disabled
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Admin' });
+    expect(option).toHaveAttribute('aria-disabled', 'true');
+
+    await user.click(option);
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('composes consumer xstyle onto the popup and options', () => {
+    const caller = stylex.create({ popup: { marginTop: '8px' }, option: { paddingInline: 0 } });
+    render(
+      <Select.Root
+        items={[{ value: 'admin', label: 'Admin' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup xstyle={caller.popup}>
+          <Select.Option
+            value='admin'
+            label='Admin'
+            xstyle={caller.option}
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    expect(screen.getByRole('listbox').querySelector('.cl-select-popup')).toHaveClass(
+      'cl-select-popup',
+      stylex.props(caller.popup).className ?? '',
+    );
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass(
+      'cl-select-option',
+      stylex.props(caller.option).className ?? '',
+    );
+  });
+
+  it('merges the className a render source hands an option', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'admin', label: 'Admin' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='admin'
+            label='Admin'
+            render={<div className='from-render' />}
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass('cl-select-option', 'from-render');
+  });
+
+  it('forwards the trigger ref', () => {
+    const ref = React.createRef<HTMLButtonElement>();
+    render(
+      <Select.Root items={[{ value: 'admin', label: 'Admin' }]}>
+        <Select.Trigger ref={ref} />
+        <Select.Popup>
+          <Select.Option
+            value='admin'
+            label='Admin'
+          />
+        </Select.Popup>
+      </Select.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('combobox'));
+  });
+
+  it('connects the trigger to a surrounding Field', async () => {
+    const user = userEvent.setup();
+    render(
+      <Field.Root
+        required
+        invalid
+      >
+        <Field.Label>Role</Field.Label>
+        <Select.Root
+          items={roles}
+          defaultValue='admin'
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+        <Field.Description>Who can manage members.</Field.Description>
+        <Field.Error>Pick a role.</Field.Error>
+      </Field.Root>,
+    );
+
+    const trigger = screen.getByRole('combobox');
+    const label = screen.getByText('Role');
+    const value = trigger.querySelector('.cl-select-value');
+    const description = screen.getByText('Who can manage members.');
+    const error = screen.getByText('Pick a role.').closest('p');
+    expect(value?.id).not.toBe('');
+    expect(trigger).toHaveAttribute('aria-labelledby', `${label.id} ${value?.id}`);
+    expect(trigger).toHaveAttribute('aria-describedby', `${description.id} ${error?.id}`);
+    expect(trigger).toHaveAttribute('aria-invalid', 'true');
+    expect(trigger).toHaveAttribute('aria-required', 'true');
+    expect(trigger).not.toHaveAttribute('required');
+    expect(trigger).toHaveAccessibleName('Role Admin');
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('option', { name: 'Member' }));
+    expect(trigger).toHaveAccessibleName('Role Member');
+  });
+
+  it('disables the trigger from a disabled Field', () => {
+    render(
+      <Field.Root disabled>
+        <Field.Label>Role</Field.Label>
+        <Select.Root
+          items={roles}
+          defaultValue='admin'
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+      </Field.Root>,
+    );
+    expect(screen.getByRole('combobox')).toBeDisabled();
+  });
+
+  it('names the trigger by its value outside a Field', () => {
+    renderSelect();
+    const trigger = screen.getByRole('combobox');
+    const value = trigger.querySelector('.cl-select-value');
+    expect(trigger).toHaveAttribute('aria-labelledby', value?.id);
+    expect(trigger).toHaveAccessibleName('All roles');
+  });
+
+  describe('alignItemWithTrigger', () => {
+    const describedRoles = [
+      { value: 'member', label: 'Member', description: 'Non-privileged permissions.' },
+      { value: 'admin', label: 'Admin', description: 'Elevated permissions.' },
+    ];
+
+    function positioner() {
+      const element = document.querySelector('.cl-select-positioner');
+      if (!(element instanceof HTMLElement)) {
+        throw new Error('positioner not rendered');
+      }
+      return element;
+    }
+
+    it('aligns the selected option over the trigger by default', () => {
+      renderSelect({ defaultOpen: true });
+      expect(positioner()).toHaveAttribute('data-side', 'none');
+    });
+
+    it('hangs below the trigger by default when any item has a description', () => {
+      renderSelect({ items: describedRoles, defaultValue: 'member', defaultOpen: true });
+      expect(positioner()).not.toHaveAttribute('data-side', 'none');
+    });
+
+    it('hangs below the trigger by default when multiple', () => {
+      render(
+        <Select.Root
+          items={roles}
+          multiple
+          defaultValue={['admin']}
+          defaultOpen
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>,
+      );
+      expect(positioner()).not.toHaveAttribute('data-side', 'none');
+    });
+
+    it('lets an explicit alignItemWithTrigger override the derived default', () => {
+      renderSelect({ items: describedRoles, defaultValue: 'member', defaultOpen: true, alignItemWithTrigger: true });
+      expect(positioner()).toHaveAttribute('data-side', 'none');
+    });
+  });
+
+  it('keeps a consumer aria-label ahead of the value', () => {
+    render(
+      <Select.Root
+        items={roles}
+        defaultValue='all'
+      >
+        <Select.Trigger aria-label='Filter by role' />
+        <Select.Popup />
+      </Select.Root>,
+    );
+    expect(screen.getByRole('combobox')).toHaveAccessibleName('Filter by role All roles');
+  });
+
+  it('does not reference the value id when the trigger renders its own children', () => {
+    render(
+      <Select.Root
+        items={roles}
+        defaultValue='all'
+      >
+        <Select.Trigger aria-label='Filter by role'>Custom</Select.Trigger>
+        <Select.Popup />
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toHaveAttribute('aria-labelledby', trigger.id);
+    expect(trigger).toHaveAccessibleName('Filter by role');
+  });
+});

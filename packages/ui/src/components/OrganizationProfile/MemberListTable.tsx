@@ -147,16 +147,29 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr> & { isDisabled?:
 };
 
 export const RoleSelect = (props: {
-  roles: { label: string; value: string }[] | undefined;
+  roles: { label: string; value: string; description?: string }[] | undefined;
   value: string;
   fallbackLabel?: string;
+  showDescriptions?: boolean;
   onChange: (params: string) => unknown;
   isDisabled?: boolean;
   triggerSx?: ThemableCssProp;
   optionListSx?: ThemableCssProp;
   prefixLocalizationKey?: LocalizationKey | string;
+  formatLabel?: (label: string, role: { label: string; value: string }) => string;
 }) => {
-  const { value, fallbackLabel, roles, onChange, isDisabled, triggerSx, optionListSx, prefixLocalizationKey } = props;
+  const {
+    value,
+    fallbackLabel,
+    roles,
+    onChange,
+    isDisabled,
+    triggerSx,
+    optionListSx,
+    prefixLocalizationKey,
+    showDescriptions,
+    formatLabel = label => label,
+  } = props;
 
   const { localizeCustomRole } = useLocalizeCustomRoles();
 
@@ -169,9 +182,10 @@ export const RoleSelect = (props: {
     () =>
       fetchedRoles.map(role => ({
         value: role.value,
-        label: localizeCustomRole(role.value) || role.label,
+        label: formatLabel(localizeCustomRole(role.value) || role.label, role),
+        description: showDescriptions ? role.description : undefined,
       })),
-    [fetchedRoles, localizeCustomRole],
+    [fetchedRoles, localizeCustomRole, formatLabel, showDescriptions],
   );
 
   return (
@@ -221,7 +235,7 @@ export const RoleSelect = (props: {
               as='span'
               colorScheme='body'
             >
-              {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
+              {selectedRole && formatLabel(localizeCustomRole(selectedRole.value) || selectedRole.label, selectedRole)}
             </Text>
           </Flex>
         ) : fallbackLabel ? (
@@ -243,6 +257,7 @@ type RolesListItemProps = PropsOfComponent<typeof Flex> & {
   option?: {
     label: string;
     value: string;
+    description?: string;
   };
 };
 
@@ -266,7 +281,17 @@ const RolesListItem = memo((props: RolesListItemProps) => {
       ]}
       {...rest}
     >
-      <Text variant='subtitle'>{option?.label}</Text>
+      <Col>
+        <Text variant='subtitle'>{option?.label}</Text>
+        {option?.description && (
+          <Text
+            colorScheme='secondary'
+            sx={t => ({ fontSize: t.fontSizes.$sm })}
+          >
+            {option.description}
+          </Text>
+        )}
+      </Col>
     </Flex>
   );
 });

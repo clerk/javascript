@@ -22,7 +22,7 @@ describe('handleCombinedFlowTransfer', () => {
     vi.resetAllMocks();
   });
 
-  it('should call completeSignUpFlow', async () => {
+  it('should pass the OIDC prompt to completeSignUpFlow', async () => {
     const mockClerk = {
       client: {
         signUp: {
@@ -42,9 +42,14 @@ describe('handleCombinedFlowTransfer', () => {
       afterSignUpUrl: 'https://test.com',
       passwordEnabled: false,
       navigateOnSetActive: vi.fn(),
+      oidcPrompt: 'select_account',
     });
 
-    expect(mockCompleteSignUpFlow).toHaveBeenCalled();
+    expect(mockCompleteSignUpFlow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        oidcPrompt: 'select_account',
+      }),
+    );
   });
 
   it('should pass unsafeMetadata to signUp.create', async () => {

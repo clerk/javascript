@@ -79,6 +79,10 @@ export type PrepareVerificationParams =
       actionCompleteRedirectUrl?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      /**
+       * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+       */
+      slackTeamIdHint?: string;
     }
   | {
       strategy: EnterpriseSSOStrategy;
@@ -134,12 +138,20 @@ export type SignUpCreateParams = Partial<
     legalAccepted: boolean;
     oidcPrompt: string;
     oidcLoginHint: string;
+    /**
+     * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+     */
+    slackTeamIdHint?: string;
     channel: PhoneCodeChannel;
     locale?: string;
+    /**
+     * An IANA timezone for this sign-up. Defaults to the browser's timezone when omitted, if available.
+     */
+    timezone?: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
-export type SignUpUpdateParams = SignUpCreateParams;
+export type SignUpUpdateParams = Omit<SignUpCreateParams, 'timezone'>;
 
 /**
  * @deprecated Use `SignUpAuthenticateWithWeb3Params` instead.

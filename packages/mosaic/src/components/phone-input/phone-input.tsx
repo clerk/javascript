@@ -1,0 +1,373 @@
+'use client';
+
+import type { CountryEntry, CountryIso } from '@clerk/shared/phone';
+import { extractDigits, getFlagEmojiFromCountryIso, IsoToCountryMap, parsePhoneString } from '@clerk/shared/phone';
+import { useMergeRefs } from '@floating-ui/react';
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { Button } from '../../primitives/button';
+import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
+import { useFormattedInput } from '../../primitives/hooks';
+import type { MosaicElementProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
+import { styles as buttonStyles } from '../button/button.styles';
+import { Field } from '../field';
+import { useOptionalFieldContext } from '../field/field.context';
+import { Icon } from '../icon';
+import { sizes as inputSizes, styles as inputStyles } from '../input/input.styles';
+import { InputGroup } from '../input-group';
+import { Popover } from '../popover';
+import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
+import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
+import { styles } from './phone-input.styles';
+
+const countryOptions = [...IsoToCountryMap.values()];
+
+function getCountry(iso: CountryIso | undefined): CountryEntry {
+  const country = iso ? IsoToCountryMap.get(iso) : undefined;
+  const fallback = IsoToCountryMap.get('us') ?? countryOptions[0];
+  if (!fallback) {
+    throw new Error('PhoneInput requires at least one country');
+  }
+  return country ?? fallback;
+}
+
+export function toCountryIso(value: string | null | undefined): CountryIso | undefined {
+  const iso = value?.toLowerCase();
+  return iso ? countryOptions.find(country => country.iso === iso)?.iso : undefined;
+}
+
+function getInitialCountry(value: string | undefined, defaultCountry: CountryIso | undefined): CountryIso {
+  return value ? parsePhoneString(value).iso : getCountry(defaultCountry).iso;
+}
+
+export interface PhoneInputProps extends Omit<
+  MosaicElementProps<'input'>,
+  'type' | 'size' | 'value' | 'defaultValue' | 'onChange'
+> {
+  /** The normalized E.164 value. */
+  value?: string;
+  /** The initial normalized E.164 value for an uncontrolled input. */
+  defaultValue?: string;
+  /** Called with the normalized E.164 value whenever the number or country changes. */
+  onValueChange?: (value: string) => void;
+  /** Controls the selected country independently when calling codes are ambiguous. */
+  country?: CountryIso;
+  /** Initial country when neither `country` nor a phone number selects one. @default 'us' */
+  defaultCountry?: CountryIso;
+  onCountryChange?: (country: CountryIso) => void;
+  size?: 'sm' | 'md' | 'lg';
+  countrySearchPlaceholder?: string;
+  noResultsMessage?: string;
+  /** Applied to the grouped root. */
+  className?: string;
+  /** Applied to the grouped root. */
+  style?: React.CSSProperties;
+}
+
+export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(function MosaicPhoneInput(
+  {
+    value: valueProp,
+    defaultValue = '',
+    onValueChange,
+    country: countryProp,
+    defaultCountry,
+    onCountryChange,
+    size = 'md',
+    countrySearchPlaceholder = 'Search',
+    noResultsMessage = 'No countries found',
+    disabled: disabledProp,
+    required: requiredProp,
+    id,
+    name,
+    form,
+    autoComplete = 'tel-national',
+    inputMode = 'tel',
+    maxLength = 25,
+    spellCheck = false,
+    xstyle,
+    'aria-invalid': ariaInvalidProp,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    ...inputProps
+  },
+  forwardedRef,
+) {
+  const field = useOptionalFieldContext();
+  const disabled = disabledProp ?? field?.disabled ?? false;
+  const ariaInvalid = ariaInvalidProp ?? (field?.invalid ? true : undefined);
+  const invalid = ariaInvalid === true || ariaInvalid === 'true';
+  const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
+  const value = valueProp ?? uncontrolledValue;
+  const [uncontrolledCountry, setUncontrolledCountry] = React.useState<CountryIso>(() =>
+    getInitialCountry(valueProp ?? defaultValue, defaultCountry),
+  );
+  const emittedValueRef = React.useRef<string | null>(null);
+  const country = getCountry(countryProp ?? uncontrolledCountry);
+  const nationalNumber = getNationalNumber(value, country);
+  const formattedNumber = formatNationalNumber(nationalNumber, country.pattern);
+  const [open, setOpen] = React.useState(false);
+  const [anchor, setAnchor] = React.useState<HTMLDivElement | null>(null);
+  const [query, setQuery] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const mergedInputRef = useMergeRefs([inputRef, forwardedRef]);
+
+  React.useEffect(() => {
+    const emittedValue = emittedValueRef.current;
+    emittedValueRef.current = null;
+    if (valueProp === undefined || valueProp === emittedValue) {
+      return;
+    }
+    if (countryProp === undefined && valueProp) {
+      setUncontrolledCountry(parsePhoneString(valueProp).iso);
+    }
+  }, [countryProp, valueProp]);
+
+  const filteredCountries = React.useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return countryOptions;
+    }
+    return countryOptions.filter(option =>
+      `${option.name} ${option.iso} +${option.code}`.toLowerCase().includes(normalizedQuery),
+    );
+  }, [query]);
+
+  const setValue = React.useCallback(
+    (nextValue: string) => {
+      emittedValueRef.current = nextValue;
+      if (valueProp === undefined) {
+        setUncontrolledValue(nextValue);
+      }
+      onValueChange?.(nextValue);
+    },
+    [onValueChange, valueProp],
+  );
+
+  const setCountry = React.useCallback(
+    (nextCountry: CountryEntry) => {
+      if (countryProp === undefined) {
+        setUncontrolledCountry(nextCountry.iso);
+      }
+      onCountryChange?.(nextCountry.iso);
+      setValue(toE164(nextCountry, nationalNumber));
+      setOpen(false);
+      setQuery('');
+      inputRef.current?.focus();
+    },
+    [countryProp, nationalNumber, onCountryChange, setValue],
+  );
+
+  const numberInput = useFormattedInput({
+    value: formattedNumber,
+    accept: /[\d+]/,
+    format: nextValue =>
+      nextValue.includes('+') ? nextValue : formatNationalNumber(extractDigits(nextValue), country.pattern),
+    onChange: nextValue => {
+      if (nextValue.includes('+')) {
+        const parsed = parsePhoneString(nextValue);
+        const parsedCountry = getCountry(parsed.iso);
+        if (countryProp === undefined) {
+          setUncontrolledCountry(parsedCountry.iso);
+        }
+        onCountryChange?.(parsedCountry.iso);
+        setValue(toE164(parsedCountry, parsed.number));
+        return;
+      }
+      setValue(toE164(country, nextValue));
+    },
+  });
+
+  return (
+    <>
+      <InputGroup.Root
+        ref={setAnchor}
+        size={size}
+        disabled={disabled}
+        invalid={invalid}
+        {...themeProps('phone-input', { size, disabled, invalid })}
+        xstyle={xstyle}
+      >
+        <Popover.Root
+          open={open}
+          onOpenChange={nextOpen => {
+            setOpen(nextOpen);
+            if (!nextOpen) {
+              setQuery('');
+            }
+          }}
+          initialFocus='first'
+          placement='bottom-start'
+          sideOffset={8}
+        >
+          <InputGroup.Start xstyle={styles.triggerStart}>
+            <Popover.Trigger
+              render={
+                <Button
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-trigger'),
+                    stylex.props(
+                      reset.base,
+                      focusOutline.visible,
+                      buttonStyles.touchTarget,
+                      styles.trigger,
+                      disabled && buttonStyles.disabled,
+                    ),
+                  )}
+                />
+              }
+              type='button'
+              disabled={disabled}
+              aria-label={`Country, ${country.name}`}
+            >
+              <span {...stylex.props(reset.base, styles.triggerContent)}>
+                <span
+                  aria-hidden='true'
+                  {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
+                >
+                  {getFlagEmojiFromCountryIso(country.iso)}
+                </span>
+                <Icon
+                  glyph={ChevronDown}
+                  size='md'
+                />
+              </span>
+            </Popover.Trigger>
+          </InputGroup.Start>
+          <Popover.Popup
+            anchor={anchor}
+            aria-label='Choose a country'
+            size='anchor'
+            {...themeProps('phone-input-popup')}
+            xstyle={[reset.base, styles.popup]}
+          >
+            <HeadlessCombobox.Root
+              open
+              inputValue={query}
+              onInputValueChange={setQuery}
+              value={country.iso}
+              onValueChange={iso => {
+                const nextCountry = countryOptions.find(option => option.iso === iso);
+                if (nextCountry) {
+                  setCountry(nextCountry);
+                }
+              }}
+            >
+              <Field.Root>
+                <label
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-search'),
+                    stylex.props(reset.base, styles.countrySearchRow),
+                  )}
+                >
+                  <span {...stylex.props(reset.base, styles.countrySearchIcon)}>
+                    <Icon
+                      glyph={MagnifyingGlass}
+                      size='md'
+                    />
+                  </span>
+                  <HeadlessCombobox.Input
+                    aria-label='Search countries'
+                    placeholder={countrySearchPlaceholder}
+                    spellCheck={false}
+                    {...mergeStyleProps(
+                      themeProps('combobox-input', { size: 'md', variant: 'ghost' }),
+                      themeProps('input', { size: 'md', variant: 'ghost', disabled: false }),
+                      stylex.props(
+                        reset.base,
+                        inputStyles.base,
+                        inputSizes.md,
+                        inputStyles.ghost,
+                        styles.countrySearchInput,
+                      ),
+                    )}
+                  />
+                </label>
+              </Field.Root>
+              <HeadlessCombobox.List
+                {...mergeStyleProps(
+                  themeProps('combobox-list'),
+                  themeProps('phone-input-country-list'),
+                  stylex.props(reset.base, scrollAreaRoot, ...scrollAreaViewport(), styles.countryList),
+                )}
+              >
+                {filteredCountries.length > 0 ? (
+                  filteredCountries.map(option => (
+                    <HeadlessCombobox.Option
+                      key={option.iso}
+                      value={option.iso}
+                      label={option.name}
+                      {...mergeStyleProps(
+                        themeProps('combobox-option'),
+                        themeProps('phone-input-country-option'),
+                        stylex.props(reset.base, styles.option),
+                      )}
+                    >
+                      <span
+                        aria-hidden='true'
+                        {...stylex.props(reset.base, styles.optionFlag)}
+                      >
+                        <span {...stylex.props(reset.base, styles.flag)}>{getFlagEmojiFromCountryIso(option.iso)}</span>
+                      </span>
+                      <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
+                      <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
+                    </HeadlessCombobox.Option>
+                  ))
+                ) : (
+                  <p {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty))}>
+                    {noResultsMessage}
+                  </p>
+                )}
+              </HeadlessCombobox.List>
+            </HeadlessCombobox.Root>
+          </Popover.Popup>
+        </Popover.Root>
+
+        <InputGroup.Start
+          aria-hidden='true'
+          {...themeProps('phone-input-prefix')}
+          xstyle={styles.prefix}
+        >
+          <span
+            aria-hidden='true'
+            {...mergeStyleProps(themeProps('phone-input-divider'), stylex.props(reset.base, styles.divider))}
+          />
+          +{country.code}
+        </InputGroup.Start>
+        <InputGroup.Input
+          ref={mergedInputRef}
+          {...themeProps('phone-input-control')}
+          xstyle={styles.control}
+          {...inputProps}
+          id={id}
+          type='tel'
+          {...numberInput}
+          disabled={disabledProp}
+          required={requiredProp}
+          form={form}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
+          maxLength={maxLength}
+          spellCheck={spellCheck}
+          aria-invalid={ariaInvalidProp}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
+        />
+      </InputGroup.Root>
+      {name ? (
+        <input
+          type='hidden'
+          name={name}
+          form={form}
+          value={value}
+          disabled={disabled}
+        />
+      ) : null}
+    </>
+  );
+});

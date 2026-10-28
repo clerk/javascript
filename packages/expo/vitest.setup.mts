@@ -1,4 +1,5 @@
-import { beforeAll, vi } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import { afterEach, beforeAll, vi } from 'vitest';
 
 globalThis.PACKAGE_NAME = '@clerk/expo';
 globalThis.PACKAGE_VERSION = '0.0.0-test';
@@ -18,3 +19,7 @@ if (typeof globalThis.__DEV__ === 'undefined') {
 }
 
 beforeAll(() => {});
+
+afterEach(() => {
+  cleanup();
+});

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/electron",
-  "version": "0.0.35",
+  "version": "0.1.7",
   "description": "Clerk SDK for Electron",
   "keywords": [
     "clerk",
@@ -64,6 +64,16 @@
         "default": "./dist/cjs/react/index.js"
       }
     },
+    "./react/experimental": {
+      "import": {
+        "types": "./dist/types/react/experimental.d.ts",
+        "default": "./dist/esm/react/experimental.js"
+      },
+      "require": {
+        "types": "./dist/types/react/experimental.d.ts",
+        "default": "./dist/cjs/react/experimental.js"
+      }
+    },
     "./passkeys": {
       "import": {
         "types": "./dist/types/passkeys/index.d.ts",
@@ -104,8 +114,8 @@
   },
   "devDependencies": {
     "@clerk/electron-passkeys": "workspace:*",
-    "@types/node": "^22.19.17",
-    "electron": "^39.2.6",
+    "@types/node": "^22.20.1",
+    "electron": "^41.0.0",
     "electron-store": "^8.2.0"
   },
   "peerDependencies": {

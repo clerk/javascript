@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { getModule } from '@/lib/registry';
 
 import { PlaygroundProvider } from './PlaygroundContext';
-import { ViewSource } from './ViewSource';
 
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
@@ -14,12 +13,14 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
   'user-profile': {
-    'user-page': dynamic(() => import('../stories/user-page.mdx')),
+    'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
     'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
-    'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
+    'user-profile-profile-section': dynamic(() => import('../stories/user-profile-profile-section.mdx')),
+    'user-profile-email-section': dynamic(() => import('../stories/user-profile-email-section.mdx')),
+    'user-profile-phone-section': dynamic(() => import('../stories/user-profile-phone-section.mdx')),
     'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
     'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
@@ -31,42 +32,98 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-billing-history-section': dynamic(
       () => import('../stories/user-profile-billing-history-section.mdx'),
     ),
+    'user-profile-enterprise-accounts-section': dynamic(
+      () => import('../stories/user-profile-enterprise-accounts-section.mdx'),
+    ),
     'user-profile-connected-accounts-section': dynamic(
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
     ),
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
-    'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
+    'user-profile-danger-section': dynamic(() => import('../stories/user-profile-danger-section.mdx')),
+  },
+  'organization-profile': {
+    'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
+    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+    'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
+    'organization-profile-profile-section': dynamic(
+      () => import('../stories/organization-profile-profile-section.mdx'),
+    ),
+    'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+  },
+  misc: {
+    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
+    'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
+    reverification: dynamic(() => import('../stories/reverification.mdx')),
+  },
+  blocks: {
+    confirmation: dynamic(() => import('../stories/confirmation.mdx')),
+    destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
+    'action-bar': dynamic(() => import('../stories/action-bar.mdx')),
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
+    skeleton: dynamic(() => import('../stories/skeleton.mdx')),
+    banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
+    checkbox: dynamic(() => import('../stories/checkbox.mdx')),
+    combobox: dynamic(() => import('../stories/combobox.mdx')),
+    'copy-button': dynamic(() => import('../stories/copy-button.mdx')),
+    'data-list': dynamic(() => import('../stories/data-list.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
+    'input-group': dynamic(() => import('../stories/input-group.mdx')),
+    pagination: dynamic(() => import('../stories/pagination.mdx')),
+    'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
-    'alert-dialog': dynamic(() => import('../stories/alert-dialog.component.mdx')),
+    drawer: dynamic(() => import('../stories/drawer.component.mdx')),
+    'empty-state': dynamic(() => import('../stories/empty-state.mdx')),
+    entity: dynamic(() => import('../stories/entity.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
+    'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
+    otp: dynamic(() => import('../stories/otp.component.mdx')),
+    panel: dynamic(() => import('../stories/panel.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
+    profile: dynamic(() => import('../stories/profile.component.mdx')),
+    radio: dynamic(() => import('../stories/radio.mdx')),
+    reveal: dynamic(() => import('../stories/reveal.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
+    select: dynamic(() => import('../stories/select.component.mdx')),
+    switch: dynamic(() => import('../stories/switch.mdx')),
+    table: dynamic(() => import('../stories/table.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    'tag-input': dynamic(() => import('../stories/tag-input.component.mdx')),
+    toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
+    tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
+    flow: dynamic(() => import('../stories/flow.component.mdx')),
+    'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.
     accordion: dynamic(() => import('../stories/accordion.mdx')),
     autocomplete: dynamic(() => import('../stories/autocomplete.mdx')),
+    combobox: dynamic(() => import('../stories/combobox.primitive.mdx')),
     collapsible: dynamic(() => import('../stories/collapsible.mdx')),
     dialog: dynamic(() => import('../stories/dialog.mdx')),
     drawer: dynamic(() => import('../stories/drawer.mdx')),
     'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
+    flow: dynamic(() => import('../stories/flow.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),
+    portal: dynamic(() => import('../stories/portal.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
+    table: dynamic(() => import('../stories/table.primitive.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
+    'tag-input': dynamic(() => import('../stories/tag-input.mdx')),
+    toast: dynamic(() => import('../stories/toast.primitive.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
   },
   styles: {
@@ -75,7 +132,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   hooks: {
     // Headless hooks — alphabetical.
-    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
+    'use-form': dynamic(() => import('../stories/use-form.mdx')),
+  },
+  localization: {
+    localization: dynamic(() => import('../stories/localization.mdx')),
   },
 };
 
@@ -88,7 +148,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
   const DocContent = docModules[group]?.[slug];
   if (!DocContent) {
     return (
-      <div className='text-muted-foreground p-8 text-sm'>
+      <div className='text-muted-foreground p-3 text-sm sm:p-8'>
         No docs found for &quot;{group}/{slug}&quot;.
       </div>
     );
@@ -101,13 +161,8 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose relative mx-auto w-full min-w-0 p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose prose-headings:scroll-mt-16 mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
-        {meta?.source ? (
-          <div className='absolute right-8 top-8'>
-            <ViewSource source={meta.source} />
-          </div>
-        ) : null}
         <DocContent />
       </article>
     </PlaygroundProvider>

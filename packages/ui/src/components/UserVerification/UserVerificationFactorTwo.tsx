@@ -3,28 +3,36 @@ import { useEffect, useMemo } from 'react';
 
 import { withCardStateProvider } from '@/elements/contexts';
 import { LoadingCard } from '@/elements/LoadingCard';
+import { useIsWebAuthnSupported } from '@/hooks';
 import { useRouter } from '@/router';
 
 import { useSecondFactorSelection } from '../SignIn/useSecondFactorSelection';
+import { isOfferableSecondFactor } from '../SignIn/utils';
 import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { sortByPrimaryFactor } from './utils';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
 import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
+import { UVFactorTwoPasskeyCard } from './UVFactorTwoPasskeyCard';
 import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
 
 const SUPPORTED_STRATEGIES: SessionVerificationSecondFactor['strategy'][] = [
   'phone_code',
   'totp',
   'backup_code',
+  'passkey',
 ] as const;
 
 export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
+  const webAuthnSupported = useIsWebAuthnSupported();
 
+  // A passkey the device can't use stays in the list, so that when it's the only
+  // second factor the passkey card renders and reports the error instead of an
+  // endless loading card. useSecondFactorSelection never starts with it otherwise.
   const availableFactors = useMemo(() => {
     return (
       sessionVerification.supportedSecondFactors
@@ -43,8 +51,11 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   } = useSecondFactorSelection<SessionVerificationSecondFactor>(availableFactors);
 
   const secondFactorsExcludingCurrent = useMemo(
-    () => availableFactors?.filter(factor => !secondFactorsAreEqual(factor, currentFactor)),
-    [availableFactors, currentFactor],
+    () =>
+      availableFactors?.filter(
+        factor => isOfferableSecondFactor(factor, webAuthnSupported) && !secondFactorsAreEqual(factor, currentFactor),
+      ),
+    [availableFactors, currentFactor, webAuthnSupported],
   );
 
   const hasAlternativeStrategies = useMemo(
@@ -95,7 +106,18 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
         />
       );
     case 'backup_code':
-      return <UVFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+      return (
+        <UVFactorTwoBackupCodeCard
+          onShowAlternativeMethodsClicked={hasAlternativeStrategies ? toggleAllStrategies : undefined}
+        />
+      );
+    case 'passkey':
+      return (
+        <UVFactorTwoPasskeyCard
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          showAlternativeMethods={hasAlternativeStrategies}
+        />
+      );
     default:
       return <LoadingCard />;
   }

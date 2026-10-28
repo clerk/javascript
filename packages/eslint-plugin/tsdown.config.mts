@@ -13,7 +13,7 @@ export default defineConfig({
   clean: true,
   minify: false,
   sourcemap: true,
-  dts: true,
+  dts: { sourcemap: true },
   // `eslint` is a peer dependency resolved from the consumer's install; never
   // bundle it into the fix runner / CLI.
   deps: {

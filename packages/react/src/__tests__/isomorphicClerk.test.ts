@@ -73,6 +73,20 @@ describe('isomorphicClerk', () => {
     expect(isomorphicClerk.__internal_moduleManager).toBe(mm);
   });
 
+  it('exposes the inner clerk-js Protect challenge load timeout', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    expect(isomorphicClerk.__internal_protectChallengeLoadTimeoutMs).toBeUndefined();
+
+    const innerClerk: any = {
+      addListener: vi.fn(),
+      __internal_protectChallengeLoadTimeoutMs: 25_000,
+    };
+    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
+
+    expect(isomorphicClerk.__internal_protectChallengeLoadTimeoutMs).toBe(25_000);
+  });
+
   it('updates props asynchronously after clerkjs has loaded', async () => {
     const propsHistory: any[] = [];
     const dummyClerkJS = {
@@ -240,6 +254,22 @@ describe('isomorphicClerk', () => {
     await expect(
       isomorphicClerk.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' }),
     ).resolves.toBeUndefined();
+  });
+
+  it('does nothing when clerk-js predates OAuth device verification mounting', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+    const node = document.createElement('div');
+
+    isomorphicClerk.__internal_mountOAuthDeviceVerification(node);
+
+    expect(() =>
+      (isomorphicClerk as any).replayInterceptedInvocations({
+        addListener: vi.fn(),
+        loaded: true,
+      } as unknown as BrowserClerk),
+    ).not.toThrow();
+    expect(() => isomorphicClerk.__internal_mountOAuthDeviceVerification(node)).not.toThrow();
+    expect(() => isomorphicClerk.__internal_unmountOAuthDeviceVerification(node)).not.toThrow();
   });
 
   it('calls __internal_handleResourceCallback immediately after clerk-js has loaded', async () => {

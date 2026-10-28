@@ -1,19 +1,11 @@
 import { requireOptionalNativeModule } from 'expo';
 
-import type { NativeAuthFlowModule, NativeTrustedDeviceModule } from './NativeClerkModule.types';
+import type { NativeAuthFlowModule, NativeClientSyncModule } from './NativeClerkModule.types';
 
-export interface Spec extends NativeAuthFlowModule, NativeTrustedDeviceModule {
-  // Exposed by Expo Modules EventEmitter for internal native client change events.
+export interface Spec extends NativeAuthFlowModule, Partial<NativeClientSyncModule> {
+  // Exposed by Expo Modules EventEmitter for the internal `clerkNativeClientInvalidated` event.
   // This is not part of the public @clerk/expo API.
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
-  configure(publishableKey: string, bearerToken: string | null): Promise<void>;
-  getClientToken(): Promise<string | null>;
-  syncClientStateFromJs(
-    deviceToken: string | null,
-    sourceId: string | null,
-    didChangeClient: boolean,
-    didChangeDeviceToken: boolean,
-  ): Promise<void>;
 }
 
 export default requireOptionalNativeModule<Spec>('ClerkExpo');

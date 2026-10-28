@@ -4,15 +4,29 @@ import React, { useState } from 'react';
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
-import { ChevronLeft } from '../../icons';
+import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
+import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
+import type { ConnectionScope } from '../ConfigureSSO/domain/connectionScope';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
+import { EnterpriseConnectionPage } from './EnterpriseConnectionPage';
+import { SecurityBackControl } from './SecurityBackControl';
+import { SecuritySSOBypassSection } from './SecuritySSOBypassSection';
 import { SecuritySsoSection } from './SecuritySsoSection';
+import { SSOBypassAllowlistPage } from './SSOBypassAllowlistPage';
+import { useSecurityCapabilities } from './useSecurityCapabilities';
 
 type OrganizationSecurityPageProps = {
   contentRef: React.RefObject<HTMLDivElement>;
 };
+
+type SecurityPageView =
+  | { kind: 'overview' }
+  | { kind: 'wizard'; forceInitialStep: boolean }
+  | { kind: 'connection'; id: string }
+  | { kind: 'directorySync' }
+  | { kind: 'ssoBypass' };
 
 export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPageProps) => {
   const { organization } = useOrganization();
@@ -26,34 +40,54 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
 };
 
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
+  const { canConfigureSso, canConfigureDirectorySync, canManageSSOBypass } = useSecurityCapabilities();
+
   const {
     organization,
     isLoading,
     enterpriseConnection,
+    enterpriseConnections,
+    selectConnection,
+    connectionDomains,
+    setConnectionDomains,
+    claimedDomains,
     organizationEnterpriseConnection,
     testRuns,
     enterpriseConnectionMutations,
     organizationDomains,
     organizationDomainMutations,
-  } = useOrganizationEnterpriseConnection();
+  } = useOrganizationEnterpriseConnection({ manage: canConfigureSso });
 
-  const [view, setView] = useState<'overview' | 'wizard'>('overview');
-  const [forceFirstStep, setForceFirstStep] = useState(false);
+  const showSSOBypass = canManageSSOBypass && enterpriseConnections.length > 0;
 
-  const exitWizard = () => setView('overview');
+  const [requestedView, setRequestedView] = useState<SecurityPageView>({ kind: 'overview' });
 
-  const openWizard = (forceInitialStep = false) => {
-    setForceFirstStep(forceInitialStep);
-    setView('wizard');
+  const exitToOverview = () => setRequestedView({ kind: 'overview' });
+
+  const openWizard = (scope: ConnectionScope, forceInitialStep = false) => {
+    selectConnection(scope);
+    setRequestedView({ kind: 'wizard', forceInitialStep });
   };
+
+  const openConnection = (id: string) => setRequestedView({ kind: 'connection', id });
+
+  const openedConnection =
+    requestedView.kind === 'connection'
+      ? enterpriseConnections.find(connection => connection.id === requestedView.id)
+      : undefined;
+
+  // A connection page whose connection is gone (removed here, or in another tab)
+  // falls back to the overview. Derived at render so no effect has to chase it.
+  const view: SecurityPageView =
+    requestedView.kind === 'connection' && !openedConnection ? { kind: 'overview' } : requestedView;
 
   // Gate the page-level loading overview to the overview view only. A wizard is
   // only ever opened after the overview has settled (it gates on `isLoading`),
-  // so once `view === 'wizard'` the connection data is present and stays warm; a
+  // so once `view.kind === 'wizard'` the connection data is present and stays warm; a
   // later `isLoading` flip (e.g. the test-runs query cold-loading after a
   // configure write) must not tear the open wizard down and reseat it — each
   // wizard step owns its own loading UI.
-  if (isLoading && view === 'overview') {
+  if (isLoading && view.kind === 'overview') {
     return (
       <SecurityPageOverview fillHeight>
         <Flex
@@ -71,52 +105,69 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     );
   }
 
-  const backControl = (
-    <SimpleButton
-      elementDescriptor={descriptors.configureSSOHeaderBackButton}
-      variant='unstyled'
-      onClick={exitWizard}
-      sx={t => ({
-        gap: t.space.$1,
-        padding: 0,
-        color: t.colors.$colorMutedForeground,
-        '&:hover': { color: t.colors.$colorForeground },
-      })}
-    >
-      <Icon icon={ChevronLeft} />
-      <Text
-        as='span'
-        variant='body'
-        localizationKey={localizationKeys('organizationProfile.navbar.security')}
+  if (view.kind === 'directorySync') {
+    return (
+      <ConfigureDirectorySyncWizard
+        title={<SecurityBackControl onClick={exitToOverview} />}
+        contentRef={contentRef}
+        onExit={exitToOverview}
       />
-    </SimpleButton>
-  );
+    );
+  }
 
-  return view === 'overview' ? (
+  if (view.kind === 'ssoBypass') {
+    return <SSOBypassAllowlistPage onBack={exitToOverview} />;
+  }
+
+  if (view.kind === 'connection' && openedConnection) {
+    return (
+      <EnterpriseConnectionPage
+        connection={openedConnection}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        onBack={exitToOverview}
+      />
+    );
+  }
+
+  if (view.kind === 'wizard') {
+    return (
+      <ConfigureSSOWizard
+        organizationEnterpriseConnection={organizationEnterpriseConnection}
+        testRuns={testRuns}
+        enterpriseConnection={enterpriseConnection}
+        connectionDomains={connectionDomains}
+        setConnectionDomains={setConnectionDomains}
+        claimedDomains={claimedDomains}
+        contentRef={contentRef}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationDomainMutations={organizationDomainMutations}
+        organizationDomains={organizationDomains}
+        forceInitialStep={view.forceInitialStep}
+        title={<SecurityBackControl onClick={exitToOverview} />}
+        onExit={exitToOverview}
+      />
+    );
+  }
+
+  return (
     <SecurityPageOverview>
       <SecuritySsoSection
-        connection={organizationEnterpriseConnection}
-        enterpriseConnection={enterpriseConnection}
-        setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
-        deleteConnection={enterpriseConnectionMutations.deleteConnection}
+        enterpriseConnections={enterpriseConnections}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
         organizationName={organization?.name ?? ''}
         contentRef={contentRef}
-        onConfigure={openWizard}
+        onConfigure={canConfigureSso ? openWizard : undefined}
+        onOpenConnection={canConfigureSso ? openConnection : undefined}
       />
+      {showSSOBypass && <SecuritySSOBypassSection onManage={() => setRequestedView({ kind: 'ssoBypass' })} />}
+      {canConfigureDirectorySync && (
+        <SecurityDirectorySyncSection
+          organizationName={organization?.name ?? ''}
+          contentRef={contentRef}
+          onConfigure={() => setRequestedView({ kind: 'directorySync' })}
+        />
+      )}
     </SecurityPageOverview>
-  ) : (
-    <ConfigureSSOWizard
-      organizationEnterpriseConnection={organizationEnterpriseConnection}
-      testRuns={testRuns}
-      enterpriseConnection={enterpriseConnection}
-      contentRef={contentRef}
-      enterpriseConnectionMutations={enterpriseConnectionMutations}
-      organizationDomainMutations={organizationDomainMutations}
-      organizationDomains={organizationDomains}
-      forceInitialStep={forceFirstStep}
-      title={backControl}
-      onExit={exitWizard}
-    />
   );
 };
 

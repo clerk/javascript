@@ -1,0 +1,107 @@
+import * as Stories from './confirmation.stories';
+
+# Confirmation
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Banner', href: '/components/banner', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+A confirmation for an action worth a second look but not worth making the user type for. Removing a connected account, revoking a session, signing out everywhere. For the destructive actions that do warrant typing, use [Destructive](/components/destructive).
+
+`color` sets the weight the confirming button carries: `negative` for what cannot be undone, `primary` for what can.
+
+The block is driven by a controller from `useConfirmController`, which owns whether the dialog is open, pending, or explaining a failure. Resolve `onConfirm` and the dialog closes. Reject it and the dialog stays open. A dialog that sits next to its button takes the button as `trigger`. It is an alert dialog: Escape and the footer's Cancel action cancel, an outside press does not, and the confirm step has no corner dismiss. Under the phone band it arrives as a bottom sheet.
+
+```tsx
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
+import { Confirmation } from '@clerk/mosaic/blocks/confirmation';
+import { Button } from '@clerk/mosaic/components/button';
+
+const remove = useConfirmController({ onConfirm: removeConnectedAccount });
+
+<Confirmation
+  controller={remove}
+  trigger={<Button color='negative' variant='outline'>Remove</Button>}
+  title='Remove connected account'
+  description='Google will be removed from this account. You will no longer be able to use this connected account and any dependent features will no longer work.'
+  actionLabel='Remove'
+/>;
+```
+
+## Failure
+
+A failed attempt leaves the dialog up. A Clerk error is localized by its code. Anything else renders as the controller's `errorFallback`, or the generic error when none is given. The message renders as a banner between the description and the actions, and clears when the dialog closes.
+
+<Story
+  name='WithError'
+  storyModule={Stories}
+/>
+
+## One block, many rows
+
+A table of members has a Remove in every row, but it needs one confirmation, not one per row. Give the controller a payload type, mount the block once after the table, and open it from any row with the member it is about. The copy props take a function of that payload, and `onConfirm` receives it.
+
+```tsx
+const remove = useConfirmController<Member>({ onConfirm: member => api.removeMember(member.id) });
+
+<Menu.Item color='negative' onClick={() => remove.open(member)}>Remove</Menu.Item>
+
+<Confirmation
+  controller={remove}
+  title='Remove member'
+  description={member => <><strong>{member.name}</strong> will be removed from the organization.</>}
+  actionLabel='Remove'
+/>
+```
+
+Opened from a menu item, focus returns to that menu's trigger when the dialog closes. If the action removes the trigger, pass `finalFocus` an element that remains on the page.
+
+<Story
+  name='WithPayload'
+  storyModule={Stories}
+/>
+
+## Reverification
+
+Wrap the action with `useReverificationFlow` and pass the result to the controller. The controller decides which step is showing, cancels the verification when the dialog closes, and blocks closing while the action is being retried. Confirmation and verification stay in the same dialog and card. The verification steps show a corner dismiss, which cancels the verification; it is withheld while the action is being retried.
+
+```tsx
+import { useReverificationFlow } from '@clerk/mosaic/features/reverification';
+
+const [remove, reverification] = useReverificationFlow(removeConnectedAccount);
+const controller = useConfirmController({ onConfirm: remove, reverification });
+```
+
+## Props
+
+| Prop          | Type                                           | Default      | Description                                                                              |
+| ------------- | ---------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------- |
+| `controller`  | `ConfirmController<Payload>`                   | — (required) | From `useConfirmController`. Owns open, pending, the error, and the reverification step. |
+| `trigger`     | `ReactNode`                                    | —            | The button that opens the dialog. Only for a controller without a payload.               |
+| `title`       | `string \| (payload: Payload) => string`       | — (required) | Names what is about to happen.                                                           |
+| `description` | `ReactNode \| (payload: Payload) => ReactNode` | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                         |
+| `actionLabel` | `string \| (payload: Payload) => string`       | — (required) | The confirming button's label.                                                           |
+| `cancelLabel` | `string`                                       | `'Cancel'`   | The cancel button's label.                                                               |
+| `color`       | `'negative' \| 'primary'`                      | `'negative'` | The weight the confirming button carries.                                                |
+| `finalFocus`  | `DialogFocusTarget`                            | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.                   |
+
+`useConfirmController<Payload>(options)`:
+
+| Option           | Type                                             | Default           | Description                                                                                 |
+| ---------------- | ------------------------------------------------ | ----------------- | ------------------------------------------------------------------------------------------- |
+| `onConfirm`      | `(payload: Payload) => Promise<unknown> \| void` | — (required)      | Runs the action. Resolve to close; reject to keep the dialog open showing why.              |
+| `reverification` | `ReverificationController`                       | —                 | From `useReverificationFlow`. Renders verification in the same dialog when the action asks. |
+| `errorFallback`  | `string`                                         | the generic error | Copy for a failure Clerk cannot describe.                                                   |
+
+The controller exposes `open(payload)`, `isOpen`, `isPending`, `errorMessage`, `step`, `onOpenChange` and `handle`, the dialog handle the block mounts on.

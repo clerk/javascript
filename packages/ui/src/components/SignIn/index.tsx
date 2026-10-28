@@ -20,9 +20,10 @@ import type { SignUpCtx } from '@/types';
 import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
-import { buildSignInOAuthCallbackParams, buildSignUpOAuthCallbackParams } from './buildOAuthCallbackParams';
+import { buildCombinedFlowOAuthCallbackParams, buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   LazySignUpContinue,
+  LazySignUpEnterpriseConnections,
   LazySignUpProtectCheck,
   LazySignUpSSOCallback,
   LazySignUpStart,
@@ -97,7 +98,7 @@ function SignInRoutes(): JSX.Element {
             {/* No canActivate guard — same resolution race as the sign-in
                 protect-check route above; the card owns its own routing. */}
             <Route path='protect-check'>
-              <LazySignUpProtectCheck />
+              <LazySignUpProtectCheck oauthCallbackParams={buildCombinedFlowOAuthCallbackParams(signUpContext)} />
             </Route>
             <Route
               path='verify-email-address'
@@ -112,12 +113,13 @@ function SignInRoutes(): JSX.Element {
               <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <LazySignUpSSOCallback {...buildSignUpOAuthCallbackParams(signUpContext)} />
+              <LazySignUpSSOCallback {...buildCombinedFlowOAuthCallbackParams(signUpContext)} />
             </Route>
             <Route path='verify'>
               <SignUpEmailLinkFlowComplete
                 redirectUrlComplete={signUpContext.afterSignUpUrl}
                 ssoCallbackUrl={signUpContext.ssoCallbackUrl}
+                oidcPrompt={signUpContext.oidcPrompt}
                 verifyEmailPath='../verify-email-address'
                 verifyPhonePath='../verify-phone-number'
                 continuePath='../continue'
@@ -149,6 +151,9 @@ function SignInRoutes(): JSX.Element {
             <Route path='tasks'>
               <LazySessionTasks redirectUrlComplete={signInContext.afterSignUpUrl} />
             </Route>
+            <Route path='enterprise-connections'>
+              <LazySignUpEnterpriseConnections />
+            </Route>
             <Route index>
               <LazySignUpStart />
             </Route>
@@ -177,6 +182,7 @@ function SignInRoot() {
     componentName: 'SignUp',
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
+    oidcPrompt: signInContext.oidcPrompt,
     forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
     signInUrl: signInContext.signInUrl,

@@ -50,4 +50,4 @@ You must enable the following host permissions in your `manifest.json` file. Thi
 - Please make sure to include `/*` at the end of each `host_permission`. Feel free to later scope this down, if your usage sees fit.
 - The `YOUR_PRODUCTION_APP_DOMAIN` and `YOUR_CLERK_PRODUCTION_FRONTEND_API` are only required when you're ready to go to production.
 
-Your Frontend API URLs can be found in [Clerk Dashboard](https://dashboard.clerk.com/last-active?path=api-keys) under the **Show API URLs** option.
+Your Frontend API URLs can be found in [Clerk Dashboard](https://dashboard.clerk.com/~/api-keys) under the **Show API URLs** option.

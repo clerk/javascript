@@ -1,10 +1,12 @@
 import { createClerkClient } from '@clerk/backend';
 import { expect, test } from '@playwright/test';
 
+import { environmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
-import { instanceKeys } from '../presets/envs';
+import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import { withRetry } from '../testUtils/retryableClerkClient';
 import { createUserService } from '../testUtils/usersService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
@@ -15,8 +17,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     let regularFakeUser: FakeUser;
     let fakeUserForOAuth: FakeUser;
 
-    test.beforeEach(() => {
-      const u = createTestUtils({ app });
+    test.beforeEach(async () => {
+      const u = await createTestUtils({ app });
       regularFakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -30,30 +32,30 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await u.services.organizations.deleteAll();
       await regularFakeUser.deleteIfExists();
 
       // Delete user from OAuth provider instance
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       await users.deleteIfExists({ email: fakeUserForOAuth.email });
 
       await app.teardown();
     });
 
     test.afterEach(async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.signOut();
       await u.page.context().clearCookies();
     });
 
     test('navigate to task on after sign-up', async ({ page, context }) => {
       // Performs sign-up
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signUp.goTo();
       await u.po.signUp.signUpWithEmailAndPassword({
         email: regularFakeUser.email,
@@ -77,7 +79,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test('with sso, navigate to task on after sign-up', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
+      const providerKeys = await resolveInstanceKeys('oauth-provider');
+      await createTestUtils({
+        app: {
+          ...app,
+          env: environmentConfig()
+            .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', providerKeys.pk)
+            .setEnvVariable('private', 'CLERK_SECRET_KEY', providerKeys.sk),
+        },
+        page,
+        context,
+      });
 
       await u.po.signUp.goTo();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
@@ -88,10 +101,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signUp.waitForMounted();
       await u.po.signUp.setEmailAddress(fakeUserForOAuth.email);
       await u.po.signUp.continue();
-      await u.po.signUp.enterTestOtpCode();
+      const [callback] = await Promise.all([
+        page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+        u.po.signUp.enterTestOtpCode(),
+      ]);
+      expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
 
       // Resolves task
-      await u.po.signUp.waitForMounted();
+      await page.waitForURL(/tasks/);
       const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
         slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-sso',
       });

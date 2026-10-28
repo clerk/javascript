@@ -8,12 +8,13 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { AlternativeMethodsMode } from './AlternativeMethods';
 import { AlternativeMethods } from './AlternativeMethods';
-import { hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
+import { getSSOBypassFactor, hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -23,6 +24,7 @@ import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
+import { SignInFactorOneSSOBypass } from './SignInFactorOneSSOBypass';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
@@ -78,6 +80,7 @@ function SignInFactorOneInternal(): JSX.Element {
   const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  const webAuthnSupported = useIsWebAuthnSupported();
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
@@ -88,7 +91,12 @@ function SignInFactorOneInternal(): JSX.Element {
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => {
-    const factor = determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
+    const factor = determineStartingSignInFactor(
+      availableFactors,
+      signIn.identifier,
+      preferredSignInStrategy,
+      webAuthnSupported,
+    );
     if (
       factor?.strategy === 'phone_code' &&
       !!firstFactorVerification.channel &&
@@ -108,6 +116,10 @@ function SignInFactorOneInternal(): JSX.Element {
     filterOutFactor: currentFactor,
     supportedFirstFactors,
   });
+
+  // Frozen on mount: client-piggybacking may drop the field, which would otherwise unmount the
+  // fallback screens mid-flow.
+  const ssoBypassFactor = React.useRef(getSSOBypassFactor(signIn)).current;
 
   const resetPasswordFactor = useResetPasswordFactor();
   const resetPasswordIntent = router.queryParams[SIGN_IN_RESET_PASSWORD_INTENT_PARAM] === 'true';
@@ -161,6 +173,10 @@ function SignInFactorOneInternal(): JSX.Element {
       prevCurrentFactor: prev.currentFactor,
     }));
   };
+
+  if (ssoBypassFactor) {
+    return <SignInFactorOneSSOBypass bypassFactor={ssoBypassFactor} />;
+  }
 
   /**
    * Prompt to choose between a list of enterprise connections as supported first factors

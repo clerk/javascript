@@ -51,6 +51,7 @@ export interface SignInResource extends ClerkResource {
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
+  ssoBypassFirstFactors: SignInFirstFactor[] | null;
   clientTrustState?: ClientTrustState;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
@@ -65,6 +66,7 @@ export interface SignInResource extends ClerkResource {
    * upgrading the SDK alone does not enable it.
    */
   protectCheck: ProtectCheckResource | null;
+  timezone: string | null;
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 
@@ -130,8 +132,10 @@ export interface SignInJSON extends ClerkResourceJSON {
   user_data: UserDataJSON;
   supported_first_factors: SignInFirstFactorJSON[];
   supported_second_factors: SignInSecondFactorJSON[];
+  sso_bypass_first_factors?: SignInFirstFactorJSON[];
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;
   protect_check?: ProtectCheckJSON | null;
+  timezone: string | null;
 }

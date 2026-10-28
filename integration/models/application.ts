@@ -66,6 +66,7 @@ export const application = (
   const stdoutFilePath = path.resolve(appDirPath, `e2e.${now}.log`);
   const stderrFilePath = path.resolve(appDirPath, `e2e.${now}.err.log`);
   let buildOutput = '';
+  let devOutput = '';
   let serveOutput = '';
 
   const self = {
@@ -79,6 +80,7 @@ export const application = (
       return state.env;
     },
     withEnv: async (env: EnvironmentConfig) => {
+      await env.resolve();
       state.env = env;
       return envWriter(appDirPath, env);
     },
@@ -133,7 +135,12 @@ export const application = (
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
-        log: opts.detached ? undefined : log,
+        log: opts.detached
+          ? undefined
+          : (msg: string) => {
+              devOutput += `\n${msg}`;
+              log(msg);
+            },
       });
 
       const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
@@ -198,6 +205,9 @@ export const application = (
     },
     get buildOutput() {
       return buildOutput;
+    },
+    get devOutput() {
+      return devOutput;
     },
     get serveOutput() {
       return serveOutput;

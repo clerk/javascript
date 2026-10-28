@@ -2,7 +2,7 @@ import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
 import { VirtualRouter } from '@/ui/router';
 
 import { OrganizationProfile } from '..';
@@ -394,6 +394,32 @@ describe('OrganizationProfile', () => {
   });
 
   describe('API Keys visibility', () => {
+    it.each([
+      { permissions: [], visible: false },
+      { permissions: ['org:sys_memberships:read'], visible: false },
+      { permissions: ['org:sys_api_keys:read'], visible: true },
+      { permissions: ['org:sys_api_keys:manage'], visible: true },
+      { permissions: ['org:sys_api_keys:read', 'org:sys_api_keys:manage'], visible: true },
+    ])('sets API Keys visibility to $visible for permissions $permissions', async ({ permissions, visible }) => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions }],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+
+      render(<OrganizationProfile />, { wrapper });
+
+      if (visible) {
+        expect(await screen.findByText('API keys')).toBeDefined();
+      } else {
+        await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+      }
+    });
+
     it('does not include API Keys when hide prop is true', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withOrganizations();
@@ -539,6 +565,27 @@ describe('OrganizationProfile', () => {
       await waitFor(() => expect(queryByText('Security')).toBeNull());
     });
 
+    it('includes Security when only Directory Sync is enabled for the org', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: false,
+              self_serve_directory_sync_enabled: true,
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('Security')).toBeDefined();
+    });
+
     it('does not include SSO when the user lacks the manage enterprise connections permission', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
@@ -594,7 +641,7 @@ describe('OrganizationProfile', () => {
       renderSecurityRoute(wrapper);
 
       expect(await screen.findByText(SECURITY_DESCRIPTION)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Configure' })).toBeInTheDocument();
     });
 
     it('blocks the security page on the guarded route when the user lacks the manage enterprise connections permission', async () => {
@@ -603,8 +650,12 @@ describe('OrganizationProfile', () => {
 
       renderSecurityRoute(wrapper);
 
-      await waitFor(() => expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument());
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
+      await act(() => new Promise<void>(resolve => setTimeout(resolve, 50)));
+
+      expect(fixtures.clerk.organization?.getEnterpriseConnections).not.toHaveBeenCalled();
+      expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
+      expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
     });
   });
 

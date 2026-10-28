@@ -251,6 +251,8 @@ export type CreateUserParams = {
   lastName?: string;
   /** The locale of the user in BCP-47 format (e.g., `'en-US'`, `'fr-FR'`). */
   locale?: string;
+  /** The timezone of the user. */
+  timezone?: string;
   /** When set to `true`, all password checks are skipped. It is recommended to use this method only when migrating plaintext passwords to Clerk. Upon migration the user base should be prompted to pick stronger password. */
   skipPasswordChecks?: boolean;
   /** When set to `true`, password is not required anymore when creating the user and can be omitted. This is useful when you are trying to create a user that doesn't have a password, in an instance that is using passwords. **You cannot use this flag if password is the only way for a user to sign into your instance.** */
@@ -274,7 +276,7 @@ export type CreateUserParams = {
   createdAt?: Date;
   /** When set to `true`, the user is created already banned and cannot sign in. */
   banned?: boolean;
-  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/secure/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
+  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/protect/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
   locked?: boolean;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
@@ -324,6 +326,8 @@ export type UpdateUserParams = {
   legalAcceptedAt?: Date;
   /** The locale of the user in BCP-47 format (e.g., `'en-US'`). */
   locale?: string;
+  /** The timezone of the user. */
+  timezone?: string;
   /** If `true`, the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;
   /** If `true`, the user can create Organizations with the Frontend API. */
@@ -785,7 +789,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured in the application's [**Rules**](https://dashboard.clerk.com/~/protect/rules) settings. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
+   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Protections**](https://dashboard.clerk.com/~/protect/protections) page under **Protect**. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
    * @param userId - The ID of the user to lock.
    */
   public async lockUser(userId: string) {
@@ -796,7 +800,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
+  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
    * @param userId - The ID of the user to unlock.
    */
   public async unlockUser(userId: string) {

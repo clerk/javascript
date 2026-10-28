@@ -11,10 +11,8 @@
     "lib": ["ES2023", "DOM"],
     "paths": {
       "@/*": ["./src/*"],
-      "@clerk/ui/mosaic": ["../ui/src/mosaic"],
-      "@clerk/ui/mosaic/*": ["../ui/src/mosaic/*"],
-      "@clerk/headless/hooks": ["../headless/src/hooks"],
-      "@clerk/headless/*": ["../headless/src/primitives/*"]
+      "@clerk/mosaic": ["../mosaic/src"],
+      "@clerk/mosaic/*": ["../mosaic/src/*"]
     },
     "plugins": [
       {
@@ -22,6 +20,7 @@
       }
     ],
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "incremental": true
   },

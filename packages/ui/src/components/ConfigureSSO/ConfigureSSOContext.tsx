@@ -18,6 +18,11 @@ export type { OrganizationDomainMutations };
  */
 export interface ConfigureSSOData {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
+  /** The scoped connection's domains, a draft while the scope is `new`. */
+  connectionDomains: string[];
+  setConnectionDomains: (domains: string[]) => Promise<void>;
+  /** Domains other connections of the organization authenticate, keyed to that connection's name. */
+  claimedDomains: Map<string, string>;
   /** Ref to the wizard's scrollable content container. */
   contentRef: React.RefObject<HTMLDivElement>;
   enterpriseConnectionMutations: EnterpriseConnectionMutations;
@@ -30,6 +35,9 @@ export interface ConfigureSSOData {
 
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
+  connectionDomains: string[];
+  setConnectionDomains: (domains: string[]) => Promise<void>;
+  claimedDomains: Map<string, string>;
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
@@ -44,6 +52,9 @@ ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
   enterpriseConnection,
+  connectionDomains,
+  setConnectionDomains,
+  claimedDomains,
   organizationEnterpriseConnection,
   testRuns,
   organizationDomains,
@@ -57,6 +68,9 @@ export const ConfigureSSOProvider = ({
     () => ({
       contentRef,
       enterpriseConnection,
+      connectionDomains,
+      setConnectionDomains,
+      claimedDomains,
       organizationEnterpriseConnection,
       testRuns,
       organizationDomains,
@@ -72,6 +86,9 @@ export const ConfigureSSOProvider = ({
       testRuns,
       organizationDomains,
       enterpriseConnection,
+      connectionDomains,
+      setConnectionDomains,
+      claimedDomains,
       onExit,
     ],
   );

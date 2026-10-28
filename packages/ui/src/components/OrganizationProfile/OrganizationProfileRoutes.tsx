@@ -6,6 +6,7 @@ import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
+import { useSecurityRouteAccess } from './useSecurityRouteAccess';
 
 const OrganizationBillingPage = lazy(() =>
   import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
@@ -62,9 +63,12 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
     isAPIKeysPageRoot,
     isSecurityPageRoot,
     shouldShowBilling,
-    shouldShowSelfServeSSO,
+    shouldShowSecurityPage,
     apiKeysProps,
   } = useOrganizationProfileContext();
+
+  const securityRouteAccess = useSecurityRouteAccess();
+  const allowSecurityRoute = securityRouteAccess.allowed || securityRouteAccess.pending;
 
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 
@@ -165,18 +169,16 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
             </Route>
           </Protect>
         )}
-        {shouldShowSelfServeSSO ? (
-          <Protect condition={has => has({ permission: 'org:sys_entconns:manage' })}>
-            <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
-              <Switch>
-                <Route index>
-                  <Suspense fallback={''}>
-                    <OrganizationSecurityPage contentRef={contentRef} />
-                  </Suspense>
-                </Route>
-              </Switch>
-            </Route>
-          </Protect>
+        {shouldShowSecurityPage && allowSecurityRoute ? (
+          <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <OrganizationSecurityPage contentRef={contentRef} />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
         ) : null}
       </Route>
     </Switch>

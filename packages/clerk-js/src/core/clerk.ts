@@ -16,6 +16,7 @@ import {
   disabledEmailAddressAttribute,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledSelfServeDirectorySyncFeature,
   disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   isSignedInAndSingleSessionModeEnabled,
@@ -29,6 +30,7 @@ import {
   CLERK_SYNCED_STATUS,
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
+import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -61,6 +63,7 @@ import type {
   __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_ProtectCheckModalProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
@@ -99,6 +102,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthDeviceVerificationProps,
   OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -106,6 +110,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   ProtectAssertion,
+  ProtectCheckFlow,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -193,6 +198,8 @@ import { createCheckoutInstance } from './modules/checkout/instance';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
+import { ProtectCheckGate } from './protectCheckGate';
+import type { SignIn, SignUp } from './resources/internal';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -325,6 +332,16 @@ export class Clerk implements ClerkInterface {
 
   get __internal_oauthTransport(): OAuthTransport | null {
     return this.#oauthTransport;
+  }
+
+  /**
+   * The verification-module load timeout asked for by the loader THIS browser was assigned, or
+   * undefined when it asked for nothing. Exposed because the assignment is a random draw per page
+   * load and cannot be recomputed from the environment config; callers fall back to the
+   * instance-wide value on that config, and then to the SDK default.
+   */
+  get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.#protect?.challengeLoadTimeoutMs;
   }
 
   public __internal_getCachedResources:
@@ -778,10 +795,16 @@ export class Clerk implements ClerkInterface {
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       this.#setTransitiveState();
 
-      if (this.#options.experimental?.persistClient ?? true) {
-        await this.client.removeSessions();
-      } else {
-        await this.client.destroy();
+      try {
+        if (this.#options.experimental?.persistClient ?? true) {
+          await this.client.removeSessions();
+        } else {
+          await this.client.destroy();
+        }
+      } catch (err) {
+        if (!isClerkRuntimeError(err) || err.code !== 'network_error') {
+          throw err;
+        }
       }
 
       await executeSignOut();
@@ -971,6 +994,56 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI
       ?.then(ui => ui.ensureMounted())
       .then(controls => controls.closeModal('enableOrganizationsPrompt'));
+  };
+
+  public __internal_resolvePendingProtectCheck = async (flow?: ProtectCheckFlow): Promise<void> => {
+    const client = this.client;
+    if (!client || client.signIn.status === 'complete' || client.signUp.status === 'complete') {
+      return;
+    }
+    const gate = ProtectCheckGate.getInstance();
+    const resolve = async (resource: SignInResource | SignUpResource) => {
+      try {
+        await gate.resolve(this, resource);
+      } catch (error) {
+        eventBus.emit(events.ResourceError, { resource: resource as SignIn | SignUp, error });
+        throw error;
+      }
+    };
+    if (flow !== 'signUp') {
+      await resolve(client.signIn);
+    }
+    if (flow !== 'signIn') {
+      await resolve(client.signUp);
+    }
+  };
+
+  public __internal_openProtectCheckModal = (
+    props: Pick<__internal_ProtectCheckModalProps, 'resource'>,
+  ): Promise<void> => {
+    if (!this.#clerkUI) {
+      return Promise.resolve();
+    }
+    return this.#clerkUI
+      .then(ui => ui.ensureMounted())
+      .then(controls => {
+        if (!controls.openProtectCheckModal) {
+          return;
+        }
+        return new Promise<void>((resolve, reject) => {
+          controls.openProtectCheckModal?.({
+            ...props,
+            onResolved: () => {
+              controls.closeModal('protectCheck');
+              resolve();
+            },
+            onFailed: error => {
+              controls.closeModal('protectCheck');
+              reject(error);
+            },
+          });
+        });
+      });
   };
 
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
@@ -1494,7 +1567,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
-    if (noUserExists(this)) {
+    if (this.user === null) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
           code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
@@ -1533,6 +1606,36 @@ export class Clerk implements ClerkInterface {
    */
   public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
     return this.unmountOAuthConsent(node);
+  };
+
+  public __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthDeviceVerificationComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'OAuthDeviceVerification';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'oauthDeviceVerification',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public __internal_unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   /**
@@ -1668,6 +1771,77 @@ export class Clerk implements ClerkInterface {
    * @hidden
    */
   public __internal_unmountConfigureSSO = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * Mount the Directory Sync onboarding component at the target element.
+   * Directory Sync provisions members through the organization's SSO connection,
+   * so it requires organizations to be enabled and the self-serve Directory Sync
+   * feature to be turned on for the instance.
+   *
+   * @param targetNode Target to mount the ConfigureDirectorySync component.
+   * @param props Configuration parameters.
+   * @hidden
+   */
+  public __internal_mountConfigureDirectorySync = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'ConfigureDirectorySync',
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
+      return;
+    }
+
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledSelfServeDirectorySyncFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureDirectorySyncComponentWhenDisabled, {
+          code: CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureDirectorySync';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureDirectorySync',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  /**
+   * Unmount the Directory Sync onboarding component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  public __internal_unmountConfigureDirectorySync = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
@@ -2546,11 +2720,14 @@ export class Clerk implements ClerkInterface {
     const signUpProtectCheckUrl =
       params.signUpProtectCheckUrl ||
       buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
+    const signInUrl = params.signInUrl || displayConfig.signInUrl;
+    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+    const enterpriseConnectionsUrl =
+      params.enterpriseConnectionsUrl ||
+      buildURL({ base: signUpUrl, hashPath: '/enterprise-connections' }, { stringify: true });
 
     const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
-    const signInUrl = params.signInUrl || displayConfig.signInUrl;
-    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
     const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({
@@ -2700,6 +2877,7 @@ export class Clerk implements ClerkInterface {
             verifyEmailAddressUrl,
             verifyPhoneNumberUrl,
             signUpProtectCheckUrl,
+            enterpriseConnectionsUrl,
             navigate,
           });
         default:
@@ -2762,6 +2940,7 @@ export class Clerk implements ClerkInterface {
         verifyEmailAddressUrl,
         verifyPhoneNumberUrl,
         signUpProtectCheckUrl,
+        enterpriseConnectionsUrl,
         navigate,
       });
     }
@@ -2771,6 +2950,15 @@ export class Clerk implements ClerkInterface {
         redirectUrl: this.buildAfterSignInUrl(),
       });
       return;
+    }
+
+    const userMustChooseEnterpriseConnection =
+      params.reloadResource !== 'signUp' &&
+      si.status === 'needs_first_factor' &&
+      hasMultipleEnterpriseConnections(signIn.supportedFirstFactors);
+
+    if (userMustChooseEnterpriseConnection) {
+      return navigateToFactorOne();
     }
 
     return navigateToSignIn();
@@ -3350,7 +3538,11 @@ export class Clerk implements ClerkInterface {
         const initEnvironmentPromise = Environment.getInstance()
           .fetch({ touch: shouldTouchEnv })
           .then(res => this.updateEnvironment(res))
-          .catch(() => {
+          .catch(err => {
+            if (isError(err, 'dev_browser_unauthenticated')) {
+              throw err;
+            }
+
             ++initializationDegradedCounter;
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
               CLERK_ENVIRONMENT_STORAGE_ENTRY,
@@ -3412,7 +3604,11 @@ export class Clerk implements ClerkInterface {
             });
         };
 
-        const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        const [environmentResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        if (environmentResult.status === 'rejected') {
+          throw environmentResult.reason;
+        }
+
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
@@ -3468,7 +3664,10 @@ export class Clerk implements ClerkInterface {
         Client.getOrCreateInstance().fetch({ fetchMaxTries }),
       ]);
     } catch (err) {
-      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+      const isUnavailable =
+        (isClerkRuntimeError(err) && err.code === 'network_error') ||
+        (isClerkAPIResponseError(err) && err.status >= 500);
+      if (isUnavailable && this.shouldFallbackToCachedResources()) {
         const cachedResources = await this.__internal_getCachedResources?.();
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
@@ -3527,7 +3726,17 @@ export class Clerk implements ClerkInterface {
       this.#touchThrottledUntil = Date.now() + 5_000;
 
       if (this.#options.touchSession) {
-        void this.#touchCurrentSession(this.session, 'focus');
+        // Even if touch fails, we're still in a generally good state that can recover.
+        // There are some caveats and edge cases, like if you reload the tab after a failed
+        // touch in a multi-tab scenario, you might get the last active user/org that was
+        // recorded by the other tab, but that's not catastrophic.
+        // We were previously not swallowing errors here, which led to unnecessary uncaught
+        // error logs in the browser console and noise in error tracking tools.
+        // This is a POST and does not currently retry, we could reconsider that if we wanted
+        // to, but probably only leads to unnecessary complexity for little gain.
+        this.#touchCurrentSession(this.session, 'focus').catch(error => {
+          debugLogger.warn('Session touch on page focus failed', { error }, 'clerk');
+        });
       }
     });
 

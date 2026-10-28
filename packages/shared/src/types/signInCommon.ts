@@ -28,6 +28,7 @@ import type {
   ResetPasswordPhoneCodeFactorConfig,
   TOTPAttempt,
   TOTPFactor,
+  TrustedDeviceAttempt,
   Web3Attempt,
   Web3SignatureConfig,
   Web3SignatureFactor,
@@ -53,6 +54,7 @@ import type {
   ResetPasswordPhoneCodeStrategy,
   TicketStrategy,
   TOTPStrategy,
+  TrustedDeviceStrategy,
   Web3Strategy,
 } from './strategies';
 import type { StartEmailLinkFlowParams } from './verification';
@@ -84,7 +86,13 @@ export type SignInFirstFactor =
   | OauthFactor
   | EnterpriseSSOFactor;
 
-export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailCodeFactor | EmailLinkFactor;
+export type SignInSecondFactor =
+  | PhoneCodeFactor
+  | TOTPFactor
+  | BackupCodeFactor
+  | EmailCodeFactor
+  | EmailLinkFactor
+  | PasskeyFactor;
 
 export interface UserData {
   firstName?: string;
@@ -113,11 +121,21 @@ export type AttemptFirstFactorParams =
   | PasswordAttempt
   | Web3Attempt
   | ResetPasswordPhoneCodeAttempt
-  | ResetPasswordEmailCodeAttempt;
+  | ResetPasswordEmailCodeAttempt
+  | TrustedDeviceAttempt;
 
-export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig | EmailLinkConfig;
+export type PrepareSecondFactorParams =
+  | PhoneCodeSecondFactorConfig
+  | EmailCodeSecondFactorConfig
+  | EmailLinkConfig
+  | PassKeyConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt | EmailCodeAttempt;
+export type AttemptSecondFactorParams =
+  | PhoneCodeAttempt
+  | TOTPAttempt
+  | BackupCodeAttempt
+  | EmailCodeAttempt
+  | PasskeyAttempt;
 
 export type SignInCreateParams = (
   | {
@@ -127,6 +145,10 @@ export type SignInCreateParams = (
       identifier?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      /**
+       * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+       */
+      slackTeamIdHint?: string;
     }
   | {
       strategy: TicketStrategy;
@@ -146,6 +168,13 @@ export type SignInCreateParams = (
       identifier: string;
     }
   | { strategy: PasskeyStrategy }
+  | {
+      /**
+       * @experimental
+       */
+      strategy: TrustedDeviceStrategy;
+      trustedDeviceId: string;
+    }
   | {
       strategy:
         | PhoneCodeStrategy
@@ -169,6 +198,10 @@ export type SignInCreateParams = (
 ) & {
   transfer?: boolean;
   signUpIfMissing?: boolean;
+  /**
+   * An IANA timezone for this sign-in. Defaults to the browser's timezone when omitted, if available.
+   */
+  timezone?: string;
 };
 
 export type ResetPasswordParams = {
@@ -177,6 +210,16 @@ export type ResetPasswordParams = {
 };
 
 export type AuthenticateWithPasskeyParams = {
+  /**
+   * The passkey flow to use when the passkey is the FIRST factor:
+   * `'autofill'` (conditional UI) or `'discoverable'` both create a new
+   * sign-in and identify the user from the passkey itself, discarding any
+   * in-progress sign-in.
+   *
+   * Omit it to complete the second factor of a sign-in in the
+   * `needs_second_factor` (or `needs_client_trust`) status that offers
+   * `passkey` among its supported second factors.
+   */
   flow?: 'autofill' | 'discoverable';
 };
 
@@ -197,7 +240,8 @@ export type SignInStrategy =
   | TOTPStrategy
   | BackupCodeStrategy
   | OAuthStrategy
-  | EnterpriseSSOStrategy;
+  | EnterpriseSSOStrategy
+  | TrustedDeviceStrategy;
 
 export interface SignInAuthenticateWithSolanaParams {
   walletName: string;

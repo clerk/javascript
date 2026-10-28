@@ -1,13 +1,31 @@
 import type { JwtPayload } from '@clerk/shared/types';
 
-import type { IdPOAuthAccessTokenJSON } from './JSON';
+import type { IdPOAuthAccessTokenActorJSON, IdPOAuthAccessTokenJSON } from './JSON';
 
 type OAuthJwtPayload = JwtPayload & {
+  aud?: string | string[];
   jti?: string;
   client_id?: string;
   scope?: string;
   scp?: string[];
+  act?: unknown;
 };
+
+function toActor(value: unknown, nestedLevels: number): IdPOAuthAccessTokenActorJSON | undefined {
+  if (typeof value !== 'object' || value === null) {
+    return undefined;
+  }
+  const { iss, sub, act } = value as Record<string, unknown>;
+  if (typeof sub !== 'string') {
+    return undefined;
+  }
+  const nested = nestedLevels > 0 ? toActor(act, nestedLevels - 1) : undefined;
+  return {
+    ...(typeof iss === 'string' ? { iss } : {}),
+    sub,
+    ...(nested ? { act: nested } : {}),
+  };
+}
 
 export class IdPOAuthAccessToken {
   constructor(
@@ -19,12 +37,16 @@ export class IdPOAuthAccessToken {
     readonly revoked: boolean,
     readonly revocationReason: string | null,
     readonly expired: boolean,
-    /** The Unix timestamp (in milliseconds) when the access token expires. */
+    /** The Unix timestamp (in seconds) when the access token expires. */
     readonly expiration: number | null,
-    /** The Unix timestamp (in milliseconds) when the access token was created. */
+    /** The Unix timestamp (in seconds) when the access token was created. */
     readonly createdAt: number,
-    /** The Unix timestamp (in milliseconds) when the access token was last updated. */
+    /** The Unix timestamp (in seconds) when the access token was last updated. */
     readonly updatedAt: number,
+    /** The intended audience for the access token. */
+    readonly aud?: string[],
+    /** The actor chain of a token issued by an OAuth 2.0 Token Exchange (RFC 8693 section 4.1). */
+    readonly act?: IdPOAuthAccessTokenActorJSON,
   ) {}
 
   static fromJSON(data: IdPOAuthAccessTokenJSON) {
@@ -40,12 +62,15 @@ export class IdPOAuthAccessToken {
       data.expiration,
       data.created_at,
       data.updated_at,
+      data.aud,
+      toActor(data.act, 1),
     );
   }
 
   /**
    * Creates an IdPOAuthAccessToken from a JWT payload.
    * Maps standard JWT claims and OAuth-specific fields to token properties.
+   * The raw JWT `aud` claim can be a string, string[], or undefined. It is normalized to string[].
    */
   static fromJwtPayload(payload: JwtPayload, clockSkewInMs = 5000): IdPOAuthAccessToken {
     const oauthPayload = payload as OAuthJwtPayload;
@@ -63,6 +88,8 @@ export class IdPOAuthAccessToken {
       payload.exp * 1000, // milliseconds: expiration, converted from JWT exp claim
       payload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
       payload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
+      oauthPayload.aud === undefined ? undefined : [oauthPayload.aud].flat(),
+      toActor(oauthPayload.act, 1),
     );
   }
 }

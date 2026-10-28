@@ -1,0 +1,799 @@
+import * as stylex from '@stylexjs/stylex';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { Dialog } from '../dialog';
+import { Flow } from '../flow';
+import { Card } from './card';
+
+const compactCard = '@container card (max-width: 20rem)' as const;
+
+const callerStyles = stylex.create({
+  root: { width: '20rem' },
+  header: { textAlign: 'right' },
+  content: { paddingInline: 0 },
+  footer: { paddingBlockEnd: 0 },
+});
+
+const responsiveLayout = stylex.create({
+  root: {
+    containerName: 'card',
+    containerType: 'inline-size',
+  },
+  footer: {
+    display: { [compactCard]: 'grid', default: 'flex' },
+    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
+  },
+});
+
+const restores: Array<() => void> = [];
+
+function stubPrototype(target: object, name: string, descriptor: PropertyDescriptor) {
+  const original = Object.getOwnPropertyDescriptor(target, name);
+  Object.defineProperty(target, name, { configurable: true, ...descriptor });
+  restores.push(() => {
+    if (original) {
+      Object.defineProperty(target, name, original);
+    } else {
+      Reflect.deleteProperty(target, name);
+    }
+  });
+}
+
+function StepCard({ title, description }: { title: string; description: string }) {
+  return (
+    <Card.Root renderBranding={false}>
+      <Card.Header>
+        <Card.Title>{title}</Card.Title>
+        <Card.Description>{description}</Card.Description>
+      </Card.Header>
+    </Card.Root>
+  );
+}
+
+function SteppedDialog({ step }: { step: string }) {
+  return (
+    <Dialog.Root defaultOpen>
+      <Dialog.Popup>
+        <Flow.Root
+          value={step}
+          state={null}
+        >
+          {() => (
+            <>
+              <Flow.Step ids={['create']}>
+                <StepCard
+                  title='Add new API key'
+                  description='Name the key.'
+                />
+              </Flow.Step>
+              <Flow.Step ids={['copy']}>
+                <StepCard
+                  title='Copy your API key'
+                  description='You will not see it again.'
+                />
+              </Flow.Step>
+            </>
+          )}
+        </Flow.Root>
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+function NestedSteppedDialog({ step }: { step: string }) {
+  return (
+    <Dialog.Root defaultOpen>
+      <Dialog.Popup>
+        <Flow.Root
+          value={step}
+          state={null}
+        >
+          {() => (
+            <>
+              <Flow.Step ids={['sms']}>
+                <Flow.Root
+                  value='phone'
+                  state={null}
+                >
+                  {() => (
+                    <Flow.Step ids={['phone']}>
+                      <StepCard
+                        title='Set up SMS verification'
+                        description='Enter your phone number.'
+                      />
+                    </Flow.Step>
+                  )}
+                </Flow.Root>
+              </Flow.Step>
+              <Flow.Step ids={['backup']}>
+                <StepCard
+                  title='Save your backup codes'
+                  description='Store them somewhere safe.'
+                />
+              </Flow.Step>
+            </>
+          )}
+        </Flow.Root>
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+function holdExitAnimations() {
+  let finish = () => undefined as void;
+  const finished = new Promise<void>(resolve => {
+    finish = resolve;
+  });
+  const getAnimations = vi.fn(() => [{ finished }]);
+  stubPrototype(Element.prototype, 'getAnimations', { value: getAnimations });
+  return async () => {
+    getAnimations.mockReturnValue([]);
+    await act(async () => {
+      finish();
+      await finished;
+    });
+  };
+}
+
+function expectSingleOwner(popup: HTMLElement) {
+  for (const attribute of ['aria-labelledby', 'aria-describedby']) {
+    const id = popup.getAttribute(attribute);
+    expect(id).toBeTruthy();
+    expect(document.querySelectorAll(`[id="${id}"]`)).toHaveLength(1);
+  }
+}
+
+describe('Mosaic Card', () => {
+  afterEach(() => {
+    restores.splice(0).forEach(restore => restore());
+  });
+
+  it('renders each compound slot with its stable class', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Header data-testid='header'>Header</Card.Header>
+        <Card.Content data-testid='content'>Content</Card.Content>
+        <Card.Footer data-testid='footer'>Footer</Card.Footer>
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveClass('cl-card-root');
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'card');
+    expect(screen.getByTestId('header')).toHaveClass('cl-card-header');
+    expect(screen.getByTestId('content')).toHaveClass('cl-card-content');
+    expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'card');
+  });
+
+  it('uses grid to stack the footer only when its card container is compact', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Footer data-testid='footer'>Footer</Card.Footer>
+      </Card.Root>,
+    );
+
+    const atoms = (style: stylex.StyleXStyles) =>
+      (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
+
+    expect(screen.getByTestId('root')).toHaveClass(...atoms(responsiveLayout.root));
+    expect(screen.getByTestId('footer')).toHaveClass(...atoms(responsiveLayout.footer));
+  });
+
+  it('reflects flush elevation on the root and footer', () => {
+    render(
+      <Card.Root
+        elevation='flush'
+        data-testid='root'
+      >
+        <Card.Footer data-testid='footer' />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'flush');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'flush');
+  });
+
+  it('reflects overlay elevation on the root and footer', () => {
+    render(
+      <Card.Root
+        elevation='overlay'
+        data-testid='root'
+      >
+        <Card.Footer data-testid='footer' />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'overlay');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
+  });
+
+  it('reflects the size on the root', () => {
+    render(
+      <>
+        <Card.Root data-testid='md' />
+        <Card.Root
+          size='lg'
+          data-testid='lg'
+        />
+      </>,
+    );
+
+    expect(screen.getByTestId('md')).toHaveAttribute('data-size', 'md');
+    expect(screen.getByTestId('lg')).toHaveAttribute('data-size', 'lg');
+  });
+
+  it('composes caller xstyle onto every slot', () => {
+    render(
+      <Card.Root
+        xstyle={callerStyles.root}
+        data-testid='root'
+      >
+        <Card.Header
+          xstyle={callerStyles.header}
+          data-testid='header'
+        />
+        <Card.Content
+          xstyle={callerStyles.content}
+          data-testid='content'
+        />
+        <Card.Footer
+          xstyle={callerStyles.footer}
+          data-testid='footer'
+        />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveClass('cl-card-root', stylex.props(callerStyles.root).className ?? '');
+    expect(screen.getByTestId('header')).toHaveClass(
+      'cl-card-header',
+      stylex.props(callerStyles.header).className ?? '',
+    );
+    expect(screen.getByTestId('content')).toHaveClass(
+      'cl-card-content',
+      stylex.props(callerStyles.content).className ?? '',
+    );
+    expect(screen.getByTestId('footer')).toHaveClass(
+      'cl-card-footer',
+      stylex.props(callerStyles.footer).className ?? '',
+    );
+  });
+
+  it('merges the className and style a render source hands a slot', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Header render={<Card.Content data-testid='header' />} />
+      </Card.Root>,
+    );
+
+    // `Card.Header` clones its merged class onto the `Card.Content` it renders; the content
+    // keeps its own slot class rather than being overwritten by the incoming one.
+    expect(screen.getByTestId('header')).toHaveClass('cl-card-header', 'cl-card-content');
+  });
+
+  it('forwards refs and arbitrary props from compound slots', () => {
+    const rootRef = React.createRef<HTMLDivElement>();
+    const headerRef = React.createRef<HTMLDivElement>();
+    const contentRef = React.createRef<HTMLDivElement>();
+    const footerRef = React.createRef<HTMLDivElement>();
+
+    render(
+      <Card.Root
+        ref={rootRef}
+        aria-label='Card'
+      >
+        <Card.Header ref={headerRef} />
+        <Card.Content ref={contentRef} />
+        <Card.Footer ref={footerRef} />
+      </Card.Root>,
+    );
+
+    expect(rootRef.current).toBe(screen.getByLabelText('Card'));
+    expect(headerRef.current).toHaveClass('cl-card-header');
+    expect(contentRef.current).toHaveClass('cl-card-content');
+    expect(footerRef.current).toHaveClass('cl-card-footer');
+  });
+
+  // The logo names the link, so the mark is what a screen reader reaches rather than an unnamed link.
+  it('can be the form itself, holding a body of more than one thing', () => {
+    const onSubmit = vi.fn(event => event.preventDefault());
+    render(
+      <Card.Root>
+        <Card.Header>Header</Card.Header>
+        <Card.Content
+          data-testid='content'
+          render={
+            <form
+              id='profile'
+              onSubmit={onSubmit}
+            />
+          }
+        >
+          <p>First</p>
+          <p>Second</p>
+        </Card.Content>
+      </Card.Root>,
+    );
+
+    const content = screen.getByTestId('content');
+    expect(content.tagName).toBe('FORM');
+    expect(content).toHaveClass('cl-card-content');
+    expect(content).toHaveTextContent('First');
+    expect(content).toHaveTextContent('Second');
+  });
+
+  it('keeps the banner slot in the document while it holds no message', () => {
+    const { container } = render(
+      <Card.Root>
+        <Card.Banner role='alert'>{undefined}</Card.Banner>
+      </Card.Root>,
+    );
+    const slot = screen.getByRole('alert');
+    expect(slot).toHaveClass('cl-card-banner');
+    expect(slot).not.toHaveAttribute('data-open');
+    expect(slot.textContent).toBe('');
+    expect(container.querySelector('.cl-banner-root')).toBeNull();
+  });
+
+  it('expands a banner into the slot while it holds a message', async () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Title</Card.Title>
+        </Card.Header>
+        <Card.Banner
+          role='alert'
+          color='negative'
+        >
+          Something went wrong.
+        </Card.Banner>
+        <Card.Content>Body</Card.Content>
+      </Card.Root>,
+    );
+    const slot = screen.getByRole('alert');
+    expect(slot).toHaveAttribute('data-open');
+    expect(slot).not.toHaveAttribute('data-starting-style');
+    expect(slot.previousElementSibling).toHaveClass('cl-card-header');
+    expect(slot.nextElementSibling).toHaveClass('cl-card-content');
+    const banner = slot.querySelector('.cl-banner-root');
+    expect(banner).toHaveAttribute('data-color', 'negative');
+    expect(banner).not.toHaveAttribute('data-starting-style');
+    expect(screen.getByText('Something went wrong.')).toHaveClass('cl-banner-label');
+
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+    expect(slot).not.toHaveAttribute('data-starting-style');
+    expect(banner).not.toHaveAttribute('data-starting-style');
+    expect(banner).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('defaults the banner to the neutral color', () => {
+    render(
+      <Card.Root>
+        <Card.Banner>Heads up.</Card.Banner>
+      </Card.Root>,
+    );
+    expect(document.querySelector('.cl-banner-root')).toHaveAttribute('data-color', 'neutral');
+  });
+
+  it('holds the last message through the exit, then unmounts the banner', async () => {
+    let finish = () => undefined as void;
+    const finished = new Promise<void>(resolve => {
+      finish = resolve;
+    });
+    const getAnimations = vi.fn(() => [{ finished }]);
+    stubPrototype(Element.prototype, 'getAnimations', { value: getAnimations });
+
+    const { rerender } = render(
+      <Card.Root>
+        <Card.Banner role='alert'>Something went wrong.</Card.Banner>
+      </Card.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+
+    rerender(
+      <Card.Root>
+        <Card.Banner role='alert'>{null}</Card.Banner>
+      </Card.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    const slot = screen.getByRole('alert');
+    expect(slot).not.toHaveAttribute('data-open');
+    expect(slot).toHaveAttribute('data-ending-style');
+    const banner = slot.querySelector('.cl-banner-root');
+    expect(banner).toHaveAttribute('data-ending-style');
+    expect(banner).toHaveAttribute('aria-hidden', 'true');
+    expect(banner).toHaveTextContent('Something went wrong.');
+
+    getAnimations.mockReturnValue([]);
+    await act(async () => {
+      finish();
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    expect(slot.querySelector('.cl-banner-root')).toBeNull();
+    expect(slot).toBeInTheDocument();
+  });
+
+  it('signs the card with Clerk, in a tab of its own', () => {
+    render(
+      <Card.Root data-testid='root'>
+        <Card.Content>Content</Card.Content>
+      </Card.Root>,
+    );
+
+    // The mark closes the card out.
+    const branding = screen.getByTestId('root').lastElementChild;
+    expect(branding).toHaveTextContent('Secured by');
+
+    const logo = screen.getByRole('link', { name: 'Clerk' });
+    expect(branding).toContainElement(logo);
+    expect(logo).toHaveAttribute('href', 'https://go.clerk.com/components');
+    expect(logo).toHaveAttribute('target', '_blank');
+    expect(logo).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  // An instance that has paid the branding off carries none of it, so the caller reading
+  // `displayConfig.branded` turns the signature off rather than the card assuming it.
+  it('withholds the branding where the caller turns it off', () => {
+    render(
+      <Card.Root renderBranding={false}>
+        <Card.Content>Content</Card.Content>
+      </Card.Root>,
+    );
+
+    expect(screen.queryByText('Secured by')).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
+  });
+
+  it('renders the title and description slots', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title data-testid='title'>Review terms</Card.Title>
+          <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('title').tagName).toBe('H2');
+    expect(screen.getByTestId('title')).toHaveClass('cl-card-title');
+    expect(screen.getByTestId('description').tagName).toBe('P');
+    expect(screen.getByTestId('description')).toHaveClass('cl-card-description');
+  });
+
+  // Nothing above named the card, so the parts carry no borrowed id.
+  it('leaves the title and description unidentified outside a labelled surface', () => {
+    render(
+      <Card.Root>
+        <Card.Title data-testid='title'>Review terms</Card.Title>
+        <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('title')).not.toHaveAttribute('id');
+    expect(screen.getByTestId('description')).not.toHaveAttribute('id');
+  });
+
+  it('names and describes the dialog it is rendered inside', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title data-testid='title'>Review terms</Card.Title>
+              <Card.Description data-testid='description'>Accept before you continue.</Card.Description>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    const popup = screen.getByRole('dialog');
+    expect(popup).toHaveAttribute('aria-labelledby', screen.getByTestId('title').id);
+    expect(popup).toHaveAttribute('aria-describedby', screen.getByTestId('description').id);
+    expect(popup).toHaveAccessibleName('Review terms');
+    expect(popup).toHaveAccessibleDescription('Accept before you continue.');
+  });
+
+  // `Dialog.Root` spans the trigger as well as the popup, so only the popup may hand out its ids.
+  it('withholds the dialog ids from a card outside the popup', async () => {
+    const user = userEvent.setup();
+    render(
+      <Dialog.Root>
+        <Card.Root renderBranding={false}>
+          <Card.Title data-testid='outside-title'>Terms</Card.Title>
+        </Card.Root>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Popup>
+          <Card.Root
+            elevation='overlay'
+            renderBranding={false}
+          >
+            <Card.Header>
+              <Card.Title>Review terms</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.getByTestId('outside-title')).not.toHaveAttribute('id');
+
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Review terms');
+  });
+
+  it('keeps the dialog id over an explicit one, and stays named', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Title
+              id='custom-title'
+              data-testid='title'
+            >
+              Review terms
+            </Card.Title>
+            <Card.Description
+              id='custom-description'
+              data-testid='description'
+            >
+              Read them before you continue.
+            </Card.Description>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(screen.getByTestId('title')).not.toHaveAttribute('id', 'custom-title');
+    expect(screen.getByTestId('description')).not.toHaveAttribute('id', 'custom-description');
+    expect(dialog).toHaveAttribute('aria-labelledby', screen.getByTestId('title').id);
+    expect(dialog).toHaveAttribute('aria-describedby', screen.getByTestId('description').id);
+    expect(dialog).toHaveAccessibleName('Review terms');
+    expect(dialog).toHaveAccessibleDescription('Read them before you continue.');
+  });
+
+  it('takes an explicit id outside a dialog, where no surface claims one', () => {
+    render(
+      <Card.Root>
+        <Card.Title
+          id='custom-title'
+          data-testid='title'
+        >
+          Review terms
+        </Card.Title>
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('title')).toHaveAttribute('id', 'custom-title');
+  });
+
+  it('names the dialog after the entering step while the previous step exits', async () => {
+    const finishExit = holdExitAnimations();
+    const { rerender } = render(<SteppedDialog step='create' />);
+
+    rerender(<SteppedDialog step='copy' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(screen.getByText('Add new API key')).toBeInTheDocument();
+    expect(popup).toHaveAccessibleName('Copy your API key');
+    expect(popup).toHaveAccessibleDescription('You will not see it again.');
+    expectSingleOwner(popup);
+
+    await finishExit();
+    expect(screen.queryByText('Add new API key')).toBeNull();
+    expect(popup).toHaveAccessibleName('Copy your API key');
+  });
+
+  it('names the dialog after the entering step when the exiting step holds a nested flow', async () => {
+    const finishExit = holdExitAnimations();
+    const { rerender } = render(<NestedSteppedDialog step='sms' />);
+
+    rerender(<NestedSteppedDialog step='backup' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(screen.getByText('Set up SMS verification')).toBeInTheDocument();
+    expect(popup).toHaveAccessibleName('Save your backup codes');
+    expect(popup).toHaveAccessibleDescription('Store them somewhere safe.');
+    expectSingleOwner(popup);
+
+    await finishExit();
+  });
+
+  it('names the dialog after the returning step when it comes back mid-exit', async () => {
+    const finishExit = holdExitAnimations();
+    const { rerender } = render(<SteppedDialog step='create' />);
+
+    rerender(<SteppedDialog step='copy' />);
+    rerender(<SteppedDialog step='create' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(popup).toHaveAccessibleName('Add new API key');
+    expect(popup).toHaveAccessibleDescription('Name the key.');
+    expectSingleOwner(popup);
+
+    await finishExit();
+  });
+
+  it('names the dialog after the new step when nothing animates', () => {
+    const { rerender } = render(<SteppedDialog step='create' />);
+
+    rerender(<SteppedDialog step='copy' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(screen.queryByText('Add new API key')).toBeNull();
+    expect(popup).toHaveAccessibleName('Copy your API key');
+    expectSingleOwner(popup);
+  });
+
+  it('leaves the stacked dialog named by its own step while the one beneath it steps', async () => {
+    const finishExit = holdExitAnimations();
+    const outer = (step: string) => (
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <StepCard
+            title='Settings'
+            description='Manage the app.'
+          />
+          <SteppedDialog step={step} />
+        </Dialog.Popup>
+      </Dialog.Root>
+    );
+    const { rerender } = render(outer('create'));
+
+    rerender(outer('copy'));
+
+    const [settings, stepped] = screen.getAllByRole('dialog', { hidden: true });
+    expect(settings).toHaveAccessibleName('Settings');
+    expect(stepped).toHaveAccessibleName('Copy your API key');
+    expectSingleOwner(settings);
+    expectSingleOwner(stepped);
+
+    await finishExit();
+  });
+
+  it('leaves a card in a step outside a dialog unidentified', () => {
+    render(
+      <Flow.Root
+        value='create'
+        state={null}
+      >
+        {() => (
+          <Flow.Step ids={['create']}>
+            <Card.Root>
+              <Card.Title data-testid='title'>Add new API key</Card.Title>
+            </Card.Root>
+          </Flow.Step>
+        )}
+      </Flow.Root>,
+    );
+
+    expect(screen.getByTestId('title')).not.toHaveAttribute('id');
+  });
+
+  it('carries the dialog dismiss button in the header', async () => {
+    const user = userEvent.setup();
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header>
+              <Card.Title>Review terms</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    const close = screen.getByRole('button', { name: 'Close' });
+    // First in the DOM, so it takes the dialog's opening focus.
+    await waitFor(() => expect(close).toHaveFocus());
+
+    await user.click(close);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('carries a dismiss button inside a dialog, which is what it closes', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Account</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Account');
+  });
+
+  it('carries no dismiss button in a header outside a dialog', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Review terms</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+  });
+
+  it('supports custom elements through render on every slot', () => {
+    render(
+      <Card.Root render={props => <section {...props} />}>
+        <Card.Header render={props => <header {...props}>Header</header>} />
+        <Card.Title render={props => <h3 {...props}>Title</h3>} />
+        <Card.Description render={props => <span {...props}>Description</span>} />
+        <Card.Content render={props => <main {...props}>Content</main>} />
+        <Card.Footer render={props => <footer {...props}>Footer</footer>} />
+      </Card.Root>,
+    );
+
+    expect(screen.getByText('Header').tagName).toBe('HEADER');
+    expect(screen.getByText('Title').tagName).toBe('H3');
+    expect(screen.getByText('Description').tagName).toBe('SPAN');
+    expect(screen.getByText('Content').tagName).toBe('MAIN');
+    expect(screen.getByText('Footer').tagName).toBe('FOOTER');
+    expect(screen.getByText('Header').closest('section')).toHaveClass('cl-card-root');
+  });
+});
+
+describe('Card surface', () => {
+  // Written out rather than imported, so a drift from `card.styles.ts` fails here instead of passing silently.
+  const probe = stylex.create({
+    surface: { minWidth: 'var(--_cl-surface-min-width, auto)' },
+  });
+  const surfaceAtom = () =>
+    stylex
+      .props(probe.surface)
+      .className!.split(' ')
+      .filter(name => !name.includes('__'));
+
+  it('lets only the outermost card take what a sheet publishes', () => {
+    render(
+      <Card.Root data-testid='outer'>
+        <Card.Content>
+          <Card.Root data-testid='inner' />
+        </Card.Content>
+      </Card.Root>,
+    );
+
+    expect(Array.from(screen.getByTestId('outer').classList)).toEqual(expect.arrayContaining(surfaceAtom()));
+    expect(Array.from(screen.getByTestId('inner').classList)).not.toEqual(expect.arrayContaining(surfaceAtom()));
+  });
+
+  it("treats a dialog's card as its surface when the dialog opens from inside another card", () => {
+    render(
+      <Card.Root>
+        <Card.Content>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup>
+              <Card.Root data-testid='dialog-card'>
+                <Card.Header>
+                  <Card.Title>Add email</Card.Title>
+                </Card.Header>
+              </Card.Root>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </Card.Content>
+      </Card.Root>,
+    );
+
+    expect(Array.from(screen.getByTestId('dialog-card').classList)).toEqual(expect.arrayContaining(surfaceAtom()));
+  });
+});

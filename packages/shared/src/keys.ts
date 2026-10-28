@@ -1,4 +1,5 @@
 import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
+import { keySetupGuidance } from './errors/keySetupGuidance';
 import { isomorphicAtob } from './isomorphicAtob';
 import { isomorphicBtoa } from './isomorphicBtoa';
 import type { PublishableKey } from './types';
@@ -36,9 +37,11 @@ const PUBLISHABLE_FRONTEND_API_DEV_REGEX = /^(([a-z]+)-){2}([0-9]{1,2})\.clerk\.
  * @returns An unpadded base64-encoded publishable key with appropriate prefix (pk_live_ or pk_test_).
  */
 export function buildPublishableKey(frontendApi: string): string {
-  const isDevKey =
-    PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) ||
-    (frontendApi.startsWith('clerk.') && LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)));
+  const isLegacyDevKey =
+    frontendApi.startsWith('clerk.') &&
+    LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)) &&
+    !frontendApi.endsWith('.prod.lclclerk.com');
+  const isDevKey = PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) || isLegacyDevKey;
   const keyPrefix = isDevKey ? PUBLISHABLE_KEY_TEST_PREFIX : PUBLISHABLE_KEY_LIVE_PREFIX;
   return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`).replace(/=+$/, '')}`;
 }
@@ -98,14 +101,6 @@ function isValidDecodedPublishableKey(decoded: string): boolean {
   return withoutTrailing.includes('.');
 }
 
-const fatalKeyGuidance = `To create a Clerk application with valid keys, in your terminal run:
-
-  npx clerk@latest init
-
-It creates a Clerk application and writes keys to your .env file. Requires no Clerk account or login and the command is non-interactive.
-
-If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy them from https://dashboard.clerk.com/last-active?path=api-keys.`;
-
 export function parsePublishableKey(
   key: string | undefined,
   options: ParsePublishableKeyOptions & { fatal: true },
@@ -135,10 +130,12 @@ export function parsePublishableKey(
 
   if (!key || !isPublishableKey(key)) {
     if (options.fatal && !key) {
-      throw new Error(`Publishable key is missing. ${fatalKeyGuidance}`);
+      throw new Error(`Publishable key is missing.\n\n${keySetupGuidance}`);
     }
     if (options.fatal && !isPublishableKey(key)) {
-      throw new Error(`Publishable key not valid (expected format: pk_test_... or pk_live_...). ${fatalKeyGuidance}`);
+      throw new Error(
+        `Publishable key not valid (expected format: pk_test_... or pk_live_...).\n\n${keySetupGuidance}`,
+      );
     }
     return null;
   }
@@ -150,14 +147,14 @@ export function parsePublishableKey(
     decodedFrontendApi = isomorphicAtob(key.split('_')[2]);
   } catch {
     if (options.fatal) {
-      throw new Error(`Publishable key not valid: Failed to decode key. ${fatalKeyGuidance}`);
+      throw new Error(`Publishable key not valid: Failed to decode key.\n\n${keySetupGuidance}`);
     }
     return null;
   }
 
   if (!isValidDecodedPublishableKey(decodedFrontendApi)) {
     if (options.fatal) {
-      throw new Error(`Publishable key not valid: Decoded key has invalid format. ${fatalKeyGuidance}`);
+      throw new Error(`Publishable key not valid: Decoded key has invalid format.\n\n${keySetupGuidance}`);
     }
     return null;
   }
