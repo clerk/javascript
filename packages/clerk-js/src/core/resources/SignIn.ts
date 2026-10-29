@@ -346,11 +346,13 @@ export class SignIn extends BaseResource implements SignInResource {
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
     const { run, stop } = Poller();
+    let attempt = 0;
 
     const startEmailLinkFlow = async ({
       emailAddressId,
       redirectUrl,
     }: SignInStartEmailLinkFlowParams): Promise<SignInResource> => {
+      const current = ++attempt;
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
       }
@@ -372,6 +374,9 @@ export class SignIn extends BaseResource implements SignInResource {
       }
 
       return new Promise((resolve, reject) => {
+        if (current !== attempt) {
+          return;
+        }
         void run(() => {
           return this.reload()
             .then(res => {
@@ -388,7 +393,12 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     };
 
-    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+    const cancelEmailLinkFlow = () => {
+      attempt++;
+      stop();
+    };
+
+    return { startEmailLinkFlow, cancelEmailLinkFlow };
   };
 
   prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {

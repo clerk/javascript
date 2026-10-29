@@ -53,13 +53,18 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource> => {
     const { run, stop } = Poller();
+    let attempt = 0;
 
     const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
+      const current = ++attempt;
       await this.prepareVerification({
         strategy: 'email_link',
         redirectUrl: redirectUrl,
       });
       return new Promise((resolve, reject) => {
+        if (current !== attempt) {
+          return;
+        }
         void run(() => {
           return this.reload()
             .then(res => {
@@ -75,7 +80,12 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
         });
       });
     };
-    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+    const cancelEmailLinkFlow = () => {
+      attempt++;
+      stop();
+    };
+
+    return { startEmailLinkFlow, cancelEmailLinkFlow };
   };
 
   createEnterpriseSSOLinkFlow = (): CreateEnterpriseSSOLinkFlowReturn<
@@ -83,10 +93,12 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     EmailAddressResource
   > => {
     const { run, stop } = Poller();
+    let attempt = 0;
 
     const startEnterpriseSSOLinkFlow = async ({
       redirectUrl,
     }: StartEnterpriseSSOLinkFlowParams): Promise<EmailAddressResource> => {
+      const current = ++attempt;
       const response = await this.prepareVerification({
         strategy: 'enterprise_sso',
         redirectUrl,
@@ -95,6 +107,9 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
         throw Error('Unexpected: External verification redirect URL is missing');
       }
       return new Promise((resolve, reject) => {
+        if (current !== attempt) {
+          return;
+        }
         void run(() => {
           return this.reload()
             .then(res => {
@@ -110,7 +125,12 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
         });
       });
     };
-    return { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow: stop };
+    const cancelEnterpriseSSOLinkFlow = () => {
+      attempt++;
+      stop();
+    };
+
+    return { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow };
   };
 
   destroy = (): Promise<void> => this._baseDelete();

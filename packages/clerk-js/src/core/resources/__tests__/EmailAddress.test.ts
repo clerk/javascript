@@ -120,4 +120,60 @@ describe('EmailAddress', () => {
       await Promise.all([first, second]);
     });
   });
+  describe.each([
+    [
+      'createEmailLinkFlow',
+      (email: EmailAddress) => {
+        const { startEmailLinkFlow, cancelEmailLinkFlow } = email.createEmailLinkFlow();
+        return { start: () => startEmailLinkFlow({ redirectUrl: '/verify' }), cancel: cancelEmailLinkFlow };
+      },
+    ],
+    [
+      'createEnterpriseSSOLinkFlow',
+      (email: EmailAddress) => {
+        const { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow } = email.createEnterpriseSSOLinkFlow();
+        return {
+          start: () => startEnterpriseSSOLinkFlow({ redirectUrl: '/verify' }),
+          cancel: cancelEnterpriseSSOLinkFlow,
+        };
+      },
+    ],
+  ])('%s', (_, createFlow) => {
+    const emailJSON = {
+      id: 'email_123',
+      verification: { status: 'unverified', external_verification_redirect_url: 'https://idp.example.com/sso' },
+    };
+
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('does not poll when cancelled while the verification is being prepared', async () => {
+      const prepared = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValueOnce(prepared.promise).mockResolvedValue({ response: emailJSON });
+      BaseResource._fetch = mockFetch;
+      const flow = createFlow(new EmailAddress({ id: 'email_123' } as EmailAddressJSON, '/me/email_addresses'));
+
+      void flow.start();
+      flow.cancel();
+      prepared.resolve({ response: emailJSON });
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('polls once for a flow restarted while the cancelled start is still preparing', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({ response: emailJSON });
+      BaseResource._fetch = mockFetch;
+      const flow = createFlow(new EmailAddress({ id: 'email_123' } as EmailAddressJSON, '/me/email_addresses'));
+
+      void flow.start();
+      flow.cancel();
+      void flow.start();
+      await new Promise(resolve => setTimeout(resolve, 0));
+      flow.cancel();
+
+      expect(mockFetch.mock.calls.map(([request]) => request.method)).toEqual(['POST', 'GET']);
+    });
+  });
 });

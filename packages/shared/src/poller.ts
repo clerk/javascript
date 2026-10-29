@@ -23,22 +23,27 @@ export function Poller({ delayInMs }: PollerOptions = { delayInMs: 1000 }): Poll
   let stopped = false;
 
   const stop: PollerStop = () => {
-    if (timerId) {
+    if (timerId !== undefined) {
       workerTimers.clearTimeout(timerId);
       workerTimers.cleanup();
+      timerId = undefined;
     }
     stopped = true;
   };
 
   const run: PollerRun = async cb => {
     stopped = false;
+    await poll(cb);
+  };
+
+  const poll = async (cb: PollerCallback) => {
     await cb(stop);
     if (stopped) {
       return;
     }
 
     timerId = workerTimers.setTimeout(() => {
-      void run(cb);
+      void poll(cb);
     }, delayInMs) as any as number;
   };
 

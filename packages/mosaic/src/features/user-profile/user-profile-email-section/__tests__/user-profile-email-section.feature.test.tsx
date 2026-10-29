@@ -183,6 +183,23 @@ describe('the user profile email section', () => {
     expect(within(emailRow()).getByText('pending@example.com').parentElement).toHaveTextContent('Unverified');
   });
 
+  it('stops checking for the opened link once the link dialog is dismissed', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending], verifiesByLink));
+    const poll = holdRequests('get', '/v1/me/email_addresses/:id');
+
+    await manageEmail(actor, 'pending@example.com', 'Verify');
+    const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
+    await waitFor(() => expect(poll.requests).toHaveLength(1));
+    poll.release();
+    await act(() => new Promise(resolve => setTimeout(resolve, 100)));
+    await actor.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    await act(() => new Promise(resolve => setTimeout(resolve, 1500)));
+    expect(poll.requests).toHaveLength(1);
+  });
+
   it('sends the user to the identity provider for an address that matches an SSO connection, even when the instance verifies by link', async () => {
     const sso = fapiEmailAddress({
       id: 'idn_sso',

@@ -254,8 +254,10 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, SignUpResource> => {
     const { run, stop } = Poller();
+    let attempt = 0;
 
     const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<SignUpResource> => {
+      const current = ++attempt;
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
@@ -265,6 +267,9 @@ export class SignUp extends BaseResource implements SignUpResource {
       });
 
       return new Promise((resolve, reject) => {
+        if (current !== attempt) {
+          return;
+        }
         void run(() => {
           return this.reload()
             .then(res => {
@@ -282,7 +287,12 @@ export class SignUp extends BaseResource implements SignUpResource {
       });
     };
 
-    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+    const cancelEmailLinkFlow = () => {
+      attempt++;
+      stop();
+    };
+
+    return { startEmailLinkFlow, cancelEmailLinkFlow };
   };
 
   preparePhoneNumberVerification = (params?: PreparePhoneNumberVerificationParams): Promise<SignUpResource> => {

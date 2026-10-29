@@ -2665,3 +2665,47 @@ describe('SignUp Slack workspace hint requests', () => {
     expect(SignUp.clerk.__internal_environment?.reload).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('SignUp createEmailLinkFlow', () => {
+  const signUpJSON = {
+    client: null,
+    response: {
+      id: 'signup_123',
+      object: 'sign_up_attempt',
+      verifications: { email_address: { status: 'unverified' } },
+    },
+  };
+
+  afterEach(() => {
+    BaseResource._fetch = resourceFetch;
+    vi.clearAllMocks();
+  });
+
+  it('does not poll when cancelled while the link is being sent', async () => {
+    const prepared = createDeferredPromise<any>();
+    const mockFetch = vi.fn().mockReturnValueOnce(prepared.promise).mockResolvedValue(signUpJSON);
+    BaseResource._fetch = mockFetch;
+    const { startEmailLinkFlow, cancelEmailLinkFlow } = new SignUp({ id: 'signup_123' } as any).createEmailLinkFlow();
+
+    void startEmailLinkFlow({ redirectUrl: '/verify' });
+    cancelEmailLinkFlow();
+    prepared.resolve(signUpJSON);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('polls once for a flow restarted while the cancelled start is still sending the link', async () => {
+    const mockFetch = vi.fn().mockResolvedValue(signUpJSON);
+    BaseResource._fetch = mockFetch;
+    const { startEmailLinkFlow, cancelEmailLinkFlow } = new SignUp({ id: 'signup_123' } as any).createEmailLinkFlow();
+
+    void startEmailLinkFlow({ redirectUrl: '/verify' });
+    cancelEmailLinkFlow();
+    void startEmailLinkFlow({ redirectUrl: '/verify' });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    cancelEmailLinkFlow();
+
+    expect(mockFetch.mock.calls.map(([request]) => request.method)).toEqual(['POST', 'GET']);
+  });
+});
