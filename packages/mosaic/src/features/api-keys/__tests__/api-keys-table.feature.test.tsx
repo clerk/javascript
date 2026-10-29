@@ -484,6 +484,23 @@ describe('APIKeysTable', () => {
       expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
     });
 
+    it('keeps the secret open on Escape while a retried copy is pending', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+      await within(dialog).findByRole('textbox', { name: 'API key' });
+      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(new Error('blocked'));
+      await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
+      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(() => new Promise<void>(() => undefined));
+
+      await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
+    });
+
     it('closes the secret on Escape after a failed copy', async () => {
       const { user } = await renderTable();
       const dialog = await openCreate(user);
