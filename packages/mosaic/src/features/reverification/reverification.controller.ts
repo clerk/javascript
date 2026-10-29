@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
-import { useMessages } from '../../localization';
+import type { ErrorDescription } from '../../localization';
+import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
@@ -13,7 +14,7 @@ import type {
   ReverificationStep,
   ReverificationViewProps,
 } from './reverification.types';
-import { errorDetail, needsPrepare, otpChannelFor } from './reverification.utils';
+import { errorDescription, needsPrepare, otpChannelFor, serverErrorDetail } from './reverification.utils';
 
 type ReverificationControllerState =
   | { status: 'idle'; onCancel?: undefined }
@@ -35,9 +36,7 @@ type OverlayFrom = 'factor' | 'method-picker';
 
 export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prepare' | 'attempt' | 'finish'>;
 
-interface FactorError {
-  detail: string | undefined;
-}
+type FactorError = { serverDetail: string } | { description: ErrorDescription };
 
 interface ReverificationContext {
   inputValue: string;
@@ -88,7 +87,8 @@ function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
 }
 
 function factorError(error: unknown): FactorError {
-  return { detail: errorDetail(error) };
+  const serverDetail = serverErrorDetail(error);
+  return serverDetail ? { serverDetail } : { description: errorDescription(error) };
 }
 
 function selectMethod(ctx: ReverificationContext, id: string): Partial<ReverificationContext> {
@@ -415,6 +415,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
 
 function useReverificationState(model: ReverificationModel): ReverificationControllerState {
   const m = useMessages('reverification');
+  const errorText = useErrorText();
   const active = model.status === 'active' ? model : null;
 
   const [snapshot, send] = useMachine(
@@ -495,7 +496,11 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       direction: context.direction,
       value: context.inputValue,
       onValueChange: (value: string) => send({ type: 'TYPE', value }),
-      errorMessage: context.error ? (context.error.detail ?? m.unstable__errors__generic) : undefined,
+      errorMessage: context.error
+        ? 'serverDetail' in context.error
+          ? context.error.serverDetail
+          : errorText(context.error.description, m.unstable__errors__generic)
+        : undefined,
       isPending: pendingStates.has(state),
       onSubmit: () => send({ type: 'SUBMIT' }),
       onShowMethods: () => send({ type: 'SHOW_METHODS' }),
@@ -525,5 +530,5 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
     };
 
     return state === 'retrying' ? { status: 'retrying', ...view } : { status: 'ready', onCancel, ...view };
-  }, [inactive, snapshot, onCancel, send, m, canResend, countingDown, resendAvailableAt, now]);
+  }, [inactive, snapshot, onCancel, send, m, errorText, canResend, countingDown, resendAvailableAt, now]);
 }

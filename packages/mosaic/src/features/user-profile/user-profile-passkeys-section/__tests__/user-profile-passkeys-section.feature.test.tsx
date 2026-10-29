@@ -368,6 +368,16 @@ describe('Adding a passkey', () => {
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     expect(await screen.findByText('Chrome on macOS')).toBeVisible();
   });
+  it('explains when the device returns no passkey', async () => {
+    servePasskeys([]);
+    fakeAuthenticator().mockResolvedValueOnce(null);
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Add passkey' }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent("Your device couldn't create a passkey. Please try again."),
+    );
+    expect(screen.getByRole('button', { name: 'Add passkey' })).toBeEnabled();
+  });
 });
 
 describe('Renaming a passkey', () => {

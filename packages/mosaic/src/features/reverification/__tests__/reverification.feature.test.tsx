@@ -842,7 +842,6 @@ describe('Reverification', () => {
   });
 
   describe('passkey', () => {
-    // Currently wrong: the banner shows the browser or clerk-js error message as is, which is not localized.
     it('completes the challenge with the passkey', async () => {
       const { clerk } = await renderReverification(
         guardedAction(),
@@ -853,7 +852,9 @@ describe('Reverification', () => {
         .fn()
         .mockResolvedValueOnce({
           publicKeyCredential: null,
-          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_failed' }),
+          error: new ClerkWebAuthnError('The operation either timed out or was not allowed.', {
+            code: 'passkey_retrieval_cancelled',
+          }),
         })
         .mockImplementationOnce(
           () =>
@@ -869,9 +870,12 @@ describe('Reverification', () => {
         const user = await startVerification();
         expect(await screen.findByText(STEP.passkey)).toBeVisible();
 
-        // A refused credential shows an error banner and stays on the step
+        // A cancelled prompt shows the localized error and stays on the step
         await user.click(screen.getByRole('button', { name: 'Continue' }));
-        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The operation was refused'));
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Passkey verification was cancelled or timed out.'),
+        );
+        expect(screen.getByRole('alert')).not.toHaveTextContent('The operation either timed out or was not allowed.');
         expect(screen.getByText(STEP.passkey)).toBeVisible();
 
         // The button is disabled and shows the verifying label while the credential is being verified
@@ -883,6 +887,34 @@ describe('Reverification', () => {
         await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
         acceptCredential();
         await untilResolved();
+      } finally {
+        restore();
+      }
+    });
+
+    it('explains when the device returns no passkey', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
+      );
+      clerk.__internal_getPublicCredentials = vi.fn().mockResolvedValue({
+        publicKeyCredential: null,
+        error: new ClerkWebAuthnError('Browser failed to get credential', { code: 'passkey_retrieval_failed' }),
+      });
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent(
+            "Your device couldn't verify your passkey. Please try again.",
+          ),
+        );
+        expect(screen.getByText(STEP.passkey)).toBeVisible();
       } finally {
         restore();
       }

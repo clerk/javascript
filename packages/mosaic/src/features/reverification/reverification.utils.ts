@@ -1,6 +1,8 @@
 import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 import type { PreferredSignInStrategy } from '@clerk/shared/types';
 
+import type { ErrorDescription } from '../../localization';
+import { toLocalizableError } from '../../utils/errors';
 import type {
   ReverificationMethod,
   ReverificationOtpChannel,
@@ -8,16 +10,19 @@ import type {
   ReverificationStrategy,
 } from './reverification.types';
 
-// TODO: Return toLocalizableError(error) and render with errorText so Clerk errors are localized by code instead of shown raw.
-export function errorDetail(error: unknown): string | undefined {
-  if (isClerkAPIResponseError(error)) {
-    const first = error.errors[0];
-    return first?.longMessage || first?.message || error.message;
-  }
+export function errorDescription(error: unknown): ErrorDescription {
   if (isClerkRuntimeError(error) && error.code !== 'network_error') {
-    return error.message;
+    return toLocalizableError(error);
   }
-  return undefined;
+  return { cause: error };
+}
+
+export function serverErrorDetail(error: unknown): string | undefined {
+  if (!isClerkAPIResponseError(error)) {
+    return undefined;
+  }
+  const first = error.errors[0];
+  return first?.longMessage || first?.message || error.message;
 }
 
 export function otpChannelFor(strategy: ReverificationStrategy): ReverificationOtpChannel | undefined {
