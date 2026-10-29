@@ -960,10 +960,10 @@ describe('Menu', () => {
 
     it('stays open when the mouse leaves a menu pressed open just before the hover delay ran out', () => {
       vi.useFakeTimers();
-      renderHoverMenu();
-      const trigger = screen.getByText('Actions');
-
       try {
+        renderHoverMenu();
+        const trigger = screen.getByText('Actions');
+
         fireEvent.pointerEnter(trigger, { pointerType: 'mouse' });
         fireEvent.mouseEnter(trigger);
         fireEvent.pointerDown(trigger, { pointerType: 'mouse' });
