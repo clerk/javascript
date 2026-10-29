@@ -82,7 +82,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // Bumped whenever we leave an invoking state, so a stale promise resolving
   // after the fact is ignored — no transition.
   let invocationToken = 0;
-  let receivedWhileStopped: (() => boolean)[] = [];
+  let deferred: (() => boolean)[] = [];
 
   // Pending `after` timers — cleared when the state is exited, paused while the actor is stopped.
   let afterTimers: AfterTimer[] = [];
@@ -182,9 +182,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         return;
       }
       if (status === 'stopped') {
-        receivedWhileStopped.push(
-          () => token === invocationToken && takeInvokeTransition(transitionConfig, settledEvent),
-        );
+        deferred.push(() => token === invocationToken && takeInvokeTransition(transitionConfig, settledEvent));
         return;
       }
       if (status === 'active' && takeInvokeTransition(transitionConfig, settledEvent)) {
@@ -252,8 +250,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       scheduleAfterTimer(timer.delay, timer.transitionConfig);
     }
     pausedAfterTimers = [];
-    const received = receivedWhileStopped;
-    receivedWhileStopped = [];
+  }
+
+  function applyDeferred(): void {
+    const received = deferred;
+    deferred = [];
     for (const apply of received) {
       apply();
     }
@@ -315,6 +316,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         value = resolveInitial();
         enterState(INIT_EVENT);
       }
+      applyDeferred();
       commit();
       return actor;
     },
@@ -333,11 +335,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     send(event) {
-      if (initialized && status === 'stopped') {
-        receivedWhileStopped.push(() => takeEventTransition(event));
+      if (!started) {
+        deferred.push(() => takeEventTransition(event));
         return;
       }
-      if (started && takeEventTransition(event)) {
+      if (takeEventTransition(event)) {
         commit();
       }
     },
@@ -362,7 +364,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     can(event) {
-      if (!started || status !== 'active') {
+      if (status !== 'active') {
         return false;
       }
       const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
