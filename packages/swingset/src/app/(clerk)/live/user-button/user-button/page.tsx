@@ -9,7 +9,7 @@ export default function UserButtonLivePage() {
   const { isLoaded, isSignedIn } = useUser();
 
   return (
-    <MosaicProvider>
+    <MosaicProvider experimental={{ newProfiles: true }}>
       <div className='mx-auto flex w-full max-w-5xl flex-col gap-6 p-3 sm:p-8'>
         <div className='flex flex-col gap-1'>
           <h1 className='text-xl font-semibold'>User button</h1>
