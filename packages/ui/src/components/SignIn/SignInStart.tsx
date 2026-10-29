@@ -39,7 +39,7 @@ import {
   withRedirectToSignInTask,
 } from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useIsWebAuthnSupported, useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -95,15 +95,16 @@ const useAutoFillPasskey = () => {
 function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const { setError } = card;
+  const { t } = useLocalizations();
   const clerk = useClerk();
   useEffect(() => {
     const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${clerk.publishableKey}`;
-    const error = SafeLocalStorage.getItem<ClerkAPIError | null>(key, null);
-    if (error) {
+    const sessionEnded = SafeLocalStorage.getItem(key, false);
+    if (sessionEnded) {
       SafeLocalStorage.removeItem(key);
-      setError(error);
+      setError(t(localizationKeys('unstable__errors.password_confirmation_session_ended')));
     }
-  }, [clerk.publishableKey, setError]);
+  }, [clerk.publishableKey, setError, t]);
   const status = useLoadingStatus();
   const { userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
