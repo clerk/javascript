@@ -80,6 +80,7 @@ export function UserProfileRenamePasskeyDialog({
             <Dialog.Close
               render={
                 <Button
+                  color='neutral'
                   variant='outline'
                   fullWidth
                   disabled={form.isSubmitting}

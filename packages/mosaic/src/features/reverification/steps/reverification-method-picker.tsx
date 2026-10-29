@@ -106,6 +106,7 @@ export function ReverificationMethodPicker({
           {onBack ? (
             <Button
               type='button'
+              color='neutral'
               variant='ghost'
               disabled={Boolean(pendingMethodId)}
               onClick={onBack}
@@ -122,6 +123,7 @@ export function ReverificationMethodPicker({
           <Button
             type='button'
             size='sm'
+            color='neutral'
             variant='link'
             disabled={Boolean(pendingMethodId)}
             onClick={() => {

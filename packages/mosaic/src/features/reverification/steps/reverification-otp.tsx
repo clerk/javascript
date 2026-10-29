@@ -102,6 +102,7 @@ export function ReverificationOTP({
                 <Button
                   type='button'
                   size='sm'
+                  color='neutral'
                   variant='link'
                   disabled={resend.disabled || isPending}
                   onClick={resend.onClick}
