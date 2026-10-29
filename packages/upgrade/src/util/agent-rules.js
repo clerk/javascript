@@ -5,23 +5,41 @@ import { isClerkAgentRulesSdk, writeClerkAgentRules as writeRules } from '@clerk
 
 import { findWorkspaceRoot, getInstalledClerkPackages, getWorkspacePackageDirs } from './detect-sdk.js';
 
-export function detectClerkAgentRuleSdks(dir) {
+function getAgentRuleSdks(packageDir) {
+  return Object.keys(getInstalledClerkPackages(packageDir))
+    .map(packageName => packageName.replace(/^@clerk\//, ''))
+    .filter(isClerkAgentRulesSdk);
+}
+
+function getPackageDirs(dir) {
   const workspaceRoot = findWorkspaceRoot(dir);
-  const packageDirs = workspaceRoot ? [workspaceRoot, ...getWorkspacePackageDirs(workspaceRoot)] : [dir];
-  const sdks = new Set();
+  return workspaceRoot ? [workspaceRoot, ...getWorkspacePackageDirs(workspaceRoot)] : [dir];
+}
 
-  for (const packageDir of packageDirs) {
-    for (const packageName of Object.keys(getInstalledClerkPackages(packageDir))) {
-      const sdk = packageName.replace(/^@clerk\//, '');
-      if (isClerkAgentRulesSdk(sdk)) {
-        sdks.add(sdk);
-      }
-    }
-  }
-
-  return [...sdks].sort();
+export function detectClerkAgentRuleSdks(dir) {
+  return [...new Set(getPackageDirs(dir).flatMap(getAgentRuleSdks))].sort();
 }
 
 export function writeClerkAgentRules({ dir, dryRun = false, sdks = detectClerkAgentRuleSdks(dir) }) {
-  return { ...writeRules({ cwd: dir, dryRun, force: true, fs, path, sdks }), sdks };
+  const packageDirs = getPackageDirs(dir);
+  const writes = packageDirs
+    .map(packageDir => ({
+      packageDir,
+      sdks: packageDirs.length === 1 ? sdks : getAgentRuleSdks(packageDir).filter(sdk => sdks.includes(sdk)),
+    }))
+    .filter(write => write.sdks.length > 0);
+
+  const results = writes.map(write =>
+    writeRules({ cwd: write.packageDir, dryRun, force: true, fs, path, sdks: write.sdks }),
+  );
+  const statuses = results.map(result => result.agentsMd);
+  const agentsMd = statuses.includes('created')
+    ? 'created'
+    : statuses.includes('updated')
+      ? 'updated'
+      : statuses.length > 0 && statuses.every(status => status === 'disabled')
+        ? 'disabled'
+        : 'unchanged';
+
+  return { targetDir: results[0]?.targetDir ?? path.resolve(dir), agentsMd, sdks };
 }

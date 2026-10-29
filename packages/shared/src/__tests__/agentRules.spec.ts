@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   CLERK_SDK_PLUGIN_END,
@@ -10,6 +10,18 @@ import {
   renderClerkSdkPluginBlock,
   writeClerkAgentRules,
 } from '../agentRules';
+import { agentEnvironmentVariables } from '../utils/runtimeEnvironment';
+
+beforeEach(() => {
+  for (const name of agentEnvironmentVariables) {
+    vi.stubEnv(name, '');
+  }
+  vi.stubEnv('CLAUDECODE', '1');
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 const createMemoryFs = (files: Record<string, string> = {}, { withRepoPackageJson = true } = {}) => {
   const store = new Map(Object.entries(withRepoPackageJson ? { '/repo/package.json': '{}', ...files } : files));
@@ -102,45 +114,6 @@ describe('writeClerkAgentRules', () => {
     expect(memory.read('/repo/src/AGENTS.md')).toBeUndefined();
   });
 
-  it('targets the app package instead of the workspace root', () => {
-    const memory = createMemoryFs({
-      '/repo/pnpm-workspace.yaml': 'packages:\n  - apps/*\n',
-      '/repo/apps/web/package.json': '{}',
-    });
-
-    writeClerkAgentRules({
-      cwd: '/repo/apps/web',
-      fs: memory.fs,
-      path: pathAdapter,
-      sdks: ['react'],
-    });
-
-    expect(memory.read('/repo/apps/web/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:react -->');
-    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
-  });
-
-  it('points to an SDK AGENTS.md that exists when the SDK is installed in a pnpm workspace app', () => {
-    const memory = createMemoryFs({
-      '/repo/pnpm-workspace.yaml': 'packages:\n  - apps/*\n',
-      '/repo/package.json': '{"name":"root","private":true}',
-      '/repo/apps/web/package.json': '{"name":"web","dependencies":{"@clerk/nextjs":"*"}}',
-      '/repo/apps/web/node_modules/@clerk/nextjs/AGENTS.md': '# Clerk Next.js',
-    });
-
-    const { files } = writeClerkAgentRules({
-      cwd: '/repo/apps/web',
-      fs: memory.fs,
-      path: pathAdapter,
-      sdks: ['nextjs'],
-    });
-
-    const agentsMdPath = files.find(file => file.endsWith('/AGENTS.md')) ?? '';
-    const pointer = memory.read(agentsMdPath)?.match(/`(node_modules\/@clerk\/nextjs\/AGENTS\.md)`/)?.[1] ?? '';
-
-    expect(pointer).toBe('node_modules/@clerk/nextjs/AGENTS.md');
-    expect(memory.fs.existsSync(pathAdapter.join(pathAdapter.dirname(agentsMdPath), pointer))).toBe(true);
-  });
-
   it('replaces only Clerk blocks and preserves surrounding content', () => {
     const memory = createMemoryFs({
       '/repo/AGENTS.md': 'Project rules\n\n<!-- BEGIN:clerk-agent-rules -->\nold\n<!-- END:clerk-agent-rules -->\n',
@@ -191,6 +164,130 @@ describe('writeClerkAgentRules', () => {
   });
 });
 
+describe('writeClerkAgentRules in a monorepo', () => {
+  const createMonorepo = (files: Record<string, string> = {}) =>
+    createMemoryFs({
+      '/repo/package.json': '{"name":"root","private":true}',
+      '/repo/pnpm-workspace.yaml': 'packages:\n  - apps/*\n',
+      '/repo/apps/web/package.json': '{"name":"web"}',
+      '/repo/apps/web/node_modules/@clerk/react/package.json': '{}',
+      '/repo/apps/ext/package.json': '{"name":"ext"}',
+      '/repo/apps/ext/node_modules/@clerk/chrome-extension/package.json': '{}',
+      ...files,
+    });
+
+  const writeWeb = (memory: ReturnType<typeof createMemoryFs>) =>
+    writeClerkAgentRules({ cwd: '/repo/apps/web', fs: memory.fs, path: pathAdapter, sdks: ['react'] });
+  const writeExt = (memory: ReturnType<typeof createMemoryFs>) =>
+    writeClerkAgentRules({ cwd: '/repo/apps/ext', fs: memory.fs, path: pathAdapter, sdks: ['chrome-extension'] });
+
+  it('writes one section per app to the AGENTS.md at the repo root', () => {
+    const memory = createMonorepo();
+
+    writeWeb(memory);
+    const result = writeExt(memory);
+
+    const content = memory.read('/repo/AGENTS.md');
+    expect(result.targetDir).toBe('/repo');
+    expect(content?.match(/<!-- BEGIN:clerk-agent-rules -->/g)).toHaveLength(1);
+    expect(content).toContain('### Clerk + React in `apps/web`');
+    expect(content).toContain('<!-- BEGIN:clerk-agent-rules:react:apps/web -->');
+    expect(content).toContain('<!-- BEGIN:clerk-agent-rules:chrome-extension:apps/ext -->');
+    expect(content?.indexOf('react:apps/web')).toBeLessThan(content?.indexOf('chrome-extension:apps/ext') ?? 0);
+    expect(memory.read('/repo/apps/web/AGENTS.md')).toBeUndefined();
+  });
+
+  it('points each section at the copy of the SDK that app installed', () => {
+    const memory = createMonorepo({ '/repo/node_modules/@clerk/chrome-extension/package.json': '{}' });
+
+    writeWeb(memory);
+    writeClerkAgentRules({ cwd: '/repo/apps/web', fs: memory.fs, path: pathAdapter, sdks: ['react'] });
+    writeClerkAgentRules({
+      cwd: '/repo/apps/ext',
+      fs: {
+        ...memory.fs,
+        existsSync: path =>
+          path !== '/repo/apps/ext/node_modules/@clerk/chrome-extension/package.json' && memory.fs.existsSync(path),
+      },
+      path: pathAdapter,
+      sdks: ['chrome-extension'],
+    });
+
+    const content = memory.read('/repo/AGENTS.md');
+    expect(content).toContain('Read `apps/web/node_modules/@clerk/react/AGENTS.md` before writing auth code.');
+    expect(content).toContain('Read `node_modules/@clerk/chrome-extension/AGENTS.md` before writing auth code.');
+  });
+
+  it('finds the repo root from package.json workspaces', () => {
+    const memory = createMemoryFs(
+      {
+        '/repo/package.json': '{"workspaces":["apps/*"]}',
+        '/repo/apps/web/package.json': '{}',
+      },
+      { withRepoPackageJson: false },
+    );
+
+    writeClerkAgentRules({ cwd: '/repo/apps/web/src', fs: memory.fs, path: pathAdapter, sdks: ['react'] });
+
+    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:react:apps/web -->');
+  });
+
+  it('turns off one app from its own package.json and keeps writing for the others', () => {
+    const memory = createMonorepo();
+    writeWeb(memory);
+    writeExt(memory);
+    memory.fs.writeFileSync('/repo/apps/web/package.json', '{"clerk":{"agentsMd":false}}', { encoding: 'utf8' });
+
+    expect(writeWeb(memory)).toEqual({ targetDir: '/repo', agentsMd: 'disabled', files: ['/repo/AGENTS.md'] });
+    writeExt(memory);
+
+    const content = memory.read('/repo/AGENTS.md');
+    expect(content).not.toContain('react:apps/web');
+    expect(content).toContain('<!-- BEGIN:clerk-agent-rules -->');
+    expect(content).toContain('<!-- BEGIN:clerk-agent-rules:chrome-extension:apps/ext -->');
+  });
+
+  it('removes the intro section and the file when the last app turns off', () => {
+    const memory = createMonorepo();
+    writeWeb(memory);
+    memory.fs.writeFileSync('/repo/apps/web/package.json', '{"clerk":{"agentsMd":false}}', { encoding: 'utf8' });
+
+    writeWeb(memory);
+
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+  });
+
+  it('turns off every app from the repo root package.json', () => {
+    const memory = createMonorepo();
+    memory.fs.writeFileSync('/repo/AGENTS.md', 'Project rules\n', { encoding: 'utf8' });
+    writeWeb(memory);
+    writeExt(memory);
+    memory.fs.writeFileSync('/repo/package.json', '{"clerk":{"agentsMd":false}}', { encoding: 'utf8' });
+
+    writeExt(memory);
+    writeWeb(memory);
+
+    expect(memory.read('/repo/AGENTS.md')).toBe('Project rules\n');
+  });
+
+  it('keeps a removed app section out without blocking the other apps', () => {
+    const memory = createMonorepo();
+    writeWeb(memory);
+    writeExt(memory);
+    const content = memory.read('/repo/AGENTS.md') ?? '';
+    const start = content.indexOf('<!-- BEGIN:clerk-agent-rules:react:apps/web -->');
+    const endMarker = '<!-- END:clerk-agent-rules:react:apps/web -->';
+    const end = content.indexOf(endMarker) + endMarker.length;
+    memory.fs.writeFileSync('/repo/AGENTS.md', content.slice(0, start) + content.slice(end), { encoding: 'utf8' });
+
+    writeWeb(memory);
+    writeExt(memory);
+
+    expect(memory.read('/repo/AGENTS.md')).not.toContain('react:apps/web');
+    expect(memory.read('/repo/AGENTS.md')).toContain('chrome-extension:apps/ext');
+  });
+});
+
 describe('writeClerkAgentRules with an unmatched BEGIN marker', () => {
   it('keeps text after an orphan shared BEGIN marker across runs', () => {
     const memory = createMemoryFs({
@@ -222,7 +319,7 @@ describe('writeClerkAgentRules with an unmatched BEGIN marker', () => {
 });
 
 describe('writeClerkAgentRules after the user removes the Clerk section', () => {
-  const statePath = '/repo/node_modules/.cache/clerk/agent-rules';
+  const statePath = '/repo/node_modules/.cache/clerk/agent-rules/clerk-agent-rules';
 
   it('records that it wrote the section', () => {
     const memory = createMemoryFs();

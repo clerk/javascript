@@ -45,6 +45,7 @@ export type WriteClerkAgentRulesResult = {
   files: string[];
 };
 
+const GENERIC_ID = 'clerk-agent-rules';
 const GENERIC_START = '<!-- BEGIN:clerk-agent-rules -->';
 const GENERIC_END = '<!-- END:clerk-agent-rules -->';
 
@@ -128,21 +129,31 @@ ${GENERIC_END}`,
   );
 }
 
-export function renderClerkSdkAgentRulesBlock(sdk: ClerkAgentRulesSdk, eol = '\n') {
+const sdkBlockId = (sdk: ClerkAgentRulesSdk, appDir = '') => `${GENERIC_ID}:${sdk}${appDir ? `:${appDir}` : ''}`;
+
+export function renderClerkSdkAgentRulesBlock(
+  sdk: ClerkAgentRulesSdk,
+  eol = '\n',
+  {
+    appDir = '',
+    agentsMdPath = `node_modules/@clerk/${sdk}/AGENTS.md`,
+  }: { appDir?: string; agentsMdPath?: string } = {},
+) {
+  const id = sdkBlockId(sdk, appDir);
   const notes = [
-    `Read \`node_modules/@clerk/${sdk}/AGENTS.md\` before writing auth code.`,
+    `Read \`${agentsMdPath}\` before writing auth code.`,
     'Clerk Elements is removed. Never use it.',
     ...(SDK_NOTES[sdk] ?? []),
   ];
 
   return normalizeEol(
-    `<!-- BEGIN:clerk-agent-rules:${sdk} -->
+    `<!-- BEGIN:${id} -->
 
-### Clerk + ${SDK_LABELS[sdk]}
+### Clerk + ${SDK_LABELS[sdk]}${appDir ? ` in \`${appDir}\`` : ''}
 
 ${notes.map(note => `- ${note}`).join('\n')}
 
-<!-- END:clerk-agent-rules:${sdk} -->`,
+<!-- END:${id} -->`,
     eol,
   );
 }
@@ -177,68 +188,100 @@ function upsertMarkedBlock(
   return `${content.trimEnd()}${eol}${eol}${block}${eol}`;
 }
 
-function removeMarkedBlock(content: string, start: string, end: string, eol: string) {
-  const startIndex = content.indexOf(start);
-  const endIndex = content.indexOf(end, startIndex + start.length);
+const blockStart = (id: string) => `<!-- BEGIN:${id} -->`;
+const blockEnd = (id: string) => `<!-- END:${id} -->`;
+
+const listBlockIds = (content: string) =>
+  [...content.matchAll(/<!-- BEGIN:(clerk-agent-rules(?::\S+)?) -->/g)].map(match => match[1]);
+
+function removeBlock(content: string, id: string, eol: string) {
+  const startIndex = content.indexOf(blockStart(id));
+  const endIndex = content.indexOf(blockEnd(id), startIndex);
   if (startIndex === -1 || endIndex === -1) {
     return content;
   }
 
   const before = content.slice(0, startIndex).trimEnd();
-  const after = content.slice(endIndex + end.length).trimStart();
+  const after = content.slice(endIndex + blockEnd(id).length).trimStart();
   return before && after ? `${before}${eol}${eol}${after}` : `${before}${after}${before || after ? eol : ''}`;
 }
 
-function isDisabledInPackageJson(fs: FileSystemAdapter, path: PathAdapter, targetDir: string) {
+function isDisabledInPackageJson(fs: FileSystemAdapter, path: PathAdapter, dir: string) {
   try {
-    const pkg = JSON.parse(fs.readFileSync(path.join(targetDir, 'package.json'), { encoding: 'utf8' }));
+    const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), { encoding: 'utf8' }));
     return pkg?.clerk?.agentsMd === false;
   } catch {
     return false;
   }
 }
 
-function findTargetDir(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
+function isWorkspaceRoot(fs: FileSystemAdapter, path: PathAdapter, dir: string) {
+  if (fs.existsSync(path.join(dir, 'pnpm-workspace.yaml'))) {
+    return true;
+  }
+  try {
+    return !!JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), { encoding: 'utf8' })).workspaces;
+  } catch {
+    return false;
+  }
+}
+
+function findAppDirs(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
   let current = path.resolve(cwd);
   const root = path.parse(current).root;
+  const dirs: string[] = [];
 
   while (current !== root) {
     if (fs.existsSync(path.join(current, 'package.json'))) {
-      return current;
+      dirs.push(current);
+      if (isWorkspaceRoot(fs, path, current)) {
+        return dirs;
+      }
+    } else if (fs.existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
+      return [...dirs, current];
     }
 
     current = path.dirname(current);
   }
 
-  return null;
+  return dirs.slice(0, 1);
+}
+
+const relativeDir = (rootDir: string, dir: string) =>
+  dir === rootDir ? '' : dir.slice(rootDir.length + 1).replace(/\\/g, '/');
+
+function findSdkAgentsMd(fs: FileSystemAdapter, path: PathAdapter, sdk: ClerkAgentRulesSdk, dirs: string[]) {
+  const rootDir = dirs[dirs.length - 1];
+  const installDir = dirs.find(dir => fs.existsSync(path.join(dir, 'node_modules', '@clerk', sdk, 'package.json')));
+  const prefix = relativeDir(rootDir, installDir ?? dirs[0]);
+  return `${prefix ? `${prefix}/` : ''}node_modules/@clerk/${sdk}/AGENTS.md`;
 }
 
 export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): WriteClerkAgentRulesResult {
   const { dryRun = false, force = false, fs, path, sdks } = options;
-  const targetDir = findTargetDir(fs, path, options.cwd);
-  if (!targetDir) {
+  const dirs = findAppDirs(fs, path, options.cwd);
+  if (dirs.length === 0) {
     return { targetDir: path.resolve(options.cwd), agentsMd: 'skipped', files: [] };
   }
 
-  const agentsPath = path.join(targetDir, 'AGENTS.md');
-  const stateDir = path.join(targetDir, 'node_modules', '.cache', 'clerk');
-  const statePath = path.join(stateDir, 'agent-rules');
+  const appDir = dirs[0];
+  const rootDir = dirs[dirs.length - 1];
+  const appKey = relativeDir(rootDir, appDir);
+  const agentsPath = path.join(rootDir, 'AGENTS.md');
   const agentsExists = fs.existsSync(agentsPath);
   const existing = agentsExists ? fs.readFileSync(agentsPath, { encoding: 'utf8' }) : '';
+  const eol = detectEol(existing);
 
-  if (isDisabledInPackageJson(fs, path, targetDir)) {
-    const eol = detectEol(existing);
-    let next = removeMarkedBlock(existing, GENERIC_START, GENERIC_END, eol);
-    for (const sdk of clerkAgentRulesSdks) {
-      next = removeMarkedBlock(
-        next,
-        `<!-- BEGIN:clerk-agent-rules:${sdk} -->`,
-        `<!-- END:clerk-agent-rules:${sdk} -->`,
-        eol,
-      );
+  const disabledDir = dirs.find(dir => isDisabledInPackageJson(fs, path, dir));
+  if (disabledDir) {
+    const ids =
+      disabledDir === rootDir ? listBlockIds(existing) : clerkAgentRulesSdks.map(sdk => sdkBlockId(sdk, appKey));
+    let next = ids.reduce((content, id) => removeBlock(content, id, eol), existing);
+    if (listBlockIds(next).every(id => id === GENERIC_ID)) {
+      next = removeBlock(next, GENERIC_ID, eol);
     }
     if (next === existing) {
-      return { targetDir, agentsMd: 'disabled', files: [] };
+      return { targetDir: rootDir, agentsMd: 'disabled', files: [] };
     }
     if (!dryRun) {
       if (next.trim() || !fs.unlinkSync) {
@@ -247,47 +290,49 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
         fs.unlinkSync(agentsPath);
       }
     }
-    return { targetDir, agentsMd: 'disabled', files: [agentsPath] };
+    return { targetDir: rootDir, agentsMd: 'disabled', files: [agentsPath] };
   }
 
-  if (!force && !existing.includes(GENERIC_START) && fs.existsSync(statePath)) {
-    return { targetDir, agentsMd: 'skipped', files: [] };
-  }
+  const stateDir = path.join(rootDir, 'node_modules', '.cache', 'clerk', 'agent-rules');
+  const statePath = (id: string) => path.join(stateDir, encodeURIComponent(id));
+  const wasRemoved = (id: string) => !force && !existing.includes(blockStart(id)) && fs.existsSync(statePath(id));
 
-  const eol = detectEol(existing);
+  if (wasRemoved(GENERIC_ID)) {
+    return { targetDir: rootDir, agentsMd: 'skipped', files: [] };
+  }
 
   let next = upsertMarkedBlock(existing, renderClerkAgentRulesBlock(eol), GENERIC_START, GENERIC_END, eol);
+  const written = [GENERIC_ID];
 
-  let insertAfter = GENERIC_END;
   for (const sdk of uniqueSdks(sdks)) {
-    const sdkEnd = `<!-- END:clerk-agent-rules:${sdk} -->`;
-    next = upsertMarkedBlock(
-      next,
-      renderClerkSdkAgentRulesBlock(sdk, eol),
-      `<!-- BEGIN:clerk-agent-rules:${sdk} -->`,
-      sdkEnd,
-      eol,
-      insertAfter,
-    );
-    if (next.includes(sdkEnd)) {
-      insertAfter = sdkEnd;
+    const id = sdkBlockId(sdk, appKey);
+    if (wasRemoved(id)) {
+      continue;
     }
+    const lastEnd = [...next.matchAll(/<!-- END:clerk-agent-rules(?::\S+)? -->/g)].pop()?.[0];
+    const block = renderClerkSdkAgentRulesBlock(sdk, eol, {
+      appDir: appKey,
+      agentsMdPath: findSdkAgentsMd(fs, path, sdk, dirs),
+    });
+    next = upsertMarkedBlock(next, block, blockStart(id), blockEnd(id), eol, lastEnd);
+    written.push(id);
   }
 
   const agentsMd = agentsExists ? (next === existing ? 'unchanged' : 'updated') : 'created';
 
   if (!dryRun) {
-    fs.mkdirSync?.(targetDir, { recursive: true });
     if (agentsMd !== 'unchanged') {
       fs.writeFileSync(agentsPath, next, { encoding: 'utf8', mode: 0o644 });
     }
-    if (!fs.existsSync(statePath)) {
-      fs.mkdirSync?.(stateDir, { recursive: true });
-      fs.writeFileSync(statePath, '', { encoding: 'utf8', mode: 0o644 });
+    for (const id of written) {
+      if (!fs.existsSync(statePath(id))) {
+        fs.mkdirSync?.(stateDir, { recursive: true });
+        fs.writeFileSync(statePath(id), '', { encoding: 'utf8', mode: 0o644 });
+      }
     }
   }
 
-  return { targetDir, agentsMd, files: agentsMd === 'unchanged' ? [] : [agentsPath] };
+  return { targetDir: rootDir, agentsMd, files: agentsMd === 'unchanged' ? [] : [agentsPath] };
 }
 
 export function logClerkAgentRulesResult({ agentsMd, files }: WriteClerkAgentRulesResult) {
