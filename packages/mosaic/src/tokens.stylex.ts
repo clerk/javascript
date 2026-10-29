@@ -60,7 +60,7 @@ const colorDefaults = {
   '--cl-color-brand-alpha-200': 'color-mix(in oklab, var(--cl-color-brand) 8%, transparent)',
   '--cl-color-brand-alpha-300': 'color-mix(in oklab, var(--cl-color-brand) 12%, transparent)',
 
-  '--cl-color-negative': 'light-dark(oklch(0.56 0.2161 26.11), oklch(0.68 0.2 26.11))',
+  '--cl-color-negative': 'light-dark(oklch(0.56 0.2161 26.11), oklch(0.6252 0.2161 26.11))',
   '--cl-color-negative-foreground': 'oklch(1 0 0)',
   '--cl-color-negative-subtle': 'light-dark(var(--cl-color-negative-alpha-200), var(--cl-color-negative-alpha-300))',
   '--cl-color-negative-border': 'var(--cl-color-negative-alpha-300)',
