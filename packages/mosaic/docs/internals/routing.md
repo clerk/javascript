@@ -102,6 +102,9 @@ This is mostly based on the above constraints, but also some research.
 - Guards belongs to machines/components, not routes
 - We should move "which step next" decisions from `clerk-js` to `shared`
   - Pure functions returning a step or an exit URL, consumed by `clerk-js`, legacy ui and Mosaic alike. No behaviour change, so we can do this first.
+- Mosaic-internal navigations do not need to trigger the navigation events in `clerk-js`
+  - These are only used to close legacy modals, which is not necessary on Mosaic-navigation
+  - Mosaic also do not need to listen to these as it has its own way to close modals
 
 ## Design notes
 
