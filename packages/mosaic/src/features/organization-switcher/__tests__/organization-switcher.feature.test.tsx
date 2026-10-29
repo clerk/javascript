@@ -193,6 +193,56 @@ describe('OrganizationSwitcher', () => {
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
+  describe('landing after an action', () => {
+    it('lands on afterSelectPersonalUrl, filled from the account, after switching to the personal account', async () => {
+      const { navigate } = await renderSwitcher({ afterSelectPersonalUrl: '/users/:id' }, noOffers());
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Personal account' }));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/users/user_1'));
+    });
+
+    it('lands where an afterSelectOrganizationUrl function points for the selected organization', async () => {
+      const { navigate } = await renderSwitcher(
+        { afterSelectOrganizationUrl: organization => `/orgs/${organization.name}` },
+        noOffers(),
+      );
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Other' }));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/orgs/Other'));
+    });
+
+    it('tells the organization profile where to land after leaving', async () => {
+      const { clerk } = await renderSwitcher({ afterLeaveOrganizationUrl: '/left' }, noOffers());
+      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+      expect(openOrganizationProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ afterLeaveOrganizationUrl: '/left' }),
+      );
+    });
+
+    it('tells create-organization where to land and whether to skip inviting members', async () => {
+      const { clerk } = await renderSwitcher(
+        { afterCreateOrganizationUrl: '/created', skipInvitationScreen: true },
+        noOffers(),
+      );
+      const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Add organization' }));
+
+      expect(openCreateOrganization).toHaveBeenCalledWith(
+        expect.objectContaining({ afterCreateOrganizationUrl: '/created', skipInvitationScreen: true }),
+      );
+    });
+  });
+
   describe('an accepted invitation', () => {
     const fullFirstPage = Array.from({ length: 10 }, (_, i) =>
       fapiMembership(fapiOrganization({ id: `org_page_${i}`, name: `Page ${i}` })),

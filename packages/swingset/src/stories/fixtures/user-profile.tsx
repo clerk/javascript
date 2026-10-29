@@ -24,7 +24,7 @@ import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-p
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
+import { chaosEmail, chaosPhone, chaosPick, chaosRows } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
@@ -62,6 +62,13 @@ const examplePaymentMethods: UserProfilePaymentMethod[] = [
   { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
 ];
 
+const chaosPaymentMethods = [
+  { label: 'American Express •••• 1005', expiryLabel: 'Expires 11/2031' },
+  { label: 'Mastercard •••• 4444', expiryLabel: 'Expired 03/2026' },
+  { label: 'SEPA Direct Debit •••• 3000', expiryLabel: undefined },
+  { label: 'Cartes Bancaires •••• 1001', expiryLabel: 'Expires 07/2028' },
+];
+
 /**
  * Every page of the user profile, backed by local state so the actions on them do something. For
  * stories that need a realistic profile surface without being about it.
@@ -74,13 +81,19 @@ export function useUserProfileFixture() {
   const mfa = useUserProfileMfaExample();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const seedEmails = useChaosFixture(exampleEmails, items =>
-    chaosRows(items, 8).map((email, index) => ({ ...email, value: chaosEmail(index), isDefault: index === 0 })),
+    chaosRows(items, 8).map((email, index) => ({
+      ...email,
+      value: chaosEmail(index),
+      isDefault: index === 0,
+      isVerified: index % 3 !== 2,
+    })),
   );
   const seedPhones = useChaosFixture(examplePhones, items =>
     chaosRows(items, 6).map((phone, index) => ({
       ...phone,
-      value: `${phone.value} ext. 1234567890`,
+      value: chaosPhone(index),
       isDefault: index === 0,
+      isVerified: index % 3 !== 2,
     })),
   );
   const emails = useUserProfileEmailsFixture({
@@ -91,16 +104,16 @@ export function useUserProfileFixture() {
   const passkeys = usePasskeysFixture();
   const activeDevices = useUserProfileActiveDevicesFixture();
 
-  const seedSubscription = useChaosFixture(exampleSubscription, subscription => ({
-    planName: chaosText(subscription.planName),
-    priceLabel: '$1,234,567.89 / Month',
-    totalDueLabel: '$1,234,567.89',
-    renewsAtLabel: chaosText(subscription.renewsAtLabel),
+  const seedSubscription = useChaosFixture(exampleSubscription, () => ({
+    planName: 'Business Plus (annual, billed in EUR)',
+    priceLabel: '€1.234.567,89 / Year',
+    totalDueLabel: '€1.234.567,89',
+    renewsAtLabel: 'Renews September 26th, 2027',
   }));
   const seedPaymentMethods = useChaosFixture(examplePaymentMethods, items =>
     chaosRows(items, 8).map((method, index) => ({
       ...method,
-      label: chaosText(method.label),
+      ...chaosPick(chaosPaymentMethods, index),
       isDefault: index === 0,
     })),
   );

@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
@@ -18,6 +18,13 @@ describe('Mosaic Spinner', () => {
     const el = spinner(container);
     expect(el).toBeInTheDocument();
     expect(el).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('announces a labeled spinner as an indeterminate progressbar', () => {
+    render(<Spinner label='Regenerating backup codes' />);
+    const progress = screen.getByRole('progressbar', { name: 'Regenerating backup codes' });
+    expect(progress).not.toHaveAttribute('aria-hidden');
+    expect(progress).not.toHaveAttribute('aria-valuenow');
   });
 
   it('applies the default size when none is passed', () => {

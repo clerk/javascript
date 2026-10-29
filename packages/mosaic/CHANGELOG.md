@@ -1,5 +1,14 @@
 # @clerk/mosaic
 
+## 0.1.15
+
+### Patch Changes
+
+- Fix menu rows in `<UserButton />` and `<OrganizationSwitcher />` showing the browser's default button border and background on pages without a CSS reset. ([#10466](https://github.com/clerk/javascript/pull/10466)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+
 ## 0.1.14
 
 ### Patch Changes

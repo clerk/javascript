@@ -55,9 +55,13 @@ describe('connected accounts', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
   });
 
-  it('recreates a disconnected account', async () => {
-    serveFapi(signedIn([disconnectedGoogle]));
-    const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+  it('recreates a disconnected account with the scopes the app requests', async () => {
+    serveFapi(signedIn([{ ...disconnectedGoogle, approved_scopes: '' }]));
+    const { clerk } = await renderWithClerk(
+      <UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
+    );
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
     const request = holdRequests('post', '/v1/me/external_accounts');
     const user = userEvent.setup();
@@ -68,6 +72,7 @@ describe('connected accounts', () => {
     await waitFor(() => expect(request.requests).toHaveLength(1));
     const body = new URLSearchParams(await request.requests[0]?.text());
     expect(body.get('strategy')).toBe('oauth_google');
+    expect(body.getAll('additional_scope')).toEqual(['calendar']);
     request.release();
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
   });

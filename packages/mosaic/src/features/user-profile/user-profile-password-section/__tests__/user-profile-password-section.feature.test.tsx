@@ -151,7 +151,7 @@ describe('Changing a password', () => {
     expect(fapi.passwordUpdates).toHaveLength(1);
   });
 
-  it('shows feedback when the password strength checker cannot load', async () => {
+  it('keeps showing the length rule when the strength checker cannot load, then reports the failure', async () => {
     const environment = fapiEnvironment();
     environment.user_settings.password_settings.show_zxcvbn = true;
     serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
@@ -164,7 +164,13 @@ describe('Changing a password', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
-    await user.type(screen.getByLabelText('New password'), 'new-password-123');
+    await user.type(screen.getByLabelText('New password'), 'new');
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain 8 or more characters.',
+      ),
+    );
+    await user.type(screen.getByLabelText('New password'), '-password-123');
 
     await waitFor(() =>
       expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
@@ -548,6 +554,21 @@ describe('Changing a password', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(fapi.passwordUpdates).toHaveLength(1));
+  });
+
+  it('does not judge password strength when the instance turns the checker off', async () => {
+    const environment = fapiEnvironment();
+    environment.user_settings.password_settings.min_zxcvbn_strength = 3;
+    await renderPassword(alice, environment);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    await user.type(screen.getByLabelText('New password'), 'password123');
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password meets all the necessary requirements.',
+      ),
+    );
   });
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.42.0",
+  "version": "1.42.1",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -117,7 +117,6 @@
     "qrcode.react": "4.2.0"
   },
   "devDependencies": {
-    "@floating-ui/react-dom": "^2.1.8",
     "@rsdoctor/rspack-plugin": "^1.5.9",
     "@rspack/cli": "catalog:rspack",
     "@rspack/core": "catalog:rspack",
@@ -125,12 +124,9 @@
     "@rspack/plugin-react-refresh": "catalog:rspack",
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
-    "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.2",
-    "cross-fetch": "^4.1.0",
     "minimatch": "^10.2.5",
     "tsdown": "catalog:repo",
-    "unplugin": "^2.3.11",
     "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {

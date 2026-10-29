@@ -29,6 +29,7 @@ export interface UserProfileAddEmailControllerOptions {
 export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
+  pendingVerifyId: string | undefined;
   onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
 }
 
@@ -39,6 +40,7 @@ interface Context {
   verification: UserProfileEmailVerification | undefined;
   error: FormError | undefined;
   resendSeconds: number;
+  held: boolean;
 }
 
 type Event =
@@ -75,7 +77,18 @@ const start = {
     verification: undefined,
     error: undefined,
     resendSeconds: 0,
+    held: false,
   })),
+};
+
+const sendCode = {
+  invoke: fromPromise(
+    (context: Context) => (context.verification?.method === 'code' ? context.verification.sent : missingDependency()),
+    {
+      onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS, held: false })) },
+      onError: { target: 'verify', actions: [fail, assign(() => ({ held: false }))] },
+    },
+  ),
 };
 
 const machine = createMachine({
@@ -88,6 +101,7 @@ const machine = createMachine({
     verification: undefined,
     error: undefined,
     resendSeconds: 0,
+    held: false,
   },
   states: {
     idle: {
@@ -102,7 +116,7 @@ const machine = createMachine({
             resendSeconds: 0,
           })),
         },
-        START: start,
+        START: { ...start, actions: [start.actions, assign(() => ({ held: true }))] },
       },
     },
     email: {
@@ -116,7 +130,7 @@ const machine = createMachine({
       always: ({ context }) => {
         const method = context.verification?.method;
         if (method === 'code') {
-          return { target: 'sending' };
+          return { target: context.held ? 'preparing' : 'sending' };
         }
         if (method === 'sso') {
           return { target: 'connecting' };
@@ -124,15 +138,8 @@ const machine = createMachine({
         return { target: 'waiting', context: { resendSeconds: method === 'link' ? LINK_RESEND_SECONDS : 0 } };
       },
     },
-    sending: {
-      invoke: fromPromise(
-        context => (context.verification?.method === 'code' ? context.verification.sent : missingDependency()),
-        {
-          onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
-          onError: { target: 'verify', actions: fail },
-        },
-      ),
-    },
+    preparing: sendCode,
+    sending: sendCode,
     waiting: {
       on: { CANCEL: 'idle', TICK: tick, RESEND: resend },
       invoke: fromPromise(
@@ -194,7 +201,7 @@ export function useUserProfileAddEmailController({
     },
   });
   const state = snapshot.value;
-  const open = state !== 'idle';
+  const open = state !== 'idle' && state !== 'preparing';
   const waitingFor = state === 'waiting' && verification?.method === 'link' ? verification : undefined;
   useEffect(() => waitingFor?.cancel, [waitingFor]);
   useEffect(() => {
@@ -260,6 +267,7 @@ export function useUserProfileAddEmailController({
     },
     onConnect: () => send({ type: 'CONNECT' }),
     verifyingId: snapshot.context.verifyingId,
+    pendingVerifyId: state === 'preparing' ? snapshot.context.verifyingId : undefined,
     onVerifyEmail: (email, verifier) => {
       codeForm.reset();
       send({ type: 'START', id: email.id, emailAddress: email.value, verifier });

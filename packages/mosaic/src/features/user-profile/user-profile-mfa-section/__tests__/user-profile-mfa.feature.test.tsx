@@ -178,10 +178,81 @@ describe('User profile MFA', () => {
     const fapi = await renderMfa(fapiUser({ id: 'user_1' }), environment);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    expect(screen.queryByRole('button', { name: /SMS verification/ })).toBeNull();
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
     await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
     expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.backupCodeCreations).toBe(0);
+  });
+
+  it('offers only the methods the user has not set up yet', async () => {
+    const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    await renderMfa(
+      fapiUser({
+        id: 'user_1',
+        phone_numbers: [reserved],
+        totp_enabled: true,
+        backup_code_enabled: true,
+        two_factor_enabled: true,
+      }),
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /^SMS verification/ })).toBeVisible());
+    expect(screen.queryByRole('button', { name: /^Authenticator app/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Backup codes/ })).toBeNull();
+  });
+
+  it('lists only phones that are not already used for SMS verification', async () => {
+    const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const other = fapiPhoneNumber({ ...phone, id: 'phone_2', phone_number: '+15555550202' });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved, other], two_factor_enabled: true }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /^SMS verification/ }));
+    await user.click(screen.getByRole('combobox', { name: /Phone number/ }));
+    const options = await screen.findAllByRole('option');
+    expect(options.map(option => option.textContent)).toEqual(['+1 (555) 555-0202']);
+  });
+
+  it('lets either factor be removed when a verified SMS phone backs up the authenticator', async () => {
+    const environment = mfaEnvironment();
+    environment.user_settings.sign_up.mfa = { required: true };
+    const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    await renderMfa(
+      fapiUser({ id: 'user_1', phone_numbers: [reserved], totp_enabled: true, two_factor_enabled: true }),
+      environment,
+    );
+    expect(screen.getByRole('button', { name: 'Manage Authenticator app' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' })).toBeVisible();
+  });
+
+  it('does not count an unverified SMS phone toward required verification', async () => {
+    const environment = mfaEnvironment();
+    environment.user_settings.sign_up.mfa = { required: true };
+    const unverified = fapiPhoneNumber({
+      ...phone,
+      reserved_for_second_factor: true,
+      verification: { ...phone.verification, status: 'unverified' },
+    });
+    await renderMfa(
+      fapiUser({ id: 'user_1', phone_numbers: [unverified], totp_enabled: true, two_factor_enabled: true }),
+      environment,
+    );
+    expect(screen.getByText('Authenticator app')).toBeVisible();
+    expect(screen.queryByText('SMS verification')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Manage Authenticator app' })).toBeNull();
+  });
+
+  it('hides existing backup codes when the instance turns them off', async () => {
+    const environment = mfaEnvironment();
+    environment.user_settings.attributes.backup_code.used_for_second_factor = false;
+    await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+      environment,
+    );
+    expect(screen.getByText('Authenticator app')).toBeVisible();
+    expect(screen.queryByText('Backup codes')).toBeNull();
   });
 
   it('shows a localized incorrect TOTP code and allows a retry with the same secret', async () => {

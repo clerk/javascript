@@ -27,6 +27,8 @@ const flowFixtures = [
   'sample.messages.ts',
 ].map(file => `${featureDir}/${file}`);
 const testFixture = 'src/hooks/__tests__/sample.test.ts';
+const partFixture = 'src/primitives/sample-part.tsx';
+const partTestFixture = 'src/primitives/__tests__/sample-part.test.tsx';
 const rootEslint = new ESLint({ cwd: root });
 const eslint = new ESLint({
   cwd: mosaicRoot,
@@ -34,7 +36,9 @@ const eslint = new ESLint({
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: [...flowFixtures, ...layerFixtures, testFixture].map(file => `packages/mosaic/${file}`),
+          allowDefaultProject: [...flowFixtures, ...layerFixtures, testFixture, partFixture, partTestFixture].map(
+            file => `packages/mosaic/${file}`,
+          ),
           maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 32,
         },
       },
@@ -345,6 +349,50 @@ describe('Mosaic layers', { timeout: 30_000 }, () => {
   });
 });
 
+describe('Mosaic parts', { timeout: 30_000 }, () => {
+  async function forwardRefMessages(file, source) {
+    const messages = await lintAt(
+      file,
+      ["import React from 'react';", "import { useRender } from './utils';", source].join('\n'),
+    );
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages.filter(message => message.ruleId === 'mosaic/forward-ref-parts').map(message => message.message);
+  }
+
+  test.each([
+    "export function Part(props: { render?: never }) { return useRender({ defaultTagName: 'div', props }); }",
+    "export const Part = (props: { render?: never }) => useRender({ defaultTagName: 'div', props });",
+    "export function Part(props: { render?: never }) { return <Composite render={() => useRender({ defaultTagName: 'div', props })} />; }",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props) { return useRender({ defaultTagName: 'div', props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { const internalRef = React.useRef(null); return useRender({ defaultTagName: 'div', ref: internalRef, props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { const internalRef = React.useRef(null); return useRender({ defaultTagName: 'div', ref: [internalRef], props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'div', ref: null, props }); });",
+  ])('rejects a part that drops the ref: %s', async source => {
+    expect(await forwardRefMessages(partFixture, source)).toEqual([
+      'Parts that render through useRender must use React.forwardRef and pass the ref to useRender (see primitives/select/select-trigger.tsx).',
+    ]);
+  });
+
+  test.each([
+    "export const Part = React.forwardRef<HTMLButtonElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'button', ref: [null, ref], props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'div', ref, props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props, ref) { return useRender({ defaultTagName: 'div', ref: [null, ref ?? null], props }); });",
+    "export const Part = React.forwardRef<HTMLDivElement, object>(function Part(props: { open?: boolean }, ref) { const finalRef = props.open ? ref : [null, ref]; return useRender({ defaultTagName: 'div', ref: finalRef, props }); });",
+    'export function Provider(props: { children: React.ReactNode }) { return props.children; }',
+  ])('allows parts that forward the ref or render nothing: %s', async source => {
+    expect(await forwardRefMessages(partFixture, source)).toEqual([]);
+  });
+
+  test('ignores test files', async () => {
+    expect(
+      await forwardRefMessages(
+        partTestFixture,
+        "export function Part(props: { render?: never }) { return useRender({ defaultTagName: 'div', props }); }",
+      ),
+    ).toEqual([]);
+  });
+});
+
 describe('Mosaic tests', { timeout: 30_000 }, () => {
   async function vitestRules(source) {
     const messages = await lintAt(testFixture, ["import { describe, expect, test } from 'vitest';", source].join('\n'));
@@ -450,6 +498,7 @@ describe('Mosaic package configuration', { timeout: 30_000 }, () => {
       'boundaries/dependencies',
       'mosaic/no-model-react-state',
       'mosaic/no-dynamic-message-catalogs',
+      'mosaic/forward-ref-parts',
       '@typescript-eslint/no-import-type-side-effects',
       ...Object.keys(noUnneededEffects.configs.strict.rules),
     ]) {

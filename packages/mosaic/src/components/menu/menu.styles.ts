@@ -160,6 +160,17 @@ export const label = stylex.create({
   },
 });
 
+export const indicator = stylex.create({
+  base: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['4'],
+  },
+});
+
 export const separator = stylex.create({
   base: {
     // Full-bleed across the popup: cancel the viewport's inline padding.

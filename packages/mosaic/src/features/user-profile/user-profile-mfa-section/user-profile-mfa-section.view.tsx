@@ -21,8 +21,7 @@ export interface UserProfileMfaSectionViewProps {
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
-  onRegenerateBackupCodes?: () => void;
-  regenerateError?: string;
+  regenerate?: { onClick: () => void; status: 'idle' | 'pending'; error?: string };
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
   removeReverification?: ReverificationController;
@@ -35,8 +34,7 @@ export function UserProfileMfaSectionView({
   addButtonRef,
   addControl,
   onAdd,
-  onRegenerateBackupCodes,
-  regenerateError,
+  regenerate,
   onRemove,
   onSetDefault,
   removeReverification,
@@ -82,11 +80,11 @@ export function UserProfileMfaSectionView({
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}
-            onRegenerateBackupCodes={onRegenerateBackupCodes}
+            regenerate={regenerate}
           />
         ))}
       </UserProfileSecurityList>
-      <Section.Error>{regenerateError ?? controller.defaultError}</Section.Error>
+      <Section.Error>{regenerate?.error ?? controller.defaultError}</Section.Error>
       {controller.remove ? (
         <Confirmation
           controller={controller.remove}

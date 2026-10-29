@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "4.42.0",
+  "version": "4.43.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -182,7 +182,6 @@
     "@base-org/account": "catalog:module-manager",
     "@coinbase/wallet-sdk": "catalog:module-manager",
     "@solana/wallet-adapter-base": "catalog:module-manager",
-    "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",
     "@stripe/react-stripe-js": "3.1.1",
     "@stripe/stripe-js": "5.6.0",
