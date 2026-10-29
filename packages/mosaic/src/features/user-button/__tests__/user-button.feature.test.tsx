@@ -2,6 +2,7 @@ import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { page } from 'vitest/browser';
 
 import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -110,6 +111,13 @@ const reading = (...names: string[]) =>
     .queryAllByText(new RegExp(`^(${names.join('|')})$`))
     .filter(node => !node.closest('.cl-user-button-header'))
     .map(node => node.textContent);
+
+async function wideViewport() {
+  await page.viewport(1280, 800);
+  onTestFinished(() => page.viewport(414, 896));
+}
+
+const profileTabs = () => screen.getAllByRole('tab').map(tab => tab.textContent);
 
 const current = () =>
   Array.from(requiredPopup().querySelectorAll('[aria-current="true"]')).map(node => node.textContent);
@@ -465,28 +473,30 @@ describe('UserButton', () => {
 
   describe('handing off', () => {
     it('opens the UserProfile modal and closes when managing the account', async () => {
+      await wideViewport();
       const { clerk, navigate } = await renderUserButton();
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile');
       const user = await open();
 
       await openSettings(user, 'Manage profile');
 
-      expect(openUserProfile).toHaveBeenCalled();
+      expect(await screen.findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+      expect(openUserProfile).not.toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
       await waitFor(() => expect(popup()).toBeNull());
     });
 
-    it('hands the opened profile the portal root the app provides', async () => {
+    it('opens the profile into the portal root the app provides', async () => {
+      await wideViewport();
       const container = document.body.appendChild(document.createElement('div'));
       onTestFinished(() => container.remove());
       serveFapi(signedIn());
-      const { clerk } = await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+      await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
       const user = await open();
 
       await openSettings(user, 'Manage profile');
 
-      expect(openUserProfile.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
+      expect(within(container).getByRole('tab', { name: 'Account' })).toBeInTheDocument();
     });
 
     it('runs a custom menu item and closes', async () => {
@@ -500,62 +510,43 @@ describe('UserButton', () => {
       await waitFor(() => expect(popup()).toBeNull());
     });
 
-    it('renders a custom page into the element the opened profile hands back', async () => {
-      const { clerk } = await renderUserButton({
-        userProfileProps: { customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }] },
-      });
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+    it('renders a custom page inside the opened profile', async () => {
+      await wideViewport();
+      await renderUserButton({ userProfileProps: { customPages: [terms] } });
       const user = await open();
 
       await openSettings(user, 'Manage profile');
-      await waitFor(() => expect(popup()).toBeNull());
+      await user.click(await screen.findByRole('tab', { name: 'Terms' }));
 
-      const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
-      expect(customPages).toHaveLength(1);
-      expect(customPages[0]).toMatchObject({ label: 'Terms', url: 'terms' });
-
-      const el = document.createElement('div');
-      document.body.appendChild(el);
-      act(() => {
-        customPages[0]?.mount?.(el);
-      });
-
-      expect(within(el).getByText('Terms body')).toBeInTheDocument();
+      expect(screen.getByText('Terms body')).toBeVisible();
     });
 
-    it('opens the profile with its pages in the order it was given', async () => {
-      const { clerk } = await renderUserButton({
-        userProfileProps: {
-          customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }],
-          pageOrder: ['account', 'terms'],
-        },
-      });
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+    it('opens the profile on the first page of the order it was given', async () => {
+      await wideViewport();
+      await renderUserButton({ userProfileProps: { customPages: [terms], pageOrder: ['terms', 'account'] } });
       const user = await open();
 
       await openSettings(user, 'Manage profile');
-      await waitFor(() => expect(popup()).toBeNull());
 
-      const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
-      expect(customPages.map((page: CustomPage) => page.label)).toEqual(['account', 'Terms', 'security']);
+      expect(await screen.findByRole('tab', { name: 'Terms' })).toHaveAttribute('aria-selected', 'true');
+      expect(profileTabs()).toEqual(['Terms', 'Account', 'Security', 'General', 'Members']);
     });
 
     it.each([
-      { features: {}, pages: ['Terms', 'account', 'security'] },
-      { features: { billing: true, apiKeys: true }, pages: ['Terms', 'account', 'security', 'billing', 'apiKeys'] },
-    ])('orders the UserProfile pages the instance turns on: $features', async ({ features, pages }) => {
-      const { clerk } = await renderUserButton(
+      { features: {}, tabs: ['Terms', 'Account', 'Security', 'General', 'Members'] },
+      { features: { apiKeys: true }, tabs: ['Terms', 'Account', 'Security', 'API Keys', 'General', 'Members'] },
+    ])('orders the UserProfile pages the instance turns on: $features', async ({ features, tabs }) => {
+      await wideViewport();
+      await renderUserButton(
         { userProfileProps: { customPages: [terms], pageOrder: ['terms'] } },
         signedIn({ environment: instanceWith(features) }),
       );
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
       await openSettings(user, 'Manage profile');
-      await waitFor(() => expect(popup()).toBeNull());
+      await screen.findByRole('tab', { name: 'Terms' });
 
-      const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
-      expect(customPages.map((page: CustomPage) => page.label)).toEqual(pages);
+      expect(profileTabs()).toEqual(tabs);
     });
 
     it.each([
@@ -932,8 +923,8 @@ describe('UserButton', () => {
     });
 
     it('manages the account from its settings row, and signs out at the foot', async () => {
-      const { clerk } = await renderUserButton({ mode: 'user' });
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+      await wideViewport();
+      await renderUserButton({ mode: 'user' });
       const user = await open();
 
       expect(
@@ -944,7 +935,8 @@ describe('UserButton', () => {
 
       await user.click(screen.getByRole('button', { name: 'Settings' }));
       expect(screen.queryByRole('menu')).toBeNull();
-      expect(openUserProfile).toHaveBeenCalled();
+      expect(await screen.findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+      expect(profileTabs()).toEqual(['Account', 'Security']);
     });
 
     it('lists every account in the flyout, then the way to add one, then signing out of them all', async () => {

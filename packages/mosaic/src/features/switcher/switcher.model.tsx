@@ -6,15 +6,17 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   UserButtonProps as ClerkUserButtonProps,
-  UserProfileModalProps,
   UserResource,
 } from '@clerk/shared/types';
 import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useModal } from '../../modals/use-modal';
 import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
+import { userProfileModal } from '../user-profile/user-profile.modal';
+import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
@@ -109,7 +111,10 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 
 /** Props forwarded to the profile modals this button opens. */
 export interface SwitcherModalProps {
-  userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
+  userProfile?: Pick<
+    UserProfileModalOptions,
+    'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'mode'
+  >;
   organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
 }
 
@@ -173,8 +178,8 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 }
 
 /**
- * @param modals - Props forwarded to the profile modals. Custom pages arrive already bridged, since only
- *   the wrapper can render the portals behind them.
+ * @param modals - Props forwarded to the profile modals. The organization profile's custom pages arrive
+ *   already bridged, since only the wrapper can render the portals behind them.
  */
 export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
@@ -185,6 +190,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
+  const userProfile = useModal(userProfileModal);
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -199,7 +205,14 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
+    openModal: () =>
+      userProfile.open(
+        {
+          ...modals?.userProfile,
+          organizationProfileProps: { afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl },
+        },
+        getContainer?.(),
+      ),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
