@@ -12,15 +12,15 @@ export function writeAgentRulesOnce() {
 
   didWrite = true;
 
+  let node;
   try {
-    logClerkAgentRulesResult(
-      writeClerkAgentRules({
-        cwd: nodeCwdOrThrow()(),
-        fs: nodeFsOrThrow(),
-        path: nodePathOrThrow(),
-        sdks: ['nextjs'],
-      }),
-    );
+    node = { cwd: nodeCwdOrThrow()(), fs: nodeFsOrThrow(), path: nodePathOrThrow() };
+  } catch {
+    return;
+  }
+
+  try {
+    logClerkAgentRulesResult(writeClerkAgentRules({ ...node, sdks: ['nextjs'] }));
   } catch (error) {
     logClerkAgentRulesError(error);
   }

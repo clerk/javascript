@@ -6,17 +6,19 @@ vi.mock('@clerk/shared/agentRules', async importOriginal => ({
   ...(await importOriginal<typeof import('@clerk/shared/agentRules')>()),
   writeClerkAgentRules: vi.fn(),
 }));
-vi.mock('../fs/utils', () => ({
+
+const nodeApis = {
   nodeCwdOrThrow: () => () => '/app',
   nodeFsOrThrow: () => ({}),
   nodePathOrThrow: () => ({}),
-}));
+};
 
 const loadWriteAgentRulesOnce = async () => (await import('../agent-rules-node.js')).writeAgentRulesOnce;
 
 describe('writeAgentRulesOnce', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.doMock('../fs/utils', () => nodeApis);
     vi.mocked(writeClerkAgentRules).mockReset();
     for (const name of automatedEnvironmentVariables) {
       vi.stubEnv(name, '');
@@ -27,6 +29,7 @@ describe('writeAgentRulesOnce', () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.restoreAllMocks();
   });
 
   it('writes the rules once per process in development, with or without an AI agent', async () => {
@@ -61,6 +64,21 @@ describe('writeAgentRulesOnce', () => {
     (await loadWriteAgentRulesOnce())();
 
     expect(writeClerkAgentRules).not.toHaveBeenCalled();
+  });
+
+  it('skips without a warning on the Edge runtime, where Node APIs are missing', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    vi.doMock('../fs/utils', () => ({
+      ...nodeApis,
+      nodeCwdOrThrow: () => {
+        throw new Error("Clerk: cwd is missing. This is an internal error. Please contact Clerk's support.");
+      },
+    }));
+
+    (await loadWriteAgentRulesOnce())();
+
+    expect(writeClerkAgentRules).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('does not throw when writing fails', async () => {
