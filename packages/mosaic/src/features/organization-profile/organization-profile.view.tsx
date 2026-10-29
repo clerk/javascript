@@ -2,9 +2,9 @@ import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
-import type { ProfileRootProps } from '../../components/profile';
-import { Profile } from '../../components/profile';
 import { useMessages } from '../../localization';
+import type { ProfilePage, ProfilePagesViewProps } from '../profile-pages/profile-pages.view';
+import { ProfilePagesView } from '../profile-pages/profile-pages.view';
 import {
   getAvailableOrganizationProfilePages,
   ORGANIZATION_PROFILE_PAGE_ICONS,
@@ -16,71 +16,66 @@ import type {
   OrganizationProfilePages,
 } from './organization-profile.types';
 
-export interface OrganizationProfileViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
+/** What the organization's navigation is built from. */
+export interface OrganizationProfilePageListOptions {
+  /** The built-in pages. One left undefined is left out of the navigation. */
+  pages: OrganizationProfilePages;
+  /** Pages of the consumer's own, added to the navigation after the built-ins. */
+  customPages?: readonly CustomOrganizationProfilePage[];
+  /**
+   * The order the navigation runs in, by id: a built-in page's id, or a custom page's `path`. Ids
+   * left out keep their default place behind the ones named.
+   */
+  pageOrder?: readonly (OrganizationProfilePageId | (string & {}))[];
+}
+
+export interface OrganizationProfileViewProps
+  extends
+    Omit<ProfilePagesViewProps, 'label' | 'groups' | 'activePage' | 'onPageChange'>,
+    OrganizationProfilePageListOptions {
   label?: string;
   activePage: OrganizationProfilePageId | (string & {});
-  pages: OrganizationProfilePages;
-  customPages?: readonly CustomOrganizationProfilePage[];
-  pageOrder?: readonly (OrganizationProfilePageId | (string & {}))[];
   onPageChange: (page: OrganizationProfilePageId | (string & {})) => void;
 }
 
 export const OrganizationProfileView = React.forwardRef<HTMLDivElement, OrganizationProfileViewProps>(
-  function OrganizationProfileView({ activePage, pages, customPages, pageOrder, onPageChange, label, ...rest }, ref) {
+  function OrganizationProfileView({ pages, customPages, pageOrder, label, ...rest }, ref) {
     const m = useMessages('organizationProfile');
-    const entries = resolveOrganizationProfilePages(
-      getAvailableOrganizationProfilePages(pages),
-      customPages,
-      pageOrder,
-    );
-    const firstPage = entries[0];
-    if (!firstPage) {
+    const list = organizationProfilePageList({ pages, customPages, pageOrder }, m.pages);
+    if (list.length === 0) {
       logger.warnOnce('[Clerk] OrganizationProfile has no pages to show.');
     }
-    const resolvedEntry = entries.find(entry => entry.id === activePage) ?? firstPage;
-    const resolvedPage = resolvedEntry?.id ?? 'general';
 
     return (
-      <Profile.Root
+      <ProfilePagesView
         ref={ref}
-        value={resolvedPage}
-        onValueChange={onPageChange}
+        label={label ?? m.label}
+        groups={[{ pages: list }]}
         {...rest}
-      >
-        <Profile.Title>{label ?? m.label}</Profile.Title>
-        <Profile.Nav>
-          {entries.map(entry => (
-            <Profile.NavItem
-              key={entry.id}
-              value={entry.id}
-              icon={
-                entry.custom ? (
-                  entry.custom.icon
-                ) : (
-                  <Icon
-                    glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
-                    size='sm'
-                  />
-                )
-              }
-            >
-              {entry.custom ? entry.custom.label : m.pages[entry.id]}
-            </Profile.NavItem>
-          ))}
-        </Profile.Nav>
-        <Profile.Content
-          pageTitle={resolvedEntry?.custom ? resolvedEntry.custom.label : resolvedEntry && m.pages[resolvedEntry.id]}
-        >
-          {entries.map(entry => (
-            <Profile.ContentPanel
-              key={entry.id}
-              value={entry.id}
-            >
-              {entry.custom ? entry.custom.content : pages[entry.id]}
-            </Profile.ContentPanel>
-          ))}
-        </Profile.Content>
-      </Profile.Root>
+      />
     );
   },
 );
+
+/** The organization's navigation, in order: the built-ins it was given content for, then the consumer's pages. */
+export function organizationProfilePageList(
+  { pages, customPages, pageOrder }: OrganizationProfilePageListOptions,
+  labels: Record<OrganizationProfilePageId, string>,
+): ProfilePage[] {
+  return resolveOrganizationProfilePages(getAvailableOrganizationProfilePages(pages), customPages, pageOrder).map(
+    entry =>
+      entry.custom
+        ? { id: entry.id, label: entry.custom.label, icon: entry.custom.icon, content: entry.custom.content }
+        : {
+            id: entry.id,
+            label: labels[entry.id],
+            icon: (
+              <Icon
+                glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
+                size='sm'
+              />
+            ),
+            content: pages[entry.id],
+          },
+  );
+}

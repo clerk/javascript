@@ -194,4 +194,66 @@ describe('UserProfileView', () => {
 
     expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
   });
+  describe('with an organization', () => {
+    const organization: NonNullable<UserProfileViewProps['organization']> = {
+      pages: { general: <p>General content</p>, apiKeys: <p>Organization API keys content</p> },
+    };
+
+    function tabs() {
+      return screen.getAllByRole('tab').map(tab => tab.textContent);
+    }
+
+    it('groups the organization pages under Organization, after the account pages', () => {
+      renderView({ organization });
+
+      expect(tabs()).toEqual(['Account', 'Security', 'Billing', 'API Keys', 'General', 'API Keys']);
+      expect(screen.getByRole('tab', { name: 'Security' })).toHaveAccessibleDescription('Account');
+      expect(screen.getByRole('tab', { name: 'General' })).toHaveAccessibleDescription('Organization');
+    });
+
+    it('gives the organization pages their own ids', async () => {
+      const onPageChange = vi.fn();
+      const user = userEvent.setup();
+      renderView({ organization, onPageChange });
+
+      await user.click(screen.getByRole('tab', { name: 'General' }));
+
+      expect(onPageChange).toHaveBeenCalledWith('organization/general');
+    });
+
+    it('opens the organization page a shared id names, not the account one', () => {
+      renderView({ organization, activePage: 'organization/apiKeys' });
+
+      expect(screen.getByRole('tab', { name: 'API Keys', description: 'Organization' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      expect(screen.getByText('Organization API keys content')).toBeVisible();
+      expect(screen.queryByText('API keys content')).not.toBeInTheDocument();
+    });
+
+    it('adds and orders custom pages within the organization group', async () => {
+      const onPageChange = vi.fn();
+      const user = userEvent.setup();
+      renderView({
+        onPageChange,
+        organization: {
+          ...organization,
+          customPages: [{ label: 'Audit log', path: 'audit', content: <p>Audit content</p> }],
+          pageOrder: ['audit'],
+        },
+      });
+
+      expect(tabs()).toEqual(['Account', 'Security', 'Billing', 'API Keys', 'Audit log', 'General', 'API Keys']);
+      await user.click(screen.getByRole('tab', { name: 'Audit log' }));
+      expect(onPageChange).toHaveBeenCalledWith('organization/audit');
+    });
+
+    it('falls back to the first page once the organization is gone', () => {
+      renderView({ activePage: 'organization/general' });
+
+      expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+      expect(document.querySelector('.cl-profile-nav-group')).not.toBeInTheDocument();
+    });
+  });
 });
