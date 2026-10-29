@@ -34,7 +34,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   });
 
   const path = '/user-profile';
-  const tab = (page: Page, name: string) => page.getByRole('tab', { name, exact: true });
+  const tab = (page: Page, name: string) => page.getByRole('navigation').getByRole('tab', { name, exact: true });
 
   async function signIn({ page, context }: { page: Page; context: BrowserContext }) {
     const u = await createTestUtils({ app, page, context });
