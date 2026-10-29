@@ -39,10 +39,6 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
   const clerk = useClerk();
 
-  React.useEffect(() => {
-    void startEmailLinkVerification();
-  }, []);
-
   const restartVerification = () => {
     cancelEmailLinkFlow();
     void startEmailLinkVerification();
@@ -92,6 +88,10 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
       />
     );
   }
+
+  React.useEffect(() => {
+    void startEmailLinkVerification();
+  }, []);
 
   return (
     <Flow.Part part='emailLink'>
