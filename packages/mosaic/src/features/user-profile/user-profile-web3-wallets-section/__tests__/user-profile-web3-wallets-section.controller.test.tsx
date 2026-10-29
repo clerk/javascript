@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
+import type { ReverificationController } from '../../../reverification';
 import { useUserProfileWeb3WalletsController } from '../user-profile-web3-wallets-section.controller';
 import type {
   ReadyWeb3WalletsModel,
@@ -13,6 +14,8 @@ const providers = [
   { id: 'web3_metamask_signature', provider: 'MetaMask' },
   { id: 'web3_solana_signature', provider: 'Solana', walletPicker: 'solana' },
 ] satisfies UserProfileWeb3Provider[];
+
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
 
 function pendingRowId(controller: ReturnType<typeof useUserProfileWeb3WalletsController>) {
   return [...controller.wallets, ...controller.availableProviders].find(row => row.isPending)?.id;
@@ -73,6 +76,7 @@ describe('Web3 connection controller', () => {
         verify: vi.fn(),
         setPrimary,
         remove: vi.fn(),
+        setPrimaryReverification: idleReverification,
       }),
     );
 

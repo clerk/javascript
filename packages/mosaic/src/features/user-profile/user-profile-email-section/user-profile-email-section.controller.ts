@@ -39,7 +39,7 @@ export function useUserProfileEmailSectionController({
     emails: emails.map(email => ({
       ...email,
       isVerifyPending: verification.pendingVerifyId === email.id,
-      isPrimaryPending: actions.pendingKey === email.id,
+      isPrimaryPending: actions.pendingKey === email.id && !setPrimaryReverification.visible,
     })),
     canAdd: Boolean(onCreateEmail),
     verification,
