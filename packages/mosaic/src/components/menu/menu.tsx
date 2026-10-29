@@ -45,6 +45,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
     render ??
     (props => (
       <Button
+        color='neutral'
         variant='ghost'
         size='sm'
         shape={children ? 'default' : 'square'}

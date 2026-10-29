@@ -86,6 +86,7 @@ function DestructiveStep<Payload>({
         <Dialog.Close
           render={
             <Button
+              color='neutral'
               variant='outline'
               fullWidth
             >

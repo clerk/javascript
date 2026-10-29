@@ -281,7 +281,7 @@ function MemberRow({
             <Entity.Label>
               {member.name}
               {member.isCurrentUser ? (
-                <Badge>{m.you}</Badge>
+                <Badge color='neutral'>{m.you}</Badge>
               ) : member.isDeprovisioned ? (
                 <Badge>{m.deprovisioned}</Badge>
               ) : member.isBanned ? (
