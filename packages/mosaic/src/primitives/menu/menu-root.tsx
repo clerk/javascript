@@ -24,6 +24,7 @@ import {
   useTypeahead,
 } from '@floating-ui/react';
 import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 import { useDirection } from '../direction-provider';
 import { useControllableState } from '../hooks/use-controllable-state';
@@ -156,7 +157,7 @@ function MenuInner(props: MenuProps) {
           const nativeEvent = event.nativeEvent;
           openFrameRef.current = requestAnimationFrame(() => {
             openFrameRef.current = null;
-            floatingContext.onOpenChange(true, nativeEvent, 'click');
+            flushSync(() => floatingContext.onOpenChange(true, nativeEvent, 'click'));
           });
         },
       },

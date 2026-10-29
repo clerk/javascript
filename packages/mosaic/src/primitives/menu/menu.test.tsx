@@ -958,6 +958,33 @@ describe('Menu', () => {
       expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
 
+    it('stays open when the mouse leaves a menu pressed open just before the hover delay ran out', () => {
+      vi.useFakeTimers();
+      renderHoverMenu();
+      const trigger = screen.getByText('Actions');
+
+      try {
+        fireEvent.pointerEnter(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseEnter(trigger);
+        fireEvent.pointerDown(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseDown(trigger, { button: 0 });
+        act(() => {
+          vi.advanceTimersByTime(100);
+        });
+        expect(trigger).toHaveAttribute('data-open', '');
+
+        fireEvent.pointerLeave(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseLeave(trigger, { relatedTarget: screen.getByText('Elsewhere') });
+        act(() => {
+          vi.runAllTimers();
+        });
+
+        expect(trigger).toHaveAttribute('data-open', '');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it('closes on a second press of the trigger', async () => {
       const user = userEvent.setup();
       renderHoverMenu();
