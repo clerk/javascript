@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  agentEnvironmentVariables,
   automatedEnvironmentVariables,
+  isAgentEnvironment,
   isAutomatedEnvironment,
   isClerkAgentRulesWriteAllowed,
 } from '../utils/runtimeEnvironment';
@@ -65,11 +67,48 @@ describe('isAutomatedEnvironment', () => {
   });
 });
 
+describe('isAgentEnvironment', () => {
+  beforeEach(() => {
+    for (const name of agentEnvironmentVariables) {
+      vi.stubEnv(name, undefined);
+    }
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it.each(['CLAUDECODE', 'CODEX_THREAD_ID', 'GEMINI_CLI', 'OPENCODE', 'AI_AGENT'])(
+    'returns true when %s is set',
+    name => {
+      vi.stubEnv(name, '1');
+
+      expect(isAgentEnvironment()).toBe(true);
+    },
+  );
+
+  it('returns false when agent environment variables are unset or falsey', () => {
+    vi.stubEnv('CLAUDECODE', 'false');
+    vi.stubEnv('CURSOR_AGENT', '0');
+
+    expect(isAgentEnvironment()).toBe(false);
+  });
+
+  it('returns true only when CURSOR_EXTENSION_HOST_ROLE is agent-exec', () => {
+    vi.stubEnv('CURSOR_EXTENSION_HOST_ROLE', 'user');
+    expect(isAgentEnvironment()).toBe(false);
+
+    vi.stubEnv('CURSOR_EXTENSION_HOST_ROLE', 'agent-exec');
+    expect(isAgentEnvironment()).toBe(true);
+  });
+});
+
 describe('isClerkAgentRulesWriteAllowed', () => {
   beforeEach(() => {
-    for (const name of automatedEnvironmentVariables) {
+    for (const name of [...automatedEnvironmentVariables, ...agentEnvironmentVariables]) {
       vi.stubEnv(name, '');
     }
+    vi.stubEnv('CLAUDECODE', '1');
     vi.stubEnv('CLERK_AGENTS_MD', '');
     vi.stubEnv('NODE_ENV', 'development');
   });
@@ -78,8 +117,14 @@ describe('isClerkAgentRulesWriteAllowed', () => {
     vi.unstubAllEnvs();
   });
 
-  it('allows writes in development without an AI agent', () => {
+  it('allows writes in development when an AI agent is detected', () => {
     expect(isClerkAgentRulesWriteAllowed()).toBe(true);
+  });
+
+  it('blocks writes when no AI agent is detected', () => {
+    vi.stubEnv('CLAUDECODE', '');
+
+    expect(isClerkAgentRulesWriteAllowed()).toBe(false);
   });
 
   it('blocks writes in production', () => {

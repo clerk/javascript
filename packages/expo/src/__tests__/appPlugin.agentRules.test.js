@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 
-import { automatedEnvironmentVariables } from '@clerk/shared/utils';
+import { agentEnvironmentVariables, automatedEnvironmentVariables } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 const nodeRequire = createRequire(import.meta.url);
@@ -20,11 +20,12 @@ describe('maybeWriteAgentRules', () => {
   beforeEach(() => {
     projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-expo-agent-rules-'));
     fs.writeFileSync(path.join(projectRoot, 'package.json'), '{}');
-    for (const name of automatedEnvironmentVariables) {
+    for (const name of [...automatedEnvironmentVariables, ...agentEnvironmentVariables]) {
       vi.stubEnv(name, '');
     }
     vi.stubEnv('CLERK_AGENTS_MD', '');
     vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('CLAUDECODE', '1');
   });
 
   afterEach(() => {
