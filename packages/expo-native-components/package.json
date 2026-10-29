@@ -55,12 +55,10 @@
     "test": "vitest run",
     "test:watch": "vitest watch"
   },
-  "dependencies": {
-    "tslib": "catalog:repo"
-  },
   "devDependencies": {
     "@expo/config-plugins": "^54.0.4",
-    "react-native": "^0.86.0"
+    "react-native": "^0.86.0",
+    "tslib": "catalog:repo"
   },
   "peerDependencies": {
     "expo": "catalog:peer-expo",

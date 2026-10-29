@@ -118,14 +118,14 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "standardwebhooks": "^1.0.0",
-    "tslib": "catalog:repo"
+    "standardwebhooks": "^1.0.0"
   },
   "devDependencies": {
     "@edge-runtime/vm": "5.0.0",
     "cookie": "1.1.1",
     "msw": "2.15.0",
-    "snakecase-keys": "9.0.2"
+    "snakecase-keys": "9.0.2",
+    "tslib": "catalog:repo"
   },
   "engines": {
     "node": ">=20.9.0"

@@ -127,8 +127,7 @@
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "base-64": "^1.0.0",
-    "react-native-url-polyfill": "4.0.0",
-    "tslib": "catalog:repo"
+    "react-native-url-polyfill": "4.0.0"
   },
   "devDependencies": {
     "@clerk/expo-biometrics": "workspace:*",
@@ -144,7 +143,8 @@
     "expo-local-authentication": "^17.0.8",
     "expo-secure-store": "^15.0.8",
     "expo-web-browser": "^15.0.11",
-    "react-native": "^0.86.0"
+    "react-native": "^0.86.0",
+    "tslib": "catalog:repo"
   },
   "peerDependencies": {
     "@clerk/expo-biometrics": ">=0.1.0",

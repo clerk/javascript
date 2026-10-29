@@ -101,14 +101,14 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@clerk/shared": "workspace:^",
-    "tslib": "catalog:repo"
+    "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
     "@clerk/localizations": "workspace:*",
     "@clerk/ui": "workspace:*",
     "@types/semver": "^7.7.1",
     "semver": "^7.8.5",
+    "tslib": "catalog:repo",
     "yaml": "^2.9.0"
   },
   "peerDependencies": {
