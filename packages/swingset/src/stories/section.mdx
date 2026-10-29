@@ -71,6 +71,8 @@ title. See [Panel](/components/panel) and [Heading](/components/heading).
 | `Section.Header`      | `<div>`     | `.cl-section-header`      | Content and optional actions.                                   |
 | `Section.Title`       | heading     | `.cl-section-title`       | The group's heading.                                            |
 | `Section.Body`        | `<div>`     | `.cl-section-body`        | The card under the header.                                      |
+| `Section.Frame`       | `<div>`     | `.cl-section-frame`       | Faded shell around a body and a footer.                         |
+| `Section.Footer`      | `<div>`     | `.cl-section-footer`      | A strip under the body, on the frame.                           |
 | `Section.Row`         | `<div>`     | `.cl-section-row`         | One setting.                                                    |
 | `Section.Items`       | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
 | `Section.Item`        | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
@@ -99,6 +101,15 @@ inside `Section.Items` reflect `data-nested`.
 
 <Story
   name='Cards'
+  storyModule={SectionStories}
+/>
+
+### Footer
+
+`Section.Frame` wraps a `Section.Body` and a `Section.Footer` in a shell of `--cl-color-surface-subtle`. The shell's color shows as a one-pixel outline around the body and behind the footer, so the pair has one outer edge and no line between them.
+
+<Story
+  name='Subscription'
   storyModule={SectionStories}
 />
 
