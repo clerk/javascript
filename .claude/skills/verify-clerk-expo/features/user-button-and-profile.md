@@ -33,7 +33,7 @@ Preconditions:
 - The UserButton is `clerk.userButton.profile` on iOS and the accessibility label `Open user profile` on Android (`nativeUserButton` in `specs/native.ts`).
 - Profile rows have no stable identifier on Android, and on iOS the profile that the UserButton opens is inside a sheet, so the specs find the rows by text (`Manage account`, `Sign out`).
 - A seeded user has no name, so the profile header shows only the avatar. The email appears under `Manage account`.
-- Open the profile from the UserButton, as a user does. The `embeddedProfile` screen is for what only an inline UserProfileView has: `onHostBack` and custom pages.
+- Open the profile from the UserButton, as a user does. Use the `embeddedProfile` screen for `onHostBack`, which only an inline UserProfileView has, and for custom pages, which the test app passes only to its inline UserProfileView. The UserButton also takes custom pages through `userProfileProps.customPages`, and no spec covers that.
 - Tap the profile's Back button with `tapProfileBack` from `specs/native.ts`, which taps the middle of its frame. On Android the label `Back` is on a group that holds the button, and `locator.tap()` on it fails with "no parent-owned touch point".
 - Do not call `host.screenshot` while a custom page is on screen. On iOS the Back button of the page then does nothing. The video shows the page.
 - The test app shows a spinner while the ticket sign-in runs, and `host.launch` waits for the home.
