@@ -284,6 +284,7 @@ export const reverificationMachine = createMachine({
           {
             guard: (_: ReverificationContext, event: ErrorInvokeEvent) => isPasskeyAbortedError(event.error),
             target: 'verifying',
+            actions: assign(() => ({ error: undefined })),
           },
           {
             target: 'verifying',

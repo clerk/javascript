@@ -916,6 +916,44 @@ describe('Reverification', () => {
       }
     });
 
+    it('clears an earlier passkey error when the next prompt is aborted', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
+      );
+      const getCredential = vi
+        .fn()
+        .mockResolvedValueOnce({
+          publicKeyCredential: null,
+          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_cancelled' }),
+        })
+        .mockResolvedValueOnce({
+          publicKeyCredential: null,
+          error: new ClerkWebAuthnError('The operation was aborted', { code: 'passkey_operation_aborted' }),
+        });
+      clerk.__internal_getPublicCredentials = getCredential;
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Passkey verification was cancelled or timed out.'),
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
+        await settle();
+
+        expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+        expect(screen.getByRole('alert').textContent).toBe('');
+      } finally {
+        restore();
+      }
+    });
+
     it('offers the passkey from the picker when another method is showing', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }));
       const restore = pretendToBeARealBrowser();
