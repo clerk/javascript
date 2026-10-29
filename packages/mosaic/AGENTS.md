@@ -96,6 +96,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - One screen replacing another on the same card or dialog → `Flow` (`src/components/flow/`), see [Views](docs/views.md)
 - An interaction with an async lifecycle or two values that move together → A machine in the controller file, via `setup()` (`src/machine/`)
 - Styles several components share → `src/styles/*.styles.ts`
+- A machine-driven step that a lock or caller must await → `waitFor` (`src/machine/wait-for.ts`), inside `usePendingAction.run`
 - Anything else small: a permission, verification codes, backup codes, avatar files, a list patch → List `src/utils/`, `src/hooks/` and `src/primitives/hooks/` first; most of these already have a helper
 
 ## Signs you are about to invent a pattern
