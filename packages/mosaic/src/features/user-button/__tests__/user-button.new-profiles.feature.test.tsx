@@ -103,13 +103,14 @@ describe('UserButton with experimental.newProfiles', () => {
 
   const profileTabs = () => screen.getAllByRole('tab').map(tab => tab.textContent);
 
-  it('opens the combined UserProfile when managing the account, and closes', async () => {
+  it('opens the combined UserProfile straight from Settings, without a menu, and closes', async () => {
     const { clerk, navigate } = await renderWithNewProfiles();
     const openUserProfile = vi.spyOn(clerk, 'openUserProfile');
     const user = await open();
 
-    await openSettings(user, 'Manage profile');
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
 
+    expect(screen.queryByRole('menu')).toBeNull();
     expect(await screen.findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
     expect(profileTabs()).toEqual(['Account', 'Security', 'General', 'Members']);
     expect(openUserProfile).not.toHaveBeenCalled();
@@ -149,7 +150,7 @@ describe('UserButton with experimental.newProfiles', () => {
     );
     const user = await open();
 
-    await openSettings(user, 'Manage profile');
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
 
     expect(within(container).getByRole('tab', { name: 'Account' })).toBeInTheDocument();
   });
@@ -163,21 +164,30 @@ describe('UserButton with experimental.newProfiles', () => {
     });
     const user = await open();
 
-    await openSettings(user, 'Manage profile');
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
 
     expect(await screen.findByRole('tab', { name: 'Terms' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('Terms body')).toBeVisible();
     expect(profileTabs()).toEqual(['Terms', 'Account', 'Security', 'General', 'Members']);
   });
 
-  it("opens the combined profile on the organization's General page, with its own pages in order", async () => {
+  it("lists the organization's own pages in order in the combined profile", async () => {
     await renderWithNewProfiles({ organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] } });
+    const user = await open();
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+    expect(await screen.findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+    expect(profileTabs()).toEqual(['Account', 'Security', 'Terms', 'General', 'Members']);
+  });
+
+  it('still asks which to manage when the organization profile routes to a page', async () => {
+    const { navigate } = await renderWithNewProfiles({ organizationProfileUrl: '/org' });
     const user = await open();
 
     await openSettings(user, 'Manage organization');
 
-    expect(await screen.findByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
-    expect(profileTabs()).toEqual(['Account', 'Security', 'Terms', 'General', 'Members']);
+    expect(navigate).toHaveBeenCalledWith('/org');
   });
 
   it("leaves the organization's pages out in user mode", async () => {

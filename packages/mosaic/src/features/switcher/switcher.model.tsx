@@ -140,6 +140,10 @@ function resolveAfterUrl<T extends object>(
   return undefined;
 }
 
+function opensModal(url: string | undefined, mode: 'navigation' | 'modal' | undefined): boolean {
+  return (mode ?? (url ? 'navigation' : 'modal')) === 'modal';
+}
+
 /** Opens the modal unless a URL routes instead. An explicit mode wins; a URL on its own means navigation. */
 function openOrNavigate({
   url,
@@ -154,8 +158,7 @@ function openOrNavigate({
   buildUrl: () => string;
   navigate: (to: string) => unknown;
 }): () => void {
-  const resolved = mode ?? (url ? 'navigation' : 'modal');
-  return resolved === 'navigation' ? () => void navigate(url ?? buildUrl()) : () => openModal();
+  return opensModal(url, mode) ? () => openModal() : () => void navigate(url ?? buildUrl());
 }
 
 const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
@@ -251,6 +254,12 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });
+
+  const managesBothInOneProfile =
+    newProfiles &&
+    mosaicUserProfile?.mode === 'combined' &&
+    opensModal(options?.userProfileUrl, options?.userProfileMode) &&
+    opensModal(options?.organizationProfileUrl, options?.organizationProfileMode);
 
   const createOrganization = openOrNavigate({
     url: options?.createOrganizationUrl,
@@ -383,7 +392,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     // Single-session apps cannot hold a second account, so both actions are meaningless there.
     onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
     onManageAccount: manageAccount,
-    onManageOrganization: manageOrganization,
+    onManageOrganization: managesBothInOneProfile ? undefined : manageOrganization,
     // Invite has no page of its own to route to, so it opens its modal even when management is routed.
     onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
     // Covers both restricted instances and users at their creation limit.
