@@ -3885,6 +3885,10 @@ export class Clerk implements ClerkInterface {
   #updateAccessors = (session?: SignedInSessionResource | null, options?: { dangerouslySkipEmit?: boolean }) => {
     const { session: newSession, organization, user } = this.#getAccessorsFromSession(session);
 
+    if (newSession?.status === 'active' && (this.session?.id !== newSession.id || this.session?.status !== 'active')) {
+      SafeLocalStorage.removeItem(`${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`);
+    }
+
     this.session = newSession;
     this.organization = organization;
     this.user = user;

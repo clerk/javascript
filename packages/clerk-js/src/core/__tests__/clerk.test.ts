@@ -4426,6 +4426,51 @@ describe('Clerk singleton', () => {
       navigate.mockRestore();
     });
 
+    it.each(['initialization', 'activation'])(
+      'does not replay a direct-builder notice after session %s',
+      async mode => {
+        const sut = new Clerk(productionPublishableKey);
+        const options = { signInUrl: 'https://accounts.example.com/sign-in' };
+        await sut.load(options);
+        const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${sut.publishableKey}`;
+        const otherKey = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:another_instance`;
+        const notice = `${sut.publishableKey}:${Date.now()}`;
+        SafeLocalStorage.setItem(key, notice, PASSWORD_CONFIRMATION_NOTICE_TTL);
+        SafeLocalStorage.setItem(otherKey, 'other-notice', PASSWORD_CONFIRMATION_NOTICE_TTL);
+
+        expect(new URL(sut.buildSignInUrl()).searchParams.get(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM)).toBe(notice);
+        expect(SafeLocalStorage.getItem(key, null)).toBe(notice);
+
+        const session = {
+          id: 'session_new',
+          status: 'active',
+          user: { id: 'user_1' },
+          touch: vi.fn().mockResolvedValue(undefined),
+          getToken: vi.fn().mockResolvedValue('token_new'),
+          lastActiveToken: { getRawString: () => 'token_new' },
+        };
+        const client = { sessions: [session], signedInSessions: [session], lastActiveSessionId: session.id };
+        let returningClerk = sut;
+        if (mode === 'initialization') {
+          mockClientFetch.mockResolvedValue(client);
+          returningClerk = new Clerk(productionPublishableKey);
+          await returningClerk.load(options);
+        } else {
+          sut.updateClient(client as any);
+          expect(SafeLocalStorage.getItem(key, null)).toBe(notice);
+          await sut.setActive({ session: session.id });
+        }
+
+        expect(returningClerk.session?.id).toBe(session.id);
+        expect(SafeLocalStorage.getItem(key, null)).toBeNull();
+        expect(SafeLocalStorage.getItem(otherKey, null)).toBe('other-notice');
+        await returningClerk.setActive({ session: null });
+        expect(
+          new URL(returningClerk.buildSignInUrl()).searchParams.has(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM),
+        ).toBe(false);
+      },
+    );
+
     it.each(['expired', 'other-instance', 'missing'])('does not forward a %s notice', async kind => {
       const sut = new Clerk(productionPublishableKey);
       await sut.load({ signInUrl: 'https://accounts.example.com/sign-in' });
@@ -4446,41 +4491,47 @@ describe('Clerk singleton', () => {
       (window as any).__internal_onAfterSetActive = null;
     });
 
-    it('signs out and notifies other tabs after the server ended the session', async () => {
-      const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
-      (window as any).__internal_onAfterSetActive = mockOnAfterSetActive;
-      const eventBusSpy = vi.spyOn(eventBus, 'emit');
-      const mockSession = {
-        id: 'session_1',
-        status: 'active',
-        user: { id: 'user_1' },
-        lastActiveToken: { getRawString: () => 'token_1' },
-      };
+    it.each([false, true])(
+      'preserves the notice and signs out when the response retains the active session: %s',
+      async retainsSession => {
+        const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
+        (window as any).__internal_onAfterSetActive = mockOnAfterSetActive;
+        const eventBusSpy = vi.spyOn(eventBus, 'emit');
+        const mockSession = {
+          id: 'session_1',
+          status: 'active',
+          user: { id: 'user_1' },
+          lastActiveToken: { getRawString: () => 'token_1' },
+        };
 
-      const sut = new Clerk(productionPublishableKey);
-      sut.updateClient({ sessions: [mockSession], signedInSessions: [mockSession] } as any);
-      const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${sut.publishableKey}`;
-      const updateClient = sut.updateClient;
-      const updateClientSpy = vi.spyOn(sut, 'updateClient').mockImplementation(client => {
+        const sut = new Clerk(productionPublishableKey);
+        sut.updateClient({ sessions: [mockSession], signedInSessions: [mockSession] } as any);
+        const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${sut.publishableKey}`;
+        const updateClient = sut.updateClient;
+        const updateClientSpy = vi.spyOn(sut, 'updateClient').mockImplementation(client => {
+          expect(SafeLocalStorage.getItem(key, null)).toMatch(new RegExp(`^${sut.publishableKey}:\\d+$`));
+          updateClient(client);
+        });
+
+        await sut.__internal_handleSessionEnded({
+          sessions: retainsSession ? [mockSession] : [],
+          signedInSessions: retainsSession ? [mockSession] : [],
+        } as any);
+
+        expect(updateClientSpy).toHaveBeenCalledTimes(1);
         expect(SafeLocalStorage.getItem(key, null)).toMatch(new RegExp(`^${sut.publishableKey}:\\d+$`));
-        updateClient(client);
-      });
+        const now = Date.now();
+        const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now + 5 * 60 * 1000 + 1);
+        expect(SafeLocalStorage.getItem(key, false)).toBe(false);
+        nowSpy.mockRestore();
+        updateClientSpy.mockRestore();
 
-      await sut.__internal_handleSessionEnded({ sessions: [], signedInSessions: [] } as any);
-
-      expect(updateClientSpy).toHaveBeenCalledTimes(1);
-      expect(SafeLocalStorage.getItem(key, null)).toMatch(new RegExp(`^${sut.publishableKey}:\\d+$`));
-      const now = Date.now();
-      const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now + 5 * 60 * 1000 + 1);
-      expect(SafeLocalStorage.getItem(key, false)).toBe(false);
-      nowSpy.mockRestore();
-      updateClientSpy.mockRestore();
-
-      expect(sut.session).toBeNull();
-      expect(eventBusSpy).toHaveBeenCalledWith(events.UserSignOut, null);
-      expect(mockOnAfterSetActive).toHaveBeenCalled();
-      eventBusSpy.mockRestore();
-    });
+        expect(sut.session).toBeNull();
+        expect(eventBusSpy).toHaveBeenCalledWith(events.UserSignOut, null);
+        expect(mockOnAfterSetActive).toHaveBeenCalled();
+        eventBusSpy.mockRestore();
+      },
+    );
   });
 
   describe('__internal_attemptToEnableEnvironmentSetting', () => {
