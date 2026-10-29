@@ -25,13 +25,13 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   Observer: typeof QueryObserver,
 ): DistributivePick<QueryObserverResult<TData, TError>, CommonQueryResult> {
   const [client, isQueryClientLoaded] = useClerkQueryClient();
+  const defaultedOptions = isQueryClientLoaded
+    ? client.defaultQueryOptions(options)
+    : (options as DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>);
+
   // Make sure results are optimistically set in fetching state before subscribing or updating options
-  const defaultedOptions: DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey> = {
-    ...(isQueryClientLoaded
-      ? client.defaultQueryOptions(options)
-      : (options as DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>)),
-    _optimisticResults: 'optimistic',
-  };
+  // eslint-disable-next-line react-hooks/immutability -- kept in sync with TanStack Query's useBaseQuery, which sets this on the defaulted options
+  defaultedOptions._optimisticResults = 'optimistic';
 
   const observer = React.useMemo(() => {
     return new Observer<TQueryFnData, TError, TData, TQueryData, TQueryKey>(client, defaultedOptions);
