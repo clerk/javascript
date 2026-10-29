@@ -288,6 +288,73 @@ describe('writeClerkAgentRules in a monorepo', () => {
   });
 });
 
+describe('writeClerkAgentRules without a detected AI agent', () => {
+  beforeEach(() => {
+    vi.stubEnv('CLAUDECODE', '');
+  });
+
+  it('writes nothing and records nothing when the repo has no agent files', () => {
+    const memory = createMemoryFs();
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result).toEqual({ targetDir: '/repo', agentsMd: 'skipped', files: [] });
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+    expect(memory.read('/repo/node_modules/.cache/clerk/agent-rules/clerk-agent-rules')).toBeUndefined();
+  });
+
+  it.each(['/repo/CLAUDE.md', '/repo/.github/copilot-instructions.md', '/repo/apps/web/GEMINI.md'])(
+    'writes when the repo has agent files such as %s',
+    file => {
+      const memory = createMemoryFs({ '/repo/.git': '', '/repo/apps/web/package.json': '{}', [file]: '' });
+
+      const result = writeClerkAgentRules({
+        cwd: '/repo/apps/web',
+        fs: memory.fs,
+        path: pathAdapter,
+        sdks: ['nextjs'],
+      });
+
+      expect(result.agentsMd).toBe('created');
+    },
+  );
+
+  it('ignores agent files above the repo, such as a home folder .claude', () => {
+    const memory = createMemoryFs(
+      { '/home/user/.claude': '', '/home/user/app/.git': '', '/home/user/app/package.json': '{}' },
+      { withRepoPackageJson: false },
+    );
+
+    const result = writeClerkAgentRules({ cwd: '/home/user/app', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.agentsMd).toBe('skipped');
+  });
+
+  it('writes on a later run once an agent is detected', () => {
+    const memory = createMemoryFs();
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    vi.stubEnv('CLAUDECODE', '1');
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.agentsMd).toBe('created');
+  });
+
+  it('writes when forced', () => {
+    const memory = createMemoryFs();
+
+    const result = writeClerkAgentRules({
+      cwd: '/repo',
+      force: true,
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    expect(result.agentsMd).toBe('created');
+  });
+});
+
 describe('writeClerkAgentRules with an unmatched BEGIN marker', () => {
   it('keeps text after an orphan shared BEGIN marker across runs', () => {
     const memory = createMemoryFs({

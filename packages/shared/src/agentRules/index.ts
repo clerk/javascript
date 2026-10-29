@@ -1,3 +1,5 @@
+import { isAgentEnvironment } from '../utils/runtimeEnvironment';
+
 export type ClerkAgentRulesSdk =
   | 'astro'
   | 'backend'
@@ -206,6 +208,21 @@ function removeBlock(content: string, id: string, eol: string) {
   return before && after ? `${before}${eol}${eol}${after}` : `${before}${after}${before || after ? eol : ''}`;
 }
 
+const AGENT_FILES = [
+  'AGENTS.md',
+  'CLAUDE.md',
+  'GEMINI.md',
+  '.claude',
+  '.codex',
+  '.cursor',
+  '.cursorrules',
+  '.gemini',
+  '.github/copilot-instructions.md',
+  '.opencode',
+  '.windsurf',
+  '.windsurfrules',
+];
+
 function isDisabledInPackageJson(fs: FileSystemAdapter, path: PathAdapter, dir: string) {
   try {
     const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), { encoding: 'utf8' }));
@@ -245,6 +262,22 @@ function findAppDirs(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
   }
 
   return dirs.slice(0, 1);
+}
+
+function findAgentFileDirs(fs: FileSystemAdapter, path: PathAdapter, dirs: string[]) {
+  let current = dirs[0];
+  const root = path.parse(current).root;
+  const repoDirs: string[] = [];
+
+  while (current !== root) {
+    repoDirs.push(current);
+    if (fs.existsSync(path.join(current, '.git'))) {
+      return repoDirs;
+    }
+    current = path.dirname(current);
+  }
+
+  return dirs;
 }
 
 const relativeDir = (rootDir: string, dir: string) =>
@@ -291,6 +324,13 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
       }
     }
     return { targetDir: rootDir, agentsMd: 'disabled', files: [agentsPath] };
+  }
+
+  const hasAgentFiles = findAgentFileDirs(fs, path, dirs).some(dir =>
+    AGENT_FILES.some(file => fs.existsSync(path.join(dir, file))),
+  );
+  if (!force && !isAgentEnvironment() && !hasAgentFiles) {
+    return { targetDir: rootDir, agentsMd: 'skipped', files: [] };
   }
 
   const stateDir = path.join(rootDir, 'node_modules', '.cache', 'clerk', 'agent-rules');

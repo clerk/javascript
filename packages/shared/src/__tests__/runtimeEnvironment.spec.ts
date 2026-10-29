@@ -108,7 +108,6 @@ describe('isClerkAgentRulesWriteAllowed', () => {
     for (const name of [...automatedEnvironmentVariables, ...agentEnvironmentVariables]) {
       vi.stubEnv(name, '');
     }
-    vi.stubEnv('CLAUDECODE', '1');
     vi.stubEnv('CLERK_AGENTS_MD', '');
     vi.stubEnv('NODE_ENV', 'development');
   });
@@ -117,14 +116,8 @@ describe('isClerkAgentRulesWriteAllowed', () => {
     vi.unstubAllEnvs();
   });
 
-  it('allows writes in development when an AI agent is detected', () => {
+  it('allows writes in development without an AI agent, so the writer can look for agent files', () => {
     expect(isClerkAgentRulesWriteAllowed()).toBe(true);
-  });
-
-  it('blocks writes when no AI agent is detected', () => {
-    vi.stubEnv('CLAUDECODE', '');
-
-    expect(isClerkAgentRulesWriteAllowed()).toBe(false);
   });
 
   it('blocks writes in production', () => {

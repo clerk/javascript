@@ -1,5 +1,5 @@
 import { writeClerkAgentRules } from '@clerk/shared/agentRules';
-import { agentEnvironmentVariables, automatedEnvironmentVariables } from '@clerk/shared/utils';
+import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@clerk/shared/agentRules', async importOriginal => ({
@@ -20,12 +20,11 @@ describe('writeAgentRulesOnce', () => {
     vi.resetModules();
     vi.doMock('../fs/utils', () => nodeApis);
     vi.mocked(writeClerkAgentRules).mockReset();
-    for (const name of [...automatedEnvironmentVariables, ...agentEnvironmentVariables]) {
+    for (const name of automatedEnvironmentVariables) {
       vi.stubEnv(name, '');
     }
     vi.stubEnv('CLERK_AGENTS_MD', '');
     vi.stubEnv('NODE_ENV', 'development');
-    vi.stubEnv('CLAUDECODE', '1');
   });
 
   afterEach(() => {
@@ -33,7 +32,7 @@ describe('writeAgentRulesOnce', () => {
     vi.restoreAllMocks();
   });
 
-  it('writes the rules once per process in development when an AI agent is detected', async () => {
+  it('writes the rules once per process in development, with or without an AI agent', async () => {
     const writeAgentRulesOnce = await loadWriteAgentRulesOnce();
 
     writeAgentRulesOnce();
@@ -41,18 +40,6 @@ describe('writeAgentRulesOnce', () => {
 
     expect(writeClerkAgentRules).toHaveBeenCalledTimes(1);
     expect(writeClerkAgentRules).toHaveBeenCalledWith(expect.objectContaining({ cwd: '/app', sdks: ['nextjs'] }));
-  });
-
-  it('skips without an AI agent, then writes once one is detected', async () => {
-    vi.stubEnv('CLAUDECODE', '');
-    const writeAgentRulesOnce = await loadWriteAgentRulesOnce();
-
-    writeAgentRulesOnce();
-    expect(writeClerkAgentRules).not.toHaveBeenCalled();
-
-    vi.stubEnv('CLAUDECODE', '1');
-    writeAgentRulesOnce();
-    expect(writeClerkAgentRules).toHaveBeenCalledTimes(1);
   });
 
   it('skips in CI', async () => {

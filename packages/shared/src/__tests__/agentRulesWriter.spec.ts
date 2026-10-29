@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type * as AgentRules from '../agentRules';
 import { writeClerkAgentRules } from '../agentRules';
 import { createClerkAgentRulesWriter } from '../agentRulesWriter';
-import { agentEnvironmentVariables, automatedEnvironmentVariables } from '../utils/runtimeEnvironment';
+import { automatedEnvironmentVariables } from '../utils/runtimeEnvironment';
 
 vi.mock('../agentRules', async importOriginal => ({
   ...(await importOriginal<typeof AgentRules>()),
@@ -15,12 +15,11 @@ describe('createClerkAgentRulesWriter', () => {
     vi.mocked(writeClerkAgentRules)
       .mockReset()
       .mockReturnValue({ targetDir: '/app', agentsMd: 'unchanged', files: [] });
-    for (const name of [...automatedEnvironmentVariables, ...agentEnvironmentVariables]) {
+    for (const name of automatedEnvironmentVariables) {
       vi.stubEnv(name, '');
     }
     vi.stubEnv('CLERK_AGENTS_MD', '');
     vi.stubEnv('NODE_ENV', 'development');
-    vi.stubEnv('CLAUDECODE', '1');
   });
 
   afterEach(() => {

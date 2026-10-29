@@ -101,7 +101,6 @@ export const isClerkAgentRulesWriteAllowed = (): boolean => {
     !['0', 'false', 'off', 'no'].includes(optOut) &&
     !isProductionEnvironment() &&
     !isTestEnvironment() &&
-    !isAutomatedEnvironment() &&
-    isAgentEnvironment()
+    !isAutomatedEnvironment()
   );
 };

@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 
-import { agentEnvironmentVariables, automatedEnvironmentVariables } from '@clerk/shared/utils';
+import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 const nodeRequire = createRequire(import.meta.url);
@@ -20,12 +20,11 @@ describe('maybeWriteAgentRules', () => {
   beforeEach(() => {
     projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'clerk-expo-agent-rules-'));
     fs.writeFileSync(path.join(projectRoot, 'package.json'), '{}');
-    for (const name of [...automatedEnvironmentVariables, ...agentEnvironmentVariables]) {
+    for (const name of automatedEnvironmentVariables) {
       vi.stubEnv(name, '');
     }
     vi.stubEnv('CLERK_AGENTS_MD', '');
     vi.stubEnv('NODE_ENV', 'development');
-    vi.stubEnv('CLAUDECODE', '1');
   });
 
   afterEach(() => {
@@ -36,7 +35,8 @@ describe('maybeWriteAgentRules', () => {
   const agentsMdPath = () => path.join(projectRoot, 'AGENTS.md');
   const config = () => ({ _internal: { projectRoot } });
 
-  test('writes the Expo rules once per process in development, with or without an AI agent', () => {
+  test('writes the Expo rules once per process in development under an AI agent', () => {
+    vi.stubEnv('CLAUDECODE', '1');
     const maybeWriteAgentRules = loadMaybeWriteAgentRules();
 
     maybeWriteAgentRules(config());
