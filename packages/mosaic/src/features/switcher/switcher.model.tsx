@@ -2,14 +2,17 @@ import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
+  OrganizationProfileModalProps,
   OrganizationResource,
   OrganizationSwitcherProps,
   UserButtonProps as ClerkUserButtonProps,
+  UserProfileModalProps,
   UserResource,
 } from '@clerk/shared/types';
 import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicExperimental } from '../../hooks/use-mosaic-experimental';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useModal } from '../../modals/use-modal';
 import { useGetPortalContainer } from '../../primitives/portal';
@@ -112,11 +115,16 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 
 /** Props forwarded to the profile modals this button opens. */
 export interface SwitcherModalProps {
-  userProfile?: Pick<
-    UserProfileModalOptions,
-    'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'mode'
-  >;
-  organizationProfile?: Pick<OrganizationProfileModalOptions, 'customPages' | 'pageOrder'>;
+  userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
+  organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
+  /** What Mosaic's own profiles take when `experimental.newProfiles` opens them instead. */
+  newProfiles?: {
+    userProfile?: Pick<
+      UserProfileModalOptions,
+      'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'mode'
+    >;
+    organizationProfile?: Pick<OrganizationProfileModalOptions, 'customPages' | 'pageOrder'>;
+  };
 }
 
 function resolveAfterUrl<T extends object>(
@@ -179,8 +187,10 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 }
 
 /**
- * @param modals - Props forwarded to the profile modals. A `combined` user profile also carries the
- *   organization's pages, so managing the organization opens it on them.
+ * @param modals - Props forwarded to the profile modals. Custom pages for Clerk's arrive already bridged,
+ *   since only the wrapper can render the portals behind them. With `experimental.newProfiles`, a
+ *   `combined` user profile also carries the organization's pages, so managing the organization opens it
+ *   on them.
  */
 export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
@@ -193,6 +203,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const router = useMosaicRouter();
   const userProfile = useModal(userProfileModal);
   const organizationProfile = useModal(organizationProfileModal);
+  const { newProfiles } = useMosaicExperimental();
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -204,15 +215,20 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     enabled: Boolean(environment?.organizationSettings.enabled),
   });
 
-  const organizationProfileProps = {
-    ...modals?.organizationProfile,
-    afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
-  };
+  const afterLeaveOrganizationUrl = options?.afterLeaveOrganizationUrl;
+  const mosaicUserProfile = modals?.newProfiles?.userProfile;
+  const mosaicOrganizationProfile = { ...modals?.newProfiles?.organizationProfile, afterLeaveOrganizationUrl };
 
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => userProfile.open({ ...modals?.userProfile, organizationProfileProps }, getContainer?.()),
+    openModal: () =>
+      newProfiles
+        ? userProfile.open(
+            { ...mosaicUserProfile, organizationProfileProps: mosaicOrganizationProfile },
+            getContainer?.(),
+          )
+        : clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -220,13 +236,18 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageOrganization = openOrNavigate({
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
-    openModal: () =>
-      modals?.userProfile?.mode === 'combined'
-        ? userProfile.open(
-            { ...modals.userProfile, organizationProfileProps, page: 'organization/general' },
-            getContainer?.(),
-          )
-        : organizationProfile.open(organizationProfileProps, getContainer?.()),
+    openModal: () => {
+      if (!newProfiles) {
+        clerk.openOrganizationProfile({ getContainer, ...modals?.organizationProfile, afterLeaveOrganizationUrl });
+      } else if (mosaicUserProfile?.mode === 'combined') {
+        userProfile.open(
+          { ...mosaicUserProfile, organizationProfileProps: mosaicOrganizationProfile, page: 'organization/general' },
+          getContainer?.(),
+        );
+      } else {
+        organizationProfile.open(mosaicOrganizationProfile, getContainer?.());
+      }
+    },
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });

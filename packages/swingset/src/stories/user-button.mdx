@@ -219,9 +219,10 @@ all accounts**. The foot keeps **Sign out**.
 ## Profile modal
 
 Mosaic's profile modals are mounted by `MosaicProvider`, so neither the opener nor the app renders a
-dialog. The exported UserButton opens Mosaic's `UserProfile` the same way, against the signed-in
-user. This example backs the modal with fixture data, so it runs without a Clerk session. The profile is combined: the active organization's
-pages follow the account's. **Manage account** calls `open()`, **Manage organization** calls
+dialog. With `experimental={{ newProfiles: true }}` on `MosaicProvider`, the exported UserButton opens
+Mosaic's `UserProfile` the same way, against the signed-in user; without it, it opens Clerk's profile.
+This example backs the modal with fixture data, so it runs without a Clerk session. The profile is
+combined: the active organization's pages follow the account's. **Manage account** calls `open()`, **Manage organization** calls
 `open({ page: 'organization/general' })`, and the app's own buttons call `open({ page })` or
 `open({ mode: 'user' })` on the same modal. Hovering one preloads the profile, so it opens without a
 wait.
