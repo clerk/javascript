@@ -1,15 +1,16 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
+import { applyOrder } from '../../../utils/apply-order';
 import type { UserProfilePhone } from '../user-profile-contact.types';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
 import type { ReadyPhoneSectionModel, UserProfilePhoneSectionViewProps } from './user-profile-phone-section.types';
 
 export function useUserProfilePhoneSectionController({
-  phones,
+  phones: modelPhones,
   defaultPhoneCountry,
   onCreatePhone,
   getPhoneVerifier,
@@ -19,6 +20,8 @@ export function useUserProfilePhoneSectionController({
   setPrimaryReverification,
   createReverification,
 }: Omit<ReadyPhoneSectionModel, 'status' | 'userId'>): UserProfilePhoneSectionViewProps {
+  const [order] = useState(() => modelPhones.map(phone => phone.id));
+  const phones = applyOrder(order, modelPhones, phone => phone.id);
   const verification = useUserProfileAddPhoneController({
     onCreate: onCreatePhone,
     reverification: createReverification,

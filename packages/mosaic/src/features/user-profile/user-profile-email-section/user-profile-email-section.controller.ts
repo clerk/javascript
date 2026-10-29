@@ -1,14 +1,15 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
+import { applyOrder } from '../../../utils/apply-order';
 import type { UserProfileEmail } from '../user-profile-contact.types';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
 import type { ReadyEmailSectionModel, UserProfileEmailSectionViewProps } from './user-profile-email-section.types';
 
 export function useUserProfileEmailSectionController({
-  emails,
+  emails: modelEmails,
   username,
   onCreateEmail,
   getEmailVerifier,
@@ -18,6 +19,8 @@ export function useUserProfileEmailSectionController({
   setPrimaryReverification,
   createReverification,
 }: Omit<ReadyEmailSectionModel, 'status' | 'userId'>): UserProfileEmailSectionViewProps {
+  const [order] = useState(() => modelEmails.map(email => email.id));
+  const emails = applyOrder(order, modelEmails, email => email.id);
   const verification = useUserProfileAddEmailController({
     username,
     onCreate: onCreateEmail,
