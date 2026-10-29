@@ -19,13 +19,11 @@ import type {
 
 export function UserProfileConnectProviderRowView({
   provider,
-  isPending,
   isDisabled,
   onConnect,
   triggerRef,
 }: {
   provider: UserProfileConnectionProvider;
-  isPending: boolean;
   isDisabled: boolean;
   onConnect: (id: string) => void;
   triggerRef?: Ref<HTMLButtonElement>;
@@ -58,8 +56,8 @@ export function UserProfileConnectProviderRowView({
             variant='outline'
             color='neutral'
             aria-label={fill(m.connectLabel, { provider: provider.provider })}
-            isPending={isPending}
-            disabled={isDisabled && !isPending}
+            isPending={provider.isPending}
+            disabled={isDisabled && !provider.isPending}
             onClick={() => onConnect(provider.id)}
           >
             {m.connect}
@@ -91,7 +89,7 @@ export function UserProfileConnectedAccountRowView({
 }) {
   const m = useMessages('userProfileConnectedAccounts');
   const actions: ActionMenuAction[] = [];
-  if ((account.status === 'reconnect' || account.status === 'error') && onReconnect && !isDisabled) {
+  if ((account.status === 'reconnect' || account.status === 'error') && onReconnect) {
     actions.push({
       label: account.status === 'reconnect' ? m.reconnect : m.tryAgain,
       onClick: () => onReconnect(account.id),
@@ -131,6 +129,8 @@ export function UserProfileConnectedAccountRowView({
         {actions.length > 0 ? (
           <Section.Actions>
             <ActionMenu
+              disabled={isDisabled}
+              focusableWhenDisabled
               triggerRef={triggerRef}
               label={fill(m.manageLabel, { provider: account.provider })}
               actions={actions}

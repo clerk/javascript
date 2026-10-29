@@ -50,8 +50,8 @@ export function useEnterpriseAccountsFixture({
 
   return {
     accounts: linkedAccounts,
-    connections: availableConnections,
-    pendingId,
+    connections: availableConnections.map(item => ({ ...item, isPending: item.id === pendingId })),
+    isDisabled: pendingId !== undefined,
     onConnect: (id: string) => {
       const connection = availableConnections.find(item => item.id === id);
       if (!connection || pendingId) {

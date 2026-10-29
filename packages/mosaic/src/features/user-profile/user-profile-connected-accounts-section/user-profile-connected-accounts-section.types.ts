@@ -16,6 +16,7 @@ export interface ConnectedAccountProviderDisplay {
 export interface UserProfileConnectionProvider extends ConnectedAccountProviderDisplay {
   id: string;
   connectError?: string;
+  isPending?: boolean;
 }
 
 export interface UserProfileConnectedAccount extends ConnectedAccountProviderDisplay {
@@ -30,7 +31,7 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   accounts: UserProfileConnectedAccount[];
   sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileConnectionProvider[];
-  pendingId?: string;
+  isDisabled?: boolean;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;

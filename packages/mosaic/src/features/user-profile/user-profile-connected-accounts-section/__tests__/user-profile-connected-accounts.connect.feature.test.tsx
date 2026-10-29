@@ -158,6 +158,27 @@ describe('connected accounts', () => {
     request.fail();
   });
 
+  it('holds connected account menus while a connection starts', async () => {
+    await renderSection([google]);
+    const request = holdRequests('post', '/v1/me/external_accounts');
+    const user = userEvent.setup();
+
+    try {
+      await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+      await waitFor(() => expect(request.requests).toHaveLength(1));
+      const manage = screen.getByRole('button', { name: 'Manage Google' });
+      expect(manage).toHaveAttribute('aria-disabled', 'true');
+      await user.click(manage);
+      expect(screen.queryByRole('menu')).toBeNull();
+    } finally {
+      request.fail();
+    }
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Manage Google' })).not.toHaveAttribute('aria-disabled', 'true'),
+    );
+  });
+
   it('verifies the session before connecting a provider, then continues to it', async () => {
     serveFapi(signedIn([], { verification: { secrets: { password: 'hunter2' } } }));
     const view = await renderWithClerk(<UserProfileConnectedAccountsSection />);
