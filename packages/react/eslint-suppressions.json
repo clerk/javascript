@@ -1,0 +1,12 @@
+{
+  "src/contexts/ClerkProvider.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "src/utils/useCustomElementPortal.tsx": {
+    "react-hooks/refs": {
+      "count": 6
+    }
+  }
+}
