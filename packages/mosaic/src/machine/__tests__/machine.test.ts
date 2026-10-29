@@ -46,6 +46,20 @@ describe('createActor — pre-start safety', () => {
     expect(actor.can({ type: 'OPEN' })).toBe(true);
     expect(actor.can({ type: 'CANCEL' })).toBe(false);
   });
+
+  it('can() before start() answers for the initial state resolved from setContext()', () => {
+    const actor = createActor(
+      createMachine<{ done: boolean }, { type: 'GO' }>({
+        initial: context => (context.done ? 'end' : 'start'),
+        context: { done: false },
+        states: { start: { on: { GO: 'end' } }, end: {} },
+      }),
+    );
+
+    actor.setContext({ done: true });
+
+    expect(actor.can({ type: 'GO' })).toBe(false);
+  });
 });
 
 describe('createActor — transitions', () => {
@@ -876,6 +890,27 @@ describe('actor restart — stop/start resumes the current state', () => {
 
     expect(entered).toEqual(['a', 'b', 'c']);
     expect(actor.getSnapshot().value).toBe('c');
+  });
+
+  it('keeps events sent before the first start when the initial entry stops the actor', () => {
+    let stopOnEntry = () => {};
+    const actor = createActor(
+      createMachine<object, { type: 'NEXT' }>({
+        initial: 'a',
+        states: { a: { entry: () => stopOnEntry(), on: { NEXT: 'b' } }, b: {} },
+      }),
+    );
+    stopOnEntry = () => {
+      stopOnEntry = () => {};
+      actor.stop();
+    };
+    actor.send({ type: 'NEXT' });
+
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('a');
+    actor.start();
+
+    expect(actor.getSnapshot().value).toBe('b');
   });
 
   it('keeps a teleported actor inert across a restart', () => {

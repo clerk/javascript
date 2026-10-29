@@ -82,7 +82,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // Bumped whenever we leave an invoking state, so a stale promise resolving
   // after the fact is ignored — no transition.
   let invocationToken = 0;
-  let deferred: (() => boolean)[] = [];
+  const deferred: (() => boolean)[] = [];
 
   // Pending `after` timers — cleared when the state is exited, paused while the actor is stopped.
   let afterTimers: AfterTimer[] = [];
@@ -253,9 +253,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   }
 
   function applyDeferred(): void {
-    const received = deferred;
-    deferred = [];
-    for (const apply of received) {
+    while (status === 'active') {
+      const apply = deferred.shift();
+      if (!apply) {
+        return;
+      }
       apply();
     }
   }
@@ -377,6 +379,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     setContext(patch: Partial<TContext>) {
       liveContextPatch = { ...liveContextPatch, ...patch };
       context = { ...context, ...patch };
+      if (!initialized) {
+        value = resolveInitial();
+      }
     },
 
     recheck() {
