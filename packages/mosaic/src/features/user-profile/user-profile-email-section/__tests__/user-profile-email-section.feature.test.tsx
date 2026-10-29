@@ -485,11 +485,13 @@ describe('email reverification', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
     await waitFor(() => expect(dialog).toHaveTextContent('Open the link we sent to new@example.com'));
     expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
-    await waitFor(() => expect(poll.requests).toHaveLength(1));
     const added = fapi.client.sessions[0]?.user.email_addresses[0];
     if (!added) {
       throw new Error('Expected the new email address');
     }
+    const pollsForAdded = () =>
+      poll.requests.filter(request => new URL(request.url).pathname === `/v1/me/email_addresses/${added.id}`);
+    await waitFor(() => expect(pollsForAdded()).toHaveLength(1));
     verifyEmailOutOfBand(fapi, added.id);
     poll.release();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
