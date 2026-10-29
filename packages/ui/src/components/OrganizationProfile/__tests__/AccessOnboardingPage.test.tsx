@@ -90,4 +90,29 @@ describe('AccessOnboardingPage', () => {
 
     expect(await screen.findByText(text)).toBeInTheDocument();
   });
+
+  it('adds and removes people who can bypass SSO on a connection', async () => {
+    const { createFixtures: createViewFixtures } = bindCreateFixtures('OrganizationProfile', {
+      router: { queryParams: { connection: 'con_okta_engineering' } },
+    });
+    const { wrapper } = await createViewFixtures(withPageFixtures);
+    const Configured = () => {
+      const { scenario, setScenario } = useAccessPrototype();
+      if (scenario !== 'configured') {
+        setScenario('configured');
+        return null;
+      }
+      return <AccessOnboardingPage />;
+    };
+
+    render(<Configured />, { wrapper });
+
+    expect(await screen.findByText('it-admin@acmedev.org')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Email address'), { target: { value: 'ops@acmedev.org' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    expect(await screen.findByText('ops@acmedev.org')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove it-admin@acmedev.org' }));
+    await waitFor(() => expect(screen.queryByText('it-admin@acmedev.org')).not.toBeInTheDocument());
+  });
 });

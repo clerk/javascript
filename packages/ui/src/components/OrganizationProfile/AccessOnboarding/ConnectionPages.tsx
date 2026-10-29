@@ -19,7 +19,7 @@ import {
   Thead,
   Tr,
 } from '../../../customizables';
-import { ChevronDown, Link, RotateLeftRight, ShieldCheck } from '../../../icons';
+import { ChevronDown, Link, RotateLeftRight, ShieldCheck, Trash } from '../../../icons';
 import { useAccessNavigation } from './navigation';
 import {
   borderSx,
@@ -677,6 +677,10 @@ export const ManageConnectionPage = ({ connectionId, fromPolicy }: { connectionI
               logsOpen={logsOpen}
               onToggleLogs={() => setLogsOpen(value => !value)}
             />
+            <BypassSso
+              connection={connection}
+              canManage={store.access.canManage}
+            />
           </>
         ) : (
           <>
@@ -733,6 +737,105 @@ export const ManageConnectionPage = ({ connectionId, fromPolicy }: { connectionI
         </PageFooter>
       ) : null}
     </ProfileCard.Page>
+  );
+};
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const BypassSso = ({ connection, canManage }: { connection: ProtoConnection; canManage: boolean }) => {
+  const store = useAccessPrototype();
+  const [email, setEmail] = useState('');
+  const emails = connection.bypassEmails ?? [];
+  const candidate = email.trim().toLowerCase();
+  const canAdd = EMAIL_PATTERN.test(candidate) && !emails.includes(candidate);
+  const add = () => {
+    if (canAdd) {
+      store.updateConnection(connection.id, { bypassEmails: [...emails, candidate] });
+      setEmail('');
+    }
+  };
+
+  return (
+    <Col
+      sx={t => ({
+        gap: t.space.$3,
+        paddingTop: t.space.$5,
+        borderTopWidth: t.borderWidths.$normal,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$borderAlpha100,
+      })}
+    >
+      <Col sx={t => ({ gap: t.space.$0x5 })}>
+        <Text variant='subtitle'>Bypass SSO</Text>
+        <Text
+          colorScheme='secondary'
+          sx={smallSx}
+        >
+          People who can sign in with an email code if this connection stops working. Every admin is alerted each time.
+        </Text>
+      </Col>
+      {emails.length > 0 ? (
+        <Col sx={t => ({ ...borderSx(t), overflow: 'hidden' })}>
+          {emails.map((entry, index) => (
+            <Flex
+              key={entry}
+              justify='between'
+              align='center'
+              gap={3}
+              sx={t => ({
+                padding: `${t.space.$1} ${t.space.$1} ${t.space.$1} ${t.space.$4}`,
+                borderTopWidth: index === 0 ? 0 : t.borderWidths.$normal,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$borderAlpha100,
+              })}
+            >
+              <Text sx={smallSx}>{entry}</Text>
+              {canManage ? (
+                <Button
+                  variant='ghost'
+                  aria-label={`Remove ${entry}`}
+                  onClick={() =>
+                    store.updateConnection(connection.id, {
+                      bypassEmails: emails.filter(existing => existing !== entry),
+                    })
+                  }
+                  sx={t => ({ padding: t.space.$1x5, color: t.colors.$colorMutedForeground })}
+                >
+                  <Icon
+                    icon={Trash}
+                    sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+                  />
+                </Button>
+              ) : null}
+            </Flex>
+          ))}
+        </Col>
+      ) : null}
+      {canManage ? (
+        <Flex
+          align='center'
+          gap={2}
+        >
+          <Box sx={{ flex: 1 }}>
+            <TextInput
+              ariaLabel='Email address'
+              placeholder='it-admin@example.com'
+              value={email}
+              onChange={setEmail}
+              onEnter={add}
+            />
+          </Box>
+          <Button
+            variant='outline'
+            textVariant='buttonSmall'
+            block={false}
+            isDisabled={!canAdd}
+            onClick={add}
+            localizationKey={protoKey('Add')}
+          />
+        </Flex>
+      ) : null}
+    </Col>
   );
 };
 

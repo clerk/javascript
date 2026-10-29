@@ -69,6 +69,8 @@ export type ProtoConnection = {
   logs: ProtoTestLog[];
   /** Directories only. */
   token?: string;
+  /** SSO only: who can sign in with an email code if the connection breaks. */
+  bypassEmails?: string[];
 };
 
 export type ScenarioKey = 'work' | 'personal' | 'configured' | 'view_only' | 'sso_unavailable';
@@ -351,6 +353,7 @@ const scenario = (key: ScenarioKey): ProtoState => {
             name: 'Okta Engineering',
             status: 'active',
             logs: [okLog('log_1', '2026-09-22T13:15:08.000Z', 'Signed in as it-admin@acmedev.org')],
+            bypassEmails: ['it-admin@acmedev.org'],
           },
           {
             id: 'con_okta_marketing',
