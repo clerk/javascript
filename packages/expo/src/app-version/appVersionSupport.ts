@@ -48,9 +48,7 @@ const state = {
   requestSequence: 0,
   lastResetRequest: 0,
   lastAnsweredRequest: 0,
-  // What the last fetched environment says about this app.
   environmentStatus: null as AppVersionSupportStatus | null,
-  // What the last answered request says: a rejection, or a header saying the app is supported.
   serverAnswer: null as ServerAnswer | null,
   status: supportedStatus(),
   display: EMPTY_DISPLAY,
@@ -246,8 +244,6 @@ function publish({
   }
 }
 
-// A rejection wins. A response saying the app is supported overrides an environment that says it isn't, because the
-// server is what enforces the minimum.
 function deriveStatus({
   environmentStatus,
   serverAnswer,
