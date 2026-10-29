@@ -1,7 +1,9 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { page } from 'vitest/browser';
 
+import { openDialog } from '../../../__tests__/feature/dialog';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -371,5 +373,40 @@ describe('OrganizationSwitcher custom trigger badges', () => {
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
     expect(trigger()).toHaveAccessibleName('Open organization menu for Other');
+  });
+});
+
+describe('OrganizationSwitcher with experimental.newProfiles', () => {
+  async function renderWithNewProfiles(props: OrganizationSwitcherProps = {}) {
+    await page.viewport(1280, 800);
+    onTestFinished(() => page.viewport(414, 896));
+    serveFapi(noOffers());
+    return renderWithClerk(tree(props), undefined, undefined, { newProfiles: true });
+  }
+
+  it('opens the OrganizationProfile, without the account pages, from Settings', async () => {
+    const { clerk } = await renderWithNewProfiles();
+    const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile');
+    const user = await openWithList();
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+    expect(await screen.findByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.queryByRole('tab', { name: 'Account' })).toBeNull();
+    expect(openOrganizationProfile).not.toHaveBeenCalled();
+  });
+
+  it('lands on afterLeaveOrganizationUrl after leaving from the opened profile', async () => {
+    const { navigate } = await renderWithNewProfiles({ afterLeaveOrganizationUrl: '/left' });
+    const user = await openWithList();
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
+    const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
+      role: 'alertdialog',
+    });
+    await user.type(within(dialog).getByRole('textbox'), 'Acme');
+    await user.click(within(dialog).getByRole('button', { name: 'Leave organization' }));
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/left'));
   });
 });

@@ -3,7 +3,7 @@
 import type { OrganizationProfileProps, UserProfileProps } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
-import type { CustomProfileItem, UserProfilePageId } from '../user-profile/user-profile.types';
+import type { CustomProfileItem, CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 import { useSwitcherController } from './switcher.controller';
 import type { SwitcherModelOptions } from './switcher.model';
 import { useSwitcherModel } from './switcher.model';
@@ -106,6 +106,19 @@ export function Switcher(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- `@clerk/shared` types `appearance` as an unresolved type until a framework SDK augments `ClerkAppearanceRegistry`; it passes through untouched.
       appearance: organizationProfileProps?.appearance,
     },
+    newProfiles: {
+      userProfile: {
+        customPages: pagesOnly(userProfileProps?.customPages),
+        pageOrder: userProfileProps?.pageOrder,
+        additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
+        apiKeysProps: userProfileProps?.apiKeysProps,
+        mode: mode === 'combined' ? 'combined' : 'user',
+      },
+      organizationProfile: {
+        customPages: pagesOnly(organizationProfileProps?.customPages),
+        pageOrder: organizationProfileProps?.pageOrder,
+      },
+    },
   });
   const controller = useSwitcherController(model, { mode, customMenuItems, menuItemOrder });
 
@@ -136,4 +149,8 @@ export function Switcher(
       {portals}
     </>
   );
+}
+
+function pagesOnly(items: CustomProfileItem[] | undefined): CustomProfilePage[] | undefined {
+  return items?.filter((item): item is CustomProfilePage => item.href === undefined);
 }

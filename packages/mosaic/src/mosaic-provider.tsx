@@ -1,6 +1,10 @@
 import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
+import { organizationProfileModal } from './features/organization-profile/organization-profile.modal';
+import { userProfileModal } from './features/user-profile/user-profile.modal';
+import type { MosaicExperimental } from './hooks/use-mosaic-experimental';
+import { MosaicExperimentalProvider } from './hooks/use-mosaic-experimental';
 import { MosaicNowProvider } from './hooks/use-now';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
@@ -19,24 +23,36 @@ export interface MosaicProviderProps {
   icons?: MosaicIconOverrides;
   /** Locale and strings for everything Mosaic renders; see `MosaicLocalization`. */
   localization?: MosaicLocalization;
+  /** Features still being tried out. Their names and behavior can change in any release. */
+  experimental?: MosaicExperimental;
 }
 
 // Exported Mosaic components annotate a React return type on purpose. The package sets
 // `jsxImportSource: '@emotion/react'`, so an inferred return leaks Emotion's `JSX.Element` into the
 // published `.d.ts`, which React 19 consumers reject as a JSX element type.
-export function MosaicProvider({ children, direction, icons, localization }: MosaicProviderProps): React.ReactElement {
+export function MosaicProvider({
+  children,
+  direction,
+  icons,
+  localization,
+  experimental,
+}: MosaicProviderProps): React.ReactElement {
   const iconsValue = React.useMemo(() => icons ?? {}, [icons]);
   const localizationValue = React.useMemo(() => resolveLocalization(localization), [localization]);
   const [now] = React.useState(() => new Date());
+  const newProfiles = experimental?.newProfiles;
+  const experimentalValue = React.useMemo(() => ({ newProfiles }), [newProfiles]);
 
   return (
     <DirectionProvider direction={direction}>
       <MosaicIconsProvider value={iconsValue}>
         <MosaicLocalizationProvider value={localizationValue}>
           <MosaicNowProvider value={now}>
-            <ToastProvider>
-              <ModalHost surfaces={modalSurfaces}>{children}</ModalHost>
-            </ToastProvider>
+            <MosaicExperimentalProvider value={experimentalValue}>
+              <ToastProvider>
+                <ModalHost surfaces={modalSurfaces}>{children}</ModalHost>
+              </ToastProvider>
+            </MosaicExperimentalProvider>
           </MosaicNowProvider>
         </MosaicLocalizationProvider>
       </MosaicIconsProvider>
@@ -44,4 +60,4 @@ export function MosaicProvider({ children, direction, icons, localization }: Mos
   );
 }
 
-const modalSurfaces: ModalSurfaces = [];
+const modalSurfaces: ModalSurfaces = [userProfileModal, organizationProfileModal];

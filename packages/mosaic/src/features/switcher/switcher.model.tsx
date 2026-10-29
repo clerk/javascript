@@ -12,9 +12,15 @@ import type {
 import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicExperimental } from '../../hooks/use-mosaic-experimental';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useModal } from '../../modals/use-modal';
 import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
+import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
+import type { OrganizationProfileModalOptions } from '../organization-profile/organization-profile.modal.types';
+import { userProfileModal } from '../user-profile/user-profile.modal';
+import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
@@ -111,6 +117,14 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 export interface SwitcherModalProps {
   userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
   organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
+  /** What Mosaic's own profiles take when `experimental.newProfiles` opens them instead. */
+  newProfiles?: {
+    userProfile?: Pick<
+      UserProfileModalOptions,
+      'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'mode'
+    >;
+    organizationProfile?: Pick<OrganizationProfileModalOptions, 'customPages' | 'pageOrder'>;
+  };
 }
 
 function resolveAfterUrl<T extends object>(
@@ -124,6 +138,10 @@ function resolveAfterUrl<T extends object>(
     return populateParamFromObject({ urlWithParam: config, entity });
   }
   return undefined;
+}
+
+function opensModal(url: string | undefined, mode: 'navigation' | 'modal' | undefined): boolean {
+  return (mode ?? (url ? 'navigation' : 'modal')) === 'modal';
 }
 
 /** Opens the modal unless a URL routes instead. An explicit mode wins; a URL on its own means navigation. */
@@ -140,8 +158,7 @@ function openOrNavigate({
   buildUrl: () => string;
   navigate: (to: string) => unknown;
 }): () => void {
-  const resolved = mode ?? (url ? 'navigation' : 'modal');
-  return resolved === 'navigation' ? () => void navigate(url ?? buildUrl()) : () => openModal();
+  return opensModal(url, mode) ? () => openModal() : () => void navigate(url ?? buildUrl());
 }
 
 const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
@@ -173,8 +190,10 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 }
 
 /**
- * @param modals - Props forwarded to the profile modals. Custom pages arrive already bridged, since only
- *   the wrapper can render the portals behind them.
+ * @param modals - Props forwarded to the profile modals. Custom pages for Clerk's arrive already bridged,
+ *   since only the wrapper can render the portals behind them. With `experimental.newProfiles`, a
+ *   `combined` user profile also carries the organization's pages, so managing the organization opens it
+ *   on them.
  */
 export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
@@ -185,6 +204,9 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
+  const userProfile = useModal(userProfileModal);
+  const organizationProfile = useModal(organizationProfileModal);
+  const { newProfiles } = useMosaicExperimental();
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -196,10 +218,20 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     enabled: Boolean(environment?.organizationSettings.enabled),
   });
 
+  const afterLeaveOrganizationUrl = options?.afterLeaveOrganizationUrl;
+  const mosaicUserProfile = modals?.newProfiles?.userProfile;
+  const mosaicOrganizationProfile = { ...modals?.newProfiles?.organizationProfile, afterLeaveOrganizationUrl };
+
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
+    openModal: () =>
+      newProfiles
+        ? userProfile.open(
+            { ...mosaicUserProfile, organizationProfileProps: mosaicOrganizationProfile },
+            getContainer?.(),
+          )
+        : clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -207,15 +239,27 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageOrganization = openOrNavigate({
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
-    openModal: () =>
-      clerk.openOrganizationProfile({
-        getContainer,
-        ...modals?.organizationProfile,
-        afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
-      }),
+    openModal: () => {
+      if (!newProfiles) {
+        clerk.openOrganizationProfile({ getContainer, ...modals?.organizationProfile, afterLeaveOrganizationUrl });
+      } else if (mosaicUserProfile?.mode === 'combined') {
+        userProfile.open(
+          { ...mosaicUserProfile, organizationProfileProps: mosaicOrganizationProfile, page: 'organization/general' },
+          getContainer?.(),
+        );
+      } else {
+        organizationProfile.open(mosaicOrganizationProfile, getContainer?.());
+      }
+    },
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });
+
+  const managesBothInOneProfile =
+    newProfiles &&
+    mosaicUserProfile?.mode === 'combined' &&
+    opensModal(options?.userProfileUrl, options?.userProfileMode) &&
+    opensModal(options?.organizationProfileUrl, options?.organizationProfileMode);
 
   const createOrganization = openOrNavigate({
     url: options?.createOrganizationUrl,
@@ -348,7 +392,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     // Single-session apps cannot hold a second account, so both actions are meaningless there.
     onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
     onManageAccount: manageAccount,
-    onManageOrganization: manageOrganization,
+    onManageOrganization: managesBothInOneProfile ? undefined : manageOrganization,
     // Invite has no page of its own to route to, so it opens its modal even when management is routed.
     onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
     // Covers both restricted instances and users at their creation limit.

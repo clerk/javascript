@@ -49,7 +49,8 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   async function openProfileSettings(page: Page) {
     await popup(page).getByRole('button', { name: 'Settings' }).click();
     const profileSettings = page.getByRole('menuitem', { name: 'Manage profile' });
-    await profileSettings.or(page.locator('.cl-userProfile-root')).first().waitFor();
+    const profile = page.getByRole('tab', { name: 'Account', exact: true });
+    await profileSettings.or(profile).first().waitFor();
     if (await profileSettings.isVisible()) {
       await profileSettings.click();
     }
@@ -101,14 +102,26 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     await expect(page.getByText('custom-link-target')).toBeVisible();
   });
 
-  test('renders a custom page inside the UserProfile modal', async ({ page, context }) => {
-    const u = await signIn({ page, context }, '/custom');
+  test('opens the Mosaic UserProfile in a modal', async ({ page, context }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await signIn({ page, context });
 
     await trigger(page).click();
     await openProfileSettings(page);
-    await u.po.userProfile.waitForUserProfileModal();
 
-    await page.locator('.cl-userProfile-root').getByText('Custom page').click();
+    await expect(page.getByRole('tab', { name: 'Account', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('.cl-userProfile-root')).toHaveCount(0);
+    await expect(popup(page)).toBeHidden();
+  });
+
+  test('renders a custom page inside the UserProfile modal', async ({ page, context }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await signIn({ page, context }, '/custom');
+
+    await trigger(page).click();
+    await openProfileSettings(page);
+
+    await page.getByRole('tab', { name: 'Custom page', exact: true }).click();
     await expect(page.getByText('custom-page-content')).toBeVisible();
   });
 });
