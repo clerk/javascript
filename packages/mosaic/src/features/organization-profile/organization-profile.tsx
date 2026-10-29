@@ -7,6 +7,7 @@ import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { useOrganizationProfileModel } from './organization-profile.model';
 import type { OrganizationProfileOptions } from './organization-profile.provider';
 import { OrganizationProfileProvider } from './organization-profile.provider';
+import type { OrganizationProfilePageId, OrganizationProfilePages } from './organization-profile.types';
 import type { OrganizationProfileViewProps } from './organization-profile.view';
 import { OrganizationProfileView } from './organization-profile.view';
 import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
@@ -83,7 +84,7 @@ export function OrganizationProfile({
   defaultPage,
   afterLeaveOrganizationUrl,
   fallback,
-  apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
+  apiKeysProps,
 }: OrganizationProfileProps) {
   const model = useOrganizationProfileModel();
   const [activePage, setActivePage] = useState<OrganizationProfileViewProps['activePage']>(
@@ -105,15 +106,24 @@ export function OrganizationProfile({
         onPageChange={setActivePage}
         customPages={customPages}
         pageOrder={pageOrder}
-        pages={{
-          general: <OrganizationProfileGeneralPanel />,
-          members: model.pages.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
-          apiKeys:
-            model.pages.includes('apiKeys') && !hideAPIKeys ? (
-              <OrganizationProfileApiKeysPanel {...apiKeysProps} />
-            ) : undefined,
-        }}
+        pages={organizationProfilePanels(model.pages, apiKeysProps)}
       />
     </OrganizationProfileProvider>
   );
+}
+
+/**
+ * The organization's built-in panels, for the pages the instance has turned on. `apiKeysProps.hide`
+ * leaves the API keys panel out; the rest of `apiKeysProps` goes to it.
+ */
+export function organizationProfilePanels(
+  available: readonly OrganizationProfilePageId[],
+  { hide: hideAPIKeys = false, ...apiKeysProps }: APIKeysPageProps = {},
+): OrganizationProfilePages {
+  return {
+    general: <OrganizationProfileGeneralPanel />,
+    members: available.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
+    apiKeys:
+      available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
+  };
 }

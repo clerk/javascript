@@ -4,7 +4,12 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
+import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
+import { organizationProfilePanels } from '../organization-profile/organization-profile';
+import { useOrganizationProfileModel } from '../organization-profile/organization-profile.model';
+import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
 import { useUserProfilePages } from '../switcher/switcher.pages';
+import type { SwitcherMode } from '../switcher/switcher.types';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
 import type { UserProfileViewProps } from './user-profile.view';
@@ -13,6 +18,12 @@ import { UserProfileApiKeysPanel } from './user-profile-api-keys-panel';
 import { UserProfileProfilePanel } from './user-profile-profile-panel';
 import { UserProfileSecurityPanel } from './user-profile-security-panel';
 import { useUserProfileUserModel } from './user-profile-user.model';
+
+/**
+ * Which profiles the surface carries. `combined` adds the active organization's pages after the
+ * account's; `user` shows the account's alone, even when an organization is active.
+ */
+export type UserProfileMode = Exclude<SwitcherMode, 'organization'>;
 
 /** Everything `<UserProfile />` takes: your own pages and their order, the page it opens on, and the OAuth scopes it asks for. */
 export interface UserProfileProps
@@ -34,11 +45,26 @@ export interface UserProfileProps
    * keys a page lists, and `showDescription` adds an optional description when creating a key.
    */
   apiKeysProps?: APIKeysPageProps;
+  /**
+   * Which profiles the surface carries: the account's and the active organization's, or the
+   * account's alone.
+   *
+   * @default 'combined'
+   */
+  mode?: UserProfileMode;
+  /**
+   * Options for the organization's pages in `combined` mode: your own pages and their order, the API
+   * keys page, and where leaving the organization lands.
+   */
+  organizationProfileProps?: Pick<
+    OrganizationProfileProps,
+    'customPages' | 'pageOrder' | 'apiKeysProps' | 'afterLeaveOrganizationUrl'
+  >;
 }
 
 /**
  * The signed-in user's profile: Account, Security, and API keys when the instance enables them,
- * with your own pages alongside. It reads the user from Clerk, so it takes no data. It renders
+ * with your own pages alongside, and the active organization's pages after them. It reads the user from Clerk, so it takes no data. It renders
  * `fallback` until Clerk answers, and nothing at all when nobody is signed in.
  *
  * @example
@@ -54,9 +80,26 @@ export interface UserProfileProps
  * ```
  *
  * @example
- * `defaultPage` picks the page the profile opens on without moving it in the navigation.
+ * `defaultPage` picks the page the profile opens on without moving it in the navigation. An
+ * organization page's id is prefixed with `organization/`.
  * ```tsx
  * <UserProfile defaultPage='security' />
+ * ```
+ *
+ * @example
+ * `mode='user'` leaves the active organization's pages out.
+ * ```tsx
+ * <UserProfile mode='user' />
+ * ```
+ *
+ * @example
+ * `organizationProfileProps` adds your own pages to the organization's group.
+ * ```tsx
+ * <UserProfile
+ *   organizationProfileProps={{
+ *     customPages: [{ path: 'audit', label: 'Audit log', icon: <ListIcon />, content: <AuditPage /> }],
+ *   }}
+ * />
  * ```
  *
  * @example
@@ -76,6 +119,8 @@ export interface UserProfileProps
  * ```
  */
 export function UserProfile({
+  mode = 'combined',
+  organizationProfileProps,
   customPages,
   pageOrder,
   defaultPage,
@@ -96,26 +141,53 @@ export function UserProfile({
     return null;
   }
 
+  const viewProps: UserProfileViewProps = {
+    elevation: 'flush',
+    activePage,
+    onPageChange: setActivePage,
+    customPages,
+    pageOrder,
+    pages: {
+      account: <UserProfileProfilePanel />,
+      security: <UserProfileSecurityPanel />,
+      apiKeys:
+        builtInPages.includes('apiKeys') && !hideAPIKeys ? <UserProfileApiKeysPanel {...apiKeysProps} /> : undefined,
+    },
+  };
+
   return (
     <UserProfileProvider
       additionalOAuthScopes={additionalOAuthScopes}
       mode='mounted'
     >
-      <UserProfileView
-        elevation='flush'
-        activePage={activePage}
-        onPageChange={setActivePage}
-        customPages={customPages}
-        pageOrder={pageOrder}
-        pages={{
-          account: <UserProfileProfilePanel />,
-          security: <UserProfileSecurityPanel />,
-          apiKeys:
-            builtInPages.includes('apiKeys') && !hideAPIKeys ? (
-              <UserProfileApiKeysPanel {...apiKeysProps} />
-            ) : undefined,
-        }}
-      />
+      {mode === 'user' ? (
+        <UserProfileView {...viewProps} />
+      ) : (
+        <CombinedUserProfileView
+          {...viewProps}
+          organizationProfileProps={organizationProfileProps}
+        />
+      )}
     </UserProfileProvider>
+  );
+}
+
+function CombinedUserProfileView({
+  organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
+  ...viewProps
+}: UserProfileViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
+  const model = useOrganizationProfileModel();
+
+  return (
+    <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
+      <UserProfileView
+        {...viewProps}
+        organization={
+          model.status === 'ready'
+            ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
+            : undefined
+        }
+      />
+    </OrganizationProfileProvider>
   );
 }
