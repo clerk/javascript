@@ -66,6 +66,7 @@ export const SignInAlternativePhoneCodePhoneNumberCard = (props: SignUpAlternati
         >
           <Form.Root
             onSubmit={handleSubmit}
+            preserveFocusOnSubmit='identifier'
             gap={8}
           >
             <Col gap={6}>
