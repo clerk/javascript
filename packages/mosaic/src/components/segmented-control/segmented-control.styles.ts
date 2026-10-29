@@ -32,7 +32,7 @@ const scaleIn = stylex.keyframes({
 
 const surface = {
   borderRadius: radiusVars['--cl-radius-md'],
-  backgroundColor: { default: colorVars['--cl-color-background'], [forcedColors]: 'Highlight' },
+  backgroundColor: { default: colorVars['--cl-color-surface'], [forcedColors]: 'Highlight' },
   boxShadow: shadowVars['--cl-shadow-sm'],
   forcedColorAdjust: 'none',
 } as const;
@@ -44,7 +44,7 @@ export const styles = stylex.create({
     padding: space['0.5'],
     borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['0.5']})`,
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
     display: 'inline-flex',
     isolation: 'isolate',
     position: 'relative',

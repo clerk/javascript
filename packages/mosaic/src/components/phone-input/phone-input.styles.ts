@@ -66,7 +66,7 @@ export const styles = stylex.create({
   popup: {
     borderRadius: radiusVars['--cl-radius-lg'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
   },
