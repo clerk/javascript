@@ -4,7 +4,7 @@ import { MosaicProvider, OrganizationSwitcher } from '@clerk/mosaic';
 
 export default function Page() {
   return (
-    <MosaicProvider>
+    <MosaicProvider experimental={{ newProfiles: true }}>
       <OrganizationSwitcher
         customMenuItems={[{ id: 'custom-link', label: 'Custom link', href: '/custom/link-target' }]}
         organizationProfileProps={{

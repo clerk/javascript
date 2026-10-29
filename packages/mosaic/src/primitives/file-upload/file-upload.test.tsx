@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -371,5 +372,42 @@ describe('FileUpload', () => {
       const { container } = render(<Harness defaultValue={[makeFile('a.png', 'image/png')]} />);
       expect(await axe(container)).toHaveNoViolations();
     });
+  });
+
+  it('forwards refs to the root, dropzone, trigger, item and delete button', () => {
+    const file = makeFile('a.png', 'image/png');
+    const refs = {
+      root: createRef<HTMLDivElement>(),
+      dropzone: createRef<HTMLDivElement>(),
+      trigger: createRef<HTMLButtonElement>(),
+      item: createRef<HTMLDivElement>(),
+      remove: createRef<HTMLButtonElement>(),
+    };
+    render(
+      <FileUpload.Root
+        ref={refs.root}
+        defaultValue={[file]}
+        data-testid='file-upload-root'
+      >
+        <FileUpload.Dropzone
+          ref={refs.dropzone}
+          data-testid='file-upload-dropzone'
+        >
+          <FileUpload.Trigger ref={refs.trigger}>Choose files</FileUpload.Trigger>
+        </FileUpload.Dropzone>
+        <FileUpload.Item
+          file={file}
+          ref={refs.item}
+          data-testid='file-upload-item'
+        >
+          <FileUpload.ItemDelete ref={refs.remove}>Remove a.png</FileUpload.ItemDelete>
+        </FileUpload.Item>
+      </FileUpload.Root>,
+    );
+    expect(refs.root.current).toBe(screen.getByTestId('file-upload-root'));
+    expect(refs.dropzone.current).toBe(screen.getByTestId('file-upload-dropzone'));
+    expect(refs.trigger.current).toBe(screen.getByRole('button', { name: 'Choose files' }));
+    expect(refs.item.current).toBe(screen.getByTestId('file-upload-item'));
+    expect(refs.remove.current).toBe(screen.getByRole('button', { name: 'Remove a.png' }));
   });
 });

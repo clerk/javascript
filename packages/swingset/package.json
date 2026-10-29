@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev --port 6006",
+    "dev": "node scripts/dev.mjs",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check"
   },
@@ -42,6 +42,7 @@
     "@tailwindcss/postcss": "^4.0.0",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "get-port": "^5.1.1",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0",
     "shadcn": "^4.10.0",

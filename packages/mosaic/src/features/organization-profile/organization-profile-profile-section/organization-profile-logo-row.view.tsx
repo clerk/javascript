@@ -43,7 +43,7 @@ export function OrganizationProfileLogoRowView({
   const errorText = useErrorText();
   const logo = useOrganizationProfileLogoController({ onChange, onRemove });
   const [rejection, setRejection] = useState<LocalizableError>();
-  const error = rejection ?? logo.error;
+  const error = rejection ? errorText(rejection) : logo.error;
   const remove = logo.onRemove;
   const handleRemove = remove
     ? () => {
@@ -101,7 +101,7 @@ export function OrganizationProfileLogoRowView({
           onRemove={handleRemove}
         />
       </Section.Item>
-      <Section.Error>{error ? errorText(error) : undefined}</Section.Error>
+      <Section.Error>{error}</Section.Error>
     </FileUpload.Root>
   );
 }
@@ -113,7 +113,7 @@ function LogoActions({
 }: {
   hasImage: boolean;
   canChange: boolean;
-  onRemove?: () => Promise<void>;
+  onRemove?: () => Promise<unknown>;
 }) {
   const m = useMessages('organizationProfileProfileSection');
   const { openFilePicker } = FileUpload.useFileUpload();

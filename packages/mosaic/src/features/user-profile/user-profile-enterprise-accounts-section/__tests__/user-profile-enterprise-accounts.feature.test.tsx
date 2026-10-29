@@ -354,6 +354,20 @@ describe('enterprise accounts', () => {
     retry.fail();
   });
 
+  it('clears the previous connection error when another connection starts', async () => {
+    await renderSection();
+    const user = userEvent.setup();
+    const request = holdRequests('post', '/v1/me/external_accounts');
+    await user.click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
+    request.fail('enterprise_error', 'Acme is unavailable.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Acme is unavailable.'));
+    const other = holdRequests('post', '/v1/me/external_accounts');
+    await user.click(screen.getByRole('button', { name: 'Connect Custom SAML' }));
+    await waitFor(() => expect(other.requests).toHaveLength(1));
+    expect(screen.queryByText('Acme is unavailable.')).toBeNull();
+    other.fail();
+  });
+
   it('releases pending after the redirect grace period', async () => {
     const { clerk } = await renderSection();
     const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});

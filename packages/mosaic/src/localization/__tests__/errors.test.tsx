@@ -31,9 +31,7 @@ describe('useErrorText', () => {
   });
 
   it('ships English for known codes', () => {
-    expect(errorText()({ code: 'form_password_incorrect', message: 'api text' })).toBe(
-      'Your current password is incorrect.',
-    );
+    expect(errorText()({ code: 'form_password_incorrect', message: 'api text' })).toBe('Password is incorrect.');
   });
 
   it('falls back to the message Clerk sent for a code it has no text for', () => {

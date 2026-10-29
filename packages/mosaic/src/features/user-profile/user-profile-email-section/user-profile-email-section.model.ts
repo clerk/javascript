@@ -3,10 +3,11 @@ import type { EmailAddressResource, UserResource } from '@clerk/shared/types';
 
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../user-profile-contact.types';
-import { byId, canAddIdentifications, toContactAccess, toContacts } from '../user-profile-contact.utils';
+import { byId, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileAddEmailField } from './user-profile-add-email.controller';
 import type { UserProfileEmailSectionModel } from './user-profile-email-section.types';
@@ -104,7 +105,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
   const access = toContactAccess(
     attributes.email_address,
     user.emailAddresses.length,
-    canAddIdentifications(user, enterpriseSSO.enabled),
+    allowsIdentificationCreation(user, enterpriseSSO),
   );
 
   if (!access.show) {
