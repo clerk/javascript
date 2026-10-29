@@ -14,7 +14,6 @@ export function UserProfileEmailSectionView({
   emails,
   canAdd,
   isDisabled,
-  pendingPrimaryId,
   verification,
   error,
   rowRef,
@@ -64,8 +63,6 @@ export function UserProfileEmailSectionView({
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
         isDisabled={isDisabled}
-        pendingPrimaryId={pendingPrimaryId}
-        pendingVerifyId={verification.pendingVerifyId}
       >
         <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>
@@ -80,7 +77,6 @@ export function UserProfileEmailSectionView({
       {remove ? (
         <Confirmation
           controller={remove}
-          disabled={isDisabled}
           title={m.removeDialog.title}
           description={email =>
             fill(email.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {

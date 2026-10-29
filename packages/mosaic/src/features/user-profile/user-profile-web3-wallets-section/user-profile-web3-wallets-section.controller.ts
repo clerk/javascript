@@ -149,18 +149,22 @@ export function useUserProfileWeb3WalletsController({
   const actionFinalFocus = () => (ownerId ? removalFocus.trigger(ownerId) : null);
 
   return {
-    wallets: wallets.map(wallet =>
-      errorId === wallet.id
+    wallets: wallets.map(wallet => {
+      const isPending = pendingId === wallet.id;
+      const row = { ...wallet, isPending, isPrimaryPending: isPending && owner?.kind === 'primary' };
+      return errorId === wallet.id
         ? owner?.kind === 'primary'
-          ? { ...wallet, primaryError: action.error }
-          : { ...wallet, verifyError: action.error }
-        : wallet,
-    ),
-    availableProviders: availableProviders.map(provider =>
-      errorId === provider.id && (!picker.open || picker.kind !== 'connect' || picker.provider.id !== provider.id)
-        ? { ...provider, connectError: action.error }
-        : provider,
-    ),
+          ? { ...row, primaryError: action.error }
+          : { ...row, verifyError: action.error }
+        : row;
+    }),
+    availableProviders: availableProviders.map(provider => {
+      const row = { ...provider, isPending: pendingId === provider.id };
+      return errorId === provider.id &&
+        (!picker.open || picker.kind !== 'connect' || picker.provider.id !== provider.id)
+        ? { ...row, connectError: action.error }
+        : row;
+    }),
     error:
       !picker.open &&
       errorId &&
@@ -168,18 +172,10 @@ export function useUserProfileWeb3WalletsController({
       !availableProviders.some(provider => provider.id === errorId)
         ? action.error
         : undefined,
-    pendingId,
-    pendingPrimaryId: owner?.kind === 'primary' ? pendingId : undefined,
     isDisabled: action.isPending,
     sectionRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: remove
-      ? {
-          ...removeWallet,
-          confirm: async (wallet: UserProfileWeb3Wallet) =>
-            (await action.runExternal(() => removeWallet.confirm(wallet))) ?? false,
-        }
-      : undefined,
+    remove: remove ? action.guard(removeWallet) : undefined,
     finalFocus: removalFocus.finalFocus,
     setPrimaryReverification,
     createReverification,

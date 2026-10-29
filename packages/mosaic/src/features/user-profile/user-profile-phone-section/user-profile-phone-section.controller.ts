@@ -36,21 +36,20 @@ export function useUserProfilePhoneSectionController({
   });
 
   return {
-    phones: phones.map(phone => ({ ...phone, value: stringToFormattedPhoneString(phone.value) })),
+    phones: phones.map(phone => ({
+      ...phone,
+      value: stringToFormattedPhoneString(phone.value),
+      isVerifyPending: verification.pendingVerifyId === phone.id,
+      isPrimaryPending: actions.pendingKey === phone.id,
+    })),
     defaultPhoneCountry,
     canAdd: Boolean(onCreatePhone),
     verification,
     error: actions.error,
     isDisabled: actions.isPending,
-    pendingPrimaryId: actions.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: onRemovePhone
-      ? {
-          ...remove,
-          confirm: async phone => (await actions.runExternal(() => remove.confirm(phone))) ?? false,
-        }
-      : undefined,
+    remove: onRemovePhone ? actions.guard(remove) : undefined,
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     setPrimaryReverification,

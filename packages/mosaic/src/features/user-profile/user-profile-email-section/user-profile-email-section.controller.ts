@@ -36,20 +36,18 @@ export function useUserProfileEmailSectionController({
   });
 
   return {
-    emails,
+    emails: emails.map(email => ({
+      ...email,
+      isVerifyPending: verification.pendingVerifyId === email.id,
+      isPrimaryPending: actions.pendingKey === email.id,
+    })),
     canAdd: Boolean(onCreateEmail),
     verification,
     error: actions.error,
     isDisabled: actions.isPending,
-    pendingPrimaryId: actions.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: onRemoveEmail
-      ? {
-          ...remove,
-          confirm: async email => (await actions.runExternal(() => remove.confirm(email))) ?? false,
-        }
-      : undefined,
+    remove: onRemoveEmail ? actions.guard(remove) : undefined,
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     setPrimaryReverification,

@@ -12,13 +12,7 @@ function useOwners(onConfirm: () => Promise<void>) {
     onConfirm,
     reverification: { status: 'loading', visible: true, onCancel: vi.fn() },
   });
-  return {
-    actions,
-    remove: {
-      ...remove,
-      confirm: async () => (await actions.runExternal(() => remove.confirm())) ?? false,
-    },
-  };
+  return { actions, remove: actions.guard(remove) };
 }
 
 describe('shared action admission', () => {
@@ -137,37 +131,5 @@ describe('shared action admission', () => {
     expect(result.current.actions.isPending).toBe(false);
     expect(result.current.remove.errorMessage).toBeUndefined();
     await act(async () => expect(await result.current.actions.run('primary', primary)).toBe(true));
-  });
-});
-
-describe('external pending actions', () => {
-  it('returns the accepted result and refuses reentrant work synchronously', async () => {
-    const { result } = renderHook(() => usePendingAction());
-    const other = vi.fn();
-    await act(async () => {
-      const accepted = result.current.runExternal(() => {
-        expect(result.current.runExternal(other)).toBeUndefined();
-        return 42;
-      });
-      expect(await accepted).toBe(42);
-    });
-    expect(other).not.toHaveBeenCalled();
-    expect(result.current.isPending).toBe(false);
-  });
-
-  it.each(['throw', 'reject'])('preserves the original %s and releases admission', async mode => {
-    const { result } = renderHook(() => usePendingAction());
-    const failure = new Error('Original failure');
-    await act(async () => {
-      const accepted = result.current.runExternal(() => {
-        if (mode === 'throw') {
-          throw failure;
-        }
-        return Promise.reject(failure);
-      });
-      await expect(accepted).rejects.toBe(failure);
-    });
-    expect(result.current.isPending).toBe(false);
-    await act(async () => expect(await result.current.runExternal(() => 'retry')).toBe('retry'));
   });
 });

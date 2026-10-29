@@ -15,7 +15,6 @@ export function UserProfilePhoneSectionView({
   defaultPhoneCountry,
   canAdd,
   isDisabled,
-  pendingPrimaryId,
   verification,
   error,
   rowRef,
@@ -65,8 +64,6 @@ export function UserProfilePhoneSectionView({
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
         isDisabled={isDisabled}
-        pendingPrimaryId={pendingPrimaryId}
-        pendingVerifyId={verification.pendingVerifyId}
       >
         <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>
@@ -82,7 +79,6 @@ export function UserProfilePhoneSectionView({
       {remove ? (
         <Confirmation
           controller={remove}
-          disabled={isDisabled}
           title={m.removeDialog.title}
           description={phone =>
             fill(phone.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
