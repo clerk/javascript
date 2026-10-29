@@ -11,6 +11,7 @@ import type {
   OrganizationProfilePageId,
   OrganizationProfilePages,
 } from './organization-profile.types';
+import type { OrganizationProfilePageListOptions } from './organization-profile.view';
 
 export const ORGANIZATION_PROFILE_PAGE_IDS: readonly OrganizationProfilePageId[] = [
   'general',
@@ -55,4 +56,14 @@ export function resolveOrganizationProfilePages(
     ...uniqueCustomPages.filter(page => !builtInIds.has(page.path)).map(page => ({ id: page.path, custom: page })),
   ];
   return applyOrder(order, entries, entry => entry.id);
+}
+
+export function organizationProfilePageIds({
+  pages,
+  customPages,
+  pageOrder,
+}: OrganizationProfilePageListOptions): string[] {
+  return resolveOrganizationProfilePages(getAvailableOrganizationProfilePages(pages), customPages, pageOrder).map(
+    entry => entry.id,
+  );
 }

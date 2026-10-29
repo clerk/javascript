@@ -1,21 +1,15 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
-import { organizationProfilePageIds, organizationProfilePanels } from '../organization-profile/organization-profile';
+import { organizationProfilePanels } from '../organization-profile/organization-profile';
 import { useOrganizationProfileModel } from '../organization-profile/organization-profile.model';
 import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
 import { useUserProfilePages } from '../switcher/switcher.pages';
 import type { SwitcherMode } from '../switcher/switcher.types';
-import {
-  getAvailableUserProfilePages,
-  ORGANIZATION_PAGE_PREFIX,
-  resolveUserProfilePages,
-  withoutOrganizationPaths,
-} from './user-profile.layout';
+import { useUserProfileController } from './user-profile.controller';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
 import type { UserProfileViewProps } from './user-profile.view';
@@ -175,18 +169,17 @@ export function UserProfile({
   );
 }
 
-type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange'> & {
+type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
   initialPage: UserProfileViewProps['activePage'];
 };
 
 function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
-  const [activePage, setActivePage] = useState(initialPage);
+  const navigation = useUserProfileController({ initialPage, ...viewProps });
 
   return (
     <UserProfileView
       {...viewProps}
-      activePage={activePage}
-      onPageChange={setActivePage}
+      {...navigation}
     />
   );
 }
@@ -197,34 +190,25 @@ function CombinedUserProfileView({
   ...viewProps
 }: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
   const model = useOrganizationProfileModel();
-  const [activePage, setActivePage] = useState(initialPage);
-  const organization =
+  const organizationState =
     model.status === 'ready'
-      ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
-      : undefined;
-
-  if (model.status !== 'loading' && activePage.startsWith(ORGANIZATION_PAGE_PREFIX)) {
-    const organizationPageIds = organization
-      ? organizationProfilePageIds(organization).map(id => `${ORGANIZATION_PAGE_PREFIX}${id}`)
-      : [];
-    if (!organizationPageIds.includes(activePage)) {
-      setActivePage(
-        resolveUserProfilePages(
-          getAvailableUserProfilePages(viewProps.pages),
-          withoutOrganizationPaths(viewProps.customPages),
-          viewProps.pageOrder,
-        )[0]?.id ?? 'account',
-      );
-    }
-  }
+      ? {
+          status: 'ready' as const,
+          pageList: { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder },
+        }
+      : { status: model.status };
+  const navigation = useUserProfileController({
+    initialPage,
+    ...viewProps,
+    organization: organizationState,
+  });
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <UserProfileView
         {...viewProps}
-        activePage={activePage}
-        onPageChange={setActivePage}
-        organization={organization}
+        {...navigation}
+        organization={organizationState.status === 'ready' ? organizationState.pageList : undefined}
       />
     </OrganizationProfileProvider>
   );
