@@ -301,7 +301,7 @@ function writeAgentsMd(options, detectedSdks) {
 
   renderText(`${prefix} Clerk AGENTS.md sections for ${sdks.map(s => `@clerk/${s}`).join(', ')}`, 'blue');
   renderText(`Target: ${result.targetDir}`);
-  renderText(`AGENTS.md: ${result.agentsMd}; CLAUDE.md: ${result.claudeMd}`);
+  renderText(`AGENTS.md: ${result.agentsMd}`);
   renderNewline();
 }
 

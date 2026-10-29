@@ -14,7 +14,7 @@ describe('clerkAgentRulesVitePlugin', () => {
   beforeEach(() => {
     vi.mocked(writeClerkAgentRules)
       .mockReset()
-      .mockReturnValue({ targetDir: '/app', agentsMd: 'unchanged', claudeMd: 'unchanged', files: [] });
+      .mockReturnValue({ targetDir: '/app', agentsMd: 'unchanged', files: [] });
     for (const name of automatedEnvironmentVariables) {
       vi.stubEnv(name, '');
     }

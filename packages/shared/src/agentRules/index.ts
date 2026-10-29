@@ -40,7 +40,6 @@ export interface WriteClerkAgentRulesOptions {
 export type WriteClerkAgentRulesResult = {
   targetDir: string;
   agentsMd: 'created' | 'updated' | 'unchanged' | 'skipped';
-  claudeMd: 'created' | 'updated' | 'unchanged' | 'skipped';
   files: string[];
 };
 
@@ -73,13 +72,6 @@ const uniqueSdks = (sdks: ClerkAgentRulesSdk[]) => [...new Set(sdks)].sort();
 
 const detectEol = (content: string) => (content.includes('\r\n') ? '\r\n' : '\n');
 const normalizeEol = (content: string, eol: string) => content.replace(/\r?\n/g, eol);
-
-const CLAUDE_AGENTS_IMPORT = /^\s*@(?:\.\/)?AGENTS\.md\s*$/m;
-
-const appendAgentsImport = (content: string) => {
-  const eol = detectEol(content);
-  return content.trim() ? `${content.trimEnd()}${eol}${eol}@AGENTS.md${eol}` : `@AGENTS.md${eol}`;
-};
 
 export const isClerkAgentRulesSdk = (value: string): value is ClerkAgentRulesSdk =>
   Object.prototype.hasOwnProperty.call(SDK_LABELS, value);
@@ -198,38 +190,17 @@ function findTargetDir(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
   return null;
 }
 
-function pickTargetFile(fs: FileSystemAdapter, path: PathAdapter, targetDir: string) {
-  const agentsPath = path.join(targetDir, 'AGENTS.md');
-  const claudePath = path.join(targetDir, 'CLAUDE.md');
-
-  for (const filePath of [agentsPath, claudePath]) {
-    if (fs.existsSync(filePath) && fs.readFileSync(filePath, { encoding: 'utf8' }).includes(GENERIC_START)) {
-      return filePath;
-    }
-  }
-
-  if (fs.existsSync(agentsPath)) {
-    return agentsPath;
-  }
-
-  if (fs.existsSync(claudePath)) {
-    return claudePath;
-  }
-
-  return agentsPath;
-}
-
 export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): WriteClerkAgentRulesResult {
   const { dryRun = false, fs, path, sdks } = options;
   const targetDir = findTargetDir(fs, path, options.cwd);
   if (!targetDir) {
-    return { targetDir: path.resolve(options.cwd), agentsMd: 'skipped', claudeMd: 'skipped', files: [] };
+    return { targetDir: path.resolve(options.cwd), agentsMd: 'skipped', files: [] };
   }
 
-  const targetFile = pickTargetFile(fs, path, targetDir);
   const agentsPath = path.join(targetDir, 'AGENTS.md');
-  const claudePath = path.join(targetDir, 'CLAUDE.md');
-  const existing = fs.existsSync(targetFile) ? fs.readFileSync(targetFile, { encoding: 'utf8' }) : '';
+  const agentsExists = fs.existsSync(agentsPath);
+  const existing = agentsExists ? fs.readFileSync(agentsPath, { encoding: 'utf8' }) : '';
+
   const eol = detectEol(existing);
 
   let next = upsertMarkedBlock(existing, renderClerkAgentRulesBlock(eol), GENERIC_START, GENERIC_END, eol);
@@ -250,45 +221,16 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
     }
   }
 
-  const targetStatus = fs.existsSync(targetFile) ? (next === existing ? 'unchanged' : 'updated') : 'created';
-  const claudeExists = fs.existsSync(claudePath);
-  const shouldCreateClaude = targetFile === agentsPath && !claudeExists;
-  const claudeContent =
-    targetFile === agentsPath && claudeExists ? fs.readFileSync(claudePath, { encoding: 'utf8' }) : null;
-  const shouldImportAgentsInClaude =
-    claudeContent !== null &&
-    claudeContent !== existing &&
-    !claudeContent.includes(GENERIC_START) &&
-    !CLAUDE_AGENTS_IMPORT.test(claudeContent);
+  const agentsMd = agentsExists ? (next === existing ? 'unchanged' : 'updated') : 'created';
 
   if (!dryRun) {
     fs.mkdirSync?.(targetDir, { recursive: true });
-    if (targetStatus !== 'unchanged') {
-      fs.writeFileSync(targetFile, next, { encoding: 'utf8', mode: 0o644 });
-    }
-    if (shouldCreateClaude) {
-      fs.writeFileSync(claudePath, '@AGENTS.md\n', { encoding: 'utf8', mode: 0o644 });
-    }
-    if (shouldImportAgentsInClaude && claudeContent !== null) {
-      fs.writeFileSync(claudePath, appendAgentsImport(claudeContent), { encoding: 'utf8', mode: 0o644 });
+    if (agentsMd !== 'unchanged') {
+      fs.writeFileSync(agentsPath, next, { encoding: 'utf8', mode: 0o644 });
     }
   }
 
-  return {
-    targetDir,
-    agentsMd: targetStatus,
-    claudeMd: shouldCreateClaude
-      ? 'created'
-      : shouldImportAgentsInClaude
-        ? 'updated'
-        : claudeExists
-          ? 'unchanged'
-          : 'skipped',
-    files: [
-      ...(targetStatus === 'unchanged' ? [] : [targetFile]),
-      ...(shouldCreateClaude || shouldImportAgentsInClaude ? [claudePath] : []),
-    ],
-  };
+  return { targetDir, agentsMd, files: agentsMd === 'unchanged' ? [] : [agentsPath] };
 }
 
 export function logClerkAgentRulesResult({ files }: WriteClerkAgentRulesResult) {

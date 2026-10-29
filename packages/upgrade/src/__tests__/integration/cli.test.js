@@ -186,7 +186,7 @@ describe('CLI Integration', () => {
       fixture?.cleanup();
     });
 
-    it('writes AGENTS.md and CLAUDE.md without running SDK upgrade detection', async () => {
+    it('writes AGENTS.md without running SDK upgrade detection', async () => {
       const fs = await import('node:fs');
       const result = await runCli(['--dir', fixture.path, '--agents-md'], { timeout: 15000 });
 
@@ -195,7 +195,7 @@ describe('CLI Integration', () => {
       expect(fs.readFileSync(path.join(fixture.path, 'AGENTS.md'), 'utf8')).toContain(
         '<!-- BEGIN:clerk-agent-rules:nextjs -->',
       );
-      expect(fs.readFileSync(path.join(fixture.path, 'CLAUDE.md'), 'utf8')).toBe('@AGENTS.md\n');
+      expect(fs.existsSync(path.join(fixture.path, 'CLAUDE.md'))).toBe(false);
     });
 
     it('does not write files in dry-run mode', async () => {
