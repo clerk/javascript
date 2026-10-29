@@ -186,30 +186,16 @@ function upsertMarkedBlock(
 function findTargetDir(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
   let current = path.resolve(cwd);
   const root = path.parse(current).root;
-  let nearestPackageDir: string | null = null;
 
   while (current !== root) {
-    if (fs.existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
+    if (fs.existsSync(path.join(current, 'package.json'))) {
       return current;
-    }
-
-    const packageJson = path.join(current, 'package.json');
-    if (fs.existsSync(packageJson)) {
-      nearestPackageDir ??= current;
-      try {
-        const pkg = JSON.parse(fs.readFileSync(packageJson, { encoding: 'utf8' }));
-        if (pkg.workspaces) {
-          return current;
-        }
-      } catch {
-        // Ignore invalid package.json while walking upward.
-      }
     }
 
     current = path.dirname(current);
   }
 
-  return nearestPackageDir;
+  return null;
 }
 
 function pickTargetFile(fs: FileSystemAdapter, path: PathAdapter, targetDir: string) {

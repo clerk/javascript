@@ -92,9 +92,10 @@ describe('writeClerkAgentRules', () => {
     expect(memory.read('/repo/src/AGENTS.md')).toBeUndefined();
   });
 
-  it('targets the workspace root when one exists', () => {
+  it('targets the app package instead of the workspace root', () => {
     const memory = createMemoryFs({
       '/repo/pnpm-workspace.yaml': 'packages:\n  - apps/*\n',
+      '/repo/apps/web/package.json': '{}',
     });
 
     writeClerkAgentRules({
@@ -104,8 +105,30 @@ describe('writeClerkAgentRules', () => {
       sdks: ['react'],
     });
 
-    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:react -->');
-    expect(memory.read('/repo/apps/web/AGENTS.md')).toBeUndefined();
+    expect(memory.read('/repo/apps/web/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:react -->');
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+  });
+
+  it('points to an SDK AGENTS.md that exists when the SDK is installed in a pnpm workspace app', () => {
+    const memory = createMemoryFs({
+      '/repo/pnpm-workspace.yaml': 'packages:\n  - apps/*\n',
+      '/repo/package.json': '{"name":"root","private":true}',
+      '/repo/apps/web/package.json': '{"name":"web","dependencies":{"@clerk/nextjs":"*"}}',
+      '/repo/apps/web/node_modules/@clerk/nextjs/AGENTS.md': '# Clerk Next.js',
+    });
+
+    const { files } = writeClerkAgentRules({
+      cwd: '/repo/apps/web',
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    const agentsMdPath = files.find(file => file.endsWith('/AGENTS.md')) ?? '';
+    const pointer = memory.read(agentsMdPath)?.match(/`(node_modules\/@clerk\/nextjs\/AGENTS\.md)`/)?.[1] ?? '';
+
+    expect(pointer).toBe('node_modules/@clerk/nextjs/AGENTS.md');
+    expect(memory.fs.existsSync(pathAdapter.join(pathAdapter.dirname(agentsMdPath), pointer))).toBe(true);
   });
 
   it('replaces only Clerk blocks and preserves surrounding content', () => {
