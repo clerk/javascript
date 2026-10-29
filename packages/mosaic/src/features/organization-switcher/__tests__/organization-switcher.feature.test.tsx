@@ -1,7 +1,9 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { page } from 'vitest/browser';
 
+import { openDialog } from '../../../__tests__/feature/dialog';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -44,6 +46,11 @@ const bob = fapiUser({
 const aliceSession = fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: 'org_1' });
 const bobSession = fapiSession({ id: 'sess_2', user: bob });
 const personalSession = fapiSession({ id: 'sess_1', user: alice });
+
+async function wideViewport() {
+  await page.viewport(1280, 800);
+  onTestFinished(() => page.viewport(414, 896));
+}
 
 function signedIn(overrides: FakeFapiSeed = {}): FakeFapiSeed {
   return {
@@ -128,8 +135,8 @@ describe('OrganizationSwitcher', () => {
   });
 
   it('heads the surface with the active organization, and manages it from the rows beneath', async () => {
-    const { clerk } = await renderSwitcher({}, noOffers());
-    const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+    await wideViewport();
+    await renderSwitcher({}, noOffers());
     const user = await openWithList();
 
     const header = requiredPopup().querySelector('.cl-organization-switcher-header') ?? requiredPopup();
@@ -144,7 +151,8 @@ describe('OrganizationSwitcher', () => {
 
     await user.click(screen.getByRole('button', { name: 'Settings' }));
     expect(screen.queryByRole('menu')).toBeNull();
-    expect(openOrganizationProfile).toHaveBeenCalled();
+    expect(await screen.findByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.queryByRole('tab', { name: 'Account' })).toBeNull();
   });
 
   it('falls back to the account, with nothing to manage, where no organization is active', async () => {
@@ -215,16 +223,19 @@ describe('OrganizationSwitcher', () => {
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/orgs/Other'));
     });
 
-    it('tells the organization profile where to land after leaving', async () => {
-      const { clerk } = await renderSwitcher({ afterLeaveOrganizationUrl: '/left' }, noOffers());
-      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+    it('lands on afterLeaveOrganizationUrl after leaving from the opened profile', async () => {
+      await wideViewport();
+      const { navigate } = await renderSwitcher({ afterLeaveOrganizationUrl: '/left' }, noOffers());
       const user = await openWithList();
 
       await user.click(screen.getByRole('button', { name: 'Settings' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
+        role: 'alertdialog',
+      });
+      await user.type(within(dialog).getByRole('textbox'), 'Acme');
+      await user.click(within(dialog).getByRole('button', { name: 'Leave organization' }));
 
-      expect(openOrganizationProfile).toHaveBeenCalledWith(
-        expect.objectContaining({ afterLeaveOrganizationUrl: '/left' }),
-      );
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/left'));
     });
 
     it('tells create-organization where to land and whether to skip inviting members', async () => {

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
+import { organizationProfileModal } from './features/organization-profile/organization-profile.modal';
 import { userProfileModal } from './features/user-profile/user-profile.modal';
 import { MosaicNowProvider } from './hooks/use-now';
 import type { MosaicIconOverrides } from './icons/overrides';
@@ -45,4 +46,4 @@ export function MosaicProvider({ children, direction, icons, localization }: Mos
   );
 }
 
-const modalSurfaces: ModalSurfaces = [userProfileModal];
+const modalSurfaces: ModalSurfaces = [userProfileModal, organizationProfileModal];

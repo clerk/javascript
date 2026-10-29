@@ -1,4 +1,4 @@
-import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
+import type { UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
@@ -549,58 +549,16 @@ describe('UserButton', () => {
       expect(profileTabs()).toEqual(tabs);
     });
 
-    it.each([
-      { features: {}, organization: {}, pages: ['Terms', 'general', 'members'] },
-      {
-        features: { billing: true, apiKeys: true },
-        organization: {},
-        pages: ['Terms', 'general', 'members', 'billing', 'apiKeys'],
-      },
-      { features: { sso: true }, organization: {}, pages: ['Terms', 'general', 'members'] },
-      {
-        features: { sso: true },
-        organization: { self_serve_sso_enabled: true },
-        pages: ['Terms', 'general', 'members', 'security'],
-      },
-      {
-        features: { sso: true, directorySync: true },
-        organization: {},
-        pages: ['Terms', 'general', 'members'],
-      },
-      {
-        features: { sso: true, directorySync: true },
-        organization: { self_serve_directory_sync_enabled: true },
-        pages: ['Terms', 'general', 'members', 'security'],
-      },
-    ])(
-      'orders the OrganizationProfile pages the instance and organization turn on: $features $organization',
-      async ({ features, organization, pages }) => {
-        const selfServe = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3, ...organization });
-        const memberships = [fapiMembership(selfServe, { permissions: ['org:sys_memberships:manage'] })];
-        const { clerk } = await renderUserButton(
-          { organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] } },
-          signedIn({
-            environment: instanceWith(features),
-            client: fapiClient([
-              fapiSession({
-                id: 'sess_1',
-                user: { ...alice, organization_memberships: memberships },
-                last_active_organization_id: 'org_1',
-              }),
-            ]),
-            memberships,
-          }),
-        );
-        const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
-        const user = await open();
+    it("opens the combined profile on the organization's General page, with its own pages in order", async () => {
+      await wideViewport();
+      await renderUserButton({ organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] } });
+      const user = await open();
 
-        await openSettings(user, 'Manage organization');
-        await waitFor(() => expect(popup()).toBeNull());
+      await openSettings(user, 'Manage organization');
 
-        const customPages = openOrganizationProfile.mock.calls[0]?.[0]?.customPages ?? [];
-        expect(customPages.map((page: CustomPage) => page.label)).toEqual(pages);
-      },
-    );
+      expect(await screen.findByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
+      expect(profileTabs()).toEqual(['Account', 'Security', 'Terms', 'General', 'Members']);
+    });
 
     it('opens the InviteMembers modal and closes', async () => {
       const { clerk, navigate } = await renderUserButton();
@@ -667,25 +625,23 @@ describe('UserButton', () => {
     });
 
     it('navigates to manage the account when a URL routes it', async () => {
-      const { clerk, navigate } = await renderUserButton({ userProfileUrl: '/account' });
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+      const { navigate } = await renderUserButton({ userProfileUrl: '/account' });
       const user = await open();
 
       await openSettings(user, 'Manage profile');
 
       expect(navigate).toHaveBeenCalledWith('/account');
-      expect(openUserProfile).not.toHaveBeenCalled();
+      expect(screen.queryByRole('tab')).toBeNull();
     });
 
     it('navigates to manage the organization when a URL routes it', async () => {
-      const { clerk, navigate } = await renderUserButton({ organizationProfileUrl: '/org' });
-      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+      const { navigate } = await renderUserButton({ organizationProfileUrl: '/org' });
       const user = await open();
 
       await openSettings(user, 'Manage organization');
 
       expect(navigate).toHaveBeenCalledWith('/org');
-      expect(openOrganizationProfile).not.toHaveBeenCalled();
+      expect(screen.queryByRole('tab')).toBeNull();
     });
 
     it('sends add-account to the sign-in page', async () => {
@@ -964,8 +920,8 @@ describe('UserButton', () => {
     });
 
     it('heads the surface with the active organization, badged with the account, managing both', async () => {
-      const { clerk } = await renderUserButton();
-      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+      await wideViewport();
+      await renderUserButton();
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       const user = await open();
@@ -987,7 +943,7 @@ describe('UserButton', () => {
         'Sign out',
       ]);
       await openSettings(user, 'Manage organization');
-      expect(openOrganizationProfile).toHaveBeenCalled();
+      expect(await screen.findByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
     });
 
     it('keeps the identifier beneath the organization even when it is all that names the account', async () => {
