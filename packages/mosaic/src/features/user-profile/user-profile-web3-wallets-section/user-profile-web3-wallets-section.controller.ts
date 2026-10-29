@@ -5,6 +5,7 @@ import { usePanelTitle } from '../../../components/panel';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import { applyOrder } from '../../../utils/apply-order';
 import type {
   ReadyWeb3WalletsModel,
   UserProfileWeb3Provider,
@@ -23,7 +24,7 @@ type WalletAction =
   | { kind: 'verify' | 'primary'; walletId: string };
 
 export function useUserProfileWeb3WalletsController({
-  wallets,
+  wallets: modelWallets,
   availableProviders,
   connect,
   verify,
@@ -45,6 +46,8 @@ export function useUserProfileWeb3WalletsController({
   | 'createReverification'
 >) {
   const messages = useMessages('userProfileWeb3Wallets');
+  const [order] = useState(() => modelWallets.map(wallet => wallet.id));
+  const wallets = applyOrder(order, modelWallets, wallet => wallet.id);
   const action = usePendingAction({ errorFallback: messages.errors.generic });
   const [picker, setPicker] = useState<SolanaPicker>({ open: false });
   const [owner, setOwner] = useState<WalletAction>();

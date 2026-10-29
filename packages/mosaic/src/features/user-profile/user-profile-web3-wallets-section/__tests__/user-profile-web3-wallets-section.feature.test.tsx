@@ -464,7 +464,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByText('Primary')).toBeInTheDocument());
   });
 
-  it('holds the wallet menu while setting primary and moves the new primary first', async () => {
+  it('holds the wallet menu while setting primary and updates the badge in place', async () => {
     const fapi = await renderWeb3({
       web3_wallets: [
         fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' }),
@@ -498,7 +498,7 @@ describe('Web3 wallets', () => {
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
-    expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })[0].closest('.cl-section-row')).toContainElement(
+    expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })[1].closest('.cl-section-row')).toContainElement(
       screen.getByTitle('0xabcdef1234567890'),
     );
     const selectedRow = screen.getByTitle('0xabcdef1234567890').closest<HTMLElement>('.cl-section-row');

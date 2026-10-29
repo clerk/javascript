@@ -92,7 +92,7 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile phone section', () => {
-  it('holds the menu while setting a number as primary, then moves the row first', async () => {
+  it('holds the menu and row order while setting a number as primary', async () => {
     const { actor } = await renderSection(signedIn([HOME, WORK]));
     const primary = holdRequests('post', '/v1/me');
     try {
@@ -117,7 +117,7 @@ describe('the user profile phone section', () => {
     }
     expect(screen.getByRole('button', { name: `Manage ${WORK_LABEL}` })).not.toHaveAttribute('aria-disabled', 'true');
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
-    expect(listed()).toEqual([WORK_LABEL, HOME_LABEL]);
+    expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
     expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
   });
 
@@ -210,8 +210,8 @@ describe('the user profile phone section', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
 
-    await waitFor(() => expect(listed()).toEqual([WORK_LABEL, HOME_LABEL]));
-    expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary');
+    await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
+    expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
   });
 
   it('removes a number once the removal is confirmed', async () => {

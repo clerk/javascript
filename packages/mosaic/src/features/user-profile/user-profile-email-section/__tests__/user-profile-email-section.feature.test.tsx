@@ -68,7 +68,7 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile email section', () => {
-  it('holds the menu while setting an address as primary, then moves the row first with focus', async () => {
+  it('holds the menu and row order while setting an address as primary, then returns focus', async () => {
     const other = fapiEmailAddress({ id: 'idn_other', email_address: 'bob@example.com', verification: VERIFIED });
     const { actor } = await renderSection(signedInWithEmails([PRIMARY, other]));
     const primary = holdRequests('post', '/v1/me');
@@ -93,7 +93,7 @@ describe('the user profile email section', () => {
     }
     expect(screen.getByRole('button', { name: 'Manage bob@example.com' })).not.toHaveAttribute('aria-disabled', 'true');
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
-    expect(emailsListed()).toEqual(['bob@example.com', 'alice@example.com']);
+    expect(emailsListed()).toEqual(['alice@example.com', 'bob@example.com']);
     expect(screen.getByRole('button', { name: 'Manage bob@example.com' })).toHaveFocus();
     expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
   });
