@@ -40,7 +40,7 @@ export function useUserProfilePhoneSectionController({
       ...phone,
       value: stringToFormattedPhoneString(phone.value),
       isVerifyPending: verification.pendingVerifyId === phone.id,
-      isPrimaryPending: actions.pendingKey === phone.id,
+      isPrimaryPending: actions.pendingKey === phone.id && !setPrimaryReverification.visible,
     })),
     defaultPhoneCountry,
     canAdd: Boolean(onCreatePhone),

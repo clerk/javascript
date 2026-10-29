@@ -601,6 +601,7 @@ describe('Web3 wallets', () => {
     await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu', { hidden: true })).toBeNull());
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await user.keyboard('hunter2{Enter}');
 

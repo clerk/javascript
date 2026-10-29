@@ -151,7 +151,11 @@ export function useUserProfileWeb3WalletsController({
   return {
     wallets: wallets.map(wallet => {
       const isPending = pendingId === wallet.id;
-      const row = { ...wallet, isPending, isPrimaryPending: isPending && owner?.kind === 'primary' };
+      const row = {
+        ...wallet,
+        isPending,
+        isPrimaryPending: isPending && owner?.kind === 'primary' && !setPrimaryReverification.visible,
+      };
       return errorId === wallet.id
         ? owner?.kind === 'primary'
           ? { ...row, primaryError: action.error }

@@ -485,6 +485,7 @@ describe('phone reverification', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu', { hidden: true })).toBeNull());
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await actor.keyboard('hunter2{Enter}');
 

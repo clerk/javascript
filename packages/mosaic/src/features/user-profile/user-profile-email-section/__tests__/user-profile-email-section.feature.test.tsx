@@ -344,6 +344,7 @@ describe('email reverification', () => {
 
     await manageEmail(actor, 'bob@example.com', 'Set as primary');
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu', { hidden: true })).toBeNull());
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await actor.keyboard('hunter2{Enter}');
 
