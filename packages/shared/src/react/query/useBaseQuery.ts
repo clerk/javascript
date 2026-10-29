@@ -25,12 +25,13 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   Observer: typeof QueryObserver,
 ): DistributivePick<QueryObserverResult<TData, TError>, CommonQueryResult> {
   const [client, isQueryClientLoaded] = useClerkQueryClient();
-  const defaultedOptions = isQueryClientLoaded
-    ? client.defaultQueryOptions(options)
-    : (options as DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>);
-
   // Make sure results are optimistically set in fetching state before subscribing or updating options
-  defaultedOptions._optimisticResults = 'optimistic';
+  const defaultedOptions: DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey> = {
+    ...(isQueryClientLoaded
+      ? client.defaultQueryOptions(options)
+      : (options as DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>)),
+    _optimisticResults: 'optimistic',
+  };
 
   const observer = React.useMemo(() => {
     return new Observer<TQueryFnData, TError, TData, TQueryData, TQueryKey>(client, defaultedOptions);

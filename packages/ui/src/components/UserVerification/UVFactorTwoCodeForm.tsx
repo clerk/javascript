@@ -31,14 +31,6 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const { session } = useSession();
   const { handleVerificationResponse } = useAfterVerification();
 
-  React.useEffect(() => {
-    if (props.factorAlreadyPrepared) {
-      return;
-    }
-
-    void prepare?.();
-  }, []);
-
   const prepare = props.prepare
     ? () =>
         props
@@ -57,6 +49,14 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       })
       .catch(reject);
   };
+
+  React.useEffect(() => {
+    if (props.factorAlreadyPrepared) {
+      return;
+    }
+
+    void prepare?.();
+  }, []);
 
   return (
     <VerificationCodeCard

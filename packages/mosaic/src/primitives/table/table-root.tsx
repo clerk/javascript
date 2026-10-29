@@ -64,7 +64,7 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
   const [columnCount, registerColumn] = useCounter();
   const [rowHeaderColumns, registerRowHeaderColumn] = useRegistry<number>();
   const anchorRef = React.useRef<string | null>(null);
-  const excluded = React.useMemo(() => new WeakSet<Element>(), []);
+  const [excluded] = React.useState(() => new WeakSet<Element>());
 
   const { tree } = bodyRows;
   const selectable = React.useMemo(
