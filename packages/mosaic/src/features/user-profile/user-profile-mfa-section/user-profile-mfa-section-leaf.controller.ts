@@ -9,6 +9,7 @@ import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.
 
 export function useUserProfileMfaSectionLeafController({
   methods,
+  pendingAction,
   onAdd,
   onRemove,
   onSetDefault,
@@ -22,23 +23,25 @@ export function useUserProfileMfaSectionLeafController({
     fallback: () =>
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
   });
+  const localPendingAction = usePendingAction();
+  const actions = pendingAction ?? localPendingAction;
   const remove = useConfirmController<UserProfileMfaMethod>({
     onConfirm: method => removalFocus.remove(method.id),
     reverification: removeReverification,
   });
   const [pickerOpen, setPickerOpen] = useState(false);
-  const defaultAction = usePendingAction({ errorFallback: m.setDefaultError });
 
   const setDefault = (id: string) => {
     const method = methods.find(method => method.id === id);
     if (!onSetDefault || method?.type !== 'sms' || !method.canSetDefault || method.isDefault) {
       return;
     }
-    void defaultAction.run(id, () => onSetDefault(id));
+    void actions.run(id, () => onSetDefault(id), { errorFallback: m.setDefaultError });
   };
 
   return {
     sectionRef,
+    isDisabled: actions.isPending,
     pickerOpen,
     onPickerOpenChange: setPickerOpen,
     addMethod: onAdd
@@ -49,16 +52,13 @@ export function useUserProfileMfaSectionLeafController({
       : undefined,
     registerTrigger: removalFocus.registerTrigger,
     openRemoval: (method: UserProfileMfaMethod) => {
-      if (defaultAction.isPending) {
-        return;
-      }
-      defaultAction.reset();
+      actions.reset();
       remove.open(method);
     },
-    remove: onRemove ? remove : undefined,
+    remove: onRemove ? actions.guard(remove) : undefined,
     finalRemovalFocus: removalFocus.finalFocus,
-    setDefaultFinalFocus: () => (defaultAction.lastKey ? removalFocus.trigger(defaultAction.lastKey) : null),
-    defaultError: defaultAction.error,
-    setDefault: onSetDefault && !defaultAction.isPending ? setDefault : undefined,
+    setDefaultFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
+    defaultError: actions.error,
+    setDefault: onSetDefault ? setDefault : undefined,
   };
 }
