@@ -504,7 +504,6 @@ describe('Reverification', () => {
   });
 
   describe('password', () => {
-    // Currently wrong: the error shown is the server's English text, not a localized message. See the errors group.
     it('recovers from a wrong password and completes the challenge', async () => {
       const { action } = await renderReverification(
         guardedAction(),
@@ -516,7 +515,7 @@ describe('Reverification', () => {
       const user = await startVerification();
       expect(await screen.findByText(STEP.password)).toBeVisible();
 
-      // A wrong password shows the server message and stays on the step
+      // A wrong password shows an error and stays on the step
       // Pressing Enter submits the password
       await user.type(passwordField(), 'wrong{Enter}');
       expect(await screen.findByText(/Password is incorrect/)).toBeInTheDocument();
@@ -586,7 +585,6 @@ describe('Reverification', () => {
   });
 
   describe('email code', () => {
-    // Currently wrong: the error shown is the server's English text, not a localized message. See the errors group.
     it('sends a code and completes the challenge with the correct code', async () => {
       const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
       const prepare = holdRequests('post', PREPARE_FIRST);
@@ -794,7 +792,6 @@ describe('Reverification', () => {
   });
 
   describe('second factor alternatives', () => {
-    // Currently wrong: the error shown is the server's English text, not a localized message. See the errors group.
     it('switches from the authenticator app to a backup code', async () => {
       await renderReverification(
         guardedAction({ level: 'second_factor', afterMinutes: 10 }),
@@ -842,7 +839,6 @@ describe('Reverification', () => {
   });
 
   describe('passkey', () => {
-    // Currently wrong: the banner shows the browser or clerk-js error message as is, which is not localized.
     it('completes the challenge with the passkey', async () => {
       const { clerk } = await renderReverification(
         guardedAction(),
@@ -853,7 +849,7 @@ describe('Reverification', () => {
         .fn()
         .mockResolvedValueOnce({
           publicKeyCredential: null,
-          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_failed' }),
+          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_cancelled' }),
         })
         .mockImplementationOnce(
           () =>
@@ -869,9 +865,12 @@ describe('Reverification', () => {
         const user = await startVerification();
         expect(await screen.findByText(STEP.passkey)).toBeVisible();
 
-        // A refused credential shows an error banner and stays on the step
+        // A refused credential shows a localized error banner and stays on the step
         await user.click(screen.getByRole('button', { name: 'Continue' }));
-        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The operation was refused'));
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Passkey verification was cancelled or timed out.'),
+        );
+        expect(screen.getByRole('alert')).not.toHaveTextContent('The operation was refused');
         expect(screen.getByText(STEP.passkey)).toBeVisible();
 
         // The button is disabled and shows the verifying label while the credential is being verified
@@ -883,6 +882,73 @@ describe('Reverification', () => {
         await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
         acceptCredential();
         await untilResolved();
+      } finally {
+        restore();
+      }
+    });
+
+    it('shows no error when the passkey prompt is aborted', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
+      );
+      const getCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: null,
+        error: new ClerkWebAuthnError('The operation was aborted', { code: 'passkey_operation_aborted' }),
+      });
+      clerk.__internal_getPublicCredentials = getCredential;
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(1));
+        await settle();
+
+        // The step stays open and ready for another attempt, without an error
+        expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+        expect(screen.getByText(STEP.passkey)).toBeVisible();
+        expect(screen.getByRole('alert').textContent).toBe('');
+      } finally {
+        restore();
+      }
+    });
+
+    it('clears an earlier passkey error when the next prompt is aborted', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
+      );
+      const getCredential = vi
+        .fn()
+        .mockResolvedValueOnce({
+          publicKeyCredential: null,
+          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_cancelled' }),
+        })
+        .mockResolvedValueOnce({
+          publicKeyCredential: null,
+          error: new ClerkWebAuthnError('The operation was aborted', { code: 'passkey_operation_aborted' }),
+        });
+      clerk.__internal_getPublicCredentials = getCredential;
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Passkey verification was cancelled or timed out.'),
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
+        await settle();
+
+        expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+        expect(screen.getByRole('alert').textContent).toBe('');
       } finally {
         restore();
       }
@@ -1619,14 +1685,30 @@ describe('Reverification', () => {
   });
 
   describe('errors', () => {
-    // Currently wrong: the controller keeps only the server's longMessage or message (errorDetail drops the error code), so nothing downstream can localize it. Known codes such as form_password_incorrect, form_code_incorrect and verification_not_sent should map to localized messages the way the old UI does.
-    // Blocked: Mosaic has no message keys for error codes yet, so there is nothing a test can override.
-    it.todo('shows a localized message for a wrong password', () => {
-      // The message for form_password_incorrect follows the configured locale
+    it('shows a localized message for a wrong password', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }), {
+        messages: { 'errors.form_password_incorrect': 'Mot de passe incorrect.' },
+      });
+      const user = await startVerification();
+
+      await user.type(await screen.findByLabelText('Password'), 'wrong{Enter}');
+
+      expect(await screen.findByText('Mot de passe incorrect.')).toBeInTheDocument();
+      expect(screen.queryByText(/Password is incorrect/)).toBeNull();
     });
 
-    it.todo('shows a localized message for a wrong code', () => {
-      // The message for form_code_incorrect follows the configured locale
+    it('shows a localized message for a wrong code', async () => {
+      const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }), {
+        messages: { 'errors.form_code_incorrect': 'Code incorrect.' },
+      });
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+
+      await pasteCode(user, WRONG_CODE);
+
+      expect(await screen.findByText('Code incorrect.')).toBeInTheDocument();
+      expect(screen.queryByText('Incorrect code')).toBeNull();
     });
 
     it('shows the long message from the server for a Clerk error code without a localized message', async () => {
