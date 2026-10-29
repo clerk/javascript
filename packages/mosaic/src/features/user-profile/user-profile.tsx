@@ -60,7 +60,8 @@ export interface UserProfileProps
   mode?: UserProfileMode;
   /**
    * Options for the organization's pages in `combined` mode: your own pages and their order, the API
-   * keys page, and where leaving the organization lands.
+   * keys page, and where leaving the organization lands. `pageOrder` names the organization's pages
+   * without the `organization/` prefix, as in `['members', 'general']`.
    */
   organizationProfileProps?: Pick<
     OrganizationProfileProps,
