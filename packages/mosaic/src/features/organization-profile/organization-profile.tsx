@@ -1,15 +1,14 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
-import { getAvailableOrganizationProfilePages, resolveOrganizationProfilePages } from './organization-profile.layout';
+import { useOrganizationProfileController } from './organization-profile.controller';
 import { useOrganizationProfileModel } from './organization-profile.model';
 import type { OrganizationProfileOptions } from './organization-profile.provider';
 import { OrganizationProfileProvider } from './organization-profile.provider';
 import type { OrganizationProfilePageId, OrganizationProfilePages } from './organization-profile.types';
-import type { OrganizationProfilePageListOptions, OrganizationProfileViewProps } from './organization-profile.view';
+import type { OrganizationProfileViewProps } from './organization-profile.view';
 import { OrganizationProfileView } from './organization-profile.view';
 import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
@@ -88,30 +87,21 @@ export function OrganizationProfile({
   apiKeysProps,
 }: OrganizationProfileProps) {
   const model = useOrganizationProfileModel();
-  const [activePage, setActivePage] = useState<OrganizationProfileViewProps['activePage']>(
-    defaultPage ?? pageOrder?.[0] ?? 'general',
-  );
+  const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
+  const navigation = useOrganizationProfileController({ pages, customPages, pageOrder, defaultPage });
 
   if (model.status === 'loading') {
     return fallback ?? null;
   }
-  if (model.status === 'hidden') {
+  if (!pages) {
     return null;
-  }
-
-  const pages = organizationProfilePanels(model.pages, apiKeysProps);
-  const pageIds = organizationProfilePageIds({ pages, customPages, pageOrder });
-  const firstPage = pageIds[0];
-  if (firstPage !== undefined && !pageIds.includes(activePage)) {
-    setActivePage(firstPage);
   }
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <OrganizationProfileView
         elevation='flush'
-        activePage={activePage}
-        onPageChange={setActivePage}
+        {...navigation}
         customPages={customPages}
         pageOrder={pageOrder}
         pages={pages}
@@ -134,14 +124,4 @@ export function organizationProfilePanels(
     apiKeys:
       available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
   };
-}
-
-export function organizationProfilePageIds({
-  pages,
-  customPages,
-  pageOrder,
-}: OrganizationProfilePageListOptions): string[] {
-  return resolveOrganizationProfilePages(getAvailableOrganizationProfilePages(pages), customPages, pageOrder).map(
-    entry => entry.id,
-  );
 }
