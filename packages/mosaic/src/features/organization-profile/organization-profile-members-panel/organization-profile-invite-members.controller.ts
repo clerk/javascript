@@ -84,7 +84,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   return { onInvite, isInviteDisabled: false, inviteDialog };
 }
 
-function resolveDefaultRole({ roles }: MembersRoles, defaultRole: string | null) {
+export function resolveDefaultRole({ roles }: MembersRoles, defaultRole: string | null) {
   const candidate = defaultRole ?? (roles.length === 1 ? roles[0]?.key : undefined);
   return roles.some(role => role.key === candidate) ? (candidate ?? null) : null;
 }

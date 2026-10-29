@@ -176,6 +176,7 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
 export { UserButton } from '../features/user-button/user-button';
 

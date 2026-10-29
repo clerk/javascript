@@ -1,0 +1,87 @@
+import * as CreateOrganizationStories from './create-organization.stories';
+
+# CreateOrganization
+
+A card that creates an organization from a logo, a name, and a slug. The new organization becomes
+the active one, and the card moves on to inviting members to it. **Skip** or **Finish** ends the flow
+at `afterCreateOrganizationUrl`, or the instance's after-create URL when none is set.
+
+It renders `fallback` while Clerk loads and nothing when nobody is signed in.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={CreateOrganizationStories}
+  composition={[
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'TagInput', href: '/components/tag-input', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { CreateOrganization } from '@clerk/mosaic';
+
+<CreateOrganization />;
+```
+
+`afterCreateOrganizationUrl` takes a `:param` template, a plain path, or a function of the new
+organization.
+
+```tsx
+<CreateOrganization afterCreateOrganizationUrl='/orgs/:slug' />
+```
+
+## Slug
+
+Typing a name fills the slug from it: lowercase, with every run of other characters turned into a
+hyphen. The slug can be edited, and only lowercase letters, numbers, and hyphens are accepted. When
+the instance turns slugs off, the field is left out.
+
+<Story
+  name='WithoutSlug'
+  storyModule={CreateOrganizationStories}
+/>
+
+## Logo
+
+**Upload** takes a PNG, JPEG, GIF, or WEBP image up to 10MB. The logo is set on the organization
+once it is created. **Remove** clears the chosen logo before the organization is created.
+
+## Errors
+
+An error that names the name or the slug appears under that field. Any other error appears above the
+form. Either way the form keeps its values.
+
+<Story
+  name='WithError'
+  storyModule={CreateOrganizationStories}
+/>
+
+## Inviting members
+
+The second step invites members to the new organization by email, with a role that starts on the
+instance's default role. Sending the invitations shows a confirmation with **Finish**. The step is
+skipped when `skipInvitationScreen` is set, or when the organization can hold only one member.
+
+## Styling
+
+| Slot                   | Attributes                              |
+| ---------------------- | --------------------------------------- |
+| `.cl-card-root`        | `data-elevation`, `data-size`           |
+| `.cl-card-header`      |                                         |
+| `.cl-card-title`       |                                         |
+| `.cl-card-description` |                                         |
+| `.cl-card-banner`      |                                         |
+| `.cl-card-content`     |                                         |
+| `.cl-card-footer`      | `data-elevation`                        |
+| `.cl-flow-root`        | `data-value="create \| invite \| sent"` |
+| `.cl-flow-step`        | `data-step="create \| invite \| sent"`  |

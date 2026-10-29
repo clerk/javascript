@@ -61,6 +61,12 @@ import {
   Labelled as CopyButtonLabelled,
   meta as copyButtonMeta,
 } from '../stories/copy-button.stories';
+import {
+  Default as CreateOrganizationDefault,
+  meta as createOrganizationMeta,
+  WithError as CreateOrganizationWithError,
+  WithoutSlug as CreateOrganizationWithoutSlug,
+} from '../stories/create-organization.stories';
 import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as DestructiveDefault,
@@ -676,6 +682,13 @@ const organizationSwitcherModule: StoryModule = {
   NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
 };
 
+const createOrganizationModule: StoryModule = {
+  meta: createOrganizationMeta,
+  Default: CreateOrganizationDefault,
+  WithoutSlug: CreateOrganizationWithoutSlug,
+  WithError: CreateOrganizationWithError,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -1046,6 +1059,7 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // Misc
   organizationSwitcherModule,
+  createOrganizationModule,
   apiKeysTableModule,
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.

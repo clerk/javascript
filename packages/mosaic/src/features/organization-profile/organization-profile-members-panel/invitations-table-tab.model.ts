@@ -76,7 +76,7 @@ export function useInvitationsTableModel() {
   };
 }
 
-function rejectedEmailAddresses(cause: unknown, submitted: string[]) {
+export function rejectedEmailAddresses(cause: unknown, submitted: string[]) {
   if (!isClerkAPIResponseError(cause)) {
     return [];
   }
