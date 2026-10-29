@@ -586,9 +586,6 @@ export default tseslint.config([
     rules: {
       ...pluginReactHooks.configs.recommended.rules,
       'react-hooks/rules-of-hooks': 'warn',
-      // Turned off while upgrading eslint-plugin-react-hooks to v7, which added these to the recommended preset.
-      // They are not meant to stay off; they will be enabled in follow-up changes.
-      'react-hooks/refs': 'off',
     },
   },
   {
