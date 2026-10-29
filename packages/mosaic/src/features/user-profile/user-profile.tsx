@@ -1,15 +1,16 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import { organizationProfilePanels } from '../organization-profile/organization-profile';
 import { useOrganizationProfileModel } from '../organization-profile/organization-profile.model';
 import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
+import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useUserProfilePages } from '../switcher/switcher.pages';
 import type { SwitcherMode } from '../switcher/switcher.types';
+import { userProfilePageIds } from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
 import type { UserProfileViewProps } from './user-profile.view';
@@ -54,7 +55,8 @@ export interface UserProfileProps
   mode?: UserProfileMode;
   /**
    * Options for the organization's pages in `combined` mode: your own pages and their order, the API
-   * keys page, and where leaving the organization lands.
+   * keys page, and where leaving the organization lands. `pageOrder` names the organization's pages
+   * without the `organization/` prefix, as in `['members', 'general']`.
    */
   organizationProfileProps?: Pick<
     OrganizationProfileProps,
@@ -130,9 +132,6 @@ export function UserProfile({
 }: UserProfileProps) {
   const model = useUserProfileUserModel();
   const builtInPages = useUserProfilePages();
-  const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>(
-    defaultPage ?? pageOrder?.[0] ?? 'account',
-  );
 
   if (model.status === 'loading') {
     return fallback ?? null;
@@ -141,10 +140,9 @@ export function UserProfile({
     return null;
   }
 
-  const viewProps: UserProfileViewProps = {
+  const viewProps: AccountViewProps = {
     elevation: 'flush',
-    activePage,
-    onPageChange: setActivePage,
+    initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
     customPages,
     pageOrder,
     pages: {
@@ -161,7 +159,7 @@ export function UserProfile({
       mode='mounted'
     >
       {mode === 'user' ? (
-        <UserProfileView {...viewProps} />
+        <AccountUserProfileView {...viewProps} />
       ) : (
         <CombinedUserProfileView
           {...viewProps}
@@ -172,21 +170,42 @@ export function UserProfile({
   );
 }
 
+type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
+  initialPage: UserProfileViewProps['activePage'];
+};
+
+function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
+  const navigation = useProfilePagesController(initialPage, userProfilePageIds(viewProps));
+
+  return (
+    <UserProfileView
+      {...viewProps}
+      {...navigation}
+    />
+  );
+}
+
 function CombinedUserProfileView({
+  initialPage,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
-}: UserProfileViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
+}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
   const model = useOrganizationProfileModel();
+  const organization =
+    model.status === 'ready'
+      ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
+      : undefined;
+  const navigation = useProfilePagesController(
+    initialPage,
+    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
+  );
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <UserProfileView
         {...viewProps}
-        organization={
-          model.status === 'ready'
-            ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
-            : undefined
-        }
+        {...navigation}
+        organization={organization}
       />
     </OrganizationProfileProvider>
   );

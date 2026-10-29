@@ -1,9 +1,13 @@
+import { logger } from '@clerk/shared/logger';
+
 import type { IconComponent } from '../../icons/glyph';
 import { Code } from '../../icons/glyphs/code';
 import { CreditCard } from '../../icons/glyphs/credit-card';
 import { ShieldCheck } from '../../icons/glyphs/shield-check';
 import { UserCircle } from '../../icons/glyphs/user-circle';
 import { applyOrder } from '../../utils/apply-order';
+import { organizationProfilePageIds } from '../organization-profile/organization-profile.layout';
+import type { OrganizationProfilePageListOptions } from '../organization-profile/organization-profile.types';
 import { withUniquePaths } from '../profile-pages/profile-pages.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
@@ -54,4 +58,39 @@ export function resolveUserProfilePages(
     ...uniqueCustomPages.filter(page => !builtInIds.has(page.path)).map(page => ({ id: page.path, custom: page })),
   ];
   return applyOrder(order, entries, entry => entry.id);
+}
+
+type UserProfilePageListOptions = {
+  pages: UserProfilePages;
+  customPages?: readonly CustomProfilePage[];
+  pageOrder?: readonly string[];
+  organization?: OrganizationProfilePageListOptions;
+};
+
+export function userProfileNavEntries({
+  pages,
+  customPages,
+  pageOrder,
+}: UserProfilePageListOptions): UserProfileNavEntry[] {
+  return resolveUserProfilePages(getAvailableUserProfilePages(pages), withoutOrganizationPaths(customPages), pageOrder);
+}
+
+export function userProfilePageIds(options: UserProfilePageListOptions): string[] {
+  const accountPageIds = userProfileNavEntries(options).map(entry => entry.id);
+  const organizationPageIds = options.organization
+    ? organizationProfilePageIds(options.organization).map(id => `${ORGANIZATION_PAGE_PREFIX}${id}`)
+    : [];
+  return [...accountPageIds, ...organizationPageIds];
+}
+
+function withoutOrganizationPaths(customPages: readonly CustomProfilePage[] = []): CustomProfilePage[] {
+  return customPages.filter(page => {
+    if (!page.path.startsWith(ORGANIZATION_PAGE_PREFIX)) {
+      return true;
+    }
+    logger.warnOnce(
+      `[Clerk] UserProfile custom page "${page.path}" uses the reserved "${ORGANIZATION_PAGE_PREFIX}" prefix and was skipped.`,
+    );
+    return false;
+  });
 }

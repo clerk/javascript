@@ -1,9 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
+import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
+import { organizationProfilePageIds } from './organization-profile.layout';
 import { useOrganizationProfileModel } from './organization-profile.model';
 import type { OrganizationProfileOptions } from './organization-profile.provider';
 import { OrganizationProfileProvider } from './organization-profile.provider';
@@ -87,14 +88,16 @@ export function OrganizationProfile({
   apiKeysProps,
 }: OrganizationProfileProps) {
   const model = useOrganizationProfileModel();
-  const [activePage, setActivePage] = useState<OrganizationProfileViewProps['activePage']>(
+  const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
+  const navigation = useProfilePagesController(
     defaultPage ?? pageOrder?.[0] ?? 'general',
+    pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
   );
 
   if (model.status === 'loading') {
     return fallback ?? null;
   }
-  if (model.status === 'hidden') {
+  if (!pages) {
     return null;
   }
 
@@ -102,11 +105,10 @@ export function OrganizationProfile({
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <OrganizationProfileView
         elevation='flush'
-        activePage={activePage}
-        onPageChange={setActivePage}
+        {...navigation}
         customPages={customPages}
         pageOrder={pageOrder}
-        pages={organizationProfilePanels(model.pages, apiKeysProps)}
+        pages={pages}
       />
     </OrganizationProfileProvider>
   );

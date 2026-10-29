@@ -9,6 +9,7 @@ import { withUniquePaths } from '../profile-pages/profile-pages.layout';
 import type {
   CustomOrganizationProfilePage,
   OrganizationProfilePageId,
+  OrganizationProfilePageListOptions,
   OrganizationProfilePages,
 } from './organization-profile.types';
 
@@ -55,4 +56,16 @@ export function resolveOrganizationProfilePages(
     ...uniqueCustomPages.filter(page => !builtInIds.has(page.path)).map(page => ({ id: page.path, custom: page })),
   ];
   return applyOrder(order, entries, entry => entry.id);
+}
+
+export function organizationProfileNavEntries({
+  pages,
+  customPages,
+  pageOrder,
+}: OrganizationProfilePageListOptions): OrganizationProfileNavEntry[] {
+  return resolveOrganizationProfilePages(getAvailableOrganizationProfilePages(pages), customPages, pageOrder);
+}
+
+export function organizationProfilePageIds(options: OrganizationProfilePageListOptions): string[] {
+  return organizationProfileNavEntries(options).map(entry => entry.id);
 }
