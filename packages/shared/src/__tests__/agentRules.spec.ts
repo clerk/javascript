@@ -24,6 +24,9 @@ const createMemoryFs = (files: Record<string, string> = {}, { withRepoPackageJso
     mkdirSync: path => {
       dirs.add(path);
     },
+    unlinkSync: path => {
+      store.delete(path);
+    },
   };
 
   return {
@@ -276,6 +279,83 @@ describe('writeClerkAgentRules after the user removes the Clerk section', () => 
   });
 });
 
+describe('writeClerkAgentRules when package.json sets clerk.agentsMd to false', () => {
+  const disabledPackageJson = '{"clerk":{"agentsMd":false}}';
+
+  it('does not create AGENTS.md', () => {
+    const memory = createMemoryFs({ '/repo/package.json': disabledPackageJson });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result).toEqual({ targetDir: '/repo', agentsMd: 'disabled', files: [] });
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+  });
+
+  it('removes existing Clerk sections and keeps the rest of the file', () => {
+    const memory = createMemoryFs();
+    memory.fs.writeFileSync('/repo/AGENTS.md', 'Project rules\n', { encoding: 'utf8' });
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs', 'react'] });
+    memory.fs.writeFileSync('/repo/AGENTS.md', `${memory.read('/repo/AGENTS.md')}\nMore rules\n`, { encoding: 'utf8' });
+    memory.fs.writeFileSync('/repo/package.json', disabledPackageJson, { encoding: 'utf8' });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result).toEqual({ targetDir: '/repo', agentsMd: 'disabled', files: ['/repo/AGENTS.md'] });
+    expect(memory.read('/repo/AGENTS.md')).toBe('Project rules\n\nMore rules\n');
+  });
+
+  it('deletes AGENTS.md when it held only Clerk sections', () => {
+    const memory = createMemoryFs();
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+    memory.fs.writeFileSync('/repo/package.json', disabledPackageJson, { encoding: 'utf8' });
+
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+  });
+
+  it('wins over a forced write', () => {
+    const memory = createMemoryFs({ '/repo/package.json': disabledPackageJson });
+
+    const result = writeClerkAgentRules({
+      cwd: '/repo',
+      force: true,
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    expect(result.agentsMd).toBe('disabled');
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+  });
+
+  it('reports the removal but changes nothing in dry-run mode', () => {
+    const memory = createMemoryFs();
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+    const before = memory.read('/repo/AGENTS.md');
+    memory.fs.writeFileSync('/repo/package.json', disabledPackageJson, { encoding: 'utf8' });
+
+    const result = writeClerkAgentRules({
+      cwd: '/repo',
+      dryRun: true,
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    expect(result.files).toEqual(['/repo/AGENTS.md']);
+    expect(memory.read('/repo/AGENTS.md')).toBe(before);
+  });
+
+  it('writes as usual when package.json is not valid JSON', () => {
+    const memory = createMemoryFs({ '/repo/package.json': '{' });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.agentsMd).toBe('created');
+  });
+});
+
 describe('isClerkAgentRulesSdk', () => {
   it('accepts supported SDKs', () => {
     expect(isClerkAgentRulesSdk('nextjs')).toBe(true);
@@ -298,7 +378,17 @@ describe('logClerkAgentRulesResult', () => {
     });
 
     expect(log).toHaveBeenCalledWith(
-      '[Clerk]: Updated /repo/AGENTS.md for AI coding agents. Remove the Clerk section from AGENTS.md or set CLERK_AGENTS_MD=false to turn this off.',
+      '[Clerk]: Updated /repo/AGENTS.md for AI coding agents. To turn this off for everyone, add "clerk": { "agentsMd": false } to package.json. To turn it off on this machine, remove the Clerk section from AGENTS.md or set CLERK_AGENTS_MD=false.',
+    );
+  });
+
+  it('logs a removal when package.json turns the rules off', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    logClerkAgentRulesResult({ targetDir: '/repo', agentsMd: 'disabled', files: ['/repo/AGENTS.md'] });
+
+    expect(log).toHaveBeenCalledWith(
+      '[Clerk]: Removed the Clerk section from /repo/AGENTS.md because package.json sets "clerk": { "agentsMd": false }.',
     );
     log.mockRestore();
   });

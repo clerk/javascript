@@ -198,6 +198,18 @@ describe('CLI Integration', () => {
       expect(fs.existsSync(path.join(fixture.path, 'CLAUDE.md'))).toBe(false);
     });
 
+    it('writes nothing when package.json sets clerk.agentsMd to false', async () => {
+      const fs = await import('node:fs');
+      const packageJsonPath = path.join(fixture.path, 'package.json');
+      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      fs.writeFileSync(packageJsonPath, JSON.stringify({ ...pkg, clerk: { agentsMd: false } }));
+
+      const result = await runCli(['--dir', fixture.path, '--agents-md'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('"clerk": { "agentsMd": false }');
+      expect(fs.existsSync(path.join(fixture.path, 'AGENTS.md'))).toBe(false);
+    });
+
     it('does not write files in dry-run mode', async () => {
       const fs = await import('node:fs');
       const result = await runCli(['--dir', fixture.path, '--agents-md', '--dry-run'], { timeout: 15000 });

@@ -297,6 +297,11 @@ function writeAgentsMd(options, detectedSdks) {
   }
 
   const result = writeClerkAgentRules({ dir: options.dir, dryRun: options.dryRun, sdks });
+  if (result.agentsMd === 'disabled') {
+    renderWarning('package.json sets "clerk": { "agentsMd": false }, so Clerk AGENTS.md sections were not written');
+    return;
+  }
+
   const prefix = options.dryRun ? '[dry run] Would write' : 'Wrote';
 
   renderText(`${prefix} Clerk AGENTS.md sections for ${sdks.map(s => `@clerk/${s}`).join(', ')}`, 'blue');

@@ -20,6 +20,7 @@ export interface FileSystemAdapter {
   readFileSync: (path: string, options: { encoding: BufferEncoding }) => string;
   writeFileSync: (path: string, data: string, options: { encoding: BufferEncoding; mode?: number }) => void;
   mkdirSync?: (path: string, options: { recursive: boolean }) => void;
+  unlinkSync?: (path: string) => void;
 }
 
 export interface PathAdapter {
@@ -40,7 +41,7 @@ export interface WriteClerkAgentRulesOptions {
 
 export type WriteClerkAgentRulesResult = {
   targetDir: string;
-  agentsMd: 'created' | 'updated' | 'unchanged' | 'skipped';
+  agentsMd: 'created' | 'updated' | 'unchanged' | 'skipped' | 'disabled';
   files: string[];
 };
 
@@ -176,6 +177,27 @@ function upsertMarkedBlock(
   return `${content.trimEnd()}${eol}${eol}${block}${eol}`;
 }
 
+function removeMarkedBlock(content: string, start: string, end: string, eol: string) {
+  const startIndex = content.indexOf(start);
+  const endIndex = content.indexOf(end, startIndex + start.length);
+  if (startIndex === -1 || endIndex === -1) {
+    return content;
+  }
+
+  const before = content.slice(0, startIndex).trimEnd();
+  const after = content.slice(endIndex + end.length).trimStart();
+  return before && after ? `${before}${eol}${eol}${after}` : `${before}${after}${before || after ? eol : ''}`;
+}
+
+function isDisabledInPackageJson(fs: FileSystemAdapter, path: PathAdapter, targetDir: string) {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(targetDir, 'package.json'), { encoding: 'utf8' }));
+    return pkg?.clerk?.agentsMd === false;
+  } catch {
+    return false;
+  }
+}
+
 function findTargetDir(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
   let current = path.resolve(cwd);
   const root = path.parse(current).root;
@@ -203,6 +225,30 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
   const statePath = path.join(stateDir, 'agent-rules');
   const agentsExists = fs.existsSync(agentsPath);
   const existing = agentsExists ? fs.readFileSync(agentsPath, { encoding: 'utf8' }) : '';
+
+  if (isDisabledInPackageJson(fs, path, targetDir)) {
+    const eol = detectEol(existing);
+    let next = removeMarkedBlock(existing, GENERIC_START, GENERIC_END, eol);
+    for (const sdk of clerkAgentRulesSdks) {
+      next = removeMarkedBlock(
+        next,
+        `<!-- BEGIN:clerk-agent-rules:${sdk} -->`,
+        `<!-- END:clerk-agent-rules:${sdk} -->`,
+        eol,
+      );
+    }
+    if (next === existing) {
+      return { targetDir, agentsMd: 'disabled', files: [] };
+    }
+    if (!dryRun) {
+      if (next.trim() || !fs.unlinkSync) {
+        fs.writeFileSync(agentsPath, next, { encoding: 'utf8', mode: 0o644 });
+      } else {
+        fs.unlinkSync(agentsPath);
+      }
+    }
+    return { targetDir, agentsMd: 'disabled', files: [agentsPath] };
+  }
 
   if (!force && !existing.includes(GENERIC_START) && fs.existsSync(statePath)) {
     return { targetDir, agentsMd: 'skipped', files: [] };
@@ -244,12 +290,21 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
   return { targetDir, agentsMd, files: agentsMd === 'unchanged' ? [] : [agentsPath] };
 }
 
-export function logClerkAgentRulesResult({ files }: WriteClerkAgentRulesResult) {
-  if (files.length > 0) {
-    console.log(
-      `[Clerk]: Updated ${files.join(' and ')} for AI coding agents. Remove the Clerk section from AGENTS.md or set CLERK_AGENTS_MD=false to turn this off.`,
-    );
+export function logClerkAgentRulesResult({ agentsMd, files }: WriteClerkAgentRulesResult) {
+  if (files.length === 0) {
+    return;
   }
+
+  if (agentsMd === 'disabled') {
+    console.log(
+      `[Clerk]: Removed the Clerk section from ${files.join(' and ')} because package.json sets "clerk": { "agentsMd": false }.`,
+    );
+    return;
+  }
+
+  console.log(
+    `[Clerk]: Updated ${files.join(' and ')} for AI coding agents. To turn this off for everyone, add "clerk": { "agentsMd": false } to package.json. To turn it off on this machine, remove the Clerk section from AGENTS.md or set CLERK_AGENTS_MD=false.`,
+  );
 }
 
 export function logClerkAgentRulesError(error: unknown) {
