@@ -150,7 +150,8 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
   const index = peers.indexOf(toast);
   const offsetY = peers.slice(0, Math.max(index, 0)).reduce((sum, t) => sum + (t.limited ? 0 : (t.height ?? 0)), 0);
 
-  const behind = frontmost !== undefined && peers.includes(frontmost) && index > peers.indexOf(frontmost);
+  const frontmostIndex = frontmost === undefined ? -1 : peers.indexOf(frontmost);
+  const behind = frontmostIndex !== -1 && index > frontmostIndex;
 
   const contextValue = useMemo<ToastRootContextValue>(
     () => ({ toast, behind, rootId, titleId, descriptionId, setTitleId, setDescriptionId }),
