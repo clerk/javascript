@@ -218,6 +218,64 @@ describe('writeClerkAgentRules with an unmatched BEGIN marker', () => {
   });
 });
 
+describe('writeClerkAgentRules after the user removes the Clerk section', () => {
+  const statePath = '/repo/node_modules/.cache/clerk/agent-rules';
+
+  it('records that it wrote the section', () => {
+    const memory = createMemoryFs();
+
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(memory.read(statePath)).toBe('');
+  });
+
+  it('does not add the section back once it was removed', () => {
+    const memory = createMemoryFs();
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+    memory.fs.writeFileSync('/repo/AGENTS.md', 'Project rules\n', { encoding: 'utf8' });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result).toEqual({ targetDir: '/repo', agentsMd: 'skipped', files: [] });
+    expect(memory.read('/repo/AGENTS.md')).toBe('Project rules\n');
+  });
+
+  it('keeps updating the section while it is still there', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': '<!-- BEGIN:clerk-agent-rules -->\nold\n<!-- END:clerk-agent-rules -->\n',
+      [statePath]: '',
+    });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.agentsMd).toBe('updated');
+    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
+  });
+
+  it('adds the section back when forced', () => {
+    const memory = createMemoryFs({ '/repo/AGENTS.md': 'Project rules\n', [statePath]: '' });
+
+    const result = writeClerkAgentRules({
+      cwd: '/repo',
+      force: true,
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    expect(result.agentsMd).toBe('updated');
+    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
+  });
+
+  it('records nothing in dry-run mode', () => {
+    const memory = createMemoryFs();
+
+    writeClerkAgentRules({ cwd: '/repo', dryRun: true, fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(memory.read(statePath)).toBeUndefined();
+  });
+});
+
 describe('isClerkAgentRulesSdk', () => {
   it('accepts supported SDKs', () => {
     expect(isClerkAgentRulesSdk('nextjs')).toBe(true);
@@ -240,7 +298,7 @@ describe('logClerkAgentRulesResult', () => {
     });
 
     expect(log).toHaveBeenCalledWith(
-      '[Clerk]: Updated /repo/AGENTS.md for AI coding agents. Set CLERK_AGENTS_MD=false to turn this off.',
+      '[Clerk]: Updated /repo/AGENTS.md for AI coding agents. Remove the Clerk section from AGENTS.md or set CLERK_AGENTS_MD=false to turn this off.',
     );
     log.mockRestore();
   });

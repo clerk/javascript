@@ -32,6 +32,7 @@ export interface PathAdapter {
 export interface WriteClerkAgentRulesOptions {
   cwd: string;
   dryRun?: boolean;
+  force?: boolean;
   fs: FileSystemAdapter;
   path: PathAdapter;
   sdks: ClerkAgentRulesSdk[];
@@ -191,15 +192,21 @@ function findTargetDir(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
 }
 
 export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): WriteClerkAgentRulesResult {
-  const { dryRun = false, fs, path, sdks } = options;
+  const { dryRun = false, force = false, fs, path, sdks } = options;
   const targetDir = findTargetDir(fs, path, options.cwd);
   if (!targetDir) {
     return { targetDir: path.resolve(options.cwd), agentsMd: 'skipped', files: [] };
   }
 
   const agentsPath = path.join(targetDir, 'AGENTS.md');
+  const stateDir = path.join(targetDir, 'node_modules', '.cache', 'clerk');
+  const statePath = path.join(stateDir, 'agent-rules');
   const agentsExists = fs.existsSync(agentsPath);
   const existing = agentsExists ? fs.readFileSync(agentsPath, { encoding: 'utf8' }) : '';
+
+  if (!force && !existing.includes(GENERIC_START) && fs.existsSync(statePath)) {
+    return { targetDir, agentsMd: 'skipped', files: [] };
+  }
 
   const eol = detectEol(existing);
 
@@ -228,6 +235,10 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
     if (agentsMd !== 'unchanged') {
       fs.writeFileSync(agentsPath, next, { encoding: 'utf8', mode: 0o644 });
     }
+    if (!fs.existsSync(statePath)) {
+      fs.mkdirSync?.(stateDir, { recursive: true });
+      fs.writeFileSync(statePath, '', { encoding: 'utf8', mode: 0o644 });
+    }
   }
 
   return { targetDir, agentsMd, files: agentsMd === 'unchanged' ? [] : [agentsPath] };
@@ -236,7 +247,7 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
 export function logClerkAgentRulesResult({ files }: WriteClerkAgentRulesResult) {
   if (files.length > 0) {
     console.log(
-      `[Clerk]: Updated ${files.join(' and ')} for AI coding agents. Set CLERK_AGENTS_MD=false to turn this off.`,
+      `[Clerk]: Updated ${files.join(' and ')} for AI coding agents. Remove the Clerk section from AGENTS.md or set CLERK_AGENTS_MD=false to turn this off.`,
     );
   }
 }

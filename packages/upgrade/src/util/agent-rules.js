@@ -23,5 +23,5 @@ export function detectClerkAgentRuleSdks(dir) {
 }
 
 export function writeClerkAgentRules({ dir, dryRun = false, sdks = detectClerkAgentRuleSdks(dir) }) {
-  return { ...writeRules({ cwd: dir, dryRun, fs, path, sdks }), sdks };
+  return { ...writeRules({ cwd: dir, dryRun, force: true, fs, path, sdks }), sdks };
 }
