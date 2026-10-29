@@ -5,6 +5,8 @@ import { Protect } from '../protect';
 import { __internal_resetProtectStorage } from '../protectSession';
 import type { Environment } from '../resources';
 
+const FRONTEND_API = 'clerk.example.com';
+
 const environment = (loaders: unknown[]): Environment => ({ protectConfig: { loaders } }) as unknown as Environment;
 
 /** No `src`, so jsdom does not fetch a real URL and race the assertions here. */
@@ -24,14 +26,14 @@ describe('Protect.challengeLoadTimeoutMs', () => {
 
   it('is undefined when no loader asks for one, so the caller falls back', () => {
     const protect = new Protect();
-    protect.load(environment([loader()]));
+    protect.load(environment([loader()]), FRONTEND_API);
 
     expect(protect.challengeLoadTimeoutMs).toBeUndefined();
   });
 
   it('reports the value from the loader this browser was assigned', () => {
     const protect = new Protect();
-    protect.load(environment([loader({ challenge_load_timeout_ms: 25_000 })]));
+    protect.load(environment([loader({ challenge_load_timeout_ms: 25_000 })]), FRONTEND_API);
 
     expect(protect.challengeLoadTimeoutMs).toBe(25_000);
   });
@@ -49,6 +51,7 @@ describe('Protect.challengeLoadTimeoutMs', () => {
         // The incumbent, which this browser does get.
         loader({ challenge_load_timeout_ms: 45_000 }),
       ]),
+      FRONTEND_API,
     );
 
     expect(protect.challengeLoadTimeoutMs).toBe(45_000);
@@ -58,7 +61,7 @@ describe('Protect.challengeLoadTimeoutMs', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.01);
 
     const protect = new Protect();
-    protect.load(environment([loader({ rollout: 0.1, challenge_load_timeout_ms: 25_000 }), loader()]));
+    protect.load(environment([loader({ rollout: 0.1, challenge_load_timeout_ms: 25_000 }), loader()]), FRONTEND_API);
 
     expect(protect.challengeLoadTimeoutMs).toBe(25_000);
   });
@@ -71,6 +74,7 @@ describe('Protect.challengeLoadTimeoutMs', () => {
         loader({ challenge_load_timeout_ms: Number.POSITIVE_INFINITY }),
         loader({ challenge_load_timeout_ms: 'soon' as unknown as number }),
       ]),
+      FRONTEND_API,
     );
 
     expect(protect.challengeLoadTimeoutMs).toBeUndefined();
@@ -84,6 +88,7 @@ describe('Protect.challengeLoadTimeoutMs', () => {
         loader({ challenge_load_timeout_ms: 25_000 }),
         loader({ challenge_load_timeout_ms: 45_000 }),
       ]),
+      FRONTEND_API,
     );
 
     expect(protect.challengeLoadTimeoutMs).toBe(25_000);

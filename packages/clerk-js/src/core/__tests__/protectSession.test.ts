@@ -12,6 +12,8 @@ import {
   ProtectSession,
 } from '../protectSession';
 
+const FRONTEND_API = 'clerk.example.com';
+const TOKEN_KEY = `__clerk_protect_st:${FRONTEND_API}`;
 const LOADER_SRC = 'https://loader.example.com/ins_2abc/{cid}/loader.js';
 
 /**
@@ -70,9 +72,9 @@ const harness = () => {
   return { applyLoader, elements, injected };
 };
 
-const session = (loaders: ProtectLoader[], tokensInvalidBefore?: number) => {
+const session = (loaders: ProtectLoader[], tokensInvalidBefore?: number, frontendApi = FRONTEND_API) => {
   const h = harness();
-  return { session: ProtectSession.create(loaders, h.applyLoader, tokensInvalidBefore), ...h };
+  return { session: ProtectSession.create(loaders, h.applyLoader, frontendApi, tokensInvalidBefore), ...h };
 };
 
 /** What the server does: the script body assigns the global, then the element fires `load`. */
@@ -246,7 +248,7 @@ describe('ProtectSession inline token', () => {
       __clerk_protect_status: 'ok',
       __clerk_protect_cid: created?.placeholders().cid,
     });
-    expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
+    expect(JSON.parse(localStorage.getItem(TOKEN_KEY) as string)).toMatchObject({
       token: 'v1.payload.mac',
       rid: created?.placeholders().rid,
     });
@@ -382,7 +384,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('reuses a fresh token without injecting the loader at all', async () => {
-    localStorage.setItem('__clerk_protect_st', storedEntry());
+    localStorage.setItem(TOKEN_KEY, storedEntry());
 
     const { session: created, elements } = session([loader()]);
     expect(created?.hasFreshToken()).toBe(true);
@@ -398,7 +400,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('ignores a stored token that has expired', async () => {
-    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.stale.mac', exp: nowSeconds() - 1 }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ token: 'v1.stale.mac', exp: nowSeconds() - 1 }));
 
     const { session: created, injected } = session([loader()]);
     expect(created?.hasFreshToken()).toBe(false);
@@ -411,7 +413,7 @@ describe('ProtectSession inline token', () => {
 
   it('ignores a planted token claiming more life than we ever mint', async () => {
     localStorage.setItem(
-      '__clerk_protect_st',
+      TOKEN_KEY,
       storedEntry({ token: 'v1.planted.mac', exp: nowSeconds() + 10 * 365 * 24 * 60 * 60 }),
     );
 
@@ -426,7 +428,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('ignores a planted value that could never have been a mint', async () => {
-    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'not-a-token' }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ token: 'not-a-token' }));
 
     const { session: created, injected } = session([loader()]);
     // Shape alone proves nothing — only the server can tell a mint from a well-formed forgery —
@@ -442,10 +444,7 @@ describe('ProtectSession inline token', () => {
   it('ignores an entry older than any token we would ever be issued', async () => {
     // `exp` is server truth compared against this browser's clock, so a clock running slow keeps
     // a lapsed entry alive. Elapsed local time is measured on one clock, so it still catches it.
-    localStorage.setItem(
-      '__clerk_protect_st',
-      storedEntry({ at: Date.now() - 25 * 60 * 60 * 1_000, exp: nowSeconds() + 43_200 }),
-    );
+    localStorage.setItem(TOKEN_KEY, storedEntry({ at: Date.now() - 25 * 60 * 60 * 1_000, exp: nowSeconds() + 43_200 }));
 
     const { session: created, injected } = session([loader()]);
     expect(created?.hasFreshToken()).toBe(false);
@@ -457,7 +456,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('ignores an entry stamped in the future, which means the clock moved backwards', () => {
-    localStorage.setItem('__clerk_protect_st', storedEntry({ at: Date.now() + 60 * 60 * 1_000 }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ at: Date.now() + 60 * 60 * 1_000 }));
 
     const { session: created } = session([loader()]);
     expect(created?.hasFreshToken()).toBe(false);
@@ -466,7 +465,7 @@ describe('ProtectSession inline token', () => {
   it('does not send a token that would lapse in flight', async () => {
     // Inside the send margin: still unexpired, but not worth shipping — it could only fail
     // verification by the time it arrived.
-    localStorage.setItem('__clerk_protect_st', storedEntry({ exp: nowSeconds() + 2 }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ exp: nowSeconds() + 2 }));
 
     const { session: created } = session([loader()]);
     expect(created?.hasFreshToken()).toBe(false);
@@ -476,7 +475,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('re-acquires when the configured floor has moved past the stored one', async () => {
-    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.revoked.mac', floor: 1_000 }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ token: 'v1.revoked.mac', floor: 1_000 }));
 
     // Raising tokens_invalid_before is the recovery lever: a bad mint or a rolled key leaves
     // browsers holding something the server will not accept, and without this they would keep
@@ -491,14 +490,14 @@ describe('ProtectSession inline token', () => {
   });
 
   it('keeps a token acquired at or above the configured floor', () => {
-    localStorage.setItem('__clerk_protect_st', storedEntry({ floor: 2_000 }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ floor: 2_000 }));
     expect(session([loader()], 2_000).session?.hasFreshToken()).toBe(true);
   });
 
   it('keeps cached tokens for an instance that has never set a floor', () => {
     // An absent floor counts as zero on both sides, so introducing the mechanism must not make
     // every browser re-acquire at once.
-    localStorage.setItem('__clerk_protect_st', storedEntry());
+    localStorage.setItem(TOKEN_KEY, storedEntry());
     expect(session([loader()]).session?.hasFreshToken()).toBe(true);
   });
 
@@ -508,11 +507,11 @@ describe('ProtectSession inline token', () => {
     serveInline(await injected(), { cid: created?.placeholders().cid });
     await created?.getRequestParams();
 
-    expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({ floor: 2_000 });
+    expect(JSON.parse(localStorage.getItem(TOKEN_KEY) as string)).toMatchObject({ floor: 2_000 });
   });
 
   it('reuses a mint whose version this build predates', async () => {
-    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v9.cached.mac' }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ token: 'v9.cached.mac' }));
 
     // The shape check must not pin a version. The server may mint ahead of this build, and
     // rejecting that here would re-run the loader on every page load until the SDK caught up.
@@ -656,18 +655,71 @@ describe('ProtectSession storage', () => {
     expect(second?.placeholders().pid).toBe(first?.placeholders().pid);
   });
 
-  it('keeps one store per origin, not one per instance', async () => {
+  it('shares one store between sessions of the same instance', async () => {
     const a = session([loader()]);
     a.session?.start();
     serveInline(await a.injected(), { cid: a.session?.placeholders().cid });
     await expect(a.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
 
-    // A second session on the same origin reads the same store rather than running its own loader.
-    // The token names the instance that minted it and is verified server-side, so an origin serving
-    // two instances costs a rejected token — never a token honoured for the wrong instance.
     const b = session([loader()]);
     expect(b.session?.hasFreshToken()).toBe(true);
-    expect(localStorage.getItem('__clerk_protect_st')).not.toBeNull();
+    expect(localStorage.getItem(TOKEN_KEY)).not.toBeNull();
+  });
+
+  it('does not reuse a token acquired for another instance on the same origin', async () => {
+    const development = session([loader()], undefined, 'example.clerk.accounts.dev');
+    development.session?.start();
+    serveInline(await development.injected(), {
+      cid: development.session?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.development.mac', exp: nowSeconds() + 43_200 }),
+    });
+    await expect(development.session?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.development.mac',
+    });
+
+    const production = session([loader()]);
+    expect(production.session?.hasFreshToken()).toBe(false);
+    production.session?.start();
+    serveInline(await production.injected(), {
+      cid: production.session?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.production.mac', exp: nowSeconds() + 43_200 }),
+    });
+
+    await expect(production.session?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.production.mac',
+      __clerk_protect_status: 'ok',
+    });
+    expect(JSON.parse(localStorage.getItem('__clerk_protect_st:example.clerk.accounts.dev') as string)).toMatchObject({
+      token: 'v1.development.mac',
+    });
+  });
+
+  it('ignores a token stored under the unscoped key by an earlier version', async () => {
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.legacy.mac' }));
+
+    const { session: created, injected } = session([loader()]);
+    expect(created?.hasFreshToken()).toBe(false);
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+  });
+
+  it('keeps instances apart in the in-memory fallback when storage is blocked', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage is blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage is blocked');
+    });
+
+    const development = session([loader()], undefined, 'example.clerk.accounts.dev');
+    development.session?.start();
+    serveInline(await development.injected(), { cid: development.session?.placeholders().cid });
+    await expect(development.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+
+    expect(session([loader()]).session?.hasFreshToken()).toBe(false);
+    expect(session([loader()], undefined, 'example.clerk.accounts.dev').session?.hasFreshToken()).toBe(true);
   });
 });
 
@@ -837,7 +889,7 @@ describe('ProtectSession default deadline', () => {
     const params = created?.getRequestParams();
 
     await vi.advanceTimersByTimeAsync(7_000);
-    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
     await vi.advanceTimersByTimeAsync(100);
 
     await expect(params).resolves.toMatchObject({
@@ -887,7 +939,7 @@ describe('ProtectSession default deadline', () => {
     await vi.advanceTimersByTimeAsync(1);
     await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
 
-    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
     await vi.advanceTimersByTimeAsync(2_000);
     expect(vi.getTimerCount()).toBe(0);
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.leader.mac' });
@@ -935,7 +987,7 @@ describe('ProtectSession default deadline', () => {
 });
 
 describe('ProtectSession late token', () => {
-  const STORE_KEY = '__clerk_protect_st';
+  const STORE_KEY = TOKEN_KEY;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -1174,15 +1226,18 @@ describe('ProtectSession late token', () => {
 
 describe('ProtectSession cross-tab single flight', () => {
   /**
-   * A serialising Web Locks stand-in. jsdom has no `navigator.locks`, and the `browser-tabs-lock`
-   * fallback is globally mocked to always grant, so without this the double-check inside the lock
-   * would never be exercised.
+   * A Web Locks stand-in that serialises per lock name, as the real one does. jsdom has no
+   * `navigator.locks`, and the `browser-tabs-lock` fallback is globally mocked to always grant, so
+   * without this the double-check inside the lock would never be exercised.
    */
   const installSerialisingLocks = () => {
-    let tail: Promise<unknown> = Promise.resolve();
-    const request = vi.fn((_key: string, _options: unknown, callback: () => Promise<unknown>) => {
-      const result = tail.then(() => callback());
-      tail = result.catch(() => undefined);
+    const tails = new Map<string, Promise<unknown>>();
+    const request = vi.fn((key: string, _options: unknown, callback: () => Promise<unknown>) => {
+      const result = (tails.get(key) ?? Promise.resolve()).then(() => callback());
+      tails.set(
+        key,
+        result.catch(() => undefined),
+      );
       return result;
     });
     Object.defineProperty(navigator, 'locks', { value: { request }, configurable: true });
@@ -1212,6 +1267,35 @@ describe('ProtectSession cross-tab single flight', () => {
     results.forEach(result => expect(result).toMatchObject({ __clerk_protect_status: 'ok' }));
   });
 
+  it('acquires separately for different instances that start together on one origin', async () => {
+    const request = installSerialisingLocks();
+
+    const development = session([loader({ token_timeout_ms: 1_000 })], undefined, 'example.clerk.accounts.dev');
+    const production = session([loader({ token_timeout_ms: 1_000 })]);
+    development.session?.start();
+    production.session?.start();
+
+    const developmentLoader = await development.injected();
+    const productionLoader = await production.injected();
+
+    serveInline(developmentLoader, {
+      cid: development.session?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.development.mac', exp: nowSeconds() + 43_200 }),
+    });
+    await expect(development.session?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.development.mac',
+    });
+
+    serveInline(productionLoader, {
+      cid: production.session?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.production.mac', exp: nowSeconds() + 43_200 }),
+    });
+    await expect(production.session?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.production.mac',
+    });
+    expect(new Set(request.mock.calls.map(([key]) => key)).size).toBe(2);
+  });
+
   it('uses whatever a leader wrote when the lock is never granted', async () => {
     Object.defineProperty(navigator, 'locks', {
       value: {
@@ -1225,7 +1309,7 @@ describe('ProtectSession cross-tab single flight', () => {
     created?.start();
     // Written after the pre-lock read has already missed, so this can only be picked up by the
     // read that follows a failed lock acquisition.
-    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
+    localStorage.setItem(TOKEN_KEY, storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
 
     await expect(created?.getRequestParams()).resolves.toMatchObject({
       __clerk_protect_token: 'v1.leader.mac',
