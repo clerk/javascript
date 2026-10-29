@@ -6,6 +6,10 @@ import {
   PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
   SafeLocalStorage,
 } from '@clerk/shared/internal/clerk-js/localStorage';
+import {
+  isPasswordConfirmationNotice,
+  PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM,
+} from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type {
@@ -99,8 +103,12 @@ function SignInStartInternal(): JSX.Element {
   const clerk = useClerk();
   useEffect(() => {
     const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${clerk.publishableKey}`;
-    const sessionEnded = SafeLocalStorage.getItem(key, false);
-    if (sessionEnded) {
+    const notice = getClerkQueryParam(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM);
+    removeClerkQueryParam(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM);
+    if (
+      isPasswordConfirmationNotice(notice, clerk.publishableKey) ||
+      isPasswordConfirmationNotice(SafeLocalStorage.getItem(key, null), clerk.publishableKey)
+    ) {
       SafeLocalStorage.removeItem(key);
       setError(t(localizationKeys('unstable__errors.password_confirmation_session_ended')));
     }

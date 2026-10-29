@@ -36,6 +36,11 @@ import {
   PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
   SafeLocalStorage,
 } from '@clerk/shared/internal/clerk-js/localStorage';
+import {
+  isPasswordConfirmationNotice,
+  PASSWORD_CONFIRMATION_NOTICE_TTL,
+  PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM,
+} from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -2275,7 +2280,17 @@ export class Clerk implements ClerkInterface {
 
     const modifiedOptions = this.isSatellite ? this.#addSyncTriggerToRedirectOptions(options) : options;
 
-    return this.#buildUrl('signInUrl', { ...modifiedOptions, redirectUrl }, options?.initialValues);
+    const signInUrl = this.#buildUrl('signInUrl', { ...modifiedOptions, redirectUrl }, options?.initialValues);
+    const notice = SafeLocalStorage.getItem(
+      `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`,
+      null,
+    );
+    if (!signInUrl || !isPasswordConfirmationNotice(notice, this.publishableKey)) {
+      return signInUrl;
+    }
+    const url = new URL(signInUrl, window.location.href);
+    url.searchParams.set(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM, notice);
+    return url.href;
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
@@ -2471,7 +2486,11 @@ export class Clerk implements ClerkInterface {
 
   public redirectToSignIn = async (options?: SignInRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildSignInUrl(options));
+      const url = this.buildSignInUrl(options);
+      if (url && new URL(url, window.location.href).searchParams.has(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM)) {
+        SafeLocalStorage.removeItem(`${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`);
+      }
+      return this.navigate(url);
     }
     return;
   };
@@ -3043,8 +3062,8 @@ export class Clerk implements ClerkInterface {
   public __internal_handleSessionEnded = (client?: ClientResource): Promise<void> => {
     SafeLocalStorage.setItem(
       `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`,
-      true,
-      5 * 60 * 1000,
+      `${this.publishableKey}:${Date.now()}`,
+      PASSWORD_CONFIRMATION_NOTICE_TTL,
     );
     if (client) {
       this.updateClient(client);

@@ -9,6 +9,10 @@ import {
   PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
   SafeLocalStorage,
 } from '@clerk/shared/internal/clerk-js/localStorage';
+import {
+  PASSWORD_CONFIRMATION_NOTICE_TTL,
+  PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM,
+} from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -4395,6 +4399,48 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('password confirmation sign-in redirects', () => {
+    beforeEach(() => window.localStorage.clear());
+    afterEach(() => window.localStorage.clear());
+
+    it('carries the notice to hosted sign-in and removes the source marker when redirecting', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({
+        signInUrl: 'https://accounts.example.com/sign-in?existing=value#/start',
+        allowedRedirectOrigins: ['https://app.example.com'],
+      });
+      const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${sut.publishableKey}`;
+      const notice = `${sut.publishableKey}:${Date.now()}`;
+      SafeLocalStorage.setItem(key, notice, PASSWORD_CONFIRMATION_NOTICE_TTL);
+      const url = new URL(sut.buildSignInUrl({ redirectUrl: 'https://app.example.com/account' }));
+      expect(url.origin).toBe('https://accounts.example.com');
+      expect(url.searchParams.get(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM)).toBe(notice);
+      expect(url.searchParams.get('existing')).toBe('value');
+      expect(url.hash).toContain('/start');
+      expect(url.href).toContain(encodeURIComponent('https://app.example.com/account'));
+      expect(SafeLocalStorage.getItem(key, null)).toBe(notice);
+      const navigate = vi.spyOn(sut, 'navigate').mockResolvedValue(undefined);
+      await sut.redirectToSignIn({ redirectUrl: 'https://app.example.com/account' });
+      expect(navigate).toHaveBeenCalledWith(url.href);
+      expect(SafeLocalStorage.getItem(key, null)).toBeNull();
+      navigate.mockRestore();
+    });
+
+    it.each(['expired', 'other-instance', 'missing'])('does not forward a %s notice', async kind => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ signInUrl: 'https://accounts.example.com/sign-in' });
+      const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${sut.publishableKey}`;
+      if (kind !== 'missing') {
+        const notice =
+          kind === 'expired'
+            ? `${sut.publishableKey}:${Date.now() - PASSWORD_CONFIRMATION_NOTICE_TTL}`
+            : `another_instance:${Date.now()}`;
+        SafeLocalStorage.setItem(key, notice, PASSWORD_CONFIRMATION_NOTICE_TTL);
+      }
+      expect(new URL(sut.buildSignInUrl()).searchParams.has(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM)).toBe(false);
+    });
+  });
+
   describe('__internal_handleSessionEnded', () => {
     afterEach(() => {
       (window as any).__internal_onAfterSetActive = null;
@@ -4416,14 +4462,14 @@ describe('Clerk singleton', () => {
       const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${sut.publishableKey}`;
       const updateClient = sut.updateClient;
       const updateClientSpy = vi.spyOn(sut, 'updateClient').mockImplementation(client => {
-        expect(SafeLocalStorage.getItem(key, false)).toBe(true);
+        expect(SafeLocalStorage.getItem(key, null)).toMatch(new RegExp(`^${sut.publishableKey}:\\d+$`));
         updateClient(client);
       });
 
       await sut.__internal_handleSessionEnded({ sessions: [], signedInSessions: [] } as any);
 
       expect(updateClientSpy).toHaveBeenCalledTimes(1);
-      expect(SafeLocalStorage.getItem(key, false)).toBe(true);
+      expect(SafeLocalStorage.getItem(key, null)).toMatch(new RegExp(`^${sut.publishableKey}:\\d+$`));
       const now = Date.now();
       const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now + 5 * 60 * 1000 + 1);
       expect(SafeLocalStorage.getItem(key, false)).toBe(false);
