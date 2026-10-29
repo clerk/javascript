@@ -1,0 +1,7 @@
+{
+  "src/react/hooks/useOrganizationEnterpriseConnectionTestRuns.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  }
+}

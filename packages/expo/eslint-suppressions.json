@@ -1,0 +1,7 @@
+{
+  "src/native-components/useAuthViewState.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  }
+}
