@@ -7,9 +7,10 @@ import type { OrganizationProfileProps } from '../organization-profile/organizat
 import { organizationProfilePanels } from '../organization-profile/organization-profile';
 import { useOrganizationProfileModel } from '../organization-profile/organization-profile.model';
 import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
+import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useUserProfilePages } from '../switcher/switcher.pages';
 import type { SwitcherMode } from '../switcher/switcher.types';
-import { useUserProfileController } from './user-profile.controller';
+import { userProfilePageIds } from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
 import type { UserProfileViewProps } from './user-profile.view';
@@ -174,7 +175,7 @@ type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange'
 };
 
 function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
-  const navigation = useUserProfileController({ initialPage, ...viewProps });
+  const navigation = useProfilePagesController(initialPage, userProfilePageIds(viewProps));
 
   return (
     <UserProfileView
@@ -190,25 +191,21 @@ function CombinedUserProfileView({
   ...viewProps
 }: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
   const model = useOrganizationProfileModel();
-  const organizationState =
+  const organization =
     model.status === 'ready'
-      ? {
-          status: 'ready' as const,
-          pageList: { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder },
-        }
-      : { status: model.status };
-  const navigation = useUserProfileController({
+      ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
+      : undefined;
+  const navigation = useProfilePagesController(
     initialPage,
-    ...viewProps,
-    organization: organizationState,
-  });
+    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
+  );
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <UserProfileView
         {...viewProps}
         {...navigation}
-        organization={organizationState.status === 'ready' ? organizationState.pageList : undefined}
+        organization={organization}
       />
     </OrganizationProfileProvider>
   );

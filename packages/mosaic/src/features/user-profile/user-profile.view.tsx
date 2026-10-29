@@ -3,18 +3,14 @@ import React from 'react';
 
 import { Icon } from '../../components/icon';
 import { useMessages } from '../../localization';
-import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
-import type { OrganizationProfilePageListOptions } from '../organization-profile/organization-profile.view';
+import type {
+  OrganizationProfilePageId,
+  OrganizationProfilePageListOptions,
+} from '../organization-profile/organization-profile.types';
 import { organizationProfilePageList } from '../organization-profile/organization-profile.view';
 import type { ProfilePage, ProfilePageGroup, ProfilePagesViewProps } from '../profile-pages/profile-pages.view';
 import { ProfilePagesView } from '../profile-pages/profile-pages.view';
-import {
-  getAvailableUserProfilePages,
-  ORGANIZATION_PAGE_PREFIX,
-  resolveUserProfilePages,
-  USER_PROFILE_PAGE_ICONS,
-  withoutOrganizationPaths,
-} from './user-profile.layout';
+import { ORGANIZATION_PAGE_PREFIX, USER_PROFILE_PAGE_ICONS, userProfileNavEntries } from './user-profile.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
 export interface UserProfileViewProps extends Omit<
@@ -53,10 +49,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
 ) {
   const m = useMessages('userProfile');
   const organizationLabels = useMessages('organizationProfile').pages;
-  const accountPages = userProfilePageList(
-    { pages, customPages: withoutOrganizationPaths(customPages), pageOrder },
-    m.pages,
-  );
+  const accountPages = userProfilePageList({ pages, customPages, pageOrder }, m.pages);
   const groups: ProfilePageGroup[] = organization
     ? [
         { label: m.accountGroup, pages: accountPages },
@@ -88,7 +81,7 @@ function userProfilePageList(
   { pages, customPages, pageOrder }: Pick<UserProfileViewProps, 'pages' | 'customPages' | 'pageOrder'>,
   labels: Record<UserProfilePageId, string>,
 ): ProfilePage[] {
-  return resolveUserProfilePages(getAvailableUserProfilePages(pages), customPages, pageOrder).map(entry =>
+  return userProfileNavEntries({ pages, customPages, pageOrder }).map(entry =>
     entry.custom
       ? { id: entry.id, label: entry.custom.label, icon: entry.custom.icon, content: entry.custom.content }
       : {

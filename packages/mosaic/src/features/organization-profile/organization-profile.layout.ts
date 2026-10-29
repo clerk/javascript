@@ -9,9 +9,9 @@ import { withUniquePaths } from '../profile-pages/profile-pages.layout';
 import type {
   CustomOrganizationProfilePage,
   OrganizationProfilePageId,
+  OrganizationProfilePageListOptions,
   OrganizationProfilePages,
 } from './organization-profile.types';
-import type { OrganizationProfilePageListOptions } from './organization-profile.view';
 
 export const ORGANIZATION_PROFILE_PAGE_IDS: readonly OrganizationProfilePageId[] = [
   'general',
@@ -58,12 +58,14 @@ export function resolveOrganizationProfilePages(
   return applyOrder(order, entries, entry => entry.id);
 }
 
-export function organizationProfilePageIds({
+export function organizationProfileNavEntries({
   pages,
   customPages,
   pageOrder,
-}: OrganizationProfilePageListOptions): string[] {
-  return resolveOrganizationProfilePages(getAvailableOrganizationProfilePages(pages), customPages, pageOrder).map(
-    entry => entry.id,
-  );
+}: OrganizationProfilePageListOptions): OrganizationProfileNavEntry[] {
+  return resolveOrganizationProfilePages(getAvailableOrganizationProfilePages(pages), customPages, pageOrder);
+}
+
+export function organizationProfilePageIds(options: OrganizationProfilePageListOptions): string[] {
+  return organizationProfileNavEntries(options).map(entry => entry.id);
 }

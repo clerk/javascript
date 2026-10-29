@@ -3,7 +3,8 @@
 import type { ReactNode } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
-import { useOrganizationProfileController } from './organization-profile.controller';
+import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
+import { organizationProfilePageIds } from './organization-profile.layout';
 import { useOrganizationProfileModel } from './organization-profile.model';
 import type { OrganizationProfileOptions } from './organization-profile.provider';
 import { OrganizationProfileProvider } from './organization-profile.provider';
@@ -88,7 +89,10 @@ export function OrganizationProfile({
 }: OrganizationProfileProps) {
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
-  const navigation = useOrganizationProfileController({ pages, customPages, pageOrder, defaultPage });
+  const navigation = useProfilePagesController(
+    defaultPage ?? pageOrder?.[0] ?? 'general',
+    pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
+  );
 
   if (model.status === 'loading') {
     return fallback ?? null;
