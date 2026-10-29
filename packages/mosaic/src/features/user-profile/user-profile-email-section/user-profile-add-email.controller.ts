@@ -8,6 +8,7 @@ import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
+import { waitFor } from '../../../machine/wait-for';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
 import { CODE_LENGTH, CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
@@ -32,7 +33,7 @@ export interface UserProfileAddEmailController extends UserProfileAddEmailDialog
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
   pendingVerifyId: string | undefined;
-  onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
+  onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => Promise<void>;
 }
 
 interface Context {
@@ -268,9 +269,10 @@ export function useUserProfileAddEmailController({
     onConnect: () => send({ type: 'CONNECT' }),
     verifyingId: snapshot.context.verifyingId,
     pendingVerifyId: state === 'preparing' ? snapshot.context.verifyingId : undefined,
-    onVerifyEmail: (email, verifier) => {
+    onVerifyEmail: async (email, verifier) => {
       codeForm.reset();
       send({ type: 'START', id: email.id, emailAddress: email.value, verifier });
+      await waitFor(actor, current => current.value !== 'preparing');
     },
   };
 }

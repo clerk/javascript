@@ -367,6 +367,41 @@ describe('User profile MFA management', () => {
     }
   });
 
+  it('blocks backup-code regeneration while the default SMS method is changing', async () => {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
+    const fapi = await renderMfa(
+      fapiUser({ id: 'user_1', phone_numbers: [first, second], backup_code_enabled: true, two_factor_enabled: true }),
+    );
+    const held = holdRequests('post', '/v1/me/phone_numbers/phone_2');
+    const user = userEvent.setup();
+    try {
+      await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+      await waitFor(() => expect(held.requests).toHaveLength(1));
+      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+      const manage = screen.getByRole('button', { name: 'Manage Backup codes' });
+      expect(manage).toHaveAttribute('aria-disabled', 'true');
+      await user.click(manage);
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(fapi.mfa.backupCodeCreations).toBe(0);
+      expect(screen.getByRole('button', { name: 'Add verification method' })).toBeDisabled();
+    } finally {
+      held.release();
+    }
+    const manage = screen.getByRole('button', { name: 'Manage Backup codes' });
+    await waitFor(() => expect(manage).not.toHaveAttribute('aria-disabled', 'true'));
+    await openMenu(user, manage);
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    await waitFor(() => expect(screen.getByText('CODE0100')).toBeVisible());
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
   it('returns failed regeneration to the section and retries from the menu', async () => {
     const fapi = await renderMfa(
       fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
@@ -421,6 +456,7 @@ describe('User profile MFA management', () => {
       expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
       expect(await screen.findByRole('progressbar', { name: 'Regenerate' })).toBeVisible();
       expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Manage Authenticator app' })).toHaveAttribute('aria-disabled', 'true');
     } finally {
       generate.release();
     }
@@ -428,6 +464,10 @@ describe('User profile MFA management', () => {
     const list = await screen.findByRole('list', { name: 'Backup codes' });
     expect(within(list).getAllByRole('listitem')).toHaveLength(10);
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(screen.getByRole('button', { name: 'Manage Authenticator app', hidden: true })).not.toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
   });
 
   it('holds the Regenerate menu item until session verification opens', async () => {
@@ -865,6 +905,12 @@ describe('User profile MFA management', () => {
       expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('+1 (555) 555-0202'),
     );
     expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('Default');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' })).not.toHaveAttribute(
+        'aria-disabled',
+        'true',
+      ),
+    );
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
     await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
   });
@@ -908,6 +954,12 @@ describe('User profile MFA management', () => {
       expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_2', default: true, reserved: undefined }),
     );
     expect(attempts).toBe(2);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' })).not.toHaveAttribute(
+        'aria-disabled',
+        'true',
+      ),
+    );
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
     await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
   });
@@ -916,7 +968,7 @@ describe('User profile MFA management', () => {
     { phase: 'mutation', method: 'post', path: '/v1/me/phone_numbers/phone_2', pendingPhone: '+1 (555) 555-0202' },
     { phase: 'refresh', method: 'get', path: '/v1/me', pendingPhone: '+1 (555) 555-0101' },
   ] as const)(
-    'keeps method menus available but hides default changes during $phase',
+    'disables method menus while changing the default during $phase',
     async ({ method, path, pendingPhone }) => {
       const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
       const second = fapiPhoneNumber({
@@ -934,16 +986,21 @@ describe('User profile MFA management', () => {
       await waitFor(() => expect(held.requests).toHaveLength(1));
       try {
         const pendingAction = screen.getByRole('button', { name: `Manage SMS verification ${pendingPhone}` });
-        await openMenu(user, pendingAction);
-        await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
-        expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
-        await user.click(await screen.findByRole('menuitem', { name: 'Remove method' }));
+        expect(pendingAction).toHaveAttribute('aria-disabled', 'true');
+        await user.click(pendingAction);
+        expect(screen.queryByRole('menu')).toBeNull();
         expect(screen.queryByRole('alertdialog')).toBeNull();
       } finally {
         held.release();
       }
       await waitFor(() => expect(screen.getByText('+1 (555) 555-0202').closest('li')).toHaveTextContent('Default'));
       await user.keyboard('{Escape}');
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' })).not.toHaveAttribute(
+          'aria-disabled',
+          'true',
+        ),
+      );
       await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
       await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
     },
