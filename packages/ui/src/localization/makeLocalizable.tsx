@@ -99,13 +99,6 @@ export const useLocalizations = () => {
       return '';
     }
 
-    if (
-      (code === 'form_password_validation_failed' || code === 'form_password_incorrect') &&
-      meta?.remainingAttempts === 0
-    ) {
-      return t(localizationKeys('unstable__errors.password_confirmation_session_ended'));
-    }
-
     return (
       t(localizationKeys(`unstable__errors.${code}__${paramName}` as any)) ||
       t(localizationKeys(`unstable__errors.${code}` as any)) ||

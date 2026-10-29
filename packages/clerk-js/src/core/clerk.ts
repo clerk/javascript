@@ -31,7 +31,11 @@ import {
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
 import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
-import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '@clerk/shared/internal/clerk-js/localStorage';
+import {
+  CLERK_ENVIRONMENT_STORAGE_ENTRY,
+  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
+  SafeLocalStorage,
+} from '@clerk/shared/internal/clerk-js/localStorage';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -3036,7 +3040,15 @@ export class Clerk implements ClerkInterface {
    *
    * @internal
    */
-  public __internal_handleSessionEnded = (): Promise<void> => {
+  public __internal_handleSessionEnded = (client?: ClientResource): Promise<void> => {
+    SafeLocalStorage.setItem(
+      `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`,
+      true,
+      5 * 60 * 1000,
+    );
+    if (client) {
+      this.updateClient(client);
+    }
     return this.#completeSignOut({ broadcast: true });
   };
 

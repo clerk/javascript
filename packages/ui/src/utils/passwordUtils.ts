@@ -1,3 +1,4 @@
+import { isPasswordConfirmationError } from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 
 import type { LocalizationKey } from '../localization';
@@ -99,7 +100,7 @@ export const createPasswordConfirmationError = (
   localizationConfig: Pick<LocalizationConfigProps, 't'>,
 ) => {
   const remainingAttempts = errors[0]?.meta?.remainingAttempts;
-  if (typeof remainingAttempts !== 'number') {
+  if (!isPasswordConfirmationError(errors[0]) || typeof remainingAttempts !== 'number') {
     return errors[0];
   }
 

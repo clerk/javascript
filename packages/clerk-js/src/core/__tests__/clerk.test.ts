@@ -5,6 +5,10 @@ import {
   EmailLinkErrorCodeStatus,
 } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
+import {
+  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
+  SafeLocalStorage,
+} from '@clerk/shared/internal/clerk-js/localStorage';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -4409,10 +4413,22 @@ describe('Clerk singleton', () => {
 
       const sut = new Clerk(productionPublishableKey);
       sut.updateClient({ sessions: [mockSession], signedInSessions: [mockSession] } as any);
-      // The failed confirmation's response carries the client without the ended session.
-      sut.updateClient({ sessions: [], signedInSessions: [] } as any);
+      const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${sut.publishableKey}`;
+      const updateClient = sut.updateClient;
+      const updateClientSpy = vi.spyOn(sut, 'updateClient').mockImplementation(client => {
+        expect(SafeLocalStorage.getItem(key, false)).toBe(true);
+        updateClient(client);
+      });
 
-      await sut.__internal_handleSessionEnded();
+      await sut.__internal_handleSessionEnded({ sessions: [], signedInSessions: [] } as any);
+
+      expect(updateClientSpy).toHaveBeenCalledTimes(1);
+      expect(SafeLocalStorage.getItem(key, false)).toBe(true);
+      const now = Date.now();
+      const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now + 5 * 60 * 1000 + 1);
+      expect(SafeLocalStorage.getItem(key, false)).toBe(false);
+      nowSpy.mockRestore();
+      updateClientSpy.mockRestore();
 
       expect(sut.session).toBeNull();
       expect(eventBusSpy).toHaveBeenCalledWith(events.UserSignOut, null);

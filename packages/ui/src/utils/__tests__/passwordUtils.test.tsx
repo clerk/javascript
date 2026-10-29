@@ -329,6 +329,12 @@ describe('createPasswordConfirmationError()', () => {
     expect(res).toBe('Mot de passe incorrect. 3 tentatives restantes.');
   });
 
+  it.each([0, 1, 2])('does not interpret attempt metadata on unrelated errors (%i)', async remainingAttempts => {
+    const result = await renderLocalizations();
+    const error = { code: 'unrelated_error', message: 'Unrelated error', meta: { remainingAttempts } };
+    expect(createPasswordConfirmationError([error], { t: result.current.t })).toBe(error);
+  });
+
   it('returns other errors unchanged', async () => {
     const result = await renderLocalizations();
     const error = { code: 'form_password_validation_failed', message: 'Incorrect password' };

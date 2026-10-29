@@ -1,7 +1,3 @@
-import {
-  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
-  SafeLocalStorage,
-} from '@clerk/shared/internal/clerk-js/localStorage';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';
@@ -107,19 +103,15 @@ describe('BaseResource', () => {
     );
   });
   it.each([
-    [0, 1],
-    [1, 0],
+    [0, 'form_password_validation_failed', 422, 1],
+    [0, 'form_password_incorrect', 422, 1],
+    [1, 'form_password_validation_failed', 422, 0],
+    [0, 'unrelated_error', 422, 0],
+    [0, 'form_password_incorrect', 409, 0],
   ])(
     'completes the sign-out when a password confirmation ends the session (remaining attempts: %i)',
-    async (remainingAttempts, expectedCalls) => {
-      const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:pk_test_confirmation`;
-      const updateClient = vi.fn(() => {
-        expect(SafeLocalStorage.getItem(key, null)).toEqual(
-          remainingAttempts === 0
-            ? expect.objectContaining({ meta: expect.objectContaining({ remainingAttempts: 0 }) })
-            : null,
-        );
-      });
+    async (remainingAttempts, code, status, expectedCalls) => {
+      const updateClient = vi.fn();
       const handleSessionEnded = vi.fn().mockResolvedValue(undefined);
 
       BaseResource.clerk = {
@@ -130,13 +122,13 @@ describe('BaseResource', () => {
               client: { id: 'client_1', sessions: [] },
               errors: [
                 {
-                  code: 'form_password_validation_failed',
+                  code,
                   message: 'Password is incorrect',
                   meta: { remaining_attempts: remainingAttempts },
                 },
               ],
             },
-            status: 422,
+            status,
             statusText: 'Unprocessable Entity',
             headers: new Headers(),
           }),
@@ -151,7 +143,10 @@ describe('BaseResource', () => {
         errors: [expect.objectContaining({ meta: expect.objectContaining({ remainingAttempts }) })],
       });
 
-      expect(updateClient).toHaveBeenCalledTimes(1);
+      expect(updateClient).toHaveBeenCalledTimes(expectedCalls ? 0 : 1);
+      if (expectedCalls) {
+        expect(handleSessionEnded).toHaveBeenCalledWith(expect.objectContaining({ id: 'client_1' }));
+      }
       expect(handleSessionEnded).toHaveBeenCalledTimes(expectedCalls);
     },
   );
