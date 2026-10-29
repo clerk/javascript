@@ -53,6 +53,10 @@ export const SignUpEmailLinkCard = () => {
     }
   };
 
+  React.useEffect(() => {
+    void startEmailLinkVerification();
+  }, []);
+
   if (showVerifyModal) {
     return (
       <EmailLinkStatusCard
@@ -62,10 +66,6 @@ export const SignUpEmailLinkCard = () => {
       />
     );
   }
-
-  React.useEffect(() => {
-    void startEmailLinkVerification();
-  }, []);
 
   return (
     <Flow.Part part='emailLink'>
