@@ -1,6 +1,5 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
@@ -20,6 +19,7 @@ import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
+import { withUserProfileModalReturn } from '../user-profile.modal-return';
 import { useUserProfileOptions } from '../user-profile.provider';
 import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
@@ -283,8 +283,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   };
 
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
-  const withModalState = (url: string, socialProvider?: string) =>
-    mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile', socialProvider }) : url;
+  const withModalState = (url: string) => (mode === 'modal' ? withUserProfileModalReturn(url) : url);
 
   const completeVerification = async (response: ExternalAccountResource): Promise<ConnectedAccountActionResult> => {
     const url = response.verification?.externalVerificationRedirectURL;
@@ -319,7 +318,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       const current = requireCurrentUser();
       const response = await createAccount(current, {
         strategy: provider.strategy,
-        redirectUrl: withModalState(redirectUrl, provider.provider),
+        redirectUrl: withModalState(redirectUrl),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
       });
       return completeVerification(response);
