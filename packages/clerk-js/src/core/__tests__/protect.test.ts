@@ -186,7 +186,7 @@ describe('Protect.load', () => {
   it('drops a malformed loader entry without failing the rest of the load', async () => {
     const protect = new Protect();
 
-    // The config is server-controlled and cached; a bad entry must not take Clerk.load(, FRONTEND_API) down.
+    // The config is server-controlled and cached; a bad entry must not take Clerk.load() down.
     expect(() =>
       protect.load(environment([null, loader({ attributes: { 'data-role': 'good' } })]), FRONTEND_API),
     ).not.toThrow();
