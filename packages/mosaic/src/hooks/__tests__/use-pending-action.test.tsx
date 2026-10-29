@@ -5,11 +5,22 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
 import { clerkApiError } from '../../__tests__/clerk-errors';
+import { useConfirmController } from '../../blocks/confirm';
 import { MosaicProvider } from '../../mosaic-provider';
+import { SaveError } from '../../utils/errors';
 import { usePendingAction } from '../use-pending-action';
 
 function blocked() {
   return clerkApiError('action_blocked', 'Raw server sentence.');
+}
+
+function useGuardedConfirm(onConfirm: () => Promise<void>) {
+  const actions = usePendingAction();
+  const remove = useConfirmController({
+    onConfirm,
+    reverification: { status: 'loading', visible: true, onCancel: vi.fn() },
+  });
+  return { actions, remove: actions.guard(remove) };
 }
 
 describe('usePendingAction', () => {
@@ -263,4 +274,126 @@ describe('usePendingAction', () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.errorKey).toBeUndefined();
   });
+});
+
+describe('usePendingAction guard', () => {
+  it('refuses a guarded confirm while a run holds the lock, leaving the dialog unchanged', async () => {
+    const pending = deferred<void>();
+    const onConfirm = vi.fn(() => Promise.resolve());
+    const { result } = renderHook(() => useGuardedConfirm(onConfirm));
+    act(() => result.current.remove.onOpenChange(true));
+    const owners = result.current;
+
+    act(() => {
+      void owners.actions.run('row', () => pending.promise);
+      void owners.remove.confirm();
+    });
+
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(result.current.remove.isOpen).toBe(true);
+    expect(result.current.remove.isPending).toBe(false);
+    expect(result.current.actions.isPending).toBe(true);
+    await act(() => pending.resolve());
+    expect(result.current.actions.isPending).toBe(false);
+    await act(() => result.current.remove.confirm());
+    expect(onConfirm).toHaveBeenCalledOnce();
+    expect(result.current.remove.isOpen).toBe(false);
+  });
+
+  it('refuses a run while a guarded confirm holds the lock, leaving its key and error unset', async () => {
+    const pending = deferred<void>();
+    const direct = vi.fn();
+    const { result } = renderHook(() => useGuardedConfirm(() => pending.promise));
+    act(() => result.current.remove.onOpenChange(true));
+    const owners = result.current;
+
+    await act(async () => {
+      void owners.remove.confirm();
+      expect(await owners.actions.run('row', direct)).toBe(false);
+    });
+
+    expect(direct).not.toHaveBeenCalled();
+    expect(result.current.actions.lastKey).toBeUndefined();
+    expect(result.current.actions.error).toBeUndefined();
+    expect(result.current.actions.isPending).toBe(true);
+    await act(() => pending.resolve());
+    await act(async () => expect(await owners.actions.run('row', direct)).toBe(true));
+    expect(direct).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the dialog error when a run refuses its retry', async () => {
+    const pending = deferred<void>();
+    const failure = new SaveError({ global: { code: 'action_blocked', message: 'Confirm refused.' } });
+    const onConfirm = vi.fn(() => Promise.reject(failure));
+    const { result } = renderHook(() => useGuardedConfirm(onConfirm));
+    act(() => result.current.remove.onOpenChange(true));
+    await act(() => result.current.remove.confirm());
+    const error = result.current.remove.errorMessage;
+    expect(error).toBeDefined();
+    expect(result.current.remove.isOpen).toBe(true);
+    expect(result.current.actions.error).toBeUndefined();
+
+    act(() => {
+      void result.current.actions.run('row', () => pending.promise);
+      void result.current.remove.confirm();
+    });
+
+    expect(onConfirm).toHaveBeenCalledOnce();
+    expect(result.current.remove.errorMessage).toBe(error);
+    expect(result.current.remove.isOpen).toBe(true);
+    expect(result.current.remove.isPending).toBe(false);
+    await act(() => pending.resolve());
+  });
+
+  it('keeps the last key and clears the run error while a guarded confirm runs', async () => {
+    const pending = deferred<void>();
+    const failure = new SaveError({ global: { code: 'action_blocked', message: 'Run refused.' } });
+    const { result } = renderHook(() => useGuardedConfirm(() => pending.promise));
+    await act(() => result.current.actions.run('row', () => Promise.reject(failure)));
+    expect(result.current.actions.error).toBeDefined();
+
+    act(() => result.current.remove.onOpenChange(true));
+    act(() => {
+      void result.current.remove.confirm();
+    });
+
+    expect(result.current.actions.isPending).toBe(true);
+    expect(result.current.actions.pendingKey).toBeUndefined();
+    expect(result.current.actions.lastKey).toBe('row');
+    expect(result.current.actions.errorKey).toBeUndefined();
+    expect(result.current.actions.error).toBeUndefined();
+    await act(() => pending.resolve());
+    expect(result.current.actions.isPending).toBe(false);
+    expect(result.current.actions.lastKey).toBe('row');
+  });
+
+  it.each(['resolve', 'reject'])(
+    'holds the lock after the dialog is cancelled until its action promises %s',
+    async outcome => {
+      const pending = deferred<void>();
+      const direct = vi.fn();
+      const { result } = renderHook(() => useGuardedConfirm(() => pending.promise));
+      act(() => result.current.remove.onOpenChange(true));
+      act(() => {
+        void result.current.remove.confirm();
+      });
+      act(() => result.current.remove.onOpenChange(false));
+      expect(result.current.remove.isOpen).toBe(false);
+      await act(async () => expect(await result.current.actions.run('row', direct)).toBe(false));
+      expect(direct).not.toHaveBeenCalled();
+      expect(result.current.actions.isPending).toBe(true);
+      expect(result.current.actions.pendingKey).toBeUndefined();
+
+      await act(() => {
+        if (outcome === 'reject') {
+          pending.reject(new Error('Late confirm failure'));
+        } else {
+          pending.resolve();
+        }
+      });
+      expect(result.current.actions.isPending).toBe(false);
+      expect(result.current.remove.errorMessage).toBeUndefined();
+      await act(async () => expect(await result.current.actions.run('row', direct)).toBe(true));
+    },
+  );
 });
