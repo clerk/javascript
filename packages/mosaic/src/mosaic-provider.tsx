@@ -3,6 +3,7 @@ import React from 'react';
 import { ToastProvider } from './components/toast/toast';
 import { organizationProfileModal } from './features/organization-profile/organization-profile.modal';
 import { userProfileModal } from './features/user-profile/user-profile.modal';
+import { UserProfileModalReturn } from './features/user-profile/user-profile.modal-return';
 import { MosaicNowProvider } from './hooks/use-now';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
@@ -37,7 +38,10 @@ export function MosaicProvider({ children, direction, icons, localization }: Mos
         <MosaicLocalizationProvider value={localizationValue}>
           <MosaicNowProvider value={now}>
             <ToastProvider>
-              <ModalHost surfaces={modalSurfaces}>{children}</ModalHost>
+              <ModalHost surfaces={modalSurfaces}>
+                <UserProfileModalReturn />
+                {children}
+              </ModalHost>
             </ToastProvider>
           </MosaicNowProvider>
         </MosaicLocalizationProvider>
