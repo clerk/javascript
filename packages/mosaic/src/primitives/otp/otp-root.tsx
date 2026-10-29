@@ -1,6 +1,15 @@
 'use client';
 
-import { type CSSProperties, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
@@ -55,7 +64,7 @@ const visuallyHiddenInputStyle: CSSProperties = {
   border: 0,
 };
 
-export function OtpRoot(props: OtpProps) {
+export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRoot(props, ref) {
   const {
     render,
     length,
@@ -240,6 +249,7 @@ export function OtpRoot(props: OtpProps) {
     <OtpContext.Provider value={contextValue}>
       {useRender({
         defaultTagName: 'div',
+        ref,
         render,
         state,
         stateAttributesMapping: {
@@ -251,4 +261,4 @@ export function OtpRoot(props: OtpProps) {
       })}
     </OtpContext.Provider>
   );
-}
+});

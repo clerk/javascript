@@ -1178,4 +1178,21 @@ describe('Menu', () => {
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
     });
   });
+
+  it('forwards a ref to the separator', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger>Actions</Menu.Trigger>
+        <Menu.Positioner>
+          <Menu.Popup>
+            <Menu.Item label='Cut'>Cut</Menu.Item>
+            <Menu.Separator ref={ref} />
+            <Menu.Item label='Copy'>Copy</Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('separator'));
+  });
 });

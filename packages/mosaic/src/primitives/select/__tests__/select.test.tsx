@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -922,5 +923,38 @@ describe('Select', () => {
       const options = screen.getAllByRole('option');
       await waitFor(() => expect(document.activeElement).toBe(options[0]));
     });
+  });
+
+  it('forwards refs to the value and the options', () => {
+    const value = createRef<HTMLSpanElement>();
+    const option = createRef<HTMLButtonElement>();
+    render(
+      <Select.Root
+        items={fruits}
+        defaultOpen
+        alignItemWithTrigger={false}
+      >
+        <Select.Trigger>
+          <Select.Value
+            ref={value}
+            data-testid='select-value'
+            placeholder='Pick a fruit...'
+          />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            <Select.Option
+              ref={option}
+              value='apple'
+              label='Apple'
+            >
+              Apple
+            </Select.Option>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    expect(value.current).toBe(screen.getByTestId('select-value'));
+    expect(option.current).toBe(screen.getByRole('option', { name: 'Apple' }));
   });
 });

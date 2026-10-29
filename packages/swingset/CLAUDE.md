@@ -9,7 +9,7 @@ This file provides guidance to Coding Agents when working with code in this repo
 Run from the monorepo root or scope with `--filter @clerk/swingset`:
 
 ```
-pnpm run dev:swingset                # next dev on port 6006
+pnpm run dev:swingset                # next dev on $PORT (default 6006), or the next free port
 pnpm build --filter @clerk/swingset  # next build
 pnpm format --filter @clerk/swingset # format-package.mjs (--check for CI)
 ```

@@ -93,7 +93,7 @@ describe('Validating a passkey name', () => {
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     const save = screen.getByRole('button', { name: 'Save' });
     await user.clear(input);
-    await user.type(input, '😀'.repeat(65));
+    await user.type(input, `${'😀'.repeat(64)}a`);
     await user.tab();
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(save).toHaveAttribute('aria-disabled', 'true');

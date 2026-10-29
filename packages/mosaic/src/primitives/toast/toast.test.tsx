@@ -60,6 +60,14 @@ function renderToast(
 
 describe('Toast', () => {
   describe('adding', () => {
+    it('starts the entrance when a toast arrives', () => {
+      renderToast();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Add toast' }));
+
+      expect(screen.getByRole('dialog', { name: 'Saved' })).toHaveAttribute('data-starting-style');
+    });
+
     it('renders a toast added through useToastManager', async () => {
       const user = userEvent.setup();
       renderToast();

@@ -354,12 +354,12 @@ describe('Mosaic Card', () => {
     );
     const slot = screen.getByRole('alert');
     expect(slot).toHaveAttribute('data-open');
-    expect(slot).toHaveAttribute('data-starting-style');
+    expect(slot).not.toHaveAttribute('data-starting-style');
     expect(slot.previousElementSibling).toHaveClass('cl-card-header');
     expect(slot.nextElementSibling).toHaveClass('cl-card-content');
     const banner = slot.querySelector('.cl-banner-root');
     expect(banner).toHaveAttribute('data-color', 'negative');
-    expect(banner).toHaveAttribute('data-starting-style');
+    expect(banner).not.toHaveAttribute('data-starting-style');
     expect(screen.getByText('Something went wrong.')).toHaveClass('cl-banner-label');
 
     await act(async () => {
