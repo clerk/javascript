@@ -1,28 +1,27 @@
 'use client';
 
-import type { OrganizationProfileProps, UserProfileProps } from '@clerk/shared/types';
+import type { UserProfileProps } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
-import type { CustomProfileItem, CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
+import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
+import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 import { useSwitcherController } from './switcher.controller';
 import type { SwitcherModelOptions } from './switcher.model';
 import { useSwitcherModel } from './switcher.model';
-import type { OrganizationProfilePageId } from './switcher.pages';
-import { useCustomPages, useOrganizationProfilePages } from './switcher.pages';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
 import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';
 import { SwitcherView } from './switcher.view';
 
 /** What a profile opened from the switcher takes beyond the profile component's own props. */
-export interface SwitcherProfilePages<PageId extends string, Item = CustomProfileItem> {
+export interface SwitcherProfilePages<PageId extends string> {
   /**
-   * Provide custom pages and links to be rendered inside the profile.
+   * Provide custom pages to be rendered inside the profile.
    */
-  customPages?: Item[];
+  customPages?: CustomProfilePage[];
   /**
    * Controls the order of the profile's navigation. Accepts the ids of built-in pages and the
    * `path` of custom pages. Pages not listed are placed after the listed ones. The first entry is
-   * the page the profile opens on, so it cannot be a link.
+   * the page the profile opens on.
    *
    * @default undefined
    */
@@ -31,13 +30,10 @@ export interface SwitcherProfilePages<PageId extends string, Item = CustomProfil
 
 /** Options for the underlying `<UserProfile />` component. */
 export interface SwitcherUserProfileProps
-  extends
-    SwitcherProfilePages<UserProfilePageId, CustomProfilePage>,
-    Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps'> {}
+  extends SwitcherProfilePages<UserProfilePageId>, Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps'> {}
 
 /** Options for the underlying `<OrganizationProfile />` component. */
-export interface SwitcherOrganizationProfileProps
-  extends SwitcherProfilePages<OrganizationProfilePageId>, Pick<OrganizationProfileProps, 'appearance'> {}
+export type SwitcherOrganizationProfileProps = SwitcherProfilePages<OrganizationProfilePageId>;
 
 export type SwitcherProps = SwitcherModelOptions &
   SwitcherTriggerProps &
@@ -49,7 +45,7 @@ export type SwitcherProps = SwitcherModelOptions &
     userProfileProps?: SwitcherUserProfileProps;
     /**
      * Specify options for the underlying <OrganizationProfile /> component.
-     * e.g., organizationProfileProps={{appearance: {...}}}
+     * e.g., organizationProfileProps={{pageOrder: ['members', 'general']}}
      */
     organizationProfileProps?: SwitcherOrganizationProfileProps;
     /**
@@ -76,48 +72,29 @@ export function Switcher(
     fallback,
     ...options
   } = props;
-  // The portals must outlive the popover, so custom pages are bridged here rather than inside it.
-  const organizationProfile = useCustomPages({
-    items: organizationProfileProps?.customPages,
-    order: organizationProfileProps?.pageOrder,
-    builtInPages: useOrganizationProfilePages(),
-  });
-  const portals = <>{organizationProfile.portals}</>;
   const model = useSwitcherModel(options, {
-    userProfile: { ...userProfileProps, mode: mode === 'user' ? 'user' : 'combined' },
-    organizationProfile: {
-      customPages: organizationProfile.customPages,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- `@clerk/shared` types `appearance` as an unresolved type until a framework SDK augments `ClerkAppearanceRegistry`; it passes through untouched.
-      appearance: organizationProfileProps?.appearance,
-    },
+    userProfile: { ...userProfileProps, mode: mode === 'combined' ? 'combined' : 'user' },
+    organizationProfile: organizationProfileProps,
   });
   const controller = useSwitcherController(model, { mode, customMenuItems, menuItemOrder });
 
   if (controller.status === 'loading') {
-    return (
-      <>
-        {fallback}
-        {portals}
-      </>
-    );
+    return <>{fallback}</>;
   }
 
   // Signed out is an answer, so the placeholder goes too rather than promising a button.
   if (controller.status === 'hidden') {
-    return <>{portals}</>;
+    return null;
   }
 
   const { status: _status, ...viewController } = controller;
 
   return (
-    <>
-      <SwitcherView
-        {...viewController}
-        renderTriggerLabel={renderTriggerLabel}
-        renderTriggerBadge={renderTriggerBadge}
-        triggerVariant={triggerVariant}
-      />
-      {portals}
-    </>
+    <SwitcherView
+      {...viewController}
+      renderTriggerLabel={renderTriggerLabel}
+      renderTriggerBadge={renderTriggerBadge}
+      triggerVariant={triggerVariant}
+    />
   );
 }
