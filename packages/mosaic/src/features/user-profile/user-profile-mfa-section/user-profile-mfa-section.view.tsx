@@ -4,6 +4,7 @@ import type { ReactNode, Ref } from 'react';
 import { Confirmation } from '../../../blocks/confirmation';
 import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
+import type { PendingAction } from '../../../hooks/use-pending-action';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
 import { UserProfileSecurityList } from '../user-profile-security-list';
@@ -17,6 +18,7 @@ export type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-p
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
+  pendingAction?: PendingAction<string>;
   addableMethods?: readonly UserProfileMfaAddableMethod[];
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
@@ -30,6 +32,7 @@ export interface UserProfileMfaSectionViewProps {
 
 export function UserProfileMfaSectionView({
   methods,
+  pendingAction,
   addableMethods,
   addButtonRef,
   addControl,
@@ -43,6 +46,7 @@ export function UserProfileMfaSectionView({
   const m = useMessages('userProfileMfa');
   const controller = useUserProfileMfaSectionLeafController({
     methods,
+    pendingAction,
     onAdd,
     onRemove,
     onSetDefault,
@@ -58,6 +62,7 @@ export function UserProfileMfaSectionView({
           (controller.addMethod && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               triggerRef={addButtonRef}
+              disabled={controller.isDisabled}
               open={controller.pickerOpen}
               onOpenChange={controller.onPickerOpenChange}
             >
@@ -77,6 +82,7 @@ export function UserProfileMfaSectionView({
           <UserProfileMfaRowView
             key={method.id}
             method={method}
+            isDisabled={controller.isDisabled}
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}

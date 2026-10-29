@@ -35,6 +35,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | An async action from a button or row: pending, an error, one lock        | `usePendingAction` (`src/hooks/`)                                                                                 |
 | Direct actions and confirmation dialogs that must exclude each other     | `usePendingAction.guard` on the confirmation (`src/hooks/`, `src/blocks/confirm/`)                                |
+| A machine-driven step that a lock or caller must await                   | `waitFor` (`src/machine/wait-for.ts`), inside `usePendingAction.run`                                              |
 | A form: values, validation, submit, field errors                         | `useForm` (`src/components/form/`), with `validateAsync` for a server-side check                                  |
 | A `<form>` element, without the browser's validation popup               | `Form` (`src/primitives/form/`)                                                                                   |
 | A model save whose Clerk errors should land on form fields               | `save` (`src/utils/errors.ts`) in the model, or reject with `FormSubmitError`                                     |

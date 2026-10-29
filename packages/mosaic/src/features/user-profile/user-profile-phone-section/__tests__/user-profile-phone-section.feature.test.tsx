@@ -196,12 +196,15 @@ describe('the user profile phone section', () => {
       expect(screen.getByRole('menuitem', { name: 'Verify phone number' })).toHaveAttribute('aria-busy', 'true');
       expect(await screen.findByRole('progressbar', { name: 'Verify phone number' })).toBeVisible();
       expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('button', { name: `Manage ${HOME_LABEL}` })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Add phone number' })).toBeDisabled();
     } finally {
       prepare.release();
     }
 
     await enterCode(actor, VERIFICATION_CODE);
     expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.getByRole('button', { name: `Manage ${HOME_LABEL}` })).not.toHaveAttribute('aria-disabled', 'true');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 

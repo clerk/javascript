@@ -200,7 +200,7 @@ describe('useUserProfileAddEmailController', () => {
       useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
     );
 
-    act(() => result.current.onVerifyEmail(other, email));
+    act(() => void result.current.onVerifyEmail(other, email));
     expect(email.start).toHaveBeenCalledOnce();
     expect(result.current.open).toBe(false);
     expect(result.current.pendingVerifyId).toBe('email_2');
@@ -227,11 +227,11 @@ describe('useUserProfileAddEmailController', () => {
     );
     expect(result.current.verifyingId).toBeUndefined();
 
-    act(() => result.current.onVerifyEmail(other, email));
+    act(() => void result.current.onVerifyEmail(other, email));
     expect(result.current.verifyingId).toBe('email_2');
     await waitFor(() => expect(result.current.step).toBe('verify'));
 
-    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
+    act(() => void result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
     expect(result.current.verifyingId).toBe('email_2');
     expect(result.current.emailAddress).toBe('other@example.com');
 
@@ -253,7 +253,7 @@ describe('useUserProfileAddEmailController', () => {
       useUserProfileAddEmailController({ reverification: idleReverification, onCreate: created }),
     );
 
-    act(() => result.current.onVerifyEmail(other, email));
+    act(() => void result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.errorMessage).toBe('Too many requests'));
     expect(result.current.step).toBe('verify');
     expect(result.current.resendSeconds).toBe(0);
@@ -279,7 +279,7 @@ describe('useUserProfileAddEmailController', () => {
     const verified = createDeferredPromise();
     const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
 
-    act(() => result.current.onVerifyEmail(other, verifier(sentLink(verified.promise.then(() => undefined)))));
+    act(() => void result.current.onVerifyEmail(other, verifier(sentLink(verified.promise.then(() => undefined)))));
     expect(result.current.step).toBe('link');
     expect(result.current.resendSeconds).toBe(60);
 
@@ -297,12 +297,12 @@ describe('useUserProfileAddEmailController', () => {
       useUserProfileAddEmailController({ reverification: idleReverification }),
     );
 
-    act(() => result.current.onVerifyEmail(other, email));
+    act(() => void result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     act(() => result.current.onOpenChange(false));
     expect(cancel).toHaveBeenCalledOnce();
 
-    act(() => result.current.onVerifyEmail(other, email));
+    act(() => void result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     unmount();
     expect(cancel).toHaveBeenCalledTimes(2);
@@ -312,7 +312,7 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(sentLink(Promise.reject(saveError('Link expired'))));
     const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
 
-    act(() => result.current.onVerifyEmail(other, email));
+    act(() => void result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.errorMessage).toBe('Link expired'));
     expect(result.current.step).toBe('link');
     expect(result.current.open).toBe(true);
@@ -323,7 +323,7 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(() => ({ method: 'sso', connect }));
     const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
 
-    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
+    act(() => void result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
     expect(result.current.step).toBe('sso');
     expect(result.current.resendSeconds).toBe(0);
 
