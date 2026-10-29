@@ -8,6 +8,7 @@ import { defineModalSurface } from './define-modal-surface';
 import type { ModalContentProps, ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 import { ModalHost } from './modal-host';
 import { useModal } from './use-modal';
+import { useModalOpenedBy, useModalOpener } from './use-modal-opener';
 
 afterEach(() => cleanup());
 
@@ -72,6 +73,22 @@ function renderCaller(surface: ModalSurface<StubOptions>, providerProps?: Omit<M
     providerProps,
   );
   return { ref, ...result };
+}
+
+function Opener<Options>({
+  surface,
+  opener,
+  options,
+  onHandle,
+}: {
+  surface: ModalSurface<Options>;
+  opener: string;
+  options: Options;
+  onHandle?: (handle: ModalHandle<Options>) => void;
+}) {
+  const handle = useModalOpener(surface, opener, options);
+  onHandle?.(handle);
+  return null;
 }
 
 class AppBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
@@ -456,5 +473,271 @@ describe('useModal', () => {
         />,
       ),
     ).toThrow(/unknown.*MosaicProvider/);
+  });
+});
+
+describe('useModalOpener', () => {
+  function renderWithOpeners(surface: ModalSurface<StubOptions>, openers: React.ReactNode) {
+    const ref: { handle: ModalHandle<StubOptions> | undefined } = { handle: undefined };
+    const caller = (
+      <Caller
+        surface={surface}
+        onHandle={h => (ref.handle = h)}
+      />
+    );
+    const result = renderWithModals(
+      [surface],
+      <>
+        {caller}
+        {openers}
+      </>,
+    );
+    const rerender = (next: React.ReactNode) =>
+      result.rerender(
+        <>
+          {caller}
+          {next}
+        </>,
+      );
+    return { ref, rerender };
+  }
+
+  it('opens with the options it registered', async () => {
+    const surface = stubSurface();
+    let handle: ModalHandle<StubOptions> | undefined;
+    renderWithOpeners(
+      surface,
+      <Opener
+        surface={surface}
+        opener='button'
+        options={{ label: 'registered' }}
+        onHandle={h => (handle = h)}
+      />,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'registered' });
+  });
+
+  it('lets the options passed to open override the registered ones', async () => {
+    const surface = stubSurface();
+    let handle: ModalHandle<StubOptions> | undefined;
+    renderWithOpeners(
+      surface,
+      <Opener
+        surface={surface}
+        opener='button'
+        options={{ label: 'registered', page: 'account' }}
+        onHandle={h => (handle = h)}
+      />,
+    );
+    await flush();
+
+    act(() => handle?.open({ page: 'security' }));
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'registered', page: 'security' });
+  });
+
+  it('keeps the options of the opener that opened it when another registers later', async () => {
+    const surface = stubSurface();
+    let handle: ModalHandle<StubOptions> | undefined;
+    renderWithOpeners(
+      surface,
+      <>
+        <Opener
+          surface={surface}
+          opener='button'
+          options={{ label: 'button' }}
+          onHandle={h => (handle = h)}
+        />
+        <Opener
+          surface={surface}
+          opener='switcher'
+          options={{ label: 'switcher' }}
+        />
+      </>,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'button' });
+  });
+
+  it('uses the options of the opener it is reopened for', async () => {
+    const surface = stubSurface();
+    const { ref } = renderWithOpeners(
+      surface,
+      <>
+        <Opener
+          surface={surface}
+          opener='button'
+          options={{ label: 'button' }}
+        />
+        <Opener
+          surface={surface}
+          opener='switcher'
+          options={{ label: 'switcher' }}
+        />
+      </>,
+    );
+    await flush();
+
+    act(() => ref.handle?.open({ page: 'account' }, undefined, 'button'));
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'button', page: 'account' });
+  });
+
+  it('falls back to the last registered options when the opener it names is not mounted', async () => {
+    const surface = stubSurface();
+    const { ref } = renderWithOpeners(
+      surface,
+      <>
+        <Opener
+          surface={surface}
+          opener='button'
+          options={{ label: 'button' }}
+        />
+        <Opener
+          surface={surface}
+          opener='switcher'
+          options={{ label: 'switcher' }}
+        />
+      </>,
+    );
+    await flush();
+
+    act(() => ref.handle?.open({ page: 'account' }, undefined, 'missing'));
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'switcher', page: 'account' });
+  });
+
+  it('uses the last registered options when opened without an opener', async () => {
+    const surface = stubSurface();
+    const { ref } = renderWithOpeners(
+      surface,
+      <>
+        <Opener
+          surface={surface}
+          opener='button'
+          options={{ label: 'button' }}
+        />
+        <Opener
+          surface={surface}
+          opener='switcher'
+          options={{ label: 'switcher' }}
+        />
+      </>,
+    );
+    await flush();
+
+    act(() => ref.handle?.open());
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'switcher' });
+  });
+
+  it('picks up options registered after the modal opened', async () => {
+    const surface = stubSurface();
+    const { ref, rerender } = renderWithOpeners(surface, null);
+    await flush();
+    act(() => ref.handle?.open({ page: 'account' }));
+    await flush();
+
+    rerender(
+      <Opener
+        surface={surface}
+        opener='button'
+        options={{ label: 'late' }}
+      />,
+    );
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'late', page: 'account' });
+  });
+
+  it('switches to the named opener when it registers after another', async () => {
+    const surface = stubSurface();
+    const switcher = (
+      <Opener
+        key='switcher'
+        surface={surface}
+        opener='switcher'
+        options={{ label: 'switcher' }}
+      />
+    );
+    const { ref, rerender } = renderWithOpeners(surface, switcher);
+    await flush();
+    act(() => ref.handle?.open({ page: 'account' }, undefined, 'button'));
+    await flush();
+    expect(readOptions()).toEqual({ label: 'switcher', page: 'account' });
+
+    rerender(
+      <>
+        {switcher}
+        <Opener
+          key='button'
+          surface={surface}
+          opener='button'
+          options={{ label: 'button' }}
+        />
+      </>,
+    );
+    await flush();
+
+    expect(readOptions()).toEqual({ label: 'button', page: 'account' });
+  });
+
+  it('drops the options of an opener that unmounts', async () => {
+    const surface = stubSurface();
+    const { ref, rerender } = renderWithOpeners(
+      surface,
+      <Opener
+        surface={surface}
+        opener='button'
+        options={{ label: 'gone' }}
+      />,
+    );
+    await flush();
+
+    rerender(null);
+    await flush();
+    act(() => ref.handle?.open({ page: 'account' }));
+    await flush();
+
+    expect(readOptions()).toEqual({ page: 'account' });
+  });
+
+  it('tells the content which opener opened it', async () => {
+    function OpenedByContent() {
+      return <output data-testid='opened-by'>{useModalOpenedBy() ?? 'nobody'}</output>;
+    }
+    const surface = stubSurface('opened-by', () => Promise.resolve({ default: OpenedByContent }));
+    let handle: ModalHandle<StubOptions> | undefined;
+    const { ref } = renderWithOpeners(
+      surface,
+      <Opener
+        surface={surface}
+        opener='button'
+        options={{}}
+        onHandle={h => (handle = h)}
+      />,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+    expect(screen.getByTestId('opened-by')).toHaveTextContent('button');
+
+    act(() => ref.handle?.open());
+    await flush();
+    expect(screen.getByTestId('opened-by')).toHaveTextContent('nobody');
   });
 });

@@ -12,6 +12,7 @@ import { populateParamFromObject } from '@clerk/shared/url';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useModal } from '../../modals/use-modal';
+import { useModalOpener } from '../../modals/use-modal-opener';
 import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
@@ -27,6 +28,7 @@ import type {
   SwitcherSession,
   SwitcherSuggestion,
 } from './switcher.types';
+import type { SwitcherSurface } from './switcher-surface';
 import { useOrganizationListInView } from './use-organization-list-in-view';
 
 // Promise-returning so the controller can drive busy state. Navigation callbacks stay fire-and-forget.
@@ -112,6 +114,7 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 
 /** Props forwarded to the profile modals this button opens. */
 export interface SwitcherModalProps {
+  opener: SwitcherSurface;
   userProfile?: Pick<
     UserProfileModalOptions,
     'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'mode'
@@ -180,9 +183,10 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 
 /**
  * @param modals - Props forwarded to the profile modals. A `combined` user profile also carries the
- *   organization's pages, so managing the organization opens it on them.
+ *   organization's pages, so managing the organization opens it on them. `opener` names this switcher,
+ *   so a profile reopened after a redirect gets this switcher's props back.
  */
-export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
+export function useSwitcherModel(options: SwitcherModelOptions | undefined, modals: SwitcherModalProps): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   // The active org names the trigger. That is not a request to turn Organizations on.
@@ -191,7 +195,6 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
-  const userProfile = useModal(userProfileModal);
   const organizationProfile = useModal(organizationProfileModal);
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
@@ -205,14 +208,17 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
 
   const organizationProfileProps = {
-    ...modals?.organizationProfile,
+    ...modals.organizationProfile,
     afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
   };
+
+  const userProfileProps = { ...modals.userProfile, organizationProfileProps };
+  const userProfile = useModalOpener(userProfileModal, modals.opener, userProfileProps);
 
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => userProfile.open({ ...modals?.userProfile, organizationProfileProps }, getContainer?.()),
+    openModal: () => userProfile.open(userProfileProps, getContainer?.()),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -221,11 +227,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
     openModal: () =>
-      modals?.userProfile?.mode === 'combined'
-        ? userProfile.open(
-            { ...modals.userProfile, organizationProfileProps, page: 'organization/general' },
-            getContainer?.(),
-          )
+      modals.userProfile?.mode === 'combined'
+        ? userProfile.open({ ...userProfileProps, page: 'organization/general' }, getContainer?.())
         : organizationProfile.open(organizationProfileProps, getContainer?.()),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,

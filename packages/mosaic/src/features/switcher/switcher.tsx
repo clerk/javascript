@@ -11,6 +11,7 @@ import { useSwitcherModel } from './switcher.model';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
 import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';
 import { SwitcherView } from './switcher.view';
+import { surfaceForMode } from './switcher-surface';
 
 /** What a profile opened from the switcher takes beyond the profile component's own props. */
 export interface SwitcherProfilePages<PageId extends string> {
@@ -73,6 +74,7 @@ export function Switcher(
     ...options
   } = props;
   const model = useSwitcherModel(options, {
+    opener: surfaceForMode(mode),
     userProfile: { ...userProfileProps, mode: mode === 'combined' ? 'combined' : 'user' },
     organizationProfile: organizationProfileProps,
   });

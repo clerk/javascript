@@ -1,5 +1,4 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource, UserResource } from '@clerk/shared/types';
 
@@ -7,7 +6,7 @@ import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
-import { useUserProfileOptions } from '../user-profile.provider';
+import { useUserProfileModalReturn } from '../user-profile.modal-return';
 import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   EnterpriseAccountActionResult,
@@ -83,7 +82,7 @@ export type UserProfileEnterpriseAccountsModel =
     };
 
 export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAccountsModel {
-  const { mode } = useUserProfileOptions();
+  const withModalReturn = useUserProfileModalReturn();
   const clerk = useClerk();
   const router = useMosaicRouter();
   const [createAccount, connectReverification] = useReverificationFlow(
@@ -137,8 +136,7 @@ export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAc
       if (!projection.connections.some(connection => connection.id === connectionId)) {
         throw unavailable();
       }
-      const url = window.location.href;
-      const redirectUrl = mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile' }) : url;
+      const redirectUrl = withModalReturn(window.location.href);
       const account = await createAccount(current, { enterpriseConnectionId: connectionId, redirectUrl });
       currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;

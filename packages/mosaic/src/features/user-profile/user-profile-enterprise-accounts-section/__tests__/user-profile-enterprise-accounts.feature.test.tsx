@@ -185,21 +185,25 @@ describe('enterprise accounts', () => {
     );
   });
 
-  it('preserves modal return state in the redirect URL', async () => {
+  it.each([
+    { mode: 'modal' as const, returnParam: 'user-profile/account' },
+    { mode: 'mounted' as const, returnParam: null },
+  ])('marks the identity provider return for a $mode profile', async ({ mode, returnParam }) => {
     serveFapi(signedIn());
-    await renderWithClerk(
-      <UserProfileProvider mode='modal'>
+    const { clerk } = await renderWithClerk(
+      <UserProfileProvider mode={mode}>
         <UserProfileEnterpriseAccountsSection />
       </UserProfileProvider>,
     );
+    vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
     const request = holdRequests('post', '/v1/me/external_accounts');
 
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     const body = new URLSearchParams(await request.requests[0]?.text());
-    const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
-    expect(encoded).toBeTruthy();
-    expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({ componentName: 'UserProfile' });
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe(returnParam);
+    expect(params.has('__clerk_modal_state')).toBe(false);
     request.fail();
   });
 

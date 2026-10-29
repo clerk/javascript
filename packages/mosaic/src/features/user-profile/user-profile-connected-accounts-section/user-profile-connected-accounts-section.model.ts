@@ -19,7 +19,7 @@ import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
-import { withUserProfileModalReturn } from '../user-profile.modal-return';
+import { useUserProfileModalReturn } from '../user-profile.modal-return';
 import { useUserProfileOptions } from '../user-profile.provider';
 import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
@@ -227,7 +227,8 @@ function unavailable() {
 }
 
 export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
-  const { additionalOAuthScopes, mode } = useUserProfileOptions();
+  const { additionalOAuthScopes } = useUserProfileOptions();
+  const withModalState = useUserProfileModalReturn();
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
@@ -283,7 +284,6 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   };
 
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
-  const withModalState = (url: string) => (mode === 'modal' ? withUserProfileModalReturn(url) : url);
 
   const completeVerification = async (response: ExternalAccountResource): Promise<ConnectedAccountActionResult> => {
     const url = response.verification?.externalVerificationRedirectURL;

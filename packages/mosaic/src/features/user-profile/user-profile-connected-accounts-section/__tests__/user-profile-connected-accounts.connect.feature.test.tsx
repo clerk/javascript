@@ -20,6 +20,7 @@ import {
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { ModalOpenedByProvider } from '../../../../modals/use-modal-opener';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
@@ -228,7 +229,28 @@ describe('connected accounts', () => {
     const body = new URLSearchParams(await request.requests[0]?.text());
     const params = new URL(body.get('redirect_url') || '').searchParams;
     expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.has('__clerk_mosaic_opener')).toBe(false);
     expect(params.has('__clerk_modal_state')).toBe(false);
+    request.fail();
+  });
+
+  it('names the opener of the profile modal in the return', async () => {
+    serveFapi(signedIn([]));
+    await renderWithClerk(
+      <ModalOpenedByProvider value='user-button'>
+        <UserProfileProvider mode='modal'>
+          <UserProfileConnectedAccountsSection />
+        </UserProfileProvider>
+      </ModalOpenedByProvider>,
+    );
+    const request = holdRequests('post', '/v1/me/external_accounts');
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    await waitFor(() => expect(request.requests).toHaveLength(1));
+    const body = new URLSearchParams(await request.requests[0]?.text());
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.get('__clerk_mosaic_opener')).toBe('user-button');
     request.fail();
   });
 

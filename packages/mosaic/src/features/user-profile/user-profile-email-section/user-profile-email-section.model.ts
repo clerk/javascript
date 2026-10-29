@@ -6,6 +6,7 @@ import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
+import { useUserProfileModalReturn } from '../user-profile.modal-return';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../user-profile-contact.types';
 import { byId, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
@@ -33,6 +34,7 @@ function startEmailVerification(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
+  withModalReturn: (url: string) => string,
 ): UserProfileEmailVerification {
   if (email.matchesSsoConnection) {
     return {
@@ -41,17 +43,12 @@ function startEmailVerification(
         Prepared on the click rather than on entering the step, so the redirect URL the server
         answers with is in hand by the time we navigate. Preparing on entry leaves the button live
         before the response lands, and an early click has nowhere to go.
-
-        TODO: carry the mounting mode back from the IdP. Legacy appends `appendModalState` to this
-        redirect when the profile is mounted as a modal, so returning from the provider reopens the
-        modal on the step the user left. Mosaic has no modal mode to encode yet; whoever adds one has
-        to encode it here too, or the user comes back to a closed dialog and a lost flow.
       */
       connect: () =>
         save(async () => {
           const prepared = await email.prepareVerification({
             strategy: 'enterprise_sso',
-            redirectUrl: window.location.href,
+            redirectUrl: withModalReturn(window.location.href),
           });
           const url = prepared.verification.externalVerificationRedirectURL;
           if (!url) {
@@ -76,9 +73,10 @@ function toEmailVerifier(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
+  withModalReturn: (url: string) => string,
 ): UserProfileEmailVerifier {
   return {
-    start: () => startEmailVerification(email, linkRedirectUrl, router),
+    start: () => startEmailVerification(email, linkRedirectUrl, router, withModalReturn),
     verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
   };
 }
@@ -86,6 +84,7 @@ function toEmailVerifier(
 export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
   const model = useUserProfileUserModel();
   const router = useMosaicRouter();
+  const withModalReturn = useUserProfileModalReturn();
   const [removeEmail, removeReverification] = useReverificationFlow((user: UserResource, id: string) =>
     byId(user.emailAddresses, id, 'email address').destroy(),
   );
@@ -114,7 +113,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
 
   const verifiesByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const linkRedirectUrl = verifiesByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
-  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
+  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router, withModalReturn);
 
   return {
     status: 'ready',

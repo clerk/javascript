@@ -28,8 +28,14 @@ export interface ModalSurface<Options> extends ModalSurfaceConfig<Options>, Moda
 }
 
 export interface ModalHandle<Options> {
-  open: (options?: Options, container?: PortalContainer) => void;
+  open: (options?: Options, container?: PortalContainer, opener?: string) => void;
   close: () => void;
   preload: () => void;
   isOpen: boolean;
+  registerOpener: (opener: ModalOpener<Options>) => () => void;
+}
+
+export interface ModalOpener<Options> {
+  id: string;
+  options: () => Options;
 }

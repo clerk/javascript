@@ -22,6 +22,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileEmailSection } from '../user-profile-email-section';
 
 const VERIFIED = fapiVerification('email_code', { status: 'verified' });
@@ -205,6 +206,32 @@ describe('the user profile email section', () => {
     expect(body.get('redirect_url')).toBe(window.location.href);
     prepare.release();
     await waitFor(() => expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.acme.co/sso')));
+  });
+
+  it.each([
+    { mode: 'modal' as const, returnParam: 'user-profile/account' },
+    { mode: 'mounted' as const, returnParam: null },
+  ])('marks the identity provider return for a $mode profile', async ({ mode, returnParam }) => {
+    const sso = fapiEmailAddress({ id: 'idn_sso', email_address: 'alice@acme.co', matches_sso_connection: true });
+    serveFapi(signedInWithEmails([PRIMARY, sso]));
+    const { clerk } = await renderWithClerk(
+      <UserProfileProvider mode={mode}>
+        <UserProfileEmailSection />
+      </UserProfileProvider>,
+    );
+    vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+    const actor = userEvent.setup();
+
+    await manageEmail(actor, 'alice@acme.co', 'Verify');
+    await actor.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Connect' }));
+
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    const body = new URLSearchParams(await prepare.requests[0]?.text());
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe(returnParam);
+    expect(params.has('__clerk_modal_state')).toBe(false);
+    prepare.fail();
   });
 
   it('does not offer to add the username as an address', async () => {
