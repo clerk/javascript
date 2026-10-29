@@ -958,3 +958,90 @@ describe('Select', () => {
     expect(option.current).toBe(screen.getByRole('option', { name: 'Apple' }));
   });
 });
+
+describe('Select.Group', () => {
+  function renderGrouped(props: { defaultOpen?: boolean; defaultValue?: string } = { defaultOpen: true }) {
+    return render(
+      <Select.Root
+        items={fruits}
+        alignItemWithTrigger={false}
+        {...props}
+      >
+        <Select.Trigger aria-label='Fruit'>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            <Select.Group>
+              <Select.GroupLabel>Pome</Select.GroupLabel>
+              <Select.Option
+                value='apple'
+                label='Apple'
+              >
+                Apple
+              </Select.Option>
+            </Select.Group>
+            <Select.Group>
+              <Select.GroupLabel>Other</Select.GroupLabel>
+              <Select.Option
+                value='banana'
+                label='Banana'
+              >
+                Banana
+              </Select.Option>
+              <Select.Option
+                value='cherry'
+                label='Cherry'
+              >
+                Cherry
+              </Select.Option>
+            </Select.Group>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+  }
+
+  it('names each group by its label', () => {
+    renderGrouped();
+    const pome = screen.getByRole('group', { name: 'Pome' });
+    const other = screen.getByRole('group', { name: 'Other' });
+    expect(pome).toContainElement(screen.getByRole('option', { name: 'Apple' }));
+    expect(other).toContainElement(screen.getByRole('option', { name: 'Cherry' }));
+  });
+
+  it('moves the active option across groups with the arrow keys', async () => {
+    const user = userEvent.setup();
+    renderGrouped({ defaultValue: 'apple' });
+    screen.getByRole('combobox').focus();
+    await user.keyboard('{ArrowDown}');
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Apple' })).toHaveFocus());
+
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveFocus();
+  });
+
+  it('has no violations when open', async () => {
+    renderGrouped();
+    expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+  });
+
+  it('forwards refs to the group and its label', () => {
+    const groupRef = createRef<HTMLDivElement>();
+    const labelRef = createRef<HTMLDivElement>();
+    render(
+      <Select.Group ref={groupRef}>
+        <Select.GroupLabel ref={labelRef}>Pome</Select.GroupLabel>
+      </Select.Group>,
+    );
+
+    expect(groupRef.current).toBe(screen.getByRole('group', { name: 'Pome' }));
+    expect(labelRef.current).toHaveTextContent('Pome');
+  });
+
+  it('throws when the label is used outside <Select.Group>', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<Select.GroupLabel>Fruits</Select.GroupLabel>)).toThrow(/within <Select.Group>/);
+  });
+});

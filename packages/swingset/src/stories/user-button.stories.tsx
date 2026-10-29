@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useOrganizationProfileFixture } from './fixtures/organization-profile';
 import { nestLabsWithClerkApp, usePrototype } from './fixtures/switcher';
 import { useUserProfileFixture } from './fixtures/user-profile';
 
@@ -291,6 +292,7 @@ const integrationsPage = {
 
 function FixtureUserProfile({ options }: UserProfileModalContentProps) {
   const { pages } = useUserProfileFixture();
+  const organization = useOrganizationProfileFixture();
   const [activePage, setActivePage] = useState(options?.page ?? 'account');
 
   return (
@@ -299,6 +301,7 @@ function FixtureUserProfile({ options }: UserProfileModalContentProps) {
       pages={pages}
       customPages={options?.customPages}
       pageOrder={options?.pageOrder}
+      organization={options?.mode === 'user' ? undefined : { pages: organization.pages }}
       onPageChange={setActivePage}
     />
   );
@@ -328,10 +331,14 @@ function ProfileModalTriggers() {
     <div className='flex flex-wrap items-center gap-2'>
       <SwitcherView
         {...prototype}
-        mode='user'
+        mode='combined'
         onManageAccount={() => {
           prototype.onManageAccount?.();
           userProfile.open({ customPages: [integrationsPage] });
+        }}
+        onManageOrganization={() => {
+          prototype.onManageOrganization?.();
+          userProfile.open({ page: 'organization/general', customPages: [integrationsPage] });
         }}
       />
       <Button
@@ -347,6 +354,20 @@ function ProfileModalTriggers() {
         onPointerEnter={userProfile.preload}
       >
         Open integrations
+      </Button>
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ page: 'organization/members', customPages: [integrationsPage] })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open organization members
+      </Button>
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ mode: 'user', customPages: [integrationsPage] })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open account only
       </Button>
     </div>
   );

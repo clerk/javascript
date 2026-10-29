@@ -9,6 +9,7 @@ import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
+import { REDIRECT_HOLD_MS } from '../user-profile.utils';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,
@@ -42,8 +43,6 @@ export interface UserProfileConnectedAccountsController {
   connectFinalFocus: DialogFocusTarget;
 }
 
-const OAUTH_REDIRECT_HOLD_MS = 2000;
-
 export function useUserProfileConnectedAccountsController({
   accounts,
   availableProviders,
@@ -74,7 +73,7 @@ export function useUserProfileConnectedAccountsController({
   const run = (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) =>
     void actions.run(id, async () => {
       if ((await action(id)) === 'redirecting') {
-        await new Promise(resolve => setTimeout(resolve, OAUTH_REDIRECT_HOLD_MS));
+        await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
       }
     });
 

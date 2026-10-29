@@ -110,7 +110,6 @@
     "@rspack/dev-server": "catalog:rspack",
     "@rspack/plugin-react-refresh": "catalog:rspack",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.2",
     "jsdom": "26.1.0",
     "minimatch": "^10.2.6",
