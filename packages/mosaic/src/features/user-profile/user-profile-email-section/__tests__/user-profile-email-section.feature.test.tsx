@@ -156,12 +156,18 @@ describe('the user profile email section', () => {
       expect(screen.getByRole('menuitem', { name: 'Verify' })).toHaveAttribute('aria-busy', 'true');
       expect(await screen.findByRole('progressbar', { name: 'Verify' })).toBeVisible();
       expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Manage alice@example.com' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
     } finally {
       prepare.release();
     }
 
     await enterCode(actor, VERIFICATION_CODE);
     expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage alice@example.com' })).not.toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 

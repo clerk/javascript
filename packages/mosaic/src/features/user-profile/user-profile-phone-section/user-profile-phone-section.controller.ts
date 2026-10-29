@@ -60,7 +60,7 @@ export function useUserProfilePhoneSectionController({
     onVerify: id => {
       const phone = phones.find(phone => phone.id === id);
       if (phone) {
-        verification.onVerifyPhone(phone, getPhoneVerifier(id));
+        void actions.run(id, () => verification.onVerifyPhone(phone, getPhoneVerifier(id)));
       }
     },
     onSetPrimary: id => void actions.run(id, () => onSetPrimaryPhone(id)),

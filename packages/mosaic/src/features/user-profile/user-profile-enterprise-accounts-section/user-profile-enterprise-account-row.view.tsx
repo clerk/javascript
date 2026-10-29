@@ -14,12 +14,10 @@ import type { UserProfileEnterpriseAccount } from './user-profile-enterprise-acc
 export function UserProfileEnterpriseAccountRowView({
   account,
   onConnect,
-  isPending,
   disabled,
 }: {
   account: UserProfileEnterpriseAccount;
   onConnect?: (id: string) => void;
-  isPending?: boolean;
   disabled?: boolean;
 }) {
   const m = useMessages('userProfileEnterpriseAccountsSection');
@@ -58,7 +56,7 @@ export function UserProfileEnterpriseAccountRowView({
               size='sm'
               variant='outline'
               aria-label={fill(m.connectProvider, { provider: account.name })}
-              isPending={isPending}
+              isPending={account.isPending}
               pendingLabel={m.connecting}
               disabled={disabled}
               onClick={() => onConnect(account.id)}

@@ -223,11 +223,12 @@ You've already seen `states`, `on`, `context`, `assign`, and `invoke`. The rest:
 
 ### API at a glance
 
-The exports live in `create-machine.ts`, `setup.ts`, `assign.ts`, `create-actor.ts` and `use-machine.ts`; their JSDoc is the reference. Which React hook to reach for:
+The exports live in `create-machine.ts`, `setup.ts`, `assign.ts`, `create-actor.ts`, `use-machine.ts` and `wait-for.ts`; their JSDoc is the reference. Which React hook to reach for:
 
 - `useMachine(machine)` when the component owns the actor for its lifetime.
 - `useActor(actor)` when the actor is shared or passed in, including a `mockActor` that renders a step directly.
 - `useSelector(actor, selector)` when a component needs one slice and should re-render only when that slice changes.
+- `waitFor(actor, predicate)` when a caller needs a promise for a machine-driven step, such as holding a `usePendingAction` lock until the machine leaves a sending state.
 
 ### Two behaviors worth knowing
 

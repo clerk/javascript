@@ -85,9 +85,12 @@ so views render it without comparing pending keys.
 
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the
-action (`user-profile-connected-accounts-section.controller.ts`). When the user
-cancels a reverification challenge, `run` resolves `false` without showing an
-error and releases the lock. It is not for:
+action (`user-profile-connected-accounts-section.controller.ts`). To hold it
+through a step a machine drives, run an action that awaits `waitFor`
+(`machine/wait-for.ts`) until the machine leaves that state
+(`user-profile-add-email.controller.ts`). When the user cancels a
+reverification challenge, `run` resolves `false` without showing an error and
+releases the lock. It is not for:
 
 - a form → `useForm`
 - a confirm step → `useConfirmController` with `Confirmation` / `Destructive`

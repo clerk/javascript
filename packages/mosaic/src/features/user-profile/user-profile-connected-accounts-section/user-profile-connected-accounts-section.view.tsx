@@ -18,7 +18,7 @@ export function UserProfileConnectedAccountsSectionView({
   accounts,
   sectionRef,
   availableProviders = [],
-  pendingId,
+  isDisabled = false,
   onConnect,
   onReconnect,
   registerTrigger,
@@ -31,7 +31,6 @@ export function UserProfileConnectedAccountsSectionView({
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
-  const isBusy = pendingId !== undefined;
 
   return (
     <>
@@ -52,7 +51,7 @@ export function UserProfileConnectedAccountsSectionView({
                   key={account.id}
                   account={account}
                   triggerRef={registerTrigger(account.id)}
-                  isDisabled={isBusy}
+                  isDisabled={isDisabled}
                   onReconnect={onReconnect}
                   onRemove={remove ? account => remove.open(account) : undefined}
                 />
@@ -63,8 +62,7 @@ export function UserProfileConnectedAccountsSectionView({
                       key={provider.id}
                       provider={provider}
                       triggerRef={registerTrigger(provider.id)}
-                      isPending={pendingId === provider.id}
-                      isDisabled={isBusy}
+                      isDisabled={isDisabled}
                       onConnect={onConnect}
                     />
                   ))
