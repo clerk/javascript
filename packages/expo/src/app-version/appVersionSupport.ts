@@ -1,3 +1,5 @@
+import type { AndroidMinimumVersionJSON, EnvironmentJSON, IOSMinimumVersionJSON } from '@clerk/shared/types';
+
 import type { NativeAppIdentity, NativeAppPlatform } from './nativeAppIdentity';
 import { getNativeAppIdentity, getNativeAppPlatform, isExpoApplicationInstalled } from './nativeAppIdentity';
 
@@ -10,7 +12,7 @@ export type AppVersionSupportStatus = {
    */
   isSupported: boolean;
   /**
-   * This build's version: its `CFBundleShortVersionString` on iOS and its `versionCode` on Android. `null` when it can't be read, such as in Expo Go or without `expo-application`.
+   * This build's version, as Clerk compares it with the minimum: its `CFBundleShortVersionString` on iOS, such as `4.2.1`, and its `versionCode` on Android, such as `42`. On Android, this isn't the version name that users see, such as `4.2.1`. `null` when it can't be read, such as in Expo Go or without `expo-application`.
    */
   currentVersion: string | null;
   /**
@@ -31,24 +33,28 @@ export type UpdateRequiredDisplay = {
 
 const EMPTY_DISPLAY: UpdateRequiredDisplay = { applicationName: null, logoImageUrl: null, supportEmail: null };
 
-type MinimumVersionJSON = {
-  bundle_id?: unknown;
-  package_name?: unknown;
-  minimum_version?: unknown;
-  update_url?: unknown;
-};
+// The environment comes from the network, so each field is still checked before it's used.
+type EnvironmentResponse = Partial<Pick<EnvironmentJSON, 'display_config' | 'native_app_settings'>>;
+
+type MinimumVersionJSON = IOSMinimumVersionJSON | AndroidMinimumVersionJSON;
+
+type ServerAnswer = { isSupported: true } | { isSupported: false; meta: Record<string, unknown> };
 
 const IOS_VERSION = /^\d+(\.\d+){0,2}$/;
 const ANDROID_VERSION_CODE = /^[1-9]\d*$/;
 
 const listeners = new Set<() => void>();
-let environmentStatus: AppVersionSupportStatus | null = null;
-let serverAnswer: { isSupported: true } | { isSupported: false; meta: Record<string, unknown> } | null = null;
-let requestSequence = 0;
-let lastResetRequest = 0;
-let lastAnsweredRequest = 0;
-let status = supportedStatus();
-let display = EMPTY_DISPLAY;
+const state = {
+  requestSequence: 0,
+  lastResetRequest: 0,
+  lastAnsweredRequest: 0,
+  // What the last fetched environment says about this app.
+  environmentStatus: null as AppVersionSupportStatus | null,
+  // What the last answered request says: a rejection, or a header saying the app is supported.
+  serverAnswer: null as ServerAnswer | null,
+  status: supportedStatus(),
+  display: EMPTY_DISPLAY,
+};
 let missingExpoApplicationWarned = false;
 
 export function subscribeToAppVersionSupport(listener: () => void): () => void {
@@ -57,36 +63,37 @@ export function subscribeToAppVersionSupport(listener: () => void): () => void {
 }
 
 export function getAppVersionSupportStatus(): AppVersionSupportStatus {
-  return status;
+  return state.status;
 }
 
 export function getUpdateRequiredDisplay(): UpdateRequiredDisplay {
-  return display;
+  return state.display;
 }
 
 export function nextAppVersionRequest(): number {
-  requestSequence += 1;
-  return requestSequence;
+  state.requestSequence += 1;
+  return state.requestSequence;
 }
 
 export function resetAppVersionSupport(): void {
-  lastResetRequest = requestSequence;
-  lastAnsweredRequest = requestSequence;
-  environmentStatus = null;
-  serverAnswer = null;
-  display = EMPTY_DISPLAY;
+  state.lastResetRequest = state.requestSequence;
+  state.lastAnsweredRequest = state.requestSequence;
+  state.environmentStatus = null;
+  state.serverAnswer = null;
+  state.display = EMPTY_DISPLAY;
   publish({ displayChanged: true, notifyLater: true });
 }
 
 export function applyFetchedEnvironment(environment: unknown, request: number): void {
-  if (request <= lastResetRequest) {
+  if (request <= state.lastResetRequest) {
     return;
   }
-  environmentStatus = resolveEnvironmentStatus(environment);
-  const nextDisplay = resolveDisplay(environment);
-  const displayChanged = !sameDisplay(nextDisplay, display);
+  const json = isRecord(environment) ? (environment as EnvironmentResponse) : null;
+  state.environmentStatus = resolveEnvironmentStatus(json);
+  const nextDisplay = resolveDisplay(json);
+  const displayChanged = !sameDisplay(nextDisplay, state.display);
   if (displayChanged) {
-    display = nextDisplay;
+    state.display = nextDisplay;
   }
   publish({ displayChanged });
 }
@@ -95,7 +102,7 @@ export function applyUnsupportedAppVersion(meta: unknown, request: number): void
   if (!acceptAnswer(request)) {
     return;
   }
-  serverAnswer = { isSupported: false, meta: isRecord(meta) ? meta : {} };
+  state.serverAnswer = { isSupported: false, meta: isRecord(meta) ? meta : {} };
   publish();
 }
 
@@ -103,19 +110,19 @@ export function applySupportedAppVersion(request: number): void {
   if (!acceptAnswer(request)) {
     return;
   }
-  serverAnswer = { isSupported: true };
+  state.serverAnswer = { isSupported: true };
   publish();
 }
 
 function acceptAnswer(request: number): boolean {
-  if (request <= lastAnsweredRequest) {
+  if (request <= state.lastAnsweredRequest) {
     return false;
   }
-  lastAnsweredRequest = request;
+  state.lastAnsweredRequest = request;
   return true;
 }
 
-function resolveEnvironmentStatus(environment: unknown): AppVersionSupportStatus {
+function resolveEnvironmentStatus(environment: EnvironmentResponse | null): AppVersionSupportStatus {
   const identity = getNativeAppIdentity();
   const minimums = minimumVersionsForPlatform(environment, identity?.platform ?? getNativeAppPlatform());
   if (!identity) {
@@ -136,18 +143,21 @@ function resolveEnvironmentStatus(environment: unknown): AppVersionSupportStatus
   };
 }
 
-function minimumVersionsForPlatform(environment: unknown, platform: NativeAppPlatform | null): MinimumVersionJSON[] {
-  if (!platform || !isRecord(environment)) {
-    return [];
-  }
-  const settings = environment.native_app_settings;
+function minimumVersionsForPlatform(
+  environment: EnvironmentResponse | null,
+  platform: NativeAppPlatform | null,
+): MinimumVersionJSON[] {
+  const settings = environment?.native_app_settings;
   const minimums = isRecord(settings) ? settings.minimum_supported_version : undefined;
-  const entries = isRecord(minimums) ? minimums[platform] : undefined;
+  const entries: MinimumVersionJSON[] | undefined = platform && isRecord(minimums) ? minimums[platform] : undefined;
   return Array.isArray(entries) ? entries.filter(isRecord) : [];
 }
 
 function appIdentifier(entry: MinimumVersionJSON, platform: NativeAppPlatform): string | null {
-  return stringOrNull(platform === 'ios' ? entry.bundle_id : entry.package_name);
+  if (platform === 'ios') {
+    return 'bundle_id' in entry ? stringOrNull(entry.bundle_id) : null;
+  }
+  return 'package_name' in entry ? stringOrNull(entry.package_name) : null;
 }
 
 function isAtLeast(identity: NativeAppIdentity, minimumVersion: string): boolean | null {
@@ -206,7 +216,10 @@ function supportedStatus(): AppVersionSupportStatus {
   };
 }
 
-function rejectionStatus(meta: Record<string, unknown>): AppVersionSupportStatus {
+function rejectionStatus(
+  meta: Record<string, unknown>,
+  environmentStatus: AppVersionSupportStatus | null,
+): AppVersionSupportStatus {
   return {
     isSupported: false,
     currentVersion: stringOrNull(meta.current_version) ?? getNativeAppIdentity()?.version ?? null,
@@ -219,16 +232,10 @@ function publish({
   displayChanged = false,
   notifyLater = false,
 }: { displayChanged?: boolean; notifyLater?: boolean } = {}): void {
-  const next = !serverAnswer
-    ? (environmentStatus ?? supportedStatus())
-    : !serverAnswer.isSupported
-      ? rejectionStatus(serverAnswer.meta)
-      : environmentStatus?.isSupported
-        ? environmentStatus
-        : supportedStatus();
-  const statusChanged = !sameStatus(next, status);
+  const next = deriveStatus(state);
+  const statusChanged = !sameStatus(next, state.status);
   if (statusChanged) {
-    status = next;
+    state.status = next;
   }
   if (statusChanged || displayChanged) {
     if (notifyLater) {
@@ -239,14 +246,29 @@ function publish({
   }
 }
 
+// A rejection wins. A response saying the app is supported overrides an environment that says it isn't, because the
+// server is what enforces the minimum.
+function deriveStatus({
+  environmentStatus,
+  serverAnswer,
+}: Pick<typeof state, 'environmentStatus' | 'serverAnswer'>): AppVersionSupportStatus {
+  if (!serverAnswer) {
+    return environmentStatus ?? supportedStatus();
+  }
+  if (!serverAnswer.isSupported) {
+    return rejectionStatus(serverAnswer.meta, environmentStatus);
+  }
+  return environmentStatus?.isSupported ? environmentStatus : supportedStatus();
+}
+
 function notifyListeners(): void {
   listeners.forEach(listener => listener());
 }
 
-function resolveDisplay(environment: unknown): UpdateRequiredDisplay {
-  const displayConfig = isRecord(environment) ? environment.display_config : undefined;
+function resolveDisplay(environment: EnvironmentResponse | null): UpdateRequiredDisplay {
+  const displayConfig = environment?.display_config;
   if (!isRecord(displayConfig)) {
-    return display;
+    return state.display;
   }
   return {
     applicationName: stringOrNull(displayConfig.application_name),
