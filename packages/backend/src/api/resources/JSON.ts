@@ -3,6 +3,8 @@ import type {
   BillingSubscriptionItemNextPaymentJSON,
   BillingSubscriptionItemSeatsJSON,
   BillingTotalsJSON as SharedBillingTotalsJSON,
+  EnterpriseConnectionTestRunJSON as SharedEnterpriseConnectionTestRunJSON,
+  EnterpriseConnectionTestRunLogJSON as SharedEnterpriseConnectionTestRunLogJSON,
   LastAuthenticationStrategy,
   SignUpStatus,
   VerificationStatus,
@@ -844,6 +846,18 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   updated_at: number;
   saml_connection?: EnterpriseConnectionSamlConnectionJSON | null;
   oauth_config?: EnterpriseConnectionOauthConfigJSON | null;
+}
+
+export interface EnterpriseConnectionTestRunLogJSON extends SharedEnterpriseConnectionTestRunLogJSON {
+  level: string;
+  message: string;
+}
+
+export interface EnterpriseConnectionTestRunJSON extends Omit<
+  SharedEnterpriseConnectionTestRunJSON,
+  'object' | 'logs'
+> {
+  logs?: EnterpriseConnectionTestRunLogJSON[];
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {

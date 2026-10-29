@@ -1,8 +1,14 @@
-import type { ClerkPaginationRequest, OrganizationEnterpriseConnectionProvider } from '@clerk/shared/types';
+import type {
+  ClerkPaginationRequest,
+  EnterpriseConnectionTestRunStatus,
+  OrganizationEnterpriseConnectionProvider,
+} from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { EnterpriseConnection } from '../resources';
+import { EnterpriseConnectionTestRun } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
+import type { EnterpriseConnectionTestRunJSON } from '../resources/JSON';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/enterprise_connections';
@@ -17,6 +23,14 @@ export type EnterpriseConnectionListParams = ClerkPaginationRequest<{
    * Filters enterprise connections by active status. If `true`, only active connections are returned. If `false`, only inactive connections are returned. If omitted, all connections are returned.
    */
   active?: boolean;
+}>;
+
+/** @generateWithEmptyComment */
+export type EnterpriseConnectionTestRunListParams = ClerkPaginationRequest<{
+  /**
+   * Filters test runs by status. If omitted, test runs of every status are returned.
+   */
+  status?: EnterpriseConnectionTestRunStatus[];
 }>;
 
 /** @inline */
@@ -242,5 +256,57 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
       method: 'DELETE',
       path: joinPaths(basePath, enterpriseConnectionId),
     });
+  }
+
+  /**
+   * Starts a test run for the given enterprise connection: a test sign-in against its Identity Provider (IdP).
+   * @param enterpriseConnectionId - The ID of the enterprise connection to test.
+   * @returns An object with a `url` property: a short-lived URL that starts the test sign-in when visited.
+   *
+   * @example
+   * ### Start a test run
+   *
+   * Send the person testing the connection to the returned `url` to sign in with the IdP.
+   *
+   * ```ts
+   * const { url } = await clerkClient.enterpriseConnections.createEnterpriseConnectionTestRun('entconn_123');
+   * ```
+   */
+  public async createEnterpriseConnectionTestRun(enterpriseConnectionId: string): Promise<{ url: string }> {
+    this.requireId(enterpriseConnectionId);
+    return this.request<{ url: string }>({
+      method: 'POST',
+      path: joinPaths(basePath, enterpriseConnectionId, 'test_runs'),
+    });
+  }
+
+  /**
+   * Gets the list of test runs for the given enterprise connection.
+   * @param enterpriseConnectionId - The ID of the enterprise connection to get the test runs of.
+   * @param params - Filters and pagination for the list.
+   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`EnterpriseConnectionTestRun`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection-test-run) objects and a `totalCount` property containing the total number of test runs for the connection.
+   *
+   * @example
+   * ### Get the failed test runs
+   *
+   * Filter by `status` to see why test sign-ins failed. Each test run's `logs` describe what happened.
+   *
+   * ```ts
+   * const { data } = await clerkClient.enterpriseConnections.getEnterpriseConnectionTestRunList('entconn_123', {
+   *   status: ['failed'],
+   * });
+   * ```
+   */
+  public async getEnterpriseConnectionTestRunList(
+    enterpriseConnectionId: string,
+    params: EnterpriseConnectionTestRunListParams = {},
+  ): Promise<PaginatedResourceResponse<EnterpriseConnectionTestRun[]>> {
+    this.requireId(enterpriseConnectionId);
+    const { data, totalCount } = await this.request<PaginatedResourceResponse<EnterpriseConnectionTestRunJSON[]>>({
+      method: 'GET',
+      path: joinPaths(basePath, enterpriseConnectionId, 'test_runs'),
+      queryParams: params,
+    });
+    return { data: data.map(testRun => EnterpriseConnectionTestRun.fromJSON(testRun)), totalCount };
   }
 }

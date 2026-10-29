@@ -1,12 +1,14 @@
 import { http, HttpResponse } from 'msw';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
+import type { EnterpriseConnectionTestRun as PublicEnterpriseConnectionTestRun } from '../../index';
 import { server, validateHeaders } from '../../mock-server';
 import type {
   CreateEnterpriseConnectionParams,
   EnterpriseConnectionSamlLoginHintParams,
 } from '../endpoints/EnterpriseConnectionApi';
 import { createBackendApiClient } from '../factory';
+import { EnterpriseConnectionTestRun } from '../resources';
 
 describe('EnterpriseConnectionAPI', () => {
   const apiClient = createBackendApiClient({
@@ -408,6 +410,141 @@ describe('EnterpriseConnectionAPI', () => {
 
       expect(response.id).toBe('entconn_123');
       expect(response.name).toBe('Clerk');
+    });
+  });
+
+  describe('createEnterpriseConnectionTestRun', () => {
+    it('starts a test run and returns its URL', async () => {
+      server.use(
+        http.post(
+          'https://api.clerk.test/v1/enterprise_connections/entconn_123/test_runs',
+          validateHeaders(() => HttpResponse.json({ url: 'https://clerk.example.com/v1/test_runs/start?token=abc' })),
+        ),
+      );
+
+      const response = await apiClient.enterpriseConnections.createEnterpriseConnectionTestRun('entconn_123');
+
+      expect(response).toEqual({ url: 'https://clerk.example.com/v1/test_runs/start?token=abc' });
+    });
+
+    it('requires an enterprise connection ID', async () => {
+      await expect(apiClient.enterpriseConnections.createEnterpriseConnectionTestRun('')).rejects.toThrow(
+        'A valid resource ID is required.',
+      );
+    });
+  });
+
+  describe('getEnterpriseConnectionTestRunList', () => {
+    const mockTestRunListResponse = {
+      data: [
+        {
+          id: 'ectr_1',
+          status: 'success',
+          connection_type: 'saml',
+          parsed_user_info: {
+            email_address: 'jane@clerk.dev',
+            first_name: 'Jane',
+            last_name: 'Doe',
+            user_id: 'jane',
+          },
+          logs: [
+            { level: 'info', code: 'response_received', short_message: 'Received', message: 'SAML response received' },
+          ],
+          saml: {
+            saml_request: 'PHNhbWxwOkF1dGhuUmVxdWVzdA==',
+            saml_response: 'PHNhbWxwOlJlc3BvbnNl',
+            relay_state: 'rs',
+          },
+          oauth: null,
+          created_at: 1672531200000,
+        },
+        {
+          id: 'ectr_2',
+          status: 'failed',
+          connection_type: 'oauth',
+          parsed_user_info: null,
+          oauth: { id_token: 'id', access_token: 'access', user_info: '{}' },
+          created_at: 1672531100000,
+        },
+      ],
+      total_count: 2,
+    };
+
+    it('fetches test runs as resources, with status filters and pagination in the query', async () => {
+      let capturedRequestUrl: string | null = null;
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/enterprise_connections/entconn_123/test_runs',
+          validateHeaders(({ request }) => {
+            capturedRequestUrl = request.url;
+            return HttpResponse.json(mockTestRunListResponse);
+          }),
+        ),
+      );
+
+      const response = await apiClient.enterpriseConnections.getEnterpriseConnectionTestRunList('entconn_123', {
+        status: ['success', 'failed'],
+        limit: 10,
+        offset: 5,
+      });
+
+      expect(capturedRequestUrl).toBeTruthy();
+      const url = new URL(capturedRequestUrl!);
+      expect(url.searchParams.getAll('status')).toEqual(['success', 'failed']);
+      expect(url.searchParams.get('limit')).toBe('10');
+      expect(url.searchParams.get('offset')).toBe('5');
+
+      expect(response.totalCount).toBe(2);
+      expect(response.data).toHaveLength(2);
+      expectTypeOf(response.data).toEqualTypeOf<PublicEnterpriseConnectionTestRun[]>();
+
+      const [saml, oauth] = response.data;
+      expect(saml).toBeInstanceOf(EnterpriseConnectionTestRun);
+      expect(saml.status).toBe('success');
+      expect(saml.connectionType).toBe('saml');
+      expect(saml.createdAt).toBe(1672531200000);
+      expect(saml.parsedUserInfo).toEqual({
+        emailAddress: 'jane@clerk.dev',
+        firstName: 'Jane',
+        lastName: 'Doe',
+        userId: 'jane',
+      });
+      expect(saml.logs).toEqual([
+        { level: 'info', code: 'response_received', shortMessage: 'Received', message: 'SAML response received' },
+      ]);
+      expect(saml.saml?.samlResponse).toBe('PHNhbWxwOlJlc3BvbnNl');
+      expect(saml.oauth).toBeNull();
+
+      expect(oauth.status).toBe('failed');
+      expect(oauth.parsedUserInfo).toBeNull();
+      expect(oauth.logs).toEqual([]);
+      expect(oauth.saml).toBeNull();
+      expect(oauth.oauth?.idToken).toBe('id');
+    });
+
+    it('sends no query params when called without filters', async () => {
+      let capturedRequestUrl: string | null = null;
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/enterprise_connections/entconn_123/test_runs',
+          validateHeaders(({ request }) => {
+            capturedRequestUrl = request.url;
+            return HttpResponse.json({ data: [], total_count: 0 });
+          }),
+        ),
+      );
+
+      const response = await apiClient.enterpriseConnections.getEnterpriseConnectionTestRunList('entconn_123');
+
+      expect(capturedRequestUrl).toBeTruthy();
+      expect(new URL(capturedRequestUrl!).search).toBe('');
+      expect(response).toEqual({ data: [], totalCount: 0 });
+    });
+
+    it('requires an enterprise connection ID', async () => {
+      await expect(apiClient.enterpriseConnections.getEnterpriseConnectionTestRunList('')).rejects.toThrow(
+        'A valid resource ID is required.',
+      );
     });
   });
 });
