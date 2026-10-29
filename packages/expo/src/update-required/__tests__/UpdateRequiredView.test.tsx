@@ -69,6 +69,7 @@ describe('UpdateRequiredView', () => {
   beforeEach(() => {
     vi.resetModules();
     mocks.openURL.mockReset();
+    mocks.openURL.mockResolvedValue(undefined);
     mocks.platformOS = 'ios';
     mocks.identity = { platform: 'ios', appIdentifier: 'com.example.app', version: '1.9.9', displayVersion: '1.9.9' };
   });
@@ -105,6 +106,21 @@ describe('UpdateRequiredView', () => {
 
     expect(mocks.openURL).toHaveBeenNthCalledWith(1, APP_STORE_URL);
     expect(mocks.openURL).toHaveBeenNthCalledWith(2, 'mailto:support@example.com');
+  });
+
+  test('keeps the screen when no app can open the support email', async () => {
+    const { store, UpdateRequiredView } = await loadModules();
+    render(<UpdateRequiredView />);
+    block(store, { updateUrl: APP_STORE_URL, supportEmail: 'support@example.com' });
+    const rejection = Promise.reject(new Error('No app can open mailto:'));
+    const caught = vi.spyOn(rejection, 'catch');
+    mocks.openURL.mockReturnValueOnce(rejection);
+
+    fireEvent.click(screen.getByText('Get Help'));
+    await act(() => Promise.resolve());
+
+    expect(caught).toHaveBeenCalledOnce();
+    expect(screen.getByText('Get Help')).toBeDefined();
   });
 
   test('leaves out the help link without a support email', async () => {

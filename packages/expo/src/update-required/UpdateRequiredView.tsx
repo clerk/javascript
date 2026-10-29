@@ -85,7 +85,7 @@ export function UpdateRequiredContent({
         {updateUrl && (
           <Pressable
             accessibilityRole='button'
-            onPress={() => void Linking.openURL(updateUrl)}
+            onPress={() => openURL(updateUrl)}
             style={({ pressed }) => [
               styles.primaryButton,
               { backgroundColor: colors.primary, opacity: pressed ? 0.8 : 1 },
@@ -99,7 +99,7 @@ export function UpdateRequiredContent({
         {supportEmail && (
           <Pressable
             accessibilityRole='button'
-            onPress={() => void Linking.openURL(`mailto:${supportEmail}`)}
+            onPress={() => openURL(`mailto:${supportEmail}`)}
             style={({ pressed }) => [styles.helpButton, { opacity: pressed ? 0.6 : 1 }]}
           >
             <Text style={[styles.helpText, { color: colors.mutedForeground }]}>
@@ -188,6 +188,11 @@ export function storeButtonText(updateUrl: string): string {
   } catch {
     return 'Update app';
   }
+}
+
+// openURL rejects when no app can open the URL, such as a mailto: link without a mail app. The screen stays as it is.
+function openURL(url: string): void {
+  Linking.openURL(url).catch(() => {});
 }
 
 function getHelpText(): string {
@@ -283,8 +288,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     letterSpacing: isIOS ? 0 : 0.15,
   },
+  // The platform minimum touch target: 44pt on iOS and 48dp on Android.
   helpButton: {
-    height: 32,
+    minHeight: isIOS ? 44 : 48,
     alignItems: 'center',
     justifyContent: 'center',
   },
