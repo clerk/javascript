@@ -131,15 +131,15 @@ export const ConfigureDirectorySyncProvider = ({
     return rotated;
   }, [rotateDirectorySyncToken]);
 
-  const setDirectoryEnabled = React.useCallback(
-    (enabled: boolean) => updateDirectorySync({ enabled }),
-    [updateDirectorySync],
-  );
-
   const provider =
     directory?.provider ?? (connection ? directorySyncProviderForConnection(connection.provider) : undefined);
 
   const roleMapping = useRoleMapping(directory, updateDirectorySync);
+
+  const setDirectoryEnabled = React.useCallback(
+    (enabled: boolean) => updateDirectorySync({ enabled }),
+    [updateDirectorySync],
+  );
 
   const value: ConfigureDirectorySyncData = {
     isLoading: isLoadingConnections || (Boolean(enterpriseConnectionId) && isLoadingDirectory),

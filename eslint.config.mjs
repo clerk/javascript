@@ -589,7 +589,6 @@ export default tseslint.config([
       // Turned off while upgrading eslint-plugin-react-hooks to v7, which added these to the recommended preset.
       // They are not meant to stay off; they will be enabled in follow-up changes.
       'react-hooks/immutability': 'off',
-      'react-hooks/preserve-manual-memoization': 'off',
       'react-hooks/refs': 'off',
       'react-hooks/set-state-in-effect': 'off',
     },
