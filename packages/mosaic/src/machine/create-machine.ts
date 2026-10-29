@@ -24,7 +24,7 @@ export function createMachine<
   TContext extends object = Record<string, never>,
   TEvent extends EventObject = EventObject,
   TStates extends string = string,
->(config: MachineConfig<TContext, TEvent, TStates>): StateMachine<TContext, TEvent> {
+>(config: MachineConfig<TContext, TEvent, TStates>): StateMachine<TContext, TEvent, TStates> {
   return {
     id: config.id,
     initial: config.initial,

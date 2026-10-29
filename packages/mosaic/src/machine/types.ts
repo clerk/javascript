@@ -44,7 +44,7 @@ export type Actions<TContext, TEvent extends EventObject> = Action<TContext, TEv
 /** The long form of a transition. */
 export interface TransitionConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
   /** State to enter. Omit for an internal transition (runs actions, stays put). */
-  target?: TStates;
+  target?: NoInfer<TStates>;
   /** Actions to run during the transition, in order. */
   actions?: Actions<TContext, TEvent>;
   /** Only take this transition when the guard passes. */
@@ -54,7 +54,7 @@ export interface TransitionConfig<TContext, TEvent extends EventObject, TStates 
 /** What an inline transition function returns. `undefined` means the event is unhandled. */
 export interface TransitionResult<TContext, TStates extends string = string> {
   /** State to enter. Omit for an internal transition (updates context, stays put). */
-  target?: TStates;
+  target?: NoInfer<TStates>;
   /** Shallow context patch applied after the transition. */
   context?: Partial<TContext>;
 }
@@ -74,7 +74,7 @@ export type TransitionFn<TContext, TEvent extends EventObject, TStates extends s
  * configs evaluated in order (first passing guard wins), or an inline function.
  */
 export type Transition<TContext, TEvent extends EventObject, TStates extends string = string> =
-  | TStates
+  | NoInfer<TStates>
   | TransitionConfig<TContext, TEvent, TStates>
   | TransitionConfig<TContext, TEvent, TStates>[]
   | TransitionFn<TContext, TEvent, TStates>;
@@ -177,7 +177,7 @@ export type InitialResolver<TContext, TStates extends string = string> = (contex
 
 export interface MachineConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
   id?: string;
-  initial: TStates | InitialResolver<TContext, TStates>;
+  initial: NoInfer<TStates> | InitialResolver<TContext, NoInfer<TStates>>;
   context?: TContext;
   states: Record<TStates, StateConfig<TContext, TEvent, TStates>>;
 }
@@ -187,44 +187,46 @@ export interface MachineConfig<TContext, TEvent extends EventObject, TStates ext
  * {@link createMachine}. `states` is exposed so docs/tests can enumerate every
  * step without running anything.
  */
-export interface StateMachine<TContext, TEvent extends EventObject> {
+export interface StateMachine<TContext, TEvent extends EventObject, TStates extends string = string> {
   id: string | undefined;
-  initial: string | InitialResolver<TContext>;
+  initial: TStates | InitialResolver<TContext, TStates>;
   context: TContext;
-  states: Record<string, StateConfig<TContext, TEvent>>;
-  config: MachineConfig<TContext, TEvent>;
+  states: Record<TStates, StateConfig<TContext, TEvent, TStates>>;
+  config: MachineConfig<TContext, TEvent, TStates>;
 }
 
 export type ActorStatus = 'active' | 'done' | 'stopped';
 
 /** A point-in-time view of a running actor. */
-export interface Snapshot<TContext> {
-  value: string;
+export interface Snapshot<TContext, TStates extends string = string> {
+  value: TStates;
   context: TContext;
   status: ActorStatus;
 }
 
 /** A subscriber receives the latest snapshot on every transition. */
-export type SnapshotListener<TContext> = (snapshot: Snapshot<TContext>) => void;
+export type SnapshotListener<TContext, TStates extends string = string> = (
+  snapshot: Snapshot<TContext, TStates>,
+) => void;
 
 /** Standard observable contract: `subscribe` returns its own unsubscribe fn. */
 export type Unsubscribe = () => void;
 
-export interface Actor<TContext, TEvent extends EventObject> {
+export interface Actor<TContext, TEvent extends EventObject, TStates extends string = string> {
   /**
    * Run entry actions / immediate transitions / invokes of the initial state.
    * After a `stop()`, resume in the current state instead: re-arm its `after`
    * timers, then apply the invoke results and events that arrived while stopped,
    * in arrival order.
    */
-  start: () => Actor<TContext, TEvent>;
+  start: () => Actor<TContext, TEvent, TStates>;
   /** Stop the actor, pausing its `after` timers and holding in-flight invoke results and sent events for a later `start()`. */
   stop: () => void;
   /** Send an event. Ignored before the first `start()` and once the actor is `done`; queued while `stopped`. */
   send: (event: TEvent) => void;
-  getSnapshot: () => Snapshot<TContext>;
+  getSnapshot: () => Snapshot<TContext, TStates>;
   /** Subscribe to snapshots; returns an unsubscribe fn (usable with `useSyncExternalStore`). */
-  subscribe: (listener: SnapshotListener<TContext>) => Unsubscribe;
+  subscribe: (listener: SnapshotListener<TContext, TStates>) => Unsubscribe;
   /** Whether the event would be handled (a guard-passing, enterable transition exists) right now. */
   can: (event: TEvent) => boolean;
   /**
@@ -248,7 +250,7 @@ export interface Actor<TContext, TEvent extends EventObject> {
   recheck: () => void;
 }
 
-export interface CreateActorOptions<TContext> {
+export interface CreateActorOptions<TContext, TStates extends string = string> {
   /**
    * Runtime context merged over machine defaults at actor creation time.
    * Use this to inject dependencies (e.g. an async function from a hook)
@@ -261,5 +263,5 @@ export interface CreateActorOptions<TContext> {
    * initial state. Used by {@link mockActor} — the actor is inert (no entry
    * actions, immediates, or invokes run for the teleported state).
    */
-  snapshot?: { value: string; context?: Partial<TContext> };
+  snapshot?: { value: TStates; context?: Partial<TContext> };
 }
