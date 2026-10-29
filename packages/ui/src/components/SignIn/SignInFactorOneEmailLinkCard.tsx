@@ -98,6 +98,10 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     }
   };
 
+  React.useEffect(() => {
+    void startEmailLinkVerification();
+  }, []);
+
   if (switchTabStatus) {
     return (
       <EmailLinkStatusCard
@@ -113,10 +117,6 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
       />
     );
   }
-
-  React.useEffect(() => {
-    void startEmailLinkVerification();
-  }, []);
 
   return (
     <Flow.Part part='emailLink'>
