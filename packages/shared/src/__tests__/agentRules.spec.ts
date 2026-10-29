@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -268,6 +270,30 @@ describe('writeClerkAgentRules in a monorepo', () => {
     writeWeb(memory);
 
     expect(memory.read('/repo/AGENTS.md')).toBe('Project rules\n');
+  });
+
+  it('keeps a newer intro written by an app on a newer Clerk version', () => {
+    const newerIntro =
+      '<!-- BEGIN:clerk-agent-rules -->\n<!-- clerk-agent-rules-version: 999 -->\n\nNewer intro\n\n<!-- END:clerk-agent-rules -->\n';
+    const memory = createMonorepo({ '/repo/AGENTS.md': newerIntro });
+
+    writeExt(memory);
+
+    const content = memory.read('/repo/AGENTS.md');
+    expect(content?.startsWith(newerIntro.trimEnd())).toBe(true);
+    expect(content).toContain('<!-- BEGIN:clerk-agent-rules:chrome-extension:apps/ext -->');
+  });
+
+  it('replaces an older intro', () => {
+    const memory = createMonorepo({
+      '/repo/AGENTS.md':
+        '<!-- BEGIN:clerk-agent-rules -->\n<!-- clerk-agent-rules-version: 0 -->\n\nOlder intro\n\n<!-- END:clerk-agent-rules -->\n',
+    });
+
+    writeExt(memory);
+
+    expect(memory.read('/repo/AGENTS.md')).not.toContain('Older intro');
+    expect(memory.read('/repo/AGENTS.md')).toContain('## Clerk: your training data is out of date');
   });
 
   it('keeps a removed app section out without blocking the other apps', () => {
@@ -590,6 +616,19 @@ describe('Clerk plugin rules', () => {
 
   it('uses the requested line endings', () => {
     expect(renderClerkSdkPluginBlock('\r\n')).not.toMatch(/[^\r]\n/);
+  });
+
+  it('pairs the intro text with its version, so changing the text needs a version bump', () => {
+    const block = renderClerkAgentRulesBlock();
+    const version = block.match(/<!-- clerk-agent-rules-version: (\d+) -->/)?.[1];
+    const sha256 = createHash('sha256')
+      .update(block.replace(/<!-- clerk-agent-rules-version: \d+ -->/, ''))
+      .digest('hex');
+
+    expect({ version, sha256 }).toEqual({
+      version: '1',
+      sha256: '4a7270844bdc65fe7388d963470fc91f6cf047cc916db4a3dc423811996b206c',
+    });
   });
 
   it('links agents to the Markdown Clerk docs in the root block', () => {

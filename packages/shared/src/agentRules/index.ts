@@ -50,6 +50,8 @@ export type WriteClerkAgentRulesResult = {
 const GENERIC_ID = 'clerk-agent-rules';
 const GENERIC_START = '<!-- BEGIN:clerk-agent-rules -->';
 const GENERIC_END = '<!-- END:clerk-agent-rules -->';
+const INTRO_VERSION = 1;
+const INTRO_VERSION_PATTERN = /<!-- clerk-agent-rules-version: (\d+) -->/;
 
 const SDK_LABELS: Record<ClerkAgentRulesSdk, string> = {
   astro: 'Astro',
@@ -117,6 +119,7 @@ ${CLERK_SDK_PLUGIN_END}`,
 export function renderClerkAgentRulesBlock(eol = '\n') {
   return normalizeEol(
     `${GENERIC_START}
+<!-- clerk-agent-rules-version: ${INTRO_VERSION} -->
 
 ## Clerk: your training data is out of date
 
@@ -188,6 +191,15 @@ function upsertMarkedBlock(
   }
 
   return `${content.trimEnd()}${eol}${eol}${block}${eol}`;
+}
+
+function readIntroVersion(content: string) {
+  const startIndex = content.indexOf(GENERIC_START);
+  const endIndex = content.indexOf(GENERIC_END, startIndex);
+  if (startIndex === -1 || endIndex === -1) {
+    return -1;
+  }
+  return Number(content.slice(startIndex, endIndex).match(INTRO_VERSION_PATTERN)?.[1] ?? 0);
 }
 
 const blockStart = (id: string) => `<!-- BEGIN:${id} -->`;
@@ -341,7 +353,10 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
     return { targetDir: rootDir, agentsMd: 'skipped', files: [] };
   }
 
-  let next = upsertMarkedBlock(existing, renderClerkAgentRulesBlock(eol), GENERIC_START, GENERIC_END, eol);
+  let next =
+    readIntroVersion(existing) > INTRO_VERSION
+      ? existing
+      : upsertMarkedBlock(existing, renderClerkAgentRulesBlock(eol), GENERIC_START, GENERIC_END, eol);
   const written = [GENERIC_ID];
 
   for (const sdk of uniqueSdks(sdks)) {
