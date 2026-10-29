@@ -28,6 +28,7 @@ import { userProfilePasswordSectionMessages } from '../features/user-profile/use
 import { userProfileAddPhoneMessages } from '../features/user-profile/user-profile-phone-section/user-profile-add-phone.messages';
 import { userProfileProfileSectionMessages } from '../features/user-profile/user-profile-profile-section/user-profile-profile-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
+import { waitlistMessages } from '../features/waitlist/waitlist.messages';
 import { errorMessages } from './errors.messages';
 import { roleMessages } from './roles.messages';
 
@@ -64,6 +65,7 @@ export const mosaicMessages = {
   userProfilePasswordSection: userProfilePasswordSectionMessages,
   userProfileProfileSection: userProfileProfileSectionMessages,
   userProfileWeb3Wallets: userProfileWeb3WalletsMessages,
+  waitlist: waitlistMessages,
 };
 
 export type MosaicMessages = typeof mosaicMessages;

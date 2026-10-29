@@ -178,6 +178,7 @@ export type {
 } from '../components/profile';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
 export { UserButton } from '../features/user-button/user-button';
+export { Waitlist } from '../features/waitlist/waitlist';
 
 import {
   colorVars,
