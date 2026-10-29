@@ -120,7 +120,17 @@ export interface UserProfileProps
  * <UserProfile additionalOAuthScopes={{ google: ['https://www.googleapis.com/auth/calendar.readonly'] }} />
  * ```
  */
-export function UserProfile({
+export function UserProfile(props: UserProfileProps) {
+  return (
+    <UserProfileSurface
+      {...props}
+      presentation='mounted'
+    />
+  );
+}
+
+export function UserProfileSurface({
+  presentation,
   mode = 'combined',
   organizationProfileProps,
   customPages,
@@ -129,7 +139,7 @@ export function UserProfile({
   additionalOAuthScopes,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
-}: UserProfileProps) {
+}: UserProfileProps & { presentation: NonNullable<UserProfileOptions['mode']> }) {
   const model = useUserProfileUserModel();
   const builtInPages = useUserProfilePages();
 
@@ -156,7 +166,7 @@ export function UserProfile({
   return (
     <UserProfileProvider
       additionalOAuthScopes={additionalOAuthScopes}
-      mode='mounted'
+      mode={presentation}
     >
       {mode === 'user' ? (
         <AccountUserProfileView {...viewProps} />

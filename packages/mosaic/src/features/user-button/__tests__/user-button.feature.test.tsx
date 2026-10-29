@@ -21,6 +21,7 @@ import {
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { PortalProvider } from '../../../primitives/portal';
+import { signedIn as withConnectedAccounts } from '../../user-profile/user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
 
@@ -484,6 +485,25 @@ describe('UserButton', () => {
       expect(openUserProfile).not.toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
       await waitFor(() => expect(popup()).toBeNull());
+    });
+
+    it('opens the profile as a modal, so an OAuth connection returns to it', async () => {
+      await wideViewport();
+      await renderUserButton({}, withConnectedAccounts([]));
+      const request = holdRequests('post', '/v1/me/external_accounts');
+      const user = await open();
+
+      await user.click(screen.getByRole('button', { name: 'Settings' }));
+      await user.click(await screen.findByRole('button', { name: 'Connect GitHub' }));
+      await waitFor(() => expect(request.requests).toHaveLength(1));
+
+      const body = new URLSearchParams(await request.requests[0]?.text());
+      const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
+      expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({
+        componentName: 'UserProfile',
+        socialProvider: 'github',
+      });
+      request.fail();
     });
 
     it('opens the profile into the portal root the app provides', async () => {

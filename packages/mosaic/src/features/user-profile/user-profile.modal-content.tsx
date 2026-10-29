@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
-import { UserProfile } from './user-profile';
+import { UserProfileSurface } from './user-profile';
 import type { UserProfileModalContentProps } from './user-profile.modal.types';
 
 export default function UserProfileModalContent({ options, close }: UserProfileModalContentProps): React.ReactElement {
@@ -16,8 +16,9 @@ export default function UserProfileModalContent({ options, close }: UserProfileM
 
   const { page, ...props } = options ?? {};
   return (
-    <UserProfile
+    <UserProfileSurface
       {...props}
+      presentation='modal'
       defaultPage={page}
     />
   );
