@@ -10,7 +10,7 @@ import { Section } from '../../components/section';
 import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
-import type { UserProfileContact } from './user-profile-contact.types';
+import type { UserProfileContact, UserProfileContactRow } from './user-profile-contact.types';
 import { styles } from './user-profile-profile-panel.styles';
 
 export interface UserProfileContactListRowViewProps {
@@ -19,11 +19,9 @@ export interface UserProfileContactListRowViewProps {
   addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
-  items: UserProfileContact[];
+  items: UserProfileContactRow[];
   onAdd?: () => void;
   onVerify?: (id: string) => void;
-  pendingVerifyId?: string;
-  pendingPrimaryId?: string;
   isDisabled?: boolean;
   onSetPrimary?: (id: string) => void;
   onRemove?: (item: UserProfileContact) => void;
@@ -36,8 +34,6 @@ export function UserProfileContactListRowView({
   items,
   onAdd,
   onVerify,
-  pendingVerifyId,
-  pendingPrimaryId,
   isDisabled = false,
   onSetPrimary,
   onRemove,
@@ -96,13 +92,13 @@ export function UserProfileContactListRowView({
                 actions.push({
                   label: item.isDefault ? m.completeVerification : m[kind].verify,
                   onClick: () => onVerify(item.id),
-                  status: pendingVerifyId === item.id ? 'pending' : 'idle',
+                  status: item.isVerifyPending ? 'pending' : 'idle',
                 });
               } else if (item.isVerified && !item.isDefault && onSetPrimary) {
                 actions.push({
                   label: m.setPrimary,
                   onClick: () => onSetPrimary(item.id),
-                  status: pendingPrimaryId === item.id ? 'pending' : 'idle',
+                  status: item.isPrimaryPending ? 'pending' : 'idle',
                 });
               }
 

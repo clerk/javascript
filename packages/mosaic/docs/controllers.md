@@ -45,8 +45,11 @@ It owns the error (see "Errors"):
 const actions = usePendingAction({ errorFallback: messages.errors.generic });
 
 return {
-  rows: rows.map(row => (actions.errorKey === row.id ? { ...row, error: actions.error } : row)),
-  pendingId: actions.pendingKey,
+  rows: rows.map(row => ({
+    ...row,
+    isPending: actions.pendingKey === row.id,
+    error: actions.errorKey === row.id ? actions.error : undefined,
+  })),
   onRemove: id => void actions.run(id, () => onRemove(id)),
 };
 ```
@@ -61,27 +64,24 @@ const remove = useConfirmController<UserProfileEmail>({
 });
 
 return {
+  contacts: contacts.map(contact => ({ ...contact, isPrimaryPending: actions.pendingKey === contact.id })),
   isDisabled: actions.isPending,
-  pendingPrimaryId: actions.pendingKey,
-  remove: {
-    ...remove,
-    confirm: async contact => (await actions.runExternal(() => remove.confirm(contact))) ?? false,
-  },
+  remove: actions.guard(remove),
 };
 ```
 
 Keep this coordination in the section controller. Run direct actions with
-`actions.run(key, action)` and wrap the returned confirmation's `confirm` callback
-with `actions.runExternal`. Pass `actions.isPending` to the section controls'
-`disabled` props, including `Confirmation.disabled`.
+`actions.run(key, action)` and pass the confirmation through `actions.guard`, which
+runs its `confirm` under the same lock. Pass `actions.isPending` to the section
+controls' `disabled` props.
 
 `confirm` resolves `true` when the operation succeeds, or `false` when it fails or
 the dialog ignores the call. Its promise follows the operation even if the
 dialog closes during cancellation. The shared pending owner waits for that
 promise, so closing the dialog does not enable another action before cancellation
 settles. Removal keeps its dialog errors, and inline row errors and focus keys
-stay unchanged. Views receive the pending and disabled props without coordinating
-the operations.
+stay unchanged. Put each row's pending state on the row the controller returns,
+so views render it without comparing pending keys.
 
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the

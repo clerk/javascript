@@ -5,6 +5,11 @@ export interface UserProfileContact {
   isVerified: boolean;
 }
 
+export interface UserProfileContactRow extends UserProfileContact {
+  isVerifyPending: boolean;
+  isPrimaryPending: boolean;
+}
+
 export type UserProfileEmail = UserProfileContact;
 
 export type UserProfilePhone = UserProfileContact;

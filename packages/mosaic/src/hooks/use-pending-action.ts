@@ -10,9 +10,15 @@ export interface PendingActionOptions {
   errorFallback?: string;
 }
 
+export interface PendingConfirm<TPayload> {
+  confirm: (payload: TPayload) => Promise<boolean>;
+}
+
 export interface PendingAction<TKey extends string> {
   run: (key: TKey, action: () => Promise<unknown> | void, options?: PendingActionOptions) => Promise<boolean>;
-  runExternal: <T>(action: () => T | Promise<T>) => Promise<T> | undefined;
+  guard: <TPayload, TConfirm extends PendingConfirm<TPayload>>(
+    confirm: TConfirm & PendingConfirm<TPayload>,
+  ) => TConfirm;
   pendingKey: TKey | undefined;
   lastKey: TKey | undefined;
   isPending: boolean;
@@ -30,7 +36,7 @@ interface PendingActionFailure<TKey extends string> {
 type Pending<TKey> = { kind: 'inline'; key: TKey } | { kind: 'external' };
 
 /**
- * Runs inline and external actions under one lock and tracks which inline key is pending, ran last, or last failed.
+ * Runs inline actions and guarded confirmations under one lock and tracks which inline key is pending, ran last, or last failed.
  * `run` resolves `true` on success and `false` on failure, ignores calls while any action is in flight, and clears the last error when any action starts.
  */
 export function usePendingAction<TKey extends string = string>({
@@ -78,7 +84,10 @@ export function usePendingAction<TKey extends string = string>({
 
   return {
     run,
-    runExternal: action => claim({ kind: 'external' }, action),
+    guard: confirm => ({
+      ...confirm,
+      confirm: async payload => (await claim({ kind: 'external' }, () => confirm.confirm(payload))) ?? false,
+    }),
     pendingKey: pending?.kind === 'inline' ? pending.key : undefined,
     lastKey,
     isPending: pending !== undefined,

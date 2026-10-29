@@ -10,7 +10,6 @@ export type ConfirmationColor = 'negative' | 'primary';
 export interface ConfirmationProps<Payload = void> extends ConfirmBlockProps<Payload> {
   /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
   color?: ConfirmationColor;
-  disabled?: boolean;
 }
 
 /**
@@ -37,7 +36,7 @@ export interface ConfirmationProps<Payload = void> extends ConfirmBlockProps<Pay
  *   actionLabel='Remove'
  * />
  */
-export function Confirmation<Payload = void>({ color = 'negative', disabled, ...props }: ConfirmationProps<Payload>) {
+export function Confirmation<Payload = void>({ color = 'negative', ...props }: ConfirmationProps<Payload>) {
   return (
     <ConfirmShell {...props}>
       {({ title, description, actionLabel, cancelLabel, isPending, errorMessage, confirm }) => (
@@ -68,7 +67,6 @@ export function Confirmation<Payload = void>({ color = 'negative', disabled, ...
               fullWidth
               color={color}
               isPending={isPending}
-              disabled={disabled && !isPending}
               onClick={confirm}
             >
               {actionLabel}

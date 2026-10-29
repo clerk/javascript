@@ -38,11 +38,7 @@ function Host<Payload>({
 
 async function renderAccount(
   options: ConfirmControllerOptions<void>,
-  {
-    localization,
-    description,
-    disabled,
-  }: { localization?: MosaicLocalization; description?: ReactNode; disabled?: boolean } = {},
+  { localization, description }: { localization?: MosaicLocalization; description?: ReactNode } = {},
 ) {
   const ref: { current: ConfirmController | undefined } = { current: undefined };
   serveFapi({ client: fapiClient([session]) });
@@ -57,7 +53,6 @@ async function renderAccount(
             title={TITLE}
             description={description ?? 'Google will be removed from this account.'}
             actionLabel='Remove'
-            disabled={disabled}
           />
         );
       }}
@@ -75,19 +70,6 @@ async function renderAccount(
 const confirmButton = () => screen.getByRole('button', { name: 'Remove' });
 
 describe('Confirmation', () => {
-  it('disables confirmation while leaving Cancel usable', async () => {
-    const onConfirm = vi.fn(() => Promise.resolve());
-    const { user, open, closed } = await renderAccount({ onConfirm }, { disabled: true });
-    await open();
-
-    expect(confirmButton()).toBeDisabled();
-    await user.click(confirmButton());
-    expect(onConfirm).not.toHaveBeenCalled();
-
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await closed();
-  });
-
   it('opens from its trigger, confirms, closes once the action lands, and hands focus back', async () => {
     const run = deferred<void>();
     const onConfirm = vi.fn(() => run.promise);

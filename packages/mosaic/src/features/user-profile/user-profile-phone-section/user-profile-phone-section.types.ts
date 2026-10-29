@@ -4,15 +4,14 @@ import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import type { CountryIso } from '../../../components/phone-input';
 import type { ReverificationController } from '../../reverification';
-import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
+import type { UserProfileContactRow, UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddPhoneController } from './user-profile-add-phone.controller';
 
 export interface UserProfilePhoneSectionViewProps {
-  phones: UserProfilePhone[];
+  phones: UserProfileContactRow[];
   defaultPhoneCountry?: CountryIso;
   canAdd: boolean;
   isDisabled: boolean;
-  pendingPrimaryId: string | undefined;
   verification: UserProfileAddPhoneController;
   error: string | undefined;
   rowRef: Ref<HTMLDivElement>;
