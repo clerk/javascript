@@ -37,7 +37,7 @@
     "dist",
     "android",
     "ios",
-    "src/specs",
+    "src/specs/*.ts",
     "expo-module.config.json",
     "react-native.config.js",
     "app.plugin.js",
