@@ -4,6 +4,7 @@ export interface UserProfileEnterpriseConnection {
   iconUrl?: string;
   monochromeIcon?: boolean;
   connectError?: string;
+  isPending?: boolean;
 }
 
 export interface UserProfileEnterpriseAccount extends UserProfileEnterpriseConnection {

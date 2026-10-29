@@ -41,7 +41,7 @@ export function useUserProfileMfaSectionLeafController({
 
   return {
     sectionRef,
-    isDisabled: actions.isPending,
+    isDisabled: actions.isPending || remove.isPending,
     pickerOpen,
     onPickerOpenChange: setPickerOpen,
     addMethod: onAdd
@@ -55,7 +55,7 @@ export function useUserProfileMfaSectionLeafController({
       actions.reset();
       remove.open(method);
     },
-    remove: onRemove ? actions.guard(remove) : undefined,
+    remove: onRemove ? remove : undefined,
     finalRemovalFocus: removalFocus.finalFocus,
     setDefaultFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
     defaultError: actions.error,

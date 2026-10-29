@@ -30,7 +30,7 @@ export interface UserProfileConnectedAccountsControllerOptions {
 export interface UserProfileConnectedAccountsController {
   accounts: UserProfileConnectedAccount[];
   availableProviders: UserProfileConnectionProvider[];
-  pendingId: string | undefined;
+  isDisabled: boolean;
   onConnect: (id: string) => void;
   onReconnect: (id: string) => void;
   sectionRef: Ref<HTMLDivElement>;
@@ -81,10 +81,12 @@ export function useUserProfileConnectedAccountsController({
     accounts: accounts.map(account =>
       actions.errorKey === account.id ? { ...account, reconnectError: actions.error } : account,
     ),
-    availableProviders: availableProviders.map(provider =>
-      actions.errorKey === provider.id ? { ...provider, connectError: actions.error } : provider,
-    ),
-    pendingId: actions.pendingKey,
+    availableProviders: availableProviders.map(provider => ({
+      ...provider,
+      isPending: actions.pendingKey === provider.id,
+      connectError: actions.errorKey === provider.id ? actions.error : undefined,
+    })),
+    isDisabled: actions.isPending || remove.isPending,
     onConnect: id => run(id, onConnect),
     onReconnect: id => run(id, onReconnect),
     sectionRef,
