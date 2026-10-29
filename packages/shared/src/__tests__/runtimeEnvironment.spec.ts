@@ -100,11 +100,14 @@ describe('isClerkAgentRulesWriteAllowed', () => {
     expect(isClerkAgentRulesWriteAllowed()).toBe(false);
   });
 
-  it.each(['false', 'FALSE', '0', 'off', 'no'])('blocks writes when CLERK_AGENTS_MD is %s', value => {
-    vi.stubEnv('CLERK_AGENTS_MD', value);
+  it.each(['false', 'FALSE', '0', 'off', 'no', ' false', 'false '])(
+    'blocks writes when CLERK_AGENTS_MD is %s',
+    value => {
+      vi.stubEnv('CLERK_AGENTS_MD', value);
 
-    expect(isClerkAgentRulesWriteAllowed()).toBe(false);
-  });
+      expect(isClerkAgentRulesWriteAllowed()).toBe(false);
+    },
+  );
 
   it('allows writes when CLERK_AGENTS_MD is unset', () => {
     vi.stubEnv('CLERK_AGENTS_MD', undefined);

@@ -63,7 +63,7 @@ export const isAutomatedEnvironment = (): boolean => {
 };
 
 export const isClerkAgentRulesWriteAllowed = (): boolean => {
-  const optOut = (getEnvVariable('CLERK_AGENTS_MD') || '').toLowerCase();
+  const optOut = (getEnvVariable('CLERK_AGENTS_MD') || '').trim().toLowerCase();
   return (
     !['0', 'false', 'off', 'no'].includes(optOut) &&
     !isProductionEnvironment() &&
