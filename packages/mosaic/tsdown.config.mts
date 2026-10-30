@@ -4,7 +4,7 @@ import { defineConfig } from 'tsdown';
 import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
 
 export default defineConfig({
-  entry: ['./src/index.ts'],
+  entry: ['./src/index.ts', './src/ui.ts'],
   outDir: './dist',
   format: ['esm'],
   dts: { sourcemap: true },

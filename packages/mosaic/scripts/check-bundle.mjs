@@ -4,9 +4,9 @@ import { resolve } from 'node:path';
 const distDir = resolve(import.meta.dirname, '../dist');
 const jsFiles = (await readdir(distDir)).filter(file => file.endsWith('.js'));
 const sources = await Promise.all(jsFiles.map(file => readFile(resolve(distDir, file), 'utf8')));
-const entry = await readFile(resolve(distDir, 'index.js'), 'utf8');
+const entries = await Promise.all(['index.js', 'ui.js'].map(file => readFile(resolve(distDir, file), 'utf8')));
 
-if (!entry.startsWith("'use client';") && !entry.startsWith('"use client";')) {
+if (!entries.every(entry => entry.startsWith("'use client';") || entry.startsWith('"use client";'))) {
   throw new Error("Published Mosaic JS is missing a top-level 'use client' boundary.");
 }
 
