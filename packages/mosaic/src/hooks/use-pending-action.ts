@@ -1,5 +1,5 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ErrorDescription } from '../localization';
 import { useErrorText } from '../localization';
@@ -11,7 +11,11 @@ export interface PendingActionOptions {
 }
 
 export interface PendingAction<TKey extends string> {
-  run: (key: TKey, action: () => Promise<unknown> | void, options?: PendingActionOptions) => Promise<boolean>;
+  run: (
+    key: TKey,
+    action: (signal: AbortSignal) => Promise<unknown> | void,
+    options?: PendingActionOptions,
+  ) => Promise<boolean>;
   pendingKey: TKey | undefined;
   lastKey: TKey | undefined;
   isPending: boolean;
@@ -28,7 +32,8 @@ interface PendingActionFailure<TKey extends string> {
 
 /**
  * Runs inline actions, such as row buttons, under one lock and tracks which key is pending, which key ran last, and which key last failed.
- * `run` resolves `true` on success and `false` on failure, ignores calls while any run is in flight, and clears the last error when it starts.
+ * `run` resolves `true` on success and `false` on failure or cancellation, ignores calls while a run owns the lock, and clears the last error when it starts.
+ * Unmount aborts the action signal; callers guard their own side effects and completion UI.
  */
 export function usePendingAction<TKey extends string = string>({
   errorFallback,
@@ -37,27 +42,42 @@ export function usePendingAction<TKey extends string = string>({
   const [pendingKey, setPendingKey] = useState<TKey>();
   const [lastKey, setLastKey] = useState<TKey>();
   const [failure, setFailure] = useState<PendingActionFailure<TKey>>();
-  const running = useRef(false);
+  const running = useRef<AbortController>();
 
-  const run = async (key: TKey, action: () => Promise<unknown> | void, options: PendingActionOptions = {}) => {
+  useEffect(
+    () => () => {
+      running.current?.abort();
+      running.current = undefined;
+    },
+    [],
+  );
+
+  const run = async (
+    key: TKey,
+    action: (signal: AbortSignal) => Promise<unknown> | void,
+    options: PendingActionOptions = {},
+  ) => {
     if (running.current) {
       return false;
     }
-    running.current = true;
+    const controller = new AbortController();
+    running.current = controller;
     setPendingKey(key);
     setLastKey(key);
     setFailure(undefined);
     try {
-      await action();
-      return true;
+      await action(controller.signal);
+      return !controller.signal.aborted;
     } catch (cause) {
-      if (!isReverificationCancelledError(cause)) {
+      if (!controller.signal.aborted && !isReverificationCancelledError(cause)) {
         setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
       }
       return false;
     } finally {
-      running.current = false;
-      setPendingKey(undefined);
+      if (running.current === controller) {
+        running.current = undefined;
+        setPendingKey(undefined);
+      }
     }
   };
 

@@ -62,8 +62,9 @@ export type UserProfileWeb3WalletsModel =
         strategy: Web3Strategy,
         walletName?: string,
         onTarget?: (target: Web3ConnectionTarget) => void,
+        signal?: AbortSignal,
       ) => Promise<void>;
-      verify: (walletId: string, walletName?: string) => Promise<void>;
+      verify: (walletId: string, walletName?: string, signal?: AbortSignal) => Promise<void>;
       setPrimary: (walletId: string) => Promise<void>;
       remove?: (walletId: string) => Promise<void>;
       removeReverification: ReverificationController;
