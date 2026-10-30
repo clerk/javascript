@@ -125,6 +125,55 @@ describe('the user profile phone section', () => {
     expect(screen.getByText('+49')).toBeInTheDocument();
   });
 
+  it('holds the phone entry step until the first code is sent', async () => {
+    const { actor, fapi } = await renderSection();
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      expect(screen.getByRole('textbox', { name: 'Phone' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Send code' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('button', { name: 'Send code' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Verification code' })).toBeNull();
+      await actor.keyboard('{Escape}{Enter}');
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      expect(prepare.requests).toHaveLength(1);
+      expect(fapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+    } finally {
+      prepare.release();
+    }
+
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
+  it('recovers from a failed first code without creating the phone again', async () => {
+    const { actor, fapi } = await renderSection();
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    } finally {
+      prepare.release();
+    }
+
+    expect(await screen.findByText('Unable to send a code.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    const retryFapi = serveFapi(fapi);
+    await actor.click(screen.getByRole('button', { name: 'Resend' }));
+    expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(retryFapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
   it('keeps the dialog open and says the code was wrong', async () => {
     const { actor } = await renderSection();
 
