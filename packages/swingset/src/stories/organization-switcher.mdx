@@ -33,9 +33,9 @@ import { OrganizationSwitcher } from '@clerk/mosaic';
 
 The avatar and name of the active organization. Where none is active, the account leads instead.
 
-`renderTriggerLabel={false}` leaves the avatar alone.
+`showTriggerLabel={false}` leaves the avatar alone.
 
-`renderTriggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. See the [UserButton trigger example](./user-button#trigger).
+`triggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. See the [UserButton trigger example](./user-button#trigger).
 
 <Story
   name='IconTrigger'

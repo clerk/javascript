@@ -42,7 +42,8 @@
     "dist",
     "!dist/**/*.d.ts.map",
     "!dist/**/*.d.mts.map",
-    "styles.css.d.ts"
+    "styles.css.d.ts",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "pnpm build:js && pnpm build:css && pnpm check:bundle && pnpm typecheck",

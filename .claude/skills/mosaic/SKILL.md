@@ -76,6 +76,28 @@ The migration workflow (`packages/mosaic/docs/migration.md`) ties the flow refer
 treats the legacy component as the spec and drives you through the model,
 controller, and view layers, then verifies parity with `parity-audit.md`.
 
+## Breaking changes
+
+While `@clerk/mosaic` is on 0.x, a breaking change is a `minor` changeset. Start
+its body with `**Breaking:**`, then give an old-to-new table and a search that
+finds affected usage, so an agent can migrate from the changelog alone. The
+changelog ships in the npm package at
+`node_modules/@clerk/mosaic/CHANGELOG.md`.
+
+```md
+---
+'@clerk/mosaic': minor
+---
+
+**Breaking:** Rename a `UserButton` prop. Values and defaults are unchanged; TypeScript flags the old name.
+
+| Before               | After              |
+| -------------------- | ------------------ |
+| `renderTriggerLabel` | `showTriggerLabel` |
+
+Find usages with `git grep -n renderTriggerLabel`.
+```
+
 ## Documenting a component in swingset
 
 `packages/swingset/CLAUDE.md` is the house style — archetypes, required section

@@ -271,7 +271,7 @@ wrapper resolves the model, hands it to the controller, and branches on `status`
 
 ```tsx
 export function UserButton(props: UserButtonProps = {}) {
-  const { renderTriggerLabel, mode, fallback, ...options } = props;
+  const { showTriggerLabel, mode, fallback, ...options } = props;
   const model = useUserButtonModel(options);
   const controller = useUserButtonController(model, { mode });
 
@@ -287,7 +287,7 @@ export function UserButton(props: UserButtonProps = {}) {
   return (
     <UserButtonView
       {...viewController}
-      renderTriggerLabel={renderTriggerLabel}
+      showTriggerLabel={showTriggerLabel}
     />
   );
 }
