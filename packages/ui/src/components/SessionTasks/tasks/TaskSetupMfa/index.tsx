@@ -50,11 +50,11 @@ const TaskSetupMFAInternal = () => {
     defaultStep: secondFactorsAvailableToAdd.length > 1 ? WIZARD_STEPS.start : defaultStep,
   });
   const { redirectUrlComplete } = useTaskSetupMFAContext();
-  const { navigateOnSetActive, redirectOnActiveSession } = useSessionTasksContext();
+  const { navigateOnSetActive, redirectOnActiveSessionRef } = useSessionTasksContext();
 
   const handleSuccess = async () => {
-    if (redirectOnActiveSession) {
-      redirectOnActiveSession.current = false;
+    if (redirectOnActiveSessionRef) {
+      redirectOnActiveSessionRef.current = false;
     }
     await clerk.setActive({
       session: session?.id,
@@ -68,10 +68,10 @@ const TaskSetupMFAInternal = () => {
   // This needed because we want the user to explicitly click the to go the the next page because they
   // need to see the backups codes.
   useEffect(() => {
-    if (redirectOnActiveSession) {
-      redirectOnActiveSession.current = false;
+    if (redirectOnActiveSessionRef) {
+      redirectOnActiveSessionRef.current = false;
     }
-  }, [redirectOnActiveSession]);
+  }, [redirectOnActiveSessionRef]);
 
   return (
     <Flow.Root flow='taskSetupMfa'>

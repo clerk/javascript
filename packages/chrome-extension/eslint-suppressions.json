@@ -1,0 +1,7 @@
+{
+  "src/react/ClerkProvider.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  }
+}

@@ -73,6 +73,8 @@ function ComboboxInner(props: ComboboxProps) {
     ),
   );
 
+  const highlightFirstRef = useRef(false);
+
   const setOpen = useCallback(
     (nextOpen: boolean) => {
       if (!nextOpen) {
@@ -107,7 +109,6 @@ function ComboboxInner(props: ComboboxProps) {
   const popupRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
-  const highlightFirstRef = useRef(false);
   const registerOption = useCallback((index: number) => {
     if (index === 0 && highlightFirstRef.current) {
       highlightFirstRef.current = false;

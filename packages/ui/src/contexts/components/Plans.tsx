@@ -341,6 +341,8 @@ export const usePlansContext = () => {
     [clerk, subscriberType, revalidateAll],
   );
 
+  const sessionId = session?.id;
+
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
     ({
@@ -369,8 +371,8 @@ export const usePlansContext = () => {
           onSubscriptionComplete?.();
         },
         onClose: () => {
-          if (session?.id) {
-            void clerk.setActive({ session: session.id });
+          if (sessionId) {
+            void clerk.setActive({ session: sessionId });
           }
         },
         appearance,
@@ -378,7 +380,7 @@ export const usePlansContext = () => {
         newSubscriptionRedirectUrl,
       });
     },
-    [clerk, revalidateAll, subscriberType, session?.id],
+    [clerk, revalidateAll, subscriberType, sessionId],
   );
 
   const defaultFreePlan = useMemo(() => {
