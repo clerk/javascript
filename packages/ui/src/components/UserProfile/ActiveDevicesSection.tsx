@@ -93,8 +93,8 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
 const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
   const { session } = useSession();
   const isCurrent = session?.id === props.session.id;
-  const isCurrentlyImpersonating = !!session?.actor;
-  const isImpersonationSession = !!props.session.actor;
+  const isCurrentlyImpersonating = !!session?.actor && !session.agent;
+  const isImpersonationSession = !!props.session.actor && props.session.actor.type !== 'agent';
   const { city, country, browserName, browserVersion, deviceType, ipAddress, isMobile } = props.session.latestActivity;
   const title = deviceType ? deviceType : isMobile ? 'Mobile device' : 'Desktop device';
   const browser = `${browserName || ''} ${browserVersion || ''}`.trim() || 'Web browser';
