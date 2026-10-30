@@ -34,7 +34,7 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         wallets={controller.wallets}
         sectionRef={controller.sectionRef}
         availableProviders={controller.availableProviders}
-        pendingId={controller.pendingId}
+        isDisabled={controller.isDisabled}
         error={controller.error}
         onConnect={id => {
           void controller.onConnect(id);

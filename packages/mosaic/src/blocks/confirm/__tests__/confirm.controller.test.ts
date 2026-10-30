@@ -91,6 +91,45 @@ describe('confirmMachine', () => {
 });
 
 describe('useConfirmController', () => {
+  it.each(['resolve', 'reject'])(
+    'keeps its completion pending after cancellation until the action can %s',
+    async outcome => {
+      const pending = deferred<void>();
+      const { result } = renderHook(() =>
+        useConfirmController({
+          onConfirm: () => pending.promise,
+          reverification: { status: 'loading', visible: true, onCancel: vi.fn() },
+        }),
+      );
+      const completed = vi.fn();
+      act(() => result.current.onOpenChange(true));
+      let completion: ReturnType<typeof result.current.confirm> | undefined;
+      act(() => {
+        completion = result.current.confirm();
+      });
+      expect(completion).toBeInstanceOf(Promise);
+      void completion?.then(completed);
+      act(() => result.current.onOpenChange(false));
+      await act(async () => {
+        await Promise.resolve();
+      });
+      expect(result.current.isOpen).toBe(false);
+      expect(completed).not.toHaveBeenCalled();
+
+      await act(async () => {
+        if (outcome === 'reject') {
+          pending.reject(cancelled);
+        } else {
+          pending.resolve();
+        }
+        await completion;
+      });
+
+      expect(completed).toHaveBeenCalledWith(outcome === 'resolve');
+      expect(result.current.errorMessage).toBeUndefined();
+    },
+  );
+
   it('ignores open while no block is mounted on the controller, and keeps one handle across renders', () => {
     const { result, rerender } = renderHook(() => useConfirmController({ onConfirm: () => Promise.resolve() }));
     const { handle } = result.current;
@@ -107,17 +146,23 @@ describe('useConfirmController', () => {
     const onConfirm = vi.fn(() => pending.promise);
     const { result } = renderHook(() => useConfirmController({ onConfirm }));
 
-    act(() => result.current.confirm());
+    await act(async () => expect(await result.current.confirm()).toBe(false));
     expect(onConfirm).not.toHaveBeenCalled();
 
     act(() => result.current.onOpenChange(true));
-    act(() => result.current.confirm());
-    act(() => result.current.confirm());
+    const confirm = result.current.confirm;
+    let completion: ReturnType<typeof confirm> | undefined;
+    let duplicate: ReturnType<typeof confirm> | undefined;
+    act(() => {
+      completion = confirm();
+      duplicate = confirm();
+    });
     expect(onConfirm).toHaveBeenCalledOnce();
+    expect(await duplicate).toBe(false);
 
     await act(async () => {
       pending.resolve();
-      await pending.promise;
+      expect(await completion).toBe(true);
     });
     await waitFor(() => expect(result.current.isOpen).toBe(false));
   });

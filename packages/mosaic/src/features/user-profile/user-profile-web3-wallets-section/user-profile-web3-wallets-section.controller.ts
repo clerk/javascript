@@ -5,6 +5,7 @@ import { usePanelTitle } from '../../../components/panel';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import { applyOrder } from '../../../utils/apply-order';
 import type {
   ReadyWeb3WalletsModel,
   UserProfileWeb3Provider,
@@ -23,7 +24,7 @@ type WalletAction =
   | { kind: 'verify' | 'primary'; walletId: string };
 
 export function useUserProfileWeb3WalletsController({
-  wallets,
+  wallets: modelWallets,
   availableProviders,
   connect,
   verify,
@@ -45,6 +46,8 @@ export function useUserProfileWeb3WalletsController({
   | 'createReverification'
 >) {
   const messages = useMessages('userProfileWeb3Wallets');
+  const [order] = useState(() => modelWallets.map(wallet => wallet.id));
+  const wallets = applyOrder(order, modelWallets, wallet => wallet.id);
   const action = usePendingAction({ errorFallback: messages.errors.generic });
   const [picker, setPicker] = useState<SolanaPicker>({ open: false });
   const [owner, setOwner] = useState<WalletAction>();
@@ -58,7 +61,6 @@ export function useUserProfileWeb3WalletsController({
       sectionRef.current ??
       panelTitle(),
   });
-  // TODO: Share the action lock during removal while preserving errors for the confirmation dialog.
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
     onConfirm: wallet => removalFocus.remove(wallet.id),
     reverification: removeReverification,
@@ -150,18 +152,26 @@ export function useUserProfileWeb3WalletsController({
   const actionFinalFocus = () => (ownerId ? removalFocus.trigger(ownerId) : null);
 
   return {
-    wallets: wallets.map(wallet =>
-      errorId === wallet.id
+    wallets: wallets.map(wallet => {
+      const isPending = pendingId === wallet.id;
+      const row = {
+        ...wallet,
+        isPending,
+        isPrimaryPending: isPending && owner?.kind === 'primary' && !setPrimaryReverification.visible,
+      };
+      return errorId === wallet.id
         ? owner?.kind === 'primary'
-          ? { ...wallet, primaryError: action.error }
-          : { ...wallet, verifyError: action.error }
-        : wallet,
-    ),
-    availableProviders: availableProviders.map(provider =>
-      errorId === provider.id && (!picker.open || picker.kind !== 'connect' || picker.provider.id !== provider.id)
-        ? { ...provider, connectError: action.error }
-        : provider,
-    ),
+          ? { ...row, primaryError: action.error }
+          : { ...row, verifyError: action.error }
+        : row;
+    }),
+    availableProviders: availableProviders.map(provider => {
+      const row = { ...provider, isPending: pendingId === provider.id };
+      return errorId === provider.id &&
+        (!picker.open || picker.kind !== 'connect' || picker.provider.id !== provider.id)
+        ? { ...row, connectError: action.error }
+        : row;
+    }),
     error:
       !picker.open &&
       errorId &&
@@ -169,10 +179,10 @@ export function useUserProfileWeb3WalletsController({
       !availableProviders.some(provider => provider.id === errorId)
         ? action.error
         : undefined,
-    pendingId,
+    isDisabled: action.isPending,
     sectionRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: remove ? removeWallet : undefined,
+    remove: remove ? action.guard(removeWallet) : undefined,
     finalFocus: removalFocus.finalFocus,
     setPrimaryReverification,
     createReverification,

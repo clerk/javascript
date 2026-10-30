@@ -10,7 +10,7 @@ export function UserProfileWeb3WalletsSectionView({
   wallets,
   sectionRef,
   availableProviders = [],
-  pendingId,
+  isDisabled = false,
   error,
   onConnect,
   onVerify,
@@ -25,7 +25,6 @@ export function UserProfileWeb3WalletsSectionView({
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect)) || Boolean(error);
-  const isBusy = pendingId !== undefined;
 
   return (
     <>
@@ -46,8 +45,7 @@ export function UserProfileWeb3WalletsSectionView({
                   key={wallet.id}
                   wallet={wallet}
                   triggerRef={registerTrigger(wallet.id)}
-                  isPending={pendingId === wallet.id}
-                  isDisabled={isBusy}
+                  isDisabled={isDisabled}
                   onVerify={onVerify}
                   onSetPrimary={onSetPrimary}
                   onRemove={remove ? wallet => remove.open(wallet) : undefined}
@@ -59,8 +57,7 @@ export function UserProfileWeb3WalletsSectionView({
                       key={provider.id}
                       wallet={provider}
                       triggerRef={registerTrigger(provider.id)}
-                      isPending={pendingId === provider.id}
-                      isDisabled={isBusy}
+                      isDisabled={isDisabled}
                       onConnect={onConnect}
                     />
                   ))

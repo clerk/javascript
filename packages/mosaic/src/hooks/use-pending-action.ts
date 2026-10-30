@@ -10,8 +10,15 @@ export interface PendingActionOptions {
   errorFallback?: string;
 }
 
+export interface PendingConfirm<TPayload> {
+  confirm: (payload: TPayload) => Promise<boolean>;
+}
+
 export interface PendingAction<TKey extends string> {
   run: (key: TKey, action: () => Promise<unknown> | void, options?: PendingActionOptions) => Promise<boolean>;
+  guard: <TPayload, TConfirm extends PendingConfirm<TPayload>>(
+    confirm: TConfirm & PendingConfirm<TPayload>,
+  ) => TConfirm;
   pendingKey: TKey | undefined;
   lastKey: TKey | undefined;
   isPending: boolean;
@@ -26,46 +33,64 @@ interface PendingActionFailure<TKey extends string> {
   errorFallback: string | undefined;
 }
 
+type Pending<TKey> = { kind: 'inline'; key: TKey } | { kind: 'external' };
+
 /**
- * Runs inline actions, such as row buttons, under one lock and tracks which key is pending, which key ran last, and which key last failed.
- * `run` resolves `true` on success and `false` on failure, ignores calls while any run is in flight, and clears the last error when it starts.
+ * Runs inline actions and guarded confirmations under one lock and tracks which inline key is pending, ran last, or last failed.
+ * `run` resolves `true` on success and `false` on failure, ignores calls while any action is in flight, and clears the last error when any action starts.
  */
 export function usePendingAction<TKey extends string = string>({
   errorFallback,
 }: PendingActionOptions = {}): PendingAction<TKey> {
   const errorText = useErrorText();
-  const [pendingKey, setPendingKey] = useState<TKey>();
+  const running = useRef(false);
+  const [pending, setPending] = useState<Pending<TKey>>();
   const [lastKey, setLastKey] = useState<TKey>();
   const [failure, setFailure] = useState<PendingActionFailure<TKey>>();
-  const running = useRef(false);
 
-  const run = async (key: TKey, action: () => Promise<unknown> | void, options: PendingActionOptions = {}) => {
+  const claim = <T>(next: Pending<TKey>, action: () => T | Promise<T>): Promise<T> | undefined => {
     if (running.current) {
-      return false;
+      return undefined;
     }
     running.current = true;
-    setPendingKey(key);
-    setLastKey(key);
+    setPending(next);
     setFailure(undefined);
-    try {
-      await action();
-      return true;
-    } catch (cause) {
-      if (!isReverificationCancelledError(cause)) {
-        setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
+    return (async () => {
+      try {
+        return await action();
+      } finally {
+        running.current = false;
+        setPending(undefined);
       }
-      return false;
-    } finally {
-      running.current = false;
-      setPendingKey(undefined);
-    }
+    })();
+  };
+
+  const run = async (key: TKey, action: () => Promise<unknown> | void, options: PendingActionOptions = {}) => {
+    return (
+      claim({ kind: 'inline', key }, async () => {
+        setLastKey(key);
+        try {
+          await action();
+          return true;
+        } catch (cause) {
+          if (!isReverificationCancelledError(cause)) {
+            setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
+          }
+          return false;
+        }
+      }) ?? false
+    );
   };
 
   return {
     run,
-    pendingKey,
+    guard: confirm => ({
+      ...confirm,
+      confirm: async payload => (await claim({ kind: 'external' }, () => confirm.confirm(payload))) ?? false,
+    }),
+    pendingKey: pending?.kind === 'inline' ? pending.key : undefined,
     lastKey,
-    isPending: pendingKey !== undefined,
+    isPending: pending !== undefined,
     error: failure ? errorText(failure.error, failure.errorFallback ?? errorFallback) : undefined,
     errorKey: failure?.key,
     reset: () => setFailure(undefined),

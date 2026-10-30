@@ -84,7 +84,7 @@ export function useUserProfileActiveDevicesController({
     registerTrigger: removalFocus.registerTrigger,
     finalFocus: removalFocus.finalFocus,
     details,
-    signOutFromDetails: revoke ? device => details.confirm(device) : undefined,
+    signOutFromDetails: revoke ? device => void details.confirm(device) : undefined,
     signOut: revoke ? signOut : undefined,
     signOutAll: revokeAll ? signOutAll : undefined,
     // Confirming removes the other devices and the trigger with them — hence the dialog mounted

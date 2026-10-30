@@ -464,7 +464,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByText('Primary')).toBeInTheDocument());
   });
 
-  it('sets a verified wallet as primary through Clerk', async () => {
+  it('holds the wallet menu while setting primary and updates the badge in place', async () => {
     const fapi = await renderWeb3({
       web3_wallets: [
         fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' }),
@@ -475,13 +475,32 @@ describe('Web3 wallets', () => {
     const user = userEvent.setup();
 
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })).toHaveLength(2));
+    expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })[1].closest('.cl-section-row')).toContainElement(
+      screen.getByTitle('0xabcdef1234567890'),
+    );
     await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
     expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
     await user.keyboard('{Escape}');
     await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[1]);
-    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    const primary = holdRequests('post', '/v1/me');
+    try {
+      await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+      await waitFor(() => expect(primary.requests).toHaveLength(1));
+      const menu = screen.getByRole('menu');
+      const item = within(menu).getByRole('menuitem', { name: 'Set as primary' });
+      expect(item).toHaveAttribute('aria-busy', 'true');
+      expect(within(menu).getByRole('menuitem', { name: 'Remove wallet' })).toHaveAttribute('aria-disabled', 'true');
+      expect(await within(item).findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeDisabled();
+    } finally {
+      primary.release();
+    }
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })[1].closest('.cl-section-row')).toContainElement(
+      screen.getByTitle('0xabcdef1234567890'),
+    );
     const selectedRow = screen.getByTitle('0xabcdef1234567890').closest<HTMLElement>('.cl-section-row');
     expect(selectedRow).not.toBeNull();
     if (selectedRow) {
@@ -582,6 +601,7 @@ describe('Web3 wallets', () => {
     await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu', { hidden: true })).toBeNull());
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await user.keyboard('hunter2{Enter}');
 
@@ -604,6 +624,7 @@ describe('Web3 wallets', () => {
     expect(screen.queryByRole('alert')).toBeNull();
     await waitFor(() => expect(secondManage()).toHaveFocus());
 
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
     await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
