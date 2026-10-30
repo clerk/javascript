@@ -49,4 +49,5 @@ relevant.
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `clerk-monorepo`    | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.                       |
 | `mosaic`            | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification).            |
+| `studio`            | The dev-only swingset video stage: authoring showcases, framing popover components by their expanded state, and the stage's grid and motion.       |
 | `verify-clerk-expo` | Proving a `@clerk/expo` change on an iOS simulator or Android emulator, local or borrowed on a CI runner, with a video or screenshots as evidence. |

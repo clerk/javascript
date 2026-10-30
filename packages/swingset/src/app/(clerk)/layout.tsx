@@ -2,6 +2,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { SwingsetDocument, swingsetMetadata } from '@/components/SwingsetDocument';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
@@ -37,7 +38,7 @@ function LiveChrome({ children, userButton }: { children: ReactNode; userButton?
   );
 }
 
-export default function ClerkLayout({ children }: { children: ReactNode }) {
+function ClerkContent({ children }: { children: ReactNode }) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
@@ -72,5 +73,15 @@ export default function ClerkLayout({ children }: { children: ReactNode }) {
     >
       <LiveChrome userButton={<LiveUserButton />}>{children}</LiveChrome>
     </ClerkProvider>
+  );
+}
+
+export const metadata = swingsetMetadata;
+
+export default function ClerkLayout({ children }: { children: ReactNode }) {
+  return (
+    <SwingsetDocument>
+      <ClerkContent>{children}</ClerkContent>
+    </SwingsetDocument>
   );
 }
