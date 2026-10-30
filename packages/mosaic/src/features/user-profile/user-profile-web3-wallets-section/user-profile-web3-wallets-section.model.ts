@@ -109,7 +109,7 @@ function walletUnavailable() {
 function rethrowProviderError(cause: unknown): never {
   if (typeof cause === 'object' && cause !== null && 'code' in cause) {
     if (cause.code === 4001) {
-      throw new DOMException('Wallet request rejected', 'AbortError');
+      throw new ClerkRuntimeError('Wallet connection was cancelled.', { code: 'web3_connection_cancelled' });
     }
     if (cause.code === -32002) {
       throw new ClerkRuntimeError('A wallet request is already pending.', { code: 'web3_request_pending' });
