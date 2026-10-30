@@ -22,6 +22,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Test a feature                            | [Testing](docs/testing.md)                                                        |
 | Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
 | Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
+| Prove a change in a browser               | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                            |
 
 ## Layers in one paragraph
 
