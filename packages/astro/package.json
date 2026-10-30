@@ -78,7 +78,7 @@
   ],
   "scripts": {
     "build": "tsdown --onSuccess \"pnpm build:dts\" && pnpm copy:components",
-    "build:dts": "tsc --emitDeclarationOnly --declaration",
+    "build:dts": "tsc -p tsconfig.declarations.json",
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
