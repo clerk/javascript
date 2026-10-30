@@ -25,6 +25,7 @@ type ReverificationViewFields = {
   value: string;
   onValueChange: (value: string) => void;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: () => void;
   onShowMethods: () => void;
