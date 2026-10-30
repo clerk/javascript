@@ -20,6 +20,7 @@ import {
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { PortalProvider } from '../../../primitives/portal';
+import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
 
@@ -67,9 +68,9 @@ function tree(props: UserButtonProps = {}) {
   );
 }
 
-function renderUserButton(props: UserButtonProps = {}, seed: FakeFapiSeed = signedIn()) {
+function renderUserButton(props: UserButtonProps = {}, seed: FakeFapiSeed = signedIn(), profile?: MosaicProfile) {
   const fapi = serveFapi(seed);
-  return renderWithClerk(tree(props)).then(view => ({ ...view, fapi }));
+  return renderWithClerk(tree(props), undefined, undefined, undefined, profile).then(view => ({ ...view, fapi }));
 }
 
 type User = ReturnType<typeof userEvent.setup>;
@@ -268,7 +269,7 @@ describe('UserButton', () => {
     });
 
     it('lists no organizations on an account-only surface', async () => {
-      await renderUserButton({ mode: 'user' });
+      await renderUserButton({ combined: false });
       const user = await open();
 
       const menu = await openAccounts(user);
@@ -501,7 +502,7 @@ describe('UserButton', () => {
     });
 
     it('renders a custom page into the element the opened profile hands back', async () => {
-      const { clerk } = await renderUserButton({
+      const { clerk } = await renderUserButton({}, undefined, {
         userProfileProps: { customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }] },
       });
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
@@ -524,7 +525,7 @@ describe('UserButton', () => {
     });
 
     it('opens the profile with its pages in the order it was given', async () => {
-      const { clerk } = await renderUserButton({
+      const { clerk } = await renderUserButton({}, undefined, {
         userProfileProps: {
           customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }],
           pageOrder: ['account', 'terms'],
@@ -544,10 +545,9 @@ describe('UserButton', () => {
       { features: {}, pages: ['Terms', 'account', 'security'] },
       { features: { billing: true, apiKeys: true }, pages: ['Terms', 'account', 'security', 'billing', 'apiKeys'] },
     ])('orders the UserProfile pages the instance turns on: $features', async ({ features, pages }) => {
-      const { clerk } = await renderUserButton(
-        { userProfileProps: { customPages: [terms], pageOrder: ['terms'] } },
-        signedIn({ environment: instanceWith(features) }),
-      );
+      const { clerk } = await renderUserButton({}, signedIn({ environment: instanceWith(features) }), {
+        userProfileProps: { customPages: [terms], pageOrder: ['terms'] },
+      });
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
@@ -587,7 +587,7 @@ describe('UserButton', () => {
         const selfServe = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3, ...organization });
         const memberships = [fapiMembership(selfServe, { permissions: ['org:sys_memberships:manage'] })];
         const { clerk } = await renderUserButton(
-          { organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] } },
+          {},
           signedIn({
             environment: instanceWith(features),
             client: fapiClient([
@@ -599,6 +599,7 @@ describe('UserButton', () => {
             ]),
             memberships,
           }),
+          { organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] } },
         );
         const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
         const user = await open();
@@ -904,7 +905,7 @@ describe('UserButton', () => {
 
   describe('in user mode', () => {
     it('heads the surface with the account, never the active organization', async () => {
-      await renderUserButton({ mode: 'user' });
+      await renderUserButton({ combined: false });
       await open();
 
       expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
@@ -915,7 +916,7 @@ describe('UserButton', () => {
     it('drops the identifier line when it would only repeat the name', async () => {
       const nameless = fapiUser({ ...alice, first_name: null, last_name: null });
       await renderUserButton(
-        { mode: 'user' },
+        { combined: false },
         signedIn({ client: fapiClient([fapiSession({ ...aliceSession, user: nameless }), bobSession]) }),
       );
       await open();
@@ -924,7 +925,7 @@ describe('UserButton', () => {
     });
 
     it('lists no organizations and offers no way to make one', async () => {
-      await renderUserButton({ mode: 'user' });
+      await renderUserButton({ combined: false });
       await open();
 
       expect(screen.queryByText('Personal account')).toBeNull();
@@ -933,7 +934,7 @@ describe('UserButton', () => {
     });
 
     it('manages the account from its settings row, and signs out at the foot', async () => {
-      const { clerk } = await renderUserButton({ mode: 'user' });
+      const { clerk } = await renderUserButton({ combined: false });
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
@@ -949,7 +950,7 @@ describe('UserButton', () => {
     });
 
     it('lists every account in the flyout, then the way to add one, then signing out of them all', async () => {
-      await renderUserButton({ mode: 'user' });
+      await renderUserButton({ combined: false });
       const user = await open();
 
       const items = within(await openAccounts(user)).getAllByRole('menuitem');
@@ -1081,7 +1082,7 @@ describe('UserButton', () => {
       ['username', { first_name: null, last_name: null }, 'alice'],
       ['email address', { first_name: null, last_name: null, username: null }, 'alice@example.com'],
     ])('names it by its %s', async (_source, overrides, name) => {
-      await renderUserButton({ mode: 'user' }, signedInAs(overrides));
+      await renderUserButton({ combined: false }, signedInAs(overrides));
 
       expect(trigger()).toHaveAccessibleName(`Open account menu for ${name}`);
     });
@@ -1342,8 +1343,8 @@ describe('UserButton', () => {
 
   describe('the trigger', () => {
     it.each([
-      [{ mode: 'combined' as const }, 'Acme'],
-      [{ mode: 'user' as const }, 'Alice Smith'],
+      [{ combined: true }, 'Acme'],
+      [{ combined: false }, 'Alice Smith'],
     ])('with %o names %s beside the avatar', async (props, name) => {
       await renderUserButton(props);
 
@@ -1384,7 +1385,7 @@ describe('UserButton', () => {
     });
 
     it('keeps the condensed trigger in user mode', async () => {
-      await renderUserButton({ mode: 'user', triggerVariant: 'full' });
+      await renderUserButton({ combined: false, triggerVariant: 'full' });
 
       expect(trigger()).toHaveAttribute('data-variant', 'condensed');
     });
@@ -1398,19 +1399,22 @@ describe('UserButton', () => {
     });
 
     it('names no organization beneath the account in user mode', async () => {
-      await renderUserButton({ mode: 'user' });
+      await renderUserButton({ combined: false });
 
       expect(within(trigger()).queryByText('Acme')).toBeNull();
     });
 
     it('still names the account in user mode where personal is hidden and none is active', async () => {
-      await renderUserButton({ mode: 'user', hidePersonal: true }, signedIn({ client: fapiClient([personalSession]) }));
+      await renderUserButton(
+        { combined: false, hidePersonal: true },
+        signedIn({ client: fapiClient([personalSession]) }),
+      );
 
       expect(within(trigger()).getByText('Alice Smith')).toBeInTheDocument();
     });
 
     it('renders the avatar alone when the label is off', async () => {
-      await renderUserButton({ mode: 'user', showTriggerLabel: false });
+      await renderUserButton({ combined: false, showTriggerLabel: false });
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
@@ -1433,17 +1437,17 @@ describe('UserButton', () => {
 
 describe('UserButton custom trigger badges', () => {
   it.each([
-    { mode: 'combined' as const, seed: signedIn(), badge: 'organization:org_1', name: 'Acme' },
-    { mode: 'user' as const, seed: signedIn(), badge: 'user:user_1', name: 'Alice Smith' },
+    { combined: true, seed: signedIn(), badge: 'organization:org_1', name: 'Acme' },
+    { combined: false, seed: signedIn(), badge: 'user:user_1', name: 'Alice Smith' },
     {
-      mode: 'combined' as const,
+      combined: true,
       seed: signedIn({ client: fapiClient([personalSession]) }),
       badge: 'user:user_1',
       name: 'Alice Smith',
     },
-  ])('shows a badge for the displayed identity as $badge', async ({ mode, seed, badge, name }) => {
+  ])('shows a badge for the displayed identity as $badge', async ({ combined, seed, badge, name }) => {
     await renderUserButton(
-      { mode, triggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      { combined, triggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
       seed,
     );
 

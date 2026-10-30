@@ -3,7 +3,7 @@ import type { UserProfileProps } from './user-profile';
 
 export interface UserProfileModalOptions extends Pick<
   UserProfileProps,
-  'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'mode' | 'organizationProfileProps'
+  'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'combined' | 'organizationProfileProps'
 > {
   page?: UserProfileProps['defaultPage'];
 }

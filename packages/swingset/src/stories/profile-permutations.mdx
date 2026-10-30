@@ -2,30 +2,37 @@ import * as Stories from './profile-permutations.stories';
 
 # Profile permutations
 
-Exploration page: every pairing of switchers and profile shape, running on fixtures. Each example shares
-one account and organization across its triggers, so switching in one updates the other and the profile.
+Every pairing of switchers and profile shape, running on fixtures. Each example shares one account and
+organization across its triggers, so switching in one updates the other and the profile.
 
-Today `mode` on `UserButton` sets both the menu and the profile. `OrganizationSwitcher` always opens the
-standalone organization profile.
+`combined` defaults to `true` in two places: on `UserButton` it decides what the menu lists, and on
+`MosaicProvider`'s `profile` it decides what the profile shows. `UserProfile` follows the provider unless
+it sets `combined` itself. Custom pages and page order go on the provider too:
 
-The snippets show the proposed API, which is not implemented. `combined` defaults to `true` in two places:
-on `UserButton` it decides what the menu lists, and on `MosaicProvider`'s `profile` it decides what the
-profile shows.
+```tsx
+<MosaicProvider
+  profile={{
+    combined: true,
+    userProfileProps: { customPages },
+    organizationProfileProps: { pageOrder },
+  }}
+>
+  <OrganizationSwitcher />
+  <UserButton combined={false} />
+</MosaicProvider>
+```
 
-| #   | Switchers                                      | Profile  | With the modal today                          | Proposed config        |
-| --- | ---------------------------------------------- | -------- | --------------------------------------------- | ---------------------- |
-| 1   | `UserButton` combined                          | Combined | Yes (the default)                             | None                   |
-| 2   | `UserButton` combined                          | Separate | No                                            | Profile opt-out        |
-| 3   | `UserButton` user                              | Account  | Yes                                           | Menu + profile opt-out |
-| 4   | `UserButton` user                              | Combined | No                                            | Menu opt-out           |
-| 5   | `UserButton` user + `OrganizationSwitcher`     | Separate | Yes                                           | Menu + profile opt-out |
-| 6   | `UserButton` user + `OrganizationSwitcher`     | Combined | No                                            | Menu opt-out           |
-| 7   | `OrganizationSwitcher`                         | Org      | Yes                                           | Profile opt-out        |
-| 8   | `OrganizationSwitcher`                         | Combined | No                                            | None                   |
-| 9   | `UserButton` combined + `OrganizationSwitcher` | Combined | No: the switcher opens the standalone profile | None                   |
-
-The `No` rows can be approximated by routing with `userProfileUrl` and `organizationProfileUrl` to pages
-that mount `<UserProfile />`.
+| #   | Switchers                                      | Profile  | Config                 |
+| --- | ---------------------------------------------- | -------- | ---------------------- |
+| 1   | `UserButton` combined                          | Combined | None                   |
+| 2   | `UserButton` combined                          | Separate | Profile opt-out        |
+| 3   | `UserButton` user                              | Account  | Menu + profile opt-out |
+| 4   | `UserButton` user                              | Combined | Menu opt-out           |
+| 5   | `UserButton` user + `OrganizationSwitcher`     | Separate | Menu + profile opt-out |
+| 6   | `UserButton` user + `OrganizationSwitcher`     | Combined | Menu opt-out           |
+| 7   | `OrganizationSwitcher`                         | Org      | Profile opt-out        |
+| 8   | `OrganizationSwitcher`                         | Combined | None                   |
+| 9   | `UserButton` combined + `OrganizationSwitcher` | Combined | None                   |
 
 ## 1. Combined button, combined profile
 
