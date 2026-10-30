@@ -45,6 +45,9 @@ type Event =
 
 const { createMachine, assign } = setup<Context, Event>();
 
+const copied = { target: 'attempted', actions: assign(() => ({ copyFailed: false })) };
+const failed = { target: 'attempted', actions: assign(() => ({ copyFailed: true })) };
+
 const machine = createMachine({
   id: 'createAPIKey',
   initial: 'closed',
@@ -63,13 +66,10 @@ const machine = createMachine({
       on: { COPY: 'copying' },
     },
     copying: {
-      on: {
-        COPIED: { target: 'attempted', actions: assign(() => ({ copyFailed: false })) },
-        COPY_FAILED: { target: 'attempted', actions: assign(() => ({ copyFailed: true })) },
-      },
+      on: { COPIED: copied, COPY_FAILED: failed },
     },
     attempted: {
-      on: { COPY: 'copying', CLOSE: 'closed' },
+      on: { COPY: 'copying', COPIED: copied, COPY_FAILED: failed, CLOSE: 'closed' },
     },
   },
 });
