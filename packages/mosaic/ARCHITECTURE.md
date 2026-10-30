@@ -457,10 +457,8 @@ export function useUserProfileEditUsernameController({ username = '', required =
   const form = useForm({
     initialValues: { username },
     canSubmit: values => values.username !== username && (!required || values.username !== ''),
-    onSubmit: async values => {
-      await onSubmit(values.username);
-      setIsOpen(false);
-    },
+    onSubmit: values => onSubmit(values.username),
+    onSuccess: () => setIsOpen(false),
   });
 
   const onOpenChange = (open: boolean) => {

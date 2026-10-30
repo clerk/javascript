@@ -29,15 +29,20 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
   const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
 
-  const form = useForm<InviteMembersValues>({
+  const form = useForm<InviteMembersValues, boolean>({
     initialValues: { emailAddresses: [], role: initialRole },
     errorFallback: m.error,
     onSubmit: async ({ emailAddresses, role }) => {
       if (!invite || !roles || role === null) {
-        return;
+        return false;
       }
       await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
-      // TODO: Skip closing and the success toast when the panel unmounted or its identity changed during the invite or the list revalidation; useForm has no success hook that is dropped on unmount.
+      return true;
+    },
+    onSuccess: (invited, { emailAddresses }) => {
+      if (!invited) {
+        return;
+      }
       setOpen(false);
       toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
     },
