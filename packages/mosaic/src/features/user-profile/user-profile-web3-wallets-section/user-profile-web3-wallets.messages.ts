@@ -1,6 +1,8 @@
 export const userProfileWeb3WalletsMessages = {
   title: 'Web3 wallets',
   connect: 'Connect',
+  cancelConnection: 'Cancel connection',
+  cancel: 'Cancel',
   connectLabel: 'Connect {provider}',
   verify: 'Verify',
   verifying: 'Verifying',

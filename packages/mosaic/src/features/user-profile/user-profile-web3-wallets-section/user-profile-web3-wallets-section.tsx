@@ -39,6 +39,7 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         onConnect={id => {
           void controller.onConnect(id);
         }}
+        onCancelConnection={controller.onCancelConnection}
         onVerify={id => {
           void controller.onVerify(id);
         }}
