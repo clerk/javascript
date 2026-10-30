@@ -1,6 +1,8 @@
 'use client';
 
+import { Icon } from '@clerk/mosaic/components/icon';
 import { UserProfile } from '@clerk/mosaic/features/user-profile/user-profile';
+import { Bolt } from '@clerk/mosaic/icons/glyphs/bolt';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -28,8 +30,48 @@ export default function UserProfileLivePage() {
             to use the live harness.
           </p>
         ) : null}
-        <UserProfile fallback={<p className='text-muted-foreground text-sm'>Loading…</p>} />
+        <UserProfile
+          showSearch
+          fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}
+          customPages={[
+            {
+              path: 'usage',
+              label: 'Usage',
+              icon: (
+                <Icon
+                  glyph={Bolt}
+                  size='sm'
+                />
+              ),
+              keywords: ['quota'],
+              content: <UsagePage />,
+            },
+          ]}
+        />
       </div>
     </MosaicProvider>
+  );
+}
+
+function UsagePage() {
+  return (
+    <div className='flex flex-col gap-6'>
+      <UserProfile.SearchTarget
+        label='Rate limits'
+        keywords={['throttle', 'requests']}
+        render={<section className='flex flex-col gap-1 rounded-lg border p-4' />}
+      >
+        <h3 className='font-semibold'>Rate limits</h3>
+        <p className='text-muted-foreground text-sm'>1,000 requests per minute.</p>
+      </UserProfile.SearchTarget>
+      <UserProfile.SearchTarget
+        label='Seats'
+        keywords={['members']}
+        render={<section className='flex flex-col gap-1 rounded-lg border p-4' />}
+      >
+        <h3 className='font-semibold'>Seats</h3>
+        <p className='text-muted-foreground text-sm'>4 of 10 seats used.</p>
+      </UserProfile.SearchTarget>
+    </div>
   );
 }

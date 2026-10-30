@@ -106,6 +106,15 @@ describe('OrganizationProfile', () => {
     expect(tabNames()).toEqual(tabs);
   });
 
+  it.each([
+    { showSearch: undefined, shown: false },
+    { showSearch: true, shown: true },
+  ])('shows the search only when asked: $showSearch', async ({ showSearch, shown }) => {
+    serve();
+    await renderWithClerk(<OrganizationProfile showSearch={showSearch} />);
+    expect(screen.queryByRole('combobox', { name: 'Search' }) !== null).toBe(shown);
+  });
+
   it('passes the API keys options to the API keys page', async () => {
     serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read', 'org:sys_api_keys:manage'] });
     await renderWithClerk(
@@ -134,6 +143,37 @@ describe('OrganizationProfile', () => {
 
     await user.click(profileNav().getByRole('tab', { name: 'API Keys' }));
     expect(screen.getByRole('heading', { level: 3, name: 'API Keys' })).toBeVisible();
+  });
+
+  it('finds a search target on a page of your own, and brings it into view', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(
+      <OrganizationProfile
+        showSearch
+        customPages={[
+          {
+            path: 'usage',
+            label: 'Usage',
+            content: (
+              <OrganizationProfile.SearchTarget
+                label='Quota'
+                render={<section />}
+              >
+                <h3>Quota</h3>
+              </OrganizationProfile.SearchTarget>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'quota');
+    await user.click(screen.getByRole('option', { name: 'Quota' }));
+
+    const quota = screen.getByRole('heading', { name: 'Quota' });
+    expect(quota).toBeVisible();
+    expect(quota.parentElement).toHaveFocus();
   });
 
   it('adds custom pages in the requested order and opens on the first', async () => {

@@ -29,7 +29,7 @@ export function UserProfileEnterpriseAccountsSectionView({
   }
   return (
     <>
-      <Section.Root>
+      <Section.Root search={{ label: m.title }}>
         <Section.Group>
           <Section.Header>
             <Section.Content>

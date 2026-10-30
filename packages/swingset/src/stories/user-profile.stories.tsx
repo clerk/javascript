@@ -15,14 +15,26 @@ export const meta: StoryMeta = {
   label: 'User profile',
   layout: 'wide',
   source: 'packages/mosaic/src/features/user-profile/user-profile.view.tsx',
+  styles: {
+    _variants: {
+      showSearch: { true: {}, false: {} },
+    },
+    _defaultVariants: {
+      showSearch: 'false',
+    },
+  },
 };
+
+function knobsAsProps(props: Record<string, unknown>) {
+  return { showSearch: props.showSearch === true || props.showSearch === 'true' };
+}
 
 /**
  * The profile as a page's content — `elevation='flush'`, the way a `Card` chooses its elevation:
  * unframed, flush with its host, scrolling with the page. The fixture stands in for the model and
  * controller: every page's data, and actions that update it, so the surface behaves.
  */
-export function Default() {
+export function Default(props: Record<string, unknown>) {
   const { activePage, setActivePage, pages } = useUserProfileFixture();
   return (
     <UserProfileView
@@ -30,6 +42,7 @@ export function Default() {
       pages={pages}
       onPageChange={setActivePage}
       elevation='flush'
+      {...knobsAsProps(props)}
     />
   );
 }

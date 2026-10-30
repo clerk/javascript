@@ -30,7 +30,7 @@ export function UserProfilePaymentMethodsSectionView({
   onRemove,
 }: UserProfilePaymentMethodsSectionViewProps) {
   return (
-    <Section.Root>
+    <Section.Root search={{ label: 'Payment methods' }}>
       <Section.Group>
         <Section.Header>
           <Section.Content>

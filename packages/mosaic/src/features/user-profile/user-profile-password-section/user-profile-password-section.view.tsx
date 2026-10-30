@@ -22,7 +22,7 @@ export function UserProfilePasswordSectionView({
   }
 
   return (
-    <Section.Root>
+    <Section.Root search={{ label: m.label }}>
       <Section.Group>
         <Section.Header>
           <Section.Content>

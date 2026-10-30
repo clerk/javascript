@@ -205,6 +205,10 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
 
+  navListHidden: {
+    display: 'none',
+  },
+
   navItem: {
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-md'],
@@ -322,6 +326,13 @@ export const styles = stylex.create({
   contentBody: {
     marginInline: 'auto',
     maxInlineSize: CONTENT_MAX_WIDTH,
+    position: 'relative',
+  },
+
+  contentPanel: {
+    insetInline: 0,
+    insetBlockStart: 0,
+    position: { default: null, ':where([data-closed])': 'absolute' },
   },
 });
 
