@@ -39,7 +39,6 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   pendingId?: string;
   error?: string;
   onConnect?: (id: string) => void;
-  onCancelConnection?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;

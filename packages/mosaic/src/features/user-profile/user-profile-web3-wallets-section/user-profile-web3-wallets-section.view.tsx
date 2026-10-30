@@ -13,7 +13,6 @@ export function UserProfileWeb3WalletsSectionView({
   pendingId,
   error,
   onConnect,
-  onCancelConnection,
   onVerify,
   onSetPrimary,
   registerTrigger,
@@ -63,7 +62,6 @@ export function UserProfileWeb3WalletsSectionView({
                       isPending={pendingId === provider.id}
                       isDisabled={isBusy}
                       onConnect={onConnect}
-                      onCancelConnection={pendingId === provider.id ? onCancelConnection : undefined}
                     />
                   ))
                 : null}

@@ -202,13 +202,6 @@ export function useUserProfileWeb3WalletsController({
         : undefined,
     pendingWalletName: picker.open ? picker.walletName : undefined,
     onConnect,
-    onCancelConnection:
-      action.isPending && owner?.kind === 'connect' && owner.target === null && !picker.open
-        ? () => {
-            action.cancel();
-            removalFocus.trigger(owner.providerId)?.focus();
-          }
-        : undefined,
     onVerify,
     onSetPrimary: (walletId: string) =>
       action.run(walletId, () => {

@@ -2,4 +2,4 @@
 "@clerk/mosaic": patch
 ---
 
-Allow users to cancel an abandoned wallet connection in UserProfile and try again. Ignore late results after cancellation or closing the profile, quietly handle rejected wallet requests, and explain when a request is still pending in the wallet.
+Handle rejected wallet requests in UserProfile without showing a generic error, and explain when a request is still pending in the wallet. Ignore late wallet responses after closing the profile so reopening starts a fresh connection flow.
