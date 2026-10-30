@@ -2,4 +2,4 @@
 '@clerk/mosaic': patch
 ---
 
-Disable Cancel while verifying or resending a phone verification code in `UserProfile`.
+Keep the phone entry screen pending until the first verification code is sent in `UserProfile`. Disable Cancel while verifying or resending a phone verification code.
