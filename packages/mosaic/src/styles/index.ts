@@ -142,6 +142,8 @@ export type {
   SectionRowProps,
   SectionTitleProps,
 } from '../components/section';
+export { Switch } from '../components/switch';
+export type { SwitchProps } from '../components/switch';
 export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
