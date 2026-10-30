@@ -45,6 +45,18 @@ describe('UserProfile modal return', () => {
     expect(window.location.hash).toBe('#accounts');
   });
 
+  it('keeps the history state of the page when it clears the param', async () => {
+    serve();
+    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
+    window.history.replaceState({ router: 'state' }, '');
+
+    await renderWithClerk(<p>Page</p>);
+
+    await screen.findByRole('dialog');
+    expect(window.location.search).toBe('');
+    expect(window.history.state).toEqual({ router: 'state' });
+  });
+
   it('ignores an unknown value', async () => {
     serve();
     visit('?__clerk_mosaic_modal=organization-profile%2Fgeneral&tab=connections');

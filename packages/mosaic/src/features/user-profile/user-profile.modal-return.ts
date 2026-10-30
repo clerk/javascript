@@ -25,7 +25,7 @@ export function UserProfileModalReturn(): null {
       return;
     }
     url.searchParams.delete(MODAL_PARAM);
-    window.history.replaceState(null, '', url);
+    window.history.replaceState(window.history.state, '', url);
     open({ page: 'account' });
   }, [open]);
 
