@@ -1,0 +1,400 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: control-swingset <verb> [args]
+
+  up                 Start swingset for this worktree and wait until /components/button renders.
+  doctor             Read-only check that the instance is ours, current, and serving.
+  url [path]         Print the instance URL, optionally joined with a path.
+  ab <args...>       Run agent-browser in this worktree's isolated session.
+  evidence <feature> Create and print a new evidence directory for a feature.
+  attach <dir> --pr <n> [--before <dir>] [--dry-run]
+                     Put the screenshots in <dir> in the pull request description.
+  down               Stop the swingset and browser session this worktree started. Keeps evidence.
+EOF
+}
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SWINGSET_DIR="$REPO_ROOT/packages/swingset"
+VERIFY_DIR="$REPO_ROOT/packages/mosaic/.verify"
+STATE_FILE="$VERIFY_DIR/instance.env"
+LOG_FILE="$VERIFY_DIR/swingset.log"
+EVIDENCE_ROOT="$VERIFY_DIR/evidence"
+SESSION="verify-mosaic-$(printf '%s' "$REPO_ROOT" | shasum | cut -c1-8)"
+READY_PATH="/components/button"
+READY_TIMEOUT_SECONDS=240
+MARKER_START='<!-- verify-evidence:mosaic -->'
+MARKER_END='<!-- /verify-evidence:mosaic -->'
+BLOCK_LINE_START='**Verified in swingset**'
+IMAGE_WIDTH=280
+
+main() {
+  local verb="${1:-}"
+  shift || true
+  case "$verb" in
+    up) cmd_up ;;
+    doctor) cmd_doctor ;;
+    url) cmd_url "${1:-}" ;;
+    ab) agent-browser --session "$SESSION" "$@" ;;
+    evidence) cmd_evidence "${1:-}" ;;
+    attach) cmd_attach "$@" ;;
+    down) cmd_down ;;
+    -h | --help | help | '') usage ;;
+    *)
+      echo "unknown verb: $verb" >&2
+      usage >&2
+      exit 64
+      ;;
+  esac
+}
+
+cmd_up() {
+  if instance_alive; then
+    echo "reused  pid $PID  $URL"
+    return
+  fi
+  require_deps_built
+  refuse_foreign_instance
+  mkdir -p "$VERIFY_DIR"
+  rm -f "$STATE_FILE"
+  : >"$LOG_FILE"
+  (
+    cd "$SWINGSET_DIR"
+    PATH="$SWINGSET_DIR/node_modules/.bin:$PATH" nohup node scripts/dev.mjs >>"$LOG_FILE" 2>&1 &
+    echo $! >"$VERIFY_DIR/pid"
+  )
+  PID="$(cat "$VERIFY_DIR/pid")"
+  rm -f "$VERIFY_DIR/pid"
+  echo "start   pid $PID  log $LOG_FILE"
+
+  URL="$(wait_for_url)"
+  printf 'PID=%s\nURL=%s\nSESSION=%s\nHEAD=%s\n' "$PID" "$URL" "$SESSION" "$(git rev-parse --short HEAD)" >"$STATE_FILE"
+  echo "listen  $URL"
+
+  wait_for_render
+  echo "ready   $URL$READY_PATH  session $SESSION"
+}
+
+cmd_doctor() {
+  local failed=0
+  check() {
+    if eval "$2"; then
+      echo "ok    $1"
+    else
+      echo "FAIL  $1${3:+  fix: $3}"
+      failed=1
+    fi
+  }
+  check "agent-browser installed ($(agent-browser --version 2>/dev/null || echo missing))" \
+    "command -v agent-browser >/dev/null" "install agent-browser 0.27+ (brew install agent-browser)"
+  check "state file $STATE_FILE" "load_state" "run control-swingset up"
+  if [ "$failed" -eq 0 ]; then
+    check "process $PID alive" "kill -0 $PID 2>/dev/null" "run control-swingset down, then up"
+    check "port $(port_of "$URL") served from this worktree ($SWINGSET_DIR)" "listener_is_ours" \
+      "another process owns the port; run control-swingset down, then up"
+    check "$URL$READY_PATH returns 200" "[ \"\$(http_status \"$URL$READY_PATH\")\" = 200 ]" \
+      "read $LOG_FILE for the compile error"
+    check "started at HEAD $HEAD (now $(git rev-parse --short HEAD))" "true"
+    echo "info  session $SESSION"
+  fi
+  return "$failed"
+}
+
+cmd_url() {
+  load_state || {
+    echo "no instance; run control-swingset up" >&2
+    exit 1
+  }
+  echo "$URL${1:-}"
+}
+
+cmd_evidence() {
+  local feature="$1"
+  if [ -z "$feature" ]; then
+    echo "usage: control-swingset evidence <feature>" >&2
+    exit 64
+  fi
+  local dir
+  dir="$EVIDENCE_ROOT/$(date -u +%Y%m%dT%H%M%SZ)-$feature"
+  mkdir -p "$dir"
+  echo "$dir"
+}
+
+cmd_attach() {
+  local after="" before="" pr="" dry_run=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --pr) pr="${2:-}" && shift 2 ;;
+      --before) before="${2:-}" && shift 2 ;;
+      --dry-run) dry_run=1 && shift ;;
+      *) after="$1" && shift ;;
+    esac
+  done
+  if [ -z "$after" ] || [ -z "$pr" ]; then
+    echo "usage: control-swingset attach <evidence-dir> --pr <n> [--before <evidence-dir>] [--dry-run]" >&2
+    exit 64
+  fi
+  require_gh_attach
+
+  local work names=() name
+  work="$(mktemp -d)"
+  while IFS= read -r name; do
+    if [ -n "$before" ] && [ ! -f "$before/$name" ]; then
+      echo "skip    $name: not in $before" >&2
+      continue
+    fi
+    names+=("$name")
+    cp "$after/$name" "$work/after-$name"
+    [ -z "$before" ] || cp "$before/$name" "$work/before-$name"
+  done < <(find "$after" -maxdepth 1 -name '*.png' -exec basename {} \; | sort)
+  if [ "${#names[@]}" -eq 0 ]; then
+    echo "refuse  no screenshots to attach in $after${before:+ that are also in $before}" >&2
+    exit 1
+  fi
+
+  local head url
+  head="$(gh pr view "$pr" --json headRefOid -q .headRefOid)"
+  url="$(gh pr view "$pr" --json url -q .url)"
+  if [ "$head" != "$(git rev-parse HEAD)" ]; then
+    echo "refuse  local HEAD is not the head of pull request #$pr ($head)" >&2
+    echo "fix     push this branch, or check out the pull request, then attach again" >&2
+    exit 1
+  fi
+  local line="$BLOCK_LINE_START from evidence \`$(basename "$after")\`${before:+, before \`$(basename "$before")\`}, at [\`${head:0:12}\`](${url%/pull/*}/commit/$head)."
+
+  local files=()
+  {
+    echo "$MARKER_START"
+    echo
+    echo "$line"
+    for name in "${names[@]}"; do
+      echo
+      echo "![${name%.png}](./after-$name)"
+      files+=(--attach "./after-$name")
+    done
+    if [ -n "$before" ]; then
+      for name in "${names[@]}"; do
+        echo
+        echo "![before ${name%.png}](./before-$name)"
+        files+=(--attach "./before-$name")
+      done
+    fi
+    echo
+    echo "$MARKER_END"
+  } >"$work/list.md"
+  gh pr view "$pr" --json body -q .body >"$work/old.md"
+  body_with_block "$work/old.md" "$work/list.md" >"$work/body.md"
+  if [ "$dry_run" -eq 1 ]; then
+    echo "would run, in $work:"
+    echo "gh pr edit $pr --body-file body.md ${files[*]}"
+    return
+  fi
+  (cd "$work" && gh pr edit "$pr" --body-file body.md "${files[@]}" >/dev/null)
+
+  local uploaded=() asset
+  gh pr view "$pr" --json body -q .body >"$work/listed.md"
+  while IFS= read -r asset; do
+    uploaded+=("$asset")
+  done < <(awk -v s="$MARKER_START" -v e="$MARKER_END" '{ sub(/\r$/, "") } $0 == s { f = 1 } f { print } $0 == e { f = 0 }' "$work/listed.md" |
+    grep -oE 'https://github\.com/user-attachments/assets/[0-9a-f-]{36}')
+  if [ "${#uploaded[@]}" -ne $((${#files[@]} / 2)) ]; then
+    echo "FAIL    expected $((${#files[@]} / 2)) uploaded files in pull request #$pr, found ${#uploaded[@]}; the list is in its description, attach again to lay it out" >&2
+    exit 1
+  fi
+
+  evidence_block "$line" "$before" "${#names[@]}" "${names[@]}" "${uploaded[@]}" >"$work/block.md"
+  body_with_block "$work/listed.md" "$work/block.md" >"$work/body.md"
+  (cd "$work" && gh pr edit "$pr" --body-file body.md >/dev/null)
+  echo "attached ${#names[@]} screenshots${before:+ with befores} to $url"
+}
+
+cmd_down() {
+  agent-browser --session "$SESSION" close >/dev/null 2>&1 || true
+  echo "closed  browser session $SESSION"
+  if ! load_state; then
+    echo "no instance state; nothing to stop"
+    return
+  fi
+  if kill -0 "$PID" 2>/dev/null; then
+    kill -TERM "$PID"
+    for _ in $(seq 1 30); do
+      kill -0 "$PID" 2>/dev/null || break
+      sleep 0.5
+    done
+    if kill -0 "$PID" 2>/dev/null; then
+      kill -KILL "$PID"
+    fi
+    echo "stopped pid $PID"
+  fi
+  rm -f "$STATE_FILE"
+  echo "kept    evidence in $EVIDENCE_ROOT"
+}
+
+instance_alive() {
+  load_state && kill -0 "$PID" 2>/dev/null && listener_is_ours
+}
+
+load_state() {
+  [ -f "$STATE_FILE" ] || return 1
+  # shellcheck disable=SC1090
+  . "$STATE_FILE"
+}
+
+listener_is_ours() {
+  local pid cwd
+  for pid in $(lsof -nP -iTCP:"$(port_of "$URL")" -sTCP:LISTEN -t 2>/dev/null); do
+    cwd="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')"
+    [ "$cwd" = "$SWINGSET_DIR" ] && return 0
+  done
+  return 1
+}
+
+refuse_foreign_instance() {
+  local pid cwd
+  for pid in $(pgrep -f "next dev" 2>/dev/null); do
+    cwd="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')"
+    if [ "$cwd" = "$SWINGSET_DIR" ]; then
+      echo "refuse  pid $pid already runs swingset in this worktree and was not started by control-swingset" >&2
+      echo "fix     stop it yourself (it shares packages/swingset/.next), then rerun up" >&2
+      exit 1
+    fi
+  done
+}
+
+require_deps_built() {
+  if [ ! -d "$REPO_ROOT/packages/nextjs/dist" ] || [ ! -d "$REPO_ROOT/packages/shared/dist" ]; then
+    echo "refuse  swingset's workspace dependencies are not built" >&2
+    echo "fix     pnpm turbo build --filter='@clerk/swingset^...'" >&2
+    exit 1
+  fi
+}
+
+wait_for_url() {
+  local deadline=$((SECONDS + 60)) url
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    url="$(sed -nE 's#.*Local:[[:space:]]+(http://[^[:space:]]+).*#\1#p' "$LOG_FILE" | head -1)"
+    if [ -n "$url" ]; then
+      echo "${url%/}"
+      return
+    fi
+    kill -0 "$PID" 2>/dev/null || fail_start "swingset exited before listening"
+    sleep 1
+  done
+  fail_start "no Local: URL in the log after 60s"
+}
+
+wait_for_render() {
+  local deadline=$((SECONDS + READY_TIMEOUT_SECONDS))
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    [ "$(http_status "$URL$READY_PATH")" = 200 ] && return
+    kill -0 "$PID" 2>/dev/null || fail_start "swingset exited while compiling"
+    sleep 2
+  done
+  fail_start "$READY_PATH did not return 200 within ${READY_TIMEOUT_SECONDS}s"
+}
+
+fail_start() {
+  echo "FAIL    $1; last log lines:" >&2
+  tail -20 "$LOG_FILE" >&2
+  cmd_down >&2
+  exit 1
+}
+
+require_gh_attach() {
+  local version
+  version="$(gh --version 2>/dev/null | sed -nE '1s/^gh version ([0-9]+)\.([0-9]+).*/\1 \2/p')"
+  if [ -z "$version" ] || [ "${version% *}" -lt 2 ] || { [ "${version% *}" -eq 2 ] && [ "${version#* }" -lt 99 ]; }; then
+    echo "refuse  attach needs gh 2.99 or newer for gh pr edit --attach (found ${version/ /.})" >&2
+    exit 1
+  fi
+}
+
+evidence_block() {
+  local line="$1" before="$2" count="$3"
+  shift 3
+  local names=("${@:1:$count}") urls=("${@:$((count + 1))}") at
+  img() { echo "<img src=\"$1\" width=\"$IMAGE_WIDTH\" alt=\"$2\">"; }
+  echo "$MARKER_START"
+  echo
+  echo "$line"
+  echo
+  if [ -n "$before" ]; then
+    echo "| Before | After |"
+    echo "| :---: | :---: |"
+    for at in "${!names[@]}"; do
+      echo "| $(img "${urls[$((count + at))]}" "Before: ${names[$at]%.png}") | $(img "${urls[$at]}" "After: ${names[$at]%.png}") |"
+    done
+    echo
+  else
+    for ((at = 0; at < count; at += 2)); do
+      if [ $((at + 1)) -lt "$count" ]; then
+        echo "| \`${names[$at]%.png}\` | \`${names[$((at + 1))]%.png}\` |"
+        echo "| :---: | :---: |"
+        echo "| $(img "${urls[$at]}" "${names[$at]%.png}") | $(img "${urls[$((at + 1))]}" "${names[$((at + 1))]%.png}") |"
+      else
+        echo "| \`${names[$at]%.png}\` |"
+        echo "| :---: |"
+        echo "| $(img "${urls[$at]}" "${names[$at]%.png}") |"
+      fi
+      echo
+    done
+  fi
+  echo "$MARKER_END"
+}
+
+body_with_block() {
+  awk -v start="$MARKER_START" -v end="$MARKER_END" -v lead="$BLOCK_LINE_START" -v blockfile="$2" '
+    function fail(why) { print "refuse  the pull request description " why >"/dev/stderr"; failed = 1; exit 1 }
+    function emit_block(  i) { for (i = 1; i <= nb; i++) print block[i] cr }
+    BEGIN { while ((getline l < blockfile) > 0) block[++nb] = l }
+    { line[NR] = $0; if ($0 ~ /\r$/) cr = "\r" }
+    END {
+      if (failed) exit 1
+      for (i = 1; i <= NR; i++) {
+        l = line[i]; sub(/\r$/, "", l)
+        if (open == "" && l == start) { s[++ns] = i; continue }
+        if (open == "" && l == end) { e[++ne] = i; continue }
+        match(l, /^ */)
+        if (RLENGTH > 3) continue
+        rest = substr(l, RLENGTH + 1)
+        if (!match(rest, /^(```+|~~~+)/)) continue
+        ticks = substr(rest, 1, RLENGTH); tail = substr(rest, RLENGTH + 1)
+        if (open == "") {
+          if (!(substr(ticks, 1, 1) == "`" && index(tail, "`"))) open = ticks
+        } else if (substr(ticks, 1, 1) == substr(open, 1, 1) && length(ticks) >= length(open) && tail ~ /^[ \t]*$/) {
+          open = ""
+        }
+      }
+      if (ns == 0 && ne == 0) {
+        if (open != "") fail("ends inside a code fence that is never closed")
+        for (i = 1; i <= NR; i++) print line[i]
+        if (NR > 0 && line[NR] !~ /^\r?$/) print cr
+        emit_block()
+        exit 0
+      }
+      if (ns != 1 || ne != 1) fail("has the start marker " ns + 0 " times and the end marker " ne + 0 " times")
+      if (e[1] < s[1]) fail("has the end marker before the start marker")
+      for (i = s[1] + 1; i < e[1]; i++) {
+        l = line[i]; sub(/\r$/, "", l)
+        if (l ~ /^[ \t]*$/) continue
+        if (index(l, lead) != 1) fail("has text between the markers that is not an evidence block")
+        break
+      }
+      for (i = 1; i < s[1]; i++) print line[i]
+      emit_block()
+      for (i = e[1] + 1; i <= NR; i++) print line[i]
+    }
+  ' "$1"
+}
+
+http_status() {
+  curl -s -o /dev/null -w '%{http_code}' --max-time 120 "$1" || true
+}
+
+port_of() {
+  echo "${1##*:}"
+}
+
+main "$@"
