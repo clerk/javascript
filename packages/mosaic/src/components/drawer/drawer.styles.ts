@@ -140,8 +140,8 @@ export const styles = stylex.create({
     // the pointer is captured on it, so `:active` survives the drag. A press elsewhere in the sheet
     // is not a press on the handle, and leaves it alone.
     '--_cl-grip-color': {
-      default: colorVars['--cl-color-border'],
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-border']}, ${colorVars['--cl-color-foreground-secondary']} 35%)`,
+      default: colorVars['--cl-color-border-subtle'],
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-border-subtle']}, ${colorVars['--cl-color-foreground-secondary']} 35%)`,
     },
     placeItems: 'center',
     display: 'grid',

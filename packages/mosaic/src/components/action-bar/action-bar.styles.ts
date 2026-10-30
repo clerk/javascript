@@ -76,7 +76,7 @@ export const styles = stylex.create({
     marginBlock: space['1'],
     marginInline: space['0.5'],
     alignSelf: 'stretch',
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     width: '1px',
   },
 });

@@ -162,11 +162,11 @@ export const styles = stylex.create({
 
 export const iconColors = stylex.create({
   success: {
-    backgroundColor: colorVars['--cl-color-positive-alpha-200'],
+    backgroundColor: colorVars['--cl-color-positive-subtle'],
     color: colorVars['--cl-color-positive'],
   },
   error: {
-    backgroundColor: colorVars['--cl-color-negative-alpha-200'],
+    backgroundColor: colorVars['--cl-color-negative-subtle'],
     color: colorVars['--cl-color-negative'],
   },
   loading: {

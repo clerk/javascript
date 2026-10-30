@@ -33,7 +33,7 @@ export const styles = stylex.create({
   controls: {
     gap: space['1'],
     alignItems: 'center',
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: { [compact]: '1px', default: 0 },
     display: { [compact]: 'grid', default: 'flex' },
@@ -55,7 +55,7 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
   },
   divider: {
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     display: { [compact]: 'none', default: 'block' },
     height: '1.25rem',
     width: '1px',

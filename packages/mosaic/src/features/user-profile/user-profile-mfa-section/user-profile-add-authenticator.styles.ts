@@ -8,7 +8,7 @@ export const styles = stylex.create({
   },
   field: {
     paddingBlockStart: space['4'],
-    borderTopColor: colorVars['--cl-color-border'],
+    borderTopColor: colorVars['--cl-color-border-subtle'],
     borderTopStyle: 'solid',
     borderTopWidth: '1px',
   },

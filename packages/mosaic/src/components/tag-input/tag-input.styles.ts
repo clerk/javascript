@@ -60,7 +60,7 @@ export const styles = stylex.create({
     minWidth: 0,
   },
   tagInvalid: {
-    backgroundColor: colorVars['--cl-color-negative-alpha-100'],
+    backgroundColor: colorVars['--cl-color-negative-subtle'],
     color: colorVars['--cl-color-negative'],
   },
   tagLabel: {
