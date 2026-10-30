@@ -162,24 +162,208 @@ describe('label forms', () => {
     expect(getComputedStyle(pending).opacity).toBe('1');
   });
 
-  it('keeps its width when pending', () => {
+  it.each(['xs', 'sm', 'md', 'lg'] as const)('does not move anything when the spinner appears (%s)', size => {
+    const boxes = () => {
+      const { width, height } = screen.getByRole('button').getBoundingClientRect();
+      const label = screen.getByText('Continue with Google').getBoundingClientRect();
+      return { width, height, labelLeft: label.left, labelTop: label.top };
+    };
     const { rerender } = render(
       <ProviderButton
         icon={<svg style={{ width: 16, height: 16 }} />}
         longLabel='Continue with Google'
         shortLabel='Google'
+        size={size}
       />,
     );
-    const width = screen.getByRole('button').getBoundingClientRect().width;
+    const before = boxes();
     rerender(
       <ProviderButton
         icon={<svg style={{ width: 16, height: 16 }} />}
         longLabel='Continue with Google'
         shortLabel='Google'
+        size={size}
         isPending
         spinDelay={{ delay: 0 }}
       />,
     );
-    expect(screen.getByRole('button').getBoundingClientRect().width).toBe(width);
+    expect(screen.getByRole('button').querySelector('.cl-spinner')).not.toBeNull();
+    expect(boxes()).toEqual(before);
+  });
+});
+
+describe('last used provider', () => {
+  function renderWithLastUsed(
+    count: number,
+    {
+      width = 600,
+      layout,
+      dir,
+      disabled,
+      isPending,
+      longLabel = 'Continue with Google',
+    }: {
+      width?: number;
+      layout?: 'inline' | 'stacked';
+      dir?: 'rtl';
+      disabled?: boolean;
+      isPending?: boolean;
+      longLabel?: string;
+    } = {},
+  ) {
+    render(
+      <div
+        dir={dir}
+        style={{ width, paddingBlockStart: 24 }}
+      >
+        <ProviderButtonGroup
+          layout={layout}
+          disabled={disabled}
+          lastUsed={
+            <ProviderButton
+              icon={<svg style={{ width: 16, height: 16 }} />}
+              longLabel={longLabel}
+              shortLabel='Google'
+              badge='Last used'
+              isPending={isPending}
+            />
+          }
+        >
+          {Array.from({ length: count }, (_, index) => (
+            <ProviderButton
+              key={index}
+              icon={<svg style={{ width: 16, height: 16 }} />}
+              longLabel={`Continue with Provider ${index}`}
+              shortLabel={`Provider ${index}`}
+            />
+          ))}
+        </ProviderButtonGroup>
+      </div>,
+    );
+    return screen.getAllByRole('button');
+  }
+
+  const badgeBox = () => {
+    const badge = screen.getByText('Last used').closest('.cl-badge');
+    if (!badge) {
+      throw new Error('badge not rendered');
+    }
+    return badge;
+  };
+
+  it.each([
+    [1, [1, 1]],
+    [2, [1, 2]],
+    [3, [1, 3]],
+    [6, [1, 3, 3]],
+    [7, [1, 4, 3]],
+  ])('puts it on its own row and balances the %i others', (count, rows) => {
+    expect(rowLengths(renderWithLastUsed(count))).toEqual(rows);
+  });
+
+  it('renders it first and at the full width of the group', () => {
+    const buttons = renderWithLastUsed(2);
+    expect(buttons[0]).toHaveAccessibleName(/Continue with Google/);
+    expect(buttons[0].getBoundingClientRect().width).toBe(600);
+  });
+
+  it('keeps its long label however many others there are', () => {
+    renderWithLastUsed(3);
+    expect(isShown('Continue with Google')).toBe(true);
+    expect(isShown('Google')).toBe(false);
+  });
+
+  it.each([
+    [1, 'Continue with Provider 0'],
+    [2, 'Provider 0'],
+  ])('picks the labels of the %i others from their own count', (count, label) => {
+    renderWithLastUsed(count);
+    expect(isShown(label)).toBe(true);
+  });
+
+  it('shows only icons for three others', () => {
+    renderWithLastUsed(3);
+    expect(isShown('Provider 0')).toBe(false);
+    expect(isShown('Continue with Provider 0')).toBe(false);
+  });
+
+  it('leaves no gap under it when it is the only provider', () => {
+    const [button] = renderWithLastUsed(0);
+    const group = button.parentElement;
+    expect(group?.getBoundingClientRect().height).toBe(button.getBoundingClientRect().height);
+  });
+
+  it('gives every button its own row when stacked', () => {
+    expect(rowLengths(renderWithLastUsed(2, { layout: 'stacked' }))).toEqual([1, 1, 1]);
+  });
+
+  it('keeps the same gap between the rows as inside them', () => {
+    const buttons = renderWithLastUsed(6);
+    const [lastUsed, second, , , fifth] = buttons.map(button => button.getBoundingClientRect());
+    expect(second.top - lastUsed.bottom).toBe(fifth.top - second.bottom);
+  });
+
+  it('disables it with the group', () => {
+    const [lastUsed] = renderWithLastUsed(1, { disabled: true });
+    expect(lastUsed).toBeDisabled();
+  });
+
+  describe('badge', () => {
+    it('adds the badge to the accessible name', () => {
+      const [lastUsed] = renderWithLastUsed(1);
+      expect(lastUsed).toHaveAccessibleName('Continue with Google, Last used');
+    });
+
+    it('overhangs the top corner at the inline end', () => {
+      const [lastUsed] = renderWithLastUsed(1);
+      const button = lastUsed.getBoundingClientRect();
+      const badge = badgeBox().getBoundingClientRect();
+      expect(badge.top).toBeLessThan(button.top);
+      expect(badge.bottom).toBeGreaterThan(button.top);
+      expect(badge.right).toBeGreaterThan(button.right);
+      expect(badge.left).toBeGreaterThan(button.left + button.width / 2);
+    });
+
+    it('overhangs the left corner in RTL', () => {
+      const [lastUsed] = renderWithLastUsed(1, { dir: 'rtl' });
+      const button = lastUsed.getBoundingClientRect();
+      const badge = badgeBox().getBoundingClientRect();
+      expect(badge.left).toBeLessThan(button.left);
+      expect(badge.right).toBeLessThan(button.left + button.width / 2);
+    });
+
+    it('is not clipped by the button or the group', () => {
+      const [lastUsed] = renderWithLastUsed(1);
+      const group = lastUsed.parentElement;
+      for (const element of [lastUsed, group]) {
+        expect(element && getComputedStyle(element).overflow).toBe('visible');
+      }
+    });
+
+    it('does not change the height of the button', () => {
+      const [lastUsed] = renderWithLastUsed(1);
+      const [other] = screen.getAllByRole('button').slice(1);
+      expect(lastUsed.getBoundingClientRect().height).toBe(other.getBoundingClientRect().height);
+    });
+
+    it('stays while pending, at full opacity', () => {
+      const [lastUsed] = renderWithLastUsed(1, { disabled: true, isPending: true });
+      expect(screen.getByText('Last used')).toBeVisible();
+      expect(getComputedStyle(lastUsed).opacity).toBe('1');
+    });
+
+    it('keeps a truncated label inside the button', () => {
+      const longLabel = 'Continue with a very long enterprise identity provider name';
+      const [lastUsed] = renderWithLastUsed(1, { width: 180, longLabel });
+      const label = screen.getByText(longLabel);
+      expect(lastUsed.getBoundingClientRect().width).toBe(180);
+      expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+      expect(label.getBoundingClientRect().right).toBeLessThanOrEqual(lastUsed.getBoundingClientRect().right);
+    });
+
+    it('renders no badge without the prop', () => {
+      renderGroup(1);
+      expect(screen.queryByText('Last used')).toBeNull();
+    });
   });
 });

@@ -105,6 +105,52 @@ export function Stacked(props: Record<string, unknown>) {
   );
 }
 
+export function LastUsed() {
+  return (
+    <div style={{ width: 400, maxWidth: '100%' }}>
+      <ProviderButtonGroup
+        lastUsed={
+          <ProviderButton
+            icon={<ProviderIcon name='Google' />}
+            longLabel='Continue with Google'
+            shortLabel='Google'
+            badge='Last used'
+          />
+        }
+      >
+        {PROVIDERS.slice(1, 4).map(name => (
+          <ProviderButton
+            key={name}
+            icon={<ProviderIcon name={name} />}
+            longLabel={`Continue with ${name}`}
+            shortLabel={name}
+          />
+        ))}
+      </ProviderButtonGroup>
+    </div>
+  );
+}
+
+export function LongLabels() {
+  return (
+    <div style={{ width: 240, maxWidth: '100%' }}>
+      <ProviderButtonGroup layout='stacked'>
+        <ProviderButton
+          icon={<ProviderIcon name='Acme' />}
+          longLabel='Continue with Acme Corporation Enterprise SSO'
+          shortLabel='Acme Corporation'
+        />
+        <ProviderButton
+          icon={<ProviderIcon name='Northwind' />}
+          longLabel='Continue with Northwind Traders Identity Provider'
+          shortLabel='Northwind Traders'
+          isPending
+        />
+      </ProviderButtonGroup>
+    </div>
+  );
+}
+
 export function Pending(props: Record<string, unknown>) {
   return (
     <Group

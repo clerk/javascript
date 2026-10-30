@@ -17,10 +17,12 @@ export interface ProviderButtonGroupProps extends MosaicElementProps<'div'> {
   layout?: 'inline' | 'stacked';
   /** Disables every button in the group. A pending button stays at full opacity. */
   disabled?: boolean;
+  /** The provider the user signed in with last. It gets its own row above the others, with its long label. */
+  lastUsed?: React.ReactNode;
 }
 
 /**
- * Lays out `ProviderButton`s, which must be its direct children.
+ * Lays out `ProviderButton`s, which must be its direct children. Only `lastUsed` sits outside them.
  *
  * @example
  * <ProviderButtonGroup disabled={isBusy}>
@@ -29,7 +31,10 @@ export interface ProviderButtonGroupProps extends MosaicElementProps<'div'> {
  * </ProviderButtonGroup>
  */
 export const ProviderButtonGroup = React.forwardRef<HTMLDivElement, ProviderButtonGroupProps>(
-  function MosaicProviderButtonGroup({ layout = 'inline', disabled = false, xstyle, children, ...rest }, ref) {
+  function MosaicProviderButtonGroup(
+    { layout = 'inline', disabled = false, lastUsed, xstyle, children, ...rest },
+    ref,
+  ) {
     const parent = React.useContext(ButtonContext);
     const value = React.useMemo(() => ({ ...parent, disabled: parent.disabled || disabled }), [parent, disabled]);
 
@@ -39,17 +44,26 @@ export const ProviderButtonGroup = React.forwardRef<HTMLDivElement, ProviderButt
           ref={ref}
           {...mergeStyleProps(
             themeProps('provider-button-group', { layout }),
-            stylex.props(
-              reset.base,
-              groupStyles.base,
-              layout === 'inline' && inlineGroupScope,
-              layout === 'stacked' && groupStyles.stacked,
-              xstyle,
-            ),
+            stylex.props(reset.base, groupStyles.root, xstyle),
             rest,
           )}
         >
-          {children}
+          {lastUsed}
+          {React.Children.toArray(children).length > 0 ? (
+            <div
+              {...mergeStyleProps(
+                themeProps('provider-button-group-row'),
+                stylex.props(
+                  reset.base,
+                  groupStyles.row,
+                  layout === 'inline' && inlineGroupScope,
+                  layout === 'stacked' && groupStyles.rowStacked,
+                ),
+              )}
+            >
+              {children}
+            </div>
+          ) : null}
         </div>
       </ButtonContext.Provider>
     );

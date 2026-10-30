@@ -20,12 +20,14 @@ be its direct children.
     { name: 'icon', type: 'ReactNode' },
     { name: 'longLabel', type: 'string' },
     { name: 'shortLabel', type: 'string' },
+    { name: 'lastUsed', type: 'ReactNode' },
+    { name: 'badge', type: 'string' },
     { name: 'pendingLabel', type: 'string', default: 'pending' },
     { name: 'spinDelay', type: '{ delay?: number; minDuration?: number }' },
   ]}
 />
 
-`layout` and `disabled` belong to `ProviderButtonGroup`. `count` only sets how many buttons this
+`layout`, `disabled` and `lastUsed` belong to `ProviderButtonGroup`. `count` only sets how many buttons this
 preview renders, and `isPending` applies to its first button. The rest belong to `ProviderButton`.
 
 ## Usage
@@ -77,6 +79,26 @@ Each button gets its own row and shows `longLabel`.
 
 <Story
   name='Stacked'
+  storyModule={Stories}
+/>
+
+### Last used
+
+`lastUsed` puts a button on its own row above the others, with its `longLabel`. The other buttons
+pick their labels and rows from their own count. `badge` shows short text on the button's top edge
+and adds it to the accessible name.
+
+<Story
+  name='LastUsed'
+  storyModule={Stories}
+/>
+
+### Long labels
+
+A label that doesn't fit ends in an ellipsis. The icon or spinner keeps its size.
+
+<Story
+  name='LongLabels'
   storyModule={Stories}
 />
 

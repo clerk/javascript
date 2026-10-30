@@ -6,6 +6,7 @@ import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { truncationStyles } from '../../styles/typography.styles';
+import { Badge } from '../badge';
 import type { ButtonProps } from '../button';
 import { Button } from '../button';
 import { ButtonContext } from '../button/button.context';
@@ -19,6 +20,8 @@ export interface ProviderButtonProps extends Omit<ButtonProps, 'children' | 'sha
   longLabel: string;
   /** The provider's name, shown when two buttons share a row. */
   shortLabel: string;
+  /** Short text in a badge on the button's top edge, such as `Last used`. Added to the accessible name. */
+  badge?: string;
   /** Marks the action as running: the button goes inert and announces itself busy. */
   isPending?: boolean;
   /** Accessible name for the pending indicator. The default is untranslated. */
@@ -46,6 +49,7 @@ export const ProviderButton = React.forwardRef<HTMLButtonElement, ProviderButton
     icon,
     longLabel,
     shortLabel,
+    badge,
     isPending = false,
     pendingLabel = 'pending',
     spinDelay,
@@ -71,7 +75,7 @@ export const ProviderButton = React.forwardRef<HTMLButtonElement, ProviderButton
       fullWidth
       disabled={disabled || isPending}
       focusableWhenDisabled={focusableWhenDisabled || isPending}
-      aria-label={longLabel}
+      aria-label={badge ? `${longLabel}, ${badge}` : longLabel}
       aria-busy={isPending || undefined}
       data-pending={isPending ? '' : undefined}
       xstyle={[buttonStyles.root, isPending && buttonStyles.rootPending, xstyle]}
@@ -103,6 +107,14 @@ export const ProviderButton = React.forwardRef<HTMLButtonElement, ProviderButton
       >
         {shortLabel}
       </span>
+      {badge ? (
+        <Badge
+          color='neutral'
+          xstyle={buttonStyles.badge}
+        >
+          {badge}
+        </Badge>
+      ) : null}
     </Button>
   );
 });

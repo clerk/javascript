@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { space } from '../../tokens.stylex';
+import { colorVars, space } from '../../tokens.stylex';
 import { inlineGroupScope } from './provider-button.markers.stylex';
 
 const gap = space['2'];
@@ -11,15 +11,20 @@ const fiveColumns = `0 0 calc((100% - 4 * ${gap}) / 5)`;
 const narrow = '@container (max-width: 20rem)' as const;
 
 export const groupStyles = stylex.create({
-  base: {
+  root: {
+    gap,
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr)',
+    width: '100%',
+  },
+  row: {
     gap,
     containerType: 'inline-size',
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    width: '100%',
   },
-  stacked: {
+  rowStacked: {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
   },
@@ -67,6 +72,19 @@ export const buttonStyles = stylex.create({
   },
   spinnerHidden: {
     opacity: 0,
+  },
+
+  badge: {
+    borderColor: colorVars['--cl-color-border'],
+    borderStyle: 'solid',
+    borderWidth: 1,
+    backgroundColor: colorVars['--cl-color-surface'],
+    boxShadow: `0 0 0 1px ${colorVars['--cl-color-surface']}`,
+    color: colorVars['--cl-color-foreground-secondary'],
+    insetBlockStart: 0,
+    insetInlineEnd: `calc(-1 * ${space['2.5']})`,
+    position: 'absolute',
+    transform: 'translateY(calc(-50% - 2px))',
   },
 
   longLabel: {
