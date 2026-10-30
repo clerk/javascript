@@ -53,6 +53,7 @@ class ClerkExpoModule : Module() {
         emit = { sendEvent(NATIVE_CLIENT_INVALIDATED_EVENT, emptyMap<String, Any?>()) }
     )
     private var configuredProxyUrl: String? = null
+    @Volatile private var updateRequiredViewEnabled = true
 
     private data class AuthFlowStateSnapshot(
         val isLoaded: Boolean,
@@ -78,6 +79,10 @@ class ClerkExpoModule : Module() {
 
         AsyncFunction("configureNative") { pubKey: String, seedDeviceToken: String?, proxyUrl: String?, promise: Promise ->
             configureNative(pubKey, seedDeviceToken, proxyUrl, promise)
+        }
+
+        AsyncFunction("setUpdateRequiredViewEnabled") { enabled: Boolean ->
+            updateRequiredViewEnabled = enabled
         }
 
         AsyncFunction("getDeviceToken") { promise: Promise ->
@@ -110,8 +115,8 @@ class ClerkExpoModule : Module() {
         }
 
         // JS owns client state. The native foreground refresh races SSO completion and mints duplicate clients (#9217).
-        return ClerkConfigurationOptions(proxyUrl = proxyUrl)
-            .withForegroundRefreshDisabled()
+        val options = ClerkConfigurationOptions(proxyUrl = proxyUrl).withForegroundRefreshDisabled()
+        return (if (updateRequiredViewEnabled) options else options.withUpdateRequiredViewDisabled())
             .withCustomHeaders(customHeaders)
     }
 

@@ -7,6 +7,10 @@ export type NativeAuthFlowModule = {
   getAuthFlowState(): Promise<NativeAuthFlowState>;
 };
 
+export type NativeUpdateRequiredViewModule = {
+  setUpdateRequiredViewEnabled(enabled: boolean): Promise<void>;
+};
+
 /**
  * Native storage owns the device token. JS reads it before each FAPI request, writes rotated tokens
  * back with compare-and-set, and refetches its own client on `clerkNativeClientInvalidated`.
