@@ -215,9 +215,9 @@ describe('UserProfile with an active organization', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'));
   });
 
-  it('lists only the account pages in user mode', async () => {
+  it('lists only the account pages when not combined', async () => {
     serveWithOrganization();
-    await renderWithClerk(<UserProfile mode='user' />);
+    await renderWithClerk(<UserProfile combined={false} />);
     expect(tabNames()).toEqual(['Account', 'Security']);
   });
 

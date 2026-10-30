@@ -1,57 +1,19 @@
 'use client';
 
-import type { OrganizationProfileProps, UserProfileProps } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
-import type { CustomProfileItem, CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
+import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useSwitcherController } from './switcher.controller';
 import type { SwitcherModelOptions } from './switcher.model';
 import { useSwitcherModel } from './switcher.model';
-import type { OrganizationProfilePageId } from './switcher.pages';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './switcher.pages';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
 import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';
 import { SwitcherView } from './switcher.view';
 
-/** What a profile opened from the switcher takes beyond the profile component's own props. */
-export interface SwitcherProfilePages<PageId extends string> {
-  /**
-   * Provide custom pages and links to be rendered inside the profile.
-   */
-  customPages?: CustomProfileItem[];
-  /**
-   * Controls the order of the profile's navigation. Accepts the ids of built-in pages and the
-   * `path` of custom pages. Pages not listed are placed after the listed ones. The first entry is
-   * the page the profile opens on, so it cannot be a link.
-   *
-   * @default undefined
-   */
-  pageOrder?: (PageId | (string & {}))[];
-}
-
-/** Options for the underlying `<UserProfile />` component. */
-export interface SwitcherUserProfileProps
-  extends
-    SwitcherProfilePages<UserProfilePageId>,
-    Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'> {}
-
-/** Options for the underlying `<OrganizationProfile />` component. */
-export interface SwitcherOrganizationProfileProps
-  extends SwitcherProfilePages<OrganizationProfilePageId>, Pick<OrganizationProfileProps, 'appearance'> {}
-
 export type SwitcherProps = SwitcherModelOptions &
   SwitcherTriggerProps &
   SwitcherMenuProps & {
-    /**
-     * Specify options for the underlying <UserProfile /> component.
-     * e.g., <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
-     */
-    userProfileProps?: SwitcherUserProfileProps;
-    /**
-     * Specify options for the underlying <OrganizationProfile /> component.
-     * e.g., organizationProfileProps={{appearance: {...}}}
-     */
-    organizationProfileProps?: SwitcherOrganizationProfileProps;
     /**
      * Fallback while loading.
      *
@@ -64,18 +26,10 @@ export type SwitcherProps = SwitcherModelOptions &
 export function Switcher(
   props: SwitcherProps & { mode: SwitcherMode; triggerVariant?: SwitcherTriggerVariant },
 ): ReactElement | null {
-  const {
-    showTriggerLabel,
-    triggerBadge,
-    triggerVariant,
-    mode,
-    userProfileProps,
-    organizationProfileProps,
-    customMenuItems,
-    menuItemOrder,
-    fallback,
-    ...options
-  } = props;
+  const { showTriggerLabel, triggerBadge, triggerVariant, mode, customMenuItems, menuItemOrder, fallback, ...options } =
+    props;
+  const profile = useMosaicProfile();
+  const { userProfileProps, organizationProfileProps } = profile;
   // The portals must outlive the popover, so custom pages are bridged here rather than inside it.
   const userProfile = useCustomPages({
     items: userProfileProps?.customPages,
@@ -94,31 +48,12 @@ export function Switcher(
     </>
   );
   const model = useSwitcherModel(options, {
-    userProfile: {
-      customPages: userProfile.customPages,
-      additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
-      apiKeysProps: userProfileProps?.apiKeysProps,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- `@clerk/shared` types `appearance` as an unresolved type until a framework SDK augments `ClerkAppearanceRegistry`; it passes through untouched.
-      appearance: userProfileProps?.appearance,
+    profile,
+    bridgedCustomPages: {
+      userProfile: userProfile.customPages,
+      organizationProfile: organizationProfile.customPages,
     },
-    organizationProfile: {
-      customPages: organizationProfile.customPages,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- `@clerk/shared` types `appearance` as an unresolved type until a framework SDK augments `ClerkAppearanceRegistry`; it passes through untouched.
-      appearance: organizationProfileProps?.appearance,
-    },
-    newProfiles: {
-      userProfile: {
-        customPages: pagesOnly(userProfileProps?.customPages),
-        pageOrder: userProfileProps?.pageOrder,
-        additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
-        apiKeysProps: userProfileProps?.apiKeysProps,
-        mode: mode === 'combined' ? 'combined' : 'user',
-      },
-      organizationProfile: {
-        customPages: pagesOnly(organizationProfileProps?.customPages),
-        pageOrder: organizationProfileProps?.pageOrder,
-      },
-    },
+    menuMode: mode,
   });
   const controller = useSwitcherController(model, { mode, customMenuItems, menuItemOrder });
 
@@ -149,8 +84,4 @@ export function Switcher(
       {portals}
     </>
   );
-}
-
-function pagesOnly(items: CustomProfileItem[] | undefined): CustomProfilePage[] | undefined {
-  return items?.filter((item): item is CustomProfilePage => item.href === undefined);
 }

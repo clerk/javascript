@@ -15,7 +15,7 @@ import { createPortal } from 'react-dom';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { applyOrder } from '../../utils/apply-order';
 import { USER_PROFILE_PAGE_IDS } from '../user-profile/user-profile.layout';
-import type { CustomProfileItem, CustomProfileLink, UserProfilePageId } from '../user-profile/user-profile.types';
+import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 
 /** A built-in OrganizationProfile page, by the id its navigation uses. */
 export type OrganizationProfilePageId = 'general' | 'members' | 'billing' | 'apiKeys' | 'security';
@@ -59,8 +59,8 @@ export function useOrganizationProfilePages(): OrganizationProfilePageId[] {
 }
 
 export interface CustomPagesOptions {
-  /** Pages and links of the consumer's own. */
-  items: CustomProfileItem[] | undefined;
+  /** Pages of the consumer's own. */
+  items: CustomProfilePage[] | undefined;
   /** The order the profile's navigation should run in, by id. */
   order: readonly string[] | undefined;
   /** The profile's own pages, in the order it shows them, minus any this instance has turned off. */
@@ -73,8 +73,6 @@ export interface CustomPagesBridge {
   /** Render these for as long as the profile can be open, or its pages come up blank. */
   portals: ReactNode[];
 }
-
-const isLink = (item: CustomProfileItem): item is CustomProfileLink => item.href !== undefined;
 
 function portalInto(containers: ReadonlyMap<string, HTMLDivElement>, id: string, node: ReactNode): ReactNode {
   const container = containers.get(id);
@@ -134,21 +132,21 @@ export function useCustomPages({ items, order, builtInPages }: CustomPagesOption
     // icon pair as invalid. So the icon callbacks go out whether or not there is an icon to put
     // through them; without them, leaving `icon` off would silently cost you the page.
     const icon = bind(`icon:${id}`);
-    const content = isLink(item) ? undefined : bind(`content:${id}`);
+    const content = bind(`content:${id}`);
 
     return {
       label: item.label,
-      // A page is routed to by its path; a link is followed to wherever it points.
-      url: isLink(item) ? item.href : item.path,
+      url: item.path,
       mountIcon: icon.mount,
       unmountIcon: icon.unmount,
-      ...(content && { mount: content.mount, unmount: content.unmount }),
+      mount: content.mount,
+      unmount: content.unmount,
     };
   });
 
   const portals = (items ?? []).flatMap(item => [
     portalInto(containers, `icon:${item.path}`, item.icon),
-    ...(isLink(item) ? [] : [portalInto(containers, `content:${item.path}`, item.content)]),
+    portalInto(containers, `content:${item.path}`, item.content),
   ]);
 
   return { customPages, portals };

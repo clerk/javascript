@@ -8,8 +8,8 @@ import { organizationProfilePanels } from '../organization-profile/organization-
 import { useOrganizationProfileModel } from '../organization-profile/organization-profile.model';
 import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
+import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useUserProfilePages } from '../switcher/switcher.pages';
-import type { SwitcherMode } from '../switcher/switcher.types';
 import { userProfilePageIds } from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
@@ -19,12 +19,6 @@ import { UserProfileApiKeysPanel } from './user-profile-api-keys-panel';
 import { UserProfileProfilePanel } from './user-profile-profile-panel';
 import { UserProfileSecurityPanel } from './user-profile-security-panel';
 import { useUserProfileUserModel } from './user-profile-user.model';
-
-/**
- * Which profiles the surface carries. `combined` adds the active organization's pages after the
- * account's; `user` shows the account's alone, even when an organization is active.
- */
-export type UserProfileMode = Exclude<SwitcherMode, 'organization'>;
 
 /** Everything `<UserProfile />` takes: your own pages and their order, the page it opens on, and the OAuth scopes it asks for. */
 export interface UserProfileProps
@@ -47,14 +41,14 @@ export interface UserProfileProps
    */
   apiKeysProps?: APIKeysPageProps;
   /**
-   * Which profiles the surface carries: the account's and the active organization's, or the
-   * account's alone.
+   * Whether the surface adds the active organization's pages after the account's. `false` shows the
+   * account's alone, even when an organization is active.
    *
-   * @default 'combined'
+   * @default `MosaicProvider`'s `profile.combined`, which is `true` unless set
    */
-  mode?: UserProfileMode;
+  combined?: boolean;
   /**
-   * Options for the organization's pages in `combined` mode: your own pages and their order, the API
+   * Options for the organization's pages when `combined`: your own pages and their order, the API
    * keys page, and where leaving the organization lands. `pageOrder` names the organization's pages
    * without the `organization/` prefix, as in `['members', 'general']`.
    */
@@ -89,9 +83,9 @@ export interface UserProfileProps
  * ```
  *
  * @example
- * `mode='user'` leaves the active organization's pages out.
+ * `combined={false}` leaves the active organization's pages out.
  * ```tsx
- * <UserProfile mode='user' />
+ * <UserProfile combined={false} />
  * ```
  *
  * @example
@@ -121,9 +115,36 @@ export interface UserProfileProps
  * ```
  */
 export function UserProfile(props: UserProfileProps) {
+  const { combined, userProfileProps, organizationProfileProps: providerOrganization } = useMosaicProfile();
+  const {
+    combined: ownCombined = combined,
+    customPages = userProfileProps?.customPages,
+    pageOrder = userProfileProps?.pageOrder,
+    additionalOAuthScopes = userProfileProps?.additionalOAuthScopes,
+    apiKeysProps = userProfileProps?.apiKeysProps,
+    organizationProfileProps: {
+      customPages: organizationCustomPages = providerOrganization?.customPages,
+      pageOrder: organizationPageOrder = providerOrganization?.pageOrder,
+      apiKeysProps: organizationApiKeysProps = providerOrganization?.apiKeysProps,
+      afterLeaveOrganizationUrl = providerOrganization?.afterLeaveOrganizationUrl,
+    } = {},
+    ...rest
+  } = props;
+
   return (
     <UserProfileSurface
-      {...props}
+      {...rest}
+      combined={ownCombined}
+      customPages={customPages}
+      pageOrder={pageOrder}
+      additionalOAuthScopes={additionalOAuthScopes}
+      apiKeysProps={apiKeysProps}
+      organizationProfileProps={{
+        customPages: organizationCustomPages,
+        pageOrder: organizationPageOrder,
+        apiKeysProps: organizationApiKeysProps,
+        afterLeaveOrganizationUrl,
+      }}
       presentation='mounted'
     />
   );
@@ -131,7 +152,7 @@ export function UserProfile(props: UserProfileProps) {
 
 export function UserProfileSurface({
   presentation,
-  mode = 'combined',
+  combined = true,
   organizationProfileProps,
   customPages,
   pageOrder,
@@ -168,13 +189,13 @@ export function UserProfileSurface({
       additionalOAuthScopes={additionalOAuthScopes}
       mode={presentation}
     >
-      {mode === 'user' ? (
-        <AccountUserProfileView {...viewProps} />
-      ) : (
+      {combined ? (
         <CombinedUserProfileView
           {...viewProps}
           organizationProfileProps={organizationProfileProps}
         />
+      ) : (
+        <AccountUserProfileView {...viewProps} />
       )}
     </UserProfileProvider>
   );

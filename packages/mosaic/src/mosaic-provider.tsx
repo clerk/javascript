@@ -2,6 +2,8 @@ import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
 import { organizationProfileModal } from './features/organization-profile/organization-profile.modal';
+import type { MosaicProfile } from './features/profile-pages/use-mosaic-profile';
+import { MosaicProfileProvider } from './features/profile-pages/use-mosaic-profile';
 import { userProfileModal } from './features/user-profile/user-profile.modal';
 import { UserProfileModalReturn } from './features/user-profile/user-profile.modal-return';
 import type { MosaicExperimental } from './hooks/use-mosaic-experimental';
@@ -26,6 +28,8 @@ export interface MosaicProviderProps {
   localization?: MosaicLocalization;
   /** Features still being tried out. Their names and behavior can change in any release. */
   experimental?: MosaicExperimental;
+  /** The profile `UserButton`, `OrganizationSwitcher`, `UserProfile` and `OrganizationProfile` share: its shape, and the options it takes. */
+  profile?: MosaicProfile;
 }
 
 // Exported Mosaic components annotate a React return type on purpose. The package sets
@@ -37,6 +41,7 @@ export function MosaicProvider({
   icons,
   localization,
   experimental,
+  profile = defaultProfile,
 }: MosaicProviderProps): React.ReactElement {
   const iconsValue = React.useMemo(() => icons ?? {}, [icons]);
   const localizationValue = React.useMemo(() => resolveLocalization(localization), [localization]);
@@ -50,12 +55,14 @@ export function MosaicProvider({
         <MosaicLocalizationProvider value={localizationValue}>
           <MosaicNowProvider value={now}>
             <MosaicExperimentalProvider value={experimentalValue}>
-              <ToastProvider>
-                <ModalHost surfaces={modalSurfaces}>
-                  <UserProfileModalReturn />
-                  {children}
-                </ModalHost>
-              </ToastProvider>
+              <MosaicProfileProvider value={profile}>
+                <ToastProvider>
+                  <ModalHost surfaces={modalSurfaces}>
+                    <UserProfileModalReturn />
+                    {children}
+                  </ModalHost>
+                </ToastProvider>
+              </MosaicProfileProvider>
             </MosaicExperimentalProvider>
           </MosaicNowProvider>
         </MosaicLocalizationProvider>
@@ -64,4 +71,5 @@ export function MosaicProvider({
   );
 }
 
+const defaultProfile: MosaicProfile = {};
 const modalSurfaces: ModalSurfaces = [userProfileModal, organizationProfileModal];

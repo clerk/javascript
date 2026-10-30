@@ -72,9 +72,9 @@ drops the fallback instead of holding the space open. Keep the two apart.
   pair so it cannot contradict itself:
 
   ```ts
-  type UserProfileMode =
-    | { userProfileUrl: string; userProfileMode?: 'navigation' }
-    | { userProfileUrl?: never; userProfileMode?: 'modal' };
+  type CreateOrganizationMode =
+    | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
+    | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
   ```
 
 ## Rules

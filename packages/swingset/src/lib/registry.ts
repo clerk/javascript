@@ -226,6 +226,7 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
+import { meta as profilePermutationsMeta } from '../stories/profile-permutations.stories';
 import {
   Default as ProviderButtonDefault,
   Many as ProviderButtonMany,
@@ -1030,6 +1031,7 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
+  { meta: profilePermutationsMeta },
   // User Profile
   userProfileModule,
   // User Profile · Panels

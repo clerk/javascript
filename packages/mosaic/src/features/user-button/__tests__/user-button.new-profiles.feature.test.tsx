@@ -17,6 +17,7 @@ import {
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { PortalProvider } from '../../../primitives/portal';
+import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import { signedIn as withConnectedAccounts } from '../../user-profile/user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
@@ -98,11 +99,15 @@ const terms = { label: 'Terms', path: 'terms', content: <p>Terms body</p> };
 describe('UserButton with experimental.newProfiles', () => {
   const newProfiles = { newProfiles: true };
 
-  async function renderWithNewProfiles(props: UserButtonProps = {}, seed: FakeFapiSeed = signedIn()) {
+  async function renderWithNewProfiles(
+    props: UserButtonProps = {},
+    seed: FakeFapiSeed = signedIn(),
+    profile?: MosaicProfile,
+  ) {
     await page.viewport(1280, 800);
     onTestFinished(() => page.viewport(414, 896));
     serveFapi(seed);
-    return renderWithClerk(tree(props), undefined, undefined, newProfiles);
+    return renderWithClerk(tree(props), undefined, undefined, newProfiles, profile);
   }
 
   const profileTabs = () => screen.getAllByRole('tab').map(tab => tab.textContent);
@@ -157,10 +162,10 @@ describe('UserButton with experimental.newProfiles', () => {
     expect(within(container).getByRole('tab', { name: 'Account' })).toBeInTheDocument();
   });
 
-  it('renders custom pages in their order, and leaves out links', async () => {
-    await renderWithNewProfiles({
+  it('renders custom pages in their order', async () => {
+    await renderWithNewProfiles({}, undefined, {
       userProfileProps: {
-        customPages: [terms, { label: 'Docs', path: 'docs', href: 'https://example.com/docs' }],
+        customPages: [terms],
         pageOrder: ['terms', 'account'],
       },
     });
@@ -174,7 +179,9 @@ describe('UserButton with experimental.newProfiles', () => {
   });
 
   it("lists the organization's own pages in order in the combined profile", async () => {
-    await renderWithNewProfiles({ organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] } });
+    await renderWithNewProfiles({}, undefined, {
+      organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] },
+    });
     const user = await open();
 
     await user.click(screen.getByRole('button', { name: 'Settings' }));
@@ -184,7 +191,7 @@ describe('UserButton with experimental.newProfiles', () => {
   });
 
   it('still asks which to manage when the organization profile routes to a page', async () => {
-    const { navigate } = await renderWithNewProfiles({ organizationProfileUrl: '/org' });
+    const { navigate } = await renderWithNewProfiles({}, undefined, { organizationProfileUrl: '/org' });
     const user = await open();
 
     await openSettings(user, 'Manage organization');
@@ -192,8 +199,8 @@ describe('UserButton with experimental.newProfiles', () => {
     expect(navigate).toHaveBeenCalledWith('/org');
   });
 
-  it("leaves the organization's pages out in user mode", async () => {
-    await renderWithNewProfiles({ mode: 'user' });
+  it("leaves the organization's pages out of a separate profile", async () => {
+    await renderWithNewProfiles({ combined: false }, undefined, { combined: false });
     const user = await open();
 
     await user.click(screen.getByRole('button', { name: 'Settings' }));

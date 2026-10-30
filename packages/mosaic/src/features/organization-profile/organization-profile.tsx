@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
+import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { organizationProfilePageIds } from './organization-profile.layout';
 import { useOrganizationProfileModel } from './organization-profile.model';
 import type { OrganizationProfileOptions } from './organization-profile.provider';
@@ -79,14 +80,16 @@ export interface OrganizationProfileProps
  * <OrganizationProfile afterLeaveOrganizationUrl='/organizations' />
  * ```
  */
-export function OrganizationProfile({
-  customPages,
-  pageOrder,
-  defaultPage,
-  afterLeaveOrganizationUrl,
-  fallback,
-  apiKeysProps,
-}: OrganizationProfileProps) {
+export function OrganizationProfile(props: OrganizationProfileProps) {
+  const { organizationProfileProps } = useMosaicProfile();
+  const {
+    customPages = organizationProfileProps?.customPages,
+    pageOrder = organizationProfileProps?.pageOrder,
+    defaultPage,
+    afterLeaveOrganizationUrl = organizationProfileProps?.afterLeaveOrganizationUrl,
+    fallback,
+    apiKeysProps = organizationProfileProps?.apiKeysProps,
+  } = props;
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
   const navigation = useProfilePagesController(
