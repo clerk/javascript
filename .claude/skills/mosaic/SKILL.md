@@ -76,6 +76,19 @@ The migration workflow (`packages/mosaic/docs/migration.md`) ties the flow refer
 treats the legacy component as the spec and drives you through the model,
 controller, and view layers, then verifies parity with `parity-audit.md`.
 
+## Breaking changes
+
+While `@clerk/mosaic` is on 0.x, a breaking change is a `patch` changeset. Start
+its body with `**Breaking:**`, then say what changed and how to update.
+
+```md
+---
+'@clerk/mosaic': patch
+---
+
+**Breaking:** Rename `renderTriggerLabel` to `showTriggerLabel`. Values and defaults are unchanged; TypeScript flags each old name.
+```
+
 ## Documenting a component in swingset
 
 `packages/swingset/CLAUDE.md` is the house style — archetypes, required section
