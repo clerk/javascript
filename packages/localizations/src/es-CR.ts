@@ -1600,6 +1600,7 @@ export const esCR: LocalizationResource = {
       actionText: '¿No posees ninguno de estos?',
       blockButton__backupCode: 'Utiliza un código de respaldo',
       blockButton__emailCode: 'Envía el código a {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'Utiliza tu llave de acceso',
       blockButton__password: 'Continúa con tu contraseña',
       blockButton__phoneCode: 'Enviar un mensaje de texto a {{identifier}}',
@@ -1621,6 +1622,10 @@ export const esCR: LocalizationResource = {
       resendButton: '¿No recibiste un código? Reenviar',
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Revisa tu correo electrónico',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'No se puede proceder con el inicio de sesión. No hay ningún factor de autenticación disponible',

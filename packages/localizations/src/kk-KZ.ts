@@ -1588,6 +1588,7 @@ export const kkKZ: LocalizationResource = {
       actionText: 'Бұл опциялар жоқ па?',
       blockButton__backupCode: 'Сақтық кодын қолдану',
       blockButton__emailCode: '{{identifier}} электрондық поштасына код жіберу',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'Passkey қолдану',
       blockButton__password: 'Құпия сөзбен жалғастыру',
       blockButton__phoneCode: '{{identifier}} нөміріне SMS жіберу',
@@ -1609,6 +1610,10 @@ export const kkKZ: LocalizationResource = {
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',
       subtitle: 'Жалғастыру үшін электрондық поштаңызға жіберілген кодты енгізіңіз',
       title: 'Растау қажет',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Растау мүмкін емес. Ешбір аутентификация әдісі қосылмаған.',

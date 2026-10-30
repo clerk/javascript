@@ -4,7 +4,7 @@ import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
 import { eventMethodCalled } from '../../telemetry';
-import type { Clerk, SessionVerificationLevel } from '../../types';
+import type { Clerk, OAuthFlow, SessionVerificationLevel } from '../../types';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
@@ -58,6 +58,12 @@ export type NeedsReverificationParameters = {
  * @interface
  */
 export type UseReverificationOptions = {
+  /**
+   * Control whether enterprise SSO verification in the default UI uses a popup or a full-page redirect. `'auto'` follows the same heuristic as the sign-in component.
+   *
+   * @default `'popup'`
+   */
+  oauthFlow?: OAuthFlow;
   /**
    * Handler for the reverification process. Opts out of using the default UI. Use this to build a custom UI.
    *
@@ -140,6 +146,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
            */
           params.openUIComponent?.({
             level: level,
+            oauthFlow: params.oauthFlow,
             afterVerification: complete,
             afterVerificationCancelled: cancel,
           });
