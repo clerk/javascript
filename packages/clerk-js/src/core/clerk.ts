@@ -697,7 +697,7 @@ export class Clerk implements ClerkInterface {
           ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
         });
       }
-      this.#protect?.load(this.environment as Environment);
+      this.#protect?.load(this.environment as Environment, this.frontendApi);
       debugLogger.info('load() complete', {}, 'clerk');
     } catch (error) {
       this.#publicEventBus.emit(clerkEvents.Status, 'error');

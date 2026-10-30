@@ -24,7 +24,7 @@ export class Protect {
     return this.#challengeLoadTimeoutMs;
   }
 
-  load(env: Environment): void {
+  load(env: Environment, frontendApi: string): void {
     const config = env?.protectConfig;
 
     if (!config?.loaders || !Array.isArray(config.loaders) || config.loaders.length === 0) {
@@ -44,13 +44,13 @@ export class Protect {
     // The config is server-controlled and cached, so nothing it can contain may take `Clerk.load()`
     // down with it.
     try {
-      this.#apply(config.loaders, config.tokens_invalid_before);
+      this.#apply(config.loaders, frontendApi, config.tokens_invalid_before);
     } catch (error) {
       logger.warnOnce(`[protect] failed to load: ${error}`);
     }
   }
 
-  #apply(configured: ProtectLoader[], tokensInvalidBefore?: number): void {
+  #apply(configured: ProtectLoader[], frontendApi: string, tokensInvalidBefore?: number): void {
     // Rollout is decided before anything else, because the session is only meaningful for the
     // loaders we are actually going to apply.
     const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
@@ -68,7 +68,7 @@ export class Protect {
     // Only an instance whose loaders reference the correlation id gets a session, so an instance
     // not using it is unaffected and stores nothing in the browser.
     const applyLoader: ApplyLoader = (loader, placeholders) => this.applyLoader(loader, placeholders);
-    this.#session = ProtectSession.create(loaders, applyLoader, tokensInvalidBefore);
+    this.#session = ProtectSession.create(loaders, applyLoader, frontendApi, tokensInvalidBefore);
 
     for (const loader of loaders) {
       // The session injects this one itself, under the acquisition lock, so exactly one tab per
