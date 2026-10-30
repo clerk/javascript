@@ -3,8 +3,8 @@
 Migrating a legacy component means taking logic that was fused into one file and
 pulling it apart into the model / controller / view layers (see the skill
 overview and `packages/mosaic/ARCHITECTURE.md` → "Flow and data architecture").
-`packages/mosaic/src/features/user-button/` is the fullest worked example of the
-finished shape.
+`packages/mosaic/src/features/reverification/` is a compact worked example of the
+finished shape: model, controller, view, types, messages, wrapper, and a feature test.
 
 **The core risk this workflow exists to manage:** a legacy component fuses
 rendering, data-fetching, and flow logic into one blob. Splitting it three ways

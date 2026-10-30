@@ -12,7 +12,7 @@ Users pass an `appearance` prop to `<ClerkProvider>` (global) or directly to ind
 
 ```tsx
 import { ClerkProvider } from '@clerk/nextjs';
-import { dark } from '@clerk/themes';
+import { dark } from '@clerk/ui/themes';
 
 <ClerkProvider
   appearance={{
