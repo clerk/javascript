@@ -382,7 +382,7 @@ describe('OrganizationSwitcher with experimental.newProfiles', () => {
     await page.viewport(1280, 800);
     onTestFinished(() => page.viewport(414, 896));
     serveFapi(noOffers());
-    return renderWithClerk(tree(props), undefined, undefined, { newProfiles: true });
+    return renderWithClerk(tree(props), undefined, undefined, { newProfiles: true }, { combined: false });
   }
 
   it('opens the OrganizationProfile, without the account pages, from Settings', async () => {

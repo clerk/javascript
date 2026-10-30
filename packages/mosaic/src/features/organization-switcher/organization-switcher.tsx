@@ -8,11 +8,11 @@ import type { OrganizationSwitcherModelOptions } from '../switcher/switcher.mode
 import type { SwitcherMenuProps } from '../switcher/switcher.types';
 import type { SwitcherTriggerProps } from '../switcher/switcher.view';
 
-/** Everything `<OrganizationSwitcher />` takes: profile routing, trigger content, the app's own menu rows, and the profile it opens. */
+/** Everything `<OrganizationSwitcher />` takes: profile routing, trigger content, and the app's own menu rows. */
 export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
   SwitcherTriggerProps &
   SwitcherMenuProps &
-  Pick<SwitcherProps, 'organizationProfileProps' | 'fallback'>;
+  Pick<SwitcherProps, 'fallback'>;
 
 /**
  * The active organization's avatar, and the menu behind it: switch organization or back to the
@@ -47,14 +47,10 @@ export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
  * ```
  *
  * @example
- * `customPages` adds your own pages to the organization profile; `customMenuItems` adds your own rows
- * beside Settings, each one either an `onClick` action or an `href` link.
+ * `customMenuItems` adds your own rows beside Settings, each one either an `onClick` action or an
+ * `href` link. The profile's own pages are set on `MosaicProvider`'s `profile`.
  * ```tsx
  * <OrganizationSwitcher
- *   organizationProfileProps={{
- *     customPages: [{ path: 'audit', label: 'Audit log', icon: <ListIcon />, content: <AuditPage /> }],
- *     pageOrder: ['general', 'members', 'audit'],
- *   }}
  *   customMenuItems={[{ id: 'docs', label: 'Documentation', icon: <BookIcon />, href: 'https://example.com/docs' }]}
  * />
  * ```

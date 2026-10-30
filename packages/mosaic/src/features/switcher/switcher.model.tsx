@@ -28,6 +28,7 @@ import type {
   SwitcherData,
   SwitcherInvitation,
   SwitcherMembership,
+  SwitcherMode,
   SwitcherSession,
   SwitcherSuggestion,
 } from './switcher.types';
@@ -122,9 +123,11 @@ export interface SwitcherModalProps {
   newProfiles?: {
     userProfile?: Pick<
       UserProfileModalOptions,
-      'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'mode'
+      'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'combined'
     >;
     organizationProfile?: Pick<OrganizationProfileModalOptions, 'customPages' | 'pageOrder'>;
+    /** Which switchers the opening menu carries. Only a menu with both has one Settings row for two targets. */
+    menuMode?: SwitcherMode;
   };
 }
 
@@ -191,7 +194,7 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 /**
  * @param modals - Props forwarded to the profile modals. Custom pages for Clerk's arrive already bridged,
  *   since only the wrapper can render the portals behind them. With `experimental.newProfiles`, a
- *   `combined` user profile also carries the organization's pages, so managing the organization opens it
+ *   combined user profile also carries the organization's pages, so managing the organization opens it
  *   on them.
  */
 export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
@@ -241,7 +244,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     openModal: () => {
       if (!newProfiles) {
         clerk.openOrganizationProfile({ getContainer, ...modals?.organizationProfile, afterLeaveOrganizationUrl });
-      } else if (mosaicUserProfile?.mode === 'combined') {
+      } else if (mosaicUserProfile?.combined) {
         userProfile.open(
           { ...mosaicUserProfile, organizationProfileProps: mosaicOrganizationProfile, page: 'organization/general' },
           getContainer?.(),
@@ -256,7 +259,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
 
   const managesBothInOneProfile =
     newProfiles &&
-    mosaicUserProfile?.mode === 'combined' &&
+    modals?.newProfiles?.menuMode === 'combined' &&
+    mosaicUserProfile?.combined &&
     opensModal(options?.userProfileUrl, options?.userProfileMode) &&
     opensModal(options?.organizationProfileUrl, options?.organizationProfileMode);
 

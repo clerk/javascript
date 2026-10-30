@@ -5,7 +5,6 @@ import type {
 import { OrganizationProfileView } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import type { SwitcherViewProps } from '@clerk/mosaic/features/switcher/switcher.view';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
-import type { UserButtonMode } from '@clerk/mosaic/features/user-button/user-button';
 import type {
   UserProfileModalContentProps,
   UserProfileModalOptions,
@@ -116,7 +115,7 @@ export function CombinedButtonAndSwitcher(_args: Record<string, unknown>) {
 }
 
 interface PermutationProps {
-  userButton?: UserButtonMode;
+  userButton?: 'combined' | 'user';
   organizationSwitcher?: boolean;
   profile: 'combined' | 'separate';
 }
@@ -134,16 +133,16 @@ function Triggers({ userButton, organizationSwitcher = false, profile }: Permuta
   const [openSurface, setOpenSurface] = useState<'userButton' | 'organizationSwitcher'>('userButton');
   const userProfile = useModal(fixtureUserProfileModal);
   const organizationProfile = useModal(fixtureOrganizationProfileModal);
-  const combined = profile === 'combined' && prototype.activeOrganization ? 'combined' : 'user';
+  const combined = profile === 'combined' && Boolean(prototype.activeOrganization);
 
   const manageAccount = () => {
     prototype.onManageAccount?.();
-    userProfile.open({ mode: combined });
+    userProfile.open({ combined });
   };
   const manageOrganization = () => {
     prototype.onManageOrganization?.();
     if (profile === 'combined') {
-      userProfile.open({ mode: combined, page: 'organization/general' });
+      userProfile.open({ combined, page: 'organization/general' });
     } else {
       organizationProfile.open();
     }
@@ -202,7 +201,7 @@ function FixtureUserProfile({ options }: UserProfileModalContentProps) {
     <UserProfileView
       activePage={activePage}
       pages={pages}
-      organization={options?.mode === 'combined' ? { pages: organization.pages } : undefined}
+      organization={options?.combined ? { pages: organization.pages } : undefined}
       onPageChange={setActivePage}
     />
   );

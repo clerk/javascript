@@ -16,7 +16,12 @@ import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { applyOrder } from '../../utils/apply-order';
 import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
 import { USER_PROFILE_PAGE_IDS } from '../user-profile/user-profile.layout';
-import type { CustomProfileItem, CustomProfileLink, UserProfilePageId } from '../user-profile/user-profile.types';
+import type {
+  CustomProfileItem,
+  CustomProfileLink,
+  CustomProfilePage,
+  UserProfilePageId,
+} from '../user-profile/user-profile.types';
 
 /**
  * The UserProfile's own pages, in the order it lists them, minus the ones this instance has turned
@@ -150,4 +155,9 @@ export function useCustomPages({ items, order, builtInPages }: CustomPagesOption
   ]);
 
   return { customPages, portals };
+}
+
+/** The pages among a profile's custom items. Mosaic's own profiles skip the link entries. */
+export function pagesOnly(items: CustomProfileItem[] | undefined): CustomProfilePage[] | undefined {
+  return items?.filter((item): item is CustomProfilePage => item.href === undefined);
 }
