@@ -125,6 +125,8 @@ export function UserProfile(props: UserProfileProps) {
     organizationProfileProps: ownOrganizationProfileProps = {
       customPages: pagesOnly(organizationProfileProps?.customPages),
       pageOrder: organizationProfileProps?.pageOrder,
+      apiKeysProps: organizationProfileProps?.apiKeysProps,
+      afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
     },
     ...rest
   } = props;

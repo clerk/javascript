@@ -4,10 +4,12 @@ import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
+import { openDialog } from '../../../__tests__/feature/dialog';
 import { type FakeFapiSeed, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEmailAddress,
+  fapiEnvironment,
   fapiMembership,
   fapiOrganization,
   fapiSession,
@@ -15,6 +17,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { OrganizationProfile } from '../../organization-profile/organization-profile';
 import { OrganizationSwitcher } from '../../organization-switcher/organization-switcher';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import { UserButton } from '../../user-button/user-button';
@@ -73,6 +76,15 @@ async function chooseSetting(trigger: () => HTMLElement, label: string) {
   await user.click(trigger());
   await openMenu(user, settings());
   await user.click(screen.getByRole('menuitem', { name: label }));
+}
+
+async function leaveOrganization() {
+  const user = userEvent.setup();
+  const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
+    role: 'alertdialog',
+  });
+  await user.type(within(dialog).getByRole('textbox'), 'Acme');
+  await user.click(within(dialog).getByRole('button', { name: 'Leave organization' }));
 }
 
 beforeEach(async () => {
@@ -156,8 +168,45 @@ describe('the profile the switchers open', () => {
     expect(tabs()).toEqual(accountTabs);
   });
 
+  it('routes both profiles with URLs from the provider', async () => {
+    const { navigate } = await renderWithProfile(<OrganizationSwitcher />, {
+      userProfileUrl: '/account',
+      organizationProfileUrl: '/org',
+    });
+
+    await clickSettings(switcherTrigger);
+
+    expect(navigate).toHaveBeenCalledWith('/org');
+  });
+
+  it("hides the organization's API keys from the profile a switcher opens", async () => {
+    const keysMemberships = [fapiMembership(acme, { permissions: ['org:sys_api_keys:read'] })];
+    await renderWithProfile(
+      <OrganizationSwitcher />,
+      { combined: false, organizationProfileProps: { apiKeysProps: { hide: true } } },
+      {
+        environment: fapiEnvironment({
+          api_keys_settings: { user_api_keys_enabled: false, orgs_api_keys_enabled: true },
+        }),
+        client: fapiClient([
+          fapiSession({
+            id: 'sess_1',
+            user: { ...alice, organization_memberships: keysMemberships },
+            last_active_organization_id: 'org_1',
+          }),
+        ]),
+        memberships: keysMemberships,
+      },
+    );
+
+    await clickSettings(switcherTrigger);
+
+    expect(await selectedTab('General')).toBeInTheDocument();
+    expect(tabs()).toEqual(['General']);
+  });
+
   it('routes the one profile with a URL, and opens the other as a modal', async () => {
-    const { navigate } = await renderWithProfile(<UserButton userProfileUrl='/account' />);
+    const { navigate } = await renderWithProfile(<UserButton />, { userProfileUrl: '/account' });
 
     await chooseSetting(buttonTrigger, 'Manage profile');
     expect(navigate).toHaveBeenCalledWith('/account');
@@ -203,7 +252,48 @@ describe('the profile the switchers open', () => {
   });
 });
 
+describe('a mounted OrganizationProfile under a provider profile', () => {
+  const audit = { ...terms, label: 'Audit', path: 'audit' };
+
+  it("uses the provider's profile props, leaving links out", async () => {
+    await renderWithProfile(<OrganizationProfile />, {
+      organizationProfileProps: {
+        customPages: [audit, { label: 'Docs', path: 'docs', href: 'https://example.com/docs' }],
+        pageOrder: ['audit'],
+      },
+    });
+
+    await waitFor(() => expect(tabs()).toEqual(['Audit', 'General', 'Members']));
+  });
+
+  it('lets its own props win over the provider', async () => {
+    await renderWithProfile(<OrganizationProfile customPages={[{ ...terms, label: 'Own', path: 'own' }]} />, {
+      organizationProfileProps: { customPages: [audit] },
+    });
+
+    await waitFor(() => expect(tabs()).toEqual(['General', 'Members', 'Own']));
+  });
+
+  it('lands where the provider says after leaving the organization', async () => {
+    const { navigate } = await renderWithProfile(<OrganizationProfile />, {
+      organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
+    });
+    await leaveOrganization();
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/left'));
+  });
+});
+
 describe('a mounted UserProfile under a provider profile', () => {
+  it('lands where the provider says after leaving the organization', async () => {
+    const { navigate } = await renderWithProfile(<UserProfile defaultPage='organization/general' />, {
+      organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
+    });
+    await leaveOrganization();
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/left'));
+  });
+
   it.each([
     { name: 'follows the provider', profile: separate, combined: undefined, expected: accountTabs },
     { name: 'defaults to combined', profile: undefined, combined: undefined, expected: allTabs },

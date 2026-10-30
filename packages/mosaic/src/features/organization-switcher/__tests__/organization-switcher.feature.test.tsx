@@ -17,6 +17,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import type { OrganizationSwitcherProps } from '../organization-switcher';
 import { OrganizationSwitcher } from '../organization-switcher';
 
@@ -71,9 +72,13 @@ function tree(props: OrganizationSwitcherProps = {}) {
   );
 }
 
-function renderSwitcher(props: OrganizationSwitcherProps = {}, seed: FakeFapiSeed = signedIn()) {
+function renderSwitcher(
+  props: OrganizationSwitcherProps = {},
+  seed: FakeFapiSeed = signedIn(),
+  profile?: MosaicProfile,
+) {
   const fapi = serveFapi(seed);
-  return renderWithClerk(tree(props)).then(view => ({ ...view, fapi }));
+  return renderWithClerk(tree(props), undefined, undefined, undefined, profile).then(view => ({ ...view, fapi }));
 }
 
 const host = () => screen.getByTestId('host');
@@ -222,7 +227,9 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('tells the organization profile where to land after leaving', async () => {
-      const { clerk } = await renderSwitcher({ afterLeaveOrganizationUrl: '/left' }, noOffers());
+      const { clerk } = await renderSwitcher({}, noOffers(), {
+        organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
+      });
       const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
       const user = await openWithList();
 
@@ -378,11 +385,11 @@ describe('OrganizationSwitcher custom trigger badges', () => {
 });
 
 describe('OrganizationSwitcher with experimental.newProfiles', () => {
-  async function renderWithNewProfiles(props: OrganizationSwitcherProps = {}) {
+  async function renderWithNewProfiles(profile: MosaicProfile = { combined: false }) {
     await page.viewport(1280, 800);
     onTestFinished(() => page.viewport(414, 896));
     serveFapi(noOffers());
-    return renderWithClerk(tree(props), undefined, undefined, { newProfiles: true }, { combined: false });
+    return renderWithClerk(tree(), undefined, undefined, { newProfiles: true }, profile);
   }
 
   it('opens the OrganizationProfile, without the account pages, from Settings', async () => {
@@ -397,8 +404,14 @@ describe('OrganizationSwitcher with experimental.newProfiles', () => {
     expect(openOrganizationProfile).not.toHaveBeenCalled();
   });
 
-  it('lands on afterLeaveOrganizationUrl after leaving from the opened profile', async () => {
-    const { navigate } = await renderWithNewProfiles({ afterLeaveOrganizationUrl: '/left' });
+  it.each([
+    { name: 'separate', combined: false },
+    { name: 'combined', combined: true },
+  ])('lands on afterLeaveOrganizationUrl after leaving from the opened profile: $name', async ({ combined }) => {
+    const { navigate } = await renderWithNewProfiles({
+      combined,
+      organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
+    });
     const user = await openWithList();
 
     await user.click(screen.getByRole('button', { name: 'Settings' }));

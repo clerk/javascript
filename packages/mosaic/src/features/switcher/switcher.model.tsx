@@ -19,6 +19,7 @@ import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
 import type { OrganizationProfileModalOptions } from '../organization-profile/organization-profile.modal.types';
+import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { userProfileModal } from '../user-profile/user-profile.modal';
 import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type {
@@ -55,35 +56,6 @@ export type SwitcherModel =
         organizationsEnabled: boolean;
       });
 
-/** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
-type UserProfileMode =
-  | {
-      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
-      userProfileUrl: string;
-      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
-      userProfileMode?: 'navigation';
-    }
-  | {
-      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
-      userProfileUrl?: never;
-      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
-      userProfileMode?: 'modal';
-    };
-
-type OrganizationProfileMode =
-  | {
-      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
-      organizationProfileUrl: string;
-      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
-      organizationProfileMode?: 'navigation';
-    }
-  | {
-      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
-      organizationProfileUrl?: never;
-      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
-      organizationProfileMode?: 'modal';
-    };
-
 type CreateOrganizationMode =
   | {
       /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
@@ -98,18 +70,15 @@ type CreateOrganizationMode =
       createOrganizationMode?: 'modal';
     };
 
-export type SwitcherModelOptions = UserProfileMode &
-  OrganizationSwitcherModelOptions &
+export type SwitcherModelOptions = OrganizationSwitcherModelOptions &
   Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
 
-export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
-  CreateOrganizationMode &
+export type OrganizationSwitcherModelOptions = CreateOrganizationMode &
   Pick<
     OrganizationSwitcherProps,
     | 'afterSelectOrganizationUrl'
     | 'afterSelectPersonalUrl'
     | 'afterCreateOrganizationUrl'
-    | 'afterLeaveOrganizationUrl'
     | 'skipInvitationScreen'
     | 'hidePersonal'
   >;
@@ -117,14 +86,20 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 /** Props forwarded to the profile modals this button opens. */
 export interface SwitcherModalProps {
   userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
-  organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
+  organizationProfile?: Pick<
+    OrganizationProfileModalProps,
+    'customPages' | 'appearance' | 'afterLeaveOrganizationUrl' | 'apiKeysProps'
+  >;
   /** What Mosaic's own profiles take when `experimental.newProfiles` opens them instead. */
   newProfiles?: {
     userProfile?: Pick<
       UserProfileModalOptions,
       'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'combined'
     >;
-    organizationProfile?: Pick<OrganizationProfileModalOptions, 'customPages' | 'pageOrder'>;
+    organizationProfile?: Pick<
+      OrganizationProfileModalOptions,
+      'customPages' | 'pageOrder' | 'afterLeaveOrganizationUrl' | 'apiKeysProps'
+    >;
     /** Which switchers the opening menu carries. Only a menu with both has one Settings row for two targets. */
     menuMode?: SwitcherMode;
   };
@@ -210,6 +185,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const userProfile = useModal(userProfileModal);
   const organizationProfile = useModal(organizationProfileModal);
   const { newProfiles } = useMosaicExperimental();
+  const { userProfileUrl, userProfileMode, organizationProfileUrl, organizationProfileMode } = useMosaicProfile();
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -221,13 +197,12 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     enabled: Boolean(environment?.organizationSettings.enabled),
   });
 
-  const afterLeaveOrganizationUrl = options?.afterLeaveOrganizationUrl;
   const mosaicUserProfile = modals?.newProfiles?.userProfile;
-  const mosaicOrganizationProfile = { ...modals?.newProfiles?.organizationProfile, afterLeaveOrganizationUrl };
+  const mosaicOrganizationProfile = modals?.newProfiles?.organizationProfile;
 
   const manageAccount = openOrNavigate({
-    url: options?.userProfileUrl,
-    mode: options?.userProfileMode,
+    url: userProfileUrl,
+    mode: userProfileMode,
     openModal: () =>
       newProfiles
         ? userProfile.open(
@@ -240,11 +215,11 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
 
   const manageOrganization = openOrNavigate({
-    url: options?.organizationProfileUrl,
-    mode: options?.organizationProfileMode,
+    url: organizationProfileUrl,
+    mode: organizationProfileMode,
     openModal: () => {
       if (!newProfiles) {
-        clerk.openOrganizationProfile({ getContainer, ...modals?.organizationProfile, afterLeaveOrganizationUrl });
+        clerk.openOrganizationProfile({ getContainer, ...modals?.organizationProfile });
       } else if (mosaicUserProfile?.combined) {
         userProfile.open(
           { ...mosaicUserProfile, organizationProfileProps: mosaicOrganizationProfile, page: 'organization/general' },
@@ -262,8 +237,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     newProfiles &&
     modals?.newProfiles?.menuMode === 'combined' &&
     mosaicUserProfile?.combined &&
-    opensModal(options?.userProfileUrl, options?.userProfileMode) &&
-    opensModal(options?.organizationProfileUrl, options?.organizationProfileMode);
+    opensModal(userProfileUrl, userProfileMode) &&
+    opensModal(organizationProfileUrl, organizationProfileMode);
 
   const createOrganization = openOrNavigate({
     url: options?.createOrganizationUrl,

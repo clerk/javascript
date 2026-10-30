@@ -35,11 +35,11 @@ export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
  * ```
  *
  * @example
- * Passing a URL routes to a page of your own instead of opening Clerk's modal. `afterSelectOrganizationUrl`
- * is where switching organization lands, and takes a `:param` template, a plain path, or a function.
+ * `createOrganizationUrl` routes to a page of your own instead of opening Clerk's modal. `afterSelectOrganizationUrl`
+ * is where switching organization lands, and takes a `:param` template, a plain path, or a function. Set
+ * `organizationProfileUrl` on `MosaicProvider`'s `profile` to route Settings to a page of your own.
  * ```tsx
  * <OrganizationSwitcher
- *   organizationProfileUrl='/settings/organization'
  *   createOrganizationUrl='/orgs/new'
  *   afterSelectOrganizationUrl='/orgs/:slug'
  *   afterSelectPersonalUrl='/dashboard'
