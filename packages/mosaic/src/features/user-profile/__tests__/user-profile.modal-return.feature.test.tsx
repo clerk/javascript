@@ -1,10 +1,14 @@
-import { configure, screen, within } from '@testing-library/react';
-import { beforeAll, describe, expect, it, onTestFinished } from 'vitest';
+import { Clerk } from '@clerk/clerk-js';
+import { ClerkContextProvider } from '@clerk/shared/react';
+import { act, configure, render, screen, within } from '@testing-library/react';
+import React from 'react';
+import { beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
-import { serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { publishableKey, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../mosaic-provider';
 
 beforeAll(async () => {
   await import('../user-profile.modal-content');
@@ -28,6 +32,26 @@ function visit(search: string) {
 function strictMode() {
   configure({ reactStrictMode: true });
   onTestFinished(() => configure({ reactStrictMode: false }));
+}
+
+function PatchesHistoryOnMount({
+  onReplaceState,
+  children,
+}: {
+  onReplaceState: (url: string) => void;
+  children: React.ReactNode;
+}) {
+  React.useEffect(() => {
+    const original = window.history.replaceState.bind(window.history);
+    window.history.replaceState = (state, unused, url) => {
+      onReplaceState(String(url));
+      original(state, unused, url);
+    };
+    return () => {
+      window.history.replaceState = original;
+    };
+  }, [onReplaceState]);
+  return children;
 }
 
 describe('UserProfile modal return', () => {
@@ -71,6 +95,45 @@ describe('UserProfile modal return', () => {
     await screen.findByRole('dialog');
     expect(window.location.search).toBe('');
     expect(window.history.state).toEqual({ router: 'state' });
+  });
+
+  it('clears the param through a history patch that a parent installs while mounting', async () => {
+    serve();
+    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
+    const onReplaceState = vi.fn();
+    const clerk = new Clerk(publishableKey());
+
+    const tree = () => (
+      <PatchesHistoryOnMount onReplaceState={onReplaceState}>
+        <ClerkContextProvider
+          clerk={clerk}
+          clerkStatus={clerk.status}
+        >
+          <MosaicProvider>
+            <p>Page</p>
+          </MosaicProvider>
+        </ClerkContextProvider>
+      </PatchesHistoryOnMount>
+    );
+    const view = render(tree());
+    await act(() => clerk.load());
+    view.rerender(tree());
+
+    await screen.findByRole('dialog');
+    expect(window.location.search).toBe('');
+    expect(onReplaceState).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps history state that is not a plain object when it clears the param', async () => {
+    serve();
+    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
+    window.history.replaceState(['router', 'state'], '');
+
+    await renderWithClerk(<p>Page</p>);
+
+    await screen.findByRole('dialog');
+    expect(window.location.search).toBe('');
+    expect(window.history.state).toEqual(['router', 'state']);
   });
 
   it('ignores an unknown value', async () => {

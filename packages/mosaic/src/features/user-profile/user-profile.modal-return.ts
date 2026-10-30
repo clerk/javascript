@@ -20,20 +20,22 @@ export function UserProfileModalReturn(): null {
   const { open } = useModal(userProfileModal);
 
   React.useEffect(() => {
-    const url = new URL(window.location.href);
-    if (url.searchParams.get(MODAL_PARAM) !== ACCOUNT_PAGE) {
-      return;
-    }
-    url.searchParams.delete(MODAL_PARAM);
-    window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
-    open({ page: 'account' });
+    queueMicrotask(() => {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get(MODAL_PARAM) !== ACCOUNT_PAGE) {
+        return;
+      }
+      url.searchParams.delete(MODAL_PARAM);
+      window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
+      open({ page: 'account' });
+    });
   }, [open]);
 
   return null;
 }
 
 function withoutNextAppRouterMarker(state: unknown): unknown {
-  if (typeof state !== 'object' || state === null) {
+  if (typeof state !== 'object' || state === null || !('__NA' in state)) {
     return state;
   }
   return Object.fromEntries(Object.entries(state).filter(([key]) => key !== '__NA'));
