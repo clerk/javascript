@@ -25,9 +25,16 @@ export function UserProfileModalReturn(): null {
       return;
     }
     url.searchParams.delete(MODAL_PARAM);
-    window.history.replaceState(window.history.state, '', url);
+    window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
     open({ page: 'account' });
   }, [open]);
 
   return null;
+}
+
+function withoutNextAppRouterMarker(state: unknown): unknown {
+  if (typeof state !== 'object' || state === null) {
+    return state;
+  }
+  return Object.fromEntries(Object.entries(state).filter(([key]) => key !== '__NA'));
 }
