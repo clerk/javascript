@@ -30,19 +30,35 @@ describe('createMachine — introspection (the swingset seam)', () => {
 });
 
 describe('createActor — pre-start safety', () => {
-  it('send() is a no-op before start() — does not run transitions without entry actions', () => {
+  it('send() before start() runs no transition until start()', () => {
     const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
     const before = actor.getSnapshot();
 
     actor.send({ type: 'OPEN' });
 
     expect(actor.getSnapshot()).toBe(before);
-    expect(actor.getSnapshot().value).toBe('idle');
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('confirming');
   });
 
-  it('can() returns false before start()', () => {
+  it('can() before start() answers for the initial state', () => {
     const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    expect(actor.can({ type: 'OPEN' })).toBe(false);
+    expect(actor.can({ type: 'OPEN' })).toBe(true);
+    expect(actor.can({ type: 'CANCEL' })).toBe(false);
+  });
+
+  it('can() before start() answers for the initial state resolved from setContext()', () => {
+    const actor = createActor(
+      createMachine<{ done: boolean }, { type: 'GO' }>({
+        initial: context => (context.done ? 'end' : 'start'),
+        context: { done: false },
+        states: { start: { on: { GO: 'end' } }, end: {} },
+      }),
+    );
+
+    actor.setContext({ done: true });
+
+    expect(actor.can({ type: 'GO' })).toBe(false);
   });
 });
 
@@ -854,12 +870,47 @@ describe('actor restart — stop/start resumes the current state', () => {
     expect(actor.getSnapshot().value).toBe('idle');
   });
 
-  it('ignores send before the first start', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.send({ type: 'OPEN' });
+  it('applies events sent before the first start in order, after entering the initial state', () => {
+    const entered: string[] = [];
+    const actor = createActor(
+      createMachine<object, { type: 'NEXT' }>({
+        initial: 'a',
+        states: {
+          a: { entry: () => entered.push('a'), on: { NEXT: 'b' } },
+          b: { entry: () => entered.push('b'), on: { NEXT: 'c' } },
+          c: { entry: () => entered.push('c') },
+        },
+      }),
+    );
+    actor.send({ type: 'NEXT' });
+    actor.send({ type: 'NEXT' });
+
+    expect(entered).toEqual([]);
     actor.start();
 
-    expect(actor.getSnapshot().value).toBe('idle');
+    expect(entered).toEqual(['a', 'b', 'c']);
+    expect(actor.getSnapshot().value).toBe('c');
+  });
+
+  it('keeps events sent before the first start when the initial entry stops the actor', () => {
+    let stopOnEntry = () => {};
+    const actor = createActor(
+      createMachine<object, { type: 'NEXT' }>({
+        initial: 'a',
+        states: { a: { entry: () => stopOnEntry(), on: { NEXT: 'b' } }, b: {} },
+      }),
+    );
+    stopOnEntry = () => {
+      stopOnEntry = () => {};
+      actor.stop();
+    };
+    actor.send({ type: 'NEXT' });
+
+    actor.start();
+    expect(actor.getSnapshot().value).toBe('a');
+    actor.start();
+
+    expect(actor.getSnapshot().value).toBe('b');
   });
 
   it('keeps a teleported actor inert across a restart', () => {
