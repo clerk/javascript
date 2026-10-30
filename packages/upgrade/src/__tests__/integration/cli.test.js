@@ -175,6 +175,72 @@ describe('CLI Integration', () => {
     });
   });
 
+  describe('--agents-md flag', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('nextjs-v7');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('writes AGENTS.md without running SDK upgrade detection', async () => {
+      const fs = await import('node:fs');
+      const result = await runCli(['--dir', fixture.path, '--agents-md'], { timeout: 15000 });
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('Wrote Clerk AGENTS.md sections');
+      expect(fs.readFileSync(path.join(fixture.path, 'AGENTS.md'), 'utf8')).toContain(
+        '<!-- BEGIN:clerk-agent-rules:nextjs -->',
+      );
+      expect(fs.existsSync(path.join(fixture.path, 'CLAUDE.md'))).toBe(false);
+    });
+
+    it('writes nothing when package.json sets clerk.agentsMd to false', async () => {
+      const fs = await import('node:fs');
+      const packageJsonPath = path.join(fixture.path, 'package.json');
+      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+      fs.writeFileSync(packageJsonPath, JSON.stringify({ ...pkg, clerk: { agentsMd: false } }));
+
+      const result = await runCli(['--dir', fixture.path, '--agents-md'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('"clerk": { "agentsMd": false }');
+      expect(fs.existsSync(path.join(fixture.path, 'AGENTS.md'))).toBe(false);
+    });
+
+    it('does not write files in dry-run mode', async () => {
+      const fs = await import('node:fs');
+      const result = await runCli(['--dir', fixture.path, '--agents-md', '--dry-run'], { timeout: 15000 });
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('[dry run] Would write');
+      expect(fs.existsSync(path.join(fixture.path, 'AGENTS.md'))).toBe(false);
+    });
+  });
+
+  describe('--agents-md flag without a Clerk SDK', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('no-clerk');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('exits with a failure status and writes nothing', async () => {
+      const fs = await import('node:fs');
+      const result = await runCli(['--dir', fixture.path, '--agents-md'], { timeout: 15000 });
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stdout + result.stderr).toContain('No Clerk SDK packages found for AGENTS.md');
+      expect(fs.existsSync(path.join(fixture.path, 'AGENTS.md'))).toBe(false);
+    });
+  });
+
   describe('Version Display', () => {
     it('shows current version in output', async () => {
       const dir = getFixturePath('nextjs-v6');

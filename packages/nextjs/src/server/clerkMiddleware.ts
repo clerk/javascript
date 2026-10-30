@@ -147,6 +147,10 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
   const [handler, params] = parseHandlerAndOptions(args);
 
   const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+    if (process.env.NODE_ENV !== 'production') {
+      await import('./agent-rules-node.js').then(m => m.writeAgentRulesOnce()).catch(() => undefined);
+    }
+
     // Handles the case where `options` is a callback function to dynamically access `NextRequest`
     const resolvedParams = typeof params === 'function' ? await params(request) : params;
 

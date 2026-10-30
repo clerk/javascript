@@ -1,3 +1,4 @@
+import { createClerkAgentRulesWriter } from '@clerk/shared/agentRulesWriter';
 import type { FastifyInstance, FastifyPluginCallback } from 'fastify';
 import fp from 'fastify-plugin';
 
@@ -5,11 +6,15 @@ import type { ClerkFastifyOptions } from './types';
 import { ALLOWED_HOOKS } from './types';
 import { withClerkMiddleware } from './withClerkMiddleware';
 
+const writeAgentRulesOnce = createClerkAgentRulesWriter('fastify');
+
 const plugin: FastifyPluginCallback<ClerkFastifyOptions> = (
   instance: FastifyInstance,
   opts: ClerkFastifyOptions,
   done,
 ) => {
+  writeAgentRulesOnce();
+
   instance.decorateRequest('auth', null);
   instance.decorateRequest('clerk', null as any);
 

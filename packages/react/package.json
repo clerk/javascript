@@ -81,10 +81,21 @@
         "types": "./dist/types.d.cts"
       }
     },
+    "./vite": {
+      "import": {
+        "types": "./dist/vite.d.mts",
+        "default": "./dist/vite.mjs"
+      },
+      "require": {
+        "types": "./dist/vite.d.cts",
+        "default": "./dist/vite.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
   "files": [
+    "AGENTS.md",
     "dist"
   ],
   "scripts": {
