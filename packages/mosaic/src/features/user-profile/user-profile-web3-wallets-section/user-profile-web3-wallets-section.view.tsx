@@ -13,7 +13,6 @@ export function UserProfileWeb3WalletsSectionView({
   isDisabled = false,
   error,
   onConnect,
-  onCancelConnection,
   onVerify,
   onSetPrimary,
   registerTrigger,
@@ -60,7 +59,6 @@ export function UserProfileWeb3WalletsSectionView({
                       triggerRef={registerTrigger(provider.id)}
                       isDisabled={isDisabled}
                       onConnect={onConnect}
-                      onCancelConnection={pendingId === provider.id ? onCancelConnection : undefined}
                     />
                   ))
                 : null}

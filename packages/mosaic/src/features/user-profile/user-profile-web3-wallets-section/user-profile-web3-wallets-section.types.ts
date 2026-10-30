@@ -42,7 +42,6 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   isDisabled?: boolean;
   error?: string;
   onConnect?: (id: string) => void;
-  onCancelConnection?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;

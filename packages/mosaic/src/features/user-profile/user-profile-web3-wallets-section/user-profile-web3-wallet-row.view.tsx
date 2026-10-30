@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
-import { Button, SubmitButton } from '../../../components/button';
+import { SubmitButton } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
@@ -20,7 +20,6 @@ export function UserProfileWeb3WalletRowView({
   triggerRef,
   isDisabled = false,
   onConnect,
-  onCancelConnection,
   onVerify,
   onSetPrimary,
   onRemove,
@@ -29,7 +28,6 @@ export function UserProfileWeb3WalletRowView({
   triggerRef?: Ref<HTMLButtonElement>;
   isDisabled?: boolean;
   onConnect?: (id: string) => void;
-  onCancelConnection?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
@@ -108,17 +106,6 @@ export function UserProfileWeb3WalletRowView({
                   size='md'
                 />
               </SubmitButton>
-            ) : null}
-            {onCancelConnection ? (
-              <Button
-                color='neutral'
-                size='sm'
-                variant='ghost'
-                aria-label={m.cancelConnection}
-                onClick={onCancelConnection}
-              >
-                {m.cancel}
-              </Button>
             ) : null}
             {actions.length > 0 ? (
               <ActionMenu
