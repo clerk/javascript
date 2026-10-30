@@ -1,0 +1,91 @@
+import * as Stories from './provider-button.stories';
+
+# ProviderButton
+
+Starts sign-in with a third-party provider. `ProviderButtonGroup` lays the buttons out, and they must
+be its direct children.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={Stories}
+/>
+
+## Props
+
+<PropTable
+  meta={Stories.meta}
+  extra={[
+    { name: 'icon', type: 'ReactNode' },
+    { name: 'longLabel', type: 'string' },
+    { name: 'shortLabel', type: 'string' },
+    { name: 'pendingLabel', type: 'string', default: 'pending' },
+    { name: 'spinDelay', type: '{ delay?: number; minDuration?: number }' },
+  ]}
+/>
+
+`layout` and `disabled` belong to `ProviderButtonGroup`. `count` only sets how many buttons this
+preview renders, and `isPending` applies to its first button. The rest belong to `ProviderButton`.
+
+## Usage
+
+```tsx
+import { ProviderButton, ProviderButtonGroup } from '@clerk/mosaic/components/provider-button';
+
+<ProviderButtonGroup>
+  <ProviderButton
+    icon={<GoogleIcon />}
+    longLabel='Continue with Google'
+    shortLabel='Google'
+  />
+  <ProviderButton
+    icon={<GitHubIcon />}
+    longLabel='Continue with GitHub'
+    shortLabel='GitHub'
+  />
+</ProviderButtonGroup>;
+```
+
+---
+
+## Examples
+
+### One button
+
+One button shows `longLabel`.
+
+<Story
+  name='One'
+  storyModule={Stories}
+/>
+
+### Many buttons
+
+Two buttons show `shortLabel`. Three or more show only the icon, in balanced rows of up to five. A
+shorter last row is centered. Two buttons move to one column in a container narrower than 20rem.
+`longLabel` is the accessible name in every form.
+
+<Story
+  name='Many'
+  storyModule={Stories}
+/>
+
+### Stacked
+
+Each button gets its own row and shows `longLabel`.
+
+<Story
+  name='Stacked'
+  storyModule={Stories}
+/>
+
+### Pending
+
+A spinner replaces the icon. Set `disabled` on the group to disable the other buttons. The pending
+button stays at full opacity.
+
+<Story
+  name='Pending'
+  storyModule={Stories}
+/>
