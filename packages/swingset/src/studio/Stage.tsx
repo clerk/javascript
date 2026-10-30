@@ -2,8 +2,8 @@
 
 import { ClerkLogo } from '@clerk/mosaic/components/clerk-logo';
 import { PortalProvider } from '@clerk/mosaic/primitives/portal';
-import type { ComponentProps, CSSProperties, MutableRefObject, ReactNode, Ref } from 'react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import type { ComponentProps, CSSProperties, MutableRefObject, ReactNode, Ref, RefObject } from 'react';
+import { createContext, useLayoutEffect, useRef, useState } from 'react';
 
 import { CodeView } from './CodeView';
 import { Cursor, type CursorState } from './Cursor';
@@ -121,12 +121,30 @@ export interface StageProps extends ComponentProps<'div'> {
   lang?: string;
   view?: ReactNode;
   focus?: { width: number; height: number };
+  cellPadding?: number;
+  plain?: boolean;
   grid?: boolean;
   cursor?: CursorState;
   stageRef?: Ref<HTMLDivElement>;
   viewRef?: Ref<HTMLElement>;
   scaleRef?: MutableRefObject<number>;
 }
+
+function useForgivingClipboard() {
+  useLayoutEffect(() => {
+    const clipboard = navigator.clipboard;
+    if (!clipboard) {
+      return;
+    }
+    const writeText = clipboard.writeText.bind(clipboard);
+    clipboard.writeText = text => writeText(text).catch(() => undefined);
+    return () => {
+      clipboard.writeText = writeText;
+    };
+  }, []);
+}
+
+export const StageOverlayContext = createContext<RefObject<HTMLDivElement | null> | null>(null);
 
 export function Stage({
   layout,
@@ -139,6 +157,8 @@ export function Stage({
   lang = 'tsx',
   view,
   focus,
+  cellPadding,
+  plain,
   grid,
   cursor,
   stageRef,
@@ -151,6 +171,8 @@ export function Stage({
   const viewportRef = useRef<HTMLDivElement>(null);
   const { frameRef, contentRef, portalRef } = useFocusFrame(title);
   const cellRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  useForgivingClipboard();
   const previousLayout = useRef(layout);
   const transition = useRef({ layout, from: layout });
   if (transition.current.layout !== layout) {
@@ -232,6 +254,7 @@ export function Stage({
         data-from={transition.current.from}
         data-format={format}
         data-grid={grid || undefined}
+        data-plain={plain || undefined}
         style={{ width, height, scale: String(scale) }}
       >
         <div className='studio-frame'>
@@ -273,7 +296,11 @@ export function Stage({
                   ref={contentRef}
                   className='studio-focus-content'
                   style={
-                    focus && ({ '--focus-w': `${focus.width}px`, '--focus-h': `${focus.height}px` } as CSSProperties)
+                    {
+                      '--focus-w': focus ? `${focus.width}px` : undefined,
+                      '--focus-h': focus ? `${focus.height}px` : undefined,
+                      '--cell-pad': cellPadding === undefined ? undefined : `${cellPadding}px`,
+                    } as CSSProperties
                   }
                 >
                   <span
@@ -289,7 +316,9 @@ export function Stage({
                     ref={cellRef}
                     className='studio-cell'
                   >
-                    <PortalProvider container={portalRef}>{view}</PortalProvider>
+                    <StageOverlayContext.Provider value={overlayRef}>
+                      <PortalProvider container={portalRef}>{view}</PortalProvider>
+                    </StageOverlayContext.Provider>
                   </div>
                 </div>
                 <div
@@ -343,6 +372,10 @@ export function Stage({
             )}
           </div>
         )}
+        <div
+          ref={overlayRef}
+          className='studio-overlay'
+        />
         {cursor && <Cursor state={cursor} />}
       </div>
       {children}

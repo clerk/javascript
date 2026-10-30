@@ -16,6 +16,8 @@ The studio is a dev-only stage for recording Mosaic showcases. It lives in swing
 - `/template?showcase=<slug>`: the workbench. Pick a step from the list, force a layout with `1`/`2`/`3`, replay the cursor with `c`, toggle dark with `d` and the 8px grid with `g`.
 - `/capture/<slug>`: the bare stage that plays the showcase, for recording.
 - `src/studio/showcases/<slug>.tsx`: one showcase. Register it in `src/studio/showcases/index.ts`.
+- `src/studio/ideas.json`: suggested showcases. Browse them with `studio-ideas`, update them with
+  `studio-ideas-refresh`, and hand a finished recording to `studio-promote`.
 
 A showcase is a `Showcase<State>` (`src/studio/types.ts`): a `View` that renders state, a `code(state)`
 that prints the matching source, and `steps` that each set a layout, a partial state, and cursor
@@ -50,6 +52,20 @@ A step's `cursor` actions are scripted: `{ at, target, click }` moves to `target
 `drag: '<selector>'` presses on `target` and drops on that selector, `park: true | { x, y }` nudges the
 cursor off what it just clicked so the result is visible, and `hide` fades it out. After `hide`, or on
 the first action, the cursor enters from below the frame.
+
+- Moves into a menu, menubar, or listbox steer: nearly straight, never past the target, and landing
+  near the row's vertical middle, so they don't brush the neighboring item. Force it either way with
+  `steer: true | false`.
+- `text: 'Label'` narrows `target` to the first match whose text starts with it, for controls that only
+  differ by their label (`{ target: 'button', text: 'Settings' }`). Targets resolve in the component
+  panel first, then anywhere on the stage.
+- `scroll: 320` scrolls the nearest scrollable ancestor of `target` by that many pixels.
+- `type: '284913'` types into whatever the click focused, one character at a time.
+- A press also focuses the control, as a real mouse does, so focus-activated widgets (profile tabs)
+  respond. Focus rings are hidden on the stage, since nothing in a capture uses the keyboard.
+
+A dialog that should cover the whole stage portals into `StageOverlayContext` (from `Stage.tsx`) with
+Mosaic's `PortalProvider`, not into the component panel. `user-profile-combined` is the example.
 
 - Each move replays a recorded human path (`src/studio/cursor-paths.ts`), stretched onto the real start
   and end points, with its timing scaled by Fitts's law. With no recordings it falls back to a

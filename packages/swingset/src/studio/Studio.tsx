@@ -8,6 +8,7 @@ import type { Showcase, StudioBadges, StudioFormat, StudioScheme } from './types
 import { useCursor } from './useCursor';
 
 const LOOP_HOLD = 1.2;
+const STEP_HOLD = 0.35;
 
 export interface StudioOptions {
   step?: number;
@@ -46,6 +47,7 @@ export function Studio<State>({ showcase, options = {} }: { showcase: Showcase<S
   const [done, setDone] = useState(false);
   const indexRef = useRef(index);
   const stepStart = useRef(0);
+  const actionsDone = useRef<number | null>(null);
   const playing = useRef(options.autoplay !== false && !options.hold);
 
   const { cursor, play, cancel, stageRef, viewRef, scaleRef } = useCursor();
@@ -70,13 +72,17 @@ export function Studio<State>({ showcase, options = {} }: { showcase: Showcase<S
     stepStart.current = performance.now() / 1000;
     let frame = 0;
     const tick = () => {
-      const elapsed = performance.now() / 1000 - stepStart.current;
+      const now = performance.now() / 1000;
       const current = indexRef.current;
-      const duration = steps[current].duration;
-      if (playing.current) {
-        if (current < steps.length - 1 && elapsed >= duration) {
+      const step = steps[current];
+      const ready =
+        actionsDone.current === null
+          ? now - stepStart.current >= step.duration
+          : now - actionsDone.current >= (step.hold ?? STEP_HOLD);
+      if (playing.current && ready) {
+        if (current < steps.length - 1) {
           setIndex(current + 1);
-        } else if (current === steps.length - 1 && elapsed >= duration + LOOP_HOLD) {
+        } else if (now - (actionsDone.current ?? stepStart.current + step.duration) >= LOOP_HOLD) {
           if (options.loop === false) {
             playing.current = false;
             setDone(true);
@@ -110,8 +116,19 @@ export function Studio<State>({ showcase, options = {} }: { showcase: Showcase<S
   }, [setIndex, restart]);
 
   useEffect(() => {
-    play(options.cursor === false ? [] : (steps[index].cursor ?? []), `${showcase.slug}:${index}`);
-    return cancel;
+    const actions = options.cursor === false ? [] : (steps[index].cursor ?? []);
+    const interactive = actions.some(action => !action.hide);
+    actionsDone.current = interactive ? Infinity : null;
+    let alive = true;
+    void play(actions, `${showcase.slug}:${index}`).then(() => {
+      if (alive && interactive) {
+        actionsDone.current = performance.now() / 1000;
+      }
+    });
+    return () => {
+      alive = false;
+      cancel();
+    };
   }, [index, cycle, steps, showcase.slug, options.cursor, play, cancel]);
 
   const step = steps[index];
@@ -129,6 +146,8 @@ export function Studio<State>({ showcase, options = {} }: { showcase: Showcase<S
       lang={showcase.lang}
       file={showcase.file}
       focus={showcase.focus}
+      cellPadding={showcase.cellPadding}
+      plain={showcase.plain}
       view={
         View && (
           <MosaicProvider key={cycle}>

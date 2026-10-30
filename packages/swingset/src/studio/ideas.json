@@ -1,0 +1,162 @@
+{
+  "mergedAfter": "2026-10-30T23:59:59Z",
+  "ideas": [
+    {
+      "id": "table-primitive",
+      "title": "Tables with row actions, selection, and tree rows",
+      "pitch": "One headless Table primitive behind every Mosaic table: select rows, expand a tree, open a row menu, with sticky columns holding still.",
+      "prs": [10414, 10421, 10371, 10291, 10248, 10385],
+      "mergedAt": "2026-10-27T00:00:00Z",
+      "strength": "strong",
+      "layout": "split",
+      "format": "landscape",
+      "beats": [
+        "Select three rows",
+        "Expand a tree row",
+        "Open a row's action menu",
+        "Scroll sideways past a sticky column"
+      ],
+      "status": "new"
+    },
+    {
+      "id": "reverification",
+      "title": "Sensitive changes ask you to confirm it's you",
+      "pitch": "Changing a primary email, adding a passkey, or connecting an account now steps into reverification inline, then picks up where you left off.",
+      "prs": [
+        10293, 10300, 10302, 10304, 10305, 10307, 10311, 10322, 10324, 10327, 10328, 10329, 10330, 10331, 10382, 10518
+      ],
+      "mergedAt": "2026-10-29T00:00:00Z",
+      "strength": "strong",
+      "layout": "component",
+      "format": "landscape",
+      "beats": [
+        "Make an email primary",
+        "Reverification card slides in",
+        "Type the code",
+        "Change lands and the row updates"
+      ],
+      "status": "new"
+    },
+    {
+      "id": "select-multiple-media",
+      "title": "Select with multiple selection and media options",
+      "pitch": "Select now takes avatars and logos in its options and lets you pick more than one.",
+      "prs": [10240, 10242, 10255],
+      "mergedAt": "2026-10-15T00:00:00Z",
+      "strength": "strong",
+      "layout": "split",
+      "format": "landscape",
+      "beats": ["Open a Select with avatar options", "Flip `multiple` on in the code", "Pick three options"],
+      "status": "new"
+    },
+    {
+      "id": "provider-buttons",
+      "title": "ProviderButton and ProviderButtonGroup",
+      "pitch": "Social sign-in buttons as one component: logos bundled, grouped layout handled for you.",
+      "prs": [10549],
+      "mergedAt": "2026-10-30T00:00:00Z",
+      "strength": "good",
+      "layout": "split",
+      "format": "landscape",
+      "beats": ["One ProviderButton", "Wrap three in a ProviderButtonGroup", "Add two more and watch the group reflow"],
+      "status": "new"
+    },
+    {
+      "id": "switch-radio",
+      "title": "Switch and Radio",
+      "pitch": "Two new form controls with Mosaic's motion and states.",
+      "prs": [10256, 10260],
+      "mergedAt": "2026-10-16T00:00:00Z",
+      "strength": "good",
+      "layout": "split",
+      "format": "square",
+      "beats": ["Toggle a Switch", "Pick between radios", "Disable both in the code"],
+      "status": "new"
+    },
+    {
+      "id": "reveal",
+      "title": "Reveal",
+      "pitch": "A new Reveal component; check the PR for what it animates before scripting the beats.",
+      "prs": [10258],
+      "mergedAt": "2026-10-22T00:00:00Z",
+      "strength": "good",
+      "layout": "component",
+      "format": "landscape",
+      "beats": ["Show the hidden state", "Reveal it", "Hide it again"],
+      "status": "new"
+    },
+    {
+      "id": "pending-menus",
+      "title": "Menus that hold open while work starts",
+      "pitch": "Sending a code or regenerating backup codes keeps the menu open with a pending row, instead of closing on you and leaving you guessing.",
+      "prs": [10436, 10446, 10533],
+      "mergedAt": "2026-10-29T00:00:00Z",
+      "strength": "good",
+      "layout": "component",
+      "format": "landscape",
+      "beats": ["Open an email row's menu", "Choose Verify", "Row shows pending, then the code step opens"],
+      "status": "new"
+    },
+    {
+      "id": "api-key-secret",
+      "title": "Creating an API key keeps the secret on screen until copied",
+      "pitch": "The new-key dialog won't close until you've copied the secret, so nobody loses it.",
+      "prs": [10278, 10246],
+      "mergedAt": "2026-10-16T00:00:00Z",
+      "strength": "good",
+      "layout": "component",
+      "format": "landscape",
+      "beats": ["Add API key", "Secret dialog appears", "Copy, then close"],
+      "status": "new"
+    },
+    {
+      "id": "table-skeletons",
+      "title": "Skeleton rows while tables load",
+      "pitch": "Members, API keys, and active devices show skeleton rows on first load instead of an empty jump.",
+      "prs": [10288, 10289, 10323],
+      "mergedAt": "2026-10-22T00:00:00Z",
+      "strength": "good",
+      "layout": "component",
+      "format": "landscape",
+      "beats": ["Open the members tab", "Skeleton rows wave", "Rows fade in"],
+      "status": "new"
+    },
+    {
+      "id": "phone-input",
+      "title": "Phone input that formats as you type",
+      "pitch": "The caret stays put while the number formats, and the country picker is tighter.",
+      "prs": [10348, 10368, 10379],
+      "mergedAt": "2026-10-23T00:00:00Z",
+      "strength": "maybe",
+      "layout": "component",
+      "format": "square",
+      "beats": ["Pick a country", "Type a number", "Edit a digit mid-number"],
+      "status": "new"
+    },
+    {
+      "id": "color-tokens",
+      "title": "Page, surface, and subtle color tokens",
+      "pitch": "New color tokens aligned with Figma, with better secondary text contrast in light mode.",
+      "prs": [10375, 10459, 10493, 10494],
+      "mergedAt": "2026-10-29T00:00:00Z",
+      "strength": "maybe",
+      "layout": "split",
+      "format": "landscape",
+      "beats": ["A profile card on the page token", "Swap the theme's tokens in the code", "Toggle dark"],
+      "status": "new"
+    },
+    {
+      "id": "oauth-reopen",
+      "title": "The profile reopens after an OAuth redirect",
+      "pitch": "Connect a Google account from the profile modal and land back in it, not on a bare page.",
+      "prs": [10545, 10550],
+      "mergedAt": "2026-10-30T00:00:00Z",
+      "strength": "maybe",
+      "layout": "component",
+      "format": "landscape",
+      "beats": ["Connect Google", "Redirect away and back", "Modal is open on Connected accounts"],
+      "note": "Needs a faked redirect on the stage.",
+      "status": "new"
+    }
+  ]
+}

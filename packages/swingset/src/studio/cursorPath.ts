@@ -63,16 +63,15 @@ function minJerk(t: number) {
 }
 
 function synthesize(kind: CursorPathKind, distance: number, width: number, random: Random): CursorPath {
-  const overshoot = distance > 240 ? between(random, 0.015, 0.045) : 0;
-  const split = overshoot ? 0.8 : 1;
+  const corrected = distance > 160;
+  const miss = corrected ? (random() < 0.8 ? -between(random, 3, 8) : between(random, 1, 4)) / distance : 0;
+  const split = corrected ? 0.88 : 1;
   const bow = between(random, 0.03, 0.08) * (random() < 0.5 ? -1 : 1);
   const points: number[] = [];
   for (let i = 0; i < SAMPLES; i++) {
     const t = i / (SAMPLES - 1);
     const v =
-      t <= split
-        ? (1 + overshoot) * minJerk((t / split) ** 0.76)
-        : 1 + overshoot - overshoot * minJerk((t - split) / (1 - split));
+      t <= split ? (1 + miss) * minJerk((t / split) ** 0.76) : 1 + miss - miss * minJerk((t - split) / (1 - split));
     points.push(round(v), round(bow * Math.sin(Math.PI * Math.min(1, v) ** 0.8)));
   }
   return {
@@ -80,7 +79,7 @@ function synthesize(kind: CursorPathKind, distance: number, width: number, rando
     distance,
     angle: 0,
     width,
-    duration: fittsTime(distance, width) * (overshoot ? 1.15 : 1) * (kind === 'drag' ? 1.3 : 1),
+    duration: fittsTime(distance, width) * (corrected ? 1.08 : 1) * (kind === 'drag' ? 1.3 : 1),
     lead: kind === 'drag' ? between(random, 80, 140) : 0,
     dwell: between(random, 80, 150),
     press: between(random, 80, 110),
@@ -117,6 +116,14 @@ export function choosePath(
   const chosen = ranked[Math.floor(random() * Math.min(3, ranked.length))].path;
   const scale = difficulty(distance, width) / difficulty(chosen.distance, chosen.width);
   return { ...chosen, duration: FITTS_A + Math.max(0, chosen.duration - FITTS_A) * scale };
+}
+
+export function steady(path: CursorPath): CursorPath {
+  return {
+    ...path,
+    points: path.points.map((value, i) => (i % 2 ? value * 0.15 : Math.min(1, value))),
+    land: [path.land[0], path.land[1] * 0.3],
+  };
 }
 
 export function trace(path: CursorPath, from: Point, to: Point) {

@@ -6,7 +6,7 @@ import { Select } from '@clerk/mosaic/components/select';
 import { Switch } from '@clerk/mosaic/components/switch';
 import { Text } from '@clerk/mosaic/components/text';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { showcases } from './showcases';
 import { FORMATS, Stage } from './Stage';
@@ -14,6 +14,7 @@ import { resolveSteps } from './Studio';
 import type { StudioBadges, StudioFormat, StudioLayout, StudioScheme } from './types';
 import { useCursor } from './useCursor';
 
+const STEP_HOLD = 0.35;
 const LAYOUTS: StudioLayout[] = ['component', 'code', 'split'];
 const SCHEMES: StudioScheme[] = ['light', 'dark'];
 const slugs = showcases.map(showcase => showcase.slug);
@@ -51,6 +52,7 @@ export function Workbench() {
   const [workspace, setWorkspace] = useState<StudioScheme>('dark');
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const stepDone = useRef<Promise<void> | null>(null);
   const { cursor, play, cancel, stageRef, viewRef, scaleRef } = useCursor();
 
   const showcase = showcases.find(s => s.slug === slug) ?? showcases[0];
@@ -62,7 +64,9 @@ export function Workbench() {
       const i = (next + steps.length) % steps.length;
       setIndex(i);
       setLayout(steps[i].layout);
-      play(steps[i].cursor ?? [], `${showcase.slug}:${i}`);
+      const actions = steps[i].cursor ?? [];
+      const done = play(actions, `${showcase.slug}:${i}`);
+      stepDone.current = actions.some(action => !action.hide) ? done : null;
     },
     [steps, play, showcase.slug],
   );
@@ -94,8 +98,21 @@ export function Workbench() {
     if (!playing) {
       return;
     }
-    const timer = setTimeout(() => goTo(index + 1), steps[index].duration * 1000);
-    return () => clearTimeout(timer);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let alive = true;
+    const step = steps[index];
+    const advance = (seconds: number) => {
+      timer = setTimeout(() => goTo(index + 1), seconds * 1000);
+    };
+    if (stepDone.current) {
+      void stepDone.current.then(() => alive && advance(step.hold ?? STEP_HOLD));
+    } else {
+      advance(step.duration);
+    }
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
   }, [playing, index, steps, goTo]);
 
   useEffect(() => {
@@ -234,6 +251,8 @@ export function Workbench() {
         lang={showcase.lang}
         file={showcase.file}
         focus={showcase.focus}
+        cellPadding={showcase.cellPadding}
+        plain={showcase.plain}
         grid={grid}
         view={
           View && (

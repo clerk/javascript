@@ -4,11 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { type CursorKind, cursorKindOf, type CursorState } from './Cursor';
 import { recordedPaths } from './cursor-paths';
-import { choosePath, type CursorPath, landing, type Point, type Random, seeded, trace } from './cursorPath';
+import { choosePath, type CursorPath, landing, type Point, type Random, seeded, steady, trace } from './cursorPath';
 import { ACTIVE_ATTR, HOVER_ATTR, mirrorInteractionStyles } from './interactionStyles';
 import type { CursorAction } from './types';
 
 const ENTRY_DROP = 48;
+const STEERED = '[role="menu"], [role="menubar"], [role="listbox"]';
 const PARK = { x: 64, y: 40 };
 const PARK_WIDTH = 48;
 
@@ -34,6 +35,11 @@ function both(element: Element, type: string, point: Point, related?: Element | 
   dispatchPointer(element, `pointer${type}`, point, related);
   dispatchPointer(element, `mouse${type}`, point, related);
 }
+
+const TYPE_MS = 110;
+const TARGET_WAIT_MS = 2000;
+const SCROLL_MS = 500;
+const SETTLE_MS = 600;
 
 export function useCursor() {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -175,6 +181,7 @@ export function useCursor() {
       }
       setCursor(c => ({ ...c, pressed: true }));
       both(hit, 'down', client(point));
+      hit.closest<HTMLElement>('button, a[href], input, select, textarea, [tabindex]')?.focus({ preventScroll: true });
       return hit;
     },
     [elementAt, client],
@@ -214,7 +221,25 @@ export function useCursor() {
         );
       };
 
-      const approach = async (stage: HTMLElement, target: Element, override?: CursorKind) => {
+      const settle = async (stage: HTMLElement, target: Element) => {
+        let last = boxOf(stage, target);
+        for (let waited = 0; waited < SETTLE_MS; waited += 50) {
+          await wait(50);
+          const next = boxOf(stage, target);
+          if (
+            Math.abs(next.left - last.left) < 0.5 &&
+            Math.abs(next.top - last.top) < 0.5 &&
+            Math.abs(next.width - last.width) < 0.5 &&
+            Math.abs(next.height - last.height) < 0.5
+          ) {
+            return;
+          }
+          last = next;
+        }
+      };
+
+      const approach = async (stage: HTMLElement, target: Element, override?: CursorKind, steer?: boolean) => {
+        await settle(stage, target);
         const box = boxOf(stage, target);
         const center = { x: box.left + box.width / 2, y: box.top + box.height / 2 };
         let from = position.current;
@@ -227,11 +252,20 @@ export function useCursor() {
           setCursor(c => ({ ...c, kind: 'default', visible: true, pressed: false }));
         }
         const width = Math.min(box.width, box.height);
-        const path = choosePath(recordedPaths, 'move', from, center, width, random);
+        const chosen = choosePath(recordedPaths, 'move', from, center, width, random);
+        const path = (steer ?? !!target.closest(STEERED)) ? steady(chosen) : chosen;
         const over = from.x >= box.left && from.x <= box.right && from.y >= box.top && from.y <= box.bottom;
         const to = over ? from : landing(box, path.land);
         if (!over) {
           await glide(path, from, to, target, override);
+        }
+        const moved = boxOf(stage, target);
+        if (to.x < moved.left || to.x > moved.right || to.y < moved.top || to.y > moved.bottom) {
+          const center = { x: moved.left + moved.width / 2, y: moved.top + moved.height / 2 };
+          const fix = choosePath(recordedPaths, 'move', to, center, Math.min(moved.width, moved.height), random);
+          const landed = landing(moved, fix.land);
+          await glide(fix, to, landed, target, override);
+          return { path, to: landed };
         }
         return { path, to };
       };
@@ -260,14 +294,49 @@ export function useCursor() {
           await glide(choosePath(recordedPaths, 'move', from, to, PARK_WIDTH, random), from, to, null, action.cursor);
           return;
         }
-        const target = action.target ? viewRef.current?.querySelector(action.target) : null;
+        const find = (selector: string, text?: string) => {
+          for (const root of [viewRef.current, stage]) {
+            const match = [...(root?.querySelectorAll(selector) ?? [])].find(
+              element => text === undefined || element.textContent?.trim().startsWith(text),
+            );
+            if (match) {
+              return match;
+            }
+          }
+          return null;
+        };
+        if (action.type && !action.target) {
+          const typing = () => document.activeElement?.matches('input, textarea, [contenteditable="true"]');
+          for (let waited = 0; !typing() && waited < TARGET_WAIT_MS; waited += 50) {
+            await wait(50);
+          }
+          for (const character of action.type) {
+            await wait(TYPE_MS);
+            document.execCommand('insertText', false, character);
+          }
+          return;
+        }
+        let target = action.target ? find(action.target, action.text) : null;
+        for (let waited = 0; action.target && !target && waited < TARGET_WAIT_MS; waited += 50) {
+          await wait(50);
+          target = find(action.target, action.text);
+        }
         if (!target) {
           return;
         }
-        const { path, to } = await approach(stage, target, action.cursor);
+        if (action.scroll) {
+          let scroller: Element | null = target;
+          while (scroller && scroller.scrollHeight <= scroller.clientHeight) {
+            scroller = scroller.parentElement;
+          }
+          scroller?.scrollBy({ top: action.scroll, behavior: 'smooth' });
+          await wait(SCROLL_MS);
+          return;
+        }
+        const { path, to } = await approach(stage, target, action.cursor, action.steer);
         setCursor(c => ({ ...c, kind: kindAt(elementAt(to), target, action.cursor) }));
 
-        const drop = action.drag ? viewRef.current?.querySelector(action.drag) : null;
+        const drop = action.drag ? find(action.drag) : null;
         if (drop) {
           await wait(path.dwell);
           const hit = press(target, to);
@@ -294,11 +363,15 @@ export function useCursor() {
         await wait(path.press);
         release(hit, to);
         (target as HTMLElement).click();
+        for (const character of action.type ?? '') {
+          await wait(TYPE_MS);
+          document.execCommand('insertText', false, character);
+        }
       };
 
-      for (const action of actions) {
-        void wait(action.at * 1000).then(() => perform(action));
-      }
+      return Promise.all(actions.map(action => wait(action.at * 1000).then(() => perform(action)))).then(
+        () => undefined,
+      );
     },
     [cancel, place, glide, hover, kindAt, elementAt, press, release],
   );

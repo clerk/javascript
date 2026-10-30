@@ -70,6 +70,7 @@ body {
   --ease-fade: ease-out;
   --track-ms: 450ms;
   --fade-in-ms: 70ms;
+  --change-hold: 1200ms;
 
   color-scheme: light;
 }
@@ -519,12 +520,6 @@ body {
   background: color-mix(in oklch, var(--diff) calc(var(--diff-on) * var(--diff-mix)), transparent);
 }
 
-.studio-previous {
-  position: absolute;
-  inset: 0 1ch;
-  animation: studio-line-fade var(--fade-out-ms) var(--ease-fade) both;
-}
-
 .studio-line[data-state='enter'] {
   animation: studio-diff-add 2400ms linear both;
 }
@@ -539,8 +534,19 @@ body {
   }
 }
 
+.studio-line[data-state='exit'] {
+  --diff: var(--negative);
+  --diff-mix: var(--mix-negative);
+  --diff-on: 1;
+}
+
+.studio-line[data-state='exit'] .studio-text,
+.studio-line[data-state='exit'] .studio-text span {
+  color: var(--comment) !important;
+}
+
 .studio-line[data-state='exit'] .studio-line-content {
-  animation: studio-line-fade var(--fade-out-ms) var(--ease-fade) both;
+  animation: studio-line-fade var(--fade-out-ms) var(--ease-fade) var(--change-hold) both;
 }
 
 .studio-text > .studio-current > span[style*='--shiki-token-comment'] {
@@ -623,7 +629,7 @@ body {
 
 .studio-cell-rules {
   position: absolute;
-  inset: -8px;
+  inset: calc(-1 * var(--cell-pad, 8px));
   background: var(--bg);
   pointer-events: none;
 }
@@ -660,6 +666,134 @@ body {
 
 .studio-cell-rules > span[data-edge='right'] {
   right: 0;
+}
+
+.studio-stage {
+  --cl-focus-outline-width: 0px;
+}
+
+.studio-overlay {
+  position: absolute;
+  inset: 0;
+  zoom: 0.8;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.studio-overlay .cl-dialog-track {
+  --_cl-dialog-inset: 80px !important;
+  padding-inline: 180px !important;
+}
+
+.studio-overlay > * {
+  pointer-events: auto;
+}
+
+.studio-spec {
+  position: relative;
+  display: grid;
+}
+
+.studio-spec-axis,
+.studio-spec-label {
+  position: absolute;
+  font-family: var(--font-paper-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.studio-spec-row {
+  display: contents;
+}
+
+.studio-spec-axis {
+  right: 24px;
+  bottom: 16px;
+  opacity: 0.6;
+}
+
+.studio-spec-label[data-axis='column'] {
+  right: 0;
+  bottom: 16px;
+  left: 0;
+  text-align: center;
+}
+
+.studio-spec-label[data-axis='row'] {
+  top: 50%;
+  right: 24px;
+  translate: 0 -50%;
+}
+
+.studio-spec-cell {
+  display: grid;
+  min-width: 144px;
+  height: 72px;
+  place-items: center;
+}
+
+.studio-spec[data-align='start'] .studio-spec-cell {
+  min-width: 0;
+  justify-items: start;
+}
+
+.studio-spec[data-align='start'] .studio-spec-label[data-axis='column'] {
+  text-align: start;
+}
+
+[data-plain] .studio-panel[data-panel='component'] {
+  background: none;
+}
+
+[data-plain] .studio-cell-rules {
+  display: none;
+}
+
+.studio-multiplayer-root {
+  position: relative;
+}
+
+.studio-multiplayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.studio-multiplayer-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: start;
+  opacity: 0;
+}
+
+.studio-multiplayer-cursor > svg {
+  display: block;
+  margin: -2px 0 0 -2px;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.2));
+  transition: scale 80ms ease-out;
+  transform-origin: 2px 2px;
+}
+
+.studio-multiplayer-cursor[data-pressed] > svg {
+  scale: 0.88;
+}
+
+.studio-multiplayer-cursor > span {
+  margin: 14px 0 0 -2px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--person);
+  color: white;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
 }
 
 .studio-portal {
