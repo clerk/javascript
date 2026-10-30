@@ -1,7 +1,7 @@
 import type { EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   demandReverificationOnce,
@@ -125,6 +125,55 @@ describe('the user profile phone section', () => {
     expect(screen.getByText('+49')).toBeInTheDocument();
   });
 
+  it('holds the phone entry step until the first code is sent', async () => {
+    const { actor, fapi } = await renderSection();
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      expect(screen.getByRole('textbox', { name: 'Phone' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Send code' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('button', { name: 'Send code' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Verification code' })).toBeNull();
+      await actor.keyboard('{Escape}{Enter}');
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      expect(prepare.requests).toHaveLength(1);
+      expect(fapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+    } finally {
+      prepare.release();
+    }
+
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
+  it('recovers from a failed first code without creating the phone again', async () => {
+    const { actor, fapi } = await renderSection();
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    } finally {
+      prepare.release();
+    }
+
+    expect(await screen.findByText('Unable to send a code.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    const retryFapi = serveFapi(fapi);
+    await actor.click(screen.getByRole('button', { name: 'Resend' }));
+    expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(retryFapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
   it('keeps the dialog open and says the code was wrong', async () => {
     const { actor } = await renderSection();
 
@@ -141,6 +190,56 @@ describe('the user profile phone section', () => {
     await addPhone(actor, '8015550100');
 
     expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+  });
+
+  it('disables Cancel while verifying a phone code and allows cancellation after an error', async () => {
+    const { actor } = await renderSection();
+    await addPhone(actor, '8015550100');
+    const attempt = holdRequests('post', '/v1/me/phone_numbers/:id/attempt_verification');
+
+    try {
+      await enterCode(actor, '000000');
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(screen.getByRole('dialog', { name: 'Verify your phone number' })).toBeVisible();
+    } finally {
+      attempt.release();
+    }
+
+    expect(await screen.findByText('Incorrect code')).toBeVisible();
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    expect(cancel).toBeEnabled();
+    await actor.click(cancel);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('disables Cancel while resending a phone code and allows cancellation once sent', async ({ onTestFinished }) => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    onTestFinished(() => vi.useRealTimers());
+    await renderSection();
+    const actor = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await addPhone(actor, '8015550100');
+    await screen.findByRole('textbox', { name: 'Verification code' });
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      for (let second = 0; second < 30; second++) {
+        await act(() => vi.advanceTimersByTimeAsync(1000));
+      }
+      const resend = screen.getByRole('button', { name: /Resend/ });
+      await waitFor(() => expect(resend).toBeEnabled());
+      await actor.click(resend);
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(screen.getByRole('dialog', { name: 'Verify your phone number' })).toBeVisible();
+    } finally {
+      prepare.release();
+    }
+
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    await waitFor(() => expect(cancel).toBeEnabled());
+    await actor.click(cancel);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('verifies a number that was left unverified', async () => {
