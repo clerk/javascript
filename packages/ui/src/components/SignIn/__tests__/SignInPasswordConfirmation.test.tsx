@@ -49,6 +49,37 @@ describe('sign-in after the password confirmation limit', () => {
     expect(SafeLocalStorage.getItem(key, null)).not.toBeNull();
   });
 
+  it('does not consume notices added after the initial mount', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => f.withEmailAddress());
+    const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${fixtures.clerk.publishableKey}`;
+    const read = vi.spyOn(SafeLocalStorage, 'getItem');
+    const { rerender } = render(<SignInStart />, { wrapper });
+    const readsAfterMount = read.mock.calls.filter(([entry]) => entry === key).length;
+    expect(readsAfterMount).toBe(1);
+
+    SafeLocalStorage.setItem(key, `${fixtures.clerk.publishableKey}:${Date.now()}`, PASSWORD_CONFIRMATION_NOTICE_TTL);
+    for (let i = 0; i < 5; i++) {
+      rerender(<SignInStart />);
+    }
+
+    expect(read.mock.calls.filter(([entry]) => entry === key)).toHaveLength(readsAfterMount);
+    expect(screen.queryByText(terminalMessage)).not.toBeInTheDocument();
+    expect(SafeLocalStorage.getItem(key, null)).not.toBeNull();
+  });
+
+  it('does not repeatedly display a notice when storage removal fails', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => f.withEmailAddress());
+    const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${fixtures.clerk.publishableKey}`;
+    SafeLocalStorage.setItem(key, `${fixtures.clerk.publishableKey}:${Date.now()}`, PASSWORD_CONFIRMATION_NOTICE_TTL);
+    const read = vi.spyOn(SafeLocalStorage, 'getItem');
+    vi.spyOn(SafeLocalStorage, 'removeItem').mockImplementation(() => undefined);
+
+    const { rerender } = render(<SignInStart />, { wrapper });
+    await screen.findByText(terminalMessage);
+    rerender(<SignInStart />);
+    expect(read.mock.calls.filter(([entry]) => entry === key)).toHaveLength(1);
+  });
+
   it('ignores an expired reason', async () => {
     const { wrapper, fixtures } = await createFixtures(f => f.withEmailAddress());
     const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${fixtures.clerk.publishableKey}`;
