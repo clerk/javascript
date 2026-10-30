@@ -38,5 +38,7 @@ function withoutNextAppRouterMarker(state: unknown): unknown {
   if (typeof state !== 'object' || state === null || !('__NA' in state)) {
     return state;
   }
-  return Object.fromEntries(Object.entries(state).filter(([key]) => key !== '__NA'));
+  const copy: object = Object.assign(Array.isArray(state) ? [] : {}, state);
+  Reflect.deleteProperty(copy, '__NA');
+  return copy;
 }

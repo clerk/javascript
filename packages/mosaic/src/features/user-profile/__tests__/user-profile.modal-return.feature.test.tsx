@@ -136,6 +136,20 @@ describe('UserProfile modal return', () => {
     expect(window.history.state).toEqual(['router', 'state']);
   });
 
+  it('keeps an array as an array when it drops the Next.js marker', async () => {
+    serve();
+    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
+    window.history.replaceState(Object.assign(['router', 'state'], { __NA: true }), '');
+
+    await renderWithClerk(<p>Page</p>);
+
+    await screen.findByRole('dialog');
+    expect(window.location.search).toBe('');
+    expect(Array.isArray(window.history.state)).toBe(true);
+    expect(window.history.state).toEqual(['router', 'state']);
+    expect(window.history.state).not.toHaveProperty('__NA');
+  });
+
   it('ignores an unknown value', async () => {
     serve();
     visit('?__clerk_mosaic_modal=organization-profile%2Fgeneral&tab=connections');
