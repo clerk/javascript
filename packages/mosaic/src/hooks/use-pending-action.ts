@@ -22,7 +22,6 @@ export interface PendingAction<TKey extends string> {
   error: string | undefined;
   errorKey: TKey | undefined;
   reset: () => void;
-  cancel: () => void;
 }
 
 interface PendingActionFailure<TKey extends string> {
@@ -34,7 +33,7 @@ interface PendingActionFailure<TKey extends string> {
 /**
  * Runs inline actions, such as row buttons, under one lock and tracks which key is pending, which key ran last, and which key last failed.
  * `run` resolves `true` on success and `false` on failure or cancellation, ignores calls while a run owns the lock, and clears the last error when it starts.
- * `cancel` and unmount abort the action signal; callers guard their own side effects and completion UI.
+ * Unmount aborts the action signal; callers guard their own side effects and completion UI.
  */
 export function usePendingAction<TKey extends string = string>({
   errorFallback,
@@ -94,11 +93,5 @@ export function usePendingAction<TKey extends string = string>({
     error: failure ? errorText(failure.error, failure.errorFallback ?? errorFallback) : undefined,
     errorKey: failure?.key,
     reset: () => setFailure(undefined),
-    cancel: () => {
-      running.current?.abort();
-      running.current = undefined;
-      setPendingKey(undefined);
-      setFailure(undefined);
-    },
   };
 }

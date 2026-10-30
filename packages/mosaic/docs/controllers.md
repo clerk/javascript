@@ -55,11 +55,10 @@ return {
 focus. To hold pending through an OAuth redirect, await a delay inside the
 action (`user-profile-connected-accounts-section.controller.ts`). When the user
 cancels a reverification challenge, `run` resolves `false` without showing an
-error and releases the lock. The action receives an `AbortSignal`; `cancel()`
-aborts it and releases the lock, and unmount aborts it too. Cancelled completions
-cannot overwrite a newer run's pending state or error. Cancellation does not stop
-an underlying provider request or undo a server mutation. Offer cancel only before
-mutations begin, and check the signal after external waits and before side effects.
+error and releases the lock. The action receives an `AbortSignal` that aborts on
+unmount. Completions after unmount cannot update the hook's state. Aborting the
+signal does not stop an underlying provider request or undo a server mutation.
+Check the signal after external waits and before side effects.
 Callers must also guard their own completion UI with the signal. `reset()` only
 clears errors. It is not for:
 
