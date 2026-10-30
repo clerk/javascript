@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -20,6 +20,10 @@ import { PortalProvider } from '../../../primitives/portal';
 import { signedIn as withConnectedAccounts } from '../../user-profile/user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
+
+beforeAll(async () => {
+  await import('../../user-profile/user-profile.modal-content');
+});
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const other = fapiOrganization({ id: 'org_9', name: 'Other' });
