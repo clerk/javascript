@@ -64,7 +64,7 @@ type PasswordPolicyResult =
   | { status: 'readonly'; mode: 'set' | 'change'; enterpriseConnectionName: string | undefined }
   | (UserProfilePasswordPolicy & { status: 'ready'; userId: string });
 
-function getPasswordPolicy(
+export function getPasswordPolicy(
   user: UserResource | null | undefined,
   environment: EnvironmentResource,
 ): PasswordPolicyResult {

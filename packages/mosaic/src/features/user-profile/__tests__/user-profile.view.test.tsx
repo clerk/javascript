@@ -276,15 +276,15 @@ describe('UserProfileView', () => {
   it('finds a section on a page that is not open, and opens that page', async () => {
     const onPageChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ onPageChange, showSearch: true });
+    renderView({ onPageChange, showSearch: true, searchSections: { security: ['password', 'activeDevices'] } });
 
-    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'subscr');
-    const billing = screen.getByRole('group', { name: 'Billing' });
-    expect(billing).toContainElement(screen.getByRole('option', { name: 'Subscription' }));
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    const security = screen.getByRole('group', { name: 'Security' });
+    expect(security).toContainElement(screen.getByRole('option', { name: 'Active devices' }));
 
-    await user.click(screen.getByRole('option', { name: 'Subscription' }));
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
 
-    expect(onPageChange).toHaveBeenCalledWith('billing');
+    expect(onPageChange).toHaveBeenCalledWith('security');
   });
 
   it('finds a page of your own by its keywords', async () => {

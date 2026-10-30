@@ -21,7 +21,7 @@ export function UserProfileSubscriptionSectionView({
   onChangePlan,
 }: UserProfileSubscriptionSectionViewProps) {
   return (
-    <Section.Root search={{ label: 'Subscription' }}>
+    <Section.Root>
       <Section.Group>
         <Section.Header>
           <Section.Content>

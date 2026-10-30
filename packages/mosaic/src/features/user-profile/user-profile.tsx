@@ -18,6 +18,7 @@ import type { UserProfileViewProps } from './user-profile.view';
 import { UserProfileView } from './user-profile.view';
 import { UserProfileApiKeysPanel } from './user-profile-api-keys-panel';
 import { UserProfileProfilePanel } from './user-profile-profile-panel';
+import { useUserProfileSearchModel } from './user-profile-search.model';
 import { UserProfileSecurityPanel } from './user-profile-security-panel';
 import { useUserProfileUserModel } from './user-profile-user.model';
 
@@ -152,6 +153,7 @@ export function UserProfileSurface({
 }: UserProfileProps & { presentation: NonNullable<UserProfileOptions['mode']> }) {
   const model = useUserProfileUserModel();
   const builtInPages = useUserProfilePages();
+  const searchSections = useUserProfileSearchModel();
 
   if (model.status === 'loading') {
     return fallback ?? null;
@@ -166,6 +168,7 @@ export function UserProfileSurface({
     customPages,
     pageOrder,
     showSearch,
+    searchSections,
     pages: {
       account: <UserProfileProfilePanel />,
       security: <UserProfileSecurityPanel />,

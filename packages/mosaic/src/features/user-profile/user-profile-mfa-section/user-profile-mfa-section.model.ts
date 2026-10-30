@@ -21,6 +21,11 @@ export function reloadUser(user: UserResource): Promise<unknown> {
   return user.reload().catch(() => undefined);
 }
 
+export function offersMfa(environment: EnvironmentResource): boolean {
+  const factors = configuredFactors(environment);
+  return factors.includes('phone_code') || factors.includes('totp');
+}
+
 export function configuredFactors(environment: EnvironmentResource | undefined): string[] {
   return Object.values(environment?.userSettings.attributes ?? {}).flatMap(attribute =>
     attribute?.used_for_second_factor ? attribute.second_factors : [],
@@ -240,7 +245,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const smsEnabled = secondFactors.includes('phone_code');
   const totpEnabled = secondFactors.includes('totp');
   const backupEnabled = secondFactors.includes('backup_code');
-  if (!smsEnabled && !totpEnabled) {
+  if (!offersMfa(environment)) {
     return { status: 'hidden' };
   }
 

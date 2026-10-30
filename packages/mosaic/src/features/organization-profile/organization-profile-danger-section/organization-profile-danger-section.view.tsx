@@ -25,7 +25,7 @@ export function OrganizationProfileDangerSectionView({
   }
 
   return (
-    <Section.Root search={{ label: m.sectionTitle }}>
+    <Section.Root searchId='danger'>
       <Section.Group>
         <Section.Header>
           <Section.Content>

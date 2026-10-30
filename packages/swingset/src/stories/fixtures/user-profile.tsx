@@ -1,4 +1,5 @@
 import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
+import { SearchTarget } from '@clerk/mosaic/components/profile';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
@@ -190,5 +191,42 @@ export function useUserProfileFixture() {
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
-  return { activePage, setActivePage, pages, devices: activeDevices.devices };
+  const searchSections: UserProfileViewProps['searchSections'] = {
+    account: ['profile', 'email', 'phone', 'connectedAccounts', 'web3Wallets', 'danger'],
+    security: ['password', 'passkeys', 'mfa', 'activeDevices'],
+  };
+  const customPages: UserProfileViewProps['customPages'] = [
+    {
+      path: 'usage',
+      label: 'Usage',
+      keywords: ['quota'],
+      search: [
+        { id: 'rate-limits', label: 'Rate limits', keywords: ['throttle', 'requests'] },
+        { id: 'seats', label: 'Seats', keywords: ['members'] },
+      ],
+      content: <UsagePage />,
+    },
+  ];
+  return { activePage, setActivePage, pages, searchSections, customPages, devices: activeDevices.devices };
+}
+
+function UsagePage() {
+  return (
+    <div className='flex flex-col gap-6'>
+      <SearchTarget
+        id='rate-limits'
+        render={<section className='flex flex-col gap-1 rounded-lg border p-4' />}
+      >
+        <h3 className='font-semibold'>Rate limits</h3>
+        <p className='text-muted-foreground text-sm'>1,000 requests per minute.</p>
+      </SearchTarget>
+      <SearchTarget
+        id='seats'
+        render={<section className='flex flex-col gap-1 rounded-lg border p-4' />}
+      >
+        <h3 className='font-semibold'>Seats</h3>
+        <p className='text-muted-foreground text-sm'>4 of 10 seats used.</p>
+      </SearchTarget>
+    </div>
+  );
 }

@@ -2,7 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
-import { useMessages } from '../../localization';
+import { type MosaicMessages, useMessages } from '../../localization';
 import type { ProfilePage, ProfilePagesViewProps } from '../profile-pages/profile-pages.view';
 import { ProfilePagesView } from '../profile-pages/profile-pages.view';
 import { ORGANIZATION_PROFILE_PAGE_ICONS, organizationProfileNavEntries } from './organization-profile.layout';
@@ -20,7 +20,7 @@ export interface OrganizationProfileViewProps
 export const OrganizationProfileView = React.forwardRef<HTMLDivElement, OrganizationProfileViewProps>(
   function OrganizationProfileView({ pages, customPages, pageOrder, label, ...rest }, ref) {
     const m = useMessages('organizationProfile');
-    const list = organizationProfilePageList({ pages, customPages, pageOrder }, m.pages);
+    const list = organizationProfilePageList({ pages, customPages, pageOrder }, m);
     if (list.length === 0) {
       logger.warnOnce('[Clerk] OrganizationProfile has no pages to show.');
     }
@@ -39,7 +39,7 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
 /** The organization's navigation, in order: the built-ins it was given content for, then the consumer's pages. */
 export function organizationProfilePageList(
   options: OrganizationProfilePageListOptions,
-  labels: Record<OrganizationProfilePageId, string>,
+  m: MosaicMessages['organizationProfile'],
 ): ProfilePage[] {
   return organizationProfileNavEntries(options).map(entry =>
     entry.custom
@@ -48,17 +48,25 @@ export function organizationProfilePageList(
           label: entry.custom.label,
           icon: entry.custom.icon,
           keywords: entry.custom.keywords,
+          search: entry.custom.search,
           content: entry.custom.content,
         }
       : {
           id: entry.id,
-          label: labels[entry.id],
+          label: m.pages[entry.id],
           icon: (
             <Icon
               glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
               size='sm'
             />
           ),
+          search:
+            entry.id === 'general'
+              ? [
+                  { id: 'profile', label: m.profile.sectionTitle },
+                  { id: 'danger', label: m.danger.sectionTitle },
+                ]
+              : undefined,
           content: options.pages[entry.id],
         },
   );

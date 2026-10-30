@@ -11,7 +11,7 @@ import { Combobox } from '../combobox';
 import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
 import { styles } from './profile-search.styles';
-import { type IndexedTarget, type ProfileSearchState, useSearchIndex } from './profile-search-index';
+import type { ProfileSearchState } from './profile-search-target';
 
 /** A page the profile's search lists, found by its `label` or `keywords`. */
 export interface ProfileSearchPage {
@@ -20,25 +20,27 @@ export interface ProfileSearchPage {
   label: string;
   icon?: React.ReactNode;
   keywords?: readonly string[];
+  /** The sections of the page the search finds. Each `id` matches a `Section.Root searchId` or `SearchTarget id` on the page. */
+  targets?: readonly ProfileSearchTarget[];
+}
+
+/** A section of a page the profile's search finds by its `label` or `keywords`. */
+export interface ProfileSearchTarget {
+  id: string;
+  label: string;
+  keywords?: readonly string[];
 }
 
 export function ProfileSearch({ pages, search }: { pages: readonly ProfileSearchPage[]; search: ProfileSearchState }) {
   const m = useMessages('profile');
-  const { query, setQuery, setFocused, indexContainer, revealResult } = search;
-  const index = useSearchIndex(indexContainer);
+  const { query, setQuery, revealResult } = search;
   const inputRef = React.useRef<HTMLInputElement>(null);
   const groupId = React.useId();
   const normalized = query.trim().toLocaleLowerCase();
-  const groups = normalized ? matchesOf(pages, index, normalized) : [];
+  const groups = normalized ? matchesOf(pages, normalized) : [];
   const results = new Map(groups.flatMap(group => group.results.map(result => [result.key, result] as const)));
 
-  React.useEffect(
-    () => () => {
-      setQuery('');
-      setFocused(false);
-    },
-    [setQuery, setFocused],
-  );
+  React.useEffect(() => () => setQuery(''), [setQuery]);
 
   return (
     <Combobox.Root
@@ -67,8 +69,6 @@ export function ProfileSearch({ pages, search }: { pages: readonly ProfileSearch
           autoComplete='off'
           aria-label={m.search.label}
           placeholder={m.search.label}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
           onKeyDown={event => {
             if (event.key === 'Escape' && query !== '') {
               event.stopPropagation();
@@ -152,7 +152,7 @@ interface Result {
   target: string | null;
 }
 
-function matchesOf(pages: readonly ProfileSearchPage[], index: readonly IndexedTarget[], query: string) {
+function matchesOf(pages: readonly ProfileSearchPage[], query: string) {
   const matches = (label: string, keywords: readonly string[] = []) =>
     [label, ...keywords].some(text => text.toLocaleLowerCase().includes(query));
   return pages
@@ -161,13 +161,13 @@ function matchesOf(pages: readonly ProfileSearchPage[], index: readonly IndexedT
       if (matches(page.label, page.keywords)) {
         results.push({ key: JSON.stringify([page.value]), label: page.label, page: page.value, target: null });
       }
-      for (const entry of index) {
-        if (entry.page === page.value && matches(entry.label, entry.keywords)) {
+      for (const target of page.targets ?? []) {
+        if (matches(target.label, target.keywords)) {
           results.push({
-            key: JSON.stringify([page.value, entry.target]),
-            label: entry.label,
+            key: JSON.stringify([page.value, target.id]),
+            label: target.label,
             page: page.value,
-            target: entry.target,
+            target: target.id,
           });
         }
       }

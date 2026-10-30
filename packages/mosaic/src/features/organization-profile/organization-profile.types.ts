@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import type { ProfileSearchTarget } from '../../components/profile';
+
 export type OrganizationProfilePageId = 'general' | 'members' | 'security' | 'billing' | 'apiKeys';
 
 export interface OrganizationProfilePages {
@@ -17,6 +19,8 @@ export interface CustomOrganizationProfilePage {
   icon?: ReactNode;
   /** Other words that find the page in the profile's search. */
   keywords?: readonly string[];
+  /** The sections the profile's search finds on the page. Mark each one with a `SearchTarget` of the same `id`. */
+  search?: readonly ProfileSearchTarget[];
   content: ReactNode;
 }
 

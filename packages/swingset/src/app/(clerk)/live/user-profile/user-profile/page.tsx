@@ -44,6 +44,10 @@ export default function UserProfileLivePage() {
                 />
               ),
               keywords: ['quota'],
+              search: [
+                { id: 'rate-limits', label: 'Rate limits', keywords: ['throttle', 'requests'] },
+                { id: 'seats', label: 'Seats', keywords: ['members'] },
+              ],
               content: <UsagePage />,
             },
           ]}
@@ -57,16 +61,14 @@ function UsagePage() {
   return (
     <div className='flex flex-col gap-6'>
       <UserProfile.SearchTarget
-        label='Rate limits'
-        keywords={['throttle', 'requests']}
+        id='rate-limits'
         render={<section className='flex flex-col gap-1 rounded-lg border p-4' />}
       >
         <h3 className='font-semibold'>Rate limits</h3>
         <p className='text-muted-foreground text-sm'>1,000 requests per minute.</p>
       </UserProfile.SearchTarget>
       <UserProfile.SearchTarget
-        label='Seats'
-        keywords={['members']}
+        id='seats'
         render={<section className='flex flex-col gap-1 rounded-lg border p-4' />}
       >
         <h3 className='font-semibold'>Seats</h3>

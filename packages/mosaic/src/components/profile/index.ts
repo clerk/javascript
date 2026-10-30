@@ -9,6 +9,6 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from './profile';
-export type { ProfileSearchPage } from './profile-search';
-export type { SearchTargetOptions, SearchTargetProps } from './profile-search-index';
-export { SearchTarget, useIsSearchIndexing } from './profile-search-index';
+export type { ProfileSearchPage, ProfileSearchTarget } from './profile-search';
+export type { SearchTargetProps } from './profile-search-target';
+export { SearchTarget } from './profile-search-target';

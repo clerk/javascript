@@ -69,7 +69,7 @@ export type UserProfilePasskeysModel =
       addReverification: ReverificationController;
     };
 
-function getPasskeysProjection(
+export function getPasskeysProjection(
   user: UserResource,
   environment: EnvironmentResource,
   isSatellite: boolean,

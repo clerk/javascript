@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { FormSubmitError } from '../../components/form';
+import type { ProfileSearchTarget } from '../../components/profile';
 
 /** Plain data, so nothing downstream of the model imports a Clerk error. */
 export interface UserProfileFormError<TField extends string = string> {
@@ -39,6 +40,8 @@ export interface CustomProfilePage {
   icon?: ReactNode;
   /** Other words that find the page in the profile's search. */
   keywords?: readonly string[];
+  /** The sections the profile's search finds on the page. Mark each one with a `SearchTarget` of the same `id`. */
+  search?: readonly ProfileSearchTarget[];
   /** Rendered as the page itself. */
   content: ReactNode;
 }

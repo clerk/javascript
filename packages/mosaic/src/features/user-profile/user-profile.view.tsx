@@ -2,7 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
-import { useMessages } from '../../localization';
+import { type MosaicMessages, useMessages } from '../../localization';
 import type {
   OrganizationProfilePageId,
   OrganizationProfilePageListOptions,
@@ -12,6 +12,7 @@ import type { ProfilePage, ProfilePageGroup, ProfilePagesViewProps } from '../pr
 import { ProfilePagesView } from '../profile-pages/profile-pages.view';
 import { ORGANIZATION_PAGE_PREFIX, USER_PROFILE_PAGE_ICONS, userProfileNavEntries } from './user-profile.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
+import type { UserProfileSearchSections, UserProfileSectionId } from './user-profile-search.model';
 
 export interface UserProfileViewProps extends Omit<
   ProfilePagesViewProps,
@@ -25,6 +26,8 @@ export interface UserProfileViewProps extends Omit<
    */
   activePage: UserProfilePageId | `organization/${OrganizationProfilePageId}` | (string & {});
   pages: UserProfilePages;
+  /** The sections each built-in page shows, for the search to find. */
+  searchSections?: UserProfileSearchSections;
   /** Pages of the consumer's own, added to the navigation after the built-ins. */
   customPages?: readonly CustomProfilePage[];
   /**
@@ -44,18 +47,18 @@ export interface UserProfileViewProps extends Omit<
  * first one, so a page turned off by the environment cannot leave the surface blank.
  */
 export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewProps>(function UserProfileView(
-  { pages, customPages, pageOrder, organization, label, ...rest },
+  { pages, searchSections = {}, customPages, pageOrder, organization, label, ...rest },
   ref,
 ) {
   const m = useMessages('userProfile');
-  const organizationLabels = useMessages('organizationProfile').pages;
-  const accountPages = userProfilePageList({ pages, customPages, pageOrder }, m.pages);
+  const organizationMessages = useMessages('organizationProfile');
+  const accountPages = userProfilePageList({ pages, customPages, pageOrder }, searchSections, m);
   const groups: ProfilePageGroup[] = organization
     ? [
         { label: m.accountGroup, pages: accountPages },
         {
           label: m.organizationGroup,
-          pages: organizationProfilePageList(organization, organizationLabels).map(page => ({
+          pages: organizationProfilePageList(organization, organizationMessages).map(page => ({
             ...page,
             id: `${ORGANIZATION_PAGE_PREFIX}${page.id}`,
           })),
@@ -79,8 +82,10 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
 /** The account's navigation, in order: the built-ins it was given content for, then the consumer's pages. */
 function userProfilePageList(
   { pages, customPages, pageOrder }: Pick<UserProfileViewProps, 'pages' | 'customPages' | 'pageOrder'>,
-  labels: Record<UserProfilePageId, string>,
+  searchSections: UserProfileSearchSections,
+  m: MosaicMessages['userProfile'],
 ): ProfilePage[] {
+  const sectionLabels = userProfileSectionLabels(m);
   return userProfileNavEntries({ pages, customPages, pageOrder }).map(entry =>
     entry.custom
       ? {
@@ -88,18 +93,36 @@ function userProfilePageList(
           label: entry.custom.label,
           icon: entry.custom.icon,
           keywords: entry.custom.keywords,
+          search: entry.custom.search,
           content: entry.custom.content,
         }
       : {
           id: entry.id,
-          label: labels[entry.id],
+          label: m.pages[entry.id],
           icon: (
             <Icon
               glyph={USER_PROFILE_PAGE_ICONS[entry.id]}
               size='sm'
             />
           ),
+          search: searchSections[entry.id]?.map(id => ({ id, label: sectionLabels[id] })),
           content: pages[entry.id],
         },
   );
+}
+
+function userProfileSectionLabels(m: MosaicMessages['userProfile']): Record<UserProfileSectionId, string> {
+  return {
+    profile: m.profile.title,
+    email: m.email.label,
+    phone: m.phone.label,
+    connectedAccounts: m.connectedAccounts.title,
+    enterpriseAccounts: m.enterpriseAccounts.title,
+    web3Wallets: m.web3Wallets.title,
+    danger: m.danger.sectionTitle,
+    password: m.password.label,
+    passkeys: m.passkeys.label,
+    mfa: m.mfa.label,
+    activeDevices: m.activeDevices.title,
+  };
 }

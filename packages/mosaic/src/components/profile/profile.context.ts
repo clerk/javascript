@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { ProfileSearchState } from './profile-search-index';
+import type { ProfileSearchState } from './profile-search-target';
 
 export type ProfileNavLayout = 'column' | 'select' | 'sheet';
 

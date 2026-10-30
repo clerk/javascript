@@ -35,11 +35,13 @@ function knobsAsProps(props: Record<string, unknown>) {
  * controller: every page's data, and actions that update it, so the surface behaves.
  */
 export function Default(props: Record<string, unknown>) {
-  const { activePage, setActivePage, pages } = useUserProfileFixture();
+  const { activePage, setActivePage, pages, searchSections, customPages } = useUserProfileFixture();
   return (
     <UserProfileView
       activePage={activePage}
       pages={pages}
+      searchSections={searchSections}
+      customPages={customPages}
       onPageChange={setActivePage}
       elevation='flush'
       {...knobsAsProps(props)}
@@ -52,7 +54,7 @@ export function Default(props: Record<string, unknown>) {
  * positions it while the profile paints itself, names the dialog, and carries its dismiss.
  */
 export function Overlay() {
-  const { activePage, setActivePage, pages } = useUserProfileFixture();
+  const { activePage, setActivePage, pages, searchSections, customPages } = useUserProfileFixture();
   return (
     <Dialog.Root>
       <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
@@ -60,6 +62,8 @@ export function Overlay() {
         <UserProfileView
           activePage={activePage}
           pages={pages}
+          searchSections={searchSections}
+          customPages={customPages}
           onPageChange={setActivePage}
         />
       </Dialog.Popup>
@@ -68,7 +72,7 @@ export function Overlay() {
 }
 
 export function Fullscreen() {
-  const { activePage, setActivePage, pages } = useUserProfileFixture();
+  const { activePage, setActivePage, pages, searchSections, customPages } = useUserProfileFixture();
   return (
     <Dialog.Root>
       <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
@@ -76,6 +80,8 @@ export function Fullscreen() {
         <UserProfileView
           activePage={activePage}
           pages={pages}
+          searchSections={searchSections}
+          customPages={customPages}
           onPageChange={setActivePage}
         />
       </Dialog.Popup>

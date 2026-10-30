@@ -31,7 +31,7 @@ import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 import type { ProfileSearchPage } from './profile-search';
 import { ProfileSearch } from './profile-search';
 import { styles as searchStyles } from './profile-search.styles';
-import { SearchHighlight, SearchIndexPage, SearchPageContext, useProfileSearch } from './profile-search-index';
+import { SearchHighlight, SearchPageContext, useProfileSearch } from './profile-search-target';
 
 // The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
 function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
@@ -235,7 +235,7 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
 });
 
 export interface ProfileNavProps extends MosaicComponentProps<'nav'> {
-  /** The pages the search lists. Their sections come from the `SearchTarget`s each page renders. Without it the nav has no search. */
+  /** The pages the search lists, with the sections each one declares. Without it the nav has no search. */
   search?: readonly ProfileSearchPage[];
 }
 
@@ -703,7 +703,6 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
           </Tabs.Panel>
         </HeadingLevelProvider>
       </ContentPanelContext.Provider>
-      <SearchIndexPage value={value}>{children}</SearchIndexPage>
     </SearchPageContext.Provider>
   );
 });

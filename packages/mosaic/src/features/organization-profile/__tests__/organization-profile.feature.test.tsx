@@ -155,9 +155,10 @@ describe('OrganizationProfile', () => {
           {
             path: 'usage',
             label: 'Usage',
+            search: [{ id: 'quota', label: 'Quota' }],
             content: (
               <OrganizationProfile.SearchTarget
-                label='Quota'
+                id='quota'
                 render={<section />}
               >
                 <h3>Quota</h3>
@@ -174,6 +175,16 @@ describe('OrganizationProfile', () => {
     const quota = screen.getByRole('heading', { name: 'Quota' });
     expect(quota).toBeVisible();
     expect(quota.parentElement).toHaveFocus();
+  });
+
+  it('finds the sections of the general page', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(<OrganizationProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'danger');
+
+    expect(within(screen.getByRole('group', { name: 'General' })).getByRole('option')).toHaveTextContent('Danger zone');
   });
 
   it('adds custom pages in the requested order and opens on the first', async () => {

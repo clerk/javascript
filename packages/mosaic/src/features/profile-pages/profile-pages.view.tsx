@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import React from 'react';
 
-import type { ProfileRootProps, ProfileSearchPage } from '../../components/profile';
+import type { ProfileRootProps, ProfileSearchPage, ProfileSearchTarget } from '../../components/profile';
 import { Profile } from '../../components/profile';
 
 /** One destination in a profile's navigation, with the page it opens. */
@@ -10,6 +10,7 @@ export interface ProfilePage {
   label: string;
   icon: ReactNode;
   keywords?: readonly string[];
+  search?: readonly ProfileSearchTarget[];
   content: ReactNode;
 }
 
@@ -49,6 +50,7 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
     label: page.label,
     icon: page.icon,
     keywords: page.keywords,
+    targets: page.search,
   }));
 
   return (

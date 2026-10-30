@@ -113,9 +113,10 @@ describe('UserProfile', () => {
           {
             path: 'usage',
             label: 'Usage',
+            search: [{ id: 'quota', label: 'Quota' }],
             content: (
               <UserProfile.SearchTarget
-                label='Quota'
+                id='quota'
                 render={<section />}
               >
                 <h3>Quota</h3>
@@ -149,9 +150,10 @@ describe('UserProfile', () => {
           {
             path: 'usage',
             label: 'Usage',
+            search: [{ id: 'quota', label: 'Quota' }],
             content: (
               <UserProfile.SearchTarget
-                label='Quota'
+                id='quota'
                 render={<section />}
               >
                 <h3>Quota</h3>
@@ -186,6 +188,50 @@ describe('UserProfile', () => {
     serve();
     await renderWithClerk(<UserProfile showSearch={showSearch} />);
     expect(screen.queryByRole('combobox', { name: 'Search' }) !== null).toBe(shown);
+  });
+
+  it.each([
+    { passkey: false, results: [] },
+    { passkey: true, results: ['Passkeys'] },
+  ])('finds a section only when the instance shows it: passkeys $passkey', async ({ passkey, results }) => {
+    serveFapi({
+      environment: fapiEnvironment({ attributes: { passkey: { enabled: passkey } } }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'passkey');
+
+    expect(screen.queryAllByRole('option').map(option => option.textContent)).toEqual(results);
+  });
+
+  it('finds the sections of a closed page without loading it', async () => {
+    serve();
+    const sessions = holdRequests('get', '/v1/me/sessions/active');
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+
+    expect(within(screen.getByRole('group', { name: 'Security' })).getByRole('option')).toHaveTextContent(
+      'Active devices',
+    );
+    expect(sessions.requests).toHaveLength(0);
+    sessions.release();
+  });
+
+  it('finds a section by the name a localization gives it', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />, undefined, {
+      overrides: { userProfile: { password: { label: 'Passphrase' } } },
+    });
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'passphrase');
+    await user.click(screen.getByRole('option', { name: 'Passphrase' }));
+
+    expect(screen.getByRole('heading', { name: 'Passphrase' }).closest('.cl-profile-search-target')).toHaveFocus();
   });
 
   it('leaves the page where it is when the found target is already in view', async () => {
