@@ -43,6 +43,7 @@ export function APIKeysTableSkeleton({
           {canManage ? (
             <Table.Column
               align='end'
+              sticky='end'
               width='4rem'
             >
               <VisuallyHidden>{m.actions}</VisuallyHidden>
@@ -77,7 +78,10 @@ export function APIKeysTableSkeleton({
                 </Text>
               </Table.Cell>
               {canManage ? (
-                <Table.Cell align='end'>
+                <Table.Cell
+                  align='end'
+                  sticky='end'
+                >
                   <Skeleton visible={false}>
                     <Menu.Root>
                       <Menu.Trigger

@@ -84,6 +84,7 @@ export function APIKeysTableView({
             {revoke ? (
               <Table.Column
                 align='end'
+                sticky='end'
                 width='4rem'
               >
                 <VisuallyHidden>{m.actions}</VisuallyHidden>
@@ -136,7 +137,10 @@ export function APIKeysTableView({
                   <Text>{apiKey.lastUsedAtLabel ?? m.neverUsed}</Text>
                 </Table.Cell>
                 {revoke ? (
-                  <Table.Cell align='end'>
+                  <Table.Cell
+                    align='end'
+                    sticky='end'
+                  >
                     <APIKeyActions
                       messages={m}
                       apiKey={apiKey}
