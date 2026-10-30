@@ -42,6 +42,21 @@ const inPersonalAccount: FakeFapiSeed = {
   memberships,
 };
 
+const keysMemberships = [fapiMembership(acme, { permissions: ['org:sys_api_keys:read'] })];
+const withOrganizationApiKeys: FakeFapiSeed = {
+  environment: fapiEnvironment({
+    api_keys_settings: { user_api_keys_enabled: false, orgs_api_keys_enabled: true },
+  }),
+  client: fapiClient([
+    fapiSession({
+      id: 'sess_1',
+      user: { ...alice, organization_memberships: keysMemberships },
+      last_active_organization_id: 'org_1',
+    }),
+  ]),
+  memberships: keysMemberships,
+};
+
 const terms = { label: 'Terms', path: 'terms', content: <p>Terms body</p> };
 const accountTabs = ['Account', 'Security'];
 const organizationTabs = ['General', 'Members'];
@@ -179,30 +194,35 @@ describe('the profile the switchers open', () => {
     expect(navigate).toHaveBeenCalledWith('/org');
   });
 
-  it("hides the organization's API keys from the profile a switcher opens", async () => {
-    const keysMemberships = [fapiMembership(acme, { permissions: ['org:sys_api_keys:read'] })];
+  it.each([
+    { name: 'separate', combined: false, expected: ['General'] },
+    { name: 'combined', combined: true, expected: ['Account', 'Security', 'General'] },
+  ])("hides the organization's API keys from the profile a switcher opens: $name", async ({ combined, expected }) => {
     await renderWithProfile(
       <OrganizationSwitcher />,
-      { combined: false, organizationProfileProps: { apiKeysProps: { hide: true } } },
-      {
-        environment: fapiEnvironment({
-          api_keys_settings: { user_api_keys_enabled: false, orgs_api_keys_enabled: true },
-        }),
-        client: fapiClient([
-          fapiSession({
-            id: 'sess_1',
-            user: { ...alice, organization_memberships: keysMemberships },
-            last_active_organization_id: 'org_1',
-          }),
-        ]),
-        memberships: keysMemberships,
-      },
+      { combined, organizationProfileProps: { apiKeysProps: { hide: true } } },
+      withOrganizationApiKeys,
     );
 
     await clickSettings(switcherTrigger);
 
     expect(await selectedTab('General')).toBeInTheDocument();
-    expect(tabs()).toEqual(['General']);
+    expect(tabs()).toEqual(expected);
+  });
+
+  it("hands the provider's organization options to Clerk's modal without newProfiles", async () => {
+    const organizationProfileProps = { afterLeaveOrganizationUrl: '/left', apiKeysProps: { hide: true } };
+    const { clerk } = await renderWithProfile(
+      <OrganizationSwitcher />,
+      { organizationProfileProps },
+      withOrganizationApiKeys,
+      {},
+    );
+    const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+
+    await clickSettings(switcherTrigger);
+
+    expect(openOrganizationProfile).toHaveBeenCalledWith(expect.objectContaining(organizationProfileProps));
   });
 
   it('routes the one profile with a URL, and opens the other as a modal', async () => {
@@ -255,10 +275,10 @@ describe('the profile the switchers open', () => {
 describe('a mounted OrganizationProfile under a provider profile', () => {
   const audit = { ...terms, label: 'Audit', path: 'audit' };
 
-  it("uses the provider's profile props, leaving links out", async () => {
+  it("uses the provider's profile props", async () => {
     await renderWithProfile(<OrganizationProfile />, {
       organizationProfileProps: {
-        customPages: [audit, { label: 'Docs', path: 'docs', href: 'https://example.com/docs' }],
+        customPages: [audit],
         pageOrder: ['audit'],
       },
     });
@@ -285,6 +305,14 @@ describe('a mounted OrganizationProfile under a provider profile', () => {
 });
 
 describe('a mounted UserProfile under a provider profile', () => {
+  it('fills in what its own organizationProfileProps leave out from the provider', async () => {
+    await renderWithProfile(<UserProfile organizationProfileProps={{ pageOrder: ['members'] }} />, {
+      organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }], pageOrder: ['general'] },
+    });
+
+    await waitFor(() => expect(tabs()).toEqual(['Account', 'Security', 'Members', 'General', 'Audit']));
+  });
+
   it('lands where the provider says after leaving the organization', async () => {
     const { navigate } = await renderWithProfile(<UserProfile defaultPage='organization/general' />, {
       organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
@@ -305,11 +333,9 @@ describe('a mounted UserProfile under a provider profile', () => {
     await waitFor(() => expect(tabs()).toEqual(expected));
   });
 
-  it("uses the provider's profile props, leaving links out", async () => {
+  it("uses the provider's profile props", async () => {
     await renderWithProfile(<UserProfile />, {
-      userProfileProps: {
-        customPages: [terms, { label: 'Docs', path: 'docs', href: 'https://example.com/docs' }],
-      },
+      userProfileProps: { customPages: [terms] },
       organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }] },
     });
 

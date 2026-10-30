@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useModal } from '../../modals/use-modal';
+import { useMosaicProfile, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
 import { userProfileModal } from './user-profile.modal';
 import type { UserProfileOptions } from './user-profile.provider';
 
@@ -18,6 +19,7 @@ export function withUserProfileModalReturn(url: string, mode: UserProfileOptions
 
 export function UserProfileModalReturn(): null {
   const { open } = useModal(userProfileModal);
+  const profile = useMosaicProfile();
 
   React.useEffect(() => {
     queueMicrotask(() => {
@@ -27,9 +29,9 @@ export function UserProfileModalReturn(): null {
       }
       url.searchParams.delete(MODAL_PARAM);
       window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
-      open({ page: 'account' });
+      open({ ...userProfileModalOptions(profile), page: 'account' });
     });
-  }, [open]);
+  }, [open, profile]);
 
   return null;
 }

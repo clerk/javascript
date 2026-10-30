@@ -2,7 +2,7 @@ import type { CustomPage } from '@clerk/shared/types';
 import { act, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import type { CustomProfileItem } from '../../user-profile/user-profile.types';
+import type { CustomProfilePage } from '../../user-profile/user-profile.types';
 import type { CustomPagesOptions } from '../switcher.pages';
 import { useCustomPages } from '../switcher.pages';
 
@@ -29,18 +29,18 @@ function Harness({ items, order, builtInPages = ['account', 'security'] }: Parti
   return <div data-testid='host'>{portals}</div>;
 }
 
-const terms: CustomProfileItem = {
+const terms: CustomProfilePage = {
   label: 'Terms',
   path: 'terms',
   icon: <span>terms icon</span>,
   content: <p>Terms body</p>,
 };
 
-const docs: CustomProfileItem = {
+const docs: CustomProfilePage = {
   label: 'Docs',
   path: 'docs',
-  href: 'https://clerk.com/docs',
   icon: <span>docs icon</span>,
+  content: <p>Docs body</p>,
 };
 
 beforeEach(() => {
@@ -55,23 +55,21 @@ describe('useCustomPages', () => {
     expect(screen.getByTestId('host')).toBeEmptyDOMElement();
   });
 
-  it('sends a page as its path and a link as its href', () => {
+  it('sends a page as its path', () => {
     render(<Harness items={[terms, docs]} />);
 
-    expect(emitted?.map(page => page.url)).toEqual(['terms', 'https://clerk.com/docs']);
+    expect(emitted?.map(page => page.url)).toEqual(['terms', 'docs']);
     expect(emitted?.map(page => page.label)).toEqual(['Terms', 'Docs']);
   });
 
   // clerk-js tells a page from a link by which callbacks are present, so content callbacks are what
-  // make an item a page. A link carrying them would be routed to instead of followed.
-  it('sends content callbacks for a page and none for a link', () => {
-    render(<Harness items={[terms, docs]} />);
+  // make an item a page.
+  it('sends content callbacks for a page', () => {
+    render(<Harness items={[terms]} />);
 
-    const [page, link] = emitted ?? [];
+    const [page] = emitted ?? [];
     expect(page.mount).toBeTypeOf('function');
     expect(page.unmount).toBeTypeOf('function');
-    expect(link.mount).toBeUndefined();
-    expect(link.unmount).toBeUndefined();
   });
 
   // Without them clerk-js drops the page as invalid, so `icon` could not be optional.
@@ -97,7 +95,7 @@ describe('useCustomPages', () => {
   });
 
   it('keeps each page in the element that asked for it', () => {
-    const help: CustomProfileItem = { label: 'Help', path: 'help', content: <p>Help body</p> };
+    const help: CustomProfilePage = { label: 'Help', path: 'help', content: <p>Help body</p> };
     render(<Harness items={[terms, help]} />);
 
     const first = mountInto(emitted?.[0].mount);
