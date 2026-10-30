@@ -154,9 +154,11 @@ cmd_attach() {
     exit 1
   fi
 
-  local head url
+  local head url repo
   head="$(gh pr view "$pr" --json headRefOid -q .headRefOid)"
   url="$(gh pr view "$pr" --json url -q .url)"
+  repo="${url#https://github.com/}"
+  repo="${repo%/pull/*}"
   if [ "$head" != "$(git rev-parse HEAD)" ]; then
     echo "refuse  local HEAD is not the head of pull request #$pr ($head)" >&2
     echo "fix     push this branch, or check out the pull request, then attach again" >&2
@@ -188,10 +190,10 @@ cmd_attach() {
   body_with_block "$work/old.md" "$work/list.md" >"$work/body.md"
   if [ "$dry_run" -eq 1 ]; then
     echo "would run, in $work:"
-    echo "gh pr edit $pr --body-file body.md ${files[*]}"
+    echo "gh pr edit $pr --repo $repo --body-file body.md ${files[*]}"
     return
   fi
-  (cd "$work" && gh pr edit "$pr" --body-file body.md "${files[@]}" >/dev/null)
+  (cd "$work" && gh pr edit "$pr" --repo "$repo" --body-file body.md "${files[@]}" >/dev/null)
 
   local uploaded=() asset
   gh pr view "$pr" --json body -q .body >"$work/listed.md"
@@ -206,7 +208,7 @@ cmd_attach() {
 
   evidence_block "$line" "$before" "${#names[@]}" "${names[@]}" "${uploaded[@]}" >"$work/block.md"
   body_with_block "$work/listed.md" "$work/block.md" >"$work/body.md"
-  (cd "$work" && gh pr edit "$pr" --body-file body.md >/dev/null)
+  (cd "$work" && gh pr edit "$pr" --repo "$repo" --body-file body.md >/dev/null)
   echo "attached ${#names[@]} screenshots${before:+ with befores} to $url"
 }
 
