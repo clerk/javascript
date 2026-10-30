@@ -9,7 +9,7 @@ import { useOrganizationProfileModel } from '../organization-profile/organizatio
 import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
-import { pagesOnly, useUserProfilePages } from '../switcher/switcher.pages';
+import { useUserProfilePages } from '../switcher/switcher.pages';
 import { userProfilePageIds } from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
@@ -115,19 +115,19 @@ export interface UserProfileProps
  * ```
  */
 export function UserProfile(props: UserProfileProps) {
-  const { combined, userProfileProps, organizationProfileProps } = useMosaicProfile();
+  const { combined, userProfileProps, organizationProfileProps: providerOrganization } = useMosaicProfile();
   const {
     combined: ownCombined = combined,
-    customPages = pagesOnly(userProfileProps?.customPages),
+    customPages = userProfileProps?.customPages,
     pageOrder = userProfileProps?.pageOrder,
     additionalOAuthScopes = userProfileProps?.additionalOAuthScopes,
     apiKeysProps = userProfileProps?.apiKeysProps,
-    organizationProfileProps: ownOrganizationProfileProps = {
-      customPages: pagesOnly(organizationProfileProps?.customPages),
-      pageOrder: organizationProfileProps?.pageOrder,
-      apiKeysProps: organizationProfileProps?.apiKeysProps,
-      afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
-    },
+    organizationProfileProps: {
+      customPages: organizationCustomPages = providerOrganization?.customPages,
+      pageOrder: organizationPageOrder = providerOrganization?.pageOrder,
+      apiKeysProps: organizationApiKeysProps = providerOrganization?.apiKeysProps,
+      afterLeaveOrganizationUrl = providerOrganization?.afterLeaveOrganizationUrl,
+    } = {},
     ...rest
   } = props;
 
@@ -139,7 +139,12 @@ export function UserProfile(props: UserProfileProps) {
       pageOrder={pageOrder}
       additionalOAuthScopes={additionalOAuthScopes}
       apiKeysProps={apiKeysProps}
-      organizationProfileProps={ownOrganizationProfileProps}
+      organizationProfileProps={{
+        customPages: organizationCustomPages,
+        pageOrder: organizationPageOrder,
+        apiKeysProps: organizationApiKeysProps,
+        afterLeaveOrganizationUrl,
+      }}
       presentation='mounted'
     />
   );

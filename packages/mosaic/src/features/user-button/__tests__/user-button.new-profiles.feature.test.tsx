@@ -162,10 +162,10 @@ describe('UserButton with experimental.newProfiles', () => {
     expect(within(container).getByRole('tab', { name: 'Account' })).toBeInTheDocument();
   });
 
-  it('renders custom pages in their order, and leaves out links', async () => {
+  it('renders custom pages in their order', async () => {
     await renderWithNewProfiles({}, undefined, {
       userProfileProps: {
-        customPages: [terms, { label: 'Docs', path: 'docs', href: 'https://example.com/docs' }],
+        customPages: [terms],
         pageOrder: ['terms', 'account'],
       },
     });

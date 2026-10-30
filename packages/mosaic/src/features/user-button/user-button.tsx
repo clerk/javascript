@@ -25,7 +25,7 @@ export interface UserButtonMenuProps {
   triggerVariant?: SwitcherTriggerVariant;
 }
 
-/** Everything `<UserButton />` takes: profile routing, trigger content, and the app's own menu rows. */
+/** Everything `<UserButton />` takes: trigger content, and the app's own menu rows. */
 export type UserButtonProps = SwitcherProps & UserButtonMenuProps;
 
 /**

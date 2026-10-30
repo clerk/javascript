@@ -8,7 +8,7 @@ import type { OrganizationSwitcherModelOptions } from '../switcher/switcher.mode
 import type { SwitcherMenuProps } from '../switcher/switcher.types';
 import type { SwitcherTriggerProps } from '../switcher/switcher.view';
 
-/** Everything `<OrganizationSwitcher />` takes: profile routing, trigger content, and the app's own menu rows. */
+/** Everything `<OrganizationSwitcher />` takes: trigger content, and the app's own menu rows. */
 export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
   SwitcherTriggerProps &
   SwitcherMenuProps &

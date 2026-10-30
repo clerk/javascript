@@ -28,7 +28,7 @@ export interface MosaicProviderProps {
   localization?: MosaicLocalization;
   /** Features still being tried out. Their names and behavior can change in any release. */
   experimental?: MosaicExperimental;
-  /** The profile `UserButton`, `OrganizationSwitcher` and `UserProfile` share: its shape, and the options it takes. */
+  /** The profile `UserButton`, `OrganizationSwitcher`, `UserProfile` and `OrganizationProfile` share: its shape, and the options it takes. */
   profile?: MosaicProfile;
 }
 
