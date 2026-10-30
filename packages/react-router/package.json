@@ -102,11 +102,11 @@
     "@clerk/backend": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "cookie": "1.0.2",
-    "tslib": "catalog:repo"
+    "cookie": "1.0.2"
   },
   "devDependencies": {
-    "react-router": "7.18.2"
+    "react-router": "7.18.2",
+    "tslib": "catalog:repo"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

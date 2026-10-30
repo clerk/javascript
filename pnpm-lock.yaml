@@ -393,9 +393,6 @@ importers:
       standardwebhooks:
         specifier: ^1.0.0
         version: 1.0.0
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@edge-runtime/vm':
         specifier: 5.0.0
@@ -409,6 +406,9 @@ importers:
       snakecase-keys:
         specifier: 9.0.2
         version: 9.0.2
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/chrome-extension:
     dependencies:
@@ -549,9 +549,6 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@clerk/electron-passkeys':
         specifier: workspace:*
@@ -565,6 +562,9 @@ importers:
       electron-store:
         specifier: ^8.2.0
         version: 8.2.0
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/electron-passkeys:
     devDependencies:
@@ -643,9 +643,6 @@ importers:
       react-native-url-polyfill:
         specifier: 4.0.0
         version: 4.0.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10))
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@clerk/expo-biometrics':
         specifier: workspace:*
@@ -689,6 +686,9 @@ importers:
       react-native:
         specifier: ^0.86.0
         version: 0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10)
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/expo-biometrics:
     devDependencies:
@@ -713,9 +713,6 @@ importers:
       react:
         specifier: 18.3.1
         version: 18.3.1
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@expo/config-plugins':
         specifier: ^54.0.4
@@ -723,6 +720,9 @@ importers:
       react-native:
         specifier: ^0.86.0
         version: 0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10)
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/expo-passkeys:
     dependencies:
@@ -751,9 +751,6 @@ importers:
       '@clerk/shared':
         specifier: workspace:^
         version: link:../shared
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@types/express':
         specifier: ^4.17.25
@@ -767,6 +764,9 @@ importers:
       supertest:
         specifier: ^6.3.4
         version: 6.3.4
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/fastify:
     dependencies:
@@ -923,9 +923,6 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       crypto-es:
         specifier: ^2.1.0
@@ -933,6 +930,9 @@ importers:
       next:
         specifier: 15.5.24
         version: 15.5.24(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.62.1)(@types/node@22.20.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/nuxt:
     dependencies:
@@ -976,9 +976,6 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@clerk/localizations':
         specifier: workspace:*
@@ -992,6 +989,9 @@ importers:
       semver:
         specifier: ^7.8.5
         version: 7.8.5
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
       yaml:
         specifier: ^2.9.0
         version: 2.9.0
@@ -1016,13 +1016,13 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       react-router:
         specifier: 7.18.2
         version: 7.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/shared:
     dependencies:
@@ -1220,9 +1220,6 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@tanstack/react-router':
         specifier: 1.170.41
@@ -1230,6 +1227,9 @@ importers:
       '@tanstack/react-start':
         specifier: 1.168.60
         version: 1.168.60(@rspack/core@2.0.6)(esbuild@0.28.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rolldown@1.1.0)(rollup@4.61.0)(vite@8.2.2(@types/node@25.6.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.46.1)(tsx@4.23.14)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.28.1))
+      tslib:
+        specifier: catalog:repo
+        version: 2.8.1
 
   packages/testing:
     dependencies:

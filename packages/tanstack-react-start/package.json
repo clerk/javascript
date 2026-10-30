@@ -81,12 +81,12 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/react": "workspace:^",
-    "@clerk/shared": "workspace:^",
-    "tslib": "catalog:repo"
+    "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
     "@tanstack/react-router": "1.170.41",
-    "@tanstack/react-start": "1.168.60"
+    "@tanstack/react-start": "1.168.60",
+    "tslib": "catalog:repo"
   },
   "peerDependencies": {
     "@tanstack/react-router": "^1.170.7",
