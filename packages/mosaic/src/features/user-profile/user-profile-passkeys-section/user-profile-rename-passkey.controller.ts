@@ -31,10 +31,8 @@ export function useUserProfileRenamePasskeyController({
     initialValues: { name },
     fields: { name: { validate: validateName } },
     canSubmit: values => Boolean(onRename) && values.name.length > 1 && values.name !== name,
-    onSubmit: async values => {
-      await onRename?.(id, values.name);
-      setIsOpen(false);
-    },
+    onSubmit: async values => onRename?.(id, values.name),
+    onSuccess: () => setIsOpen(false),
   });
 
   const onOpenChange = (open: boolean) => {

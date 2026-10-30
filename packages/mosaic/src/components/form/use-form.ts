@@ -8,10 +8,11 @@ import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
 import { createFormMachine, fieldConfig, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
 import type { FieldFeedback } from './form-submit-error';
 
-export interface UseFormOptions<TValues extends object> {
+export interface UseFormOptions<TValues extends object, TResult = unknown> {
   initialValues: TValues;
   fields?: FieldsConfig<TValues>;
-  onSubmit: (values: TValues) => Promise<unknown>;
+  onSubmit: (values: TValues) => Promise<TResult>;
+  onSuccess?: (result: TResult, submittedValues: TValues) => void;
   canSubmit?: (values: TValues) => boolean;
   errorFallback?: string;
 }
@@ -82,7 +83,9 @@ type ElementRef = (element: HTMLElement | null) => void;
 
 const always = () => true;
 
-export function useForm<TValues extends object>(options: UseFormOptions<TValues>): UseFormResult<TValues> {
+export function useForm<TValues extends object, TResult = unknown>(
+  options: UseFormOptions<TValues, TResult>,
+): UseFormResult<TValues> {
   const id = useId();
   const m = useMessages('form');
   const errorText = useErrorText();
@@ -92,7 +95,11 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   const deps = {
     initialValues: options.initialValues,
     fields: options.fields,
-    onSubmit: options.onSubmit,
+    onSubmit: async (submittedValues: TValues) => {
+      const { onSubmit, onSuccess } = options;
+      const result = await onSubmit(submittedValues);
+      return () => onSuccess?.(result, submittedValues);
+    },
     canSubmit: options.canSubmit ?? always,
     fallbackMessage: options.errorFallback ?? m.error,
     errorText,

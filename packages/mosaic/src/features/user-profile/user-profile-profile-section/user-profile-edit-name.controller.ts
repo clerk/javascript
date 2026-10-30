@@ -33,10 +33,8 @@ export function useUserProfileEditNameController({
       (values.firstName !== firstName || values.lastName !== lastName) &&
       (!firstNameRequired || values.firstName !== '') &&
       (!lastNameRequired || values.lastName !== ''),
-    onSubmit: async values => {
-      await onSubmit(values);
-      setIsOpen(false);
-    },
+    onSubmit: values => onSubmit(values),
+    onSuccess: () => setIsOpen(false),
   });
 
   const onOpenChange = (open: boolean) => {

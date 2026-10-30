@@ -121,12 +121,25 @@ boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
 const [isOpen, setIsOpen] = useState(false);
 const form = useForm({
   initialValues: { username },
-  onSubmit: async values => {
-    await onSubmit(values.username);
-    setIsOpen(false);
-  },
+  onSubmit: values => onSubmit(values.username),
+  onSuccess: () => setIsOpen(false),
 });
 ```
+
+Keep mutations and required revalidation in `onSubmit`. Put success UI, such as
+closing the dialog or showing a toast, in the optional synchronous
+`onSuccess(result, submittedValues)` callback. The result type comes from
+`onSubmit`. The callback and values belong to the submission that started the
+request. The form machine delivers success only while its actor is mounted.
+Rejection and cancelled reverification skip the callback.
+
+The callback runs during the completion transition, before `isSubmitting` clears.
+Use it to close or display UI, not to reset or resubmit the form. A resolved
+`onSubmit` counts as success even if it returned early. Prevent no-op submissions
+with `canSubmit`, or return a result that lets `onSuccess` distinguish them.
+Unmount suppression does not cancel the underlying request. Identity changes
+must unmount the form, for example through the composing component's React key,
+if they should discard its completion UI.
 
 The choice is invisible from outside — the controller returns plain props either
 way, so the view and its tests are unaffected, and swapping one for the other

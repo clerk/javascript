@@ -49,13 +49,16 @@ export function useCreateAPIKeyController({
       if (expiration === null) {
         return;
       }
-      setSecret(
-        await onCreate({
-          name: name.trim(),
-          description: description.trim() || undefined,
-          expiresAt: getExpirationDate(expiration, new Date()),
-        }),
-      );
+      return onCreate({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        expiresAt: getExpirationDate(expiration, new Date()),
+      });
+    },
+    onSuccess: secret => {
+      if (secret !== undefined) {
+        setSecret(secret);
+      }
     },
   });
 
