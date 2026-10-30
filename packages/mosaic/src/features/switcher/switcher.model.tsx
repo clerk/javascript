@@ -17,6 +17,7 @@ import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useModal } from '../../modals/use-modal';
 import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
+import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
 import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
 import type { OrganizationProfileModalOptions } from '../organization-profile/organization-profile.modal.types';
 import { userProfileModal } from '../user-profile/user-profile.modal';
@@ -161,8 +162,6 @@ function openOrNavigate({
   return opensModal(url, mode) ? () => openModal() : () => void navigate(url ?? buildUrl());
 }
 
-const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
-
 function displayName(user: UserResource): string {
   return getFullName(user) || getIdentifier(user);
 }
@@ -288,7 +287,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const { enabled: organizationsEnabled, forceOrganizationSelection } = organizationSettings;
   const { singleSessionMode } = authConfig;
 
-  const canInviteMembers = session.checkAuthorization({ permission: INVITE_MEMBERS_PERMISSION }) ?? false;
+  const canInviteMembers =
+    session.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
   const membershipData = userMemberships.data ?? [];
   const suggestionData = userSuggestions.data ?? [];
   const invitationData = userInvitations.data ?? [];

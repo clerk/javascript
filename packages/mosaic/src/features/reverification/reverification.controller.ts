@@ -8,6 +8,7 @@ import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, ErrorInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { toLocalizableError } from '../../utils/errors';
+import { CODE_RESEND_SECONDS } from '../../utils/verification';
 import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
 import type {
   ReverificationErrorReason,
@@ -76,10 +77,8 @@ const unseatedDeps: ReverificationDeps = {
   finish: notSeated,
 };
 
-export const RESEND_COOLDOWN_MS = 30_000;
-
 function lockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
-  return { resendAvailableAt: Date.now() + RESEND_COOLDOWN_MS };
+  return { resendAvailableAt: Date.now() + CODE_RESEND_SECONDS * 1000 };
 }
 
 function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
@@ -527,7 +526,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       // useSyncExternalStore feels unnecessarily complex here
       resendRemainingSeconds:
         countingDown && resendAvailableAt
-          ? Math.min(RESEND_COOLDOWN_MS / 1000, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
+          ? Math.min(CODE_RESEND_SECONDS, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
           : undefined,
     };
 

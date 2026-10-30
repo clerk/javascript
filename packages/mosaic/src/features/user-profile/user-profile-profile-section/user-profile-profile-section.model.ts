@@ -5,6 +5,7 @@ import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import { isAttributeAvailable } from '../user-profile.utils';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { providerId } from '../user-profile-provider.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
@@ -18,7 +19,7 @@ function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfil
     return undefined;
   }
   const connection = account.enterpriseConnection;
-  return { name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, '') };
+  return { name: connection?.name || providerId(account.provider) };
 }
 
 function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {

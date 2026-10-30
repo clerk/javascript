@@ -54,6 +54,9 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | An inline message row; height is undefined until measured                | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts` |
 | Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)                  |
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                                  |
+| An organization permission checked with `checkAuthorization`             | `ORGANIZATION_PERMISSIONS` (`src/utils/permissions.ts`)                                                           |
+| A verification code's length or resend cooldown                          | `CODE_LENGTH`, `CODE_RESEND_SECONDS` (`src/utils/verification.ts`)                                                |
+| An avatar or logo file picker and its rejection errors                   | `AVATAR_UPLOAD`, `AVATAR_REJECTION_ERRORS` (`src/utils/avatar-upload.ts`)                                         |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                    |
 | An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                     |
 | An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                                  |
