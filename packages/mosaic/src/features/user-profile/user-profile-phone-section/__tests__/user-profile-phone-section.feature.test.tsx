@@ -1,7 +1,7 @@
 import type { EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   demandReverificationOnce,
@@ -141,6 +141,56 @@ describe('the user profile phone section', () => {
     await addPhone(actor, '8015550100');
 
     expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+  });
+
+  it('disables Cancel while verifying a phone code and allows cancellation after an error', async () => {
+    const { actor } = await renderSection();
+    await addPhone(actor, '8015550100');
+    const attempt = holdRequests('post', '/v1/me/phone_numbers/:id/attempt_verification');
+
+    try {
+      await enterCode(actor, '000000');
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(screen.getByRole('dialog', { name: 'Verify your phone number' })).toBeVisible();
+    } finally {
+      attempt.release();
+    }
+
+    expect(await screen.findByText('Incorrect code')).toBeVisible();
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    expect(cancel).toBeEnabled();
+    await actor.click(cancel);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('disables Cancel while resending a phone code and allows cancellation once sent', async ({ onTestFinished }) => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    onTestFinished(() => vi.useRealTimers());
+    await renderSection();
+    const actor = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await addPhone(actor, '8015550100');
+    await screen.findByRole('textbox', { name: 'Verification code' });
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      for (let second = 0; second < 30; second++) {
+        await act(() => vi.advanceTimersByTimeAsync(1000));
+      }
+      const resend = screen.getByRole('button', { name: /Resend/ });
+      await waitFor(() => expect(resend).toBeEnabled());
+      await actor.click(resend);
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(screen.getByRole('dialog', { name: 'Verify your phone number' })).toBeVisible();
+    } finally {
+      prepare.release();
+    }
+
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    await waitFor(() => expect(cancel).toBeEnabled());
+    await actor.click(cancel);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('verifies a number that was left unverified', async () => {
