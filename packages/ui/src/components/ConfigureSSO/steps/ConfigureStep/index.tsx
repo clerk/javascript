@@ -78,6 +78,7 @@ export const ConfigureProviderStep = (): JSX.Element | null => {
         elementId={descriptors.configureSSOStep.setId('configure')}
       >
         {ConfigureSteps ? (
+          // eslint-disable-next-line react-hooks/static-components -- resolveConfigureSteps returns a module-level component, so its identity is stable across renders
           <ConfigureSteps />
         ) : (
           <>
