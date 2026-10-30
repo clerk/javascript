@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -20,6 +20,10 @@ import { PortalProvider } from '../../../primitives/portal';
 import { signedIn as withConnectedAccounts } from '../../user-profile/user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
+
+beforeAll(async () => {
+  await import('../../user-profile/user-profile.modal-content');
+});
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const other = fapiOrganization({ id: 'org_9', name: 'Other' });
@@ -128,11 +132,9 @@ describe('UserButton with experimental.newProfiles', () => {
     await waitFor(() => expect(request.requests).toHaveLength(1));
 
     const body = new URLSearchParams(await request.requests[0]?.text());
-    const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
-    expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({
-      componentName: 'UserProfile',
-      socialProvider: 'github',
-    });
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.has('__clerk_modal_state')).toBe(false);
     request.fail();
   });
 
