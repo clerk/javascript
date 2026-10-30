@@ -349,7 +349,7 @@ function createBackupCodeActions(
   flow: MfaFlow,
   run: RunMfaAction,
   send: MfaSend,
-  m: MosaicMessages['userProfileBackupCodes'],
+  m: MosaicMessages['userProfile']['mfa']['backupCodes'],
 ) {
   const fileValues = { applicationName: model.applicationName, identifier: model.identifier };
   const generateBackupCodes = () => {
@@ -505,7 +505,7 @@ function createSetupProps(
 
 export function useUserProfileMfaController(model: ReadyModel) {
   const errorText = useErrorText();
-  const backupCodeMessages = useMessages('userProfileBackupCodes');
+  const backupCodeMessages = useMessages('userProfile').mfa.backupCodes;
   const [{ context, value }, send] = useMachine(mfaMachine);
   const isBusy = value === 'busy';
   const run: RunMfaAction = (key, action) => {

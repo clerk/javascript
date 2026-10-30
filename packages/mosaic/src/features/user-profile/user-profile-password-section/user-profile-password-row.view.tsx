@@ -9,7 +9,7 @@ export function UserProfilePasswordRowView({
   hasPassword = false,
   managedBy,
 }: UserProfilePasswordSectionViewProps) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   return (
     <Section.Items>
       <Section.Item>

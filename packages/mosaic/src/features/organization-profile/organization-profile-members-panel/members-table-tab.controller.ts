@@ -15,7 +15,7 @@ export function useMembersTableController(
   { roles, isLoading: isLoadingRoles }: MembersRolesState,
 ) {
   const locale = useLocale();
-  const messages = useMessages('membersTableTab');
+  const messages = useMessages('organizationProfile').members.list;
   const roleNames = useMessages('roles');
   const roleAction = usePendingAction({ errorFallback: messages.roleChangeError });
   const members = model.rows.map(({ joinedAt, ...member }) => ({

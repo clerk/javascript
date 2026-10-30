@@ -48,7 +48,7 @@ export function UserProfilePasskeysSectionView({
   addReverification,
   addFinalFocus,
 }: UserProfilePasskeysSectionViewProps) {
-  const m = useMessages('userProfilePasskeys');
+  const m = useMessages('userProfile').passkeys;
 
   return (
     <>

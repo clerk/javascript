@@ -47,7 +47,7 @@ export function RequestsTableTabSkeleton({
   hasDecline: boolean;
   hasBulkAction: boolean;
 }) {
-  const m = useMessages('requestsTableTab');
+  const m = useMessages('organizationProfile').members.requests;
   const hasActions = hasAccept || hasDecline;
   return (
     <div

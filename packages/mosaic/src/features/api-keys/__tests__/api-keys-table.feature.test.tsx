@@ -247,9 +247,9 @@ describe('APIKeysTable', () => {
         <MosaicProvider
           localization={{
             overrides: {
-              'apiKeysTable.search': 'Find a key',
-              'apiKeysTable.expires': 'Expiration: {expiresDate}',
-              'apiKeysTable.revokeTitle': 'Retirer {name} ?',
+              'apiKeys.search': 'Find a key',
+              'apiKeys.expires': 'Expiration: {expiresDate}',
+              'apiKeys.revokeTitle': 'Retirer {name} ?',
             },
           }}
         >

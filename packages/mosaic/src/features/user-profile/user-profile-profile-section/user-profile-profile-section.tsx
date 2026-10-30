@@ -78,7 +78,7 @@ function EditName({
   firstNameAttribute: UserProfileNameAttribute;
   lastNameAttribute: UserProfileNameAttribute;
 }) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const controller = useUserProfileEditNameController({
     ...options,
     firstNameRequired: firstNameAttribute.required,
@@ -107,7 +107,7 @@ function EditName({
 }
 
 function EditUsername(options: UserProfileEditUsernameControllerOptions) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const controller = useUserProfileEditUsernameController(options);
   const isSet = Boolean(options.username);
 

@@ -46,7 +46,7 @@ export function UserProfileEditNameDialog({
   title,
   form,
 }: UserProfileEditNameDialogProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;
   const { enabled: showLastName = true, required: lastNameRequired = false } = lastNameAttribute;

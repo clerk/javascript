@@ -39,7 +39,7 @@ export function OrganizationProfileLogoRowView({
   onReject,
   onRemove,
 }: OrganizationProfileLogoRowViewProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const errorText = useErrorText();
   const logo = useOrganizationProfileLogoController({ onChange, onRemove });
   const [rejection, setRejection] = useState<LocalizableError>();
@@ -115,7 +115,7 @@ function LogoActions({
   canChange: boolean;
   onRemove?: () => Promise<unknown>;
 }) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: ActionMenuAction[] = [];
 

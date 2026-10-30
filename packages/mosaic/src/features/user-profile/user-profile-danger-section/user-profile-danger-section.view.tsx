@@ -9,7 +9,7 @@ export interface UserProfileDangerSectionViewProps {
 }
 
 export function UserProfileDangerSectionView({ controller }: UserProfileDangerSectionViewProps) {
-  const m = useMessages('userProfileDangerSection');
+  const m = useMessages('userProfile').danger;
 
   return (
     <Section.Root>

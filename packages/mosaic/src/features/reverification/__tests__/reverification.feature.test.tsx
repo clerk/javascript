@@ -1748,7 +1748,7 @@ describe('Reverification', () => {
         guardedAction(),
         verificationSeed({ firstFactors: [passwordFactor] }),
         {
-          messages: { 'reverification.unstable__errors__generic': 'Something custom went wrong' },
+          messages: { 'reverification.attemptFailed': 'Something custom went wrong' },
         },
       );
       const user = await startVerification();

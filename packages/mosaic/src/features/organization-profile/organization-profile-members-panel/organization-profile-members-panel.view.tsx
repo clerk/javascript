@@ -31,9 +31,9 @@ export function OrganizationProfileMembersPanelView({
   inviteDialog,
 }: OrganizationProfileMembersPanelViewProps) {
   const m = useMessages('organizationProfile');
-  const membersMessages = useMessages('membersTableTab');
-  const invitationsMessages = useMessages('invitationsTableTab');
-  const requestsMessages = useMessages('requestsTableTab');
+  const membersMessages = useMessages('organizationProfile').members.list;
+  const invitationsMessages = useMessages('organizationProfile').members.invitations;
+  const requestsMessages = useMessages('organizationProfile').members.requests;
   const tabs = [
     {
       id: 'members',

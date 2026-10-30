@@ -208,8 +208,10 @@ user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring 
 model nor the view owns it, and the two cannot drift.
 
 `*.messages.ts` holds strings only, exported as one `<feature>Messages` object
-declared `as const` and registered under a namespace in `src/localization/registry.ts`.
-Views read their namespace inside the component with `useMessages('userButton')`, so
+declared `as const` and mounted in `src/localization/registry.ts` under the public
+component it belongs to, such as `userProfile.mfa.backupCodes`. A root is a public
+component or a shared block, never a file name. Views read their root inside the
+component with `useMessages('userProfile').mfa`, so
 the `localization` prop on `MosaicProvider` can replace any string; a module-level
 helper takes the messages as a parameter rather than importing them.
 
@@ -246,6 +248,19 @@ so a consumer's overrides type-check against the real keys, as a dot path
 (`'userButton.popup.label'`) or a nested object (`{ userButton: { popup: { label } } }`).
 Renaming or moving a key breaks every override that names it; treat it like renaming
 a prop.
+
+The key tree follows what the user sees, so a key can be found from the screen:
+
+- A root is a public component (`userProfile`) or a shared block (`form`, `errors`).
+  There is no `common` root. The same English in two components is two keys,
+  because a translation may need to differ by context.
+- Below the root, keys nest by section, then by the dialog or step inside it:
+  `userProfile.email.addDialog`, `userProfile.email.removeDialog`.
+- Copy that several views render through one shared component belongs to that
+  component (`userProfile.contact` for the row both email and phone use).
+- Every segment is camelCase. A map keyed by data ids (`errors`, `roles`,
+  `userProfile.mfa.methods`) keeps the ids as its keys;
+  `src/localization/__tests__/registry.test.ts` lists those maps and checks the rest.
 
 ### Composition
 

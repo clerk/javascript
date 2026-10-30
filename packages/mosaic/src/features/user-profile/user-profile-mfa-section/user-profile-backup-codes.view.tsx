@@ -38,7 +38,7 @@ export function UserProfileBackupCodesView({
   pendingAction,
   errorMessage,
 }: UserProfileBackupCodesViewProps) {
-  const m = useMessages('userProfileBackupCodes');
+  const m = useMessages('userProfile').mfa.backupCodes;
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const hasCodes = codes.length > 0 && pendingAction !== 'generate';
   const showSaveActions = hasCodes || pendingAction === 'generate';

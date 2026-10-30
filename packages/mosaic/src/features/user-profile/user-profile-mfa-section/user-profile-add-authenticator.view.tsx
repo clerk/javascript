@@ -29,7 +29,7 @@ export function UserProfileAddAuthenticatorView({
   isPending = false,
   errorMessage,
 }: UserProfileAddAuthenticatorViewProps) {
-  const m = useMessages('userProfileAddAuthenticator');
+  const m = useMessages('userProfile').mfa.addAuthenticator;
   const formId = useId();
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const inputRef = useFlowAutoFocus<HTMLInputElement>();

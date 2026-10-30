@@ -9,7 +9,7 @@ import { toLocalizableError } from '../../../utils/errors';
 import { passwordComplexityMessage, passwordStrengthMessage } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValues } from './user-profile-password-section.types';
 
-type Messages = MosaicMessages['userProfilePasswordSection'];
+type Messages = MosaicMessages['userProfile']['password'];
 type Settings = Pick<PasswordSettingsData, 'min_length' | 'max_length'>;
 type ComplexityRule =
   | 'min_length'

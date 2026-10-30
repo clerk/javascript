@@ -29,7 +29,7 @@ export function UserProfileConnectedAccountsSectionView({
   connectReverification,
   connectFinalFocus,
 }: UserProfileConnectedAccountsSectionViewProps) {
-  const m = useMessages('userProfileConnectedAccounts');
+  const m = useMessages('userProfile').connectedAccounts;
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
   const isBusy = pendingId !== undefined;
 

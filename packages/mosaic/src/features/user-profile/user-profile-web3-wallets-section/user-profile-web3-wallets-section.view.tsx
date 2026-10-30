@@ -23,7 +23,7 @@ export function UserProfileWeb3WalletsSectionView({
   createReverification,
   createFinalFocus,
 }: UserProfileWeb3WalletsSectionViewProps) {
-  const m = useMessages('userProfileWeb3Wallets');
+  const m = useMessages('userProfile').web3Wallets;
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect)) || Boolean(error);
   const isBusy = pendingId !== undefined;
 

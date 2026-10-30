@@ -33,7 +33,7 @@ export function UserProfileWeb3WalletRowView({
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
-  const m = useMessages('userProfileWeb3Wallets');
+  const m = useMessages('userProfile').web3Wallets;
   const linkedWallet = 'address' in wallet ? wallet : undefined;
   const address = linkedWallet?.address;
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);

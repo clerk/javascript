@@ -20,7 +20,7 @@ export type APIKeysTableSubjectKind = 'user' | 'organization';
 
 type Strings<T> = { readonly [K in keyof T]: T[K] extends string ? string : Strings<T[K]> };
 
-export type APIKeysTableMessages = Strings<Omit<MosaicMessages['apiKeysTable'], 'noKeysDescription'>> & {
+export type APIKeysTableMessages = Strings<Omit<MosaicMessages['apiKeys'], 'noKeysDescription'>> & {
   readonly noKeysDescription: string;
 };
 

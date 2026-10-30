@@ -33,7 +33,7 @@ export interface UserProfileAddSmsViewProps {
 }
 
 export function UserProfileAddSmsView(props: UserProfileAddSmsViewProps) {
-  const m = useMessages('userProfileAddSms');
+  const m = useMessages('userProfile').mfa.addSms;
   const selectRef = useFlowAutoFocus<HTMLButtonElement>();
   const phoneRef = useFlowAutoFocus<HTMLInputElement>();
   return (
@@ -96,7 +96,7 @@ export function UserProfileAddSmsView(props: UserProfileAddSmsViewProps) {
 }
 
 function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HTMLButtonElement> }) {
-  const m = useMessages('userProfileAddSms');
+  const m = useMessages('userProfile').mfa.addSms;
   const formId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLButtonElement>()]);
   return (

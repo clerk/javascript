@@ -434,7 +434,7 @@ describe('enterprise accounts', () => {
           locale: 'fr-FR',
           overrides: {
             'errors.generic': 'Erreur globale.',
-            'userProfileEnterpriseAccountsSection.errors.generic': 'La connexion a échoué. Réessayez.',
+            'userProfile.enterpriseAccounts.errors.generic': 'La connexion a échoué. Réessayez.',
           },
         }}
       >

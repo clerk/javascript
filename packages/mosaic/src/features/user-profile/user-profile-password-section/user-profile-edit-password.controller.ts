@@ -43,7 +43,7 @@ export function useUserProfileEditPasswordController({
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
   const requiresCurrentPassword = policy.requiresCurrentPassword;
   const validationError = useMessages('errors').generic;
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm({
