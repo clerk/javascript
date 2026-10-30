@@ -1,0 +1,149 @@
+import * as Stories from './profile-permutations.stories';
+
+# Profile permutations
+
+Exploration page: every pairing of switchers and profile shape, running on fixtures. Each example shares
+one account and organization across its triggers, so switching in one updates the other and the profile.
+
+Today `mode` on `UserButton` sets both the menu and the profile. `OrganizationSwitcher` always opens the
+standalone organization profile.
+
+The snippets show the proposed API, which is not implemented. `combined` defaults to `true` in two places:
+on `UserButton` it decides what the menu lists, and on `MosaicProvider`'s `profile` it decides what the
+profile shows.
+
+| #   | Switchers                                      | Profile  | With the modal today                          | Proposed config        |
+| --- | ---------------------------------------------- | -------- | --------------------------------------------- | ---------------------- |
+| 1   | `UserButton` combined                          | Combined | Yes (the default)                             | None                   |
+| 2   | `UserButton` combined                          | Separate | No                                            | Profile opt-out        |
+| 3   | `UserButton` user                              | Account  | Yes                                           | Menu + profile opt-out |
+| 4   | `UserButton` user                              | Combined | No                                            | Menu opt-out           |
+| 5   | `UserButton` user + `OrganizationSwitcher`     | Separate | Yes                                           | Menu + profile opt-out |
+| 6   | `UserButton` user + `OrganizationSwitcher`     | Combined | No                                            | Menu opt-out           |
+| 7   | `OrganizationSwitcher`                         | Org      | Yes                                           | Profile opt-out        |
+| 8   | `OrganizationSwitcher`                         | Combined | No                                            | None                   |
+| 9   | `UserButton` combined + `OrganizationSwitcher` | Combined | No: the switcher opens the standalone profile | None                   |
+
+The `No` rows can be approximated by routing with `userProfileUrl` and `organizationProfileUrl` to pages
+that mount `<UserProfile />`.
+
+## 1. Combined button, combined profile
+
+Settings opens one profile.
+
+```tsx
+<UserButton />
+```
+
+<Story
+  name='CombinedButtonCombinedProfile'
+  storyModule={Stories}
+/>
+
+## 2. Combined button, separate profiles
+
+Settings offers the account and the organization as two targets.
+
+```tsx
+<MosaicProvider profile={{ combined: false }}>
+  <UserButton />
+</MosaicProvider>
+```
+
+<Story
+  name='CombinedButtonSeparateProfiles'
+  storyModule={Stories}
+/>
+
+## 3. User button, account profile
+
+```tsx
+<MosaicProvider profile={{ combined: false }}>
+  <UserButton combined={false} />
+</MosaicProvider>
+```
+
+<Story
+  name='UserButtonAccountProfile'
+  storyModule={Stories}
+/>
+
+## 4. User button, combined profile
+
+No organization rows in the menu, but the profile carries the active organization's pages.
+
+```tsx
+<UserButton combined={false} />
+```
+
+<Story
+  name='UserButtonCombinedProfile'
+  storyModule={Stories}
+/>
+
+## 5. User button and switcher, separate profiles
+
+```tsx
+<MosaicProvider profile={{ combined: false }}>
+  <OrganizationSwitcher />
+  <UserButton combined={false} />
+</MosaicProvider>
+```
+
+<Story
+  name='UserButtonAndSwitcherSeparateProfiles'
+  storyModule={Stories}
+/>
+
+## 6. User button and switcher, combined profile
+
+Both triggers open the same profile. The button lands on the account's pages and the switcher on the
+organization's. Switch to the personal account and the organization group leaves the profile.
+
+```tsx
+<OrganizationSwitcher />
+<UserButton combined={false} />
+```
+
+<Story
+  name='UserButtonAndSwitcherCombinedProfile'
+  storyModule={Stories}
+/>
+
+## 7. Switcher, organization profile
+
+```tsx
+<MosaicProvider profile={{ combined: false }}>
+  <OrganizationSwitcher />
+</MosaicProvider>
+```
+
+<Story
+  name='SwitcherOrganizationProfile'
+  storyModule={Stories}
+/>
+
+## 8. Switcher, combined profile
+
+```tsx
+<OrganizationSwitcher />
+```
+
+<Story
+  name='SwitcherCombinedProfile'
+  storyModule={Stories}
+/>
+
+## 9. Combined button and switcher
+
+Both menus list the organizations, and both open the combined profile.
+
+```tsx
+<OrganizationSwitcher />
+<UserButton />
+```
+
+<Story
+  name='CombinedButtonAndSwitcher'
+  storyModule={Stories}
+/>
