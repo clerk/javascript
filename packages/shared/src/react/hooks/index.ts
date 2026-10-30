@@ -83,7 +83,10 @@ export type {
 } from './useOrganizationSSOBypassAllowlist';
 
 export { createCacheKeys as __internal_createCacheKeys } from './createCacheKeys';
-export { useClearQueriesOnSignOut as __internal_useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
+export {
+  useClearQueriesOnSignOut as __internal_useClearQueriesOnSignOut,
+  usePersistentQueryCleanupOnSignOut as __internal_usePersistentQueryCleanupOnSignOut,
+} from './useClearQueriesOnSignOut';
 export { useClerkQuery as __internal_useClerkQuery } from '../query/useQuery';
 
 export { useUserBase as __internal_useUserBase } from './base/useUserBase';
