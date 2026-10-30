@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { createElement, Fragment } from 'react';
 
+import type { TermPlaceholder } from './terms.messages';
+
 export type MessageValues = Record<string, string | number>;
 
 export type PluralForms = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
@@ -13,7 +15,7 @@ export interface RichOptions {
 }
 
 export type MessageParams<T extends string> = T extends `${string}{${infer Key}}${infer Rest}`
-  ? Key extends `#${string}` | `/${string}`
+  ? Key extends `#${string}` | `/${string}` | TermPlaceholder
     ? MessageParams<Rest>
     : Key | MessageParams<Rest>
   : never;
@@ -55,6 +57,16 @@ function own<T>(record: Partial<Record<string, T>> | undefined, key: string): T 
 export function fill<T extends string>(template: T, values: Values<T, string | number>): string;
 export function fill(template: string, values: Partial<MessageValues>): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) => String(own(values, key) ?? match));
+}
+
+export function fillAll(node: unknown, values: MessageValues): unknown {
+  if (typeof node === 'string') {
+    return fill(node, values);
+  }
+  if (typeof node === 'object' && node !== null) {
+    return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, fillAll(value, values)]));
+  }
+  return node;
 }
 
 export function plural<F extends PluralForms>(

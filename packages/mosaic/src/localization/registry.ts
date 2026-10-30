@@ -31,9 +31,12 @@ import { userProfilePhoneSectionMessages } from '../features/user-profile/user-p
 import { userProfileProfileSectionMessages } from '../features/user-profile/user-profile-profile-section/user-profile-profile-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
+import { fillAll, plural } from './messages';
 import { roleMessages } from './roles.messages';
+import { termMessages } from './terms.messages';
 
-export const mosaicMessages = {
+export const messageTemplates = {
+  terms: termMessages,
   userButton: userButtonMessages,
   organizationSwitcher: organizationSwitcherMessages,
   userProfile: {
@@ -76,4 +79,23 @@ export const mosaicMessages = {
   roles: roleMessages,
 };
 
-export type MosaicMessages = typeof mosaicMessages;
+export type MosaicMessages = typeof messageTemplates;
+
+export const mosaicMessages = applyTerms(messageTemplates, 'en');
+
+export function applyTerms(templates: MosaicMessages, locale: string): MosaicMessages {
+  const { organization } = templates.terms;
+  const one = plural(organization, 1, locale);
+  const values = {
+    organization: one,
+    Organization: capitalize(one, locale),
+    organizations: organization.other,
+    Organizations: capitalize(organization.other, locale),
+  };
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- The walk only replaces string leaves, so the shape is unchanged.
+  return fillAll(templates, values) as MosaicMessages;
+}
+
+function capitalize(word: string, locale: string): string {
+  return word.charAt(0).toLocaleUpperCase(locale) + word.slice(1);
+}

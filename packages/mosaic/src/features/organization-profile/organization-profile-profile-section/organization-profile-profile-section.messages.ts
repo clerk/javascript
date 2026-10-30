@@ -1,5 +1,5 @@
 export const organizationProfileProfileSectionMessages = {
-  sectionTitle: 'Organization details',
+  sectionTitle: '{Organization} details',
   logo: {
     label: 'Logo',
     description: 'Recommended size 1:1, up to 10MB.',
@@ -24,7 +24,7 @@ export const organizationProfileProfileSectionMessages = {
     copied: 'Copied',
 
     dialogTitle: 'Edit slug',
-    dialogDescription: 'A unique identifier used in organization URLs. Changing it may break existing links.',
+    dialogDescription: 'A unique identifier used in {organization} URLs. Changing it may break existing links.',
     fieldLabel: 'Slug',
     cancel: 'Cancel',
     save: 'Save changes',
