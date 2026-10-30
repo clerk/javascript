@@ -128,11 +128,9 @@ describe('UserButton with experimental.newProfiles', () => {
     await waitFor(() => expect(request.requests).toHaveLength(1));
 
     const body = new URLSearchParams(await request.requests[0]?.text());
-    const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
-    expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({
-      componentName: 'UserProfile',
-      socialProvider: 'github',
-    });
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.has('__clerk_modal_state')).toBe(false);
     request.fail();
   });
 
