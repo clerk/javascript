@@ -1,6 +1,6 @@
 export const errorMessages: { readonly generic: string } & Readonly<Record<string, string>> = {
   generic: 'Something went wrong. Please try again.',
-  already_a_member_in_organization: 'Some of these email addresses already belong to members of this organization.',
+  already_a_member_in_organization: 'Some of these email addresses already belong to members of this {organization}.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
   active_device_unavailable: 'This device is no longer available. Please try again.',
   api_key_secret_unavailable:
@@ -35,14 +35,14 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_username_invalid_length: 'Your username must be between {min_length} and {max_length} characters long.',
   form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
   insufficient_seats:
-    'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
+    'Your {organization} does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_change_plan:
-    'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
+    'Your {organization} does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_contact_support:
-    'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
+    'Your {organization} does not have enough seats to invite the desired number of members. Please contact support.',
   invitation_unavailable: 'This invitation is no longer pending.',
   invitations_not_supported_in_organization:
-    "This organization doesn't support email invitations. Please contact support to enable this feature.",
+    "This {organization} doesn't support email invitations. Please contact support to enable this feature.",
   member_unavailable: 'This member is no longer available to manage.',
   missing_organization_permission: 'You do not have permission to perform this action.',
   mfa_account_changed: 'This account changed. Please try again.',
@@ -52,19 +52,19 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   mfa_print_unavailable: 'Printing is unavailable in this browser.',
   mfa_setup_factor_first: 'Set up a verification method first.',
   network_error: 'Unable to reach the server. Check your connection and try again.',
-  not_a_member_in_organization: 'You are no longer a member of this organization.',
+  not_a_member_in_organization: 'You are no longer a member of this {organization}.',
   not_allowed_access: 'Some of these email addresses are not allowed to access this application.',
   oauth_access_denied: 'You did not grant access to your account.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
-  organization_changed: 'The active organization changed. Please try again.',
+  organization_changed: 'The active {organization} changed. Please try again.',
   organization_invitation_not_unique: 'An invitation is already pending for this email address.',
   organization_invitation_not_pending: 'This invitation is no longer pending.',
   organization_membership_quota_exceeded:
-    'You have reached your limit of organization memberships, including outstanding invitations.',
+    'You have reached your limit of {organization} memberships, including outstanding invitations.',
   organization_not_found_or_unauthorized:
-    'You are no longer a member of this organization. Please choose or create another one.',
+    'You are no longer a member of this {organization}. Please choose or create another one.',
   organization_not_found_or_unauthorized_with_create_organization_disabled:
-    'You are no longer a member of this organization. Please choose another one.',
+    'You are no longer a member of this {organization}. Please choose another one.',
   request_unavailable: 'This request is no longer pending.',
   passkey_already_exists: 'A passkey is already registered with this device.',
   passkey_not_supported: 'Passkeys are not supported on this device.',

@@ -4,7 +4,7 @@ export const userProfileMessages = {
   /** Labels the account's pages when the organization's are listed beside them. */
   accountGroup: 'Account',
   /** Labels the organization's pages, listed after the account's. */
-  organizationGroup: 'Organization',
+  organizationGroup: '{Organization}',
   pages: {
     account: 'Account',
     security: 'Security',

@@ -16,7 +16,7 @@ describe('resolveLocalization', () => {
     const { messages } = resolveLocalization({ messages: { userButton: { trigger: { open: 'Menü für {name}' } } } });
     expect(messages.userButton.trigger.open).toBe('Menü für {name}');
     expect(messages.userButton.popup.label).toBe(mosaicMessages.userButton.popup.label);
-    expect(messages.userProfile).toBe(mosaicMessages.userProfile);
+    expect(messages.userProfile).toEqual(mosaicMessages.userProfile);
   });
 
   it('expands dot paths', () => {
@@ -67,6 +67,98 @@ describe('resolveLocalization', () => {
   it('does not mutate the base messages', () => {
     resolveLocalization({ messages: { 'userButton.popup.label': 'Konto' } });
     expect(mosaicMessages.userButton.popup.label).toBe('Account');
+  });
+});
+
+describe('terms', () => {
+  const workspace = { organization: { one: 'workspace', other: 'workspaces' } };
+
+  it('keeps the organization noun in English by default', () => {
+    const { messages } = resolveLocalization(undefined);
+    expect(messages.organizationProfile.label).toBe('Organization');
+    expect(messages.organizationSwitcher.popup.label).toBe('Organizations');
+    expect(messages.organizationSwitcher.organizations.loading).toBe('Loading organizations…');
+    expect(messages.organizationProfile.danger.leave.label).toBe('Leave organization');
+  });
+
+  it('derives all four placeholders from one term', () => {
+    const { messages } = resolveLocalization({ overrides: { terms: workspace } });
+    expect(messages.organizationProfile.label).toBe('Workspace');
+    expect(messages.organizationSwitcher.popup.label).toBe('Workspaces');
+    expect(messages.organizationSwitcher.organizations.loading).toBe('Loading workspaces…');
+    expect(messages.organizationProfile.danger.leave.label).toBe('Leave workspace');
+  });
+
+  it('leaves no organization noun behind in any built-in string', () => {
+    const { messages } = resolveLocalization({ overrides: { terms: workspace } });
+    const { terms: _terms, ...rest } = messages;
+    const strings: string[] = [];
+    const collect = (node: unknown) => {
+      if (typeof node === 'string') {
+        strings.push(node);
+      } else if (typeof node === 'object' && node !== null) {
+        Object.values(node).forEach(collect);
+      }
+    };
+    collect(rest);
+    expect(strings.filter(value => /\borganizations?\b/i.test(value))).toEqual([]);
+  });
+
+  it('accepts a term from a catalog, by dot path, with overrides winning', () => {
+    const fromCatalog = resolveLocalization({
+      locale: 'es-ES',
+      messages: { 'terms.organization': { one: 'organización', other: 'organizaciones' } },
+    });
+    expect(fromCatalog.messages.organizationProfile.label).toBe('Organización');
+
+    const overridden = resolveLocalization({
+      locale: 'es-ES',
+      messages: { terms: { organization: { one: 'organización' } } },
+      overrides: { terms: { organization: { one: 'espacio' } } },
+    });
+    expect(overridden.messages.organizationProfile.label).toBe('Espacio');
+  });
+
+  it('uses the form the locale picks for one', () => {
+    const { messages } = resolveLocalization({
+      locale: 'ja',
+      messages: { terms: { organization: { other: '組織' } } },
+    });
+    expect(messages.organizationProfile.label).toBe('組織');
+    expect(messages.organizationSwitcher.popup.label).toBe('組織');
+  });
+
+  it('capitalizes with the rules of the locale', () => {
+    const { messages } = resolveLocalization({
+      locale: 'tr',
+      messages: { terms: { organization: { one: 'işyeri', other: 'işyerleri' } } },
+    });
+    expect(messages.organizationProfile.label).toBe('İşyeri');
+  });
+
+  it('lets a specific key win over a term', () => {
+    const { messages } = resolveLocalization({
+      overrides: { terms: workspace, 'organizationProfile.label': 'Team' },
+    });
+    expect(messages.organizationProfile.label).toBe('Team');
+    expect(messages.organizationSwitcher.popup.label).toBe('Workspaces');
+  });
+
+  it('fills terms in custom strings, plural forms and error messages', () => {
+    const { messages } = resolveLocalization({
+      overrides: { terms: workspace, 'userButton.popup.label': 'Your {organization}' },
+    });
+    expect(messages.userButton.popup.label).toBe('Your workspace');
+    expect(messages.organizationProfile.danger.delete.dialogDescription.other).toContain('all workspace data');
+    expect(messages.errors.organization_changed).toBe('The active workspace changed. Please try again.');
+  });
+
+  it('keeps other placeholders and markup for later', () => {
+    const { messages } = resolveLocalization({
+      overrides: { terms: workspace, 'userButton.popup.label': '{#strong}{organization}{/strong} {name}' },
+    });
+    expect(messages.userButton.popup.label).toBe('{#strong}workspace{/strong} {name}');
+    expect(messages.organizationSwitcher.trigger.open).toBe('Open workspace menu for {name}');
   });
 });
 

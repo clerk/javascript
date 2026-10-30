@@ -1,14 +1,14 @@
 export const organizationSwitcherMessages = {
   trigger: {
-    open: 'Open organization menu for {name}',
+    open: 'Open {organization} menu for {name}',
   },
   popup: {
-    label: 'Organizations',
+    label: '{Organizations}',
   },
   organizations: {
     personal: 'Personal account',
-    notSelected: 'No organization selected',
-    loading: 'Loading organizations…',
+    notSelected: 'No {organization} selected',
+    loading: 'Loading {organizations}…',
     members: { one: '{count} member', other: '{count} members' },
     accept: 'Accept',
     join: 'Join',
@@ -19,7 +19,7 @@ export const organizationSwitcherMessages = {
     invite: 'Invite members',
     settings: 'Settings',
     profile: 'Manage profile',
-    organization: 'Manage organization',
-    createOrganization: 'Add organization',
+    organization: 'Manage {organization}',
+    createOrganization: 'Add {organization}',
   },
 } as const;

@@ -2,6 +2,7 @@ import { describe, expectTypeOf, test } from 'vitest';
 
 import type { MosaicCatalog, MosaicLocalization } from './catalog';
 import { useMessages } from './context';
+import { fill } from './messages';
 import type { MosaicMessages } from './registry';
 
 // Message overrides are derived from the message files: nested objects or dot paths, every key
@@ -28,6 +29,14 @@ describe('MosaicCatalog', () => {
     const value: MosaicCatalog = {
       'errors.form_identifier_exists__username': 'Nombre de usuario en uso.',
       errors: { generic: 'Algo salió mal.', form_param_nil: 'Obligatorio.' },
+    };
+    void value;
+  });
+
+  test('accepts terms, nested or by dot path', () => {
+    const value: MosaicCatalog = {
+      terms: { organization: { one: 'workspace', other: 'workspaces' } },
+      'terms.organization': { few: 'x' },
     };
     void value;
   });
@@ -83,6 +92,7 @@ describe('MosaicLocalization', () => {
 
 describe('useMessages', () => {
   test('returns the namespace with its template types', () => {
+    fill(useMessages('organizationSwitcher').trigger.open, { name: 'Acme' });
     expectTypeOf(useMessages('userButton')).toEqualTypeOf<MosaicMessages['userButton']>();
     expectTypeOf(useMessages('userButton').trigger.open).toEqualTypeOf<'Open account menu for {name}'>();
     // @ts-expect-error unknown namespace
