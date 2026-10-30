@@ -27,7 +27,7 @@ it('handles cancellation in MetaMask without offering a Clerk cancel button and 
 
   expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
   expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeEnabled();
-  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  expect(screen.getByRole('alert')).toHaveTextContent('Wallet connection was cancelled. Please try again.');
   expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0);
   expect(request).not.toHaveBeenCalledWith(expect.objectContaining({ method: 'personal_sign' }));
 
@@ -40,14 +40,14 @@ it('handles cancellation in MetaMask without offering a Clerk cancel button and 
   expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.web3_wallet).toBe('0xabcdef1234567890');
 });
 
-it('releases a rejected MetaMask connection without displaying an error', async () => {
+it('explains a rejected MetaMask connection and releases the pending state', async () => {
   const request = vi.fn().mockRejectedValue({ code: 4001, message: 'User rejected the request.' });
   vi.stubGlobal('ethereum', { request });
   serveFapi(signedInWallets(['web3_metamask_signature']));
   await renderWithClerk(<UserProfileWeb3WalletsSection />);
   await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
   await waitFor(() => expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled());
-  expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
+  expect(screen.getByRole('alert')).toHaveTextContent('Wallet connection was cancelled. Please try again.');
 });
 
 it('explains that an existing MetaMask request needs attention in the wallet', async () => {

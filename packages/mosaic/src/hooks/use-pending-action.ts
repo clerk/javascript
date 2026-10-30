@@ -69,11 +69,7 @@ export function usePendingAction<TKey extends string = string>({
       await action(controller.signal);
       return !controller.signal.aborted;
     } catch (cause) {
-      if (
-        !controller.signal.aborted &&
-        !isReverificationCancelledError(cause) &&
-        !(cause instanceof DOMException && cause.name === 'AbortError')
-      ) {
+      if (!controller.signal.aborted && !isReverificationCancelledError(cause)) {
         setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
       }
       return false;
