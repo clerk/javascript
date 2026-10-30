@@ -1,5 +1,11 @@
 # @clerk/expo-native-components
 
+## 0.4.3
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 0.4.2
 
 ### Patch Changes
