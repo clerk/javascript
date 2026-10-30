@@ -6,6 +6,7 @@ import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { toLocalizableError } from '../../../utils/errors';
+import { CODE_RESEND_SECONDS } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type {
   SmsEnrollmentResult,
@@ -73,7 +74,6 @@ type MfaEvent =
     };
 
 const { createMachine, assign, fromPromise } = setup<MfaContext, MfaEvent>();
-const RESEND_COOLDOWN_SECONDS = 30;
 const REVERIFIABLE_ACTIONS: readonly MfaAction[] = ['generate', 'sms', 'prepareAuthenticator'];
 const PENDING_METHODS: Partial<Record<MfaAction, NonNullable<UserProfileMfaSetupViewProps['pendingMethod']>>> = {
   prepareAuthenticator: 'authenticator',
@@ -236,7 +236,7 @@ const mfaMachine = createMachine({
                 resendSeconds:
                   context.pending === 'resend' ||
                   (context.pending === 'sms' && event.output.kind === 'sms' && event.output.step === 'verify')
-                    ? RESEND_COOLDOWN_SECONDS
+                    ? CODE_RESEND_SECONDS
                     : context.resendSeconds,
               };
             }),

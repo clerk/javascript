@@ -2,10 +2,8 @@ import { useOrganization, useSession } from '@clerk/shared/react';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useOrganizationRolesQuery } from '../../../queries/use-organization-roles-query';
+import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
 import type { MembersPanelRoles } from './members-table-tab.types';
-
-const READ_PERMISSION = 'org:sys_memberships:read';
-const MANAGE_PERMISSION = 'org:sys_memberships:manage';
 
 export function useMembersPanelAccessModel() {
   const { isLoaded, organization } = useOrganization();
@@ -14,8 +12,9 @@ export function useMembersPanelAccessModel() {
   if (!isLoaded || !isSessionLoaded || !environment) {
     return { status: 'loading' as const };
   }
-  const canReadMembers = session?.checkAuthorization({ permission: READ_PERMISSION }) ?? false;
-  const canManageInvitations = session?.checkAuthorization({ permission: MANAGE_PERMISSION }) ?? false;
+  const canReadMembers = session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsRead }) ?? false;
+  const canManageInvitations =
+    session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
   const canManageRequests = canManageInvitations && environment.organizationSettings.domains.enabled;
   if (!organization || !session || (!canReadMembers && !canManageInvitations)) {
     return { status: 'hidden' as const };

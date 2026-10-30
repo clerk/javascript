@@ -8,7 +8,7 @@ import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import { withUserProfileModalReturn } from '../user-profile.modal-return';
 import { useUserProfileOptions } from '../user-profile.provider';
-import { isMonochromeProvider } from '../user-profile-provider.utils';
+import { isMonochromeProvider, providerId } from '../user-profile-provider.utils';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -52,7 +52,7 @@ export function projectEnterpriseAccounts({
       id: account.id ?? '',
       name: account.enterpriseConnection?.name ?? '',
       iconUrl: account.enterpriseConnection?.logoPublicUrl ?? undefined,
-      monochromeIcon: isMonochromeProvider(account.provider.replace(/^(oauth_|saml_)/, '').trim()),
+      monochromeIcon: isMonochromeProvider(providerId(account.provider)),
       emailAddress: account.emailAddress,
       requiresAction: Boolean(account.verification?.error?.longMessage),
     }));
@@ -62,7 +62,7 @@ export function projectEnterpriseAccounts({
       id: connection.id,
       name: connection.name,
       iconUrl: connection.logoPublicUrl ?? undefined,
-      monochromeIcon: isMonochromeProvider(connection.provider.replace(/^(oauth_|saml_)/, '').trim()),
+      monochromeIcon: isMonochromeProvider(providerId(connection.provider)),
     }));
 
   return visibleAccounts.length || linkableConnections.length

@@ -3,6 +3,7 @@ import type { OrganizationResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/errors';
+import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
 import type { OrganizationProfileProfileSectionViewProps } from './organization-profile-profile-section.view';
 
 type OrganizationProfileProfileSectionModel =
@@ -25,7 +26,8 @@ export function useOrganizationProfileProfileSectionModel(): OrganizationProfile
 
   const organizationId = organization.id;
   const canManage =
-    Boolean(membership) && (session?.checkAuthorization({ permission: 'org:sys_profile:manage' }) ?? false);
+    Boolean(membership) &&
+    (session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.profileManage }) ?? false);
   const currentOrganization = (): OrganizationResource => {
     const current = clerk.organization;
     if (!current || current.id !== organizationId) {

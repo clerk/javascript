@@ -3,10 +3,10 @@ import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
 import type { ClerkAPIError, OrganizationInvitationResource } from '@clerk/shared/types';
 
 import { save } from '../../../utils/errors';
+import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
 import type { MembersRoles } from './members-table-tab.types';
 
 const PAGE_SIZE = 10;
-const MANAGE_PERMISSION = 'org:sys_memberships:manage';
 
 export interface InviteMembersInput {
   emailAddresses: string[];
@@ -18,7 +18,7 @@ export interface InviteMembersInput {
 export function useInvitationsTableModel() {
   const clerk = useClerk();
   const { session } = useSession();
-  const canManage = session?.checkAuthorization({ permission: MANAGE_PERMISSION }) ?? false;
+  const canManage = session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
   const { organization, invitations } = useOrganization({
     invitations: canManage ? { pageSize: PAGE_SIZE, keepPreviousData: true } : undefined,
   });

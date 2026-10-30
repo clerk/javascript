@@ -3,11 +3,11 @@
 import type { OrganizationProfileProps, UserProfileProps } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
+import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
 import type { CustomProfileItem, CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 import { useSwitcherController } from './switcher.controller';
 import type { SwitcherModelOptions } from './switcher.model';
 import { useSwitcherModel } from './switcher.model';
-import type { OrganizationProfilePageId } from './switcher.pages';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './switcher.pages';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
 import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';

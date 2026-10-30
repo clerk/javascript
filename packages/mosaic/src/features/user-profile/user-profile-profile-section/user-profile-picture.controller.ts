@@ -3,15 +3,9 @@ import { useState } from 'react';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import type { LocalizableError } from '../../../localization';
 import { useErrorText } from '../../../localization';
-import type { FileRejection, FileRejectionReason } from '../../../primitives/file-upload';
+import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
-
-/** Rejecting a pick locally reads the same as the server rejecting the upload. */
-const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
-  accept: { code: 'avatar_file_type_invalid' },
-  size: { code: 'avatar_file_size_exceeded' },
-  overflow: { code: 'avatar_file_count_exceeded' },
-};
+import { AVATAR_REJECTION_ERRORS } from '../../../utils/avatar-upload';
 
 export interface UserProfilePictureControllerOptions {
   onChange?: (file: File) => Promise<void>;
@@ -49,7 +43,7 @@ export function useUserProfilePictureController({
     onChange: onChange ? file => void save(file, () => onChange(file)) : undefined,
     onReject: rejections => {
       const rejected = rejections[0];
-      setRejection(rejected ? REJECTION_ERRORS[rejected.reason] : undefined);
+      setRejection(rejected ? AVATAR_REJECTION_ERRORS[rejected.reason] : undefined);
     },
     onRemove: onRemove ? () => void save(undefined, onRemove) : undefined,
     isPending: upload.isPending,

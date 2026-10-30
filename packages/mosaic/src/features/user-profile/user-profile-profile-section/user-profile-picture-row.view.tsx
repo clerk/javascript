@@ -5,11 +5,8 @@ import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
+import { AVATAR_UPLOAD } from '../../../utils/avatar-upload';
 import type { UserProfilePictureController } from './user-profile-picture.controller';
-
-const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-/** Matches the limit the row's own description advertises. */
-const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
 
 export interface UserProfilePictureRowViewProps extends UserProfilePictureController {
   name: string;
@@ -38,8 +35,7 @@ export function UserProfilePictureRowView({
 
   return (
     <FileUpload.Root
-      accept={PROFILE_PICTURE_MIME_TYPES}
-      maxSize={PROFILE_PICTURE_MAX_BYTES}
+      {...AVATAR_UPLOAD}
       disabled={isPending}
       aria-busy={isPending || undefined}
       render={<Section.Row />}
