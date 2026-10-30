@@ -31,6 +31,11 @@ type FapiQueryStringParameters = {
 
 type FapiRequestOptions = {
   fetchMaxTries?: number;
+  /**
+   * Accepts an empty body on a successful response, resolving with a `null` payload, for endpoints that answer with
+   * no content. Without it, an empty body fails to parse, so a required resource never loads from an empty response.
+   */
+  allowEmptyBody?: boolean;
 };
 
 export type FapiResponse<T> = Response & {
@@ -325,10 +330,15 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // 204 No Content responses do not have a body so we should not try to parse it.
     // Gateway errors may not be JSON (e.g. a proxy's HTML 502); they resolve to `undefined` so they keep their
     // status instead of throwing a parse error, and skip the after response callbacks since they did not come from FAPI.
+    const parseBody = (): Promise<FapiResponseJSON<T> | null> =>
+      requestOptions?.allowEmptyBody && response.ok
+        ? // Proxies can drop Content-Length, so the body itself has to be read to know it's empty.
+          response.text().then(text => (text === '' ? null : (JSON.parse(text) as FapiResponseJSON<T>)))
+        : response.json();
     const json: FapiResponseJSON<T> | null | undefined =
       response.status === 204
         ? null
-        : await response.json().catch(e => {
+        : await parseBody().catch(e => {
             if (response.status >= 500) {
               return undefined;
             }

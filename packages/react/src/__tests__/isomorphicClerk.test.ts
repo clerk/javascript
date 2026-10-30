@@ -1,3 +1,4 @@
+import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   BrowserClerk,
@@ -288,6 +289,150 @@ describe('isomorphicClerk', () => {
       'done',
     );
     expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
+  });
+
+  describe('a headless Clerk instance whose load failed', () => {
+    function createFailingHeadlessClerk({ finishesBeforeLoadRejects = false, throwingListener = false } = {}) {
+      const eventBus = createClerkEventBus();
+      let status = 'loading';
+      eventBus.prioritizedOn(clerkEvents.Status, next => (status = next));
+      const clerkjs = {
+        get loaded() {
+          return status === 'ready' || status === 'degraded';
+        },
+        get status() {
+          return status;
+        },
+        load: vi.fn(() => {
+          eventBus.emit(clerkEvents.Status, 'error');
+          if (finishesBeforeLoadRejects) {
+            eventBus.emit(clerkEvents.Status, 'ready');
+          }
+          return Promise.reject(new Error('Unsupported app version'));
+        }),
+        on: eventBus.on,
+        off: eventBus.off,
+        addListener: vi.fn(() => {
+          if (throwingListener) {
+            throw new Error('listener failed');
+          }
+        }),
+        finishLoad: (next: 'ready' | 'degraded' = 'ready') => eventBus.emit(clerkEvents.Status, next),
+      };
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: clerkjs as any,
+        experimental: { runtimeEnvironment: 'headless' },
+      });
+      return { clerkjs, isomorphicClerk };
+    }
+
+    it('replays the queued calls once when clerk-js finishes loading the same instance', async () => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk();
+      const statuses: string[] = [];
+      isomorphicClerk.on('status', status => statuses.push(status));
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('error');
+      expect(clerkjs.addListener).not.toHaveBeenCalled();
+
+      clerkjs.finishLoad();
+      await vi.advanceTimersByTimeAsync(0);
+      clerkjs.finishLoad();
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('ready');
+      expect(isomorphicClerk.loaded).toBe(true);
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+      expect(statuses).toContain('ready');
+    });
+
+    it('replays the queued calls when clerk-js finished loading before the failure was handled', async () => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk({ finishesBeforeLoadRejects: true });
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('ready');
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+    });
+
+    it('replays once when the replay after a successful load throws', async () => {
+      const eventBus = createClerkEventBus();
+      let status = 'loading';
+      eventBus.prioritizedOn(clerkEvents.Status, next => (status = next));
+      const clerkjs = {
+        get loaded() {
+          return status === 'ready';
+        },
+        get status() {
+          return status;
+        },
+        load: vi.fn(() => {
+          eventBus.emit(clerkEvents.Status, 'ready');
+          return Promise.resolve();
+        }),
+        on: eventBus.on,
+        off: eventBus.off,
+        addListener: vi.fn(() => {
+          throw new Error('listener failed');
+        }),
+      };
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: clerkjs as any,
+        experimental: { runtimeEnvironment: 'headless' },
+      });
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([
+      ['after the failure was handled', false],
+      ['before the failure was handled', true],
+    ])('reports an error when the replay throws for a load that finished %s', async (_, finishesBeforeLoadRejects) => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk({
+        finishesBeforeLoadRejects,
+        throwingListener: true,
+      });
+      const statuses: string[] = [];
+      isomorphicClerk.on('status', status => statuses.push(status));
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      if (!finishesBeforeLoadRejects) {
+        clerkjs.finishLoad();
+        await vi.advanceTimersByTimeAsync(0);
+      }
+
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+      expect(statuses.at(-1)).toBe('error');
+    });
+
+    it('waits while clerk-js is still failing', async () => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk();
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      clerkjs.finishLoad('error' as 'ready');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('error');
+      expect(clerkjs.addListener).not.toHaveBeenCalled();
+    });
+
+    it('lets every other status listener on clerk-js see the finished load', async () => {
+      const { clerkjs } = createFailingHeadlessClerk();
+      await vi.advanceTimersByTimeAsync(0);
+      const laterListener = vi.fn();
+      clerkjs.on('status', laterListener);
+
+      clerkjs.finishLoad();
+
+      expect(laterListener).toHaveBeenCalledWith('ready');
+    });
   });
 
   describe('__internal_* URL precedence', () => {
