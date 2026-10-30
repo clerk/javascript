@@ -78,12 +78,12 @@ controller, and view layers, then verifies parity with `parity-audit.md`.
 
 ## Breaking changes
 
-While `@clerk/mosaic` is on 0.x, a breaking change is a `patch` changeset. Start
+While `@clerk/mosaic` is on 0.x, a breaking change is a `minor` changeset. Start
 its body with `**Breaking:**`, then say what changed and how to update.
 
 ```md
 ---
-'@clerk/mosaic': patch
+'@clerk/mosaic': minor
 ---
 
 **Breaking:** Rename `renderTriggerLabel` to `showTriggerLabel`. Values and defaults are unchanged; TypeScript flags each old name.
