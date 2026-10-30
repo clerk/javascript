@@ -381,10 +381,6 @@ describe('OrganizationSwitcher custom trigger badges', () => {
 });
 
 describe('OrganizationSwitcher with experimental.newProfiles', () => {
-  beforeAll(async () => {
-    await import('../../organization-profile/organization-profile.modal-content');
-  });
-
   async function renderWithNewProfiles(props: OrganizationSwitcherProps = {}) {
     await page.viewport(1280, 800);
     onTestFinished(() => page.viewport(414, 896));
