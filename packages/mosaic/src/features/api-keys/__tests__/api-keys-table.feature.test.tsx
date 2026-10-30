@@ -216,6 +216,19 @@ describe('APIKeysTable', () => {
       expect(columnWidths()).toEqual(loadingWidths);
     });
 
+    it('pins the actions column to the end edge', async () => {
+      await renderTable();
+      const table = await loadedTable();
+      await within(table).findByText('Web app');
+
+      const headers = within(table).getAllByRole('columnheader');
+      expect(headers[headers.length - 1]).toHaveAttribute('data-sticky', 'end');
+      for (const name of ['Web app', 'CI pipeline']) {
+        const trigger = within(table).getByRole('button', { name: `Manage ${name}` });
+        expect(trigger.closest('[role=cell], td')).toHaveAttribute('data-sticky', 'end');
+      }
+    });
+
     it('explains when the user has no keys', async () => {
       await renderTable(signedIn([]));
 
