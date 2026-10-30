@@ -18,6 +18,7 @@ export function withRedirect<P extends AvailableComponentProps>(
   condition: ComponentGuard,
   redirectUrl: RedirectUrl,
   warning?: string,
+  navigateOptions?: { replace?: boolean },
 ): (props: P) => null | JSX.Element {
   const displayName = Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
@@ -36,7 +37,7 @@ export function withRedirect<P extends AvailableComponentProps>(
         }
         // TODO: Fix this properly
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        navigate(redirectUrl({ clerk, environment, options }));
+        navigate(redirectUrl({ clerk, environment, options }), navigateOptions);
       }
     }, []);
 
