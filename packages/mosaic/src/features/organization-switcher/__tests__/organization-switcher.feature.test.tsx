@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
@@ -377,6 +377,10 @@ describe('OrganizationSwitcher custom trigger badges', () => {
 });
 
 describe('OrganizationSwitcher with experimental.newProfiles', () => {
+  beforeAll(async () => {
+    await import('../../organization-profile/organization-profile.modal-content');
+  });
+
   async function renderWithNewProfiles(props: OrganizationSwitcherProps = {}) {
     await page.viewport(1280, 800);
     onTestFinished(() => page.viewport(414, 896));
