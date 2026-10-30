@@ -9,7 +9,7 @@ import type {
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
@@ -21,6 +21,7 @@ import { Card } from '../../../components/card';
 import type { MosaicLocalization } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { Reverification, useReverificationFlow } from '../reverification';
+import { errorCode, Host } from './reverification-test-host';
 
 const alice = fapiUser({
   id: 'user_1',
@@ -109,66 +110,6 @@ function preferring(strategy: 'password' | 'otp') {
 
 function guardedAction(config?: ReverificationConfig) {
   return vi.fn().mockResolvedValueOnce(reverificationError(config)).mockResolvedValue({ done: true });
-}
-
-function errorCode(error: unknown) {
-  if (error instanceof Error) {
-    return 'code' in error && typeof error.code === 'string' ? error.code : error.message;
-  }
-  return 'unknown';
-}
-
-function Host({ action, onOutcome }: { action: () => Promise<unknown>; onOutcome?: (outcome: string) => void }) {
-  const [run, reverification] = useReverificationFlow(action);
-  const [outcome, setOutcome] = useState('');
-  const [running, setRunning] = useState(false);
-  const inFlight = useRef(false);
-  const report = (value: string) => {
-    setOutcome(value);
-    onOutcome?.(value);
-  };
-
-  return (
-    <>
-      <button
-        type='button'
-        onClick={() => {
-          const owner = !inFlight.current;
-          if (owner) {
-            inFlight.current = true;
-            setRunning(true);
-          }
-          void run()
-            .then(
-              () => report('resolved'),
-              (error: unknown) => report(`rejected: ${errorCode(error)}`),
-            )
-            .finally(() => {
-              if (owner) {
-                inFlight.current = false;
-                setRunning(false);
-              }
-            });
-        }}
-      >
-        Run action
-      </button>
-      <output aria-label='Outcome'>{outcome}</output>
-      {running ? (
-        <Card.Root renderBranding={false}>
-          <Reverification controller={reverification} />
-          {reverification.onCancel ? (
-            <button
-              type='button'
-              onClick={reverification.onCancel}
-            >
-              Dismiss
-            </button>
-          ) : null}
-        </Card.Root>
-      ) : null}
-    </>
-  );
 }
 
 function HoldingHost({ action }: { action: () => Promise<unknown> }) {
@@ -504,6 +445,21 @@ describe('Reverification', () => {
   });
 
   describe('password', () => {
+    it('shows unrelated attempt errors globally without marking the password invalid', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+
+      await user.type(passwordField(), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      attempt.fail('unrelated_parameter', 'This session cannot be verified.', 'session_id');
+
+      expect(await screen.findByText('This session cannot be verified.')).toBeVisible();
+      expect(passwordField()).not.toHaveAttribute('aria-invalid', 'true');
+      expect(screen.getByRole('alert')).toHaveTextContent('This session cannot be verified.');
+    });
+
     it('recovers from a wrong password and completes the challenge', async () => {
       const { action } = await renderReverification(
         guardedAction(),
@@ -1770,7 +1726,10 @@ describe('Reverification', () => {
 
         await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
 
-        await waitFor(() => expect(passwordField()).toBeInvalid());
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+        );
+        expect(passwordField()).not.toHaveAttribute('aria-invalid', 'true');
         expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument();
         expect(document.body).not.toHaveTextContent(/https?:\/\//);
       } finally {
@@ -1788,7 +1747,10 @@ describe('Reverification', () => {
 
         // The step stays open with an error
         await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
-        await waitFor(() => expect(passwordField()).toBeInvalid());
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+        );
+        expect(passwordField()).not.toHaveAttribute('aria-invalid', 'true');
         expect(screen.getByText(STEP.password)).toBeVisible();
         expect(passwordField()).toBeEnabled();
         expect(passwordField()).toHaveValue(PASSWORD);

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { isLocalizableError, MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../localization';
-import { save, SaveError, toLocalizableError } from '../errors';
+import { save, SaveError, toLocalizableError, toLocalizableErrors } from '../errors';
 
 function errorText() {
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -89,5 +89,44 @@ describe('toLocalizableError', () => {
     silenceConsole();
     const cause = new ClerkAPIResponseError('Server error', { status: 500, data: [] });
     expect(toLocalizableError(cause)).toEqual({ cause });
+  });
+});
+
+describe('toLocalizableErrors', () => {
+  it('preserves every API error in response order and leaves single-error callers unchanged', () => {
+    const cause = new ClerkAPIResponseError('Invalid', {
+      status: 422,
+      data: [
+        { code: 'first', message: 'Short', long_message: 'Long', meta: { param_name: 'password' } },
+        { code: 'second', message: 'Global' },
+        { code: 'third', message: 'Other', meta: { param_name: 'session_id' } },
+      ],
+    });
+    const errors = toLocalizableErrors(cause);
+    expect(errors).toEqual([
+      { code: 'first', message: 'Long', paramName: 'password' },
+      { code: 'second', message: 'Global' },
+      { code: 'third', message: 'Other', paramName: 'session_id' },
+    ]);
+    expect(toLocalizableError(cause)).toEqual(errors[0]);
+  });
+
+  it('preserves global-first SaveError behavior for single-error callers', () => {
+    const global = { code: 'global' };
+    const field = { code: 'field', paramName: 'password' };
+    const cause = new SaveError({ fields: { password: field }, global });
+    expect(toLocalizableErrors(cause)).toEqual([global, field]);
+    expect(toLocalizableError(cause)).toEqual(global);
+  });
+
+  it.each([
+    new Error('private detail'),
+    undefined,
+    new SaveError({}),
+    new ClerkAPIResponseError('Empty', { status: 500, data: [] }),
+  ])('keeps a single logged fallback for %s', cause => {
+    const log = silenceConsole();
+    expect(toLocalizableErrors(cause)).toEqual([{ cause }]);
+    expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
   });
 });

@@ -42,7 +42,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A delete that needs the user to type a phrase                            | `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)                     |
 | An action that may need step-up verification                             | `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`           |
 | A direct action that needs step-up verification                          | `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view      |
-| Showing any error to the user                                            | One of the owners above. They call `toLocalizableError` and resolve copy with `useErrorText`                      |
+| Showing any error to the user                                            | One of the owners above. They call `toLocalizableError` (or `toLocalizableErrors` for all errors) and resolve copy with `useErrorText`                      |
 | Moving focus after a list row is removed                                 | `useListRemovalFocus` (`src/hooks/`)                                                                              |
 | A debounced, abortable async check as the user types                     | `useDebouncedAsync` (`src/hooks/`)                                                                                |
 | A spinner that should not flash or flicker                               | `useSpinDelay` (`src/hooks/`)                                                                                     |

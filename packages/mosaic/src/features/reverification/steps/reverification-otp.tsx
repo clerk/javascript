@@ -30,6 +30,7 @@ export interface ReverificationOTPProps {
   value: string;
   length?: number;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending?: boolean;
   resend?: ReverificationOtpResend;
   onValueChange: (value: string) => void;
@@ -44,6 +45,7 @@ export function ReverificationOTP({
   value,
   length = 6,
   errorMessage,
+  globalErrorMessage,
   isPending = false,
   resend,
   onValueChange,
@@ -69,6 +71,12 @@ export function ReverificationOTP({
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         <Form
           id={formId}
