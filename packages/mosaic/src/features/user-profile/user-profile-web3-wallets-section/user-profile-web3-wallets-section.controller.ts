@@ -65,36 +65,50 @@ export function useUserProfileWeb3WalletsController({
   });
 
   const runConnection = (provider: UserProfileWeb3Provider, walletName?: string) =>
-    action.run(provider.id, async () => {
+    action.run(provider.id, async signal => {
       setOwner({ kind: 'connect', providerId: provider.id, target: null });
       if (walletName) {
         setPicker({ open: true, kind: 'connect', provider, walletName });
       }
       try {
-        await connect(provider.id, walletName, target => {
-          setOwner({ kind: 'connect', providerId: provider.id, target });
-          if (provider.walletPicker === 'solana' && target.kind === 'wallet') {
-            setPicker({ open: false });
-          }
-        });
-        setPicker({ open: false });
-      } finally {
-        setPicker(current =>
-          current.open && current.kind === 'connect' ? { ...current, walletName: undefined } : current,
+        await connect(
+          provider.id,
+          walletName,
+          target => {
+            if (signal.aborted) {
+              return;
+            }
+            setOwner({ kind: 'connect', providerId: provider.id, target });
+            if (provider.walletPicker === 'solana' && target.kind === 'wallet') {
+              setPicker({ open: false });
+            }
+          },
+          signal,
         );
+        if (!signal.aborted) {
+          setPicker({ open: false });
+        }
+      } finally {
+        if (!signal.aborted) {
+          setPicker(current =>
+            current.open && current.kind === 'connect' ? { ...current, walletName: undefined } : current,
+          );
+        }
       }
     });
 
   const runVerification = (walletId: string, walletName?: string) =>
-    action.run(walletId, async () => {
+    action.run(walletId, async signal => {
       setOwner({ kind: 'verify', walletId });
       if (walletName) {
         setPicker({ open: true, kind: 'verify', walletId, walletName });
       }
       try {
-        await verify(walletId, walletName);
+        await verify(walletId, walletName, signal);
       } finally {
-        setPicker({ open: false });
+        if (!signal.aborted) {
+          setPicker({ open: false });
+        }
       }
     });
 
@@ -188,6 +202,13 @@ export function useUserProfileWeb3WalletsController({
         : undefined,
     pendingWalletName: picker.open ? picker.walletName : undefined,
     onConnect,
+    onCancelConnection:
+      action.isPending && owner?.kind === 'connect' && owner.target === null && !picker.open
+        ? () => {
+            action.cancel();
+            removalFocus.trigger(owner.providerId)?.focus();
+          }
+        : undefined,
     onVerify,
     onSetPrimary: (walletId: string) =>
       action.run(walletId, () => {

@@ -264,3 +264,48 @@ describe('usePendingAction', () => {
     expect(result.current.errorKey).toBeUndefined();
   });
 });
+
+it.each(['resolve', 'reject'] as const)('cancel releases the lock and ignores a late %s', async outcome => {
+  const old = deferred<void>();
+  const next = deferred<void>();
+  const { result } = renderHook(() => usePendingAction());
+  let signal: AbortSignal | undefined;
+  let first: Promise<boolean> | undefined;
+  act(() => {
+    first = result.current.run('old', current => {
+      signal = current;
+      return old.promise;
+    });
+  });
+  act(() => result.current.cancel());
+  expect(signal?.aborted).toBe(true);
+  expect(result.current.isPending).toBe(false);
+  act(() => {
+    void result.current.run('next', () => next.promise);
+  });
+  await act(async () => {
+    if (outcome === 'resolve') {
+      old.resolve();
+    } else {
+      old.reject(blocked());
+    }
+    expect(await first).toBe(false);
+  });
+  expect(result.current.pendingKey).toBe('next');
+  expect(result.current.error).toBeUndefined();
+  await act(() => next.resolve());
+});
+
+it('aborts the action signal on unmount', () => {
+  const pending = deferred<void>();
+  const { result, unmount } = renderHook(() => usePendingAction());
+  let signal: AbortSignal | undefined;
+  act(() => {
+    void result.current.run('a', current => {
+      signal = current;
+      return pending.promise;
+    });
+  });
+  unmount();
+  expect(signal?.aborted).toBe(true);
+});
