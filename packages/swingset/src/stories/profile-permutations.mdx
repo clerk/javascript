@@ -7,14 +7,16 @@ organization across its triggers, so switching in one updates the other and the 
 
 `combined` defaults to `true` in two places: on `UserButton` it decides what the menu lists, and on
 `MosaicProvider`'s `profile` it decides what the profile shows. `UserProfile` follows the provider unless
-it sets `combined` itself. Custom pages and page order go on the provider too:
+it sets `combined` itself. Profile URLs, custom pages, page order and where leaving an organization lands
+go on the provider too:
 
 ```tsx
 <MosaicProvider
   profile={{
     combined: true,
+    userProfileUrl: '/account',
     userProfileProps: { customPages },
-    organizationProfileProps: { pageOrder },
+    organizationProfileProps: { pageOrder, afterLeaveOrganizationUrl: '/' },
   }}
 >
   <OrganizationSwitcher />

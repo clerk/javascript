@@ -677,7 +677,7 @@ describe('UserButton', () => {
     });
 
     it('navigates to manage the account when a URL routes it', async () => {
-      const { clerk, navigate } = await renderUserButton({ userProfileUrl: '/account' });
+      const { clerk, navigate } = await renderUserButton({}, undefined, { userProfileUrl: '/account' });
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
@@ -688,7 +688,7 @@ describe('UserButton', () => {
     });
 
     it('navigates to manage the organization when a URL routes it', async () => {
-      const { clerk, navigate } = await renderUserButton({ organizationProfileUrl: '/org' });
+      const { clerk, navigate } = await renderUserButton({}, undefined, { organizationProfileUrl: '/org' });
       const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
       const user = await open();
 

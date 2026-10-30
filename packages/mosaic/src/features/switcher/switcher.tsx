@@ -66,6 +66,8 @@ export function Switcher(
       customPages: organizationProfile.customPages,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- `@clerk/shared` types `appearance` as an unresolved type until a framework SDK augments `ClerkAppearanceRegistry`; it passes through untouched.
       appearance: organizationProfileProps?.appearance,
+      afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
+      apiKeysProps: organizationProfileProps?.apiKeysProps,
     },
     newProfiles: {
       userProfile: {
@@ -78,6 +80,8 @@ export function Switcher(
       organizationProfile: {
         customPages: pagesOnly(organizationProfileProps?.customPages),
         pageOrder: organizationProfileProps?.pageOrder,
+        afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
+        apiKeysProps: organizationProfileProps?.apiKeysProps,
       },
       menuMode: mode,
     },

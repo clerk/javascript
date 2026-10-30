@@ -191,7 +191,7 @@ describe('UserButton with experimental.newProfiles', () => {
   });
 
   it('still asks which to manage when the organization profile routes to a page', async () => {
-    const { navigate } = await renderWithNewProfiles({ organizationProfileUrl: '/org' });
+    const { navigate } = await renderWithNewProfiles({}, undefined, { organizationProfileUrl: '/org' });
     const user = await open();
 
     await openSettings(user, 'Manage organization');

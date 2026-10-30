@@ -56,13 +56,12 @@ export type UserButtonProps = SwitcherProps & UserButtonMenuProps;
  * ```
  *
  * @example
- * Passing a URL routes to a page of your own instead of opening Clerk's modal; that is the whole
- * opt-in. `afterSelectOrganizationUrl` is where switching organization lands, and takes a `:param`
- * template, a plain path, or a function. `afterSwitchSessionUrl` is where switching account lands.
+ * `afterSelectOrganizationUrl` is where switching organization lands, and takes a `:param` template,
+ * a plain path, or a function. `afterSwitchSessionUrl` is where switching account lands. Set
+ * `userProfileUrl` and `organizationProfileUrl` on `MosaicProvider`'s `profile` to route Settings to
+ * pages of your own.
  * ```tsx
  * <UserButton
- *   userProfileUrl='/account'
- *   organizationProfileUrl='/settings/organization'
  *   afterSelectOrganizationUrl='/orgs/:slug'
  *   afterSwitchSessionUrl='/dashboard'
  * />
