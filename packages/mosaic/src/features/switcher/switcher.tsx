@@ -65,8 +65,8 @@ export function Switcher(
   props: SwitcherProps & { mode: SwitcherMode; triggerVariant?: SwitcherTriggerVariant },
 ): ReactElement | null {
   const {
-    renderTriggerLabel,
-    renderTriggerBadge,
+    showTriggerLabel,
+    triggerBadge,
     triggerVariant,
     mode,
     userProfileProps,
@@ -142,8 +142,8 @@ export function Switcher(
     <>
       <SwitcherView
         {...viewController}
-        renderTriggerLabel={renderTriggerLabel}
-        renderTriggerBadge={renderTriggerBadge}
+        showTriggerLabel={showTriggerLabel}
+        triggerBadge={triggerBadge}
         triggerVariant={triggerVariant}
       />
       {portals}

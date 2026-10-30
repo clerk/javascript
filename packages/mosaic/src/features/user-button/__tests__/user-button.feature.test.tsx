@@ -1390,7 +1390,7 @@ describe('UserButton', () => {
     });
 
     it('leads the avatar alone with the organization, unbadged', async () => {
-      await renderUserButton({ renderTriggerLabel: false });
+      await renderUserButton({ showTriggerLabel: false });
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(trigger().querySelector('[data-shape]')).toHaveAttribute('data-shape', 'square');
@@ -1410,7 +1410,7 @@ describe('UserButton', () => {
     });
 
     it('renders the avatar alone when the label is off', async () => {
-      await renderUserButton({ mode: 'user', renderTriggerLabel: false });
+      await renderUserButton({ mode: 'user', showTriggerLabel: false });
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
@@ -1443,7 +1443,7 @@ describe('UserButton custom trigger badges', () => {
     },
   ])('shows a badge for the displayed identity as $badge', async ({ mode, seed, badge, name }) => {
     await renderUserButton(
-      { mode, renderTriggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      { mode, triggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
       seed,
     );
 
@@ -1457,10 +1457,8 @@ describe('UserButton custom trigger badges', () => {
 
   it('hides the badge while pending and for null without changing the name', async () => {
     const badge = deferred<{ id: string; label: string } | null>();
-    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
-      id === 'org_1' ? badge.promise : Promise.resolve(null),
-    );
-    const { clerk } = await renderUserButton({ renderTriggerBadge });
+    const triggerBadge = vi.fn(({ id }: { id: string }) => (id === 'org_1' ? badge.promise : Promise.resolve(null)));
+    const { clerk } = await renderUserButton({ triggerBadge });
 
     expect(trigger()).toHaveTextContent('Acme');
     expect(trigger()).not.toHaveTextContent('Pro plan');
@@ -1469,18 +1467,18 @@ describe('UserButton custom trigger badges', () => {
     expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
 
     await act(() => clerk.setActive({ organization: 'org_9' }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
   it('discards the previous workspace badge after switching organizations', async () => {
     const first = deferred<{ id: string; label: string } | null>();
-    const renderTriggerBadge = vi.fn(async ({ id }: { id: string }) =>
+    const triggerBadge = vi.fn(async ({ id }: { id: string }) =>
       id === 'org_1' ? first.promise : { id: 'other', label: 'Other plan' },
     );
-    const { clerk } = await renderUserButton({ renderTriggerBadge });
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_1' }));
+    const { clerk } = await renderUserButton({ triggerBadge });
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_1' }));
 
     await act(() => clerk.setActive({ organization: 'org_9' }));
     await waitFor(() => expect(within(trigger()).getByText('Other plan')).toBeInTheDocument());
@@ -1496,7 +1494,7 @@ describe('UserButton custom trigger badges', () => {
       calls();
       return Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' });
     };
-    const { rerender } = await renderUserButton({ renderTriggerBadge: () => inline() });
+    const { rerender } = await renderUserButton({ triggerBadge: () => inline() });
     await waitFor(() => expect(within(trigger()).getByText('Enterprise plan')).toBeInTheDocument());
 
     let dropped = false;
@@ -1507,7 +1505,7 @@ describe('UserButton custom trigger badges', () => {
     onTestFinished(() => observer.disconnect());
 
     await open();
-    rerender(tree({ renderTriggerBadge: () => inline() }));
+    rerender(tree({ triggerBadge: () => inline() }));
     expect(within(trigger()).getByText('Enterprise plan')).toBeInTheDocument();
     await act(() => Promise.resolve());
 
@@ -1516,34 +1514,34 @@ describe('UserButton custom trigger badges', () => {
   });
 
   it('hides the badge for false or on failure', async () => {
-    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
+    const triggerBadge = vi.fn(({ id }: { id: string }) =>
       id === 'org_1'
         ? Promise.resolve({ id: 'pro', label: 'Pro plan' })
         : Promise.reject(new Error('Plan unavailable')),
     );
-    const { clerk, rerender } = await renderUserButton({ renderTriggerBadge });
+    const { clerk, rerender } = await renderUserButton({ triggerBadge });
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
-    rerender(tree({ renderTriggerBadge: false }));
+    rerender(tree({ triggerBadge: false }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
 
-    rerender(tree({ renderTriggerBadge }));
+    rerender(tree({ triggerBadge }));
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
     await act(() => clerk.setActive({ organization: 'org_9' }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
   it('does not request a badge when the trigger label is hidden', async () => {
-    const renderTriggerBadge = vi.fn(() => Promise.resolve({ id: 'pro', label: 'Pro plan' }));
-    await renderUserButton({ renderTriggerLabel: false, renderTriggerBadge });
+    const triggerBadge = vi.fn(() => Promise.resolve({ id: 'pro', label: 'Pro plan' }));
+    await renderUserButton({ showTriggerLabel: false, triggerBadge });
 
     expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
     expect(trigger()).not.toHaveTextContent('Acme');
     expect(trigger()).not.toHaveTextContent('Pro plan');
-    expect(renderTriggerBadge).not.toHaveBeenCalled();
+    expect(triggerBadge).not.toHaveBeenCalled();
   });
 });
