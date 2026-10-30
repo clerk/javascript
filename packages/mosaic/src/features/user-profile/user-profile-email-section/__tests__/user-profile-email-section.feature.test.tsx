@@ -22,6 +22,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileEmailSection } from '../user-profile-email-section';
 
 const VERIFIED = fapiVerification('email_code', { status: 'verified' });
@@ -205,6 +206,33 @@ describe('the user profile email section', () => {
     expect(body.get('redirect_url')).toBe(window.location.href);
     prepare.release();
     await waitFor(() => expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.acme.co/sso')));
+  });
+
+  it('returns to the profile modal after verifying through the identity provider', async () => {
+    const sso = fapiEmailAddress({
+      id: 'idn_sso',
+      email_address: 'alice@acme.co',
+      matches_sso_connection: true,
+    });
+    serveFapi(signedInWithEmails([PRIMARY, sso]));
+    await renderWithClerk(
+      <UserProfileProvider mode='modal'>
+        <UserProfileEmailSection />
+      </UserProfileProvider>,
+    );
+    const actor = userEvent.setup();
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+
+    await manageEmail(actor, 'alice@acme.co', 'Verify');
+    const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
+    await actor.click(within(dialog).getByRole('button', { name: 'Connect' }));
+
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    const body = new URLSearchParams(await prepare.requests[0]?.text());
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.has('__clerk_modal_state')).toBe(false);
+    prepare.fail();
   });
 
   it('does not offer to add the username as an address', async () => {
@@ -485,11 +513,13 @@ describe('email reverification', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
     await waitFor(() => expect(dialog).toHaveTextContent('Open the link we sent to new@example.com'));
     expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
-    await waitFor(() => expect(poll.requests).toHaveLength(1));
     const added = fapi.client.sessions[0]?.user.email_addresses[0];
     if (!added) {
       throw new Error('Expected the new email address');
     }
+    const pollsForAdded = () =>
+      poll.requests.filter(request => new URL(request.url).pathname === `/v1/me/email_addresses/${added.id}`);
+    await waitFor(() => expect(pollsForAdded()).toHaveLength(1));
     verifyEmailOutOfBand(fapi, added.id);
     poll.release();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());

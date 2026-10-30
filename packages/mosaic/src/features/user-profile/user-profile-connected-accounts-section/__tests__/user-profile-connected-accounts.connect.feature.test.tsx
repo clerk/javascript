@@ -214,7 +214,7 @@ describe('connected accounts', () => {
     expect(await screen.findByText('The connection could not start. Please try again.')).toBeInTheDocument();
   });
 
-  it('preserves modal state when connecting', async () => {
+  it('returns to the profile modal after connecting', async () => {
     serveFapi(signedIn([]));
     await renderWithClerk(
       <UserProfileProvider mode='modal'>
@@ -226,12 +226,27 @@ describe('connected accounts', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     const body = new URLSearchParams(await request.requests[0]?.text());
-    const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
-    expect(encoded).toBeTruthy();
-    expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({
-      componentName: 'UserProfile',
-      socialProvider: 'github',
-    });
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.has('__clerk_modal_state')).toBe(false);
+    request.fail();
+  });
+
+  it('returns to the page without modal state when connecting from a mounted profile', async () => {
+    serveFapi(signedIn([]));
+    await renderWithClerk(
+      <UserProfileProvider mode='mounted'>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
+    );
+    const request = holdRequests('post', '/v1/me/external_accounts');
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    await waitFor(() => expect(request.requests).toHaveLength(1));
+    const body = new URLSearchParams(await request.requests[0]?.text());
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.has('__clerk_mosaic_modal')).toBe(false);
+    expect(params.has('__clerk_modal_state')).toBe(false);
     request.fail();
   });
 

@@ -20,6 +20,10 @@ import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { OrganizationSwitcherProps } from '../organization-switcher';
 import { OrganizationSwitcher } from '../organization-switcher';
 
+beforeAll(async () => {
+  await import('../../organization-profile/organization-profile.modal-content');
+});
+
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const other = fapiOrganization({ id: 'org_9', name: 'Other' });
 const beta = fapiOrganization({ id: 'org_2', name: 'Beta' });

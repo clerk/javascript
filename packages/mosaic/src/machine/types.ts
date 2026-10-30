@@ -214,15 +214,15 @@ export type Unsubscribe = () => void;
 
 export interface Actor<TContext, TEvent extends EventObject, TStates extends string = string> {
   /**
-   * Run entry actions / immediate transitions / invokes of the initial state.
-   * After a `stop()`, resume in the current state instead: re-arm its `after`
+   * Run entry actions / immediate transitions / invokes of the initial state,
+   * then apply the events sent before this first start, in order. After a `stop()`, resume in the current state instead: re-arm its `after`
    * timers, then apply the invoke results and events that arrived while stopped,
    * in arrival order.
    */
   start: () => Actor<TContext, TEvent, TStates>;
   /** Stop the actor, pausing its `after` timers and holding in-flight invoke results and sent events for a later `start()`. */
   stop: () => void;
-  /** Send an event. Ignored before the first `start()` and once the actor is `done`; queued while `stopped`. */
+  /** Send an event. Ignored once the actor is `done`; queued until `start()` before the first start and while `stopped`. */
   send: (event: TEvent) => void;
   getSnapshot: () => Snapshot<TContext, TStates>;
   /** Subscribe to snapshots; returns an unsubscribe fn (usable with `useSyncExternalStore`). */
