@@ -1,6 +1,7 @@
 const CLERK_PREFIX = '__clerk_';
 
 export const CLERK_ENVIRONMENT_STORAGE_ENTRY = 'environment';
+export const PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY = 'password_confirmation_error';
 
 interface StorageEntry<T> {
   value: T;
