@@ -1,4 +1,5 @@
 import { ProviderButton, ProviderButtonGroup } from '@clerk/mosaic/components/provider-button';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -55,7 +56,7 @@ function ProviderIcon({ name }: { name: string }) {
   );
 }
 
-function Group({ count, isPending, ...props }: Record<string, unknown>) {
+export function Default({ count, isPending, ...props }: Record<string, unknown>) {
   return (
     <div style={{ width: 400, maxWidth: '100%' }}>
       <ProviderButtonGroup {...(props as Record<string, never>)}>
@@ -73,35 +74,51 @@ function Group({ count, isPending, ...props }: Record<string, unknown>) {
   );
 }
 
-export function Default(props: Record<string, unknown>) {
-  return <Group {...props} />;
-}
-
-export function One(props: Record<string, unknown>) {
+export function One() {
   return (
-    <Group
-      {...props}
-      count={1}
-    />
+    <div style={{ width: 400, maxWidth: '100%' }}>
+      <ProviderButtonGroup>
+        <ProviderButton
+          icon={<ProviderIcon name='Google' />}
+          longLabel='Continue with Google'
+          shortLabel='Google'
+        />
+      </ProviderButtonGroup>
+    </div>
   );
 }
 
-export function Many(props: Record<string, unknown>) {
+export function Many() {
   return (
-    <Group
-      {...props}
-      count={7}
-    />
+    <div style={{ width: 400, maxWidth: '100%' }}>
+      <ProviderButtonGroup>
+        {PROVIDERS.map(name => (
+          <ProviderButton
+            key={name}
+            icon={<ProviderIcon name={name} />}
+            longLabel={`Continue with ${name}`}
+            shortLabel={name}
+          />
+        ))}
+      </ProviderButtonGroup>
+    </div>
   );
 }
 
-export function Stacked(props: Record<string, unknown>) {
+export function Stacked() {
   return (
-    <Group
-      {...props}
-      count={3}
-      layout='stacked'
-    />
+    <div style={{ width: 400, maxWidth: '100%' }}>
+      <ProviderButtonGroup layout='stacked'>
+        {PROVIDERS.slice(0, 3).map(name => (
+          <ProviderButton
+            key={name}
+            icon={<ProviderIcon name={name} />}
+            longLabel={`Continue with ${name}`}
+            shortLabel={name}
+          />
+        ))}
+      </ProviderButtonGroup>
+    </div>
   );
 }
 
@@ -151,13 +168,28 @@ export function LongLabels() {
   );
 }
 
-export function Pending(props: Record<string, unknown>) {
+export function Pending() {
+  const [pending, setPending] = useState<string | null>(null);
+
+  const start = (name: string) => {
+    setPending(name);
+    setTimeout(() => setPending(null), 2000);
+  };
+
   return (
-    <Group
-      {...props}
-      count={2}
-      disabled
-      isPending
-    />
+    <div style={{ width: 400, maxWidth: '100%' }}>
+      <ProviderButtonGroup disabled={pending !== null}>
+        {PROVIDERS.slice(0, 2).map(name => (
+          <ProviderButton
+            key={name}
+            icon={<ProviderIcon name={name} />}
+            longLabel={`Continue with ${name}`}
+            shortLabel={name}
+            isPending={pending === name}
+            onClick={() => start(name)}
+          />
+        ))}
+      </ProviderButtonGroup>
+    </div>
   );
 }

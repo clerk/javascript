@@ -72,6 +72,18 @@ describe('Mosaic ProviderButton', () => {
       expect(screen.getByRole('progressbar', { name: 'pending' })).toBeInTheDocument();
     });
 
+    it('adds the pending label to the accessible name', () => {
+      render(
+        <ProviderButton
+          {...googleProps}
+          badge='Last used'
+          isPending
+          pendingLabel='Connecting'
+        />,
+      );
+      expect(screen.getByRole('button')).toHaveAccessibleName(`${googleProps.longLabel}, Connecting, Last used`);
+    });
+
     it('swaps the icon for the spinner only after the delay, and keeps the labels', () => {
       render(
         <ProviderButton

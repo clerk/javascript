@@ -2,8 +2,8 @@ import * as Stories from './provider-button.stories';
 
 # ProviderButton
 
-Starts sign-in with a third-party provider. `ProviderButtonGroup` lays the buttons out, and they must
-be its direct children.
+A button for signing in with a third-party provider. It only renders the button, so start the provider
+flow from `onClick`. `ProviderButtonGroup` lays the buttons out, and they must be its direct children.
 
 ## Playground
 
@@ -105,7 +105,7 @@ A label that doesn't fit ends in an ellipsis. The icon or spinner keeps its size
 ### Pending
 
 A spinner replaces the icon. Set `disabled` on the group to disable the other buttons. The pending
-button stays at full opacity.
+button stays at full opacity. Click a button to see it pending for two seconds.
 
 <Story
   name='Pending'

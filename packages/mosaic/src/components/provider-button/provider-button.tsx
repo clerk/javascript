@@ -75,7 +75,7 @@ export const ProviderButton = React.forwardRef<HTMLButtonElement, ProviderButton
       fullWidth
       disabled={disabled || isPending}
       focusableWhenDisabled={focusableWhenDisabled || isPending}
-      aria-label={badge ? `${longLabel}, ${badge}` : longLabel}
+      aria-label={[longLabel, isPending && pendingLabel, badge].filter(Boolean).join(', ')}
       aria-busy={isPending || undefined}
       data-pending={isPending ? '' : undefined}
       xstyle={[buttonStyles.root, isPending && buttonStyles.rootPending, xstyle]}
