@@ -101,15 +101,21 @@ export type PasswordHasher =
   | 'argon2id'
   | 'awscognito'
   | 'bcrypt'
+  | 'bcrypt_peppered'
   | 'bcrypt_sha256_django'
   | 'md5'
+  | 'md5_salted'
   | 'pbkdf2_sha256'
   | 'pbkdf2_sha256_django'
   | 'pbkdf2_sha1'
+  | 'pbkdf2_sha512'
+  | 'pbkdf2_sha512_hex'
   | 'phpass'
   | 'scrypt_firebase'
   | 'scrypt_werkzeug'
   | 'sha256'
+  | 'sha256_salted'
+  | 'sha512_symfony'
   | 'md5_phpass'
   | 'ldap_ssha';
 
@@ -145,9 +151,9 @@ export type UserPasswordHashingParams = {
    *   </ul>
    *  <li> [`md5_salted` (insecure)](https://en.wikipedia.org/wiki/MD5) </li>
    *   <ul>
-   *    <li> When set, `password_digest` must be in the format of `salt$hash`. </li>
-   *    <li> _salt:_ The salt used to generate the above hash. </li>
+   *    <li> When set, `password_digest` must be in the format of `hash$salt`. </li>
    *    <li> _hash:_ A 32-length hex string. </li>
+   *    <li> _salt:_ The salt used to generate the above hash. </li>
    *   </ul>
    *  <li> [`pbkdf2_sha1`](https://en.wikipedia.org/wiki/PBKDF2) </li>
    *   <ul>
@@ -205,9 +211,9 @@ export type UserPasswordHashingParams = {
    *   </ul>
    *  <li> [`sha256_salted` (insecure)](https://en.wikipedia.org/wiki/SHA-2) </li>
    *   <ul>
-   *    <li> When set, `password_digest` must be in the format of `salt$hash`. </li>
-   *    <li> _salt:_ The salt used to generate the above hash. </li>
+   *    <li> When set, `password_digest` must be in the format of `hash$salt`. </li>
    *    <li> _hash:_ A 64-length hex string. </li>
+   *    <li> _salt:_ The salt used to generate the above hash. </li>
    *   </ul>
    *  <li> [`argon2`](https://argon2.online/) variants: `argon2i` and `argon2id`. </li>
    *   <ul>
