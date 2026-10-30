@@ -16,9 +16,21 @@ export const meta: StoryMeta = {
   label: 'Organization profile',
   layout: 'wide',
   source: 'packages/mosaic/src/features/organization-profile/organization-profile.view.tsx',
+  styles: {
+    _variants: {
+      showSearch: { true: {}, false: {} },
+    },
+    _defaultVariants: {
+      showSearch: 'false',
+    },
+  },
 };
 
-export function Default() {
+function knobsAsProps(props: Record<string, unknown>) {
+  return { showSearch: props.showSearch === true || props.showSearch === 'true' };
+}
+
+export function Default(props: Record<string, unknown>) {
   const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
   return (
     <OrganizationProfileView
@@ -26,6 +38,7 @@ export function Default() {
       pages={pages}
       onPageChange={setActivePage}
       elevation='flush'
+      {...knobsAsProps(props)}
     />
   );
 }
