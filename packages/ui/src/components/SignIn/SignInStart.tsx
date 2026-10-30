@@ -101,7 +101,12 @@ function SignInStartInternal(): JSX.Element {
   const { setError } = card;
   const { t } = useLocalizations();
   const clerk = useClerk();
+  const hasCheckedSessionEndedNotice = useRef(false);
   useEffect(() => {
+    if (hasCheckedSessionEndedNotice.current) {
+      return;
+    }
+    hasCheckedSessionEndedNotice.current = true;
     const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${clerk.publishableKey}`;
     const notice = getClerkQueryParam(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM);
     removeClerkQueryParam(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM);
