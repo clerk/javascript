@@ -811,6 +811,7 @@ describe('UserButton', () => {
         const menu = await openAccounts(user);
         await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
         expect(waiting()).toBe(true);
+        await waitFor(() => expect(touch.requests).toHaveLength(1));
 
         await user.click(trigger());
         await waitFor(() => expect(popup()).toBeNull());
