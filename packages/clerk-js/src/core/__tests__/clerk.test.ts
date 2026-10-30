@@ -1318,7 +1318,6 @@ describe('Clerk singleton', () => {
         await sut.signOut({ redirectUrl: '/after-sign-out?tab=security#settings' });
 
         expect(mockClientSignOut).toHaveBeenCalledWith({
-          persistClient: true,
           redirectUrl: 'https://satellite.test/after-sign-out?tab=security#settings',
         });
         expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
@@ -1455,7 +1454,6 @@ describe('Clerk singleton', () => {
         });
 
         expect(mockClientSignOut).toHaveBeenCalledExactlyOnceWith({
-          persistClient: true,
           redirectUrl: 'https://satellite.test/signed-out?tab=security#settings',
         });
         expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');

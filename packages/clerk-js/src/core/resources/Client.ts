@@ -95,23 +95,14 @@ export class Client extends BaseResource implements ClientResource {
     });
   }
 
-  async __internal_signOut({
-    persistClient,
-    redirectUrl,
-  }: {
-    persistClient: boolean;
-    redirectUrl: string;
-  }): Promise<{ signOutUrl?: string }> {
+  async __internal_signOut({ redirectUrl }: { redirectUrl: string }): Promise<{ signOutUrl?: string }> {
     const json = await BaseResource._fetch<ClientJSON>({
       method: 'DELETE',
-      path: persistClient ? this.path() + '/sessions' : '/client',
+      path: this.path() + '/sessions',
       search: { sign_out_redirect_url: redirectUrl },
     });
     this.fromJSON((json?.response || json) as ClientJSON | null);
     SessionTokenCache.clear();
-    if (!persistClient) {
-      this.resetClient();
-    }
     return { signOutUrl: json?.sign_out_url };
   }
 

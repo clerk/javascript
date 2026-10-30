@@ -828,7 +828,6 @@ export class Clerk implements ClerkInterface {
       try {
         if (repairRedirectUrl && Client.isClientResource(this.client)) {
           ({ signOutUrl } = await this.client.__internal_signOut({
-            persistClient,
             redirectUrl: repairRedirectUrl.href,
           }));
         } else if (persistClient) {
