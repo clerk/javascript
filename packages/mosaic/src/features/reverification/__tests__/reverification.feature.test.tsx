@@ -695,6 +695,30 @@ describe('Reverification', () => {
       expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
     });
 
+    it('keeps a code delivery failure after returning from the method picker', async () => {
+      await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [emailFactor, passwordFactor] }, { environment: preferring('otp') }),
+      );
+      const prepare = holdRequests('post', PREPARE_FIRST);
+      const user = await startVerification();
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      await useAnotherMethod(user);
+      expect(await screen.findByRole('button', { name: 'Continue with your password' })).toBeVisible();
+
+      prepare.fail('preparation_failed', 'Could not send your code');
+      await settle();
+      await user.click(screen.getByRole('button', { name: 'Back' }));
+
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      expect(await screen.findByText('Could not send your code')).toBeVisible();
+      expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
+      const retry = holdRequests('post', PREPARE_FIRST);
+      await user.click(screen.getByRole('button', { name: /Resend/ }));
+      await waitFor(() => expect(retry.requests).toHaveLength(1));
+      retry.release();
+    });
+
     it('resends a code once the cooldown has passed', async () => {
       const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
       vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });

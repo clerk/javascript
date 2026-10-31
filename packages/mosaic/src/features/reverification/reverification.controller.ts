@@ -48,6 +48,7 @@ interface ReverificationContext {
   submitRequested: boolean;
   frozenActiveMethodId: string | undefined;
   overlayFrom: OverlayFrom;
+  preparationView: 'verifying' | 'methodPicker' | 'help';
   supportEmail: string;
   deps: ReverificationDeps;
 }
@@ -170,6 +171,20 @@ const factorEvents = {
   RESET: 'inactive',
 } satisfies NonNullable<StateConfig<ReverificationContext, ReverificationEvent>['on']>;
 
+const methodPickerSelection = {
+  SELECT_METHOD: [
+    {
+      target: 'methodPickerPreparing',
+      guard: (ctx, event) => {
+        const method = ctx.methods.find(candidate => candidate.id === event.id);
+        return Boolean(method && needsPrepare(method));
+      },
+      actions: assign((ctx, event) => selectMethod(ctx, event.id)),
+    },
+    { target: 'verifying', actions: assign((ctx, event) => selectMethod(ctx, event.id)) },
+  ],
+} satisfies NonNullable<StateConfig<ReverificationContext, ReverificationEvent>['on']>;
+
 export const reverificationMachine = createMachine({
   id: 'reverification',
   initial: 'inactive',
@@ -183,6 +198,7 @@ export const reverificationMachine = createMachine({
     submitRequested: false,
     frozenActiveMethodId: undefined,
     overlayFrom: 'factor',
+    preparationView: 'verifying',
     supportEmail: '',
     deps: unseatedDeps,
   },
@@ -212,29 +228,50 @@ export const reverificationMachine = createMachine({
       as verifying, but if the user submits, we queue that up until after prepare resolves
     */
     preparing: {
+      entry: assign(() => ({ preparationView: 'verifying' as const })),
       on: {
         ...factorEvents,
+        ...methodPickerSelection,
+        SHOW_METHODS: {
+          ...factorEvents.SHOW_METHODS,
+          target: undefined,
+          actions: [factorEvents.SHOW_METHODS.actions, assign(() => ({ preparationView: 'methodPicker' as const }))],
+        },
+        SHOW_HELP: {
+          actions: assign(ctx => ({
+            preparationView: 'help' as const,
+            overlayFrom: ctx.preparationView === 'methodPicker' ? ('method-picker' as const) : ('factor' as const),
+            direction: 1 as const,
+            submitRequested: false,
+          })),
+        },
+        BACK: {
+          actions: assign(ctx => ({
+            preparationView:
+              ctx.preparationView === 'help' && ctx.overlayFrom === 'method-picker'
+                ? ('methodPicker' as const)
+                : ('verifying' as const),
+            direction: -1 as const,
+          })),
+        },
         SUBMIT: {
+          guard: ctx => ctx.preparationView === 'verifying',
           actions: assign(() => ({ submitRequested: true })),
         },
       },
       invoke: fromPromise(prepareActive, {
-        onDone: [
-          {
-            guard: (ctx: ReverificationContext) => ctx.submitRequested,
-            target: 'submitting' as const,
-            actions: assign(() => ({ submitRequested: false })),
-          },
-          { target: 'verifying' as const },
-        ],
-        onError: {
-          target: 'verifying',
-          actions: assign((_, event) => ({
+        onDone: ({ context }) => ({
+          target: context.submitRequested ? 'submitting' : context.preparationView,
+          context: { submitRequested: false },
+        }),
+        onError: ({ context, event }) => ({
+          target: context.preparationView,
+          context: {
             error: toLocalizableError(event.error),
             submitRequested: false,
             ...unlockResend(),
-          })),
-        },
+          },
+        }),
       }),
     },
 
@@ -296,17 +333,7 @@ export const reverificationMachine = createMachine({
 
     methodPicker: {
       on: {
-        SELECT_METHOD: [
-          {
-            target: 'methodPickerPreparing',
-            guard: (ctx, event) => {
-              const method = ctx.methods.find(candidate => candidate.id === event.id);
-              return Boolean(method && needsPrepare(method));
-            },
-            actions: assign((ctx, event) => selectMethod(ctx, event.id)),
-          },
-          { target: 'verifying', actions: assign((ctx, event) => selectMethod(ctx, event.id)) },
-        ],
+        ...methodPickerSelection,
         SHOW_HELP: {
           target: 'help',
           actions: assign(() => ({ direction: 1 as const, overlayFrom: 'method-picker' as const })),
@@ -475,7 +502,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
 
     const { context } = snapshot;
     const activeMethod = context.activeMethod;
-    const state = snapshot.value;
+    const state = snapshot.value === 'preparing' ? context.preparationView : snapshot.value;
 
     if (state === 'unavailable') {
       return { status: 'error', reason: 'noFactors', onCancel };
