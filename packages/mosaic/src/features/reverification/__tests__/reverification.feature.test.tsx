@@ -677,12 +677,20 @@ describe('Reverification', () => {
         },
       );
 
-      it('keeps the cooldown of a code sent while the picker is open', async () => {
+      it.each(['picker', 'help'] as const)('keeps the cooldown of a code sent while the %s is open', async step => {
         const { prepare, user } = await startSendingCode();
         await useAnotherMethod(user);
+        if (step === 'help') {
+          await user.click(await screen.findByRole('button', { name: 'Get help' }));
+          expect(await screen.findByText(/If you have trouble verifying your account/)).toBeVisible();
+        }
 
         prepare.release();
         await settle();
+        if (step === 'help') {
+          expect(screen.getByText(/If you have trouble verifying your account/)).toBeVisible();
+          await back(user);
+        }
         expect(screen.getByRole('button', { name: 'Continue with your password' })).toBeVisible();
         await back(user);
 
@@ -1196,6 +1204,7 @@ describe('Reverification', () => {
       await waitFor(() => expect(secondPrepare.requests).toHaveLength(1));
       expect(method('Continue with your password')).toBeDisabled();
       expect(method('Back')).toBeDisabled();
+      expect(method('Get help')).toBeDisabled();
       secondPrepare.release();
       expect(await screen.findByText(STEP.phoneCode)).toBeVisible();
       expect(fapi.verification.firstFactorVerification?.strategy).toBe('phone_code');
