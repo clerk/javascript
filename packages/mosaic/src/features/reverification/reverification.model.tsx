@@ -18,11 +18,16 @@ import type {
 } from './reverification.types';
 import { pickStartingMethod } from './reverification.utils';
 
+export type ReverificationPreparation = { reusableUntil: number | null };
+
+export type ReverificationScope = { runId: symbol; sessionId: string };
+
 export type ReverificationActiveModel = {
+  scope: ReverificationScope;
   status: 'active';
   supportEmail: string;
   start: () => Promise<ReverificationResult>;
-  prepare: (method: ReverificationPreparableMethod) => Promise<void>;
+  prepare: (method: ReverificationPreparableMethod) => Promise<ReverificationPreparation>;
   attempt: (method: ReverificationMethod, value: string) => Promise<ReverificationResult>;
   finish: () => Promise<void>;
   cancel: () => void;
@@ -124,7 +129,12 @@ export function useReverificationModel(reverificationState: ReverificationState)
 
   const { level, cancel, complete } = reverificationState;
 
-  if (!session || !environment || supportEmail === undefined) {
+  if (
+    !session ||
+    !environment ||
+    supportEmail === undefined ||
+    (reverificationState.sessionId !== null && session.id !== reverificationState.sessionId)
+  ) {
     return { status: 'loading', cancel };
   }
 
@@ -136,31 +146,38 @@ export function useReverificationModel(reverificationState: ReverificationState)
 
   return {
     status: 'active',
+    scope: { runId: reverificationState.runId, sessionId: session.id },
     supportEmail,
     start: async () => handleResponse(await session.startVerification({ level: level ?? 'second_factor' })),
     cancel,
     prepare: async method => {
-      switch (method.strategy) {
-        case 'email_code':
-          await session.prepareFirstFactorVerification({
-            strategy: 'email_code',
-            emailAddressId: method.emailAddressId,
-          });
-          return;
-        case 'phone_code':
-          if (method.stage === 'second') {
-            await session.prepareSecondFactorVerification({
-              strategy: 'phone_code',
-              phoneNumberId: method.phoneNumberId,
-            });
-            return;
-          }
-          await session.prepareFirstFactorVerification({
-            strategy: 'phone_code',
-            phoneNumberId: method.phoneNumberId,
-          });
-          return;
-      }
+      const resource =
+        method.strategy === 'email_code'
+          ? await session.prepareFirstFactorVerification({
+              strategy: 'email_code',
+              emailAddressId: method.emailAddressId,
+            })
+          : method.stage === 'second'
+            ? await session.prepareSecondFactorVerification({
+                strategy: 'phone_code',
+                phoneNumberId: method.phoneNumberId,
+              })
+            : await session.prepareFirstFactorVerification({
+                strategy: 'phone_code',
+                phoneNumberId: method.phoneNumberId,
+              });
+      const verification =
+        method.stage === 'first' ? resource.firstFactorVerification : resource.secondFactorVerification;
+      const expiresAt = verification.expireAt?.getTime();
+      const reusableUntil =
+        verification.status === 'unverified' &&
+        verification.strategy === method.strategy &&
+        expiresAt !== undefined &&
+        Number.isFinite(expiresAt) &&
+        expiresAt > Date.now()
+          ? expiresAt
+          : null;
+      return { reusableUntil };
     },
     attempt: async (method, value) => {
       switch (method.strategy) {

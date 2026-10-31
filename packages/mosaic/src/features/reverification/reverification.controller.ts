@@ -1,22 +1,24 @@
 import { isClerkRuntimeError } from '@clerk/shared/error';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
+import { useNow } from '../../hooks/use-now';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, ErrorInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { toLocalizableError } from '../../utils/errors';
-import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
+import type { ReverificationActiveModel, ReverificationModel, ReverificationScope } from './reverification.model';
 import type {
   ReverificationErrorReason,
   ReverificationMethod,
+  ReverificationPreparableMethod,
   ReverificationResult,
   ReverificationStep,
   ReverificationViewProps,
 } from './reverification.types';
-import { needsPrepare, otpChannelFor } from './reverification.utils';
+import { invalidatesPreparedCode, needsPrepare, otpChannelFor } from './reverification.utils';
 
 type ReverificationControllerState =
   | { status: 'idle'; onCancel?: undefined }
@@ -38,7 +40,26 @@ type Overlay = Extract<ReverificationStep, 'method-picker' | 'help'>;
 
 export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prepare' | 'attempt' | 'finish'>;
 
+type RetainedPreparation = {
+  method: ReverificationPreparableMethod;
+  expiresAt: number;
+  resendAvailableAt: number;
+};
+
+type PreparationSettlement = {
+  method: ReverificationPreparableMethod;
+  resendAvailableAt: number;
+} & ({ status: 'sent'; reusableUntil: number | null } | { status: 'failed'; error: unknown });
+
+type Operation =
+  | { kind: 'result'; promise: Promise<ReverificationResult> }
+  | { kind: 'prepare'; promise: Promise<PreparationSettlement> }
+  | { kind: 'finish'; promise: Promise<void> };
+
 interface ReverificationContext {
+  scope: ReverificationScope | null;
+  retainedPreparation: RetainedPreparation | null;
+  operation: Operation | null;
   inputValue: string;
   error: ErrorDescription | undefined;
   direction: FlowDirection;
@@ -53,7 +74,7 @@ interface ReverificationContext {
 }
 
 type ReverificationEvent =
-  | { type: 'START' }
+  | { type: 'START'; scope: ReverificationScope }
   | { type: 'RESET' }
   | { type: 'TYPE'; value: string }
   | { type: 'SUBMIT' }
@@ -78,10 +99,6 @@ const unseatedDeps: ReverificationDeps = {
 
 export const RESEND_COOLDOWN_MS = 30_000;
 
-function lockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
-  return { resendAvailableAt: Date.now() + RESEND_COOLDOWN_MS };
-}
-
 function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
   return { resendAvailableAt: undefined };
 }
@@ -90,19 +107,11 @@ function isPasskeyAbortedError(error: unknown): boolean {
   return isClerkRuntimeError(error) && error.code === 'passkey_operation_aborted';
 }
 
-function selectMethod(ctx: ReverificationContext, id: string): Partial<ReverificationContext> {
-  return {
-    activeMethod: ctx.methods.find(method => method.id === id) ?? ctx.activeMethod,
-    inputValue: '',
-    error: undefined,
-    direction: 1,
-    submitRequested: false,
-  };
-}
-
-function prepareActive(ctx: ReverificationContext) {
-  const method = ctx.activeMethod;
-  return method && needsPrepare(method) ? ctx.deps.prepare(method) : Promise.resolve();
+function resultPromise(ctx: ReverificationContext): Promise<ReverificationResult> {
+  if (ctx.operation?.kind !== 'result') {
+    throw new Error('Expected a reverification result operation');
+  }
+  return ctx.operation.promise;
 }
 
 function submit(ctx: ReverificationContext): Promise<ReverificationResult> {
@@ -113,7 +122,89 @@ function submit(ctx: ReverificationContext): Promise<ReverificationResult> {
   return ctx.deps.attempt(method, ctx.inputValue);
 }
 
+function sameMethod(a: ReverificationMethod | null, b: ReverificationMethod | null): boolean {
+  return Boolean(a && b && a.stage === b.stage && a.strategy === b.strategy && a.id === b.id);
+}
+
+function beginPreparation(ctx: ReverificationContext): Partial<ReverificationContext> {
+  const method = ctx.activeMethod;
+  if (!method || !needsPrepare(method)) {
+    throw new Error('Expected a preparable reverification method');
+  }
+  const resendAvailableAt = Date.now() + RESEND_COOLDOWN_MS;
+  const promise = ctx.deps.prepare(method).then<PreparationSettlement, PreparationSettlement>(
+    result => ({ status: 'sent', method, resendAvailableAt, ...result }),
+    (error: unknown) => ({ status: 'failed', method, resendAvailableAt, error }),
+  );
+  return {
+    retainedPreparation: null,
+    resendAvailableAt,
+    operation: { kind: 'prepare', promise },
+  };
+}
+
+function sameScope(a: ReverificationScope | null, b: ReverificationScope | null): boolean {
+  return a?.runId === b?.runId && a?.sessionId === b?.sessionId;
+}
+
+function clearRun(): Partial<ReverificationContext> {
+  return {
+    scope: null,
+    retainedPreparation: null,
+    activeMethod: null,
+    methods: [],
+    inputValue: '',
+    error: undefined,
+    submitRequested: false,
+    overlay: [],
+    frozenActiveMethodId: undefined,
+    ...unlockResend(),
+  };
+}
+
+const bindRun = assign<Extract<ReverificationEvent, { type: 'START' }>>((_, event) => ({
+  ...clearRun(),
+  scope: event.scope,
+}));
+const runEvents = {
+  RESET: 'inactive',
+  START: { target: 'starting', actions: bindRun },
+} as const;
+const interruptionEvents = {
+  RESET: { target: 'draining', actions: assign(clearRun) },
+  START: { target: 'draining', actions: bindRun },
+} as const;
+const clearOperation = assign(() => ({ operation: null }));
+const resumeRun = ({ context }: { context: ReverificationContext }) => ({
+  target: context.scope ? ('starting' as const) : ('inactive' as const),
+});
+
+function settlePreparation(ctx: ReverificationContext, result: PreparationSettlement) {
+  const method = ctx.activeMethod;
+  if (method && needsPrepare(method) && !sameMethod(method, result.method)) {
+    return { target: 'preparing' as const };
+  }
+  const matches = sameMethod(method, result.method);
+  return {
+    target:
+      ctx.submitRequested && (result.status === 'sent' || !matches) ? ('submitting' as const) : ('verifying' as const),
+    context: {
+      operation: null,
+      retainedPreparation:
+        result.status === 'sent' && result.reusableUntil !== null
+          ? { method: result.method, expiresAt: result.reusableUntil, resendAvailableAt: result.resendAvailableAt }
+          : null,
+      resendAvailableAt: result.status === 'sent' ? result.resendAvailableAt : undefined,
+      overlay: pendingPicker(ctx) ? [] : ctx.overlay,
+      error: matches && result.status === 'failed' ? toLocalizableError(result.error) : ctx.error,
+      submitRequested: false,
+    },
+  };
+}
+
 const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => ({
+  operation: null,
+  retainedPreparation: null,
   methods: event.output.methods,
   activeMethod: event.output.startingMethod,
   inputValue: '',
@@ -140,13 +231,21 @@ const afterResult = [
       return Boolean(method && needsPrepare(method));
     },
     target: 'preparing' as const,
-    actions: [applyResult, assign(() => lockResend())],
+    actions: applyResult,
   },
   { target: 'verifying' as const, actions: applyResult },
 ];
 
 function topOverlay(ctx: ReverificationContext): Overlay | undefined {
   return ctx.overlay[ctx.overlay.length - 1];
+}
+
+function pendingPicker(ctx: ReverificationContext): boolean {
+  return (
+    ctx.operation?.kind === 'prepare' &&
+    topOverlay(ctx) === 'method-picker' &&
+    ctx.activeMethod?.id !== ctx.frozenActiveMethodId
+  );
 }
 
 const factorEvents = {
@@ -164,7 +263,7 @@ const factorEvents = {
     })),
   },
   SHOW_HELP: {
-    guard: ctx => topOverlay(ctx) !== 'help',
+    guard: ctx => topOverlay(ctx) !== 'help' && !pendingPicker(ctx),
     actions: assign(ctx => ({
       overlay: [...ctx.overlay, 'help' as const],
       direction: 1 as const,
@@ -172,31 +271,49 @@ const factorEvents = {
     })),
   },
   BACK: {
-    guard: ctx => ctx.overlay.length > 0,
+    guard: ctx => ctx.overlay.length > 0 && !pendingPicker(ctx),
     actions: assign(ctx => ({ overlay: ctx.overlay.slice(0, -1), direction: -1 as const })),
   },
-  SELECT_METHOD: [
-    {
-      target: 'methodPickerPreparing',
-      guard: (ctx, event) => {
-        const method = ctx.methods.find(candidate => candidate.id === event.id);
-        return topOverlay(ctx) === 'method-picker' && Boolean(method && needsPrepare(method));
+  SELECT_METHOD: ({ context: ctx, event }) => {
+    if (topOverlay(ctx) !== 'method-picker') {
+      return;
+    }
+    const method = ctx.methods.find(candidate => candidate.id === event.id);
+    if (!method) {
+      return;
+    }
+    const selection = {
+      activeMethod: method,
+      inputValue: '',
+      error: undefined,
+      direction: 1 as const,
+      submitRequested: false,
+    };
+    if (ctx.operation?.kind === 'prepare') {
+      return { context: { ...selection, overlay: needsPrepare(method) ? ctx.overlay : [] } };
+    }
+    const retained = ctx.retainedPreparation;
+    const reusable = retained && sameMethod(method, retained.method) && retained.expiresAt > Date.now();
+    const prepare = needsPrepare(method) && !reusable;
+    return {
+      target: prepare ? 'preparing' : 'verifying',
+      context: {
+        ...selection,
+        overlay: prepare ? ctx.overlay : [],
+        resendAvailableAt: reusable ? retained.resendAvailableAt : ctx.resendAvailableAt,
       },
-      actions: assign((ctx, event) => selectMethod(ctx, event.id)),
-    },
-    {
-      target: 'verifying',
-      guard: ctx => topOverlay(ctx) === 'method-picker',
-      actions: assign((ctx, event) => ({ ...selectMethod(ctx, event.id), overlay: [] })),
-    },
-  ],
-  RESET: 'inactive',
+    };
+  },
+  ...runEvents,
 } satisfies NonNullable<StateConfig<ReverificationContext, ReverificationEvent>['on']>;
 
 export const reverificationMachine = createMachine({
   id: 'reverification',
   initial: 'inactive',
   context: {
+    scope: null,
+    retainedPreparation: null,
+    operation: null,
     inputValue: '',
     error: undefined,
     direction: 1,
@@ -211,74 +328,39 @@ export const reverificationMachine = createMachine({
   },
   states: {
     inactive: {
-      entry: assign(() => ({
-        inputValue: '',
-        error: undefined,
-        submitRequested: false,
-        overlay: [],
-        ...unlockResend(),
-      })),
-      on: { START: 'starting' },
+      entry: assign(() => ({ ...clearRun(), operation: null })),
+      on: { START: { target: 'starting', actions: bindRun } },
     },
 
     starting: {
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(ctx => ctx.deps.start(), {
+      entry: assign(ctx => ({ operation: { kind: 'result', promise: ctx.deps.start() } })),
+      on: interruptionEvents,
+      invoke: fromPromise(resultPromise, {
         onDone: afterResult,
-        onError: 'failed',
+        onError: { target: 'failed', actions: clearOperation },
       }),
     },
 
-    /*
-      Preparing a factor behind the scenes (e.g. sending an OTP)
-
-      This shows the factor card with optimistic UI, so it needs to handle the same actions
-      as verifying, but if the user submits, we queue that up until after prepare resolves
-    */
     preparing: {
+      entry: assign(beginPreparation),
       on: {
         ...factorEvents,
+        ...interruptionEvents,
         SUBMIT: {
           guard: ctx => ctx.overlay.length === 0,
           actions: assign(() => ({ submitRequested: true })),
         },
       },
-      invoke: fromPromise(prepareActive, {
-        onDone: [
-          {
-            guard: (ctx: ReverificationContext) => ctx.submitRequested,
-            target: 'submitting' as const,
-            actions: assign(() => ({ submitRequested: false })),
-          },
-          { target: 'verifying' as const },
-        ],
-        onError: {
-          target: 'verifying',
-          actions: assign((_, event) => ({
-            error: toLocalizableError(event.error),
-            submitRequested: false,
-            ...unlockResend(),
-          })),
+      invoke: fromPromise(
+        ctx => {
+          const operation = ctx.operation;
+          if (operation?.kind !== 'prepare') {
+            throw new Error('Expected preparation');
+          }
+          return operation.promise;
         },
-      }),
-    },
-
-    /*
-      When selecting a method from the picker, we prepare before going to the factor card
-
-      We don't use optimistic UI here simply because we're in a better position to show
-      some feedback that does not feel janky. The view handles disabling inputs while preparing.
-    */
-    methodPickerPreparing: {
-      entry: assign(() => lockResend()),
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(prepareActive, {
-        onDone: { target: 'verifying', actions: assign(() => ({ overlay: [] })) },
-        onError: {
-          target: 'verifying',
-          actions: assign((_, event) => ({ error: toLocalizableError(event.error), overlay: [], ...unlockResend() })),
-        },
-      }),
+        { onDone: ({ context, event }) => settlePreparation(context, event.output) },
+      ),
     },
 
     verifying: {
@@ -293,7 +375,6 @@ export const reverificationMachine = createMachine({
             Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod)) &&
             (ctx.resendAvailableAt === undefined || Date.now() >= ctx.resendAvailableAt),
           actions: assign(() => ({
-            ...lockResend(),
             inputValue: '',
             error: undefined,
             submitRequested: false,
@@ -303,43 +384,74 @@ export const reverificationMachine = createMachine({
     },
 
     submitting: {
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(submit, {
+      entry: assign(ctx => ({
+        operation: { kind: 'result', promise: submit(ctx) },
+        retainedPreparation:
+          ctx.activeMethod && !invalidatesPreparedCode(ctx.activeMethod) ? ctx.retainedPreparation : null,
+      })),
+      on: interruptionEvents,
+      invoke: fromPromise(resultPromise, {
         onDone: afterResult,
         onError: [
           {
             guard: (_: ReverificationContext, event: ErrorInvokeEvent) => isPasskeyAbortedError(event.error),
             target: 'verifying',
-            actions: assign(() => ({ error: undefined })),
+            actions: assign(() => ({ operation: null, error: undefined })),
           },
           {
             target: 'verifying',
-            actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
+            actions: assign((_, event) => ({ operation: null, error: toLocalizableError(event.error) })),
           },
         ],
       }),
     },
 
     unavailable: {
-      on: { RESET: 'inactive' },
+      on: runEvents,
     },
 
     failed: {
-      on: { RESET: 'inactive' },
+      on: runEvents,
     },
 
     finishing: {
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(ctx => ctx.deps.finish(), {
-        onDone: 'retrying',
-        onError: 'failed',
-      }),
+      entry: assign(ctx => ({ retainedPreparation: null, operation: { kind: 'finish', promise: ctx.deps.finish() } })),
+      on: interruptionEvents,
+      invoke: fromPromise(
+        ctx => {
+          const operation = ctx.operation;
+          if (operation?.kind !== 'finish') {
+            throw new Error('Expected finishing operation');
+          }
+          return operation.promise;
+        },
+        {
+          onDone: { target: 'retrying', actions: clearOperation },
+          onError: { target: 'failed', actions: clearOperation },
+        },
+      ),
+    },
+
+    draining: {
+      on: {
+        RESET: { actions: assign(clearRun) },
+        START: { actions: bindRun },
+      },
+      invoke: fromPromise<unknown>(
+        ctx => {
+          if (!ctx.operation) {
+            throw new Error('Expected an operation to drain');
+          }
+          return ctx.operation.promise;
+        },
+        { onDone: resumeRun, onError: resumeRun },
+      ),
     },
 
     // This means we are retrying the action after successful reverification
     // This state is left by the model returning to inactive once the retry has completed
     retrying: {
-      on: { RESET: 'inactive' },
+      on: runEvents,
     },
   },
 });
@@ -427,34 +539,26 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       : undefined,
   );
 
-  const [now, setNow] = useState(() => Date.now());
   const resendAvailableAt = snapshot.context.resendAvailableAt;
+  const now = useNow({ updateInterval: resendAvailableAt === undefined ? undefined : 1000 }).getTime();
   const canResend = resendAvailableAt === undefined || now >= resendAvailableAt;
   const countingDown = !canResend;
-
-  useEffect(() => {
-    if (!countingDown) {
-      return;
-    }
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, [countingDown, resendAvailableAt]);
 
   const cancelModel =
     (model.status === 'loading' || model.status === 'active') && snapshot.value !== 'retrying'
       ? model.cancel
       : undefined;
   const onCancel = cancelModel;
-  const needsStart = active !== null && snapshot.value === 'inactive';
-  const needsReset = model.status === 'inactive' && snapshot.value !== 'inactive';
+  const needsStart = active !== null && !sameScope(active.scope, snapshot.context.scope);
+  const needsReset = model.status === 'inactive' && snapshot.context.scope !== null;
   /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Syncs the machine with the model status, which changes outside this component. */
   useEffect(() => {
-    if (needsStart) {
-      send({ type: 'START' });
+    if (needsStart && active) {
+      send({ type: 'START', scope: active.scope });
     } else if (needsReset) {
       send({ type: 'RESET' });
     }
-  }, [needsStart, needsReset, send]);
+  }, [needsStart, needsReset, active, send]);
   /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   const inactive = model.status === 'inactive';
@@ -484,9 +588,10 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
 
     // If we are currently on the alternative methods screen and preparing a factor, activeMethod will
     // have transitioned to the factor we are now preparing, so the one we want to hide is the old one
-    const excludeId = state === 'methodPickerPreparing' ? context.frozenActiveMethodId : activeMethod?.id;
+    const isPendingPicker = pendingPicker(context);
+    const excludeId = isPendingPicker ? context.frozenActiveMethodId : activeMethod?.id;
     const methods = context.methods.filter(method => method.id !== excludeId);
-    const pendingMethodId = state === 'methodPickerPreparing' ? activeMethod?.id : undefined;
+    const pendingMethodId = isPendingPicker ? activeMethod?.id : undefined;
 
     const view: ReverificationViewProps = {
       step,
@@ -510,12 +615,6 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
       onResend: () => send({ type: 'RESEND' }),
       canResend,
-      // We clamp this to 30s because the first render after locking resend
-      // will have the old `now` state set, which would result in a value above
-      // 30s. There are other solutions like reading Date.now() in render and
-      // letting the interval only retrigger render, but that makes the render
-      // impure which is something the React compiler would warn about.
-      // useSyncExternalStore feels unnecessarily complex here
       resendRemainingSeconds:
         countingDown && resendAvailableAt
           ? Math.min(RESEND_COOLDOWN_MS / 1000, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
