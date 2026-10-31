@@ -426,6 +426,10 @@ jobs:
         run: pnpm turbo build $TURBO_ARGS --filter=@clerk/mosaic...
 
       - name: Run feature tests
+        env:
+          VITEST_BROWSER_DEBUG: 'true'
+          VITEST_PW_DEBUG: '1'
+          DEBUG: 'vitest:browser:gc'
         run: pnpm --filter @clerk/mosaic test:feature
 
       - name: Run browser tests
