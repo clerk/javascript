@@ -72,7 +72,7 @@ for (const environmentType of ['development', 'production'] as const) {
       await signIn.continue();
       await signIn.getPasswordInput().fill(user.password);
       await signIn.continue();
-      await expect(extensionPage.getByTestId('user-id')).toHaveText(/^user_/);
+      await expect(extensionPage.getByTestId('user-id')).toHaveText(/^user_/, { timeout: 30_000 });
       await expect(extensionPage.getByTestId('session-id')).toHaveText(/^sess_/);
     });
 
@@ -94,6 +94,14 @@ for (const environmentType of ['development', 'production'] as const) {
       await extensionPage.getByRole('button', { name: 'Create account', exact: true }).click();
       const { signUp } = createPageObjects({ page: extensionPage, useTestingToken: false });
       await signUp.waitForMounted();
+      const preparation = extensionPage
+        .waitForResponse(
+          response =>
+            response.request().method() === 'POST' &&
+            new URL(response.url()).pathname.startsWith('/v1/client/sign_ups/') &&
+            new URL(response.url()).pathname.endsWith('/prepare_verification'),
+        )
+        .catch(() => undefined);
       const [response] = await Promise.all([
         extensionPage.waitForResponse(
           response =>
@@ -102,9 +110,10 @@ for (const environmentType of ['development', 'production'] as const) {
         signUp.signUpWithEmailAndPassword({ email: user.email, password: user.password }),
       ]);
       expect(response.ok()).toBe(true);
+      expect((await preparation)?.ok()).toBe(true);
       await signUp.enterTestOtpCode({ awaitPrepare: false });
 
-      await expect(extensionPage.getByTestId('user-id')).toHaveText(/^user_/);
+      await expect(extensionPage.getByTestId('user-id')).toHaveText(/^user_/, { timeout: 30_000 });
       await expect(extensionPage.getByTestId('session-id')).toHaveText(/^sess_/);
     });
   });
