@@ -262,6 +262,18 @@ describe('useUserProfileAddEmailController', () => {
     await waitFor(() => expect(email.start).toHaveBeenCalledTimes(2));
   });
 
+  it('tells the user when sending fails with a save that carries no errors', async () => {
+    const email = verifier(() => ({ method: 'code', sent: Promise.reject(new SaveError({})) }));
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: created }),
+    );
+
+    act(() => result.current.onVerifyEmail(other, email));
+    await waitFor(() => expect(result.current.open).toBe(true));
+    expect(result.current.step).toBe('verify');
+    expect(result.current.errorMessage).toBe('Something went wrong. Please try again.');
+  });
+
   it('shows the error for the field that failed', async () => {
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({

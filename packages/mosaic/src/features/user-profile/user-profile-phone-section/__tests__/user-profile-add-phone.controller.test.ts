@@ -1,6 +1,8 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { save } from '../../../../utils/errors';
 import { useUserProfileAddPhoneController } from '../user-profile-add-phone.controller';
 
 const sendCode = vi.fn(() => Promise.resolve());
@@ -75,5 +77,15 @@ describe('useUserProfileAddPhoneController', () => {
     });
     expect(sendCode).toHaveBeenCalledTimes(2);
     expect(result.current.resendSeconds).toBe(30);
+  });
+
+  it('tells the user when sending a code fails with a Clerk response that carries no errors', async () => {
+    const empty = new ClerkAPIResponseError('Server error', { status: 500, data: [] });
+    sendCode.mockImplementationOnce(() => save(() => Promise.reject(empty)));
+
+    const result = await sendFirstCode();
+
+    expect(result.current.step).toBe('verify');
+    expect(result.current.errorMessage).toBe('Something went wrong. Please try again.');
   });
 });
