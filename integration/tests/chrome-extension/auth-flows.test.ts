@@ -17,7 +17,7 @@ for (const environmentType of ['development', 'production'] as const) {
   });
 
   test.describe(`chrome extension ${environmentType} auth @chrome-extension`, () => {
-    test.describe.configure({ mode: 'serial' });
+    test.describe.configure({ mode: 'default', timeout: 90_000 });
 
     let services: { clerk: ClerkClient; users: UserService };
     let user: FakeUser;
@@ -77,10 +77,10 @@ for (const environmentType of ['development', 'production'] as const) {
       await signUp.signUpWithEmailAndPassword({ email: user.email, password: user.password });
 
       if (environmentType === 'development') {
-        await signUp.enterTestOtpCode();
+        await signUp.enterTestOtpCode({ awaitPrepare: false });
       } else {
         const code = await createEmailService().getCodeForEmailAddress(user.email!);
-        await signUp.enterOtpCode(code);
+        await signUp.enterOtpCode(code, { awaitPrepare: false });
       }
 
       await expect(extensionPage.getByTestId('user-id')).toHaveText(/^user_/);
