@@ -598,7 +598,9 @@ export class Clerk implements ClerkInterface {
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
-    this.#protect = new Protect();
+    if (!__BUILD_DISABLE_RHC__) {
+      this.#protect = new Protect();
+    }
   }
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
