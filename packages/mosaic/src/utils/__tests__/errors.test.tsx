@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { isLocalizableError, MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../localization';
-import { save, SaveError, toLocalizableError } from '../errors';
+import { save, SaveError, toFormError, toLocalizableError, UNEXPECTED_ERROR } from '../errors';
 
 function errorText() {
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -29,6 +29,12 @@ describe('save', () => {
   it('lets a cancelled reverification through untouched, so the dialog can close quietly', async () => {
     const cause = new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' });
     await expect(save(() => Promise.reject(cause))).rejects.toBe(cause);
+  });
+});
+
+describe('toFormError', () => {
+  it('reads a save that carried nothing as the generic error', () => {
+    expect(toFormError(new SaveError({})).global).toEqual(UNEXPECTED_ERROR);
   });
 });
 
