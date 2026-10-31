@@ -4,7 +4,11 @@ import { deferred, tick } from '../../../__tests__/async';
 import { createActor } from '../../../machine/create-actor';
 import { type ReverificationDeps, reverificationMachine } from '../reverification.controller';
 import type { ReverificationPreparation } from '../reverification.model';
-import type { ReverificationPreparableMethod } from '../reverification.types';
+import type {
+  ReverificationMethod,
+  ReverificationPreparableMethod,
+  ReverificationResult,
+} from '../reverification.types';
 
 const email: ReverificationPreparableMethod = {
   id: 'email_code:alice',
@@ -23,9 +27,11 @@ const work: ReverificationPreparableMethod = {
 
 function deps(): ReverificationDeps {
   return {
-    start: vi.fn(async () => ({ status: 'needs_first_factor', methods: [email, work], startingMethod: email })),
-    prepare: vi.fn(async () => ({ status: 'unverified', strategy: 'email_code', expiresAt: Date.now() + 60_000 })),
-    attempt: vi.fn(async () => ({ status: 'complete', methods: [], startingMethod: null })),
+    start: vi.fn(() =>
+      Promise.resolve({ status: 'needs_first_factor', methods: [email, work], startingMethod: email }),
+    ),
+    prepare: vi.fn(() => Promise.resolve({ reusableUntil: Date.now() + 60_000 })),
+    attempt: vi.fn(() => Promise.resolve({ status: 'complete', methods: [], startingMethod: null })),
     finish: vi.fn(async () => {}),
   };
 }
@@ -36,8 +42,7 @@ describe('reverification operation ordering', () => {
     const actor = createActor(reverificationMachine, {
       snapshot: { value, context: { deps: effects, scope: { runId: Symbol(), sessionId: 'session' } } },
     }).start();
-    actor.setContext({ requestedScope: { runId: Symbol(), sessionId: 'session' } });
-    actor.send({ type: 'START' });
+    actor.send({ type: 'START', scope: { runId: Symbol(), sessionId: 'session' } });
     await tick();
     expect(effects.start).toHaveBeenCalledOnce();
     actor.stop();
@@ -45,17 +50,22 @@ describe('reverification operation ordering', () => {
 
   it('coalesces A to B to A selections while A is pending', async () => {
     const effects = deps();
+    const password: ReverificationMethod = { id: 'password', stage: 'first', strategy: 'password' };
+    effects.start = vi.fn(() =>
+      Promise.resolve({ status: 'needs_first_factor', methods: [password, email, work], startingMethod: password }),
+    );
     const pending = deferred<ReverificationPreparation>();
     effects.prepare = vi.fn(() => pending.promise);
     const actor = createActor(reverificationMachine, {
-      context: { deps: effects, requestedScope: { runId: Symbol(), sessionId: 'session' } },
+      context: { deps: effects },
     }).start();
-    actor.send({ type: 'START' });
+    actor.send({ type: 'START', scope: { runId: Symbol(), sessionId: 'session' } });
     await tick();
     actor.send({ type: 'SHOW_METHODS' });
+    actor.send({ type: 'SELECT_METHOD', id: email.id });
     actor.send({ type: 'SELECT_METHOD', id: work.id });
     actor.send({ type: 'SELECT_METHOD', id: email.id });
-    pending.resolve({ status: 'unverified', strategy: 'email_code', expiresAt: Date.now() + 60_000 });
+    pending.resolve({ reusableUntil: Date.now() + 60_000 });
     await tick();
     expect(effects.prepare).toHaveBeenCalledExactlyOnceWith(email);
     actor.send({ type: 'TYPE', value: '123456' });
@@ -65,3 +75,151 @@ describe('reverification operation ordering', () => {
     actor.stop();
   });
 });
+
+describe('reverification interrupted requests', () => {
+  it.each(['start', 'prepare', 'attempt', 'finish'] as const)(
+    'waits for an interrupted %s before starting the latest run',
+    async operation => {
+      for (const fails of [false, true]) {
+        const effects = deps();
+        const result = deferred<ReverificationResult>();
+        const preparation = deferred<ReverificationPreparation>();
+        const finish = deferred<void>();
+        if (operation === 'start') {
+          effects.start = vi.fn(() => result.promise);
+        }
+        if (operation === 'prepare') {
+          effects.prepare = vi.fn(() => preparation.promise);
+        }
+        if (operation === 'attempt') {
+          effects.attempt = vi.fn(() => result.promise);
+        }
+        if (operation === 'finish') {
+          effects.finish = vi.fn(() => finish.promise);
+        }
+        const actor = createActor(reverificationMachine, { context: { deps: effects } }).start();
+        const start = () => {
+          const scope = { runId: Symbol(), sessionId: 'session' };
+          actor.send({ type: 'START', scope });
+          return scope;
+        };
+        start();
+        await tick();
+        if (operation === 'attempt' || operation === 'finish') {
+          actor.send({ type: 'SUBMIT' });
+          await tick();
+        }
+        actor.send({ type: 'RESET' });
+        start();
+        actor.send({ type: 'RESET' });
+        const latest = start();
+        await tick();
+        expect(effects.start).toHaveBeenCalledOnce();
+        const nextStart = vi.fn(deps().start);
+        actor.setContext({ deps: { ...deps(), start: nextStart } });
+        if (operation === 'prepare') {
+          if (fails) {
+            preparation.reject(new Error('stale prepare'));
+          } else {
+            preparation.resolve({ reusableUntil: Date.now() + 60_000 });
+          }
+        } else if (operation === 'finish') {
+          if (fails) {
+            finish.reject(new Error('stale finish'));
+          } else {
+            finish.resolve();
+          }
+        } else {
+          if (fails) {
+            result.reject(new Error('stale result'));
+          } else {
+            result.resolve({ status: 'complete', methods: [], startingMethod: null });
+          }
+        }
+        await tick();
+        expect(nextStart).toHaveBeenCalledOnce();
+        expect(actor.getSnapshot().context.scope).toBe(latest);
+        expect(actor.getSnapshot().context.error).toBeUndefined();
+        expect(effects.finish).toHaveBeenCalledTimes(operation === 'finish' ? 1 : 0);
+        actor.stop();
+      }
+    },
+  );
+
+  it('checking whether a method can be selected never sends a code', async () => {
+    const effects = deps();
+    const actor = createActor(reverificationMachine, { context: { deps: effects } }).start();
+    actor.send({ type: 'START', scope: { runId: Symbol(), sessionId: 'session' } });
+    await tick();
+    actor.send({ type: 'SHOW_METHODS' });
+    expect(actor.can({ type: 'SELECT_METHOD', id: work.id })).toBe(true);
+    expect(actor.can({ type: 'SELECT_METHOD', id: work.id })).toBe(true);
+    expect(effects.prepare).toHaveBeenCalledExactlyOnceWith(email);
+    actor.stop();
+  });
+});
+
+describe('reverification preparation overlays', () => {
+  it('blocks leaving a pending picker and preserves help opened over the factor', async () => {
+    const effects = deps();
+    const pending = deferred<ReverificationPreparation>();
+    effects.prepare = vi.fn(() => pending.promise);
+    const actor = createActor(reverificationMachine, { context: { deps: effects } }).start();
+    actor.send({ type: 'START', scope: { runId: Symbol(), sessionId: 'session' } });
+    await tick();
+    actor.send({ type: 'SHOW_HELP' });
+    expect(actor.getSnapshot().context.overlay).toEqual(['help']);
+    expect(actor.can({ type: 'BACK' })).toBe(true);
+    actor.send({ type: 'BACK' });
+    actor.send({ type: 'SHOW_METHODS' });
+    actor.send({ type: 'SELECT_METHOD', id: work.id });
+    expect(actor.can({ type: 'BACK' })).toBe(false);
+    expect(actor.can({ type: 'SHOW_HELP' })).toBe(false);
+    actor.send({ type: 'BACK' });
+    actor.send({ type: 'SHOW_HELP' });
+    expect(actor.getSnapshot().context.overlay).toEqual(['method-picker']);
+    actor.stop();
+  });
+
+  it('keeps help visible when the send behind it settles', async () => {
+    const effects = deps();
+    const pending = deferred<ReverificationPreparation>();
+    effects.prepare = vi.fn(() => pending.promise);
+    const actor = createActor(reverificationMachine, { context: { deps: effects } }).start();
+    actor.send({ type: 'START', scope: { runId: Symbol(), sessionId: 'session' } });
+    await tick();
+    actor.send({ type: 'SHOW_HELP' });
+    pending.resolve({ reusableUntil: Date.now() + 60_000 });
+    await tick();
+    expect(actor.getSnapshot().context.overlay).toEqual(['help']);
+    expect(actor.getSnapshot().context.operation).toBeNull();
+    actor.send({ type: 'BACK' });
+    expect(actor.getSnapshot().context.overlay).toEqual([]);
+    actor.stop();
+  });
+});
+
+it.each([false, true])(
+  'keeps a picker opened over the original pending factor when the send settles (failure %s)',
+  async fails => {
+    const effects = deps();
+    const pending = deferred<ReverificationPreparation>();
+    effects.prepare = vi.fn(() => pending.promise);
+    const actor = createActor(reverificationMachine, { context: { deps: effects } }).start();
+    actor.send({ type: 'START', scope: { runId: Symbol(), sessionId: 'session' } });
+    await tick();
+    actor.send({ type: 'SHOW_METHODS' });
+    expect(actor.can({ type: 'BACK' })).toBe(true);
+    expect(actor.can({ type: 'SHOW_HELP' })).toBe(true);
+    if (fails) {
+      pending.reject({ code: 'form_identifier_not_found', message: 'Unknown identifier' });
+    } else {
+      pending.resolve({ reusableUntil: Date.now() + 60_000 });
+    }
+    await tick();
+    expect(actor.getSnapshot().context.overlay).toEqual(['method-picker']);
+    actor.send({ type: 'BACK' });
+    expect(actor.getSnapshot().context.overlay).toEqual([]);
+    actor.stop();
+  },
+);
