@@ -822,9 +822,11 @@ describe('Reverification', () => {
         await useAnotherMethod(user);
         const second = holdRequests('post', PREPARE_FIRST);
         await user.click(await screen.findByRole('button', { name: 'Email code to alice@work.example' }));
-        await waitFor(() => expect(second.requests).toHaveLength(1));
+        await settle();
+        expect(second.requests).toHaveLength(0);
 
         prepare.fail('preparation_failed', 'Could not send your code');
+        await waitFor(() => expect(second.requests).toHaveLength(1));
         await settle();
         expect(screen.getByRole('button', { name: 'Email code to alice@work.example' })).toBeVisible();
         expect(screen.queryByText('Could not send your code')).toBeNull();
@@ -846,10 +848,12 @@ describe('Reverification', () => {
 
         const next = holdRequests('post', PREPARE_FIRST);
         await user.click(screen.getByRole('button', { name: 'Run action' }));
-        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
-        await waitFor(() => expect(next.requests).toHaveLength(1));
+        await settle();
+        expect(next.requests).toHaveLength(0);
 
         prepare.fail('preparation_failed', 'Could not send your code');
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        await waitFor(() => expect(next.requests).toHaveLength(1));
         await settle();
         expect(screen.getByText(STEP.emailCode)).toBeVisible();
         expect(screen.queryByText('Could not send your code')).toBeNull();
@@ -1239,14 +1243,11 @@ describe('Reverification', () => {
       expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(firstPrepare.requests).toHaveLength(1);
 
-      // Picking an email code shows a pending row and disables the other actions while the code is sent
       const secondPrepare = holdRequests('post', PREPARE_FIRST);
       await useAnotherMethod(user);
       await user.click(await screen.findByRole('button', { name: 'Email code to alice@example.com' }));
-      await waitFor(() => expect(secondPrepare.requests).toHaveLength(1));
-      expect(method('Send SMS code to +1 555 0100')).toBeDisabled();
-      expect(method('Back')).toBeDisabled();
-      secondPrepare.release();
+      await screen.findByRole('group', { name: 'Verification code' });
+      expect(secondPrepare.requests).toHaveLength(0);
 
       // The code step opens with an empty field and no error once the code is sent
       await screen.findByRole('group', { name: 'Verification code' });
@@ -1257,6 +1258,10 @@ describe('Reverification', () => {
       // Picking a phone code sends the SMS code through the first factor endpoints
       await useAnotherMethod(user);
       await user.click(await screen.findByRole('button', { name: 'Send SMS code to +1 555 0100' }));
+      await waitFor(() => expect(secondPrepare.requests).toHaveLength(1));
+      expect(method('Continue with your password')).toBeDisabled();
+      expect(method('Back')).toBeDisabled();
+      secondPrepare.release();
       expect(await screen.findByText(STEP.phoneCode)).toBeVisible();
       expect(fapi.verification.firstFactorVerification?.strategy).toBe('phone_code');
 
@@ -1636,14 +1641,12 @@ describe('Reverification', () => {
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
 
-      // The new challenge opens from the first step with empty fields
       await user.click(screen.getByRole('button', { name: 'Run action' }));
-      expect(await screen.findByText(STEP.password)).toBeVisible();
-      expect(passwordField()).toHaveValue('');
-      expect(passwordField()).toBeEnabled();
+      await settle();
+      expect(screen.queryByText(STEP.password)).toBeNull();
 
-      // The late response from the dismissed attempt has no effect
       attempt.release();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       await settle();
       expect(passwordField()).toHaveValue('');
       expect(passwordField()).toBeEnabled();
@@ -1714,10 +1717,14 @@ describe('Reverification', () => {
       await startVerification();
       expect(await screen.findByText(STEP.password)).toBeVisible();
 
+      const newStart = holdRequests('post', '/v1/client/sessions/sess_2/verify');
       await act(() => clerk.setActive({ session: 'sess_2' }));
 
       await untilClosed();
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await settle();
+      newStart.release();
+      expect(newStart.requests).toHaveLength(0);
     });
 
     it('keeps the challenge open while the session is briefly unset during a navigation', async () => {
