@@ -4,7 +4,6 @@ import type {
   SessionVerificationFirstFactor,
   SessionVerificationResource,
   SessionVerificationSecondFactor,
-  VerificationResource,
 } from '@clerk/shared/types';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
@@ -19,9 +18,7 @@ import type {
 } from './reverification.types';
 import { pickStartingMethod } from './reverification.utils';
 
-export type ReverificationPreparation = Pick<VerificationResource, 'status' | 'strategy'> & {
-  expiresAt: number | null;
-};
+export type ReverificationPreparation = { reusableUntil: number | null };
 
 export type ReverificationScope = { runId: symbol; sessionId: string };
 
@@ -171,11 +168,16 @@ export function useReverificationModel(reverificationState: ReverificationState)
               });
       const verification =
         method.stage === 'first' ? resource.firstFactorVerification : resource.secondFactorVerification;
-      return {
-        status: verification.status,
-        strategy: verification.strategy,
-        expiresAt: verification.expireAt?.getTime() ?? null,
-      };
+      const expiresAt = verification.expireAt?.getTime();
+      const reusableUntil =
+        verification.status === 'unverified' &&
+        verification.strategy === method.strategy &&
+        expiresAt !== undefined &&
+        Number.isFinite(expiresAt) &&
+        expiresAt > Date.now()
+          ? expiresAt
+          : null;
+      return { reusableUntil };
     },
     attempt: async (method, value) => {
       switch (method.strategy) {
