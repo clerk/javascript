@@ -1,7 +1,8 @@
 import { isClerkRuntimeError } from '@clerk/shared/error';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
+import { useNow } from '../../hooks/use-now';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
@@ -538,18 +539,10 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       : undefined,
   );
 
-  const [now, setNow] = useState(() => Date.now());
   const resendAvailableAt = snapshot.context.resendAvailableAt;
+  const now = useNow({ updateInterval: resendAvailableAt === undefined ? undefined : 1000 }).getTime();
   const canResend = resendAvailableAt === undefined || now >= resendAvailableAt;
   const countingDown = !canResend;
-
-  useEffect(() => {
-    if (!countingDown) {
-      return;
-    }
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, [countingDown, resendAvailableAt]);
 
   const cancelModel =
     (model.status === 'loading' || model.status === 'active') && snapshot.value !== 'retrying'
@@ -622,12 +615,6 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
       onResend: () => send({ type: 'RESEND' }),
       canResend,
-      // We clamp this to 30s because the first render after locking resend
-      // will have the old `now` state set, which would result in a value above
-      // 30s. There are other solutions like reading Date.now() in render and
-      // letting the interval only retrigger render, but that makes the render
-      // impure which is something the React compiler would warn about.
-      // useSyncExternalStore feels unnecessarily complex here
       resendRemainingSeconds:
         countingDown && resendAvailableAt
           ? Math.min(RESEND_COOLDOWN_MS / 1000, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
