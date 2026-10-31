@@ -695,28 +695,168 @@ describe('Reverification', () => {
       expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
     });
 
-    it('keeps a code delivery failure after returning from the method picker', async () => {
-      await renderReverification(
-        guardedAction(),
-        verificationSeed({ firstFactors: [emailFactor, passwordFactor] }, { environment: preferring('otp') }),
+    describe('when the user leaves the step while the code is being sent', () => {
+      async function startSendingCode(
+        firstFactors: SignInFirstFactorJSON[] = [emailFactor, passwordFactor],
+        action = guardedAction(),
+      ) {
+        await renderReverification(action, verificationSeed({ firstFactors }, { environment: preferring('otp') }));
+        const prepare = holdRequests('post', PREPARE_FIRST);
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+        return { prepare, user };
+      }
+
+      const back = (user: User) => user.click(screen.getByRole('button', { name: 'Back' }));
+
+      it.each(['picker', 'help'] as const)(
+        'shows a failure that arrives on the %s step once the user returns',
+        async step => {
+          const { prepare, user } = await startSendingCode();
+          await useAnotherMethod(user);
+          if (step === 'help') {
+            await user.click(await screen.findByRole('button', { name: 'Get help' }));
+            expect(await screen.findByText(/If you have trouble verifying your account/)).toBeVisible();
+          }
+
+          prepare.fail('preparation_failed', 'Could not send your code');
+          await settle();
+          if (step === 'help') {
+            expect(screen.getByText(/If you have trouble verifying your account/)).toBeVisible();
+            await back(user);
+          }
+          expect(await screen.findByRole('button', { name: 'Continue with your password' })).toBeVisible();
+          await back(user);
+
+          // The step shows the failure and the user can resend immediately
+          expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+          expect(await screen.findByText('Could not send your code')).toBeVisible();
+          expect(prepare.requests).toHaveLength(1);
+          const retry = holdRequests('post', PREPARE_FIRST);
+          await user.click(screen.getByRole('button', { name: /Resend/ }));
+          await waitFor(() => expect(retry.requests).toHaveLength(1));
+          expect(screen.queryByText('Could not send your code')).toBeNull();
+          expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+          retry.release();
+        },
       );
-      const prepare = holdRequests('post', PREPARE_FIRST);
-      const user = await startVerification();
-      await waitFor(() => expect(prepare.requests).toHaveLength(1));
-      await useAnotherMethod(user);
-      expect(await screen.findByRole('button', { name: 'Continue with your password' })).toBeVisible();
 
-      prepare.fail('preparation_failed', 'Could not send your code');
-      await settle();
-      await user.click(screen.getByRole('button', { name: 'Back' }));
+      it('keeps the cooldown of a code sent while the picker is open', async () => {
+        const { prepare, user } = await startSendingCode();
+        await useAnotherMethod(user);
 
-      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
-      expect(await screen.findByText('Could not send your code')).toBeVisible();
-      expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
-      const retry = holdRequests('post', PREPARE_FIRST);
-      await user.click(screen.getByRole('button', { name: /Resend/ }));
-      await waitFor(() => expect(retry.requests).toHaveLength(1));
-      retry.release();
+        prepare.release();
+        await settle();
+        expect(screen.getByRole('button', { name: 'Continue with your password' })).toBeVisible();
+        await back(user);
+
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+        expect(prepare.requests).toHaveLength(1);
+      });
+
+      it.each(['sent', 'not sent'] as const)(
+        'holds a submit made after returning from the picker until the code is %s',
+        async result => {
+          const { prepare, user } = await startSendingCode();
+          const attempt = holdRequests('post', ATTEMPT_FIRST);
+          await useAnotherMethod(user);
+          await back(user);
+          expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+
+          await pasteCode(user, CODE);
+          await settle();
+          expect(attempt.requests).toHaveLength(0);
+
+          if (result === 'sent') {
+            prepare.release();
+            await waitFor(() => expect(attempt.requests).toHaveLength(1));
+            attempt.release();
+            await untilResolved();
+          } else {
+            prepare.fail('preparation_failed', 'Could not send your code');
+            expect(await screen.findByText('Could not send your code')).toBeVisible();
+            expect(attempt.requests).toHaveLength(0);
+            expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
+            attempt.release();
+          }
+          expect(prepare.requests).toHaveLength(1);
+        },
+      );
+
+      it('drops a held submit when the user opens the picker', async () => {
+        const { prepare, user } = await startSendingCode();
+        const attempt = holdRequests('post', ATTEMPT_FIRST);
+        await pasteCode(user, CODE);
+        await useAnotherMethod(user);
+
+        prepare.release();
+        await settle();
+        expect(screen.getByRole('button', { name: 'Continue with your password' })).toBeVisible();
+        expect(attempt.requests).toHaveLength(0);
+
+        // The typed code is still there on return
+        await back(user);
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        expect(slotValues()).toEqual(CODE.split(''));
+        expect(attempt.requests).toHaveLength(0);
+        expect(prepare.requests).toHaveLength(1);
+        attempt.release();
+      });
+
+      it('ignores a late failure after the user picks the password', async () => {
+        const { prepare, user } = await startSendingCode();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Continue with your password' }));
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+
+        prepare.fail('preparation_failed', 'Could not send your code');
+        await settle();
+        expect(screen.getByText(STEP.password)).toBeVisible();
+        expect(screen.queryByText('Could not send your code')).toBeNull();
+      });
+
+      it('ignores a late failure after the user picks another email address', async () => {
+        const { prepare, user } = await startSendingCode([emailFactor, workEmailFactor]);
+        await useAnotherMethod(user);
+        const second = holdRequests('post', PREPARE_FIRST);
+        await user.click(await screen.findByRole('button', { name: 'Email code to alice@work.example' }));
+        await waitFor(() => expect(second.requests).toHaveLength(1));
+
+        prepare.fail('preparation_failed', 'Could not send your code');
+        await settle();
+        expect(screen.getByRole('button', { name: 'Email code to alice@work.example' })).toBeVisible();
+        expect(screen.queryByText('Could not send your code')).toBeNull();
+        expect(prepare.requests).toHaveLength(1);
+        expect(second.requests).toHaveLength(1);
+        second.release();
+      });
+
+      it('ignores a late failure after the challenge is dismissed from the picker and run again', async () => {
+        const action = vi
+          .fn()
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValueOnce(reverificationError());
+        const { prepare, user } = await startSendingCode(undefined, action);
+        await useAnotherMethod(user);
+        await dismiss(user);
+        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await untilClosed();
+
+        const next = holdRequests('post', PREPARE_FIRST);
+        await user.click(screen.getByRole('button', { name: 'Run action' }));
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        await waitFor(() => expect(next.requests).toHaveLength(1));
+
+        prepare.fail('preparation_failed', 'Could not send your code');
+        await settle();
+        expect(screen.getByText(STEP.emailCode)).toBeVisible();
+        expect(screen.queryByText('Could not send your code')).toBeNull();
+        expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+        expect(prepare.requests).toHaveLength(1);
+        next.release();
+      });
     });
 
     it('resends a code once the cooldown has passed', async () => {
