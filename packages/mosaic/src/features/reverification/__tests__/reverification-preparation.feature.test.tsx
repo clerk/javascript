@@ -4,14 +4,12 @@ import type { VerificationJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import type { FakeVerificationSeed } from '../../../__tests__/feature/fake-fapi/verification';
 import {
   fapiClient,
-  fapiEmailAddress,
   fapiEnvironment,
   fapiSession,
   fapiSessionVerification,
@@ -19,83 +17,44 @@ import {
   fapiVerification,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { Card } from '../../../components/card';
-import { Reverification, useReverificationFlow } from '../reverification';
+import {
+  aliceSession,
+  CODE,
+  emailFactor,
+  HoldingHost,
+  passwordFactor,
+  phoneFactor,
+  PREPARE_FIRST,
+  PREPARE_SECOND,
+  SECRETS,
+  STEP,
+  workEmailFactor,
+} from './reverification.fixtures';
 
-const PREPARE_FIRST = '/v1/client/sessions/sess_1/verify/prepare_first_factor';
-const EMAIL_STEP = 'Enter the code sent to your email to continue';
-const PASSWORD_STEP = 'Enter your current password to continue';
-const CODE = '123456';
+const EMAIL_STEP = STEP.emailCode;
+const PASSWORD_STEP = STEP.password;
 const PHONE_CODE = '234567';
 const WORK_CODE = '654321';
 const EMAIL_METHOD = 'Email code to alice@example.com';
 const PHONE_METHOD = 'Send SMS code to +1 555 0100';
-const PHONE_STEP = 'Enter the code sent to your phone to continue';
-const PREPARE_SECOND = '/v1/client/sessions/sess_1/verify/prepare_second_factor';
-const emailFactor = {
-  strategy: 'email_code',
-  email_address_id: 'idn_alice',
-  safe_identifier: 'alice@example.com',
-} as const;
-const passwordFactor = { strategy: 'password' } as const;
-const phoneFactor = { strategy: 'phone_code', phone_number_id: 'idn_phone', safe_identifier: '+1 555 0100' } as const;
-const workFactor = {
-  strategy: 'email_code',
-  email_address_id: 'idn_work',
-  safe_identifier: 'alice@work.example',
-} as const;
-
-function Host({ action }: { action: () => Promise<unknown> }) {
-  const [run, controller] = useReverificationFlow(action);
-  const [outcome, setOutcome] = useState('');
-  return (
-    <>
-      <button
-        type='button'
-        onClick={() =>
-          void run().then(
-            () => setOutcome('resolved'),
-            () => setOutcome('rejected'),
-          )
-        }
-      >
-        Run action
-      </button>
-      <output aria-label='Outcome'>{outcome}</output>
-      <Card.Root renderBranding={false}>
-        <Reverification controller={controller} />
-        {controller.onCancel ? (
-          <button
-            type='button'
-            onClick={controller.onCancel}
-          >
-            Dismiss
-          </button>
-        ) : null}
-      </Card.Root>
-    </>
-  );
-}
+const PHONE_STEP = STEP.phoneCode;
 
 async function renderPreparation(
   action = vi.fn().mockResolvedValueOnce(reverificationError()).mockResolvedValue({ done: true }),
   verification: FakeVerificationSeed = {},
 ) {
-  const alice = fapiUser({
-    email_addresses: [fapiEmailAddress({ id: 'idn_alice', email_address: 'alice@example.com' })],
-  });
-  const session = fapiSession({ id: 'sess_1', user: alice });
+  const session = aliceSession;
   const fapi = serveFapi({
     client: fapiClient([session]),
     environment: fapiEnvironment({ display_config: { preferred_sign_in_strategy: 'otp' } }),
     verification: {
       firstFactors: [emailFactor, passwordFactor],
-      secrets: { email_code: CODE, phone_code: PHONE_CODE, password: 'hunter2', totp: CODE, backup_code: 'backup-1' },
+      secrets: { ...SECRETS, phone_code: PHONE_CODE },
       codesByIdentification: { idn_alice: CODE, idn_work: WORK_CODE, idn_phone: PHONE_CODE },
       ...verification,
     },
   });
-  const view = await renderWithClerk(<Host action={action} />);
+  const view = await renderWithClerk(<HoldingHost action={action} />);
   return { ...view, fapi, action, session };
 }
 
@@ -261,7 +220,7 @@ describe('Reverification preparation', () => {
   });
 
   it('replaces the sole challenge on email A to B to A and rejects B code on A', async () => {
-    const { prepares, user } = await startPrepared({ firstFactors: [emailFactor, workFactor] });
+    const { prepares, user } = await startPrepared({ firstFactors: [emailFactor, workEmailFactor] });
     await selectMethod(user, 'Email code to alice@work.example');
     expect(await screen.findByText(EMAIL_STEP)).toBeVisible();
     await selectMethod(user, EMAIL_METHOD);
@@ -388,7 +347,7 @@ describe('Reverification preparation', () => {
   );
 
   it('serializes two successful preparations and accepts only the selected destination code', async () => {
-    await renderPreparation(undefined, { firstFactors: [emailFactor, workFactor] });
+    await renderPreparation(undefined, { firstFactors: [emailFactor, workEmailFactor] });
     const first = holdRequests('post', PREPARE_FIRST);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Run action' }));
@@ -469,7 +428,7 @@ describe('Reverification preparation', () => {
     const { rerender, prepares, user, action } = await startPrepared();
     action.mockResolvedValueOnce(reverificationError());
     rerender(
-      <Host
+      <HoldingHost
         key='new'
         action={action}
       />,
