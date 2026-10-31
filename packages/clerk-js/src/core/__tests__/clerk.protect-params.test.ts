@@ -1,5 +1,5 @@
 import type { ProtectAssertion } from '@clerk/shared/types';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Clerk } from '../clerk';
 
@@ -53,6 +53,10 @@ describe('Clerk getProtectParams', () => {
     capturedOptions.current = undefined;
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('is wired into the FAPI client', () => {
     expect(hookFor()).toBeTypeOf('function');
   });
@@ -73,6 +77,22 @@ describe('Clerk getProtectParams', () => {
     getRequestParams.mockResolvedValue(undefined);
 
     await expect(hookFor('token-abc')()).resolves.toEqual(assertionParams);
+  });
+
+  it('does not acquire remote loader params in no-RHC builds', async () => {
+    vi.stubGlobal('__BUILD_DISABLE_RHC__', true);
+    getRequestParams.mockResolvedValue(sessionParams);
+
+    await expect(hookFor()()).resolves.toBeUndefined();
+    expect(getRequestParams).not.toHaveBeenCalled();
+  });
+
+  it('sends application assertions in no-RHC builds', async () => {
+    vi.stubGlobal('__BUILD_DISABLE_RHC__', true);
+    getRequestParams.mockResolvedValue(sessionParams);
+
+    await expect(hookFor('token-abc')()).resolves.toEqual(assertionParams);
+    expect(getRequestParams).not.toHaveBeenCalled();
   });
 
   // Returning `{}` would make every sign-in body differ from what it was before the feature existed.
