@@ -17,11 +17,11 @@
       "Edit(./**/*.key)",
       "Edit(./**/.keys.json)",
       "Bash(cat .env:*)",
-      "Bash(cat **/credentials.json:*)",
-      "Bash(cat **/*.pem:*)",
-      "Bash(cat **/*.key:*)",
-      "Bash(cat secrets/**:*)",
-      "Bash(cat **/.keys.json:*)"
+      "Bash(cat **/credentials.json*)",
+      "Bash(cat **/*.pem*)",
+      "Bash(cat **/*.key*)",
+      "Bash(cat secrets/**)",
+      "Bash(cat **/.keys.json*)"
     ]
   },
   "hooks": {
