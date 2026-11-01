@@ -454,6 +454,16 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       ? model.cancel
       : undefined;
   const onCancel = cancelModel;
+  const signal = model.status === 'inactive' ? undefined : model.signal;
+  useEffect(() => {
+    const reset = () => send({ type: 'RESET' });
+    signal?.addEventListener('abort', reset, { once: true });
+    if (signal?.aborted) {
+      reset();
+    }
+    return () => signal?.removeEventListener('abort', reset);
+  }, [signal, send]);
+
   const needsStart = active !== null && snapshot.value === 'inactive';
   const needsReset = model.status === 'inactive' && snapshot.value !== 'inactive';
   /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Syncs the machine with the model status, which changes outside this component. */

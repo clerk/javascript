@@ -18,7 +18,7 @@ export { useSessionList } from './useSessionList';
 export { useUser } from './useUser';
 export { useClerk } from './useClerk';
 export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo';
-export { useReverification } from './useReverification';
+export { useReverification, __internal_createReverificationHandler } from './useReverification';
 export { useStatements as __experimental_useStatements } from './useStatements';
 export { usePaymentAttempts as __experimental_usePaymentAttempts } from './usePaymentAttempts';
 export { usePaymentMethods as __experimental_usePaymentMethods } from './usePaymentMethods';

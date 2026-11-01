@@ -20,6 +20,7 @@ import { pickStartingMethod } from './reverification.utils';
 
 export type ReverificationActiveModel = {
   status: 'active';
+  signal: AbortSignal;
   supportEmail: string;
   start: () => Promise<ReverificationResult>;
   prepare: (method: ReverificationPreparableMethod) => Promise<void>;
@@ -30,9 +31,9 @@ export type ReverificationActiveModel = {
 
 export type ReverificationModel =
   | { status: 'inactive' }
-  | { status: 'loading'; cancel: () => void }
+  | { status: 'loading'; cancel: () => void; signal: AbortSignal }
   | ReverificationActiveModel
-  | { status: 'retrying' };
+  | { status: 'retrying'; signal: AbortSignal };
 
 function toMethod(
   factor: SessionVerificationFirstFactor | SessionVerificationSecondFactor,
@@ -114,32 +115,39 @@ export function useReverificationModel(reverificationState: ReverificationState)
   const environment = useMosaicEnvironment();
   const supportEmail = useMosaicSupportEmail();
 
-  if (reverificationState.phase === 'inactive') {
+  if (reverificationState.phase === 'inactive' || reverificationState.signal.aborted) {
     return { status: 'inactive' };
   }
 
   if (reverificationState.phase === 'retrying') {
-    return { status: 'retrying' };
+    return { status: 'retrying', signal: reverificationState.signal };
   }
 
-  const { level, cancel, complete } = reverificationState;
+  const { level, cancel, complete, signal, sessionId } = reverificationState;
 
-  if (!session || !environment || supportEmail === undefined) {
-    return { status: 'loading', cancel };
+  if (!session || session.id !== sessionId || !environment || supportEmail === undefined) {
+    return { status: 'loading', cancel, signal };
   }
 
   const webAuthnSupported = isWebAuthnSupported();
   const preferredSignInStrategy = environment.displayConfig.preferredSignInStrategy;
 
-  const handleResponse = (resource: SessionVerificationResource) =>
-    toResult(resource, preferredSignInStrategy, webAuthnSupported);
+  const handleResponse = (resource: SessionVerificationResource) => {
+    signal.throwIfAborted();
+    return toResult(resource, preferredSignInStrategy, webAuthnSupported);
+  };
 
   return {
     status: 'active',
+    signal,
     supportEmail,
-    start: async () => handleResponse(await session.startVerification({ level: level ?? 'second_factor' })),
+    start: async () => {
+      signal.throwIfAborted();
+      return handleResponse(await session.startVerification({ level: level ?? 'second_factor' }));
+    },
     cancel,
     prepare: async method => {
+      signal.throwIfAborted();
       switch (method.strategy) {
         case 'email_code':
           await session.prepareFirstFactorVerification({
@@ -163,6 +171,7 @@ export function useReverificationModel(reverificationState: ReverificationState)
       }
     },
     attempt: async (method, value) => {
+      signal.throwIfAborted();
       switch (method.strategy) {
         case 'password':
           return handleResponse(
@@ -187,7 +196,9 @@ export function useReverificationModel(reverificationState: ReverificationState)
       }
     },
     finish: async () => {
+      signal.throwIfAborted();
       await clerk.setActive({ session: session.id });
+      signal.throwIfAborted();
       complete();
     },
   };

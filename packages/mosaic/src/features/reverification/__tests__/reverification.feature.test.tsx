@@ -1603,7 +1603,7 @@ describe('Reverification', () => {
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
     });
 
-    it('lets a retry finish when the session changes or signs out', async () => {
+    it('cancels a retry when the session changes or signs out', async () => {
       const retry = deferred<{ done: true }>();
       const action = vi
         .fn()
@@ -1619,11 +1619,11 @@ describe('Reverification', () => {
 
       await act(() => clerk.setActive({ session: 'sess_2' }));
       await act(() => clerk.signOut());
-      await settle();
-      expect(outcome()).toBe('');
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
 
       retry.resolve({ done: true });
-      await untilResolved();
+      await settle();
+      expect(outcome()).toBe('rejected: reverification_cancelled');
     });
 
     it('cancels the challenge when its owner unmounts', async () => {
@@ -1664,7 +1664,7 @@ describe('Reverification', () => {
       expect(action).toHaveBeenCalledOnce();
     });
 
-    it('lets a retry finish when its owner unmounts', async () => {
+    it('cancels a retry when its owner unmounts', async () => {
       serveFapi(verificationSeed({ firstFactors: [passwordFactor] }));
       const retry = deferred<{ done: true }>();
       const action = vi
@@ -1683,11 +1683,11 @@ describe('Reverification', () => {
       await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
 
       rerender(<p>Gone</p>);
-      await settle();
-      expect(onOutcome).not.toHaveBeenCalled();
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: reverification_cancelled'));
 
       retry.resolve({ done: true });
-      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('resolved'));
+      await settle();
+      expect(onOutcome).toHaveBeenCalledTimes(1);
     });
 
     it('passes through an error that is unrelated to reverification', async () => {

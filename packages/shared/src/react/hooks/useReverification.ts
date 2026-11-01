@@ -14,9 +14,13 @@ const CLERK_API_REVERIFICATION_ERROR_CODE = 'session_reverification_required';
 /**
  *
  */
-async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
+async function resolveResult<T>(
+  result: Promise<T> | T,
+  signal?: AbortSignal,
+): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
+    signal?.throwIfAborted();
     if (r instanceof Response) {
       return r.json();
     }
@@ -96,6 +100,7 @@ type UseReverification = <
 type CreateReverificationHandlerParams = UseReverificationOptions & {
   openUIComponent: Clerk['__internal_openReverification'];
   telemetry: Clerk['telemetry'];
+  signal?: AbortSignal;
 };
 
 /**
@@ -109,60 +114,60 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
     fetcher: Fetcher,
   ): (...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>>> {
     return (async (...args: Parameters<Fetcher>) => {
-      let result = await resolveResult(fetcher(...args));
+      const { signal } = params;
+      const resolvers = createDeferredPromise();
+      const cancelled = createDeferredPromise();
+      const cancel = () => {
+        const error = new ClerkRuntimeError('User cancelled attempted verification', {
+          code: 'reverification_cancelled',
+        });
+        resolvers.reject(error);
+      };
+      const abort = () => {
+        cancel();
+        cancelled.reject(
+          new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
+        );
+      };
+      const run = async () => {
+        signal?.throwIfAborted();
+        let result = await resolveResult(fetcher(...args), signal);
+        signal?.throwIfAborted();
 
-      if (isReverificationHint(result)) {
-        /**
-         * Create a promise
-         */
-        const resolvers = createDeferredPromise();
+        if (isReverificationHint(result)) {
+          const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
+          const level = isValidMetadata ? isValidMetadata().level : undefined;
+          const complete = () => resolvers.resolve(true);
 
-        const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
+          if (params.onNeedsReverification === undefined) {
+            params.openUIComponent?.({
+              level,
+              afterVerification: complete,
+              afterVerificationCancelled: cancel,
+            });
+          } else {
+            params.onNeedsReverification({ cancel, complete, level });
+          }
 
-        const level = isValidMetadata ? isValidMetadata().level : undefined;
-
-        const cancel = () => {
-          resolvers.reject(
-            new ClerkRuntimeError('User cancelled attempted verification', {
-              code: 'reverification_cancelled',
-            }),
-          );
-        };
-
-        const complete = () => {
-          resolvers.resolve(true);
-        };
-
-        if (params.onNeedsReverification === undefined) {
-          /**
-           * On success resolve the pending promise
-           * On cancel reject the pending promise
-           */
-          params.openUIComponent?.({
-            level: level,
-            afterVerification: complete,
-            afterVerificationCancelled: cancel,
-          });
-        } else {
-          params.onNeedsReverification({
-            cancel,
-            complete,
-            level,
-          });
+          await resolvers.promise;
+          signal?.throwIfAborted();
+          result = await resolveResult(fetcher(...args), signal);
+          signal?.throwIfAborted();
         }
 
-        /**
-         * Wait until the promise from above have been resolved or rejected
-         */
-        await resolvers.promise;
+        return result;
+      };
 
-        /**
-         * After the promise resolved successfully try the original request one more time
-         */
-        result = await resolveResult(fetcher(...args));
+      void resolvers.promise.catch(() => undefined);
+      signal?.addEventListener('abort', abort, { once: true });
+      if (signal?.aborted) {
+        abort();
       }
-
-      return result;
+      try {
+        return await Promise.race([cancelled.promise, run()]);
+      } finally {
+        signal?.removeEventListener('abort', abort);
+      }
     }) as ExcludeClerkError<Awaited<ReturnType<Fetcher>>>;
   }
 
@@ -246,3 +251,5 @@ export const useReverification: UseReverification = (fetcher, options) => {
     [__internal_openReverification, telemetry],
   );
 };
+
+export { createReverificationHandler as __internal_createReverificationHandler };

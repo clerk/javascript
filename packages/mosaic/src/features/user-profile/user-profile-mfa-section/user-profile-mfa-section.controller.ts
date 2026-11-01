@@ -1,5 +1,5 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
@@ -524,7 +524,11 @@ export function useUserProfileMfaController(model: ReadyModel) {
       controller => controller.visible,
     ) ?? model.backupCodesReverification;
   const hasPendingReverification = context.pending !== undefined && REVERIFIABLE_ACTIONS.includes(context.pending);
-  const reverifying = hasPendingReverification && reverification.visible;
+  const [hasShownReverification, setHasShownReverification] = useState(false);
+  const reverifying = hasPendingReverification && (reverification.visible || hasShownReverification);
+  if (hasShownReverification !== reverifying) {
+    setHasShownReverification(reverifying);
+  }
   const dialogOpen = flow.kind !== 'closed' || reverifying;
   useEffect(() => {
     if (!dialogOpen || resendSeconds === 0) {

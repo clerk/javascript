@@ -156,7 +156,10 @@ function createSmsActions(
       if (existing) {
         return enrollSms(existing.id);
       }
-      return { status: 'needsVerification', phone: summarizePhone(await calls.createPhone(current, phoneNumber)) };
+      const created = await calls.createPhone(current, phoneNumber);
+      const phone = currentPhone(created.id);
+      await phone.prepareVerification();
+      return { status: 'needsVerification', phone: summarizePhone(phone) };
     },
     enrollSms,
     resendSms: async phoneId => {
@@ -211,12 +214,8 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     await reloadUser(current);
     return result;
   });
-  const [createPhone, createPhoneReverification] = useReverificationFlow(
-    async (current: UserResource, phoneNumber: string) => {
-      const phone = await current.createPhoneNumber({ phoneNumber });
-      await phone.prepareVerification();
-      return phone;
-    },
+  const [createPhone, createPhoneReverification] = useReverificationFlow((current: UserResource, phoneNumber: string) =>
+    current.createPhoneNumber({ phoneNumber }),
   );
   const [reservePhone, enrollSmsReverification] = useReverificationFlow(
     async (current: UserResource, phone: PhoneNumberResource) => {

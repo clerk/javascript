@@ -1,6 +1,12 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { useReverification, useSafeLayoutEffect, useSession } from '@clerk/shared/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  __internal_createReverificationHandler,
+  useClerk,
+  type useReverification,
+  useSafeLayoutEffect,
+} from '@clerk/shared/react';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { useCallback, useRef, useState } from 'react';
 
 import type { ReverificationState } from './reverification.types';
 
@@ -11,178 +17,111 @@ export type UseReverificationWithStateResult<F extends ReverificationFetcher = R
   ReverificationState,
 ];
 
-type RuntimeOperation =
-  | { status: 'idle' }
-  | { status: 'requesting'; promise: Promise<unknown> }
-  | {
-      status: 'active';
-      promise: Promise<unknown>;
-      sessionId: string | null;
-      complete: () => void;
-      cancel: () => void;
-    }
-  | { status: 'retrying'; promise: Promise<unknown> }
-  | { status: 'cancelling'; promise: Promise<unknown> };
-
-type Runtime = {
-  operation: RuntimeOperation;
-  sessionId: string | null;
+type ReverificationRun = {
+  userId: string | undefined;
+  sessionId: string | undefined;
+  abort: AbortController;
 };
 
-const REQUEST_ALREADY_IN_PROGRESS_CODE = 'request_already_in_progress';
-
-function requestAlreadyInProgressError(): ClerkRuntimeError {
-  return new ClerkRuntimeError('A request is already in progress.', {
-    code: REQUEST_ALREADY_IN_PROGRESS_CODE,
-  });
-}
-
-/**
- * Wraps useReverification without the default UI. Returns [handler, state]: call handler
- * to run the action, and render your own UI from state.phase ('inactive' | 'active' |
- * 'retrying'). While 'active', state.complete and state.cancel end the challenge.
- *
- * The state follows the run: 'active' while a challenge is pending, 'retrying' while the fetcher
- * runs again after it, and 'inactive' otherwise. Cancelling returns to 'inactive' at once; the
- * run rejects shortly after.
- *
- * The handler runs one call at a time. A call made while another is pending rejects with a
- * ClerkRuntimeError with code 'request_already_in_progress'.
- */
-// The reason we need to enforce single-flight is that we need a direct link between
-// a single invocation of the handler and a specific reverification. useReverification
-// does not have well-defined behavior for concurrent calls, so we add the single-flight
-// constraint for extra safeguards here.
-// If we ever want to make this hook public API, we might want to reconsider the single-flight
-// behavior by first fixing the useReverification hook.
 export function useReverificationWithState<F extends ReverificationFetcher>(
   fetcher: F,
 ): UseReverificationWithStateResult<F> {
-  const { session } = useSession();
-  // The return is observable and needs to be driven by React state
+  const clerk = useClerk();
+  clerk.telemetry?.record(eventMethodCalled('useReverification', { onNeedsReverification: true }));
   const [reverificationState, setReverificationState] = useState<ReverificationState>({ phase: 'inactive' });
-  // State updates are not immediate and since parallel requests can resolve before observing
-  // those state changes, the internal state is driven by a ref
-  const runtimeRef = useRef<Runtime>({
-    operation: { status: 'idle' },
-    sessionId: session?.id ?? null,
-  });
-  useSafeLayoutEffect(() => {
-    runtimeRef.current.sessionId = session?.id ?? null;
-  });
+  const currentRun = useRef<ReverificationRun | null>(null);
+  const fetcherRef = useRef(fetcher);
 
-  const completeChallenge = useCallback(() => {
-    const operation = runtimeRef.current.operation;
-    if (operation.status !== 'active') {
+  const cancelRun = useCallback((run: ReverificationRun) => {
+    if (currentRun.current !== run) {
       return;
     }
-    runtimeRef.current.operation = { status: 'retrying', promise: operation.promise };
-    setReverificationState({ phase: 'retrying' });
-    operation.complete();
-  }, []);
-
-  const cancelChallenge = useCallback(() => {
-    const operation = runtimeRef.current.operation;
-    if (operation.status !== 'active') {
-      return;
-    }
-    runtimeRef.current.operation = { status: 'cancelling', promise: operation.promise };
+    currentRun.current = null;
     setReverificationState({ phase: 'inactive' });
-    operation.cancel();
+    run.abort.abort(
+      new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
+    );
   }, []);
 
-  const wrapped = useReverification(fetcher, {
-    onNeedsReverification: ({ complete, cancel, level }) => {
-      const operation = runtimeRef.current.operation;
-      if (operation.status !== 'requesting') {
-        // This can happen e.g. when the component unmounts mid-flight
-        cancel();
+  useSafeLayoutEffect(() => {
+    fetcherRef.current = fetcher;
+  });
+
+  useSafeLayoutEffect(() => {
+    const unsubscribe = clerk.addListener(({ user, session }) => {
+      const run = currentRun.current;
+      if (!run) {
         return;
       }
-
-      runtimeRef.current.operation = {
-        status: 'active',
-        promise: operation.promise,
-        sessionId: runtimeRef.current.sessionId,
-        complete,
-        cancel,
-      };
-
-      setReverificationState({
-        phase: 'active',
-        level,
-        complete: completeChallenge,
-        cancel: cancelChallenge,
-      });
-    },
-  });
+      if (
+        user === null ||
+        session === null ||
+        (user !== undefined && user.id !== run.userId) ||
+        (session !== undefined && session.id !== run.sessionId)
+      ) {
+        cancelRun(run);
+      }
+    });
+    return () => {
+      unsubscribe();
+      const run = currentRun.current;
+      if (run) {
+        cancelRun(run);
+      }
+    };
+  }, [clerk, cancelRun]);
 
   const singleFlight = useCallback(
     (...args: Parameters<F>) => {
-      // Only a single handler call is allowed to be in progress at the same time
-      if (runtimeRef.current.operation.status !== 'idle') {
-        return Promise.reject(requestAlreadyInProgressError());
+      if (currentRun.current) {
+        return Promise.reject(
+          new ClerkRuntimeError('A request is already in progress.', { code: 'request_already_in_progress' }),
+        );
       }
 
-      const invocation = Promise.resolve().then(() => wrapped(...args));
-      runtimeRef.current.operation = { status: 'requesting', promise: invocation };
-      void invocation
-        .finally(() => {
-          const operation = runtimeRef.current.operation;
-          if (operation.status === 'idle' || operation.promise !== invocation) {
+      const run: ReverificationRun = {
+        userId: clerk.user?.id,
+        sessionId: clerk.session?.id,
+        abort: new AbortController(),
+      };
+      currentRun.current = run;
+      const handler = __internal_createReverificationHandler({
+        openUIComponent: clerk.__internal_openReverification,
+        telemetry: clerk.telemetry,
+        signal: run.abort.signal,
+        onNeedsReverification: ({ complete, level }) => {
+          if (currentRun.current !== run) {
             return;
           }
-          runtimeRef.current.operation = { status: 'idle' };
-          setReverificationState({ phase: 'inactive' });
+          setReverificationState({
+            phase: 'active',
+            level,
+            signal: run.abort.signal,
+            sessionId: run.sessionId,
+            complete: () => {
+              if (currentRun.current !== run) {
+                return;
+              }
+              setReverificationState({ phase: 'retrying', signal: run.abort.signal });
+              complete();
+            },
+            cancel: () => cancelRun(run),
+          });
+        },
+      })(fetcherRef.current);
+      const invocation = handler(...args);
+      void invocation
+        .finally(() => {
+          if (currentRun.current === run) {
+            currentRun.current = null;
+            setReverificationState({ phase: 'inactive' });
+          }
         })
-        // The original error is meant to be handled outside, but .finally() creates
-        // a new promise that errors the same way, so we swallow that duplicate error silently
         .catch(() => undefined);
-
       return invocation;
     },
-    [wrapped],
-  ) as ReturnType<typeof useReverification<F>>;
-
-  const phase = reverificationState.phase;
-  useEffect(() => {
-    // eslint-disable-next-line react-you-might-not-need-an-effect/no-event-handler -- Reacts to the Clerk session changing, which happens outside any event handler here.
-    if (phase !== 'active') {
-      return;
-    }
-    const operation = runtimeRef.current.operation;
-    if (operation.status !== 'active') {
-      return;
-    }
-    // Do not reset on the transitive state
-    if (session === undefined) {
-      return;
-    }
-    if (session === null) {
-      cancelChallenge();
-      return;
-    }
-    // If operation started before sessionId was known, we record it here
-    if (operation.sessionId === null) {
-      runtimeRef.current.operation = { ...operation, sessionId: session.id };
-      return;
-    }
-    if (session.id !== operation.sessionId) {
-      cancelChallenge();
-    }
-  }, [phase, session, cancelChallenge]);
-
-  // Cancel on unmount - Does not cancel ongoing retry after reverification has finished
-  useEffect(() => {
-    const runtime = runtimeRef.current;
-    return () => {
-      const operation = runtime.operation;
-      runtime.operation = { status: 'idle' };
-      if (operation.status === 'active') {
-        operation.cancel();
-      }
-    };
-  }, []);
+    [clerk, cancelRun],
+  );
 
   return [singleFlight, reverificationState];
 }
