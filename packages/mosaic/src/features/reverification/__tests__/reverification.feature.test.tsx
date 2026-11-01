@@ -1556,6 +1556,26 @@ describe('Reverification', () => {
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
     });
 
+    it('cancels a delayed reverification hint when the active session changes', async () => {
+      const response = deferred<unknown>();
+      const action = vi.fn(() => response.promise);
+      const { clerk } = await renderReverification(
+        action,
+        verificationSeed({ firstFactors: [passwordFactor] }, { client: fapiClient([aliceSession, bobSession]) }),
+      );
+      await startVerification();
+      await waitFor(() => expect(action).toHaveBeenCalledOnce());
+
+      await act(() => clerk.setActive({ session: 'sess_2' }));
+      expect(clerk.session?.id).toBe('sess_2');
+      response.resolve(reverificationError());
+
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      expect(screen.queryByText(TITLE)).toBeNull();
+      expect(screen.queryByLabelText('Password')).toBeNull();
+      expect(action).toHaveBeenCalledOnce();
+    });
+
     it('keeps the challenge open while the session is briefly unset during a navigation', async () => {
       const { clerk, navigate } = await renderReverification(
         guardedAction(),
