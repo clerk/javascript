@@ -243,7 +243,6 @@ function DialogHarness() {
                     <Card.Footer>
                       <Button
                         color='negative'
-                        fullWidth
                         onClick={continueDelete}
                         disabled={requestPending}
                       >

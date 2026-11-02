@@ -51,6 +51,7 @@ export function WaitlistView({ step, form, renderBranding, isRedirecting, onSign
             type='button'
             variant='link'
             size='sm'
+            fullWidth={false}
             onClick={onSignIn}
           >
             {m.signIn.action}
