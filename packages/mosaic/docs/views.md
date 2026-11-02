@@ -108,10 +108,11 @@ shared footer puts its submit button in `Card.Content` (`waitlist.view.tsx`).
 
 The controller owns the form with `useForm`, including what `canSubmit` allows, and
 passes `form` to the view. The view does not check values, call `preventDefault` or
-create the form's id.
+create the form's id. This applies when you add or rewrite a form. Some existing forms
+predate it.
 
 ```tsx
-function EditNameStep({ form, messages }: EditNameStepProps) {
+function EditNameStep({ form, messages, onCancel }: EditNameStepProps) {
   const { feedback } = form.fields.name;
 
   return (
@@ -143,17 +144,15 @@ function EditNameStep({ form, messages }: EditNameStepProps) {
         </Field.Root>
       </Card.Content>
       <Card.Footer>
-        <Dialog.Close
-          render={
-            <Button
-              variant='outline'
-              color='neutral'
-              fullWidth
-            />
-          }
+        <Button
+          variant='outline'
+          color='neutral'
+          fullWidth
+          disabled={form.isSubmitting}
+          onClick={onCancel}
         >
           {messages.cancel}
-        </Dialog.Close>
+        </Button>
         <SubmitButton
           form={form.id}
           fullWidth

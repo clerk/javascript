@@ -80,6 +80,8 @@ Stop and check the table if you are writing any of these in a feature:
 - `Card.Root` in a screen or a `*Steps` component
 - a value check, `preventDefault` or `useId` for a form in a view
 
+The form rule applies when you add or rewrite a form. Some existing forms predate it.
+
 ## Nested radii
 
 A part inset from a rounded surface gets its radius from that surface: `max(0px, calc(outer - border - padding))`. Do not pick a fixed step, or it stops matching when `--cl-radius-*` or `--cl-spacing` is overridden. This applies to small insets. When the inset is about as large as the outer radius or larger (Card content, TagInput tags), the part keeps its own radius.
