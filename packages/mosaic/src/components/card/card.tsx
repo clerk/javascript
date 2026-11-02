@@ -142,6 +142,20 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   });
 });
 
+const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardMedia(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('card-media'), stylex.props(reset.base, slots.header.media, xstyle), rest),
+    },
+  });
+});
+
 /**
  * Names the card. Renders an `<h2>`, and inside a dialog takes the id the popup points
  * `aria-labelledby` at, so the card names the dialog without knowing it is in one.
@@ -271,9 +285,9 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
 });
 
 /**
- * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Title`, `Card.Description`,
- * `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and
- * forwards its ref.
+ * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Media`, `Card.Title`,
+ * `Card.Description`, `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic
+ * `render` prop and forwards its ref.
  *
  * `Card.Banner` is a message slot between the header and the content. It is always rendered, and
  * a `Banner` expands into it while its children hold a message, collapsing again once they are
@@ -282,4 +296,4 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
  * Rendered as the content of a `Dialog.Popup`, the card reads that surface from `DialogContext`:
  * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
  */
-export const Card = { Root, Header, Title, Description, Banner: CardBanner, Content, Footer };
+export const Card = { Root, Header, Media, Title, Description, Banner: CardBanner, Content, Footer };

@@ -59,6 +59,8 @@ export const sizes = stylex.create({
   lg: { width: '36.25rem' },
 });
 
+const HEADER_ROW_GAP = space['0.5'];
+
 export const header = stylex.create({
   // `row-reverse` so the dismiss button leads in the DOM — and so takes the dialog's opening
   // focus — while sitting at the inline end.
@@ -73,7 +75,11 @@ export const header = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: '1',
-    rowGap: space['0.5'],
+    rowGap: HEADER_ROW_GAP,
+  },
+  media: {
+    display: 'flex',
+    marginBlockEnd: `calc(${space['6']} - ${HEADER_ROW_GAP})`,
   },
   title: {
     color: colorVars['--cl-color-foreground'],
