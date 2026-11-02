@@ -6,20 +6,19 @@ import { useEffect, useRef } from 'react';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { save } from '../../utils/errors';
+import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
 import type { APIKeyRecord } from './api-keys-table.types';
 import type { CreateAPIKeyInput } from './create-api-key.controller';
 
 export const PAGE_SIZE = 10;
-const READ_PERMISSION = 'org:sys_api_keys:read';
-const MANAGE_PERMISSION = 'org:sys_api_keys:manage';
 
 export function useAPIKeysAccess(subject: string | undefined) {
   const { isLoaded, session } = useSession();
   const settings = useMosaicEnvironment()?.apiKeysSettings;
   const isOrganization = subject !== undefined && isOrganizationId(subject);
   const can = (permission: string) => !isOrganization || (session?.checkAuthorization({ permission }) ?? false);
-  const canRead = can(READ_PERMISSION);
-  const canManage = can(MANAGE_PERMISSION);
+  const canRead = can(ORGANIZATION_PERMISSIONS.apiKeysRead);
+  const canManage = can(ORGANIZATION_PERMISSIONS.apiKeysManage);
   const isAvailable =
     subject !== undefined &&
     (isOrganization

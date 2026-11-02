@@ -1,13 +1,14 @@
 {
   "name": "@clerk/swingset",
-  "version": "0.0.66",
+  "version": "0.0.67",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "next build",
     "dev": "node scripts/dev.mjs",
     "format": "node ../../scripts/format-package.mjs",
-    "format:check": "node ../../scripts/format-package.mjs --check"
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

@@ -44,18 +44,18 @@ const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? 
  * actor.send({ type: 'TOGGLE' });
  * ```
  */
-export function createActor<TContext extends object, TEvent extends EventObject>(
-  machine: StateMachine<TContext, TEvent>,
-  options: CreateActorOptions<TContext> = {},
-): Actor<TContext, TEvent> {
+export function createActor<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
+  machine: StateMachine<TContext, TEvent, TStates>,
+  options: CreateActorOptions<TContext, TStates> = {},
+): Actor<TContext, TEvent, TStates> {
   const teleport = options.snapshot;
 
   // Internally the actor operates on the broader `EventObject`: invoke done/error
   // events aren't part of the user's `TEvent` union, so the config is viewed
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
-  const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
-  const emptyState: StateConfig<TContext, EventObject> = {};
-  const stateOf = (id: string): StateConfig<TContext, EventObject> => {
+  const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject, TStates>>;
+  const emptyState: StateConfig<TContext, EventObject, TStates> = {};
+  const stateOf = (id: string): StateConfig<TContext, EventObject, TStates> => {
     const state = states[id];
     if (state) {
       return state;
@@ -82,7 +82,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // Bumped whenever we leave an invoking state, so a stale promise resolving
   // after the fact is ignored — no transition.
   let invocationToken = 0;
-  let receivedWhileStopped: (() => boolean)[] = [];
+  const deferred: (() => boolean)[] = [];
 
   // Pending `after` timers — cleared when the state is exited, paused while the actor is stopped.
   let afterTimers: AfterTimer[] = [];
@@ -90,9 +90,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   // The snapshot is cached and only replaced on an actual change, so
   // getSnapshot() is referentially stable for useSyncExternalStore.
-  let snapshot: Snapshot<TContext> = { value, context, status };
+  let snapshot: Snapshot<TContext, TStates> = { value, context, status };
 
-  const listeners: SnapshotListener<TContext>[] = [];
+  const listeners: SnapshotListener<TContext, TStates>[] = [];
 
   /**
    * Normalise a raw `Transition` value into a `TransitionConfig[]` the runtime
@@ -102,16 +102,16 @@ export function createActor<TContext extends object, TEvent extends EventObject>
    * - `TransitionConfig[]` → as-is
    * - `TransitionFn` → called immediately; `undefined` return → `[]` (unhandled)
    */
-  function normalizeTransition(raw: unknown, event: EventObject): TransitionConfig<TContext, EventObject>[] {
+  function normalizeTransition(raw: unknown, event: EventObject): TransitionConfig<TContext, EventObject, TStates>[] {
     if (typeof raw === 'function') {
       // SAFETY: raw is a TransitionFn — (args: {context, event}) => TransitionResult | undefined.
-      // The cast is required because the generic TStates parameter is erased at this internal
-      // boundary; callers have already narrowed the event type via StateConfig.on[K].
-      const result = (raw as TransitionFn<TContext, EventObject>)({ context, event });
+      // The cast is required because raw arrives untyped at this internal boundary; callers
+      // have already narrowed the event type via StateConfig.on[K].
+      const result = (raw as TransitionFn<TContext, EventObject, TStates>)({ context, event });
       if (result === undefined) {
         return [];
       }
-      const cfg: TransitionConfig<TContext, EventObject> = { target: result.target };
+      const cfg: TransitionConfig<TContext, EventObject, TStates> = { target: result.target };
       if (result.context !== undefined) {
         const patch = result.context;
         // SAFETY: Constructing AssignAction inline avoids importing the assign() helper here.
@@ -120,8 +120,8 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       return [cfg];
     }
-    return toArr<unknown>(raw).map(e =>
-      typeof e === 'string' ? { target: e } : (e as TransitionConfig<TContext, EventObject>),
+    return toArr(raw as TStates | TransitionConfig<TContext, EventObject, TStates>).map(e =>
+      typeof e === 'string' ? { target: e } : e,
     );
   }
 
@@ -136,9 +136,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   }
 
   function pickTransition(
-    transitions: TransitionConfig<TContext, EventObject>[],
+    transitions: TransitionConfig<TContext, EventObject, TStates>[],
     event: EventObject,
-  ): TransitionConfig<TContext, EventObject> | undefined {
+  ): TransitionConfig<TContext, EventObject, TStates> | undefined {
     return transitions.find(transition => !transition.guard || transition.guard(context, event));
   }
 
@@ -153,19 +153,19 @@ export function createActor<TContext extends object, TEvent extends EventObject>
    * Returns `false` — a true no-op — when the target's entry guard blocks it, so
    * the caller skips the commit and subscribers are never notified.
    */
-  function takeTransition(transition: TransitionConfig<TContext, EventObject>, event: EventObject): boolean {
-    const external = transition.target !== undefined;
-    if (external && !canEnter(transition.target as string, event)) {
+  function takeTransition(transition: TransitionConfig<TContext, EventObject, TStates>, event: EventObject): boolean {
+    const { target } = transition;
+    if (target !== undefined && !canEnter(target, event)) {
       return false; // entry guard blocks landing → snapshot unchanged, no notify
     }
-    if (external) {
+    if (target !== undefined) {
       runActions(stateOf(value).exit, event);
       invocationToken++; // abandon the invoke of the state we're leaving
       clearAfterTimers();
     }
     runActions(transition.actions, event);
-    if (external) {
-      value = transition.target as string;
+    if (target !== undefined) {
+      value = target;
       enterState(event);
     }
     return true;
@@ -182,9 +182,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         return;
       }
       if (status === 'stopped') {
-        receivedWhileStopped.push(
-          () => token === invocationToken && takeInvokeTransition(transitionConfig, settledEvent),
-        );
+        deferred.push(() => token === invocationToken && takeInvokeTransition(transitionConfig, settledEvent));
         return;
       }
       if (status === 'active' && takeInvokeTransition(transitionConfig, settledEvent)) {
@@ -252,9 +250,14 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       scheduleAfterTimer(timer.delay, timer.transitionConfig);
     }
     pausedAfterTimers = [];
-    const received = receivedWhileStopped;
-    receivedWhileStopped = [];
-    for (const apply of received) {
+  }
+
+  function applyDeferred(): void {
+    while (status === 'active') {
+      const apply = deferred.shift();
+      if (!apply) {
+        return;
+      }
       apply();
     }
   }
@@ -299,7 +302,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     }
   }
 
-  const actor: Actor<TContext, TEvent> = {
+  const actor: Actor<TContext, TEvent, TStates> = {
     start() {
       if (started) {
         return actor;
@@ -315,6 +318,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         value = resolveInitial();
         enterState(INIT_EVENT);
       }
+      applyDeferred();
       commit();
       return actor;
     },
@@ -333,11 +337,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     send(event) {
-      if (initialized && status === 'stopped') {
-        receivedWhileStopped.push(() => takeEventTransition(event));
+      if (!started) {
+        deferred.push(() => takeEventTransition(event));
         return;
       }
-      if (started && takeEventTransition(event)) {
+      if (takeEventTransition(event)) {
         commit();
       }
     },
@@ -351,7 +355,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     // if nanostores is adopted repo-wide later a `toAtom(actor)` adapter is a
     // trivial, non-breaking wrapper over `subscribe` + `getSnapshot` — no need to
     // pull the dependency in now.
-    subscribe(listener: SnapshotListener<TContext>): Unsubscribe {
+    subscribe(listener: SnapshotListener<TContext, TStates>): Unsubscribe {
       listeners.push(listener);
       return () => {
         const i = listeners.indexOf(listener);
@@ -362,7 +366,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     can(event) {
-      if (!started || status !== 'active') {
+      if (status !== 'active') {
         return false;
       }
       const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
@@ -375,6 +379,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     setContext(patch: Partial<TContext>) {
       liveContextPatch = { ...liveContextPatch, ...patch };
       context = { ...context, ...patch };
+      if (!initialized) {
+        value = resolveInitial();
+      }
     },
 
     recheck() {
@@ -424,9 +431,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
  * actor.getSnapshot(); // → { value: 'deleting', context: {...}, status: 'active' }
  * ```
  */
-export function mockActor<TContext extends object, TEvent extends EventObject>(
-  machine: StateMachine<TContext, TEvent>,
-  snapshot: { value: string; context?: Partial<TContext> },
-): Actor<TContext, TEvent> {
+export function mockActor<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
+  machine: StateMachine<TContext, TEvent, TStates>,
+  snapshot: { value: TStates; context?: Partial<TContext> },
+): Actor<TContext, TEvent, TStates> {
   return createActor(machine, { snapshot });
 }

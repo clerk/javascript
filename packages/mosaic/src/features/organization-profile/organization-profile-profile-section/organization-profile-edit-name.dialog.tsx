@@ -28,7 +28,7 @@ export function OrganizationProfileEditNameDialog({
   trigger,
   form,
 }: OrganizationProfileEditNameDialogProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const inputRef = useRef<HTMLInputElement>(null);
   const { feedback } = form.fields.name;
   const { ref, ...control } = form.register('name');

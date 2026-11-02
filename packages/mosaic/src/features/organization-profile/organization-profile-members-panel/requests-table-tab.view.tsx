@@ -42,7 +42,7 @@ export function RequestsTableTabView({
   isError = false,
   onRetry,
 }: RequestsTableTabViewProps) {
-  const m = useMessages('requestsTableTab');
+  const m = useMessages('organizationProfile').members.requests;
   const showPagination = Math.ceil(totalCount / pageSize) > 1;
   const hasActions = Boolean(onAccept || onDecline);
   return (
@@ -137,7 +137,7 @@ function RequestsTableBody({
   registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
   registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
-  const m = useMessages('requestsTableTab');
+  const m = useMessages('organizationProfile').members.requests;
   return (
     <Table.Body
       items={requests}
@@ -218,7 +218,7 @@ function RequestActions({
   registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
   registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
-  const m = useMessages('requestsTableTab');
+  const m = useMessages('organizationProfile').members.requests;
   const [acceptRef] = useState(() => registerAcceptTrigger?.(request.id));
   const [declineRef] = useState(() => registerDeclineTrigger?.(request.id));
   const actions = usePendingAction<'accept' | 'decline'>();

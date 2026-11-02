@@ -91,6 +91,8 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaAxis, ScrollAreaGutter } from '../components/scroll-area';
+export { ProviderButton, ProviderButtonGroup } from '../components/provider-button';
+export type { ProviderButtonGroupProps, ProviderButtonProps } from '../components/provider-button';
 export { Radio } from '../components/radio';
 export type { RadioGroupProps, RadioItemProps } from '../components/radio';
 export { Select } from '../components/select';

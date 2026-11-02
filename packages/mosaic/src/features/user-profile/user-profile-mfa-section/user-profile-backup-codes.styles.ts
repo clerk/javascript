@@ -9,7 +9,7 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     listStyleType: 'none',

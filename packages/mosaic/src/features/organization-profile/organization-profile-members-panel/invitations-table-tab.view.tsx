@@ -38,7 +38,7 @@ export function InvitationsTableTabView({
   isError = false,
   onRetry,
 }: InvitationsTableTabViewProps) {
-  const m = useMessages('invitationsTableTab');
+  const m = useMessages('organizationProfile').members.invitations;
   const showPagination = Math.ceil(totalCount / pageSize) > 1;
   return (
     <>
@@ -136,7 +136,7 @@ function InvitationsTableBody({
   onRevokeClick?: (invitation: OrganizationProfileInvitation) => void;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
-  const m = useMessages('invitationsTableTab');
+  const m = useMessages('organizationProfile').members.invitations;
   return (
     <Table.Body
       items={invitations}

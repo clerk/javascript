@@ -164,15 +164,10 @@ const errorMessage = translateError(apiError);
 ### Card Pattern
 ```tsx
 const MyCard = () => (
-  <Card>
-    <Card.Root>
-      <Card.Header>
-        <Card.Title>Title</Card.Title>
-      </Card.Header>
-      <Card.Content>Content</Card.Content>
-      <Card.Footer>Footer</Card.Footer>
-    </Card.Root>
-  </Card>
+  <Card.Root>
+    <Card.Content>Content</Card.Content>
+    <Card.Footer>Footer</Card.Footer>
+  </Card.Root>
 );
 ```
 

@@ -104,6 +104,8 @@ By default, the selected option visually aligns with the trigger. Disable this f
 | `Select.Positioner` | `<div>`         | Floating positioned container              |
 | `Select.Popup`      | `<div>`         | Visual wrapper for the option list         |
 | `Select.Option`     | `<button>`      | A selectable option                        |
+| `Select.Group`      | `<div>`         | Groups options, named by its label         |
+| `Select.GroupLabel` | `<div>`         | Names the enclosing `Select.Group`         |
 | `Select.Arrow`      | `<svg>`         | Optional floating arrow                    |
 
 ## Props

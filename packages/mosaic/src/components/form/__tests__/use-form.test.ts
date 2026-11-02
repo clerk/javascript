@@ -1,5 +1,7 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook } from '@testing-library/react';
+import { createElement, StrictMode, useEffect, useLayoutEffect } from 'react';
+import { flushSync } from 'react-dom';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { deferred, tick } from '../../../__tests__/async';
@@ -64,6 +66,131 @@ describe('useForm', () => {
     });
     expect(result.current.isSubmitting).toBe(false);
     expect(result.current.error).toBeUndefined();
+  });
+
+  it('reports the exact result and submitted values once using the callback captured at submit', async () => {
+    const request = deferred<{ id: string }>();
+    const onSuccess = vi.fn();
+    const replacement = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ onSuccess }) => useForm({ initialValues: { username: 'alex' }, onSubmit: () => request.promise, onSuccess }),
+      { initialProps: { onSuccess } },
+    );
+    act(() => result.current.setValue('username', 'alexc'));
+    const submittedValues = result.current.values;
+    act(() => result.current.submit());
+    act(() => result.current.submit());
+    rerender({ onSuccess: replacement });
+    const saved = { id: 'saved' };
+    await act(async () => {
+      request.resolve(saved);
+      await tick();
+    });
+    expect(onSuccess).toHaveBeenCalledExactlyOnceWith(saved, submittedValues);
+    expect(onSuccess.mock.calls[0]?.[0]).toBe(saved);
+    expect(onSuccess.mock.calls[0]?.[1]).toBe(submittedValues);
+    expect(replacement).not.toHaveBeenCalled();
+    expect(result.current.isSubmitting).toBe(false);
+  });
+
+  it.each([
+    new FormSubmitError({ message: 'Could not save' }),
+    new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
+  ])('does not report success when submission rejects with %s', async failure => {
+    const onSuccess = vi.fn();
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { username: 'alex' },
+        onSubmit: () => Promise.reject(failure),
+        onSuccess,
+      }),
+    );
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+    expect(result.current.isSubmitting).toBe(false);
+  });
+
+  it('does not report success after unmounting a pending form', async () => {
+    const request = deferred<void>();
+    const onSuccess = vi.fn();
+    const { result, unmount } = renderHook(() =>
+      useForm({
+        initialValues: { username: 'alex' },
+        onSubmit: () => request.promise,
+        onSuccess,
+      }),
+    );
+    act(() => result.current.submit());
+    unmount();
+    await act(async () => {
+      request.resolve();
+      await tick();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('suppresses success when the request settles during unmount layout cleanup', async () => {
+    const request = deferred<void>();
+    const onSuccess = vi.fn();
+    const { result, unmount } = renderHook(() => {
+      const form = useForm({ initialValues: { username: 'alex' }, onSubmit: () => request.promise, onSuccess });
+      useLayoutEffect(() => () => request.resolve(), []);
+      return form;
+    });
+    act(() => result.current.submit());
+    unmount();
+    await act(tick);
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('reports success once when StrictMode replays effects during submission', async () => {
+    const request = deferred<void>();
+    const onSubmit = vi.fn(() => request.promise);
+    const onEffect = vi.fn();
+    const onSuccess = vi.fn();
+    renderHook(
+      () => {
+        const form = useForm({ initialValues: { username: 'alex' }, onSubmit, onSuccess });
+        const { submit } = form;
+        useEffect(() => {
+          onEffect();
+          submit();
+        }, [submit]);
+        return form;
+      },
+      { wrapper: ({ children }) => createElement(StrictMode, null, children) },
+    );
+    expect(onEffect).toHaveBeenCalledTimes(2);
+    await act(async () => {
+      request.resolve();
+      await tick();
+    });
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSuccess).toHaveBeenCalledOnce();
+  });
+
+  it('allows success to synchronously unmount the form before pending clears', async () => {
+    const request = deferred<void>();
+    const onSuccess = vi.fn(() => {
+      expect(result.current.isSubmitting).toBe(true);
+      flushSync(() => unmount());
+    });
+    const { result, unmount } = renderHook(() =>
+      useForm({
+        initialValues: { username: 'alex' },
+        onSubmit: () => request.promise,
+        onSuccess,
+      }),
+    );
+    act(() => result.current.submit());
+    await act(async () => {
+      request.resolve();
+      await tick();
+    });
+    expect(onSuccess).toHaveBeenCalledOnce();
   });
 
   it('submits a value set in the same tick', () => {

@@ -1,0 +1,205 @@
+{
+  "src/Components.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "src/common/EmailLinkVerify.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/common/PrintableComponent.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/components/ConfigureDirectorySync/steps/TestSyncStep.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/ConfigureSSO/elements/Wizard/useWizardMachine.ts": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "src/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection.ts": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "src/components/OAuthDeviceVerification/OAuthDeviceVerification.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/OrganizationProfile/RemoveDomainForm.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "src/components/PaymentMethods/AddPaymentMethod.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/components/PaymentMethods/PaymentMethods.tsx": {
+    "react-hooks/refs": {
+      "count": 5
+    }
+  },
+  "src/components/PricingTable/PricingTable.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/ProtectCheckModal/index.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "src/components/SignIn/SignInFactorOne.tsx": {
+    "react-hooks/refs": {
+      "count": 8
+    }
+  },
+  "src/components/SignIn/SignInStart.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "src/components/SignIn/useSecondFactorSelection.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/components/UserProfile/MfaPhoneCodeScreen.tsx": {
+    "react-hooks/refs": {
+      "count": 9
+    }
+  },
+  "src/components/UserProfile/PhoneForm.tsx": {
+    "react-hooks/refs": {
+      "count": 9
+    }
+  },
+  "src/components/UserProfile/RemoveResourceForm.tsx": {
+    "react-hooks/refs": {
+      "count": 23
+    }
+  },
+  "src/components/UserVerification/UserVerificationFactorOne.tsx": {
+    "react-hooks/refs": {
+      "count": 2
+    }
+  },
+  "src/components/devPrompts/EnableOrganizationsPrompt/index.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/components/devPrompts/KeylessPrompt/use-drag-to-corner.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/elements/Avatar.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/elements/CaptchaElement.tsx": {
+    "react-hooks/refs": {
+      "count": 5
+    }
+  },
+  "src/elements/CodeControl.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/elements/Collapsible.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/elements/FormControl.tsx": {
+    "react-hooks/refs": {
+      "count": 42
+    }
+  },
+  "src/elements/IdentityPreview.tsx": {
+    "react-hooks/refs": {
+      "count": 8
+    }
+  },
+  "src/elements/Menu.tsx": {
+    "react-hooks/refs": {
+      "count": 2
+    }
+  },
+  "src/elements/PhoneInput/useFormattedPhoneNumber.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/elements/Portal.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/elements/Select.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/elements/Tooltip.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/elements/contexts/index.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/hooks/useClerkModalStateParams.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/hooks/useInView.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/hooks/usePasswordComplexity.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/hooks/useProtectCheckRunner.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/hooks/useTabState.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/router/BaseRouter.tsx": {
+    "react-hooks/refs": {
+      "count": 2
+    }
+  },
+  "src/utils/ExternalElementMounter.tsx": {
+    "react-hooks/refs": {
+      "count": 2
+    }
+  }
+}

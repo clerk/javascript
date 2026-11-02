@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DirectionProvider } from '../direction-provider';
@@ -630,5 +630,18 @@ describe('Otp', () => {
       );
       expect(await axe(container)).toHaveNoViolations();
     });
+  });
+
+  it('forwards a ref to the root', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Otp.Root
+        length={4}
+        ref={ref}
+      >
+        <Slots />
+      </Otp.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('group'));
   });
 });

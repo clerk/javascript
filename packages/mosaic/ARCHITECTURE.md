@@ -18,14 +18,18 @@ Tokens are CSS custom properties declared through `stylex.defineVars` in `tokens
 // packages/mosaic/src/tokens.stylex.ts
 export const colorVars = stylex.defineVars({
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
-  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
   // …
 });
 ```
 
 Each exported `*Vars` const in that file is one group (`colorVars`, `radiusVars`, …); the file is the list. `space` is also declared with `defineVars`, but its keys are not `--cl-*` names, so its steps compile to hashed custom properties that are internal, not part of the contract.
 
-There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-background-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-background` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp; in dark mode override `--cl-color-background` too, since the ramp mixes toward it. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
+There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-surface-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-surface` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp. The exception is the borders: `--cl-color-border` (controls) and `--cl-color-border-subtle` (containers and dividers) are neutral washes, 7 and 4 percent in light mode and 12 and 8 percent in dark mode, so they keep the same step over the surface and the faded surface alike. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
+
+The seeds are `--cl-color-page`, `--cl-color-neutral`, `--cl-color-brand`, `--cl-color-negative`, `--cl-color-positive` and `--cl-color-warning`. Brand and the three statuses share one shape: the seed, `-foreground` (white in light mode; in dark mode the surface color for brand, positive and warning, where the fills are light, and white for negative), `-subtle` (the 8 percent wash, 12 in dark mode) and `-border` (the 12 percent wash), so both work over the page, the surface or a faded fill and `-alpha-100|200|300` washes. Neutral has the same slots under its own names: `--cl-color-surface-subtle`, `--cl-color-neutral-subtle` (the same wash as the accent `-subtle`, for chips such as the neutral badge) and `--cl-color-border`. Only the seeds and the `-foreground` pairs are set by hand, so retinting a seed retints its companions.
+
+Three tiers carry the layering. `--cl-color-page` is the base: the shell of a settings surface such as the profile, and the darkest layer (`oklch(0.16 0 0)` in dark mode, white in light mode). `--cl-color-surface` is everything raised on it (cards, sections, menus, popovers, dialogs, controls) and the base the gray ramp mixes into. `--cl-color-surface-subtle` is the faded step on a surface, for footers, tiles and striped rows. The surface is derived, not set: in dark mode it is `--cl-color-neutral` mixed 5 percent into `--cl-color-page`, and in light mode it is white mixed 60 percent into `--cl-color-page`, so it is exactly white over a white page and still reads as near white over a gray one. So retinting `--cl-color-page` retints the shell, the surface and the whole ramp together; override `--cl-color-surface` directly only to change how far cards sit above the shell. All three are solid, never alpha, so they look the same over any backdrop.
 
 Light and dark come from CSS `light-dark()` on the default values, so there is no theme object and no re-render on theme change — the browser resolves it.
 
@@ -51,7 +55,7 @@ A theme styles a part from CSS, against that class and its attributes:
   border-radius: 4px;
 }
 .cl-item[data-interactive] {
-  background-color: var(--cl-color-background);
+  background-color: var(--cl-color-surface);
 }
 ```
 
@@ -204,8 +208,10 @@ user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring 
 model nor the view owns it, and the two cannot drift.
 
 `*.messages.ts` holds strings only, exported as one `<feature>Messages` object
-declared `as const` and registered under a namespace in `src/localization/registry.ts`.
-Views read their namespace inside the component with `useMessages('userButton')`, so
+declared `as const` and mounted in `src/localization/registry.ts` under the public
+component it belongs to, such as `userProfile.mfa.backupCodes`. A root is a public
+component or a shared block, never a file name. Views read their root inside the
+component with `useMessages('userProfile').mfa`, so
 the `localization` prop on `MosaicProvider` can replace any string; a module-level
 helper takes the messages as a parameter rather than importing them.
 
@@ -243,6 +249,19 @@ so a consumer's overrides type-check against the real keys, as a dot path
 Renaming or moving a key breaks every override that names it; treat it like renaming
 a prop.
 
+The key tree follows what the user sees, so a key can be found from the screen:
+
+- A root is a public component (`userProfile`) or a shared block (`form`, `errors`).
+  There is no `common` root. The same English in two components is two keys,
+  because a translation may need to differ by context.
+- Below the root, keys nest by section, then by the dialog or step inside it:
+  `userProfile.email.addDialog`, `userProfile.email.removeDialog`.
+- Copy that several views render through one shared component belongs to that
+  component (`userProfile.contact` for the row both email and phone use).
+- Every segment is camelCase. A map keyed by data ids (`errors`, `roles`,
+  `userProfile.mfa.methods`) keeps the ids as its keys;
+  `src/localization/__tests__/registry.test.ts` lists those maps and checks the rest.
+
 ### Composition
 
 Two shapes, chosen by whether the slice fetches its own data.
@@ -252,7 +271,7 @@ wrapper resolves the model, hands it to the controller, and branches on `status`
 
 ```tsx
 export function UserButton(props: UserButtonProps = {}) {
-  const { renderTriggerLabel, mode, fallback, ...options } = props;
+  const { showTriggerLabel, mode, fallback, ...options } = props;
   const model = useUserButtonModel(options);
   const controller = useUserButtonController(model, { mode });
 
@@ -268,7 +287,7 @@ export function UserButton(props: UserButtonProps = {}) {
   return (
     <UserButtonView
       {...viewController}
-      renderTriggerLabel={renderTriggerLabel}
+      showTriggerLabel={showTriggerLabel}
     />
   );
 }
@@ -438,10 +457,8 @@ export function useUserProfileEditUsernameController({ username = '', required =
   const form = useForm({
     initialValues: { username },
     canSubmit: values => values.username !== username && (!required || values.username !== ''),
-    onSubmit: async values => {
-      await onSubmit(values.username);
-      setIsOpen(false);
-    },
+    onSubmit: values => onSubmit(values.username),
+    onSuccess: () => setIsOpen(false),
   });
 
   const onOpenChange = (open: boolean) => {

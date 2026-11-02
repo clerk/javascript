@@ -42,6 +42,9 @@ Every part that renders a DOM element calls **`useRender`** (from
 Copy `src/primitives/select/select-trigger.tsx`: it is the reference part. Its
 params are documented on `UseRenderParams*` in `utils/use-render.tsx`.
 
+- **Forward the ref.** Every part that renders through `useRender` is a
+  `React.forwardRef` and passes its `ref` to `useRender`;
+  `mosaic/forward-ref-parts` enforces this.
 - **`ownProps satisfies DefaultProps<Tag>`** for authored defaults, not `as`.
 - **`mergeProps(internal, consumer)` — internal first, consumer second.** Event
   handlers chain (internal fires, then consumer), `style` shallow-merges,

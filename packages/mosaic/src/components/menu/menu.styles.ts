@@ -12,6 +12,10 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
+const popupRadius = radiusVars['--cl-radius-lg'];
+const inset = space['0.5'];
+const itemRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
+
 // Positioning is applied inline by the headless positioner; this only clears the
 // focus outline it receives. No z-index: the portalled, fixed positioner already
 // paints above page content, and consumers own their own stacking order.
@@ -23,9 +27,9 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
-    borderRadius: radiusVars['--cl-radius-lg'],
+    borderRadius: popupRadius,
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
@@ -73,7 +77,7 @@ export const viewport = stylex.create({
     // The inset belongs to the scrolling box, not the popup: `Menu.Separator` bleeds through it
     // with a negative margin, and from inside a viewport that clips its inline axis a bleed past
     // the popup's own padding would be cut off instead.
-    padding: space['0.5'],
+    padding: inset,
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
@@ -82,7 +86,7 @@ export const viewport = stylex.create({
 
 export const item = stylex.create({
   base: {
-    borderRadius: '0.375rem',
+    borderRadius: itemRadius,
     borderStyle: 'none',
     gap: space['0.5'],
     outline: 'none',
@@ -175,7 +179,7 @@ export const separator = stylex.create({
   base: {
     // Full-bleed across the popup: cancel the viewport's inline padding.
     marginBlock: space['0.5'],
-    marginInline: `calc(-1 * ${space['0.5']})`,
+    marginInline: `calc(-1 * ${inset})`,
     backgroundColor: colorVars['--cl-color-border'],
     blockSize: '1px',
     flexShrink: 0,

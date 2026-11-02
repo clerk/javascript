@@ -25,6 +25,17 @@ describe('getAvailableUserProfilePages', () => {
 });
 
 describe('resolveUserProfilePages', () => {
+  it('keeps the first custom page for a repeated path', () => {
+    const otherTerms: CustomProfilePage = { label: 'Other terms', path: 'terms', content: null };
+    const otherAccount: CustomProfilePage = { label: 'Other account', path: 'account', content: null };
+    const account: CustomProfilePage = { label: 'My account', path: 'account', content: null };
+
+    expect(resolveUserProfilePages(['account'], [account, terms, otherTerms, otherAccount])).toEqual([
+      { id: 'account', custom: account },
+      { id: 'terms', custom: terms },
+    ]);
+  });
+
   it('lists the built-ins, then the custom pages by path', () => {
     expect(resolveUserProfilePages(['account', 'security'], [terms, help])).toEqual([
       { id: 'account' },

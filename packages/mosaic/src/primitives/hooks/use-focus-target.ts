@@ -34,6 +34,7 @@ export function useInitialFocus(
   floatingContext: FloatingContext,
 ): ResolvedInitialFocus {
   const elementRef = React.useRef<HTMLElement | null>(null);
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- this flags a real bug: openEvent is only updated through floatingContext.onOpenChange, so a controlled open after a controlled close passes initialFocus the previous interaction type
   return React.useMemo(() => {
     if (!open || initialFocus === undefined || initialFocus === true) {
       return 0;

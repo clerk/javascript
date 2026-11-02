@@ -22,7 +22,7 @@ export function UserProfileEnterpriseAccountRowView({
   isPending?: boolean;
   disabled?: boolean;
 }) {
-  const m = useMessages('userProfileEnterpriseAccountsSection');
+  const m = useMessages('userProfile').enterpriseAccounts;
   return (
     <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>

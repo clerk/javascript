@@ -56,7 +56,7 @@ export function InviteMembersFields({
   isRoleDisabled = false,
   isPending,
 }: InviteMembersFieldsProps) {
-  const m = useMessages('organizationProfileInviteMembers');
+  const m = useMessages('organizationProfile').members.invite;
   const hasInvalid = hasInvalidEmailAddresses({ emailAddresses, rejectedEmailAddresses });
 
   return (

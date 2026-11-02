@@ -588,6 +588,13 @@ export default tseslint.config([
       'react-hooks/rules-of-hooks': 'warn',
     },
   },
+  {
+    name: 'repo/react-hooks/test',
+    files: TEST_FILES,
+    rules: {
+      'react-hooks/globals': 'off',
+    },
+  },
   ...PACKAGE_IMPORT_RESOLVER_CONFIGS,
   {
     name: 'packages/clerk-js',

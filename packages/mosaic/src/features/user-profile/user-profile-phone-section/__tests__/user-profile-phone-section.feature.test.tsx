@@ -149,6 +149,7 @@ describe('the user profile phone section', () => {
 
     expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Unverified');
     await manage(actor, WORK_LABEL, 'Verify phone number');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
     await enterCode(actor, VERIFICATION_CODE);
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
@@ -171,6 +172,7 @@ describe('the user profile phone section', () => {
       prepare.release();
     }
 
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
     await enterCode(actor, VERIFICATION_CODE);
     expect(screen.queryByRole('menu')).toBeNull();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());

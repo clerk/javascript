@@ -1,6 +1,6 @@
 'use client';
 
-import { type CSSProperties, type ReactNode, useCallback, useId, useMemo, useRef } from 'react';
+import React, { type CSSProperties, type ReactNode, useCallback, useId, useMemo, useRef } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
@@ -57,7 +57,7 @@ const visuallyHiddenInputStyle: CSSProperties = {
   border: 0,
 };
 
-export function FileUploadRoot(props: FileUploadProps) {
+export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadProps>(function FileUploadRoot(props, ref) {
   const {
     render,
     value: valueProp,
@@ -170,6 +170,7 @@ export function FileUploadRoot(props: FileUploadProps) {
     <FileUploadContext.Provider value={contextValue}>
       {useRender({
         defaultTagName: 'div',
+        ref,
         render,
         state,
         stateAttributesMapping: {
@@ -180,4 +181,4 @@ export function FileUploadRoot(props: FileUploadProps) {
       })}
     </FileUploadContext.Provider>
   );
-}
+});

@@ -21,7 +21,7 @@ export interface AccordionProps extends ComponentProps<'div'> {
   children: ReactNode;
 }
 
-export function AccordionRoot(props: AccordionProps) {
+export const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionProps>(function AccordionRoot(props, ref) {
   const { render, type = 'multiple', disabled = false, children, ...otherProps } = props;
 
   const [value, setValue] = useControllableState(props.value, props.defaultValue ?? [], props.onValueChange);
@@ -80,7 +80,7 @@ export function AccordionRoot(props: AccordionProps) {
           return useRender({
             defaultTagName: 'div',
             render,
-            ref: isRef(compositeRef) ? compositeRef : undefined,
+            ref: [isRef(compositeRef) ? compositeRef : null, ref],
             props: mergedProps,
           });
         }}
@@ -89,4 +89,4 @@ export function AccordionRoot(props: AccordionProps) {
       </Composite>
     </AccordionContext.Provider>
   );
-}
+});

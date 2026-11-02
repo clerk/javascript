@@ -137,7 +137,7 @@ export function useOrganizationListModel(options: OrganizationListModelOptions =
     invitations,
     suggestions,
     paging: {
-      ref,
+      observe: ref,
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
     createOrganization:
