@@ -121,7 +121,7 @@ describe('Waitlist', () => {
       await user.type(await screen.findByRole('textbox', { name: 'Email address' }), 'alice@example.com');
       await user.click(joinButton());
 
-      expect(await screen.findByRole('status')).toHaveTextContent('You will be redirected soon…');
+      await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('You will be redirected soon…'));
       expect(navigate).not.toHaveBeenCalled();
 
       await act(() => vi.advanceTimersByTimeAsync(2000));
