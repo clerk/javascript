@@ -72,7 +72,7 @@ export const styles = stylex.create({
     },
     // `clip`, not `hidden`: a scroll container here would scroll the surface instead of the column.
     overflow: 'clip',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-page'],
     blockSize: {
       [compact]: '100dvh',
       default: '45rem',
@@ -187,6 +187,22 @@ export const styles = stylex.create({
     isolation: 'isolate',
     position: 'relative',
     minWidth: 0,
+  },
+
+  navGroup: {
+    gap: NAV_GAP,
+    display: 'flex',
+    flexDirection: 'column',
+    marginBlockStart: { default: null, ':not(:first-child)': space['4'] },
+  },
+
+  navGroupLabel: {
+    paddingBlock: space['1'],
+    paddingInline: space['2.5'],
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
 
   navItem: {

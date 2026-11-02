@@ -94,7 +94,7 @@ function getPasswordPolicy(
 
 export function useUserProfilePasswordModel(): UserProfilePasswordModel {
   const clerk = useClerk();
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const locale = useLocale();
   const errorText = useErrorText();
   const errorMessages = useMessages('errors');

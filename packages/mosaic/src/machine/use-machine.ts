@@ -3,7 +3,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore }
 import { createActor } from './create-actor';
 import type { Actor, CreateActorOptions, EventObject, Snapshot, StateMachine } from './types';
 
-export interface UseMachineOptions<TContext> extends CreateActorOptions<TContext> {
+export interface UseMachineOptions<TContext, TStates extends string = string> extends CreateActorOptions<
+  TContext,
+  TStates
+> {
   /** Called once when the machine reaches a final state (`type: 'final'`). */
   onDone?: () => void;
 }
@@ -16,9 +19,9 @@ export interface UseMachineOptions<TContext> extends CreateActorOptions<TContext
  * hook only subscribes. A {@link mockActor} can be passed directly to render a
  * teleported step.
  */
-export function useActor<TContext extends object, TEvent extends EventObject>(
-  actor: Actor<TContext, TEvent>,
-): [Snapshot<TContext>, Actor<TContext, TEvent>['send']] {
+export function useActor<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
+  actor: Actor<TContext, TEvent, TStates>,
+): [Snapshot<TContext, TStates>, Actor<TContext, TEvent, TStates>['send']] {
   const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
   return [snapshot, actor.send];
 }
@@ -34,11 +37,11 @@ export function useActor<TContext extends object, TEvent extends EventObject>(
  * return <button onClick={() => send({ type: 'TOGGLE' })}>{snapshot.value}</button>;
  * ```
  */
-export function useMachine<TContext extends object, TEvent extends EventObject>(
-  machine: StateMachine<TContext, TEvent>,
-  options?: UseMachineOptions<TContext>,
-): [Snapshot<TContext>, Actor<TContext, TEvent>['send'], Actor<TContext, TEvent>] {
-  const actorRef = useRef<Actor<TContext, TEvent> | null>(null);
+export function useMachine<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
+  machine: StateMachine<TContext, TEvent, TStates>,
+  options?: UseMachineOptions<TContext, TStates>,
+): [Snapshot<TContext, TStates>, Actor<TContext, TEvent, TStates>['send'], Actor<TContext, TEvent, TStates>] {
+  const actorRef = useRef<Actor<TContext, TEvent, TStates> | null>(null);
   if (actorRef.current === null) {
     actorRef.current = createActor(machine, options);
   }
@@ -84,9 +87,14 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
  * const error = useSelector(actor, snap => snap.context.error);
  * ```
  */
-export function useSelector<TContext extends object, TEvent extends EventObject, TSelected>(
-  actor: Actor<TContext, TEvent>,
-  selector: (snapshot: Snapshot<TContext>) => TSelected,
+export function useSelector<
+  TContext extends object,
+  TEvent extends EventObject,
+  TSelected,
+  TStates extends string = string,
+>(
+  actor: Actor<TContext, TEvent, TStates>,
+  selector: (snapshot: Snapshot<TContext, TStates>) => TSelected,
   equals: (a: TSelected, b: TSelected) => boolean = Object.is,
 ): TSelected {
   const selectorRef = useRef(selector);

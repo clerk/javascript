@@ -17,7 +17,11 @@ export const styles = stylex.create({
     backgroundColor: 'transparent',
     cursor: 'pointer',
     display: 'inline-flex',
-    transitionDuration: durationVars['--cl-duration-base'],
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      ':hover': durationVars['--cl-duration-instant'],
+    },
+    transitionTimingFunction: 'linear',
     maxWidth: '100%',
     minWidth: 0,
   },

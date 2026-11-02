@@ -55,6 +55,7 @@ export function Confirmation<Payload = void>({ color = 'negative', ...props }: C
             <Dialog.Close
               render={
                 <Button
+                  color='neutral'
                   variant='outline'
                   fullWidth
                 >

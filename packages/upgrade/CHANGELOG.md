@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 2.0.10
+
+### Patch Changes
+
+- Correct Core 3 upgrade guide entries: the `idPOAuthAccessToken` property name in the backend verify example is fixed, `@clerk/react-router/api.server` is described as deprecated (still exported) instead of removed, and the Expo minimum version check now flags caret ranges such as `"expo": "^52.1.0"`. ([#10298](https://github.com/clerk/javascript/pull/10298)) by [@royanger](https://github.com/royanger)
+
 ## 2.0.9
 
 ### Patch Changes

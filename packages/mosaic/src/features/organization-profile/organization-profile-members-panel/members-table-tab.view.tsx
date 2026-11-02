@@ -51,7 +51,7 @@ export function MembersTableTabView({
   isChangingRole = false,
   roleError,
 }: MembersTableTabViewProps) {
-  const m = useMessages('membersTableTab');
+  const m = useMessages('organizationProfile').members.list;
   const query = searchValue.trim();
   const showPagination = Math.ceil(totalCount / pageSize) > 1;
   return (
@@ -148,7 +148,7 @@ function MembersTableNotices({
   hasRoleSetMigration,
   roleError,
 }: Pick<MembersTableTabViewProps, 'hasRoleSetMigration' | 'roleError'>) {
-  const m = useMessages('membersTableTab');
+  const m = useMessages('organizationProfile').members.list;
   return (
     <>
       {hasRoleSetMigration ? (
@@ -194,7 +194,7 @@ function MembersTableBody({
   onRemoveClick?: (member: OrganizationProfileMember) => void;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
-  const m = useMessages('membersTableTab');
+  const m = useMessages('organizationProfile').members.list;
   return (
     <Table.Body
       items={members}
@@ -253,7 +253,7 @@ function MemberRow({
   onRemoveClick?: () => void;
   triggerRef?: Ref<HTMLButtonElement>;
 }) {
-  const m = useMessages('membersTableTab');
+  const m = useMessages('organizationProfile').members.list;
   const manageable = canManageMember(member);
   return (
     <Table.Row
@@ -281,7 +281,7 @@ function MemberRow({
             <Entity.Label>
               {member.name}
               {member.isCurrentUser ? (
-                <Badge>{m.you}</Badge>
+                <Badge color='neutral'>{m.you}</Badge>
               ) : member.isDeprovisioned ? (
                 <Badge>{m.deprovisioned}</Badge>
               ) : member.isBanned ? (

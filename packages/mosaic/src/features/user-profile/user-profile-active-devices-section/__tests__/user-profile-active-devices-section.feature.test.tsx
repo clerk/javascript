@@ -405,7 +405,7 @@ describe('Active devices', () => {
       ),
     );
     const messages = {
-      userProfileActiveDevices: { detailsDialog: { signOutError: 'Erreur de déconnexion.' } },
+      userProfile: { activeDevices: { detailsDialog: { signOutError: 'Erreur de déconnexion.' } } },
       errors: { invalid_action_for_session: 'Cet appareil est indisponible.' },
     };
     await renderWithClerk(
@@ -602,7 +602,7 @@ describe('Active devices', () => {
       <MosaicLocalizationProvider
         value={resolveLocalization({
           locale: 'fr-FR',
-          messages: { userProfileActiveDevices: { lastSeen: 'Vu {date}', deviceName: '{browser} sur {device}' } },
+          messages: { userProfile: { activeDevices: { lastSeen: 'Vu {date}', deviceName: '{browser} sur {device}' } } },
         })}
       >
         <MosaicNowProvider value={now}>
@@ -795,10 +795,12 @@ describe('Change language while viewing device details', () => {
             messages:
               locale === 'fr-FR'
                 ? {
-                    userProfileActiveDevices: {
-                      deviceName: '{browser} sur {device}',
-                      lastSeen: 'Vu {date}',
-                      detailsDialog: { lastActive: 'Dernière activité {lastActive}', signOut: 'Déconnecter' },
+                    userProfile: {
+                      activeDevices: {
+                        deviceName: '{browser} sur {device}',
+                        lastSeen: 'Vu {date}',
+                        detailsDialog: { lastActive: 'Dernière activité {lastActive}', signOut: 'Déconnecter' },
+                      },
                     },
                   }
                 : undefined,
@@ -890,7 +892,7 @@ describe('Sign out an unavailable device', () => {
           locale,
           messages: {
             errors: locale === 'fr-FR' ? { active_device_unavailable: expectedMessage } : undefined,
-            userProfileActiveDevices: { detailsDialog: { signOutError: 'Unexpected device failure.' } },
+            userProfile: { activeDevices: { detailsDialog: { signOutError: 'Unexpected device failure.' } } },
           },
         })}
       >

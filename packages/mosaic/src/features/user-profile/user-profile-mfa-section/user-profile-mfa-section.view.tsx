@@ -40,7 +40,7 @@ export function UserProfileMfaSectionView({
   removeReverification,
   setDefaultReverification,
 }: UserProfileMfaSectionViewProps) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const controller = useUserProfileMfaSectionLeafController({
     methods,
     onAdd,
@@ -104,7 +104,7 @@ export function UserProfileMfaSectionView({
   );
 }
 
-function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfileMfa']) {
+function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfile']['mfa']) {
   if (method.type === 'sms') {
     return method.description
       ? fill(m.removeDialog.smsDescription, { phoneNumber: stringToFormattedPhoneString(method.description) })

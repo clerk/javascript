@@ -21,7 +21,7 @@ import { SafeLock } from './auth/safeLock';
 
 /** Persistent, per-app-origin client id. Opaque and random — nothing about the device. */
 const PID_STORAGE_KEY = '__clerk_protect_pid';
-/** The shared `{ token, exp, rid }` store every tab reads before it considers acquiring. */
+/** Prefix of the shared `{ token, exp, rid }` store every tab of an instance reads before it considers acquiring. */
 const TOKEN_STORAGE_KEY = '__clerk_protect_st';
 const ACQUISITION_LOCK_KEY = 'clerk.lock.protectSessionToken';
 
@@ -489,12 +489,12 @@ export class ProtectSession {
   readonly #tokenUrl?: string;
   readonly #timeoutMs: number;
   readonly #applyLoader: ApplyLoader;
-  /**
-   * One store per origin. The token is scoped to the instance that minted it and is verified
-   * server-side, so an origin serving two instances costs a rejected token, never a wrong grant.
-   */
   /** Currently configured `tokens_invalid_before`; 0 when the instance has never set one. */
   readonly #floor: number = 0;
+  /**
+   * One store per instance, keyed by its Frontend API, so instances sharing an origin (development
+   * and production, say) each acquire and send their own token.
+   */
   readonly #tokenStorageKey: string;
   readonly #lock: ReturnType<typeof SafeLock>;
 
@@ -512,16 +512,22 @@ export class ProtectSession {
   static create(
     loaders: ProtectLoader[],
     applyLoader: ApplyLoader,
+    frontendApi: string,
     tokensInvalidBefore?: number,
   ): ProtectSession | undefined {
     const templated = loaders.filter(isTemplated);
     if (templated.length === 0) {
       return undefined;
     }
-    return new ProtectSession(templated, applyLoader, tokensInvalidBefore);
+    return new ProtectSession(templated, applyLoader, frontendApi, tokensInvalidBefore);
   }
 
-  private constructor(templatedLoaders: ProtectLoader[], applyLoader: ApplyLoader, tokensInvalidBefore?: number) {
+  private constructor(
+    templatedLoaders: ProtectLoader[],
+    applyLoader: ApplyLoader,
+    frontendApi: string,
+    tokensInvalidBefore?: number,
+  ) {
     this.#applyLoader = applyLoader;
     this.#floor = normalizeFloor(tokensInvalidBefore);
 
@@ -546,8 +552,8 @@ export class ProtectSession {
     this.#tokenUrl = tokenLoader ? resolveTokenUrl(tokenLoader, this.#placeholders) : undefined;
     this.#timeoutMs = clampTimeout(tokenLoader?.token_timeout_ms);
 
-    this.#tokenStorageKey = TOKEN_STORAGE_KEY;
-    this.#lock = SafeLock(ACQUISITION_LOCK_KEY);
+    this.#tokenStorageKey = `${TOKEN_STORAGE_KEY}:${frontendApi}`;
+    this.#lock = SafeLock(`${ACQUISITION_LOCK_KEY}:${frontendApi}`);
   }
 
   placeholders(): ProtectPlaceholders {

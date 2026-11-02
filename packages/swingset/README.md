@@ -51,7 +51,7 @@ const myModule: StoryModule = { meta: myMeta, Default };
 export const registry: StoryModule[] = [..., myModule];
 ```
 
-Import stories explicitly (not `import *`) and add the module under its group's comment in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, and `Reverification` render in array order.
+Import stories explicitly (not `import *`) and add the module under its group's comment in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; the other groups render in array order (see `ALPHABETICAL_GROUPS` in `src/lib/registry.ts`).
 
 **3. Add docs** — `src/stories/my-component.mdx`
 

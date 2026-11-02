@@ -56,7 +56,7 @@ describe('Passkey action errors', () => {
     serveAccounts();
     const view = await renderWithClerk(
       <MosaicProvider
-        localization={{ messages: { userProfilePasskeys: { saveError: 'Could not add this passkey.' } } }}
+        localization={{ messages: { userProfile: { passkeys: { saveError: 'Could not add this passkey.' } } } }}
       >
         <UserProfilePasskeysSection />
       </MosaicProvider>,
@@ -71,7 +71,7 @@ describe('Passkey action errors', () => {
     expect(screen.queryByText('Private authenticator details')).toBeNull();
     view.rerender(
       <MosaicProvider
-        localization={{ messages: { userProfilePasskeys: { saveError: 'Impossible de créer cette clé.' } } }}
+        localization={{ messages: { userProfile: { passkeys: { saveError: 'Impossible de créer cette clé.' } } } }}
       >
         <UserProfilePasskeysSection />
       </MosaicProvider>,
@@ -399,7 +399,7 @@ describe('Replacing instance policy while editing', () => {
         localization={{
           locale: 'fr-FR',
           messages: {
-            userProfilePasskeys: { accountUnavailableError: 'Ce compte ne permet plus cette action.' },
+            userProfile: { passkeys: { accountUnavailableError: 'Ce compte ne permet plus cette action.' } },
             form: { error: 'Erreur générique du formulaire.' },
           },
         }}

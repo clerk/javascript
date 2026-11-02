@@ -3,7 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars } from '../tokens.stylex';
 
 const highlight =
-  'light-dark(color-mix(in oklab, var(--cl-color-background) 62%, transparent), color-mix(in oklab, var(--cl-color-neutral) 7%, transparent))';
+  'light-dark(color-mix(in oklab, var(--cl-color-surface) 62%, transparent), color-mix(in oklab, var(--cl-color-neutral) 7%, transparent))';
 
 const translate = stylex.keyframes({
   from: { transform: 'translateX(-100%)' },

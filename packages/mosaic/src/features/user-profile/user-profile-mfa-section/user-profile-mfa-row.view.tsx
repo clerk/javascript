@@ -21,7 +21,7 @@ export function UserProfileMfaRowView({
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
 }) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const label = method.label ?? m.methods[method.type];
   const description =
     method.type === 'sms' && method.description ? stringToFormattedPhoneString(method.description) : method.description;

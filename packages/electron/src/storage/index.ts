@@ -1,3 +1,5 @@
+import { chmodSync } from 'node:fs';
+
 import { safeStorage } from 'electron';
 import Store from 'electron-store';
 
@@ -125,8 +127,14 @@ async function resolveCipher(): Promise<Cipher | null> {
 export function storage(options: StorageOptions = {}): TokenStorage {
   const store = new Store<Record<string, string>>({
     name: options.name ?? 'clerk-tokens',
+    configFileMode: 0o600,
     ...(options.path ? { cwd: options.path } : {}),
   });
+  try {
+    chmodSync(store.path, 0o600);
+  } catch {
+    /* the file does not exist yet, or it belongs to another user */
+  }
   const memoryFallback = new Map<string, string>();
   // IPC requests can resolve out of order, so only the latest mutation may update storage.
   const mutationVersions = new Map<string, number>();

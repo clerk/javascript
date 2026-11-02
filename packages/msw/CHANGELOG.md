@@ -1,5 +1,12 @@
 # @clerk/msw
 
+## 0.0.84
+
+### Patch Changes
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
 ## 0.0.83
 
 ### Patch Changes

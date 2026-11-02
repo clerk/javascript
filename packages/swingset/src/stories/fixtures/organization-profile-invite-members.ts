@@ -18,7 +18,7 @@ export function useInviteMembersFixture(): {
   onInvite: (event: MouseEvent<HTMLButtonElement>) => void;
   inviteDialog: OrganizationProfileInviteMembersDialogProps;
 } {
-  const m = useMessages('organizationProfileInviteMembers');
+  const m = useMessages('organizationProfile').members.invite;
   const locale = useLocale();
   const roles = useChaosFixture(exampleRoles, items => items.map((role, index) => ({ ...role, ...chaosRole(index) })));
   const toast = useToastManager();

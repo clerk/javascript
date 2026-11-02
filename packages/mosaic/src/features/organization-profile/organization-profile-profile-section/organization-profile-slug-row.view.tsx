@@ -15,7 +15,7 @@ interface OrganizationProfileSlugRowViewProps {
 }
 
 export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationProfileSlugRowViewProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   return (
     <Section.Row>
       <Section.Item>
@@ -52,7 +52,7 @@ export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationP
 }
 
 function EditSlug({ slug, onSubmit }: { slug: string; onSubmit: (slug: string) => Promise<void> }) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const controller = useOrganizationProfileEditSlugController({ slug, onSubmit });
 
   return (

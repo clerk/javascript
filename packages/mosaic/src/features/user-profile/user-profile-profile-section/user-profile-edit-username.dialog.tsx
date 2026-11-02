@@ -40,7 +40,7 @@ export function UserProfileEditUsernameDialog({
   reverification,
   step,
 }: UserProfileEditUsernameDialogProps) {
-  const m = useMessages('userProfileProfileSection').username;
+  const m = useMessages('userProfile').profile.username;
   const usernameRef = useRef<HTMLInputElement>(null);
 
   const edit = (
@@ -143,7 +143,7 @@ function UsernameField({
   form: UseFormResult<UserProfileEditUsernameValue>;
   inputRef: RefObject<HTMLInputElement>;
 }) {
-  const m = useMessages('userProfileProfileSection').username;
+  const m = useMessages('userProfile').profile.username;
   const { feedback } = form.fields.username;
   const error = feedback?.type === 'error' ? feedback.message : undefined;
   const { ref, ...control } = form.register('username');

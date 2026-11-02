@@ -48,7 +48,7 @@ export function UserProfileEditPasswordDialog({
   reverification,
   step,
 }: UserProfileEditPasswordDialogProps) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
 
@@ -198,7 +198,7 @@ function PasswordField({
   name: UserProfileEditPasswordField;
   advisoryFeedback?: FieldFeedback;
 }) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields[name];

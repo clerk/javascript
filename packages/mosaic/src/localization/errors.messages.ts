@@ -17,7 +17,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_param_format_invalid__email_address: 'Email address must be a valid email address.',
   form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
   form_param_value_invalid__role: 'This role cannot be assigned here.',
-  form_password_incorrect: 'Your current password is incorrect.',
+  form_password_incorrect: 'Password is incorrect.',
+  form_password_incorrect__current_password: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
   form_password_matches_identifier:
     'Password cannot match your email address, phone number or username. For account safety, please use a different password.',

@@ -99,6 +99,7 @@ function HeaderCloseButton() {
       aria-label='Close'
       render={props => (
         <Button
+          color='neutral'
           variant='ghost'
           shape='circle'
           size='sm'

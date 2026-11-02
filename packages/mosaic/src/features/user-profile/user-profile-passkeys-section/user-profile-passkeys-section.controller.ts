@@ -22,7 +22,7 @@ export function useUserProfilePasskeysSectionController({
   reverification,
   addReverification,
 }: PasskeysControllerInput): UserProfilePasskeysSectionViewProps {
-  const messages = useMessages('userProfilePasskeys');
+  const messages = useMessages('userProfile').passkeys;
   const add = usePendingAction<'add'>({ errorFallback: messages.saveError });
   const sectionRef = useRef<HTMLDivElement>(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);

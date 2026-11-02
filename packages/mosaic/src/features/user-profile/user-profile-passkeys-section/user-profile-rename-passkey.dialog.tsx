@@ -25,7 +25,7 @@ export function UserProfileRenamePasskeyDialog({
   onOpenChange,
   form,
 }: UserProfileRenamePasskeyDialogProps) {
-  const m = useMessages('userProfilePasskeys');
+  const m = useMessages('userProfile').passkeys;
   const inputRef = useRef<HTMLInputElement>(null);
   const { ref, ...control } = form.register('name');
   const mergedRef = useMergeRefs([ref, inputRef]);
@@ -80,6 +80,7 @@ export function UserProfileRenamePasskeyDialog({
             <Dialog.Close
               render={
                 <Button
+                  color='neutral'
                   variant='outline'
                   fullWidth
                   disabled={form.isSubmitting}

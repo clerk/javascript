@@ -69,7 +69,7 @@ export const apiKeysTableMessages = {
 } as const;
 
 export function resolveAPIKeysTableMessages(
-  catalog: MosaicMessages['apiKeysTable'],
+  catalog: MosaicMessages['apiKeys'],
   subjectKind: APIKeysTableSubjectKind,
   overrides?: Partial<APIKeysTableMessages>,
 ): APIKeysTableMessages {
