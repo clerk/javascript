@@ -5,9 +5,7 @@ import type { OrganizationProfilePageId } from '../organization-profile/organiza
 import type { UserProfileProps } from '../user-profile/user-profile';
 import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 
-export type MosaicProfile = MosaicProfileOptions & UserProfileRouting & OrganizationProfileRouting;
-
-interface MosaicProfileOptions {
+export interface MosaicProfile {
   /**
    * Whether one profile carries the account's pages and the active organization's. `false` keeps them
    * in separate profiles. It decides the profile's shape, not what `UserButton`'s menu lists.
@@ -24,36 +22,15 @@ interface MosaicProfileOptions {
    * whichever component opens or mounts it.
    */
   organizationProfileProps?: ProfileOrganizationProps;
+  /**
+   * Full URL or path of your own user profile page. Setting it routes there instead of opening the modal.
+   */
+  userProfileUrl?: string;
+  /**
+   * Full URL or path of your own organization profile page. Setting it routes there instead of opening the modal.
+   */
+  organizationProfileUrl?: string;
 }
-
-/** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
-type UserProfileRouting =
-  | {
-      /** Full URL or path of your own user profile page. Setting it routes there instead of opening the modal. */
-      userProfileUrl: string;
-      /** How the user profile opens: `modal` opens it in place, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
-      userProfileMode?: 'navigation';
-    }
-  | {
-      /** Full URL or path of your own user profile page. Setting it routes there instead of opening the modal. */
-      userProfileUrl?: never;
-      /** How the user profile opens: `modal` opens it in place, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
-      userProfileMode?: 'modal';
-    };
-
-type OrganizationProfileRouting =
-  | {
-      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening the modal. */
-      organizationProfileUrl: string;
-      /** How the organization profile opens: `modal` opens it in place, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
-      organizationProfileMode?: 'navigation';
-    }
-  | {
-      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening the modal. */
-      organizationProfileUrl?: never;
-      /** How the organization profile opens: `modal` opens it in place, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
-      organizationProfileMode?: 'modal';
-    };
 
 /** What a profile takes beyond the profile component's own props. */
 export interface ProfilePages<PageId extends string> {

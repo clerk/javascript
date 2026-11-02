@@ -107,10 +107,6 @@ export function resolveAfterUrl<T extends object>(
   return undefined;
 }
 
-function opensModal(url: string | undefined, mode: 'navigation' | 'modal' | undefined): boolean {
-  return (mode ?? (url ? 'navigation' : 'modal')) === 'modal';
-}
-
 /** Opens the modal unless a URL routes instead. An explicit mode wins; a URL on its own means navigation. */
 function openOrNavigate({
   url,
@@ -120,12 +116,13 @@ function openOrNavigate({
   navigate,
 }: {
   url: string | undefined;
-  mode: 'navigation' | 'modal' | undefined;
+  mode?: 'navigation' | 'modal';
   openModal: () => void;
   buildUrl: () => string;
   navigate: (to: string) => unknown;
 }): () => void {
-  return opensModal(url, mode) ? () => openModal() : () => void navigate(url ?? buildUrl());
+  const opensModal = (mode ?? (url ? 'navigation' : 'modal')) === 'modal';
+  return opensModal ? () => openModal() : () => void navigate(url ?? buildUrl());
 }
 
 function displayName(user: UserResource): string {
@@ -179,9 +176,7 @@ export function useSwitcherModel(
     userProfileProps,
     organizationProfileProps,
     userProfileUrl,
-    userProfileMode,
     organizationProfileUrl,
-    organizationProfileMode,
   } = profile;
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
@@ -198,7 +193,6 @@ export function useSwitcherModel(
 
   const manageAccount = openOrNavigate({
     url: userProfileUrl,
-    mode: userProfileMode,
     openModal: () =>
       newProfiles
         ? userProfile.open(mosaicUserProfile, getContainer?.())
@@ -214,7 +208,6 @@ export function useSwitcherModel(
 
   const manageOrganization = openOrNavigate({
     url: organizationProfileUrl,
-    mode: organizationProfileMode,
     openModal: () => {
       if (!newProfiles) {
         clerk.openOrganizationProfile({
@@ -234,11 +227,7 @@ export function useSwitcherModel(
   });
 
   const managesBothInOneProfile =
-    newProfiles &&
-    menuMode === 'combined' &&
-    combined &&
-    opensModal(userProfileUrl, userProfileMode) &&
-    opensModal(organizationProfileUrl, organizationProfileMode);
+    newProfiles && menuMode === 'combined' && combined && !userProfileUrl && !organizationProfileUrl;
 
   const createOrganization = openOrNavigate({
     url: options.createOrganizationUrl,

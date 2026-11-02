@@ -15,7 +15,8 @@ Breaking changes:
 
 - `UserButton`: `mode` is replaced by `combined`, which only decides what the menu lists. `mode='user'` becomes `combined={false}`, and to keep the account-only profile too, also set `profile={{ combined: false }}` on `MosaicProvider`.
 - `UserButton` and `OrganizationSwitcher`: `userProfileProps` and `organizationProfileProps` move to `MosaicProvider`'s `profile`.
-- `UserButton` and `OrganizationSwitcher`: `userProfileUrl`, `userProfileMode`, `organizationProfileUrl` and `organizationProfileMode` move to `MosaicProvider`'s `profile`.
+- `UserButton` and `OrganizationSwitcher`: `userProfileUrl` and `organizationProfileUrl` move to `MosaicProvider`'s `profile`.
+- `UserButton` and `OrganizationSwitcher`: `userProfileMode` and `organizationProfileMode` are removed. Setting a URL routes there, and leaving it out opens the modal.
 - `UserButton` and `OrganizationSwitcher`: `appearance` is no longer accepted in `userProfileProps` or `organizationProfileProps`.
 - `UserButton` and `OrganizationSwitcher`: link items (`href`) are no longer accepted in `customPages`.
 - `UserButton` and `OrganizationSwitcher`: `afterLeaveOrganizationUrl` moves to `profile.organizationProfileProps`, which also takes `apiKeysProps`.
