@@ -30,6 +30,12 @@ export function isKeyboardOpen(context: Pick<FloatingContext, 'dataRef'>): boole
   return openEvent ? isKeyboardEvent(openEvent) : false;
 }
 
+export function isHoverOpen(context: Pick<FloatingContext, 'dataRef'>): boolean {
+  const type = context.dataRef.current.openEvent?.type;
+
+  return type != null && type.includes('mouse') && type !== 'mousedown';
+}
+
 /**
  * The kind of input behind an open or close, Base UI's taxonomy: the empty string means there
  * was no interaction — the change was programmatic (a state machine, a route, a mutation result).

@@ -26,7 +26,7 @@ export const root = stylex.create({
   card: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-lg'],
   },
   flush: {
@@ -38,7 +38,7 @@ export const root = stylex.create({
   overlay: {
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-lg'],
   },
 });

@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import type { ClerkAPIError } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
@@ -85,6 +85,11 @@ export async function save<TField extends string = never>(
   try {
     await run();
   } catch (cause) {
+    // A cancelled reverification is the user backing out, not a failure to show, so it passes
+    // through for the owner to recognise.
+    if (isReverificationCancelledError(cause)) {
+      throw cause;
+    }
     const formError = toClerkFormError(cause, fields, params);
     if (!formError) {
       throw cause;

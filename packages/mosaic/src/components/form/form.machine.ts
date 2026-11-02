@@ -1,3 +1,5 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
+
 import type { LocalizableError } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { TransitionResult } from '../../machine/types';
@@ -39,7 +41,7 @@ export interface AsyncFieldState {
 export interface FormDeps<TValues extends object> {
   initialValues: TValues;
   fields: FieldsConfig<TValues> | undefined;
-  onSubmit: (values: TValues) => Promise<unknown>;
+  onSubmit: (values: TValues) => Promise<() => void>;
   canSubmit: (values: TValues) => boolean;
   fallbackMessage: string;
   errorText: (error: LocalizableError) => string;
@@ -249,12 +251,19 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
         invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
           onDone: {
             target: 'editing',
-            actions: assign(() => ({ error: undefined })),
+            actions: [assign(() => ({ error: undefined })), (_, event) => event.output()],
           },
-          onError: {
-            target: 'editing',
-            actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
-          },
+          onError: [
+            {
+              guard: (_, e) => Boolean(e.error) && isReverificationCancelledError(e.error),
+              target: 'editing',
+              actions: assign(() => ({ error: undefined })),
+            },
+            {
+              target: 'editing',
+              actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
+            },
+          ],
         }),
       },
     },

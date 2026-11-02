@@ -34,7 +34,7 @@ export interface ProtectLoader {
   token_url?: string;
   /**
    * How long to wait for the token before giving up and reporting a status instead. Defaults to
-   * 5000 and is capped at 10000 by the SDK, so this cannot stall a sign-in.
+   * 10000 and is capped at 10000 by the SDK, so this cannot stall a sign-in.
    */
   token_timeout_ms?: number;
   /**

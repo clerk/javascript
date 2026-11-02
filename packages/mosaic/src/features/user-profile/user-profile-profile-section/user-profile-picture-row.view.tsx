@@ -28,7 +28,7 @@ export function UserProfilePictureRowView({
   onReject,
   onRemove,
 }: UserProfilePictureRowViewProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -85,16 +85,16 @@ function ProfilePictureActions({
   canChange: boolean;
   onRemove?: () => void;
 }) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
+    actions.push({ label: m.picture.change, onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
+    actions.push({ label: m.picture.remove, color: 'negative', onClick: onRemove });
   }
 
   if (actions.length > 0) {

@@ -67,26 +67,26 @@ return (
     await app.withEnv(appConfigs.envs.withSessionTasks);
     await app.dev();
 
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     user = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(user);
   });
 
   test.afterAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     await user.deleteIfExists();
     await u.services.organizations.deleteAll();
     await app.teardown();
   });
 
   test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.signOut();
     await u.page.context().clearCookies();
   });
 
   test('redirects to completion page after resolving task', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Performs sign-in
     await u.po.signIn.goTo();

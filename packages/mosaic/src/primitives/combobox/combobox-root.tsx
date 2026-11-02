@@ -86,6 +86,7 @@ function ComboboxInner(props: ComboboxProps) {
   useEffect(() => {
     if (!open) {
       setQueryChanged(false);
+      highlightFirstRef.current = false;
     }
     if (open) {
       return;
@@ -106,6 +107,13 @@ function ComboboxInner(props: ComboboxProps) {
   const popupRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
+  const highlightFirstRef = useRef(false);
+  const registerOption = useCallback((index: number) => {
+    if (index === 0 && highlightFirstRef.current) {
+      highlightFirstRef.current = false;
+      setActiveIndex(0);
+    }
+  }, []);
   const registerSelectedIndex = useCallback(
     (index: number, value: string, label: string) => {
       labelsByValueRef.current.set(value, label);
@@ -219,7 +227,12 @@ function ComboboxInner(props: ComboboxProps) {
         setSelectedIndex(null);
       }
       setOpenState(true);
-      setActiveIndex(0);
+      if (elementsRef.current[0]) {
+        setActiveIndex(0);
+      } else {
+        highlightFirstRef.current = true;
+        setActiveIndex(null);
+      }
     },
     [props.inline, setInputValue, setOpenState, setSelectedValue],
   );
@@ -252,6 +265,7 @@ function ComboboxInner(props: ComboboxProps) {
       focusInput,
       popupId,
       registerSelectedIndex,
+      registerOption,
       mounted,
       transitionProps,
     }),
@@ -275,6 +289,7 @@ function ComboboxInner(props: ComboboxProps) {
       focusInput,
       popupId,
       registerSelectedIndex,
+      registerOption,
       mounted,
       transitionProps,
     ],

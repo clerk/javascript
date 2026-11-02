@@ -3664,7 +3664,10 @@ export class Clerk implements ClerkInterface {
         Client.getOrCreateInstance().fetch({ fetchMaxTries }),
       ]);
     } catch (err) {
-      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+      const isUnavailable =
+        (isClerkRuntimeError(err) && err.code === 'network_error') ||
+        (isClerkAPIResponseError(err) && err.status >= 500);
+      if (isUnavailable && this.shouldFallbackToCachedResources()) {
         const cachedResources = await this.__internal_getCachedResources?.();
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();

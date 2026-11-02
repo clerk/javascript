@@ -3,34 +3,43 @@ import { type ReactNode, type Ref, useRef } from 'react';
 
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { Dialog } from '../../../components/dialog';
+import { Dialog, type DialogFocusTarget } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
+import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
 
 export interface UserProfileAddMfaDialogProps {
   open: boolean;
+  initialFocus?: DialogFocusTarget;
   onOpenChange: (open: boolean) => void;
   children: ReactNode;
   disabled?: boolean;
   hideTrigger?: boolean;
+  reverifying?: boolean;
+  showCloseButton?: boolean;
   triggerRef?: Ref<HTMLButtonElement>;
 }
 
 export function UserProfileAddMfaDialog({
   open,
+  initialFocus,
   onOpenChange,
   children,
   disabled,
   hideTrigger,
+  reverifying = false,
+  showCloseButton = true,
   triggerRef: triggerRefProp,
 }: UserProfileAddMfaDialogProps) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useMergeRefs([triggerRefProp, addButtonRef]);
   return (
     <Dialog.Root
       open={open}
       onOpenChange={onOpenChange}
+      shouldCloseOnInteractOutside={!reverifying}
+      showCloseButton={showCloseButton}
     >
       {!hideTrigger ? (
         <Dialog.Trigger
@@ -46,7 +55,7 @@ export function UserProfileAddMfaDialog({
           }
         >
           <Icon
-            name='plus'
+            glyph={Plus}
             placement='inline-start'
             size='sm'
           />
@@ -55,6 +64,7 @@ export function UserProfileAddMfaDialog({
       ) : null}
       <Dialog.Popup
         variant='card'
+        initialFocus={initialFocus}
         finalFocus={addButtonRef}
       >
         <Card.Root

@@ -7,7 +7,7 @@ import { colorVars, durationVars, easingVars } from '../tokens.stylex';
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
 const focusShadow = '0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%))';
 const invalidFocusShadow = `0 0 0 3px ${colorVars['--cl-color-negative-alpha-300']}`;
-const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-brand']} 5%, transparent)`;
+const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 5%, transparent)`;
 
 export const inputStyles = stylex.create({
   base: {

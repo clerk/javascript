@@ -35,7 +35,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
         await app.setup();
         await app.withEnv(appConfigs.envs.withWhatsappPhoneCode);
         await app.dev();
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser(test, {
+        fakeUser = (await createTestUtils({ app })).services.users.createFakeUser(test, {
           withEmail: false,
           withPhoneNumber: true,
           withPassword: false,
@@ -48,7 +48,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
       });
 
       test('sign up', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signUp.goTo();
 
         // intercept the request to /sign_ups
@@ -89,7 +89,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
       });
 
       test('sign in', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
 
         // intercept the request to /sign_in
@@ -131,7 +131,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
         page,
         context,
       }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
 
         // intercept the request to /sign_in

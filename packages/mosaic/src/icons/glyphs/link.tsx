@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const Link = glyph(
+  'link',
   <>
     <path
       fillRule='evenodd'

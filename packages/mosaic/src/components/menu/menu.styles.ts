@@ -25,7 +25,7 @@ export const popup = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
@@ -95,6 +95,13 @@ export const item = stylex.create({
         ':hover': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      ':is([data-active])': colorVars['--cl-color-foreground'],
+      '@media (hover: hover)': {
+        ':hover': colorVars['--cl-color-foreground'],
+      },
+    },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'flex',
     // The viewport is a height-capped flex column: without this the rows squash to fit the cap
@@ -102,7 +109,7 @@ export const item = stylex.create({
     flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
     outlineOffset: 0,
@@ -150,6 +157,17 @@ export const label = stylex.create({
     paddingInline: space['1'],
     flexGrow: 1,
     minWidth: 0,
+  },
+});
+
+export const indicator = stylex.create({
+  base: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['4'],
   },
 });
 

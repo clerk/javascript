@@ -1,11 +1,15 @@
+import type { ConfirmController } from '../../../blocks/confirm';
 import { Destructive } from '../../../blocks/destructive';
-import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 
-export function UserProfileDangerSectionView(destructiveProps: DestructiveController) {
-  const m = useMessages('userProfileDangerSection');
+export interface UserProfileDangerSectionViewProps {
+  controller: ConfirmController;
+}
+
+export function UserProfileDangerSectionView({ controller }: UserProfileDangerSectionViewProps) {
+  const m = useMessages('userProfile').danger;
 
   return (
     <Section.Root>
@@ -24,7 +28,7 @@ export function UserProfileDangerSectionView(destructiveProps: DestructiveContro
               </Section.Content>
               <Section.Actions>
                 <Destructive
-                  {...destructiveProps}
+                  controller={controller}
                   trigger={
                     <Button
                       color='negative'

@@ -1,5 +1,72 @@
 # Change Log
 
+## 3.26.5
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Add `bcrypt_peppered`, `md5_salted`, `pbkdf2_sha512`, `pbkdf2_sha512_hex`, `sha256_salted`, and `sha512_symfony` to the `PasswordHasher` type, so TypeScript accepts every hasher the `createUser()` JSDoc documents. The JSDoc for `md5_salted` and `sha256_salted` now also shows the `password_digest` format the Backend API accepts: `hash$salt`, not `salt$hash`. ([#10504](https://github.com/clerk/javascript/pull/10504)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
+## 3.26.4
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+
+## 3.26.3
+
+### Patch Changes
+
+- Update the `lockUser()` JSDoc to link to the **Protections** page under **Protect** (`/~/protect/protections`) in the Clerk Dashboard. Point the user lock links in the `lockUser()`, `unlockUser()`, `CreateUserParams.locked`, and `User.locked` JSDoc to the current guide on user locks. ([#10395](https://github.com/clerk/javascript/pull/10395)) by [@mwickett](https://github.com/mwickett)
+
+- Session `expireAt` and `abandonAt` no longer special-case a `0` deadline; the backend now always sends a real deadline. ([#10389](https://github.com/clerk/javascript/pull/10389)) by [@swolfand](https://github.com/swolfand)
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/shared@4.42.0
+
+## 3.26.2
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+
+## 3.26.1
+
+### Patch Changes
+
+- Stop accepting the legacy `cl_I7d4PD111III` JWT category as a session or handshake token. Clerk no longer issues it, so `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for a token carrying it, the same as for other non-session categories. ([#10286](https://github.com/clerk/javascript/pull/10286)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.26.0
+
+### Minor Changes
+
+- Add webhook types for transactional email delivery, delays, bounces, complaints, failures, and suppressions. Bounce events distinguish `Permanent`, `Transient`, and `Undetermined` classifications. `verifyWebhook()` preserves the original event timestamp and instance ID for outcome handlers. These types prepare for the transactional email pilot; receiving the events requires the corresponding backend rollout. ([#9776](https://github.com/clerk/javascript/pull/9776)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Clarify issuer validation for session tokens and document that machine token verification ignores the issuer option. ([#10282](https://github.com/clerk/javascript/pull/10282)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+
+## 3.25.0
+
+### Minor Changes
+
+- Added an optional `issuer` option to `verifyJwt()`, `verifyToken()`, and `authenticateRequest()` to validate the JWT `iss` claim against a string or list of allowed strings. For `verifyToken()` and `authenticateRequest()`, this applies only to session tokens. Omitting `issuer` preserves existing behavior. ([#8772](https://github.com/clerk/javascript/pull/8772)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.24.0
+
+### Minor Changes
+
+- Add `deprovisioned` to the Backend `User` object and `UserJSON`, so you can tell when Directory Sync has deactivated a user, including in `user.updated` webhook payloads, without casting. It's separate from `banned`: Directory Sync sets and clears `deprovisioned`, while you set `banned` through the Dashboard or Backend API. ([#10245](https://github.com/clerk/javascript/pull/10245)) by [@manovotny](https://github.com/manovotny)
+
 ## 3.23.2
 
 ### Patch Changes

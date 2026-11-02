@@ -15,7 +15,7 @@ export function UserProfileSolanaWalletView({
   error?: string;
   onConnect: (walletName: string) => void;
 }) {
-  const m = useMessages('userProfileWeb3Wallets');
+  const m = useMessages('userProfile').web3Wallets;
   const pending = pendingWalletName !== undefined;
 
   return (

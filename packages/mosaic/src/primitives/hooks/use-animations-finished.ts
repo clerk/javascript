@@ -14,11 +14,18 @@ import { flushSync } from 'react-dom';
  * before polling animations. This avoids a race where `getAnimations()` returns
  * an empty array before the enter transition has been registered.
  *
+ * When `filter` is given, only animations it accepts are waited on, so an
+ * unrelated (or infinite) animation on the element can't hold the callback.
+ *
  * Each call aborts any pending wait from a previous call, so rapid open/close
  * toggles don't leak stale callbacks, and returns a cancel function for callers
  * that need to abandon a wait before it resolves.
  */
-export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: boolean) {
+export function useAnimationsFinished(
+  ref: RefObject<HTMLElement | null>,
+  open: boolean,
+  filter?: (animation: Animation) => boolean,
+) {
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -42,11 +49,13 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
         return cancel;
       }
 
+      const getAnimations = () => (filter ? element.getAnimations().filter(filter) : element.getAnimations());
+
       const runCheck = () => {
         if (signal.aborted) {
           return;
         }
-        const animations = element.getAnimations();
+        const animations = getAnimations();
         if (animations.length === 0) {
           // Called synchronously (from useEffect or MutationObserver) —
           // plain callback is fine, React will batch the state update.
@@ -68,7 +77,7 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
             }
             // An animation was cancelled. If new animations are running, wait
             // for those instead; otherwise we're done.
-            const current = element.getAnimations();
+            const current = getAnimations();
             if (current.length > 0) {
               runCheck();
             } else {
@@ -95,6 +104,6 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
       runCheck();
       return cancel;
     },
-    [ref, open],
+    [ref, open, filter],
   );
 }

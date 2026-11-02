@@ -82,7 +82,7 @@ export const styles = stylex.create({
     borderWidth: { default: null, '@media (forced-colors: active)': '1px' },
     outline: 'none',
     overscrollBehavior: 'contain',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     borderStartEndRadius: radiusVars['--cl-radius-2xl'],
     borderStartStartRadius: radiusVars['--cl-radius-2xl'],
     // No drop shadow — the sheet sits on the screen edge, so there is nothing for it to float over.

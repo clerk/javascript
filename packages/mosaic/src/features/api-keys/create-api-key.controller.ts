@@ -1,23 +1,27 @@
 import type { MouseEventHandler } from 'react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import { useForm } from '../../components/form';
 import { useNow } from '../../hooks/use-now';
 import { useLocale } from '../../localization';
+import { setup } from '../../machine/setup';
+import { useMachine } from '../../machine/use-machine';
 import { formatDate } from '../../utils/format-date';
 import { getExpirationDate } from './api-keys-table.format';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 import type { CreateAPIKeyDialogProps, CreateAPIKeyValues } from './create-api-key.dialog';
 
-const initialValues: CreateAPIKeyValues = { name: '', expiration: null };
+const initialValues: CreateAPIKeyValues = { name: '', description: '', expiration: null };
 
 export interface CreateAPIKeyInput {
   name: string;
+  description: string | undefined;
   expiresAt: Date | null;
 }
 
 export interface CreateAPIKeyControllerOptions {
   messages: APIKeysTableMessages;
+  showDescription: boolean;
   onCreate: (input: CreateAPIKeyInput) => Promise<string>;
 }
 
@@ -26,26 +30,87 @@ export interface CreateAPIKeyController {
   dialog: CreateAPIKeyDialogProps;
 }
 
+interface Context {
+  secret: string | null;
+  copyFailed: boolean;
+}
+
+type Event =
+  | { type: 'OPEN' }
+  | { type: 'CREATED'; secret: string }
+  | { type: 'COPY' }
+  | { type: 'COPIED' }
+  | { type: 'COPY_FAILED' }
+  | { type: 'CLOSE' };
+
+const { createMachine, assign } = setup<Context, Event>();
+
+const clearCopyError = assign(() => ({ copyFailed: false }));
+const setCopyError = assign(() => ({ copyFailed: true }));
+
+const machine = createMachine({
+  id: 'createAPIKey',
+  initial: 'closed',
+  context: { secret: null, copyFailed: false },
+  states: {
+    closed: {
+      on: { OPEN: { target: 'form', actions: assign(() => ({ secret: null, copyFailed: false })) } },
+    },
+    form: {
+      on: {
+        CREATED: { target: 'secret', actions: assign((_, event) => ({ secret: event.secret })) },
+        CLOSE: 'closed',
+      },
+    },
+    secret: {
+      on: { COPY: 'copying' },
+    },
+    copying: {
+      on: {
+        COPIED: { target: 'attempted', actions: clearCopyError },
+        COPY_FAILED: { target: 'attempted', actions: setCopyError },
+      },
+    },
+    attempted: {
+      on: {
+        COPY: 'copying',
+        COPIED: { target: 'attempted', actions: clearCopyError },
+        COPY_FAILED: { target: 'attempted', actions: setCopyError },
+        CLOSE: 'closed',
+      },
+    },
+  },
+});
+
 export function useCreateAPIKeyController({
   messages,
+  showDescription,
   onCreate,
 }: CreateAPIKeyControllerOptions): CreateAPIKeyController {
   const locale = useLocale();
   const now = useNow({ updateInterval: 60_000 });
   const trigger = useRef<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState(false);
-  const [secret, setSecret] = useState<string | null>(null);
-  const [copyError, setCopyError] = useState<string | null>(null);
+  const [snapshot, send] = useMachine(machine);
+  const { secret, copyFailed } = snapshot.context;
 
   const form = useForm({
     initialValues,
     errorFallback: messages.createError,
     canSubmit: values => values.name.trim().length > 2 && values.expiration !== null,
-    onSubmit: async ({ name, expiration }) => {
+    onSubmit: async ({ name, description, expiration }) => {
       if (expiration === null) {
         return;
       }
-      setSecret(await onCreate({ name: name.trim(), expiresAt: getExpirationDate(expiration, new Date()) }));
+      return onCreate({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        expiresAt: getExpirationDate(expiration, new Date()),
+      });
+    },
+    onSuccess: secret => {
+      if (secret !== undefined) {
+        send({ type: 'CREATED', secret });
+      }
     },
   });
 
@@ -56,36 +121,36 @@ export function useCreateAPIKeyController({
     onOpen: event => {
       trigger.current = event.currentTarget;
       form.reset();
-      setSecret(null);
-      setCopyError(null);
-      setOpen(true);
+      send({ type: 'OPEN' });
     },
     dialog: {
       messages,
-      open,
+      open: snapshot.value !== 'closed',
       onOpenChange: next => {
-        if (!form.isSubmitting) {
-          setOpen(next);
+        if (!next && !form.isSubmitting) {
+          send({ type: 'CLOSE' });
         }
       },
       finalFocus: trigger,
       form,
+      showDescription,
       expirationDateLabel: expirationDate ? formatDate(expirationDate, locale) : null,
       secret,
-      copyError,
+      copyError: copyFailed ? messages.copyError : null,
       onCopy: async close => {
+        send({ type: 'COPY' });
         try {
           await navigator.clipboard.writeText(secret ?? '');
         } catch (error) {
-          setCopyError(messages.copyError);
+          send({ type: 'COPY_FAILED' });
           if (!close) {
             throw error;
           }
           return;
         }
-        setCopyError(null);
+        send({ type: 'COPIED' });
         if (close) {
-          setOpen(false);
+          send({ type: 'CLOSE' });
         }
       },
     },

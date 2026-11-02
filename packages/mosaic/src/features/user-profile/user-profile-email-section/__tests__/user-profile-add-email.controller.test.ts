@@ -3,8 +3,11 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { SaveError } from '../../../../utils/errors';
+import type { ReverificationController } from '../../../reverification';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../../user-profile-contact.types';
 import { useUserProfileAddEmailController } from '../user-profile-add-email.controller';
+
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
 
 const sentCode = (): UserProfileEmailVerification => ({ method: 'code', sent: Promise.resolve() });
 
@@ -20,6 +23,7 @@ function verifier(
 }
 
 const created = () => Promise.resolve(verifier());
+const other = { id: 'email_2', value: 'other@example.com' };
 
 function saveError(message: string, field?: 'emailAddress' | 'code') {
   return new SaveError(field ? { fields: { [field]: { message } } } : { global: { message } });
@@ -33,6 +37,7 @@ describe('useUserProfileAddEmailController', () => {
     const verification = createDeferredPromise();
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({
+        reverification: idleReverification,
         onCreate: () =>
           Promise.resolve(
             verifier(sentCode, async () => {
@@ -42,6 +47,7 @@ describe('useUserProfileAddEmailController', () => {
       }),
     );
     act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
     await act(async () => {
       result.current.onSubmit();
       await Promise.resolve();
@@ -62,6 +68,7 @@ describe('useUserProfileAddEmailController', () => {
   it('starts with the supplied email address', () => {
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({
+        reverification: idleReverification,
         initialEmailAddress: 'saved@example.com',
         onCreate: created,
       }),
@@ -76,7 +83,9 @@ describe('useUserProfileAddEmailController', () => {
       await request.promise;
       return verifier();
     });
-    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate }));
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
+    );
     act(() => result.current.onOpenChange(true));
     act(() => result.current.onEmailAddressChange('new@example.com'));
     act(() => {
@@ -105,8 +114,11 @@ describe('useUserProfileAddEmailController', () => {
   it('waits before resending, blocks overlapping requests, and restarts the countdown', async () => {
     vi.useFakeTimers();
     const email = verifier();
-    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate: () => Promise.resolve(email) }));
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: () => Promise.resolve(email) }),
+    );
     act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
     await act(async () => {
       result.current.onSubmit();
       await vi.advanceTimersByTimeAsync(0);
@@ -136,6 +148,7 @@ describe('useUserProfileAddEmailController', () => {
     const operation = vi.fn().mockRejectedValueOnce(saveError('Try again')).mockResolvedValue(verifier());
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({
+        reverification: idleReverification,
         onCreate: step === 'email' ? operation : () => Promise.resolve(verifier(sentCode, operation)),
       }),
     );
@@ -160,7 +173,9 @@ describe('useUserProfileAddEmailController', () => {
   it('creates the email, sends it a code, verifies the submitted code, and closes on success', async () => {
     const email = verifier();
     const onCreate = vi.fn(() => Promise.resolve(email));
-    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate }));
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
+    );
 
     expect(result.current.open).toBe(false);
     act(() => result.current.onOpenChange(true));
@@ -177,21 +192,55 @@ describe('useUserProfileAddEmailController', () => {
     expect(email.verifyCode).toHaveBeenCalledExactlyOnceWith('123456');
   });
 
-  it('verifies an existing email without creating one', async () => {
+  it('verifies an existing email without creating one, opening once its code is sent', async () => {
     const onCreate = vi.fn(created);
-    const email = verifier();
-    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate }));
+    const sent = createDeferredPromise();
+    const email = verifier(() => ({ method: 'code', sent: sent.promise.then(() => undefined) }));
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
+    );
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
+    expect(email.start).toHaveBeenCalledOnce();
+    expect(result.current.open).toBe(false);
+    expect(result.current.pendingVerifyId).toBe('email_2');
+
+    await act(async () => {
+      sent.resolve();
+      await sent.promise;
+    });
     expect(result.current.open).toBe(true);
+    expect(result.current.pendingVerifyId).toBeUndefined();
     expect(result.current.step).toBe('verify');
     expect(result.current.emailAddress).toBe('other@example.com');
-    await waitFor(() => expect(email.start).toHaveBeenCalledOnce());
 
     act(() => result.current.onSubmit('123456'));
     await waitFor(() => expect(result.current.open).toBe(false));
     expect(email.verifyCode).toHaveBeenCalledExactlyOnceWith('123456');
     expect(onCreate).not.toHaveBeenCalled();
+  });
+
+  it('owns which address is being verified until the next add', async () => {
+    const email = verifier();
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: created }),
+    );
+    expect(result.current.verifyingId).toBeUndefined();
+
+    act(() => result.current.onVerifyEmail(other, email));
+    expect(result.current.verifyingId).toBe('email_2');
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+
+    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
+    expect(result.current.verifyingId).toBe('email_2');
+    expect(result.current.emailAddress).toBe('other@example.com');
+
+    act(() => result.current.onOpenChange(false));
+    expect(result.current.open).toBe(false);
+    expect(result.current.verifyingId).toBe('email_2');
+
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.verifyingId).toBeUndefined();
   });
 
   it('stays on the code step when sending fails, and lets the user resend at once', async () => {
@@ -200,9 +249,11 @@ describe('useUserProfileAddEmailController', () => {
       method: 'code',
       sent: Promise.reject(saveError('Too many requests')),
     }));
-    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate: created }));
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: created }),
+    );
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.errorMessage).toBe('Too many requests'));
     expect(result.current.step).toBe('verify');
     expect(result.current.resendSeconds).toBe(0);
@@ -214,21 +265,21 @@ describe('useUserProfileAddEmailController', () => {
   it('shows the error for the field that failed', async () => {
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({
+        reverification: idleReverification,
         onCreate: () => Promise.reject(saveError('That email is taken.', 'emailAddress')),
       }),
     );
     act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
     act(() => result.current.onSubmit());
     await waitFor(() => expect(result.current.errorMessage).toBe('That email is taken.'));
   });
 
   it('waits for the link to be opened, then closes', async () => {
     const verified = createDeferredPromise();
-    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+    const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
 
-    act(() =>
-      result.current.onVerifyEmail('other@example.com', verifier(sentLink(verified.promise.then(() => undefined)))),
-    );
+    act(() => result.current.onVerifyEmail(other, verifier(sentLink(verified.promise.then(() => undefined)))));
     expect(result.current.step).toBe('link');
     expect(result.current.resendSeconds).toBe(60);
 
@@ -242,14 +293,16 @@ describe('useUserProfileAddEmailController', () => {
   it('stops waiting for the link when closed or unmounted', async () => {
     const cancel = vi.fn();
     const email = verifier(sentLink(new Promise(() => {}), cancel));
-    const { result, unmount } = renderHook(() => useUserProfileAddEmailController({}));
+    const { result, unmount } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification }),
+    );
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     act(() => result.current.onOpenChange(false));
     expect(cancel).toHaveBeenCalledOnce();
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     unmount();
     expect(cancel).toHaveBeenCalledTimes(2);
@@ -257,9 +310,9 @@ describe('useUserProfileAddEmailController', () => {
 
   it('shows a link failure and lets the user send a new link', async () => {
     const email = verifier(sentLink(Promise.reject(saveError('Link expired'))));
-    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+    const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.errorMessage).toBe('Link expired'));
     expect(result.current.step).toBe('link');
     expect(result.current.open).toBe(true);
@@ -268,9 +321,9 @@ describe('useUserProfileAddEmailController', () => {
   it('connects once per click and stays on the SSO step when connecting fails', async () => {
     const connect = vi.fn(() => Promise.reject(saveError('Connection unavailable')));
     const email = verifier(() => ({ method: 'sso', connect }));
-    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+    const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
 
-    act(() => result.current.onVerifyEmail('person@acme.co', email));
+    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
     expect(result.current.step).toBe('sso');
     expect(result.current.resendSeconds).toBe(0);
 
@@ -289,6 +342,7 @@ describe('useUserProfileAddEmailController', () => {
     const shown: string[] = [];
     const { result } = renderHook(() => {
       const controller = useUserProfileAddEmailController({
+        reverification: idleReverification,
         onCreate: () => Promise.resolve(verifier(sentLink(new Promise(() => {})))),
       });
       if (controller.open && shown.at(-1) !== controller.step) {
@@ -306,7 +360,13 @@ describe('useUserProfileAddEmailController', () => {
 
   it('does not add an email that is the same as the username', () => {
     const onCreate = vi.fn(created);
-    const { result } = renderHook(() => useUserProfileAddEmailController({ username: 'person@example.com', onCreate }));
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({
+        reverification: idleReverification,
+        username: 'person@example.com',
+        onCreate,
+      }),
+    );
     act(() => result.current.onOpenChange(true));
     act(() => result.current.onEmailAddressChange('person@example.com'));
     expect(result.current.canSubmitEmail).toBe(false);
@@ -316,5 +376,35 @@ describe('useUserProfileAddEmailController', () => {
 
     act(() => result.current.onEmailAddressChange('other@example.com'));
     expect(result.current.canSubmitEmail).toBe(true);
+  });
+
+  it('does not add an empty email', () => {
+    const onCreate = vi.fn(created);
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
+    );
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.canSubmitEmail).toBe(false);
+    act(() => result.current.onSubmit());
+    expect(onCreate).not.toHaveBeenCalled();
+    expect(result.current.isPending).toBe(false);
+  });
+
+  it('does not verify an incomplete code', async () => {
+    const email = verifier();
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: () => Promise.resolve(email) }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
+    act(() => result.current.onSubmit());
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+    expect(result.current.canSubmitCode).toBe(false);
+    act(() => result.current.onSubmit('123'));
+    expect(email.verifyCode).not.toHaveBeenCalled();
+    expect(result.current.isPending).toBe(false);
+
+    act(() => result.current.onCodeChange('123456'));
+    expect(result.current.canSubmitCode).toBe(true);
   });
 });

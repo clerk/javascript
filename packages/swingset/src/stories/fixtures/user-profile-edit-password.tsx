@@ -24,7 +24,7 @@ export function useUserProfileEditPasswordFixture({
   latency = 800,
   failWith,
 }: UserProfileEditPasswordFixtureOptions = {}) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [hasFailed, setHasFailed] = useState(false);
   const policy: UserProfilePasswordPolicy = hasPassword
@@ -52,6 +52,7 @@ export function useUserProfileEditPasswordFixture({
         open={controller.isOpen}
         onOpenChange={controller.onOpenChange}
         requiresCurrentPassword={policy.requiresCurrentPassword}
+        step={controller.step}
         trigger={
           <Button
             color='neutral'

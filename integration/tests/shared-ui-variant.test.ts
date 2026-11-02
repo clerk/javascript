@@ -9,7 +9,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSharedUIVariant] })(
     test.describe.configure({ mode: 'parallel' });
 
     test('loads without __clerkSharedModules error when using shared UI variant', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const errors: string[] = [];
 
       page.on('console', msg => {

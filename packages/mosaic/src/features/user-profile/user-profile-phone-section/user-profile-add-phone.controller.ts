@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
+import type { DialogHandle } from '../../../components/dialog';
+import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
@@ -7,20 +9,26 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
-import type { UserProfilePhoneVerifier } from '../user-profile-contact.types';
+import type { ReverificationController } from '../../reverification';
+import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
 
 export type UserProfileAddPhoneField = 'phoneNumber' | 'code';
 
 export interface UserProfileAddPhoneControllerOptions {
   onCreate?: (phoneNumber: string) => Promise<UserProfilePhoneVerifier>;
+  reverification?: ReverificationController;
 }
 
 export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialogProps {
-  onVerifyPhone: (phoneNumber: string, verifier: UserProfilePhoneVerifier) => void;
+  handle: DialogHandle<unknown>;
+  verifyingId: string | undefined;
+  pendingVerifyId: string | undefined;
+  onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => void;
 }
 
 interface Context {
+  verifyingId: string | undefined;
   phoneNumber: string;
   verifier: UserProfilePhoneVerifier | undefined;
   error: FormError | undefined;
@@ -29,7 +37,7 @@ interface Context {
 
 type Event =
   | { type: 'ADD' }
-  | { type: 'START'; phoneNumber: string; verifier: UserProfilePhoneVerifier }
+  | { type: 'START'; id?: string; phoneNumber: string; verifier: UserProfilePhoneVerifier }
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
   | { type: 'RESEND' }
@@ -48,6 +56,7 @@ const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.
 const start = {
   target: 'sending',
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
+    verifyingId: event.id,
     phoneNumber: event.phoneNumber,
     verifier: event.verifier,
     error: undefined,
@@ -55,10 +64,18 @@ const start = {
   })),
 };
 
+const sendCode = {
+  invoke: fromPromise((context: Context) => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
+    onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
+    onError: { target: 'verify', actions: fail },
+  }),
+};
+
 const machine = createMachine({
   id: 'addPhone',
   initial: 'idle',
   context: {
+    verifyingId: undefined,
     phoneNumber: '',
     verifier: undefined,
     error: undefined,
@@ -69,20 +86,16 @@ const machine = createMachine({
       on: {
         ADD: {
           target: 'phone',
-          actions: assign(() => ({ verifier: undefined, error: undefined, resendSeconds: 0 })),
+          actions: assign(() => ({ verifyingId: undefined, verifier: undefined, error: undefined, resendSeconds: 0 })),
         },
-        START: start,
+        START: { ...start, target: 'preparing' },
       },
     },
     phone: {
       on: { CANCEL: 'idle', START: start },
     },
-    sending: {
-      invoke: fromPromise(context => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
-        onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
-        onError: { target: 'verify', actions: fail },
-      }),
-    },
+    preparing: sendCode,
+    sending: sendCode,
     verify: {
       on: {
         CANCEL: 'idle',
@@ -100,8 +113,10 @@ const machine = createMachine({
 
 export function useUserProfileAddPhoneController({
   onCreate,
+  reverification,
 }: UserProfileAddPhoneControllerOptions): UserProfileAddPhoneController {
   const errorText = useErrorText();
+  const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
   const { resendSeconds, error } = snapshot.context;
   const phoneForm = useForm({
@@ -123,7 +138,7 @@ export function useUserProfileAddPhoneController({
     },
   });
   const state = snapshot.value;
-  const open = state !== 'idle';
+  const open = state !== 'idle' && state !== 'preparing';
   useEffect(() => {
     if (!open || resendSeconds === 0) {
       return;
@@ -132,23 +147,29 @@ export function useUserProfileAddPhoneController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const step = state === 'phone' ? 'phone' : 'verify';
-  const form = step === 'phone' ? phoneForm : codeForm;
-  const formError = step === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
+  const isReverifying = phoneForm.isSubmitting && Boolean(reverification?.visible);
+  const step = isReverifying ? 'reverify' : state === 'phone' ? 'phone' : 'verify';
+  const form = state === 'phone' ? phoneForm : codeForm;
+  const formError = state === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
+    handle,
     resendSeconds,
     isResending: state === 'sending',
     open,
     step,
-    phoneNumber: step === 'phone' ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
+    reverification,
+    phoneNumber: state === 'phone' ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
     code: codeForm.values.code,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting,
     onOpenChange: open => {
       if (form.isSubmitting) {
-        return;
+        if (open || state !== 'phone' || !reverification?.onCancel) {
+          return;
+        }
+        reverification.onCancel();
       }
       if (open) {
         phoneForm.reset();
@@ -177,9 +198,11 @@ export function useUserProfileAddPhoneController({
         send({ type: 'RESEND' });
       }
     },
-    onVerifyPhone: (phoneNumber, verifier) => {
+    verifyingId: snapshot.context.verifyingId,
+    pendingVerifyId: state === 'preparing' ? snapshot.context.verifyingId : undefined,
+    onVerifyPhone: (phone, verifier) => {
       codeForm.reset();
-      send({ type: 'START', phoneNumber, verifier });
+      send({ type: 'START', id: phone.id, phoneNumber: phone.value, verifier });
     },
   };
 }

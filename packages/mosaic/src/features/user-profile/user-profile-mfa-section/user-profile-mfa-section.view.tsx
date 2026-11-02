@@ -1,9 +1,11 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { type ReactNode, type Ref, useMemo } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import { UserProfileSecurityList } from '../user-profile-security-list';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -19,9 +21,11 @@ export interface UserProfileMfaSectionViewProps {
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
-  onRegenerateBackupCodes?: () => void;
+  regenerate?: { onClick: () => void; status: 'idle' | 'pending'; error?: string };
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
+  removeReverification?: ReverificationController;
+  setDefaultReverification?: ReverificationController;
 }
 
 export function UserProfileMfaSectionView({
@@ -30,13 +34,20 @@ export function UserProfileMfaSectionView({
   addButtonRef,
   addControl,
   onAdd,
-  onRegenerateBackupCodes,
+  regenerate,
   onRemove,
   onSetDefault,
+  removeReverification,
+  setDefaultReverification,
 }: UserProfileMfaSectionViewProps) {
-  const m = useMessages('userProfileMfa');
-  const controller = useUserProfileMfaSectionLeafController({ methods, onRemove, onSetDefault });
-  const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
+  const m = useMessages('userProfile').mfa;
+  const controller = useUserProfileMfaSectionLeafController({
+    methods,
+    onAdd,
+    onRemove,
+    onSetDefault,
+    removeReverification,
+  });
 
   return (
     <>
@@ -44,7 +55,7 @@ export function UserProfileMfaSectionView({
         sectionRef={controller.sectionRef}
         addControl={
           addControl ??
-          (onAdd && addableMethods?.length ? (
+          (controller.addMethod && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               triggerRef={addButtonRef}
               open={controller.pickerOpen}
@@ -52,10 +63,7 @@ export function UserProfileMfaSectionView({
             >
               <UserProfileAddMfaView
                 methods={addableMethods}
-                onSelect={type => {
-                  onAdd(type);
-                  controller.closePicker();
-                }}
+                onSelect={controller.addMethod}
               />
             </UserProfileAddMfaDialog>
           ) : null)
@@ -70,28 +78,33 @@ export function UserProfileMfaSectionView({
             key={method.id}
             method={method}
             triggerRef={controller.registerTrigger(method.id)}
-            onRemove={onRemove ? () => controller.openRemoval(() => removeMethod.open(method)) : undefined}
-            onSetDefault={onSetDefault && !controller.isSettingDefault ? controller.setDefault : undefined}
-            onRegenerateBackupCodes={onRegenerateBackupCodes}
+            onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
+            onSetDefault={controller.setDefault}
+            regenerate={regenerate}
           />
         ))}
       </UserProfileSecurityList>
-      <Section.Error>{controller.defaultError}</Section.Error>
-      {onRemove ? (
+      <Section.Error>{regenerate?.error ?? controller.defaultError}</Section.Error>
+      {controller.remove ? (
         <Confirmation
-          handle={removeMethod}
+          controller={controller.remove}
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
           finalFocus={controller.finalRemovalFocus}
-          onConfirm={controller.confirmRemoval}
+        />
+      ) : null}
+      {setDefaultReverification ? (
+        <ReverificationDialog
+          controller={setDefaultReverification}
+          finalFocus={controller.setDefaultFinalFocus}
         />
       ) : null}
     </>
   );
 }
 
-function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfileMfa']) {
+function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfile']['mfa']) {
   if (method.type === 'sms') {
     return method.description
       ? fill(m.removeDialog.smsDescription, { phoneNumber: stringToFormattedPhoneString(method.description) })

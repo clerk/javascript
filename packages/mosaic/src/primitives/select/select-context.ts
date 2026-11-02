@@ -28,8 +28,11 @@ export interface SelectContextValue {
   setActiveIndex: React.Dispatch<React.SetStateAction<number | null>>;
   selectedIndex: number | null;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
-  selectedValue: string | undefined;
-  selectedLabel: string | null;
+  multiple: boolean;
+  /** The selection in the order it was made; at most one value unless `multiple`. */
+  selectedValues: string[];
+  /** Labels of values picked while uncontrolled, kept after the options unmount; `null` when controlled. */
+  cachedLabels: ReadonlyMap<string, string> | null;
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
   labelsRef: React.MutableRefObject<Array<string | null>>;
   popupRef: RefObject<HTMLDivElement | null>;

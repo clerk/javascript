@@ -31,9 +31,11 @@ const INLINE_TOKEN_GLOBAL = '__clerk_specter';
 /** A token this close to expiry is treated as absent, so a fresh run starts before it lapses. */
 const TOKEN_REFRESH_MARGIN_MS = 60 * 1_000;
 /** Acquisition deadline when the instance does not configure one. */
-const DEFAULT_TOKEN_TIMEOUT_MS = 5 * 1_000;
+const DEFAULT_TOKEN_TIMEOUT_MS = 10 * 1_000;
 /** Ceiling on the instance-configured deadline, so no server value can stall a sign-in. */
 const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
+const STORE_POLL_INTERVAL_MS = 100;
+const LOCK_REFUSAL_WINDOW_MS = 4_000;
 /** A stored token claiming more remaining life than this was not minted by us. */
 const MAX_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
 /** Longest token we will hand back, so a planted store entry cannot bloat a sign-in body. */
@@ -56,6 +58,7 @@ const TOKEN_SEND_MARGIN_MS = 5 * 1_000;
 /** Bounds we hold the server-supplied `retry_in_ms` to. */
 const MIN_RETRY_DELAY_MS = 50;
 const MAX_RETRY_DELAY_MS = 1_000;
+const LATE_TOKEN_RETRY_DELAY_MS = 1_000;
 
 /** Lowercase RFC 4648 base32 — a `cid` has to survive case-insensitive, alphanumeric-only contexts. */
 const BASE32_ALPHABET = 'abcdefghijklmnopqrstuvwxyz234567';
@@ -366,7 +369,7 @@ function settleWithin(ready: PromiseLike<unknown>, deadline: number): Promise<un
  * `timeout`: until the server half deploys it is the correct answer for every load, and calling
  * that a timeout would make a normal rollout look like an outage.
  */
-async function readInlineToken(cid: string, rid: string, deadline: number): Promise<MintedToken | ProtectStatus> {
+async function readInlineToken(cid: string, rid: string, deadline?: number): Promise<MintedToken | ProtectStatus> {
   const inline = (globalThis as unknown as Record<string, unknown>)[INLINE_TOKEN_GLOBAL];
   if (!inline || typeof inline !== 'object') {
     return 'no_token';
@@ -379,7 +382,8 @@ async function readInlineToken(cid: string, rid: string, deadline: number): Prom
     return 'no_token';
   }
 
-  const resolved = await settleWithin(ready, deadline);
+  const resolved =
+    deadline === undefined ? await Promise.resolve(ready).catch(() => null) : await settleWithin(ready, deadline);
   if (resolved === DEADLINE) {
     return 'timeout';
   }
@@ -404,16 +408,17 @@ function isRetryableStatus(status: number): boolean {
 }
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) {
+    return Promise.resolve();
+  }
   return new Promise(resolve => {
-    const timer = setTimeout(resolve, ms);
-    signal.addEventListener(
-      'abort',
-      () => {
-        clearTimeout(timer);
-        resolve();
-      },
-      { once: true },
-    );
+    const settle = () => {
+      clearTimeout(timer);
+      signal.removeEventListener('abort', settle);
+      resolve();
+    };
+    const timer = setTimeout(settle, ms);
+    signal.addEventListener('abort', settle, { once: true });
   });
 }
 
@@ -622,7 +627,8 @@ export class ProtectSession {
     if (readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor)) {
       return;
     }
-    if (Date.now() - this.#lastAttemptAt < this.#backoffMs()) {
+    const elapsed = Date.now() - this.#lastAttemptAt;
+    if (elapsed >= 0 && elapsed < this.#backoffMs()) {
       return;
     }
     this.#startAcquisition();
@@ -666,29 +672,54 @@ export class ProtectSession {
       return 'ok';
     }
 
-    const result = await this.#lock.acquireLockAndRun(async () => {
-      // Double-checked inside the lock. Without this re-read every tab runs the loader in turn,
-      // which is the exact failure this design exists to prevent.
-      if (this.#freshStoredToken()) {
-        return 'ok' satisfies ProtectStatus;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.#timeoutMs);
+    let lockWaitedOut = false;
+    const lockTimer = setTimeout(() => {
+      lockWaitedOut = true;
+    }, LOCK_REFUSAL_WINDOW_MS);
+    try {
+      const result = await this.#lock.acquireLockAndRun(async () => {
+        // Double-checked inside the lock. Without this re-read every tab runs the loader in turn,
+        // which is the exact failure this design exists to prevent.
+        if (this.#freshStoredToken()) {
+          return 'ok' satisfies ProtectStatus;
+        }
+        return await this.#mint();
+      });
+
+      if (typeof result === 'string') {
+        return result as ProtectStatus;
       }
-      return await this.#mint();
-    });
 
-    if (typeof result === 'string') {
-      return result as ProtectStatus;
+      // Refused: nobody is minting for us. Waited out: a leader may still be, so poll the store until our deadline.
+      if (!lockWaitedOut) {
+        return this.#freshStoredToken() ? 'ok' : 'timeout';
+      }
+      return (await this.#awaitStoredToken(controller.signal)) ? 'ok' : 'timeout';
+    } finally {
+      clearTimeout(timer);
+      clearTimeout(lockTimer);
     }
+  }
 
-    // The lock was never held — `SafeLock` gives up waiting after ~5s so a wedged leader delays
-    // nobody. Whatever a leader did manage to write is still ours to use.
-    return this.#freshStoredToken() ? 'ok' : 'timeout';
+  async #awaitStoredToken(signal: AbortSignal): Promise<boolean> {
+    for (;;) {
+      if (this.#freshStoredToken()) {
+        return true;
+      }
+      if (signal.aborted) {
+        return false;
+      }
+      await sleep(STORE_POLL_INTERVAL_MS, signal);
+    }
   }
 
   /** Runs the loader and takes the token it was served with. Never rejects. */
   async #mint(): Promise<ProtectStatus> {
     const deadline = Date.now() + this.#timeoutMs;
 
-    const outcome = await this.#runTokenLoader(deadline);
+    const outcome = await this.#runTokenLoader(deadline, () => void this.#keepLateToken());
     if (outcome === 'error') {
       return 'script_error';
     }
@@ -701,6 +732,9 @@ export class ProtectSession {
     }
 
     const inline = await readInlineToken(this.#cid as string, this.#rid as string, deadline);
+    if (inline === 'timeout') {
+      void this.#keepLateToken();
+    }
     if (typeof inline === 'string') {
       return inline;
     }
@@ -709,11 +743,38 @@ export class ProtectSession {
     return 'ok';
   }
 
+  async #keepLateToken(): Promise<void> {
+    if (this.#tokenUrl) {
+      return;
+    }
+    const late = await readInlineToken(this.#cid as string, this.#rid as string);
+    if (typeof late === 'string') {
+      return;
+    }
+    while (validateToken(late.token, late.exp, TOKEN_SEND_MARGIN_MS)) {
+      const saved = await this.#lock.acquireLockAndRun(() => {
+        if (!validateToken(late.token, late.exp, TOKEN_SEND_MARGIN_MS)) {
+          return Promise.resolve(true);
+        }
+        const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor);
+        if (!stored || (stored.floor <= this.#floor && stored.exp < late.exp)) {
+          writeStoredToken(this.#tokenStorageKey, late, this.#floor);
+          this.#consecutiveFailures = 0;
+        }
+        return Promise.resolve(true);
+      });
+      if (saved === true) {
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, LATE_TOKEN_RETRY_DELAY_MS));
+    }
+  }
+
   /**
    * Injects the token loader and settles on whichever of `load`, `error` or the deadline comes
    * first, or immediately when the element has nothing to fetch.
    */
-  #runTokenLoader(deadline: number): Promise<LoaderOutcome> {
+  #runTokenLoader(deadline: number, onLateLoad?: () => void): Promise<LoaderOutcome> {
     const loader = this.#tokenLoader;
     if (!loader) {
       return Promise.resolve('error');
@@ -739,12 +800,29 @@ export class ProtectSession {
     }
 
     return new Promise<LoaderOutcome>(resolve => {
-      const timer = setTimeout(() => resolve('timeout'), Math.max(0, deadline - Date.now()));
+      let timedOut = false;
+      const timer = setTimeout(
+        () => {
+          timedOut = true;
+          resolve('timeout');
+        },
+        Math.max(0, deadline - Date.now()),
+      );
       const settle = (outcome: LoaderOutcome) => () => {
         clearTimeout(timer);
         resolve(outcome);
       };
-      element.addEventListener('load', settle('loaded'), { once: true });
+      element.addEventListener(
+        'load',
+        () => {
+          if (timedOut) {
+            onLateLoad?.();
+            return;
+          }
+          settle('loaded')();
+        },
+        { once: true },
+      );
       element.addEventListener('error', settle('error'), { once: true });
     });
   }

@@ -32,8 +32,7 @@ export type ReverificationModel =
   | { status: 'inactive' }
   | { status: 'loading'; cancel: () => void }
   | ReverificationActiveModel
-  | { status: 'retrying' }
-  | { status: 'settled' };
+  | { status: 'retrying' };
 
 function toMethod(
   factor: SessionVerificationFirstFactor | SessionVerificationSecondFactor,
@@ -121,10 +120,6 @@ export function useReverificationModel(reverificationState: ReverificationState)
 
   if (reverificationState.phase === 'retrying') {
     return { status: 'retrying' };
-  }
-
-  if (reverificationState.phase === 'settled') {
-    return { status: 'settled' };
   }
 
   const { level, cancel, complete } = reverificationState;

@@ -402,8 +402,19 @@ export class SignIn extends BaseResource implements SignInResource {
 
   attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.attemptSecondFactor', { id: this.id, strategy: params.strategy });
+    let config;
+    switch (params.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(params.publicKeyCredential)),
+        };
+        break;
+      default:
+        config = { ...params };
+    }
+
     return this._basePost({
-      body: params,
+      body: { ...config, strategy: params.strategy },
       action: 'attempt_second_factor',
     });
   };
@@ -412,8 +423,15 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
-      params || {};
+    const {
+      strategy,
+      redirectUrlComplete,
+      identifier,
+      oidcPrompt,
+      slackTeamIdHint,
+      continueSignIn,
+      enterpriseConnectionId,
+    } = params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -439,12 +457,15 @@ export class SignIn extends BaseResource implements SignInResource {
     // provider first" and the challenge runs on the way back, where the callback routes to it.
     let challengedCreateHandOff: URL | null = null;
 
-    if (!this.id || !continueSignIn) {
+    const shouldCreateSignIn = !this.id || !continueSignIn;
+    if (shouldCreateSignIn) {
       await this.create({
         strategy,
         identifier,
         redirectUrl,
         actionCompleteRedirectUrl,
+        oidcPrompt,
+        slackTeamIdHint,
       });
 
       if (isChallengePending()) {
@@ -455,14 +476,16 @@ export class SignIn extends BaseResource implements SignInResource {
       }
     }
 
-    if (strategy === 'enterprise_sso') {
-      await this.prepareFirstFactor({
+    if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
+      const prepareParams = {
         strategy,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        slackTeamIdHint,
         enterpriseConnectionId,
-      });
+      };
+      await this._basePost({ body: prepareParams, action: 'prepare_first_factor', coalesce: true });
 
       // A challenged prepare builds no verification, so any redirect left on the sign-in is from an
       // earlier attempt and may be for another connection. Only this call's create hand-off is safe
@@ -622,6 +645,25 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
+  /**
+   * Authenticates the sign-in with a passkey.
+   *
+   * When called without `params.flow` while the sign-in status is `needs_second_factor` (or
+   * `needs_client_trust`) and the sign-in offers `passkey` among its `supportedSecondFactors`, the
+   * passkey acts as the second factor: the in-progress sign-in is reused via the discrete
+   * prepare/attempt second-factor flow.
+   *
+   * Otherwise the passkey verifies the first factor, with `params.flow` selecting how the ceremony
+   * starts: `'autofill'`/`'discoverable'` create a new sign-in and identify the user from the
+   * passkey itself, discarding any in-progress sign-in, while the default requires a sign-in
+   * created beforehand. A sign-in parked at a second-factor status that does NOT offer passkey (the
+   * backend advertises it only when the instance allows passkeys to satisfy the second factor, the
+   * user has one registered, and the client version supports it) also takes this path, matching
+   * clients that predate passkey second factors: the ceremony starts over instead of failing.
+   *
+   * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails.
+   * @returns The updated `SignIn` resource.
+   */
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
     const { flow } = params || {};
 
@@ -638,6 +680,33 @@ export class SignIn extends BaseResource implements SignInResource {
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
+      });
+    }
+
+    const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
+    const hasPasskeySecondFactor = (this.supportedSecondFactors || []).some(f => f.strategy === 'passkey');
+    if (!flow && isSecondFactor && hasPasskeySecondFactor) {
+      await this.prepareSecondFactor({ strategy: 'passkey' });
+
+      const { nonce: secondFactorNonce } = this.secondFactorVerification;
+      const secondFactorPublicKeyOptions = secondFactorNonce
+        ? convertJSONToPublicKeyRequestOptions(JSON.parse(secondFactorNonce))
+        : null;
+      if (!secondFactorPublicKeyOptions) {
+        clerkMissingWebAuthnPublicKeyOptions('get');
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions: secondFactorPublicKeyOptions,
+        conditionalUI: false,
+      });
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      return this.attemptSecondFactor({
+        publicKeyCredential,
+        strategy: 'passkey',
       });
     }
 
@@ -864,6 +933,7 @@ class SignInFuture implements SignInFutureResource {
     verifyEmailCode: this.verifyMFAEmailCode.bind(this),
     verifyTOTP: this.verifyTOTP.bind(this),
     verifyBackupCode: this.verifyBackupCode.bind(this),
+    passkey: this.verifyMFAPasskey.bind(this),
   };
 
   #canBeDiscarded = false;
@@ -1307,8 +1377,16 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: ClerkError | null }> {
-    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId, identifier } =
-      params;
+    const {
+      strategy,
+      redirectUrl,
+      redirectCallbackUrl,
+      popup,
+      oidcPrompt,
+      slackTeamIdHint,
+      enterpriseConnectionId,
+      identifier,
+    } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       let actionCompleteRedirectUrl = redirectUrl;
       try {
@@ -1329,13 +1407,12 @@ class SignInFuture implements SignInFutureResource {
 
       // Reuse the existing sign-in by default so any state already attached to it carries
       // into the SSO attempt (e.g. a ticket from `signIn.create({ strategy: 'ticket' })`,
-      // or a discovered identifier). OAuth is the exception: its redirect URL only comes
-      // back from `_create` and cannot be refreshed in place, so any redirect already
-      // lingering on the resource is stale. Reusing it would replay a previous attempt's
-      // redirect, including a retry of the same provider after an abandoned redirect
-      // (SDK-75), so whenever an OAuth call finds a pending redirect we start fresh.
-      // `enterprise_sso` is always safe to reuse because the `prepare_first_factor` call
-      // below refreshes its redirect against the existing sign-in.
+      // or a discovered identifier). For OAuth, a pending redirect may belong to an
+      // abandoned attempt, including a retry of the same provider (SDK-75), so start
+      // fresh rather than replay it. `enterprise_sso` can reuse the sign-in because
+      // `prepare_first_factor` below refreshes its redirect. When reusing a sign-in
+      // without a pending redirect, an explicit `slackTeamIdHint` also triggers preparation
+      // so the hint is applied to the existing attempt.
       const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
       const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
       const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
@@ -1355,6 +1432,8 @@ class SignInFuture implements SignInFutureResource {
             strategy,
             ...routes,
             identifier,
+            oidcPrompt,
+            slackTeamIdHint,
           },
           { resolveProtectCheck: false },
         );
@@ -1367,15 +1446,16 @@ class SignInFuture implements SignInFutureResource {
         }
       }
 
-      if (strategy === 'enterprise_sso') {
+      if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
         const prepare = (options?: { resolveProtectCheck?: boolean }) =>
           this.#resource.__internal_basePost(
             {
               body: {
                 ...routes,
                 oidcPrompt,
+                slackTeamIdHint,
                 enterpriseConnectionId,
-                strategy: 'enterprise_sso',
+                strategy,
               },
               action: 'prepare_first_factor',
               coalesce: true,
@@ -1638,6 +1718,56 @@ class SignInFuture implements SignInFutureResource {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePost({
         body: { code, strategy: 'backup_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAPasskey(): Promise<{ error: ClerkError | null }> {
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    return runAsyncResourceTask(this.#resource, async () => {
+      const passkeyFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'passkey');
+      if (!passkeyFactor) {
+        throw new ClerkRuntimeError('Passkey factor not found', { code: 'factor_not_found' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'passkey' },
+        action: 'prepare_second_factor',
+        coalesce: true,
+      });
+
+      const { nonce } = this.#resource.secondFactorVerification;
+      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+      if (!publicKeyOptions) {
+        throw new ClerkRuntimeError('Missing public key options', { code: 'missing_public_key_options' });
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions,
+        conditionalUI: false,
+      });
+      if (!publicKeyCredential) {
+        throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+          strategy: 'passkey',
+        },
         action: 'attempt_second_factor',
       });
     });

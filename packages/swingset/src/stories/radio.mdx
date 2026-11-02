@@ -1,0 +1,68 @@
+import * as RadioStories from './radio.stories';
+
+# Radio
+
+`Radio.Group` holds one choice out of several, and each `Radio.Item` is a styled native `<input type="radio">`. The group gives its items a shared `name` and checks the item whose `value` matches its own, controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`). Put each item in a [Field](/components/field) with `orientation='horizontal'` to give it a label and a description.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={RadioStories}
+  composition={[{ name: 'Field', href: '/components/field', layer: 'Components' }]}
+/>
+
+## Usage
+
+```tsx
+import { Field } from '@clerk/mosaic/components/field';
+import { Radio } from '@clerk/mosaic/components/radio';
+
+<Radio.Group
+  aria-label='Plan'
+  value={plan}
+  onValueChange={setPlan}
+>
+  <Field.Root orientation='horizontal'>
+    <Radio.Item value='monthly' />
+    <Field.Label>Monthly</Field.Label>
+  </Field.Root>
+  <Field.Root orientation='horizontal'>
+    <Radio.Item value='yearly' />
+    <Field.Label>Yearly</Field.Label>
+  </Field.Root>
+</Radio.Group>;
+```
+
+## Parts
+
+| Part          | Slot                    | Description                                                                              |
+| ------------- | ----------------------- | ---------------------------------------------------------------------------------------- |
+| `Radio.Group` | `radio-group`           | The `radiogroup`. Owns `value`, `defaultValue`, `onValueChange`, `name` and `disabled`.  |
+| `Radio.Item`  | `radio` / `radio-input` | One choice. `data-size`, `data-disabled`. Forwards its ref and input props to the input. |
+| ↳ indicator   | `radio-indicator`       | The dot, shown while the item is checked.                                                |
+
+---
+
+## Examples
+
+### Descriptions
+
+<Story
+  name='Descriptions'
+  storyModule={RadioStories}
+/>
+
+### States
+
+<Story
+  name='States'
+  storyModule={RadioStories}
+/>
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={RadioStories}
+/>

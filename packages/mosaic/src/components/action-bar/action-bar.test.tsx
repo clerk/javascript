@@ -2,8 +2,9 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { PortalProvider } from '../../primitives/portal';
 import { Dialog } from '../dialog';
 import { Menu } from '../menu';
 import { ActionBar } from './action-bar';
@@ -64,20 +65,39 @@ beforeEach(() => {
   vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
 });
 
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
 describe('Mosaic ActionBar', () => {
   it('renders a labelled toolbar tied to its table and described by its count', () => {
     render(<BulkActions />);
     const bar = screen.getByRole('toolbar', { name: 'Bulk actions' });
     expect(bar).toHaveClass('cl-action-bar');
     expect(bar).toHaveAttribute('data-open', 'true');
+    expect(bar).not.toHaveAttribute('data-starting-style');
+    expect(bar.style.transition).toBe('');
     expect(bar).toHaveAttribute('aria-controls', 'members');
     expect(bar).toHaveAttribute('aria-orientation', 'horizontal');
     expect(bar).toHaveAccessibleDescription('3 selected');
     expect(screen.getAllByRole('separator')).toHaveLength(2);
+  });
+
+  it('portals into the PortalProvider container', async () => {
+    function App() {
+      const ref = React.useRef<HTMLDivElement>(null);
+      return (
+        <div
+          ref={ref}
+          data-testid='container'
+        >
+          <PortalProvider container={ref}>
+            <BulkActions />
+          </PortalProvider>
+        </div>
+      );
+    }
+    render(<App />);
+
+    expect(screen.getByTestId('container')).toContainElement(
+      await screen.findByRole('toolbar', { name: 'Bulk actions' }),
+    );
   });
 
   it('renders nothing while closed', () => {

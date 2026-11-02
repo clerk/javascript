@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT && fromJSON(vars.TIMEOUT_MINUTES_SHORT) || 5 }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           show-progress: false
@@ -41,3 +41,26 @@ jobs:
           SHELLCHECK_OPTS: --exclude=SC2086,SC2129,SC2162
         with:
           args: -color
+
+  actions-lock:
+    name: Verify actions lockfile
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT && fromJSON(vars.TIMEOUT_MINUTES_SHORT) || 5 }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
+          show-progress: false
+          sparse-checkout: .github
+          sparse-checkout-cone-mode: false
+
+      - name: Install gh-actions-lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh extension install github/gh-actions-lock --pin v0.2.0
+
+      - name: Verify every workflow dependency is locked
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh actions-lock --verify

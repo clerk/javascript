@@ -1,5 +1,66 @@
 # @clerk/hono
 
+## 0.1.96
+
+### Patch Changes
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`11907aa`](https://github.com/clerk/javascript/commit/11907aa0f17bd9c861ccdd5a469d2694d7a503cf), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/backend@3.26.5
+  - @clerk/shared@4.43.1
+
+## 0.1.95
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+  - @clerk/backend@3.26.4
+
+## 0.1.94
+
+### Patch Changes
+
+- Updated dependencies [[`d005fee`](https://github.com/clerk/javascript/commit/d005fee54006ecb2536f45042e0856c89577b1c1), [`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/backend@3.26.3
+  - @clerk/shared@4.42.0
+
+## 0.1.93
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+  - @clerk/backend@3.26.2
+
+## 0.1.92
+
+### Patch Changes
+
+- Updated dependencies [[`49c8afd`](https://github.com/clerk/javascript/commit/49c8afd12724d83418a0c1b85d009c389330dcb6)]:
+  - @clerk/backend@3.26.1
+
+## 0.1.91
+
+### Patch Changes
+
+- Updated dependencies [[`85dec02`](https://github.com/clerk/javascript/commit/85dec028a0320c32023fa58139e269db0202b1eb), [`b799bad`](https://github.com/clerk/javascript/commit/b799bad6057c469f777506b4bc40b1c44b0d4cb4), [`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/backend@3.26.0
+  - @clerk/shared@4.41.0
+
+## 0.1.90
+
+### Patch Changes
+
+- Updated dependencies [[`57aeba8`](https://github.com/clerk/javascript/commit/57aeba8420be67296a8dda5b049586bf42c2767f)]:
+  - @clerk/backend@3.25.0
+
+## 0.1.89
+
+### Patch Changes
+
+- Updated dependencies [[`9159465`](https://github.com/clerk/javascript/commit/9159465ac02cafec69a3e4e2235cddd1ed3639b7)]:
+  - @clerk/backend@3.24.0
+
 ## 0.1.88
 
 ### Patch Changes

@@ -6,7 +6,10 @@ import { FormSubmitError } from '../../../components/form';
 import { getMosaicEnvironment, useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save, SaveError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import type {
   UserProfilePasskey,
   UserProfilePasskeyNameValidator,
@@ -62,6 +65,8 @@ export type UserProfilePasskeysModel =
       onRename: (id: string, name: string) => Promise<void>;
       validateName: UserProfilePasskeyNameValidator;
       onRemove: (id: string) => Promise<void>;
+      reverification: ReverificationController;
+      addReverification: ReverificationController;
     };
 
 function getPasskeysProjection(
@@ -72,11 +77,7 @@ function getPasskeysProjection(
   return projectPasskeys({
     passkeys: user.passkeys,
     enabled: Boolean(environment.userSettings.attributes.passkey?.enabled),
-    allowIdentificationCreation:
-      !environment.userSettings.enterpriseSSO.enabled ||
-      !user.enterpriseAccounts.some(
-        account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
-      ),
+    allowIdentificationCreation: allowsIdentificationCreation(user, environment.userSettings.enterpriseSSO),
     isSatellite,
   });
 }
@@ -88,7 +89,9 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const environment = useMosaicEnvironment();
   const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
-  const messages = useMessages('userProfilePasskeys');
+  const messages = useMessages('userProfile').passkeys;
+  const [deletePasskey, reverification] = useReverificationFlow((passkey: PasskeyResource) => passkey.delete());
+  const [createPasskey, addReverification] = useReverificationFlow((current: UserResource) => current.createPasskey());
   const validateName: UserProfilePasskeyNameValidator = name =>
     new TextEncoder().encode(name).length > 256 ? { type: 'error', message: messages.nameTooLongError } : undefined;
 
@@ -158,7 +161,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
               global: { code: 'passkey_account_unavailable', message: messages.accountUnavailableError },
             });
           }
-          await save(() => current.createPasskey());
+          await save(() => createPasskey(current));
         }
       : undefined,
     onRename: async (id, name) => {
@@ -177,7 +180,9 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       if (!passkey) {
         throw new SaveError({ global: { code: 'passkey_unavailable', message: messages.unavailableError } });
       }
-      await save(() => passkey.delete());
+      await save(() => deletePasskey(passkey));
     },
+    reverification,
+    addReverification,
   };
 }

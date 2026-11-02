@@ -1,9 +1,6 @@
 import type { ReactNode } from 'react';
 
 import { FormSubmitError } from '../../components/form';
-import type { UserProfileBillingPanelViewProps } from './user-profile-billing-panel.view';
-import type { UserProfileProfilePanelViewProps } from './user-profile-profile-panel.view';
-import type { UserProfileSecurityPanelViewProps } from './user-profile-security-panel.view';
 
 /** Plain data, so nothing downstream of the model imports a Clerk error. */
 export interface UserProfileFormError<TField extends string = string> {
@@ -26,9 +23,9 @@ export type UserProfilePageId = 'account' | 'security' | 'billing' | 'apiKeys';
 
 /** The built-in pages an instance shows: `account` always, the rest as the environment allows. */
 export interface UserProfilePages {
-  account: UserProfileProfilePanelViewProps;
-  security?: UserProfileSecurityPanelViewProps;
-  billing?: UserProfileBillingPanelViewProps;
+  account: ReactNode;
+  security?: ReactNode;
+  billing?: ReactNode;
   apiKeys?: ReactNode;
 }
 

@@ -9,6 +9,7 @@ import { Field } from '../../../components/field';
 import { Flow, type FlowDirection, useFlowAutoFocus } from '../../../components/flow';
 import { Select } from '../../../components/select';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import { EnterPhoneStep, VerifyPhoneStep } from '../user-profile-phone.steps';
 
 export interface UserProfileAddSmsViewProps {
@@ -32,7 +33,7 @@ export interface UserProfileAddSmsViewProps {
 }
 
 export function UserProfileAddSmsView(props: UserProfileAddSmsViewProps) {
-  const m = useMessages('userProfileAddSms');
+  const m = useMessages('userProfile').mfa.addSms;
   const selectRef = useFlowAutoFocus<HTMLButtonElement>();
   const phoneRef = useFlowAutoFocus<HTMLInputElement>();
   return (
@@ -95,7 +96,7 @@ export function UserProfileAddSmsView(props: UserProfileAddSmsViewProps) {
 }
 
 function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HTMLButtonElement> }) {
-  const m = useMessages('userProfileAddSms');
+  const m = useMessages('userProfile').mfa.addSms;
   const formId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLButtonElement>()]);
   return (
@@ -106,7 +107,7 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={formId}
             onSubmit={event => {
               event.preventDefault();
@@ -141,17 +142,19 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
+          <Field.Description>
+            <Button
+              type='button'
+              variant='link'
+              color='neutral'
+              size='sm'
+              disabled={props.isPending}
+              onClick={props.onAddPhone}
+            >
+              {m.addPhone}
+            </Button>
+          </Field.Description>
         </Field.Root>
-        <Button
-          type='button'
-          variant='link'
-          color='neutral'
-          size='sm'
-          disabled={props.isPending}
-          onClick={props.onAddPhone}
-        >
-          {m.addPhone}
-        </Button>
       </Card.Content>
       <Card.Footer>
         <Button

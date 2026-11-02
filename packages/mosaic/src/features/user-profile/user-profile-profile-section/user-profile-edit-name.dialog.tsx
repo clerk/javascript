@@ -10,6 +10,7 @@ import { Field } from '../../../components/field';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import type { UserProfileNameAttribute } from './user-profile-profile-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
@@ -32,7 +33,7 @@ export interface UserProfileEditNameDialogProps {
 }
 
 /**
- * Edits the user's first and last name. Validates nothing beyond the native `required` the
+ * Edits the user's first and last name. Validates nothing beyond the required fields the
  * instance asks for: the name the API will take is the API's to decide, so a rejection comes back
  * through the form.
  */
@@ -45,7 +46,7 @@ export function UserProfileEditNameDialog({
   title,
   form,
 }: UserProfileEditNameDialogProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;
   const { enabled: showLastName = true, required: lastNameRequired = false } = lastNameAttribute;
@@ -75,7 +76,7 @@ export function UserProfileEditNameDialog({
           </Card.Banner>
           <Card.Content
             render={
-              <form
+              <Form
                 id={form.id}
                 onSubmit={form.handleSubmit}
               />

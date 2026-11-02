@@ -694,6 +694,7 @@ export interface UserJSON extends ClerkResourceJSON {
   last_sign_in_at: number | null;
   banned: boolean;
   locked: boolean;
+  deprovisioned: boolean;
   lockout_expires_in_seconds: number | null;
   verification_attempts_remaining: number | null;
   created_at: number;

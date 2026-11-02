@@ -26,7 +26,7 @@ export const styles = stylex.create({
     borderWidth: '1px',
     appearance: 'none',
     backgroundColor: {
-      default: colorVars['--cl-color-background'],
+      default: colorVars['--cl-color-surface'],
       ':checked': colorVars['--cl-color-brand'],
       ':indeterminate': colorVars['--cl-color-brand'],
     },

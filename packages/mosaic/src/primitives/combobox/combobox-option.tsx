@@ -16,8 +16,16 @@ export interface ComboboxOptionProps extends ComponentProps<'div'> {
 export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionProps>(
   function ComboboxOption(props, ref) {
     const { render, value, label, disabled, ...otherProps } = props;
-    const { activeIndex, selectedValue, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, refs } =
-      useComboboxContext();
+    const {
+      activeIndex,
+      selectedValue,
+      getItemProps,
+      handleSelect,
+      valuesByIndexRef,
+      registerSelectedIndex,
+      registerOption,
+      refs,
+    } = useComboboxContext();
 
     const id = useId();
     const displayLabel = label ?? value;
@@ -32,11 +40,12 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
         map.set(index, value);
       }
       const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel);
+      registerOption(index);
       return () => {
         map.delete(index);
         unregisterSelectedIndex?.();
       };
-    }, [index, value, displayLabel, disabled, valuesByIndexRef, registerSelectedIndex]);
+    }, [index, value, displayLabel, disabled, valuesByIndexRef, registerSelectedIndex, registerOption]);
 
     const state = {
       selected: isSelected,

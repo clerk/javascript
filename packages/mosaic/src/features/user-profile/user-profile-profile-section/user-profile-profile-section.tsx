@@ -59,6 +59,7 @@ function Profile({ model }: { model: ReadyProfileSectionModel }) {
             username={model.username}
             required={model.usernameRequired}
             onSubmit={model.onSubmitUsername}
+            reverification={model.usernameReverification}
           />
         ) : undefined
       }
@@ -77,8 +78,12 @@ function EditName({
   firstNameAttribute: UserProfileNameAttribute;
   lastNameAttribute: UserProfileNameAttribute;
 }) {
-  const m = useMessages('userProfileProfileSection');
-  const controller = useUserProfileEditNameController(options);
+  const m = useMessages('userProfile').profile;
+  const controller = useUserProfileEditNameController({
+    ...options,
+    firstNameRequired: firstNameAttribute.required,
+    lastNameRequired: lastNameAttribute.required,
+  });
 
   return (
     <UserProfileEditNameDialog
@@ -102,7 +107,7 @@ function EditName({
 }
 
 function EditUsername(options: UserProfileEditUsernameControllerOptions) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const controller = useUserProfileEditUsernameController(options);
   const isSet = Boolean(options.username);
 
@@ -111,6 +116,8 @@ function EditUsername(options: UserProfileEditUsernameControllerOptions) {
       form={controller.form}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
+      reverification={options.reverification}
+      step={controller.step}
       title={isSet ? m.username.dialogTitle : m.username.addDialogTitle}
       trigger={
         <Button

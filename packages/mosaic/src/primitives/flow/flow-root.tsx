@@ -2,9 +2,14 @@
 
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { useAnimationsFinished } from '../hooks/use-animations-finished';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { autoUpdate, getDimensions } from '../utils/dom';
 import { FlowContext, type FlowContextValue, type FlowDirection } from './flow-context';
+
+function isHeightTransition(animation: Animation): boolean {
+  return 'transitionProperty' in animation && animation.transitionProperty === 'height';
+}
 
 export interface FlowRootProps extends ComponentProps<'div'> {
   value: string;
@@ -17,29 +22,21 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
   const [activeStep, setActiveStep] = useState<HTMLElement | null>(null);
   const [measured, setMeasured] = useState(false);
   const [initial, setInitial] = useState(true);
-  const [exitingSteps, setExitingSteps] = useState<ReadonlySet<HTMLElement>>(() => new Set());
+  const [transitioning, setTransitioning] = useState(false);
+  const lastActiveStepRef = useRef<HTMLElement | null>(null);
+  const stepHeightRef = useRef<number | null>(null);
+  const runOnHeightTransitionFinished = useAnimationsFinished(rootRef, false, isHeightTransition);
 
   const registerActiveStep = useCallback((element: HTMLElement) => {
+    if (lastActiveStepRef.current && lastActiveStepRef.current !== element) {
+      setTransitioning(true);
+    }
+    lastActiveStepRef.current = element;
     setActiveStep(element);
   }, []);
 
   const unregisterActiveStep = useCallback((element: HTMLElement) => {
     setActiveStep(current => (current === element ? null : current));
-  }, []);
-
-  const registerExitingStep = useCallback((element: HTMLElement) => {
-    setExitingSteps(current => new Set(current).add(element));
-  }, []);
-
-  const unregisterExitingStep = useCallback((element: HTMLElement) => {
-    setExitingSteps(current => {
-      if (!current.has(element)) {
-        return current;
-      }
-      const next = new Set(current);
-      next.delete(element);
-      return next;
-    });
   }, []);
 
   useLayoutEffect(() => {
@@ -48,10 +45,24 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     }
 
     return autoUpdate(activeStep, () => {
-      rootRef.current?.style.setProperty('--cl-flow-step-height', `${getDimensions(activeStep).height}px`);
+      const root = rootRef.current;
+      const { height } = getDimensions(activeStep);
+      if (root && stepHeightRef.current !== null && height !== stepHeightRef.current) {
+        root.dataset.heightChange = height < stepHeightRef.current ? 'shrink' : 'grow';
+      }
+      stepHeightRef.current = height;
+      root?.style.setProperty('--cl-flow-step-height', `${height}px`);
       setMeasured(true);
     });
   }, [activeStep]);
+
+  useLayoutEffect(() => {
+    if (!transitioning) {
+      return;
+    }
+
+    return runOnHeightTransitionFinished(() => setTransitioning(false));
+  }, [transitioning, activeStep, runOnHeightTransitionFinished]);
 
   useLayoutEffect(() => {
     if (!measured || !initial) {
@@ -69,10 +80,8 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
       rootRef,
       registerActiveStep,
       unregisterActiveStep,
-      registerExitingStep,
-      unregisterExitingStep,
     }),
-    [value, direction, registerActiveStep, unregisterActiveStep, registerExitingStep, unregisterExitingStep],
+    [value, direction, registerActiveStep, unregisterActiveStep],
   );
 
   const element = useRender({
@@ -82,7 +91,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     props: mergeProps<'div'>(
       {
         'data-initial': initial ? '' : undefined,
-        'data-transitioning': exitingSteps.size > 0 ? '' : undefined,
+        'data-transitioning': transitioning ? '' : undefined,
       },
       otherProps,
     ),

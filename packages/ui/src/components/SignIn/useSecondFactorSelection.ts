@@ -1,6 +1,7 @@
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
+import { useIsWebAuthnSupported } from '../../hooks';
 import { determineStartingSignInSecondFactor } from './utils';
 
 const secondFactorKey = (factor: SignInFactor | null | undefined) => {
@@ -15,9 +16,10 @@ const secondFactorKey = (factor: SignInFactor | null | undefined) => {
 };
 
 export function useSecondFactorSelection<T extends SignInFactor = SignInFactor>(availableFactors: T[] | null) {
+  const webAuthnSupported = useIsWebAuthnSupported();
   const lastPreparedFactorKeyRef = React.useRef('');
   const [currentFactor, setCurrentFactor] = React.useState<T | null>(
-    () => determineStartingSignInSecondFactor(availableFactors) as T | null,
+    () => determineStartingSignInSecondFactor(availableFactors, webAuthnSupported) as T | null,
   );
 
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);

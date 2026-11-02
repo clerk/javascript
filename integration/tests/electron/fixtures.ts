@@ -23,6 +23,7 @@ const electronExecutable = (app: Application) =>
   path.resolve(app.appDir, 'node_modules', '.bin', process.platform === 'win32' ? 'electron.cmd' : 'electron');
 
 async function setupClerkTestingEnv(env: EnvironmentConfig) {
+  await env.resolve();
   const publishableKey = env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
   const secretKey = env.privateVariables.get('CLERK_SECRET_KEY');
   const apiUrl = env.privateVariables.get('CLERK_API_URL');

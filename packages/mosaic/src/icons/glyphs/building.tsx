@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const Building = glyph(
+  'building',
   <>
     <path
       d='M6.83333 5.83333H5.16667'

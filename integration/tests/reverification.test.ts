@@ -23,7 +23,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     let fakeOrganization: FakeOrganization;
 
     test.beforeAll(async () => {
-      const m = createTestUtils({ app });
+      const m = await createTestUtils({ app });
       fakeAdmin = m.services.users.createFakeUser(test);
       const admin = await m.services.users.createBapiUser(fakeAdmin);
       fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
@@ -49,7 +49,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     test('reverification prompt on adding new email address', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
@@ -89,7 +89,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     test('reverification prompt on adding new phone number', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
@@ -129,7 +129,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     test('reverification prompt can be cancelled when adding email', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
@@ -160,7 +160,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     test('reverification prompt when deleting account', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const delFakeUser = u.services.users.createFakeUser(test, {
         withUsername: true,
         fictionalEmail: true,
@@ -216,7 +216,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     utils.forEach(type => {
       test(`reverification error from ${capitalize(type)}`, async ({ page, context }) => {
         test.setTimeout(270_000);
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
@@ -258,7 +258,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
 
       test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
         test.setTimeout(270_000);
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();

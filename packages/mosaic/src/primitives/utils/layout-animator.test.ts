@@ -53,7 +53,6 @@ describe('createLayoutAnimator', () => {
   afterEach(() => {
     dispose();
     container.remove();
-    vi.restoreAllMocks();
   });
 
   it('slides items that move when a sibling is removed', async () => {
@@ -250,7 +249,6 @@ describe('createLayoutAnimator', () => {
     await flush();
 
     expect(observed.filter(element => element === a)).toHaveLength(1);
-    vi.unstubAllGlobals();
   });
 
   it('stops watching once disposed', async () => {

@@ -1,4 +1,4 @@
-# Motion: entrances, exits, and pulses
+# Motion: entrances, exits, and loading
 
 Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 `durationDefaults` / `easingDefaults` — read those comments first. This file is the
@@ -36,13 +36,11 @@ For entrances, opacity takes `--cl-ease-enter`: there is nothing
 past `1` to overshoot into, so the pass is clamped away and only its cost — the
 slower approach to full opacity — is left.
 
-## Repeating pulses
+## Loading skeletons
 
-Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons
-(`user-profile-backup-codes.styles.ts`). Its
-symmetric curve slows at both ends of each fade, keeping the reversal smooth.
-Keep the pulse duration on the component and disable the animation under
-`prefers-reduced-motion: reduce`.
+Loading placeholders shimmer: a highlight sweeps across each one over 1.6s on the
+plain `ease-in-out` keyword, not a token. How to build them, size them, and tune the
+shimmer is in `skeletons.md`.
 
 ## A curve has a direction — don't run the entrance curve backwards
 
@@ -232,6 +230,12 @@ an explicit `height` from a measured var instead, and the rest of the recipe car
 over: the wrapper is its own clip layer (no padding, `align-content: end`), the exiting
 message leaves the flow pinned to the **bottom** (`inset: auto 0 0`) so it rides the
 moving edge, and the mask is the same static top fade.
+
+`useMessageHeight` returns `undefined` until the first measurement.
+`feedbackHeight.measured` leaves the height variable unset in that state so an
+initially visible row uses natural layout instead of transitioning from a false
+zero height. Once measured, the hook retains the last numeric height, including
+zero, while the content exits.
 
 The spacing above a message is the parent's gap, which a closed row must not cost.
 Cancel the parent's gap on the wrapper and put it back inside the clip as the

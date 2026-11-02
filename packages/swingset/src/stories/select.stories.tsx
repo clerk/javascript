@@ -49,3 +49,41 @@ export function Default() {
     </Select.Root>
   );
 }
+
+export function Multiple() {
+  return (
+    <Select.Root
+      multiple
+      defaultValue={['apple', 'cherry']}
+      alignItemWithTrigger={false}
+    >
+      <Select.Trigger>
+        <Select.Value placeholder='Choose fruits…' />
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Positioner>
+          <Select.Popup>
+            <Select.Option
+              value='apple'
+              label='Apple'
+            >
+              Apple
+            </Select.Option>
+            <Select.Option
+              value='banana'
+              label='Banana'
+            >
+              Banana
+            </Select.Option>
+            <Select.Option
+              value='cherry'
+              label='Cherry'
+            >
+              Cherry
+            </Select.Option>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
+  );
+}

@@ -24,7 +24,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/dialog/dialog.tsx',
   styles: {
     _variants: {
-      variant: { card: {}, profile: {} },
+      variant: { card: {}, profile: {}, fullscreen: {} },
       compactPlacement: { center: {}, sheet: {} },
     },
     _defaultVariants: {

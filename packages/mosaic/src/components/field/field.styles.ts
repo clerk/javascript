@@ -22,7 +22,7 @@ export const styles = stylex.create({
     minWidth: 0,
   },
   label: {
-    color: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-foreground'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   message: {

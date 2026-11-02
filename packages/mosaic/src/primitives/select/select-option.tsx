@@ -1,7 +1,7 @@
 'use client';
 
 import { useListItem } from '@floating-ui/react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useSelectContext } from './select-context';
@@ -12,15 +12,23 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
   disabled?: boolean;
 }
 
-export function SelectOption(props: SelectOptionProps) {
+export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function SelectOption(props, ref) {
   const { render, value, label, disabled, ...otherProps } = props;
-  const { activeIndex, selectedValue, setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
-    useSelectContext();
+  const {
+    activeIndex,
+    selectedValues,
+    setSelectedIndex,
+    getItemProps,
+    handleSelect,
+    valueToLabelRef,
+    selectedItemRef,
+  } = useSelectContext();
 
   const displayLabel = label ?? value;
   const { ref: itemRef, index } = useListItem({ label: displayLabel });
 
-  const isSelected = selectedValue === value;
+  const isSelected = selectedValues.includes(value);
+  const isAnchor = selectedValues[selectedValues.length - 1] === value;
   const isActive = activeIndex === index;
 
   useEffect(() => {
@@ -32,10 +40,10 @@ export function SelectOption(props: SelectOptionProps) {
   }, [value, displayLabel, valueToLabelRef]);
 
   useEffect(() => {
-    if (isSelected) {
+    if (isAnchor) {
       setSelectedIndex(index);
     }
-  }, [index, isSelected, setSelectedIndex]);
+  }, [index, isAnchor, setSelectedIndex]);
 
   const state = {
     selected: isSelected,
@@ -71,7 +79,7 @@ export function SelectOption(props: SelectOptionProps) {
       active: (v: boolean) => (v ? { 'data-active': '' } : null),
       disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
-    ref: [itemRef, isSelected ? selectedItemRef : null],
+    ref: [itemRef, isAnchor ? selectedItemRef : null, ref],
     props: mergeProps<'button'>(defaultProps, otherProps),
   });
-}
+});

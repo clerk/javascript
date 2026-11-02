@@ -2,11 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
-// Timed to match `skeleton.tsx`'s pulse, so the two generations of placeholder read as one thing.
-const pulse = stylex.keyframes({
-  '50%': { opacity: 0.5 },
-});
-
 export const styles = stylex.create({
   // root — sizes and positions its parts; fill comes from the image or fallback
   base: {
@@ -71,16 +66,6 @@ export const styles = stylex.create({
     visibility: 'hidden',
   },
 
-  fallbackPending: {
-    animationDuration: '2s',
-    animationIterationCount: 'infinite',
-    animationName: {
-      default: pulse,
-      '@media (prefers-reduced-motion: reduce)': 'none',
-    },
-    animationTimingFunction: 'cubic-bezier(0.4, 0, 0.6, 1)',
-  },
-
   icon: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-full'],
@@ -88,7 +73,7 @@ export const styles = stylex.create({
     borderWidth: '1px',
     overflow: 'hidden',
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxSizing: 'border-box',
     display: 'flex',
     insetBlockEnd: `calc(${space['2']} * -1)`,

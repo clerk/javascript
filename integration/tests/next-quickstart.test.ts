@@ -10,7 +10,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -21,7 +21,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
   });
 
   test('Clerk client loads on first visit and Sign In button renders', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToAppHome();
 
     await u.page.waitForClerkJsLoaded();
@@ -32,7 +32,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
   });
 
   test('can sign in with email and password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
     await u.po.expect.toBeSignedOut();
@@ -52,7 +52,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
   });
 
   test('user button is functional after sign in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
     await u.po.expect.toBeSignedOut();
@@ -80,7 +80,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
   });
 
   test('can sign out through user button', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
     await u.po.expect.toBeSignedOut();

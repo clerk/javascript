@@ -43,7 +43,7 @@ export const styles = stylex.create({
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     animationTimingFunction: easingVars['--cl-ease-default'],
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-lg'],
     color: colorVars['--cl-color-foreground'],
     display: {

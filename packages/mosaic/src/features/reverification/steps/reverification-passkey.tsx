@@ -1,3 +1,6 @@
+import { useMergeRefs } from '@floating-ui/react';
+import type { Ref } from 'react';
+
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -16,6 +19,7 @@ export interface ReverificationPasskeyProps {
   isPending?: boolean;
   onSubmit: () => void;
   onCancel?: () => void;
+  focusRef?: Ref<HTMLElement>;
 }
 
 export function ReverificationPasskey({
@@ -24,6 +28,7 @@ export function ReverificationPasskey({
   isPending = false,
   onSubmit,
   onCancel,
+  focusRef,
 }: ReverificationPasskeyProps) {
   return (
     <>
@@ -51,7 +56,7 @@ export function ReverificationPasskey({
           </Button>
         ) : null}
         <SubmitButton
-          ref={useFlowAutoFocus<HTMLButtonElement>()}
+          ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()])}
           type='button'
           fullWidth
           isPending={isPending}

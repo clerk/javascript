@@ -41,7 +41,7 @@
 
 The fastest way to get started with Clerk is by following the [TanStack React Start Quickstart](https://clerk.com/docs/quickstarts/tanstack-react-start?utm_source=github&utm_medium=clerk_tanstack_react_start).
 
-You'll learn how to install `@clerk/tanstack-react-start`, set up your environment keys, configure `createClerkHandler` and protect your pages.
+You'll learn how to install `@clerk/tanstack-react-start`, set up your environment keys, configure `clerkMiddleware()` and protect your pages.
 
 ## Usage
 

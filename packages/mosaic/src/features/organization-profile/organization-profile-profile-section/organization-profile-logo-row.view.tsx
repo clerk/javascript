@@ -5,6 +5,8 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { Pen } from '../../../icons/glyphs/pen';
+import { X } from '../../../icons/glyphs/x';
 import type { LocalizableError } from '../../../localization';
 import { useErrorText, useMessages } from '../../../localization';
 import type { FileRejection, FileRejectionReason } from '../../../primitives/file-upload';
@@ -37,11 +39,11 @@ export function OrganizationProfileLogoRowView({
   onReject,
   onRemove,
 }: OrganizationProfileLogoRowViewProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const errorText = useErrorText();
   const logo = useOrganizationProfileLogoController({ onChange, onRemove });
   const [rejection, setRejection] = useState<LocalizableError>();
-  const error = rejection ?? logo.error;
+  const error = rejection ? errorText(rejection) : logo.error;
   const remove = logo.onRemove;
   const handleRemove = remove
     ? () => {
@@ -99,7 +101,7 @@ export function OrganizationProfileLogoRowView({
           onRemove={handleRemove}
         />
       </Section.Item>
-      <Section.Error>{error ? errorText(error) : undefined}</Section.Error>
+      <Section.Error>{error}</Section.Error>
     </FileUpload.Root>
   );
 }
@@ -111,18 +113,18 @@ function LogoActions({
 }: {
   hasImage: boolean;
   canChange: boolean;
-  onRemove?: () => Promise<void>;
+  onRemove?: () => Promise<unknown>;
 }) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.logo.change, icon: 'pen', onClick: openFilePicker });
+    actions.push({ label: m.logo.change, icon: Pen, onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.logo.remove, icon: 'x', onClick: () => void onRemove() });
+    actions.push({ label: m.logo.remove, icon: X, onClick: () => void onRemove() });
   }
 
   if (actions.length > 0) {

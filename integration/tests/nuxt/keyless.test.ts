@@ -14,12 +14,6 @@ test.describe('Keyless mode @nuxt', () => {
   test.describe.configure({ mode: 'serial' });
   test.setTimeout(90_000);
 
-  test.use({
-    extraHTTPHeaders: {
-      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET || '',
-    },
-  });
-
   let app: Application;
   let dashboardUrl = 'https://dashboard.clerk.com/';
 

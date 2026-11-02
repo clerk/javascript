@@ -1,0 +1,4 @@
+{
+  "main": "../dist/native-components/index.js",
+  "types": "./index.d.ts"
+}

@@ -88,7 +88,7 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
   const [descriptionId, setDescriptionId] = useState<string | undefined>(undefined);
 
   const open = toast.transitionStatus !== 'ending';
-  const { mounted, transitionProps } = useTransition({ open, ref: rootRef });
+  const { mounted, transitionProps } = useTransition({ open, ref: rootRef, animateOnMount: true });
 
   useEffect(() => {
     if (!mounted) {

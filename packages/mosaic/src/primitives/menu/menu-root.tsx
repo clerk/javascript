@@ -24,11 +24,14 @@ import {
   useTypeahead,
 } from '@floating-ui/react';
 import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
+import { useDirection } from '../direction-provider';
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
+import { isHoverOpen } from '../utils/interaction-modality';
 import { resolveSideOffset, type SideOffset } from '../utils/side-offset';
 import { MenuContext, type MenuContextValue } from './menu-context';
 
@@ -48,11 +51,19 @@ export interface MenuProps {
    * is that surface, so it has to be given somewhere else to land.
    */
   fallbackPlacements?: Placement[];
+  /**
+   * Opens the menu when a mouse rests on the trigger, and closes it when the mouse leaves for
+   * somewhere other than the menu. A press still opens it, and keeps a hover-opened menu open.
+   * Submenus open on hover regardless.
+   *
+   * @default false
+   */
+  openOnHover?: boolean;
   children: ReactNode;
 }
 
 function MenuInner(props: MenuProps) {
-  const { placement: placementProp, sideOffset, fallbackPlacements, children } = props;
+  const { placement: placementProp, sideOffset, fallbackPlacements, openOnHover = false, children } = props;
 
   const parentContext = useContext(MenuContext);
   const tree = useFloatingTree();
@@ -62,6 +73,7 @@ function MenuInner(props: MenuProps) {
   // has a parent node id too, and treating that as nesting makes it hover-open, side-placed, and
   // unclickable by mouse.
   const isNested = parentId != null && parentContext != null;
+  const direction = useDirection();
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -70,6 +82,8 @@ function MenuInner(props: MenuProps) {
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
   const arrowRef = useRef<SVGSVGElement | null>(null);
+  const pressPointerTypeRef = useRef<string | null>(null);
+  const openFrameRef = useRef<number | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
 
   const resolvedPlacement = placementProp ?? (isNested ? 'right-start' : 'bottom-start');
@@ -106,8 +120,9 @@ function MenuInner(props: MenuProps) {
   });
 
   const hover = useHover(floatingContext, {
-    enabled: isNested,
+    enabled: isNested || openOnHover,
     delay: { open: 75 },
+    mouseOnly: !isNested,
     handleClose: safePolygon({ blockPointerEvents: true }),
   });
   const click = useClick(floatingContext, {
@@ -119,10 +134,31 @@ function MenuInner(props: MenuProps) {
     () => ({
       reference: {
         onPointerDown(event: React.PointerEvent) {
-          if (isNested || event.button !== 0 || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) {
+          pressPointerTypeRef.current = event.pointerType;
+        },
+        onMouseDown(event: React.MouseEvent) {
+          const pointerType = pressPointerTypeRef.current;
+          pressPointerTypeRef.current = null;
+          if (isNested || event.button !== 0 || (pointerType !== 'mouse' && pointerType !== 'pen')) {
             return;
           }
-          floatingContext.onOpenChange(!open, event.nativeEvent, 'click');
+          if (openFrameRef.current !== null) {
+            cancelAnimationFrame(openFrameRef.current);
+            openFrameRef.current = null;
+            return;
+          }
+          if (open && !isHoverOpen(floatingContext)) {
+            floatingContext.onOpenChange(false, event.nativeEvent, 'click');
+            return;
+          }
+          // Safari blurs an already-focused button on press, moving focus to its nearest focusable
+          // ancestor. Opening now lets that blur reach the open menu and close it, so open on the
+          // next frame, after the press has settled, as Base UI's `useClick` does.
+          const nativeEvent = event.nativeEvent;
+          openFrameRef.current = requestAnimationFrame(() => {
+            openFrameRef.current = null;
+            flushSync(() => floatingContext.onOpenChange(true, nativeEvent, 'click'));
+          });
         },
       },
     }),
@@ -146,6 +182,7 @@ function MenuInner(props: MenuProps) {
     listRef: elementsRef,
     activeIndex,
     nested: isNested,
+    rtl: direction === 'rtl',
     onNavigate: setActiveIndex,
   });
   const typeahead = useTypeahead(floatingContext, {
@@ -163,6 +200,15 @@ function MenuInner(props: MenuProps) {
     listNavigation,
     typeahead,
   ]);
+
+  useEffect(
+    () => () => {
+      if (openFrameRef.current !== null) {
+        cancelAnimationFrame(openFrameRef.current);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!tree) {

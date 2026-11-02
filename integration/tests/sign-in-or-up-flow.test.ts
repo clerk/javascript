@@ -14,7 +14,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test, {
         withPhoneNumber: true,
         withUsername: true,
@@ -27,14 +27,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('flows are combined', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
       await expect(u.page.getByText(`Don’t have an account?`)).toBeHidden();
     });
 
     test('sign in with email and password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -44,14 +44,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('sign in with email and instant password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
     });
 
     test('sign in with email code', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
       await u.po.signIn.continue();
@@ -62,7 +62,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('(modal) sign in with email code', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/buttons');
       await u.page.getByText('Sign in button (fallback)').click();
       await u.po.signIn.waitForModal();
@@ -76,7 +76,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('sign in with phone number and password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.usePhoneNumberIdentifier().click();
       await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
@@ -86,7 +86,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('sign in only with phone number', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUserWithoutPassword = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: false,
@@ -104,7 +104,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('sign in with username and password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.getIdentifierInput().fill(fakeUser.username);
       await u.po.signIn.setPassword(fakeUser.password);
@@ -113,7 +113,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('can reset password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUserWithPasword = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -135,7 +135,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('cannot sign in with wrong password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
@@ -149,7 +149,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('cannot sign in with wrong password but can sign in with email', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
@@ -168,7 +168,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('access protected page', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
@@ -179,7 +179,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('sign up with email and password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -211,7 +211,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
 
   test.describe('sign-up', () => {
     test('sign up with username, email, and password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -238,7 +238,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('(modal) sign up with username, email, and password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -267,7 +267,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('sign up, sign out and sign in again', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -320,7 +320,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
     });
 
     test('sign in with ticket renders sign up', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo({
         searchParams: new URLSearchParams({ __clerk_ticket: '123', __clerk_status: 'sign_up' }),
       });

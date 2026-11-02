@@ -7,6 +7,7 @@ export * from './useEnabledThirdPartyProviders';
 export * from './useEnterpriseSSOLink';
 export * from './useFetch';
 export * from './useInView';
+export * from './useIsWebAuthnSupported';
 export * from './useLoadingStatus';
 export * from './useNavigateToFlowStart';
 export * from './usePassword';

@@ -18,13 +18,6 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
     const panelRef = useRef<HTMLElement | null>(null);
     const [height, setHeight] = useState<number | undefined>(undefined);
 
-    // Track whether open has ever transitioned from true→false.
-    // Until that happens, skip enter animations (prevents animate-on-load).
-    const hasBeenClosed = useRef(false);
-    if (!open) {
-      hasBeenClosed.current = true;
-    }
-
     const { mounted, transitionStatus, transitionProps } = useTransition({
       open,
       ref: panelRef,
@@ -70,23 +63,14 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
 
     const state = { open };
 
-    // Skip enter animation for panels that have never been closed
-    const effectiveTransitionProps = !hasBeenClosed.current
-      ? {
-          ...transitionProps,
-          'data-starting-style': undefined,
-          style: undefined,
-        }
-      : transitionProps;
-
     const defaultProps: Record<string, unknown> = {
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
-      ...effectiveTransitionProps,
+      ...transitionProps,
       style: {
         '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
-        ...effectiveTransitionProps.style,
+        ...transitionProps.style,
       },
     };
 

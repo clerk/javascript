@@ -789,7 +789,7 @@ The controllers that already made this call are the best reference:
 
 - `blocks/confirmation/confirmation.controller.ts`: a machine
 - `blocks/destructive/destructive.controller.ts`: one `useState` holding a status union
-- `features/user-button/user-button.controller.tsx`: a machine
+- `features/switcher/switcher.controller.tsx`: a machine
 - `hooks/use-pending-action.ts`: keyed `useState` plus a lock
 
 ---

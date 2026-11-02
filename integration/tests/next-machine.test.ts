@@ -1,8 +1,20 @@
-import { test } from '@playwright/test';
+import type { User } from '@clerk/backend';
+import { TokenType } from '@clerk/backend/internal';
+import { expect, test } from '@playwright/test';
 
+import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
-import type { MachineAuthTestAdapter } from '../testUtils/machineAuthHelpers';
-import { registerApiKeyAuthTests, registerM2MAuthTests, registerOAuthAuthTests } from '../testUtils/machineAuthHelpers';
+import { createTestUtils } from '../testUtils';
+import type { FakeMachineNetwork, MachineAuthTestAdapter } from '../testUtils/machineAuthHelpers';
+import {
+  createFakeMachineNetwork,
+  createJwtM2MToken,
+  createMachineClient,
+  registerApiKeyAuthTests,
+  registerM2MAuthTests,
+  registerOAuthAuthTests,
+} from '../testUtils/machineAuthHelpers';
+import type { FakeAPIKey, FakeUser } from '../testUtils/usersService';
 
 const adapter: MachineAuthTestAdapter = {
   baseConfig: appConfigs.next.appRouter,
@@ -94,4 +106,197 @@ test.describe('Next.js machine authentication @machine', () => {
   registerApiKeyAuthTests(adapter);
   registerM2MAuthTests(adapter);
   registerOAuthAuthTests(adapter);
+
+  test.describe('auth.protect() authorization with API keys', () => {
+    test.describe.configure({ mode: 'parallel' });
+    let app: Application;
+    let fakeUser: FakeUser;
+    let fakeBapiUser: User;
+    let fakeAPIKey: FakeAPIKey;
+
+    test.beforeAll(async () => {
+      test.setTimeout(120_000);
+
+      app = await appConfigs.next.appRouter
+        .clone()
+        .addFile(
+          'src/app/api/protect/route.ts',
+          () => `
+          import { auth } from '@clerk/nextjs/server';
+
+          export async function GET() {
+            const { userId, tokenType } = await auth.protect({ token: 'api_key' });
+
+            return Response.json({ userId, tokenType });
+          }
+
+          export async function POST() {
+            const { userId } = await auth.protect({ role: 'org:admin' }, { token: ['session_token', 'api_key'] });
+
+            return Response.json({ userId });
+          }
+
+          export async function PUT() {
+            await auth.protect(() => false, { token: 'api_key' });
+
+            return Response.json({ protected: true });
+          }
+
+          export async function PATCH() {
+            const { userId, tokenType } = await auth.protect(() => true, { token: 'api_key' });
+
+            return Response.json({ userId, tokenType });
+          }
+          `,
+        )
+        .commit();
+      await app.setup();
+      await app.withEnv(appConfigs.envs.withAPIKeys.clone());
+      await app.dev();
+
+      const u = await createTestUtils({ app });
+      fakeUser = u.services.users.createFakeUser(test);
+      fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
+      fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
+    });
+
+    test.afterAll(async () => {
+      await fakeAPIKey?.revoke();
+      await fakeUser?.deleteIfExists();
+      await app?.teardown();
+    });
+
+    test('should return 200 if API key is valid and no authorization params are passed', async ({ request }) => {
+      const res = await request.get(new URL('/api/protect', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${fakeAPIKey.secret}` },
+      });
+      expect(res.status()).toBe(200);
+      expect(await res.json()).toEqual({ userId: fakeBapiUser.id, tokenType: TokenType.ApiKey });
+    });
+
+    test('should return 401 if API key is valid but a role is required', async ({ request }) => {
+      const res = await request.post(new URL('/api/protect', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${fakeAPIKey.secret}` },
+      });
+      expect(res.status()).toBe(401);
+    });
+
+    test('should return 401 if API key is valid but the predicate returns false', async ({ request }) => {
+      const res = await request.put(new URL('/api/protect', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${fakeAPIKey.secret}` },
+      });
+      expect(res.status()).toBe(401);
+    });
+
+    test('should return 200 if API key is valid and the predicate returns true', async ({ request }) => {
+      const res = await request.patch(new URL('/api/protect', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${fakeAPIKey.secret}` },
+      });
+      expect(res.status()).toBe(200);
+      expect(await res.json()).toEqual({ userId: fakeBapiUser.id, tokenType: TokenType.ApiKey });
+    });
+  });
+
+  test.describe('session helpers with machine tokens', () => {
+    test.describe.configure({ mode: 'parallel' });
+    let app: Application;
+    let network: FakeMachineNetwork;
+    let jwtToken: string;
+
+    test.beforeAll(async () => {
+      test.setTimeout(120_000);
+
+      network = await createFakeMachineNetwork(createMachineClient());
+      jwtToken = (await createJwtM2MToken(createMachineClient(), network.scopedSender.secretKey)).token;
+
+      app = await appConfigs.next.appRouter
+        .clone()
+        .addFile(
+          'src/pages/api/pages-session.ts',
+          () => `
+          import { getAuth } from '@clerk/nextjs/server';
+          import type { NextApiRequest, NextApiResponse } from 'next';
+
+          export default function handler(req: NextApiRequest, res: NextApiResponse) {
+            const { userId, tokenType } = getAuth(req);
+
+            if (!userId) {
+              return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            return res.status(200).json({ userId, tokenType });
+          }
+          `,
+        )
+        .addFile(
+          'src/app/api/app-session/route.ts',
+          () => `
+          import { auth } from '@clerk/nextjs/server';
+
+          export async function GET() {
+            const { userId, tokenType } = await auth();
+
+            if (!userId) {
+              return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+
+            return Response.json({ userId, tokenType });
+          }
+          `,
+        )
+        .addFile(
+          'src/app/api/app-machine/route.ts',
+          () => `
+          import { auth } from '@clerk/nextjs/server';
+
+          export async function GET() {
+            const { subject, tokenType, isAuthenticated } = await auth({ acceptsToken: 'm2m_token' });
+
+            if (!isAuthenticated) {
+              return Response.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+
+            return Response.json({ subject, tokenType });
+          }
+          `,
+        )
+        .commit();
+      await app.setup();
+      await app.withEnv(
+        appConfigs.envs.withAPIKeys
+          .clone()
+          .setEnvVariable('private', 'CLERK_MACHINE_SECRET_KEY', network.primaryServer.secretKey),
+      );
+      await app.dev();
+    });
+
+    test.afterAll(async () => {
+      await network?.cleanup();
+      await app?.teardown();
+    });
+
+    test('should return 200 from auth() if the route accepts M2M tokens', async ({ request }) => {
+      const res = await request.get(new URL('/api/app-machine', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+      expect(res.status()).toBe(200);
+      expect(await res.json()).toEqual({ subject: network.scopedSender.id, tokenType: TokenType.M2MToken });
+    });
+
+    test('should return 401 from getAuth() if a JWT-format M2M token is sent', async ({ request }) => {
+      const res = await request.get(new URL('/api/pages-session', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+      expect(res.status()).toBe(401);
+    });
+
+    test('should return 401 from auth() if a JWT-format M2M token is sent with a padded Authorization header', async ({
+      request,
+    }) => {
+      const res = await request.get(new URL('/api/app-session', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${jwtToken} x` },
+      });
+      expect(res.status()).toBe(401);
+    });
+  });
 });

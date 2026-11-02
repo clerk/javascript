@@ -23,12 +23,13 @@ import * as stylex from '@stylexjs/stylex';
 // Color Tokens
 // =============================================================================
 
-// Every achromatic token is `--cl-color-neutral` mixed into `--cl-color-background`, so
-// retinting neutral (a warm gray, say) retints the whole ramp. The percentages reproduce
-// the Figma gray scale: grays have zero chroma, so an oklab mix is linear in lightness.
-// Dark mode needs its own percentage because its background is a 900, not black.
+// Every achromatic token is `--cl-color-neutral` mixed into `--cl-color-surface`, so
+// retinting neutral (a warm gray, say) retints the whole ramp. Each tier sits about one 1.09:1
+// contrast step from the one below it. Light mode mixes toward black, which holds that ratio at a
+// fixed percentage; dark mode mixes toward white, so its percentages shrink as the tiers rise
+// (surface 5, subtle 4). Borders are washes, so they keep the same step on any tier.
 const neutralMix = (light: number, dark: number) =>
-  `light-dark(color-mix(in oklab, var(--cl-color-neutral) ${light}%, var(--cl-color-background)), color-mix(in oklab, var(--cl-color-neutral) ${dark}%, var(--cl-color-background)))`;
+  `light-dark(color-mix(in oklab, var(--cl-color-neutral) ${light}%, var(--cl-color-surface)), color-mix(in oklab, var(--cl-color-neutral) ${dark}%, var(--cl-color-surface)))`;
 
 const colorDefaults = {
   '--cl-color-neutral': 'light-dark(oklch(0 0 0), oklch(1 0 0))',
@@ -36,48 +37,55 @@ const colorDefaults = {
   '--cl-color-neutral-alpha-200': 'color-mix(in oklab, var(--cl-color-neutral) 8%, transparent)',
   '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
 
-  '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
-  '--cl-color-background-subtle': neutralMix(3, 4),
+  '--cl-color-page': 'light-dark(oklch(1 0 0), oklch(0.16 0 0))',
+  '--cl-color-surface':
+    'light-dark(color-mix(in oklab, oklch(1 0 0) 60%, var(--cl-color-page)), color-mix(in oklab, var(--cl-color-neutral) 5%, var(--cl-color-page)))',
+  '--cl-color-surface-subtle': neutralMix(3, 4),
+  '--cl-color-neutral-subtle': 'light-dark(var(--cl-color-neutral-alpha-200), var(--cl-color-neutral-alpha-300))',
 
   '--cl-color-foreground': neutralMix(79.5, 98),
-  '--cl-color-foreground-secondary': neutralMix(56, 64.25),
+  '--cl-color-foreground-secondary': neutralMix(55, 64.25),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border': neutralMix(5.5, 8),
-  '--cl-color-border-subtle': neutralMix(3, 4.25),
+  '--cl-color-border':
+    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 7%, transparent), var(--cl-color-neutral-alpha-300))',
+  '--cl-color-border-subtle':
+    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 4%, transparent), var(--cl-color-neutral-alpha-200))',
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
-  '--cl-color-brand-secondary': 'light-dark(oklch(0.5555 0 0), oklch(0.7155 0 0))',
-  '--cl-color-brand-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
-  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
+  '--cl-color-brand-subtle': 'light-dark(var(--cl-color-brand-alpha-200), var(--cl-color-brand-alpha-300))',
+  '--cl-color-brand-border': 'var(--cl-color-brand-alpha-300)',
+  '--cl-color-brand-alpha-100': 'color-mix(in oklab, var(--cl-color-brand) 6%, transparent)',
+  '--cl-color-brand-alpha-200': 'color-mix(in oklab, var(--cl-color-brand) 8%, transparent)',
+  '--cl-color-brand-alpha-300': 'color-mix(in oklab, var(--cl-color-brand) 12%, transparent)',
 
-  '--cl-color-negative': 'light-dark(oklch(0.5903 0.213 26.78), oklch(0.7106 0.1661 22.22))',
+  '--cl-color-negative': 'light-dark(oklch(0.56 0.2161 26.11), oklch(0.6252 0.2161 26.11))',
   '--cl-color-negative-foreground': 'oklch(1 0 0)',
-  '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
-  '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
+  '--cl-color-negative-subtle': 'light-dark(var(--cl-color-negative-alpha-200), var(--cl-color-negative-alpha-300))',
+  '--cl-color-negative-border': 'var(--cl-color-negative-alpha-300)',
   '--cl-color-negative-alpha-100': 'color-mix(in oklab, var(--cl-color-negative) 6%, transparent)',
   '--cl-color-negative-alpha-200': 'color-mix(in oklab, var(--cl-color-negative) 8%, transparent)',
   '--cl-color-negative-alpha-300': 'color-mix(in oklab, var(--cl-color-negative) 12%, transparent)',
 
-  '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
-  '--cl-color-positive-foreground': 'oklch(1 0 0)',
-  '--cl-color-positive-subtle': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
-  '--cl-color-positive-border': 'light-dark(oklch(0.7922 0.1959 148.18), oklch(0.4479 0.1083 151.33))',
+  '--cl-color-positive': 'light-dark(oklch(0.55 0.15 148), oklch(0.7227 0.192 149.58))',
+  '--cl-color-positive-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
+  '--cl-color-positive-subtle': 'light-dark(var(--cl-color-positive-alpha-200), var(--cl-color-positive-alpha-300))',
+  '--cl-color-positive-border': 'var(--cl-color-positive-alpha-300)',
   '--cl-color-positive-alpha-100': 'color-mix(in oklab, var(--cl-color-positive) 6%, transparent)',
   '--cl-color-positive-alpha-200': 'color-mix(in oklab, var(--cl-color-positive) 8%, transparent)',
   '--cl-color-positive-alpha-300': 'color-mix(in oklab, var(--cl-color-positive) 12%, transparent)',
 
-  '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
-  '--cl-color-warning-foreground': 'oklch(1 0 0)',
-  '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
-  '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
+  '--cl-color-warning': 'light-dark(oklch(0.6 0.16 48), oklch(0.7576 0.159 55.93))',
+  '--cl-color-warning-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
+  '--cl-color-warning-subtle': 'light-dark(var(--cl-color-warning-alpha-200), var(--cl-color-warning-alpha-300))',
+  '--cl-color-warning-border': 'var(--cl-color-warning-alpha-300)',
   '--cl-color-warning-alpha-100': 'color-mix(in oklab, var(--cl-color-warning) 6%, transparent)',
   '--cl-color-warning-alpha-200': 'color-mix(in oklab, var(--cl-color-warning) 8%, transparent)',
   '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
 
-  '--cl-color-input':
-    'light-dark(var(--cl-color-background), color-mix(in oklab, var(--cl-color-neutral) 4%, var(--cl-color-background)))',
-  '--cl-color-input-placeholder': neutralMix(28, 64),
+  '--cl-color-input': 'var(--cl-color-surface)',
+  '--cl-color-input-placeholder': neutralMix(45, 64.25),
 
   '--cl-color-ring': neutralMix(80, 90),
 } as const;
@@ -147,7 +155,7 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
 // thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
 // they resolve at use time — overriding the base re-derives all three, while any one stays
-// individually overridable. The base is itself mixed most of the way toward `--cl-color-background`,
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-surface`,
 // which keeps a 4px bar reading as a hairline rather than a hard rule; `idle` carries on in that
 // direction, and the other two step back toward `--cl-color-foreground`, deepening in light
 // mode and lightening in dark, since that token already carries both.
@@ -170,8 +178,8 @@ const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
 const scrollbarDefaults = {
   '--cl-scrollbar-width': '8px',
   '--cl-scrollbar-thumb-inset': '2px',
-  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-foreground-secondary']}, ${colorVars['--cl-color-background']} 55%)`,
-  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-background']} 45%)`,
+  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-foreground-secondary']}, ${colorVars['--cl-color-surface']} 55%)`,
+  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-surface']} 45%)`,
   '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 15%)`,
   '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 30%)`,
 } as const;
@@ -410,7 +418,6 @@ const easingDefaults = {
   '--cl-ease-enter': 'cubic-bezier(0, 0, 0.2, 1)',
   '--cl-ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
   '--cl-ease-in-out': 'cubic-bezier(0.645, 0.045, 0.355, 1)',
-  '--cl-ease-pulse': 'cubic-bezier(0.4, 0, 0.6, 1)',
 } as const;
 
 export const easingVars = stylex.defineVars(easingDefaults);

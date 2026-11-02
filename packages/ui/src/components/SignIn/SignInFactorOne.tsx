@@ -8,6 +8,7 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
@@ -79,6 +80,7 @@ function SignInFactorOneInternal(): JSX.Element {
   const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  const webAuthnSupported = useIsWebAuthnSupported();
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
@@ -89,7 +91,12 @@ function SignInFactorOneInternal(): JSX.Element {
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => {
-    const factor = determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
+    const factor = determineStartingSignInFactor(
+      availableFactors,
+      signIn.identifier,
+      preferredSignInStrategy,
+      webAuthnSupported,
+    );
     if (
       factor?.strategy === 'phone_code' &&
       !!firstFactorVerification.channel &&

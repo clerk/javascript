@@ -3,6 +3,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   already_a_member_in_organization: 'Some of these email addresses already belong to members of this organization.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
   active_device_unavailable: 'This device is no longer available. Please try again.',
+  api_key_secret_unavailable:
+    'The API key was created, but its secret could not be shown. Revoke it and create a new one.',
   avatar_file_count_exceeded: 'Only one file can be uploaded at a time.',
   avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
   avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
@@ -15,7 +17,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_param_format_invalid__email_address: 'Email address must be a valid email address.',
   form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
   form_param_value_invalid__role: 'This role cannot be assigned here.',
-  form_password_incorrect: 'Your current password is incorrect.',
+  form_password_incorrect: 'Password is incorrect.',
+  form_password_incorrect__current_password: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
   form_password_matches_identifier:
     'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
@@ -92,6 +95,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
   web3_provider_unavailable: 'This wallet provider is unavailable.',
   web3_wallet_creation_failed: 'The wallet could not be created.',
+  web3_wallet_account_mismatch: 'Select the wallet account that matches this address.',
   web3_verification_message_unavailable: 'The wallet verification message is unavailable.',
   web3_signature_unavailable: 'The wallet signature is unavailable.',
   web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',

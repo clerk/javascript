@@ -1,6 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
+import { useFlowStepActive } from '../../primitives/flow';
 import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -97,6 +99,7 @@ function HeaderCloseButton() {
       aria-label='Close'
       render={props => (
         <Button
+          color='neutral'
           variant='ghost'
           shape='circle'
           size='sm'
@@ -104,7 +107,7 @@ function HeaderCloseButton() {
         />
       )}
     >
-      <Icon name='x' />
+      <Icon glyph={X} />
     </Dialog.Close>
   );
 }
@@ -124,10 +127,11 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
-              Not outside a dialog, where there is nothing to close, and not in an alert dialog. */}
+              Not outside a dialog, where there is nothing to close, and not where the dialog's
+              `showCloseButton` is off, which is the default for an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <HeaderCloseButton /> : null}
+          {isInDialog(dialog) && dialog.showCloseButton ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>
@@ -146,6 +150,7 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const stepActive = useFlowStepActive();
   return useRender({
     defaultTagName: 'h2',
     render,
@@ -154,7 +159,7 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
       ...mergeStyleProps(themeProps('card-title'), stylex.props(reset.base, slots.header.title, xstyle), rest),
       // The popup points `aria-labelledby` at this id, so the surface outranks the caller: an id
       // that displaced it would leave the dialog with no accessible name.
-      ...(dialog && { id: dialog.labelId }),
+      ...(dialog && stepActive && { id: dialog.labelId }),
     },
   });
 });
@@ -165,6 +170,7 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const stepActive = useFlowStepActive();
   return useRender({
     defaultTagName: 'p',
     render,
@@ -175,7 +181,7 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
         stylex.props(reset.base, slots.header.description, xstyle),
         rest,
       ),
-      ...(dialog && { id: dialog.descriptionId }),
+      ...(dialog && stepActive && { id: dialog.descriptionId }),
     },
   });
 });

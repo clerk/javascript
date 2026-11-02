@@ -40,7 +40,7 @@ export const popup = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
@@ -129,6 +129,18 @@ export const option = stylex.create({
   },
 });
 
+export const media = stylex.create({
+  base: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['5'],
+  },
+});
+
 export const content = stylex.create({
   base: {
     display: 'flex',
@@ -148,10 +160,12 @@ export const description = stylex.create({
 // Rendered on every row and shown only on the selected one, so labels never shift with selection.
 export const indicator = stylex.create({
   base: {
+    alignSelf: 'flex-start',
     color: colorVars['--cl-color-foreground-secondary'],
     visibility: {
       default: 'hidden',
       [stylex.when.ancestor('[data-selected]', selectOptionScope)]: 'visible',
     },
+    height: space['5'],
   },
 });

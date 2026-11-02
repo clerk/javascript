@@ -37,11 +37,6 @@ const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']},
 // Both selectors are written out per cell rather than hoisted to a const: `@stylexjs/sort-keys`
 // reads a computed key as its identifier name and fails the ordering.
 //
-// `:active` also excludes `[data-pending]`, which `SubmitButton` sets while its action runs. That
-// button drops its pointer events, which is enough for the pointer, but a focused button still
-// takes `:active` from the keyboard — space and enter — and a pending button shouldn't flash a
-// pressed fill for a press it ignores.
-//
 // `[data-open]` takes the pressed fill too, so a button acting as a disclosure trigger stays
 // visibly engaged for as long as its surface is open. Disclosure primitives set it on the
 // trigger (`popover-trigger.tsx` and friends); a plain button never carries it. It is excluded
@@ -147,7 +142,7 @@ export const variants = stylex.create({
   'filled-primary': {
     backgroundColor: {
       default: colorVars['--cl-color-brand'],
-      ':not([data-disabled]):not([data-pending]):active': primaryActive,
+      ':not([data-disabled]):active': primaryActive,
       ':not([data-disabled])[data-open]': primaryActive,
       '@media (hover: hover)': {
         default: null,
@@ -159,7 +154,7 @@ export const variants = stylex.create({
   'filled-neutral': {
     backgroundColor: {
       default: colorVars['--cl-color-neutral-alpha-100'],
-      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-300'],
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-300'],
       ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-300'],
       '@media (hover: hover)': {
         default: null,
@@ -171,7 +166,7 @@ export const variants = stylex.create({
   'filled-negative': {
     backgroundColor: {
       default: colorVars['--cl-color-negative'],
-      ':not([data-disabled]):not([data-pending]):active': negativeActive,
+      ':not([data-disabled]):active': negativeActive,
       ':not([data-disabled])[data-open]': negativeActive,
       '@media (hover: hover)': {
         default: null,
@@ -188,7 +183,7 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
       ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
@@ -201,7 +196,7 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
       ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
@@ -214,7 +209,7 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
       ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
@@ -227,7 +222,7 @@ export const variants = stylex.create({
   'ghost-primary': {
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
       ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
@@ -239,7 +234,7 @@ export const variants = stylex.create({
   'ghost-neutral': {
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
       ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
@@ -253,7 +248,7 @@ export const variants = stylex.create({
   'ghost-negative': {
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):not([data-pending]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
       ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
       '@media (hover: hover)': {
         default: null,

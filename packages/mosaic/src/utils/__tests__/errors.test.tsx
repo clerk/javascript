@@ -1,10 +1,10 @@
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { isLocalizableError, MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../localization';
-import { SaveError, toLocalizableError } from '../errors';
+import { save, SaveError, toLocalizableError } from '../errors';
 
 function errorText() {
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -17,11 +17,22 @@ function silenceConsole() {
   return vi.spyOn(console, 'error').mockImplementation(() => {});
 }
 
-describe('toLocalizableError', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
+describe('save', () => {
+  it('wraps a Clerk API error the user can act on', async () => {
+    const cause = new ClerkAPIResponseError('Forbidden', {
+      status: 403,
+      data: [{ code: 'action_blocked', message: 'Short', long_message: 'Long' }],
+    });
+    await expect(save(() => Promise.reject(cause))).rejects.toBeInstanceOf(SaveError);
   });
 
+  it('lets a cancelled reverification through untouched, so the dialog can close quietly', async () => {
+    const cause = new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' });
+    await expect(save(() => Promise.reject(cause))).rejects.toBe(cause);
+  });
+});
+
+describe('toLocalizableError', () => {
   it('reads the global error a save left, code and all', () => {
     const cause = new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } });
     expect(toLocalizableError(cause)).toEqual({ code: 'action_blocked', message: 'Raw server sentence.' });

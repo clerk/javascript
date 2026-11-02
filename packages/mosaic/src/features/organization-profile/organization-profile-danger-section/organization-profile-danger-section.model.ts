@@ -2,6 +2,7 @@ import { useOrganization, useOrganizationList, useSession, useUser } from '@cler
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { useOrganizationProfileOptions } from '../organization-profile.provider';
 
 const organizationListParams = {
   userMemberships: { infinite: true },
@@ -20,11 +21,8 @@ export type OrganizationProfileDangerSectionModel =
       deleteOrganization?: () => Promise<void>;
     };
 
-export function useOrganizationProfileDangerSectionModel({
-  afterLeaveOrganizationUrl,
-}: {
-  afterLeaveOrganizationUrl?: string;
-}): OrganizationProfileDangerSectionModel {
+export function useOrganizationProfileDangerSectionModel(): OrganizationProfileDangerSectionModel {
+  const { afterLeaveOrganizationUrl } = useOrganizationProfileOptions();
   const { isLoaded, organization, membership } = useOrganization();
   const { user } = useUser();
   const { session } = useSession();

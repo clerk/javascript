@@ -36,6 +36,7 @@ export interface ComboboxContextValue {
   focusInput: () => void;
   popupId: string | undefined;
   registerSelectedIndex: (index: number, value: string, label: string) => (() => void) | undefined;
+  registerOption: (index: number) => void;
   mounted: boolean;
   transitionProps: TransitionProps;
 }

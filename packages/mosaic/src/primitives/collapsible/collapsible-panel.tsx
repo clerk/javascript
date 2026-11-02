@@ -19,11 +19,6 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
     const [height, setHeight] = useState<number | undefined>(undefined);
     const [width, setWidth] = useState<number | undefined>(undefined);
 
-    const hasBeenClosed = useRef(false);
-    if (!open) {
-      hasBeenClosed.current = true;
-    }
-
     const { mounted, transitionStatus, transitionProps } = useTransition({
       open,
       ref: panelRef,
@@ -77,23 +72,15 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
 
     const state = { open };
 
-    const effectiveTransitionProps = !hasBeenClosed.current
-      ? {
-          ...transitionProps,
-          'data-starting-style': undefined,
-          style: undefined,
-        }
-      : transitionProps;
-
     const defaultProps: Record<string, unknown> = {
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
-      ...effectiveTransitionProps,
+      ...transitionProps,
       style: {
         '--collapsible-panel-height': height != null ? `${height}px` : undefined,
         '--collapsible-panel-width': width != null ? `${width}px` : undefined,
-        ...effectiveTransitionProps.style,
+        ...transitionProps.style,
       },
     };
 

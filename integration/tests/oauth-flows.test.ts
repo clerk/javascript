@@ -2,8 +2,9 @@ import { createClerkClient } from '@clerk/backend';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { environmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
-import { instanceKeys } from '../presets/envs';
+import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { withRetry } from '../testUtils/retryableClerkClient';
@@ -12,7 +13,11 @@ import { createUserService } from '../testUtils/usersService';
 const grantOAuthConsent = async (page: Page) => {
   const allowAccessButton = page.getByRole('button', { name: 'Allow' });
   await expect(allowAccessButton).toBeVisible();
-  await allowAccessButton.click();
+  const [callback] = await Promise.all([
+    page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+    allowAccessButton.click(),
+  ]);
+  expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
 };
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flows @nextjs', ({ app }) => {
@@ -24,8 +29,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   test.beforeAll(async () => {
     // Create a clerkClient for the OAuth provider instance.
     const client = createClerkClient({
-      secretKey: instanceKeys.get('oauth-provider').sk,
-      publishableKey: instanceKeys.get('oauth-provider').pk,
+      secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+      publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
     });
     const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, {
@@ -40,7 +45,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test.afterAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     // Delete the user on the OAuth provider instance.
     await fakeUser.deleteIfExists();
     await modalSignUpUser.deleteIfExists();
@@ -51,11 +56,22 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign up with custom oauth provider', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
+    const providerKeys = await resolveInstanceKeys('oauth-provider');
+    await createTestUtils({
+      app: {
+        ...app,
+        env: environmentConfig()
+          .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', providerKeys.pk)
+          .setEnvVariable('private', 'CLERK_SECRET_KEY', providerKeys.sk),
+      },
+      page,
+      context,
+    });
     await u.po.signUp.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -70,11 +86,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign in with custom oauth provider', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -88,7 +104,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign in modal', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
@@ -98,7 +114,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.po.signIn.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -111,7 +127,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('openSignIn with withSignUp signs up a new user with custom oauth provider', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
@@ -126,7 +142,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     });
     await u.po.signIn.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(modalSignUpUser.email);
     await u.po.signIn.continue();
@@ -138,7 +154,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('openSignIn OAuth uses ClerkProvider.signInUrl for sso-callback', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
@@ -174,7 +190,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign up modal', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     // The SignUpModal will only redirect to its provided forceRedirectUrl if the user is signing up; it will not
     // redirect if the sign up is transferred to a sign in.
     await u.services.users.deleteIfExists({ email: fakeUser.email });
@@ -187,7 +203,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.po.signUp.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -198,7 +214,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign in modal to sign up modal to transfer respects original forceRedirectUrl', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // The user already exists on the OAuth provider instance, but we want to make sure that the user is created on the
     // app instance as well so that their sign up is transferred to a sign in.
@@ -223,7 +239,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     // Use OAuth provider
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     // Sign in with existing account
     await u.po.signIn.setIdentifier(fakeUser.email);
@@ -238,7 +254,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
   test.describe('authenticateWithPopup', () => {
     test('SignIn with oauthFlow=popup opens popup', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/buttons');
       await u.page.waitForClerkJsLoaded();
@@ -251,8 +267,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
       const popupPromise = context.waitForEvent('page');
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
-      const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      const popupUtils = await createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
       await popupUtils.po.signIn.continue();
@@ -274,7 +290,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
   });
 
   test('openSignIn OAuth in combined flow targets /sign-in#/sso-callback', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
@@ -317,8 +333,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
 
     test.beforeAll(async () => {
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
@@ -328,14 +344,14 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await fakeUser.deleteIfExists();
       await u.services.users.deleteIfExists({ email: fakeUser.email });
       await app.teardown();
     });
 
     test('popup OAuth navigates through sso-callback with path-based routing', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/sign-in-popup');
       await u.page.waitForClerkJsLoaded();
@@ -344,8 +360,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
       const popupPromise = context.waitForEvent('page');
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
-      const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      const popupUtils = await createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       // Complete OAuth in the popup
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
@@ -374,8 +390,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
 
     test.beforeAll(async () => {
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
@@ -385,14 +401,14 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await fakeUser.deleteIfExists();
       await u.services.users.deleteIfExists({ email: fakeUser.email });
       await app.teardown();
     });
 
     test('popup OAuth navigates through sso-callback with hash-based routing', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/sign-in-hash-popup');
       await u.page.waitForClerkJsLoaded();
@@ -401,8 +417,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
       const popupPromise = context.waitForEvent('page');
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
-      const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      const popupUtils = await createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       // Complete OAuth in the popup
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
@@ -435,8 +451,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     test.beforeAll(async () => {
       // Create a clerkClient for the OAuth provider instance.
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
@@ -447,7 +463,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       // Delete the user on the OAuth provider instance.
       await fakeUser.deleteIfExists();
       // Delete the user on the app instance.
@@ -456,11 +472,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test('sign up via transfer with custom oauth provider', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -477,7 +493,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test('sign up via transfer modal', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.services.users.deleteIfExists({ email: fakeUser.email });
 
       await u.page.goToRelative('/buttons');
@@ -488,7 +504,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       await u.po.signIn.waitForModal();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -506,7 +522,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       context,
       browser,
     }) => {
-      const u = createTestUtils({ app, page, context, browser });
+      const u = await createTestUtils({ app, page, context, browser });
 
       // Open sign-in page in both tabs before signing in
       await u.po.signIn.goTo();
@@ -519,7 +535,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       // Sign in via OAuth on the first tab
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
       await u.po.signIn.enterTestOtpCode();

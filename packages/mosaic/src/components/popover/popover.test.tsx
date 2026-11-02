@@ -226,7 +226,6 @@ describe('Mosaic Popover', () => {
     expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
     await settle();
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   it('warns when the dialog has no accessible name', async () => {
@@ -242,7 +241,6 @@ describe('Mosaic Popover', () => {
 
     await settle();
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
-    warn.mockRestore();
   });
 
   it('does not warn when a Popover.Title supplies the name', async () => {
@@ -259,7 +257,6 @@ describe('Mosaic Popover', () => {
     expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
     await settle();
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   it('forwards the ref to the popup element', () => {

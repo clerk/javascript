@@ -11,8 +11,7 @@ description: >-
 
 # Working in the clerk/javascript monorepo
 
-This is Clerk's JavaScript SDK monorepo: 24 packages (22 published `@clerk/*` plus the private
-`@clerk/msw` and `@clerk/swingset`) managed with pnpm
+This is Clerk's JavaScript SDK monorepo: the `@clerk/*` packages under `packages/`, managed with pnpm
 workspaces and Turborepo. Read this before building, testing, committing, or touching anything
 under `packages/`.
 
@@ -27,7 +26,7 @@ The order matters more than the commands. Do them in sequence:
 1. **Node `>=24.15.0`** (pinned in `.nvmrc`). `nvm use` if you have nvm. Wrong Node version is the
    single most common cause of cryptic "cannot find module @clerk/..." build errors.
 2. **`corepack enable`** before installing. The `preinstall` hook runs `only-allow pnpm`; npm/yarn
-   are hard-blocked. Corepack pins the right pnpm (`>=10.33.0`).
+   are hard-blocked. Corepack pins the right pnpm (`engines` in `package.json`).
 3. **`pnpm install` from the repo root** (never a subdirectory). It is a workspace; installing from
    a package dir leaves cross-package links broken.
 4. **`pnpm build`** before anything else. Packages depend on each other's built `dist/` + `.d.ts`.
@@ -39,7 +38,7 @@ Full sequence, the 11 footguns, and the internal integration-test / 1Password se
 
 ## Package map: where does X live?
 
-The ~10 packages people touch most. Full 25-package table, the dependency pyramid, and the complete
+The ~10 packages people touch most. How to list every package, the dependency pyramid, and the complete
 "change X, touch Y" routing are in [`references/package-map.md`](references/package-map.md).
 
 | Package                | You change it when...                                                                                                                                       |
@@ -143,8 +142,8 @@ see [`references/setup-and-footguns.md`](references/setup-and-footguns.md) and `
 
 Each rule below restates `AGENTS.md`; the parenthetical is how it is enforced.
 
-- **pnpm only, Node `>=24.15`, pnpm `>=10.33`.** (`preinstall` blocks npm/yarn; `engines` in
-  `package.json`.)
+- **pnpm only, at the Node and pnpm versions in `engines` in `package.json`.** (`preinstall` blocks
+  npm/yarn.)
 - **Every PR needs a changeset.** Write the file directly; the `pnpm changeset` /
   `pnpm changeset:empty` scripts are interactive prompts an agent cannot drive. A changeset is a
   changelog entry for users upgrading, not a summary of the diff. See

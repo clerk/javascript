@@ -68,7 +68,7 @@ export default function Page() {
     await app.withEnv(appConfigs.envs.withRestrictedMode);
     await app.dev();
 
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
@@ -87,7 +87,7 @@ export default function Page() {
   });
 
   test('Existing user signs in succesfull', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -98,7 +98,7 @@ export default function Page() {
   });
 
   test('Sign up page return restricted and click Back to sign in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signUp.goTo();
     await u.po.signUp.waitForMounted();
 
@@ -111,12 +111,11 @@ export default function Page() {
   });
 
   test('Sign up page with invitation render correctly and sign up', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const invitedUser = u.services.users.createFakeUser(test, { fictionalEmail: true });
 
     const invitation = await u.services.invitations.createBapiInvitation(invitedUser.email);
 
-    await u.po.testingToken.setup();
     await u.page.goto(invitation.url);
     await u.po.signUp.waitForMounted();
     await expect(u.page.getByText(/Create your account/i).first()).toBeVisible();

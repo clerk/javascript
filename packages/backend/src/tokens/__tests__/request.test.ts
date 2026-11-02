@@ -1555,6 +1555,23 @@ describe('tokens.authenticateRequest(options)', () => {
       vi.clearAllMocks();
     });
 
+    test('ignores a session issuer when authenticating an M2M JWT', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+
+      const { data: m2mJwt } = await signJwt(mockM2MJwtPayload, signingJwks, {
+        algorithm: 'RS256',
+        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+      });
+
+      const request = mockRequest({ authorization: `Bearer ${m2mJwt}` });
+      const requestState = await authenticateRequest(
+        request,
+        mockOptions({ acceptsToken: 'm2m_token', issuer: mockJwtPayload.iss }),
+      );
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+
     // Test each token type with parameterized tests
     const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.M2MToken];
 

@@ -5,6 +5,7 @@ import { Combobox } from '@clerk/mosaic/components/combobox';
 import { Field } from '@clerk/mosaic/components/field';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
+import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -17,7 +18,7 @@ export { default as __source } from './combobox.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Combobox',
   source: 'packages/mosaic/src/components/combobox/combobox.tsx',
 };
@@ -37,7 +38,7 @@ export function Default() {
               render={<Button />}
             >
               <Icon
-                name='chevron-down'
+                glyph={ChevronDown}
                 size='sm'
               />
             </Combobox.Trigger>
@@ -81,7 +82,7 @@ export function Scrolling() {
               render={<Button />}
             >
               <Icon
-                name='chevron-down'
+                glyph={ChevronDown}
                 size='sm'
               />
             </Combobox.Trigger>

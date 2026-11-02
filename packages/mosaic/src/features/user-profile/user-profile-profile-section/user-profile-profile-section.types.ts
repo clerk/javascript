@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import type { ReverificationController } from '../../reverification';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 import type { UserProfilePictureController } from './user-profile-picture.controller';
@@ -52,6 +53,7 @@ export type UserProfileProfileSectionModel =
       username: string;
       usernameRequired: boolean;
       onSubmitUsername?: (username: string) => Promise<void>;
+      usernameReverification: ReverificationController;
     };
 
 export type ReadyProfileSectionModel = Extract<UserProfileProfileSectionModel, { status: 'ready' }>;

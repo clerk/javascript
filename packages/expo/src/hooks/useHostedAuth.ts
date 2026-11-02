@@ -228,7 +228,7 @@ function warnAndroidDefaultRedirectOnce(): void {
   if (__DEV__ && !hasWarnedAndroidDefaultRedirect) {
     hasWarnedAndroidDefaultRedirect = true;
     console.warn(
-      '[useHostedAuth] The default Android redirect URL relies on the `clerk://<package>.hosted-callback` intent ' +
+      'Clerk: The default Android redirect URL relies on the `clerk://<package>.hosted-callback` intent ' +
         'filter registered by the Clerk Expo config plugin. If the plugin is not enabled in app.json or the ' +
         'native project has not been rebuilt since (e.g. `npx expo prebuild`), the browser cannot redirect ' +
         'back to the app and hosted auth will hang. Alternatively, pass a custom `redirectUrl` handled by the app.',

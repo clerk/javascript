@@ -28,6 +28,10 @@ expo:
   - changed-files:
       - any-glob-to-any-file: packages/expo/**
 
+expo-native-components:
+  - changed-files:
+      - any-glob-to-any-file: packages/expo-native-components/**
+
 express:
   - changed-files:
       - any-glob-to-any-file: packages/express/**

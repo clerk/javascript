@@ -5,6 +5,7 @@ import { fapiClient, fapiSession, fapiUser } from './fapi';
 import { renderWithClerk } from './render';
 
 describe('fake FAPI isolation between tests', () => {
+  // eslint-disable-next-line vitest/expect-expect -- Leaves work running for the next test, which asserts it is isolated.
   it('leaves a request in flight when the test ends', async () => {
     const user = fapiUser({ id: 'user_1' });
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
@@ -20,6 +21,7 @@ describe('fake FAPI isolation between tests', () => {
     memberships.release();
   });
 
+  // eslint-disable-next-line vitest/expect-expect -- Leaves work running for the next test, which asserts it is isolated.
   it('starts a request after the test ends', async () => {
     const user = fapiUser({ id: 'user_1' });
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
