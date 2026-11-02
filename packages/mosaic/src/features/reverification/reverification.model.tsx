@@ -40,10 +40,10 @@ function toMethod(
   webAuthnSupported: boolean,
 ): ReverificationMethod | null {
   if (factor.strategy === 'passkey') {
-    if (stage !== 'first' || !webAuthnSupported) {
+    if (!webAuthnSupported) {
       return null;
     }
-    return { id: 'passkey', stage: 'first', strategy: 'passkey' };
+    return { id: 'passkey', stage, strategy: 'passkey' };
   }
 
   if (factor.strategy === 'password') {
@@ -183,7 +183,11 @@ export function useReverificationModel(reverificationState: ReverificationState)
             await session.attemptSecondFactorVerification({ strategy: method.strategy, code: value }),
           );
         case 'passkey':
-          return handleResponse(await session.verifyWithPasskey());
+          return handleResponse(
+            await (method.stage === 'second'
+              ? session.verifyWithPasskey({ level: 'second_factor' })
+              : session.verifyWithPasskey()),
+          );
       }
     },
     finish: async () => {

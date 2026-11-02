@@ -51,6 +51,7 @@ function pickStartingFirstFactor(
 
 function pickStartingSecondFactor(methods: readonly ReverificationMethod[]): ReverificationMethod | null {
   return (
+    methods.find(method => method.strategy === 'passkey') ??
     methods.find(method => method.strategy === 'totp') ??
     methods.find(method => method.strategy === 'phone_code') ??
     methods[0] ??
