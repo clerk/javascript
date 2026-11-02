@@ -29,6 +29,7 @@ import type { MosaicComponentProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { useHeldMessage } from '../../utils/feedback';
 import type { ButtonProps } from '../button';
 import { Button } from '../button';
 import { Icon } from '../icon';
@@ -90,10 +91,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   });
   const countId = React.useId();
   const context = React.useMemo(() => ({ countId }), [countId]);
-  const openChildrenRef = React.useRef(children);
-  if (open) {
-    openChildrenRef.current = children;
-  }
+  const heldChildren = useHeldMessage(children, open);
 
   const wasOpenRef = React.useRef(false);
   const [status, setStatus] = React.useState('');
@@ -101,6 +99,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     const wasOpen = wasOpenRef.current;
     wasOpenRef.current = open;
     if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- The live region must commit empty before its text arrives, or a bar mounted open is never announced.
       setStatus('');
     } else if (!wasOpen) {
       setStatus(openAnnouncement ?? announcement ?? '');
@@ -227,9 +226,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
                   onKeyDown={guardPortalledKeys}
                   {...stylex.props(styles.items)}
                 >
-                  <CompositeItemsProvider value={items}>
-                    {open ? children : openChildrenRef.current}
-                  </CompositeItemsProvider>
+                  <CompositeItemsProvider value={items}>{heldChildren}</CompositeItemsProvider>
                 </div>
               </Bar>
             </div>
@@ -254,14 +251,16 @@ function Bar({ render, barRefs, onCompositeKeyDown, open, transitionStatus, onFo
     render,
     ref: barRefs,
     props: {
-      ...mergeProps<'div'>(props, { onKeyDown: onCompositeKeyDown }),
+      ...mergeProps<'div'>(props, {
+        onKeyDown: onCompositeKeyDown,
+        onFocus: () => onFocusWithinChange(true),
+        onBlur: () => onFocusWithinChange(false),
+      }),
       ...(transitionStatus === 'starting' ? { 'data-starting-style': '', style: { transition: 'none' } } : null),
       ...(transitionStatus === 'ending' ? { 'data-ending-style': '' } : null),
       'data-open': open,
       role: 'toolbar',
       'aria-orientation': 'horizontal',
-      onFocus: () => onFocusWithinChange(true),
-      onBlur: () => onFocusWithinChange(false),
     },
   });
 }
