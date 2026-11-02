@@ -10,7 +10,7 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { InformationBox } from '@/ui/elements/InformationBox';
 import type { SuccessPage } from '@/ui/elements/SuccessPage';
 import { handleError } from '@/ui/utils/errorHandler';
-import { createPasswordError } from '@/ui/utils/passwordUtils';
+import { createPasswordConfirmationError, createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useEnvironment } from '../../contexts';
@@ -69,6 +69,8 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     type: 'password',
     label: localizationKeys('formFieldLabel__currentPassword'),
     isRequired: true,
+    validatePassword: false,
+    buildErrorMessage: errors => createPasswordConfirmationError(errors, { t }),
   });
 
   const passwordField = useFormControl('newPassword', '', {

@@ -2,6 +2,14 @@ import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePh
 import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
+import {
+  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
+  SafeLocalStorage,
+} from '@clerk/shared/internal/clerk-js/localStorage';
+import {
+  isPasswordConfirmationNotice,
+  PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM,
+} from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type {
@@ -35,7 +43,7 @@ import {
   withRedirectToSignInTask,
 } from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useIsWebAuthnSupported, useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -90,7 +98,26 @@ const useAutoFillPasskey = () => {
 
 function SignInStartInternal(): JSX.Element {
   const card = useCardState();
+  const { setError } = card;
+  const { t } = useLocalizations();
   const clerk = useClerk();
+  const hasCheckedSessionEndedNotice = useRef(false);
+  useEffect(() => {
+    if (hasCheckedSessionEndedNotice.current) {
+      return;
+    }
+    hasCheckedSessionEndedNotice.current = true;
+    const key = `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${clerk.publishableKey}`;
+    const notice = getClerkQueryParam(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM);
+    removeClerkQueryParam(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM);
+    if (
+      isPasswordConfirmationNotice(notice, clerk.publishableKey) ||
+      isPasswordConfirmationNotice(SafeLocalStorage.getItem(key, null), clerk.publishableKey)
+    ) {
+      SafeLocalStorage.removeItem(key);
+      setError(t(localizationKeys('unstable__errors.password_confirmation_session_ended')));
+    }
+  }, [clerk.publishableKey, setError, t]);
   const status = useLoadingStatus();
   const { userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();

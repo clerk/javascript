@@ -31,6 +31,16 @@ import {
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
 import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
+import {
+  CLERK_ENVIRONMENT_STORAGE_ENTRY,
+  PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY,
+  SafeLocalStorage,
+} from '@clerk/shared/internal/clerk-js/localStorage';
+import {
+  isPasswordConfirmationNotice,
+  PASSWORD_CONFIRMATION_NOTICE_TTL,
+  PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM,
+} from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -174,7 +184,6 @@ import {
   stripOrigin,
   web3,
 } from '../utils';
-import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -2271,7 +2280,17 @@ export class Clerk implements ClerkInterface {
 
     const modifiedOptions = this.isSatellite ? this.#addSyncTriggerToRedirectOptions(options) : options;
 
-    return this.#buildUrl('signInUrl', { ...modifiedOptions, redirectUrl }, options?.initialValues);
+    const signInUrl = this.#buildUrl('signInUrl', { ...modifiedOptions, redirectUrl }, options?.initialValues);
+    const notice = SafeLocalStorage.getItem(
+      `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`,
+      null,
+    );
+    if (!signInUrl || !isPasswordConfirmationNotice(notice, this.publishableKey)) {
+      return signInUrl;
+    }
+    const url = new URL(signInUrl, window.location.href);
+    url.searchParams.set(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM, notice);
+    return url.href;
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
@@ -2467,7 +2486,11 @@ export class Clerk implements ClerkInterface {
 
   public redirectToSignIn = async (options?: SignInRedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildSignInUrl(options));
+      const url = this.buildSignInUrl(options);
+      if (url && new URL(url, window.location.href).searchParams.has(PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM)) {
+        SafeLocalStorage.removeItem(`${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`);
+      }
+      return this.navigate(url);
     }
     return;
   };
@@ -3016,10 +3039,7 @@ export class Clerk implements ClerkInterface {
       if (this.session) {
         return;
       }
-      if (opts.broadcast) {
-        eventBus.emit(events.UserSignOut, null);
-      }
-      return this.setActive({ session: null });
+      return this.#completeSignOut(opts);
     } catch (err) {
       // `/client` can fail with either a 401, a 403, 500 or network errors.
       // 401 is already handled internally in our fetcher.
@@ -3031,6 +3051,31 @@ export class Clerk implements ClerkInterface {
         throw err;
       }
     }
+  };
+
+  /**
+   * Completes a sign-out that FAPI already performed, such as when a failed password
+   * confirmation ended the session and the piggybacked client no longer contains it.
+   *
+   * @internal
+   */
+  public __internal_handleSessionEnded = (client?: ClientResource): Promise<void> => {
+    SafeLocalStorage.setItem(
+      `${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`,
+      `${this.publishableKey}:${Date.now()}`,
+      PASSWORD_CONFIRMATION_NOTICE_TTL,
+    );
+    if (client) {
+      this.updateClient(client);
+    }
+    return this.#completeSignOut({ broadcast: true });
+  };
+
+  #completeSignOut = (opts: { broadcast: boolean }): Promise<void> => {
+    if (opts.broadcast) {
+      eventBus.emit(events.UserSignOut, null);
+    }
+    return this.setActive({ session: null });
   };
 
   public __internal_handleUnauthenticatedDevBrowser = async (): Promise<void> => {
@@ -3839,6 +3884,10 @@ export class Clerk implements ClerkInterface {
    */
   #updateAccessors = (session?: SignedInSessionResource | null, options?: { dangerouslySkipEmit?: boolean }) => {
     const { session: newSession, organization, user } = this.#getAccessorsFromSession(session);
+
+    if (newSession?.status === 'active' && (this.session?.id !== newSession.id || this.session?.status !== 'active')) {
+      SafeLocalStorage.removeItem(`${PASSWORD_CONFIRMATION_ERROR_STORAGE_ENTRY}:${this.publishableKey}`);
+    }
 
     this.session = newSession;
     this.organization = organization;

@@ -30,6 +30,7 @@ export interface ClerkAPIErrorJSON {
     link_url?: string;
     link_text?: string;
     data?: Record<string, string | number | boolean>;
+    remaining_attempts?: number;
   };
 }
 
@@ -122,6 +123,8 @@ export interface ClerkAPIError {
      * sensitive.
      */
     data?: Record<string, string | number | boolean>;
+    /** Remaining password confirmation attempts in the current session; zero means the session has ended. */
+    remainingAttempts?: number;
   };
 }
 

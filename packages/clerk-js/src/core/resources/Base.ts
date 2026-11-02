@@ -1,5 +1,6 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
+import { isPasswordConfirmationError } from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type {
   ClerkAPIErrorJSON,
@@ -128,7 +129,7 @@ export abstract class BaseResource {
     }
 
     const { payload, status, statusText, headers } = fapiResponse;
-
+    const errors = payload?.errors ?? [];
     if (headers) {
       const country = headers.get('x-country');
 
@@ -136,7 +137,12 @@ export abstract class BaseResource {
     }
 
     // TODO: Link to Client payload piggybacking design document
-    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
+    const shouldUpdateClient = (requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient;
+    if (status === 422 && isPasswordConfirmationError(errors[0]) && errors[0]?.meta?.remaining_attempts === 0) {
+      await BaseResource.clerk.__internal_handleSessionEnded(
+        shouldUpdateClient ? getClientResourceFromPayload(payload) : undefined,
+      );
+    } else if (shouldUpdateClient) {
       this._updateClient<J>(payload);
     }
 
@@ -145,9 +151,8 @@ export abstract class BaseResource {
     }
 
     if (status >= 400) {
-      const errors = payload?.errors as ClerkAPIErrorJSON[];
-      const message = errors?.[0]?.long_message;
-      const code = errors?.[0]?.code;
+      const message = errors[0]?.long_message;
+      const code = errors[0]?.code;
 
       // Handle 401 errors based on the specific error code:
       // - dev_browser_unauthenticated: reset the dev browser token
