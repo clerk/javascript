@@ -779,6 +779,50 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
     });
 
+    it('drops a hydrated token immediately when the device clock is far ahead of exp', async () => {
+      // #10401 / default path: min(exp, localLifetime) picks server exp, which is already
+      // past on a fast clock. Hydrated and broadcast tokens keep this behaviour.
+      const deviceLead = 200;
+      const freshRaw = createJwtWithOiat(deviceNow - deviceLead, deviceNow - deviceLead, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('keeps a freshly minted token for its full lifetime when the device clock is far ahead (#10575)', async () => {
+      // Session mint path sets trustLocalLifetime so expiresAt is insert + (exp - iat).
+      const deviceLead = 200;
+      const freshRaw = createJwtWithOiat(deviceNow - deviceLead, deviceNow - deviceLead, 60);
+
+      SessionTokenCache.set({
+        tokenId,
+        tokenResolver: Promise.resolve(makeToken(freshRaw)),
+        trustLocalLifetime: true,
+      });
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(50 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(11 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not re-broadcast-age a fast-clock mint when trustLocalLifetime is unset on broadcast', async () => {
+      const deviceLead = 200;
+      const freshRaw = createJwtWithOiat(deviceNow - deviceLead, deviceNow - deviceLead, 60);
+
+      await broadcastListener({
+        data: { organizationId: null, sessionId: tokenId, tokenId, tokenRaw: freshRaw, traceId: 'fast' },
+      } as MessageEvent<SessionTokenEvent>);
+
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
     it('keeps the fresher token expiry when a later fetch resolves with a staler token', async () => {
       const fresherRaw = createJwtWithOiat(deviceNow - 10, deviceNow - 10, 60);
       const stalerRaw = createJwtWithOiat(deviceNow - 50, deviceNow - 50, 60);

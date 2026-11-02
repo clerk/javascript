@@ -591,6 +591,7 @@ export class Session extends BaseResource implements SessionResource {
     SessionTokenCache.set({
       tokenId,
       tokenResolver,
+      trustLocalLifetime: true,
       ...focusedRefresh(() =>
         this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
       ),
@@ -659,6 +660,7 @@ export class Session extends BaseResource implements SessionResource {
         SessionTokenCache.set({
           tokenId,
           tokenResolver: Promise.resolve(token),
+          trustLocalLifetime: true,
           ...focusedRefresh(() =>
             this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
           ),

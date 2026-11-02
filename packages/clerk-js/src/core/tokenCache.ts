@@ -24,6 +24,12 @@ interface TokenCacheSetParams extends TokenCacheKeyJSON {
    * May be pending and should be awaited before accessing token data.
    */
   tokenResolver: Promise<TokenResource>;
+  /**
+   * When true, age the token from local insert time for its full lifetime (`exp - iat`).
+   * Use for tokens this client just minted. Leave unset for hydrated or broadcast tokens
+   * so a slow device clock still prefers the earlier of server `exp` and local lifetime (#10401 / #10575).
+   */
+  trustLocalLifetime?: boolean;
 }
 
 type Seconds = number;
@@ -383,8 +389,12 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         // `exp` is server time, so reading it on the device clock is late by the
         // device's lag. A full lifetime from cache insert is late by the token's age
         // on arrival. The earlier of the two is late only by the smaller error.
+        // Freshly minted tokens (#10575) skip the server `exp` floor: a fast device
+        // clock makes `exp` look already past at insert and would otherwise drop every
+        // mint immediately.
+        const localLifetime = ownEntry.createdAt + claims.exp - claims.iat;
         const candidate: TokenWithExpiry = {
-          expiresAt: Math.min(claims.exp, ownEntry.createdAt + claims.exp - claims.iat),
+          expiresAt: params.trustLocalLifetime ? localLifetime : Math.min(claims.exp, localLifetime),
           token: newToken,
         };
 
