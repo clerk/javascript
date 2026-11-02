@@ -3,11 +3,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import type { ErrorDescription } from '../../localization';
-import { useErrorText, useMessages } from '../../localization';
+import { isLocalizableError, useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, ErrorInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
-import { toLocalizableError } from '../../utils/errors';
+import { toLocalizableErrors } from '../../utils/errors';
 import { CODE_RESEND_SECONDS } from '../../utils/verification';
 import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
 import type {
@@ -41,7 +41,7 @@ export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prep
 
 interface ReverificationContext {
   inputValue: string;
-  error: ErrorDescription | undefined;
+  errors: ErrorDescription[];
   direction: FlowDirection;
   activeMethod: ReverificationMethod | null;
   methods: readonly ReverificationMethod[];
@@ -93,7 +93,7 @@ function selectMethod(ctx: ReverificationContext, id: string): Partial<Reverific
   return {
     activeMethod: ctx.methods.find(method => method.id === id) ?? ctx.activeMethod,
     inputValue: '',
-    error: undefined,
+    errors: [],
     direction: 1,
     submitRequested: false,
   };
@@ -116,7 +116,7 @@ const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => 
   methods: event.output.methods,
   activeMethod: event.output.startingMethod,
   inputValue: '',
-  error: undefined,
+  errors: [],
   ...unlockResend(),
   direction: 1,
 }));
@@ -146,7 +146,7 @@ const afterResult = [
 
 const factorEvents = {
   TYPE: {
-    actions: assign((_, event) => ({ inputValue: event.value, error: undefined })),
+    actions: assign((_, event) => ({ inputValue: event.value, errors: [] })),
   },
   SHOW_METHODS: {
     target: 'methodPicker',
@@ -174,7 +174,7 @@ export const reverificationMachine = createMachine({
   initial: 'inactive',
   context: {
     inputValue: '',
-    error: undefined,
+    errors: [],
     direction: 1,
     activeMethod: null,
     methods: [],
@@ -189,7 +189,7 @@ export const reverificationMachine = createMachine({
     inactive: {
       entry: assign(() => ({
         inputValue: '',
-        error: undefined,
+        errors: [],
         submitRequested: false,
         ...unlockResend(),
       })),
@@ -229,7 +229,7 @@ export const reverificationMachine = createMachine({
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({
-            error: toLocalizableError(event.error),
+            errors: toLocalizableErrors(event.error),
             submitRequested: false,
             ...unlockResend(),
           })),
@@ -250,7 +250,7 @@ export const reverificationMachine = createMachine({
         onDone: 'verifying',
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ error: toLocalizableError(event.error), ...unlockResend() })),
+          actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error), ...unlockResend() })),
         },
       }),
     },
@@ -268,7 +268,7 @@ export const reverificationMachine = createMachine({
           actions: assign(() => ({
             ...lockResend(),
             inputValue: '',
-            error: undefined,
+            errors: [],
             submitRequested: false,
           })),
         },
@@ -283,11 +283,11 @@ export const reverificationMachine = createMachine({
           {
             guard: (_: ReverificationContext, event: ErrorInvokeEvent) => isPasskeyAbortedError(event.error),
             target: 'verifying',
-            actions: assign(() => ({ error: undefined })),
+            actions: assign(() => ({ errors: [] })),
           },
           {
             target: 'verifying',
-            actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
+            actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error) })),
           },
         ],
       }),
@@ -354,6 +354,15 @@ export const reverificationMachine = createMachine({
 });
 
 const pendingStates = new Set(['submitting', 'finishing', 'retrying']);
+
+const fieldParameter = {
+  password: 'password',
+  passkey: undefined,
+  email_code: 'code',
+  phone_code: 'code',
+  totp: 'code',
+  backup_code: 'code',
+} as const satisfies Record<ReverificationMethod['strategy'], string | undefined>;
 
 function factorStep(method: ReverificationMethod): ReverificationStep {
   if (method.strategy === 'password') {
@@ -496,12 +505,22 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
     const methods = context.methods.filter(method => method.id !== excludeId);
     const pendingMethodId = state === 'methodPickerPreparing' ? activeMethod?.id : undefined;
 
+    const fieldParam = activeMethod && fieldParameter[activeMethod.strategy];
+    const fieldMessages: string[] = [];
+    const globalMessages: string[] = [];
+    for (const error of context.errors) {
+      const messages =
+        isLocalizableError(error) && fieldParam && error.paramName === fieldParam ? fieldMessages : globalMessages;
+      messages.push(errorText(error, m.attemptFailed));
+    }
+
     const view: ReverificationViewProps = {
       step,
       direction: context.direction,
       value: context.inputValue,
       onValueChange: (value: string) => send({ type: 'TYPE', value }),
-      errorMessage: context.error ? errorText(context.error, m.attemptFailed) : undefined,
+      errorMessage: fieldMessages.join(' ') || undefined,
+      globalErrorMessage: globalMessages.join(' ') || undefined,
       isPending: pendingStates.has(state),
       onSubmit: () => send({ type: 'SUBMIT' }),
       onShowMethods: () => send({ type: 'SHOW_METHODS' }),

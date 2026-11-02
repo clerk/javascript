@@ -28,6 +28,7 @@ export interface ReverificationPasswordProps {
   messages: ReverificationPasswordMessages;
   value: string;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending?: boolean;
   onValueChange: (value: string) => void;
   onSubmit: () => void;
@@ -39,6 +40,7 @@ export function ReverificationPassword({
   messages,
   value,
   errorMessage,
+  globalErrorMessage,
   isPending = false,
   onValueChange,
   onSubmit,
@@ -63,6 +65,12 @@ export function ReverificationPassword({
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         <Form
           id={formId}
