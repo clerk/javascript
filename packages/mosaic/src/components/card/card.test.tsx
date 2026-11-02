@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Button, SubmitButton } from '../button';
+import { ButtonContext } from '../button/button.context';
 import { Dialog } from '../dialog';
 import { Flow } from '../flow';
 import { Card } from './card';
@@ -750,6 +752,55 @@ describe('Mosaic Card', () => {
     expect(screen.getByText('Content').tagName).toBe('MAIN');
     expect(screen.getByText('Footer').tagName).toBe('FOOTER');
     expect(screen.getByText('Header').closest('section')).toHaveClass('cl-card-root');
+  });
+});
+
+describe('Card.Footer buttons', () => {
+  it('makes buttons full width by default', () => {
+    render(
+      <Card.Footer>
+        <Button>Cancel</Button>
+        <SubmitButton>Save</SubmitButton>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveAttribute('data-full-width', '');
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('data-full-width', '');
+  });
+
+  it('lets a button opt out', () => {
+    render(
+      <Card.Footer>
+        <Button fullWidth={false}>Sign in</Button>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('keeps button defaults from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Card.Footer>
+          <Button>Save</Button>
+        </Card.Footer>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('leaves buttons outside the footer alone', () => {
+    render(
+      <Card.Root>
+        <Card.Content>
+          <Button>Inside content</Button>
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside content' })).not.toHaveAttribute('data-full-width');
   });
 });
 

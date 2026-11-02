@@ -151,7 +151,6 @@ function ListStep({
             ref={createButton}
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={Boolean(pendingKey)}
             focusableWhenDisabled
             onClick={onCreateOrganization}

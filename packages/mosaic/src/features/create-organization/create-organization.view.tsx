@@ -147,7 +147,6 @@ function CreateStep({ form, slugEnabled, onNameChange, onCancel }: CreateOrganiz
           <Button
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={form.isSubmitting}
             onClick={onCancel}
           >
@@ -156,7 +155,6 @@ function CreateStep({ form, slugEnabled, onNameChange, onCancel }: CreateOrganiz
         ) : null}
         <SubmitButton
           form={form.id}
-          fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled
@@ -303,7 +301,6 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
         <Button
           variant='outline'
           color='neutral'
-          fullWidth
           disabled={invite.isPending}
           onClick={onFinish}
         >
@@ -311,7 +308,6 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
         </Button>
         <SubmitButton
           form={formId}
-          fullWidth
           isPending={invite.isPending}
           disabled={!canSubmit}
           focusableWhenDisabled
@@ -336,7 +332,6 @@ function SentStep({ onFinish }: CreateOrganizationStepsProps) {
       <Card.Footer>
         <Button
           ref={finishButton}
-          fullWidth
           onClick={onFinish}
         >
           {m.sent.finish}

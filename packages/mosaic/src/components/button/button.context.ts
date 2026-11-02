@@ -5,10 +5,12 @@ import React from 'react';
 
 import type { ButtonProps } from './button';
 
-export const ButtonContext = React.createContext<
-  Pick<ButtonProps, 'size' | 'shape' | 'variant' | 'color' | 'disabled'> & {
-    styles?: StyleXStyles;
-    sizeStyles?: StyleXStyles;
-    iconStyles?: StyleXStyles;
-  }
->({});
+type ButtonDefaults = Pick<ButtonProps, 'size' | 'shape' | 'variant' | 'color' | 'disabled' | 'fullWidth'> & {
+  styles?: StyleXStyles;
+  sizeStyles?: StyleXStyles;
+  iconStyles?: StyleXStyles;
+};
+
+export const NO_BUTTON_DEFAULTS: ButtonDefaults = {};
+
+export const ButtonContext = React.createContext<ButtonDefaults>(NO_BUTTON_DEFAULTS);
