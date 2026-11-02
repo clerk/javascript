@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import {
   colorVars,
+  durationVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -46,6 +47,7 @@ export const styles = stylex.create({
       default: null,
       ':focus-visible': positiveFocusShadow,
     },
+    transitionDuration: durationVars['--cl-duration-base'],
   },
   touchTarget: {
     minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
