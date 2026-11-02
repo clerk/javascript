@@ -3535,8 +3535,16 @@ export class Clerk implements ClerkInterface {
       retries++;
 
       try {
-        const initEnvironmentPromise = Environment.getInstance()
-          .fetch({ touch: shouldTouchEnv })
+        // Abort /environment on timeout so Clerk.load() cannot hang on React Native (see #10577).
+        const environmentFetchController = new AbortController();
+        const initEnvironmentPromise = timeLimit(
+          Environment.getInstance().fetch({
+            touch: shouldTouchEnv,
+            abortSignal: environmentFetchController.signal,
+          }),
+          INITIALIZATION_TIMEOUT_MS,
+          environmentFetchController,
+        )
           .then(res => this.updateEnvironment(res))
           .catch(err => {
             if (isError(err, 'dev_browser_unauthenticated')) {
