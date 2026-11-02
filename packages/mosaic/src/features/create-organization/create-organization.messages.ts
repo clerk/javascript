@@ -11,6 +11,7 @@ export const createOrganizationMessages = {
     slugPlaceholder: 'my-org',
     slugInvalid: 'Use lowercase letters, numbers and hyphens only.',
     submit: 'Create organization',
+    cancel: 'Cancel',
     error: 'Unable to create the organization. Please try again.',
   },
   invite: {

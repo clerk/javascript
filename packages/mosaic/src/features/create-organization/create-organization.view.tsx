@@ -39,6 +39,7 @@ export interface CreateOrganizationViewProps {
   onNameChange: (name: string) => void;
   invite: CreateOrganizationInviteController;
   onFinish: () => void;
+  onCancel?: () => void;
   renderBranding?: boolean;
 }
 
@@ -67,7 +68,12 @@ export function CreateOrganizationView({ renderBranding = true, ...props }: Crea
   );
 }
 
-function CreateStep({ form, slugEnabled, onNameChange }: Omit<CreateOrganizationViewProps, 'renderBranding'>) {
+function CreateStep({
+  form,
+  slugEnabled,
+  onNameChange,
+  onCancel,
+}: Omit<CreateOrganizationViewProps, 'renderBranding'>) {
   const m = useMessages('createOrganization');
   const { ref: nameRef, onChange: _onChange, ...nameControl } = form.register('name');
   const autoFocus = useFlowAutoFocus();
@@ -133,6 +139,17 @@ function CreateStep({ form, slugEnabled, onNameChange }: Omit<CreateOrganization
         ) : null}
       </Card.Content>
       <Card.Footer>
+        {onCancel ? (
+          <Button
+            variant='outline'
+            color='neutral'
+            fullWidth
+            disabled={form.isSubmitting}
+            onClick={onCancel}
+          >
+            {m.create.cancel}
+          </Button>
+        ) : null}
         <SubmitButton
           form={form.id}
           fullWidth

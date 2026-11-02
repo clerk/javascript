@@ -70,12 +70,14 @@ function RestartableCreateOrganization({ model }: { model: CreateOrganizationRea
   );
 }
 
-function ConnectedCreateOrganization({
+export function ConnectedCreateOrganization({
   model,
+  onCancel,
   onRestart,
 }: {
   model: CreateOrganizationReadyModel;
-  onRestart: () => void;
+  onCancel?: () => void;
+  onRestart?: () => void;
 }) {
   const controller = useCreateOrganizationController(model, { onRestart });
   const organizationId = controller.step.step === 'create' ? null : controller.step.organizationId;
@@ -94,6 +96,7 @@ function ConnectedCreateOrganization({
       slugEnabled={model.slugEnabled}
       renderBranding={model.renderBranding}
       invite={invite}
+      onCancel={onCancel}
     />
   );
 }

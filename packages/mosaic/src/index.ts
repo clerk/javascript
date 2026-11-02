@@ -10,6 +10,8 @@ export type { OrganizationProfileProps } from './features/organization-profile/o
 export { OrganizationProfile } from './features/organization-profile/organization-profile';
 export type { UserProfileMode, UserProfileProps } from './features/user-profile/user-profile';
 export { UserProfile } from './features/user-profile/user-profile';
+export type { OrganizationListProps } from './features/organization-list/organization-list';
+export { OrganizationList } from './features/organization-list/organization-list';
 export { MosaicProvider } from './mosaic-provider';
 export type { PortalContainer, PortalProviderProps } from './primitives/portal';
 export { PortalProvider } from './primitives/portal';

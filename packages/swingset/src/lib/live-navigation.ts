@@ -39,6 +39,7 @@ const livePages = new Set([
   '/misc/api-keys-table',
   '/misc/reverification',
   '/misc/create-organization',
+  '/misc/organization-list',
   '/user-button/user-button',
 ]);
 

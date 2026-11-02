@@ -28,14 +28,14 @@ export interface CreateOrganizationController {
 
 export function useCreateOrganizationController(
   model: CreateOrganizationReadyModel,
-  { onRestart }: { onRestart: () => void },
+  { onRestart }: { onRestart?: () => void } = {},
 ): CreateOrganizationController {
   const m = useMessages('createOrganization');
   const [step, setStep] = useState<CreateOrganizationStep>({ step: 'create' });
 
   const finish = async (organizationId: string) => {
     await model.onComplete(organizationId);
-    onRestart();
+    onRestart?.();
   };
 
   const form = useForm<CreateOrganizationValues, CreatedOrganization>({
