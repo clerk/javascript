@@ -1351,10 +1351,12 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         badge__ssoRequired: LocalizationValue;
         badge__active: LocalizationValue;
+        badge__inProgress: LocalizationValue;
         badge__inactive: LocalizationValue;
         description: LocalizationValue;
         error__load: LocalizationValue;
         primaryButton__configure: LocalizationValue;
+        primaryButton__continueConfiguration: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;

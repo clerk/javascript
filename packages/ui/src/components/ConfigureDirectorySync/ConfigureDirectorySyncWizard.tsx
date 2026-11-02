@@ -34,16 +34,19 @@ export const ConfigureDirectorySyncWizard = (props: ConfigureDirectorySyncWizard
 );
 
 const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Element => {
-  const { connection, directory, isLoading } = useConfigureDirectorySync();
+  const { connection, directory, providerMeta, isLoading } = useConfigureDirectorySync();
   const hasSsoConnection = Boolean(connection);
   const hasDirectory = Boolean(directory);
+  // A pull directory exists before its credentials do, and the configure step
+  // is where they are collected, so it is not done until they are stored.
+  const hasCredentials = providerMeta?.mode !== 'pull' || Boolean(directory?.credentialsConfigured);
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
       {
         id: 'configure',
         label: localizationKeys('configureDirectorySync.stepper.configure'),
-        isComplete: () => hasSsoConnection && hasDirectory,
+        isComplete: () => hasSsoConnection && hasDirectory && hasCredentials,
       },
       {
         id: 'attributes',
@@ -61,7 +64,7 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
         isReachable: () => hasSsoConnection && hasDirectory,
       },
     ],
-    [hasSsoConnection, hasDirectory],
+    [hasSsoConnection, hasDirectory, hasCredentials],
   );
 
   if (isLoading) {

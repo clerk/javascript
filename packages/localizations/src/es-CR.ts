@@ -1441,6 +1441,7 @@ export const esCR: LocalizationResource = {
       },
       directorySyncSection: {
         badge__active: undefined,
+        badge__inProgress: undefined,
         badge__inactive: undefined,
         badge__ssoRequired: undefined,
         description: undefined,
@@ -1450,6 +1451,7 @@ export const esCR: LocalizationResource = {
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__configure: undefined,
+        primaryButton__continueConfiguration: undefined,
         removeDialog: {
           confirmButton: undefined,
           subtitle: undefined,
