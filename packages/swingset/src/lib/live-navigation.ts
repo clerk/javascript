@@ -38,6 +38,8 @@ const livePages = new Set([
   '/user-profile/user-profile-web3wallets-section',
   '/misc/api-keys-table',
   '/misc/reverification',
+  '/misc/create-organization',
+  '/misc/organization-list',
   '/misc/waitlist',
   '/user-button/user-button',
 ]);
