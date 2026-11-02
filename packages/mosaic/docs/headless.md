@@ -2,8 +2,10 @@
 
 `packages/mosaic/src/primitives/` is the unstyled, accessible primitive layer
 inside Mosaic, one folder per primitive (Dialog, Menu, Select, …). Every part emits **zero
-styles** — positioning, keyboard nav, focus management, dismiss, and ARIA are
-delegated to `@floating-ui/react`; all appearance is applied externally via
+styles** — positioning, popup list navigation, focus management, dismiss, and ARIA are
+delegated to `@floating-ui/react`, and roving-tabindex groups use `useComposite`,
+with items registering through `useCompositeItem`
+(`primitives/hooks/use-composite.ts`); all appearance is applied externally via
 `data-*` selectors and consumer classNames.
 
 Internal to `@clerk/mosaic`: import by relative path; there is no subpath export.
@@ -143,7 +145,7 @@ or the transform origin won't follow the arrow.
 Read the direction with `useDirection()` from `primitives/direction-provider`, never from the DOM
 `dir` attribute or computed style. It returns `ltr` outside a `DirectionProvider`. Use
 `readingDirectionKeys(direction)` for the previous and next arrow keys, or pass
-`rtl: direction === 'rtl'` to floating-ui's `Composite` or `useListNavigation`
+`rtl: direction === 'rtl'` to `useComposite` or floating-ui's `useListNavigation`
 (`tabs/tabs-list.tsx`). `MosaicProvider` renders the `DirectionProvider` from its `direction` prop.
 
 ## Testing

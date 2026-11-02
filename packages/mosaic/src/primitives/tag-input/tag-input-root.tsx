@@ -2,6 +2,8 @@
 
 import React, { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
+import { readingDirectionKeys, useDirection } from '../direction-provider';
+import { useComposite } from '../hooks/use-composite';
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import {
@@ -69,6 +71,31 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       tagRefs.current.delete(tagValue);
     }
   }, []);
+
+  const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const direction = useDirection();
+  const { previousKey, nextKey } = readingDirectionKeys(direction);
+  const presentTags = () => value.flatMap(tagValue => tagRefs.current.get(tagValue) ?? []);
+
+  const composite = useComposite(element, {
+    getItems: presentTags,
+    orientation: 'horizontal',
+    loop: false,
+    rtl: direction === 'rtl',
+    stopPropagation: 'none',
+    syncTabIndexes: () => {},
+    getNextItem: (event, target, defaultNext) => {
+      const tags = presentTags();
+      if (event.key === nextKey && target === tags.at(-1)) {
+        return inputRef.current;
+      }
+      if (event.key === previousKey && target === tags[0]) {
+        event.preventDefault();
+        return null;
+      }
+      return defaultNext();
+    },
+  });
 
   const focusInput = useCallback(() => {
     inputRef.current?.focus();
@@ -198,13 +225,13 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       {useRender({
         defaultTagName: 'div',
         render,
-        ref: forwardedRef,
+        ref: [setElement, forwardedRef],
         state,
         stateAttributesMapping: {
           disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
           empty: (v: boolean) => (v ? { 'data-empty': '' } : null),
         },
-        props: mergeProps<'div'>(defaultProps, otherProps),
+        props: mergeProps<'div'>({ ...defaultProps, onKeyDown: composite.handleKeyDown }, otherProps),
       })}
     </TagInputContext.Provider>
   );

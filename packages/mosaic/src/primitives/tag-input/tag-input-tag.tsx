@@ -3,7 +3,6 @@
 import { inertProps } from '@clerk/shared/inert';
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { TagContext, useTagInputContext } from './tag-input-context';
@@ -15,8 +14,7 @@ export interface TagInputTagProps extends ComponentProps<'div'> {
 export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
   function TagInputTag(props, forwardedRef) {
     const { render, value: tagValue, ...otherProps } = props;
-    const { value, tags, disabled, remove, focusInput, focusTag, registerTag, onTagExited } = useTagInputContext();
-    const { previousKey, nextKey } = readingDirectionKeys(useDirection());
+    const { value, tags, disabled, remove, registerTag, onTagExited } = useTagInputContext();
 
     const present = value.includes(tagValue);
     const invalid = tags.find(tag => tag.value === tagValue)?.invalid ?? false;
@@ -53,40 +51,11 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
         if (event.target !== event.currentTarget) {
           return;
         }
-        const index = value.indexOf(tagValue);
-
-        switch (event.key) {
-          case previousKey:
-            event.preventDefault();
-            focusTag(value[index - 1]);
-            return;
-          case nextKey: {
-            event.preventDefault();
-            const next = value[index + 1];
-            if (next === undefined) {
-              focusInput();
-            } else {
-              focusTag(next);
-            }
-            return;
+        if (event.key === 'Backspace' || event.key === 'Delete') {
+          event.preventDefault();
+          if (!disabled) {
+            remove(tagValue, event.key === 'Backspace' ? 'previous' : 'next');
           }
-          case 'Home':
-            event.preventDefault();
-            focusTag(value[0]);
-            return;
-          case 'End':
-            event.preventDefault();
-            focusTag(value[value.length - 1]);
-            return;
-          case 'Backspace':
-          case 'Delete':
-            event.preventDefault();
-            if (!disabled) {
-              remove(tagValue, event.key === 'Backspace' ? 'previous' : 'next');
-            }
-            return;
-          default:
-            return;
         }
       },
     } satisfies DefaultProps<'div'>;

@@ -310,6 +310,13 @@ describe('TagInput', () => {
       expect(input()).toHaveValue('x');
     });
 
+    it('claims the previous key on the first tag, without letting it scroll the page', async () => {
+      render(<Harness defaultValue={['a']} />);
+      tag('a').focus();
+      expect(fireEvent.keyDown(tag('a'), { key: 'ArrowLeft' })).toBe(false);
+      expect(tag('a')).toHaveFocus();
+    });
+
     it('moves between tags and back to the input with arrow keys', async () => {
       const user = userEvent.setup();
       render(<Harness defaultValue={['a', 'b']} />);

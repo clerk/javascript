@@ -164,6 +164,32 @@ describe('Mosaic ActionBar', () => {
     expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
   });
 
+  it('leaves a control that is not an action out of arrow key navigation', async () => {
+    function WithPlainControl() {
+      const anchor = useAnchor();
+      return (
+        <>
+          <div ref={anchor} />
+          <ActionBar.Root
+            open
+            anchor={anchor}
+            aria-label='Bulk actions'
+          >
+            <ActionBar.Action>Change role</ActionBar.Action>
+            <button type='button'>Plain</button>
+            <ActionBar.Action>Remove</ActionBar.Action>
+          </ActionBar.Root>
+        </>
+      );
+    }
+    const user = userEvent.setup();
+    render(<WithPlainControl />);
+    screen.getByRole('button', { name: 'Change role' }).focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Plain' })).not.toHaveAttribute('tabindex');
+  });
+
   it('moves between controls with the arrow keys, wrapping at the ends', async () => {
     const user = userEvent.setup();
     render(<BulkActions />);
@@ -187,6 +213,14 @@ describe('Mosaic ActionBar', () => {
     await user.keyboard('{ArrowRight}');
     await user.tab({ shift: true });
     await user.tab();
+    expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus();
+  });
+
+  it('leaves Home and End alone', async () => {
+    const user = userEvent.setup();
+    render(<BulkActions />);
+    screen.getByRole('button', { name: 'Remove' }).focus();
+    await user.keyboard('{Home}{End}');
     expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus();
   });
 
