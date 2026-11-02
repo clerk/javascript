@@ -50,8 +50,8 @@ document.body.dataset.loaded = String(clerk.loaded);
         id: 'protect_config_test',
         object: 'protect_config',
         loaders: [
-          { type: 'script', attributes: { src: 'https://example.com/device-intelligence.js' } },
-          { type: 'script', text_content: 'window.remoteLoaderExecuted = true;' },
+          { type: 'script', target: 'body', attributes: { src: 'https://example.com/device-intelligence.js' } },
+          { type: 'script', target: 'body', text_content: 'window.remoteLoaderExecuted = true;' },
         ],
       };
 

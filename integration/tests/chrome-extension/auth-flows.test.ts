@@ -21,13 +21,24 @@ for (const environmentType of ['development', 'production'] as const) {
 
     let services: { clerk: ClerkClient; users: UserService };
     let user: FakeUser;
-    let addedOrigin: string | undefined;
-    let restoreTestMode = false;
 
     test.beforeAll(async ({ extensionApp }) => {
       const publishableKey = extensionApp.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
       expect(publishableKey?.startsWith(environmentType === 'production' ? 'pk_live_' : 'pk_test_')).toBe(true);
       ({ services } = await createTestUtils({ app: extensionApp }));
+
+      if (environmentType === 'production') {
+        const { frontendApi } = parsePublishableKey(publishableKey, { fatal: true });
+        const readTestMode = async () => {
+          const response = await fetch(`https://${frontendApi}/v1/environment?_is_native=1`);
+          return response.ok ? (await response.json()).auth_config?.test_mode : undefined;
+        };
+
+        if ((await readTestMode()) !== true) {
+          await services.clerk.instance.update({ testMode: true });
+          await expect.poll(readTestMode, { timeout: 60_000, intervals: [1_000, 2_000, 5_000] }).toBe(true);
+        }
+      }
     });
 
     test.beforeEach(async ({ extensionId }) => {
@@ -38,30 +49,12 @@ for (const environmentType of ['development', 'production'] as const) {
         const instance = await services.clerk.instance.get();
         if (!instance.allowedOrigins?.includes(origin)) {
           await services.clerk.instance.update({ allowedOrigins: [...(instance.allowedOrigins || []), origin] });
-          addedOrigin = origin;
         }
       }
     });
 
     test.afterEach(async () => {
-      try {
-        await user?.deleteIfExists();
-      } finally {
-        try {
-          if (addedOrigin) {
-            const instance = await services.clerk.instance.get();
-            await services.clerk.instance.update({
-              allowedOrigins: (instance.allowedOrigins || []).filter(origin => origin !== addedOrigin),
-            });
-            addedOrigin = undefined;
-          }
-        } finally {
-          if (restoreTestMode) {
-            await services.clerk.instance.update({ testMode: false });
-            restoreTestMode = false;
-          }
-        }
-      }
+      await user?.deleteIfExists();
     });
 
     test('signs in with email and password without a Testing Token', async ({ extensionPage }) => {
@@ -76,21 +69,7 @@ for (const environmentType of ['development', 'production'] as const) {
       await expect(extensionPage.getByTestId('session-id')).toHaveText(/^sess_/);
     });
 
-    test('signs up with email and password without a Testing Token', async ({ extensionPage, extensionApp }) => {
-      if (environmentType === 'production') {
-        const { frontendApi } = parsePublishableKey(extensionApp.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'), {
-          fatal: true,
-        });
-        const response = await fetch(`https://${frontendApi}/v1/environment?_is_native=1`);
-        expect(response.ok).toBe(true);
-        const environment = await response.json();
-        expect(typeof environment.auth_config.test_mode).toBe('boolean');
-        restoreTestMode = !environment.auth_config.test_mode;
-        if (restoreTestMode) {
-          await services.clerk.instance.update({ testMode: true });
-        }
-      }
-
+    test('signs up with email and password without a Testing Token', async ({ extensionPage }) => {
       await extensionPage.getByRole('button', { name: 'Create account', exact: true }).click();
       const { signUp } = createPageObjects({ page: extensionPage, useTestingToken: false });
       await signUp.waitForMounted();
