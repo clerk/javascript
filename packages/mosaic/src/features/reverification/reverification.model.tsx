@@ -104,7 +104,7 @@ function toResult(
   return {
     status: resource.status,
     methods,
-    startingMethod: pickStartingMethod(methods, preferredSignInStrategy, webAuthnSupported),
+    startingMethod: pickStartingMethod(methods, preferredSignInStrategy),
   };
 }
 
@@ -184,9 +184,7 @@ export function useReverificationModel(reverificationState: ReverificationState)
           );
         case 'passkey':
           return handleResponse(
-            await (method.stage === 'second'
-              ? session.verifyWithPasskey({ level: 'second_factor' })
-              : session.verifyWithPasskey()),
+            await session.verifyWithPasskey({ level: method.stage === 'second' ? 'second_factor' : 'first_factor' }),
           );
       }
     },

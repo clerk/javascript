@@ -608,6 +608,28 @@ describe('Reverification', () => {
       }
     });
 
+    it('shows the no factors card when the only second factor is a passkey without WebAuthn', async () => {
+      const { action } = await renderReverification(
+        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
+        verificationSeed({ secondFactors: [secondPasskeyFactor] }),
+      );
+      const restore = pretendWebAuthnIsUnsupported();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
+        expect(screen.queryByText(STEP.passkey)).toBeNull();
+
+        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await untilClosed();
+        expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+        expect(action).toHaveBeenCalledTimes(1);
+      } finally {
+        restore();
+      }
+    });
+
     it('recovers from a cancelled prompt, method switch, dismissal, and reopening', async () => {
       const hint = reverificationError({ level: 'second_factor', afterMinutes: 10 });
       const action = vi.fn().mockResolvedValueOnce(hint).mockResolvedValueOnce(hint).mockResolvedValue({ done: true });
