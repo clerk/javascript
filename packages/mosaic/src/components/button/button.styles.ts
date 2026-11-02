@@ -254,11 +254,11 @@ export const variants = stylex.create({
   'ghost-negative': {
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-negative-alpha-300'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-negative-alpha-300'],
+      ':not([data-disabled]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-alpha-200'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-subtle'],
       },
     },
     color: colorVars['--cl-color-negative'],
