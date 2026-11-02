@@ -136,6 +136,14 @@ describe('terms', () => {
     expect(messages.organizationProfile.label).toBe('İşyeri');
   });
 
+  it('capitalizes a first letter outside the basic multilingual plane', () => {
+    const { messages } = resolveLocalization({
+      locale: 'ff-Adlm',
+      messages: { terms: { organization: { one: '𞤢𞤣', other: '𞤢𞤣' } } },
+    });
+    expect(messages.organizationProfile.label).toBe('𞤀𞤣');
+  });
+
   it('lets a specific key win over a term', () => {
     const { messages } = resolveLocalization({
       overrides: { terms: workspace, 'organizationProfile.label': 'Team' },

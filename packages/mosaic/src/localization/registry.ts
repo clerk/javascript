@@ -97,5 +97,6 @@ export function applyTerms(templates: MosaicMessages, locale: string): MosaicMes
 }
 
 function capitalize(word: string, locale: string): string {
-  return word.charAt(0).toLocaleUpperCase(locale) + word.slice(1);
+  const first = [...word][0];
+  return first ? first.toLocaleUpperCase(locale) + word.slice(first.length) : word;
 }
