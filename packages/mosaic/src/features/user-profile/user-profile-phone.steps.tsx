@@ -15,8 +15,7 @@ import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
 import { Form } from '../../primitives/form';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
-
-const CODE_LENGTH = 6;
+import { CODE_LENGTH } from '../../utils/verification';
 
 interface EnterPhoneStepProps {
   inputRef?: Ref<HTMLInputElement>;

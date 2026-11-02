@@ -9,6 +9,7 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
+import { CODE_LENGTH, CODE_RESEND_SECONDS } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type {
   UserProfileEmail,
@@ -58,7 +59,6 @@ function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Email verification is missing'));
 }
 
-const CODE_RESEND_SECONDS = 30;
 const LINK_RESEND_SECONDS = 60;
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
@@ -167,8 +167,6 @@ const machine = createMachine({
     },
   },
 });
-
-const CODE_LENGTH = 6;
 
 export function useUserProfileAddEmailController({
   initialEmailAddress = '',

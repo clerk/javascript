@@ -14,11 +14,9 @@ import { createPortal } from 'react-dom';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { applyOrder } from '../../utils/apply-order';
+import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
 import { USER_PROFILE_PAGE_IDS } from '../user-profile/user-profile.layout';
 import type { CustomProfileItem, CustomProfileLink, UserProfilePageId } from '../user-profile/user-profile.types';
-
-/** A built-in OrganizationProfile page, by the id its navigation uses. */
-export type OrganizationProfilePageId = 'general' | 'members' | 'billing' | 'apiKeys' | 'security';
 
 /**
  * The UserProfile's own pages, in the order it lists them, minus the ones this instance has turned

@@ -9,18 +9,10 @@ import { Pen } from '../../../icons/glyphs/pen';
 import { X } from '../../../icons/glyphs/x';
 import type { LocalizableError } from '../../../localization';
 import { useErrorText, useMessages } from '../../../localization';
-import type { FileRejection, FileRejectionReason } from '../../../primitives/file-upload';
+import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
+import { AVATAR_REJECTION_ERRORS, AVATAR_UPLOAD } from '../../../utils/avatar-upload';
 import { useOrganizationProfileLogoController } from './organization-profile-logo.controller';
-
-const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-const LOGO_MAX_BYTES = 10 * 1000 * 1000;
-
-const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
-  accept: { code: 'avatar_file_type_invalid' },
-  size: { code: 'avatar_file_size_exceeded' },
-  overflow: { code: 'avatar_file_count_exceeded' },
-};
 
 interface OrganizationProfileLogoRowViewProps {
   name: string;
@@ -62,12 +54,11 @@ export function OrganizationProfileLogoRowView({
     <FileUpload.Root
       disabled={logo.isPending}
       aria-busy={logo.isPending || undefined}
-      accept={LOGO_MIME_TYPES}
-      maxSize={LOGO_MAX_BYTES}
+      {...AVATAR_UPLOAD}
       render={<Section.Row />}
       onReject={rejections => {
         const rejected = rejections[0];
-        setRejection(rejected ? REJECTION_ERRORS[rejected.reason] : undefined);
+        setRejection(rejected ? AVATAR_REJECTION_ERRORS[rejected.reason] : undefined);
         onReject?.(rejections);
       }}
       onValueChange={files => {

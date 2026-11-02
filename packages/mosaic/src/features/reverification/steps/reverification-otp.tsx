@@ -8,6 +8,7 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
 import { Form } from '../../../primitives/form';
+import { CODE_LENGTH } from '../../../utils/verification';
 
 export interface ReverificationOtpMessages {
   title: string;
@@ -42,7 +43,7 @@ export interface ReverificationOTPProps {
 export function ReverificationOTP({
   messages,
   value,
-  length = 6,
+  length = CODE_LENGTH,
   errorMessage,
   isPending = false,
   resend,
