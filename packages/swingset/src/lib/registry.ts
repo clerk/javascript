@@ -348,6 +348,13 @@ import {
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
+  Default as UserAvatarDefault,
+  meta as userAvatarMeta,
+  NoImage as UserAvatarNoImage,
+  Shapes as UserAvatarShapes,
+  Sizes as UserAvatarSizes,
+} from '../stories/user-avatar.stories';
+import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
   User as UserButtonUser,
@@ -685,6 +692,14 @@ const userButtonModule: StoryModule = {
   meta: userButtonMeta,
   Combined: UserButtonCombined,
   User: UserButtonUser,
+};
+
+const userAvatarModule: StoryModule = {
+  meta: userAvatarMeta,
+  Default: UserAvatarDefault,
+  NoImage: UserAvatarNoImage,
+  Shapes: UserAvatarShapes,
+  Sizes: UserAvatarSizes,
 };
 
 const organizationSwitcherModule: StoryModule = {
@@ -1063,6 +1078,7 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // Misc
   organizationSwitcherModule,
+  userAvatarModule,
   apiKeysTableModule,
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
