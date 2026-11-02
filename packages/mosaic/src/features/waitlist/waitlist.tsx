@@ -22,8 +22,6 @@ export interface WaitlistProps extends WaitlistModelOptions {
  *
  * @example
  * ```tsx
- * import { Waitlist } from '@clerk/mosaic';
- *
  * <Waitlist />
  * ```
  *

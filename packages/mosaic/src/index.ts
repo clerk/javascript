@@ -6,8 +6,6 @@ export type { UserAvatarProps } from './features/user-avatar/user-avatar';
 export { UserAvatar } from './features/user-avatar/user-avatar';
 export type { OrganizationSwitcherProps } from './features/organization-switcher/organization-switcher';
 export { OrganizationSwitcher } from './features/organization-switcher/organization-switcher';
-export type { WaitlistProps } from './features/waitlist/waitlist';
-export { Waitlist } from './features/waitlist/waitlist';
 export type { OrganizationProfileProps } from './features/organization-profile/organization-profile';
 export { OrganizationProfile } from './features/organization-profile/organization-profile';
 export type { UserProfileMode, UserProfileProps } from './features/user-profile/user-profile';
