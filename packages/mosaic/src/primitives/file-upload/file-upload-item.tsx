@@ -2,7 +2,7 @@
 
 import React, { useCallback, useMemo } from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { FileUploadItemContext, type FileUploadItemContextValue, useFileUploadContext } from './file-upload-context';
 
 export interface FileUploadItemProps extends ComponentProps<'div'> {
@@ -21,7 +21,7 @@ export const FileUploadItem = React.forwardRef<HTMLDivElement, FileUploadItemPro
 
     const state = { image: file.type.startsWith('image/') };
 
-    const defaultProps: Record<string, unknown> = {};
+    const defaultProps = {} satisfies DefaultProps<'div'>;
 
     return (
       <FileUploadItemContext.Provider value={itemContextValue}>

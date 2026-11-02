@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 
 import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { useTransition } from '../hooks/use-transition';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { TagContext, useTagInputContext } from './tag-input-context';
 
 export interface TagInputTagProps extends ComponentProps<'div'> {
@@ -42,7 +42,7 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
 
     const state = { invalid, disabled };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       ...transitionProps,
       ...inertProps(!present),
       role: 'listitem',
@@ -89,7 +89,7 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
             return;
         }
       },
-    };
+    } satisfies DefaultProps<'div'>;
 
     const element = useRender({
       defaultTagName: 'div',

@@ -2,6 +2,7 @@ import type React from 'react';
 import { describe, expectTypeOf, test } from 'vitest';
 
 import type { ComponentProps, RenderProps } from './use-render';
+import { mergeProps } from './use-render';
 
 type RenderFn<Tag extends keyof React.JSX.IntrinsicElements> = Extract<
   NonNullable<ComponentProps<Tag>['render']>,
@@ -12,6 +13,16 @@ type RenderArg<Tag extends keyof React.JSX.IntrinsicElements> =
 type HasColor<P> = 'color' extends keyof P ? true : false;
 
 describe('use-render', () => {
+  test('the merged props are those of the tag', () => {
+    const merged = mergeProps<'button'>({ id: 'a' }, {});
+
+    expectTypeOf(merged.disabled).toEqualTypeOf<boolean | undefined>();
+    // @ts-expect-error -- Not a button prop
+    merged.onClik = () => {};
+    // @ts-expect-error -- Not a handler
+    merged.onClick = 1;
+  });
+
   test('a part keeps its own tag props', () => {
     expectTypeOf<ComponentProps<'button'>>().toExtend<{ type?: 'button' | 'submit' | 'reset' }>();
   });

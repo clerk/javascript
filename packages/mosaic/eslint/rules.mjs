@@ -268,3 +268,20 @@ export const forwardRefParts = {
     };
   },
 };
+
+export const noRawInvoke = {
+  meta: {
+    type: 'problem',
+    schema: [],
+    messages: {
+      useFromPromise: 'Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.',
+    },
+  },
+  create(context) {
+    return {
+      'Property[key.name="invoke"] > ObjectExpression:has(> Property[key.name="src"])'(node) {
+        context.report({ node, messageId: 'useFromPromise' });
+      },
+    };
+  },
+};

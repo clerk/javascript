@@ -3,7 +3,7 @@
 import { CompositeItem } from '@floating-ui/react';
 import React, { useCallback } from 'react';
 
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isRef, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsTabProps extends ComponentProps<'button'> {
@@ -33,10 +33,10 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
       ref={register}
       disabled={disabled}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-        const defaultProps: Record<string, unknown> = {
+        const defaultProps: DefaultProps<'button'> = {
           id: tabId,
-          role: 'tab' as const,
-          type: 'button' as const,
+          role: 'tab',
+          type: 'button',
           'aria-selected': isSelected,
           'aria-controls': panelId,
           'aria-disabled': disabled || undefined,

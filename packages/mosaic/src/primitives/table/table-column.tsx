@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useCellIndex, useTableContext } from './table-context';
 import { isOwnClick } from './table-dom';
 
@@ -29,7 +29,7 @@ export const TableColumn = React.forwardRef<HTMLTableCellElement, TableColumnPro
     [rowHeader, index, registerRowHeaderColumn],
   );
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     scope: 'col',
     ...(canSort
       ? {
@@ -47,7 +47,7 @@ export const TableColumn = React.forwardRef<HTMLTableCellElement, TableColumnPro
           },
         }
       : {}),
-  };
+  } satisfies DefaultProps<'th'>;
 
   const state = { sortable: canSort, sortDirection };
 

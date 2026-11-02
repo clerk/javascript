@@ -86,7 +86,7 @@ type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
 export function mergeProps<Tag extends keyof React.JSX.IntrinsicElements>(
   a: PropsInput<Tag>,
   b: PropsInput<Tag>,
-): Record<string, unknown>;
+): DefaultProps<Tag>;
 export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
   const merged: Record<string, unknown> = { ...a };
 
