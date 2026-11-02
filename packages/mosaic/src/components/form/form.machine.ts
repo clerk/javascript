@@ -41,7 +41,7 @@ export interface AsyncFieldState {
 export interface FormDeps<TValues extends object> {
   initialValues: TValues;
   fields: FieldsConfig<TValues> | undefined;
-  onSubmit: (values: TValues) => Promise<unknown>;
+  onSubmit: (values: TValues) => Promise<() => void>;
   canSubmit: (values: TValues) => boolean;
   fallbackMessage: string;
   errorText: (error: LocalizableError) => string;
@@ -251,7 +251,7 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
         invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
           onDone: {
             target: 'editing',
-            actions: assign(() => ({ error: undefined })),
+            actions: [assign(() => ({ error: undefined })), (_, event) => event.output()],
           },
           onError: [
             {

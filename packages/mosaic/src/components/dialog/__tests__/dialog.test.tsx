@@ -6,6 +6,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../../props';
 import { colorVars, radiusVars, space } from '../../../tokens.stylex';
+import { Button } from '../../button';
+import { ButtonContext } from '../../button/button.context';
 import { Card } from '../../card';
 import type { DialogVariant } from '../dialog';
 import { Dialog } from '../dialog';
@@ -395,6 +397,38 @@ describe('stacked backdrops', () => {
   });
 });
 
+describe('button defaults', () => {
+  it('does not inherit full width from a card footer it is opened from', () => {
+    render(
+      <Card.Footer>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('does not inherit disabled from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).toBeEnabled();
+  });
+});
+
 describe('Dialog.CloseButton', () => {
   it('closes the dialog and carries a default accessible name', async () => {
     const user = userEvent.setup();
@@ -584,7 +618,7 @@ describe('popup surface', () => {
   // an atom from its property and value, so a probe with the popup's own values yields the very
   // atoms `styles.popup` declares.
   const probe = stylex.create({
-    background: { backgroundColor: colorVars['--cl-color-background'] },
+    background: { backgroundColor: colorVars['--cl-color-page'] },
     radius: { borderRadius: radiusVars['--cl-radius-xl'] },
   });
 

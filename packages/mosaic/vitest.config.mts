@@ -60,6 +60,11 @@ export default defineConfig({
       {
         extends: true,
         publicDir: 'test/public',
+        server: {
+          warmup: {
+            clientFiles: ['./src/**/*.modal-content.tsx'],
+          },
+        },
         optimizeDeps: {
           include: [
             '@clerk/clerk-js',

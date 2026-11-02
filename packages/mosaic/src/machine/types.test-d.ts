@@ -1,10 +1,11 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
 import { assign } from './assign';
-import { createActor } from './create-actor';
+import { createActor, mockActor } from './create-actor';
 import { createMachine } from './create-machine';
 import { setup } from './setup';
 import type { Snapshot, StateMachine } from './types';
+import { useActor, useMachine, useSelector } from './use-machine';
 
 // ─── Shared fixture ──────────────────────────────────────────────────────────
 
@@ -12,7 +13,7 @@ type TestContext = { count: number; label: string };
 
 type TestEvent = { type: 'SIMPLE' } | { type: 'WITH_PAYLOAD'; value: string } | { type: 'OPTIONAL'; count?: number };
 
-const machine = createMachine<TestContext, TestEvent>({
+const machine = setup<TestContext, TestEvent>().createMachine({
   initial: 'idle',
   context: { count: 0, label: '' },
   states: {
@@ -103,14 +104,49 @@ describe('snapshot — context and value are correctly typed', () => {
     expectTypeOf(snap.context).toEqualTypeOf<TestContext>();
   });
 
-  test('value is string', () => {
+  test('value is the union of state names', () => {
     const snap = actor.getSnapshot();
-    expectTypeOf(snap.value).toEqualTypeOf<string>();
+    expectTypeOf(snap.value).toEqualTypeOf<'idle'>();
   });
 
-  test('full snapshot matches Snapshot<TContext>', () => {
+  test('full snapshot matches Snapshot<TContext, TStates>', () => {
     const snap = actor.getSnapshot();
-    expectTypeOf(snap).toEqualTypeOf<Snapshot<TestContext>>();
+    expectTypeOf(snap).toEqualTypeOf<Snapshot<TestContext, 'idle'>>();
+  });
+
+  test('value is the union of state names for a machine built through setup', () => {
+    const m = setup<TestContext, TestEvent>().createMachine({ initial: 'a', states: { a: {}, b: {} } });
+    expectTypeOf(createActor(m).getSnapshot().value).toEqualTypeOf<'a' | 'b'>();
+  });
+
+  test('value is the union of state names for a machine built without type arguments', () => {
+    const m = createMachine({ initial: 'a', states: { a: { on: { NEXT: 'b' } }, b: {} } });
+    expectTypeOf(createActor(m).getSnapshot().value).toEqualTypeOf<'a' | 'b'>();
+  });
+
+  test('value stays string when createMachine is given only context and event types', () => {
+    const m = createMachine<TestContext, TestEvent>({
+      initial: 'a',
+      context: { count: 0, label: '' },
+      states: { a: {} },
+    });
+    expectTypeOf(createActor(m).getSnapshot().value).toEqualTypeOf<string>();
+  });
+
+  test('useMachine, useActor and useSelector keep the union of state names', () => {
+    expectTypeOf(useMachine(machine)[0].value).toEqualTypeOf<'idle'>();
+    expectTypeOf(useActor(actor)[0].value).toEqualTypeOf<'idle'>();
+    expectTypeOf(useSelector(actor, snap => snap.value)).toEqualTypeOf<'idle'>();
+  });
+
+  test('createActor rejects a snapshot value that is not a state', () => {
+    // @ts-expect-error — 'missing' is not a state
+    createActor(machine, { snapshot: { value: 'missing' } });
+  });
+
+  test('mockActor rejects a value that is not a state', () => {
+    // @ts-expect-error — 'missing' is not a state
+    mockActor(machine, { value: 'missing' });
   });
 });
 
@@ -253,6 +289,42 @@ describe('setup — eliminates repetitive generic params', () => {
               actions: a(() => ({ unknown_key: true })),
             },
           },
+        },
+      },
+    });
+  });
+
+  test('invalid initial is rejected', () => {
+    make({
+      // @ts-expect-error — 'missing' is not a state
+      initial: 'missing',
+      context: { count: 0, label: '' },
+      states: { idle: {}, active: {} },
+    });
+  });
+
+  test('invalid transition target is rejected', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          // @ts-expect-error — 'nonexistent' is not a state
+          on: { SIMPLE: 'nonexistent' },
+        },
+        active: {},
+      },
+    });
+  });
+
+  test('invalid target in a long-form transition is rejected', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          // @ts-expect-error — 'nonexistent' is not a state
+          always: { target: 'nonexistent' },
         },
       },
     });

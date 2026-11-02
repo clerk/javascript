@@ -231,8 +231,7 @@ jobs:
             ${{ env.PACKAGE }}/.verify/runs/*/e2e*/report.json
             ${{ env.PACKAGE }}/.verify/runs/*/e2e*/junit.xml
             ${{ env.PACKAGE }}/.verify/runs/*/e2e*/summary.md
-            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/failures
-            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/artifacts
+            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/results
           retention-days: 3
           if-no-files-found: warn
 

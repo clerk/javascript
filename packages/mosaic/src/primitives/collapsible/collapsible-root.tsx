@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useId, useMemo } from 'react';
+import React, { type ReactNode, useId, useMemo } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
@@ -18,7 +18,7 @@ export interface CollapsibleProps extends ComponentProps<'div'> {
   children: ReactNode;
 }
 
-export function CollapsibleRoot(props: CollapsibleProps) {
+export const CollapsibleRoot = React.forwardRef<HTMLDivElement, CollapsibleProps>(function CollapsibleRoot(props, ref) {
   const { render, open: openProp, defaultOpen, onOpenChange, disabled = false, children, ...otherProps } = props;
 
   const [open, setOpen] = useControllableState(openProp, defaultOpen ?? false, onOpenChange);
@@ -42,6 +42,7 @@ export function CollapsibleRoot(props: CollapsibleProps) {
     <CollapsibleContext.Provider value={contextValue}>
       {useRender({
         defaultTagName: 'div',
+        ref,
         render,
         state,
         stateAttributesMapping: {
@@ -52,4 +53,4 @@ export function CollapsibleRoot(props: CollapsibleProps) {
       })}
     </CollapsibleContext.Provider>
   );
-}
+});

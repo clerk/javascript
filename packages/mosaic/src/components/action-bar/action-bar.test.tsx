@@ -71,6 +71,8 @@ describe('Mosaic ActionBar', () => {
     const bar = screen.getByRole('toolbar', { name: 'Bulk actions' });
     expect(bar).toHaveClass('cl-action-bar');
     expect(bar).toHaveAttribute('data-open', 'true');
+    expect(bar).not.toHaveAttribute('data-starting-style');
+    expect(bar.style.transition).toBe('');
     expect(bar).toHaveAttribute('aria-controls', 'members');
     expect(bar).toHaveAttribute('aria-orientation', 'horizontal');
     expect(bar).toHaveAccessibleDescription('3 selected');

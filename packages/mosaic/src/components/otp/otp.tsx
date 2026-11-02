@@ -7,6 +7,7 @@ import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { inputStyles } from '../../styles/input.styles';
 import { reset } from '../../styles/reset.styles';
+import { CODE_LENGTH } from '../../utils/verification';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { styles } from './otp.styles';
 
@@ -52,7 +53,7 @@ function OtpSlots({ status, firstSlotRef }: { status: OtpStatus; firstSlotRef: R
  */
 export const Otp = React.forwardRef<HTMLInputElement, OtpProps>(function MosaicOtp(
   {
-    length = 6,
+    length = CODE_LENGTH,
     status: statusProp,
     disabled: disabledProp,
     required: requiredProp,

@@ -69,8 +69,8 @@ props (ARIA attributes, click and keyboard handlers) to spread.
 
 ### Items
 
-`label` names the item for typeahead and for assistive technology. What the row shows is composed
-from `Menu.Media` and `Menu.Label`, and those children are required: text dropped straight into the
+`label` names the item for typeahead and for assistive technology. Compose the row with
+`Menu.Label` and optional `Menu.Media` and `Menu.Indicator` parts. Text dropped straight into the
 item is not a flex child the row can size, so it neither lines up with the other rows nor
 truncates. A row with nothing to lead it is `Menu.Label` alone. Use
 `color='negative'` for destructive actions; the color is inherited by the children. `disabled` items
@@ -121,7 +121,13 @@ line. Items whose text is a name — an account, an organization — need it mos
 the menu instead of ellipsing. It is also what pushes a trailing mark to the end of the row. Use it
 for every composed item, so rows built from parts all read the same.
 
-The two together are the whole of a row that leads with an avatar and trails with a check:
+### Indicator
+
+`Menu.Indicator` is a square trailing column for a mark at the end of the row, such as a check or a
+spinner. It keeps its width while empty, so render it on any item whose mark can appear later and
+the label does not shift when it does.
+
+Together they make a row that leads with an avatar and trails with a check:
 
 ```tsx
 <Menu.Item label='colin@clerk.dev'>
@@ -134,7 +140,9 @@ The two together are the whole of a row that leads with an avatar and trails wit
     </Avatar.Root>
   </Menu.Media>
   <Menu.Label>colin@clerk.dev</Menu.Label>
-  <Icon glyph={Checkmark} size='sm' />
+  <Menu.Indicator>
+    <Icon glyph={Checkmark} size='sm' />
+  </Menu.Indicator>
 </Menu.Item>
 ```
 

@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -207,5 +208,21 @@ describe('Collapsible', () => {
       const { container } = renderCollapsible({ defaultOpen: true });
       expect(await axe(container)).toHaveNoViolations();
     });
+  });
+
+  it('forwards refs to the root and trigger', () => {
+    const root = createRef<HTMLDivElement>();
+    const trigger = createRef<HTMLButtonElement>();
+    render(
+      <Collapsible.Root
+        ref={root}
+        data-testid='collapsible-root'
+      >
+        <Collapsible.Trigger ref={trigger}>Toggle</Collapsible.Trigger>
+        <Collapsible.Panel>Content</Collapsible.Panel>
+      </Collapsible.Root>,
+    );
+    expect(root.current).toBe(screen.getByTestId('collapsible-root'));
+    expect(trigger.current).toBe(screen.getByRole('button', { name: 'Toggle' }));
   });
 });

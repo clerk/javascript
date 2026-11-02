@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Button, SubmitButton } from '../button';
+import { ButtonContext } from '../button/button.context';
 import { Dialog } from '../dialog';
 import { Flow } from '../flow';
 import { Card } from './card';
@@ -354,12 +356,12 @@ describe('Mosaic Card', () => {
     );
     const slot = screen.getByRole('alert');
     expect(slot).toHaveAttribute('data-open');
-    expect(slot).toHaveAttribute('data-starting-style');
+    expect(slot).not.toHaveAttribute('data-starting-style');
     expect(slot.previousElementSibling).toHaveClass('cl-card-header');
     expect(slot.nextElementSibling).toHaveClass('cl-card-content');
     const banner = slot.querySelector('.cl-banner-root');
     expect(banner).toHaveAttribute('data-color', 'negative');
-    expect(banner).toHaveAttribute('data-starting-style');
+    expect(banner).not.toHaveAttribute('data-starting-style');
     expect(screen.getByText('Something went wrong.')).toHaveClass('cl-banner-label');
 
     await act(async () => {
@@ -750,6 +752,55 @@ describe('Mosaic Card', () => {
     expect(screen.getByText('Content').tagName).toBe('MAIN');
     expect(screen.getByText('Footer').tagName).toBe('FOOTER');
     expect(screen.getByText('Header').closest('section')).toHaveClass('cl-card-root');
+  });
+});
+
+describe('Card.Footer buttons', () => {
+  it('makes buttons full width by default', () => {
+    render(
+      <Card.Footer>
+        <Button>Cancel</Button>
+        <SubmitButton>Save</SubmitButton>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveAttribute('data-full-width', '');
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('data-full-width', '');
+  });
+
+  it('lets a button opt out', () => {
+    render(
+      <Card.Footer>
+        <Button fullWidth={false}>Sign in</Button>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('keeps button defaults from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Card.Footer>
+          <Button>Save</Button>
+        </Card.Footer>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('leaves buttons outside the footer alone', () => {
+    render(
+      <Card.Root>
+        <Card.Content>
+          <Button>Inside content</Button>
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside content' })).not.toHaveAttribute('data-full-width');
   });
 });
 

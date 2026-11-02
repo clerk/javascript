@@ -236,6 +236,28 @@ describe('Menu', () => {
     });
   });
 
+  describe('Arrow', () => {
+    it('forwards a ref to the arrow element', async () => {
+      const user = userEvent.setup();
+      const ref = React.createRef<SVGSVGElement>();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Arrow ref={ref} />
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+
+      expect(ref.current).toBeInstanceOf(SVGSVGElement);
+    });
+  });
+
   describe('disabled items', () => {
     it('marks disabled item with data-disabled', async () => {
       const user = userEvent.setup();
@@ -375,6 +397,51 @@ describe('Menu', () => {
       await user.keyboard('{ArrowDown}{ArrowUp}');
 
       expect(screen.getByText('Cut')).toHaveAttribute('data-active', '');
+    });
+
+    function renderWithEnabledAriaFlag(flagged: 'first' | 'last') {
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item
+                label='Cut'
+                aria-disabled={flagged === 'first' ? false : undefined}
+              >
+                Cut
+              </Menu.Item>
+              <Menu.Item label='Copy'>Copy</Menu.Item>
+              <Menu.Item
+                label='Paste'
+                aria-disabled={flagged === 'last' ? false : undefined}
+              >
+                Paste
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+    }
+
+    it('treats aria-disabled="false" as enabled when pressing Home', async () => {
+      const user = userEvent.setup();
+      renderWithEnabledAriaFlag('first');
+
+      await user.click(screen.getByText('Actions'));
+      await user.keyboard('{ArrowDown}{Home}');
+
+      expect(screen.getByRole('menuitem', { name: 'Cut' })).toHaveAttribute('data-active');
+    });
+
+    it('treats aria-disabled="false" as enabled when pressing End', async () => {
+      const user = userEvent.setup();
+      renderWithEnabledAriaFlag('last');
+
+      await user.click(screen.getByText('Actions'));
+      await user.keyboard('{End}');
+
+      expect(screen.getByRole('menuitem', { name: 'Paste' })).toHaveAttribute('data-active');
     });
 
     it('Home moves to first item', async () => {
@@ -958,6 +1025,33 @@ describe('Menu', () => {
       expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
 
+    it('stays open when the mouse leaves a menu pressed open just before the hover delay ran out', () => {
+      vi.useFakeTimers();
+      try {
+        renderHoverMenu();
+        const trigger = screen.getByText('Actions');
+
+        fireEvent.pointerEnter(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseEnter(trigger);
+        fireEvent.pointerDown(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseDown(trigger, { button: 0 });
+        act(() => {
+          vi.advanceTimersByTime(100);
+        });
+        expect(trigger).toHaveAttribute('data-open', '');
+
+        fireEvent.pointerLeave(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseLeave(trigger, { relatedTarget: screen.getByText('Elsewhere') });
+        act(() => {
+          vi.runAllTimers();
+        });
+
+        expect(trigger).toHaveAttribute('data-open', '');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it('closes on a second press of the trigger', async () => {
       const user = userEvent.setup();
       renderHoverMenu();
@@ -1177,5 +1271,22 @@ describe('Menu', () => {
 
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
     });
+  });
+
+  it('forwards a ref to the separator', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger>Actions</Menu.Trigger>
+        <Menu.Positioner>
+          <Menu.Popup>
+            <Menu.Item label='Cut'>Cut</Menu.Item>
+            <Menu.Separator ref={ref} />
+            <Menu.Item label='Copy'>Copy</Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('separator'));
   });
 });

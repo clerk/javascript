@@ -34,14 +34,14 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
           event.preventDefault();
           const items = elementsRef.current;
           if (event.key === 'Home') {
-            const firstEnabled = items.findIndex(el => el != null && !el.hasAttribute('aria-disabled'));
+            const firstEnabled = items.findIndex(el => el != null && el.getAttribute('aria-disabled') !== 'true');
             if (firstEnabled !== -1) {
               setActiveIndex(firstEnabled);
             }
           } else {
             for (let i = items.length - 1; i >= 0; i--) {
               const item = items[i];
-              if (item != null && !item.hasAttribute('aria-disabled')) {
+              if (item != null && item.getAttribute('aria-disabled') !== 'true') {
                 setActiveIndex(i);
                 break;
               }

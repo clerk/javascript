@@ -34,7 +34,7 @@ const oauthStrategies = OAUTH_PROVIDERS.map(p => p.strategy);
 const web3Strategies = WEB3_PROVIDERS.map(p => p.strategy);
 const phoneCodeChannels = ALTERNATIVE_PHONE_CODE_PROVIDERS.map(p => p.channel);
 
-const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries([
+const knownProviderToDisplayData: ThirdPartyProviderToDataMap = fromEntries([
   ...[...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.provider, { strategy: p.strategy, name: p.name, iconUrl: iconImageUrl(p.provider) }];
   }),
@@ -43,7 +43,7 @@ const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries([
   }),
 ]) as ThirdPartyProviderToDataMap;
 
-const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries([
+const knownStrategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries([
   ...[...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.strategy, { id: p.provider, name: p.name, iconUrl: iconImageUrl(p.provider) }];
   }),
@@ -79,6 +79,9 @@ export const useEnabledThirdPartyProviders = () => {
   const activeCustomSocialStrategies = socialProviderStrategies.filter(
     s => !oauthStrategies.includes(s) || s.startsWith('oauth_custom_'),
   );
+
+  const providerToDisplayData = { ...knownProviderToDisplayData };
+  const strategyToDisplayData = { ...knownStrategyToDisplayData };
 
   allCustomOAuthProviders.forEach(s => {
     const providerName = s.replace('oauth_', '') as OAuthProvider;

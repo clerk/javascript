@@ -18,7 +18,7 @@ else
 end
 
 clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
-clerk_ios_revision = '1e6edcbc483a9ae02513eb5f28310b4db3e6e42b'
+clerk_ios_version = '1.7.0'
 
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'
@@ -44,7 +44,7 @@ Pod::Spec.new do |s|
     spm_dependency(
       s,
       url: clerk_ios_repo,
-      requirement: { :kind => 'revision', :revision => clerk_ios_revision },
+      requirement: { :kind => 'exactVersion', :version => clerk_ios_version },
       products: ['ClerkKit', 'ClerkKitUI']
     )
   else

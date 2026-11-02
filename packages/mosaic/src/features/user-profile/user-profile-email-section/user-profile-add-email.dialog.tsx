@@ -144,7 +144,7 @@ interface EnterEmailStepProps {
 }
 
 function EnterEmailStep(props: EnterEmailStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const emailFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
@@ -190,7 +190,6 @@ function EnterEmailStep(props: EnterEmailStepProps) {
       <Card.Footer>
         <SubmitButton
           form={emailFormId}
-          fullWidth
           disabled={!props.canSubmit}
           isPending={props.isPending}
           pendingLabel={m.email.pending}
@@ -217,7 +216,7 @@ interface VerifyEmailStepProps {
 }
 
 function VerifyEmailStep(props: VerifyEmailStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const verifyFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
@@ -275,7 +274,6 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -283,7 +281,6 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
         </Dialog.Close>
         <SubmitButton
           form={verifyFormId}
-          fullWidth
           isPending={props.isPending}
           disabled={!props.canSubmit || props.isResending}
           pendingLabel={m.verify.pending}
@@ -303,7 +300,7 @@ interface VerifyLinkStepProps {
 }
 
 function VerifyLinkStep(props: VerifyLinkStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
 
   return (
     <>
@@ -332,7 +329,6 @@ function VerifyLinkStep(props: VerifyLinkStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -351,7 +347,7 @@ interface VerifySsoStepProps {
 }
 
 function VerifySsoStep(props: VerifySsoStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const domain = props.emailAddress.split('@')[1] ?? props.emailAddress;
 
   return (
@@ -406,7 +402,6 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >

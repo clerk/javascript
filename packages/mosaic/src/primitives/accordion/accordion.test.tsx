@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -203,6 +204,7 @@ describe('Accordion', () => {
         renderAccordion({ defaultValue: ['item1'] });
         const panel = document.querySelector('[data-testid="accordion-panel"]') as HTMLElement;
         expect(panel.getAttribute('style')).toContain('--cl-accordion-panel-height');
+        expect(panel.getAttribute('style')).not.toContain('panel-width');
       } finally {
         if (original) {
           (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
@@ -441,5 +443,35 @@ describe('Accordion', () => {
       const { container } = renderAccordion({ defaultValue: ['item1'] });
       expect(await axe(container)).toHaveNoViolations();
     });
+  });
+
+  it('forwards refs to the root, item, header and trigger', () => {
+    const refs = {
+      root: createRef<HTMLDivElement>(),
+      item: createRef<HTMLDivElement>(),
+      header: createRef<HTMLHeadingElement>(),
+      trigger: createRef<HTMLButtonElement>(),
+    };
+    render(
+      <Accordion.Root
+        ref={refs.root}
+        data-testid='accordion-root'
+      >
+        <Accordion.Item
+          value='item1'
+          ref={refs.item}
+          data-testid='accordion-item'
+        >
+          <Accordion.Header ref={refs.header}>
+            <Accordion.Trigger ref={refs.trigger}>Section 1</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel>Content 1</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    expect(refs.root.current).toBe(screen.getByTestId('accordion-root'));
+    expect(refs.item.current).toBe(screen.getByTestId('accordion-item'));
+    expect(refs.header.current).toBe(screen.getByRole('heading'));
+    expect(refs.trigger.current).toBe(screen.getByRole('button', { name: 'Section 1' }));
   });
 });

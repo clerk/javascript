@@ -5,7 +5,7 @@ import type {
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosText } from '@/lib/chaos';
+import { chaosCompany, chaosEmail } from '@/lib/chaos';
 
 export const accounts: UserProfileEnterpriseAccount[] = [
   {
@@ -30,10 +30,14 @@ export function useEnterpriseAccountsFixture({
   initialError?: string;
 } = {}) {
   const seedAccounts = useChaosFixture(initialAccounts, items =>
-    items.map((account, index) => ({ ...account, name: chaosText(account.name), emailAddress: chaosEmail(index) })),
+    items.map((account, index) => ({
+      ...account,
+      name: `${chaosCompany(index)} Okta`,
+      emailAddress: chaosEmail(index),
+    })),
   );
   const seedConnections = useChaosFixture(connections, items =>
-    items.map(connection => ({ ...connection, name: chaosText(connection.name) })),
+    items.map((connection, index) => ({ ...connection, name: `${chaosCompany(index + 2)} SAML` })),
   );
   const [linkedAccounts, setLinkedAccounts] = useState(seedAccounts);
   const [availableConnections, setAvailableConnections] = useState(

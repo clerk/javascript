@@ -4,7 +4,7 @@ import vitest from '@vitest/eslint-plugin';
 import boundaries from 'eslint-plugin-boundaries';
 import noUnneededEffects from 'eslint-plugin-react-you-might-not-need-an-effect';
 
-import { noDynamicMessageCatalogs, noModelReactState } from './rules.mjs';
+import { forwardRefParts, noDynamicMessageCatalogs, noModelReactState } from './rules.mjs';
 
 const mosaicRoot = path.resolve(import.meta.dirname, '..');
 
@@ -29,6 +29,7 @@ export default [
         rules: {
           'no-model-react-state': noModelReactState,
           'no-dynamic-message-catalogs': noDynamicMessageCatalogs,
+          'forward-ref-parts': forwardRefParts,
         },
       },
     },
@@ -52,6 +53,14 @@ export default [
     files: ['src/**/*.model.{ts,tsx}'],
     rules: {
       'mosaic/no-model-react-state': 'error',
+    },
+  },
+  {
+    name: 'packages/mosaic - parts',
+    files: ['src/primitives/**/*.tsx', 'src/components/**/*.tsx'],
+    ignores: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}'],
+    rules: {
+      'mosaic/forward-ref-parts': 'error',
     },
   },
   {

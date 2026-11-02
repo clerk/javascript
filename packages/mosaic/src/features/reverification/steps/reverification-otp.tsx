@@ -8,6 +8,7 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
 import { Form } from '../../../primitives/form';
+import { CODE_LENGTH } from '../../../utils/verification';
 
 export interface ReverificationOtpMessages {
   title: string;
@@ -30,6 +31,7 @@ export interface ReverificationOTPProps {
   value: string;
   length?: number;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending?: boolean;
   resend?: ReverificationOtpResend;
   onValueChange: (value: string) => void;
@@ -42,8 +44,9 @@ export interface ReverificationOTPProps {
 export function ReverificationOTP({
   messages,
   value,
-  length = 6,
+  length = CODE_LENGTH,
   errorMessage,
+  globalErrorMessage,
   isPending = false,
   resend,
   onValueChange,
@@ -69,6 +72,12 @@ export function ReverificationOTP({
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         <Form
           id={formId}
@@ -102,6 +111,7 @@ export function ReverificationOTP({
                 <Button
                   type='button'
                   size='sm'
+                  color='neutral'
                   variant='link'
                   disabled={resend.disabled || isPending}
                   onClick={resend.onClick}
@@ -119,7 +129,6 @@ export function ReverificationOTP({
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={isPending}
             onClick={onCancel}
           >
@@ -128,7 +137,6 @@ export function ReverificationOTP({
         ) : null}
         <SubmitButton
           form={formId}
-          fullWidth
           disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}

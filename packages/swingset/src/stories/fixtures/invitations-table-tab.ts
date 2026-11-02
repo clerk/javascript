@@ -8,7 +8,7 @@ import { useLocale } from '@clerk/mosaic/localization';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
+import { chaosEmail, chaosRole, chaosRows } from '@/lib/chaos';
 
 const exampleInvitations = [
   'ada',
@@ -36,7 +36,7 @@ export function useInvitationsTableFixture({ proposed = false, empty = false } =
     chaosRows(items).map((invitation, index) => ({
       ...invitation,
       email: chaosEmail(index),
-      roleLabel: chaosText(invitation.roleLabel),
+      roleLabel: chaosRole(index).label,
     })),
   );
   const [items, setItems] = useState(empty ? [] : invitations);

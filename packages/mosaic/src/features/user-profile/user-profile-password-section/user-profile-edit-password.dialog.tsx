@@ -48,7 +48,7 @@ export function UserProfileEditPasswordDialog({
   reverification,
   step,
 }: UserProfileEditPasswordDialogProps) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
 
@@ -121,7 +121,6 @@ export function UserProfileEditPasswordDialog({
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             >
               {m.cancel}
             </Button>
@@ -129,7 +128,6 @@ export function UserProfileEditPasswordDialog({
         />
         <SubmitButton
           form={form.id}
-          fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled
@@ -198,7 +196,7 @@ function PasswordField({
   name: UserProfileEditPasswordField;
   advisoryFeedback?: FieldFeedback;
 }) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields[name];

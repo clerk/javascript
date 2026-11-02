@@ -40,8 +40,9 @@ import type {
  */
 export function setup<TContext extends object, TEvent extends EventObject>() {
   return {
-    createMachine: (config: MachineConfig<TContext, TEvent>): StateMachine<TContext, TEvent> =>
-      _createMachine<TContext, TEvent>(config),
+    createMachine: <TStates extends string>(
+      config: MachineConfig<TContext, TEvent, TStates>,
+    ): StateMachine<TContext, TEvent, TStates> => _createMachine<TContext, TEvent, TStates>(config),
 
     assign: <TEvt extends EventObject = EventObject>(
       fn: (context: TContext, event: TEvt) => Partial<TContext>,

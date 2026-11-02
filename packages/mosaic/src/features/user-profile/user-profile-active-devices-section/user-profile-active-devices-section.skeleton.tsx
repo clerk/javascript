@@ -12,7 +12,7 @@ const PLACEHOLDER_DEVICES: UserProfileDevice[] = [
 ];
 
 export function UserProfileActiveDevicesSectionSkeleton() {
-  const m = useMessages('userProfileActiveDevices');
+  const m = useMessages('userProfile').activeDevices;
   return (
     <>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>

@@ -10,7 +10,7 @@ export const tooltipSurface = stylex.create({
     paddingInline: space['1.5'],
     alignItems: 'center',
     backgroundColor: colorVars['--cl-color-foreground'],
-    color: colorVars['--cl-color-background'],
+    color: colorVars['--cl-color-surface'],
     display: 'flex',
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
