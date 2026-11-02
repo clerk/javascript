@@ -365,6 +365,15 @@ describe('Mosaic machines', { timeout: 30_000 }, () => {
     ).toEqual(['Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.']);
   });
 
+  test.each([
+    ['a quoted src key', 'export const state = { invoke: { "src": () => Promise.resolve(1) } };'],
+    ['a quoted invoke key', 'export const state = { "invoke": { src: () => Promise.resolve(1) } };'],
+    ['an as cast', 'export const state = { invoke: { src: () => Promise.resolve(1) } as object };'],
+    ['satisfies', 'export const state = { invoke: { src: () => Promise.resolve(1) } satisfies object };'],
+  ])('rejects a raw invoke written with %s', async (_name, source) => {
+    expect(await rawInvokeMessages(`${featureDir}/sample.controller.ts`, source)).toHaveLength(1);
+  });
+
   test('allows an invoke from fromPromise', async () => {
     expect(
       await rawInvokeMessages(

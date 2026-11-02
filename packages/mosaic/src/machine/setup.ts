@@ -89,4 +89,5 @@ type InferredTransition<TContext, TEvent extends EventObject, TStates extends st
   | `${TStates}`
   | { target: TStates }
   | { target: TStates }[]
+  | ((args: { context: TContext; event: TEvent }) => { target?: TStates; context?: Partial<TContext> } | undefined)
   | Transition<TContext, TEvent, TStates>;

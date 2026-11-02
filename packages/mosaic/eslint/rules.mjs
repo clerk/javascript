@@ -279,8 +279,19 @@ export const noRawInvoke = {
   },
   create(context) {
     return {
-      'Property[key.name="invoke"] > ObjectExpression:has(> Property[key.name="src"])'(node) {
-        context.report({ node, messageId: 'useFromPromise' });
+      Property(node) {
+        if (propertyName(node.key, node.computed) !== 'invoke') {
+          return;
+        }
+        const invoke = unwrapExpression(node.value);
+        if (
+          invoke.type === 'ObjectExpression' &&
+          invoke.properties.some(
+            property => property.type === 'Property' && propertyName(property.key, property.computed) === 'src',
+          )
+        ) {
+          context.report({ node: invoke, messageId: 'useFromPromise' });
+        }
       },
     };
   },

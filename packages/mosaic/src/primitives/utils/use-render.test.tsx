@@ -78,6 +78,7 @@ describe('mergeProps', () => {
   });
 
   it('lets the second argument clear an event handler with null', () => {
+    // @ts-expect-error -- Props don't type a handler as null; this pins the runtime behavior
     const result = mergeProps<'button'>({ onClick: () => {} }, { onClick: null });
     expect(result.onClick).toBeNull();
   });

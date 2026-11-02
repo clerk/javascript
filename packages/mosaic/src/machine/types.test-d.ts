@@ -494,6 +494,44 @@ describe('setup.fromPromise — e.output is typed from src return type', () => {
     });
   });
 
+  test('a function transition is checked against the machine it joins', () => {
+    const known = { invoke: fromPromise(fakeFetch, { onDone: () => ({ target: 'idle' }) }) };
+    const stays = { invoke: fromPromise(fakeFetch, { onError: () => ({ context: { error: 'failed' } }) }) };
+    const unhandled = { invoke: fromPromise(fakeFetch, { onDone: () => undefined }) };
+    const unknownTarget = { invoke: fromPromise(fakeFetch, { onDone: () => ({ target: 'nope' }) }) };
+
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {},
+        known,
+        stays,
+        unhandled,
+        // @ts-expect-error — 'nope' is not a state
+        unknownTarget,
+      },
+    });
+  });
+
+  test('an inline function transition sees the typed output', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: ({ event }) => {
+              expectTypeOf(event.output).toEqualTypeOf<FetchResult>();
+              return { target: 'done' };
+            },
+          }),
+        },
+        done: {},
+      },
+    });
+  });
+
   test('the machine keeps its state names as a union', () => {
     const fetching = make2({
       initial: 'idle',

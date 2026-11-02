@@ -23,6 +23,17 @@ describe('use-render', () => {
     merged.onClick = 1;
   });
 
+  test('data attributes keep the typed result', () => {
+    expectTypeOf(mergeProps<'div'>({ 'data-open': '' }, {}).id).toEqualTypeOf<string | undefined>();
+  });
+
+  test('values that are not props of the tag are rejected', () => {
+    // @ts-expect-error -- Not a handler
+    mergeProps<'button'>({}, { onClick: 1 });
+    // @ts-expect-error -- Not a button prop
+    mergeProps<'button'>({}, { onClik: () => {} });
+  });
+
   test('a part keeps its own tag props', () => {
     expectTypeOf<ComponentProps<'button'>>().toExtend<{ type?: 'button' | 'submit' | 'reset' }>();
   });
