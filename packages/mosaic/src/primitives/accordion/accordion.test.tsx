@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -537,7 +537,8 @@ describe('Accordion', () => {
       </Accordion.Root>,
     );
     const notes = screen.getByRole('textbox', { name: 'Notes' });
-    await userEvent.type(notes, 'a{Enter}b{ArrowUp}');
+    await userEvent.type(notes, 'a{Enter}b');
+    expect(fireEvent.keyDown(notes, { key: 'ArrowUp' })).toBe(true);
     expect(notes).toHaveFocus();
   });
 });
