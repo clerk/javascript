@@ -139,6 +139,12 @@ import {
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
 import {
+  CustomElement as InviteMembersButtonCustomElement,
+  Default as InviteMembersButtonDefault,
+  meta as inviteMembersButtonMeta,
+  Unavailable as InviteMembersButtonUnavailable,
+} from '../stories/invite-members-button.stories';
+import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -714,6 +720,13 @@ const userButtonModule: StoryModule = {
   User: UserButtonUser,
 };
 
+const inviteMembersButtonModule: StoryModule = {
+  meta: inviteMembersButtonMeta,
+  Default: InviteMembersButtonDefault,
+  CustomElement: InviteMembersButtonCustomElement,
+  Unavailable: InviteMembersButtonUnavailable,
+};
+
 const waitlistModule: StoryModule = {
   meta: waitlistMeta,
   Default: WaitlistDefault,
@@ -1124,6 +1137,7 @@ export const registry: StoryModule[] = [
   createOrganizationModule,
   organizationListModule,
   userAvatarModule,
+  inviteMembersButtonModule,
   apiKeysTableModule,
   reverificationModule,
   waitlistModule,
