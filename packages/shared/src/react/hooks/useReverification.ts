@@ -117,17 +117,16 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
       const { signal } = params;
       const resolvers = createDeferredPromise();
       const cancelled = createDeferredPromise();
-      const cancel = () => {
-        const error = new ClerkRuntimeError('User cancelled attempted verification', {
+      const cancellationError = () =>
+        new ClerkRuntimeError('User cancelled attempted verification', {
           code: 'reverification_cancelled',
         });
-        resolvers.reject(error);
+      const cancel = () => {
+        resolvers.reject(cancellationError());
       };
       const abort = () => {
         cancel();
-        cancelled.reject(
-          new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
-        );
+        cancelled.reject(cancellationError());
       };
       const run = async () => {
         signal?.throwIfAborted();

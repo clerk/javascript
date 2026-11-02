@@ -52,7 +52,7 @@ export type ReverificationState =
       cancel: () => void;
       level: SessionVerificationLevel | undefined;
       signal: AbortSignal;
-      sessionId: string | undefined;
+      sessionId: string;
     }
   | { phase: 'retrying'; signal: AbortSignal };
 

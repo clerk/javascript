@@ -90,6 +90,62 @@ async function setup(action: () => Promise<unknown>) {
 }
 
 describe('reverification run identity', () => {
+  it('rejects before issuing a request when there is no active session', async () => {
+    serveFapi({ client: fapiClient([]) });
+    const action = vi.fn().mockResolvedValue({ done: true });
+    const report = vi.fn();
+    await renderWithClerk(
+      <Host
+        action={action}
+        report={report}
+      />,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Run' }));
+
+    await waitFor(() =>
+      expect(report).toHaveBeenCalledWith(expect.objectContaining({ code: 'reverification_cancelled' })),
+    );
+    expect(action).not.toHaveBeenCalled();
+    expect(screen.queryByLabelText('Password')).toBeNull();
+  });
+
+  it('allows a fresh request after rejecting a start during a session transition', async () => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]) });
+    const action = vi.fn().mockResolvedValue({ done: true });
+    const report = vi.fn();
+    const { clerk, navigate } = await renderWithClerk(
+      <Host
+        action={action}
+        report={report}
+      />,
+    );
+    const navigation = deferred<undefined>();
+    navigate.mockImplementationOnce(() => navigation.promise);
+    let switching: Promise<void> = Promise.resolve();
+    act(() => {
+      switching = clerk.setActive({ session: 'sess_1', redirectUrl: '/elsewhere' });
+    });
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/elsewhere'));
+    expect(clerk.session).toBeUndefined();
+
+    try {
+      fireEvent.click(screen.getByRole('button', { name: 'Run' }));
+      await waitFor(() =>
+        expect(report).toHaveBeenCalledWith(expect.objectContaining({ code: 'reverification_cancelled' })),
+      );
+      expect(action).not.toHaveBeenCalled();
+    } finally {
+      navigation.resolve(undefined);
+      await act(() => switching);
+    }
+
+    fireEvent.click(screen.getByRole('button', { name: 'Run' }));
+    await waitFor(() => expect(report).toHaveBeenLastCalledWith({ done: true }));
+    expect(action).toHaveBeenCalledOnce();
+  });
+
   it('frees the slot before an old hint arrives and leaves the new challenge intact', async () => {
     const oldResponse = deferred<unknown>();
     const action = vi

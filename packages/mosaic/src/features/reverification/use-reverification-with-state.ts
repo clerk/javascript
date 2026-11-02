@@ -18,8 +18,7 @@ export type UseReverificationWithStateResult<F extends ReverificationFetcher = R
 ];
 
 type ReverificationRun = {
-  userId: string | undefined;
-  sessionId: string | undefined;
+  sessionId: string;
   abort: AbortController;
 };
 
@@ -48,17 +47,12 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
   });
 
   useSafeLayoutEffect(() => {
-    const unsubscribe = clerk.addListener(({ user, session }) => {
+    const unsubscribe = clerk.addListener(({ session }) => {
       const run = currentRun.current;
       if (!run) {
         return;
       }
-      if (
-        user === null ||
-        session === null ||
-        (user !== undefined && user.id !== run.userId) ||
-        (session !== undefined && session.id !== run.sessionId)
-      ) {
+      if (session === null || (session !== undefined && session.id !== run.sessionId)) {
         cancelRun(run);
       }
     });
@@ -79,9 +73,15 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
         );
       }
 
+      const sessionId = clerk.session?.id;
+      if (!sessionId) {
+        return Promise.reject(
+          new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
+        );
+      }
+
       const run: ReverificationRun = {
-        userId: clerk.user?.id,
-        sessionId: clerk.session?.id,
+        sessionId,
         abort: new AbortController(),
       };
       currentRun.current = run;
