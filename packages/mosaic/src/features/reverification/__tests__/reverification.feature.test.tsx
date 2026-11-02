@@ -517,167 +517,6 @@ describe('Reverification', () => {
     });
   });
 
-  describe('second-factor passkey', () => {
-    it('verifies the second factor, refreshes the session, and resumes the action once', async () => {
-      const { action, clerk, fapi } = await renderReverification(
-        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
-        verificationSeed({ secondFactors: [secondPasskeyFactor] }),
-      );
-      const getCredential = vi.fn().mockResolvedValue({ publicKeyCredential: fakeAssertion(), error: null });
-      clerk.__internal_getPublicCredentials = getCredential;
-      const restore = pretendToBeARealBrowser();
-      const touch = holdRequests('post', TOUCH);
-
-      try {
-        const user = await startVerification();
-        expect(await screen.findByText(STEP.passkey)).toBeVisible();
-        await user.click(screen.getByRole('button', { name: 'Continue' }));
-
-        await waitFor(() => expect(fapi.verification.secondFactorVerification?.strategy).toBe('passkey'));
-        expect(fapi.verification.firstFactorVerification).toBeNull();
-        await waitFor(() => expect(touch.requests).toHaveLength(1));
-        expect(action).toHaveBeenCalledTimes(1);
-
-        touch.release();
-        await untilResolved();
-        expect(action).toHaveBeenCalledTimes(2);
-        expect(getCredential).toHaveBeenCalledTimes(1);
-      } finally {
-        touch.release();
-        restore();
-      }
-    });
-
-    it('offers an advertised passkey after the first factor of a multi-factor request', async () => {
-      const { action, clerk } = await renderReverification(
-        guardedAction({ level: 'multi_factor', afterMinutes: 10 }),
-        verificationSeed({ firstFactors: [passwordFactor], secondFactors: [totpFactor, secondPasskeyFactor] }),
-      );
-      clerk.__internal_getPublicCredentials = vi.fn().mockResolvedValue({
-        publicKeyCredential: fakeAssertion(),
-        error: null,
-      });
-      const restore = pretendToBeARealBrowser();
-
-      try {
-        const user = await startVerification();
-        expect(await screen.findByText(STEP.password)).toBeVisible();
-        await user.type(passwordField(), `${PASSWORD}{Enter}`);
-        expect(await screen.findByText(STEP.passkey)).toBeVisible();
-        await user.click(screen.getByRole('button', { name: 'Continue' }));
-        await untilResolved();
-        expect(action).toHaveBeenCalledTimes(2);
-      } finally {
-        restore();
-      }
-    });
-
-    it('does not offer a second-factor passkey omitted by the server', async () => {
-      await renderReverification(
-        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
-        verificationSeed({ secondFactors: [totpFactor, backupCodeFactor] }),
-      );
-      const restore = pretendToBeARealBrowser();
-
-      try {
-        const user = await startVerification();
-        expect(await screen.findByText(STEP.totp)).toBeVisible();
-        await useAnotherMethod(user);
-        expect(await screen.findByRole('button', { name: 'Use a backup code' })).toBeVisible();
-        expect(screen.queryByRole('button', { name: 'Use your passkey' })).toBeNull();
-      } finally {
-        restore();
-      }
-    });
-
-    it('does not offer an advertised second-factor passkey without WebAuthn', async () => {
-      await renderReverification(
-        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
-        verificationSeed({ secondFactors: [totpFactor, secondPasskeyFactor, backupCodeFactor] }),
-      );
-      const restore = pretendWebAuthnIsUnsupported();
-
-      try {
-        const user = await startVerification();
-        expect(await screen.findByText(STEP.totp)).toBeVisible();
-        await useAnotherMethod(user);
-        expect(await screen.findByRole('button', { name: 'Use a backup code' })).toBeVisible();
-        expect(screen.queryByRole('button', { name: 'Use your passkey' })).toBeNull();
-      } finally {
-        restore();
-      }
-    });
-
-    it('shows the no factors card when the only second factor is a passkey without WebAuthn', async () => {
-      const { action } = await renderReverification(
-        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
-        verificationSeed({ secondFactors: [secondPasskeyFactor] }),
-      );
-      const restore = pretendWebAuthnIsUnsupported();
-
-      try {
-        const user = await startVerification();
-        expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
-        expect(screen.queryByText(STEP.passkey)).toBeNull();
-
-        await user.click(screen.getByRole('button', { name: 'Close' }));
-        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-        await untilClosed();
-        expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
-        expect(action).toHaveBeenCalledTimes(1);
-      } finally {
-        restore();
-      }
-    });
-
-    it('recovers from a cancelled prompt, method switch, dismissal, and reopening', async () => {
-      const hint = reverificationError({ level: 'second_factor', afterMinutes: 10 });
-      const action = vi.fn().mockResolvedValueOnce(hint).mockResolvedValueOnce(hint).mockResolvedValue({ done: true });
-      const { clerk } = await renderReverification(
-        action,
-        verificationSeed({ secondFactors: [secondPasskeyFactor, totpFactor] }),
-      );
-      const getCredential = vi
-        .fn()
-        .mockResolvedValueOnce({
-          publicKeyCredential: null,
-          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_cancelled' }),
-        })
-        .mockResolvedValue({ publicKeyCredential: fakeAssertion(), error: null });
-      clerk.__internal_getPublicCredentials = getCredential;
-      const restore = pretendToBeARealBrowser();
-
-      try {
-        const user = await startVerification();
-        expect(await screen.findByText(STEP.passkey)).toBeVisible();
-        await user.click(screen.getByRole('button', { name: 'Continue' }));
-        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Passkey verification was cancelled'));
-        expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
-
-        await useAnotherMethod(user);
-        await user.click(await screen.findByRole('button', { name: 'Use your authenticator app' }));
-        expect(await screen.findByText(STEP.totp)).toBeVisible();
-        await useAnotherMethod(user);
-        await user.click(await screen.findByRole('button', { name: 'Use your passkey' }));
-        expect(await screen.findByText(STEP.passkey)).toBeVisible();
-        expect(screen.getByRole('alert').textContent).toBe('');
-
-        await dismiss(user);
-        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-        await untilClosed();
-
-        await startVerification();
-        expect(await screen.findByText(STEP.passkey)).toBeVisible();
-        await user.click(screen.getByRole('button', { name: 'Continue' }));
-        await untilResolved();
-        expect(action).toHaveBeenCalledTimes(3);
-        expect(getCredential).toHaveBeenCalledTimes(2);
-      } finally {
-        restore();
-      }
-    });
-  });
-
   describe('password', () => {
     it('recovers from a wrong password and completes the challenge', async () => {
       const { action } = await renderReverification(
@@ -964,6 +803,30 @@ describe('Reverification', () => {
       await pasteCode(user, CODE);
       await untilResolved();
     });
+
+    it('offers an advertised passkey after the first factor of a multi-factor request', async () => {
+      const { action, clerk } = await renderReverification(
+        guardedAction({ level: 'multi_factor', afterMinutes: 10 }),
+        verificationSeed({ firstFactors: [passwordFactor], secondFactors: [totpFactor, secondPasskeyFactor] }),
+      );
+      clerk.__internal_getPublicCredentials = vi.fn().mockResolvedValue({
+        publicKeyCredential: fakeAssertion(),
+        error: null,
+      });
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await user.type(passwordField(), `${PASSWORD}{Enter}`);
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await untilResolved();
+        expect(action).toHaveBeenCalledTimes(2);
+      } finally {
+        restore();
+      }
+    });
   });
 
   describe('second factor alternatives', () => {
@@ -1013,12 +876,36 @@ describe('Reverification', () => {
     });
   });
 
-  describe('passkey', () => {
+  describe.each([
+    {
+      stage: 'first factor',
+      action: () => guardedAction(),
+      seed: { firstFactors: [passwordFactor, passkeyFactor] },
+      verifiedOn: 'firstFactorVerification' as const,
+      skippedOn: 'secondFactorVerification' as const,
+      otherMethod: { name: 'Continue with your password', step: STEP.password },
+      withoutWebAuthn: {
+        seed: { firstFactors: [passwordFactor, passkeyFactor, emailFactor] },
+        step: STEP.password,
+        alternative: 'Email code to alice@example.com',
+      },
+    },
+    {
+      stage: 'second factor',
+      action: () => guardedAction({ level: 'second_factor', afterMinutes: 10 }),
+      seed: { secondFactors: [totpFactor, secondPasskeyFactor] },
+      verifiedOn: 'secondFactorVerification' as const,
+      skippedOn: 'firstFactorVerification' as const,
+      otherMethod: { name: 'Use your authenticator app', step: STEP.totp },
+      withoutWebAuthn: {
+        seed: { secondFactors: [totpFactor, secondPasskeyFactor, backupCodeFactor] },
+        step: STEP.totp,
+        alternative: 'Use a backup code',
+      },
+    },
+  ])('passkey as the $stage', ({ action, seed, verifiedOn, skippedOn, otherMethod, withoutWebAuthn }) => {
     it('completes the challenge with the passkey', async () => {
-      const { clerk } = await renderReverification(
-        guardedAction(),
-        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
-      );
+      const { clerk, fapi } = await renderReverification(action(), verificationSeed(seed));
       let acceptCredential: () => void = () => {};
       const getCredential = vi
         .fn()
@@ -1057,16 +944,15 @@ describe('Reverification', () => {
         await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
         acceptCredential();
         await untilResolved();
+        expect(fapi.verification[verifiedOn]?.strategy).toBe('passkey');
+        expect(fapi.verification[skippedOn]).toBeNull();
       } finally {
         restore();
       }
     });
 
     it('shows no error when the passkey prompt is aborted', async () => {
-      const { clerk } = await renderReverification(
-        guardedAction(),
-        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
-      );
+      const { clerk } = await renderReverification(action(), verificationSeed(seed));
       const getCredential = vi.fn().mockResolvedValue({
         publicKeyCredential: null,
         error: new ClerkWebAuthnError('The operation was aborted', { code: 'passkey_operation_aborted' }),
@@ -1092,10 +978,7 @@ describe('Reverification', () => {
     });
 
     it('clears an earlier passkey error when the next prompt is aborted', async () => {
-      const { clerk } = await renderReverification(
-        guardedAction(),
-        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
-      );
+      const { clerk } = await renderReverification(action(), verificationSeed(seed));
       const getCredential = vi
         .fn()
         .mockResolvedValueOnce({
@@ -1130,15 +1013,15 @@ describe('Reverification', () => {
     });
 
     it('offers the passkey from the picker when another method is showing', async () => {
-      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }));
+      await renderReverification(action(), verificationSeed(seed));
       const restore = pretendToBeARealBrowser();
 
       try {
         const user = await startVerification();
         expect(await screen.findByText(STEP.passkey)).toBeVisible();
         await useAnotherMethod(user);
-        await user.click(await screen.findByRole('button', { name: 'Continue with your password' }));
-        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await user.click(await screen.findByRole('button', { name: otherMethod.name }));
+        expect(await screen.findByText(otherMethod.step)).toBeVisible();
 
         // The passkey is listed once the user is on another method
         await useAnotherMethod(user);
@@ -1150,20 +1033,17 @@ describe('Reverification', () => {
     });
 
     it('does not offer a passkey when the browser does not support WebAuthn', async () => {
-      await renderReverification(
-        guardedAction(),
-        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor, emailFactor] }),
-      );
+      await renderReverification(action(), verificationSeed(withoutWebAuthn.seed));
       const restore = pretendWebAuthnIsUnsupported();
 
       try {
         // The passkey is not the starting method
         const user = await startVerification();
-        expect(await screen.findByText(STEP.password)).toBeVisible();
+        expect(await screen.findByText(withoutWebAuthn.step)).toBeVisible();
 
         // The passkey is not listed in the picker
         await useAnotherMethod(user);
-        expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
+        expect(await screen.findByRole('button', { name: withoutWebAuthn.alternative })).toBeVisible();
         expect(screen.queryByRole('button', { name: 'Use your passkey' })).toBeNull();
       } finally {
         restore();
