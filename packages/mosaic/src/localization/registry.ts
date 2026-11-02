@@ -38,8 +38,6 @@ import { roleMessages } from './roles.messages';
 export const mosaicMessages = {
   userButton: userButtonMessages,
   organizationSwitcher: organizationSwitcherMessages,
-  createOrganization: createOrganizationMessages,
-  organizationList: organizationListMessages,
   userProfile: {
     ...userProfileMessages,
     profile: userProfileProfileSectionMessages,
@@ -73,6 +71,8 @@ export const mosaicMessages = {
     danger: organizationProfileDangerSectionMessages,
   },
   apiKeys: apiKeysTableMessages,
+  createOrganization: createOrganizationMessages,
+  organizationList: organizationListMessages,
   reverification: reverificationMessages,
   profile: profileMessages,
   form: formMessages,

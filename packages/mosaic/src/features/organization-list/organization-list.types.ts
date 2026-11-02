@@ -24,7 +24,7 @@ export interface OrganizationListSuggestion {
 }
 
 export interface OrganizationListPaging {
-  observe: (element: HTMLElement | null) => void;
+  ref: (element: HTMLElement | null) => void;
   hasMore: boolean;
 }
 

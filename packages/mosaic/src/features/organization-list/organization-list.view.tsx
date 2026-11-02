@@ -41,7 +41,7 @@ export function OrganizationListView({
   memberships,
   invitations,
   suggestions,
-  paging: { observe, hasMore },
+  paging: { ref: loadMoreRef, hasMore },
   pendingKey,
   error,
   onSelectOrganization,
@@ -102,7 +102,7 @@ export function OrganizationListView({
             />
           ))}
           {hasMore ? (
-            <Item.Root ref={observe}>
+            <Item.Root ref={loadMoreRef}>
               <Item.Media>
                 <Spinner
                   size='sm'

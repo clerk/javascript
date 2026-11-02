@@ -94,7 +94,7 @@ function OrganizationListHarness({
     memberships: empty ? [] : initialMemberships,
     invitations,
     suggestions,
-    paging: { observe: () => {}, hasMore: false },
+    paging: { ref: () => {}, hasMore: false },
     createOrganization,
     onSelectOrganization: async () => {
       await settleAfter(1000);
