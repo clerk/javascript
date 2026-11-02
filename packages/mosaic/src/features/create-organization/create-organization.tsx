@@ -29,8 +29,6 @@ export type CreateOrganizationProps = CreateOrganizationModelOptions & {
  *
  * @example
  * ```tsx
- * import { CreateOrganization } from '@clerk/mosaic';
- *
  * <CreateOrganization />
  * ```
  *

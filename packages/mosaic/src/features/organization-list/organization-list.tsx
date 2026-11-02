@@ -27,8 +27,6 @@ export type OrganizationListProps = OrganizationListModelOptions & {
  *
  * @example
  * ```tsx
- * import { OrganizationList } from '@clerk/mosaic';
- *
  * <OrganizationList />
  * ```
  *
