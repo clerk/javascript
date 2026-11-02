@@ -975,6 +975,18 @@ describe('Clerk singleton', () => {
         expect(mockClientFetch.mock.calls[0]?.[0]?.abortSignal?.aborted).toBe(true);
       });
 
+      it('aborts /environment when the environment fetch hangs past the init timeout', async () => {
+        vi.useFakeTimers();
+        mockEnvironmentFetch.mockReturnValueOnce(new Promise(() => {}));
+        mockClientFetch.mockResolvedValue({ signedInSessions: [], lastActiveSessionId: null });
+
+        const sut = new Clerk(productionPublishableKey);
+        await pumpUntilSettled(sut.load());
+
+        expect(mockEnvironmentFetch.mock.calls[0]?.[0]?.abortSignal?.aborted).toBe(true);
+        expect(sut.status).toBe('degraded');
+      });
+
       it('builds the degraded identity from the minted token and falls back to the cookie only if the mint fails', async () => {
         const stubSession = makeSession();
         const freshSession = { id: 'sess_1', status: 'active', user: { id: 'user_fresh' } };
