@@ -162,6 +162,7 @@ import {
 } from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
 import {
   Default as OAuthConsentDefault,
   ManyScopes as OAuthConsentManyScopes,
@@ -1215,6 +1216,7 @@ export const registry: StoryModule[] = [
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
   // Misc
+  { meta: mosaicProviderMeta },
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,

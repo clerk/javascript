@@ -53,6 +53,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
   },
   misc: {
+    'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
     'organization-list': dynamic(() => import('../stories/organization-list.mdx')),
