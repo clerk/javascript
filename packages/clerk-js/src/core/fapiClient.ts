@@ -48,6 +48,7 @@ export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiR
 export interface FapiResponseJSON<T> {
   response: T;
   client?: ClientJSON;
+  sign_out_url?: string;
   errors?: ClerkAPIErrorJSON[];
   meta?: {
     client?: ClientJSON;

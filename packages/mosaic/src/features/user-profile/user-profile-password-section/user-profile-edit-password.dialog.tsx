@@ -121,7 +121,6 @@ export function UserProfileEditPasswordDialog({
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             >
               {m.cancel}
             </Button>
@@ -129,7 +128,6 @@ export function UserProfileEditPasswordDialog({
         />
         <SubmitButton
           form={form.id}
-          fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled

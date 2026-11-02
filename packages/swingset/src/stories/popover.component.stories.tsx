@@ -35,12 +35,7 @@ export function Default() {
             <Text>ada@example.com</Text>
           </Card.Header>
           <Card.Footer>
-            <Button
-              color='negative'
-              fullWidth
-            >
-              Sign out of all accounts
-            </Button>
+            <Button color='negative'>Sign out of all accounts</Button>
           </Card.Footer>
         </Card.Root>
       </Popover.Popup>

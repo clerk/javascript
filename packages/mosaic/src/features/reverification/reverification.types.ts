@@ -13,7 +13,8 @@ export type ReverificationErrorReason = 'noFactors' | 'generic';
 export type ReverificationStep = 'password' | 'passkey' | 'otp' | 'backup-code' | 'method-picker' | 'help';
 
 export type ReverificationMethod =
-  | { id: string; stage: 'first'; strategy: 'password' | 'passkey' }
+  | { id: string; stage: 'first'; strategy: 'password' }
+  | { id: string; stage: 'first' | 'second'; strategy: 'passkey' }
   | { id: string; stage: 'first'; strategy: 'email_code'; emailAddressId: string; identifier: string }
   | { id: string; stage: 'first' | 'second'; strategy: 'phone_code'; phoneNumberId: string; identifier: string }
   | { id: string; stage: 'second'; strategy: 'totp' | 'backup_code' };
@@ -25,6 +26,7 @@ type ReverificationViewFields = {
   value: string;
   onValueChange: (value: string) => void;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: () => void;
   onShowMethods: () => void;

@@ -82,7 +82,6 @@ export function UserProfileRenamePasskeyDialog({
                 <Button
                   color='neutral'
                   variant='outline'
-                  fullWidth
                   disabled={form.isSubmitting}
                 >
                   {m.cancel}
@@ -91,7 +90,6 @@ export function UserProfileRenamePasskeyDialog({
             />
             <SubmitButton
               form={form.id}
-              fullWidth
               isPending={form.isSubmitting}
               disabled={!form.canSubmit}
               focusableWhenDisabled

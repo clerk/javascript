@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import { useForm } from '../../../components/form';
 import { useToastManager } from '../../../components/toast';
 import { plural, useLocale, useMessages } from '../../../localization';
-import type { InviteMembersInput } from './invitations-table-tab.model';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
+import type { InviteMembersInput } from './organization-profile-invite-members.model';
 
 interface InviteMembersValues {
   emailAddresses: string[];
@@ -89,7 +89,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   return { onInvite, isInviteDisabled: false, inviteDialog };
 }
 
-function resolveDefaultRole({ roles }: MembersRoles, defaultRole: string | null) {
+export function resolveDefaultRole({ roles }: MembersRoles, defaultRole: string | null) {
   const candidate = defaultRole ?? (roles.length === 1 ? roles[0]?.key : undefined);
   return roles.some(role => role.key === candidate) ? (candidate ?? null) : null;
 }

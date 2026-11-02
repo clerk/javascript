@@ -83,7 +83,6 @@ export function OrganizationProfileEditNameDialog({
                 <Button
                   variant='outline'
                   color='neutral'
-                  fullWidth
                 />
               }
             >
@@ -91,7 +90,6 @@ export function OrganizationProfileEditNameDialog({
             </Dialog.Close>
             <SubmitButton
               form={form.id}
-              fullWidth
               isPending={form.isSubmitting}
               disabled={!form.canSubmit}
               focusableWhenDisabled

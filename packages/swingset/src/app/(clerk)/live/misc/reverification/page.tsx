@@ -2,7 +2,7 @@
 
 import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
-import { Button } from '@clerk/mosaic/components/button';
+import { Button, SubmitButton } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import { Dialog } from '@clerk/mosaic/components/dialog';
 import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
@@ -49,9 +49,10 @@ function CardHarness() {
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex flex-wrap items-center gap-2'>
-        <Button
+        <SubmitButton
+          type='button'
           color='negative'
-          disabled={busy}
+          isPending={busy}
           onClick={() => {
             if (busy) {
               return;
@@ -84,9 +85,9 @@ function CardHarness() {
           }}
         >
           Delete account
-        </Button>
+        </SubmitButton>
       </div>
-      {requestPending ? (
+      {requestPending && reverification.visible ? (
         <Card.Root renderBranding={false}>
           <Reverification controller={reverification} />
         </Card.Root>
@@ -242,7 +243,6 @@ function DialogHarness() {
                     <Card.Footer>
                       <Button
                         color='negative'
-                        fullWidth
                         onClick={continueDelete}
                         disabled={requestPending}
                       >
