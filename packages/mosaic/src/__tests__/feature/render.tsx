@@ -33,7 +33,14 @@ export async function renderWithClerk(
   );
   let current = ui;
   const view = render(wrap(current));
-  await act(() => clerk.load({ routerPush: to => navigate(to), routerReplace: to => navigate(to), ...options }));
+  await act(() =>
+    clerk.load({
+      standardBrowser: false,
+      routerPush: to => navigate(to),
+      routerReplace: to => navigate(to),
+      ...options,
+    }),
+  );
   view.rerender(wrap(current));
 
   return {
