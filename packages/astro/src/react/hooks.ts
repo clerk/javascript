@@ -11,7 +11,7 @@ import type {
   UseAuthReturn,
 } from '@clerk/shared/types';
 import type { Store, StoreValue } from 'nanostores';
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 import { authAsyncStorage } from '#async-local-storage';
 
@@ -88,8 +88,8 @@ type UseAuth = (options?: PendingSessionOptions) => UseAuthReturn;
 export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
   const authContext = useAuthStore();
 
-  const getToken: GetToken = useCallback(createGetToken(), []);
-  const signOut: SignOut = useCallback(createSignOut(), []);
+  const getToken: GetToken = useMemo(() => createGetToken(), []);
+  const signOut: SignOut = useMemo(() => createSignOut(), []);
 
   const { userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims } = authContext;
 
