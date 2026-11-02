@@ -41,6 +41,10 @@ const livePages = new Set([
   '/misc/create-organization',
   '/misc/organization-list',
   '/misc/waitlist',
+  '/misc/sign-in-button',
+  '/misc/sign-in-with-metamask-button',
+  '/misc/sign-up-button',
+  '/misc/sign-out-button',
   '/user-button/user-button',
 ]);
 

@@ -310,6 +310,30 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  CustomElement as SignInButtonCustomElement,
+  Default as SignInButtonDefault,
+  meta as signInButtonMeta,
+  Pending as SignInButtonPending,
+} from '../stories/sign-in-button.stories';
+import {
+  CustomElement as SignInWithMetamaskButtonCustomElement,
+  Default as SignInWithMetamaskButtonDefault,
+  meta as signInWithMetamaskButtonMeta,
+  Pending as SignInWithMetamaskButtonPending,
+} from '../stories/sign-in-with-metamask-button.stories';
+import {
+  CustomElement as SignOutButtonCustomElement,
+  Default as SignOutButtonDefault,
+  meta as signOutButtonMeta,
+  Pending as SignOutButtonPending,
+} from '../stories/sign-out-button.stories';
+import {
+  CustomElement as SignUpButtonCustomElement,
+  Default as SignUpButtonDefault,
+  meta as signUpButtonMeta,
+  Pending as SignUpButtonPending,
+} from '../stories/sign-up-button.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -721,6 +745,34 @@ const waitlistModule: StoryModule = {
   Redirecting: WaitlistRedirecting,
 };
 
+const signInButtonModule: StoryModule = {
+  meta: signInButtonMeta,
+  Default: SignInButtonDefault,
+  CustomElement: SignInButtonCustomElement,
+  Pending: SignInButtonPending,
+};
+
+const signInWithMetamaskButtonModule: StoryModule = {
+  meta: signInWithMetamaskButtonMeta,
+  Default: SignInWithMetamaskButtonDefault,
+  CustomElement: SignInWithMetamaskButtonCustomElement,
+  Pending: SignInWithMetamaskButtonPending,
+};
+
+const signOutButtonModule: StoryModule = {
+  meta: signOutButtonMeta,
+  Default: SignOutButtonDefault,
+  CustomElement: SignOutButtonCustomElement,
+  Pending: SignOutButtonPending,
+};
+
+const signUpButtonModule: StoryModule = {
+  meta: signUpButtonMeta,
+  Default: SignUpButtonDefault,
+  CustomElement: SignUpButtonCustomElement,
+  Pending: SignUpButtonPending,
+};
+
 const userAvatarModule: StoryModule = {
   meta: userAvatarMeta,
   Default: UserAvatarDefault,
@@ -1127,6 +1179,10 @@ export const registry: StoryModule[] = [
   apiKeysTableModule,
   reverificationModule,
   waitlistModule,
+  signInButtonModule,
+  signInWithMetamaskButtonModule,
+  signUpButtonModule,
+  signOutButtonModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,

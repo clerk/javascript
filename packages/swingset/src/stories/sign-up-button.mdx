@@ -1,0 +1,69 @@
+import * as SignUpButtonStories from './sign-up-button.stories';
+
+# SignUpButton
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={SignUpButtonStories}
+/>
+
+## Usage
+
+```tsx
+import { SignUpButton } from '@clerk/mosaic/features/sign-up-button/sign-up-button';
+
+<SignUpButton />;
+```
+
+## Props
+
+| Prop                        | Type                              | Default      | Description                                                                   |
+| --------------------------- | --------------------------------- | ------------ | ----------------------------------------------------------------------------- |
+| `mode`                      | `'redirect' \| 'modal'`           | `'redirect'` | Navigates to the sign-up page, or opens sign-up in a modal.                   |
+| `forceRedirectUrl`          | `string`                          | —            | Where to go after signing up, always.                                         |
+| `fallbackRedirectUrl`       | `string`                          | —            | Where to go after signing up when the URL has no `redirect_url`.              |
+| `signInForceRedirectUrl`    | `string`                          | —            | Where to go after signing in from sign-up, always.                            |
+| `signInFallbackRedirectUrl` | `string`                          | —            | Where to go after signing in from sign-up when the URL has no `redirect_url`. |
+| `initialValues`             | `SignUpInitialValues`             | —            | Prefills the sign-up form.                                                    |
+| `unsafeMetadata`            | `SignUpUnsafeMetadata`            | —            | In a modal, metadata copied to the new user's `unsafeMetadata`.               |
+| `oauthFlow`                 | `'auto' \| 'redirect' \| 'popup'` | `'auto'`     | In a modal, whether OAuth sign-up redirects or opens a popup.                 |
+| `render`                    | `ReactElement \| func`            | —            | The element to render. The button's props are merged into it.                 |
+| `children`                  | `ReactNode`                       | `'Sign up'`  | The button's content. The default label is localized as `signUpButton.label`. |
+| `nativeButton`              | `boolean`                         | `true`       | Set to `false` when `render` is not a `<button>`, to apply button semantics.  |
+| `onClick`                   | `MouseEventHandler`               | —            | Runs alongside starting sign-up.                                              |
+| `fallback`                  | `ReactNode`                       | —            | Rendered while Clerk loads.                                                   |
+
+Other `<button>` attributes pass through to the rendered element.
+
+## Your own element
+
+<Story
+  name='CustomElement'
+  storyModule={SignUpButtonStories}
+/>
+
+## Pending
+
+The button is disabled while the redirect runs.
+
+<Story
+  name='Pending'
+  storyModule={SignUpButtonStories}
+/>
+
+## Styling
+
+The button emits no class. Style it with your own `className`, or through the element you pass to
+`render`.
+
+| Attribute       | Description                      |
+| --------------- | -------------------------------- |
+| `data-disabled` | Present while the redirect runs. |
+
+```css
+.sign-up[data-disabled] {
+  cursor: progress;
+}
+```

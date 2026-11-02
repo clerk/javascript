@@ -1,0 +1,63 @@
+import * as SignOutButtonStories from './sign-out-button.stories';
+
+# SignOutButton
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={SignOutButtonStories}
+/>
+
+## Usage
+
+```tsx
+import { SignOutButton } from '@clerk/mosaic/features/sign-out-button/sign-out-button';
+
+<SignOutButton />;
+```
+
+## Props
+
+| Prop           | Type                   | Default                              | Description                                                                              |
+| -------------- | ---------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| `redirectUrl`  | `string`               | the application's after-sign-out URL | Where to go after signing out.                                                           |
+| `sessionId`    | `string`               | —                                    | Signs out this session only. Other signed-in sessions stay signed in.                    |
+| `render`       | `ReactElement \| func` | —                                    | The element to render. The button's props are merged into it.                            |
+| `children`     | `ReactNode`            | `'Sign out'`                         | The button's content. The default label is localized as `signOutButton.label`.           |
+| `nativeButton` | `boolean`              | `true`                               | Set to `false` when `render` is not a `<button>`, to apply button semantics.             |
+| `onClick`      | `MouseEventHandler`    | —                                    | Runs alongside signing out.                                                              |
+| `fallback`     | `ReactNode`            | —                                    | Rendered while Clerk loads. Nothing renders once Clerk answers that nobody is signed in. |
+
+Other `<button>` attributes pass through to the rendered element.
+
+## Your own element
+
+<Story
+  name='CustomElement'
+  storyModule={SignOutButtonStories}
+/>
+
+## Pending
+
+The button is disabled while signing out.
+
+<Story
+  name='Pending'
+  storyModule={SignOutButtonStories}
+/>
+
+## Styling
+
+The button emits no class. Style it with your own `className`, or through the element you pass to
+`render`.
+
+| Attribute       | Description                |
+| --------------- | -------------------------- |
+| `data-disabled` | Present while signing out. |
+
+```css
+.sign-out[data-disabled] {
+  cursor: progress;
+}
+```

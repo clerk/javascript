@@ -59,6 +59,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
+    'sign-in-button': dynamic(() => import('../stories/sign-in-button.mdx')),
+    'sign-in-with-metamask-button': dynamic(() => import('../stories/sign-in-with-metamask-button.mdx')),
+    'sign-up-button': dynamic(() => import('../stories/sign-up-button.mdx')),
+    'sign-out-button': dynamic(() => import('../stories/sign-out-button.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
