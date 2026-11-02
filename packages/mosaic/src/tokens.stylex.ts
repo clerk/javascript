@@ -47,10 +47,8 @@ const colorDefaults = {
   '--cl-color-foreground-secondary': neutralMix(55, 64.25),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border':
-    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 7%, transparent), var(--cl-color-neutral-alpha-300))',
-  '--cl-color-border-subtle':
-    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 4%, transparent), var(--cl-color-neutral-alpha-200))',
+  '--cl-color-border': 'var(--cl-color-neutral-alpha-300)',
+  '--cl-color-border-subtle': 'var(--cl-color-neutral-alpha-200)',
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
   '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',

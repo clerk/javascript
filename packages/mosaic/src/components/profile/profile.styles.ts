@@ -104,7 +104,6 @@ export const styles = stylex.create({
   },
 
   layoutInDialog: {
-    borderWidth: '0px',
     blockSize: 'auto',
     boxShadow: {
       [compact]: 'none',
@@ -120,6 +119,7 @@ export const styles = stylex.create({
 
   layoutFullscreen: {
     borderRadius: 0,
+    borderWidth: '0px',
     boxShadow: 'none',
   },
 
