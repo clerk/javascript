@@ -57,6 +57,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
+    waitlist: dynamic(() => import('../stories/waitlist.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),

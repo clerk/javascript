@@ -491,6 +491,12 @@ import {
   LiveRegion as VisuallyHiddenLiveRegion,
   meta as visuallyHiddenMeta,
 } from '../stories/visually-hidden.stories';
+import {
+  Default as WaitlistDefault,
+  Joined as WaitlistJoined,
+  meta as waitlistMeta,
+  Redirecting as WaitlistRedirecting,
+} from '../stories/waitlist.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -705,6 +711,13 @@ const inviteMembersButtonModule: StoryModule = {
   Default: InviteMembersButtonDefault,
   CustomElement: InviteMembersButtonCustomElement,
   Unavailable: InviteMembersButtonUnavailable,
+};
+
+const waitlistModule: StoryModule = {
+  meta: waitlistMeta,
+  Default: WaitlistDefault,
+  Joined: WaitlistJoined,
+  Redirecting: WaitlistRedirecting,
 };
 
 const userAvatarModule: StoryModule = {
@@ -1095,6 +1108,7 @@ export const registry: StoryModule[] = [
   inviteMembersButtonModule,
   apiKeysTableModule,
   reverificationModule,
+  waitlistModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
