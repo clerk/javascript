@@ -178,9 +178,10 @@ in [Test placement](#test-placement).
   `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
   `{ clerk, navigate, rerender, ... }`.
   `navigate` is the router Clerk was loaded with, called with the path.
-  By default, `standardBrowser: false` skips Clerk's browser cookie service,
-  preventing session cookies from accumulating across tests. Pass
-  `{ standardBrowser: true }` when a test needs browser authentication behavior.
+  It loads Clerk with `standardBrowser: false`, so there are no cookies, token
+  polling, captcha, or FAPI-initiated redirects. A test's Clerk is never
+  disposed, and its cookie service would otherwise write cookies into later
+  tests.
 
 The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the
 window. Before each test it moves FAPI to a new host, so a request a previous
