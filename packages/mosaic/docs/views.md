@@ -42,6 +42,51 @@ Two shapes, chosen by whether the slice fetches its own data:
   (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
   with its `onSubmit`). Still no Clerk — the effect arrives from above.
 
+## Moving between screens on one surface
+
+When one screen replaces another on the same card or dialog, render both as steps
+of `Flow` (`components/flow`). The surface stays put, its height animates, and the
+outgoing screen stays mounted until its exit finishes. A conditional or an early
+return makes the new screen pop in instead.
+
+```tsx
+<Card.Root renderBranding={renderBranding}>
+  <Flow.Root
+    value={step}
+    direction={step === 'list' ? -1 : 1}
+    state={props}
+  >
+    {current => (
+      <>
+        <Flow.Step ids={['list']}>
+          <ListStep {...current} />
+        </Flow.Step>
+        <Flow.Step ids={['create']}>
+          <CreateStep {...current} />
+        </Flow.Step>
+      </>
+    )}
+  </Flow.Root>
+</Card.Root>
+```
+
+- **The surface sits outside the flow, and a step renders only what goes inside
+  it.** A screen used as a step of another feature cannot bring its own `Card.Root`.
+  `ConfirmShell` owns the card and `Reverification` renders only its contents.
+- **Nest a flow when a step has steps of its own.** The outer flow keeps its step
+  mounted, and `useFlowAutoFocus` reaches the inner active step.
+- **The controller owns the step.** Going back is direction `-1`. Derive it from the
+  step when each step has one way in, and hold it in the controller when it does not
+  (`reverification.controller.ts`).
+- **Mark what takes focus with `useFlowAutoFocus`.** Focus moves only for a step
+  that transitions in, so a flow that opens on a step does not take focus.
+
+A loading or error state of a single screen is not a step, and neither is the
+skeleton shown before a feature has data. Those can stay conditionals.
+
+The parts, data attributes and CSS variables are in
+`src/primitives/flow/README.md`.
+
 ## Where the strings live
 
 Every string a view renders comes from the feature's `*.messages.ts`, shaped the
