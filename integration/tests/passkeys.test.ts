@@ -18,15 +18,15 @@ type SavedCredential = {
 const TOTP_SECRET = 'JBSWY3DPEHPK3PXP';
 
 // clerk-js gates WebAuthn behind isValidBrowser(), which bails when
-// navigator.webdriver is true, so mask it before installing the virtual authenticator.
+// navigator.webdriver is true, so mask it before Clerk loads.
 const installVirtualAuthenticator = async (context: BrowserContext, { autofill = false } = {}) => {
+  await context.credentials.install();
   await context.addInitScript(autofill => {
     Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
     if (!autofill) {
       PublicKeyCredential.isConditionalMediationAvailable = () => Promise.resolve(false);
     }
   }, autofill);
-  await context.credentials.install();
 };
 
 let app: Application;
