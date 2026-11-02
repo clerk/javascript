@@ -59,6 +59,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
+    'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
