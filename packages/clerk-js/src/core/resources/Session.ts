@@ -15,6 +15,7 @@ import {
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '@clerk/shared/internal/clerk-js/passkeys';
 import { retry } from '@clerk/shared/retry';
+import { timeLimit } from '@clerk/shared/utils';
 import type {
   ActClaim,
   AgentActClaim,
@@ -59,6 +60,9 @@ import { SessionVerification } from './SessionVerification';
 
 const focusedRefresh = (onRefresh: () => void): { onRefresh?: () => void } =>
   isTabFocused() === false ? {} : { onRefresh };
+
+/** Bound session-token POSTs the same way /client is bounded during load (see #9065 / #10577). */
+const SESSION_TOKEN_FETCH_TIMEOUT_MS = 7_000;
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -544,19 +548,23 @@ export class Session extends BaseResource implements SessionResource {
           ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
 
+    const abort = new AbortController();
+    const search = skipCache ? { debug: 'skip_cache' } : {};
+
     if (sessionMinterEnabled) {
       // Session Minter sends the token in the body, no expired_token retry needed
-      return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
+      return timeLimit(Token.create(path, params, search, abort.signal), SESSION_TOKEN_FETCH_TIMEOUT_MS, abort);
     }
 
     // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
     const lastActiveToken = this.lastActiveToken?.getRawString();
-    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    const mint = Token.create(path, params, search, abort.signal).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
-        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+        return Token.create(path, { ...params }, { expired_token: lastActiveToken }, abort.signal);
       }
       throw e;
     });
+    return timeLimit(mint, SESSION_TOKEN_FETCH_TIMEOUT_MS, abort);
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
