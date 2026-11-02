@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
-import type { OrganizationProfilePageId } from '../switcher/switcher.pages';
+import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
 import type { UserProfileProps } from '../user-profile/user-profile';
 import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 
