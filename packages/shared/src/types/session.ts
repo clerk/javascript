@@ -540,7 +540,7 @@ export type SessionVerifyPrepareFirstFactorParams =
   /**
    * @experimental
    */
-  | Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'>
+  | (Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'> & { actionCompleteRedirectUrl?: string })
   /**
    * @experimental
    */

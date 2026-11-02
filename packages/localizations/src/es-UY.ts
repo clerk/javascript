@@ -1599,6 +1599,7 @@ export const esUY: LocalizationResource = {
       actionText: '¿No tenés ninguno de estos?',
       blockButton__backupCode: 'Usar un código de respaldo',
       blockButton__emailCode: 'Enviar código por correo a {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Continuar con tu contraseña',
       blockButton__phoneCode: 'Enviar código SMS a {{identifier}}',
@@ -1621,6 +1622,10 @@ export const esUY: LocalizationResource = {
       resendButton: '¿No recibiste un código? Reenviar',
       subtitle: 'Ingresá el código enviado a tu correo para continuar',
       title: 'Verificación requerida',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'No se puede proceder con la verificación. No hay un factor de autenticación adecuado configurado',

@@ -1598,6 +1598,7 @@ export const nlBE: LocalizationResource = {
       actionText: 'Heb je geen van deze?',
       blockButton__backupCode: 'Backupcode gebruiken',
       blockButton__emailCode: 'Email code naar {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Doorgaan met je wachtwoord',
       blockButton__phoneCode: 'Verzend SMS code naar {{identifier}}',
@@ -1620,6 +1621,10 @@ export const nlBE: LocalizationResource = {
       resendButton: 'Niet ontvangen? Opnieuw verzenden',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Controleer je email',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Kan niet verder gaan met verificatie. Er is geen beschikbare verificatiefactor.',

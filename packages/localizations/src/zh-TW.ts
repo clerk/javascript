@@ -1589,6 +1589,7 @@ export const zhTW: LocalizationResource = {
       actionText: '沒有以上任何一種方式嗎？',
       blockButton__backupCode: '使用備用碼',
       blockButton__emailCode: '傳送驗證碼至 {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: '使用您的金鑰',
       blockButton__password: '使用您的密碼登入',
       blockButton__phoneCode: '傳送簡訊代碼至 {{identifier}}',
@@ -1610,6 +1611,10 @@ export const zhTW: LocalizationResource = {
       resendButton: '沒收到代碼？重新傳送',
       subtitle: '請輸入已寄至您電子郵件的驗證碼以繼續',
       title: '需要驗證您的身分',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: '無法繼續驗證。沒有可用的驗證方式。',

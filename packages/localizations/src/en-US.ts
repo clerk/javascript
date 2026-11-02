@@ -1641,6 +1641,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__enterpriseSSO: 'Continue with {{name}}',
       blockButton__passkey: 'Use your passkey',
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
@@ -1662,6 +1663,10 @@ export const enUS: LocalizationResource = {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the code sent to your email to continue',
+      title: 'Verification required',
+    },
+    enterpriseSSO: {
+      subtitle: 'Continue with your enterprise account to confirm it’s you',
       title: 'Verification required',
     },
     noAvailableMethods: {

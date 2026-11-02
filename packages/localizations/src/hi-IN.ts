@@ -1603,6 +1603,7 @@ export const hiIN: LocalizationResource = {
       actionText: 'इनमें से कोई भी नहीं है?',
       blockButton__backupCode: 'बैकअप कोड का उपयोग करें',
       blockButton__emailCode: '{{identifier}} पर ईमेल कोड',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'अपनी पासकी का उपयोग करें',
       blockButton__password: 'अपने पासवर्ड के साथ जारी रखें',
       blockButton__phoneCode: '{{identifier}} पर SMS कोड भेजें',
@@ -1625,6 +1626,10 @@ export const hiIN: LocalizationResource = {
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
       subtitle: 'जारी रखने के लिए अपने ईमेल पर भेजे गए कोड को दर्ज करें',
       title: 'सत्यापन आवश्यक है',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'सत्यापन जारी नहीं रख सकते। कोई उपयुक्त प्रमाणीकरण कारक कॉन्फ़िगर नहीं है',

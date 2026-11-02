@@ -1596,6 +1596,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget av dessa?',
       blockButton__backupCode: 'Använd en reservkod',
       blockButton__emailCode: 'Skicka kod via e-post till {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Fortsätt med ditt lösenord',
       blockButton__phoneCode: 'Skicka SMS-kod till {{identifier}}',
@@ -1618,6 +1619,10 @@ export const svSE: LocalizationResource = {
       resendButton: 'Fick du ingen kod? Skicka igen',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din e-post',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',

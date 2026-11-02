@@ -1604,6 +1604,7 @@ export const caES: LocalizationResource = {
       actionText: 'No tens accés a aquest mètode? Prova una altra opció.',
       blockButton__backupCode: 'Utilitzar codi de seguretat',
       blockButton__emailCode: 'Utilitzar codi de correu electrònic',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Utilitzar contrasenya',
       blockButton__phoneCode: 'Utilitzar codi de telèfon',
@@ -1626,6 +1627,10 @@ export const caES: LocalizationResource = {
       resendButton: 'Reenviar codi',
       subtitle: "Comprova el codi de verificació a la teva bústia d'entrada.",
       title: 'Verificació per correu electrònic',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Ho sentim, no tens cap mètode de verificació disponible. Contacta amb suport.',

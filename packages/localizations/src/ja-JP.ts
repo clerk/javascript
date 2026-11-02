@@ -1604,6 +1604,7 @@ export const jaJP: LocalizationResource = {
       actionText: 'これらのいずれもお持ちでないですか？',
       blockButton__backupCode: 'バックアップコードを使用する',
       blockButton__emailCode: '{{identifier}} にメールコードを送信',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'パスキーを使用する',
       blockButton__password: 'パスワードで続行',
       blockButton__phoneCode: '{{identifier}} にSMSコードを送信',
@@ -1626,6 +1627,10 @@ export const jaJP: LocalizationResource = {
       resendButton: 'コードが届いていませんか？再送信',
       subtitle: '続行するには、メールに送信されたコードを入力してください',
       title: '確認が必要です',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: '確認を続行できません。利用可能な認証要素が設定されていません。',

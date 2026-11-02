@@ -1606,6 +1606,7 @@ export const ptBR: LocalizationResource = {
       actionText: 'Não tem nenhum dos métodos? Tente outra forma.',
       blockButton__backupCode: 'Usar código de backup',
       blockButton__emailCode: 'Enviar código para {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'Usar sua chave de acesso',
       blockButton__password: 'Usar senha',
       blockButton__phoneCode: 'Enviar código de telefone',
@@ -1627,6 +1628,10 @@ export const ptBR: LocalizationResource = {
       resendButton: 'Reenviar código',
       subtitle: 'Verifique seu e-mail e insira o código para continuar.',
       title: 'Verifique seu e-mail',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Nenhum método de verificação disponível. Entre em contato com o suporte.',

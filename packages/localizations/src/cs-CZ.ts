@@ -1601,6 +1601,7 @@ export const csCZ: LocalizationResource = {
       actionText: 'Nemáte žádnou z těchto možností?',
       blockButton__backupCode: 'Použít záložní kód',
       blockButton__emailCode: 'Odeslat kód na e-mail {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'Použít váš přístupový klíč',
       blockButton__password: 'Pokračovat s vaším heslem',
       blockButton__phoneCode: 'Odeslat SMS kód na {{identifier}}',
@@ -1623,6 +1624,10 @@ export const csCZ: LocalizationResource = {
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
       subtitle: 'Zadejte kód odeslaný na váš e-mail pro pokračování',
       title: 'Vyžadováno ověření',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Nelze pokračovat s ověřením. Není nakonfigurován žádný vhodný autentizační faktor',

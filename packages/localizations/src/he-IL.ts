@@ -1590,6 +1590,7 @@ export const heIL: LocalizationResource = {
       actionText: 'אין לך אף אחד מאלה?',
       blockButton__backupCode: 'השתמש בקוד גיבוי',
       blockButton__emailCode: 'קוד אימייל ל {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'המשך עם הסיסמה שלך',
       blockButton__phoneCode: 'שלח קוד SMS ל {{identifier}}',
@@ -1611,6 +1612,10 @@ export const heIL: LocalizationResource = {
       resendButton: 'לא קיבלת קוד? שלח שוב',
       subtitle: 'המשך ל {{applicationName}}',
       title: 'בדוק את האימייל שלך',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'לא ניתן להמשיך עם האימות. אין גורם אימות זמין',

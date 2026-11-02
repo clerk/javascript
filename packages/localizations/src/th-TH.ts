@@ -1596,6 +1596,7 @@ export const thTH: LocalizationResource = {
       actionText: 'ไม่สามารถเข้าถึงวิธีเหล่านี้?',
       blockButton__backupCode: 'ใช้รหัสสำรอง',
       blockButton__emailCode: 'ส่งรหัสทางอีเมลไปยัง {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'ใช้พาสคีย์ของคุณ',
       blockButton__password: 'ดำเนินการต่อด้วยรหัสผ่านของคุณ',
       blockButton__phoneCode: 'ส่งรหัส SMS ไปยัง {{identifier}}',
@@ -1618,6 +1619,10 @@ export const thTH: LocalizationResource = {
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
       subtitle: 'ใส่รหัสที่ส่งไปยังอีเมลของคุณเพื่อดำเนินการต่อ',
       title: 'ต้องการการยืนยัน',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'ไม่สามารถดำเนินการยืนยันได้ ไม่มีปัจจัยการยืนยันตัวตนที่เหมาะสมได้รับการกำหนดค่า',

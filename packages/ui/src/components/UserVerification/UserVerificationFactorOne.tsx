@@ -1,3 +1,4 @@
+import { getEnterpriseConnectionFactors } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
 import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/shared/types';
 import React, { useEffect, useMemo } from 'react';
 
@@ -16,6 +17,7 @@ import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorO
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { sortByPrimaryFactor } from './utils';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
+import { UVFactorOneEnterpriseSSOCard } from './UVFactorOneEnterpriseSSOCard';
 import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
 
@@ -30,6 +32,9 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   if ('phoneNumberId' in factor) {
     key += factor.phoneNumberId;
   }
+  if ('enterpriseConnectionId' in factor) {
+    key += factor.enterpriseConnectionId;
+  }
   return key;
 };
 
@@ -38,7 +43,10 @@ const SUPPORTED_STRATEGIES: SessionVerificationFirstFactor['strategy'][] = [
   'email_code',
   'phone_code',
   'passkey',
+  'enterprise_sso',
 ] as const;
+
+const factorHasCard = (factor: SignInFactor) => factorHasLocalStrategy(factor) || factor.strategy === 'enterprise_sso';
 
 export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { data } = useUserVerificationSession();
@@ -59,7 +67,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const webAuthnSupported = useIsWebAuthnSupported();
 
-  const [{ currentFactor }, setFactor] = React.useState<{
+  const [{ currentFactor, prevCurrentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => ({
@@ -73,7 +81,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   });
 
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
-    () => !currentFactor || !factorHasLocalStrategy(currentFactor),
+    () => !currentFactor || !factorHasCard(currentFactor),
   );
 
   const toggleAllStrategies = hasAlternativeStrategies
@@ -112,7 +120,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   }
 
   if (showAllStrategies) {
-    const canGoBack = factorHasLocalStrategy(currentFactor);
+    const canGoBack = factorHasCard(currentFactor);
 
     const toggle = toggleAllStrategies;
     const backHandler = () => {
@@ -157,6 +165,17 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
       );
     case 'passkey':
       return <UVFactorOnePasskeysCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+    case 'enterprise_sso':
+      return (
+        <UVFactorOneEnterpriseSSOCard
+          factors={getEnterpriseConnectionFactors(
+            prevCurrentFactor
+              ? availableFactors?.filter(f => factorKey(f) === factorKey(currentFactor))
+              : availableFactors,
+          )}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
     default:
       return <LoadingCard />;
   }
