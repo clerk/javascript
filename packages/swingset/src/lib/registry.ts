@@ -133,6 +133,12 @@ import {
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
 import {
+  CustomElement as InviteMembersButtonCustomElement,
+  Default as InviteMembersButtonDefault,
+  meta as inviteMembersButtonMeta,
+  Unavailable as InviteMembersButtonUnavailable,
+} from '../stories/invite-members-button.stories';
+import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -694,6 +700,13 @@ const userButtonModule: StoryModule = {
   User: UserButtonUser,
 };
 
+const inviteMembersButtonModule: StoryModule = {
+  meta: inviteMembersButtonMeta,
+  Default: InviteMembersButtonDefault,
+  CustomElement: InviteMembersButtonCustomElement,
+  Unavailable: InviteMembersButtonUnavailable,
+};
+
 const userAvatarModule: StoryModule = {
   meta: userAvatarMeta,
   Default: UserAvatarDefault,
@@ -1079,6 +1092,7 @@ export const registry: StoryModule[] = [
   // Misc
   organizationSwitcherModule,
   userAvatarModule,
+  inviteMembersButtonModule,
   apiKeysTableModule,
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
