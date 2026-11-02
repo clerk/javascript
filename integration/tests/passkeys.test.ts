@@ -19,10 +19,13 @@ const TOTP_SECRET = 'JBSWY3DPEHPK3PXP';
 
 // clerk-js gates WebAuthn behind isValidBrowser(), which bails when
 // navigator.webdriver is true, so mask it before installing the virtual authenticator.
-const installVirtualAuthenticator = async (context: BrowserContext) => {
-  await context.addInitScript(() => {
+const installVirtualAuthenticator = async (context: BrowserContext, { autofill = false } = {}) => {
+  await context.addInitScript(autofill => {
     Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
-  });
+    if (!autofill) {
+      PublicKeyCredential.isConditionalMediationAvailable = () => Promise.resolve(false);
+    }
+  }, autofill);
   await context.credentials.install();
 };
 
@@ -76,7 +79,7 @@ test.describe('passkeys @generic', () => {
 
   test('signs in with passkey via conditional UI autofill', async ({ page, context }) => {
     await context.credentials.create(savedCredential.rpId, savedCredential);
-    await installVirtualAuthenticator(context);
+    await installVirtualAuthenticator(context, { autofill: true });
 
     const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
@@ -95,8 +98,6 @@ test.describe('passkeys @generic', () => {
     await u.po.signIn.continue();
 
     await expect(u.page.getByText('Use your passkey')).toBeVisible();
-    // Seed only now: the start page's conditional-UI autofill is answered
-    // instantly by the virtual authenticator and would preempt this flow.
     await context.credentials.create(savedCredential.rpId, savedCredential);
     await u.po.signIn.continue();
 
@@ -111,7 +112,6 @@ test.describe('passkeys @generic', () => {
 
     const usePasskeyLink = u.page.getByRole('link', { name: /use passkey instead/i });
     await expect(usePasskeyLink).toBeVisible();
-    // Seed after load for the same autofill-preemption reason as above.
     await context.credentials.create(savedCredential.rpId, savedCredential);
     await usePasskeyLink.click();
 
@@ -180,8 +180,6 @@ test.describe('passkeys as a second factor @generic', () => {
 
     // Passkey outranks the enrolled authenticator app once the backend advertises it.
     await expect(u.page.getByText('Use your passkey')).toBeVisible();
-    // Seed only now: the start page's conditional-UI autofill would otherwise
-    // answer with this credential and verify it as the first factor instead.
     await context.credentials.create(savedCredential.rpId, savedCredential);
     await u.po.signIn.continue();
 
