@@ -40,6 +40,7 @@ const livePages = new Set([
   '/misc/reverification',
   '/misc/create-organization',
   '/misc/organization-list',
+  '/misc/waitlist',
   '/user-button/user-button',
 ]);
 

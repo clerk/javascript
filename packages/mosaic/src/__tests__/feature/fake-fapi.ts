@@ -16,6 +16,7 @@ import type {
   SessionWithActivitiesJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
+  WaitlistJSON,
   Web3WalletJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
@@ -77,6 +78,7 @@ export interface FakeFapiState {
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
   passwordUpdates: URLSearchParams[];
+  waitlistEntries: string[];
   enterpriseConnections: EnterpriseConnectionJSON[];
   enterpriseLinking: FakeEnterpriseLinking;
   mfa: FakeMfaState;
@@ -316,6 +318,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],
+    waitlistEntries: [],
     enterpriseConnections: [],
     deviceTrackingEnabled: true,
     mfa: createMfaState(),
@@ -573,6 +576,33 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       target.status = 'revoked';
       return envelope({ ...deviceSessionPayload(target), user: requester.user, status: 'revoked' }, state.client);
+    }),
+    http.post(fapiUrl('/v1/waitlist'), async ({ request }) => {
+      const emailAddress = new URLSearchParams(await request.text()).get('email_address') ?? '';
+      if (!/^[^\s@]+@[^\s@]+$/.test(emailAddress)) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_format_invalid',
+                message: 'is invalid',
+                long_message: 'email_address must be a valid email address.',
+                meta: { param_name: 'email_address' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      state.waitlistEntries.push(emailAddress);
+      const now = Date.now();
+      const entry: WaitlistJSON = {
+        object: 'waitlist',
+        id: `wle_${state.waitlistEntries.length}`,
+        created_at: now,
+        updated_at: now,
+      };
+      return envelope(entry, null);
     }),
     http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
       const session = findSession(state, state.client.last_active_session_id);
