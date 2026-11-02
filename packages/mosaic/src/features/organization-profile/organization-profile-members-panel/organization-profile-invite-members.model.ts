@@ -44,7 +44,7 @@ export function useInviteMembersModel({ onInvited }: { onInvited?: () => unknown
     });
 }
 
-function rejectedEmailAddresses(cause: unknown, submitted: string[]) {
+export function rejectedEmailAddresses(cause: unknown, submitted: string[]) {
   if (!isClerkAPIResponseError(cause)) {
     return [];
   }

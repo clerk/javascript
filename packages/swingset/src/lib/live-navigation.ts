@@ -39,6 +39,8 @@ const livePages = new Set([
   '/misc/invite-members-button',
   '/misc/api-keys-table',
   '/misc/reverification',
+  '/misc/create-organization',
+  '/misc/organization-list',
   '/misc/waitlist',
   '/user-button/user-button',
 ]);

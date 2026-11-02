@@ -128,7 +128,7 @@ export interface SwitcherModalProps {
   };
 }
 
-function resolveAfterUrl<T extends object>(
+export function resolveAfterUrl<T extends object>(
   config: ((entity: T) => string) | string | undefined,
   entity: T,
 ): string | undefined {

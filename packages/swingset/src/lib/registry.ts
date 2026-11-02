@@ -61,6 +61,12 @@ import {
   Labelled as CopyButtonLabelled,
   meta as copyButtonMeta,
 } from '../stories/copy-button.stories';
+import {
+  Default as CreateOrganizationDefault,
+  meta as createOrganizationMeta,
+  WithError as CreateOrganizationWithError,
+  WithoutSlug as CreateOrganizationWithoutSlug,
+} from '../stories/create-organization.stories';
 import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as DestructiveDefault,
@@ -156,6 +162,14 @@ import {
 } from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OrganizationListDefault,
+  Empty as OrganizationListEmpty,
+  Loading as OrganizationListLoading,
+  meta as organizationListMeta,
+  WithError as OrganizationListWithError,
+  WithoutPersonal as OrganizationListWithoutPersonal,
+} from '../stories/organization-list.stories';
 import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
@@ -734,6 +748,22 @@ const organizationSwitcherModule: StoryModule = {
   NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
 };
 
+const createOrganizationModule: StoryModule = {
+  meta: createOrganizationMeta,
+  Default: CreateOrganizationDefault,
+  WithoutSlug: CreateOrganizationWithoutSlug,
+  WithError: CreateOrganizationWithError,
+};
+
+const organizationListModule: StoryModule = {
+  meta: organizationListMeta,
+  Default: OrganizationListDefault,
+  WithoutPersonal: OrganizationListWithoutPersonal,
+  Loading: OrganizationListLoading,
+  Empty: OrganizationListEmpty,
+  WithError: OrganizationListWithError,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -1104,6 +1134,8 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // Misc
   organizationSwitcherModule,
+  createOrganizationModule,
+  organizationListModule,
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
