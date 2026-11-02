@@ -36,4 +36,12 @@ describe('fake FAPI isolation between tests', () => {
     expect(memberships.requests).toHaveLength(0);
     memberships.release();
   });
+
+  it('does not let any Clerk write session cookies', async () => {
+    const user = fapiUser({ id: 'user_1' });
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+    const { clerk } = await renderWithClerk(<div />);
+    expect(await clerk.session?.getToken()).toEqual(expect.any(String));
+    expect(document.cookie).not.toMatch(/(?:^|; )__session/);
+  });
 });
