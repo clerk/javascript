@@ -9,7 +9,7 @@ export const list = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     paddingInline: space['3'],
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
     display: 'flex',
     flexDirection: 'column',
     width: '100%',

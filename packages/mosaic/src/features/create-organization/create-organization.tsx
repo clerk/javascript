@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactElement, ReactNode } from 'react';
+import { useState } from 'react';
 
 import { useMembersPanelRolesModel } from '../organization-profile/organization-profile-members-panel/organization-profile-members-panel.model';
 import type { CreateOrganizationReadyModel } from './create-organization.controller';
@@ -54,11 +55,29 @@ export function CreateOrganization({ fallback, ...options }: CreateOrganizationP
     return null;
   }
 
-  return <ConnectedCreateOrganization model={model} />;
+  return <RestartableCreateOrganization model={model} />;
 }
 
-function ConnectedCreateOrganization({ model }: { model: CreateOrganizationReadyModel }) {
-  const controller = useCreateOrganizationController(model);
+function RestartableCreateOrganization({ model }: { model: CreateOrganizationReadyModel }) {
+  const [round, setRound] = useState(0);
+
+  return (
+    <ConnectedCreateOrganization
+      key={round}
+      model={model}
+      onRestart={() => setRound(current => current + 1)}
+    />
+  );
+}
+
+function ConnectedCreateOrganization({
+  model,
+  onRestart,
+}: {
+  model: CreateOrganizationReadyModel;
+  onRestart: () => void;
+}) {
+  const controller = useCreateOrganizationController(model, { onRestart });
   const organizationId = controller.step.step === 'create' ? null : controller.step.organizationId;
   const roles = useMembersPanelRolesModel(controller.step.step === 'invite');
   const invite = useCreateOrganizationInviteController({

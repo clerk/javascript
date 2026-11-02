@@ -17,7 +17,7 @@ export function UserProfileProfileSectionView({
   usernameAction,
   picture,
 }: UserProfileProfileSectionViewProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
 
   return (
     <Section.Root>

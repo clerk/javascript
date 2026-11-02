@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.26.5
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Add `bcrypt_peppered`, `md5_salted`, `pbkdf2_sha512`, `pbkdf2_sha512_hex`, `sha256_salted`, and `sha512_symfony` to the `PasswordHasher` type, so TypeScript accepts every hasher the `createUser()` JSDoc documents. The JSDoc for `md5_salted` and `sha256_salted` now also shows the `password_digest` format the Backend API accepts: `hash$salt`, not `salt$hash`. ([#10504](https://github.com/clerk/javascript/pull/10504)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
 ## 3.26.4
 
 ### Patch Changes

@@ -35,10 +35,6 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const [switchTabStatus, setSwitchTabStatus] = React.useState<'verified_switch_tab' | 'transferable' | null>(null);
   const clerk = useClerk();
 
-  React.useEffect(() => {
-    void startEmailLinkVerification();
-  }, []);
-
   const restartVerification = () => {
     cancelEmailLinkFlow();
     void startEmailLinkVerification();
@@ -101,6 +97,10 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
       return navigate('../factor-two');
     }
   };
+
+  React.useEffect(() => {
+    void startEmailLinkVerification();
+  }, []);
 
   if (switchTabStatus) {
     return (

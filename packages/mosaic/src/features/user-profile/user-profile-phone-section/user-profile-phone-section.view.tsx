@@ -26,13 +26,14 @@ export function UserProfilePhoneSectionView({
   onVerify,
   onSetPrimary,
 }: UserProfilePhoneSectionViewProps) {
-  const m = useMessages('userProfileContact');
+  const messages = useMessages('userProfile');
+  const m = messages.phone;
   const addPhoneAction = canAdd ? (
     <Dialog.Trigger
       handle={verification.handle}
       render={
         <Button
-          aria-label={m.phone.add}
+          aria-label={m.add}
           color='neutral'
           size='sm'
           variant='outline'
@@ -44,7 +45,7 @@ export function UserProfilePhoneSectionView({
         placement='inline-start'
         size='sm'
       />
-      {m.add}
+      {messages.contact.add}
     </Dialog.Trigger>
   ) : undefined;
 
@@ -55,7 +56,7 @@ export function UserProfilePhoneSectionView({
         triggerRef={registerTrigger}
         items={phones}
         kind='phone'
-        label={m.phone.label}
+        label={m.label}
         addAction={addPhoneAction}
         onRemove={remove ? phone => remove.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
@@ -76,14 +77,14 @@ export function UserProfilePhoneSectionView({
       {remove ? (
         <Confirmation
           controller={remove}
-          title={m.phone.removeDialog.title}
+          title={m.removeDialog.title}
           description={phone =>
-            fill(phone.isVerified ? m.phone.removeDialog.verifiedDescription : m.phone.removeDialog.description, {
+            fill(phone.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
               phoneNumber: phone.value,
             })
           }
-          actionLabel={m.phone.removeDialog.confirm}
-          cancelLabel={m.phone.removeDialog.cancel}
+          actionLabel={m.removeDialog.confirm}
+          cancelLabel={m.removeDialog.cancel}
           finalFocus={finalFocus}
         />
       ) : null}

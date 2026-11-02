@@ -233,6 +233,22 @@ describe('CreateOrganization', () => {
     });
   });
 
+  describe('starting over', () => {
+    it('returns to an empty form when no after-create url is set', async () => {
+      const { navigate } = await renderCreateOrganization(
+        signedIn({ display_config: { after_create_organization_url: '' } }),
+      );
+      const user = userEvent.setup();
+
+      await create(user, 'Acme');
+      await user.click(await screen.findByRole('button', { name: 'Skip' }));
+
+      expect(await screen.findByRole('textbox', { name: 'Name' })).toHaveValue('');
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('');
+      expect(navigate).not.toHaveBeenCalled();
+    });
+  });
+
   describe('inviting members', () => {
     it('sends invitations to the new organization, then finishes', async () => {
       const { fapi, navigate } = await renderCreateOrganization();

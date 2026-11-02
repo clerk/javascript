@@ -69,18 +69,25 @@ reaches the page title instead.
 
 ## Parts
 
-| Part                   | Element                 | Slot                       |
-| ---------------------- | ----------------------- | -------------------------- |
-| `Profile.Root`         | `div` (the container)   | `cl-profile`               |
-| —                      | `span` (query sentinel) | `cl-profile-sentinel`      |
-| `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`           |
-| —                      | back `button`           | `cl-profile-back-button`   |
-| —                      | tablist                 | `cl-profile-nav-list`      |
-| `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`      |
-| `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`       |
-| —                      | page title heading      | `cl-profile-page-title`    |
-| —                      | compact title `button`  | `cl-profile-nav-trigger`   |
-| `Profile.ContentPanel` | `div[role=tabpanel]`    | `cl-profile-content-panel` |
+| Part                   | Element                 | Slot                         |
+| ---------------------- | ----------------------- | ---------------------------- |
+| `Profile.Root`         | `div` (the container)   | `cl-profile`                 |
+| —                      | `span` (query sentinel) | `cl-profile-sentinel`        |
+| `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`             |
+| —                      | back `button`           | `cl-profile-back-button`     |
+| —                      | tablist                 | `cl-profile-nav-list`        |
+| `Profile.NavGroup`     | `div`                   | `cl-profile-nav-group`       |
+| —                      | group label `div`       | `cl-profile-nav-group-label` |
+| `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`        |
+| `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`         |
+| —                      | page title heading      | `cl-profile-page-title`      |
+| —                      | compact title `button`  | `cl-profile-nav-trigger`     |
+| `Profile.ContentPanel` | `div[role=tabpanel]`    | `cl-profile-content-panel`   |
+
+`Profile.NavGroup` sets a `label` above a run of `NavItem`s. Each tab in it is described by that
+label, so two tabs with the same name stay distinct; the label itself is hidden from assistive
+technology, so the tablist holds only tabs. In the compact listbox the group is a `role=group` named
+by its label.
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog. While compact, `ContentPanel` is a `div[role=group]` named by the page title.

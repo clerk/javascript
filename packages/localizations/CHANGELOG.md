@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.24.4
+
+### Patch Changes
+
+- Use future tense for nl-NL and nl-BE translations ([#10507](https://github.com/clerk/javascript/pull/10507)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
 ## 4.24.3
 
 ### Patch Changes

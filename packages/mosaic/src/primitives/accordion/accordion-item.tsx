@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { AccordionItemContext, type AccordionItemContextValue, useAccordionContext } from './accordion-context';
@@ -12,7 +12,7 @@ export interface AccordionItemProps extends ComponentProps<'div'> {
   disabled?: boolean;
 }
 
-export function AccordionItem(props: AccordionItemProps) {
+export const AccordionItem = React.forwardRef<HTMLDivElement, AccordionItemProps>(function AccordionItem(props, ref) {
   const { render, value: itemValue, disabled: itemDisabled, ...otherProps } = props;
   const ctx = useAccordionContext();
 
@@ -34,6 +34,7 @@ export function AccordionItem(props: AccordionItemProps) {
     <AccordionItemContext.Provider value={itemContextValue}>
       {useRender({
         defaultTagName: 'div',
+        ref,
         render,
         state,
         stateAttributesMapping: {
@@ -44,4 +45,4 @@ export function AccordionItem(props: AccordionItemProps) {
       })}
     </AccordionItemContext.Provider>
   );
-}
+});

@@ -89,7 +89,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const environment = useMosaicEnvironment();
   const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
-  const messages = useMessages('userProfilePasskeys');
+  const messages = useMessages('userProfile').passkeys;
   const [deletePasskey, reverification] = useReverificationFlow((passkey: PasskeyResource) => passkey.delete());
   const [createPasskey, addReverification] = useReverificationFlow((current: UserResource) => current.createPasskey());
   const validateName: UserProfilePasskeyNameValidator = name =>

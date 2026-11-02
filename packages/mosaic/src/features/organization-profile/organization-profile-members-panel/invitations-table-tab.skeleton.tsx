@@ -44,7 +44,7 @@ export function InvitationsTableTabSkeleton({
   hasRevoke: boolean;
   hasBulkAction: boolean;
 }) {
-  const m = useMessages('invitationsTableTab');
+  const m = useMessages('organizationProfile').members.invitations;
   return (
     <div
       {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}

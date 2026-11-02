@@ -54,14 +54,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
     return signIn.clientTrustState === 'new' && !anyAttributeUsedForSecondFactor;
   }, [signIn.clientTrustState, env.userSettings.attributes]);
 
-  React.useEffect(() => {
-    if (props.factorAlreadyPrepared) {
-      return;
-    }
-
-    void prepare?.();
-  }, []);
-
   const prepare = props.prepare
     ? () => {
         return props
@@ -112,6 +104,14 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         return reject(err);
       });
   };
+
+  React.useEffect(() => {
+    if (props.factorAlreadyPrepared) {
+      return;
+    }
+
+    void prepare?.();
+  }, []);
 
   return (
     <VerificationCodeCard

@@ -6,6 +6,7 @@ import {
 import { CreateOrganizationView } from '@clerk/mosaic/features/create-organization/create-organization.view';
 import { save } from '@clerk/mosaic/utils/errors';
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -42,15 +43,30 @@ const slugTaken = () =>
     ],
   });
 
+interface HarnessProps {
+  slugEnabled?: boolean;
+  skipInvitations?: boolean;
+  failCreate?: boolean;
+}
+
+function RestartableHarness(props: HarnessProps) {
+  const [round, setRound] = useState(0);
+
+  return (
+    <CreateOrganizationHarness
+      key={round}
+      {...props}
+      onRestart={() => setRound(current => current + 1)}
+    />
+  );
+}
+
 function CreateOrganizationHarness({
   slugEnabled = true,
   skipInvitations = false,
   failCreate = false,
-}: {
-  slugEnabled?: boolean;
-  skipInvitations?: boolean;
-  failCreate?: boolean;
-}) {
+  onRestart,
+}: HarnessProps & { onRestart: () => void }) {
   const model: CreateOrganizationReadyModel = {
     status: 'ready',
     slugEnabled,
@@ -65,9 +81,9 @@ function CreateOrganizationHarness({
       return { organizationId: 'org_1', skipInvitations };
     },
     onInvite: () => settleAfter(1000),
-    onComplete: () => {},
+    onComplete: () => Promise.resolve(),
   };
-  const controller = useCreateOrganizationController(model);
+  const controller = useCreateOrganizationController(model, { onRestart });
   const invite = useCreateOrganizationInviteController({
     organizationId: controller.step.step === 'create' ? null : controller.step.organizationId,
     roles,
@@ -86,13 +102,13 @@ function CreateOrganizationHarness({
 }
 
 export function Default(_args: Record<string, unknown>) {
-  return <CreateOrganizationHarness />;
+  return <RestartableHarness />;
 }
 
 export function WithoutSlug(_args: Record<string, unknown>) {
-  return <CreateOrganizationHarness slugEnabled={false} />;
+  return <RestartableHarness slugEnabled={false} />;
 }
 
 export function WithError(_args: Record<string, unknown>) {
-  return <CreateOrganizationHarness failCreate />;
+  return <RestartableHarness failCreate />;
 }

@@ -799,4 +799,16 @@ describe('Tabs', () => {
       expect(panel.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
     });
   });
+
+  it('forwards a ref to the list', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Tabs.Root defaultValue='tab1'>
+        <Tabs.List ref={ref}>
+          <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('tablist'));
+  });
 });

@@ -29,32 +29,37 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
   await host.launch();
   await host.tap(homeLinks(screen).nativeModules);
   await host.tap(screen.getByTestId('google-sign-in-button'));
-  if (platform === 'android') {
-    await expect
-      .poll(() => googlePage.count().catch(() => 0), {
-        timeout: GOOGLE_UI_TIMEOUT_MS,
-        message: 'a page of Google Play services is on screen',
-      })
-      .toBeGreaterThan(0);
-  } else {
-    await expect(screen.getByText(/accounts\.google\.com/)).toBeVisible({ timeout: GOOGLE_UI_TIMEOUT_MS });
-  }
-  await host.screenshot('google-system-prompt');
-  let cancelled = true;
-  if (platform === 'android') {
-    await device.back();
-    cancelled = await googleResult.waitFor({ timeout: BACK_OUT_MS }).then(
-      () => true,
-      () => false,
-    );
+  try {
+    if (platform === 'android') {
+      await expect
+        .poll(() => googlePage.count().catch(() => 0), {
+          timeout: GOOGLE_UI_TIMEOUT_MS,
+          message: 'a page of Google Play services is on screen',
+        })
+        .toBeGreaterThan(0);
+    } else {
+      await expect(screen.getByText(/accounts\.google\.com/)).toBeVisible({ timeout: GOOGLE_UI_TIMEOUT_MS });
+    }
+    await host.screenshot('google-system-prompt');
+    let cancelled = true;
+    if (platform === 'android') {
+      await device.back();
+      cancelled = await googleResult.waitFor({ timeout: BACK_OUT_MS }).then(
+        () => true,
+        () => false,
+      );
+      if (!cancelled) await forceStopGooglePlayServices();
+      await expect(googlePage).toHaveCount(0, { timeout: 15_000 });
+    } else {
+      await device.alert('dismiss');
+    }
+    if (cancelled) {
+      await expect(googleResult).toHaveText('Google sign-in was cancelled', { timeout: 15_000 });
+      await host.screenshot('google-cancelled');
+    }
+  } catch (error) {
     // Without a Google account, Google Play services can show a page that back does not close, and its add-account flow outlives the app and covers the next test.
-    if (!cancelled) await forceStopGooglePlayServices();
-    await expect(googlePage).toHaveCount(0, { timeout: 15_000 });
-  } else {
-    await device.alert('dismiss');
-  }
-  if (cancelled) {
-    await expect(googleResult).toHaveText('Google sign-in was cancelled', { timeout: 15_000 });
-    await host.screenshot('google-cancelled');
+    if (platform === 'android') await forceStopGooglePlayServices().catch(() => {});
+    throw error;
   }
 });

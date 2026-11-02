@@ -2,6 +2,7 @@ import { useOrganization, useOrganizationList, useSession, useUser } from '@cler
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
 import { useOrganizationProfileOptions } from '../organization-profile.provider';
 
 const organizationListParams = {
@@ -50,7 +51,7 @@ export function useOrganizationProfileDangerSectionModel(): OrganizationProfileD
   const canDelete =
     Boolean(membership) &&
     organization.adminDeleteEnabled &&
-    (session?.checkAuthorization({ permission: 'org:sys_profile:delete' }) ?? false);
+    (session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.profileDelete }) ?? false);
 
   return {
     status: 'ready',

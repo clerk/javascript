@@ -30,7 +30,7 @@ export function UserProfileConnectProviderRowView({
   onConnect: (id: string) => void;
   triggerRef?: Ref<HTMLButtonElement>;
 }) {
-  const m = useMessages('userProfileConnectedAccounts');
+  const m = useMessages('userProfile').connectedAccounts;
   return (
     <Section.Row xstyle={styles.connectRow}>
       <Section.Item>
@@ -89,7 +89,7 @@ export function UserProfileConnectedAccountRowView({
   onReconnect?: (id: string) => void;
   onRemove?: (account: UserProfileConnectedAccount) => void;
 }) {
-  const m = useMessages('userProfileConnectedAccounts');
+  const m = useMessages('userProfile').connectedAccounts;
   const actions: ActionMenuAction[] = [];
   if ((account.status === 'reconnect' || account.status === 'error') && onReconnect && !isDisabled) {
     actions.push({

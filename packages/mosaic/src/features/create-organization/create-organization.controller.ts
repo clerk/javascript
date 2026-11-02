@@ -7,7 +7,11 @@ import { useMessages } from '../../localization';
 import type { MembersRoles } from '../organization-profile/organization-profile-members-panel/members-table-tab.types';
 import { resolveDefaultRole } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
 import type { CreateOrganizationModel } from './create-organization.model';
-import type { CreateOrganizationStep, CreateOrganizationValues } from './create-organization.types';
+import type {
+  CreatedOrganization,
+  CreateOrganizationStep,
+  CreateOrganizationValues,
+} from './create-organization.types';
 import { isSlug, toSlug } from './create-organization.utils';
 
 export type CreateOrganizationReadyModel = Extract<CreateOrganizationModel, { status: 'ready' }>;
@@ -22,17 +26,19 @@ export interface CreateOrganizationController {
   onInvitationsSent: () => void;
 }
 
-export function useCreateOrganizationController(model: CreateOrganizationReadyModel): CreateOrganizationController {
+export function useCreateOrganizationController(
+  model: CreateOrganizationReadyModel,
+  { onRestart }: { onRestart: () => void },
+): CreateOrganizationController {
   const m = useMessages('createOrganization');
   const [step, setStep] = useState<CreateOrganizationStep>({ step: 'create' });
 
-  const finish = (organizationId: string) => {
-    model.onComplete(organizationId);
-    form.reset(initialValues);
-    setStep({ step: 'create' });
+  const finish = async (organizationId: string) => {
+    await model.onComplete(organizationId);
+    onRestart();
   };
 
-  const form = useForm<CreateOrganizationValues>({
+  const form = useForm<CreateOrganizationValues, CreatedOrganization>({
     initialValues,
     fields: {
       slug: {
@@ -44,10 +50,10 @@ export function useCreateOrganizationController(model: CreateOrganizationReadyMo
     },
     canSubmit: values => values.name.trim() !== '' && (!model.slugEnabled || values.slug !== ''),
     errorFallback: m.create.error,
-    onSubmit: async values => {
-      const created = await model.onCreate(values);
+    onSubmit: values => model.onCreate(values),
+    onSuccess: created => {
       if (created.skipInvitations) {
-        finish(created.organizationId);
+        void finish(created.organizationId);
         return;
       }
       setStep({ step: 'invite', organizationId: created.organizationId });
@@ -65,7 +71,7 @@ export function useCreateOrganizationController(model: CreateOrganizationReadyMo
     },
     onFinish: () => {
       if (step.step !== 'create') {
-        finish(step.organizationId);
+        void finish(step.organizationId);
       }
     },
     onInvitationsSent: () => {
@@ -114,16 +120,21 @@ export function useCreateOrganizationInviteController({
   const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
   const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
 
-  const form = useForm<InviteValues>({
+  const form = useForm<InviteValues, boolean>({
     initialValues: { emailAddresses: [], role: null },
     errorFallback: m.invite.error,
     onSubmit: async ({ emailAddresses, role }) => {
       const selected = role ?? initialRole;
       if (!organizationId || selected === null) {
-        return;
+        return false;
       }
       await onInvite(organizationId, { emailAddresses, role: selected, onRejected: setRejectedEmailAddresses });
-      onSent();
+      return true;
+    },
+    onSuccess: sent => {
+      if (sent) {
+        onSent();
+      }
     },
   });
 
