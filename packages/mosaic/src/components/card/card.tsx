@@ -24,6 +24,8 @@ type CardElevation = 'card' | 'flush' | 'overlay';
 
 export type CardSize = keyof typeof slots.sizes;
 
+export type CardHeaderAlign = keyof typeof slots.headerAlign;
+
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
 // The enclosing card and the dialog it was rendered in. Context crosses portals, so a card in a
@@ -113,17 +115,27 @@ function HeaderCloseButton() {
   );
 }
 
-const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
-  { render, xstyle, children, ...rest },
+export interface CardHeaderProps extends MosaicComponentProps<'div'> {
+  /** Aligns the header's content. @default 'start' */
+  align?: CardHeaderAlign;
+}
+
+const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
+  { align = 'start', render, xstyle, children, ...rest },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const hasCloseButton = isInDialog(dialog) && dialog.showCloseButton;
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('card-header', { align }),
+        stylex.props(reset.base, slots.header.base, xstyle),
+        rest,
+      ),
       children: (
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
@@ -132,8 +144,18 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
               `showCloseButton` is off, which is the default for an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isInDialog(dialog) && dialog.showCloseButton ? <HeaderCloseButton /> : null}
-          <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
+          {hasCloseButton ? <HeaderCloseButton /> : null}
+          <div
+            {...mergeStyleProps(
+              themeProps('card-header-content'),
+              stylex.props(
+                reset.base,
+                slots.header.content,
+                slots.headerAlign[align],
+                hasCloseButton && align === 'center' && slots.header.contentBesideCloseButton,
+              ),
+            )}
+          >
             {children}
           </div>
         </>

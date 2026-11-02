@@ -20,14 +20,10 @@ export { default as __source } from './card.component.stories?raw';
 const CLERK_LOGO_SRC = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 
 const styles = stylex.create({
-  consentHeader: {
-    textAlign: 'center',
-  },
   connection: {
     alignItems: 'center',
     display: 'flex',
     gap: space['2'],
-    justifyContent: 'center',
   },
   appLogo: {
     alignItems: 'center',
@@ -121,7 +117,7 @@ export function WithMedia() {
 export function OAuthConsent() {
   return (
     <Card.Root>
-      <Card.Header xstyle={styles.consentHeader}>
+      <Card.Header align='center'>
         <Card.Media xstyle={styles.connection}>
           <Avatar.Root
             shape='square'

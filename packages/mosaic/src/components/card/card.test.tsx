@@ -454,6 +454,21 @@ describe('Mosaic Card', () => {
     expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
   });
 
+  it('reflects the header alignment, starting by default', () => {
+    render(
+      <Card.Root>
+        <Card.Header data-testid='default' />
+        <Card.Header
+          align='center'
+          data-testid='center'
+        />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('default')).toHaveAttribute('data-align', 'start');
+    expect(screen.getByTestId('center')).toHaveAttribute('data-align', 'center');
+  });
+
   it('renders media in the header, above the title', () => {
     render(
       <Card.Root>
