@@ -178,8 +178,7 @@ in [Test placement](#test-placement).
   `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
   `{ clerk, navigate, rerender, ... }`.
   `navigate` is the router Clerk was loaded with, called with the path.
-  It loads Clerk with `standardBrowser: false`, so there are no cookies, token
-  polling, captcha, or FAPI-initiated redirects. A test's Clerk is never
+  It loads Clerk with `standardBrowser: false`. A test's Clerk is never
   disposed, and its cookie service would otherwise write cookies into later
   tests.
 
