@@ -1,23 +1,24 @@
 'use client';
 
-import { FloatingArrow } from '@floating-ui/react';
+import { FloatingArrow, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
 import { parsePlacement } from '../utils/side-offset';
 import { useSelectContext } from './select-context';
 
-export type SelectArrowProps = React.ComponentPropsWithRef<typeof FloatingArrow>;
+export type SelectArrowProps = Omit<React.ComponentPropsWithoutRef<typeof FloatingArrow>, 'context'>;
 
-export function SelectArrow(props: SelectArrowProps) {
+export const SelectArrow = React.forwardRef<SVGSVGElement, SelectArrowProps>(function SelectArrow(props, ref) {
   const { floatingContext, arrowRef, placement } = useSelectContext();
+  const mergedRef = useMergeRefs([arrowRef, ref]);
   const side = parsePlacement(placement).side;
 
   return (
     <FloatingArrow
       data-side={side}
       {...props}
-      ref={arrowRef}
+      ref={mergedRef}
       context={floatingContext}
     />
   );
-}
+});
