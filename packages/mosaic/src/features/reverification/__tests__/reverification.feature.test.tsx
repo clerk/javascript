@@ -18,7 +18,6 @@ import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } 
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { MosaicLocalization } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { Host } from './reverification-test-host';
 import {
   aliceSession,
   ATTEMPT_FIRST,
@@ -26,7 +25,6 @@ import {
   BACKUP_CODE,
   CODE,
   emailFactor,
-  errorCode,
   HoldingHost,
   PASSWORD,
   passwordFactor,
@@ -37,6 +35,7 @@ import {
   VERIFY,
   workEmailFactor,
 } from './reverification.fixtures';
+import { Host } from './reverification-test-host';
 
 const bobSession = fapiSession({
   id: 'sess_2',
