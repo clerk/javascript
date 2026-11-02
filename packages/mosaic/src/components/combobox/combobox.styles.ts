@@ -12,12 +12,16 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
+const popupRadius = radiusVars['--cl-radius-lg'];
+const inset = space['1'];
+const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
+
 export const styles = stylex.create({
   positioner: {
     outline: 'none',
   },
   popup: {
-    borderRadius: radiusVars['--cl-radius-lg'],
+    borderRadius: popupRadius,
     outline: 'none',
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-surface'],
@@ -53,21 +57,21 @@ export const styles = stylex.create({
     minWidth: '12.5rem',
   },
   viewport: {
-    padding: space['1'],
+    padding: inset,
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
     maxHeight: '16rem',
   },
   list: {
-    padding: space['1'],
+    padding: inset,
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
     maxHeight: '16rem',
   },
   option: {
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: optionRadius,
     gap: space['2'],
     outline: {
       default: 'none',

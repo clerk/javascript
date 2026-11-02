@@ -73,6 +73,15 @@ Stop and check the table if you are writing any of these in a feature:
 - `setTimeout` to debounce or to delay a spinner
 - `stylex.create` inside a `.tsx` file
 
+## Nested radii
+
+A part inset from a rounded surface gets its radius from that surface: `max(0px, calc(outer - border - padding))`. Do not pick a fixed step, or it stops matching when `--cl-radius-*` or `--cl-spacing` is overridden. This applies to small insets. When the inset is about as large as the outer radius or larger (Card content, TagInput tags), the part keeps its own radius.
+
+- **Same component:** declare the outer radius, border and padding as local consts, and use them in both the surface and the calc, so changing any of them updates the inner radius (`components/select/select.styles.ts`).
+- **Different component:** the parent computes the radius from the same consts and sets a `--_cl-*-radius` var, and the child reads it with a fallback (`--_cl-button-radius` in `components/action-bar/action-bar.styles.ts` and `components/button/button.styles.ts`).
+
+Do not add a shared `concentric()` helper or a global surface-radius var. A global var inherits into nested surfaces and gives them the wrong value.
+
 ## Readability before complexity scores
 
 Do not extract a helper or introduce a machine only to reduce a lint score.
