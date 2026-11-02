@@ -45,7 +45,7 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     const ownProps = {
       id,
       role: 'option',
-      'aria-selected': isActive,
+      'aria-selected': isSelected,
       'aria-disabled': disabled || undefined,
     } satisfies DefaultProps<'div'>;
 

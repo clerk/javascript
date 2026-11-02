@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Popover } from '../popover/index';
@@ -291,18 +291,110 @@ describe('Autocomplete', () => {
       expect(options).toHaveLength(4);
     });
 
-    it('active option has aria-selected=true', async () => {
+    it('keeps aria-selected on the selected option while the highlight moves', async () => {
       const user = userEvent.setup();
-      render(<FilteredAutocomplete />);
+      render(
+        <Autocomplete.Root
+          defaultOpen
+          defaultValue='apple'
+        >
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              {fruits.map(f => (
+                <Autocomplete.Option
+                  key={f.value}
+                  value={f.value}
+                  label={f.label}
+                >
+                  {f.label}
+                </Autocomplete.Option>
+              ))}
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
 
-      await user.type(screen.getByPlaceholderText('Search fruits...'), 'a');
+      await user.click(screen.getByPlaceholderText('Search fruits...'));
+      await user.keyboard('{ArrowDown}{ArrowDown}');
 
-      const options = screen.getAllByRole('option');
-      expect(options[0]).toHaveAttribute('aria-selected', 'true');
+      const options = screen.getAllByRole('option', { hidden: true });
+      const active = options.find(option => option.hasAttribute('data-active'));
+      const selected = options.find(option => option.hasAttribute('data-selected'));
+      expect(active).toBeDefined();
+      expect(active).not.toBe(selected);
+      expect(selected).toHaveAttribute('aria-selected', 'true');
+      expect(active).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+
+  describe('Arrow', () => {
+    it('forwards a ref to the arrow element', () => {
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Autocomplete.Root defaultOpen>
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Arrow ref={ref} />
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      expect(ref.current).toBeInstanceOf(SVGSVGElement);
     });
   });
 
   describe('animation lifecycle', () => {
+    it('holds options during exit and shows updated options when reopened', () => {
+      function Fixture({ open, label }: { open: boolean; label: string }) {
+        return (
+          <Autocomplete.Root open={open}>
+            <Autocomplete.Input aria-label='Fruit' />
+            <Autocomplete.Positioner>
+              <Autocomplete.Popup data-testid='frozen-popup'>
+                <Autocomplete.Option value={label}>{label}</Autocomplete.Option>
+              </Autocomplete.Popup>
+            </Autocomplete.Positioner>
+          </Autocomplete.Root>
+        );
+      }
+
+      const { rerender } = render(
+        <Fixture
+          open
+          label='Apple'
+        />,
+      );
+      const popup = screen.getByTestId('frozen-popup');
+      Object.defineProperty(popup, 'getAnimations', {
+        value: () => [{ finished: new Promise<void>(() => {}) }],
+      });
+
+      rerender(
+        <Fixture
+          open={false}
+          label='Banana'
+        />,
+      );
+
+      expect(popup).toHaveAttribute('data-closed', '');
+      expect(popup).toHaveTextContent('Apple');
+      expect(popup).not.toHaveTextContent('Banana');
+
+      rerender(
+        <Fixture
+          open
+          label='Banana'
+        />,
+      );
+
+      expect(popup).toHaveAttribute('data-open', '');
+      expect(popup).toHaveTextContent('Banana');
+      expect(popup).not.toHaveTextContent('Apple');
+    });
+
     it('positioner is not rendered when closed', () => {
       render(<StaticAutocomplete />);
       expect(document.querySelector('[data-testid="autocomplete-positioner"]')).not.toBeInTheDocument();
