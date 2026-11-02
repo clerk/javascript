@@ -181,6 +181,7 @@ export type {
 export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
+export { TaskChooseOrganization } from '../features/task-choose-organization/task-choose-organization';
 export { UserButton } from '../features/user-button/user-button';
 export { Waitlist } from '../features/waitlist/waitlist';
 

@@ -1,0 +1,125 @@
+import * as TaskChooseOrganizationStories from './task-choose-organization.stories';
+
+# TaskChooseOrganization
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={TaskChooseOrganizationStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'Skeleton', href: '/components/skeleton', layer: 'Components' },
+    { name: 'CreateOrganization', href: '/misc/create-organization', layer: 'Misc' },
+    { name: 'OrganizationList', href: '/misc/organization-list', layer: 'Misc' },
+  ]}
+/>
+
+## Usage
+
+TaskChooseOrganization is available internally in Swingset. It is not yet exported from `@clerk/mosaic`.
+
+```tsx
+<TaskChooseOrganization redirectUrlComplete='/dashboard' />
+```
+
+| Prop                  | Type        | Default      | Description                                             |
+| --------------------- | ----------- | ------------ | ------------------------------------------------------- |
+| `redirectUrlComplete` | `string`    | — (required) | Where the user goes once the session has no tasks left. |
+| `fallback`            | `ReactNode` | —            | Rendered while Clerk loads.                             |
+
+It renders `fallback` while Clerk loads and nothing when nobody is signed in. When the session has no
+`choose-organization` task, it sends the user on straight away.
+
+## Choosing an organization
+
+The list holds the organizations the user belongs to, then invitations, then suggestions, the same
+rows as [OrganizationList](/misc/organization-list) without the personal account. Selecting an
+organization makes it active and finishes the task. The user goes on to their next task, at its
+`taskUrls` entry or the sign-in task route, or to `redirectUrlComplete` when none is left.
+
+A user whose only membership is exclusive is not asked. Their organization is activated as soon as the
+card has their memberships, and the list stays on screen with that row pending. If activating fails,
+the error appears above the list and the user can choose again.
+
+## Loading
+
+The rows stand in as placeholders until the first page of every list, and the organization creation
+defaults, have loaded.
+
+<Story
+  name='Loading'
+  storyModule={TaskChooseOrganizationStories}
+/>
+
+## Creating an organization
+
+**Create new organization** replaces the list with the [CreateOrganization](/misc/create-organization)
+form, and **Cancel** returns to it. Creating the organization makes it active and finishes the task.
+When there is nothing to list, the form opens straight away and offers no way back.
+
+<Story
+  name='Empty'
+  storyModule={TaskChooseOrganizationStories}
+/>
+
+When the instance has organization creation defaults, they fill the name and slug, and an advisory
+about them appears above the form.
+
+<Story
+  name='WithDefaults'
+  storyModule={TaskChooseOrganizationStories}
+/>
+
+For users who cannot create organizations, the button is left out and the subtitle only offers to join.
+
+<Story
+  name='WithoutCreate'
+  storyModule={TaskChooseOrganizationStories}
+/>
+
+When such a user has nothing to join either, the card says they need an invitation.
+
+<Story
+  name='Unavailable'
+  storyModule={TaskChooseOrganizationStories}
+/>
+
+## Signing out
+
+The foot of the card names the signed-in user by email address or username, with **Sign out**. Sign
+out ends the session and goes to the after-sign-out URL. While other accounts stay signed in, it ends
+only this one and goes to the after-multi-session-single-sign-out URL.
+
+## Errors
+
+A failed action shows its error above the list. Selecting an organization the user is no longer a
+member of explains that, and suggests creating another one where the user may.
+
+<Story
+  name='WithError'
+  storyModule={TaskChooseOrganizationStories}
+/>
+
+## Styling
+
+| Slot                   | Attributes                                      |
+| ---------------------- | ----------------------------------------------- |
+| `.cl-card-root`        | `data-elevation`, `data-size`                   |
+| `.cl-card-header`      |                                                 |
+| `.cl-card-title`       |                                                 |
+| `.cl-card-description` |                                                 |
+| `.cl-card-banner`      |                                                 |
+| `.cl-card-content`     |                                                 |
+| `.cl-card-footer`      | `data-elevation`                                |
+| `.cl-flow-root`        | `data-value="choose \| create \| unavailable"`  |
+| `.cl-flow-step`        | `data-step="choose \| create \| unavailable"`   |
+| `.cl-item-group`       | `data-variant`                                  |
+| `.cl-item`             | `data-interactive`, `data-size`, `data-variant` |
+| `.cl-item-media`       | `data-size`                                     |
+| `.cl-item-content`     |                                                 |
+| `.cl-item-label`       | `data-variant`                                  |
+| `.cl-item-actions`     |                                                 |

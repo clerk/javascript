@@ -346,6 +346,16 @@ import {
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
 import {
+  Default as TaskChooseOrganizationDefault,
+  Empty as TaskChooseOrganizationEmpty,
+  Loading as TaskChooseOrganizationLoading,
+  meta as taskChooseOrganizationMeta,
+  Unavailable as TaskChooseOrganizationUnavailable,
+  WithDefaults as TaskChooseOrganizationWithDefaults,
+  WithError as TaskChooseOrganizationWithError,
+  WithoutCreate as TaskChooseOrganizationWithoutCreate,
+} from '../stories/task-choose-organization.stories';
+import {
   Colors as TextColors,
   Default as TextDefault,
   meta as textMeta,
@@ -751,6 +761,17 @@ const organizationListModule: StoryModule = {
   WithError: OrganizationListWithError,
 };
 
+const taskChooseOrganizationModule: StoryModule = {
+  meta: taskChooseOrganizationMeta,
+  Default: TaskChooseOrganizationDefault,
+  WithoutCreate: TaskChooseOrganizationWithoutCreate,
+  Empty: TaskChooseOrganizationEmpty,
+  WithDefaults: TaskChooseOrganizationWithDefaults,
+  Unavailable: TaskChooseOrganizationUnavailable,
+  Loading: TaskChooseOrganizationLoading,
+  WithError: TaskChooseOrganizationWithError,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -1123,6 +1144,7 @@ export const registry: StoryModule[] = [
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
+  taskChooseOrganizationModule,
   userAvatarModule,
   apiKeysTableModule,
   reverificationModule,

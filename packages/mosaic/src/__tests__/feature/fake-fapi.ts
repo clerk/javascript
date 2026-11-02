@@ -5,6 +5,7 @@ import type {
   EmailAddressJSON,
   EnterpriseConnectionJSON,
   OAuthProvider,
+  OrganizationCreationDefaultsJSON,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -84,6 +85,7 @@ export interface FakeFapiState {
   mfa: FakeMfaState;
   activeDevices?: ActiveDeviceRecord[];
   deviceTrackingEnabled: boolean;
+  organizationCreationDefaults?: OrganizationCreationDefaultsJSON;
 }
 
 export interface ActiveDeviceRecord extends SessionWithActivitiesJSON {
@@ -509,8 +511,14 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         return missing();
       }
       const organizationId = body.get('active_organization_id') || null;
+      const choosesOrganization = organizationId !== null && session.tasks?.[0]?.key === 'choose-organization';
+      const remainingTasks = choosesOrganization ? (session.tasks?.slice(1) ?? []) : session.tasks;
       const touched = {
         ...session,
+        ...(choosesOrganization && {
+          tasks: remainingTasks?.length ? remainingTasks : null,
+          status: remainingTasks?.length ? session.status : ('active' as const),
+        }),
         last_active_organization_id: organizationId,
         last_active_token: fapiToken({ sid: session.id, sub: session.user.id, org_id: organizationId }),
       };
@@ -842,6 +850,9 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }));
       return envelope(organization, state.client);
     }),
+    http.get(fapiUrl('/v1/me/organization_creation_defaults'), () =>
+      state.organizationCreationDefaults ? envelope(state.organizationCreationDefaults, state.client) : missing(),
+    ),
     http.get(fapiUrl('/v1/organizations/:organizationId'), ({ params }) => {
       const membership = state.memberships.find(m => m.organization.id === params.organizationId);
       return membership ? envelope(membership.organization, null) : missing();
