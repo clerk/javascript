@@ -2,7 +2,9 @@
 
 import type { ReactElement, ReactNode } from 'react';
 
-import { ConnectedCreateOrganization } from '../create-organization/create-organization';
+import { useCreateOrganizationFlow } from '../create-organization/create-organization';
+import type { CreateOrganizationReadyModel } from '../create-organization/create-organization.controller';
+import { CreateOrganizationSteps } from '../create-organization/create-organization.view';
 import type { OrganizationListReadyController } from './organization-list.controller';
 import { useOrganizationListController, useOrganizationListScreenController } from './organization-list.controller';
 import type { OrganizationListModelOptions } from './organization-list.model';
@@ -70,22 +72,39 @@ function ConnectedOrganizationList({ controller }: { controller: OrganizationLis
   const screen = useOrganizationListScreenController(controller);
   const { createOrganization } = controller;
 
-  if (screen.creating && createOrganization) {
-    return (
-      <ConnectedCreateOrganization
-        model={{
-          ...createOrganization,
-          onComplete: organizationId => createOrganization.onComplete(organizationId).finally(screen.onCreated),
-        }}
-        onCancel={screen.onCancelCreate}
-      />
-    );
-  }
-
   return (
     <OrganizationListView
       {...controller}
+      creating={screen.creating}
+      createSteps={
+        createOrganization ? (
+          <OrganizationListCreateSteps
+            model={{
+              ...createOrganization,
+              onComplete: organizationId => createOrganization.onComplete(organizationId).finally(screen.onCreated),
+            }}
+            onCancel={screen.onCancelCreate}
+          />
+        ) : undefined
+      }
       onCreateOrganization={screen.onCreateOrganization}
+    />
+  );
+}
+
+function OrganizationListCreateSteps({
+  model,
+  onCancel,
+}: {
+  model: CreateOrganizationReadyModel;
+  onCancel?: () => void;
+}) {
+  const steps = useCreateOrganizationFlow(model);
+
+  return (
+    <CreateOrganizationSteps
+      {...steps}
+      onCancel={onCancel}
     />
   );
 }

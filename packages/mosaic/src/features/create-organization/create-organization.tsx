@@ -11,6 +11,7 @@ import {
 } from './create-organization.controller';
 import type { CreateOrganizationModelOptions } from './create-organization.model';
 import { useCreateOrganizationModel } from './create-organization.model';
+import type { CreateOrganizationStepsProps } from './create-organization.view';
 import { CreateOrganizationView } from './create-organization.view';
 
 /** Everything `<CreateOrganization />` takes: where to go once the organization exists, and whether to offer invitations first. */
@@ -68,16 +69,28 @@ function RestartableCreateOrganization({ model }: { model: CreateOrganizationRea
   );
 }
 
-export function ConnectedCreateOrganization({
+function ConnectedCreateOrganization({
   model,
-  onCancel,
   onRestart,
 }: {
   model: CreateOrganizationReadyModel;
-  onCancel?: () => void;
-  onRestart?: () => void;
+  onRestart: () => void;
 }) {
-  const controller = useCreateOrganizationController(model, { onRestart });
+  const steps = useCreateOrganizationFlow(model, { onRestart });
+
+  return (
+    <CreateOrganizationView
+      {...steps}
+      renderBranding={model.renderBranding}
+    />
+  );
+}
+
+export function useCreateOrganizationFlow(
+  model: CreateOrganizationReadyModel,
+  options: { onRestart?: () => void } = {},
+): CreateOrganizationStepsProps {
+  const controller = useCreateOrganizationController(model, options);
   const organizationId = controller.step.step === 'create' ? null : controller.step.organizationId;
   const roles = useMembersPanelRolesModel(controller.step.step === 'invite');
   const invite = useCreateOrganizationInviteController({
@@ -88,13 +101,5 @@ export function ConnectedCreateOrganization({
     onSent: controller.onInvitationsSent,
   });
 
-  return (
-    <CreateOrganizationView
-      {...controller}
-      slugEnabled={model.slugEnabled}
-      renderBranding={model.renderBranding}
-      invite={invite}
-      onCancel={onCancel}
-    />
-  );
+  return { ...controller, slugEnabled: model.slugEnabled, invite };
 }

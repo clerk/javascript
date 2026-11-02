@@ -3,7 +3,7 @@ import {
   useCreateOrganizationController,
   useCreateOrganizationInviteController,
 } from '@clerk/mosaic/features/create-organization/create-organization.controller';
-import { CreateOrganizationView } from '@clerk/mosaic/features/create-organization/create-organization.view';
+import { CreateOrganizationSteps } from '@clerk/mosaic/features/create-organization/create-organization.view';
 import type {
   OrganizationListReadyController,
   OrganizationListReadyModel,
@@ -123,24 +123,22 @@ function OrganizationListHarness({
 function OrganizationListScreens({ controller }: { controller: OrganizationListReadyController }) {
   const screen = useOrganizationListScreenController(controller);
 
-  if (screen.creating) {
-    return (
-      <CreateOrganizationHarness
-        onComplete={screen.onCreated}
-        onCancel={screen.onCancelCreate}
-      />
-    );
-  }
-
   return (
     <OrganizationListView
       {...controller}
+      creating={screen.creating}
+      createSteps={
+        <CreateOrganizationStepsHarness
+          onComplete={screen.onCreated}
+          onCancel={screen.onCancelCreate}
+        />
+      }
       onCreateOrganization={screen.onCreateOrganization}
     />
   );
 }
 
-function CreateOrganizationHarness({ onComplete, onCancel }: { onComplete: () => void; onCancel?: () => void }) {
+function CreateOrganizationStepsHarness({ onComplete, onCancel }: { onComplete: () => void; onCancel?: () => void }) {
   const controller = useCreateOrganizationController({
     ...createOrganization,
     onComplete: () => Promise.resolve().then(onComplete),
@@ -154,7 +152,7 @@ function CreateOrganizationHarness({ onComplete, onCancel }: { onComplete: () =>
   });
 
   return (
-    <CreateOrganizationView
+    <CreateOrganizationSteps
       {...controller}
       slugEnabled={createOrganization.slugEnabled}
       invite={invite}

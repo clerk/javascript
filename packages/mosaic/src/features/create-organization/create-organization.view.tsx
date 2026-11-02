@@ -32,7 +32,7 @@ const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
   overflow: { code: 'avatar_file_count_exceeded' },
 };
 
-export interface CreateOrganizationViewProps {
+export interface CreateOrganizationStepsProps {
   step: CreateOrganizationStep;
   form: UseFormResult<CreateOrganizationValues>;
   slugEnabled: boolean;
@@ -40,40 +40,44 @@ export interface CreateOrganizationViewProps {
   invite: CreateOrganizationInviteController;
   onFinish: () => void;
   onCancel?: () => void;
+}
+
+export interface CreateOrganizationViewProps extends CreateOrganizationStepsProps {
   renderBranding?: boolean;
 }
 
 export function CreateOrganizationView({ renderBranding = true, ...props }: CreateOrganizationViewProps) {
   return (
     <Card.Root renderBranding={renderBranding}>
-      <Flow.Root
-        value={props.step.step}
-        state={props}
-      >
-        {current => (
-          <>
-            <Flow.Step ids={['create']}>
-              <CreateStep {...current} />
-            </Flow.Step>
-            <Flow.Step ids={['invite']}>
-              <InviteStep {...current} />
-            </Flow.Step>
-            <Flow.Step ids={['sent']}>
-              <SentStep {...current} />
-            </Flow.Step>
-          </>
-        )}
-      </Flow.Root>
+      <CreateOrganizationSteps {...props} />
     </Card.Root>
   );
 }
 
-function CreateStep({
-  form,
-  slugEnabled,
-  onNameChange,
-  onCancel,
-}: Omit<CreateOrganizationViewProps, 'renderBranding'>) {
+export function CreateOrganizationSteps(props: CreateOrganizationStepsProps) {
+  return (
+    <Flow.Root
+      value={props.step.step}
+      state={props}
+    >
+      {current => (
+        <>
+          <Flow.Step ids={['create']}>
+            <CreateStep {...current} />
+          </Flow.Step>
+          <Flow.Step ids={['invite']}>
+            <InviteStep {...current} />
+          </Flow.Step>
+          <Flow.Step ids={['sent']}>
+            <SentStep {...current} />
+          </Flow.Step>
+        </>
+      )}
+    </Flow.Root>
+  );
+}
+
+function CreateStep({ form, slugEnabled, onNameChange, onCancel }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
   const { ref: nameRef, onChange: _onChange, ...nameControl } = form.register('name');
   const autoFocus = useFlowAutoFocus();
@@ -260,7 +264,7 @@ function LogoField({
   );
 }
 
-function InviteStep({ invite, onFinish }: Omit<CreateOrganizationViewProps, 'renderBranding'>) {
+function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
   const formId = useId();
   const canSubmit = canSendInvitations(invite);
@@ -319,7 +323,7 @@ function InviteStep({ invite, onFinish }: Omit<CreateOrganizationViewProps, 'ren
   );
 }
 
-function SentStep({ onFinish }: Omit<CreateOrganizationViewProps, 'renderBranding'>) {
+function SentStep({ onFinish }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
   const finishButton = useFlowAutoFocus();
 

@@ -216,15 +216,17 @@ describe('OrganizationList', () => {
   });
 
   describe('creating an organization', () => {
-    it('opens the create form in place of the list, and returns to it on cancel', async () => {
+    it('moves to the create form within the card, and back to the list on cancel', async () => {
       await renderOrganizationList();
       const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Create organization' }));
       expect(await screen.findByRole('heading', { name: 'Create organization' })).toBeVisible();
+      await waitFor(() => expect(screen.getByRole('textbox', { name: 'Name' })).toHaveFocus());
 
       await user.click(screen.getByRole('button', { name: 'Cancel' }));
       expect(await screen.findByRole('heading', { name: 'Choose an account' })).toBeVisible();
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Create organization' })).toHaveFocus());
     });
 
     it('creates the organization, goes to afterCreateOrganizationUrl and lists it', async () => {

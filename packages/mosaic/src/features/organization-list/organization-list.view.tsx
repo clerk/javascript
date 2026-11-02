@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
+import { Flow, useFlowAutoFocus } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
@@ -20,11 +22,15 @@ import { organizationListBusyKeys } from './organization-list.types';
 export interface OrganizationListViewProps extends Omit<OrganizationListData, 'organizationsLoading'> {
   pendingKey?: string | null;
   error?: string;
+  creating?: boolean;
+  createSteps?: ReactNode;
   onSelectOrganization?: (organizationId: string | null) => void;
   onAcceptInvitation?: (invitationId: string) => void;
   onAcceptSuggestion?: (suggestionId: string) => void;
   onCreateOrganization?: () => void;
 }
+
+type OrganizationListStepProps = Omit<OrganizationListViewProps, 'renderBranding' | 'creating' | 'createSteps'>;
 
 function busyState(pendingKey: string | null | undefined, key: string) {
   if (!pendingKey) {
@@ -34,8 +40,33 @@ function busyState(pendingKey: string | null | undefined, key: string) {
 }
 
 export function OrganizationListView({
-  applicationName,
   renderBranding,
+  creating = false,
+  createSteps,
+  ...props
+}: OrganizationListViewProps) {
+  return (
+    <Card.Root renderBranding={renderBranding}>
+      <Flow.Root
+        value={creating && createSteps ? 'create' : 'list'}
+        direction={creating ? 1 : -1}
+        state={props}
+      >
+        {current => (
+          <>
+            <Flow.Step ids={['list']}>
+              <ListStep {...current} />
+            </Flow.Step>
+            <Flow.Step ids={['create']}>{createSteps}</Flow.Step>
+          </>
+        )}
+      </Flow.Root>
+    </Card.Root>
+  );
+}
+
+function ListStep({
+  applicationName,
   hidePersonal,
   personalImageUrl,
   memberships,
@@ -48,13 +79,14 @@ export function OrganizationListView({
   onAcceptInvitation,
   onAcceptSuggestion,
   onCreateOrganization,
-}: OrganizationListViewProps) {
+}: OrganizationListStepProps) {
   const m = useMessages('organizationList');
+  const createButton = useFlowAutoFocus();
   const listed = new Set(memberships.map(membership => membership.organizationId));
   const visibleInvitations = invitations.filter(i => i.status === 'pending' || !listed.has(i.organizationId));
 
   return (
-    <Card.Root renderBranding={renderBranding}>
+    <>
       <OrganizationListHeader
         hidePersonal={hidePersonal}
         applicationName={applicationName}
@@ -116,6 +148,7 @@ export function OrganizationListView({
       {onCreateOrganization ? (
         <Card.Footer>
           <Button
+            ref={createButton}
             variant='outline'
             color='neutral'
             fullWidth
@@ -128,7 +161,7 @@ export function OrganizationListView({
           </Button>
         </Card.Footer>
       ) : null}
-    </Card.Root>
+    </>
   );
 }
 
