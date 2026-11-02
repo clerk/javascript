@@ -88,7 +88,6 @@ function DestructiveStep<Payload>({
             <Button
               color='neutral'
               variant='outline'
-              fullWidth
             >
               {cancelLabel}
             </Button>
@@ -96,7 +95,6 @@ function DestructiveStep<Payload>({
         />
         <SubmitButton
           form={formId}
-          fullWidth
           color='negative'
           isPending={isPending}
           disabled={!isConfirmed}

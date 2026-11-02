@@ -104,7 +104,6 @@ export function OrganizationProfileInviteMembersDialog({
                 <Button
                   variant='outline'
                   color='neutral'
-                  fullWidth
                 >
                   {m.cancel}
                 </Button>
@@ -112,7 +111,6 @@ export function OrganizationProfileInviteMembersDialog({
             />
             <SubmitButton
               form={formId}
-              fullWidth
               isPending={isPending}
               disabled={!canSubmit}
               focusableWhenDisabled

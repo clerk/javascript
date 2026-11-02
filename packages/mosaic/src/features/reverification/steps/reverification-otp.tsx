@@ -129,7 +129,6 @@ export function ReverificationOTP({
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={isPending}
             onClick={onCancel}
           >
@@ -138,7 +137,6 @@ export function ReverificationOTP({
         ) : null}
         <SubmitButton
           form={formId}
-          fullWidth
           disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}

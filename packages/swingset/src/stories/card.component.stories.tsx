@@ -48,7 +48,7 @@ export function Default(props: Record<string, unknown>) {
         </Field.Root>
       </Card.Content>
       <Card.Footer>
-        <Button fullWidth>Continue</Button>
+        <Button>Continue</Button>
       </Card.Footer>
     </Card.Root>
   );

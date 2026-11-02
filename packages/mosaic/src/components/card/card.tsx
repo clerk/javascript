@@ -13,6 +13,7 @@ import type { BannerRootProps } from '../banner';
 import { Banner } from '../banner';
 import { Branding } from '../branding';
 import { Button } from '../button';
+import { ButtonContext } from '../button/button.context';
 import type { DialogContextValue } from '../dialog';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Icon } from '../icon';
@@ -251,7 +252,9 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   ref,
 ) {
   const elevation = React.useContext(CardContext)?.elevation ?? DEFAULT_ELEVATION;
-  return useRender({
+  const parentButtonDefaults = React.useContext(ButtonContext);
+  const buttonDefaults = React.useMemo(() => ({ ...parentButtonDefaults, fullWidth: true }), [parentButtonDefaults]);
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
@@ -263,6 +266,8 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
       ),
     },
   });
+
+  return <ButtonContext.Provider value={buttonDefaults}>{element}</ButtonContext.Provider>;
 });
 
 /**
