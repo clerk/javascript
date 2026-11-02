@@ -104,6 +104,15 @@ section. The dialog opens once `visible` is true, so it skips the loading card, 
 dismissal only while the controller has a cancel callback. Return focus with the hook's
 `lastKey`, which outlives the run, unlike `pendingKey`.
 
+For a direct action in `ActionMenu`, opt in with `status: 'idle'`. Set it to
+`'pending'` while its request runs and no dialog is open yet. Update the status
+in the click event, since the menu closes on the next render unless an action
+is pending. The menu reserves room for a spinner, disables its actions, and
+blocks dismissal while pending. It closes when the status returns to `'idle'`,
+whether a dialog opened or the request settled. Leave `status` undefined for
+ordinary actions that close through the menu's native click behavior. Ordinary
+failures use the section's existing error.
+
 A single open boolean earns nothing. A two-state machine with one event is a
 boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
 `useState` and hands the async part to `useForm`:
@@ -112,12 +121,25 @@ boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
 const [isOpen, setIsOpen] = useState(false);
 const form = useForm({
   initialValues: { username },
-  onSubmit: async values => {
-    await onSubmit(values.username);
-    setIsOpen(false);
-  },
+  onSubmit: values => onSubmit(values.username),
+  onSuccess: () => setIsOpen(false),
 });
 ```
+
+Keep mutations and required revalidation in `onSubmit`. Put success UI, such as
+closing the dialog or showing a toast, in the optional synchronous
+`onSuccess(result, submittedValues)` callback. The result type comes from
+`onSubmit`. The callback and values belong to the submission that started the
+request. The form machine delivers success only while its actor is mounted.
+Rejection and cancelled reverification skip the callback.
+
+The callback runs during the completion transition, before `isSubmitting` clears.
+Use it to close or display UI, not to reset or resubmit the form. A resolved
+`onSubmit` counts as success even if it returned early. Prevent no-op submissions
+with `canSubmit`, or return a result that lets `onSuccess` distinguish them.
+Unmount suppression does not cancel the underlying request. Identity changes
+must unmount the form, for example through the composing component's React key,
+if they should discard its completion UI.
 
 The choice is invisible from outside — the controller returns plain props either
 way, so the view and its tests are unaffected, and swapping one for the other

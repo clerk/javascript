@@ -6,6 +6,7 @@ import { FormSubmitError } from '../../../components/form';
 import { getMosaicEnvironment, useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save, SaveError } from '../../../utils/errors';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
@@ -76,11 +77,7 @@ function getPasskeysProjection(
   return projectPasskeys({
     passkeys: user.passkeys,
     enabled: Boolean(environment.userSettings.attributes.passkey?.enabled),
-    allowIdentificationCreation:
-      !environment.userSettings.enterpriseSSO.enabled ||
-      !user.enterpriseAccounts.some(
-        account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
-      ),
+    allowIdentificationCreation: allowsIdentificationCreation(user, environment.userSettings.enterpriseSSO),
     isSatellite,
   });
 }
@@ -92,7 +89,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const environment = useMosaicEnvironment();
   const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
-  const messages = useMessages('userProfilePasskeys');
+  const messages = useMessages('userProfile').passkeys;
   const [deletePasskey, reverification] = useReverificationFlow((passkey: PasskeyResource) => passkey.delete());
   const [createPasskey, addReverification] = useReverificationFlow((current: UserResource) => current.createPasskey());
   const validateName: UserProfilePasskeyNameValidator = name =>

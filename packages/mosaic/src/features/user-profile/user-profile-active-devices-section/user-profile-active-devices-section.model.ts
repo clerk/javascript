@@ -42,7 +42,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   const { isLoaded: isSessionLoaded, session } = useSession();
   const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
-  const m = useMessages('userProfileActiveDevices');
+  const m = useMessages('userProfile').activeDevices;
   const userId = user?.id;
   const sessionId = session?.id;
   const [revokeSession, reverification] = useReverificationFlow((target: SessionWithActivitiesResource) =>

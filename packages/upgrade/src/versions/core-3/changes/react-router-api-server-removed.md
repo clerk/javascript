@@ -1,15 +1,16 @@
 ---
-title: '`@clerk/react-router/api.server` export removed'
+title: '`@clerk/react-router/api.server` export deprecated'
 packages: ['react-router']
 matcher: '@clerk/react-router/api.server'
-category: 'breaking'
+category: 'deprecation'
+warning: true
 ---
 
-The `@clerk/react-router/api.server` export has been removed. Use `@clerk/react-router/server` instead.
+The `@clerk/react-router/api.server` export is deprecated and will be removed in a future major version. Use `@clerk/react-router/server` instead.
 
 ```diff
-- import { getAuth } from '@clerk/react-router/api.server';
-+ import { getAuth } from '@clerk/react-router/server';
+- import { createClerkClient } from '@clerk/react-router/api.server';
++ import { createClerkClient } from '@clerk/react-router/server';
 ```
 
 A codemod is available to automatically apply this change:

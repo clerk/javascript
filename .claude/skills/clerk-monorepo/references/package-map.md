@@ -1,48 +1,25 @@
 # Package map
 
-The 25 active, git-tracked packages, the dependency shape, and the full "change X, touch Y" routing.
-`SKILL.md` has the short version (the ~10 packages people touch most).
-
-> The authoritative package list is the set of `packages/*/package.json` files tracked in git. The
-> `packages/` directory can also hold leftover build artifacts from **removed** packages (e.g.
-> `types`, `remix`, `themes`, `elements`, `agent-toolkit`, `dev-cli`) that contain only build output
-> (`dist/`, `node_modules/`, `.turbo/`) and no `package.json`. Those are not active packages and are
-> not valid commit scopes.
+Every package, the dependency shape, and the full "change X, touch Y" routing. `SKILL.md` has the
+short version (the ~10 packages people touch most).
 
 ## All packages
 
-Categories: **foundational** (depended on by most others), **browser-runtime** (ships to the
-browser directly), **adapter** (framework SDK), **ui/i18n**, **tooling**. The "BC" column marks the
-two packages whose runtime is pushed into apps pinned to older SDKs, so they carry the strict
-backwards-compatibility contract (see `breaking-changes.md`).
+The package list is the set of git-tracked `packages/*/package.json` files. Most have a
+`description` saying what the package is, and `"private": true` marks the ones that never publish:
 
-| Package                         | Category        | BC  | Purpose                                                                                                                                                                                                                                                            |
-| ------------------------------- | --------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@clerk/shared`                 | foundational    |     | Internal utilities used by all SDKs (storage, events, React helpers). Hosts the shared types as `@clerk/shared/types`. Most-depended-on package.                                                                                                                   |
-| `@clerk/backend`                | foundational    |     | Backend API REST client, JWT verification, webhook helpers. Used by every server adapter.                                                                                                                                                                          |
-| `@clerk/clerk-js`               | browser-runtime | ⚠️  | The browser runtime (script tag). Backwards-compat sensitive.                                                                                                                                                                                                      |
-| `@clerk/ui`                     | ui              | ⚠️  | React components for the hosted sign-in / sign-up flows (`packages/ui/src/components`). Consumed by the react/astro/vue/chrome-extension adapters. Backwards-compat sensitive.                                                                                     |
-| `@clerk/mosaic`                 | ui              |     | Experimental next-generation React components. Public ESM package (`UserButton` + `styles.css`). Ships unstyled, accessible primitives (dialog, menu, popover, ...) internally under `src/primitives/`. Reads Clerk context from the host SDK via `@clerk/shared`. |
-| `@clerk/react`                  | adapter (core)  |     | React hooks and context (`useAuth`, `useUser`, `useOrganization`, ...). Shared by the React-based adapters.                                                                                                                                                        |
-| `@clerk/nextjs`                 | adapter         |     | Next.js SDK: middleware, route handlers, server components.                                                                                                                                                                                                        |
-| `@clerk/express`                | adapter         |     | Express middleware and server helpers.                                                                                                                                                                                                                             |
-| `@clerk/fastify`                | adapter         |     | Fastify plugin.                                                                                                                                                                                                                                                    |
-| `@clerk/hono`                   | adapter         |     | Hono SDK (edge / serverless).                                                                                                                                                                                                                                      |
-| `@clerk/astro`                  | adapter         |     | Astro integration (components + server utilities).                                                                                                                                                                                                                 |
-| `@clerk/nuxt`                   | adapter         |     | Nuxt module (Vue).                                                                                                                                                                                                                                                 |
-| `@clerk/vue`                    | adapter         |     | Vue 3 composables and components.                                                                                                                                                                                                                                  |
-| `@clerk/react-router`           | adapter         |     | React Router v7 SDK.                                                                                                                                                                                                                                               |
-| `@clerk/tanstack-react-start`   | adapter         |     | TanStack React Start SDK.                                                                                                                                                                                                                                          |
-| `@clerk/expo`                   | adapter         |     | React Native / Expo SDK.                                                                                                                                                                                                                                           |
-| `@clerk/expo-native-components` | adapter         |     | Native components (`AuthView`, `UserButton`, `UserProfileView`) and the native module for Expo, built on clerk-ios / clerk-android. Optional companion to `@clerk/expo`.                                                                                           |
-| `@clerk/expo-passkeys`          | adapter         |     | Passkeys companion library for Expo.                                                                                                                                                                                                                               |
-| `@clerk/chrome-extension`       | browser-runtime |     | SDK for Chrome extension contexts.                                                                                                                                                                                                                                 |
-| `@clerk/localizations`          | ui/i18n         |     | Translation strings for the UI components. Consumed by `ui`.                                                                                                                                                                                                       |
-| `@clerk/testing`                | tooling         |     | E2E test helpers for consumers (Playwright + Cypress).                                                                                                                                                                                                             |
-| `@clerk/msw`                    | tooling         |     | MSW request handlers for mocking the Clerk API in tests. Private (not published).                                                                                                                                                                                  |
-| `@clerk/swingset`               | tooling         |     | Component explorer for `@clerk/mosaic`. Private (not published).                                                                                                                                                                                                   |
-| `@clerk/upgrade`                | tooling         |     | CLI codemod tool for upgrading consumers between SDK versions.                                                                                                                                                                                                     |
-| `@clerk/eslint-plugin`          | tooling         |     | ESLint plugin enforcing Clerk patterns across JavaScript frameworks (lint rules shipped to apps). Published.                                                                                                                                                       |
+```bash
+for f in $(git ls-files 'packages/*/package.json' | awk -F/ 'NF==3'); do
+  node -p "const p = require('./$f'); p.name + (p.private ? ' (private)' : '') + ': ' + (p.description ?? '')"
+done
+```
+
+The `packages/` directory can also hold leftover build artifacts from **removed** packages (e.g.
+`types`, `remix`, `themes`, `elements`) with no `package.json`. Those are not active packages and are
+not valid commit scopes.
+
+Only `@clerk/clerk-js` and `@clerk/ui` carry the strict backwards-compatibility contract: their
+runtime is pushed into apps pinned to older SDKs (see `breaking-changes.md`).
 
 Tests: `pnpm turbo test --filter=@clerk/<name>` (or `pnpm --filter @clerk/<name> test` after a
 build). Most packages use vitest; `@clerk/backend` runs a multi-runtime suite (node + edge +

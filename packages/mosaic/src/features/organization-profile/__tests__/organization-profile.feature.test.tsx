@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
@@ -176,5 +176,27 @@ describe('OrganizationProfile', () => {
 
     await waitFor(() => expect(fapi.memberships).toHaveLength(0));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'));
+  });
+
+  it('keeps the shown page after the open one leaves the navigation', async () => {
+    const globex = fapiOrganization({ id: 'org_2', name: 'Globex', slug: 'globex' });
+    const memberships = [
+      fapiMembership(acme, { permissions: ['org:sys_memberships:read'] }),
+      fapiMembership(globex, { permissions: [] }),
+    ];
+    const user = fapiUser({ id: 'user_1', organization_memberships: memberships });
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: acme.id })]),
+      memberships,
+    });
+    const { clerk } = await renderWithClerk(<OrganizationProfile defaultPage='members' />);
+
+    await act(() => clerk.setActive({ organization: globex.id }));
+    await waitFor(() => expect(tabNames()).toEqual(['General']));
+    await act(() => clerk.setActive({ organization: acme.id }));
+    await waitFor(() => expect(tabNames()).toEqual(['General', 'Members']));
+
+    expect(profileNav().getByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
   });
 });

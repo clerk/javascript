@@ -22,7 +22,7 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
     const invalid = tags.find(tag => tag.value === tagValue)?.invalid ?? false;
 
     const elementRef = useRef<HTMLDivElement | null>(null);
-    const { mounted, transitionProps } = useTransition({ open: present, ref: elementRef });
+    const { mounted, transitionProps } = useTransition({ open: present, ref: elementRef, animateOnMount: true });
 
     useEffect(() => {
       if (!mounted) {

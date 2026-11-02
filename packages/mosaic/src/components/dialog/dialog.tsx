@@ -264,6 +264,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         aria-label={ariaLabel}
         render={props => (
           <Button
+            color='neutral'
             variant='ghost'
             shape='circle'
             size='sm'

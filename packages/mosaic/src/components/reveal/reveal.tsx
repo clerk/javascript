@@ -19,14 +19,6 @@ export const Reveal = React.forwardRef<HTMLDivElement, RevealProps>(function Mos
 ) {
   const element = React.useRef<HTMLElement | null>(null);
   const { mounted, transitionProps } = useTransition({ open, ref: element });
-  const [hasBeenClosed, setHasBeenClosed] = React.useState(!open);
-  if (!open && !hasBeenClosed) {
-    setHasBeenClosed(true);
-  }
-  const effectiveTransitionProps = hasBeenClosed
-    ? transitionProps
-    : { ...transitionProps, 'data-starting-style': undefined, style: undefined };
-
   return useRender({
     defaultTagName: 'div',
     ref: [ref, element],
@@ -34,7 +26,7 @@ export const Reveal = React.forwardRef<HTMLDivElement, RevealProps>(function Mos
       ...mergeStyleProps(
         themeProps('reveal'),
         stylex.props(reset.base, reveal.root, xstyle),
-        { ...effectiveTransitionProps },
+        { ...transitionProps },
         rest,
       ),
       children: (

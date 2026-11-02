@@ -46,7 +46,7 @@ export function OrganizationProfileInviteMembersDialog({
   error,
   onSubmit,
 }: OrganizationProfileInviteMembersDialogProps) {
-  const m = useMessages('organizationProfileInviteMembers');
+  const m = useMessages('organizationProfile').members.invite;
   const formId = useId();
   const emailInput = useRef<HTMLInputElement>(null);
   const isValid = (value: string) => isEmail(value) && !rejectedEmailAddresses.includes(value);

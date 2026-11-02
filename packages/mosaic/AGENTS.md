@@ -22,6 +22,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Test a feature                            | [Testing](docs/testing.md)                                                        |
 | Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
 | Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
+| Add a public prop that shows or hides UI  | [Public visibility props](docs/public-props.md)                                   |
 
 ## Layers in one paragraph
 
@@ -34,7 +35,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Problem                                                                  | Use                                                                                                               |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | An async action from a button or row: pending, an error, one lock        | `usePendingAction` (`src/hooks/`)                                                                                 |
-| A form: values, validation, submit, field errors                         | `useForm` (`src/components/form/`), with `validateAsync` for a server-side check                                  |
+| A form: values, validation, submit, field errors, success UI             | `useForm` (`src/components/form/`), with `validateAsync` for server checks and `onSuccess` for mounted success UI |
 | A `<form>` element, without the browser's validation popup               | `Form` (`src/primitives/form/`)                                                                                   |
 | A model save whose Clerk errors should land on form fields               | `save` (`src/utils/errors.ts`) in the model, or reject with `FormSubmitError`                                     |
 | A confirm step before an action                                          | `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)                   |
@@ -50,9 +51,12 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A value turned into kebab case, e.g. for a `data-*` attribute            | `kebabCase` (`src/utils/kebab-case.ts`)                                                                           |
 | Current time for display labels                                          | `useNow` (`src/hooks/`)                                                                                           |
 | Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                    |
-| An inline message row that animates open and closed                      | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts` |
+| An inline message row; height is undefined until measured                | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts` |
 | Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)                  |
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                                  |
+| An organization permission checked with `checkAuthorization`             | `ORGANIZATION_PERMISSIONS` (`src/utils/permissions.ts`)                                                           |
+| A verification code's length or resend cooldown                          | `CODE_LENGTH`, `CODE_RESEND_SECONDS` (`src/utils/verification.ts`)                                                |
+| An avatar or logo file picker and its rejection errors                   | `AVATAR_UPLOAD`, `AVATAR_REJECTION_ERRORS` (`src/utils/avatar-upload.ts`)                                         |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                    |
 | An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                     |
 | An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                                  |
@@ -68,6 +72,15 @@ Stop and check the table if you are writing any of these in a feature:
 - a ref map of buttons to restore focus after a removal
 - `setTimeout` to debounce or to delay a spinner
 - `stylex.create` inside a `.tsx` file
+
+## Nested radii
+
+A part inset from a rounded surface gets its radius from that surface: `max(0px, calc(outer - border - padding))`. Do not pick a fixed step, or it stops matching when `--cl-radius-*` or `--cl-spacing` is overridden. This applies to small insets. When the inset is about as large as the outer radius or larger (Card content, TagInput tags), the part keeps its own radius.
+
+- **Same component:** declare the outer radius, border and padding as local consts, and use them in both the surface and the calc, so changing any of them updates the inner radius (`components/select/select.styles.ts`).
+- **Different component:** the parent computes the radius from the same consts and sets a `--_cl-*-radius` var, and the child reads it with a fallback (`--_cl-button-radius` in `components/action-bar/action-bar.styles.ts` and `components/button/button.styles.ts`).
+
+Do not add a shared `concentric()` helper or a global surface-radius var. A global var inherits into nested surfaces and gives them the wrong value.
 
 ## Readability before complexity scores
 

@@ -174,8 +174,8 @@ describe('UserButton', () => {
       expect(trigger()).toBeInTheDocument();
     });
 
-    it('renders nothing when nobody is signed in', async () => {
-      await renderUserButton({ mode }, signedIn({ client: fapiClient() }));
+    it('renders nothing, not even its fallback, when nobody is signed in', async () => {
+      await renderUserButton({ mode, fallback: <output>Loading</output> }, signedIn({ client: fapiClient() }));
 
       expect(host()).toBeEmptyDOMElement();
     });
@@ -290,6 +290,19 @@ describe('UserButton', () => {
       expect(popup()).toBeInTheDocument();
     });
 
+    it('lands a switched account where the instance sends it', async () => {
+      const { navigate } = await renderUserButton(
+        {},
+        signedIn({ environment: fapiEnvironment({ display_config: { after_switch_session_url: '/switched' } }) }),
+      );
+      const user = await open();
+
+      const menu = await openAccounts(user);
+      await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringMatching(/\/switched$/)));
+    });
+
     it('signs out of the active account alone while another stays signed in', async () => {
       const { fapi, navigate } = await renderUserButton();
       const user = await open();
@@ -397,6 +410,39 @@ describe('UserButton', () => {
       await waitFor(() => expect(screen.queryByRole('button', { name: 'Join' })).toBeNull());
       await waitFor(() => expect(waiting()).toBe(false));
       expect(popup()).toBeInTheDocument();
+    });
+
+    it('reports a failed accept, and drops an invitation that is no longer pending', async () => {
+      const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { fapi } = await renderUserButton({}, noOffers({ invitations: [fapiInvitation('inv_1', gamma)] }));
+      const user = await openWithList();
+      const accept = holdRequests('post', '/v1/me/organization_invitations/:id/accept');
+
+      await user.click(screen.getByRole('button', { name: 'Accept' }));
+      fapi.invitations = [fapiInvitation('inv_1', gamma, { status: 'revoked' })];
+      accept.fail('organization_invitation_not_pending');
+
+      await waitFor(() => expect(screen.queryByRole('button', { name: 'Accept' })).toBeNull());
+      expect(reading('Gamma')).toEqual([]);
+      expect(log).toHaveBeenCalledWith(
+        '[Clerk] User button action failed',
+        expect.objectContaining({ errors: [expect.objectContaining({ code: 'organization_invitation_not_pending' })] }),
+      );
+      expect(popup()).toBeInTheDocument();
+    });
+
+    it('shows a suggestion as requested when a failed join finds it already accepted', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { fapi } = await renderUserButton({}, noOffers({ suggestions: [fapiSuggestion('sug_1', beta)] }));
+      const user = await openWithList();
+      const join = holdRequests('post', '/v1/me/organization_suggestions/:id/accept');
+
+      await user.click(screen.getByRole('button', { name: 'Join' }));
+      fapi.suggestions = [fapiSuggestion('sug_1', beta, { status: 'accepted' })];
+      join.fail('organization_suggestion_already_accepted');
+
+      await waitFor(() => expect(reading('Beta', 'Requested')).toEqual(['Beta', 'Requested']));
+      expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
     });
 
     it('spins inside the join button while the suggestion is joined', async () => {
@@ -577,6 +623,21 @@ describe('UserButton', () => {
       await waitFor(() => expect(popup()).toBeNull());
     });
 
+    it('offers no invite to a member who cannot manage memberships', async () => {
+      const plain = [fapiMembership(acme), fapiMembership(other)];
+      await renderUserButton(
+        {},
+        signedIn({
+          client: fapiClient([fapiSession({ ...aliceSession, user: { ...alice, organization_memberships: plain } })]),
+          memberships: plain,
+        }),
+      );
+      await open();
+
+      expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Invite members' })).toBeNull();
+    });
+
     it('opens the CreateOrganization modal and closes', async () => {
       const { clerk, navigate } = await renderUserButton();
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
@@ -750,6 +811,7 @@ describe('UserButton', () => {
         const menu = await openAccounts(user);
         await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
         expect(waiting()).toBe(true);
+        await waitFor(() => expect(touch.requests).toHaveLength(1));
 
         await user.click(trigger());
         await waitFor(() => expect(popup()).toBeNull());
@@ -811,6 +873,19 @@ describe('UserButton', () => {
     last.scrollIntoView();
 
     expect(await screen.findByRole('button', { name: 'Org 15' })).toBeInTheDocument();
+  });
+
+  it('loads the next page of invitations when the end of the list scrolls into view', async () => {
+    const many = Array.from({ length: 15 }, (_, i) =>
+      fapiInvitation(`inv_p${i + 1}`, fapiOrganization({ id: `org_i${i + 1}`, name: `Invited ${i + 1}` })),
+    );
+    await renderUserButton({}, noOffers({ invitations: many }));
+    await open();
+
+    const last = await screen.findByText('Invited 10');
+    last.scrollIntoView();
+
+    expect(await screen.findByText('Invited 15')).toBeInTheDocument();
   });
 
   it('lists the active organization where its page puts it, and lists it once', async () => {
@@ -1077,25 +1152,6 @@ describe('UserButton', () => {
       expect(reading('Gamma', 'Personal account')).toEqual(['Personal account', 'Gamma']);
     });
 
-    it('drops revoked and expired invitations, which have nothing to accept', async () => {
-      await renderUserButton(
-        {},
-        noOffers({
-          invitations: [
-            fapiInvitation('inv_1', gamma, { status: 'revoked' }),
-            fapiInvitation('inv_2', beta, { status: 'expired' }),
-          ],
-        }),
-      );
-      await openWithList();
-
-      expect(reading('Gamma', 'Beta', 'Personal account', 'Acme', 'Other')).toEqual([
-        'Personal account',
-        'Acme',
-        'Other',
-      ]);
-    });
-
     it('reports an accepted suggestion instead of offering to join it again', async () => {
       await renderUserButton({}, noOffers({ suggestions: [fapiSuggestion('sug_1', beta, { status: 'accepted' })] }));
       await openWithList();
@@ -1334,7 +1390,7 @@ describe('UserButton', () => {
     });
 
     it('leads the avatar alone with the organization, unbadged', async () => {
-      await renderUserButton({ renderTriggerLabel: false });
+      await renderUserButton({ showTriggerLabel: false });
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(trigger().querySelector('[data-shape]')).toHaveAttribute('data-shape', 'square');
@@ -1354,7 +1410,7 @@ describe('UserButton', () => {
     });
 
     it('renders the avatar alone when the label is off', async () => {
-      await renderUserButton({ mode: 'user', renderTriggerLabel: false });
+      await renderUserButton({ mode: 'user', showTriggerLabel: false });
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
@@ -1387,7 +1443,7 @@ describe('UserButton custom trigger badges', () => {
     },
   ])('shows a badge for the displayed identity as $badge', async ({ mode, seed, badge, name }) => {
     await renderUserButton(
-      { mode, renderTriggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      { mode, triggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
       seed,
     );
 
@@ -1401,10 +1457,8 @@ describe('UserButton custom trigger badges', () => {
 
   it('hides the badge while pending and for null without changing the name', async () => {
     const badge = deferred<{ id: string; label: string } | null>();
-    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
-      id === 'org_1' ? badge.promise : Promise.resolve(null),
-    );
-    const { clerk } = await renderUserButton({ renderTriggerBadge });
+    const triggerBadge = vi.fn(({ id }: { id: string }) => (id === 'org_1' ? badge.promise : Promise.resolve(null)));
+    const { clerk } = await renderUserButton({ triggerBadge });
 
     expect(trigger()).toHaveTextContent('Acme');
     expect(trigger()).not.toHaveTextContent('Pro plan');
@@ -1413,18 +1467,18 @@ describe('UserButton custom trigger badges', () => {
     expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
 
     await act(() => clerk.setActive({ organization: 'org_9' }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
   it('discards the previous workspace badge after switching organizations', async () => {
     const first = deferred<{ id: string; label: string } | null>();
-    const renderTriggerBadge = vi.fn(async ({ id }: { id: string }) =>
+    const triggerBadge = vi.fn(async ({ id }: { id: string }) =>
       id === 'org_1' ? first.promise : { id: 'other', label: 'Other plan' },
     );
-    const { clerk } = await renderUserButton({ renderTriggerBadge });
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_1' }));
+    const { clerk } = await renderUserButton({ triggerBadge });
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_1' }));
 
     await act(() => clerk.setActive({ organization: 'org_9' }));
     await waitFor(() => expect(within(trigger()).getByText('Other plan')).toBeInTheDocument());
@@ -1440,7 +1494,7 @@ describe('UserButton custom trigger badges', () => {
       calls();
       return Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' });
     };
-    const { rerender } = await renderUserButton({ renderTriggerBadge: () => inline() });
+    const { rerender } = await renderUserButton({ triggerBadge: () => inline() });
     await waitFor(() => expect(within(trigger()).getByText('Enterprise plan')).toBeInTheDocument());
 
     let dropped = false;
@@ -1451,7 +1505,7 @@ describe('UserButton custom trigger badges', () => {
     onTestFinished(() => observer.disconnect());
 
     await open();
-    rerender(tree({ renderTriggerBadge: () => inline() }));
+    rerender(tree({ triggerBadge: () => inline() }));
     expect(within(trigger()).getByText('Enterprise plan')).toBeInTheDocument();
     await act(() => Promise.resolve());
 
@@ -1460,34 +1514,34 @@ describe('UserButton custom trigger badges', () => {
   });
 
   it('hides the badge for false or on failure', async () => {
-    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
+    const triggerBadge = vi.fn(({ id }: { id: string }) =>
       id === 'org_1'
         ? Promise.resolve({ id: 'pro', label: 'Pro plan' })
         : Promise.reject(new Error('Plan unavailable')),
     );
-    const { clerk, rerender } = await renderUserButton({ renderTriggerBadge });
+    const { clerk, rerender } = await renderUserButton({ triggerBadge });
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
-    rerender(tree({ renderTriggerBadge: false }));
+    rerender(tree({ triggerBadge: false }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
 
-    rerender(tree({ renderTriggerBadge }));
+    rerender(tree({ triggerBadge }));
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
     await act(() => clerk.setActive({ organization: 'org_9' }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
   it('does not request a badge when the trigger label is hidden', async () => {
-    const renderTriggerBadge = vi.fn(() => Promise.resolve({ id: 'pro', label: 'Pro plan' }));
-    await renderUserButton({ renderTriggerLabel: false, renderTriggerBadge });
+    const triggerBadge = vi.fn(() => Promise.resolve({ id: 'pro', label: 'Pro plan' }));
+    await renderUserButton({ showTriggerLabel: false, triggerBadge });
 
     expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
     expect(trigger()).not.toHaveTextContent('Acme');
     expect(trigger()).not.toHaveTextContent('Pro plan');
-    expect(renderTriggerBadge).not.toHaveBeenCalled();
+    expect(triggerBadge).not.toHaveBeenCalled();
   });
 });

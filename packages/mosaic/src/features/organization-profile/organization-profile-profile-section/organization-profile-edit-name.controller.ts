@@ -23,10 +23,8 @@ export function useOrganizationProfileEditNameController({
   const form = useForm({
     initialValues: { name },
     canSubmit: values => values.name !== name && values.name.trim() !== '',
-    onSubmit: async values => {
-      await onSubmit(values.name);
-      setIsOpen(false);
-    },
+    onSubmit: values => onSubmit(values.name),
+    onSuccess: () => setIsOpen(false),
   });
 
   const onOpenChange = (open: boolean) => {

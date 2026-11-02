@@ -373,4 +373,27 @@ describe('Popover', () => {
       expect(ref.current).toHaveAttribute('data-side');
     });
   });
+
+  it('forwards refs to the title, description and close button', () => {
+    const refs = {
+      title: createRef<HTMLHeadingElement>(),
+      description: createRef<HTMLParagraphElement>(),
+      close: createRef<HTMLButtonElement>(),
+    };
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open popover</Popover.Trigger>
+        <Popover.Positioner>
+          <Popover.Popup>
+            <Popover.Title ref={refs.title}>Popover Title</Popover.Title>
+            <Popover.Description ref={refs.description}>Some description</Popover.Description>
+            <Popover.Close ref={refs.close}>Close</Popover.Close>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Root>,
+    );
+    expect(refs.title.current).toBe(screen.getByText('Popover Title'));
+    expect(refs.description.current).toBe(screen.getByText('Some description'));
+    expect(refs.close.current).toBe(screen.getByRole('button', { name: 'Close' }));
+  });
 });

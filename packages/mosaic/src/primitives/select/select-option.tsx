@@ -1,7 +1,7 @@
 'use client';
 
 import { useListItem } from '@floating-ui/react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useSelectContext } from './select-context';
@@ -12,7 +12,7 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
   disabled?: boolean;
 }
 
-export function SelectOption(props: SelectOptionProps) {
+export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function SelectOption(props, ref) {
   const { render, value, label, disabled, ...otherProps } = props;
   const {
     activeIndex,
@@ -79,7 +79,7 @@ export function SelectOption(props: SelectOptionProps) {
       active: (v: boolean) => (v ? { 'data-active': '' } : null),
       disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
-    ref: [itemRef, isAnchor ? selectedItemRef : null],
+    ref: [itemRef, isAnchor ? selectedItemRef : null, ref],
     props: mergeProps<'button'>(defaultProps, otherProps),
   });
-}
+});

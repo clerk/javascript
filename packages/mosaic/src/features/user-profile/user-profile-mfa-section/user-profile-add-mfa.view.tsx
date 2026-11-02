@@ -24,7 +24,7 @@ const icons = {
 } as const;
 
 export function UserProfileAddMfaView({ methods, onSelect, pendingMethod, errorMessage }: UserProfileAddMfaViewProps) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
   return (
     <>

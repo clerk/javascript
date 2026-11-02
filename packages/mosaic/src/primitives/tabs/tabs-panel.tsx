@@ -27,18 +27,6 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     ref: panelRef,
   });
 
-  // Suppress enter animation on initial mount so the initially-selected panel
-  // appears instantly. After the panel has been deselected once, subsequent
-  // selections will animate normally. Matches the Accordion pattern.
-  const hasBeenDeselected = useRef(false);
-  if (!isSelected) {
-    hasBeenDeselected.current = true;
-  }
-
-  const effectiveTransitionProps = !hasBeenDeselected.current
-    ? { ...transitionProps, 'data-starting-style': undefined, style: undefined }
-    : transitionProps;
-
   const state = { hidden: !mounted };
 
   const defaultProps = {
@@ -48,9 +36,9 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     tabIndex: 0,
     ...inertProps(!isSelected),
     hidden: mounted ? undefined : true,
-    ...effectiveTransitionProps,
+    ...transitionProps,
     style: {
-      ...effectiveTransitionProps.style,
+      ...transitionProps.style,
       '--cl-tab-transition-direction': direction === 'forward' ? '1' : '-1',
     },
     children: keepMounted || mounted ? <Freeze frozen={!isSelected && mounted}>{children}</Freeze> : null,

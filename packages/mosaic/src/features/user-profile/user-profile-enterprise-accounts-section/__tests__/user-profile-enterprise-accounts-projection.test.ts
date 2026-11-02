@@ -31,15 +31,16 @@ describe('projectEnterpriseAccounts', () => {
         {
           ...linked,
           provider,
+          enterpriseConnection: { ...linked.enterpriseConnection, logoPublicUrl: 'https://img.example/linked.png' },
         },
       ],
-      connections: [{ ...connection('available'), provider }],
+      connections: [{ ...connection('available'), provider, logoPublicUrl: 'https://img.example/available.png' }],
     });
 
     expect(projection).toMatchObject({
       status: 'ready',
-      accounts: [{ monochromeIcon }],
-      connections: [{ monochromeIcon }],
+      accounts: [{ monochromeIcon, iconUrl: 'https://img.example/linked.png' }],
+      connections: [{ monochromeIcon, iconUrl: 'https://img.example/available.png' }],
     });
   });
 

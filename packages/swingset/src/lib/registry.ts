@@ -227,6 +227,14 @@ import {
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import {
+  Default as ProviderButtonDefault,
+  Many as ProviderButtonMany,
+  meta as providerButtonMeta,
+  One as ProviderButtonOne,
+  Pending as ProviderButtonPending,
+  Stacked as ProviderButtonStacked,
+} from '../stories/provider-button.stories';
+import {
   Default as RadioDefault,
   Descriptions as RadioDescriptions,
   meta as radioMeta,
@@ -514,6 +522,15 @@ const copyButtonModule: StoryModule = {
   Default: CopyButtonDefault,
   Inline: CopyButtonInline,
   Labelled: CopyButtonLabelled,
+};
+
+const providerButtonModule: StoryModule = {
+  meta: providerButtonMeta,
+  Default: ProviderButtonDefault,
+  One: ProviderButtonOne,
+  Many: ProviderButtonMany,
+  Stacked: ProviderButtonStacked,
+  Pending: ProviderButtonPending,
 };
 
 const organizationProfileModule: StoryModule = {
@@ -1062,6 +1079,7 @@ export const registry: StoryModule[] = [
   checkboxModule,
   comboboxModule,
   copyButtonModule,
+  providerButtonModule,
   flowComponentModule,
   inputModule,
   inputGroupModule,

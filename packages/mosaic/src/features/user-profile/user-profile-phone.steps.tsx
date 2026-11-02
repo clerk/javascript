@@ -15,8 +15,7 @@ import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
 import { Form } from '../../primitives/form';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
-
-const CODE_LENGTH = 6;
+import { CODE_LENGTH } from '../../utils/verification';
 
 interface EnterPhoneStepProps {
   inputRef?: Ref<HTMLInputElement>;
@@ -30,7 +29,7 @@ interface EnterPhoneStepProps {
 }
 
 export function EnterPhoneStep(props: EnterPhoneStepProps) {
-  const m = useMessages('userProfileAddPhone');
+  const m = useMessages('userProfile').phone.addDialog;
   const phoneFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
   const canSubmit = props.phoneNumber !== '';
@@ -105,7 +104,7 @@ interface VerifyPhoneStepProps {
 }
 
 export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
-  const m = useMessages('userProfileAddPhone');
+  const m = useMessages('userProfile').phone.addDialog;
   const verifyFormId = useId();
   const canSubmit = props.code.length === CODE_LENGTH;
 

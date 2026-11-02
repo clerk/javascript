@@ -144,7 +144,7 @@ interface EnterEmailStepProps {
 }
 
 function EnterEmailStep(props: EnterEmailStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const emailFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
@@ -217,7 +217,7 @@ interface VerifyEmailStepProps {
 }
 
 function VerifyEmailStep(props: VerifyEmailStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const verifyFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
@@ -303,7 +303,7 @@ interface VerifyLinkStepProps {
 }
 
 function VerifyLinkStep(props: VerifyLinkStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
 
   return (
     <>
@@ -351,7 +351,7 @@ interface VerifySsoStepProps {
 }
 
 function VerifySsoStep(props: VerifySsoStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const domain = props.emailAddress.split('@')[1] ?? props.emailAddress;
 
   return (

@@ -38,7 +38,7 @@ export function useUserProfileActiveDevicesController({
   revokeAll,
   reverification,
 }: UserProfileActiveDevicesControllerOptions): UserProfileActiveDevicesController {
-  const m = useMessages('userProfileActiveDevices');
+  const m = useMessages('userProfile').activeDevices;
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   const visibleDevices = devices.filter(device => !removedIds.includes(device.id));
   const currentDeviceTriggerRef = useRef<HTMLButtonElement>(null);

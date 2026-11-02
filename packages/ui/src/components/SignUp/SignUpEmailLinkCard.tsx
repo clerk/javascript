@@ -21,10 +21,6 @@ export const SignUpEmailLinkCard = () => {
 
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signUp);
 
-  React.useEffect(() => {
-    void startEmailLinkVerification();
-  }, []);
-
   const restartVerification = () => {
     cancelEmailLinkFlow();
     void startEmailLinkVerification();
@@ -56,6 +52,10 @@ export const SignUpEmailLinkCard = () => {
       });
     }
   };
+
+  React.useEffect(() => {
+    void startEmailLinkVerification();
+  }, []);
 
   if (showVerifyModal) {
     return (

@@ -34,7 +34,7 @@ export const item = stylex.create({
       default: colorVars['--cl-color-foreground-secondary'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral'],
       },
     },
     backgroundColor: {
@@ -61,6 +61,16 @@ export const item = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     borderStyle: 'solid',
     borderWidth: '1px',
+  },
+
+  interactiveOutline: {
+    borderColor: {
+      default: null,
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-border'],
+      },
+    },
   },
 
   xs: {

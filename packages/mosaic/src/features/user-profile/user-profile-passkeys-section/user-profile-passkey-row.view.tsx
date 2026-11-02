@@ -27,7 +27,7 @@ export function UserProfilePasskeyRowView({
   validateName?: UserProfilePasskeyNameValidator;
   onRemove?: () => void;
 }) {
-  const m = useMessages('userProfilePasskeys');
+  const m = useMessages('userProfile').passkeys;
   const renameDialog = useMemo(() => Dialog.createHandle(), []);
   const controller = useUserProfileRenamePasskeyController({
     id: passkey.id,
