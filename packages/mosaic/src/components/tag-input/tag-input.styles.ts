@@ -1,11 +1,19 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, fontFamilyVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontFamilyVars,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
-    '--cl-layout-duration': '200ms',
-    '--cl-layout-easing': 'ease-out',
+    '--cl-layout-duration': durationVars['--cl-duration-base'],
+    '--cl-layout-easing': easingVars['--cl-ease-enter'],
     padding: space['2'],
     borderRadius: radiusVars['--cl-radius-md'],
     gap: space['2'],
@@ -49,12 +57,18 @@ export const styles = stylex.create({
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
     },
-    transitionDuration: durationVars['--cl-duration-base'],
+    transitionDuration: {
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    },
     transitionProperty: {
       default: 'opacity, transform',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
-    transitionTimingFunction: { default: 'ease-out', ':where([data-ending-style])': 'ease-in' },
+    transitionTimingFunction: {
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
     height: space['6'],
     maxWidth: '100%',
     minWidth: 0,
@@ -88,7 +102,11 @@ export const styles = stylex.create({
     display: 'inline-flex',
     flexShrink: 0,
     justifyContent: 'center',
-    transitionDuration: durationVars['--cl-duration-base'],
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      ':enabled:active': durationVars['--cl-duration-instant'],
+      ':enabled:hover': durationVars['--cl-duration-instant'],
+    },
     transitionProperty: 'background-color',
     transitionTimingFunction: 'linear',
     height: space['4'],
