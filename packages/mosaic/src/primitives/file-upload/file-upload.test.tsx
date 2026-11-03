@@ -83,6 +83,60 @@ describe('FileUpload', () => {
       expect(dropzone).not.toHaveAttribute('data-dragging');
     });
 
+    it.each([
+      { name: 'a type outside accept', types: ['text/plain'], multiple: false, rejected: true },
+      { name: 'a type inside accept', types: ['image/png'], multiple: false, rejected: false },
+      { name: 'a type the browser leaves blank', types: [''], multiple: false, rejected: false },
+      {
+        name: 'a first file outside accept in single mode',
+        types: ['text/plain', 'image/png'],
+        multiple: false,
+        rejected: true,
+      },
+      {
+        name: 'one file inside accept in multiple mode',
+        types: ['text/plain', 'image/png'],
+        multiple: true,
+        rejected: false,
+      },
+    ])('marks the drag rejected for $name: $rejected', ({ types, multiple, rejected }) => {
+      render(
+        <Harness
+          accept='image/*'
+          multiple={multiple}
+        />,
+      );
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
+      const items = types.map(type => ({ kind: 'file', type }));
+
+      fireEvent.dragEnter(dropzone, { dataTransfer: { types: ['Files'], items, files: [] } });
+
+      expect(dropzone).toHaveAttribute('data-dragging', '');
+      expect(dropzone.hasAttribute('data-drag-rejected')).toBe(rejected);
+    });
+
+    it('keeps an extension-only accept open until the drop, since names are hidden while dragging', () => {
+      render(<Harness accept='.png' />);
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
+
+      fireEvent.dragEnter(dropzone, {
+        dataTransfer: { types: ['Files'], items: [{ kind: 'file', type: 'text/plain' }], files: [] },
+      });
+
+      expect(dropzone).not.toHaveAttribute('data-drag-rejected');
+    });
+
+    it('clears the rejected state when the drag leaves', () => {
+      render(<Harness accept='image/*' />);
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
+      const dataTransfer = { types: ['Files'], items: [{ kind: 'file', type: 'text/plain' }], files: [] };
+
+      fireEvent.dragEnter(dropzone, { dataTransfer });
+      fireEvent.dragLeave(dropzone, { dataTransfer });
+
+      expect(dropzone).not.toHaveAttribute('data-drag-rejected');
+    });
+
     it('ignores drags that carry no files', () => {
       render(<Harness />);
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
