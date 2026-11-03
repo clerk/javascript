@@ -93,7 +93,8 @@ export const mosaicMessages = applyTerms(messageTemplates, 'en');
 
 export function applyTerms(templates: MosaicMessages, locale: string): MosaicMessages {
   const { organization } = templates.terms;
-  const termLocale = organization === termMessages.organization ? 'en' : locale;
+  const english = termMessages.organization;
+  const termLocale = organization.one === english.one && organization.other === english.other ? 'en' : locale;
   const one = plural(organization, 1, termLocale);
   const values = {
     organization: one,

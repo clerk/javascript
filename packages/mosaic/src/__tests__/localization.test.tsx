@@ -142,6 +142,14 @@ describe('terms', () => {
     expect(messages.organizationProfile.label).toBe('Organization');
   });
 
+  it('keeps the English singular when a catalog copies the English term', () => {
+    const { messages } = resolveLocalization({
+      locale: 'ja',
+      messages: { terms: { organization: { one: 'organization', other: 'organizations' } } },
+    });
+    expect(messages.organizationProfile.danger.leave.label).toBe('Leave organization');
+  });
+
   it('capitalizes a first letter outside the basic multilingual plane', () => {
     const { messages } = resolveLocalization({
       locale: 'ff-Adlm',
