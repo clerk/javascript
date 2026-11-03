@@ -2,7 +2,7 @@
 
 import React, { type CSSProperties } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender, useStore } from '../utils';
 import { TableRowContext, type TableRowContextValue, useTableContext, useTableItem } from './table-context';
 import { focusIsInChildRows, isOwnClick, isRtl, openLink, type TableLink } from './table-dom';
 
@@ -18,15 +18,15 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
   const table = useTableContext();
   const item = useTableItem();
   const { value } = item;
-  const { registerDisabled, registerInteractive } = table;
+  const { store, registerDisabled, registerInteractive } = table;
   const elementRef = React.useRef<HTMLTableRowElement | null>(null);
 
   const actionable = !disabled && (onClick !== undefined || href !== undefined);
   const canSelect = !disabled && table.selectionMode !== 'none';
-  const selected = table.selection.includes(value);
+  const selected = useStore(store, state => state.selection.includes(value));
   const canExpand = table.tree && (item.hasChildren || expandable);
-  const expanded = canExpand && table.expanded.includes(value);
-  const hasSelection = table.selection.length > 0;
+  const isExpanded = useStore(store, state => state.expanded.includes(value));
+  const expanded = canExpand && isExpanded;
   const [rowHeaders, setRowHeaders] = React.useState<string[]>([]);
   const rowHeaderIds = rowHeaders.length > 0 ? rowHeaders.join(' ') : undefined;
 
@@ -82,6 +82,7 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
         return;
       }
       const pointer = event.detail !== 0;
+      const hasSelection = store.get().selection.length > 0;
       if (canSelect && pointer && (hasSelection || !actionable)) {
         toggleSelected({ range: event.shiftKey });
       } else if (actionable) {

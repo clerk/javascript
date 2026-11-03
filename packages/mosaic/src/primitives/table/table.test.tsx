@@ -646,6 +646,31 @@ describe('Table', () => {
       expect(onSelectionChange).toHaveBeenCalledWith(['a']);
       expect(checkbox('Alpha')).not.toBeChecked();
     });
+
+    it('re-renders only the rows whose selection changes', async () => {
+      const user = userEvent.setup();
+      const renders: string[] = [];
+      render(
+        <LogsTable
+          selectionMode='multiple'
+          rowProps={log => ({
+            render: props => {
+              renders.push(log.id);
+              return <tr {...props} />;
+            },
+          })}
+        />,
+      );
+
+      renders.length = 0;
+      await user.click(checkbox('Bravo'));
+      expect(renders).toEqual(['b']);
+
+      renders.length = 0;
+      await user.click(checkbox('Charlie'));
+      expect(renders).toEqual(['c']);
+      expect(screen.getByRole('checkbox', { name: 'Select all' })).toHaveProperty('indeterminate', true);
+    });
   });
 
   describe('tree rows', () => {

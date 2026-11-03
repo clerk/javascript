@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, mergeProps, useRender, useStore } from '../utils';
 import { type TableItem, TableItemContext, useTableContext } from './table-context';
 
 export interface TableBodyProps<Item> extends Omit<ComponentProps<'tbody'>, 'children'> {
@@ -31,7 +31,8 @@ export const TableBody = React.forwardRef(TableBodyImpl) as TableBodyComponent;
 
 function TableBodyImpl<Item>(props: TableBodyProps<Item>, ref: React.ForwardedRef<HTMLTableSectionElement>) {
   const { render, items, itemToStringValue, itemToChildren, children, renderEmptyState, ...otherProps } = props;
-  const { expanded, syncBodyRows, columnCount, excludeFromNavigation } = useTableContext();
+  const { store, syncBodyRows, columnCount, excludeFromNavigation } = useTableContext();
+  const expanded = useStore(store, state => state.expanded);
   const tree = itemToChildren !== undefined;
 
   const rows = React.useMemo(

@@ -1,5 +1,7 @@
 import { createContext, useContext, useId, useLayoutEffect, useRef, useState } from 'react';
 
+import type { Store } from '../utils';
+
 export type TableSelectionMode = 'none' | 'single' | 'multiple';
 
 export interface TableSort {
@@ -12,15 +14,19 @@ export interface TableBodyRows {
   tree: boolean;
 }
 
+export interface TableState {
+  selection: string[];
+  expanded: string[];
+  selectable: string[];
+}
+
+export type TableSelectAll = 'empty' | 'none' | 'some' | 'all';
+
 export interface TableContextValue {
   selectionMode: TableSelectionMode;
-  selection: string[];
+  store: Store<TableState>;
   sort: TableSort | null;
   tree: boolean;
-  allSelected: boolean;
-  someSelected: boolean;
-  canSelectAll: boolean;
-  expanded: string[];
   toggleSelected: (value: string, options?: { range?: boolean }) => void;
   toggleAllSelected: () => void;
   toggleExpanded: (value: string) => void;
@@ -69,6 +75,17 @@ export function useTableContext() {
     throw new Error('Table compound components must be used within <Table.Root>');
   }
   return ctx;
+}
+
+export function selectAllState({ selection, selectable }: TableState): TableSelectAll {
+  if (selectable.length === 0) {
+    return 'empty';
+  }
+  const selectedCount = selectable.filter(value => selection.includes(value)).length;
+  if (selectedCount === 0) {
+    return 'none';
+  }
+  return selectedCount === selectable.length ? 'all' : 'some';
 }
 
 export function useTableItem() {

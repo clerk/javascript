@@ -3,13 +3,15 @@
 import React from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, createStore, type DefaultProps, mergeProps, useRender } from '../utils';
 import {
+  selectAllState,
   type TableBodyRows,
   TableContext,
   type TableContextValue,
   type TableSelectionMode,
   type TableSort,
+  type TableState,
 } from './table-context';
 import { isTextEntry } from './table-dom';
 import { useGridNavigation } from './use-grid-navigation';
@@ -71,43 +73,61 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
     () => (selectionMode === 'none' ? [] : bodyRows.values.filter(value => !disabledValues.includes(value))),
     [selectionMode, bodyRows, disabledValues],
   );
-  const selectedCount = selectable.filter(value => selection.includes(value)).length;
-  const allSelected = selectable.length > 0 && selectedCount === selectable.length;
-  const someSelected = selectedCount > 0 && !allSelected;
+  const [store] = React.useState(() => createStore<TableState>({ selection, expanded, selectable }));
   const interactive = tree || selectionMode !== 'none' || interactiveCount > 0;
+
+  React.useLayoutEffect(() => {
+    store.set({ selection, expanded, selectable });
+  }, [store, selection, expanded, selectable]);
 
   const leaveCell = useGridNavigation(element, interactive, excluded);
 
-  const toggleSelected = (value: string, options?: { range?: boolean }) => {
-    if (!selectable.includes(value)) {
-      return;
-    }
-    const selected = !selection.includes(value);
-    if (selectionMode === 'single') {
-      setSelection(selected ? [value] : []);
-      return;
-    }
-    const anchor = options?.range && anchorRef.current !== null ? selectable.indexOf(anchorRef.current) : -1;
-    anchorRef.current = value;
-    const index = selectable.indexOf(value);
-    const changed = anchor === -1 ? [value] : selectable.slice(Math.min(anchor, index), Math.max(anchor, index) + 1);
-    setSelection(selected ? union(selection, changed) : selection.filter(other => !changed.includes(other)));
-  };
+  const toggleSelected = React.useCallback(
+    (value: string, options?: { range?: boolean }) => {
+      const { selection: current, selectable: rows } = store.get();
+      if (!rows.includes(value)) {
+        return;
+      }
+      const selected = !current.includes(value);
+      if (selectionMode === 'single') {
+        setSelection(selected ? [value] : []);
+        return;
+      }
+      const anchor = options?.range && anchorRef.current !== null ? rows.indexOf(anchorRef.current) : -1;
+      anchorRef.current = value;
+      const index = rows.indexOf(value);
+      const changed = anchor === -1 ? [value] : rows.slice(Math.min(anchor, index), Math.max(anchor, index) + 1);
+      setSelection(selected ? union(current, changed) : current.filter(other => !changed.includes(other)));
+    },
+    [store, selectionMode, setSelection],
+  );
 
-  const toggleAllSelected = () => {
-    setSelection(allSelected ? selection.filter(value => !selectable.includes(value)) : union(selection, selectable));
-  };
+  const toggleAllSelected = React.useCallback(() => {
+    const state = store.get();
+    setSelection(
+      selectAllState(state) === 'all'
+        ? state.selection.filter(value => !state.selectable.includes(value))
+        : union(state.selection, state.selectable),
+    );
+  }, [store, setSelection]);
 
-  const toggleExpanded = (value: string) => {
-    setExpanded(expanded.includes(value) ? expanded.filter(other => other !== value) : [...expanded, value]);
-  };
+  const toggleExpanded = React.useCallback(
+    (value: string) => {
+      const current = store.get().expanded;
+      setExpanded(current.includes(value) ? current.filter(other => other !== value) : [...current, value]);
+    },
+    [store, setExpanded],
+  );
 
-  const sortBy = (column: string) => {
-    const direction = sort?.column === column && sort.direction === 'ascending' ? 'descending' : 'ascending';
-    const next: TableSort = { column, direction };
-    setSort(next);
-    onSortChange?.(next);
-  };
+  const sortBy = React.useCallback(
+    (column: string) => {
+      const direction = sort?.column === column && sort.direction === 'ascending' ? 'descending' : 'ascending';
+      const next: TableSort = { column, direction };
+      setSort(next);
+      onSortChange?.(next);
+    },
+    [sort, setSort, onSortChange],
+  );
 
   const syncBodyRows = React.useCallback((next: TableBodyRows) => {
     setBodyRows(previous =>
@@ -117,28 +137,44 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
 
   const excludeFromNavigation = React.useCallback((node: Element) => excluded.add(node), [excluded]);
 
-  const contextValue: TableContextValue = {
-    selectionMode,
-    selection,
-    expanded,
-    sort,
-    tree,
-    allSelected,
-    someSelected,
-    canSelectAll: selectable.length > 0,
-    toggleSelected,
-    toggleAllSelected,
-    toggleExpanded,
-    sortBy,
-    syncBodyRows,
-    registerDisabled,
-    registerInteractive,
-    registerColumn,
-    rowHeaderColumns,
-    registerRowHeaderColumn,
-    columnCount,
-    excludeFromNavigation,
-  };
+  const contextValue = React.useMemo<TableContextValue>(
+    () => ({
+      selectionMode,
+      store,
+      sort,
+      tree,
+      toggleSelected,
+      toggleAllSelected,
+      toggleExpanded,
+      sortBy,
+      syncBodyRows,
+      registerDisabled,
+      registerInteractive,
+      registerColumn,
+      rowHeaderColumns,
+      registerRowHeaderColumn,
+      columnCount,
+      excludeFromNavigation,
+    }),
+    [
+      selectionMode,
+      store,
+      sort,
+      tree,
+      toggleSelected,
+      toggleAllSelected,
+      toggleExpanded,
+      sortBy,
+      syncBodyRows,
+      registerDisabled,
+      registerInteractive,
+      registerColumn,
+      rowHeaderColumns,
+      registerRowHeaderColumn,
+      columnCount,
+      excludeFromNavigation,
+    ],
+  );
 
   const defaultProps = {
     role: tree ? 'treegrid' : interactive ? 'grid' : undefined,
@@ -162,7 +198,7 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
         !isTextEntry(target)
       ) {
         event.preventDefault();
-        if (!allSelected) {
+        if (selectAllState({ selection, expanded, selectable }) !== 'all') {
           toggleAllSelected();
         }
       }

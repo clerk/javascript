@@ -2,8 +2,14 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { TableHeaderContext, TableRowContext, useRowHeaderLabel, useTableContext } from './table-context';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender, useStore } from '../utils';
+import {
+  selectAllState,
+  TableHeaderContext,
+  TableRowContext,
+  useRowHeaderLabel,
+  useTableContext,
+} from './table-context';
 
 export type TableSelectionCheckboxProps = ComponentProps<'input'>;
 
@@ -54,6 +60,7 @@ function useSelectionCheckboxState() {
   const table = useTableContext();
   const row = React.useContext(TableRowContext);
   const inHeader = React.useContext(TableHeaderContext);
+  const selectAll = useStore(table.store, state => (row ? 'empty' : selectAllState(state)));
 
   if (row) {
     return {
@@ -66,9 +73,9 @@ function useSelectionCheckboxState() {
   }
   return {
     enabled: inHeader && table.selectionMode === 'multiple',
-    checked: table.allSelected,
-    indeterminate: table.someSelected,
-    disabled: !table.canSelectAll,
+    checked: selectAll === 'all',
+    indeterminate: selectAll === 'some',
+    disabled: selectAll === 'empty',
     toggle: table.toggleAllSelected,
   };
 }
