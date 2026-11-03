@@ -61,8 +61,9 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The menu id is owned by floating-ui's menu role: a consumer-supplied id must
     // not override it, or the trigger's aria-controls pairing would silently break.
-    if (floatingProps.id != null) {
-      merged.id = floatingProps.id;
+    const wiredId = floatingProps['id'];
+    if (typeof wiredId === 'string') {
+      merged.id = wiredId;
     }
 
     const element = useRender({

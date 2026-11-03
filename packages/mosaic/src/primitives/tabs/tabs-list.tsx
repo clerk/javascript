@@ -4,7 +4,7 @@ import { Composite } from '@floating-ui/react';
 import React from 'react';
 
 import { useDirection } from '../direction-provider';
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isRef, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export type TabsListProps = ComponentProps<'div'>;
@@ -19,7 +19,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
       orientation={orientation}
       rtl={orientation === 'horizontal' && direction === 'rtl'}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-        const defaultProps: Record<string, unknown> = {
+        const defaultProps = {
           role: 'tablist' as const,
           onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
             if (event.key !== 'Home' && event.key !== 'End') {
@@ -29,7 +29,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
             const items = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])'));
             (event.key === 'Home' ? items.at(0) : items.at(-1))?.focus();
           },
-        };
+        } satisfies DefaultProps<'div'>;
 
         const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, compositeProps));
 

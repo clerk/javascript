@@ -176,7 +176,7 @@ const factorEvents = {
   },
   SELECT_METHOD: [
     {
-      target: 'methodPickerPreparing',
+      target: 'methodPickerPreparing' as const,
       guard: (ctx, event) => {
         const method = ctx.methods.find(candidate => candidate.id === event.id);
         return topOverlay(ctx) === 'method-picker' && Boolean(method && needsPrepare(method));
@@ -184,12 +184,12 @@ const factorEvents = {
       actions: assign((ctx, event) => selectMethod(ctx, event.id)),
     },
     {
-      target: 'verifying',
+      target: 'verifying' as const,
       guard: ctx => topOverlay(ctx) === 'method-picker',
       actions: assign((ctx, event) => ({ ...selectMethod(ctx, event.id), overlay: [] })),
     },
   ],
-  RESET: 'inactive',
+  RESET: 'inactive' as const,
 } satisfies NonNullable<StateConfig<ReverificationContext, ReverificationEvent>['on']>;
 
 export const reverificationMachine = createMachine({

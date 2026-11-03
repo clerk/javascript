@@ -157,7 +157,8 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
   /**
    * A promise to invoke on entry. Use {@link PromiseSrc} (created by
    * `setup().fromPromise`) to carry the resolved type to `onDone.actions`.
-   * A raw `src` function is also accepted — `e.output` is `any` in that case.
+   * A raw `src` function is also accepted — `e.output` is `any` in that case, so
+   * `mosaic/no-raw-invoke` rejects it outside tests.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Each state invokes its own output type, and TypeScript cannot express that per-state type here; `unknown` would reject typed `onDone` handlers.
   invoke?: InvokeConfig<TContext, TEvent, any, TStates>;
@@ -179,7 +180,7 @@ export interface MachineConfig<TContext, TEvent extends EventObject, TStates ext
   id?: string;
   initial: NoInfer<TStates> | InitialResolver<TContext, NoInfer<TStates>>;
   context?: TContext;
-  states: Record<TStates, StateConfig<TContext, TEvent, TStates>>;
+  states: Record<TStates, StateConfig<TContext, TEvent, NoInfer<TStates>>>;
 }
 
 /**

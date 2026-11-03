@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useFileUploadContext } from './file-upload-context';
 
 export type FileUploadTriggerProps = ComponentProps<'button'>;
@@ -14,11 +14,11 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
 
     const state = { disabled };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       type: 'button' as const,
       disabled,
       onClick: () => openFilePicker(),
-    };
+    } satisfies DefaultProps<'button'>;
 
     return useRender({
       defaultTagName: 'button',

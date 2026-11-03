@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { type FirstInputLabel, OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
 import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
 
@@ -222,7 +222,7 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
 
   const state = { disabled, complete, empty: value.length === 0 };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     role: 'group',
     children: (
       <>
@@ -243,7 +243,7 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
         ) : null}
       </>
     ),
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <OtpContext.Provider value={contextValue}>

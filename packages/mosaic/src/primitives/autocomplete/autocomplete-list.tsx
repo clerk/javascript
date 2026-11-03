@@ -19,7 +19,7 @@ export const AutocompleteList = React.forwardRef<HTMLDivElement, AutocompleteLis
     }, [setInlineMode]);
 
     const floatingProps = getFloatingProps();
-    const wiredId = floatingProps.id;
+    const wiredId = floatingProps['id'];
 
     const ownProps = {} satisfies DefaultProps<'div'>;
 
@@ -28,7 +28,7 @@ export const AutocompleteList = React.forwardRef<HTMLDivElement, AutocompleteLis
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not
     // override it, or the aria-controls pairing would silently break.
-    if (wiredId != null) {
+    if (typeof wiredId === 'string') {
       merged.id = wiredId;
     }
 

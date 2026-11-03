@@ -2,7 +2,7 @@
 
 import React, { type DragEvent, useRef, useState } from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useFileUploadContext } from './file-upload-context';
 
 export type FileUploadDropzoneProps = ComponentProps<'div'>;
@@ -19,7 +19,7 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
 
     const state = { dragging, disabled };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       'aria-disabled': disabled || undefined,
       onDragEnter: (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -59,7 +59,7 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
           addFiles(files);
         }
       },
-    };
+    } satisfies DefaultProps<'div'>;
 
     return useRender({
       defaultTagName: 'div',

@@ -3,7 +3,7 @@
 import { CompositeItem } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isRef, mergeProps, useRender } from '../utils';
 import { useSegmentedControlContext } from './segmented-control-context';
 
 export interface SegmentedControlItemProps extends ComponentProps<'button'> {
@@ -27,7 +27,7 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
     return (
       <CompositeItem
         render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-          const defaultProps: Record<string, unknown> = {
+          const defaultProps = {
             role: 'radio' as const,
             type: 'button' as const,
             'aria-checked': isSelected,
@@ -38,7 +38,7 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
                 select(itemValue);
               }
             },
-          };
+          } satisfies DefaultProps<'button'>;
 
           const merged = mergeProps<'button'>(mergeProps<'button'>(defaultProps, otherProps), compositeProps);
           const { ref: compositeRef, ...mergedProps } = merged;

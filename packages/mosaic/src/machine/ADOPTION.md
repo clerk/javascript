@@ -115,10 +115,9 @@ Problems:
 ### After
 
 ```ts
-import { createMachine } from '../../machine/create-machine';
-import { assign } from '../../machine/assign';
+import { setup } from '../../machine/setup';
 
-type Context = { error: string | null };
+type Context = { emailAddress: string; error: string | null };
 type Event = { type: 'SUBMIT'; emailAddress: string } | { type: 'NAVIGATE_DONE' };
 
 type WaitlistDeps = {
@@ -127,20 +126,25 @@ type WaitlistDeps = {
   afterJoinWaitlistUrl?: string;
 };
 
+const { createMachine, assign, fromPromise } = setup<Context, Event>();
+
 function createWaitlistMachine(deps: WaitlistDeps) {
-  return createMachine<Context, Event>({
+  return createMachine({
     id: 'waitlist',
     initial: 'idle',
-    context: { error: null },
+    context: { emailAddress: '', error: null },
     states: {
       idle: {
-        on: { SUBMIT: 'submitting' },
+        on: {
+          SUBMIT: {
+            target: 'submitting',
+            actions: assign((_ctx, e) => ({ emailAddress: e.emailAddress })),
+          },
+        },
       },
       submitting: {
         // Double-submit is impossible: SUBMIT is not handled here.
-        invoke: {
-          src: (ctx, event) =>
-            deps.joinWaitlist({ emailAddress: (event as Extract<Event, { type: 'SUBMIT' }>).emailAddress }),
+        invoke: fromPromise(ctx => deps.joinWaitlist({ emailAddress: ctx.emailAddress }), {
           onDone: {
             target: 'success',
             actions: assign(() => ({ error: null })),
@@ -149,7 +153,7 @@ function createWaitlistMachine(deps: WaitlistDeps) {
             target: 'idle',
             actions: assign((_ctx, e) => ({ error: String(e.error) })),
           },
-        },
+        }),
       },
       success: {
         // Optional auto-navigate on entry:
@@ -375,7 +379,9 @@ type SignInEvent =
   | { type: 'CLEAR_PROVIDER' }
   | { type: 'SUBMIT'; identifier: string };
 
-const signInStartMachine = createMachine<SignInContext, SignInEvent>({
+const { createMachine, assign, fromPromise } = setup<SignInContext, SignInEvent>();
+
+const signInStartMachine = createMachine({
   id: 'signInStart',
   initial: 'idle',
   context: { selectedProvider: null, identifier: '', error: null },
@@ -405,14 +411,13 @@ const signInStartMachine = createMachine<SignInContext, SignInEvent>({
       },
     },
     submitting: {
-      invoke: {
-        src: ctx => signIn.create({ identifier: ctx.identifier }),
+      invoke: fromPromise(ctx => signIn.create({ identifier: ctx.identifier }), {
         onDone: { target: 'idle', actions: assign(() => ({ error: null })) },
         onError: {
           target: 'idle',
           actions: assign((_ctx, e) => ({ error: String(e.error) })),
         },
-      },
+      }),
     },
   },
 });
@@ -521,7 +526,7 @@ type SignInStartEvent =
   | { type: 'TYPE_IDENTIFIER'; value: string }
   | { type: 'SUBMIT_IDENTIFIER' };
 
-const { createMachine, assign } = setup<SignInStartContext, SignInStartEvent>();
+const { createMachine, assign, fromPromise } = setup<SignInStartContext, SignInStartEvent>();
 
 export function createSignInStartMachine(deps: { signInFn: SignInStartContext['signInFn'] }) {
   return createMachine({
@@ -546,17 +551,19 @@ export function createSignInStartMachine(deps: { signInFn: SignInStartContext['s
       submitting: {
         // Both entry points converge here. idle's on-handlers are inactive,
         // so a second CLICK_SOCIAL while already submitting is dropped automatically.
-        invoke: {
-          src: ctx =>
+        invoke: fromPromise(
+          ctx =>
             ctx.activeStrategy === 'email'
               ? ctx.signInFn({ identifier: ctx.identifier })
               : ctx.signInFn({ strategy: ctx.activeStrategy! }),
-          onDone: 'success',
-          onError: {
-            target: 'idle',
-            actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+          {
+            onDone: 'success',
+            onError: {
+              target: 'idle',
+              actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+            },
           },
-        },
+        ),
       },
       success: { type: 'final' },
     },
