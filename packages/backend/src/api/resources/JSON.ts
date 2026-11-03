@@ -765,7 +765,7 @@ export interface UserDeletedJSON extends DeletedObjectJSON {
 
 /**
  * Directory group webhook event payload: a group as the identity provider reported it to a directory.
- * Used for `directoryGroup.created`, `directoryGroup.updated` and `directoryGroup.deleted` webhook events.
+ * Used for `directoryGroup.created`, `directoryGroup.updated`, `directoryGroup.synced` and `directoryGroup.deleted` webhook events.
  */
 export interface DirectoryGroupWebhookEventJSON {
   object: typeof ObjectType.DirectoryGroup;

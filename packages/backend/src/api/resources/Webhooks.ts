@@ -77,7 +77,7 @@ export type EmailDeliveryWebhookEvent =
 export type SMSWebhookEvent = Webhook<'sms.created', SMSMessageJSON>;
 
 export type DirectoryGroupWebhookEvent = Webhook<
-  'directoryGroup.created' | 'directoryGroup.updated' | 'directoryGroup.deleted',
+  'directoryGroup.created' | 'directoryGroup.updated' | 'directoryGroup.synced' | 'directoryGroup.deleted',
   DirectoryGroupWebhookEventJSON
 >;
 
