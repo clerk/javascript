@@ -148,6 +148,33 @@ If a feature supports SSR, also verify matching initial times during server
 rendering and hydration. Sharing time within one provider tree does not by
 itself guarantee agreement between server and client.
 
+## Private API requests
+
+Use `useMosaicRequest` from `src/hooks/use-mosaic-request.ts` when a new Mosaic
+flow needs an API request before its resource API is stable. The hook loads the
+request capability through the existing Clerk module manager. The core request
+layer still owns authentication, serialization, API errors, and client updates.
+An older runtime without this capability rejects the request with a localized
+error. No legacy UI provider is required.
+
+Keep endpoint types and query hooks private to Mosaic. Use the shared query and
+mutation hooks for request state and cache updates; the controller still uses
+`useForm` or `usePendingAction` for the interaction. Return a promise that covers
+the write and required cache work. See `src/features/demo/demo.model.ts` for an
+example. The `/demo` route is a test fixture, not a deployed endpoint.
+
+Keep request construction in plain functions beside the query hook, as in
+`src/queries/demo.requests.ts`. These functions receive the request capability
+and own the endpoint, parameters, response types, and required response checks.
+The hook owns query keys, identity checks, request state, and invalidation.
+For example, its query function calls `getDemoInstance(request, { signal })`.
+This keeps the endpoint code usable without React or a resource class.
+
+The demo uses the existing sign-out query cleanup. As with the other Mosaic
+query hooks, cleanup runs while the hook is mounted; inactive entries otherwise
+remain until query garbage collection. Identity is part of the cache key, and
+late writes must not populate a new session's cache.
+
 ## Testing
 
 The feature test covers the model by default, running it against a real Clerk

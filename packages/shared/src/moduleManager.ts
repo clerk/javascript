@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
 export type ImportableModuleToTypeMap = {
+  '@clerk/mosaic-runtime': import('./internal/clerk-js/mosaicRuntime').MosaicRuntime;
   '@zxcvbn-ts/core': typeof import('@zxcvbn-ts/core');
   '@zxcvbn-ts/language-common': typeof import('@zxcvbn-ts/language-common');
   '@base-org/account': typeof import('@base-org/account');

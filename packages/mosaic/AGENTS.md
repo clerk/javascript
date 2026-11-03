@@ -53,6 +53,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                    |
 | An inline message row; height is undefined until measured                | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts` |
 | Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)                  |
+| A private Mosaic API request without a resource method                   | `useMosaicRequest` (`src/hooks/use-mosaic-request.ts`), called from a model or query hook                         |
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                                  |
 | An organization permission checked with `checkAuthorization`             | `ORGANIZATION_PERMISSIONS` (`src/utils/permissions.ts`)                                                           |
 | A verification code's length or resend cooldown                          | `CODE_LENGTH`, `CODE_RESEND_SECONDS` (`src/utils/verification.ts`)                                                |

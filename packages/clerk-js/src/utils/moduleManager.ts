@@ -3,6 +3,8 @@ import { safeImport } from '@clerk/shared/safeImport';
 
 export class ModuleManager implements ModuleManagerI {
   #importMap = {
+    '@clerk/mosaic-runtime': () =>
+      safeImport(() => import('../core/mosaicRuntime').then(module => module.mosaicRuntime)),
     '@zxcvbn-ts/core': () => safeImport(() => import('@zxcvbn-ts/core')),
     '@zxcvbn-ts/language-common': () => safeImport(() => import('@zxcvbn-ts/language-common')),
     '@base-org/account': () => safeImport(() => import('@base-org/account')),

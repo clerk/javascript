@@ -85,6 +85,7 @@ export type {
 export { createCacheKeys as __internal_createCacheKeys } from './createCacheKeys';
 export { useClearQueriesOnSignOut as __internal_useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 export { useClerkQuery as __internal_useClerkQuery } from '../query/useQuery';
+export { useClerkMutation as __internal_useClerkMutation } from '../query/useMutation';
 
 export { useUserBase as __internal_useUserBase } from './base/useUserBase';
 export { useClientBase as __internal_useClientBase } from './base/useClientBase';

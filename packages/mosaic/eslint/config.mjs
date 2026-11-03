@@ -125,7 +125,9 @@ export default [
             { from: { element: { type: 'root' } }, allow: { to: { element: { type: '*' } } } },
             { from: { file: { categories: 'css-entry' } }, allow: { to: { element: { type: '*' } } } },
             {
-              from: { element: { type: ['utils', 'hooks', 'styles', 'components', 'localization', 'modals'] } },
+              from: {
+                element: { type: ['utils', 'hooks', 'styles', 'components', 'localization', 'modals', 'queries'] },
+              },
               allow: { to: { element: { type: SHARED } } },
             },
             {
@@ -171,6 +173,14 @@ export default [
                 dependency: { kind: 'value', specifiers: 'useMosaicEnvironment' },
               },
               message: 'Read the Mosaic environment in the model and pass plain data to the controller or view.',
+            },
+            {
+              from: FLOW_UI,
+              disallow: {
+                to: { element: { type: 'hooks' } },
+                dependency: { kind: 'value', specifiers: 'useMosaicRequest' },
+              },
+              message: 'Make Mosaic requests in the model or query layer and pass plain callbacks to the controller.',
             },
             {
               from: FLOW_UI,

@@ -2,6 +2,7 @@ import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
 import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
+import { demoMessages } from '../features/demo/demo.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
@@ -37,6 +38,7 @@ import { errorMessages } from './errors.messages';
 import { roleMessages } from './roles.messages';
 
 export const mosaicMessages = {
+  demo: demoMessages,
   userButton: userButtonMessages,
   organizationSwitcher: organizationSwitcherMessages,
   userProfile: {
