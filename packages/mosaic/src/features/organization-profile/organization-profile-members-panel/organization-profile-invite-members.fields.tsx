@@ -7,41 +7,7 @@ import { Select } from '../../../components/select';
 import { TagInput } from '../../../components/tag-input';
 import { fill, useMessages } from '../../../localization';
 import { styles } from './organization-profile-invite-members.styles';
-
-const isEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value);
-
-interface InviteMembersValidity {
-  emailAddresses: string[];
-  emailDraft?: string;
-  rejectedEmailAddresses?: string[];
-  role: string | null;
-}
-
-function isValidEmail(value: string, rejectedEmailAddresses: string[]) {
-  return isEmail(value) && !rejectedEmailAddresses.includes(value);
-}
-
-export function hasInvalidEmailAddresses({
-  emailAddresses,
-  rejectedEmailAddresses = [],
-}: Omit<InviteMembersValidity, 'role'>) {
-  return !emailAddresses.every(value => isValidEmail(value, rejectedEmailAddresses));
-}
-
-export function canSendInvitations({
-  emailAddresses,
-  emailDraft = '',
-  rejectedEmailAddresses = [],
-  role,
-}: InviteMembersValidity) {
-  const draft = emailDraft.trim();
-  const pending = draft ? [...emailAddresses, draft] : emailAddresses;
-  return (
-    pending.length > 0 &&
-    !hasInvalidEmailAddresses({ emailAddresses: pending, rejectedEmailAddresses }) &&
-    role !== null
-  );
-}
+import { hasInvalidEmailAddresses, isValidEmail } from './organization-profile-invite-members.utils';
 
 export interface InviteMembersFieldsProps {
   emailInputRef?: Ref<HTMLInputElement>;
@@ -69,7 +35,7 @@ export function InviteMembersFields({
   isPending,
 }: InviteMembersFieldsProps) {
   const m = useMessages('organizationProfile').members.invite;
-  const hasInvalid = hasInvalidEmailAddresses({ emailAddresses, rejectedEmailAddresses });
+  const hasInvalid = hasInvalidEmailAddresses(emailAddresses, rejectedEmailAddresses);
 
   return (
     <>

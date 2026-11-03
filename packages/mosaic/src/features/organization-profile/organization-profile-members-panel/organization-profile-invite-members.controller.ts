@@ -7,6 +7,7 @@ import { plural, useLocale, useMessages } from '../../../localization';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
 import type { InviteMembersInput } from './organization-profile-invite-members.model';
+import { canSendInvitations } from './organization-profile-invite-members.utils';
 
 interface InviteMembersValues {
   emailAddresses: string[];
@@ -33,6 +34,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   const form = useForm<InviteMembersValues, boolean>({
     initialValues: { emailAddresses: [], emailDraft: '', role: initialRole },
     errorFallback: m.error,
+    canSubmit: values => canSendInvitations({ ...values, rejectedEmailAddresses }),
     onSubmit: async ({ emailAddresses, role }) => {
       if (!invite || !roles || role === null) {
         return false;
@@ -77,13 +79,13 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     finalFocus: trigger,
     emailAddresses: form.values.emailAddresses,
     onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
-    emailDraft: form.values.emailDraft,
     onEmailDraftChange: emailDraft => form.setValue('emailDraft', emailDraft),
     rejectedEmailAddresses,
     roles: roles.roles.map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
     role: form.values.role,
     onRoleChange: role => form.setValue('role', role),
     isRoleDisabled: roles.hasRoleSetMigration,
+    canSubmit: form.canSubmit || form.isSubmitting,
     isPending: form.isSubmitting,
     error: form.error ?? null,
     onSubmit: form.submit,

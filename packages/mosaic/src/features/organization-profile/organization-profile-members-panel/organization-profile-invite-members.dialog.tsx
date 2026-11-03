@@ -7,7 +7,7 @@ import { Dialog } from '../../../components/dialog';
 import type { SelectItem } from '../../../components/select';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { canSendInvitations, InviteMembersFields } from './organization-profile-invite-members.fields';
+import { InviteMembersFields } from './organization-profile-invite-members.fields';
 
 export interface OrganizationProfileInviteMembersDialogProps {
   open: boolean;
@@ -15,13 +15,13 @@ export interface OrganizationProfileInviteMembersDialogProps {
   finalFocus?: DialogFocusTarget;
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
-  emailDraft: string;
   onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses?: string[];
   roles: SelectItem[];
   role: string | null;
   onRoleChange: (role: string | null) => void;
   isRoleDisabled?: boolean;
+  canSubmit: boolean;
   isPending: boolean;
   error: string | null;
   onSubmit: () => void | Promise<void>;
@@ -33,13 +33,13 @@ export function OrganizationProfileInviteMembersDialog({
   finalFocus,
   emailAddresses,
   onEmailAddressesChange,
-  emailDraft,
   onEmailDraftChange,
   rejectedEmailAddresses = [],
   roles,
   role,
   onRoleChange,
   isRoleDisabled = false,
+  canSubmit,
   isPending,
   error,
   onSubmit,
@@ -47,7 +47,6 @@ export function OrganizationProfileInviteMembersDialog({
   const m = useMessages('organizationProfile').members.invite;
   const formId = useId();
   const emailInput = useRef<HTMLInputElement>(null);
-  const canSubmit = canSendInvitations({ emailAddresses, emailDraft, rejectedEmailAddresses, role });
 
   return (
     <Dialog.Root

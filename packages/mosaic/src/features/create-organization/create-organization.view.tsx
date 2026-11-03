@@ -13,10 +13,7 @@ import { useErrorText, useMessages } from '../../localization';
 import { FileUpload } from '../../primitives/file-upload';
 import { Form } from '../../primitives/form';
 import { AVATAR_REJECTION_ERRORS } from '../../utils/avatar-upload';
-import {
-  canSendInvitations,
-  InviteMembersFields,
-} from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.fields';
+import { InviteMembersFields } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.fields';
 import type { CreateOrganizationInviteController } from './create-organization.controller';
 import type { CreateOrganizationStep, CreateOrganizationValues } from './create-organization.types';
 
@@ -212,7 +209,6 @@ function LogoField({
 function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
   const formId = useId();
-  const canSubmit = canSendInvitations(invite);
   const emailInput = useFlowAutoFocus();
 
   return (
@@ -232,7 +228,7 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
             id={formId}
             onSubmit={event => {
               event.preventDefault();
-              if (canSubmit && !invite.isPending) {
+              if (invite.canSubmit && !invite.isPending) {
                 invite.onSubmit();
               }
             }}
@@ -256,7 +252,7 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
         <SubmitButton
           form={formId}
           isPending={invite.isPending}
-          disabled={!canSubmit}
+          disabled={!invite.canSubmit}
           focusableWhenDisabled
         >
           {m.invite.submit}

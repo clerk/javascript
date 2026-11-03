@@ -1,5 +1,6 @@
 import { useToastManager } from '@clerk/mosaic/components/toast';
 import type { OrganizationProfileInviteMembersDialogProps } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.dialog';
+import { canSendInvitations } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.utils';
 import { plural, useLocale, useMessages } from '@clerk/mosaic/localization';
 import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';
@@ -47,12 +48,12 @@ export function useInviteMembersFixture(): {
       finalFocus: trigger,
       emailAddresses,
       onEmailAddressesChange: setEmailAddresses,
-      emailDraft,
       onEmailDraftChange: setEmailDraft,
       rejectedEmailAddresses,
       roles,
       role,
       onRoleChange: setRole,
+      canSubmit: canSendInvitations({ emailAddresses, emailDraft, rejectedEmailAddresses, role }),
       isPending,
       error,
       onSubmit: async () => {
