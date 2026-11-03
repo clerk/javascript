@@ -65,6 +65,7 @@ export function InviteMembersFields({
         required
         invalid={hasInvalid}
         disabled={isPending}
+        focusableWhenDisabled
       >
         <div {...stylex.props(styles.labelRow)}>
           <Field.Label>{m.emailLabel}</Field.Label>

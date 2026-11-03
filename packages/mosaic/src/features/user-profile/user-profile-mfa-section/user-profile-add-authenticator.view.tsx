@@ -57,6 +57,7 @@ export function UserProfileAddAuthenticatorView({
         <Field.Root
           required
           disabled={isPending}
+          focusableWhenDisabled
           invalid={Boolean(errorMessage)}
           xstyle={styles.field}
         >
