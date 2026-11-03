@@ -41,14 +41,14 @@ export function OAuthConsentSkeleton({
   return (
     <>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-      <Card.Header xstyle={styles.centered}>
+      <Card.Header align='center'>
         <Card.Title>
-          <Skeleton xstyle={styles.skeletonCentered}>
+          <Skeleton>
             {fill(m.title, { oauthApplicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME, applicationName })}
           </Skeleton>
         </Card.Title>
         <Card.Description>
-          <Skeleton xstyle={styles.skeletonCentered}>
+          <Skeleton>
             {fill(m.subtitle, { oauthApplicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME, domain: redirectDomain })}
           </Skeleton>
         </Card.Description>
