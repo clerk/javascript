@@ -85,12 +85,13 @@ export const mosaicMessages = applyTerms(messageTemplates, 'en');
 
 export function applyTerms(templates: MosaicMessages, locale: string): MosaicMessages {
   const { organization } = templates.terms;
-  const one = plural(organization, 1, locale);
+  const termLocale = organization === termMessages.organization ? 'en' : locale;
+  const one = plural(organization, 1, termLocale);
   const values = {
     organization: one,
-    Organization: capitalize(one, locale),
+    Organization: capitalize(one, termLocale),
     organizations: organization.other,
-    Organizations: capitalize(organization.other, locale),
+    Organizations: capitalize(organization.other, termLocale),
   };
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- The walk only replaces string leaves, so the shape is unchanged.
   return fillAll(templates, values) as MosaicMessages;

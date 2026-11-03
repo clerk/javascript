@@ -136,6 +136,12 @@ describe('terms', () => {
     expect(messages.organizationProfile.label).toBe('İşyeri');
   });
 
+  it('keeps the English singular when a catalog leaves the term untranslated', () => {
+    const { messages } = resolveLocalization({ locale: 'ja', messages: { 'userButton.popup.label': 'アカウント' } });
+    expect(messages.organizationProfile.danger.leave.label).toBe('Leave organization');
+    expect(messages.organizationProfile.label).toBe('Organization');
+  });
+
   it('capitalizes a first letter outside the basic multilingual plane', () => {
     const { messages } = resolveLocalization({
       locale: 'ff-Adlm',
