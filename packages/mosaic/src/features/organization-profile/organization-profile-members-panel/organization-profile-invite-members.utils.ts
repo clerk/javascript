@@ -15,13 +15,15 @@ export function hasInvalidEmailAddresses(emailAddresses: string[], rejectedEmail
   return !emailAddresses.every(value => isValidEmail(value, rejectedEmailAddresses));
 }
 
-export function canSendInvitations({
+export function pendingEmailAddresses({
   emailAddresses,
   emailDraft,
-  rejectedEmailAddresses,
-  role,
-}: InviteMembersValidity) {
+}: Pick<InviteMembersValidity, 'emailAddresses' | 'emailDraft'>) {
   const draft = emailDraft.trim();
-  const pending = draft ? [...emailAddresses, draft] : emailAddresses;
+  return draft && !emailAddresses.includes(draft) ? [...emailAddresses, draft] : emailAddresses;
+}
+
+export function canSendInvitations({ rejectedEmailAddresses, role, ...input }: InviteMembersValidity) {
+  const pending = pendingEmailAddresses(input);
   return pending.length > 0 && !hasInvalidEmailAddresses(pending, rejectedEmailAddresses) && role !== null;
 }

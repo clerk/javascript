@@ -22,6 +22,7 @@ function Harness({ initialEmailAddresses = [], ...overrides }: HarnessProps) {
       onOpenChange={vi.fn()}
       emailAddresses={emailAddresses}
       onEmailAddressesChange={setEmailAddresses}
+      emailDraft={emailDraft}
       onEmailDraftChange={setEmailDraft}
       roles={[
         { value: 'member', label: 'Member', description: 'Non-privileged permissions.' },

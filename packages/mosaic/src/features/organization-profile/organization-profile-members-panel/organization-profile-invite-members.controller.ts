@@ -7,7 +7,7 @@ import { plural, useLocale, useMessages } from '../../../localization';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
 import type { InviteMembersInput } from './organization-profile-invite-members.model';
-import { canSendInvitations } from './organization-profile-invite-members.utils';
+import { canSendInvitations, pendingEmailAddresses } from './organization-profile-invite-members.utils';
 
 interface InviteMembersValues {
   emailAddresses: string[];
@@ -35,19 +35,25 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     initialValues: { emailAddresses: [], emailDraft: '', role: initialRole },
     errorFallback: m.error,
     canSubmit: values => canSendInvitations({ ...values, rejectedEmailAddresses }),
-    onSubmit: async ({ emailAddresses, role }) => {
+    onSubmit: async values => {
+      const { role } = values;
       if (!invite || !roles || role === null) {
         return false;
       }
-      await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
+      await invite({
+        emailAddresses: pendingEmailAddresses(values),
+        role,
+        roles,
+        onRejected: setRejectedEmailAddresses,
+      });
       return true;
     },
-    onSuccess: (invited, { emailAddresses }) => {
+    onSuccess: (invited, values) => {
       if (!invited) {
         return;
       }
       setOpen(false);
-      toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
+      toast.add({ type: 'success', label: plural(m.sent, pendingEmailAddresses(values).length, locale) });
     },
   });
 
@@ -79,6 +85,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     finalFocus: trigger,
     emailAddresses: form.values.emailAddresses,
     onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
+    emailDraft: form.values.emailDraft,
     onEmailDraftChange: emailDraft => form.setValue('emailDraft', emailDraft),
     rejectedEmailAddresses,
     roles: roles.roles.map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),

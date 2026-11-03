@@ -15,6 +15,7 @@ export interface OrganizationProfileInviteMembersDialogProps {
   finalFocus?: DialogFocusTarget;
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
+  emailDraft: string;
   onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses?: string[];
   roles: SelectItem[];
@@ -33,6 +34,7 @@ export function OrganizationProfileInviteMembersDialog({
   finalFocus,
   emailAddresses,
   onEmailAddressesChange,
+  emailDraft,
   onEmailDraftChange,
   rejectedEmailAddresses = [],
   roles,
@@ -92,6 +94,7 @@ export function OrganizationProfileInviteMembersDialog({
               emailInputRef={emailInput}
               emailAddresses={emailAddresses}
               onEmailAddressesChange={onEmailAddressesChange}
+              emailDraft={emailDraft}
               onEmailDraftChange={onEmailDraftChange}
               rejectedEmailAddresses={rejectedEmailAddresses}
               roles={roles}

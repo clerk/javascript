@@ -1,26 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useTagInputContext } from './tag-input-context';
 import { splitTags } from './tag-input-utils';
 
-export type TagInputInputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue'> & {
-  onInputValueChange?: (text: string) => void;
-};
+export type TagInputInputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue'>;
 
 export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputProps>(
   function TagInputInput(props, forwardedRef) {
-    const { render, onInputValueChange, ...otherProps } = props;
-    const { value, delimiters, disabled, focusableWhenDisabled, add, focusTag, registerInput } = useTagInputContext();
-    const [text, setText] = useState('');
-
-    const updateText = (next: string) => {
-      setText(next);
-      onInputValueChange?.(next);
-    };
+    const { render, ...otherProps } = props;
+    const {
+      value,
+      inputValue: text,
+      setInputValue: setText,
+      delimiters,
+      disabled,
+      focusableWhenDisabled,
+      add,
+      focusTag,
+      registerInput,
+    } = useTagInputContext();
     const { previousKey } = readingDirectionKeys(useDirection());
 
     const commit = () => {
@@ -28,7 +30,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
         return;
       }
       add([text]);
-      updateText('');
+      setText('');
     };
 
     const defaultProps = {
@@ -41,7 +43,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
         const parts = splitTags(event.currentTarget.value, delimiters);
         const pending = parts.pop() ?? '';
         add(parts);
-        updateText(pending);
+        setText(pending);
       },
       onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => {
         if (disabled) {
@@ -53,7 +55,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
         }
         event.preventDefault();
         add([text, ...parts]);
-        updateText('');
+        setText('');
       },
       onBlur: commit,
       onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {

@@ -11,6 +11,8 @@ export type FocusAfterRemove = 'input' | 'previous' | 'next';
 export interface TagInputContextValue {
   value: string[];
   tags: TagInputTag[];
+  inputValue: string;
+  setInputValue: (inputValue: string) => void;
   delimiters: string[];
   disabled: boolean;
   focusableWhenDisabled: boolean;

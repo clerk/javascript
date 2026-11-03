@@ -21,14 +21,23 @@ import { styles } from './tag-input.styles';
 
 type TagInputRootProps = Pick<
   PrimitiveTagInputProps,
-  'value' | 'defaultValue' | 'onValueChange' | 'validate' | 'delimiters' | 'name' | 'form' | 'disabled'
+  | 'value'
+  | 'defaultValue'
+  | 'onValueChange'
+  | 'inputValue'
+  | 'defaultInputValue'
+  | 'onInputValueChange'
+  | 'validate'
+  | 'delimiters'
+  | 'name'
+  | 'form'
+  | 'disabled'
 >;
 
 export interface TagInputProps
   extends
     Omit<MosaicComponentProps<'input'>, keyof TagInputRootProps | 'render' | 'children' | 'type'>,
-    TagInputRootProps,
-    Pick<PrimitiveTagInputInputProps, 'onInputValueChange'> {
+    TagInputRootProps {
   removeLabel?: (value: string) => string;
 }
 
@@ -93,6 +102,9 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
     value,
     defaultValue,
     onValueChange,
+    inputValue,
+    defaultInputValue,
+    onInputValueChange,
     validate,
     delimiters,
     name,
@@ -131,6 +143,9 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
+      inputValue={inputValue}
+      defaultInputValue={defaultInputValue}
+      onInputValueChange={onInputValueChange}
       validate={validate}
       delimiters={delimiters}
       name={name}

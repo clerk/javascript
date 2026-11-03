@@ -1,6 +1,9 @@
 import { useToastManager } from '@clerk/mosaic/components/toast';
 import type { OrganizationProfileInviteMembersDialogProps } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.dialog';
-import { canSendInvitations } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.utils';
+import {
+  canSendInvitations,
+  pendingEmailAddresses,
+} from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.utils';
 import { plural, useLocale, useMessages } from '@clerk/mosaic/localization';
 import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';
@@ -48,6 +51,7 @@ export function useInviteMembersFixture(): {
       finalFocus: trigger,
       emailAddresses,
       onEmailAddressesChange: setEmailAddresses,
+      emailDraft,
       onEmailDraftChange: setEmailDraft,
       rejectedEmailAddresses,
       roles,
@@ -61,14 +65,15 @@ export function useInviteMembersFixture(): {
         setError(null);
         await new Promise(resolve => setTimeout(resolve, 800));
         setIsPending(false);
-        const rejected = emailAddresses.filter(email => existingMembers.includes(email));
+        const invited = pendingEmailAddresses({ emailAddresses, emailDraft });
+        const rejected = invited.filter(email => existingMembers.includes(email));
         if (rejected.length > 0) {
           setRejectedEmailAddresses(rejected);
           setError(`${rejected.join(', ')} ${rejected.length === 1 ? 'is' : 'are'} already a member.`);
           return;
         }
         setOpen(false);
-        toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
+        toast.add({ type: 'success', label: plural(m.sent, invited.length, locale) });
       },
     },
   };

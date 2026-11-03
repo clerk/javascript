@@ -13,6 +13,7 @@ export interface InviteMembersFieldsProps {
   emailInputRef?: Ref<HTMLInputElement>;
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
+  emailDraft: string;
   onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses?: string[];
   roles: SelectItem[];
@@ -26,6 +27,7 @@ export function InviteMembersFields({
   emailInputRef,
   emailAddresses,
   onEmailAddressesChange,
+  emailDraft,
   onEmailDraftChange,
   rejectedEmailAddresses = [],
   roles,
@@ -55,6 +57,7 @@ export function InviteMembersFields({
           delimiters={[',', ' ']}
           value={emailAddresses}
           onValueChange={onEmailAddressesChange}
+          inputValue={emailDraft}
           onInputValueChange={onEmailDraftChange}
           validate={value => isValidEmail(value, rejectedEmailAddresses)}
           removeLabel={email => fill(m.removeEmail, { email })}

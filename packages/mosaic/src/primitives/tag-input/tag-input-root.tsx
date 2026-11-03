@@ -19,6 +19,9 @@ export interface TagInputProps extends Omit<ComponentProps<'div'>, 'defaultValue
   value?: string[];
   defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
+  inputValue?: string;
+  defaultInputValue?: string;
+  onInputValueChange?: (inputValue: string) => void;
   validate?: (value: string) => boolean;
   delimiters?: string[];
   name?: string;
@@ -34,6 +37,9 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
     value: valueProp,
     defaultValue = EMPTY,
     onValueChange,
+    inputValue: inputValueProp,
+    defaultInputValue = '',
+    onInputValueChange,
     validate,
     delimiters = DEFAULT_DELIMITERS,
     name,
@@ -45,6 +51,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
   } = props;
 
   const [value, setValue] = useControllableState(valueProp, defaultValue, onValueChange);
+  const [inputValue, setInputValue] = useControllableState(inputValueProp, defaultInputValue, onInputValueChange);
   const valueRef = useRef(value);
   valueRef.current = value;
 
@@ -137,6 +144,8 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
     () => ({
       value,
       tags,
+      inputValue,
+      setInputValue,
       delimiters,
       disabled,
       focusableWhenDisabled,
@@ -151,6 +160,8 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
     [
       value,
       tags,
+      inputValue,
+      setInputValue,
       delimiters,
       disabled,
       focusableWhenDisabled,

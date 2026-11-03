@@ -6,7 +6,10 @@ import type { SelectItem } from '../../components/select';
 import { useMessages } from '../../localization';
 import type { MembersRoles } from '../organization-profile/organization-profile-members-panel/members-table-tab.types';
 import { resolveDefaultRole } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
-import { canSendInvitations } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.utils';
+import {
+  canSendInvitations,
+  pendingEmailAddresses,
+} from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.utils';
 import type { CreateOrganizationModel } from './create-organization.model';
 import type {
   CreatedOrganization,
@@ -100,6 +103,7 @@ export interface CreateOrganizationInviteControllerOptions {
 export interface CreateOrganizationInviteController {
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
+  emailDraft: string;
   onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses: string[];
   roles: SelectItem[];
@@ -128,12 +132,16 @@ export function useCreateOrganizationInviteController({
     initialValues: { emailAddresses: [], emailDraft: '', role: null },
     errorFallback: m.invite.error,
     canSubmit: values => canSendInvitations({ ...values, role: values.role ?? initialRole, rejectedEmailAddresses }),
-    onSubmit: async ({ emailAddresses, role }) => {
-      const selected = role ?? initialRole;
+    onSubmit: async values => {
+      const selected = values.role ?? initialRole;
       if (!organizationId || selected === null) {
         return false;
       }
-      await onInvite(organizationId, { emailAddresses, role: selected, onRejected: setRejectedEmailAddresses });
+      await onInvite(organizationId, {
+        emailAddresses: pendingEmailAddresses(values),
+        role: selected,
+        onRejected: setRejectedEmailAddresses,
+      });
       return true;
     },
     onSuccess: sent => {
@@ -146,6 +154,7 @@ export function useCreateOrganizationInviteController({
   return {
     emailAddresses: form.values.emailAddresses,
     onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
+    emailDraft: form.values.emailDraft,
     onEmailDraftChange: emailDraft => form.setValue('emailDraft', emailDraft),
     rejectedEmailAddresses,
     roles: (roles?.roles ?? []).map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
