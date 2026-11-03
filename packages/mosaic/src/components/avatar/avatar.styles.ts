@@ -88,38 +88,18 @@ export const styles = stylex.create({
 // shape — square takes the radius its size sets below; circle rounds fully
 export const shapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: 'var(--_cl-avatar-radius)' },
+  square: { borderRadius: 'var(--_cl-media-radius)' },
 });
 
-// size — square box; font-size is ~0.4x the box, the ceiling at which two initials still clear
-// the circle's clip.
+// size — the box and radius come from `mediaSizes`; font-size is ~0.4x the box, the ceiling at which
+// two initials still clear the circle's clip.
 export const sizes = stylex.create({
-  xs: {
-    '--_cl-avatar-radius': radiusVars['--cl-radius-sm'],
-    fontSize: '0.625rem',
-    height: space['6'],
-    width: space['6'],
-  },
-  sm: {
-    '--_cl-avatar-radius': radiusVars['--cl-radius-md'],
-    fontSize: '0.8125rem',
-    height: space['8'],
-    width: space['8'],
-  },
-  md: {
-    '--_cl-avatar-radius': radiusVars['--cl-radius-lg'],
-    fontSize: '0.9375rem',
-    height: space['9.5'],
-    width: space['9.5'],
-  },
-  lg: {
-    '--_cl-avatar-radius': radiusVars['--cl-radius-lg'],
-    fontSize: '1.125rem',
-    height: space['12'],
-    width: space['12'],
-  },
+  xs: { fontSize: '0.625rem' },
+  sm: { fontSize: '0.8125rem' },
+  md: { fontSize: '0.9375rem' },
+  lg: { fontSize: '1.125rem' },
   fit: {
-    '--_cl-avatar-radius': radiusVars['--cl-radius-md'],
+    '--_cl-media-radius': radiusVars['--cl-radius-md'],
     fontSize: '0.75rem',
     height: '100%',
     width: '100%',
