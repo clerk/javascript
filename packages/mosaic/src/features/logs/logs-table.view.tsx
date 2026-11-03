@@ -209,7 +209,7 @@ function LogRow({
 
 function EventCode({ code }: { code: string }) {
   let start = 0;
-  return code.split(/(?<=[._])/).map(part => {
+  return (code.match(/[^._]*[._]|[^._]+/g) ?? ['']).map(part => {
     const offset = start;
     start += part.length;
     return (
