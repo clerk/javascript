@@ -114,7 +114,7 @@ The workflow publishes only when all of these hold. Otherwise it prints the reas
 
 `attach` checks the same rules before it sends anything, and fails with the reason.
 
-So one session does both runs: push the branch, `up`, `run` for the before run, push the change, `run` again, open the pull request, `attach` with `--before <run-id>`, `down`. Open the pull request after the last run, so that it is not left open without its evidence, which reaches the description about a minute after `down`.
+So one session does both runs: push the branch, `up`, `run` for the before run, push the change, `run` again, open the pull request with `gh pr create --draft`, `attach` with `--before <run-id>`, `down`, then `gh pr ready <n>` once the description shows the evidence. Open the pull request after the last run, so that it is not left open without its evidence, which reaches the description about a minute after `down`. It stays a draft until then so that review bots read the description with the evidence in it.
 
 A before run is the build without the change, so its commit is often the one the branch started from, which is no commit of the pull request. The workflow therefore does not look for that commit among the commits of the pull request. It asks GitHub whether that commit is the commit of the run or a commit before it in its history, and it publishes nothing when the answer is no. After a rebase that rewrote the commit of the before run, `run` the spec again on a commit that the branch still has, and pass that run as `--before`. The workflow cannot check that the files of the before run came from a build of that commit, which is why the line says that the session reports the before run.
 
