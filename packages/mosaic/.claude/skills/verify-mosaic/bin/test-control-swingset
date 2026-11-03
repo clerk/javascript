@@ -67,7 +67,9 @@ EOF
 }
 
 test_attach_says_how_to_recover_when_it_stops_after_uploading() {
-  mkdir after && touch after/a.png
+  in_a_repo
+  local after
+  after="$(cmd_evidence after)" && touch "$after/a.png"
   gh() {
     case "$*" in
       --version) echo 'gh version 2.99.0' ;;
@@ -77,13 +79,15 @@ test_attach_says_how_to_recover_when_it_stops_after_uploading() {
       'pr edit'*) touch "$TMPDIR_CASE/edited" ;;
     esac
   }
-  attempt cmd_attach after --pr 1
+  attempt cmd_attach "$after" --pr 1
   expect_eq "$STATUS" 1
   expect_eq "$OUT" "$STOPPED_ATTACH"
 }
 
 test_attach_says_how_to_recover_when_some_uploads_fail() {
-  mkdir after && touch after/a.png
+  in_a_repo
+  local after
+  after="$(cmd_evidence after)" && touch "$after/a.png"
   gh() {
     case "$*" in
       --version) echo 'gh version 2.99.0' ;;
@@ -92,9 +96,83 @@ test_attach_says_how_to_recover_when_some_uploads_fail() {
       'pr edit'*) return 1 ;;
     esac
   }
-  attempt cmd_attach after --pr 1
+  attempt cmd_attach "$after" --pr 1
   expect_eq "$STATUS" 1
   expect_eq "$OUT" "$STOPPED_ATTACH"
+}
+
+test_attach_refuses_evidence_captured_with_an_env_file_loaded() {
+  in_a_repo
+  local log dir
+  for log in '   - Environments: .env.local' ' Reload env: .env.local'; do
+    printf '%s\n' "$log" >"$LOG_FILE"
+    dir="$(cmd_evidence live)"
+    attempt cmd_attach "$dir" --pr 1
+    expect_eq "$STATUS" 1
+    expect_eq "$OUT" "$(printf '%s\n' \
+      "refuse  $(basename "$dir") was captured while swingset had an env file loaded, so it can show real instance data" \
+      "fix     capture it again with swingset started without packages/swingset/.env.local")"
+    rm -rf "$dir"
+  done
+}
+
+test_attach_refuses_while_swingset_has_an_env_file_loaded() {
+  in_a_repo
+  local dir
+  dir="$(cmd_evidence fixture)"
+  printf ' Reload env: .env.local\n' >"$LOG_FILE"
+  attempt cmd_attach "$dir" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "$(printf '%s\n' \
+    "refuse  swingset has loaded an env file since it started, so screenshots taken since can show real instance data" \
+    "fix     start swingset again without packages/swingset/.env.local, capture again, then attach")"
+}
+
+test_attach_refuses_a_folder_evidence_did_not_make() {
+  mkdir -p "$EVIDENCE_ROOT/old"
+  attempt cmd_attach "$EVIDENCE_ROOT/old" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "$(printf '%s\n' \
+    "refuse  old has no source.env from control-swingset evidence" \
+    "fix     capture it again in a folder from control-swingset evidence")"
+}
+
+test_attach_refuses_a_folder_outside_this_worktrees_evidence() {
+  in_a_repo
+  local dir other
+  dir="$(cmd_evidence after)"
+  mkdir "$VERIFY_DIR/elsewhere" && cp "$dir/source.env" "$VERIFY_DIR/elsewhere/"
+  ln -s ../elsewhere "$EVIDENCE_ROOT/link"
+  for other in "$VERIFY_DIR/elsewhere" "$EVIDENCE_ROOT/../elsewhere" "$EVIDENCE_ROOT/link" "$EVIDENCE_ROOT"; do
+    attempt cmd_attach "$dir" --pr 1 --before "$other"
+    expect_eq "$STATUS" 1
+    expect_eq "$OUT" "refuse  $other is not a folder in $EVIDENCE_ROOT"
+  done
+}
+
+test_attach_runs_nothing_from_a_source_env() {
+  mkdir -p "$EVIDENCE_ROOT/bad"
+  printf 'COMMIT=$(touch %s/pwned)\nDIRTY=0\nLIVE=0\n' "$TMPDIR_CASE" >"$EVIDENCE_ROOT/bad/source.env"
+  touch "$EVIDENCE_ROOT/bad/a.png"
+  gh() {
+    case "$*" in
+      --version) echo 'gh version 2.99.0' ;;
+      *headRefOid*) echo 0123456789abcdef ;;
+      *'--json url'*) echo https://github.com/o/r/pull/1 ;;
+      *) return 1 ;;
+    esac
+  }
+  attempt cmd_attach "$EVIDENCE_ROOT/bad" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$([ -e pwned ] && echo ran || echo not run)" "not run"
+}
+
+test_doctor_runs_nothing_from_the_state_file() {
+  printf 'PID=1\nURL=http://localhost:1"$(touch %s/pwned)"\n' "$TMPDIR_CASE" >"$STATE_FILE"
+  attempt cmd_doctor
+  printf 'PID=1$(touch %s/pwned)\n' "$TMPDIR_CASE" >"$STATE_FILE"
+  attempt cmd_doctor
+  expect_eq "$([ -e pwned ] && echo ran || echo not run)" "not run"
 }
 
 test_attach_puts_each_before_beside_its_after() {
@@ -112,16 +190,14 @@ test_attach_lays_screenshots_two_across() {
 }
 
 test_attach_names_the_commit_each_evidence_folder_was_captured_at() {
-  git init -q repo && cd repo && git -c user.name=test -c user.email=test@example.com commit -q --allow-empty -m one
+  in_a_repo
   local clean dirty commit
   commit="$(git rev-parse HEAD)"
   clean="$(cmd_evidence clean)"
   touch change
   dirty="$(cmd_evidence dirty)"
-  mkdir old
   expect_eq "$(evidence_label "$clean")" "\`$(basename "$clean")\`, captured at \`${commit:0:12}\`"
   expect_eq "$(evidence_label "$dirty")" "\`$(basename "$dirty")\`, captured at \`${commit:0:12}\` with uncommitted changes"
-  expect_eq "$(evidence_label old)" "\`old\`, captured at an unrecorded commit"
 }
 
 test_attach_explains_a_missing_gh() {
@@ -205,6 +281,10 @@ run_case() {
   mkdir -p "$VERIFY_DIR" "$SWINGSET_DIR"
   agent-browser() { echo 'agent-browser 0.27.0'; }
   "$1"
+}
+
+in_a_repo() {
+  git init -q . && git -c user.name=test -c user.email=test@example.com commit -q --allow-empty -m one
 }
 
 rewrite() {

@@ -122,7 +122,9 @@ cmd_evidence() {
   local dir
   dir="$EVIDENCE_ROOT/$(date -u +%Y%m%dT%H%M%SZ)-$feature"
   mkdir -p "$dir"
-  printf 'COMMIT=%s\nDIRTY=%s\n' "$(git rev-parse HEAD)" "$([ -z "$(git status --porcelain)" ] && echo 0 || echo 1)" >"$dir/source.env"
+  printf 'COMMIT=%s\nDIRTY=%s\nLIVE=%s\n' "$(git rev-parse HEAD)" \
+    "$([ -z "$(git status --porcelain)" ] && echo 0 || echo 1)" \
+    "$(env_file_loaded && echo 1 || echo 0)" >"$dir/source.env"
   echo "$dir"
 }
 
@@ -139,6 +141,13 @@ cmd_attach() {
   if [ -z "$after" ] || [ -z "$pr" ]; then
     echo "usage: control-swingset attach <evidence-dir> --pr <n> [--before <evidence-dir>] [--dry-run]" >&2
     exit 64
+  fi
+  require_attachable_evidence "$after"
+  [ -z "$before" ] || require_attachable_evidence "$before"
+  if env_file_loaded; then
+    echo "refuse  swingset has loaded an env file since it started, so screenshots taken since can show real instance data" >&2
+    echo "fix     start swingset again without packages/swingset/.env.local, capture again, then attach" >&2
+    exit 1
   fi
   require_gh_attach
 
@@ -247,8 +256,10 @@ write_state() {
 
 load_state() {
   [ -f "$STATE_FILE" ] || return 1
-  # shellcheck disable=SC1090
-  . "$STATE_FILE"
+  PID="$(env_value "$STATE_FILE" PID '[0-9]+')"
+  URL="$(env_value "$STATE_FILE" URL 'http://localhost:[0-9]+')"
+  HEAD="$(env_value "$STATE_FILE" HEAD '[0-9a-f]{7,40}')"
+  [ -n "$PID" ]
 }
 
 listener_is_ours() {
@@ -313,6 +324,27 @@ report_stopped_attach() {
   [ $? -eq 0 ] || echo "FAIL    attach stopped after it began uploading, so $1 may list some screenshots as plain links; check its description, then attach again" >&2
 }
 
+require_attachable_evidence() {
+  local root real live record="$1/source.env"
+  root="$(cd "$EVIDENCE_ROOT" 2>/dev/null && pwd -P)" || root=""
+  real="$(cd "$1" 2>/dev/null && pwd -P)" || real=""
+  if [ -z "$root" ] || [ -z "$real" ] || [ "${real#"$root"/}" != "$(basename "$real")" ]; then
+    echo "refuse  $1 is not a folder in $EVIDENCE_ROOT" >&2
+    exit 1
+  fi
+  live="$([ ! -f "$record" ] || env_value "$record" LIVE '[01]')"
+  if [ -z "$live" ] || [ -z "$(env_value "$record" COMMIT '[0-9a-f]{40}')" ] || [ -z "$(env_value "$record" DIRTY '[01]')" ]; then
+    echo "refuse  $(basename "$1") has no source.env from control-swingset evidence" >&2
+    echo "fix     capture it again in a folder from control-swingset evidence" >&2
+    exit 1
+  fi
+  if [ "$live" = 1 ]; then
+    echo "refuse  $(basename "$1") was captured while swingset had an env file loaded, so it can show real instance data" >&2
+    echo "fix     capture it again with swingset started without packages/swingset/.env.local" >&2
+    exit 1
+  fi
+}
+
 require_gh_attach() {
   local version
   version="$(gh --version 2>/dev/null | sed -nE '1s/^gh version ([0-9.]+).*/\1/p' || true)"
@@ -323,17 +355,12 @@ require_gh_attach() {
 }
 
 evidence_label() {
-  local COMMIT="" DIRTY=0
-  if [ -f "$1/source.env" ]; then
-    # shellcheck disable=SC1091
-    . "$1/source.env"
-  fi
-  if [ -z "$COMMIT" ]; then
-    echo "\`$(basename "$1")\`, captured at an unrecorded commit"
-  elif [ "$DIRTY" = 1 ]; then
-    echo "\`$(basename "$1")\`, captured at \`${COMMIT:0:12}\` with uncommitted changes"
+  local commit
+  commit="$(env_value "$1/source.env" COMMIT '[0-9a-f]{40}')"
+  if [ "$(env_value "$1/source.env" DIRTY '[01]')" = 1 ]; then
+    echo "\`$(basename "$1")\`, captured at \`${commit:0:12}\` with uncommitted changes"
   else
-    echo "\`$(basename "$1")\`, captured at \`${COMMIT:0:12}\`"
+    echo "\`$(basename "$1")\`, captured at \`${commit:0:12}\`"
   fi
 }
 
@@ -413,6 +440,14 @@ body_with_block() {
       for (i = e[1] + 1; i <= NR; i++) print line[i]
     }
   ' "$1"
+}
+
+env_value() {
+  sed -nE "s/^$2=//p" "$1" | head -1 | grep -xE "$3" || true
+}
+
+env_file_loaded() {
+  [ -f "$LOG_FILE" ] && grep -qE -e '- Environments: ' -e 'Reload env: ' "$LOG_FILE"
 }
 
 http_status() {

@@ -90,7 +90,7 @@ Proof standards:
 - A screenshot alone proves nothing about state. Pair it with the ARIA snapshot or the attribute dump that shows the claimed value.
 - For a styling change, check both themes (`Dark mode` switch) and RTL when the change touches layout.
 - Name the feature file and entry point you used. Report every entry point you could not reach, and why, instead of claiming it through another one.
-- Evidence lives in `packages/mosaic/.verify/evidence/`, which git ignores. `CS down` keeps it. Each folder's `source.env` records the commit it was made at and whether the tree had uncommitted changes.
+- Evidence lives in `packages/mosaic/.verify/evidence/`, which git ignores. `CS down` keeps it. Each folder's `source.env` records the commit it was made at, whether the tree had uncommitted changes, and whether swingset had an env file loaded.
 
 ## Attach
 
@@ -103,6 +103,7 @@ attached 3 screenshots with befores to https://github.com/clerk/javascript/pull/
 
 - It writes a block between `<!-- verify-evidence:mosaic -->` and `<!-- /verify-evidence:mosaic -->`. A line names each evidence folder with the commit it was captured at, and the pull request's head commit when it was attached. With `--before`, a table shows each control screenshot beside the screenshot of the same name. Without it, the screenshots sit two across under their names.
 - Run it again to replace the block. Nothing outside the markers changes.
+- The upload is public, so it takes only fixture data. It refuses a folder that `CS evidence` did not make in this worktree's evidence folder, and a folder captured while swingset had an env file loaded, such as `.env.local` for the Live Sandbox. It also refuses while the running swingset has loaded one.
 - It refuses when a marker appears twice or alone, when the text between the markers does not start with its `**Verified in swingset**` line, or when the description ends in an unclosed code fence. Markers inside a code fence do not count.
 - It edits the description twice: once to upload the screenshots as a list, then to lay them out. If it stops after it began uploading, even when only some uploads failed, it says so. Check the description, then run it again.
 - `--before` keeps only the screenshots both folders have, and names each one it skips. Save the control screenshots under the same names.

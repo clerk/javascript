@@ -39,6 +39,7 @@ Use it only when the change depends on a real Clerk instance, such as real sign-
 - Without a publishable key, `/live`, `/sign-in`, and every `/live/...` page show "set up a publishable key". Report those paths as skipped.
 - With a key: the user creates `packages/swingset/.env.local`. Never read or edit it. Restart with `CS down` and `CS up`, sign in at `/sign-in` with a test user the user gives you, then drive `/live/<group>/<component>` as for a feature.
 - Real changes reach the real instance. Prefer read-only checks.
+- `attach` refuses evidence captured with an env file loaded, because its uploads are public. Say in the pull request what you checked, without real user data.
 
 ## Every page
 
