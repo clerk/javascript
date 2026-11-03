@@ -35,17 +35,17 @@ function methodLabel(method: SignInMethod, m: Messages): string {
   const identifier = 'identifier' in method ? method.identifier : '';
   switch (method.strategy) {
     case 'password':
-      return m.alternativeMethods.blockButton__password;
+      return m.alternativeMethods.blockButtonPassword;
     case 'passkey':
-      return m.alternativeMethods.blockButton__passkey;
+      return m.alternativeMethods.blockButtonPasskey;
     case 'email_code':
-      return fill(m.alternativeMethods.blockButton__emailCode, { identifier });
+      return fill(m.alternativeMethods.blockButtonEmailCode, { identifier });
     case 'phone_code':
-      return fill(m.alternativeMethods.blockButton__phoneCode, { identifier });
+      return fill(m.alternativeMethods.blockButtonPhoneCode, { identifier });
     case 'totp':
-      return m.alternativeMethods.blockButton__totp;
+      return m.alternativeMethods.blockButtonTotp;
     case 'backup_code':
-      return m.alternativeMethods.blockButton__backupCode;
+      return m.alternativeMethods.blockButtonBackupCode;
   }
 }
 
@@ -86,7 +86,7 @@ export function SignInView({
   const m = useMessages('signIn');
 
   const actions = {
-    secondaryActionLabel: m.footerActionLink__useAnotherMethod,
+    secondaryActionLabel: m.footerActionLinkUseAnotherMethod,
     primaryActionLabel: m.formButtonPrimary,
     pendingLabel: m.verifying,
   };
@@ -132,8 +132,8 @@ export function SignInView({
                 socialBlockButton: provider => fill(m.socialButtonsBlockButton, { provider }),
                 socialIconButton: provider => fill(m.socialButtonsIconButton, { provider }),
                 dividerText: m.dividerText,
-                fieldLabel: m.formFieldLabel__emailAddress,
-                fieldPlaceholder: m.formFieldInputPlaceholder__emailAddress,
+                fieldLabel: m.formFieldLabelEmailAddress,
+                fieldPlaceholder: m.formFieldInputPlaceholderEmailAddress,
                 primaryActionLabel: m.formButtonPrimary,
                 pendingLabel: m.verifying,
                 actionText: m.start.actionText,
@@ -158,10 +158,10 @@ export function SignInView({
                 title: m.password.title,
                 description: m.password.subtitle,
                 identityEditLabel: m.identityPreviewEditButton,
-                fieldLabel: m.formFieldLabel__password,
-                fieldPlaceholder: m.formFieldInputPlaceholder__password,
-                showPasswordLabel: m.formFieldAction__showPassword,
-                hidePasswordLabel: m.formFieldAction__hidePassword,
+                fieldLabel: m.formFieldLabelPassword,
+                fieldPlaceholder: m.formFieldInputPlaceholderPassword,
+                showPasswordLabel: m.formFieldActionShowPassword,
+                hidePasswordLabel: m.formFieldActionHidePassword,
                 forgotPasswordLabel: m.password.actionLink,
                 ...actions,
               }}
@@ -222,7 +222,7 @@ export function SignInView({
               messages={{
                 title: m.backupCodeMfa.title,
                 description: m.backupCodeMfa.subtitle,
-                fieldLabel: m.formFieldLabel__backupCode,
+                fieldLabel: m.formFieldLabelBackupCode,
                 ...actions,
               }}
               value={value}
@@ -262,7 +262,7 @@ export function SignInView({
                 title: m.alternativeMethods.getHelp.title,
                 description: m.alternativeMethods.getHelp.content,
                 backButton: m.backButton,
-                supportButton: m.alternativeMethods.getHelp.blockButton__emailSupport,
+                supportButton: m.alternativeMethods.getHelp.blockButtonEmailSupport,
               }}
               onEmailSupport={onEmailSupport}
               onBack={onBack}
@@ -275,16 +275,16 @@ export function SignInView({
               messages={{
                 title: m.signUp.title,
                 description: m.signUp.subtitle,
-                firstNameLabel: m.formFieldLabel__firstName,
-                firstNamePlaceholder: m.formFieldInputPlaceholder__firstName,
-                lastNameLabel: m.formFieldLabel__lastName,
-                lastNamePlaceholder: m.formFieldInputPlaceholder__lastName,
-                emailLabel: m.formFieldLabel__emailAddress,
-                emailPlaceholder: m.formFieldInputPlaceholder__emailAddress,
-                passwordLabel: m.formFieldLabel__password,
-                passwordPlaceholder: m.formFieldInputPlaceholder__password,
-                showPasswordLabel: m.formFieldAction__showPassword,
-                hidePasswordLabel: m.formFieldAction__hidePassword,
+                firstNameLabel: m.formFieldLabelFirstName,
+                firstNamePlaceholder: m.formFieldInputPlaceholderFirstName,
+                lastNameLabel: m.formFieldLabelLastName,
+                lastNamePlaceholder: m.formFieldInputPlaceholderLastName,
+                emailLabel: m.formFieldLabelEmailAddress,
+                emailPlaceholder: m.formFieldInputPlaceholderEmailAddress,
+                passwordLabel: m.formFieldLabelPassword,
+                passwordPlaceholder: m.formFieldInputPlaceholderPassword,
+                showPasswordLabel: m.formFieldActionShowPassword,
+                hidePasswordLabel: m.formFieldActionHidePassword,
                 primaryActionLabel: m.formButtonPrimary,
                 pendingLabel: m.verifying,
                 actionText: m.signUp.actionText,
