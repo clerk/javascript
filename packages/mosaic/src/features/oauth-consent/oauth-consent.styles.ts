@@ -36,7 +36,7 @@ export const styles = stylex.create({
   scopesTitle: {
     paddingBlock: space['2'],
     paddingInline: space['3'],
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
     borderBlockEndColor: colorVars['--cl-color-border'],
     borderBlockEndStyle: 'solid',
     borderBlockEndWidth: '1px',

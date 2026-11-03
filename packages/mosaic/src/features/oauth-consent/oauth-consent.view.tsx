@@ -330,18 +330,11 @@ function OrganizationAccess({
 function OrganizationPicker({ open, children }: { open: boolean; children: ReactNode }) {
   const element = useRef<HTMLDivElement | null>(null);
   const { mounted, transitionProps } = useTransition({ open, ref: element });
-  const hasBeenClosed = useRef(!open);
-  if (!open) {
-    hasBeenClosed.current = true;
-  }
-  const effectiveTransitionProps = hasBeenClosed.current
-    ? transitionProps
-    : { ...transitionProps, 'data-starting-style': undefined, style: undefined };
 
   return (
     <div
       ref={element}
-      {...effectiveTransitionProps}
+      {...transitionProps}
       {...stylex.props(styles.organizationPicker)}
     >
       <div
