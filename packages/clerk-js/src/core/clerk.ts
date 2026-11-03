@@ -685,7 +685,7 @@ export class Clerk implements ClerkInterface {
       this.#finishLoad();
     } catch (error) {
       // A reload that succeeded while this load was running already applied newer resources, so the load finishes.
-      if (this.#initialResourcesReloadedDuringLoad && this.#status === 'loading') {
+      if (!this.#options.standardBrowser && this.#initialResourcesReloadedDuringLoad && this.#status === 'loading') {
         this.#finishLoad();
         this.#publicEventBus.emit(clerkEvents.Status, 'ready');
         return;
@@ -3743,7 +3743,7 @@ export class Clerk implements ClerkInterface {
 
     // A load that is still running finishes with these resources if it fails. An overlapping reload may have finished
     // loading first.
-    if (this.#status === 'error') {
+    if (!this.#options.standardBrowser && this.#status === 'error') {
       this.#finishLoad();
       this.#publicEventBus.emit(clerkEvents.Status, 'ready');
     } else if (this.#status === 'loading') {

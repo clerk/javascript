@@ -357,25 +357,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.replayInterceptedInvocations(clerk);
     };
 
+    const onLoadFailed = (err: unknown) => {
+      if (__DEV__) {
+        console.error('Clerk: Failed to load:', err);
+      }
+      this.#eventBus.emit(clerkEvents.Status, 'error');
+      this.emitLoaded();
+    };
+
     if (!clerk.loaded) {
-      let loadFailed = false;
       clerk
         .load(this.options)
-        .catch(err => {
-          loadFailed = true;
-          throw err;
+        .then(onLoaded, err => {
+          onLoadFailed(err);
+          this.replayWhenLoadIsFinished(clerk);
         })
-        .then(() => onLoaded())
-        .catch(err => {
-          if (__DEV__) {
-            console.error('Clerk: Failed to load:', err);
-          }
-          this.#eventBus.emit(clerkEvents.Status, 'error');
-          this.emitLoaded();
-          if (loadFailed) {
-            this.replayWhenLoadIsFinished(clerk);
-          }
-        });
+        .catch(onLoadFailed);
     } else {
       onLoaded();
     }
@@ -386,11 +383,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    * once Clerk stops rejecting the app's version.
    */
   private replayWhenLoadIsFinished(clerk: HeadlessBrowserClerk | BrowserClerk): void {
-    // A reload can finish the load before this runs.
-    if (clerk.loaded) {
-      this.replayFinishedLoad(clerk);
-      return;
-    }
     if (typeof clerk.on !== 'function') {
       return;
     }
@@ -406,7 +398,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         this.replayFinishedLoad(clerk);
       });
     };
-    clerk.on('status', onStatus);
+    clerk.on('status', onStatus, { notify: true });
   }
 
   // Nothing awaits this replay, so a queued call or listener that throws is handled here, as it is when the first load
