@@ -6,6 +6,10 @@ test('useBiometricCredentials reports what the expo-biometrics native module fou
   screen,
   platform,
 }) => {
+  await host.useSettings({
+    config: { 'auth_biometric.used_for_sign_in': true },
+    environment: { 'auth_config.native_settings.trusted_device_sign_in_enabled': true },
+  });
   const nativeAnswer = platform === 'ios' ? 'biometric_authentication_unavailable' : 'no_local_credential';
   await host.launch();
   await host.tap(homeLinks(screen).nativeModules);

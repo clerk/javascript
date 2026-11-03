@@ -132,7 +132,7 @@ function SelectInner(props: SelectProps) {
       }
       setOpen(next);
     },
-    [setOpen],
+    [setOpen, setTouchOpen],
   );
 
   const {

@@ -3,7 +3,7 @@
 import { CompositeItem } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isRef, mergeProps, useRender } from '../utils';
 import { useAccordionContext, useAccordionItemContext } from './accordion-context';
 
 export type AccordionTriggerProps = ComponentProps<'button'>;
@@ -20,7 +20,7 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
       <CompositeItem
         disabled={disabled}
         render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-          const defaultProps: Record<string, unknown> = {
+          const defaultProps = {
             id: triggerId,
             type: 'button' as const,
             'aria-expanded': open,
@@ -31,7 +31,7 @@ export const AccordionTrigger = React.forwardRef<HTMLButtonElement, AccordionTri
                 ctx.toggle(itemValue);
               }
             },
-          };
+          } satisfies DefaultProps<'button'>;
 
           const merged = mergeProps<'button'>(mergeProps<'button'>(defaultProps, otherProps), compositeProps);
 

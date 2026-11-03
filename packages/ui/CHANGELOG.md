@@ -1,5 +1,17 @@
 # @clerk/ui
 
+## 1.42.3
+
+### Patch Changes
+
+- Fix custom OAuth provider names and icons incorrectly carrying over from a previously loaded environment. ([#10526](https://github.com/clerk/javascript/pull/10526)) by [@Ephem](https://github.com/Ephem)
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+  - @clerk/localizations@4.24.5
+
 ## 1.42.2
 
 ### Patch Changes

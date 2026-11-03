@@ -74,7 +74,7 @@ export type StateAttributesMapping<S> = {
 
 type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
   | React.ComponentPropsWithRef<Tag>
-  | Record<string, unknown>;
+  | (React.ComponentPropsWithRef<Tag> & Record<`data-${string}`, string | undefined>);
 
 /**
  * Merges two props objects. Event handlers are chained (both fire),
@@ -86,8 +86,12 @@ type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
 export function mergeProps<Tag extends keyof React.JSX.IntrinsicElements>(
   a: PropsInput<Tag>,
   b: PropsInput<Tag>,
-): Record<string, unknown>;
+): DefaultProps<Tag>;
 export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
+  return mergeRecords(a, b);
+}
+
+function mergeRecords(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
   const merged: Record<string, unknown> = { ...a };
 
   for (const key of Object.keys(b)) {
@@ -263,9 +267,9 @@ export function useRender<
   }
 
   if (React.isValidElement(render)) {
-    // SAFETY: `@types/react` types element `props` as `unknown`; mergeProps reads it
+    // SAFETY: `@types/react` types element `props` as `unknown`; mergeRecords reads it
     // as an untyped bag of props, which is exactly what a cloned element carries.
-    const merged = mergeProps<Tag>(computedProps, render.props as Record<string, unknown>);
+    const merged = mergeRecords(computedProps, render.props as Record<string, unknown>);
     // SAFETY: cloneElement's prop type omits `ref`, but React re-associates a ref passed
     // here at runtime (base-ui clones render elements the same way). Asserting the element's
     // props as an untyped bag lets the merged props + ref through the index signature.

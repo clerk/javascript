@@ -204,6 +204,7 @@ describe('Accordion', () => {
         renderAccordion({ defaultValue: ['item1'] });
         const panel = document.querySelector('[data-testid="accordion-panel"]') as HTMLElement;
         expect(panel.getAttribute('style')).toContain('--cl-accordion-panel-height');
+        expect(panel.getAttribute('style')).not.toContain('panel-width');
       } finally {
         if (original) {
           (Element.prototype as { getAnimations?: unknown }).getAnimations = original;

@@ -8,7 +8,7 @@ import type {
   SignOut,
   UseAuthReturn,
 } from '@clerk/shared/types';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
@@ -99,8 +99,8 @@ export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
   const authState = useAuthBase();
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
-  const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
+  const getToken: GetToken = useMemo(() => createGetToken(isomorphicClerk), [isomorphicClerk]);
+  const signOut: SignOut = useMemo(() => createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { treatPendingAsSignedOut }));
 

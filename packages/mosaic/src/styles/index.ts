@@ -120,6 +120,8 @@ export type {
 } from '../components/table';
 export { SegmentedControl } from '../components/segmented-control';
 export type { SegmentedControlItemProps, SegmentedControlRootProps } from '../components/segmented-control';
+export { Separator } from '../components/separator';
+export type { SeparatorProps } from '../components/separator';
 export { Tabs } from '../components/tabs';
 export type {
   TabsListProps,
@@ -178,8 +180,11 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { CreateOrganization } from '../features/create-organization/create-organization';
+export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
 export { UserButton } from '../features/user-button/user-button';
+export { Waitlist } from '../features/waitlist/waitlist';
 
 import {
   colorVars,

@@ -2,7 +2,7 @@ import * as IconFrameStories from './icon-frame.stories';
 
 # IconFrame
 
-IconFrame centers an icon or other visual in a square Mosaic surface. `bordered` and `filled` are independent treatments, while `size` controls the frame dimensions. The default is a bordered 40px frame; the filled treatment uses `--cl-color-surface-subtle`.
+IconFrame centers an icon or other visual in a square Mosaic surface. `bordered` and `filled` are independent treatments, while `size` controls the frame dimensions. The default is a bordered 40px frame; the filled treatment is a translucent wash with the same percentages as `--cl-color-surface-subtle`, so it keeps its tone over a hovered row.
 
 ## Playground
 
@@ -45,7 +45,7 @@ import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
   composition={[{ name: 'Icon', href: '/components/icon', layer: 'Components' }]}
 />
 
-`sm`, `md`, `lg`, and `xl` map to 28px, 32px, 36px, and 40px respectively.
+`xs`, `sm`, `md`, and `lg` map to 24px, 32px, 40px, and 48px respectively, the same steps and corner radii as `Avatar`.
 
 ### Treatments
 

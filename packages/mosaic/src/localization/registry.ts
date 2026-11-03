@@ -1,6 +1,9 @@
 import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
+import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
+import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
+import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
 import { invitationsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.messages';
@@ -30,6 +33,7 @@ import { userProfileAddPhoneMessages } from '../features/user-profile/user-profi
 import { userProfilePhoneSectionMessages } from '../features/user-profile/user-profile-phone-section/user-profile-phone-section.messages';
 import { userProfileProfileSectionMessages } from '../features/user-profile/user-profile-profile-section/user-profile-profile-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
+import { waitlistMessages } from '../features/waitlist/waitlist.messages';
 import { errorMessages } from './errors.messages';
 import { roleMessages } from './roles.messages';
 
@@ -68,12 +72,16 @@ export const mosaicMessages = {
     },
     danger: organizationProfileDangerSectionMessages,
   },
+  inviteMembersButton: inviteMembersButtonMessages,
   apiKeys: apiKeysTableMessages,
+  createOrganization: createOrganizationMessages,
+  organizationList: organizationListMessages,
   reverification: reverificationMessages,
   profile: profileMessages,
   form: formMessages,
   errors: errorMessages,
   roles: roleMessages,
+  waitlist: waitlistMessages,
 };
 
 export type MosaicMessages = typeof mosaicMessages;

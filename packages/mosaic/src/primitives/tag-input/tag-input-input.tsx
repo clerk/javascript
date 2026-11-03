@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 import { readingDirectionKeys, useDirection } from '../direction-provider';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useTagInputContext } from './tag-input-context';
 import { splitTags } from './tag-input-utils';
 
@@ -21,7 +21,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
       setText('');
     };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       type: 'text',
       value: text,
       disabled,
@@ -61,7 +61,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
           focusTag(value[value.length - 1]);
         }
       },
-    };
+    } satisfies DefaultProps<'input'>;
 
     return useRender({
       defaultTagName: 'input',

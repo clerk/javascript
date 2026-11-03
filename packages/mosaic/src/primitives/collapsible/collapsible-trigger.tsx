@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useCollapsibleContext } from './collapsible-context';
 
 export type CollapsibleTriggerProps = ComponentProps<'button'>;
@@ -14,7 +14,7 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
 
     const state = { open, disabled };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       id: triggerId,
       type: 'button' as const,
       'aria-expanded': open,
@@ -25,7 +25,7 @@ export const CollapsibleTrigger = React.forwardRef<HTMLButtonElement, Collapsibl
           setOpen(!open);
         }
       },
-    };
+    } satisfies DefaultProps<'button'>;
 
     const merged = mergeProps<'button'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not

@@ -61,6 +61,12 @@ import {
   Labelled as CopyButtonLabelled,
   meta as copyButtonMeta,
 } from '../stories/copy-button.stories';
+import {
+  Default as CreateOrganizationDefault,
+  meta as createOrganizationMeta,
+  WithError as CreateOrganizationWithError,
+  WithoutSlug as CreateOrganizationWithoutSlug,
+} from '../stories/create-organization.stories';
 import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as DestructiveDefault,
@@ -133,6 +139,12 @@ import {
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
 import {
+  CustomElement as InviteMembersButtonCustomElement,
+  Default as InviteMembersButtonDefault,
+  meta as inviteMembersButtonMeta,
+  Unavailable as InviteMembersButtonUnavailable,
+} from '../stories/invite-members-button.stories';
+import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -150,6 +162,14 @@ import {
 } from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OrganizationListDefault,
+  Empty as OrganizationListEmpty,
+  Loading as OrganizationListLoading,
+  meta as organizationListMeta,
+  WithError as OrganizationListWithError,
+  WithoutPersonal as OrganizationListWithoutPersonal,
+} from '../stories/organization-list.stories';
 import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
@@ -296,6 +316,11 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -347,6 +372,13 @@ import {
 } from '../stories/tooltip.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
+import {
+  Default as UserAvatarDefault,
+  meta as userAvatarMeta,
+  NoImage as UserAvatarNoImage,
+  Shapes as UserAvatarShapes,
+  Sizes as UserAvatarSizes,
+} from '../stories/user-avatar.stories';
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
@@ -478,6 +510,12 @@ import {
   LiveRegion as VisuallyHiddenLiveRegion,
   meta as visuallyHiddenMeta,
 } from '../stories/visually-hidden.stories';
+import {
+  Default as WaitlistDefault,
+  Joined as WaitlistJoined,
+  meta as waitlistMeta,
+  Redirecting as WaitlistRedirecting,
+} from '../stories/waitlist.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -687,10 +725,48 @@ const userButtonModule: StoryModule = {
   User: UserButtonUser,
 };
 
+const inviteMembersButtonModule: StoryModule = {
+  meta: inviteMembersButtonMeta,
+  Default: InviteMembersButtonDefault,
+  CustomElement: InviteMembersButtonCustomElement,
+  Unavailable: InviteMembersButtonUnavailable,
+};
+
+const waitlistModule: StoryModule = {
+  meta: waitlistMeta,
+  Default: WaitlistDefault,
+  Joined: WaitlistJoined,
+  Redirecting: WaitlistRedirecting,
+};
+
+const userAvatarModule: StoryModule = {
+  meta: userAvatarMeta,
+  Default: UserAvatarDefault,
+  NoImage: UserAvatarNoImage,
+  Shapes: UserAvatarShapes,
+  Sizes: UserAvatarSizes,
+};
+
 const organizationSwitcherModule: StoryModule = {
   meta: organizationSwitcherMeta,
   Default: OrganizationSwitcherDefault,
   NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
+};
+
+const createOrganizationModule: StoryModule = {
+  meta: createOrganizationMeta,
+  Default: CreateOrganizationDefault,
+  WithoutSlug: CreateOrganizationWithoutSlug,
+  WithError: CreateOrganizationWithError,
+};
+
+const organizationListModule: StoryModule = {
+  meta: organizationListMeta,
+  Default: OrganizationListDefault,
+  WithoutPersonal: OrganizationListWithoutPersonal,
+  Loading: OrganizationListLoading,
+  Empty: OrganizationListEmpty,
+  WithError: OrganizationListWithError,
 };
 
 const headingModule: StoryModule = {
@@ -830,6 +906,12 @@ const segmentedControlModule: StoryModule = {
   meta: segmentedControlMeta,
   Default: SegmentedControlDefault,
   Disabled: SegmentedControlDisabled,
+};
+
+const separatorModule: StoryModule = {
+  meta: separatorMeta,
+  Default: SeparatorDefault,
+  Labelled: SeparatorLabelled,
 };
 
 const switchModule: StoryModule = {
@@ -1063,8 +1145,13 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // Misc
   organizationSwitcherModule,
+  createOrganizationModule,
+  organizationListModule,
+  userAvatarModule,
+  inviteMembersButtonModule,
   apiKeysTableModule,
   reverificationModule,
+  waitlistModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
@@ -1103,6 +1190,7 @@ export const registry: StoryModule[] = [
   revealModule,
   sectionModule,
   segmentedControlModule,
+  separatorModule,
   selectComponentModule,
   switchModule,
   tableModule,

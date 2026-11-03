@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useTagInputContext, useTagValue } from './tag-input-context';
 
 export type TagInputTagRemoveProps = ComponentProps<'button'>;
@@ -13,7 +13,7 @@ export const TagInputTagRemove = React.forwardRef<HTMLButtonElement, TagInputTag
     const { disabled, remove } = useTagInputContext();
     const tagValue = useTagValue();
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       type: 'button',
       tabIndex: -1,
       disabled,
@@ -23,7 +23,7 @@ export const TagInputTagRemove = React.forwardRef<HTMLButtonElement, TagInputTag
           remove(tagValue, 'input');
         }
       },
-    };
+    } satisfies DefaultProps<'button'>;
 
     return useRender({
       defaultTagName: 'button',
