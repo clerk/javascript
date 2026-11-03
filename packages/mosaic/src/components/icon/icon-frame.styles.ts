@@ -1,11 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   base: {
     borderColor: 'transparent',
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: 'var(--_cl-media-radius)',
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
@@ -22,11 +22,4 @@ export const styles = stylex.create({
   filled: {
     backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
   },
-});
-
-export const sizes = stylex.create({
-  sm: { height: space['7'] },
-  md: { height: space['8'] },
-  lg: { height: space['9'] },
-  xl: { height: space['10'] },
 });
