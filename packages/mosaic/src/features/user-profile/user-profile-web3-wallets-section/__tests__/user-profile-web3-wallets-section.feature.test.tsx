@@ -558,12 +558,15 @@ describe('Web3 wallets', () => {
     await user.click(confirm);
     await waitFor(() => expect(hold.requests).toHaveLength(1));
     expect(confirm).toHaveAttribute('aria-busy', 'true');
+    const manage = screen.getByRole('button', { name: 'Manage MetaMask', hidden: true });
+    expect(manage).toHaveAttribute('aria-disabled', 'true');
     hold.fail('wallet_removal_failed');
 
     await waitFor(() =>
       expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent('wallet_removal_failed'),
     );
     await waitFor(() => expect(confirm).not.toHaveAttribute('aria-busy', 'true'));
+    expect(manage).not.toHaveAttribute('aria-disabled', 'true');
     const retryFapi = serveFapi(fapi);
     await user.click(confirm);
     await waitFor(() => expect(retryFapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
