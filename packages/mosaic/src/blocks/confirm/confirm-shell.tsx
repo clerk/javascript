@@ -69,7 +69,7 @@ function ConfirmCard<Payload>({
     cancelLabel,
     isPending: controller.isPending,
     errorMessage: controller.errorMessage,
-    confirm: () => void controller.confirm(payload),
+    confirm: () => controller.confirm(payload),
   });
 
   return (

@@ -84,8 +84,8 @@ export interface ConfirmController<Payload = void> {
   /** Opens the dialog about `payload` */
   open: (payload: Payload) => void;
   onOpenChange: (open: boolean) => void;
-  /** Runs the action for `payload`. The dialog closes when it resolves and shows why when it rejects. Resolves whether the action succeeded. */
-  confirm: (payload: Payload) => Promise<boolean>;
+  /** Runs the action for `payload`. The dialog closes when it resolves and shows why when it rejects. */
+  confirm: (payload: Payload) => void;
 }
 
 export interface ConfirmControllerOptions<Payload = void> {
@@ -140,21 +140,15 @@ export function useConfirmController<Payload = void>({
       send({ type: 'CANCEL' });
     },
     confirm: payload => {
-      let completion: Promise<boolean> | undefined;
+      if (snapshot.value !== 'confirming') {
+        return;
+      }
       send({
         type: 'CONFIRM',
-        run: () => {
-          const operation = (async () => {
-            await onConfirm(payload);
-          })();
-          completion = operation.then(
-            () => true,
-            () => false,
-          );
-          return operation;
+        run: async () => {
+          await onConfirm(payload);
         },
       });
-      return completion ?? Promise.resolve(false);
     },
   };
 }

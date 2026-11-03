@@ -179,10 +179,10 @@ export function useUserProfileWeb3WalletsController({
       !availableProviders.some(provider => provider.id === errorId)
         ? action.error
         : undefined,
-    isDisabled: action.isPending,
+    isDisabled: action.isPending || removeWallet.isPending,
     sectionRef,
     registerTrigger: removalFocus.registerTrigger,
-    remove: remove ? action.guard(removeWallet) : undefined,
+    remove: remove ? removeWallet : undefined,
     finalFocus: removalFocus.finalFocus,
     setPrimaryReverification,
     createReverification,
