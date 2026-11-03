@@ -305,6 +305,38 @@ describe('OrganizationSwitcher', () => {
     expect(reading('Settings', 'Terms of service', 'Support')).toEqual(['Support', 'Terms of service', 'Settings']);
   });
 
+  describe('the organization profile page order', () => {
+    const termsPage = { label: 'Terms', path: 'terms', icon: <span />, content: <p>Terms body</p> };
+
+    async function openedPageLabels(permissions: string[]) {
+      const memberships = [fapiMembership(acme, { permissions }), fapiMembership(other)];
+      const user = fapiUser({ ...alice, organization_memberships: memberships });
+      const session = fapiSession({ id: 'sess_1', user, last_active_organization_id: 'org_1' });
+      const { clerk } = await renderSwitcher({}, noOffers({ client: fapiClient([session]), memberships }), {
+        organizationProfileProps: { customPages: [termsPage], pageOrder: ['terms', 'security'] },
+      });
+      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+      const clicker = await openWithList();
+
+      await clicker.click(screen.getByRole('button', { name: 'Settings' }));
+
+      return openOrganizationProfile.mock.calls[0]?.[0]?.customPages?.map(page => page.label);
+    }
+
+    it('keeps Security where it was asked for when the member can manage the SSO bypass allowlist', async () => {
+      expect(await openedPageLabels(['org:sys_entconns_sso_bypass:manage'])).toEqual([
+        'Terms',
+        'security',
+        'general',
+        'members',
+      ]);
+    });
+
+    it('leaves Security out when the organization profile will not show it', async () => {
+      expect(await openedPageLabels([])).toEqual(['Terms', 'general', 'members']);
+    });
+  });
+
   it('themes its parts through organization-switcher slots', async () => {
     await renderSwitcher({}, noOffers());
     await openWithList();

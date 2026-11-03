@@ -6,7 +6,7 @@ import {
   disabledUserAPIKeysFeature,
   disabledUserBillingFeature,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useSession } from '@clerk/shared/react';
 import type { CustomPage } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
@@ -14,6 +14,7 @@ import { createPortal } from 'react-dom';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { applyOrder } from '../../utils/apply-order';
+import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
 import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
 import { USER_PROFILE_PAGE_IDS } from '../user-profile/user-profile.layout';
 import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
@@ -42,6 +43,9 @@ export function useUserProfilePages(): UserProfilePageId[] {
 export function useOrganizationProfilePages(): OrganizationProfilePageId[] {
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
+  const { session } = useSession();
+  const canManageSSOBypass =
+    session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.ssoBypassManage }) ?? false;
 
   const pages: OrganizationProfilePageId[] = ['general', 'members'];
   if (!disabledOrganizationBillingFeature(clerk, environment)) {
@@ -50,7 +54,11 @@ export function useOrganizationProfilePages(): OrganizationProfilePageId[] {
   if (!disabledOrganizationAPIKeysFeature(clerk, environment)) {
     pages.push('apiKeys');
   }
-  if (!disabledSelfServeSSOFeature(clerk, environment) || !disabledSelfServeDirectorySyncFeature(clerk, environment)) {
+  if (
+    !disabledSelfServeSSOFeature(clerk, environment) ||
+    !disabledSelfServeDirectorySyncFeature(clerk, environment) ||
+    canManageSSOBypass
+  ) {
     pages.push('security');
   }
   return pages;
