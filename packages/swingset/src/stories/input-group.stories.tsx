@@ -151,3 +151,25 @@ export function Invalid(props: Record<string, unknown>) {
     </Field.Root>
   );
 }
+
+export function FieldOverrides(props: Record<string, unknown>) {
+  return (
+    <Field.Root
+      disabled
+      invalid
+      xstyle={styles.fieldWidth}
+    >
+      <Field.Label>Website</Field.Label>
+      <InputGroup.Root
+        {...knobsAsProps(props)}
+        disabled={false}
+        invalid={false}
+      >
+        <InputGroup.Start>https://</InputGroup.Start>
+        <InputGroup.Input placeholder='example' />
+        <InputGroup.End>.com</InputGroup.End>
+      </InputGroup.Root>
+      <Field.Error>The field is disabled and invalid; the group overrides both</Field.Error>
+    </Field.Root>
+  );
+}

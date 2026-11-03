@@ -81,3 +81,12 @@ function PasswordField() {
   name='Invalid'
   storyModule={InputGroupStories}
 />
+
+### Field overrides
+
+An explicit `disabled` or `invalid` on the group wins over the `Field` state, for the input and its addons.
+
+<Story
+  name='FieldOverrides'
+  storyModule={InputGroupStories}
+/>

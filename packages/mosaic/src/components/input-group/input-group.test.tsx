@@ -284,6 +284,57 @@ describe('Mosaic InputGroup', () => {
     expect(input).toHaveAccessibleDescription('Enter a valid website');
   });
 
+  it('keeps an explicit false group state over a disabled and invalid Field', () => {
+    render(
+      <Field.Root
+        disabled
+        invalid
+      >
+        <Field.Label>Website</Field.Label>
+        <InputGroup.Root
+          disabled={false}
+          invalid={false}
+        >
+          <InputGroup.Start>https://</InputGroup.Start>
+          <Input />
+          <InputGroup.End>
+            <Button aria-label='Clear' />
+          </InputGroup.End>
+        </InputGroup.Root>
+      </Field.Root>,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Website' });
+    expect(document.querySelector('.cl-input-group')).not.toHaveAttribute('data-disabled');
+    expect(document.querySelector('.cl-input-group')).not.toHaveAttribute('data-invalid');
+    expect(input).toBeEnabled();
+    expect(input).not.toHaveAttribute('aria-invalid');
+    expect(input).not.toHaveAttribute('data-disabled');
+    expect(screen.getByText('https://')).not.toHaveAttribute('data-disabled');
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeEnabled();
+  });
+
+  it('keeps direct Input overrides inside a group that resolves to false', () => {
+    render(
+      <Field.Root>
+        <Field.Label>Website</Field.Label>
+        <InputGroup.Root
+          disabled={false}
+          invalid={false}
+        >
+          <Input
+            disabled
+            aria-invalid
+          />
+        </InputGroup.Root>
+      </Field.Root>,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Website' });
+    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+  });
+
   it('lets text focus the grouped input without changing its value', async () => {
     const user = userEvent.setup();
     render(

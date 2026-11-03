@@ -46,10 +46,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
     ariaDescribedBy,
   });
   const size = inputGroup?.size ?? sizeProp ?? 'md';
-  const disabled = inputGroup?.disabled || fieldProps?.disabled || disabledProp || false;
+  const disabled = (inputGroup ? inputGroup.disabled : fieldProps?.disabled) || disabledProp || false;
   const keepsFocus = disabled && (fieldProps?.focusableWhenDisabled ?? false);
   const required = fieldProps?.required ?? requiredProp;
-  const ariaInvalidValue = inputGroup?.invalid ? true : (fieldProps?.['aria-invalid'] ?? ariaInvalid);
+  const ariaInvalidValue = (inputGroup ? inputGroup.invalid : fieldProps?.['aria-invalid']) || ariaInvalid;
 
   return useRender({
     defaultTagName: 'input',
