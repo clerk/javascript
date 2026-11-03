@@ -165,7 +165,7 @@ describe('UserButton', () => {
     it('renders nothing while Clerk is still loading', async () => {
       serveFapi(signedIn());
       const client = holdRequests('get', '/v1/client');
-      const rendering = renderWithClerk(tree({ mode }));
+      const rendering = renderWithClerk(tree({ combined: mode === 'combined' }));
 
       await waitFor(() => expect(client.requests).toHaveLength(1));
       expect(host()).toBeEmptyDOMElement();
@@ -176,14 +176,17 @@ describe('UserButton', () => {
     });
 
     it('renders nothing, not even its fallback, when nobody is signed in', async () => {
-      await renderUserButton({ mode, fallback: <output>Loading</output> }, signedIn({ client: fapiClient() }));
+      await renderUserButton(
+        { combined: mode === 'combined', fallback: <output>Loading</output> },
+        signedIn({ client: fapiClient() }),
+      );
 
       expect(host()).toBeEmptyDOMElement();
     });
 
     it('leaves organizations out entirely when the instance has them disabled', async () => {
       await renderUserButton(
-        { mode },
+        { combined: mode === 'combined' },
         signedIn({ environment: fapiEnvironment({ organization_settings: { enabled: false } }) }),
       );
 

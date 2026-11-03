@@ -10,7 +10,7 @@ import { OrganizationProfileProvider } from '../organization-profile/organizatio
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useUserProfilePages } from '../switcher/switcher.pages';
-import { userProfilePageIds } from './user-profile.layout';
+import { ORGANIZATION_PAGE_PREFIX, userProfilePageIds } from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
 import type { UserProfileViewProps } from './user-profile.view';
@@ -226,9 +226,13 @@ function CombinedUserProfileView({
     model.status === 'ready'
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
+  const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
   const navigation = useProfilePagesController(
     initialPage,
-    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
+    pageIds,
+    initialPage.startsWith(ORGANIZATION_PAGE_PREFIX)
+      ? pageIds?.find(id => id.startsWith(ORGANIZATION_PAGE_PREFIX))
+      : undefined,
   );
 
   return (

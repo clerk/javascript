@@ -20,6 +20,7 @@ import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
 import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
 import type { MosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
+import { ORGANIZATION_PAGE_PREFIX } from '../user-profile/user-profile.layout';
 import { userProfileModal } from '../user-profile/user-profile.modal';
 import type {
   SwitcherBrandingProps,
@@ -217,7 +218,13 @@ export function useSwitcherModel(
           apiKeysProps: organizationProfileProps?.apiKeysProps,
         });
       } else if (combined) {
-        userProfile.open({ ...mosaicUserProfile, page: 'organization/general' }, getContainer?.());
+        userProfile.open(
+          {
+            ...mosaicUserProfile,
+            page: `${ORGANIZATION_PAGE_PREFIX}${organizationProfileProps?.pageOrder?.[0] ?? 'general'}`,
+          },
+          getContainer?.(),
+        );
       } else {
         organizationProfile.open(organizationProfileProps, getContainer?.());
       }

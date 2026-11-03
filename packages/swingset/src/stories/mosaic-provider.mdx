@@ -9,7 +9,7 @@ components open.
 Wrap the part of your app that uses Mosaic. Every prop is optional.
 
 ```tsx
-import { MosaicProvider } from '@clerk/mosaic';
+import { MosaicProvider, UserButton } from '@clerk/mosaic';
 
 <MosaicProvider>
   <UserButton />
@@ -41,6 +41,7 @@ themselves.
 
 ```tsx
 <MosaicProvider
+  experimental={{ newProfiles: true }}
   profile={{
     combined: true,
     userProfileUrl: '/account',
@@ -55,6 +56,9 @@ themselves.
 
 `combined` on `MosaicProvider` decides what the profile shows, and `combined` on `UserButton` decides what
 its menu lists. [Profile permutations](/user-button/profile-permutations) shows each pairing.
+
+`profile.combined` takes effect only with `experimental.newProfiles`. Without it, `UserButton` and
+`OrganizationSwitcher` open Clerk's modals.
 
 | Option                     | Type                       | Default | Description                                                                       |
 | -------------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------- |

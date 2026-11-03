@@ -235,6 +235,26 @@ describe('the profile the switchers open', () => {
     expect(await selectedTab('General')).toBeInTheDocument();
   });
 
+  it('opens a combined profile on the first organization page in the configured order', async () => {
+    await renderWithProfile(<OrganizationSwitcher />, {
+      organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] },
+    });
+
+    await clickSettings(switcherTrigger);
+
+    expect(await selectedTab('Terms')).toBeInTheDocument();
+  });
+
+  it('skips a page this organization does not have when opening a combined profile', async () => {
+    await renderWithProfile(<OrganizationSwitcher />, {
+      organizationProfileProps: { pageOrder: ['apiKeys', 'members'] },
+    });
+
+    await clickSettings(switcherTrigger);
+
+    expect(await selectedTab('Members')).toBeInTheDocument();
+  });
+
   it.each([
     { name: 'the button', ui: <UserButton combined={false} />, trigger: buttonTrigger },
     { name: 'the switcher', ui: <OrganizationSwitcher />, trigger: switcherTrigger },
