@@ -40,6 +40,8 @@ export interface FileUploadProps extends Omit<ComponentProps<'div'>, 'value' | '
   onReject?: (rejections: FileRejection[]) => void;
   /** Disable the trigger, dropzone, and picker. @default false */
   disabled?: boolean;
+  /** `id` for the hidden file input, so a `<label htmlFor>` can open the picker. */
+  inputId?: string;
   children: ReactNode;
 }
 
@@ -68,6 +70,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadProps>(
     maxSize,
     onReject,
     disabled = false,
+    inputId: inputIdProp,
     children,
     ...otherProps
   } = props;
@@ -76,7 +79,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadProps>(
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const rootId = useId();
-  const inputId = `${rootId}input`;
+  const inputId = inputIdProp ?? `${rootId}input`;
 
   const addFiles = useCallback(
     (incoming: FileList | File[]) => {

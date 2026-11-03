@@ -1,10 +1,14 @@
 export const createOrganizationMessages = {
   create: {
     title: 'Create {organization}',
-    logoLabel: 'Logo',
-    logoDescription: 'Recommended size 1:1, up to 10MB.',
-    uploadLogo: 'Upload',
-    removeLogo: 'Remove',
+    logo: {
+      label: 'Logo',
+      description: 'Recommended size 1:1, up to 10MB.',
+      upload: 'Upload',
+      manage: 'Manage logo',
+      change: 'Change logo',
+      remove: 'Remove logo',
+    },
     nameLabel: 'Name',
     namePlaceholder: '{Organization} name',
     slugLabel: 'Slug',

@@ -21,7 +21,7 @@ Set up each machine once.
 
 1. Install Node 24, at 24.15.0 or newer, which the `pnpm install` below needs. For a local iOS device, install Xcode with an iOS simulator runtime. For a local Android device, install Android Studio with the SDK, the emulator, and Java 21. The CLI looks for the SDK in `ANDROID_HOME`, `ANDROID_SDK_ROOT`, and `~/Library/Android/sdk`.
 2. Create the iOS template simulator, which the CLI clones to make each simulator it drives, with `xcrun simctl create "Clerk Verify Template iOS" "iPhone Air"`. That makes a new simulator that holds only the system's apps. Do not clone a simulator you already use: a clone holds every app of the original, and those apps show on the home screen at the start of a video. Boot the template once and shut it down: a clone of a template that never booted takes about twenty seconds longer to boot. `doctor` says when a system HTTPS proxy needs its CA trusted there. Android needs no template: the first `up --platform android` writes the `Clerk_Verify_Pixel` AVD.
-3. Give the machine the team's Clerk Platform API key. Set `CLERK_PLATFORM_API_KEY` to the key. Or set `CLERK_PLATFORM_API_KEY_FILE` to a file that holds it and that only you can read (mode 0600). Or set `VERIFY_PLATFORM_KEY_REFERENCE` to the key's 1Password secret reference, which the 1Password CLI reads once a person approves the request in the 1Password app, within 60 seconds. Never put the key or the reference in a file inside a repository.
+3. Give the machine the team's Clerk Platform API key. Set `MOBILE_VERIFICATION_PLATFORM_API_KEY` to the key. Or set `MOBILE_VERIFICATION_PLATFORM_API_KEY_FILE` to a file that holds it and that only you can read (mode 0600). Or set `MOBILE_VERIFICATION_PLATFORM_API_KEY_REFERENCE` to the key's 1Password secret reference, which the 1Password CLI reads once a person approves the request in the 1Password app, within 60 seconds. Never put the key or the reference in a file inside a repository.
 4. Install ffmpeg (`brew install ffmpeg`), which `attach --video` uses to cut the video to the part that `host.evidence` marks. Without it, `attach` posts the whole video and says that ffmpeg is not installed.
 5. Install simslim (`brew install mobai-app/tap/simslim`), so that each local iOS simulator boots without its background services and uses about a quarter of the memory. `doctor` says whether it is installed. Set `VERIFY_SIMSLIM=0` to boot stock simulators.
 
@@ -251,9 +251,9 @@ When this machine cannot attach and there is no session to hand the files to, or
 
 `attach` writes only to an open pull request, and fails on one that is closed or merged. It refuses a run that is tainted, that ran on a session build with uncommitted changes, that has a failing spec or no passing one, or whose `app.log` names a user that the run did not create. A before run can have failing specs. `attach` refuses a before run that is tainted, that ran on a session build with uncommitted changes, that was never sealed, or whose `app.log` names a user that the run did not create.
 
-Work in this order, with one `up` for both runs: make the branch and `git push` it, `up`, `run` the spec without your change when it changes something that exists, make the change, commit, `git push`, `run` the spec again, open the pull request, `attach` with the before run as `--before <run-id>`, `down`. Open the pull request after the last run, so that it is not left open without its evidence. Commit before the second `run`, so that the line `attach` writes names a commit the pull request holds. In the pull request, name the run id and the specs you ran, and say what you did not run.
+Work in this order, with one `up` for both runs: make the branch and `git push` it, `up`, `run` the spec without your change when it changes something that exists, make the change, commit, `git push`, `run` the spec again, open the pull request as a draft with `gh pr create --draft`, `attach` with the before run as `--before <run-id>`, `down`, then `gh pr ready <n>` once the description holds the evidence tables. Open the pull request after the last run, so that it is not left open without its evidence. Open it as a draft because review bots such as CodeRabbit review a pull request when it opens or turns ready, and judge the description they read then. A pull request opened ready is reviewed before `attach` writes the evidence. Commit before the second `run`, so that the line `attach` writes names a commit the pull request holds. In the pull request, name the run id and the specs you ran, and say what you did not run.
 
-On a local device `attach` writes the description itself, and no run needs a push. A remote session builds only the commit it was started on and later commits of the branch, so its before run comes before the push of the change. Its evidence reaches the description about a minute after `down`.
+On a local device `attach` writes the description itself, and no run needs a push. A remote session builds only the commit it was started on and later commits of the branch, so its before run comes before the push of the change. Its evidence reaches the description about a minute after `down`, so check that `gh pr view <n> --json body` shows the `verify-evidence` block with its table, not the list of files that the first of its two writes leaves, before `gh pr ready <n>`.
 
 When the change is already committed or pushed, make the before run on its base commit in this worktree, so the run lands in this checkout's `.verify/runs/`. A spec in `specs/explored/` stays through the switch, because that directory is gitignored. A committed spec of the change is not on the base, so copy it to `specs/explored/` first and change its import to `'../fixtures.ts'`.
 
@@ -274,8 +274,11 @@ $ integration/expo-native/bin/control-clerk-expo down
 $ git switch <branch>
 $ integration/expo-native/bin/control-clerk-expo up --platform ios --backend remote
 $ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform ios
+$ gh pr create --draft
 $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot <label> --before <before-run-id>
 $ integration/expo-native/bin/control-clerk-expo down
+$ gh pr view <n> --json body   # wait for the verify-evidence table, about a minute after down
+$ gh pr ready <n>
 $ git push origin --delete <branch>-before && git branch -D <branch>-before
 ```
 
