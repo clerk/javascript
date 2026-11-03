@@ -13,6 +13,7 @@ type HarnessProps = Partial<Omit<OrganizationProfileInviteMembersDialogProps, 'e
 
 function Harness({ initialEmailAddresses = [], ...overrides }: HarnessProps) {
   const [emailAddresses, setEmailAddresses] = useState(initialEmailAddresses);
+  const [emailDraft, setEmailDraft] = useState('');
   const [role, setRole] = useState<string | null>('member');
   return (
     <OrganizationProfileInviteMembersDialog
@@ -20,6 +21,8 @@ function Harness({ initialEmailAddresses = [], ...overrides }: HarnessProps) {
       onOpenChange={vi.fn()}
       emailAddresses={emailAddresses}
       onEmailAddressesChange={setEmailAddresses}
+      emailDraft={emailDraft}
+      onEmailDraftChange={setEmailDraft}
       roles={[
         { value: 'member', label: 'Member', description: 'Non-privileged permissions.' },
         { value: 'admin', label: 'Admin', description: 'Elevated permissions.' },

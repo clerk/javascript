@@ -25,6 +25,7 @@ export function useInviteMembersFixture(): {
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
   const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
+  const [emailDraft, setEmailDraft] = useState('');
   const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
   const [role, setRole] = useState<string | null>('member');
   const [isPending, setIsPending] = useState(false);
@@ -34,6 +35,7 @@ export function useInviteMembersFixture(): {
     onInvite: event => {
       trigger.current = event.currentTarget;
       setEmailAddresses([]);
+      setEmailDraft('');
       setRejectedEmailAddresses([]);
       setRole('member');
       setError(null);
@@ -45,6 +47,8 @@ export function useInviteMembersFixture(): {
       finalFocus: trigger,
       emailAddresses,
       onEmailAddressesChange: setEmailAddresses,
+      emailDraft,
+      onEmailDraftChange: setEmailDraft,
       rejectedEmailAddresses,
       roles,
       role,
