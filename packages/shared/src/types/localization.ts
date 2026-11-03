@@ -730,11 +730,8 @@ export type __internal_LocalizationResource = {
       label__alternativeMethods: LocalizationValue;
     };
     resetPasswordCode: {
-      title: LocalizationValue;
       title__saveNewPassword_email: LocalizationValue;
       title__saveNewPassword_phone: LocalizationValue;
-      subtitle_email: LocalizationValue;
-      subtitle_phone: LocalizationValue;
       subtitle__saveNewPassword_email: LocalizationValue;
       subtitle__saveNewPassword_phone: LocalizationValue;
       formTitle: LocalizationValue;
