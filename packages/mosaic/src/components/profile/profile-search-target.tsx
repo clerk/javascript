@@ -105,6 +105,7 @@ export function useProfileSearch({
   const [query, setQuery] = React.useState('');
   const targetsRef = React.useRef(new Map<string, HTMLElement>());
   const [reveal, setReveal] = React.useState<Reveal | null>(null);
+  const revealedRef = React.useRef<Reveal | null>(null);
   const [highlightedTarget, setHighlightedTarget] = React.useState<string | null>(null);
 
   const registerTarget = React.useCallback((key: string, element: HTMLElement | null) => {
@@ -128,10 +129,10 @@ export function useProfileSearch({
   const clearHighlight = React.useCallback(() => setHighlightedTarget(null), []);
 
   React.useEffect(() => {
-    if (!reveal || reveal.page !== value) {
+    if (!reveal || reveal.page !== value || revealedRef.current === reveal) {
       return;
     }
-    setReveal(null);
+    revealedRef.current = reveal;
     const key = reveal.target === null ? null : targetKey(reveal.page, reveal.target);
     const element = key === null ? undefined : targetsRef.current.get(key);
     if (key === null || !element) {

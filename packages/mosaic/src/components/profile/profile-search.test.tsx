@@ -304,6 +304,19 @@ describe('Profile search', () => {
     expect(targetOf('Password')).not.toHaveAttribute('data-highlighted');
   });
 
+  it('reveals a chosen section once, not again when its page is reopened', async () => {
+    const user = userEvent.setup();
+    renderSurface();
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
+    await user.click(screen.getByRole('tab', { name: 'Account' }));
+    await user.click(screen.getByRole('tab', { name: 'Security' }));
+
+    expect(scrolledTargets()).toHaveLength(1);
+    expect(screen.getByText('Devices list').parentElement).not.toHaveFocus();
+  });
+
   it('keeps targets out of the tab order', () => {
     renderSurface();
 
