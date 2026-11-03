@@ -316,6 +316,11 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -903,6 +908,12 @@ const segmentedControlModule: StoryModule = {
   Disabled: SegmentedControlDisabled,
 };
 
+const separatorModule: StoryModule = {
+  meta: separatorMeta,
+  Default: SeparatorDefault,
+  Labelled: SeparatorLabelled,
+};
+
 const switchModule: StoryModule = {
   meta: switchMeta,
   Default: SwitchDefault,
@@ -1179,6 +1190,7 @@ export const registry: StoryModule[] = [
   revealModule,
   sectionModule,
   segmentedControlModule,
+  separatorModule,
   selectComponentModule,
   switchModule,
   tableModule,
