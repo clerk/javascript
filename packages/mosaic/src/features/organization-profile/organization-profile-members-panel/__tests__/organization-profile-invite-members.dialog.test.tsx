@@ -1,64 +1,55 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../../mosaic-provider';
-import type { OrganizationProfileInviteMembersDialogProps } from '../organization-profile-invite-members.dialog';
+import { useInviteMembersForm } from '../organization-profile-invite-members.controller';
 import { OrganizationProfileInviteMembersDialog } from '../organization-profile-invite-members.dialog';
-import { canSendInvitations } from '../organization-profile-invite-members.utils';
+import type { InviteMembersInput } from '../organization-profile-invite-members.model';
 
-type HarnessProps = Partial<Omit<OrganizationProfileInviteMembersDialogProps, 'emailAddresses'>> & {
-  initialEmailAddresses?: string[];
-};
-
-function Harness({ initialEmailAddresses = [], ...overrides }: HarnessProps) {
-  const [emailAddresses, setEmailAddresses] = useState(initialEmailAddresses);
-  const [emailDraft, setEmailDraft] = useState('');
-  const [role, setRole] = useState<string | null>('member');
+function Harness({ send }: { send: (input: InviteMembersInput) => Promise<void> }) {
+  const { invite } = useInviteMembersForm({
+    roles: {
+      roles: [
+        { key: 'org:member', name: 'Member' },
+        { key: 'org:admin', name: 'Admin' },
+      ],
+      hasRoleSetMigration: false,
+    },
+    defaultRole: 'org:member',
+    errorFallback: 'Something went wrong.',
+    send,
+    onSent: vi.fn(),
+  });
   return (
     <OrganizationProfileInviteMembersDialog
       open
       onOpenChange={vi.fn()}
-      emailAddresses={emailAddresses}
-      onEmailAddressesChange={setEmailAddresses}
-      emailDraft={emailDraft}
-      onEmailDraftChange={setEmailDraft}
-      roles={[
-        { value: 'member', label: 'Member', description: 'Non-privileged permissions.' },
-        { value: 'admin', label: 'Admin', description: 'Elevated permissions.' },
-      ]}
-      role={role}
-      onRoleChange={setRole}
-      canSubmit={canSendInvitations({ emailAddresses, emailDraft, rejectedEmailAddresses: [], role })}
-      isPending={false}
-      error={null}
-      onSubmit={vi.fn()}
-      {...overrides}
+      invite={invite}
     />
-  );
-}
-
-function renderDialog(props: HarnessProps = {}) {
-  return render(
-    <MosaicProvider>
-      <Harness {...props} />
-    </MosaicProvider>,
   );
 }
 
 describe('OrganizationProfileInviteMembersDialog', () => {
   it('blocks submitting until malformed emails are removed', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    renderDialog({ onSubmit, initialEmailAddresses: ['preston@clerk.dev', 'nate'] });
+    const send = vi.fn(() => Promise.resolve());
+    render(
+      <MosaicProvider>
+        <Harness send={send} />
+      </MosaicProvider>,
+    );
 
+    await user.type(screen.getByRole('textbox', { name: 'Email' }), 'preston@clerk.dev,nate,');
     expect(screen.getByText('Remove invalid email addresses to continue')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Send invites' }));
-    expect(onSubmit).not.toHaveBeenCalled();
+    expect(send).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Remove nate' }));
     await user.click(screen.getByRole('button', { name: 'Send invites' }));
-    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(send).toHaveBeenCalledOnce();
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({ emailAddresses: ['preston@clerk.dev'], role: 'org:member' }),
+    );
   });
 });

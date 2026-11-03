@@ -1,5 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 import { AvatarUpload } from '../../blocks/avatar-upload';
 import { Button, SubmitButton } from '../../components/button';
@@ -13,8 +13,8 @@ import { useErrorText, useMessages } from '../../localization';
 import { FileUpload } from '../../primitives/file-upload';
 import { Form } from '../../primitives/form';
 import { AVATAR_REJECTION_ERRORS } from '../../utils/avatar-upload';
+import type { InviteMembersForm } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
 import { InviteMembersFields } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.fields';
-import type { CreateOrganizationInviteController } from './create-organization.controller';
 import type { CreateOrganizationStep, CreateOrganizationValues } from './create-organization.types';
 
 export interface CreateOrganizationStepsProps {
@@ -22,7 +22,7 @@ export interface CreateOrganizationStepsProps {
   form: UseFormResult<CreateOrganizationValues>;
   slugEnabled: boolean;
   onNameChange: (name: string) => void;
-  invite: CreateOrganizationInviteController;
+  invite: InviteMembersForm;
   onFinish: () => void;
   onCancel?: () => void;
 }
@@ -208,7 +208,6 @@ function LogoField({
 
 function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
-  const formId = useId();
   const emailInput = useFlowAutoFocus();
 
   return (
@@ -225,17 +224,14 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
       <Card.Content
         render={
           <Form
-            id={formId}
-            onSubmit={event => {
-              event.preventDefault();
-              invite.onSubmit();
-            }}
+            id={invite.formId}
+            onSubmit={invite.onSubmit}
           />
         }
       >
         <InviteMembersFields
           emailInputRef={emailInput}
-          {...invite}
+          invite={invite}
         />
       </Card.Content>
       <Card.Footer>
@@ -248,7 +244,7 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
           {m.invite.skip}
         </Button>
         <SubmitButton
-          form={formId}
+          form={invite.formId}
           isPending={invite.isPending}
           disabled={!invite.canSubmit}
           focusableWhenDisabled

@@ -2,41 +2,32 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import { Field } from '../../../components/field';
-import type { SelectItem } from '../../../components/select';
 import { Select } from '../../../components/select';
 import { TagInput } from '../../../components/tag-input';
 import { fill, useMessages } from '../../../localization';
+import type { InviteMembersForm } from './organization-profile-invite-members.controller';
 import { styles } from './organization-profile-invite-members.styles';
 import { hasInvalidEmailAddresses, isValidEmail } from './organization-profile-invite-members.utils';
 
 export interface InviteMembersFieldsProps {
   emailInputRef?: Ref<HTMLInputElement>;
-  emailAddresses: string[];
-  onEmailAddressesChange: (emailAddresses: string[]) => void;
-  emailDraft: string;
-  onEmailDraftChange: (emailDraft: string) => void;
-  rejectedEmailAddresses?: string[];
-  roles: SelectItem[];
-  role: string | null;
-  onRoleChange: (role: string | null) => void;
-  isRoleDisabled?: boolean;
-  isPending: boolean;
+  invite: InviteMembersForm;
 }
 
-export function InviteMembersFields({
-  emailInputRef,
-  emailAddresses,
-  onEmailAddressesChange,
-  emailDraft,
-  onEmailDraftChange,
-  rejectedEmailAddresses = [],
-  roles,
-  role,
-  onRoleChange,
-  isRoleDisabled = false,
-  isPending,
-}: InviteMembersFieldsProps) {
+export function InviteMembersFields({ emailInputRef, invite }: InviteMembersFieldsProps) {
   const m = useMessages('organizationProfile').members.invite;
+  const {
+    emailAddresses,
+    onEmailAddressesChange,
+    emailDraft,
+    onEmailDraftChange,
+    rejectedEmailAddresses,
+    roles,
+    role,
+    onRoleChange,
+    isRoleDisabled,
+    isPending,
+  } = invite;
   const hasInvalid = hasInvalidEmailAddresses(emailAddresses, rejectedEmailAddresses);
 
   return (
