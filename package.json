@@ -29,7 +29,7 @@
     "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
     "pub": "pkglab pub",
-    "release": "changeset publish && git push --follow-tags && node scripts/wait-for-packages-on-npm.mjs",
+    "release": "changeset publish && node scripts/wait-for-packages-on-npm.mjs",
     "release:canary": "changeset publish --tag canary --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
     "release:canary-core3": "changeset publish --tag canary-core3 --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
