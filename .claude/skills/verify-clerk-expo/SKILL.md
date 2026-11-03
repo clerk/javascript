@@ -268,16 +268,17 @@ On a remote device, the before run needs a session of its own, started on the ba
 ```console
 $ git switch -c <branch>-before "$(git merge-base origin/main HEAD)"
 $ git push origin <branch>-before
-$ integration/expo-native/bin/control-clerk-expo up --platform ios --backend remote
-$ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform ios
+$ integration/expo-native/bin/control-clerk-expo up --platform <platform> --backend remote
+$ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform <platform>
 $ integration/expo-native/bin/control-clerk-expo down
 $ git switch <branch>
-$ integration/expo-native/bin/control-clerk-expo up --platform ios --backend remote
-$ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform ios
+$ integration/expo-native/bin/control-clerk-expo up --platform <platform> --backend remote
+$ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform <platform>
 $ gh pr create --draft
+$ # in a Claude Code cloud session, open the draft with gh api repos/clerk/javascript/pulls -f title='<title>' -f head=<branch> -f base=main -F draft=true -F body=@<file> instead
 $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot <label> --before <before-run-id>
 $ integration/expo-native/bin/control-clerk-expo down
-$ sh -c 'for i in $(seq 40); do gh api repos/clerk/javascript/pulls/<n> --jq .body | sed -n "/<!-- verify-evidence:ios -->/,/<!-- \/verify-evidence:ios -->/p" | grep -q "| :---:" && exit 0; sleep 15; done; exit 1' && gh pr ready <n>
+$ sh -c 'for i in $(seq 40); do gh api repos/clerk/javascript/pulls/<n> --jq .body | sed -n "/<!-- verify-evidence:<platform> -->/,/<!-- \/verify-evidence:<platform> -->/p" | grep -q "| :---:" && exit 0; sleep 15; done; exit 1' && gh pr ready <n>
 $ # in a Claude Code cloud session, end the line above with && gh api -X POST repos/clerk/javascript/pulls/<n>/ccr/ready_for_review in place of gh pr ready
 $ git push origin --delete <branch>-before && git branch -D <branch>-before
 ```
