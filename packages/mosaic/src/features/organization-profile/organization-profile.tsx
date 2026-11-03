@@ -89,9 +89,10 @@ export function OrganizationProfile({
 }: OrganizationProfileProps) {
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
-  const navigation = useProfilePagesController(
+  const { activePage, onPageChange } = useProfilePagesController(
     defaultPage ?? pageOrder?.[0] ?? 'general',
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
+    { routing: 'virtual', path: '/organization' },
   );
 
   if (model.status === 'loading') {
@@ -105,7 +106,8 @@ export function OrganizationProfile({
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <OrganizationProfileView
         elevation='flush'
-        {...navigation}
+        activePage={activePage}
+        onPageChange={onPageChange}
         customPages={customPages}
         pageOrder={pageOrder}
         pages={pages}
