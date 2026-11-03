@@ -12,11 +12,14 @@ export type TagInputInputProps = Omit<ComponentProps<'input'>, 'value' | 'defaul
 export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputProps>(
   function TagInputInput(props, forwardedRef) {
     const { render, ...otherProps } = props;
-    const { value, delimiters, disabled, add, focusTag, registerInput } = useTagInputContext();
+    const { value, delimiters, disabled, focusableWhenDisabled, add, focusTag, registerInput } = useTagInputContext();
     const [text, setText] = useState('');
     const { previousKey } = readingDirectionKeys(useDirection());
 
     const commit = () => {
+      if (disabled) {
+        return;
+      }
       add([text]);
       setText('');
     };
@@ -24,7 +27,8 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
     const defaultProps: Record<string, unknown> = {
       type: 'text',
       value: text,
-      disabled,
+      disabled: disabled && !focusableWhenDisabled,
+      ...(disabled && focusableWhenDisabled ? { readOnly: true, 'aria-disabled': true } : null),
       autoComplete: 'off',
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         const parts = splitTags(event.currentTarget.value, delimiters);
@@ -33,6 +37,9 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
         setText(pending);
       },
       onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => {
+        if (disabled) {
+          return;
+        }
         const parts = splitTags(event.clipboardData.getData('text'), delimiters);
         if (parts.length < 2) {
           return;

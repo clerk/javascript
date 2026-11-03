@@ -153,6 +153,21 @@ describe('OrganizationProfileGeneralPanel', () => {
       await waitFor(() => expect(screen.getByText('Acme Inc')).toBeVisible());
     });
 
+    it('keeps focus on the name field while saving', async () => {
+      await renderPanel();
+      const user = userEvent.setup();
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit name' }));
+      const input = within(dialog).getByRole('textbox', { name: 'Name' });
+      await user.type(input, ' Inc');
+      const update = holdRequests('post', '/v1/organizations/:organizationId');
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(update.requests).toHaveLength(1));
+      expect(input).toHaveFocus();
+      update.release();
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.getByText('Acme Inc')).toBeVisible());
+    });
+
     it('drops an open edit when the organization changes', async () => {
       const other = fapiOrganization({ id: 'org_2', name: 'Other' });
       const { clerk } = await renderPanel(signedIn({ organizations: [acme, other] }));
@@ -254,6 +269,21 @@ describe('OrganizationProfileGeneralPanel', () => {
       await waitFor(() => expect(fapi.memberships[0]?.organization.slug).toBe(''));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
       expect(fapi.memberships[0]?.organization.name).toBe('Acme');
+    });
+
+    it('keeps focus on the slug field while saving', async () => {
+      await renderPanel();
+      const user = userEvent.setup();
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit slug' }));
+      const input = within(dialog).getByRole('textbox', { name: 'Slug' });
+      await user.type(input, '-inc');
+      const update = holdRequests('post', '/v1/organizations/:organizationId');
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(update.requests).toHaveLength(1));
+      expect(input).toHaveFocus();
+      update.release();
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.getByText('acme-inc')).toBeVisible());
     });
 
     it('keeps the slug field accessible with hidden label and explanatory copy', async () => {

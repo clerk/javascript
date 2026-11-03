@@ -401,6 +401,63 @@ describe('TagInput', () => {
     });
   });
 
+  describe('focusableWhenDisabled', () => {
+    async function pendingWithDraft() {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      const { rerender } = render(
+        <Harness
+          name='emails'
+          defaultValue={['a']}
+          onValueChange={onValueChange}
+          focusableWhenDisabled
+        />,
+      );
+      await user.type(input(), 'draft');
+      rerender(
+        <Harness
+          name='emails'
+          defaultValue={['a']}
+          onValueChange={onValueChange}
+          focusableWhenDisabled
+          disabled
+        />,
+      );
+      return { user, onValueChange };
+    }
+
+    it('keeps the focused input focused and read-only', async () => {
+      await pendingWithDraft();
+
+      expect(input()).toHaveFocus();
+      expect(input()).not.toBeDisabled();
+      expect(input()).toHaveAttribute('readonly');
+      expect(input()).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Remove a' })).toBeDisabled();
+      expect(document.querySelector('input[name="emails"]')).toBeDisabled();
+    });
+
+    it('does not add tags from typing, paste, Enter or blur', async () => {
+      const { user, onValueChange } = await pendingWithDraft();
+
+      await user.keyboard('x,');
+      fireEvent.paste(input(), { clipboardData: { getData: () => 'b,c' } });
+      await user.keyboard('{Enter}');
+      await user.tab();
+
+      expect(onValueChange).not.toHaveBeenCalled();
+      expect(tagValues()).toEqual(['a']);
+      expect(input()).toHaveValue('draft');
+    });
+
+    it('stays natively disabled without the option', () => {
+      render(<Harness disabled />);
+
+      expect(input()).toBeDisabled();
+      expect(input()).not.toHaveAttribute('readonly');
+    });
+  });
+
   describe('root', () => {
     it('focuses the input when the empty area of the root is pressed', async () => {
       const user = userEvent.setup();

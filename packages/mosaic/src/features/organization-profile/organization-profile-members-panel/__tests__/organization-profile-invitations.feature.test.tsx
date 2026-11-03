@@ -709,6 +709,27 @@ describe('inviting members', () => {
     expect(bulk.requests).toHaveLength(1);
   });
 
+  it('keeps focus on the email field while the invite is pending', async () => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { dialog } = await openInviteDialog();
+    await addEmails(dialog, 'grace@example.com');
+    const email = dialog.getByRole('textbox', { name: 'Email' });
+    await waitFor(() =>
+      expect(dialog.getByRole('button', { name: 'Send invites' })).not.toHaveAttribute('aria-disabled', 'true'),
+    );
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await browserEvent.keyboard('{Enter}');
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    try {
+      await waitFor(() => expect(email.closest('[data-disabled]')).not.toBeNull());
+      expect(email).toHaveFocus();
+    } finally {
+      bulk.release();
+    }
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+  });
+
   it('clears the draft, rejected addresses and error after closing and reopening', async () => {
     serveInvite({ defaultRole: 'org:member' });
     await renderWithClerk(<OrganizationProfileMembersPanel />);

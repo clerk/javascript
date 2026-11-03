@@ -13,6 +13,7 @@ export interface TagInputContextValue {
   tags: TagInputTag[];
   delimiters: string[];
   disabled: boolean;
+  focusableWhenDisabled: boolean;
   add: (values: string[]) => void;
   remove: (value: string, focusAfter: FocusAfterRemove) => void;
   focusInput: () => void;

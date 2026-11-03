@@ -63,6 +63,7 @@ export function UserProfileRenamePasskeyDialog({
               required
               invalid={feedback?.type === 'error'}
               disabled={form.isSubmitting}
+              focusableWhenDisabled
             >
               <Field.Label>{m.nameLabel}</Field.Label>
               <Input

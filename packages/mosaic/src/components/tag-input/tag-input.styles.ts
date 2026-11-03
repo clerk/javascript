@@ -102,7 +102,7 @@ export const styles = stylex.create({
     paddingInline: space['1'],
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-foreground'],
-    cursor: { default: null, ':disabled': 'not-allowed' },
+    cursor: { default: null, ':disabled': 'not-allowed', ':read-only': 'not-allowed' },
     flexBasis: '8ch',
     flexGrow: 1,
     fontFamily: 'inherit',

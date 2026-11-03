@@ -135,6 +135,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
       name={name}
       form={form}
       disabled={disabled}
+      focusableWhenDisabled={fieldProps?.focusableWhenDisabled}
       {...mergeStyleProps(
         themeProps('tag-input', { disabled, invalid }),
         stylex.props(reset.base, inputStyles.group, styles.root, disabled && styles.disabled, xstyle),

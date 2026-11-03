@@ -24,6 +24,7 @@ export interface TagInputProps extends Omit<ComponentProps<'div'>, 'defaultValue
   name?: string;
   form?: string;
   disabled?: boolean;
+  focusableWhenDisabled?: boolean;
   children: ReactNode;
 }
 
@@ -38,6 +39,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
     name,
     form,
     disabled = false,
+    focusableWhenDisabled = false,
     children,
     ...otherProps
   } = props;
@@ -137,6 +139,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       tags,
       delimiters,
       disabled,
+      focusableWhenDisabled,
       add,
       remove,
       focusInput,
@@ -145,7 +148,20 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       registerTag,
       onTagExited,
     }),
-    [value, tags, delimiters, disabled, add, remove, focusInput, focusTag, registerInput, registerTag, onTagExited],
+    [
+      value,
+      tags,
+      delimiters,
+      disabled,
+      focusableWhenDisabled,
+      add,
+      remove,
+      focusInput,
+      focusTag,
+      registerInput,
+      registerTag,
+      onTagExited,
+    ],
   );
 
   const state = { disabled, empty: value.length === 0 };

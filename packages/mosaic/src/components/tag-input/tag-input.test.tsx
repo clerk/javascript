@@ -257,6 +257,24 @@ describe('Mosaic TagInput', () => {
       expect(screen.getByRole('textbox', { name: 'Email' })).toHaveFocus();
     });
 
+    it('stays focusable when the disabled field asks for it', () => {
+      render(
+        <Field.Root
+          disabled
+          focusableWhenDisabled
+        >
+          <Field.Label>Email</Field.Label>
+          <TagInput />
+        </Field.Root>,
+      );
+
+      const input = screen.getByRole('textbox', { name: 'Email' });
+      expect(input).not.toBeDisabled();
+      expect(input).toHaveAttribute('readonly');
+      expect(input).toHaveAttribute('aria-disabled', 'true');
+      expect(rootOf(input)).toHaveAttribute('data-disabled', '');
+    });
+
     it('takes disabled, required and invalid from the field', () => {
       render(
         <Field.Root
