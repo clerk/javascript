@@ -11,7 +11,6 @@ import { Pagination } from '../../components/pagination';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { Document } from '../../icons/glyphs/document';
 import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { Lock } from '../../icons/glyphs/lock';
@@ -21,8 +20,6 @@ import { truncationStyles } from '../../styles/typography.styles';
 import { LogDetailsDialog } from './log-details.dialog';
 import { styles } from './logs-table.styles';
 import type { LogEntry, LogsTableMessages, LogsTableViewProps } from './logs-table.types';
-
-const COLUMN_COUNT = 4;
 
 const getRowId = (row: LogEntry) => row.id;
 
@@ -41,18 +38,7 @@ export function LogsTableView({
   onRetry,
 }: LogsTableViewProps) {
   const details = useMemo(() => Dialog.createHandle<LogEntry>(), []);
-  const { table, pagination } = useServerDataTable({
-    data: logs,
-    totalCount,
-    getRowId,
-    sortableColumns: [],
-    page,
-    pageSize,
-    onPageChange,
-    onPageSizeChange,
-    searchValue,
-    onSearchChange,
-  });
+  const showPagination = Math.ceil(totalCount / pageSize) > 1 || (totalCount > 0 && Boolean(onPageSizeChange));
   const query = searchValue.trim();
   const emptyState = query
     ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
@@ -66,8 +52,8 @@ export function LogsTableView({
           <Table.Search
             label={m.search}
             clearLabel={m.clearSearch}
-            value={table.globalFilter}
-            onValueChange={table.setGlobalFilter}
+            value={searchValue}
+            onValueChange={onSearchChange}
           />
         </Table.Toolbar>
         <Table.Root
@@ -76,18 +62,17 @@ export function LogsTableView({
           layout='fixed'
           minWidth='44rem'
         >
-          <LogsTableColumns />
           <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>{m.event}</Table.HeaderCell>
-              <Table.HeaderCell>{m.member}</Table.HeaderCell>
-              <Table.HeaderCell>{m.ipAddress}</Table.HeaderCell>
-              <Table.HeaderCell>{m.timestamp}</Table.HeaderCell>
-            </Table.Row>
+            <Table.Column>{m.event}</Table.Column>
+            <Table.Column>{m.member}</Table.Column>
+            <Table.Column width='11rem'>{m.ipAddress}</Table.Column>
+            <Table.Column width='11rem'>{m.timestamp}</Table.Column>
           </Table.Header>
-          <Table.Body>
-            {isError ? (
-              <Table.Empty colSpan={COLUMN_COUNT}>
+          <Table.Body
+            items={isError ? [] : logs}
+            itemToStringValue={getRowId}
+            renderEmptyState={() =>
+              isError ? (
                 <EmptyState.Root>
                   <EmptyState.Icon glyph={ExclamationCircle} />
                   <EmptyState.Label>{m.loadError}</EmptyState.Label>
@@ -104,30 +89,39 @@ export function LogsTableView({
                     </EmptyState.Actions>
                   ) : null}
                 </EmptyState.Root>
-              </Table.Empty>
-            ) : table.rows.length === 0 ? (
-              <Table.Empty colSpan={COLUMN_COUNT}>
+              ) : (
                 <EmptyState.Root>
                   <EmptyState.Icon glyph={Document} />
                   <EmptyState.Label>{emptyState.label}</EmptyState.Label>
                   <EmptyState.Description>{emptyState.description}</EmptyState.Description>
                 </EmptyState.Root>
-              </Table.Empty>
-            ) : (
-              table.rows.map(row => (
-                <LogRow
-                  key={row.id}
-                  log={row.original}
-                  details={details}
-                  messages={m}
-                />
-              ))
+              )
+            }
+          >
+            {log => (
+              <LogRow
+                log={log}
+                details={details}
+                messages={m}
+              />
             )}
           </Table.Body>
         </Table.Root>
-        {pagination ? (
+        {showPagination ? (
           <Pagination
-            {...pagination}
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalCount}
+            disabled={isFetching}
+            onChange={onPageChange}
+            onPageSizeChange={
+              onPageSizeChange
+                ? next => {
+                    onPageSizeChange(next);
+                    onPageChange(1);
+                  }
+                : undefined
+            }
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
@@ -230,16 +224,5 @@ export function LogsTableRestrictedView({ messages: m }: { messages: LogsTableMe
         <EmptyState.Description>{m.noAccessDescription}</EmptyState.Description>
       </EmptyState.Root>
     </div>
-  );
-}
-
-function LogsTableColumns() {
-  return (
-    <Table.ColumnGroup>
-      <Table.Column />
-      <Table.Column />
-      <Table.Column width='11rem' />
-      <Table.Column width='11rem' />
-    </Table.ColumnGroup>
   );
 }

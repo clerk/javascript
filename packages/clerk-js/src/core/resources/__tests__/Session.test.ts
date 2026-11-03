@@ -16,7 +16,6 @@ import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
 import { BaseResource, Client, Organization, Session } from '../internal';
-import { SessionWithActivities } from '../SessionWithActivities';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
@@ -41,55 +40,19 @@ describe('Session', () => {
     vi.useRealTimers();
   });
 
-  it.each([0, 2000000000000])('preserves a session deadline of %s through snapshots', deadline => {
-    const session = new Session({
-      id: 'session_lifetime',
-      status: 'active',
-      expire_at: deadline,
-      abandon_at: deadline,
-      public_user_data: { user_id: 'user_1' },
-    } as SessionJSON);
-    expect(session.expireAt.getTime()).toBe(deadline);
-    expect(session.abandonAt.getTime()).toBe(deadline);
-    expect(session.hasMaximumLifetime).toBe(deadline > 0);
-    const restored = new Session(session.__internal_toSnapshot());
-    expect(restored.expireAt.getTime()).toBe(deadline);
-    expect(restored.hasMaximumLifetime).toBe(deadline > 0);
-    const withActivities = new SessionWithActivities(
-      { id: session.id, expire_at: deadline, abandon_at: deadline } as any,
-      '/me/sessions',
-    );
-    expect(withActivities.hasMaximumLifetime).toBe(deadline > 0);
-    expect(withActivities.abandonAt.getTime()).toBe(deadline);
-  });
-
-  it('keeps zero only for session deadlines', () => {
-    const session = new Session({
-      id: 'session_lifetime',
-      status: 'active',
-      expire_at: 0,
-      abandon_at: 0,
-      created_at: 0,
-      updated_at: 0,
-      public_user_data: { user_id: 'user_1' },
-    } as SessionJSON);
-
-    expect(session.expireAt.getTime()).toBe(0);
-    expect(session.abandonAt.getTime()).toBe(0);
-    expect(session.createdAt.getTime()).toBe(Date.now());
-    expect(session.updatedAt.getTime()).toBe(Date.now());
-  });
-
   describe('getToken()', () => {
     let dispatchSpy;
+    let cacheSetSpy;
 
     beforeEach(() => {
       dispatchSpy = vi.spyOn(eventBus, 'emit');
+      cacheSetSpy = vi.spyOn(SessionTokenCache, 'set');
       BaseResource.clerk = clerkMock();
     });
 
     afterEach(() => {
       dispatchSpy?.mockRestore();
+      cacheSetSpy?.mockRestore();
       BaseResource.clerk = null as any;
     });
 
@@ -114,7 +77,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('does not register proactive refresh after an unfocused network mint', async () => {
@@ -124,7 +91,7 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({ tokenId, tokenResolver: expect.any(Promise) });
       });
 
       it('does not register proactive refresh for an unfocused hydrated token', async () => {
@@ -134,7 +101,7 @@ describe('Session', () => {
         await Promise.resolve();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({ tokenId, tokenResolver: expect.any(Promise) });
       });
 
       it('registers proactive refresh when document.hasFocus is not callable', async () => {
@@ -144,7 +111,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('registers proactive refresh when document.hasFocus throws', async () => {
@@ -156,7 +127,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('registers proactive refresh when document is missing', async () => {
@@ -166,7 +141,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
     });
 
@@ -889,9 +868,11 @@ describe('Session', () => {
         const freshToken = await session.getToken();
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
-        expect(
-          SessionTokenCache.get({ tokenId: TokenId.build('session_1', undefined, null) })?.entry.onRefresh,
-        ).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId: TokenId.build('session_1', undefined, null),
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('does not emit token:update with an empty token when background refresh fires while offline', async () => {
@@ -2662,7 +2643,7 @@ describe('Session', () => {
       SessionTokenCache.clear();
     });
 
-    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve high then low)', async () => {
+    it('concurrent skipCache mints return their own token; cache entry and lastActiveToken stay freshest (resolve high then low)', async () => {
       const session = makeSession();
       const high = createJwtWithOiat(NOW, NOW + 30);
       const low = createJwtWithOiat(NOW, NOW);
@@ -2678,17 +2659,17 @@ describe('Session', () => {
       await expect(pHigh).resolves.toBe(high);
 
       // Each skipCache call returns its own mint (main parity): the low fetch resolves last and
-      // returns low, but it never regresses the cache slot or lastActiveToken.
+      // returns low, but it never regresses the cache entry or lastActiveToken.
       dLow.resolve({ object: 'token', jwt: low });
       await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', undefined, null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(await session.getToken()).toBe(high);
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
 
-    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve low then high)', async () => {
+    it('concurrent skipCache mints return their own token; cache entry and lastActiveToken stay freshest (resolve low then high)', async () => {
       const session = makeSession();
       const high = createJwtWithOiat(NOW, NOW + 30);
       const low = createJwtWithOiat(NOW, NOW);
@@ -2708,7 +2689,7 @@ describe('Session', () => {
       await expect(pSecond).resolves.toBe(high);
 
       const tokenId = TokenId.build('session_1', undefined, null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(await session.getToken()).toBe(high);
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
@@ -2734,7 +2715,7 @@ describe('Session', () => {
       expect(fetchSpy.mock.calls[2][0].body.token).toBe(high);
 
       const tokenId = TokenId.build('session_1', undefined, null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
 
@@ -2750,14 +2731,14 @@ describe('Session', () => {
       const pHigh = session.getToken({ organizationId: 'org_other', skipCache: true });
       const pLow = session.getToken({ organizationId: 'org_other', skipCache: true });
 
-      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
+      // Each skipCache call returns its own mint (main parity); the cache entry still stays freshest.
       dHigh.resolve({ object: 'token', jwt: high });
       await expect(pHigh).resolves.toBe(high);
       dLow.resolve({ object: 'token', jwt: low });
       await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', undefined, 'org_other');
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(session.lastActiveToken).toBeNull();
     });
 
@@ -2773,14 +2754,14 @@ describe('Session', () => {
       const pHigh = session.getToken({ template: 't', skipCache: true });
       const pLow = session.getToken({ template: 't', skipCache: true });
 
-      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
+      // Each skipCache call returns its own mint (main parity); the cache entry still stays freshest.
       dHigh.resolve({ object: 'token', jwt: high });
       await expect(pHigh).resolves.toBe(high);
       dLow.resolve({ object: 'token', jwt: low });
       await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', 't', null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(session.lastActiveToken).toBeNull();
     });
 

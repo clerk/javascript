@@ -12,9 +12,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
-  'organization-switcher': {
-    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
-  },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
@@ -55,14 +52,16 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
     'organization-profile-logs-panel': dynamic(() => import('../stories/organization-profile-logs-panel.mdx')),
   },
-  'api-keys': {
-    'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
-  },
   misc: {
+    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
+    'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
+    'organization-list': dynamic(() => import('../stories/organization-list.mdx')),
+    'user-avatar': dynamic(() => import('../stories/user-avatar.mdx')),
+    'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
+    'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
     'logs-table': dynamic(() => import('../stories/logs-table.mdx')),
-  },
-  reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
+    waitlist: dynamic(() => import('../stories/waitlist.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
@@ -79,6 +78,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     checkbox: dynamic(() => import('../stories/checkbox.mdx')),
     combobox: dynamic(() => import('../stories/combobox.mdx')),
     'copy-button': dynamic(() => import('../stories/copy-button.mdx')),
+    'provider-button': dynamic(() => import('../stories/provider-button.mdx')),
     'data-list': dynamic(() => import('../stories/data-list.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
@@ -128,6 +128,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.mdx')),
     portal: dynamic(() => import('../stories/portal.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
+    table: dynamic(() => import('../stories/table.primitive.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     'tag-input': dynamic(() => import('../stories/tag-input.mdx')),
     toast: dynamic(() => import('../stories/toast.primitive.mdx')),
@@ -139,9 +140,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   hooks: {
     // Headless hooks — alphabetical.
-    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
     'use-form': dynamic(() => import('../stories/use-form.mdx')),
-    'use-server-data-table': dynamic(() => import('../stories/use-server-data-table.mdx')),
   },
   localization: {
     localization: dynamic(() => import('../stories/localization.mdx')),

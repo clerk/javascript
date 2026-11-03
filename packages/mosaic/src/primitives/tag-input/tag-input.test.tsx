@@ -4,6 +4,7 @@ import { createRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { axe } from '../test-utils/axe';
 import { TagInput } from './index';
 
@@ -82,6 +83,12 @@ function holdExitAnimations() {
 
 describe('TagInput', () => {
   describe('adding', () => {
+    it('starts the entrance for a tag present on mount', () => {
+      render(<Harness defaultValue={['a@clerk.dev']} />);
+
+      expect(tag('a@clerk.dev')).toHaveAttribute('data-starting-style');
+    });
+
     it('adds the typed text as a tag on Enter and clears the input', async () => {
       const user = userEvent.setup();
       const onValueChange = vi.fn();
@@ -324,9 +331,9 @@ describe('TagInput', () => {
     it('follows reading order in RTL', async () => {
       const user = userEvent.setup();
       render(
-        <div dir='rtl'>
+        <DirectionProvider direction='rtl'>
           <Harness defaultValue={['a', 'b']} />
-        </div>,
+        </DirectionProvider>,
       );
 
       await user.click(input());

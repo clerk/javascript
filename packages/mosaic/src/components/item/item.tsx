@@ -80,6 +80,7 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
           slots.item[size],
           variant === 'outline' && slots.item.outline,
           interactive && slots.item.interactive,
+          interactive && variant === 'outline' && slots.item.interactiveOutline,
           xstyle,
         ),
         rest,

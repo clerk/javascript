@@ -1,5 +1,5 @@
-import { expect, type Locator } from 'e2e';
-import type { SecretLike, SeededUser } from './support/types.ts';
+import { expect, type Locator } from '@clerk/internal-mobile-e2e/specs/fixtures';
+import type { SecretLike, SeededUser } from '@clerk/internal-mobile-e2e/specs/support/types';
 
 interface Screen {
   getByTestId(id: string): Locator;
@@ -34,6 +34,8 @@ export function nativeAuth(screen: Screen, platform: string) {
     passwordLabel: screen.getByText('Enter your password'),
     passwordField: screen.getByRole('textbox').last(),
     passwordContinue: ios ? screen.getByTestId('clerk.auth.signIn.continue') : screen.getByText('Continue'),
+    codeScreen: ios ? screen.getByTestId('clerk.auth.signIn.code') : screen.getByText('Check your email'),
+    codeField: ios ? screen.getByTestId('clerk.auth.signIn.code') : screen.getByRole('textbox').last(),
   };
 }
 

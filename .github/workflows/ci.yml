@@ -154,7 +154,7 @@ jobs:
         if: steps.changed.outputs.package == 'true'
         run: npm ci --prefix "$PACKAGE"
 
-      - name: Run the package's unit tests, which include the check of the copied core against its manifest
+      - name: Run the package's unit tests
         if: steps.changed.outputs.package == 'true'
         run: npm test --prefix "$PACKAGE"
 
@@ -379,6 +379,10 @@ jobs:
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
+      - name: Run verify script tests
+        if: matrix.node-version == '24.15.0'
+        run: pnpm vitest run --root scripts verify-attach verify-flaky
+
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4.6.2
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
@@ -423,6 +427,9 @@ jobs:
 
       - name: Run feature tests
         run: pnpm --filter @clerk/mosaic test:feature
+
+      - name: Run browser tests
+        run: pnpm --filter @clerk/mosaic test:browser
 
       - name: Upload failure artifacts
         if: ${{ cancelled() || failure() }}
@@ -710,4 +717,4 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Publish with pkg-pr-new
-        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
+        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.93' }} publish --compact --pnpm './packages/*'

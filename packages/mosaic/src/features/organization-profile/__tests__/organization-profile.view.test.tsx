@@ -38,7 +38,6 @@ it('warns when there are no pages to show', () => {
   );
 
   expect(warn).toHaveBeenCalledWith('[Clerk] OrganizationProfile has no pages to show.');
-  warn.mockRestore();
 });
 
 it('replaces the corner dismiss with a back button in a fullscreen dialog', () => {

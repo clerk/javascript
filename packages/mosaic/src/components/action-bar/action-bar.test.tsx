@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PortalProvider } from '../../primitives/portal';
 import { Dialog } from '../dialog';
@@ -65,16 +65,14 @@ beforeEach(() => {
   vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
 });
 
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
 describe('Mosaic ActionBar', () => {
   it('renders a labelled toolbar tied to its table and described by its count', () => {
     render(<BulkActions />);
     const bar = screen.getByRole('toolbar', { name: 'Bulk actions' });
     expect(bar).toHaveClass('cl-action-bar');
     expect(bar).toHaveAttribute('data-open', 'true');
+    expect(bar).not.toHaveAttribute('data-starting-style');
+    expect(bar.style.transition).toBe('');
     expect(bar).toHaveAttribute('aria-controls', 'members');
     expect(bar).toHaveAttribute('aria-orientation', 'horizontal');
     expect(bar).toHaveAccessibleDescription('3 selected');

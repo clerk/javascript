@@ -79,7 +79,10 @@ export function ReverificationMethodPicker({
                 }
               >
                 <Item.Media>
-                  <IconFrame filled>
+                  <IconFrame
+                    filled
+                    bordered={false}
+                  >
                     <Icon glyph={method.icon} />
                   </IconFrame>
                 </Item.Media>
@@ -100,18 +103,18 @@ export function ReverificationMethodPicker({
               </Item.Root>
             );
           })}
+          {onBack ? (
+            <Button
+              type='button'
+              color='neutral'
+              variant='ghost'
+              disabled={Boolean(pendingMethodId)}
+              onClick={onBack}
+            >
+              {messages.backButton}
+            </Button>
+          ) : null}
         </Item.Group>
-        {onBack ? (
-          <Button
-            type='button'
-            variant='ghost'
-            fullWidth
-            disabled={Boolean(pendingMethodId)}
-            onClick={onBack}
-          >
-            {messages.backButton}
-          </Button>
-        ) : null}
         <Text
           size='xs'
           xstyle={styles.helpText}
@@ -120,6 +123,7 @@ export function ReverificationMethodPicker({
           <Button
             type='button'
             size='sm'
+            color='neutral'
             variant='link'
             disabled={Boolean(pendingMethodId)}
             onClick={() => {

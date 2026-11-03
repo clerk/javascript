@@ -1,4 +1,4 @@
-import '../testing/git-env.ts';
+import '@clerk/internal-mobile-e2e/testing/git-env';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -6,9 +6,9 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileS
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
-import { isRunning, run } from '../src/core/exec.ts';
-import type { EvidencePath, LocalLease } from '../src/core/types.ts';
-import { readClaim, takeSlot } from '../src/core/claims.ts';
+import { isRunning, run } from '@clerk/internal-mobile-e2e/core/exec';
+import type { EvidencePath, LocalLease } from '@clerk/internal-mobile-e2e/core/types';
+import { readClaim, takeSlot } from '@clerk/internal-mobile-e2e/core/claims';
 import { LANE_FAILED, LANE_READY, LOG_FILTER, RECORD_SIZE, collectRecordingArgs, emulatorArgs, laneSettingsCommand, laneSettingsHold, laneSettingsReadCommand, logFilter, logcatSince, stopScreenrecordArgs, waitForLane } from '../src/platform/android/emulator.ts';
 import { lanePort, localAndroidBackend, laneSerial, parseAdbDevices, startScreenrecord, terminateGroup } from '../src/platform/android/local.ts';
 import { ensureLaneAvd, jdkCheck, localAvailability, resolveJavaHome, sdkRoot, systemImage, type Machine } from '../src/platform/android/sdk.ts';

@@ -7,7 +7,7 @@ import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosName, chaosRows, chaosText } from '@/lib/chaos';
+import { chaosEmail, chaosName, chaosRows } from '@/lib/chaos';
 
 export function useLogsTableFixture({
   initialLogs = SAMPLE_LOGS,
@@ -18,7 +18,7 @@ export function useLogsTableFixture({
     chaosRows(items).map((log, index) => ({
       ...log,
       actor: { ...log.actor, name: chaosName(index), email: chaosEmail(index) },
-      target: chaosText(log.target ?? undefined) ?? null,
+      target: log.target === null ? null : chaosEmail(index + 1),
     })),
   );
   const [searchValue, setSearchValue] = useState('');

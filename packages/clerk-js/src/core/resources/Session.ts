@@ -44,7 +44,7 @@ import type {
 } from '@clerk/shared/types';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
-import { unixEpochToDate, unixEpochToDeadline } from '@/utils/date';
+import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
 import { getTabState, isTabFocused } from '@/utils/isTabFocused';
 import { TokenId } from '@/utils/tokenId';
@@ -87,10 +87,6 @@ export class Session extends BaseResource implements SessionResource {
 
   static isSessionResource(resource: unknown): resource is Session {
     return !!resource && resource instanceof Session;
-  }
-
-  get hasMaximumLifetime(): boolean {
-    return this.expireAt.getTime() > 0;
   }
 
   constructor(data: SessionJSON | SessionJSONSnapshot) {
@@ -442,8 +438,8 @@ export class Session extends BaseResource implements SessionResource {
 
     this.id = data.id;
     this.status = data.status;
-    this.expireAt = unixEpochToDeadline(data.expire_at);
-    this.abandonAt = unixEpochToDeadline(data.abandon_at);
+    this.expireAt = unixEpochToDate(data.expire_at);
+    this.abandonAt = unixEpochToDate(data.abandon_at);
     this.factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
@@ -510,7 +506,7 @@ export class Session extends BaseResource implements SessionResource {
     if (cacheResult) {
       // Proactive refresh is handled by timers scheduled in the cache
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
-      const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
+      const cachedToken = cacheResult.token ?? (await cacheResult.tokenResolver);
       // Only emit token updates when we have an actual token — emitting with an empty
       // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
       if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {

@@ -565,6 +565,27 @@ describe('OrganizationProfile', () => {
       await waitFor(() => expect(queryByText('Security')).toBeNull());
     });
 
+    it('includes Security when only Directory Sync is enabled for the org', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: false,
+              self_serve_directory_sync_enabled: true,
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('Security')).toBeDefined();
+    });
+
     it('does not include SSO when the user lacks the manage enterprise connections permission', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });

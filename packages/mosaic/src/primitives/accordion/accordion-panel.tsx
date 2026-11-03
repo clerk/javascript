@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 
-import { useAnimationsFinished } from '../hooks/use-animations-finished';
-import { useTransition } from '../hooks/use-transition';
+import { usePanelSize } from '../hooks/use-panel-size';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
-import { autoUpdate, getScrollDimensions } from '../utils/dom';
 import { useAccordionItemContext } from './accordion-context';
 
 export type AccordionPanelProps = ComponentProps<'div'>;
@@ -15,78 +13,18 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
     const { render, ...otherProps } = props;
     const { open, triggerId, panelId } = useAccordionItemContext();
 
-    const panelRef = useRef<HTMLElement | null>(null);
-    const [height, setHeight] = useState<number | undefined>(undefined);
-
-    // Track whether open has ever transitioned from true→false.
-    // Until that happens, skip enter animations (prevents animate-on-load).
-    const hasBeenClosed = useRef(false);
-    if (!open) {
-      hasBeenClosed.current = true;
-    }
-
-    const { mounted, transitionStatus, transitionProps } = useTransition({
-      open,
-      ref: panelRef,
-    });
-
-    const runOnAnimationsFinished = useAnimationsFinished(panelRef, open);
-
-    // Measure the content height and keep it in sync via ResizeObserver
-    useLayoutEffect(() => {
-      if (!mounted) {
-        return;
-      }
-
-      const panel = panelRef.current;
-      if (!panel) {
-        return;
-      }
-
-      return autoUpdate(panel, () => setHeight(getScrollDimensions(panel).height));
-    }, [mounted]);
-
-    // Once the open animation settles, drop the measured pixel height so the
-    // panel flows naturally with its content (CSS var omitted → height: auto).
-    useLayoutEffect(() => {
-      if (!open || !mounted) {
-        return;
-      }
-      runOnAnimationsFinished(() => setHeight(undefined));
-    }, [open, mounted, runOnAnimationsFinished]);
-
-    // Re-pin to a measured pixel value when closing starts so the exit
-    // transition animates from a concrete height (height: auto can't interpolate).
-    useLayoutEffect(() => {
-      if (open || transitionStatus !== 'ending') {
-        return;
-      }
-      const panel = panelRef.current;
-      if (!panel) {
-        return;
-      }
-      setHeight(getScrollDimensions(panel).height);
-    }, [open, transitionStatus]);
+    const { panelRef, mounted, transitionProps, height } = usePanelSize(open);
 
     const state = { open };
-
-    // Skip enter animation for panels that have never been closed
-    const effectiveTransitionProps = !hasBeenClosed.current
-      ? {
-          ...transitionProps,
-          'data-starting-style': undefined,
-          style: undefined,
-        }
-      : transitionProps;
 
     const defaultProps: Record<string, unknown> = {
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
-      ...effectiveTransitionProps,
+      ...transitionProps,
       style: {
         '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
-        ...effectiveTransitionProps.style,
+        ...transitionProps.style,
       },
     };
 

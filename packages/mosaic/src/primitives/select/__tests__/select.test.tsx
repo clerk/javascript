@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -88,6 +89,12 @@ describe('Select', () => {
   describe('items prop and label resolution', () => {
     it('shows placeholder when no value is selected', () => {
       renderSelect();
+      const value = document.querySelector('[data-testid="select-value"]');
+      expect(value?.textContent).toBe('Pick a fruit...');
+    });
+
+    it('shows placeholder when the controlled value is an empty string', () => {
+      renderSelect({ value: '' });
       const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Pick a fruit...');
     });
@@ -317,120 +324,6 @@ describe('Select', () => {
         expect(options[1]).toHaveAttribute('data-active', '');
       },
     );
-
-    it('scrolls options into view on arrow key navigation', async () => {
-      const manyItems = Array.from({ length: 20 }, (_, i) => ({
-        label: `Item ${i + 1}`,
-        value: `item-${i + 1}`,
-      }));
-
-      const user = userEvent.setup();
-      render(
-        <Select.Root
-          items={manyItems}
-          alignItemWithTrigger={false}
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </div>
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      await user.click(screen.getByRole('combobox'));
-
-      // Navigate down through many items to force scrolling
-      for (let i = 0; i < 15; i++) {
-        await user.keyboard('{ArrowDown}');
-      }
-
-      const activeOption = document.querySelector('[role="option"][data-active]');
-      expect(activeOption).toBeInTheDocument();
-
-      // The active item should be visible within its scroll container
-      const scrollContainer = activeOption!.closest('div[style]') as HTMLElement;
-      const optionRect = activeOption!.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
-      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
-    });
-
-    it('scrolls selected item into view when reopening', async () => {
-      const manyItems = Array.from({ length: 20 }, (_, i) => ({
-        label: `Item ${i + 1}`,
-        value: `item-${i + 1}`,
-      }));
-
-      const user = userEvent.setup();
-      render(
-        <Select.Root
-          items={manyItems}
-          alignItemWithTrigger={false}
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </div>
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      const trigger = screen.getByRole('combobox');
-
-      // Open, navigate to item near the bottom, select it
-      await user.click(trigger);
-      for (let i = 0; i < 15; i++) {
-        await user.keyboard('{ArrowDown}');
-      }
-      await user.keyboard('{Enter}');
-
-      // Reopen — the selected item should be scrolled into view
-      await user.click(trigger);
-
-      const selectedOption = document.querySelector('[role="option"][data-selected]');
-      expect(selectedOption).toBeInTheDocument();
-
-      const scrollContainer = selectedOption!.closest('div[style]') as HTMLElement;
-      const optionRect = selectedOption!.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
-      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
-    });
   });
 
   describe('option state attributes', () => {
@@ -532,7 +425,7 @@ describe('Select', () => {
     });
   });
 
-  describe('ARIA attributes', () => {
+  describe('ARIA roles and states', () => {
     it('options have role=option', () => {
       renderSelect({ defaultOpen: true });
 
@@ -660,118 +553,32 @@ describe('Select', () => {
       // Standard Floating UI positioning uses position: absolute with transform
       expect(positioner.style.position).toBe('absolute');
     });
-
-    const manyItems: SelectItem[] = Array.from({ length: 20 }, (_, i) => ({
-      label: `Item ${i + 1}`,
-      value: `item-${i + 1}`,
-    }));
-
-    it('aligns selected item with trigger vertically', () => {
-      render(
-        <Select.Root
-          items={manyItems}
-          defaultOpen
-          defaultValue='item-10'
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              {manyItems.map(({ label, value }) => (
-                <Select.Option
-                  key={value}
-                  value={value}
-                  label={label}
-                >
-                  {label}
-                </Select.Option>
-              ))}
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      const trigger = screen.getByRole('combobox');
-      const selectedOption = document.querySelector('[role="option"][data-selected]');
-      expect(selectedOption).toBeInTheDocument();
-
-      const triggerRect = trigger.getBoundingClientRect();
-      const selectedRect = selectedOption!.getBoundingClientRect();
-
-      // The selected item should be positioned near the trigger's vertical position
-      expect(Math.abs(selectedRect.top - triggerRect.top)).toBeLessThan(50);
-    });
-
-    // Requires real layout engine — getBoundingClientRect returns 0 in happy-dom
-    it.skip('repositions when ancestor scrolls', async () => {
-      const user = userEvent.setup();
-      render(
-        <div
-          data-testid='scroll-container'
-          style={{ height: '200px', overflow: 'auto', paddingTop: '300px' }}
-        >
-          <Select.Root
-            items={manyItems}
-            defaultValue='item-5'
-          >
-            <Select.Trigger>
-              <Select.Value
-                data-testid='select-value'
-                placeholder='Pick...'
-              />
-            </Select.Trigger>
-            <Select.Positioner data-testid='select-positioner'>
-              <Select.Popup data-testid='select-popup'>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </Select.Popup>
-            </Select.Positioner>
-          </Select.Root>
-          <div style={{ height: '500px' }} />
-        </div>,
-      );
-
-      await user.click(screen.getByRole('combobox'));
-
-      const positioner = document.querySelector('[data-testid="select-positioner"]') as HTMLElement;
-      const initialTop = positioner.getBoundingClientRect().top;
-
-      // Scroll the container
-      const scrollContainer = screen.getByTestId('scroll-container');
-      scrollContainer.scrollTop = 100;
-      scrollContainer.dispatchEvent(new Event('scroll'));
-
-      // autoUpdate repositions on scroll — wait for the update
-      await waitFor(() => {
-        const newTop = positioner.getBoundingClientRect().top;
-        expect(newTop).not.toBe(initialTop);
-      });
-    });
   });
 
-  describe('alignItemWithTrigger', () => {
+  describe('alignItemWithTrigger positioning', () => {
     it('marks the positioner with data-side="none" and blocks page scrolling while open', async () => {
       const user = userEvent.setup();
-      renderSelect({ alignItemWithTrigger: true });
+      renderSelect({ alignItemWithTrigger: true, defaultValue: 'banana' });
+      const trigger = screen.getByRole('combobox');
+      trigger.getBoundingClientRect = () => new DOMRect(0, 300, 120, 32);
 
-      await user.click(screen.getByRole('combobox'));
+      await user.click(trigger);
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'none');
       expect(document.body).toHaveStyle({ overflowY: 'hidden' });
 
       await user.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByTestId('select-positioner')).not.toBeInTheDocument());
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
+    });
+
+    it('positions like a menu when nothing is selected', async () => {
+      const user = userEvent.setup();
+      renderSelect({ alignItemWithTrigger: true, value: '' });
+
+      await user.click(screen.getByRole('combobox'));
+
+      await waitFor(() => expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom'));
       expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 
@@ -892,6 +699,38 @@ describe('Select', () => {
       for (const option of options) {
         expect(option).toHaveAttribute('type', 'button');
       }
+    });
+  });
+
+  describe('Arrow', () => {
+    it('forwards a ref to the arrow element', async () => {
+      const user = userEvent.setup();
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick a fruit...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.Arrow ref={ref} />
+              <Select.Option
+                value='apple'
+                label='Apple'
+              >
+                Apple
+              </Select.Option>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      expect(ref.current).toBeInstanceOf(SVGSVGElement);
     });
   });
 
@@ -1116,5 +955,125 @@ describe('Select', () => {
       const options = screen.getAllByRole('option');
       await waitFor(() => expect(document.activeElement).toBe(options[0]));
     });
+  });
+
+  it('forwards refs to the value and the options', () => {
+    const value = createRef<HTMLSpanElement>();
+    const option = createRef<HTMLButtonElement>();
+    render(
+      <Select.Root
+        items={fruits}
+        defaultOpen
+        alignItemWithTrigger={false}
+      >
+        <Select.Trigger>
+          <Select.Value
+            ref={value}
+            data-testid='select-value'
+            placeholder='Pick a fruit...'
+          />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            <Select.Option
+              ref={option}
+              value='apple'
+              label='Apple'
+            >
+              Apple
+            </Select.Option>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    expect(value.current).toBe(screen.getByTestId('select-value'));
+    expect(option.current).toBe(screen.getByRole('option', { name: 'Apple' }));
+  });
+});
+
+describe('Select.Group', () => {
+  function renderGrouped(props: { defaultOpen?: boolean; defaultValue?: string } = { defaultOpen: true }) {
+    return render(
+      <Select.Root
+        items={fruits}
+        alignItemWithTrigger={false}
+        {...props}
+      >
+        <Select.Trigger aria-label='Fruit'>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            <Select.Group>
+              <Select.GroupLabel>Pome</Select.GroupLabel>
+              <Select.Option
+                value='apple'
+                label='Apple'
+              >
+                Apple
+              </Select.Option>
+            </Select.Group>
+            <Select.Group>
+              <Select.GroupLabel>Other</Select.GroupLabel>
+              <Select.Option
+                value='banana'
+                label='Banana'
+              >
+                Banana
+              </Select.Option>
+              <Select.Option
+                value='cherry'
+                label='Cherry'
+              >
+                Cherry
+              </Select.Option>
+            </Select.Group>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+  }
+
+  it('names each group by its label', () => {
+    renderGrouped();
+    const pome = screen.getByRole('group', { name: 'Pome' });
+    const other = screen.getByRole('group', { name: 'Other' });
+    expect(pome).toContainElement(screen.getByRole('option', { name: 'Apple' }));
+    expect(other).toContainElement(screen.getByRole('option', { name: 'Cherry' }));
+  });
+
+  it('moves the active option across groups with the arrow keys', async () => {
+    const user = userEvent.setup();
+    renderGrouped({ defaultValue: 'apple' });
+    screen.getByRole('combobox').focus();
+    await user.keyboard('{ArrowDown}');
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Apple' })).toHaveFocus());
+
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveFocus();
+  });
+
+  it('has no violations when open', async () => {
+    renderGrouped();
+    expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+  });
+
+  it('forwards refs to the group and its label', () => {
+    const groupRef = createRef<HTMLDivElement>();
+    const labelRef = createRef<HTMLDivElement>();
+    render(
+      <Select.Group ref={groupRef}>
+        <Select.GroupLabel ref={labelRef}>Pome</Select.GroupLabel>
+      </Select.Group>,
+    );
+
+    expect(groupRef.current).toBe(screen.getByRole('group', { name: 'Pome' }));
+    expect(labelRef.current).toHaveTextContent('Pome');
+  });
+
+  it('throws when the label is used outside <Select.Group>', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<Select.GroupLabel>Fruits</Select.GroupLabel>)).toThrow(/within <Select.Group>/);
   });
 });

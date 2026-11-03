@@ -10,7 +10,6 @@ import { Pagination } from '../../components/pagination';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { Key } from '../../icons/glyphs/key';
 import { fill } from '../../localization';
@@ -40,27 +39,11 @@ export function APIKeysTableView({
   revoke,
   finalFocus,
   onBulkAction,
-  sort,
-  onSortChange,
   isFetching = false,
   isError = false,
   onRetry,
 }: APIKeysTableViewProps) {
-  const { table, sortHeader, pagination } = useServerDataTable({
-    data: apiKeys,
-    totalCount,
-    getRowId,
-    sortableColumns: ['name', 'createdAt', 'lastUsed'],
-    sort,
-    onSortChange,
-    page,
-    pageSize,
-    onPageChange,
-    onPageSizeChange,
-    searchValue,
-    onSearchChange,
-  });
-  const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
+  const showPagination = Math.ceil(totalCount / pageSize) > 1 || (totalCount > 0 && Boolean(onPageSizeChange));
   const query = searchValue.trim();
   const emptyState = query
     ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
@@ -74,8 +57,8 @@ export function APIKeysTableView({
             ref={searchInputRef}
             label={m.search}
             clearLabel={m.clearSearch}
-            value={table.globalFilter}
-            onValueChange={table.setGlobalFilter}
+            value={searchValue}
+            onValueChange={onSearchChange}
           />
           {onCreate ? (
             <Button
@@ -91,34 +74,27 @@ export function APIKeysTableView({
           aria-busy={isFetching}
           layout='fixed'
           minWidth='36rem'
+          selectionMode={onBulkAction ? 'multiple' : 'none'}
         >
-          <APIKeysTableColumns
-            selectable={Boolean(onBulkAction)}
-            revocable={Boolean(revoke)}
-          />
           <Table.Header>
-            <Table.Row>
-              {onBulkAction ? (
-                <Table.SelectAllCell
-                  aria-label={m.selectAll}
-                  checked={table.getIsAllRowsSelected()}
-                  indeterminate={table.getIsSomeRowsSelected()}
-                  onChange={table.toggleAllRowsSelected}
-                />
-              ) : null}
-              <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('createdAt')}>{m.createdAt}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('lastUsed')}>{m.lastUsed}</Table.HeaderCell>
-              {revoke ? (
-                <Table.HeaderCell align='end'>
-                  <VisuallyHidden>{m.actions}</VisuallyHidden>
-                </Table.HeaderCell>
-              ) : null}
-            </Table.Row>
+            {onBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+            <Table.Column>{m.name}</Table.Column>
+            <Table.Column width='9rem'>{m.createdAt}</Table.Column>
+            <Table.Column width='9rem'>{m.lastUsed}</Table.Column>
+            {revoke ? (
+              <Table.Column
+                align='end'
+                width='4rem'
+              >
+                <VisuallyHidden>{m.actions}</VisuallyHidden>
+              </Table.Column>
+            ) : null}
           </Table.Header>
-          <Table.Body>
-            {isError ? (
-              <Table.Empty colSpan={columnCount}>
+          <Table.Body
+            items={isError ? [] : apiKeys}
+            itemToStringValue={getRowId}
+            renderEmptyState={() =>
+              isError ? (
                 <EmptyState.Root>
                   <EmptyState.Icon glyph={ExclamationCircle} />
                   <EmptyState.Label>{m.loadError}</EmptyState.Label>
@@ -135,58 +111,59 @@ export function APIKeysTableView({
                     </EmptyState.Actions>
                   ) : null}
                 </EmptyState.Root>
-              </Table.Empty>
-            ) : table.rows.length === 0 ? (
-              <Table.Empty colSpan={columnCount}>
+              ) : (
                 <EmptyState.Root>
                   <EmptyState.Icon glyph={Key} />
                   <EmptyState.Label>{emptyState.label}</EmptyState.Label>
                   <EmptyState.Description>{emptyState.description}</EmptyState.Description>
                 </EmptyState.Root>
-              </Table.Empty>
-            ) : (
-              table.rows.map(row => (
-                <Table.Row
-                  key={row.id}
-                  selected={Boolean(onBulkAction) && row.getIsSelected()}
-                >
-                  {onBulkAction ? (
-                    <Table.SelectCell
-                      aria-label={fill(m.select, { name: row.original.name })}
-                      checked={row.getIsSelected()}
-                      onToggleSelected={row.toggleSelected}
-                    />
-                  ) : null}
-                  <Table.Cell>
-                    <APIKeyMetadata
+              )
+            }
+          >
+            {apiKey => (
+              <Table.Row>
+                {onBulkAction ? <Table.SelectionCell aria-label={fill(m.select, { name: apiKey.name })} /> : null}
+                <Table.Cell>
+                  <APIKeyMetadata
+                    messages={m}
+                    apiKey={apiKey}
+                  />
+                </Table.Cell>
+                <Table.Cell noWrap>
+                  <Text>{apiKey.createdAtLabel}</Text>
+                </Table.Cell>
+                <Table.Cell noWrap>
+                  <Text>{apiKey.lastUsedAtLabel ?? m.neverUsed}</Text>
+                </Table.Cell>
+                {revoke ? (
+                  <Table.Cell align='end'>
+                    <APIKeyActions
                       messages={m}
-                      apiKey={row.original}
+                      apiKey={apiKey}
+                      registerTrigger={registerTrigger}
+                      onSelect={key => revoke.open(key)}
                     />
                   </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.createdAtLabel}</Text>
-                  </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
-                  </Table.Cell>
-                  {revoke ? (
-                    <Table.Cell align='end'>
-                      <APIKeyActions
-                        messages={m}
-                        apiKey={row.original}
-                        registerTrigger={registerTrigger}
-                        onSelect={apiKey => revoke.open(apiKey)}
-                      />
-                    </Table.Cell>
-                  ) : null}
-                </Table.Row>
-              ))
+                ) : null}
+              </Table.Row>
             )}
           </Table.Body>
         </Table.Root>
-        {pagination ? (
+        {showPagination ? (
           <Pagination
-            {...pagination}
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalCount}
+            disabled={isFetching}
+            onChange={onPageChange}
+            onPageSizeChange={
+              onPageSizeChange
+                ? next => {
+                    onPageSizeChange(next);
+                    onPageChange(1);
+                  }
+                : undefined
+            }
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
@@ -267,17 +244,5 @@ function APIKeyActions({
         </Menu.Item>
       </Menu.Popup>
     </Menu.Root>
-  );
-}
-
-export function APIKeysTableColumns({ selectable, revocable }: { selectable: boolean; revocable: boolean }) {
-  return (
-    <Table.ColumnGroup>
-      {selectable ? <Table.Column /> : null}
-      <Table.Column />
-      <Table.Column width='9rem' />
-      <Table.Column width='9rem' />
-      {revocable ? <Table.Column width='4rem' /> : null}
-    </Table.ColumnGroup>
   );
 }

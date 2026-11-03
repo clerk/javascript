@@ -129,7 +129,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     refs.setReference(anchor.current);
   });
 
-  const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
+  const { mounted, transitionStatus, setMounted } = useTransitionStatus({ open });
   const runOnAnimationsFinished = useAnimationsFinished(barRef, open);
 
   const focusWithinRef = React.useRef(false);

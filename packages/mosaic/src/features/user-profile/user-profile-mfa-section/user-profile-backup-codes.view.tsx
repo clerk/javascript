@@ -38,7 +38,7 @@ export function UserProfileBackupCodesView({
   pendingAction,
   errorMessage,
 }: UserProfileBackupCodesViewProps) {
-  const m = useMessages('userProfileBackupCodes');
+  const m = useMessages('userProfile').mfa.backupCodes;
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const hasCodes = codes.length > 0 && pendingAction !== 'generate';
   const showSaveActions = hasCodes || pendingAction === 'generate';
@@ -104,7 +104,6 @@ export function UserProfileBackupCodesView({
                 type='button'
                 variant='outline'
                 color='neutral'
-                fullWidth
                 disabled={!hasCodes}
                 onClick={onPrint}
               >
@@ -115,7 +114,6 @@ export function UserProfileBackupCodesView({
               type='button'
               variant='outline'
               color='neutral'
-              fullWidth
               isPending={pendingAction === 'download'}
               disabled={!hasCodes || pendingAction === 'copy'}
               pendingLabel={m.downloading}
@@ -133,7 +131,6 @@ export function UserProfileBackupCodesView({
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={Boolean(pendingAction)}
             onClick={onBack ?? onCancel}
           >
@@ -142,7 +139,6 @@ export function UserProfileBackupCodesView({
         )}
         <SubmitButton
           type='button'
-          fullWidth
           isPending={pendingAction === 'copy'}
           disabled={showSaveActions && (!hasCodes || pendingAction === 'download')}
           focusableWhenDisabled

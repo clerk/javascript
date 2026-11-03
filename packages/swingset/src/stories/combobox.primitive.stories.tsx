@@ -6,7 +6,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
-  status: 'wip',
+  status: 'stable',
   title: 'Combobox',
   source: 'packages/mosaic/src/primitives/combobox/index.ts',
 };

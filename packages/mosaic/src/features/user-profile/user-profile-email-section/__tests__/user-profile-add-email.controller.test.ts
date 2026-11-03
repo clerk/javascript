@@ -47,6 +47,7 @@ describe('useUserProfileAddEmailController', () => {
       }),
     );
     act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
     await act(async () => {
       result.current.onSubmit();
       await Promise.resolve();
@@ -117,6 +118,7 @@ describe('useUserProfileAddEmailController', () => {
       useUserProfileAddEmailController({ reverification: idleReverification, onCreate: () => Promise.resolve(email) }),
     );
     act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
     await act(async () => {
       result.current.onSubmit();
       await vi.advanceTimersByTimeAsync(0);
@@ -190,18 +192,27 @@ describe('useUserProfileAddEmailController', () => {
     expect(email.verifyCode).toHaveBeenCalledExactlyOnceWith('123456');
   });
 
-  it('verifies an existing email without creating one', async () => {
+  it('verifies an existing email without creating one, opening once its code is sent', async () => {
     const onCreate = vi.fn(created);
-    const email = verifier();
+    const sent = createDeferredPromise();
+    const email = verifier(() => ({ method: 'code', sent: sent.promise.then(() => undefined) }));
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
     );
 
     act(() => result.current.onVerifyEmail(other, email));
+    expect(email.start).toHaveBeenCalledOnce();
+    expect(result.current.open).toBe(false);
+    expect(result.current.pendingVerifyId).toBe('email_2');
+
+    await act(async () => {
+      sent.resolve();
+      await sent.promise;
+    });
     expect(result.current.open).toBe(true);
+    expect(result.current.pendingVerifyId).toBeUndefined();
     expect(result.current.step).toBe('verify');
     expect(result.current.emailAddress).toBe('other@example.com');
-    await waitFor(() => expect(email.start).toHaveBeenCalledOnce());
 
     act(() => result.current.onSubmit('123456'));
     await waitFor(() => expect(result.current.open).toBe(false));
@@ -259,6 +270,7 @@ describe('useUserProfileAddEmailController', () => {
       }),
     );
     act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
     act(() => result.current.onSubmit());
     await waitFor(() => expect(result.current.errorMessage).toBe('That email is taken.'));
   });
@@ -364,5 +376,35 @@ describe('useUserProfileAddEmailController', () => {
 
     act(() => result.current.onEmailAddressChange('other@example.com'));
     expect(result.current.canSubmitEmail).toBe(true);
+  });
+
+  it('does not add an empty email', () => {
+    const onCreate = vi.fn(created);
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
+    );
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.canSubmitEmail).toBe(false);
+    act(() => result.current.onSubmit());
+    expect(onCreate).not.toHaveBeenCalled();
+    expect(result.current.isPending).toBe(false);
+  });
+
+  it('does not verify an incomplete code', async () => {
+    const email = verifier();
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: () => Promise.resolve(email) }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
+    act(() => result.current.onSubmit());
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+    expect(result.current.canSubmitCode).toBe(false);
+    act(() => result.current.onSubmit('123'));
+    expect(email.verifyCode).not.toHaveBeenCalled();
+    expect(result.current.isPending).toBe(false);
+
+    act(() => result.current.onCodeChange('123456'));
+    expect(result.current.canSubmitCode).toBe(true);
   });
 });

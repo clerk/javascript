@@ -151,7 +151,8 @@ describe('OrganizationProfileMembersPanel', () => {
     await waitFor(() => expect(members.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
     members.release();
-    await openMenu(user, await screen.findByRole('button', { name: 'Manage Bob Smith' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeEnabled());
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob Smith' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     const dialog = await screen.findByRole('alertdialog', { name: 'Remove Bob Smith?' });
     await user.click(within(dialog).getByRole('button', { name: 'Remove from organization' }));

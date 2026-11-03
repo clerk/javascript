@@ -1,6 +1,6 @@
 import { test, expect, CLERK_TEST_CODE } from '../../fixtures.ts';
 import { homeLinks } from '../../native.ts';
-import { runPassword } from '../../support/clerk.ts';
+import { runPassword } from '@clerk/internal-mobile-e2e/specs/support/clerk';
 
 test('useSignUp completes with the email code', async ({ host, screen }) => {
   const email = await host.newEmail();

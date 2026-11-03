@@ -1,4 +1,4 @@
-import type { CommandLine } from '../../core/exec.ts';
+import type { CommandLine } from '@clerk/internal-mobile-e2e/core/exec';
 import { AVD_NAME } from './sdk.ts';
 
 export const RECORD_SIZE = '720x1608';

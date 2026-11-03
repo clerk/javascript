@@ -22,15 +22,21 @@ export const setupTestingTokens = async ({
 
   await context.route(
     url =>
-      (tokens.has(url.origin) && url.pathname.startsWith('/v1/')) || url.pathname.startsWith('/v1/me/oauth/consent/'),
+      (tokens.has(url.origin) && url.pathname.startsWith('/v1/')) ||
+      url.pathname.startsWith('/v1/me/oauth/consent/') ||
+      url.pathname === '/oauth/authorize/continue',
     async route => {
-      const requestUrl = new URL(route.request().url());
-      const requestToken = tokens.get(requestUrl.origin);
+      const request = route.request();
+      const requestUrl = new URL(request.url());
+      const requestToken = requestUrl.pathname.startsWith('/v1/') ? tokens.get(requestUrl.origin) : undefined;
       if (requestToken) {
         requestUrl.searchParams.set('__clerk_testing_token', requestToken);
       }
 
-      if (route.request().method() !== 'POST' || !requestUrl.pathname.startsWith('/v1/me/oauth/consent/')) {
+      const redirectsToCallback =
+        (request.method() === 'POST' && requestUrl.pathname.startsWith('/v1/me/oauth/consent/')) ||
+        (request.method() === 'GET' && requestUrl.pathname === '/oauth/authorize/continue');
+      if (!redirectsToCallback) {
         if (!requestToken) {
           return route.fallback();
         }

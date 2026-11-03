@@ -129,7 +129,7 @@ function Rows({ rows }: { rows: Array<[string, ReactNode]> }) {
 // helper its placeholders call for.
 function Strings() {
   const m = useMessages('userButton');
-  const link = useMessages('userProfileAddEmail');
+  const link = useMessages('userProfile').email.addDialog;
   const locale = useLocale();
   return (
     <Rows

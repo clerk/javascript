@@ -1,5 +1,6 @@
 'use client';
 
+import { inertProps } from '@clerk/shared/inert';
 import React from 'react';
 
 import { type ComponentProps, Freeze, mergeProps, useRender } from '../utils';
@@ -13,6 +14,7 @@ export const MenuPopup = React.forwardRef<HTMLDivElement, MenuPopupProps>(functi
 
   const defaultProps = {
     ...transitionProps,
+    ...inertProps(!open),
     children: <Freeze frozen={!open}>{children}</Freeze>,
   };
 

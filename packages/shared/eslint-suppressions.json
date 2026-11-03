@@ -1,0 +1,37 @@
+{
+  "src/react/hooks/useDeepEqualMemo.ts": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "src/react/hooks/useOrganizationDomains.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/react/hooks/useOrganizationEnterpriseConnectionTestRuns.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "src/react/hooks/usePagesOrInfinite.shared.ts": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "src/react/hooks/usePagesOrInfinite.tsx": {
+    "react-hooks/refs": {
+      "count": 21
+    }
+  },
+  "src/react/hooks/usePreviousValue.ts": {
+    "react-hooks/refs": {
+      "count": 5
+    }
+  },
+  "src/react/stripe-react/utils.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  }
+}

@@ -4,13 +4,18 @@ import { useEffect, useState } from 'react';
 
 export type TransitionStatus = 'starting' | 'ending' | undefined;
 
+export interface UseTransitionStatusOptions {
+  open: boolean;
+  animateOnMount?: boolean;
+}
+
 /**
  * Core state machine for enter/exit animations.
  *
  * Tracks whether a component should be in the DOM (`mounted`) and which
  * animation phase it is in (`transitionStatus`).
  *
- * - When `open` becomes true: synchronously sets `mounted=true` and
+ * - When `open` becomes true after mount: synchronously sets `mounted=true` and
  *   `transitionStatus='starting'` during render so the first committed DOM
  *   frame carries `[data-starting-style]`. One animation frame later, clears
  *   the status so the CSS transition fires.
@@ -18,9 +23,11 @@ export type TransitionStatus = 'starting' | 'ending' | undefined;
  *   The element stays mounted until the caller explicitly calls `setMounted(false)`
  *   (typically after all CSS animations have finished).
  */
-export function useTransitionStatus(open: boolean) {
+export function useTransitionStatus({ open, animateOnMount = false }: UseTransitionStatusOptions) {
   const [mounted, setMounted] = useState(open);
-  const [transitionStatus, setTransitionStatus] = useState<TransitionStatus>(open ? 'starting' : undefined);
+  const [transitionStatus, setTransitionStatus] = useState<TransitionStatus>(
+    open && animateOnMount ? 'starting' : undefined,
+  );
 
   // Synchronous render-phase state updates. Running these during render (not in
   // useEffect) guarantees the first committed DOM includes the right data

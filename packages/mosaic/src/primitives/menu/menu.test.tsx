@@ -1,8 +1,9 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { Popover } from '../popover';
 import { axe } from '../test-utils/axe';
 import { Menu } from './index';
@@ -235,6 +236,28 @@ describe('Menu', () => {
     });
   });
 
+  describe('Arrow', () => {
+    it('forwards a ref to the arrow element', async () => {
+      const user = userEvent.setup();
+      const ref = React.createRef<SVGSVGElement>();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Arrow ref={ref} />
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+
+      expect(ref.current).toBeInstanceOf(SVGSVGElement);
+    });
+  });
+
   describe('disabled items', () => {
     it('marks disabled item with data-disabled', async () => {
       const user = userEvent.setup();
@@ -376,6 +399,51 @@ describe('Menu', () => {
       expect(screen.getByText('Cut')).toHaveAttribute('data-active', '');
     });
 
+    function renderWithEnabledAriaFlag(flagged: 'first' | 'last') {
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item
+                label='Cut'
+                aria-disabled={flagged === 'first' ? false : undefined}
+              >
+                Cut
+              </Menu.Item>
+              <Menu.Item label='Copy'>Copy</Menu.Item>
+              <Menu.Item
+                label='Paste'
+                aria-disabled={flagged === 'last' ? false : undefined}
+              >
+                Paste
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+    }
+
+    it('treats aria-disabled="false" as enabled when pressing Home', async () => {
+      const user = userEvent.setup();
+      renderWithEnabledAriaFlag('first');
+
+      await user.click(screen.getByText('Actions'));
+      await user.keyboard('{ArrowDown}{Home}');
+
+      expect(screen.getByRole('menuitem', { name: 'Cut' })).toHaveAttribute('data-active');
+    });
+
+    it('treats aria-disabled="false" as enabled when pressing End', async () => {
+      const user = userEvent.setup();
+      renderWithEnabledAriaFlag('last');
+
+      await user.click(screen.getByText('Actions'));
+      await user.keyboard('{End}');
+
+      expect(screen.getByRole('menuitem', { name: 'Paste' })).toHaveAttribute('data-active');
+    });
+
     it('Home moves to first item', async () => {
       const user = userEvent.setup();
       render(
@@ -500,7 +568,7 @@ describe('Menu', () => {
     });
   });
 
-  describe('ARIA attributes', () => {
+  describe('ARIA roles and states', () => {
     it('trigger has aria-expanded', async () => {
       const user = userEvent.setup();
       render(
@@ -736,6 +804,43 @@ describe('Menu', () => {
       expect(screen.getByText('Share')).toHaveAttribute('data-closed', '');
       expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
+
+    it('opens and closes a submenu with the reading-direction arrow keys in RTL', async () => {
+      const user = userEvent.setup();
+      render(
+        <DirectionProvider direction='rtl'>
+          <Menu.Root>
+            <Menu.Trigger>Actions</Menu.Trigger>
+            <Menu.Positioner>
+              <Menu.Popup>
+                <Menu.Root>
+                  <Menu.Trigger>Share</Menu.Trigger>
+                  <Menu.Positioner>
+                    <Menu.Popup>
+                      <Menu.Item label='Email'>Email</Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Root>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Root>
+        </DirectionProvider>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+      await new Promise(r => requestAnimationFrame(r));
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{ArrowRight}');
+      expect(screen.getByText('Share')).not.toHaveAttribute('data-open');
+
+      await user.keyboard('{ArrowLeft}');
+      expect(screen.getByText('Share')).toHaveAttribute('data-open', '');
+
+      await new Promise(r => requestAnimationFrame(r));
+      await user.keyboard('{ArrowRight}');
+      expect(screen.getByText('Share')).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+    });
   });
 
   describe('inside a popover', () => {
@@ -795,17 +900,9 @@ describe('Menu', () => {
       vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
     });
 
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
-
     beforeEach(() => {
       vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
       vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
-    });
-
-    afterEach(() => {
-      vi.restoreAllMocks();
     });
 
     function renderHoverMenu(children?: React.ReactNode) {
@@ -846,8 +943,8 @@ describe('Menu', () => {
       expect(await screen.findByText('Cut')).toBeInTheDocument();
     });
 
-    it('does not open on hover without openOnHover', async () => {
-      const user = userEvent.setup();
+    it('does not open on hover without openOnHover', () => {
+      vi.useFakeTimers();
       render(
         <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
@@ -859,10 +956,16 @@ describe('Menu', () => {
         </Menu.Root>,
       );
 
-      await user.hover(screen.getByText('Actions'));
-      await new Promise(r => setTimeout(r, 150));
+      try {
+        fireEvent.mouseEnter(screen.getByText('Actions'));
+        act(() => {
+          vi.runAllTimers();
+        });
 
-      expect(screen.queryByText('Cut')).toBeNull();
+        expect(screen.queryByText('Cut')).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('stays open as the mouse moves from the trigger into the menu', async () => {
@@ -920,6 +1023,33 @@ describe('Menu', () => {
       await user.hover(screen.getByText('Elsewhere'));
 
       expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+    });
+
+    it('stays open when the mouse leaves a menu pressed open just before the hover delay ran out', () => {
+      vi.useFakeTimers();
+      try {
+        renderHoverMenu();
+        const trigger = screen.getByText('Actions');
+
+        fireEvent.pointerEnter(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseEnter(trigger);
+        fireEvent.pointerDown(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseDown(trigger, { button: 0 });
+        act(() => {
+          vi.advanceTimersByTime(100);
+        });
+        expect(trigger).toHaveAttribute('data-open', '');
+
+        fireEvent.pointerLeave(trigger, { pointerType: 'mouse' });
+        fireEvent.mouseLeave(trigger, { relatedTarget: screen.getByText('Elsewhere') });
+        act(() => {
+          vi.runAllTimers();
+        });
+
+        expect(trigger).toHaveAttribute('data-open', '');
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('closes on a second press of the trigger', async () => {
@@ -1141,5 +1271,22 @@ describe('Menu', () => {
 
       expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
     });
+  });
+
+  it('forwards a ref to the separator', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger>Actions</Menu.Trigger>
+        <Menu.Positioner>
+          <Menu.Popup>
+            <Menu.Item label='Cut'>Cut</Menu.Item>
+            <Menu.Separator ref={ref} />
+            <Menu.Item label='Copy'>Copy</Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('separator'));
   });
 });

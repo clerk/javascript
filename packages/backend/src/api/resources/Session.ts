@@ -52,13 +52,9 @@ export class Session {
     readonly status: string,
     /** The time the session was last active on the [`Client`](https://clerk.com/docs/reference/backend/types/backend-client). */
     readonly lastActiveAt: number,
-    /**
-     * The Unix timestamp when the `Session` will expire. For an indefinite native session, this is `0`, meaning no expiration deadline. Check `status` to determine whether the session is active.
-     */
+    /** The Unix timestamp when the `Session` will expire. */
     readonly expireAt: number,
-    /**
-     * The Unix timestamp when the `Session` will be abandoned. For an indefinite native session, this is `0`, meaning no abandonment deadline.
-     */
+    /** The Unix timestamp when the `Session` will be abandoned. */
     readonly abandonAt: number,
     /** The Unix timestamp when the `Session` was first created. */
     readonly createdAt: number,

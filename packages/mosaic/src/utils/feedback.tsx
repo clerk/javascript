@@ -11,7 +11,7 @@ export function hasMessage(children: React.ReactNode) {
 }
 
 export function useMessageHeight(active: HTMLElement | null) {
-  const [height, setHeight] = React.useState(0);
+  const [height, setHeight] = React.useState<number | undefined>(undefined);
 
   useSafeLayoutEffect(() => {
     if (!active) {

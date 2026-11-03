@@ -2,8 +2,9 @@ import type { ApiKeyJSON } from '@clerk/shared/types';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../__tests__/async';
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import {
@@ -247,9 +248,9 @@ describe('APIKeysTable', () => {
         <MosaicProvider
           localization={{
             overrides: {
-              'apiKeysTable.search': 'Find a key',
-              'apiKeysTable.expires': 'Expiration: {expiresDate}',
-              'apiKeysTable.revokeTitle': 'Retirer {name} ?',
+              'apiKeys.search': 'Find a key',
+              'apiKeys.expires': 'Expiration: {expiresDate}',
+              'apiKeys.revokeTitle': 'Retirer {name} ?',
             },
           }}
         >
@@ -359,6 +360,8 @@ describe('APIKeysTable', () => {
       await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
       await waitFor(() => expect(table()).toHaveAttribute('aria-busy', 'true'));
       expect(within(table()).getByText('Key 1')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Previous API keys page' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
       next.release();
       expect(await within(await loadedTable()).findByText('Key 11')).toBeVisible();
       expect(within(table()).queryByText('Key 1')).toBeNull();
@@ -466,13 +469,12 @@ describe('APIKeysTable', () => {
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       await within(dialog).findByRole('textbox', { name: 'API key' });
       let rejectCopy: (error: Error) => void = () => undefined;
-      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(
+      vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(
         () =>
           new Promise<void>((_, reject) => {
             rejectCopy = reject;
           }),
       );
-      onTestFinished(() => writeText.mockRestore());
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await user.keyboard('{Escape}');
@@ -483,14 +485,49 @@ describe('APIKeysTable', () => {
       expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
     });
 
+    it('keeps the secret open on Escape while a retried copy is pending', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+      await within(dialog).findByRole('textbox', { name: 'API key' });
+      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(new Error('blocked'));
+      await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
+      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(() => new Promise<void>(() => undefined));
+
+      await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
+    });
+
+    it('clears the copy error when an overlapping copy succeeds after one fails', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+      await within(dialog).findByRole('textbox', { name: 'API key' });
+      const first = deferred<void>();
+      const second = deferred<void>();
+      vi.spyOn(navigator.clipboard, 'writeText').mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+
+      await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
+      await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
+      first.reject(new Error('blocked'));
+      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      second.resolve();
+
+      await waitFor(() => expect(within(dialog).getByRole('alert')).not.toHaveTextContent('Could not copy'));
+    });
+
     it('closes the secret on Escape after a failed copy', async () => {
       const { user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       await within(dialog).findByRole('textbox', { name: 'API key' });
-      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
-      onTestFinished(() => writeText.mockRestore());
+      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
@@ -505,8 +542,7 @@ describe('APIKeysTable', () => {
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       await within(dialog).findByRole('textbox', { name: 'API key' });
-      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
-      onTestFinished(() => writeText.mockRestore());
+      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await waitFor(() =>
@@ -614,7 +650,6 @@ describe('APIKeysTable', () => {
 
     it('explains a created key that came back without its secret and lists it', async () => {
       const consoleError = vi.spyOn(console, 'error');
-      onTestFinished(() => consoleError.mockRestore());
       const { fapi, user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');

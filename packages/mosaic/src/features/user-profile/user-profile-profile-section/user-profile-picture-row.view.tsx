@@ -3,15 +3,10 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { Pen } from '../../../icons/glyphs/pen';
-import { X } from '../../../icons/glyphs/x';
 import { useMessages } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
+import { AVATAR_UPLOAD } from '../../../utils/avatar-upload';
 import type { UserProfilePictureController } from './user-profile-picture.controller';
-
-const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-/** Matches the limit the row's own description advertises. */
-const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
 
 export interface UserProfilePictureRowViewProps extends UserProfilePictureController {
   name: string;
@@ -30,7 +25,7 @@ export function UserProfilePictureRowView({
   onReject,
   onRemove,
 }: UserProfilePictureRowViewProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -40,8 +35,7 @@ export function UserProfilePictureRowView({
 
   return (
     <FileUpload.Root
-      accept={PROFILE_PICTURE_MIME_TYPES}
-      maxSize={PROFILE_PICTURE_MAX_BYTES}
+      {...AVATAR_UPLOAD}
       disabled={isPending}
       aria-busy={isPending || undefined}
       render={<Section.Row />}
@@ -87,16 +81,16 @@ function ProfilePictureActions({
   canChange: boolean;
   onRemove?: () => void;
 }) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: Pen, onClick: openFilePicker });
+    actions.push({ label: m.picture.change, onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: X, onClick: onRemove });
+    actions.push({ label: m.picture.remove, color: 'negative', onClick: onRemove });
   }
 
   if (actions.length > 0) {

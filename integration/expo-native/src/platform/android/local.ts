@@ -1,8 +1,8 @@
 import { execFileSync, spawn } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { defaultClaimsDir, freeSlot, isOrphaned, readClaim, readClaims, takeSlot, type Claim } from '../../core/claims.ts';
-import { isRunning, run, sleep, type ProcessRef } from '../../core/exec.ts';
+import { defaultClaimsDir, freeSlot, isOrphaned, readClaim, readClaims, takeSlot, type Claim } from '@clerk/internal-mobile-e2e/core/claims';
+import { isRunning, run, sleep, type ProcessRef } from '@clerk/internal-mobile-e2e/core/exec';
 import {
   LOCAL_POOL,
   VerifyFailure,
@@ -12,7 +12,7 @@ import {
   type EvidencePath,
   type LocalLease,
   type Recording,
-} from '../../core/types.ts';
+} from '@clerk/internal-mobile-e2e/core/types';
 import { LANE_SETTINGS, emulatorArgs, installArgs, laneSettingsCommand, laneSettingsHold, laneSettingsReadCommand, logcatArgs, recordingOnDevice, screenrecordArgs } from './emulator.ts';
 import { AVD_NAME, ensureLaneAvd, jdkCheck, localAvailability, sdkTool, thisMachine, type Machine } from './sdk.ts';
 

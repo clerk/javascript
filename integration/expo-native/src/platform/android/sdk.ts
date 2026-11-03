@@ -1,7 +1,7 @@
 import { closeSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { delimiter, dirname, join } from 'node:path';
-import type { Availability, DoctorCheck } from '../../core/types.ts';
+import type { Availability, DoctorCheck } from '@clerk/internal-mobile-e2e/core/types';
 
 export const AVD_NAME = 'Clerk_Verify_Pixel';
 const IMAGE_API = 36;

@@ -1,6 +1,5 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
@@ -20,7 +19,9 @@ import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
+import { withUserProfileModalReturn } from '../user-profile.modal-return';
 import { useUserProfileOptions } from '../user-profile.provider';
+import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
@@ -71,8 +72,6 @@ const RECONNECT_ERROR_CODES = [
   'external_account_email_address_verification_required',
 ];
 
-const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
-
 type SocialSettings = Partial<
   Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
@@ -89,8 +88,9 @@ export function createProviderCatalog(
     enabled: enabled.has(strategy),
     display: {
       provider: name,
+      iconId: provider,
       iconUrl: iconImageUrl(provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
+      monochromeIcon: isMonochromeProvider(provider),
     },
   }));
   const candidates = new Set([
@@ -110,7 +110,7 @@ export function createProviderCatalog(
       strategy,
       provider,
       enabled: enabled.has(strategy),
-      display: { provider: settings?.name || provider, iconUrl: settings?.logo_url || undefined },
+      display: { provider: settings?.name || provider, iconId: provider, iconUrl: settings?.logo_url || undefined },
     });
   }
   return [
@@ -283,8 +283,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   };
 
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
-  const withModalState = (url: string, socialProvider?: string) =>
-    mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile', socialProvider }) : url;
+  const withModalState = (url: string) => withUserProfileModalReturn(url, mode);
 
   const completeVerification = async (response: ExternalAccountResource): Promise<ConnectedAccountActionResult> => {
     const url = response.verification?.externalVerificationRedirectURL;
@@ -319,7 +318,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       const current = requireCurrentUser();
       const response = await createAccount(current, {
         strategy: provider.strategy,
-        redirectUrl: withModalState(redirectUrl, provider.provider),
+        redirectUrl: withModalState(redirectUrl),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
       });
       return completeVerification(response);

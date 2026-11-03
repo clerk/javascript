@@ -77,3 +77,194 @@ export const noDynamicMessageCatalogs = {
     };
   },
 };
+
+function isForwardRefCall(node) {
+  if (node?.type !== 'CallExpression') {
+    return false;
+  }
+  const callee = node.callee;
+  if (callee.type === 'Identifier') {
+    return callee.name === 'forwardRef';
+  }
+  return (
+    callee.type === 'MemberExpression' &&
+    callee.object.type === 'Identifier' &&
+    callee.object.name === 'React' &&
+    propertyName(callee.property, callee.computed) === 'forwardRef'
+  );
+}
+
+function unwrapExpression(node) {
+  let current = node;
+  while (current && ['TSAsExpression', 'TSSatisfiesExpression', 'TSNonNullExpression'].includes(current.type)) {
+    current = current.expression;
+  }
+  return current;
+}
+
+function isFunction(node) {
+  return ['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression'].includes(node?.type);
+}
+
+function useRenderCalls(fn, visitorKeys) {
+  const calls = [];
+  const visit = node => {
+    if (!node || typeof node.type !== 'string') {
+      return;
+    }
+    if (node.type === 'CallExpression' && node.callee.type === 'Identifier' && node.callee.name === 'useRender') {
+      calls.push(node);
+    }
+    for (const key of visitorKeys[node.type] ?? []) {
+      const child = node[key];
+      if (Array.isArray(child)) {
+        child.forEach(visit);
+      } else {
+        visit(child);
+      }
+    }
+  };
+  visit(fn);
+  return calls;
+}
+
+function includesRef(value, refName, scope) {
+  const node = unwrapExpression(value);
+  if (node?.type === 'Identifier') {
+    if (node.name === refName) {
+      return true;
+    }
+    const variable = findVariable(scope, node.name);
+    const definition = variable?.defs.length === 1 ? variable.defs[0] : undefined;
+    return definition?.node.type === 'VariableDeclarator' && includesRef(definition.node.init, refName, scope);
+  }
+  if (node?.type === 'LogicalExpression') {
+    return includesRef(node.left, refName, scope);
+  }
+  if (node?.type === 'ConditionalExpression') {
+    return includesRef(node.consequent, refName, scope) && includesRef(node.alternate, refName, scope);
+  }
+  return node?.type === 'ArrayExpression' && node.elements.some(element => includesRef(element, refName, scope));
+}
+
+function findVariable(scope, name) {
+  for (let current = scope; current; current = current.upper) {
+    const variable = current.set.get(name);
+    if (variable) {
+      return variable;
+    }
+  }
+  return undefined;
+}
+
+function passesRef(call, refName, scope) {
+  const [options] = call.arguments;
+  if (options?.type !== 'ObjectExpression') {
+    return true;
+  }
+  return options.properties.some(
+    property =>
+      property.type === 'Property' &&
+      propertyName(property.key, property.computed) === 'ref' &&
+      includesRef(property.value, refName, scope),
+  );
+}
+
+export const forwardRefParts = {
+  meta: {
+    type: 'problem',
+    schema: [],
+    messages: {
+      forwardRef:
+        'Parts that render through useRender must use React.forwardRef and pass the ref to useRender (see primitives/select/select-trigger.tsx).',
+    },
+  },
+  create(context) {
+    const isComponentName = name => /^[A-Z]/.test(name);
+
+    const check = (reportNode, init) => {
+      const expression = unwrapExpression(init);
+      const wrapped = isForwardRefCall(expression);
+      const fn = wrapped ? unwrapExpression(expression.arguments[0]) : expression;
+      if (!isFunction(fn)) {
+        return;
+      }
+      const calls = useRenderCalls(fn, context.sourceCode.visitorKeys);
+      if (calls.length === 0) {
+        return;
+      }
+      const refName = fn.params[1]?.type === 'Identifier' ? fn.params[1].name : undefined;
+      if (!wrapped || calls.some(call => !passesRef(call, refName, context.sourceCode.getScope(call)))) {
+        context.report({ node: reportNode, messageId: 'forwardRef' });
+      }
+    };
+
+    const checkDeclaration = declaration => {
+      if (declaration?.type === 'FunctionDeclaration' && declaration.id && isComponentName(declaration.id.name)) {
+        check(declaration.id, declaration);
+      }
+      if (declaration?.type === 'VariableDeclaration') {
+        for (const declarator of declaration.declarations) {
+          if (declarator.id.type === 'Identifier' && isComponentName(declarator.id.name) && declarator.init) {
+            check(declarator.id, declarator.init);
+          }
+        }
+      }
+    };
+
+    return {
+      Program(program) {
+        const localDeclarations = new Map();
+        for (const statement of program.body) {
+          const declaration = statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
+          if (declaration?.type === 'FunctionDeclaration' && declaration.id) {
+            localDeclarations.set(declaration.id.name, declaration);
+          }
+          if (declaration?.type === 'VariableDeclaration') {
+            for (const declarator of declaration.declarations) {
+              if (declarator.id.type === 'Identifier') {
+                localDeclarations.set(declarator.id.name, { type: 'VariableDeclaration', declarations: [declarator] });
+              }
+            }
+          }
+        }
+
+        const checked = new Set();
+        const checkOnce = declaration => {
+          if (declaration && !checked.has(declaration)) {
+            checked.add(declaration);
+            checkDeclaration(declaration);
+          }
+        };
+
+        for (const statement of program.body) {
+          if (statement.type === 'ExportNamedDeclaration') {
+            if (statement.declaration?.type === 'FunctionDeclaration') {
+              checkOnce(localDeclarations.get(statement.declaration.id?.name));
+            } else if (statement.declaration?.type === 'VariableDeclaration') {
+              for (const declarator of statement.declaration.declarations) {
+                if (declarator.id.type === 'Identifier') {
+                  checkOnce(localDeclarations.get(declarator.id.name));
+                }
+              }
+            } else if (!statement.source) {
+              for (const specifier of statement.specifiers) {
+                if (specifier.local.type === 'Identifier' && isComponentName(specifier.exported.name ?? '')) {
+                  checkOnce(localDeclarations.get(specifier.local.name));
+                }
+              }
+            }
+          }
+          if (statement.type === 'ExportDefaultDeclaration') {
+            const declaration = statement.declaration;
+            if (declaration.type === 'Identifier') {
+              checkOnce(localDeclarations.get(declaration.name));
+            } else if (declaration.type === 'FunctionDeclaration' && declaration.id) {
+              checkOnce(localDeclarations.get(declaration.id.name));
+            }
+          }
+        }
+      },
+    };
+  },
+};

@@ -26,7 +26,7 @@ export const styles = stylex.create({
     borderWidth: '1px',
     appearance: 'none',
     backgroundColor: {
-      default: colorVars['--cl-color-background'],
+      default: colorVars['--cl-color-surface'],
       ':checked': colorVars['--cl-color-brand'],
       ':indeterminate': colorVars['--cl-color-brand'],
     },
@@ -35,7 +35,12 @@ export const styles = stylex.create({
     flexShrink: 0,
     opacity: { default: null, ':disabled': 0.5 },
     position: 'relative',
-    transitionDuration: durationVars['--cl-duration-fast'],
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      ':checked': durationVars['--cl-duration-instant'],
+      ':indeterminate': durationVars['--cl-duration-instant'],
+      ':hover': durationVars['--cl-duration-instant'],
+    },
     transitionProperty: 'background-color, border-color',
     transitionTimingFunction: 'linear',
   },

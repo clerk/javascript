@@ -8,7 +8,6 @@ import { Toast, type ToastManager, type ToastObject } from './index';
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
-  vi.restoreAllMocks();
 });
 
 function ToastList() {
@@ -61,6 +60,14 @@ function renderToast(
 
 describe('Toast', () => {
   describe('adding', () => {
+    it('starts the entrance when a toast arrives', () => {
+      renderToast();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Add toast' }));
+
+      expect(screen.getByRole('dialog', { name: 'Saved' })).toHaveAttribute('data-starting-style');
+    });
+
     it('renders a toast added through useToastManager', async () => {
       const user = userEvent.setup();
       renderToast();
@@ -398,8 +405,6 @@ describe('Toast', () => {
       });
       advance(1000);
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-      visibility.mockRestore();
     });
 
     it('stays paused when mounted in a hidden document', () => {
@@ -944,9 +949,7 @@ describe('Toast', () => {
 
     it('exposes --toast-height and --toast-frontmost-height', () => {
       const heights: Record<string, number> = { Old: 40, New: 64 };
-      const offsetHeight = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (
-        this: HTMLElement,
-      ) {
+      vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
         return heights[this.getAttribute('data-title') ?? ''] ?? 0;
       });
       let captured: ToastManager | undefined;
@@ -993,8 +996,6 @@ describe('Toast', () => {
       expect(oldest.style.getPropertyValue('--toast-frontmost-height')).toBe('64px');
       expect(oldest.style.getPropertyValue('--toast-offset-y')).toBe('64px');
       expect(screen.getByTestId('viewport').style.getPropertyValue('--toast-frontmost-height')).toBe('64px');
-
-      offsetHeight.mockRestore();
     });
 
     it('marks Content behind the frontmost toast with data-behind', () => {
@@ -1216,9 +1217,8 @@ describe('Toast', () => {
         Toast.useToastManager();
         return null;
       }
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => render(<Bad />)).toThrow('<Toast.Provider>');
-      spy.mockRestore();
     });
 
     it('throws when Arrow is used outside Positioner', () => {
@@ -1235,7 +1235,7 @@ describe('Toast', () => {
       }
       const manager = Toast.createToastManager();
       manager.add({ title: 'Hi' });
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() =>
         render(
           <Toast.Provider toastManager={manager}>
@@ -1243,7 +1243,6 @@ describe('Toast', () => {
           </Toast.Provider>,
         ),
       ).toThrow('<Toast.Positioner>');
-      spy.mockRestore();
     });
   });
 });

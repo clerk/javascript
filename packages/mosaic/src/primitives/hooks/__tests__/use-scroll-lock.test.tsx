@@ -39,12 +39,19 @@ const overlays: Array<[string, (open: boolean) => ReactElement]> = [
   [
     'select',
     open => (
-      <Select.Root open={open}>
-        <Select.Trigger />
+      <Select.Root
+        open={open}
+        defaultValue='a'
+      >
+        <Select.Trigger ref={placeAwayFromViewportEdge} />
         <Select.Portal>
           <Select.Positioner>
             <Select.Popup>
               <div data-testid='content' />
+              <Select.Option
+                value='a'
+                label='A'
+              />
             </Select.Popup>
           </Select.Positioner>
         </Select.Portal>
@@ -143,4 +150,10 @@ function showScrollbar(width: number): void {
     configurable: true,
     value: window.innerWidth - width,
   });
+}
+
+function placeAwayFromViewportEdge(trigger: HTMLButtonElement | null): void {
+  if (trigger) {
+    trigger.getBoundingClientRect = () => new DOMRect(0, 300, 120, 32);
+  }
 }

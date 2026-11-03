@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Pen } from '../../icons/glyphs/pen';
 import { Icon } from '../icon';
@@ -45,7 +45,9 @@ class MockImage {
   }
 }
 
-vi.stubGlobal('Image', MockImage);
+beforeEach(() => {
+  vi.stubGlobal('Image', MockImage);
+});
 
 afterEach(() => {
   outcomes = {};
@@ -365,9 +367,8 @@ describe('Mosaic Avatar', () => {
   });
 
   it('throws when a part is rendered outside <Avatar.Root>', () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Avatar.Fallback>CN</Avatar.Fallback>)).toThrow(/must be rendered inside <Avatar.Root>/);
     expect(() => render(<Avatar.Icon />)).toThrow(/must be rendered inside <Avatar.Root>/);
-    spy.mockRestore();
   });
 });

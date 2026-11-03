@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { MosaicProvider } from '../../../../mosaic-provider';
@@ -44,10 +44,6 @@ function renderTab(overrides: Partial<RequestsTableTabViewProps> = {}) {
 }
 
 describe('RequestsTableTabView', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it.each(['Accept', 'Decline'] as const)(
     'holds the row while %s is pending and allows retry after failure',
     async action => {
@@ -83,6 +79,12 @@ describe('RequestsTableTabView', () => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     },
   );
+
+  it('locks paging while a page loads', () => {
+    renderView({ totalCount: 25, page: 2, isFetching: true });
+    expect(screen.getByRole('button', { name: 'Previous requests page' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next requests page' })).toBeDisabled();
+  });
 
   it('does not report requests as loaded when they fail to load', () => {
     renderView({ isError: true, onRetry: vi.fn() });

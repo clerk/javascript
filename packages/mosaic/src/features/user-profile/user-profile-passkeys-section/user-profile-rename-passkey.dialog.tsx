@@ -9,6 +9,7 @@ import { Field } from '../../../components/field';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import type { UserProfileRenamePasskeyValues } from './user-profile-passkeys-section.types';
 
 export interface UserProfileRenamePasskeyDialogProps {
@@ -24,7 +25,7 @@ export function UserProfileRenamePasskeyDialog({
   onOpenChange,
   form,
 }: UserProfileRenamePasskeyDialogProps) {
-  const m = useMessages('userProfilePasskeys');
+  const m = useMessages('userProfile').passkeys;
   const inputRef = useRef<HTMLInputElement>(null);
   const { ref, ...control } = form.register('name');
   const mergedRef = useMergeRefs([ref, inputRef]);
@@ -52,7 +53,7 @@ export function UserProfileRenamePasskeyDialog({
           </Card.Banner>
           <Card.Content
             render={
-              <form
+              <Form
                 id={form.id}
                 onSubmit={form.handleSubmit}
               />
@@ -79,8 +80,8 @@ export function UserProfileRenamePasskeyDialog({
             <Dialog.Close
               render={
                 <Button
+                  color='neutral'
                   variant='outline'
-                  fullWidth
                   disabled={form.isSubmitting}
                 >
                   {m.cancel}
@@ -89,7 +90,6 @@ export function UserProfileRenamePasskeyDialog({
             />
             <SubmitButton
               form={form.id}
-              fullWidth
               isPending={form.isSubmitting}
               disabled={!form.canSubmit}
               focusableWhenDisabled

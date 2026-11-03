@@ -21,7 +21,7 @@ export interface UserProfileMfaSectionViewProps {
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
-  onRegenerateBackupCodes?: () => void;
+  regenerate?: { onClick: () => void; status: 'idle' | 'pending'; error?: string };
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
   removeReverification?: ReverificationController;
@@ -34,13 +34,13 @@ export function UserProfileMfaSectionView({
   addButtonRef,
   addControl,
   onAdd,
-  onRegenerateBackupCodes,
+  regenerate,
   onRemove,
   onSetDefault,
   removeReverification,
   setDefaultReverification,
 }: UserProfileMfaSectionViewProps) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const controller = useUserProfileMfaSectionLeafController({
     methods,
     onAdd,
@@ -80,11 +80,11 @@ export function UserProfileMfaSectionView({
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}
-            onRegenerateBackupCodes={onRegenerateBackupCodes}
+            regenerate={regenerate}
           />
         ))}
       </UserProfileSecurityList>
-      <Section.Error>{controller.defaultError}</Section.Error>
+      <Section.Error>{regenerate?.error ?? controller.defaultError}</Section.Error>
       {controller.remove ? (
         <Confirmation
           controller={controller.remove}
@@ -104,7 +104,7 @@ export function UserProfileMfaSectionView({
   );
 }
 
-function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfileMfa']) {
+function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfile']['mfa']) {
   if (method.type === 'sms') {
     return method.description
       ? fill(m.removeDialog.smsDescription, { phoneNumber: stringToFormattedPhoneString(method.description) })

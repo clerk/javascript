@@ -1,5 +1,5 @@
 ---
-description: v7 - Generate commit message from chat changes
+description: v8 - Generate commit message from chat changes
 (note to LLMs: increment version when you make changes to this file)
 ---
 
@@ -9,16 +9,11 @@ Generate a commit message for changes in this chat. **Do not commit or push** (s
 
 ---
 
-## ⚙️ REPO-SPECIFIC CONFIGURATION
+## Scopes and types
 
-> **Edit this section when using in a new repository.**
+The scope is required. Valid scopes: any `packages/*` short name, the same name with `clerk-` removed (`clerk-js` or `js`), or `repo`, `release`, `e2e`, `ci`, `*`. Source of truth: `commitlint.config.ts`.
 
-### Valid Scopes
-
-Scopes must match package/app names. No scope is also valid. Invalid scope = commitlint rejection.
-
-- **Packages:** astro, backend, chrome-extension, clerk-js, elements, expo, expo-passkeys, express, fastify, localizations, nextjs, nuxt, react, react-router, remix, shared, tanstack-react-start, testing, themes, types, ui, upgrade, vue
-- **Other:** docs, repo, release, e2e, \*
+Only the PR title is linted, and it becomes the squash commit, so the title format matters most.
 
 ---
 
@@ -33,31 +28,17 @@ Scopes must match package/app names. No scope is also valid. Invalid scope = com
 
 ## Valid Types
 
-**Types (REQUIRED - ALWAYS FIRST):** feat | fix | build | chore | ci | perf | refactor | revert | style | test
+feat | fix | docs | build | chore | ci | perf | refactor | revert | style | test
 
-## FORMAT - READ THIS CAREFULLY
-
-**CRITICAL: Type is MANDATORY and ALWAYS comes FIRST**
+## Format
 
 ```
-type(scope): description    ← CORRECT: type first, scope optional
-type: description           ← CORRECT: type without scope
+type(scope): description    ← CORRECT
+type: description           ← WRONG: scope is required
+scope: description          ← WRONG: missing type
 ```
 
-**WRONG FORMATS:**
-
-```
-docs: description           ← WRONG: "docs" is a SCOPE, not a type!
-scope: description          ← WRONG: missing type!
-```
-
-**If working with docs:**
-
-```
-feat(docs): add new guide   ← CORRECT
-chore(docs): update readme  ← CORRECT
-docs: something             ← WRONG
-```
+`docs` is a type, not a scope: `docs(repo): update contributing guide`.
 
 ## Process
 
@@ -75,7 +56,7 @@ docs: something             ← WRONG
 
    Then **STOP and wait** for response.
 
-6. Generate commit message (TYPE FIRST, then optional scope in parentheses)
+6. Generate commit message (type first, then the scope in parentheses)
 7. If "stage" present → run `git add` on affected files (only chat-mentioned files unless "all" flag present)
 
 ## Format Rules
@@ -84,9 +65,8 @@ docs: something             ← WRONG
 type(scope): description
 ```
 
-- **TYPE IS REQUIRED** - one of: feat, fix, build, chore, ci, perf, refactor, revert, style, test
-- **SCOPE IS OPTIONAL** - if present, wrap in parentheses after type
-- All lowercase, ≤72 chars
+- Type and scope are both required
+- ≤72 chars
 - Title = "what it does", body = "why"
 - Be specific (use domain terms from conversation, not generic words)
 - No filler: avoid "update", "changes", "code" when meaningless
@@ -121,7 +101,7 @@ Why:
 ## Examples
 
 ```
-feat(api): add rate limiting to auth endpoints
+feat(backend): add rate limiting to auth endpoints
 
 Why:
 DDoS attacks on /api/sign-in caused production degradation.
@@ -136,21 +116,21 @@ May need IP allowlist for trusted services (CLERK-5678).
 ```
 
 ```
-chore(docs): fix typo in authentication guide
+docs(nextjs): fix typo in the middleware README
 
 Why:
 Users reported confusion from misspelling.
 ```
 
 ```
-ci: consolidate test job into checks to speed up pipeline
+ci(repo): consolidate test job into checks to speed up pipeline
 
 Why:
 Reduce CI overhead by running tests in same job as lint/type checks.
 ```
 
 ```
-feat(docs): document commitlint scope validation system
+docs(repo): document commitlint scope validation system
 
 Why:
 Added clear documentation to help contributors understand scope requirements.
@@ -159,9 +139,9 @@ Added clear documentation to help contributors understand scope requirements.
 ## Remember
 
 - Important:Do not add unnecessary new lines or paragraphs to sentences. Let the editor wrap lines as needed.
-- **TYPE FIRST, ALWAYS** - never start with a scope
+- **TYPE FIRST, ALWAYS**, then the scope in parentheses
 - **NEVER COMMIT OR PUSH**
-- Type is REQUIRED, scope is optional
+- Type and scope are both required
 - **Always explain WHY changes were made** - what problem was being solved, what issues were identified, what motivated the change
 - **Provide enough context** - someone reading the commit in 2 years should understand the reasoning without access to the conversation
 - Only ask questions for high-impact changes

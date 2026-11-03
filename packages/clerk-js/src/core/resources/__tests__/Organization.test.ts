@@ -56,11 +56,39 @@ describe('Organization', () => {
       maxAllowedMemberships: 3,
       adminDeleteEnabled: true,
       selfServeSSOEnabled: true,
+      selfServeDirectorySyncEnabled: false,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
       publicMetadata: {
         public: 'metadata',
       },
+    });
+  });
+
+  it('parses self_serve_directory_sync_enabled and keeps it in the snapshot', () => {
+    const organization = new Organization({
+      object: 'organization',
+      id: 'test_id',
+      name: 'test_name',
+      public_metadata: {},
+      slug: 'test_slug',
+      image_url: '',
+      created_at: 12345,
+      updated_at: 5678,
+      members_count: 1,
+      pending_invitations_count: 0,
+      admin_delete_enabled: true,
+      max_allowed_memberships: 3,
+      has_image: false,
+      self_serve_sso_enabled: false,
+      self_serve_directory_sync_enabled: true,
+    });
+
+    expect(organization.selfServeSSOEnabled).toBe(false);
+    expect(organization.selfServeDirectorySyncEnabled).toBe(true);
+    expect(organization.__internal_toSnapshot()).toMatchObject({
+      self_serve_sso_enabled: false,
+      self_serve_directory_sync_enabled: true,
     });
   });
 
