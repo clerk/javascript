@@ -294,12 +294,12 @@ function SelectRow({ name, imageUrl, shape, busy, disabled, onSelect }: SelectRo
         <Item.Label>{name}</Item.Label>
       </Item.Content>
       {busy ? (
-        <Item.Actions>
+        <Item.Media>
           <Spinner
             size='sm'
             label={m.pending}
           />
-        </Item.Actions>
+        </Item.Media>
       ) : null}
     </Item.Root>
   );
