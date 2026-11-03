@@ -59,6 +59,7 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs && node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.js",
     "build:analyze": "rspack build --config rspack.config.mjs --env production --env variant=\"clerk.browser\" --env analysis",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.mjs --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
@@ -76,7 +77,6 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports --ignore-rules false-cjs",
     "lint:publint": "publint || true",
-    "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "test": "vitest --watch=false",
     "test:sandbox:integration": "playwright test",
     "test:sandbox:integration:ui": "playwright test --ui",
