@@ -193,6 +193,7 @@ cmd_attach() {
     return
   fi
   (cd "$work" && gh pr edit "$pr" --repo "$repo" --body-file body.md "${files[@]}" >/dev/null)
+  trap "report_stopped_attach $(printf %q "$url")" EXIT
 
   local uploaded=() asset
   gh pr view "$pr" --json body -q .body >"$work/listed.md"
@@ -201,13 +202,14 @@ cmd_attach() {
   done < <(awk -v s="$MARKER_START" -v e="$MARKER_END" '{ sub(/\r$/, "") } $0 == s { f = 1 } f { print } $0 == e { f = 0 }' "$work/listed.md" |
     grep -oE 'https://github\.com/user-attachments/assets/[0-9a-f-]{36}')
   if [ "${#uploaded[@]}" -ne $((${#files[@]} / 2)) ]; then
-    echo "FAIL    expected $((${#files[@]} / 2)) uploaded files in pull request #$pr, found ${#uploaded[@]}; the list is in its description, attach again to lay it out" >&2
+    echo "FAIL    expected $((${#files[@]} / 2)) uploaded files in pull request #$pr, found ${#uploaded[@]}" >&2
     exit 1
   fi
 
   evidence_block "$line" "$before" "${#names[@]}" "${names[@]}" "${uploaded[@]}" >"$work/block.md"
   body_with_block "$work/listed.md" "$work/block.md" >"$work/body.md"
   (cd "$work" && gh pr edit "$pr" --repo "$repo" --body-file body.md >/dev/null)
+  trap - EXIT
   echo "attached ${#names[@]} screenshots${before:+ with befores} to $url"
 }
 
@@ -307,6 +309,10 @@ fail_start() {
   exit 1
 }
 
+report_stopped_attach() {
+  [ $? -eq 0 ] || echo "FAIL    attach stopped after uploading the screenshots, so $1 lists them as plain links; check its description, then attach again" >&2
+}
+
 require_gh_attach() {
   local version
   version="$(gh --version 2>/dev/null | sed -nE '1s/^gh version ([0-9.]+).*/\1/p' || true)"
@@ -387,8 +393,8 @@ body_with_block() {
           open = ""
         }
       }
+      if (open != "") fail("ends inside a code fence that is never closed")
       if (ns == 0 && ne == 0) {
-        if (open != "") fail("ends inside a code fence that is never closed")
         for (i = 1; i <= NR; i++) print line[i]
         if (NR > 0 && line[NR] !~ /^\r?$/) print cr
         emit_block()

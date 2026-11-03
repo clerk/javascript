@@ -61,7 +61,24 @@ x\nSTART\n|has the start marker 1 times and the end marker 0 times
 x\nEND\nSTART\n|has the end marker before the start marker
 x\nSTART\nhand written\nEND\n|has text between the markers that is not an evidence block
 x\n```\nnever closed\n|ends inside a code fence that is never closed
+x\nSTART\n**Verified in swingset** OLD\nEND\n```\nnever closed\n|ends inside a code fence that is never closed
 EOF
+}
+
+test_attach_says_how_to_recover_when_it_stops_after_uploading() {
+  mkdir after && touch after/a.png
+  gh() {
+    case "$*" in
+      --version) echo 'gh version 2.99.0' ;;
+      *headRefOid*) echo 0123456789abcdef ;;
+      *'--json url'*) echo https://github.com/o/r/pull/1 ;;
+      *'--json body'*) [ ! -f "$TMPDIR_CASE/edited" ] || return 1 ;;
+      'pr edit'*) touch "$TMPDIR_CASE/edited" ;;
+    esac
+  }
+  attempt cmd_attach after --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "FAIL    attach stopped after uploading the screenshots, so https://github.com/o/r/pull/1 lists them as plain links; check its description, then attach again"
 }
 
 test_attach_puts_each_before_beside_its_after() {
@@ -79,7 +96,7 @@ test_attach_lays_screenshots_two_across() {
 }
 
 test_attach_names_the_commit_each_evidence_folder_was_captured_at() {
-  git init -q repo && cd repo && git commit -q --allow-empty -m one
+  git init -q repo && cd repo && git -c user.name=test -c user.email=test@example.com commit -q --allow-empty -m one
   local clean dirty commit
   commit="$(git rev-parse HEAD)"
   clean="$(cmd_evidence clean)"
@@ -117,7 +134,7 @@ test_doctor_finds_the_listener_in_this_worktree() {
   (cd "$SWINGSET_DIR" && exec node -e 'process.title = "next-server (v16.0.0)"; require("http").createServer().listen(0, function () { console.log(this.address().port) })' >"$TMPDIR_CASE/port") &
   server=$!
   for _ in $(seq 1 50); do
-    port="$(cat "$TMPDIR_CASE/port" 2>/dev/null)"
+    port="$(cat "$TMPDIR_CASE/port" 2>/dev/null || true)"
     [ -n "$port" ] && break
     sleep 0.1
   done

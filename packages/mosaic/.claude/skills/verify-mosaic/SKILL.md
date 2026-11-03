@@ -103,7 +103,8 @@ attached 3 screenshots with befores to https://github.com/clerk/javascript/pull/
 
 - It writes a block between `<!-- verify-evidence:mosaic -->` and `<!-- /verify-evidence:mosaic -->`. A line names each evidence folder with the commit it was captured at, and the pull request's head commit when it was attached. With `--before`, a table shows each control screenshot beside the screenshot of the same name. Without it, the screenshots sit two across under their names.
 - Run it again to replace the block. Nothing outside the markers changes.
-- It refuses when a marker appears twice or alone, when the markers hold text it did not write, or when the description ends in an unclosed code fence. Markers inside a code fence do not count.
+- It refuses when a marker appears twice or alone, when the text between the markers does not start with its `**Verified in swingset**` line, or when the description ends in an unclosed code fence. Markers inside a code fence do not count.
+- It edits the description twice: once to upload the screenshots as a list, then to lay them out. If it stops between the two, it says so. Check the description, then run it again.
 - `--before` keeps only the screenshots both folders have, and names each one it skips. Save the control screenshots under the same names.
 - It needs `gh` 2.99 or newer for `gh pr edit --attach`. `--dry-run` prints the command without changing the pull request.
 - Only `.png` files go up. ARIA snapshots and attribute dumps stay local; quote the line that proves the claim in the description instead.
