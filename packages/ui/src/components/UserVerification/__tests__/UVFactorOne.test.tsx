@@ -322,7 +322,7 @@ describe('UserVerificationFactorOne', () => {
     const reachResetCodeStep = async (userEvent: RenderedUserEvent) => {
       await userEvent.click(screen.getByText('Reset your password'));
       await setNewPassword(userEvent, 'a-much-better-password-123');
-      await screen.findByText('Enter the code sent to your email address to set your new password');
+      await screen.findByText('Enter the code sent to your email to continue');
     };
 
     it('offers the reset and the other methods after a breached password', async () => {
@@ -341,7 +341,8 @@ describe('UserVerificationFactorOne', () => {
       // Sign out of other sessions is checked by default
       expect(screen.getByRole('checkbox', { name: /sign out of all other devices/i })).toBeChecked();
       await setNewPassword(userEvent, 'a-much-better-password-123');
-      await screen.findByText('Enter the code sent to your email address to set your new password');
+      await screen.findByText('Enter the code sent to your email to continue');
+      screen.getByText('Verification required');
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
 
       await waitFor(() => expect(afterVerification).toHaveBeenCalled());
@@ -367,7 +368,7 @@ describe('UserVerificationFactorOne', () => {
 
       await screen.findByText('Set new password');
       await setNewPassword(userEvent, 'another-better-password-456');
-      await screen.findByText('Enter the code sent to your email address to set your new password');
+      await screen.findByText('Enter the code sent to your email to continue');
       expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledOnce();
     });
 
@@ -379,7 +380,7 @@ describe('UserVerificationFactorOne', () => {
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
 
       await waitFor(() => expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenCalledTimes(2));
-      screen.getByText('Enter the code sent to your email address to set your new password');
+      screen.getByText('Enter the code sent to your email to continue');
     });
 
     it('goes to the second factor when one is still required', async () => {

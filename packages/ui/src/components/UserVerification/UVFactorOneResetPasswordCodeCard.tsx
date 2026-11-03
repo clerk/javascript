@@ -29,9 +29,13 @@ export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPassword
     <Flow.Part part='resetPassword'>
       <UVFactorOneCodeForm
         {...codeCardProps}
+        // Outside the change-password form, this code verifies the user for the action they started,
+        // so it uses the same copy as the plain code screens.
         cardTitle={
           !hasNewPassword
-            ? localizationKeys('reverification.resetPasswordCode.title')
+            ? isEmail
+              ? localizationKeys('reverification.emailCode.title')
+              : localizationKeys('reverification.phoneCode.title')
             : isEmail
               ? localizationKeys('reverification.resetPasswordCode.title__saveNewPassword_email')
               : localizationKeys('reverification.resetPasswordCode.title__saveNewPassword_phone')
@@ -42,8 +46,8 @@ export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPassword
               ? localizationKeys('reverification.resetPasswordCode.subtitle__saveNewPassword_email')
               : localizationKeys('reverification.resetPasswordCode.subtitle__saveNewPassword_phone')
             : isEmail
-              ? localizationKeys('reverification.resetPasswordCode.subtitle_email')
-              : localizationKeys('reverification.resetPasswordCode.subtitle_phone')
+              ? localizationKeys('reverification.emailCode.subtitle')
+              : localizationKeys('reverification.phoneCode.subtitle')
         }
         inputLabel={localizationKeys('reverification.resetPasswordCode.formTitle')}
         resendButton={localizationKeys('reverification.resetPasswordCode.resendButton')}
