@@ -85,7 +85,7 @@ export const styles = stylex.create({
   },
 });
 
-// shape — square takes the radius its size sets below; circle rounds fully
+// shape — square takes the radius its size sets (see `mediaSizes`); circle rounds fully
 export const shapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
   square: { borderRadius: 'var(--_cl-media-radius)' },

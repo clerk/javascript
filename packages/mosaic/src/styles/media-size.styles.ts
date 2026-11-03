@@ -15,8 +15,8 @@ export const mediaSizes = stylex.create({
   },
   md: {
     '--_cl-media-radius': radiusVars['--cl-radius-md'],
-    height: space['9.5'],
-    width: space['9.5'],
+    height: space['10'],
+    width: space['10'],
   },
   lg: {
     '--_cl-media-radius': radiusVars['--cl-radius-lg'],
