@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.6.42
+
+### Patch Changes
+
+- Updated dependencies [[`ed3fe79`](https://github.com/clerk/javascript/commit/ed3fe791dca5af8ace0d05592728c06da2cf5e4d), [`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/backend@3.26.6
+  - @clerk/react@6.18.5
+  - @clerk/shared@4.44.0
+
+## 3.6.41
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`11907aa`](https://github.com/clerk/javascript/commit/11907aa0f17bd9c861ccdd5a469d2694d7a503cf), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/backend@3.26.5
+  - @clerk/react@6.18.4
+  - @clerk/shared@4.43.1
+
 ## 3.6.40
 
 ### Patch Changes

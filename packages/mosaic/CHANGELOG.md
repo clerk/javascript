@@ -1,5 +1,137 @@
 # @clerk/mosaic
 
+## 0.2.1
+
+### Patch Changes
+
+- Tighten component motion. Input hover and focus now appear instantly and fade on the way out, toasts leave faster than they arrive, hover and press feedback on `Checkbox`, `Radio`, the `Drawer` handle, the switcher trigger and the tag remove button responds instantly, and the `Table` expand icon respects `prefers-reduced-motion`. ([#10578](https://github.com/clerk/javascript/pull/10578)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Preserve verification code delivery errors and resend cooldowns when navigating to other methods or help and back in UserProfile. ([#10564](https://github.com/clerk/javascript/pull/10564)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Show the generic error message in the `UserProfile` add email and add phone dialogs when sending a verification fails with a Clerk response that carries no error details. Previously these dialogs showed no message. ([#10563](https://github.com/clerk/javascript/pull/10563)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `Card.Media`, a slot for a logo, icon or image at the top of `Card.Header`, with 24px of space below it. Style it with `.cl-card-media`. `Card.Header` also takes an `align` prop, `start` by default, so `align='center'` centers its content. ([#10590](https://github.com/clerk/javascript/pull/10590)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Align the corners of `Select`, `Combobox`, `Menu` and `PhoneInput` options and `ActionBar` buttons with their surrounding surface. These radii now follow `--cl-radius-lg` and `--cl-spacing` rather than `--cl-radius-md`, so an override of `--cl-radius-md` no longer changes them. ([#10579](https://github.com/clerk/javascript/pull/10579)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Center the pending spinner on an `OrganizationList` row in a trailing column that mirrors the row's avatar, instead of pressing it against the row's edge. ([#10607](https://github.com/clerk/javascript/pull/10607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- When users are asked to confirm their identity again, they can now use a passkey set up as their second step, as long as their browser supports passkeys. ([#10570](https://github.com/clerk/javascript/pull/10570)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Add `<UserAvatar />`, which shows the signed-in user's profile image. It takes `shape`, `size` and `fallback`, renders nothing when nobody is signed in, and can be styled through `.cl-user-avatar`. ([#10500](https://github.com/clerk/javascript/pull/10500)) by [@kylemac](https://github.com/kylemac)
+
+- Fix the `OrganizationList` loading skeleton. Avatar placeholders now match the size of the loaded avatars instead of shrinking to the width of the initials, and the personal account row is shown unless `hidePersonal` is set. ([#10608](https://github.com/clerk/javascript/pull/10608)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Preserve all errors during UserProfile reverification. Show errors for the active password or code beside that field, and unrelated errors in a banner without marking the field invalid. ([#10558](https://github.com/clerk/javascript/pull/10558)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
+## 0.2.0
+
+### Minor Changes
+
+- **Breaking:** Replace and remove color tokens. TypeScript does not flag these, so find usages with `git grep -nE -e '--cl-color-(background|brand-secondary)'`. ([#10493](https://github.com/clerk/javascript/pull/10493)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+  | Before                         | After                                                                                                                      |
+  | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+  | `--cl-color-background`        | `--cl-color-page` for the profile shell, `--cl-color-surface` for anything raised on it, such as cards, menus and controls |
+  | `--cl-color-background-subtle` | `--cl-color-surface-subtle`                                                                                                |
+  | `--cl-color-brand-secondary`   | Removed, with no direct replacement. Choose another token by where it is used.                                             |
+
+  Dark mode gives the profile its own shell color. `--cl-color-background` is replaced by `--cl-color-page`, the base layer (near-black in dark mode, white in light), which backs the profile shell. A new `--cl-color-surface` backs everything raised on it, such as cards, sections, menus, popovers and controls, and the gray ramp mixes into it. The surface is derived from the page (neutral mixed 5 percent into it in dark mode, white mixed 60 percent into it in light mode), so retinting `--cl-color-page` retints the shell, the surface and the ramp together, and with the default white page the shell, surface and borders look the same in light mode. `--cl-color-background-subtle` is renamed `--cl-color-surface-subtle`.
+
+  Brand and the negative, positive and warning colors now share one set of derived tokens: `-foreground`, `-subtle`, `-border` and `-alpha-100|200|300`, so overriding a seed retints its companions. `-foreground` flips to dark text in dark mode for brand, positive and warning, where white would fail, while negative keeps white text. `--cl-color-brand-secondary` is removed. `--cl-color-neutral-subtle` is new. `--cl-color-border` and `--cl-color-border-subtle` are now neutral washes (7 and 4 percent in light mode, 12 and 8 in dark mode), so they stay visible on the surface and faded fills.
+
+  In light mode the negative, positive and warning colors are slightly darker so their text passes contrast on their own `-subtle` fill, `--cl-color-foreground-secondary` is a little darker, and `--cl-color-input-placeholder` has its own value that now passes contrast on the field.
+
+- **Breaking:** Nest localization keys under the component they appear in, for example `userProfileMfa.label` is now `userProfile.mfa.label`. Update any `localization` overrides that use the old keys, written as nested objects or dot paths; TypeScript flags each one. Keys below a root stay the same unless listed here. ([#10458](https://github.com/clerk/javascript/pull/10458)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                 | After                                     |
+  | -------------------------------------- | ----------------------------------------- |
+  | `apiKeysTable`                         | `apiKeys`                                 |
+  | `membersTableTab`                      | `organizationProfile.members.list`        |
+  | `invitationsTableTab`                  | `organizationProfile.members.invitations` |
+  | `requestsTableTab`                     | `organizationProfile.members.requests`    |
+  | `organizationProfileInviteMembers`     | `organizationProfile.members.invite`      |
+  | `organizationProfileProfileSection`    | `organizationProfile.profile`             |
+  | `organizationProfileDangerSection`     | `organizationProfile.danger`              |
+  | `userProfileProfileSection`            | `userProfile.profile`                     |
+  | `userProfileContact`                   | `userProfile.contact`                     |
+  | `userProfileContact.email`             | `userProfile.email`                       |
+  | `userProfileContact.phone`             | `userProfile.phone`                       |
+  | `userProfileAddEmail`                  | `userProfile.email.addDialog`             |
+  | `userProfileAddPhone`                  | `userProfile.phone.addDialog`             |
+  | `userProfileConnectedAccounts`         | `userProfile.connectedAccounts`           |
+  | `userProfileEnterpriseAccountsSection` | `userProfile.enterpriseAccounts`          |
+  | `userProfileWeb3Wallets`               | `userProfile.web3Wallets`                 |
+  | `userProfilePasswordSection`           | `userProfile.password`                    |
+  | `userProfilePasskeys`                  | `userProfile.passkeys`                    |
+  | `userProfileMfa`                       | `userProfile.mfa`                         |
+  | `userProfileAddSms`                    | `userProfile.mfa.addSms`                  |
+  | `userProfileAddAuthenticator`          | `userProfile.mfa.addAuthenticator`        |
+  | `userProfileAuthenticatorSetup`        | `userProfile.mfa.authenticatorSetup`      |
+  | `userProfileBackupCodes`               | `userProfile.mfa.backupCodes`             |
+  | `userProfileActiveDevices`             | `userProfile.activeDevices`               |
+  | `userProfileDangerSection`             | `userProfile.danger`                      |
+
+  Keys under `reverification` are also renamed:
+
+  | Before                                                                                                   | After                                              |
+  | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+  | `alternativeMethods.title`, `.description`                                                               | `methods.title`, `.description`                    |
+  | `alternativeMethods.blockButton__<method>`                                                               | `methods.<method>`                                 |
+  | `alternativeMethods.actionText`                                                                          | `methods.helpText`                                 |
+  | `alternativeMethods.actionLink`                                                                          | `methods.help`                                     |
+  | `alternativeMethods.getHelp.title`, `.description`                                                       | `help.title`, `.description`                       |
+  | `alternativeMethods.getHelp.blockButton__emailSupport`                                                   | `help.emailSupport`                                |
+  | `backupCodeMfa.*`                                                                                        | `backupCode.*`                                     |
+  | `formFieldLabel__backupCode`                                                                             | `backupCode.label`                                 |
+  | `formFieldLabel__password`                                                                               | `password.label`                                   |
+  | `formFieldInputPlaceholder__password`                                                                    | `password.placeholder`                             |
+  | `formFieldAction__showPassword`, `formFieldAction__hidePassword`                                         | `password.showPassword`, `.hidePassword`           |
+  | `emailCode.formTitle`, `phoneCode.formTitle`, `totpMfa.formTitle`                                        | `emailCode.label`, `phoneCode.label`, `totp.label` |
+  | `emailCode.resendButton`, `phoneCode.resendButton`                                                       | `emailCode.resend`, `phoneCode.resend`             |
+  | `totpMfa.title`, `.description`                                                                          | `totp.title`, `.description`                       |
+  | `phoneCodeMfa.*`                                                                                         | `phoneCode.*`, with the renames above              |
+  | `error.closeButton`                                                                                      | `error.close`                                      |
+  | `backButton`                                                                                             | `back`                                             |
+  | `formButtonPrimary`                                                                                      | `continue`                                         |
+  | `footerActionLink__useAnotherMethod`                                                                     | `useAnotherMethod`                                 |
+  | `unstable__errors__generic`                                                                              | `attemptFailed`                                    |
+  | `passkey.blockButton__passkey`, `password.actionLink`, `formButtonReset`, `identityPreviewEditButton__*` | Removed. Delete the override.                      |
+
+  Find usages with:
+
+  ```sh
+  git grep -nE -e 'apiKeysTable|(members|invitations|requests)TableTab|organizationProfile(InviteMembers|DangerSection|ProfileSection)' \
+    -e 'userProfile(ActiveDevices|AddEmail|AddPhone|AddAuthenticator|AddSms|AuthenticatorSetup|BackupCodes|ConnectedAccounts|Contact|DangerSection|EnterpriseAccountsSection|Mfa|Passkeys|PasswordSection|ProfileSection|Web3Wallets)'
+  ```
+
+- **Breaking:** Rename two `UserButton` and `OrganizationSwitcher` props. Values and defaults are unchanged; TypeScript flags each old name. ([#10554](https://github.com/clerk/javascript/pull/10554)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before               | After              |
+  | -------------------- | ------------------ |
+  | `renderTriggerLabel` | `showTriggerLabel` |
+  | `renderTriggerBadge` | `triggerBadge`     |
+
+  Find usages with `git grep -nE 'renderTrigger(Label|Badge)'`.
+
+### Patch Changes
+
+- Fix hover-enabled menus, such as the `UserButton` account and settings flyouts, sometimes closing when the pointer moved toward an item after the menu was opened with a click. ([#10533](https://github.com/clerk/javascript/pull/10533)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the user profile modal's return from a redirect on Next.js App Router apps: the URL change now reaches the router, so `useSearchParams` no longer keeps the removed param and going back no longer reloads the page. History state that isn't a plain object is also kept intact. ([#10550](https://github.com/clerk/javascript/pull/10550)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Ellipsis menus, the dialog and card close buttons, the Cancel buttons in the confirmation, delete and rename dialogs, and the reverification Back button and resend and help links use the neutral color instead of the brand color, and the "You" badge in the members table is neutral. Field labels use the neutral text color, and disabled inputs and tag inputs are tinted with the neutral color. Email and phone values in the user profile use the primary text color. An interactive row's icon darkens fully on hover, and an outlined interactive row firms up its border on hover. ([#10494](https://github.com/clerk/javascript/pull/10494)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+- The user profile modal now reopens on the Account page after a user leaves it to connect or reconnect a social or enterprise account, or to verify an email address through enterprise SSO. Mosaic no longer sends `__clerk_modal_state` on these redirects, so returning from them no longer opens the legacy profile modal. ([#10545](https://github.com/clerk/javascript/pull/10545)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Suppress organization invitation success notifications when the members panel closes or the active organization or session changes before the invitation finishes. ([#10551](https://github.com/clerk/javascript/pull/10551)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
 ## 0.1.15
 
 ### Patch Changes

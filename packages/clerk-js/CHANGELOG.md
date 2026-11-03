@@ -1,5 +1,35 @@
 # Change Log
 
+## 6.42.2
+
+### Patch Changes
+
+- In `@clerk/expo` apps on iOS and Android, Clerk now finishes loading once its requests succeed again after a failed load, such as while Clerk rejects an outdated app version. Previously it stayed failed until the app restarted. ([#10461](https://github.com/clerk/javascript/pull/10461)) by [@seanperez29](https://github.com/seanperez29)
+
+- Fix sign-ins and sign-ups being blocked by Device Intelligence checks when the same origin served more than one Clerk instance, such as an app moving from development to production keys. The Device Intelligence token is now stored per instance, so a token acquired for one instance is no longer sent to another. ([#10536](https://github.com/clerk/javascript/pull/10536)) by [@mwickett](https://github.com/mwickett)
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
+## 6.42.1
+
+### Patch Changes
+
+- Keep a Device Intelligence result that arrives after ClerkJS has stopped waiting for it, and use it for the next sign-in or sign-up instead of discarding it. Users on slow connections who retry are less likely to have sign-ups blocked by protections that require a Device Intelligence result. ([#10276](https://github.com/clerk/javascript/pull/10276)) by [@mwickett](https://github.com/mwickett)
+
+- Wait up to 10 seconds, instead of 5, for the Device Intelligence check to finish before sending a sign-in or sign-up without its result. This applies when an instance hasn't configured its own limit. Users on slow connections are less likely to have sign-ups blocked by protections that require a Device Intelligence result. ([#10275](https://github.com/clerk/javascript/pull/10275)) by [@mwickett](https://github.com/mwickett)
+
+  Keep the wait bounded when the device clock changes so later attempts can recover after another tab's lock is released.
+
+  The shared loader type reference now documents the same 10-second default.
+
+- Fix `getToken()` returning an expired session token when the device clock runs behind and a token is cached again, or a staler token arrives after a fresher one. ([#10429](https://github.com/clerk/javascript/pull/10429)) by [@Ephem](https://github.com/Ephem)
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
 ## 6.42.0
 
 ### Minor Changes

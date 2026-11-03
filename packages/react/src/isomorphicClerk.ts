@@ -357,19 +357,60 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.replayInterceptedInvocations(clerk);
     };
 
+    const onLoadFailed = (err: unknown) => {
+      if (__DEV__) {
+        console.error('Clerk: Failed to load:', err);
+      }
+      this.#eventBus.emit(clerkEvents.Status, 'error');
+      this.emitLoaded();
+    };
+
     if (!clerk.loaded) {
       clerk
         .load(this.options)
-        .then(() => onLoaded())
-        .catch(err => {
-          if (__DEV__) {
-            console.error('Clerk: Failed to load:', err);
-          }
-          this.#eventBus.emit(clerkEvents.Status, 'error');
-          this.emitLoaded();
-        });
+        .then(onLoaded, err => {
+          onLoadFailed(err);
+          this.replayWhenLoadIsFinished(clerk);
+        })
+        .catch(onLoadFailed);
     } else {
       onLoaded();
+    }
+  }
+
+  /**
+   * clerk-js can finish a failed load on the same instance, such as when `@clerk/expo` reloads its initial resources
+   * once Clerk stops rejecting the app's version.
+   */
+  private replayWhenLoadIsFinished(clerk: HeadlessBrowserClerk | BrowserClerk): void {
+    if (typeof clerk.on !== 'function') {
+      return;
+    }
+    let finished = false;
+    const onStatus = (status: ClerkStatus) => {
+      if (finished || (status !== 'ready' && status !== 'degraded')) {
+        return;
+      }
+      finished = true;
+      // Unsubscribing while the event bus dispatches would skip the next listener.
+      queueMicrotask(() => {
+        clerk.off('status', onStatus);
+        this.replayFinishedLoad(clerk);
+      });
+    };
+    clerk.on('status', onStatus, { notify: true });
+  }
+
+  // Nothing awaits this replay, so a queued call or listener that throws is handled here, as it is when the first load
+  // succeeds.
+  private replayFinishedLoad(clerk: HeadlessBrowserClerk | BrowserClerk): void {
+    try {
+      this.replayInterceptedInvocations(clerk);
+    } catch (err) {
+      if (__DEV__) {
+        console.error('Clerk: Failed to load:', err);
+      }
+      this.#eventBus.emit(clerkEvents.Status, 'error');
     }
   }
 

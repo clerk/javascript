@@ -1,6 +1,6 @@
 {
   "name": "@clerk/mosaic",
-  "version": "0.1.15",
+  "version": "0.2.1",
   "description": "Clerk Mosaic UI components",
   "keywords": [
     "clerk",
@@ -42,7 +42,8 @@
     "dist",
     "!dist/**/*.d.ts.map",
     "!dist/**/*.d.mts.map",
-    "styles.css.d.ts"
+    "styles.css.d.ts",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "pnpm build:js && pnpm build:css && pnpm check:bundle && pnpm typecheck",
@@ -61,6 +62,8 @@
     "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
+    "test:visual": "bash ./scripts/test-visual.sh compare",
+    "test:visual:update": "bash ./scripts/test-visual.sh update",
     "test:webkit": "vitest run --project webkit",
     "typecheck": "tsc --noEmit"
   },

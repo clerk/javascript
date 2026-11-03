@@ -263,8 +263,8 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
           <Button
             variant='ghost'
             size='md'
-            color={color}
             {...merged}
+            color={color}
             // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's CompositeItem calls this render callback synchronously during its own render, so the hook keeps a stable position.
             ref={useMergeRefs<unknown>([ref, isRef(itemRef) ? itemRef : undefined])}
             xstyle={[color === 'negative' && styles.destructive, xstyle]}

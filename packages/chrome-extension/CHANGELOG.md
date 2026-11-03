@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.1.104
+
+### Patch Changes
+
+- Published packages no longer include compiled test files, test type declarations, or test fixtures. ([#10522](https://github.com/clerk/javascript/pull/10522)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`c44d34a`](https://github.com/clerk/javascript/commit/c44d34a24f7e99ce77119ce4467a4272d0a49aa7), [`5bb8efc`](https://github.com/clerk/javascript/commit/5bb8efca8f3ba658f77c2d1331c6facd8fc8df7d), [`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/clerk-js@6.42.2
+  - @clerk/ui@1.42.3
+  - @clerk/react@6.18.5
+  - @clerk/shared@4.44.0
+
+## 3.1.103
+
+### Patch Changes
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`690edf2`](https://github.com/clerk/javascript/commit/690edf28f799996cf5d274bb7a1193f8435e3689), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0), [`1bce44b`](https://github.com/clerk/javascript/commit/1bce44bed5c54b2c788262462d3ac80391c090f7)]:
+  - @clerk/react@6.18.4
+  - @clerk/clerk-js@6.42.1
+  - @clerk/shared@4.43.1
+  - @clerk/ui@1.42.2
+
 ## 3.1.102
 
 ### Patch Changes

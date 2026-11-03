@@ -17,6 +17,8 @@ const SDK_METADATA = {
   version: PACKAGE_VERSION,
 };
 
+ReactClerkProvider.displayName = 'ReactClerkProvider';
+
 /**
  * React Router hydration errors should not stop Clerk navigation from working, as the components mount only after
  * hydration is done (in the case of a hydration error, the components will simply mount after client-side hydration).
@@ -40,7 +42,6 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
   }, [awaitableNavigate]);
 
   const { clerkState, ...restProps } = rest;
-  ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   if (typeof isSpaMode !== 'undefined' && !isSpaMode) {
     assertValidClerkState(clerkState);

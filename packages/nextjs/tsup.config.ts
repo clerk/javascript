@@ -13,6 +13,7 @@ export default defineConfig(overrideOptions => {
     entry: [
       './src/**/*.{ts,tsx,js,jsx}',
       '!./src/**/*.test.{ts,tsx}',
+      '!./src/**/*.test-d.{ts,tsx}',
       '!./src/**/server-actions.ts',
       '!./src/**/keyless-actions.ts',
       '!./src/vendor/**',

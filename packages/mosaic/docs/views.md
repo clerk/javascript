@@ -42,6 +42,142 @@ Two shapes, chosen by whether the slice fetches its own data:
   (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
   with its `onSubmit`). Still no Clerk — the effect arrives from above.
 
+## Moving between screens on one surface
+
+When one screen replaces another on the same card or dialog, render both as steps
+of `Flow` (`components/flow`). The surface stays put, its height animates, and the
+outgoing screen stays mounted until its exit finishes. A conditional or an early
+return makes the new screen pop in instead.
+
+```tsx
+<Card.Root renderBranding={renderBranding}>
+  <Flow.Root
+    value={step}
+    direction={step === 'list' ? -1 : 1}
+    state={props}
+  >
+    {current => (
+      <>
+        <Flow.Step ids={['list']}>
+          <ListStep {...current} />
+        </Flow.Step>
+        <Flow.Step ids={['create']}>
+          <CreateStep {...current} />
+        </Flow.Step>
+      </>
+    )}
+  </Flow.Root>
+</Card.Root>
+```
+
+- **The surface sits outside the flow, and a step renders only what goes inside
+  it.** A screen used as a step of another feature cannot bring its own `Card.Root`.
+  `ConfirmShell` owns the card and `Reverification` renders only its contents.
+- **Nest a flow when a step has steps of its own.** The outer flow keeps its step
+  mounted, and `useFlowAutoFocus` reaches the inner active step.
+- **The controller owns the step.** Going back is direction `-1`. Derive it from the
+  step when each step has one way in, and hold it in the controller when it does not
+  (`reverification.controller.ts`).
+- **Mark what takes focus with `useFlowAutoFocus`.** Focus moves only for a step
+  that transitions in, so a flow that opens on a step does not take focus.
+
+A loading or error state of a single screen is not a step, and neither is the
+skeleton shown before a feature has data. Those can stay conditionals.
+
+The parts, data attributes and CSS variables are in
+`src/primitives/flow/README.md`.
+
+### Who renders `Card.Root`
+
+Only the part that creates the surface renders `Card.Root`, and cards do not nest.
+
+| Layer   | Renders                                                        | Example                   |
+| ------- | -------------------------------------------------------------- | ------------------------- |
+| Surface | `Card.Root`, inside a dialog or popover when there is one      | `CreateOrganizationView`  |
+| Steps   | `Flow.Root` and its steps, no card                             | `CreateOrganizationSteps` |
+| Screen  | `Card.Header`, `Card.Banner`, `Card.Content` and `Card.Footer` | A step of the flow        |
+
+A feature's skeleton is a surface too. A feature that another feature can embed
+exports its steps, and its view is `Card.Root` around them.
+
+Chrome that stays across steps goes under the surface, outside the flow. A step's
+`Card.Footer` must be a sibling of its `Card.Content`, so a step on a surface with a
+shared footer puts its submit button in `Card.Content` (`waitlist.view.tsx`).
+
+## Forms on a card
+
+The controller owns the form with `useForm`, including what `canSubmit` allows, and
+passes `form` to the view. The view does not check values, call `preventDefault` or
+create the form's id. This applies when you add or rewrite a form. Some existing forms
+predate it.
+
+```tsx
+function EditNameStep({ form, messages, onCancel }: EditNameStepProps) {
+  const { feedback } = form.fields.name;
+
+  return (
+    <>
+      <Card.Header>
+        <Card.Title>{messages.title}</Card.Title>
+      </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {form.error}
+      </Card.Banner>
+      <Card.Content
+        render={
+          <Form
+            id={form.id}
+            onSubmit={form.handleSubmit}
+          />
+        }
+      >
+        <Field.Root
+          disabled={form.isSubmitting}
+          invalid={feedback?.type === 'error'}
+        >
+          <Field.Label>{messages.label}</Field.Label>
+          <Input {...form.register('name')} />
+          <Field.Feedback feedback={feedback} />
+        </Field.Root>
+      </Card.Content>
+      <Card.Footer>
+        <Button
+          variant='outline'
+          color='neutral'
+          fullWidth
+          disabled={form.isSubmitting}
+          onClick={onCancel}
+        >
+          {messages.cancel}
+        </Button>
+        <SubmitButton
+          form={form.id}
+          fullWidth
+          isPending={form.isSubmitting}
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
+        >
+          {messages.save}
+        </SubmitButton>
+      </Card.Footer>
+    </>
+  );
+}
+```
+
+- **Errors:** a form-level error goes in `Card.Banner`, and a field error in
+  `Field.Feedback`.
+- **Focus:** `initialFocus` on `Dialog.Popup` covers the step a dialog opens on, and
+  `useFlowAutoFocus` covers each step entered after it. A field that can be either uses
+  both.
+- **Closing while pending:** the controller's `onOpenChange` ignores the close, and the
+  view does not guard it again.
+- **No values to submit:** a step with no values does not need `useForm`
+  (`CopyKeyStep` uses `Form` only so Enter copies the key).
+
 ## Where the strings live
 
 Every string a view renders comes from the feature's `*.messages.ts`, shaped the

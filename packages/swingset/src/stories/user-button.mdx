@@ -86,7 +86,7 @@ always condensed.
   storyModule={UserButtonStories}
 />
 
-`renderTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
+`showTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
 fully to match it; see [User only](#user-only).
 
 <Story
@@ -94,18 +94,18 @@ fully to match it; see [User only](#user-only).
   storyModule={UserButtonStories}
 />
 
-`renderTriggerBadge={false}` keeps the name. The badge is part of the label, so it needs both.
+`triggerBadge={false}` keeps the name. The badge is part of the label, so it needs both.
 
 <Story
   name='WithoutTriggerBadge'
   storyModule={UserButtonStories}
 />
 
-`renderTriggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. The returned `label` is used as the text content of the label while the returned `id` is embedded into a `data-badge-id` attribute that can then be used to target specific badge types (such as with CSS).
+`triggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. The returned `label` is used as the text content of the label while the returned `id` is embedded into a `data-badge-id` attribute that can then be used to target specific badge types (such as with CSS).
 
 ```tsx
 <UserButton
-  renderTriggerBadge={async ({ kind, id }) => {
+  triggerBadge={async ({ kind, id }) => {
     const plan = await (kind === "organization" ? getOrganizationPlan(id) : getUserPlan(id));
     if (plan) {
       return { id: plan.key, label: plan.name };

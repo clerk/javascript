@@ -65,7 +65,7 @@ export function CombinedIconTrigger(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       mode='combined'
-      renderTriggerLabel={false}
+      showTriggerLabel={false}
     />
   );
 }
@@ -101,7 +101,7 @@ export function UserAvatarTrigger(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       mode='user'
-      renderTriggerLabel={false}
+      showTriggerLabel={false}
     />
   );
 }
@@ -113,7 +113,7 @@ export function UserAvatarSingleSession(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       mode='user'
-      renderTriggerLabel={false}
+      showTriggerLabel={false}
     />
   );
 }
@@ -127,7 +127,7 @@ export function WithoutTriggerBadge(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       triggerVariant='full'
-      renderTriggerBadge={false}
+      triggerBadge={false}
     />
   );
 }
@@ -140,7 +140,7 @@ export function CustomTriggerBadge(_args: Record<string, unknown>) {
       {...prototype}
       mode='combined'
       triggerVariant='full'
-      renderTriggerBadge={() => Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' })}
+      triggerBadge={() => Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' })}
     />
   );
 }

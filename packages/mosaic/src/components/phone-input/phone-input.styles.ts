@@ -10,6 +10,10 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
+const popupRadius = radiusVars['--cl-radius-lg'];
+const listInset = space['1'];
+const optionRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
+
 export const styles = stylex.create({
   triggerStart: {
     paddingInlineStart: 'var(--_cl-input-group-inset)',
@@ -47,7 +51,7 @@ export const styles = stylex.create({
     width: space['4'],
   },
   divider: {
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     flexShrink: 0,
     height: space['3.5'],
     width: '1px',
@@ -64,7 +68,7 @@ export const styles = stylex.create({
     paddingInlineStart: space['1.5'],
   },
   popup: {
-    borderRadius: radiusVars['--cl-radius-lg'],
+    borderRadius: popupRadius,
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
@@ -73,7 +77,7 @@ export const styles = stylex.create({
   countrySearchRow: {
     gap: space['1'],
     alignItems: 'center',
-    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndColor: colorVars['--cl-color-border-subtle'],
     borderBlockEndStyle: 'solid',
     borderBlockEndWidth: '1px',
     display: 'flex',
@@ -114,15 +118,14 @@ export const styles = stylex.create({
     },
   },
   countryList: {
+    padding: listInset,
     gap: space['0.5'],
-    paddingBlock: space['0.5'],
-    paddingInline: space['1'],
     display: 'flex',
     flexDirection: 'column',
     maxHeight: '16rem',
   },
   option: {
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: optionRadius,
     gap: space['1'],
     outline: {
       default: 'none',

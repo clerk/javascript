@@ -25,7 +25,7 @@ export const colorVars = stylex.defineVars({
 
 Each exported `*Vars` const in that file is one group (`colorVars`, `radiusVars`, …); the file is the list. `space` is also declared with `defineVars`, but its keys are not `--cl-*` names, so its steps compile to hashed custom properties that are internal, not part of the contract.
 
-There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-surface-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-surface` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp. The exception is the borders: `--cl-color-border` (controls) and `--cl-color-border-subtle` (containers and dividers) are neutral washes, 7 and 4 percent in light mode and 12 and 8 percent in dark mode, so they keep the same step over the surface and the faded surface alike. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
+There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-surface-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-surface` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp. The exception is the borders: `--cl-color-border` (controls) and `--cl-color-border-subtle` (containers and dividers) are neutral washes, 12 and 8 percent in both modes, so they keep the same step over the surface and the faded surface alike. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
 
 The seeds are `--cl-color-page`, `--cl-color-neutral`, `--cl-color-brand`, `--cl-color-negative`, `--cl-color-positive` and `--cl-color-warning`. Brand and the three statuses share one shape: the seed, `-foreground` (white in light mode; in dark mode the surface color for brand, positive and warning, where the fills are light, and white for negative), `-subtle` (the 8 percent wash, 12 in dark mode) and `-border` (the 12 percent wash), so both work over the page, the surface or a faded fill and `-alpha-100|200|300` washes. Neutral has the same slots under its own names: `--cl-color-surface-subtle`, `--cl-color-neutral-subtle` (the same wash as the accent `-subtle`, for chips such as the neutral badge) and `--cl-color-border`. Only the seeds and the `-foreground` pairs are set by hand, so retinting a seed retints its companions.
 
@@ -273,7 +273,7 @@ wrapper resolves the model, hands it to the controller, and branches on `status`
 
 ```tsx
 export function UserButton(props: UserButtonProps = {}) {
-  const { renderTriggerLabel, mode, fallback, ...options } = props;
+  const { showTriggerLabel, mode, fallback, ...options } = props;
   const model = useUserButtonModel(options);
   const controller = useUserButtonController(model, { mode });
 
@@ -289,7 +289,7 @@ export function UserButton(props: UserButtonProps = {}) {
   return (
     <UserButtonView
       {...viewController}
-      renderTriggerLabel={renderTriggerLabel}
+      showTriggerLabel={showTriggerLabel}
     />
   );
 }
@@ -459,10 +459,8 @@ export function useUserProfileEditUsernameController({ username = '', required =
   const form = useForm({
     initialValues: { username },
     canSubmit: values => values.username !== username && (!required || values.username !== ''),
-    onSubmit: async values => {
-      await onSubmit(values.username);
-      setIsOpen(false);
-    },
+    onSubmit: values => onSubmit(values.username),
+    onSuccess: () => setIsOpen(false),
   });
 
   const onOpenChange = (open: boolean) => {

@@ -1,14 +1,17 @@
 import type { EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import {
   demandReverificationOnce,
   type FakeFapiSeed,
+  fapiUrl,
   holdRequests,
   serveFapi,
   VERIFICATION_CODE,
+  worker,
 } from '../../../../__tests__/feature/fake-fapi';
 import type { FapiAttributeOverrides } from '../../../../__tests__/feature/fapi';
 import {
@@ -125,6 +128,19 @@ describe('the user profile phone section', () => {
     expect(screen.getByText('+49')).toBeInTheDocument();
   });
 
+  it('says something went wrong when sending the code fails without details', async () => {
+    const { actor } = await renderSection();
+    worker.use(
+      http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), () =>
+        HttpResponse.json({ errors: [] }, { status: 500 }),
+      ),
+    );
+
+    await addPhone(actor, '8015550100');
+
+    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+  });
+
   it('keeps the dialog open and says the code was wrong', async () => {
     const { actor } = await renderSection();
 
@@ -149,6 +165,7 @@ describe('the user profile phone section', () => {
 
     expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Unverified');
     await manage(actor, WORK_LABEL, 'Verify phone number');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
     await enterCode(actor, VERIFICATION_CODE);
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
@@ -171,6 +188,7 @@ describe('the user profile phone section', () => {
       prepare.release();
     }
 
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
     await enterCode(actor, VERIFICATION_CODE);
     expect(screen.queryByRole('menu')).toBeNull();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());

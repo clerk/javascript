@@ -5,7 +5,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from '
 
 import { useDirection } from '../direction-provider';
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isRef, mergeProps, useRender } from '../utils';
 import {
   SegmentedControlContext,
   type SegmentedControlContextValue,
@@ -79,7 +79,7 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
           onNavigate={onNavigate}
           render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
             const { onKeyDown: compositeKeyDown, ...otherCompositeProps } = compositeProps;
-            const defaultProps: Record<string, unknown> = {
+            const defaultProps = {
               role: 'radiogroup' as const,
               onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
                 navigatedIndexRef.current = -1;
@@ -97,7 +97,7 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
                 }
               },
               'aria-disabled': disabled || undefined,
-            };
+            } satisfies DefaultProps<'div'>;
 
             const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, otherCompositeProps));
             const { ref: compositeRef, ...mergedProps } = merged;

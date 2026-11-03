@@ -38,7 +38,11 @@ export const styles = stylex.create({
     flexShrink: 0,
     opacity: { default: null, ':disabled': 0.5 },
     position: 'relative',
-    transitionDuration: durationVars['--cl-duration-fast'],
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      ':checked': durationVars['--cl-duration-instant'],
+      ':hover': durationVars['--cl-duration-instant'],
+    },
     transitionProperty: 'background-color, border-color',
     transitionTimingFunction: 'linear',
   },

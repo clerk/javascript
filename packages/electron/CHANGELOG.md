@@ -1,5 +1,27 @@
 # @clerk/electron
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [[`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`5bb8efc`](https://github.com/clerk/javascript/commit/5bb8efca8f3ba658f77c2d1331c6facd8fc8df7d), [`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/clerk-js@6.42.2
+  - @clerk/react@6.18.5
+  - @clerk/shared@4.44.0
+
+## 0.1.8
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- The token file written by `storage()` from `@clerk/electron/storage` is now readable and writable only by its owner (`0600`). It was previously world-readable (`0644` under the default umask). Existing token files are updated the next time `storage()` is called. ([#9971](https://github.com/clerk/javascript/pull/9971)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`690edf2`](https://github.com/clerk/javascript/commit/690edf28f799996cf5d274bb7a1193f8435e3689), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0), [`1bce44b`](https://github.com/clerk/javascript/commit/1bce44bed5c54b2c788262462d3ac80391c090f7)]:
+  - @clerk/react@6.18.4
+  - @clerk/clerk-js@6.42.1
+  - @clerk/shared@4.43.1
+
 ## 0.1.7
 
 ### Patch Changes

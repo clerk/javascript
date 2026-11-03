@@ -53,8 +53,13 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   misc: {
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
+    'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
+    'organization-list': dynamic(() => import('../stories/organization-list.mdx')),
+    'user-avatar': dynamic(() => import('../stories/user-avatar.mdx')),
+    'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
+    waitlist: dynamic(() => import('../stories/waitlist.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
@@ -93,6 +98,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     radio: dynamic(() => import('../stories/radio.mdx')),
     reveal: dynamic(() => import('../stories/reveal.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    separator: dynamic(() => import('../stories/separator.mdx')),
     'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
     switch: dynamic(() => import('../stories/switch.mdx')),

@@ -3,16 +3,15 @@ import { useOrganization, useSession } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
+import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
 import type { MembersRoles, OrganizationProfileMember } from './members-table-tab.types';
 
 const PAGE_SIZE = 10;
-const READ_PERMISSION = 'org:sys_memberships:read';
-const MANAGE_PERMISSION = 'org:sys_memberships:manage';
 
 export function useMembersTableModel(query: string) {
   const { session } = useSession();
-  const canRead = session?.checkAuthorization({ permission: READ_PERMISSION }) ?? false;
-  const canManage = session?.checkAuthorization({ permission: MANAGE_PERMISSION }) ?? false;
+  const canRead = session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsRead }) ?? false;
+  const canManage = session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
   const { organization, memberships } = useOrganization({
     memberships: canRead ? { pageSize: PAGE_SIZE, keepPreviousData: true, query: query || undefined } : undefined,
   });

@@ -12,6 +12,8 @@ import {
 } from '../../tokens.stylex';
 
 const reduceMotion = '@media (prefers-reduced-motion: reduce)';
+const barRadius = radiusVars['--cl-radius-lg'];
+const inset = space['1'];
 
 export const styles = stylex.create({
   positioner: {
@@ -25,10 +27,11 @@ export const styles = stylex.create({
     '--_cl-icon-color': colorVars['--cl-color-negative'],
   },
   bar: {
-    borderRadius: radiusVars['--cl-radius-lg'],
+    '--_cl-button-radius': `max(0px, calc(${barRadius} - ${inset}))`,
+    borderRadius: barRadius,
     gap: space['1'],
-    paddingBlock: space['1'],
-    paddingInline: space['1'],
+    paddingBlock: inset,
+    paddingInline: inset,
     alignItems: 'center',
     backgroundColor: colorVars['--cl-color-surface'],
     blockSize: space['10'],
@@ -76,7 +79,7 @@ export const styles = stylex.create({
     marginBlock: space['1'],
     marginInline: space['0.5'],
     alignSelf: 'stretch',
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     width: '1px',
   },
 });

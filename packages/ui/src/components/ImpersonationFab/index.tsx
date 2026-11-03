@@ -3,6 +3,8 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SignedInSessionResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
+import { useSignOutWithRedirect } from '@/ui/hooks/useSignOutWithRedirect';
+
 import { useSignOutContext, withCoreUserGuard } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
@@ -65,11 +67,12 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   const { user } = useUser();
   const { signOut } = useClerk();
   const { otherSessions } = useMultipleSessions({ user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const signOutWithRedirect = useSignOutWithRedirect();
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
+      return signOutWithRedirect(navigateAfterSignOut, afterSignOutUrl);
     }
     return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session.id });
   };

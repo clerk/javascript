@@ -3,11 +3,11 @@
 import type { OrganizationProfileProps, UserProfileProps } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
+import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
 import type { CustomProfileItem, CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 import { useSwitcherController } from './switcher.controller';
 import type { SwitcherModelOptions } from './switcher.model';
 import { useSwitcherModel } from './switcher.model';
-import type { OrganizationProfilePageId } from './switcher.pages';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './switcher.pages';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
 import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';
@@ -65,8 +65,8 @@ export function Switcher(
   props: SwitcherProps & { mode: SwitcherMode; triggerVariant?: SwitcherTriggerVariant },
 ): ReactElement | null {
   const {
-    renderTriggerLabel,
-    renderTriggerBadge,
+    showTriggerLabel,
+    triggerBadge,
     triggerVariant,
     mode,
     userProfileProps,
@@ -142,8 +142,8 @@ export function Switcher(
     <>
       <SwitcherView
         {...viewController}
-        renderTriggerLabel={renderTriggerLabel}
-        renderTriggerBadge={renderTriggerBadge}
+        showTriggerLabel={showTriggerLabel}
+        triggerBadge={triggerBadge}
         triggerVariant={triggerVariant}
       />
       {portals}

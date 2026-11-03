@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.15.0
+
+### Minor Changes
+
+- Support the minimum app versions set in the Clerk Dashboard. When your iOS or Android app's version is older than its minimum, Clerk rejects the app's requests until the user updates, and `<ClerkProvider>` shows an update screen over your app with a link to the store and, when your instance has a support email, a way to contact support. ([#10343](https://github.com/clerk/javascript/pull/10343)) by [@seanperez29](https://github.com/seanperez29)
+
+  To show your own screen instead, set `updateRequiredViewEnabled={false}` on `<ClerkProvider>` and read the new `useAppVersionSupport()` hook, which returns `isSupported`, `currentVersion`, `minimumVersion`, and `updateUrl`.
+
+  Install `expo-application` (`npx expo install expo-application`), which Clerk uses to read your app's bundle ID or package name and its version. Without it, `useAppVersionSupport()` always reports the app as supported, Clerk doesn't block requests made from JavaScript, and `<ClerkProvider>` shows no update screen. If you use `@clerk/expo-native-components`, the native iOS and Android SDKs still identify the app themselves, so their requests are blocked and they show their own update screen. Apps in Expo Go and web apps are never blocked.
+
+### Patch Changes
+
+- Updated dependencies [[`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`5bb8efc`](https://github.com/clerk/javascript/commit/5bb8efca8f3ba658f77c2d1331c6facd8fc8df7d), [`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/clerk-js@6.42.2
+  - @clerk/react@6.18.5
+  - @clerk/shared@4.44.0
+
+## 4.14.5
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`690edf2`](https://github.com/clerk/javascript/commit/690edf28f799996cf5d274bb7a1193f8435e3689), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0), [`1bce44b`](https://github.com/clerk/javascript/commit/1bce44bed5c54b2c788262462d3ac80391c090f7)]:
+  - @clerk/react@6.18.4
+  - @clerk/clerk-js@6.42.1
+  - @clerk/shared@4.43.1
+
 ## 4.14.4
 
 ### Patch Changes

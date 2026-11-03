@@ -28,14 +28,12 @@ export function ReverificationHelp({ messages, onEmailSupport, onBack }: Reverif
           type='button'
           variant='outline'
           color='neutral'
-          fullWidth
           onClick={onBack}
         >
           {messages.backButton}
         </Button>
         <Button
           type='button'
-          fullWidth
           onClick={onEmailSupport}
         >
           {messages.supportButton}

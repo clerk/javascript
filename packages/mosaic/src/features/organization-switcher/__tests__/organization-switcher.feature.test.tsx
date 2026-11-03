@@ -318,7 +318,7 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('renders the avatar alone when the label is off', async () => {
-      await renderSwitcher({ renderTriggerLabel: false });
+      await renderSwitcher({ showTriggerLabel: false });
 
       expect(trigger()).toHaveAccessibleName('Open organization menu for Acme');
       expect(within(trigger()).queryByText('Acme')).toBeNull();
@@ -345,7 +345,7 @@ describe('OrganizationSwitcher custom trigger badges', () => {
     { seed: signedIn({ client: fapiClient([personalSession]) }), badge: 'user:user_1', name: 'Alice Smith' },
   ])('shows a badge for the displayed identity as $badge', async ({ seed, badge, name }) => {
     await renderSwitcher(
-      { renderTriggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      { triggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
       seed,
     );
 
@@ -355,25 +355,22 @@ describe('OrganizationSwitcher custom trigger badges', () => {
   });
 
   it('does not request a badge when no organization or personal account is displayed', async () => {
-    const renderTriggerBadge = vi.fn(() => Promise.resolve({ id: 'custom', label: 'Custom plan' }));
-    await renderSwitcher(
-      { hidePersonal: true, renderTriggerBadge },
-      signedIn({ client: fapiClient([personalSession]) }),
-    );
+    const triggerBadge = vi.fn(() => Promise.resolve({ id: 'custom', label: 'Custom plan' }));
+    await renderSwitcher({ hidePersonal: true, triggerBadge }, signedIn({ client: fapiClient([personalSession]) }));
 
     expect(trigger()).toHaveTextContent('No organization selected');
-    expect(renderTriggerBadge).not.toHaveBeenCalled();
+    expect(triggerBadge).not.toHaveBeenCalled();
   });
 
   it('hides the badge for null and keeps the organization name', async () => {
-    const renderTriggerBadge = vi.fn(({ id }: { id: string }) =>
+    const triggerBadge = vi.fn(({ id }: { id: string }) =>
       Promise.resolve(id === 'org_1' ? { id: 'pro', label: 'Pro plan' } : null),
     );
-    const { clerk } = await renderSwitcher({ renderTriggerBadge });
+    const { clerk } = await renderSwitcher({ triggerBadge });
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
     await act(() => clerk.setActive({ organization: 'org_9' }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
     expect(trigger()).toHaveAccessibleName('Open organization menu for Other');

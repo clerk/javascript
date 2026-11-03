@@ -4,6 +4,9 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Button } from '../button';
+import { ButtonContext } from '../button/button.context';
+import { Card } from '../card';
 import { Popover } from './popover';
 
 afterEach(() => cleanup());
@@ -13,6 +16,36 @@ const settle = () =>
   act(async () => {
     await new Promise(resolve => setTimeout(resolve, 0));
   });
+
+describe('button defaults', () => {
+  it('does not inherit full width from a card footer it is opened from', () => {
+    render(
+      <Card.Footer>
+        <Popover.Root defaultOpen>
+          <Popover.Popup aria-label='Panel'>
+            <Button>Inside popup</Button>
+          </Popover.Popup>
+        </Popover.Root>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('does not inherit disabled from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Popover.Root defaultOpen>
+          <Popover.Popup aria-label='Panel'>
+            <Button>Inside popup</Button>
+          </Popover.Popup>
+        </Popover.Root>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).toBeEnabled();
+  });
+});
 
 describe('Mosaic Popover', () => {
   it('uses a custom anchor and restores the trigger when it is removed', async () => {

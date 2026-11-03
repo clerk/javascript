@@ -1,0 +1,46 @@
+import * as SeparatorStories from './separator.stories';
+
+# Separator
+
+Separator draws a horizontal line between blocks of content. Without children it is a plain 1px line. With children it is a labelled divider, with a line on each side of the label. It renders a `div` with `role='separator'`; the label is presentational and is not announced by screen readers.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={SeparatorStories}
+/>
+
+## Usage
+
+```tsx
+import { Separator } from '@clerk/mosaic/components/separator';
+
+<Separator />
+<Separator>or</Separator>
+```
+
+<Story
+  name='Labelled'
+  storyModule={SeparatorStories}
+/>
+
+## Parts
+
+| Part        | Element | Class           | Description                                                     |
+| ----------- | ------- | --------------- | --------------------------------------------------------------- |
+| `Separator` | `div`   | `.cl-separator` | The line, or with children the label and a line on either side. |
+
+`Separator` accepts `render` and `xstyle` and forwards its ref.
+
+## Styling
+
+`data-labelled` is set when the separator has children. The labelled lines are the root's `::before` and `::after`. Both forms read `--cl-color-border` for the line; the label reads `--cl-color-foreground-secondary`.
+
+```css
+.cl-separator:not([data-labelled]),
+.cl-separator::before,
+.cl-separator::after {
+  background-color: var(--cl-color-border-subtle);
+}
+```

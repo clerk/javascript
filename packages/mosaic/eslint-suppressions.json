@@ -1,4 +1,9 @@
 {
+  "src/blocks/destructive/destructive.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
   "src/components/dialog/dialog.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
@@ -6,6 +11,11 @@
   },
   "src/components/flow/flow.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/form/use-form.ts": {
+    "react-hooks/refs": {
       "count": 1
     }
   },
@@ -22,11 +32,29 @@
   "src/components/profile/profile.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/features/api-keys/api-keys-table.model.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/features/organization-profile/organization-profile-members-panel/members-table-tab.model.ts": {
+    "react-hooks/refs": {
+      "count": 1
     }
   },
   "src/features/reverification/use-reverification-with-state.ts": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
+    }
+  },
+  "src/features/switcher/switcher.view.tsx": {
+    "react-hooks/refs": {
+      "count": 8
     }
   },
   "src/features/user-profile/user-profile-web3-wallets-section/user-profile-solana-wallet.model.ts": {
@@ -36,6 +64,21 @@
   },
   "src/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallet-row.view.tsx": {
     "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/hooks/use-debounced-async.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/hooks/use-in-view.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/hooks/use-spin-delay.ts": {
+    "react-hooks/set-state-in-effect": {
       "count": 1
     }
   },
@@ -69,18 +112,57 @@
       "count": 2
     }
   },
+  "src/machine/use-machine.ts": {
+    "react-hooks/refs": {
+      "count": 11
+    }
+  },
+  "src/primitives/autocomplete/autocomplete-root.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/primitives/combobox/combobox-root.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/primitives/dialog/dialog-popup.tsx": {
+    "react-hooks/refs": {
+      "count": 2
+    }
+  },
   "src/primitives/dialog/dialog-trigger.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
     }
   },
+  "src/primitives/drawer/drawer-root.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
   "src/primitives/drawer/use-drawer-drag.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
   "src/primitives/drawer/use-snap-points.ts": {
     "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/primitives/file-upload/use-object-url.ts": {
+    "react-hooks/set-state-in-effect": {
       "count": 1
     }
   },
@@ -92,6 +174,14 @@
   "src/primitives/hooks/use-focus-target.ts": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 2
+    },
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/primitives/menu/menu-root.tsx": {
+    "react-hooks/refs": {
+      "count": 1
     }
   },
   "src/primitives/menu/menu-trigger.tsx": {
@@ -101,6 +191,47 @@
   },
   "src/primitives/otp/otp-input.tsx": {
     "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/primitives/popover/popover-root.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/primitives/portal/portal.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/primitives/select/select-root.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/primitives/tabs/tabs-root.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "src/primitives/toast/toast-provider.tsx": {
+    "react-hooks/refs": {
+      "count": 5
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/primitives/toast/toast-root.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "src/primitives/tooltip/tooltip-root.tsx": {
+    "react-hooks/refs": {
       "count": 1
     }
   },
@@ -120,6 +251,11 @@
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
+    }
+  },
+  "src/utils/feedback.tsx": {
+    "react-hooks/refs": {
+      "count": 2
     }
   }
 }

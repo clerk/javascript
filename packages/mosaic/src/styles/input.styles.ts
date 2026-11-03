@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars } from '../tokens.stylex';
+import { colorVars, durationVars } from '../tokens.stylex';
 
 // Focus is marked with a border colour change and a soft box-shadow rather than the
 // system focus ring, so a text-entry field reads as a field rather than a control.
@@ -44,13 +44,12 @@ export const inputStyles = stylex.create({
     },
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
-      ':focus-visible': durationVars['--cl-duration-fast'],
+      ':focus-visible': durationVars['--cl-duration-instant'],
+      ':focus-visible:where([aria-invalid="true"])': durationVars['--cl-duration-base'],
+      ':hover:not([aria-invalid="true"])': durationVars['--cl-duration-instant'],
     },
     transitionProperty: 'color, background-color, border-color, box-shadow',
-    transitionTimingFunction: {
-      default: 'linear',
-      ':focus-visible': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
-    },
+    transitionTimingFunction: 'linear',
   },
   group: {
     borderColor: {
@@ -86,13 +85,12 @@ export const inputStyles = stylex.create({
     },
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
-      ':has(input:focus-visible, textarea:focus-visible)': durationVars['--cl-duration-fast'],
+      ':hover:not([data-invalid])': durationVars['--cl-duration-instant'],
+      ':has(input:focus-visible, textarea:focus-visible)': durationVars['--cl-duration-instant'],
+      ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': durationVars['--cl-duration-base'],
     },
     transitionProperty: 'color, background-color, border-color, box-shadow',
-    transitionTimingFunction: {
-      default: 'linear',
-      ':has(input:focus-visible, textarea:focus-visible)': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
-    },
+    transitionTimingFunction: 'linear',
   },
   disabled: {
     backgroundColor: disabledBackgroundColor,

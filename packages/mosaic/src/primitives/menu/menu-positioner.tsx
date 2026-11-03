@@ -34,14 +34,14 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
           event.preventDefault();
           const items = elementsRef.current;
           if (event.key === 'Home') {
-            const firstEnabled = items.findIndex(el => el != null && !el.hasAttribute('aria-disabled'));
+            const firstEnabled = items.findIndex(el => el != null && el.getAttribute('aria-disabled') !== 'true');
             if (firstEnabled !== -1) {
               setActiveIndex(firstEnabled);
             }
           } else {
             for (let i = items.length - 1; i >= 0; i--) {
               const item = items[i];
-              if (item != null && !item.hasAttribute('aria-disabled')) {
+              if (item != null && item.getAttribute('aria-disabled') !== 'true') {
                 setActiveIndex(i);
                 break;
               }
@@ -61,8 +61,9 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The menu id is owned by floating-ui's menu role: a consumer-supplied id must
     // not override it, or the trigger's aria-controls pairing would silently break.
-    if (floatingProps.id != null) {
-      merged.id = floatingProps.id;
+    const wiredId = floatingProps['id'];
+    if (typeof wiredId === 'string') {
+      merged.id = wiredId;
     }
 
     const element = useRender({

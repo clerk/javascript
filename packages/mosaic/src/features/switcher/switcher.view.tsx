@@ -1016,25 +1016,25 @@ export interface SwitcherTriggerProps {
    *
    * @default true
    */
-  renderTriggerLabel?: boolean;
+  showTriggerLabel?: boolean;
   /**
    * Carries the active organization's plan beside the label. Part of the label, so it needs
-   * `renderTriggerLabel`: a plan badge with nothing to qualify says nothing.
+   * `showTriggerLabel`: a plan badge with nothing to qualify says nothing.
    * A function receives the displayed user or organization ID and returns a badge with string `id` and `label` properties.
    * The badge uses `id` for `data-badge-id` and `label` for its text.
    * The badge is hidden for a null result, while pending, or if the function fails.
    *
    * @default true
    */
-  renderTriggerBadge?: SwitcherTriggerBadge;
+  triggerBadge?: SwitcherTriggerBadge;
 }
 
 export type SwitcherTriggerVariant = 'full' | 'condensed';
 
 /** The trigger: the lead's avatar, and what it is called. */
 export function SwitcherTrigger({
-  renderTriggerLabel = true,
-  renderTriggerBadge = true,
+  showTriggerLabel = true,
+  triggerBadge = true,
   triggerVariant = 'condensed',
 }: SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
   const m = useSwitcherMessages();
@@ -1046,15 +1046,11 @@ export function SwitcherTrigger({
     kind: lead.kind,
     id: lead.kind === 'organization' ? lead.organization.organizationId : data.activeSession.userId,
     sessionId: data.activeSession.sessionId,
-    renderTriggerBadge,
-    renderTriggerLabel,
+    triggerBadge,
+    showTriggerLabel,
   });
   const planLabel =
-    typeof renderTriggerBadge === 'function'
-      ? badge?.label
-      : renderTriggerBadge
-        ? leadOrganization(lead)?.planLabel
-        : undefined;
+    typeof triggerBadge === 'function' ? badge?.label : triggerBadge ? leadOrganization(lead)?.planLabel : undefined;
   const user = leadUser(lead);
 
   return (
@@ -1064,15 +1060,15 @@ export function SwitcherTrigger({
       xstyle={[
         focusOutline.visible,
         styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
-        !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
+        showTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
+        !showTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
       <TriggerAvatar
         lead={lead}
-        variant={renderTriggerLabel ? triggerVariant : 'avatarOnly'}
+        variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
       />
-      {renderTriggerLabel ? (
+      {showTriggerLabel ? (
         <>
           <span
             {...mergeStyleProps(
@@ -1160,16 +1156,16 @@ export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> &
  * connected, Clerk-backed `Switcher` lives in `switcher.tsx` and wraps this view.
  */
 export function SwitcherView({
-  renderTriggerLabel,
-  renderTriggerBadge,
+  showTriggerLabel,
+  triggerBadge,
   triggerVariant,
   ...root
 }: SwitcherViewProps): ReactElement {
   return (
     <SwitcherRoot {...root}>
       <SwitcherTrigger
-        renderTriggerLabel={renderTriggerLabel}
-        renderTriggerBadge={renderTriggerBadge}
+        showTriggerLabel={showTriggerLabel}
+        triggerBadge={triggerBadge}
         triggerVariant={triggerVariant}
       />
       <SwitcherPopup />
