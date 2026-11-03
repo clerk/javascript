@@ -30,14 +30,15 @@ describe('Card.Media', () => {
   });
 });
 
-describe('Card.Header align', () => {
+describe('Card.Root align', () => {
   function CenteredCard() {
     return (
       <Card.Root
+        align='center'
         renderBranding={false}
         data-testid='root'
       >
-        <Card.Header align='center'>
+        <Card.Header>
           <Card.Media data-testid='media'>
             <svg
               width='32'
