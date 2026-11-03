@@ -5,6 +5,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SELF="$HERE/$(basename "${BASH_SOURCE[0]}")"
 START_MARKER='<!-- verify-evidence:mosaic -->'
 END_MARKER='<!-- /verify-evidence:mosaic -->'
+STOPPED_ATTACH="FAIL    attach stopped after it began uploading, so https://github.com/o/r/pull/1 may list some screenshots as plain links; check its description, then attach again"
 
 main() {
   local failed=0 name out
@@ -78,7 +79,22 @@ test_attach_says_how_to_recover_when_it_stops_after_uploading() {
   }
   attempt cmd_attach after --pr 1
   expect_eq "$STATUS" 1
-  expect_eq "$OUT" "FAIL    attach stopped after uploading the screenshots, so https://github.com/o/r/pull/1 lists them as plain links; check its description, then attach again"
+  expect_eq "$OUT" "$STOPPED_ATTACH"
+}
+
+test_attach_says_how_to_recover_when_some_uploads_fail() {
+  mkdir after && touch after/a.png
+  gh() {
+    case "$*" in
+      --version) echo 'gh version 2.99.0' ;;
+      *headRefOid*) echo 0123456789abcdef ;;
+      *'--json url'*) echo https://github.com/o/r/pull/1 ;;
+      'pr edit'*) return 1 ;;
+    esac
+  }
+  attempt cmd_attach after --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "$STOPPED_ATTACH"
 }
 
 test_attach_puts_each_before_beside_its_after() {

@@ -192,8 +192,8 @@ cmd_attach() {
     echo "gh pr edit $pr --repo $repo --body-file body.md ${files[*]}"
     return
   fi
-  (cd "$work" && gh pr edit "$pr" --repo "$repo" --body-file body.md "${files[@]}" >/dev/null)
   trap "report_stopped_attach $(printf %q "$url")" EXIT
+  (cd "$work" && gh pr edit "$pr" --repo "$repo" --body-file body.md "${files[@]}" >/dev/null)
 
   local uploaded=() asset
   gh pr view "$pr" --json body -q .body >"$work/listed.md"
@@ -310,7 +310,7 @@ fail_start() {
 }
 
 report_stopped_attach() {
-  [ $? -eq 0 ] || echo "FAIL    attach stopped after uploading the screenshots, so $1 lists them as plain links; check its description, then attach again" >&2
+  [ $? -eq 0 ] || echo "FAIL    attach stopped after it began uploading, so $1 may list some screenshots as plain links; check its description, then attach again" >&2
 }
 
 require_gh_attach() {
