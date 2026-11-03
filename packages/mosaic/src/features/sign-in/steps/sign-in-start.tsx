@@ -8,18 +8,16 @@ import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Input } from '../../../components/input';
+import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignInSocialProvider } from '../sign-in.types';
 
-const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
-
 export interface SignInStartMessages {
   title: string;
   description: string;
-  socialBlockButton: (provider: string) => string;
-  socialIconButton: (provider: string) => string;
+  socialButton: (provider: string) => string;
   dividerText: string;
   fieldLabel: string;
   fieldPlaceholder: string;
@@ -31,6 +29,7 @@ export interface SignInStartMessages {
 
 export interface SignInStartProps {
   messages: SignInStartMessages;
+  logo?: { src: string; alt: string };
   socialProviders: readonly SignInSocialProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
@@ -43,50 +42,9 @@ export interface SignInStartProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-function SocialButtons({
-  messages,
-  providers,
-  pendingProviderId,
-  disabled,
-  onSelect,
-}: {
-  messages: SignInStartMessages;
-  providers: readonly SignInSocialProvider[];
-  pendingProviderId?: string;
-  disabled: boolean;
-  onSelect: (id: string) => void;
-}) {
-  const asBlock = providers.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
-  return (
-    <div {...stylex.props(asBlock ? styles.socialBlock : styles.socialIcons)}>
-      {providers.map(provider => (
-        <SubmitButton
-          key={provider.id}
-          type='button'
-          variant='outline'
-          color='neutral'
-          fullWidth
-          aria-label={asBlock ? undefined : messages.socialIconButton(provider.name)}
-          disabled={disabled}
-          isPending={pendingProviderId === provider.id}
-          pendingLabel={messages.socialIconButton(provider.name)}
-          onClick={() => onSelect(provider.id)}
-        >
-          <img
-            src={provider.iconUrl}
-            alt=''
-            aria-hidden
-            {...stylex.props(styles.providerIcon)}
-          />
-          {asBlock ? messages.socialBlockButton(provider.name) : null}
-        </SubmitButton>
-      ))}
-    </div>
-  );
-}
-
 export function SignInStart({
   messages,
+  logo,
   socialProviders,
   pendingProviderId,
   onSelectProvider,
@@ -111,19 +69,40 @@ export function SignInStart({
   return (
     <>
       <Card.Header>
+        {logo ? (
+          <Card.Media>
+            <img
+              src={logo.src}
+              alt={logo.alt}
+              {...stylex.props(styles.logo)}
+            />
+          </Card.Media>
+        ) : null}
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
         {socialProviders.length > 0 ? (
           <>
-            <SocialButtons
-              messages={messages}
-              providers={socialProviders}
-              pendingProviderId={pendingProviderId}
-              disabled={busy}
-              onSelect={onSelectProvider}
-            />
+            <ProviderButtonGroup disabled={busy}>
+              {socialProviders.map(provider => (
+                <ProviderButton
+                  key={provider.id}
+                  icon={
+                    <img
+                      src={provider.iconUrl}
+                      alt=''
+                      {...stylex.props(styles.providerIcon)}
+                    />
+                  }
+                  longLabel={messages.socialButton(provider.name)}
+                  shortLabel={provider.name}
+                  isPending={pendingProviderId === provider.id}
+                  pendingLabel={messages.pendingLabel}
+                  onClick={() => onSelectProvider(provider.id)}
+                />
+              ))}
+            </ProviderButtonGroup>
             <div
               role='separator'
               {...stylex.props(styles.divider)}

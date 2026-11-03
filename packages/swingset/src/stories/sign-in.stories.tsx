@@ -18,6 +18,7 @@ export const meta: StoryMeta = {
 };
 
 const APPLICATION_NAME = 'Acme';
+const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
@@ -271,6 +272,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           step={step}
           direction={direction}
           applicationName={APPLICATION_NAME}
+          applicationLogoUrl={APPLICATION_LOGO_URL}
           combined
           socialProviders={socialProviders}
           pendingProviderId={pendingProviderId}
@@ -381,6 +383,7 @@ function StepPanel({
       <SignInView
         step={step}
         applicationName={APPLICATION_NAME}
+        applicationLogoUrl={APPLICATION_LOGO_URL}
         combined={combined}
         socialProviders={providers}
         pendingProviderId={pendingProviderId}

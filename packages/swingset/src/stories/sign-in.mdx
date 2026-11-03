@@ -18,6 +18,7 @@ The example pauses briefly in each pending state. An email containing `new` take
     { name: 'OTP', href: '/components/otp', layer: 'Components' },
     { name: 'Item', href: '/components/item', layer: 'Components' },
     { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'ProviderButton', href: '/components/provider-button', layer: 'Components' },
   ]}
 />
 
@@ -34,6 +35,7 @@ import { SignInView } from '@clerk/mosaic/features/sign-in';
     step={step}
     combined
     applicationName='Acme'
+    applicationLogoUrl={logoUrl}
     socialProviders={providers}
     {...callbacks}
   />

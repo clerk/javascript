@@ -3,15 +3,11 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  socialBlock: {
-    gap: space['2'],
-    display: 'grid',
-  },
-  socialIcons: {
-    gap: space['2'],
-    display: 'grid',
-    gridAutoColumns: 'minmax(0, 1fr)',
-    gridAutoFlow: 'column',
+  logo: {
+    display: 'block',
+    objectFit: 'contain',
+    height: space['8'],
+    maxWidth: '100%',
   },
   providerIcon: {
     display: 'block',

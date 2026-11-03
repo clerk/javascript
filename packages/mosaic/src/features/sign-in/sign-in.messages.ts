@@ -7,8 +7,7 @@ export const signInMessages = {
     actionText: 'Don’t have an account?',
     actionLink: 'Sign up',
   },
-  socialButtonsBlockButton: 'Continue with {provider}',
-  socialButtonsIconButton: 'Sign in with {provider}',
+  socialButton: 'Continue with {provider}',
   dividerText: 'or',
   password: {
     title: 'Enter your password',

@@ -53,6 +53,7 @@ export function SignInView({
   step,
   direction,
   applicationName,
+  applicationLogoUrl,
   combined,
   socialProviders,
   pendingProviderId,
@@ -126,11 +127,11 @@ export function SignInView({
           <Flow.Step ids={['start']}>
             <SignInStart
               focusRef={focusRef}
+              logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
               messages={{
                 title: fill(combined ? m.start.titleCombined : m.start.title, { applicationName }),
                 description: combined ? m.start.subtitleCombined : m.start.subtitle,
-                socialBlockButton: provider => fill(m.socialButtonsBlockButton, { provider }),
-                socialIconButton: provider => fill(m.socialButtonsIconButton, { provider }),
+                socialButton: provider => fill(m.socialButton, { provider }),
                 dividerText: m.dividerText,
                 fieldLabel: m.formFieldLabelEmailAddress,
                 fieldPlaceholder: m.formFieldInputPlaceholderEmailAddress,

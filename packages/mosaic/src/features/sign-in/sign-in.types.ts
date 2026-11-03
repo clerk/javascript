@@ -33,6 +33,7 @@ export interface SignInViewProps {
   step: SignInStep;
   direction?: FlowDirection;
   applicationName: string;
+  applicationLogoUrl?: string;
   combined: boolean;
   socialProviders: readonly SignInSocialProvider[];
   pendingProviderId?: string;
