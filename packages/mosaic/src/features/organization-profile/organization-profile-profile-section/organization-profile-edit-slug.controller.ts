@@ -23,10 +23,8 @@ export function useOrganizationProfileEditSlugController({
   const form = useForm({
     initialValues: { slug },
     canSubmit: values => values.slug !== slug,
-    onSubmit: async values => {
-      await onSubmit(values.slug);
-      setIsOpen(false);
-    },
+    onSubmit: values => onSubmit(values.slug),
+    onSuccess: () => setIsOpen(false),
   });
 
   const onOpenChange = (open: boolean) => {

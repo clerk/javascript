@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const Eye = glyph(
+  'eye',
   <>
     <path
       d='M10 8C10 9.1046 9.1046 10 8 10C6.8954 10 6 9.1046 6 8C6 6.8954 6.8954 6 8 6C9.1046 6 10 6.8954 10 8Z'

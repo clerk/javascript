@@ -49,7 +49,7 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     paddingInline: space['4'],
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     display: 'flex',
     flexDirection: 'column',
     width: 'auto',

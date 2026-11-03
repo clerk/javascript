@@ -1,5 +1,66 @@
 # Change Log
 
+## 4.14.5
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`690edf2`](https://github.com/clerk/javascript/commit/690edf28f799996cf5d274bb7a1193f8435e3689), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0), [`1bce44b`](https://github.com/clerk/javascript/commit/1bce44bed5c54b2c788262462d3ac80391c090f7)]:
+  - @clerk/react@6.18.4
+  - @clerk/clerk-js@6.42.1
+  - @clerk/shared@4.43.1
+
+## 4.14.4
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/clerk-js@6.42.0
+  - @clerk/shared@4.43.0
+  - @clerk/react@6.18.3
+
+## 4.14.3
+
+### Patch Changes
+
+- Fix native components such as `UserButton` occasionally staying signed out after a JS sign-in. When the sign-in finished while the SDK was syncing a change from the native SDK, the native SDK was never refreshed with the new session. ([#10431](https://github.com/clerk/javascript/pull/10431)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`eec2699`](https://github.com/clerk/javascript/commit/eec2699f2050084f0bd1059efee95b5e94fe9607)]:
+  - @clerk/clerk-js@6.41.1
+
+## 4.14.2
+
+### Patch Changes
+
+- Fix an intermittent `No session was found with id sess_...` error right after signing in when native components are installed. A request that the JS or native SDK sent with the client token from before the sign-in could leave both SDKs on a new, empty client. The SDK now keeps the client that the sign-in created, and no longer briefly reports the user as signed out while it recovers. ([#10407](https://github.com/clerk/javascript/pull/10407)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/clerk-js@6.41.0
+  - @clerk/shared@4.42.0
+  - @clerk/react@6.18.2
+
+## 4.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+  - @clerk/clerk-js@6.40.1
+  - @clerk/react@6.18.1
+
+## 4.14.0
+
+### Minor Changes
+
+- Rewrite the sync between the Clerk JS client and the native Clerk SDK. Both now share a single device token stored by the native SDK. This fixes a stale token in the app's `tokenCache` signing out a session that was signed in natively, and the two SDKs ending up on different tokens when both rotated the device token at the same time. ([#9956](https://github.com/clerk/javascript/pull/9956)) by [@mikepitre](https://github.com/mikepitre)
+
+  If you use the native components, update `@clerk/expo-native-components` to 0.3.0 or later and ship a new app build. Builds made with an older version render the native components blank, so don't deliver this version to them as an over-the-air update. With EAS Update, the `fingerprint` runtime version policy keeps those builds from receiving it. With any other policy, change your runtime version when you make this upgrade.
+
+### Patch Changes
+
+- Show `@clerk/expo` warnings and errors in development builds. The build previously removed them. ([#10319](https://github.com/clerk/javascript/pull/10319)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.13.1
 
 ### Patch Changes

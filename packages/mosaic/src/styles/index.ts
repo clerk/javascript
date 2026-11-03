@@ -91,6 +91,8 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaAxis, ScrollAreaGutter } from '../components/scroll-area';
+export { ProviderButton, ProviderButtonGroup } from '../components/provider-button';
+export type { ProviderButtonGroupProps, ProviderButtonProps } from '../components/provider-button';
 export { Radio } from '../components/radio';
 export type { RadioGroupProps, RadioItemProps } from '../components/radio';
 export { Select } from '../components/select';
@@ -107,13 +109,13 @@ export type {
   TableAlign,
   TableBodyProps,
   TableCellProps,
-  TableEmptyProps,
-  TableHeaderCellProps,
+  TableColumnProps,
+  TableExpandButtonProps,
   TableHeaderProps,
-  TableProps,
+  TableRootProps,
   TableRowProps,
-  TableSelectAllCellProps,
-  TableSelectCellProps,
+  TableSelectionCellProps,
+  TableSelectionColumnProps,
   TableSort,
 } from '../components/table';
 export { SegmentedControl } from '../components/segmented-control';
@@ -164,6 +166,8 @@ export type {
 } from '../components/popover';
 export { Panel } from '../components/panel';
 export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from '../components/panel';
+export { Reveal } from '../components/reveal';
+export type { RevealProps } from '../components/reveal';
 export { Profile } from '../components/profile';
 export type {
   ProfileContentProps,
@@ -174,8 +178,11 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { CreateOrganization } from '../features/create-organization/create-organization';
+export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
 export { UserButton } from '../features/user-button/user-button';
+export { Waitlist } from '../features/waitlist/waitlist';
 
 import {
   colorVars,

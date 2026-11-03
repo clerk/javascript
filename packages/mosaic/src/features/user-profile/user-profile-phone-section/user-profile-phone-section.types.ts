@@ -38,6 +38,7 @@ export type UserProfilePhoneSectionModel =
       onRemovePhone?: (id: string) => Promise<void>;
       removeReverification: ReverificationController;
       setPrimaryReverification: ReverificationController;
+      createReverification: ReverificationController;
     };
 
 export type ReadyPhoneSectionModel = Extract<UserProfilePhoneSectionModel, { status: 'ready' }>;

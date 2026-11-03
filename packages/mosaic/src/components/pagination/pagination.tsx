@@ -1,6 +1,10 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDoubleLeft } from '../../icons/glyphs/chevron-double-left';
+import { ChevronDoubleRight } from '../../icons/glyphs/chevron-double-right';
+import { ChevronLeft } from '../../icons/glyphs/chevron-left';
+import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { fill } from '../../localization/messages';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -166,7 +170,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 onClick={() => goTo(1)}
               >
                 <Icon
-                  name='chevron-double-left'
+                  glyph={ChevronDoubleLeft}
                   size='sm'
                   xstyle={rtl.mirror}
                 />
@@ -183,7 +187,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               onClick={() => goTo(current - pageStep)}
             >
               <Icon
-                name='chevron-left'
+                glyph={ChevronLeft}
                 size='sm'
                 xstyle={rtl.mirror}
               />
@@ -209,7 +213,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               onClick={() => goTo(current + pageStep)}
             >
               <Icon
-                name='chevron-right'
+                glyph={ChevronRight}
                 size='sm'
                 xstyle={rtl.mirror}
               />
@@ -226,7 +230,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 onClick={() => goTo(pageCount)}
               >
                 <Icon
-                  name='chevron-double-right'
+                  glyph={ChevronDoubleRight}
                   size='sm'
                   xstyle={rtl.mirror}
                 />

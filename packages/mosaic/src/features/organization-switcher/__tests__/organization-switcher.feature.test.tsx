@@ -1,7 +1,9 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest';
+import { page } from 'vitest/browser';
 
+import { openDialog } from '../../../__tests__/feature/dialog';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -18,8 +20,8 @@ import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { OrganizationSwitcherProps } from '../organization-switcher';
 import { OrganizationSwitcher } from '../organization-switcher';
 
-afterEach(() => {
-  vi.restoreAllMocks();
+beforeAll(async () => {
+  await import('../../organization-profile/organization-profile.modal-content');
 });
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
@@ -197,6 +199,56 @@ describe('OrganizationSwitcher', () => {
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
+  describe('landing after an action', () => {
+    it('lands on afterSelectPersonalUrl, filled from the account, after switching to the personal account', async () => {
+      const { navigate } = await renderSwitcher({ afterSelectPersonalUrl: '/users/:id' }, noOffers());
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Personal account' }));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/users/user_1'));
+    });
+
+    it('lands where an afterSelectOrganizationUrl function points for the selected organization', async () => {
+      const { navigate } = await renderSwitcher(
+        { afterSelectOrganizationUrl: organization => `/orgs/${organization.name}` },
+        noOffers(),
+      );
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Other' }));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/orgs/Other'));
+    });
+
+    it('tells the organization profile where to land after leaving', async () => {
+      const { clerk } = await renderSwitcher({ afterLeaveOrganizationUrl: '/left' }, noOffers());
+      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+      expect(openOrganizationProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ afterLeaveOrganizationUrl: '/left' }),
+      );
+    });
+
+    it('tells create-organization where to land and whether to skip inviting members', async () => {
+      const { clerk } = await renderSwitcher(
+        { afterCreateOrganizationUrl: '/created', skipInvitationScreen: true },
+        noOffers(),
+      );
+      const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Add organization' }));
+
+      expect(openCreateOrganization).toHaveBeenCalledWith(
+        expect.objectContaining({ afterCreateOrganizationUrl: '/created', skipInvitationScreen: true }),
+      );
+    });
+  });
+
   describe('an accepted invitation', () => {
     const fullFirstPage = Array.from({ length: 10 }, (_, i) =>
       fapiMembership(fapiOrganization({ id: `org_page_${i}`, name: `Page ${i}` })),
@@ -266,7 +318,7 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('renders the avatar alone when the label is off', async () => {
-      await renderSwitcher({ renderTriggerLabel: false });
+      await renderSwitcher({ showTriggerLabel: false });
 
       expect(trigger()).toHaveAccessibleName('Open organization menu for Acme');
       expect(within(trigger()).queryByText('Acme')).toBeNull();
@@ -293,7 +345,7 @@ describe('OrganizationSwitcher custom trigger badges', () => {
     { seed: signedIn({ client: fapiClient([personalSession]) }), badge: 'user:user_1', name: 'Alice Smith' },
   ])('shows a badge for the displayed identity as $badge', async ({ seed, badge, name }) => {
     await renderSwitcher(
-      { renderTriggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      { triggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
       seed,
     );
 
@@ -303,27 +355,59 @@ describe('OrganizationSwitcher custom trigger badges', () => {
   });
 
   it('does not request a badge when no organization or personal account is displayed', async () => {
-    const renderTriggerBadge = vi.fn(() => Promise.resolve({ id: 'custom', label: 'Custom plan' }));
-    await renderSwitcher(
-      { hidePersonal: true, renderTriggerBadge },
-      signedIn({ client: fapiClient([personalSession]) }),
-    );
+    const triggerBadge = vi.fn(() => Promise.resolve({ id: 'custom', label: 'Custom plan' }));
+    await renderSwitcher({ hidePersonal: true, triggerBadge }, signedIn({ client: fapiClient([personalSession]) }));
 
     expect(trigger()).toHaveTextContent('No organization selected');
-    expect(renderTriggerBadge).not.toHaveBeenCalled();
+    expect(triggerBadge).not.toHaveBeenCalled();
   });
 
   it('hides the badge for null and keeps the organization name', async () => {
-    const { rerender } = await renderSwitcher({
-      renderTriggerBadge: () => Promise.resolve({ id: 'pro', label: 'Pro plan' }),
-    });
+    const triggerBadge = vi.fn(({ id }: { id: string }) =>
+      Promise.resolve(id === 'org_1' ? { id: 'pro', label: 'Pro plan' } : null),
+    );
+    const { clerk } = await renderSwitcher({ triggerBadge });
     await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
 
-    const renderTriggerBadge = vi.fn(() => Promise.resolve(null));
-    rerender(tree({ renderTriggerBadge }));
-    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalled());
+    await act(() => clerk.setActive({ organization: 'org_9' }));
+    await waitFor(() => expect(triggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_9' }));
     expect(trigger()).not.toHaveTextContent('Pro plan');
-    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
-    expect(trigger()).toHaveAccessibleName('Open organization menu for Acme');
+    expect(within(trigger()).getByText('Other')).toBeInTheDocument();
+    expect(trigger()).toHaveAccessibleName('Open organization menu for Other');
+  });
+});
+
+describe('OrganizationSwitcher with experimental.newProfiles', () => {
+  async function renderWithNewProfiles(props: OrganizationSwitcherProps = {}) {
+    await page.viewport(1280, 800);
+    onTestFinished(() => page.viewport(414, 896));
+    serveFapi(noOffers());
+    return renderWithClerk(tree(props), undefined, undefined, { newProfiles: true });
+  }
+
+  it('opens the OrganizationProfile, without the account pages, from Settings', async () => {
+    const { clerk } = await renderWithNewProfiles();
+    const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile');
+    const user = await openWithList();
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+    expect(await screen.findByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.queryByRole('tab', { name: 'Account' })).toBeNull();
+    expect(openOrganizationProfile).not.toHaveBeenCalled();
+  });
+
+  it('lands on afterLeaveOrganizationUrl after leaving from the opened profile', async () => {
+    const { navigate } = await renderWithNewProfiles({ afterLeaveOrganizationUrl: '/left' });
+    const user = await openWithList();
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
+    const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
+      role: 'alertdialog',
+    });
+    await user.type(within(dialog).getByRole('textbox'), 'Acme');
+    await user.click(within(dialog).getByRole('button', { name: 'Leave organization' }));
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/left'));
   });
 });

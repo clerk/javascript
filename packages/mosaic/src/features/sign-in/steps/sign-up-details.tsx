@@ -11,6 +11,9 @@ import { Icon } from '../../../components/icon';
 import { Input } from '../../../components/input';
 import { InputGroup } from '../../../components/input-group';
 import { Text } from '../../../components/text';
+import { Eye } from '../../../icons/glyphs/eye';
+import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignUpDetails } from '../sign-in.types';
 
@@ -71,100 +74,101 @@ export function SignUpDetailsStep({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
-          {...stylex.props(styles.fieldStack)}
         >
-          <div {...stylex.props(styles.nameRow)}>
+          <div {...stylex.props(styles.fieldStack)}>
+            <div {...stylex.props(styles.nameRow)}>
+              <Field.Root
+                required
+                invalid={Boolean(errors.firstName)}
+                disabled={isPending}
+                focusableWhenDisabled
+              >
+                <Field.Label>{messages.firstNameLabel}</Field.Label>
+                <Input
+                  ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
+                  name='firstName'
+                  autoComplete='given-name'
+                  placeholder={messages.firstNamePlaceholder}
+                  value={values.firstName}
+                  onChange={event => onValueChange('firstName', event.target.value)}
+                />
+                <Field.Message>
+                  <Field.Error>{errors.firstName}</Field.Error>
+                </Field.Message>
+              </Field.Root>
+              <Field.Root
+                required
+                invalid={Boolean(errors.lastName)}
+                disabled={isPending}
+                focusableWhenDisabled
+              >
+                <Field.Label>{messages.lastNameLabel}</Field.Label>
+                <Input
+                  name='lastName'
+                  autoComplete='family-name'
+                  placeholder={messages.lastNamePlaceholder}
+                  value={values.lastName}
+                  onChange={event => onValueChange('lastName', event.target.value)}
+                />
+                <Field.Message>
+                  <Field.Error>{errors.lastName}</Field.Error>
+                </Field.Message>
+              </Field.Root>
+            </div>
             <Field.Root
               required
-              invalid={Boolean(errors.firstName)}
+              invalid={Boolean(errors.emailAddress)}
               disabled={isPending}
               focusableWhenDisabled
             >
-              <Field.Label>{messages.firstNameLabel}</Field.Label>
+              <Field.Label>{messages.emailLabel}</Field.Label>
               <Input
-                ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
-                name='firstName'
-                autoComplete='given-name'
-                placeholder={messages.firstNamePlaceholder}
-                value={values.firstName}
-                onChange={event => onValueChange('firstName', event.target.value)}
+                name='emailAddress'
+                type='email'
+                autoComplete='email'
+                placeholder={messages.emailPlaceholder}
+                value={values.emailAddress}
+                onChange={event => onValueChange('emailAddress', event.target.value)}
               />
               <Field.Message>
-                <Field.Error>{errors.firstName}</Field.Error>
+                <Field.Error>{errors.emailAddress}</Field.Error>
               </Field.Message>
             </Field.Root>
             <Field.Root
               required
-              invalid={Boolean(errors.lastName)}
+              invalid={Boolean(errors.password)}
               disabled={isPending}
               focusableWhenDisabled
             >
-              <Field.Label>{messages.lastNameLabel}</Field.Label>
-              <Input
-                name='lastName'
-                autoComplete='family-name'
-                placeholder={messages.lastNamePlaceholder}
-                value={values.lastName}
-                onChange={event => onValueChange('lastName', event.target.value)}
-              />
+              <Field.Label>{messages.passwordLabel}</Field.Label>
+              <InputGroup.Root>
+                <InputGroup.Input
+                  name='password'
+                  type={visible ? 'text' : 'password'}
+                  autoComplete='new-password'
+                  placeholder={messages.passwordPlaceholder}
+                  value={values.password}
+                  onChange={event => onValueChange('password', event.target.value)}
+                />
+                <InputGroup.End>
+                  <Button
+                    type='button'
+                    aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
+                    onClick={() => setVisible(current => !current)}
+                  >
+                    <Icon glyph={visible ? EyeSlash : Eye} />
+                  </Button>
+                </InputGroup.End>
+              </InputGroup.Root>
               <Field.Message>
-                <Field.Error>{errors.lastName}</Field.Error>
+                <Field.Error>{errors.password}</Field.Error>
               </Field.Message>
             </Field.Root>
           </div>
-          <Field.Root
-            required
-            invalid={Boolean(errors.emailAddress)}
-            disabled={isPending}
-            focusableWhenDisabled
-          >
-            <Field.Label>{messages.emailLabel}</Field.Label>
-            <Input
-              name='emailAddress'
-              type='email'
-              autoComplete='email'
-              placeholder={messages.emailPlaceholder}
-              value={values.emailAddress}
-              onChange={event => onValueChange('emailAddress', event.target.value)}
-            />
-            <Field.Message>
-              <Field.Error>{errors.emailAddress}</Field.Error>
-            </Field.Message>
-          </Field.Root>
-          <Field.Root
-            required
-            invalid={Boolean(errors.password)}
-            disabled={isPending}
-            focusableWhenDisabled
-          >
-            <Field.Label>{messages.passwordLabel}</Field.Label>
-            <InputGroup.Root>
-              <InputGroup.Input
-                name='password'
-                type={visible ? 'text' : 'password'}
-                autoComplete='new-password'
-                placeholder={messages.passwordPlaceholder}
-                value={values.password}
-                onChange={event => onValueChange('password', event.target.value)}
-              />
-              <InputGroup.End>
-                <Button
-                  type='button'
-                  aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
-                  onClick={() => setVisible(current => !current)}
-                >
-                  <Icon name={visible ? 'eye-slash' : 'eye'} />
-                </Button>
-              </InputGroup.End>
-            </InputGroup.Root>
-            <Field.Message>
-              <Field.Error>{errors.password}</Field.Error>
-            </Field.Message>
-          </Field.Root>
-        </form>
+        </Form>
         {onSignIn ? (
           <Text
             size='sm'

@@ -15,6 +15,7 @@ import { activeElement, contains, getDocument, getTarget, useLatestRef } from '@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
 import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
 import { Portal } from '../../primitives/portal';
 import { isElement, isRef, mergeProps, useRender } from '../../primitives/utils';
@@ -128,7 +129,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     refs.setReference(anchor.current);
   });
 
-  const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
+  const { mounted, transitionStatus, setMounted } = useTransitionStatus({ open });
   const runOnAnimationsFinished = useAnimationsFinished(barRef, open);
 
   const focusWithinRef = React.useRef(false);
@@ -262,8 +263,8 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
           <Button
             variant='ghost'
             size='md'
-            color={color}
             {...merged}
+            color={color}
             // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's CompositeItem calls this render callback synchronously during its own render, so the hook keeps a stable position.
             ref={useMergeRefs<unknown>([ref, isRef(itemRef) ? itemRef : undefined])}
             xstyle={[color === 'negative' && styles.destructive, xstyle]}
@@ -327,7 +328,7 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
       aria-label={ariaLabel ?? 'Clear selection'}
       {...mergeStyleProps(themeProps('action-bar-dismiss'), rest)}
     >
-      <Icon name='x' />
+      <Icon glyph={X} />
     </Action>
   );
 });

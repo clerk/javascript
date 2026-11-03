@@ -36,6 +36,7 @@ export type UserProfileEmailSectionModel =
       onRemoveEmail?: (id: string) => Promise<void>;
       removeReverification: ReverificationController;
       setPrimaryReverification: ReverificationController;
+      createReverification: ReverificationController;
     };
 
 export type ReadyEmailSectionModel = Extract<UserProfileEmailSectionModel, { status: 'ready' }>;

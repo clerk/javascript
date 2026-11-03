@@ -96,7 +96,7 @@ function DeviceDetails({
   isSigningOut: boolean;
   errorMessage: string | undefined;
 }) {
-  const m = useMessages('userProfileActiveDevices');
+  const m = useMessages('userProfile').activeDevices;
   const fields: { label: string; value: string | undefined }[] = [
     { label: m.detailsDialog.model, value: device.model },
     { label: m.detailsDialog.browser, value: device.browser },
@@ -136,7 +136,6 @@ function DeviceDetails({
         {onSignOut && !device.isCurrent ? (
           <SubmitButton
             type='button'
-            fullWidth
             isPending={isSigningOut}
             onClick={onSignOut}
           >
@@ -147,7 +146,6 @@ function DeviceDetails({
             render={
               <Button
                 color='neutral'
-                fullWidth
                 variant='outline'
               />
             }

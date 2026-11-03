@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import { useForm } from '../../../components/form';
 import { useToastManager } from '../../../components/toast';
 import { plural, useLocale, useMessages } from '../../../localization';
-import type { InviteMembersInput } from './invitations-table-tab.model';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
+import type { InviteMembersInput } from './organization-profile-invite-members.model';
 
 interface InviteMembersValues {
   emailAddresses: string[];
@@ -20,7 +20,7 @@ export interface InviteMembersControllerOptions {
 }
 
 export function useInviteMembersController({ roles, defaultRole, invite }: InviteMembersControllerOptions) {
-  const m = useMessages('organizationProfileInviteMembers');
+  const m = useMessages('organizationProfile').members.invite;
   const roleNames = useMessages('roles');
   const locale = useLocale();
   const toast = useToastManager();
@@ -29,15 +29,20 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
   const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
 
-  const form = useForm<InviteMembersValues>({
+  const form = useForm<InviteMembersValues, boolean>({
     initialValues: { emailAddresses: [], role: initialRole },
     errorFallback: m.error,
     onSubmit: async ({ emailAddresses, role }) => {
       if (!invite || !roles || role === null) {
-        return;
+        return false;
       }
       await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
-      // TODO: Skip closing and the success toast when the panel unmounted or its identity changed during the invite or the list revalidation; useForm has no success hook that is dropped on unmount.
+      return true;
+    },
+    onSuccess: (invited, { emailAddresses }) => {
+      if (!invited) {
+        return;
+      }
       setOpen(false);
       toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
     },
@@ -84,7 +89,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   return { onInvite, isInviteDisabled: false, inviteDialog };
 }
 
-function resolveDefaultRole({ roles }: MembersRoles, defaultRole: string | null) {
+export function resolveDefaultRole({ roles }: MembersRoles, defaultRole: string | null) {
   const candidate = defaultRole ?? (roles.length === 1 ? roles[0]?.key : undefined);
   return roles.some(role => role.key === candidate) ? (candidate ?? null) : null;
 }

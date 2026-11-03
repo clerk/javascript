@@ -25,6 +25,8 @@ dismiss into the navigation; standalone it paints the same frame and takes its o
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Profile } from '@clerk/mosaic/components/profile';
+import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
+import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 
 <Profile.Root
   value={page}
@@ -34,13 +36,13 @@ import { Profile } from '@clerk/mosaic/components/profile';
   <Profile.Nav>
     <Profile.NavItem
       value='account'
-      icon={<Icon name='user-circle' size='sm' />}
+      icon={<Icon glyph={UserCircle} size='sm' />}
     >
       Account
     </Profile.NavItem>
     <Profile.NavItem
       value='security'
-      icon={<Icon name='shield-check' size='sm' />}
+      icon={<Icon glyph={ShieldCheck} size='sm' />}
       badge={<Badge>2</Badge>}
     >
       Security
@@ -67,18 +69,25 @@ reaches the page title instead.
 
 ## Parts
 
-| Part                   | Element                 | Slot                       |
-| ---------------------- | ----------------------- | -------------------------- |
-| `Profile.Root`         | `div` (the container)   | `cl-profile`               |
-| —                      | `span` (query sentinel) | `cl-profile-sentinel`      |
-| `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`           |
-| —                      | back `button`           | `cl-profile-back-button`   |
-| —                      | tablist                 | `cl-profile-nav-list`      |
-| `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`      |
-| `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`       |
-| —                      | page title heading      | `cl-profile-page-title`    |
-| —                      | compact title `button`  | `cl-profile-nav-trigger`   |
-| `Profile.ContentPanel` | `div[role=tabpanel]`    | `cl-profile-content-panel` |
+| Part                   | Element                 | Slot                         |
+| ---------------------- | ----------------------- | ---------------------------- |
+| `Profile.Root`         | `div` (the container)   | `cl-profile`                 |
+| —                      | `span` (query sentinel) | `cl-profile-sentinel`        |
+| `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`             |
+| —                      | back `button`           | `cl-profile-back-button`     |
+| —                      | tablist                 | `cl-profile-nav-list`        |
+| `Profile.NavGroup`     | `div`                   | `cl-profile-nav-group`       |
+| —                      | group label `div`       | `cl-profile-nav-group-label` |
+| `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`        |
+| `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`         |
+| —                      | page title heading      | `cl-profile-page-title`      |
+| —                      | compact title `button`  | `cl-profile-nav-trigger`     |
+| `Profile.ContentPanel` | `div[role=tabpanel]`    | `cl-profile-content-panel`   |
+
+`Profile.NavGroup` sets a `label` above a run of `NavItem`s. Each tab in it is described by that
+label, so two tabs with the same name stay distinct; the label itself is hidden from assistive
+technology, so the tablist holds only tabs. In the compact listbox the group is a `role=group` named
+by its label.
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog. While compact, `ContentPanel` is a `div[role=group]` named by the page title.

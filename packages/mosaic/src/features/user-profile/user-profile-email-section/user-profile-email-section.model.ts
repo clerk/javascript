@@ -3,10 +3,14 @@ import type { EmailAddressResource, UserResource } from '@clerk/shared/types';
 
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
+import { withUserProfileModalReturn } from '../user-profile.modal-return';
+import type { UserProfileOptions } from '../user-profile.provider';
+import { useUserProfileOptions } from '../user-profile.provider';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../user-profile-contact.types';
-import { byId, canAddIdentifications, toContactAccess, toContacts } from '../user-profile-contact.utils';
+import { byId, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileAddEmailField } from './user-profile-add-email.controller';
 import type { UserProfileEmailSectionModel } from './user-profile-email-section.types';
@@ -32,6 +36,7 @@ function startEmailVerification(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
+  mode: UserProfileOptions['mode'],
 ): UserProfileEmailVerification {
   if (email.matchesSsoConnection) {
     return {
@@ -40,17 +45,12 @@ function startEmailVerification(
         Prepared on the click rather than on entering the step, so the redirect URL the server
         answers with is in hand by the time we navigate. Preparing on entry leaves the button live
         before the response lands, and an early click has nowhere to go.
-
-        TODO: carry the mounting mode back from the IdP. Legacy appends `appendModalState` to this
-        redirect when the profile is mounted as a modal, so returning from the provider reopens the
-        modal on the step the user left. Mosaic has no modal mode to encode yet; whoever adds one has
-        to encode it here too, or the user comes back to a closed dialog and a lost flow.
       */
       connect: () =>
         save(async () => {
           const prepared = await email.prepareVerification({
             strategy: 'enterprise_sso',
-            redirectUrl: window.location.href,
+            redirectUrl: withUserProfileModalReturn(window.location.href, mode),
           });
           const url = prepared.verification.externalVerificationRedirectURL;
           if (!url) {
@@ -75,9 +75,10 @@ function toEmailVerifier(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
+  mode: UserProfileOptions['mode'],
 ): UserProfileEmailVerifier {
   return {
-    start: () => startEmailVerification(email, linkRedirectUrl, router),
+    start: () => startEmailVerification(email, linkRedirectUrl, router, mode),
     verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
   };
 }
@@ -85,11 +86,16 @@ function toEmailVerifier(
 export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
   const model = useUserProfileUserModel();
   const router = useMosaicRouter();
+  const { mode } = useUserProfileOptions();
   const [removeEmail, removeReverification] = useReverificationFlow((user: UserResource, id: string) =>
     byId(user.emailAddresses, id, 'email address').destroy(),
   );
   const [setPrimaryEmail, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
     user.update({ primaryEmailAddressId: id }),
+  );
+  const [createEmail, createReverification] = useReverificationFlow(
+    (currentUser: () => UserResource, emailAddress: string) =>
+      currentUser().createEmailAddress({ email: emailAddress }),
   );
   if (model.status !== 'ready') {
     return model;
@@ -100,7 +106,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
   const access = toContactAccess(
     attributes.email_address,
     user.emailAddresses.length,
-    canAddIdentifications(user, enterpriseSSO.enabled),
+    allowsIdentificationCreation(user, enterpriseSSO),
   );
 
   if (!access.show) {
@@ -109,7 +115,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
 
   const verifiesByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const linkRedirectUrl = verifiesByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
-  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
+  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router, mode);
 
   return {
     status: 'ready',
@@ -118,7 +124,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
     username: user.username ?? undefined,
     onCreateEmail: access.canCreate
       ? async emailAddress => {
-          const request = currentUser().createEmailAddress({ email: emailAddress });
+          const request = createEmail(currentUser, emailAddress);
           await save(() => request, ADD_EMAIL_FIELDS);
           return verifierFor(await request);
         }
@@ -128,5 +134,6 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
     onRemoveEmail: access.canRemove ? id => saveAsUser(current => removeEmail(current, id)) : undefined,
     removeReverification,
     setPrimaryReverification,
+    createReverification,
   };
 }

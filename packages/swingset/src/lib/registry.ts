@@ -61,6 +61,12 @@ import {
   Labelled as CopyButtonLabelled,
   meta as copyButtonMeta,
 } from '../stories/copy-button.stories';
+import {
+  Default as CreateOrganizationDefault,
+  meta as createOrganizationMeta,
+  WithError as CreateOrganizationWithError,
+  WithoutSlug as CreateOrganizationWithoutSlug,
+} from '../stories/create-organization.stories';
 import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as DestructiveDefault,
@@ -133,6 +139,12 @@ import {
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
 import {
+  CustomElement as InviteMembersButtonCustomElement,
+  Default as InviteMembersButtonDefault,
+  meta as inviteMembersButtonMeta,
+  Unavailable as InviteMembersButtonUnavailable,
+} from '../stories/invite-members-button.stories';
+import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -150,6 +162,14 @@ import {
 } from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OrganizationListDefault,
+  Empty as OrganizationListEmpty,
+  Loading as OrganizationListLoading,
+  meta as organizationListMeta,
+  WithError as OrganizationListWithError,
+  WithoutPersonal as OrganizationListWithoutPersonal,
+} from '../stories/organization-list.stories';
 import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
@@ -227,12 +247,21 @@ import {
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import {
+  Default as ProviderButtonDefault,
+  Many as ProviderButtonMany,
+  meta as providerButtonMeta,
+  One as ProviderButtonOne,
+  Pending as ProviderButtonPending,
+  Stacked as ProviderButtonStacked,
+} from '../stories/provider-button.stories';
+import {
   Default as RadioDefault,
   Descriptions as RadioDescriptions,
   meta as radioMeta,
   Sizes as RadioSizes,
   States as RadioStates,
 } from '../stories/radio.stories';
+import { Default as RevealDefault, meta as revealMeta } from '../stories/reveal.component.stories';
 import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
@@ -320,6 +349,7 @@ import {
   States as SwitchStates,
   WithField as SwitchWithField,
 } from '../stories/switch.stories';
+import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
@@ -354,12 +384,14 @@ import {
   Placement as TooltipComponentPlacement,
 } from '../stories/tooltip.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
-import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
-  Default as UseServerDataTableDefault,
-  meta as useServerDataTableMeta,
-} from '../stories/use-server-data-table.stories';
+  Default as UserAvatarDefault,
+  meta as userAvatarMeta,
+  NoImage as UserAvatarNoImage,
+  Shapes as UserAvatarShapes,
+  Sizes as UserAvatarSizes,
+} from '../stories/user-avatar.stories';
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
@@ -491,6 +523,12 @@ import {
   LiveRegion as VisuallyHiddenLiveRegion,
   meta as visuallyHiddenMeta,
 } from '../stories/visually-hidden.stories';
+import {
+  Default as WaitlistDefault,
+  Joined as WaitlistJoined,
+  meta as waitlistMeta,
+  Redirecting as WaitlistRedirecting,
+} from '../stories/waitlist.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -535,6 +573,15 @@ const copyButtonModule: StoryModule = {
   Default: CopyButtonDefault,
   Inline: CopyButtonInline,
   Labelled: CopyButtonLabelled,
+};
+
+const providerButtonModule: StoryModule = {
+  meta: providerButtonMeta,
+  Default: ProviderButtonDefault,
+  One: ProviderButtonOne,
+  Many: ProviderButtonMany,
+  Stacked: ProviderButtonStacked,
+  Pending: ProviderButtonPending,
 };
 
 const organizationProfileModule: StoryModule = {
@@ -661,6 +708,8 @@ const radioModule: StoryModule = {
   Sizes: RadioSizes,
 };
 
+const revealModule: StoryModule = { meta: revealMeta, Default: RevealDefault };
+
 const dataListModule: StoryModule = {
   meta: dataListMeta,
   Default: DataListDefault,
@@ -689,10 +738,48 @@ const userButtonModule: StoryModule = {
   User: UserButtonUser,
 };
 
+const inviteMembersButtonModule: StoryModule = {
+  meta: inviteMembersButtonMeta,
+  Default: InviteMembersButtonDefault,
+  CustomElement: InviteMembersButtonCustomElement,
+  Unavailable: InviteMembersButtonUnavailable,
+};
+
+const waitlistModule: StoryModule = {
+  meta: waitlistMeta,
+  Default: WaitlistDefault,
+  Joined: WaitlistJoined,
+  Redirecting: WaitlistRedirecting,
+};
+
+const userAvatarModule: StoryModule = {
+  meta: userAvatarMeta,
+  Default: UserAvatarDefault,
+  NoImage: UserAvatarNoImage,
+  Shapes: UserAvatarShapes,
+  Sizes: UserAvatarSizes,
+};
+
 const organizationSwitcherModule: StoryModule = {
   meta: organizationSwitcherMeta,
   Default: OrganizationSwitcherDefault,
   NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
+};
+
+const createOrganizationModule: StoryModule = {
+  meta: createOrganizationMeta,
+  Default: CreateOrganizationDefault,
+  WithoutSlug: CreateOrganizationWithoutSlug,
+  WithError: CreateOrganizationWithError,
+};
+
+const organizationListModule: StoryModule = {
+  meta: organizationListMeta,
+  Default: OrganizationListDefault,
+  WithoutPersonal: OrganizationListWithoutPersonal,
+  Loading: OrganizationListLoading,
+  Empty: OrganizationListEmpty,
+  WithError: OrganizationListWithError,
 };
 
 const headingModule: StoryModule = {
@@ -789,6 +876,7 @@ const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const portalModule: StoryModule = { meta: portalMeta };
 const selectModule: StoryModule = { meta: selectMeta };
+const tablePrimitiveModule: StoryModule = { meta: tablePrimitiveMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tagInputModule: StoryModule = { meta: tagInputMeta };
 const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
@@ -805,11 +893,7 @@ const scrollAreaModule: StoryModule = {
   ShadowIndicators: ScrollAreaShadowIndicators,
 };
 
-const useDataTableModule: StoryModule = { meta: useDataTableMeta };
-
 const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
-
-const useServerDataTableModule: StoryModule = { meta: useServerDataTableMeta, Default: UseServerDataTableDefault };
 
 const localizationModule: StoryModule = {
   meta: localizationMeta,
@@ -1054,8 +1138,6 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
-  // Organization Switcher
-  organizationSwitcherModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1087,10 +1169,15 @@ export const registry: StoryModule[] = [
   // Organization Profile · Sections
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
-  // API Keys
+  // Misc
+  organizationSwitcherModule,
+  createOrganizationModule,
+  organizationListModule,
+  userAvatarModule,
+  inviteMembersButtonModule,
   apiKeysTableModule,
-  // Reverification
   reverificationModule,
+  waitlistModule,
   // Authentication
   signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
@@ -1107,6 +1194,7 @@ export const registry: StoryModule[] = [
   checkboxModule,
   comboboxModule,
   copyButtonModule,
+  providerButtonModule,
   flowComponentModule,
   inputModule,
   inputGroupModule,
@@ -1127,6 +1215,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   radioModule,
+  revealModule,
   sectionModule,
   segmentedControlModule,
   selectComponentModule,
@@ -1153,6 +1242,7 @@ export const registry: StoryModule[] = [
   popoverModule,
   portalModule,
   selectModule,
+  tablePrimitiveModule,
   tabsModule,
   tagInputModule,
   toastPrimitiveModule,
@@ -1160,9 +1250,7 @@ export const registry: StoryModule[] = [
   // Styles — atomic styles that ship as StyleX atoms rather than components.
   scrollAreaModule,
   // Hooks
-  useDataTableModule,
   useFormModule,
-  useServerDataTableModule,
   // Localization
   localizationModule,
 ];

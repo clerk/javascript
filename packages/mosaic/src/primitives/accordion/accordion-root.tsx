@@ -4,7 +4,7 @@ import { Composite } from '@floating-ui/react';
 import React, { type ReactNode, useCallback, useId, useMemo } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isRef, mergeProps, useRender } from '../utils';
 import { AccordionContext, type AccordionContextValue } from './accordion-context';
 
 export interface AccordionProps extends ComponentProps<'div'> {
@@ -21,7 +21,7 @@ export interface AccordionProps extends ComponentProps<'div'> {
   children: ReactNode;
 }
 
-export function AccordionRoot(props: AccordionProps) {
+export const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionProps>(function AccordionRoot(props, ref) {
   const { render, type = 'multiple', disabled = false, children, ...otherProps } = props;
 
   const [value, setValue] = useControllableState(props.value, props.defaultValue ?? [], props.onValueChange);
@@ -56,7 +56,7 @@ export function AccordionRoot(props: AccordionProps) {
           // generic <div> (no widget role). Strip it to avoid an axe violation.
           const { 'aria-orientation': _ao, ...restCompositeProps } = compositeProps;
 
-          const defaultProps: Record<string, unknown> = {
+          const defaultProps = {
             onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
               if (event.key !== 'Home' && event.key !== 'End') {
                 return;
@@ -67,7 +67,7 @@ export function AccordionRoot(props: AccordionProps) {
               );
               (event.key === 'Home' ? items.at(0) : items.at(-1))?.focus();
             },
-          };
+          } satisfies DefaultProps<'div'>;
 
           const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, restCompositeProps));
 
@@ -80,7 +80,7 @@ export function AccordionRoot(props: AccordionProps) {
           return useRender({
             defaultTagName: 'div',
             render,
-            ref: isRef(compositeRef) ? compositeRef : undefined,
+            ref: [isRef(compositeRef) ? compositeRef : null, ref],
             props: mergedProps,
           });
         }}
@@ -89,4 +89,4 @@ export function AccordionRoot(props: AccordionProps) {
       </Composite>
     </AccordionContext.Provider>
   );
-}
+});

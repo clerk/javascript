@@ -8,6 +8,9 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
+import { Eye } from '../../../icons/glyphs/eye';
+import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
@@ -75,7 +78,7 @@ export function SignInPassword({
           disabled={isPending}
           onEdit={onEditIdentifier}
         />
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
         >
@@ -102,7 +105,7 @@ export function SignInPassword({
                   aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
                   onClick={() => setVisible(current => !current)}
                 >
-                  <Icon name={visible ? 'eye-slash' : 'eye'} />
+                  <Icon glyph={visible ? EyeSlash : Eye} />
                 </Button>
               </InputGroup.End>
             </InputGroup.Root>
@@ -122,7 +125,7 @@ export function SignInPassword({
               </Button>
             ) : null}
           </Field.Root>
-        </form>
+        </Form>
       </Card.Content>
       <Card.Footer>
         {onCancel ? (

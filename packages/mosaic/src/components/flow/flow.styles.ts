@@ -66,7 +66,6 @@ export const styles = stylex.create({
       default: easingVars['--cl-ease-enter'],
       ':where([data-ending-style])': easingVars['--cl-ease-in-out'],
     },
-    willChange: 'transform',
     minWidth: 0,
     width: '100%',
   },

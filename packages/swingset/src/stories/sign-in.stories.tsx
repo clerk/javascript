@@ -55,7 +55,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const [signUpDetails, setSignUpDetails] = useState<SignUpDetails>(emptySignUp);
   const [signUpErrors, setSignUpErrors] = useState<Partial<Record<keyof SignUpDetails, string>>>();
   const [supportRequested, setSupportRequested] = useState(false);
-  const stageRef = useRef<'first' | 'second'>('first');
+  const [stage, setStage] = useState<'first' | 'second'>('first');
   const pickerReturnRef = useRef<SignInStep>('password');
 
   const navigate = (next: SignInStep, nextDirection: -1 | 1) => {
@@ -96,7 +96,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         navigate('sign-up', 1);
         return;
       }
-      stageRef.current = 'first';
+      setStage('first');
       setMethodId('password');
       navigate('password', 1);
     });
@@ -112,7 +112,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         setErrorMessage('Password is incorrect. Try again, or use another method.');
         return;
       }
-      stageRef.current = 'second';
+      setStage('second');
       setMethodId('totp');
       navigate('totp', 1);
     });
@@ -178,7 +178,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       case 'email-code':
         void submitCode(() => {
-          stageRef.current = 'second';
+          setStage('second');
           setMethodId('totp');
           navigate('totp', 1);
         });
@@ -261,7 +261,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     })();
   };
 
-  const stageMethods = stageRef.current === 'first' ? firstFactors : secondFactors;
+  const stageMethods = stage === 'first' ? firstFactors : secondFactors;
   const otpChannel = step === 'email-code' || step === 'verify-email' ? 'email' : step === 'totp' ? 'totp' : undefined;
 
   return (
@@ -281,7 +281,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
             setErrorMessage(undefined);
           }}
           onEditIdentifier={() => {
-            stageRef.current = 'first';
+            setStage('first');
             navigate('start', -1);
           }}
           value={value}

@@ -9,6 +9,7 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Input } from '../../../components/input';
 import { Text } from '../../../components/text';
+import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignInSocialProvider } from '../sign-in.types';
 
@@ -138,7 +139,7 @@ export function SignInStart({
             </div>
           </>
         ) : null}
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
         >
@@ -162,7 +163,7 @@ export function SignInStart({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
           </Field.Root>
-        </form>
+        </Form>
         {onSignUp ? (
           <Text
             size='sm'

@@ -16,8 +16,8 @@ export function useFlowStepActive(): boolean {
 
 /**
  * Marks an element as the one to focus when the enclosing `Flow.Step` enters.
- * When several mounted elements are marked, the first in DOM order is focused. Outside a
- * step the ref is a no-op, so a view can render standalone without a wrapper.
+ * When several mounted elements are marked, the first in DOM order outside an exiting step is
+ * focused. Outside a step the ref is a no-op, so a view can render standalone without a wrapper.
  */
 export function useFlowAutoFocus<T extends HTMLElement = HTMLElement>(): RefCallback<T> {
   const context = useContext(FlowStepContext);

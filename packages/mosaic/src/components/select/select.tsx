@@ -1,6 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import type {
   SelectMultipleProps as PrimitiveSelectMultipleProps,
   SelectOptionProps as PrimitiveSelectOptionProps,
@@ -161,7 +163,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
         </Primitive.Value>
       )}
       <Icon
-        name='chevron-down'
+        glyph={ChevronDown}
         size='sm'
         placement='inline-end'
         {...themeProps('select-trigger-icon')}
@@ -273,7 +275,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
         )}
       </OptionContext.Provider>
       <Icon
-        name='checkmark'
+        glyph={Checkmark}
         size='sm'
         xstyle={slots.indicator.base}
         {...themeProps('select-option-indicator')}

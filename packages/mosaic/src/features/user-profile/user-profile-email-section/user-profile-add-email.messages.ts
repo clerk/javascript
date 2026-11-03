@@ -13,9 +13,10 @@ export const userProfileAddEmailMessages = {
     submit: 'Verify',
     pending: 'Verifying',
     cancel: 'Cancel',
-    resend: 'Didn’t receive a code? Resend',
+    resend: 'Resend',
+    resendText: 'Didn’t receive a code?',
     resending: 'Sending code…',
-    resendCountdown: 'Didn’t receive a code? Resend ({seconds})',
+    resendCountdown: 'Resend ({seconds})',
   },
   link: {
     title: 'Verify your email',

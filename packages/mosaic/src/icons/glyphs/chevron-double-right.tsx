@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const ChevronDoubleRight = glyph(
+  'chevron-double-right',
   <>
     <path
       d='M9.33333 10.6667L11.5286 8.4714C11.7889 8.21107 11.7889 7.78893 11.5286 7.5286L9.33333 5.33333'

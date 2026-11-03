@@ -4,6 +4,8 @@ import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { CreditCard } from '../../../icons/glyphs/credit-card';
+import { Plus } from '../../../icons/glyphs/plus';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 
 export interface UserProfilePaymentMethod {
@@ -44,7 +46,7 @@ export function UserProfilePaymentMethodsSectionView({
                 onClick={onAdd}
               >
                 <Icon
-                  name='plus'
+                  glyph={Plus}
                   placement='inline-start'
                   size='sm'
                 />
@@ -98,7 +100,7 @@ function PaymentMethodItem({
 
   return (
     <Section.Item>
-      <UserProfileProviderIcon name='credit-card' />
+      <UserProfileProviderIcon glyph={CreditCard} />
       <Section.Content>
         <Section.Label>
           {paymentMethod.label} {paymentMethod.isDefault ? <Badge color='neutral'>Default</Badge> : null}

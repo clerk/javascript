@@ -2,6 +2,7 @@ import type * as stylex from '@stylexjs/stylex';
 import type React from 'react';
 
 import type { ComponentProps } from './primitives/utils';
+import { kebabCase } from './utils/kebab-case';
 
 /**
  * What `xstyle` accepts: exactly what `stylex.props(...)` does, since that is where a part
@@ -63,8 +64,6 @@ export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> 
 
 type VariantValue = string | number | boolean | null | undefined;
 
-const kebab = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-
 /**
  * The stable class + variant reflection for a slot.
  *
@@ -84,7 +83,7 @@ export function themeProps(
     if (value == null || value === false) {
       continue;
     }
-    attrs[`data-${kebab(axis)}`] = value === true ? '' : String(value);
+    attrs[`data-${kebabCase(axis)}`] = value === true ? '' : String(value);
   }
   return { className: `cl-${slot}`, ...attrs };
 }

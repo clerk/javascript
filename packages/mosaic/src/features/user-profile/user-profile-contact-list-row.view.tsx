@@ -7,6 +7,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { UserProfileContact } from './user-profile-contact.types';
@@ -21,6 +22,7 @@ export interface UserProfileContactListRowViewProps {
   items: UserProfileContact[];
   onAdd?: () => void;
   onVerify?: (id: string) => void;
+  pendingVerifyId?: string;
   onSetPrimary?: (id: string) => void;
   onRemove?: (item: UserProfileContact) => void;
   children?: ReactNode;
@@ -32,6 +34,7 @@ export function UserProfileContactListRowView({
   items,
   onAdd,
   onVerify,
+  pendingVerifyId,
   onSetPrimary,
   onRemove,
   addAction,
@@ -39,8 +42,9 @@ export function UserProfileContactListRowView({
   triggerRef,
   children,
 }: UserProfileContactListRowViewProps) {
-  const m = useMessages('userProfileContact');
-  const emptyDescription = m[kind].empty;
+  const messages = useMessages('userProfile');
+  const m = messages.contact;
+  const nouns = messages[kind];
 
   return (
     <Section.Group
@@ -56,14 +60,14 @@ export function UserProfileContactListRowView({
         ) : onAdd ? (
           <Section.Actions>
             <Button
-              aria-label={m[kind].add}
+              aria-label={nouns.add}
               color='neutral'
               size='sm'
               variant='outline'
               onClick={onAdd}
             >
               <Icon
-                name='plus'
+                glyph={Plus}
                 placement='inline-start'
                 size='sm'
               />
@@ -77,7 +81,7 @@ export function UserProfileContactListRowView({
           {items.length === 0 ? (
             <Section.Item>
               <Section.Content>
-                <Section.Description>{emptyDescription}</Section.Description>
+                <Section.Description>{nouns.empty}</Section.Description>
               </Section.Content>
             </Section.Item>
           ) : (
@@ -86,8 +90,9 @@ export function UserProfileContactListRowView({
 
               if (!item.isVerified && onVerify) {
                 actions.push({
-                  label: item.isDefault ? m.completeVerification : m[kind].verify,
+                  label: item.isDefault ? m.completeVerification : nouns.verify,
                   onClick: () => onVerify(item.id),
+                  status: pendingVerifyId === item.id ? 'pending' : 'idle',
                 });
               } else if (item.isVerified && !item.isDefault && onSetPrimary) {
                 actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
@@ -95,7 +100,7 @@ export function UserProfileContactListRowView({
 
               if (onRemove) {
                 actions.push({
-                  label: m[kind].remove,
+                  label: nouns.remove,
                   color: 'negative',
                   onClick: () => onRemove(item),
                 });

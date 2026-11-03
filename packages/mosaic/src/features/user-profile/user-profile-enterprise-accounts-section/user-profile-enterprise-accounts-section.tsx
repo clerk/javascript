@@ -27,11 +27,12 @@ export function UserProfileEnterpriseAccountsSection({ fallback }: UserProfileEn
 }
 
 function EnterpriseAccounts({ model }: { model: Extract<UserProfileEnterpriseAccountsModel, { status: 'ready' }> }) {
-  const m = useMessages('userProfileEnterpriseAccountsSection');
+  const m = useMessages('userProfile').enterpriseAccounts;
   const controller = useUserProfileEnterpriseAccountsController({
     accounts: model.accounts,
     connections: model.connections,
     onConnect: model.connect,
+    connectReverification: model.connectReverification,
     errorFallback: m.errors.generic,
   });
 

@@ -12,7 +12,6 @@ import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 
 afterEach(() => {
   vi.useRealTimers();
-  vi.restoreAllMocks();
 });
 
 function accounts() {

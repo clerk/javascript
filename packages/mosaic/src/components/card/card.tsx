@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
 import { useFlowStepActive } from '../../primitives/flow';
 import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
@@ -12,6 +13,7 @@ import type { BannerRootProps } from '../banner';
 import { Banner } from '../banner';
 import { Branding } from '../branding';
 import { Button } from '../button';
+import { ButtonContext } from '../button/button.context';
 import type { DialogContextValue } from '../dialog';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Icon } from '../icon';
@@ -21,6 +23,8 @@ import * as slots from './card.styles';
 type CardElevation = 'card' | 'flush' | 'overlay';
 
 export type CardSize = keyof typeof slots.sizes;
+
+export type CardHeaderAlign = keyof typeof slots.headerAlign;
 
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
@@ -98,6 +102,7 @@ function HeaderCloseButton() {
       aria-label='Close'
       render={props => (
         <Button
+          color='neutral'
           variant='ghost'
           shape='circle'
           size='sm'
@@ -105,22 +110,32 @@ function HeaderCloseButton() {
         />
       )}
     >
-      <Icon name='x' />
+      <Icon glyph={X} />
     </Dialog.Close>
   );
 }
 
-const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
-  { render, xstyle, children, ...rest },
+export interface CardHeaderProps extends MosaicComponentProps<'div'> {
+  /** Aligns the header's content. @default 'start' */
+  align?: CardHeaderAlign;
+}
+
+const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
+  { align = 'start', render, xstyle, children, ...rest },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const hasCloseButton = isInDialog(dialog) && dialog.showCloseButton;
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('card-header', { align }),
+        stylex.props(reset.base, slots.header.base, xstyle),
+        rest,
+      ),
       children: (
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
@@ -129,12 +144,36 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
               `showCloseButton` is off, which is the default for an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isInDialog(dialog) && dialog.showCloseButton ? <HeaderCloseButton /> : null}
-          <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
+          {hasCloseButton ? <HeaderCloseButton /> : null}
+          <div
+            {...mergeStyleProps(
+              themeProps('card-header-content'),
+              stylex.props(
+                reset.base,
+                slots.header.content,
+                slots.headerAlign[align],
+                hasCloseButton && align === 'center' && slots.header.contentBesideCloseButton,
+              ),
+            )}
+          >
             {children}
           </div>
         </>
       ),
+    },
+  });
+});
+
+const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardMedia(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('card-media'), stylex.props(reset.base, slots.header.media, xstyle), rest),
     },
   });
 });
@@ -249,7 +288,9 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   ref,
 ) {
   const elevation = React.useContext(CardContext)?.elevation ?? DEFAULT_ELEVATION;
-  return useRender({
+  const parentButtonDefaults = React.useContext(ButtonContext);
+  const buttonDefaults = React.useMemo(() => ({ ...parentButtonDefaults, fullWidth: true }), [parentButtonDefaults]);
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
@@ -261,12 +302,14 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
       ),
     },
   });
+
+  return <ButtonContext.Provider value={buttonDefaults}>{element}</ButtonContext.Provider>;
 });
 
 /**
- * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Title`, `Card.Description`,
- * `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and
- * forwards its ref.
+ * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Media`, `Card.Title`,
+ * `Card.Description`, `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic
+ * `render` prop and forwards its ref.
  *
  * `Card.Banner` is a message slot between the header and the content. It is always rendered, and
  * a `Banner` expands into it while its children hold a message, collapsing again once they are
@@ -275,4 +318,4 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
  * Rendered as the content of a `Dialog.Popup`, the card reads that surface from `DialogContext`:
  * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
  */
-export const Card = { Root, Header, Title, Description, Banner: CardBanner, Content, Footer };
+export const Card = { Root, Header, Media, Title, Description, Banner: CardBanner, Content, Footer };

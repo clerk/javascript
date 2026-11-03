@@ -18,8 +18,7 @@ export { default as __source } from './user-profile-profile-panel.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
-  substatus: 'needs reverification',
+  status: 'stable',
   title: 'UserProfileProfilePanel',
   label: 'Profile panel',
   navigation: { category: 'Panels' },

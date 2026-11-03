@@ -3,6 +3,11 @@ import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Item } from '@clerk/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
+import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
+import { ChevronRight } from '@clerk/mosaic/icons/glyphs/chevron-right';
+import { EllipsisHorizontal } from '@clerk/mosaic/icons/glyphs/ellipsis-horizontal';
+import { LogOut } from '@clerk/mosaic/icons/glyphs/log-out';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
 import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
@@ -145,7 +150,7 @@ export function Group() {
               size='sm'
               shape='square'
             >
-              <Icon name='ellipsis-horizontal' />
+              <Icon glyph={EllipsisHorizontal} />
             </Button>
           </Item.Actions>
         </Item.Root>
@@ -166,7 +171,7 @@ export function Group() {
             <Item.Label>Clerk</Item.Label>
           </Item.Content>
           <Icon
-            name='checkmark'
+            glyph={Checkmark}
             size='md'
             xstyle={styles.iconWidth}
           />
@@ -240,7 +245,7 @@ export function Group() {
         >
           <Item.Media>
             <Icon
-              name='plus'
+              glyph={Plus}
               size='sm'
             />
           </Item.Media>
@@ -261,7 +266,7 @@ export function Group() {
         >
           <Item.Media>
             <Icon
-              name='log-out'
+              glyph={LogOut}
               size='sm'
             />
           </Item.Media>
@@ -358,7 +363,7 @@ export function OutlineGroup() {
             <Item.Description>Member</Item.Description>
           </Item.Content>
           <Icon
-            name='chevron-right'
+            glyph={ChevronRight}
             size='md'
             xstyle={styles.iconWidth}
           />

@@ -1,16 +1,12 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
 import { clerkApiError } from '../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../mosaic-provider';
 import { usePendingAction } from '../use-pending-action';
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function blocked() {
   return clerkApiError('action_blocked', 'Raw server sentence.');

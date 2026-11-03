@@ -1,10 +1,12 @@
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-const distFile = resolve(import.meta.dirname, '../dist/index.js');
-const source = await readFile(distFile, 'utf8');
+const distDir = resolve(import.meta.dirname, '../dist');
+const jsFiles = (await readdir(distDir)).filter(file => file.endsWith('.js'));
+const sources = await Promise.all(jsFiles.map(file => readFile(resolve(distDir, file), 'utf8')));
+const entry = await readFile(resolve(distDir, 'index.js'), 'utf8');
 
-if (!source.startsWith("'use client';") && !source.startsWith('"use client";')) {
+if (!entry.startsWith("'use client';") && !entry.startsWith('"use client";')) {
   throw new Error("Published Mosaic JS is missing a top-level 'use client' boundary.");
 }
 
@@ -14,19 +16,23 @@ const forbidden = [
   { name: 'StyleX', pattern: /(?:from|import)\s*['"]@stylexjs\// },
 ];
 
-const hits = forbidden.filter(({ pattern }) => pattern.test(source)).map(({ name }) => name);
+const hits = forbidden.filter(({ pattern }) => sources.some(source => pattern.test(source))).map(({ name }) => name);
 
 if (hits.length > 0) {
   throw new Error(`Published Mosaic JS still references ${hits.join(', ')}.`);
 }
 
-if (!/(?:from|import)\s*['"]@clerk\/shared(?:\/[^'"]*)?['"]/.test(source)) {
+if (sources.some(source => /^\/\/#region src\/icons\/registry\b/m.test(source))) {
+  throw new Error('Published Mosaic JS bundles the icon registry; import glyphs directly so unused ones tree-shake.');
+}
+
+if (!sources.some(source => /(?:from|import)\s*['"]@clerk\/shared(?:\/[^'"]*)?['"]/.test(source))) {
   throw new Error(
     'Published Mosaic JS does not import @clerk/shared; Clerk context would not resolve from the host SDK.',
   );
 }
 
-if (!/(?:from|import)\s*['"]@floating-ui\/react(?:\/[^'"]*)?['"]/.test(source)) {
+if (!sources.some(source => /(?:from|import)\s*['"]@floating-ui\/react(?:\/[^'"]*)?['"]/.test(source))) {
   throw new Error('Published Mosaic JS does not import @floating-ui/react; it should be an external dependency.');
 }
 

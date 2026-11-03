@@ -9,6 +9,8 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
+import { CODE_LENGTH, CODE_RESEND_SECONDS } from '../../../utils/verification';
+import type { ReverificationController } from '../../reverification';
 import type {
   UserProfileEmail,
   UserProfileEmailVerification,
@@ -22,11 +24,13 @@ export interface UserProfileAddEmailControllerOptions {
   initialEmailAddress?: string;
   username?: string;
   onCreate?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
+  reverification: ReverificationController;
 }
 
 export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
+  pendingVerifyId: string | undefined;
   onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
 }
 
@@ -37,6 +41,7 @@ interface Context {
   verification: UserProfileEmailVerification | undefined;
   error: FormError | undefined;
   resendSeconds: number;
+  held: boolean;
 }
 
 type Event =
@@ -54,18 +59,17 @@ function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Email verification is missing'));
 }
 
-const CODE_RESEND_SECONDS = 30;
 const LINK_RESEND_SECONDS = 60;
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
 const resend = {
-  target: 'starting',
+  target: 'starting' as const,
   guard: (context: Context) => context.resendSeconds === 0,
   actions: assign(() => ({ error: undefined })),
 };
 const start = {
-  target: 'starting',
+  target: 'starting' as const,
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
     verifyingId: event.id,
     emailAddress: event.emailAddress,
@@ -73,7 +77,18 @@ const start = {
     verification: undefined,
     error: undefined,
     resendSeconds: 0,
+    held: false,
   })),
+};
+
+const sendCode = {
+  invoke: fromPromise(
+    (context: Context) => (context.verification?.method === 'code' ? context.verification.sent : missingDependency()),
+    {
+      onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS, held: false })) },
+      onError: { target: 'verify', actions: [fail, assign(() => ({ held: false }))] },
+    },
+  ),
 };
 
 const machine = createMachine({
@@ -86,6 +101,7 @@ const machine = createMachine({
     verification: undefined,
     error: undefined,
     resendSeconds: 0,
+    held: false,
   },
   states: {
     idle: {
@@ -100,7 +116,7 @@ const machine = createMachine({
             resendSeconds: 0,
           })),
         },
-        START: start,
+        START: { ...start, actions: [start.actions, assign(() => ({ held: true }))] },
       },
     },
     email: {
@@ -114,7 +130,7 @@ const machine = createMachine({
       always: ({ context }) => {
         const method = context.verification?.method;
         if (method === 'code') {
-          return { target: 'sending' };
+          return { target: context.held ? 'preparing' : 'sending' };
         }
         if (method === 'sso') {
           return { target: 'connecting' };
@@ -122,15 +138,8 @@ const machine = createMachine({
         return { target: 'waiting', context: { resendSeconds: method === 'link' ? LINK_RESEND_SECONDS : 0 } };
       },
     },
-    sending: {
-      invoke: fromPromise(
-        context => (context.verification?.method === 'code' ? context.verification.sent : missingDependency()),
-        {
-          onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
-          onError: { target: 'verify', actions: fail },
-        },
-      ),
-    },
+    preparing: sendCode,
+    sending: sendCode,
     waiting: {
       on: { CANCEL: 'idle', TICK: tick, RESEND: resend },
       invoke: fromPromise(
@@ -163,6 +172,7 @@ export function useUserProfileAddEmailController({
   initialEmailAddress = '',
   username,
   onCreate,
+  reverification,
 }: UserProfileAddEmailControllerOptions): UserProfileAddEmailController {
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
@@ -170,7 +180,7 @@ export function useUserProfileAddEmailController({
   const { resendSeconds, error, verification } = snapshot.context;
   const emailForm = useForm({
     initialValues: { emailAddress: initialEmailAddress },
-    canSubmit: values => !username || values.emailAddress !== username,
+    canSubmit: values => values.emailAddress !== '' && values.emailAddress !== username,
     onSubmit: async ({ emailAddress }) => {
       if (onCreate) {
         send({ type: 'START', emailAddress, verifier: await onCreate(emailAddress) });
@@ -179,6 +189,7 @@ export function useUserProfileAddEmailController({
   });
   const codeForm = useForm({
     initialValues: { code: '' },
+    canSubmit: values => values.code.length === CODE_LENGTH,
     onSubmit: async ({ code }) => {
       const { verifier } = actor.getSnapshot().context;
       if (verifier) {
@@ -188,7 +199,7 @@ export function useUserProfileAddEmailController({
     },
   });
   const state = snapshot.value;
-  const open = state !== 'idle';
+  const open = state !== 'idle' && state !== 'preparing';
   const waitingFor = state === 'waiting' && verification?.method === 'link' ? verification : undefined;
   useEffect(() => waitingFor?.cancel, [waitingFor]);
   useEffect(() => {
@@ -199,9 +210,10 @@ export function useUserProfileAddEmailController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const step = toStep(state, verification);
-  const form = step === 'email' ? emailForm : codeForm;
-  const formError = step === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
+  const isReverifying = emailForm.isSubmitting && reverification.visible;
+  const step = isReverifying ? 'reverify' : toStep(state, verification);
+  const form = state === 'email' ? emailForm : codeForm;
+  const formError = state === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
@@ -210,14 +222,19 @@ export function useUserProfileAddEmailController({
     isResending: state === 'sending',
     open,
     step,
-    emailAddress: step === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
+    reverification,
+    emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
     canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
     code: codeForm.values.code,
+    canSubmitCode: codeForm.canSubmit || codeForm.isSubmitting,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {
       if (form.isSubmitting) {
-        return;
+        if (open || state !== 'email' || !reverification.onCancel) {
+          return;
+        }
+        reverification.onCancel();
       }
       if (open) {
         emailForm.reset();
@@ -248,6 +265,7 @@ export function useUserProfileAddEmailController({
     },
     onConnect: () => send({ type: 'CONNECT' }),
     verifyingId: snapshot.context.verifyingId,
+    pendingVerifyId: state === 'preparing' ? snapshot.context.verifyingId : undefined,
     onVerifyEmail: (email, verifier) => {
       codeForm.reset();
       send({ type: 'START', id: email.id, emailAddress: email.value, verifier });
@@ -258,7 +276,7 @@ export function useUserProfileAddEmailController({
 function toStep(
   state: string,
   verification: UserProfileEmailVerification | undefined,
-): UserProfileAddEmailDialogProps['step'] {
+): Exclude<UserProfileAddEmailDialogProps['step'], 'reverify'> {
   if (state === 'email') {
     return 'email';
   }

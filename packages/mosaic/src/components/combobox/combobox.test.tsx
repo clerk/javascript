@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import { Button } from '../button';
 import { Field } from '../field';
 import { Icon } from '../icon';
@@ -23,7 +25,7 @@ function FloatingCombobox(props?: { onValueChange?: (value: string | null) => vo
             render={<Button />}
           >
             <Icon
-              name='chevron-down'
+              glyph={ChevronDown}
               size='sm'
             />
           </Combobox.Trigger>
@@ -319,7 +321,7 @@ describe('Mosaic Combobox', () => {
       <Combobox.Root open>
         <InputGroup.Root size='lg'>
           <InputGroup.Start>
-            <Icon name='magnifying-glass' />
+            <Icon glyph={MagnifyingGlass} />
           </InputGroup.Start>
           <Combobox.Input
             aria-label='Search countries'

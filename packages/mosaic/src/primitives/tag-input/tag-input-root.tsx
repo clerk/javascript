@@ -3,7 +3,7 @@
 import React, { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import {
   type FocusAfterRemove,
   TagInputContext,
@@ -150,7 +150,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
 
   const state = { disabled, empty: value.length === 0 };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     onMouseDown: (event: React.MouseEvent<HTMLDivElement>) => {
       if (disabled || !(event.target instanceof Element) || event.target.closest('input, [role="listitem"]')) {
         return;
@@ -175,7 +175,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
           : null}
       </>
     ),
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <TagInputContext.Provider value={contextValue}>

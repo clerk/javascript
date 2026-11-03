@@ -268,7 +268,7 @@ describe('UserProfileSecurityPanelView', () => {
     const backupOnlyView = renderView(
       <UserProfileMfaSectionView
         methods={[backupCodes]}
-        onRegenerateBackupCodes={onRegenerateBackupCodes}
+        regenerate={{ onClick: onRegenerateBackupCodes, status: 'idle' }}
         onRemove={onRemove}
       />,
     );
@@ -280,7 +280,7 @@ describe('UserProfileSecurityPanelView', () => {
     renderView(
       <UserProfileMfaSectionView
         methods={[{ id: 'sms_1', type: 'sms' }, backupCodes]}
-        onRegenerateBackupCodes={onRegenerateBackupCodes}
+        regenerate={{ onClick: onRegenerateBackupCodes, status: 'idle' }}
         onRemove={onRemove}
       />,
     );

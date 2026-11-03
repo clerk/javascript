@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { Checkmark } from '../../../icons/glyphs/checkmark';
 import { Icon } from '../icon';
 import { IconFrame } from '../icon-frame';
 
@@ -40,7 +41,7 @@ describe('Mosaic IconFrame', () => {
   it('composes with an Icon', () => {
     const { container } = render(
       <IconFrame>
-        <Icon name='checkmark' />
+        <Icon glyph={Checkmark} />
       </IconFrame>,
     );
     const frame = container.querySelector('.cl-icon-frame');

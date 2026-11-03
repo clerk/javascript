@@ -36,8 +36,13 @@ const livePages = new Set([
   '/organization-profile/organization-profile-danger-section',
   '/user-profile/user-profile-passkeys-section',
   '/user-profile/user-profile-web3wallets-section',
-  '/api-keys/api-keys-table',
-  '/reverification/reverification',
+  '/misc/invite-members-button',
+  '/misc/api-keys-table',
+  '/misc/reverification',
+  '/misc/create-organization',
+  '/misc/organization-list',
+  '/misc/waitlist',
+  '/user-button/user-button',
 ]);
 
 const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);

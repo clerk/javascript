@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
+import { Pen } from '../../../icons/glyphs/pen';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from '../sign-in.styles';
 
@@ -33,7 +34,7 @@ export function SignInIdentityPreview({ identifier, editLabel, disabled = false,
           disabled={disabled}
           onClick={onEdit}
         >
-          <Icon name='pen' />
+          <Icon glyph={Pen} />
         </Button>
       ) : null}
     </div>

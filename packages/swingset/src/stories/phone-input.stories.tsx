@@ -13,7 +13,7 @@ export { default as __source } from './phone-input.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'PhoneInput',
   source: 'packages/mosaic/src/components/phone-input/phone-input.tsx',
   styles: {

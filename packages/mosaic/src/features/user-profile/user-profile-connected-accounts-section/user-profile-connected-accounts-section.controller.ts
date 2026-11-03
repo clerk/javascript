@@ -9,6 +9,7 @@ import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
+import { REDIRECT_HOLD_MS } from '../user-profile.utils';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,
@@ -23,6 +24,7 @@ export interface UserProfileConnectedAccountsControllerOptions {
   onRemove?: (id: string) => void | Promise<void>;
   removeReverification: ReverificationController;
   reconnectReverification: ReverificationController;
+  connectReverification: ReverificationController;
 }
 
 export interface UserProfileConnectedAccountsController {
@@ -37,9 +39,9 @@ export interface UserProfileConnectedAccountsController {
   finalFocus: DialogFocusTarget;
   reconnectReverification: ReverificationController;
   reconnectFinalFocus: DialogFocusTarget;
+  connectReverification: ReverificationController;
+  connectFinalFocus: DialogFocusTarget;
 }
-
-const OAUTH_REDIRECT_HOLD_MS = 2000;
 
 export function useUserProfileConnectedAccountsController({
   accounts,
@@ -49,8 +51,9 @@ export function useUserProfileConnectedAccountsController({
   onRemove,
   removeReverification,
   reconnectReverification,
+  connectReverification,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
-  const messages = useMessages('userProfileConnectedAccounts');
+  const messages = useMessages('userProfile').connectedAccounts;
   const actions = usePendingAction({ errorFallback: messages.errors.generic });
   const sectionRef = useRef<HTMLDivElement>(null);
   const panelTitle = usePanelTitle();
@@ -70,7 +73,7 @@ export function useUserProfileConnectedAccountsController({
   const run = (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) =>
     void actions.run(id, async () => {
       if ((await action(id)) === 'redirecting') {
-        await new Promise(resolve => setTimeout(resolve, OAUTH_REDIRECT_HOLD_MS));
+        await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
       }
     });
 
@@ -90,5 +93,7 @@ export function useUserProfileConnectedAccountsController({
     finalFocus: removalFocus.finalFocus,
     reconnectReverification,
     reconnectFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
+    connectReverification,
+    connectFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
   };
 }

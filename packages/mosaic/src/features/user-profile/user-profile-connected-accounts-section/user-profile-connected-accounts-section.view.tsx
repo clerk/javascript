@@ -26,8 +26,10 @@ export function UserProfileConnectedAccountsSectionView({
   finalFocus,
   reconnectReverification,
   reconnectFinalFocus,
+  connectReverification,
+  connectFinalFocus,
 }: UserProfileConnectedAccountsSectionViewProps) {
-  const m = useMessages('userProfileConnectedAccounts');
+  const m = useMessages('userProfile').connectedAccounts;
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
   const isBusy = pendingId !== undefined;
 
@@ -60,6 +62,7 @@ export function UserProfileConnectedAccountsSectionView({
                     <UserProfileConnectProviderRowView
                       key={provider.id}
                       provider={provider}
+                      triggerRef={registerTrigger(provider.id)}
                       isPending={pendingId === provider.id}
                       isDisabled={isBusy}
                       onConnect={onConnect}
@@ -84,6 +87,12 @@ export function UserProfileConnectedAccountsSectionView({
         <ReverificationDialog
           controller={reconnectReverification}
           finalFocus={reconnectFinalFocus}
+        />
+      ) : null}
+      {connectReverification ? (
+        <ReverificationDialog
+          controller={connectReverification}
+          finalFocus={connectFinalFocus}
         />
       ) : null}
     </>

@@ -14,6 +14,7 @@ import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { fill } from '../../localization';
+import { Form } from '../../primitives/form';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 
@@ -102,7 +103,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={form.id}
             onSubmit={form.handleSubmit}
           />
@@ -162,7 +163,6 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
       <Card.Footer>
         <SubmitButton
           form={form.id}
-          fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled
@@ -192,7 +192,7 @@ function CopyKeyStep(props: CreateAPIKeyDialogProps) {
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={formId}
             onSubmit={event => {
               event.preventDefault();
@@ -222,12 +222,7 @@ function CopyKeyStep(props: CreateAPIKeyDialogProps) {
         </Field.Root>
       </Card.Content>
       <Card.Footer>
-        <SubmitButton
-          form={formId}
-          fullWidth
-        >
-          {m.copyAndClose}
-        </SubmitButton>
+        <SubmitButton form={formId}>{m.copyAndClose}</SubmitButton>
       </Card.Footer>
     </>
   );

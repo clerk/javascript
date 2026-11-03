@@ -135,14 +135,10 @@ describe('Combobox', () => {
   });
 
   it('requires an option around the selection indicator', () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    try {
-      expect(() => render(<Combobox.OptionIndicator />)).toThrow(
-        'Combobox.OptionIndicator must be used within Combobox.Option',
-      );
-    } finally {
-      error.mockRestore();
-    }
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() => render(<Combobox.OptionIndicator />)).toThrow(
+      'Combobox.OptionIndicator must be used within Combobox.Option',
+    );
   });
 
   it('measures a custom popup anchor while keeping keyboard focus on the input', async () => {

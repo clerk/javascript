@@ -17,8 +17,12 @@ export function useUserProfilePhoneSectionController({
   onRemovePhone,
   removeReverification,
   setPrimaryReverification,
+  createReverification,
 }: Omit<ReadyPhoneSectionModel, 'status' | 'userId'>): UserProfilePhoneSectionViewProps {
-  const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
+  const verification = useUserProfileAddPhoneController({
+    onCreate: onCreatePhone,
+    reverification: createReverification,
+  });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({

@@ -122,6 +122,20 @@ describe('UserProfileAddPhoneDialog', () => {
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
 
+  it('holds Send code while the phone number is empty', () => {
+    const { props } = renderView({ phoneNumber: '' });
+    expect(screen.getByRole('button', { name: 'Send code' })).toBeDisabled();
+    screen.getByRole('textbox', { name: 'Phone' }).closest('form')?.requestSubmit();
+    expect(props.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('holds Verify until the code is complete', () => {
+    const { props } = renderView({ step: 'verify', code: '123' });
+    expect(screen.getByRole('button', { name: 'Verify', exact: true })).toBeDisabled();
+    screen.getByRole('textbox', { name: 'Verification code' }).closest('form')?.requestSubmit();
+    expect(props.onSubmit).not.toHaveBeenCalled();
+  });
+
   it('blocks submission and resend while verification is pending', async () => {
     const user = userEvent.setup();
     const { props } = renderView({ step: 'verify', code: '123456', isPending: true });
@@ -133,7 +147,7 @@ describe('UserProfileAddPhoneDialog', () => {
     const verify = screen.getByRole('button', { name: 'Verify', exact: true });
     expect(verify).toHaveAttribute('aria-busy', 'true');
     await user.click(verify);
-    await user.click(screen.getByRole('button', { name: 'Didn’t receive a code? Resend' }));
+    await user.click(screen.getByRole('button', { name: 'Resend' }));
 
     expect(props.onSubmit).not.toHaveBeenCalled();
     expect(props.onResend).not.toHaveBeenCalled();
@@ -145,13 +159,15 @@ describe('UserProfileAddPhoneDialog', () => {
     const field = screen.getByRole('textbox', { name: step === 'phone' ? 'Phone' : 'Verification code' });
     expect(field).toHaveAttribute('aria-invalid', 'true');
     const describedControl = step === 'verify' ? screen.getByRole('group', { name: 'Verification code' }) : field;
-    expect(describedControl).toHaveAccessibleDescription('Please try again.');
+    expect(describedControl).toHaveAccessibleDescription(
+      step === 'verify' ? 'Please try again. Didn’t receive a code? Resend' : 'Please try again.',
+    );
   });
 
   it('allows resending only after the countdown and the current request finish', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ step: 'verify', resendSeconds: 12 });
-    await user.click(screen.getByRole('button', { name: 'Didn’t receive a code? Resend (12)' }));
+    await user.click(screen.getByRole('button', { name: 'Resend (12)' }));
     expect(props.onResend).not.toHaveBeenCalled();
 
     rerender(
@@ -162,7 +178,7 @@ describe('UserProfileAddPhoneDialog', () => {
         />
       </MosaicProvider>,
     );
-    await user.click(screen.getByRole('button', { name: 'Didn’t receive a code? Resend' }));
+    await user.click(screen.getByRole('button', { name: 'Resend' }));
     expect(props.onResend).toHaveBeenCalledOnce();
 
     rerender(

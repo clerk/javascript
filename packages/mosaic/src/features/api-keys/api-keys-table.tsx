@@ -2,9 +2,10 @@ import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import type { ReactNode } from 'react';
 
 import { useMessages } from '../../localization';
-import { useAPIKeysTableController } from './api-keys-table.controller';
+import { useAPIKeysTableController, useAPIKeysTableSearchController } from './api-keys-table.controller';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
-import { PAGE_SIZE } from './api-keys-table.model';
+import { PAGE_SIZE, useAPIKeysTableModel } from './api-keys-table.model';
+import { APIKeysTableSkeleton } from './api-keys-table.skeleton';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 import { APIKeysTableView } from './api-keys-table.view';
 
@@ -37,14 +38,14 @@ function SubjectAPIKeysTable({
   fallback,
 }: APIKeysTableProps) {
   const messages = resolveAPIKeysTableMessages(
-    useMessages('apiKeysTable'),
+    useMessages('apiKeys'),
     isOrganizationId(subject) ? 'organization' : 'user',
     overrides,
   );
   const pageSize = perPage !== undefined && Number.isInteger(perPage) && perPage > 0 ? perPage : PAGE_SIZE;
-  const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController({
-    subject,
-    pageSize,
+  const search = useAPIKeysTableSearchController();
+  const model = useAPIKeysTableModel(subject, pageSize, search.query);
+  const { isLoaded, isAvailable, isLoading, manage, ...controller } = useAPIKeysTableController(model, {
     showDescription,
     messages,
   });
@@ -52,12 +53,22 @@ function SubjectAPIKeysTable({
   if (!isLoaded || !isAvailable) {
     return fallback ?? null;
   }
+  if (isLoading) {
+    return (
+      <APIKeysTableSkeleton
+        messages={messages}
+        canManage={Boolean(manage)}
+      />
+    );
+  }
 
   return (
     <APIKeysTableView
       messages={messages}
       pageSize={pageSize}
       {...controller}
+      searchValue={search.searchValue}
+      onSearchChange={search.onSearchChange}
       {...manage}
     />
   );

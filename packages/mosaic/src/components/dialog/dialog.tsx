@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useAccessibleDescriptionWarning } from '../../hooks/use-accessible-description-warning';
 import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
+import { X } from '../../icons/glyphs/x';
 import type {
   DialogFocusTarget,
   DialogHandle,
@@ -15,6 +16,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
+import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';
 import {
@@ -29,6 +31,7 @@ import {
   viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
+import { guardKeyboardFocus } from './keyboard-focus';
 import { acquireKeyboardInset } from './keyboard-inset';
 import { guardKeyboardTouch } from './keyboard-touch';
 
@@ -262,6 +265,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         aria-label={ariaLabel}
         render={props => (
           <Button
+            color='neutral'
             variant='ghost'
             shape='circle'
             size='sm'
@@ -270,7 +274,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         )}
         {...mergeStyleProps(themeProps('dialog-close-button'), stylex.props(xstyle), rest)}
       >
-        <Icon name='x' />
+        <Icon glyph={X} />
       </Primitive.Close>
     </span>
   );
@@ -313,6 +317,7 @@ function Viewport({
   const trackRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => acquireKeyboardInset(), []);
   React.useEffect(() => (trackRef.current ? guardKeyboardTouch(trackRef.current) : undefined), []);
+  React.useEffect(() => (trackRef.current ? guardKeyboardFocus(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
       overlay
@@ -471,7 +476,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Portal>{holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
+    <Primitive.Portal>
+      <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
+        {holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}
+      </ButtonContext.Provider>
+    </Primitive.Portal>
   );
 });
 

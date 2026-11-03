@@ -3,6 +3,7 @@ import type { APIKeysTableMessages, APIKeysTableSubjectKind } from './api-keys-t
 
 export const apiKeysTableMessages = {
   loading: 'Loading API keys',
+  loaded: 'API keys loaded',
   loadError: 'Could not load API keys',
   loadErrorDescription: 'Something went wrong. Please try again.',
   retry: 'Try again',
@@ -68,7 +69,7 @@ export const apiKeysTableMessages = {
 } as const;
 
 export function resolveAPIKeysTableMessages(
-  catalog: MosaicMessages['apiKeysTable'],
+  catalog: MosaicMessages['apiKeys'],
   subjectKind: APIKeysTableSubjectKind,
   overrides?: Partial<APIKeysTableMessages>,
 ): APIKeysTableMessages {

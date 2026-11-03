@@ -146,6 +146,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
 
   const phase = reverificationState.phase;
   useEffect(() => {
+    // eslint-disable-next-line react-you-might-not-need-an-effect/no-event-handler -- Reacts to the Clerk session changing, which happens outside any event handler here.
     if (phase !== 'active') {
       return;
     }

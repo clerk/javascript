@@ -1,9 +1,18 @@
 'use client';
 
-import { type CSSProperties, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { type FirstInputLabel, OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
 import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
 
@@ -55,7 +64,7 @@ const visuallyHiddenInputStyle: CSSProperties = {
   border: 0,
 };
 
-export function OtpRoot(props: OtpProps) {
+export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRoot(props, ref) {
   const {
     render,
     length,
@@ -213,7 +222,7 @@ export function OtpRoot(props: OtpProps) {
 
   const state = { disabled, complete, empty: value.length === 0 };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     role: 'group',
     children: (
       <>
@@ -234,12 +243,13 @@ export function OtpRoot(props: OtpProps) {
         ) : null}
       </>
     ),
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <OtpContext.Provider value={contextValue}>
       {useRender({
         defaultTagName: 'div',
+        ref,
         render,
         state,
         stateAttributesMapping: {
@@ -251,4 +261,4 @@ export function OtpRoot(props: OtpProps) {
       })}
     </OtpContext.Provider>
   );
-}
+});

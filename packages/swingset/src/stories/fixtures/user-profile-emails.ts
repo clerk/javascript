@@ -43,6 +43,7 @@ export function useUserProfileEmailsFixture({
     emails,
     removeReverification: idleReverification,
     setPrimaryReverification: idleReverification,
+    createReverification: idleReverification,
     username,
     ...flow,
     onSetPrimaryEmail: id => {

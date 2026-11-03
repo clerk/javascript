@@ -7,29 +7,26 @@ export function useSwitcherTriggerController({
   kind,
   id,
   sessionId,
-  renderTriggerBadge,
-  renderTriggerLabel,
+  triggerBadge,
+  showTriggerLabel,
 }: {
   kind: 'user' | 'organization' | 'none';
   id: string | undefined;
   sessionId: string;
-  renderTriggerBadge: SwitcherTriggerBadge;
-  renderTriggerLabel: boolean;
+  triggerBadge: SwitcherTriggerBadge;
+  showTriggerLabel: boolean;
 }) {
-  const request = useMemo(() => {
-    const shouldRequestBadge = renderTriggerLabel && kind !== 'none' && id && typeof renderTriggerBadge === 'function';
+  const shouldRequestBadge = showTriggerLabel && typeof triggerBadge === 'function';
+  const request = useMemo(
+    () => (kind !== 'none' && id ? { options: { kind, id }, sessionId } : undefined),
+    [kind, id, sessionId],
+  );
 
-    if (!shouldRequestBadge) {
-      return undefined;
-    }
-
-    return { options: { kind, id }, resolve: renderTriggerBadge, sessionId };
-  }, [kind, id, renderTriggerBadge, renderTriggerLabel, sessionId]);
-
-  const result = useDebouncedAsync(request, async value => value?.resolve(value.options), {
-    delayMs: 0,
-    enabled: request !== undefined,
-  });
+  const result = useDebouncedAsync(
+    request,
+    async value => (value && typeof triggerBadge === 'function' ? triggerBadge(value.options) : undefined),
+    { delayMs: 0, enabled: shouldRequestBadge && request !== undefined },
+  );
 
   return { badge: result.isPending ? undefined : result.data };
 }

@@ -2,10 +2,11 @@ import { useClerk } from '@clerk/shared/react';
 import type { PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { toCountryIso } from '../../../components/phone-input';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import type { UserProfilePhoneVerifier } from '../user-profile-contact.types';
-import { byId, canAddIdentifications, toContactAccess, toContacts } from '../user-profile-contact.utils';
+import { byId, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileAddPhoneField } from './user-profile-add-phone.controller';
 import type { UserProfilePhoneSectionModel } from './user-profile-phone-section.types';
@@ -28,6 +29,9 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
   const [setPrimaryPhone, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
     user.update({ primaryPhoneNumberId: id }),
   );
+  const [createPhone, createReverification] = useReverificationFlow(
+    (currentUser: () => UserResource, phoneNumber: string) => currentUser().createPhoneNumber({ phoneNumber }),
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -37,7 +41,7 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
   const access = toContactAccess(
     attributes.phone_number,
     user.phoneNumbers.length,
-    canAddIdentifications(user, enterpriseSSO.enabled),
+    allowsIdentificationCreation(user, enterpriseSSO),
   );
 
   if (!access.show) {
@@ -51,7 +55,7 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
     defaultPhoneCountry: toCountryIso(clerk.__internal_country),
     onCreatePhone: access.canCreate
       ? async phoneNumber => {
-          const request = currentUser().createPhoneNumber({ phoneNumber });
+          const request = createPhone(currentUser, phoneNumber);
           await save(() => request, ADD_PHONE_FIELDS);
           return toPhoneVerifier(await request);
         }
@@ -61,5 +65,6 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
     onRemovePhone: access.canRemove ? id => saveAsUser(current => removePhone(current, id)) : undefined,
     removeReverification,
     setPrimaryReverification,
+    createReverification,
   };
 }

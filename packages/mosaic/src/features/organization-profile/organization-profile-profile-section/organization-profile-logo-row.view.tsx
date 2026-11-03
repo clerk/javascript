@@ -5,20 +5,14 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { Pen } from '../../../icons/glyphs/pen';
+import { X } from '../../../icons/glyphs/x';
 import type { LocalizableError } from '../../../localization';
 import { useErrorText, useMessages } from '../../../localization';
-import type { FileRejection, FileRejectionReason } from '../../../primitives/file-upload';
+import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
+import { AVATAR_REJECTION_ERRORS, AVATAR_UPLOAD } from '../../../utils/avatar-upload';
 import { useOrganizationProfileLogoController } from './organization-profile-logo.controller';
-
-const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-const LOGO_MAX_BYTES = 10 * 1000 * 1000;
-
-const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
-  accept: { code: 'avatar_file_type_invalid' },
-  size: { code: 'avatar_file_size_exceeded' },
-  overflow: { code: 'avatar_file_count_exceeded' },
-};
 
 interface OrganizationProfileLogoRowViewProps {
   name: string;
@@ -37,11 +31,11 @@ export function OrganizationProfileLogoRowView({
   onReject,
   onRemove,
 }: OrganizationProfileLogoRowViewProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const errorText = useErrorText();
   const logo = useOrganizationProfileLogoController({ onChange, onRemove });
   const [rejection, setRejection] = useState<LocalizableError>();
-  const error = rejection ?? logo.error;
+  const error = rejection ? errorText(rejection) : logo.error;
   const remove = logo.onRemove;
   const handleRemove = remove
     ? () => {
@@ -60,12 +54,11 @@ export function OrganizationProfileLogoRowView({
     <FileUpload.Root
       disabled={logo.isPending}
       aria-busy={logo.isPending || undefined}
-      accept={LOGO_MIME_TYPES}
-      maxSize={LOGO_MAX_BYTES}
+      {...AVATAR_UPLOAD}
       render={<Section.Row />}
       onReject={rejections => {
         const rejected = rejections[0];
-        setRejection(rejected ? REJECTION_ERRORS[rejected.reason] : undefined);
+        setRejection(rejected ? AVATAR_REJECTION_ERRORS[rejected.reason] : undefined);
         onReject?.(rejections);
       }}
       onValueChange={files => {
@@ -99,7 +92,7 @@ export function OrganizationProfileLogoRowView({
           onRemove={handleRemove}
         />
       </Section.Item>
-      <Section.Error>{error ? errorText(error) : undefined}</Section.Error>
+      <Section.Error>{error}</Section.Error>
     </FileUpload.Root>
   );
 }
@@ -111,18 +104,18 @@ function LogoActions({
 }: {
   hasImage: boolean;
   canChange: boolean;
-  onRemove?: () => Promise<void>;
+  onRemove?: () => Promise<unknown>;
 }) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.logo.change, icon: 'pen', onClick: openFilePicker });
+    actions.push({ label: m.logo.change, icon: Pen, onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.logo.remove, icon: 'x', onClick: () => void onRemove() });
+    actions.push({ label: m.logo.remove, icon: X, onClick: () => void onRemove() });
   }
 
   if (actions.length > 0) {

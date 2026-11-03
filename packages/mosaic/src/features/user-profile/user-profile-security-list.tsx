@@ -3,6 +3,7 @@ import type { ReactNode, Ref } from 'react';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { Plus } from '../../icons/glyphs/plus';
 
 export function UserProfileSecurityList({
   sectionRef,
@@ -45,7 +46,7 @@ export function UserProfileSecurityList({
                 onClick={onAdd}
               >
                 <Icon
-                  name='plus'
+                  glyph={Plus}
                   placement='inline-start'
                   size='sm'
                 />

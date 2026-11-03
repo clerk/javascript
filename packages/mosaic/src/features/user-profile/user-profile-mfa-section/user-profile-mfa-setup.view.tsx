@@ -1,4 +1,7 @@
-import { Flow } from '../../../components/flow';
+import { useMergeRefs } from '@floating-ui/react';
+import type { Ref } from 'react';
+
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 import type { UserProfileAddAuthenticatorViewProps } from './user-profile-add-authenticator.view';
@@ -14,19 +17,19 @@ import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.typ
 export interface UserProfileMfaSetupViewProps extends UserProfileAddMfaViewProps {
   step: UserProfileMfaAddableMethod | 'select' | 'verify';
   reverification: ReverificationController;
+  initialFocusRef?: Ref<HTMLElement>;
+  onReverificationClose?: () => void;
   sms: UserProfileAddSmsViewProps;
-  authenticator: Omit<UserProfileAddAuthenticatorViewProps, 'onBack'>;
+  authenticator?: Omit<UserProfileAddAuthenticatorViewProps, 'onBack'>;
   backupCodes: Omit<UserProfileBackupCodesViewProps, 'onCancel'>;
   onBack: () => void;
   onCancel: () => void;
 }
 
 export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
-  const step = props.step === 'authenticator' && props.authenticator.setup ? 'authenticator-verify' : props.step;
-
   return (
     <Flow.Root
-      value={step}
+      value={props.step}
       direction={props.step === 'select' ? -1 : 1}
       state={props}
     >
@@ -35,6 +38,8 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
           <Flow.Step ids={['select']}>
             <UserProfileAddMfaView
               methods={current.methods}
+              pendingMethod={current.pendingMethod}
+              errorMessage={current.errorMessage}
               onSelect={current.onSelect}
             />
           </Flow.Step>
@@ -42,16 +47,12 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
             <UserProfileAddSmsView {...current.sms} />
           </Flow.Step>
           <Flow.Step ids={['authenticator']}>
-            <UserProfileAddAuthenticatorView
-              {...current.authenticator}
-              onBack={current.onBack}
-            />
-          </Flow.Step>
-          <Flow.Step ids={['authenticator-verify']}>
-            <UserProfileAddAuthenticatorView
-              {...current.authenticator}
-              onBack={current.onBack}
-            />
+            {current.authenticator ? (
+              <UserProfileAddAuthenticatorView
+                {...current.authenticator}
+                onBack={current.onBack}
+              />
+            ) : null}
           </Flow.Step>
           <Flow.Step ids={['backup-codes']}>
             <UserProfileBackupCodesView
@@ -60,10 +61,30 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
             />
           </Flow.Step>
           <Flow.Step ids={['verify']}>
-            <Reverification controller={current.reverification} />
+            <ReverifyStep
+              controller={current.reverification}
+              initialFocusRef={current.initialFocusRef}
+              onClose={current.onReverificationClose}
+            />
           </Flow.Step>
         </>
       )}
     </Flow.Root>
+  );
+}
+
+function ReverifyStep(props: {
+  controller: ReverificationController;
+  initialFocusRef?: Ref<HTMLElement>;
+  onClose?: () => void;
+}) {
+  const flowFocusRef = useFlowAutoFocus<HTMLElement>();
+  const initialFocusRef = useMergeRefs([flowFocusRef, props.initialFocusRef]);
+
+  return (
+    <Reverification
+      {...props}
+      initialFocusRef={initialFocusRef}
+    />
   );
 }

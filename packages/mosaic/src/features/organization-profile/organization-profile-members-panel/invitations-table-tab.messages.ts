@@ -8,6 +8,7 @@ export const invitationsTableTabMessages = {
   noInvitations: 'No pending invitations',
   noInvitationsDescription: 'Invite people to add them to this organization.',
   loading: 'Loading invitations',
+  loaded: 'Invitations loaded',
   loadError: 'Unable to load invitations',
   retry: 'Try again',
   selectAll: 'Select all invitations on this page',

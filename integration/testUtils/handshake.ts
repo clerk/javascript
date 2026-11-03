@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto';
+
 // @ts-ignore ignore types
 import jwt from 'jsonwebtoken';
-// @ts-ignore ignore types
-import * as uuid from 'uuid';
 
 const rsaPairs = {
   a: {
@@ -77,10 +77,10 @@ t5o8u/dlwJ1fGGday48gs/hA4V/F9zDjecNkYWUB/wUwVStqZljn
 const allConfigs: any = [];
 
 export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'live'; matchedKeys?: boolean }) {
-  const ins_id = uuid.v4();
-  const pkHost = `clerk.${uuid.v4()}.com`;
+  const ins_id = randomUUID();
+  const pkHost = `clerk.${randomUUID()}.com`;
   const pk = `pk_${mode}_${btoa(`${pkHost}$`)}`;
-  const sk = `sk_${mode}_${uuid.v4()}`;
+  const sk = `sk_${mode}_${randomUUID()}`;
   const rsa = matchedKeys
     ? rsaPairs.a
     : {

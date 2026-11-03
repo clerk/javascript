@@ -1,6 +1,10 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Tooltip } from '@clerk/mosaic/components/tooltip';
+import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
+import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
+import { MagnifyingGlass } from '@clerk/mosaic/icons/glyphs/magnifying-glass';
+import { Pen } from '@clerk/mosaic/icons/glyphs/pen';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -21,7 +25,7 @@ export function Default() {
         <Tooltip.Popup>
           Tooltip
           <Icon
-            name='checkmark'
+            glyph={Checkmark}
             size='sm'
           />
         </Tooltip.Popup>
@@ -89,7 +93,7 @@ export function Group() {
                 aria-label='Edit'
                 {...props}
               >
-                <Icon name='pen' />
+                <Icon glyph={Pen} />
               </Button>
             )}
           />
@@ -104,7 +108,7 @@ export function Group() {
                 aria-label='Search'
                 {...props}
               >
-                <Icon name='magnifying-glass' />
+                <Icon glyph={MagnifyingGlass} />
               </Button>
             )}
           />
@@ -119,7 +123,7 @@ export function Group() {
                 aria-label='Settings'
                 {...props}
               >
-                <Icon name='cog-6-teeth' />
+                <Icon glyph={Cog6Teeth} />
               </Button>
             )}
           />

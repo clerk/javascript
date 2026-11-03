@@ -1,9 +1,16 @@
+import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import { Flow } from '../../components/flow';
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Envelope } from '../../icons/glyphs/envelope';
+import { Key } from '../../icons/glyphs/key';
+import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
+import { SecurityPasskey } from '../../icons/glyphs/security-passkey';
+import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import type { MosaicMessages } from '../../localization';
-import { fill, useMessages } from '../../localization';
+import { fill, rich, useMessages } from '../../localization';
+import { tabularNumbersStyle } from '../../styles/typography.styles';
 import { ReverificationBackupCode } from '../reverification/steps/reverification-backup-code';
 import { ReverificationHelp } from '../reverification/steps/reverification-help';
 import { ReverificationMethodPicker } from '../reverification/steps/reverification-method-picker';
@@ -16,13 +23,13 @@ import { SignUpDetailsStep } from './steps/sign-up-details';
 type Messages = MosaicMessages['signIn'];
 
 const methodIcon = {
-  password: 'security-lock-square',
-  passkey: 'security-passkey',
-  email_code: 'envelope',
-  phone_code: 'security-phone',
-  totp: 'security-lock-square',
-  backup_code: 'key',
-} as const satisfies Record<SignInMethod['strategy'], IconName>;
+  password: SecurityLockSquare,
+  passkey: SecurityPasskey,
+  email_code: Envelope,
+  phone_code: SecurityPhone,
+  totp: SecurityLockSquare,
+  backup_code: Key,
+} as const satisfies Record<SignInMethod['strategy'], IconComponent>;
 
 function methodLabel(method: SignInMethod, m: Messages): string {
   const identifier = 'identifier' in method ? method.identifier : '';
@@ -84,11 +91,21 @@ export function SignInView({
     pendingLabel: m.verifying,
   };
   const hasAlternatives = methods.length > 0;
-  const resendLabel = m.emailCode.resendButton;
   const resend =
     otpChannel === 'email' || otpChannel === 'phone'
       ? {
-          label: resendRemainingSeconds ? `${resendLabel} (${resendRemainingSeconds})` : resendLabel,
+          text: m.emailCode.resendText,
+          label: resendRemainingSeconds ? (
+            <span>
+              {rich(m.emailCode.resendCountdown, {
+                values: {
+                  seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
+                },
+              })}
+            </span>
+          ) : (
+            m.emailCode.resend
+          ),
           disabled: !canResend || isPending,
           onClick: onResend,
         }

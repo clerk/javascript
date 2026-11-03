@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useRef } from 'react';
 
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { useUserProfileMfaController } from './user-profile-mfa-section.controller';
@@ -33,7 +33,7 @@ export function mfaSectionNode(model: UserProfileMfaModel, fallback: ReactNode =
 
 function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'ready' }> }) {
   const controller = useUserProfileMfaController(model);
-
+  const initialFocusRef = useRef<HTMLElement>(null);
   return (
     <UserProfileMfaSectionView
       {...controller.sectionProps}
@@ -41,12 +41,22 @@ function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'r
         controller.showAddControl ? (
           <UserProfileAddMfaDialog
             open={controller.dialogOpen}
+            disabled={controller.isPending}
             onOpenChange={controller.onDialogOpenChange}
             hideTrigger={!controller.showAddTrigger}
             reverifying={controller.reverifying}
             showCloseButton={controller.showCloseButton}
+            initialFocus={
+              controller.reverifying && controller.setupProps.reverification.status !== 'error'
+                ? initialFocusRef
+                : undefined
+            }
           >
-            <UserProfileMfaSetupView {...controller.setupProps} />
+            <UserProfileMfaSetupView
+              {...controller.setupProps}
+              initialFocusRef={initialFocusRef}
+              onReverificationClose={() => controller.onDialogOpenChange(false)}
+            />
           </UserProfileAddMfaDialog>
         ) : undefined
       }

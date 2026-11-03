@@ -4,7 +4,9 @@ import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
 import { useEffect, useMemo, useRef } from 'react';
 
+import { getNativeAppIdentity } from '../app-version/nativeAppIdentity';
 import type { TokenCache } from '../cache/types';
+import { UpdateRequiredModal } from '../update-required/UpdateRequiredModal';
 import { ClerkExpoModule } from '../utils/native-module';
 import { isNative, isWeb } from '../utils/runtime';
 import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
@@ -50,6 +52,12 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_disableNativeClientSync?: boolean;
+  /**
+   * Shows an update screen over your app on iOS and Android when its version is older than the minimum set in the Clerk Dashboard. The screen covers the whole app and can't be dismissed until the user updates. Set this to `false` to show your own UI from `useAppVersionSupport()` instead.
+   *
+   * @default true
+   */
+  updateRequiredViewEnabled?: boolean;
 };
 
 const SDK_METADATA = {
@@ -68,6 +76,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     experimental,
     __experimental_resourceCache,
     __experimental_disableNativeClientSync = false,
+    updateRequiredViewEnabled = true,
     ...rest
   } = props;
   const pk = publishableKey;
@@ -75,8 +84,19 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   const tokenCacheRef = useRef(tokenCache);
   tokenCacheRef.current = tokenCache;
   const nativeProxyUrl = typeof proxyUrl === 'string' && proxyUrl ? proxyUrl : null;
+  const nativeUpdateRequiredViewEnabledRef = useRef(true);
+  nativeUpdateRequiredViewEnabledRef.current = updateRequiredViewEnabled && !getNativeAppIdentity();
   const nativeClientSync = useMemo(
-    () => (nativeModule ? createNativeClientSync(nativeModule, pk, nativeProxyUrl, () => tokenCacheRef.current) : null),
+    () =>
+      nativeModule
+        ? createNativeClientSync(
+            nativeModule,
+            pk,
+            nativeProxyUrl,
+            () => tokenCacheRef.current,
+            () => nativeUpdateRequiredViewEnabledRef.current,
+          )
+        : null,
     [nativeModule, pk, nativeProxyUrl],
   );
 
@@ -127,6 +147,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       }}
     >
       {children}
+      {isNative() && updateRequiredViewEnabled && <UpdateRequiredModal />}
     </ClerkReactProvider>
   );
 }

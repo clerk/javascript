@@ -8,6 +8,12 @@ We follow [Write tests. Not too many. Mostly integration.](https://kentcdodds.co
   a user. Past that point, tests cost more than they return.
 - **Don't test implementation details.** A test that breaks on a refactor that
   keeps the behavior is testing the wrong thing.
+- **A test fails if, and only if, the feature stops doing what it is for.**
+  Before writing or reviewing a test, ask "when will this fail?". If the answer
+  includes a refactor that keeps the behavior, a renamed helper, or something
+  the test doesn't control, such as real network or timing, the test is wrong.
+  See
+  [The Golden Rule of Assertions](https://www.epicweb.dev/the-golden-rule-of-assertions).
 - **Static checks come first.** TypeScript and ESLint catch typos and shape
   errors, so tests don't need to.
 
@@ -89,13 +95,18 @@ Existing tests that break these rules move when their folder next changes.
 pnpm --filter @clerk/mosaic test                      # unit tests (jsdom and primitives)
 pnpm --filter @clerk/mosaic test:feature              # feature tests (Chromium)
 pnpm --filter @clerk/mosaic test:feature user-button  # one feature
+pnpm --filter @clerk/mosaic test:browser              # layout tests (Chromium)
 pnpm --filter @clerk/mosaic exec vitest run           # every project
 ```
 
 CI runs feature tests in their own `Mosaic Feature Tests` job, so the repo-wide
 unit test job never needs a browser.
 
-Feature tests need Chromium: run `pnpm playwright install chromium` once. They
+jsdom and happy-dom have no layout engine, so every rect is 0 and a test that
+asserts on position, size or scrolling always passes there. Name such a test
+`*.browser.test.tsx` so it runs in Chromium, in the same CI job.
+
+Feature and browser tests need Chromium: run `pnpm playwright install chromium` once. They
 import the built `@clerk/clerk-js`, so run `pnpm turbo build --filter=@clerk/clerk-js`
 after changing it. Failure screenshots land in `packages/mosaic/.vitest/`.
 Console output from passing tests only shows with `--reporter=verbose`.
@@ -167,6 +178,9 @@ in [Test placement](#test-placement).
   `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
   `{ clerk, navigate, rerender, ... }`.
   `navigate` is the router Clerk was loaded with, called with the path.
+  It loads Clerk with `standardBrowser: false`. A test's Clerk is never
+  disposed, and its cookie service would otherwise write cookies into later
+  tests.
 
 The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the
 window. Before each test it moves FAPI to a new host, so a request a previous

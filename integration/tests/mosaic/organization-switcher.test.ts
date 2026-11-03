@@ -86,13 +86,15 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })(
     });
 
     test('renders a custom page inside the OrganizationProfile modal', async ({ page, context }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
       await signIn({ page, context });
 
       await trigger(page).click();
       await popup(page).getByRole('button', { name: 'Settings' }).click();
 
-      const profile = page.locator('.cl-organizationProfile-root');
-      await profile.getByText('Custom page').click();
+      await expect(page.getByRole('tab', { name: 'General', exact: true })).toHaveAttribute('aria-selected', 'true');
+      await expect(page.locator('.cl-organizationProfile-root')).toHaveCount(0);
+      await page.getByRole('tab', { name: 'Custom page', exact: true }).click();
       await expect(page.getByText('custom-page-content')).toBeVisible();
     });
   },
