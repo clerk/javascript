@@ -8,6 +8,7 @@ import type {
 import { createContext, type CSSProperties, useContext } from 'react';
 
 import type { TransitionProps } from '../hooks/use-transition';
+import type { Store } from '../utils';
 
 export interface AutocompleteContextValue {
   open: boolean;
@@ -19,7 +20,6 @@ export interface AutocompleteContextValue {
   placement: Placement;
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
-  getItemProps: UseInteractionsReturn['getItemProps'];
   activeIndex: number | null;
   selectedIndex: number | null;
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
@@ -30,7 +30,6 @@ export interface AutocompleteContextValue {
   setInlineMode: React.Dispatch<React.SetStateAction<boolean>>;
   handleSelect: (value: string, index: number, label: string) => void;
   handleInputChange: (value: string) => void;
-  registerSelectedIndex: (index: number, value: string) => void;
   mounted: boolean;
   transitionProps: TransitionProps;
 }
@@ -41,6 +40,30 @@ export function useAutocompleteContext() {
   const ctx = useContext(AutocompleteContext);
   if (!ctx) {
     throw new Error('Autocomplete compound components must be used within <Autocomplete>');
+  }
+  return ctx;
+}
+
+export interface AutocompleteHighlight {
+  activeIndex: number | null;
+  selectedValue: string | undefined;
+}
+
+export interface AutocompleteOptionsContextValue {
+  store: Store<AutocompleteHighlight>;
+  getItemProps: UseInteractionsReturn['getItemProps'];
+  handleSelect: (value: string, index: number, label: string) => void;
+  refs: ExtendedRefs<ReferenceType>;
+  valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
+  registerSelectedIndex: (index: number, selected: boolean) => void;
+}
+
+export const AutocompleteOptionsContext = createContext<AutocompleteOptionsContextValue | null>(null);
+
+export function useAutocompleteOptionsContext() {
+  const ctx = useContext(AutocompleteOptionsContext);
+  if (!ctx) {
+    throw new Error('Autocomplete.Option must be used within <Autocomplete>');
   }
   return ctx;
 }

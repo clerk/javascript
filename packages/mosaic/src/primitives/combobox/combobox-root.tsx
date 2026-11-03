@@ -17,12 +17,19 @@ import {
   useListNavigation,
   useRole,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
-import { ComboboxContext, type ComboboxContextValue } from './combobox-context';
+import { createStore } from '../utils/store';
+import {
+  ComboboxContext,
+  type ComboboxContextValue,
+  type ComboboxHighlight,
+  ComboboxOptionsContext,
+  type ComboboxOptionsContextValue,
+} from './combobox-context';
 
 export interface ComboboxProps {
   /** Controlled input text. */
@@ -115,17 +122,19 @@ function ComboboxInner(props: ComboboxProps) {
       setActiveIndex(0);
     }
   }, []);
-  const registerSelectedIndex = useCallback(
-    (index: number, value: string, label: string) => {
-      labelsByValueRef.current.set(value, label);
-      if (value === selectedValue) {
-        setSelectedIndex(index);
-        return () => setSelectedIndex(current => (current === index ? null : current));
-      }
+  const registerSelectedIndex = useCallback((index: number, value: string, label: string, selected: boolean) => {
+    labelsByValueRef.current.set(value, label);
+    if (!selected) {
       return undefined;
-    },
-    [selectedValue],
-  );
+    }
+    setSelectedIndex(index);
+    return () => setSelectedIndex(current => (current === index ? null : current));
+  }, []);
+
+  const [store] = useState(() => createStore<ComboboxHighlight>({ activeIndex, selectedValue }));
+  useLayoutEffect(() => {
+    store.set({ activeIndex, selectedValue });
+  }, [store, activeIndex, selectedValue]);
 
   const previousOpenRef = useRef(open);
   useEffect(() => {
@@ -251,7 +260,6 @@ function ComboboxInner(props: ComboboxProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       selectedIndex,
       elementsRef,
@@ -266,8 +274,6 @@ function ComboboxInner(props: ComboboxProps) {
       setOpen,
       focusInput,
       popupId,
-      registerSelectedIndex,
-      registerOption,
       mounted,
       transitionProps,
     }),
@@ -282,7 +288,6 @@ function ComboboxInner(props: ComboboxProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       selectedIndex,
       handleSelect,
@@ -290,16 +295,21 @@ function ComboboxInner(props: ComboboxProps) {
       setOpen,
       focusInput,
       popupId,
-      registerSelectedIndex,
-      registerOption,
       mounted,
       transitionProps,
     ],
   );
 
+  const optionsContextValue = useMemo<ComboboxOptionsContextValue>(
+    () => ({ store, getItemProps, handleSelect, refs, valuesByIndexRef, registerSelectedIndex, registerOption }),
+    [store, getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+  );
+
   return (
     <FloatingNode id={nodeId}>
-      <ComboboxContext.Provider value={contextValue}>{children}</ComboboxContext.Provider>
+      <ComboboxContext.Provider value={contextValue}>
+        <ComboboxOptionsContext.Provider value={optionsContextValue}>{children}</ComboboxOptionsContext.Provider>
+      </ComboboxContext.Provider>
     </FloatingNode>
   );
 }

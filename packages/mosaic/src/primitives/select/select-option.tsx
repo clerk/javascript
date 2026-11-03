@@ -3,8 +3,8 @@
 import { useListItem } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { useSelectContext } from './select-context';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender, useStore } from '../utils';
+import { useSelectOptionsContext } from './select-context';
 
 export interface SelectOptionProps extends ComponentProps<'button'> {
   value: string;
@@ -14,22 +14,15 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
 
 export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function SelectOption(props, ref) {
   const { render, value, label, disabled, ...otherProps } = props;
-  const {
-    activeIndex,
-    selectedValues,
-    setSelectedIndex,
-    getItemProps,
-    handleSelect,
-    valueToLabelRef,
-    selectedItemRef,
-  } = useSelectContext();
+  const { store, setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
+    useSelectOptionsContext();
 
   const displayLabel = label ?? value;
   const { ref: itemRef, index } = useListItem({ label: displayLabel });
 
-  const isSelected = selectedValues.includes(value);
-  const isAnchor = selectedValues[selectedValues.length - 1] === value;
-  const isActive = activeIndex === index;
+  const isSelected = useStore(store, state => state.selectedValues.includes(value));
+  const isAnchor = useStore(store, state => state.selectedValues.at(-1) === value);
+  const isActive = useStore(store, state => state.activeIndex === index);
 
   useEffect(() => {
     const map = valueToLabelRef.current;

@@ -1,5 +1,7 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
+import { createStore } from '../utils/store';
+
 export type ToastPriority = 'low' | 'high';
 
 export type ToastSide = 'top' | 'bottom' | 'left' | 'right';
@@ -100,50 +102,48 @@ function resolvePromiseResult<Value>(result: ToastPromiseResult<Value>, value: V
  * create one yourself and pass it as `toastManager` to add toasts outside React.
  */
 export function createToastManager(): ExternalToastManager {
-  let toasts: ToastObject[] = [];
-  const listeners = new Set<() => void>();
-
-  const set = (next: ToastObject[]) => {
-    toasts = next;
-    for (const listener of listeners) {
-      listener();
-    }
-  };
+  const store = createStore<ToastObject[]>([]);
 
   const manager: ExternalToastManager = {
     add: options => {
       toastCounter += 1;
       const id = options.id ?? `toast-${toastCounter}`;
-      const open = toasts.find(t => t.id === id && isActive(t));
+      const open = store.get().find(t => t.id === id && isActive(t));
       if (open) {
-        set(toasts.map(t => (t === open ? { ...t, ...options, id, repeatCount: (t.repeatCount ?? 0) + 1 } : t)));
+        store.set(
+          store.get().map(t => (t === open ? { ...t, ...options, id, repeatCount: (t.repeatCount ?? 0) + 1 } : t)),
+        );
         return id;
       }
-      const replaced = toasts.find(t => t.id === id);
-      set([{ ...options, id, transitionStatus: 'starting' }, ...toasts.filter(t => t !== replaced)]);
+      const replaced = store.get().find(t => t.id === id);
+      store.set([{ ...options, id, transitionStatus: 'starting' }, ...store.get().filter(t => t !== replaced)]);
       replaced?.onRemove?.();
       return id;
     },
     close: id => {
-      const closing = toasts.filter(t => isActive(t) && (id === undefined || t.id === id));
+      const closing = store.get().filter(t => isActive(t) && (id === undefined || t.id === id));
       if (closing.length === 0) {
         return;
       }
-      set(toasts.map(t => (closing.includes(t) ? { ...t, transitionStatus: 'ending' } : t)));
+      store.set(store.get().map(t => (closing.includes(t) ? { ...t, transitionStatus: 'ending' } : t)));
       for (const toast of closing) {
         toast.onClose?.();
       }
     },
     remove: id => {
-      const toast = toasts.find(t => t.id === id);
+      const toast = store.get().find(t => t.id === id);
       if (!toast) {
         return;
       }
-      set(toasts.filter(t => t !== toast));
+      store.set(store.get().filter(t => t !== toast));
       toast.onRemove?.();
     },
     update: (id, options) => {
-      set(toasts.map(t => (t.id === id ? { ...t, ...(typeof options === 'function' ? options(t) : options), id } : t)));
+      store.set(
+        store
+          .get()
+          .map(t => (t.id === id ? { ...t, ...(typeof options === 'function' ? options(t) : options), id } : t)),
+      );
     },
     promise: (promise, options) => {
       const id = manager.add({ timeout: 0, type: 'loading', ...resolvePromiseResult(options.loading, undefined) });
@@ -159,17 +159,12 @@ export function createToastManager(): ExternalToastManager {
       );
     },
     setHeight: (id, height) => {
-      if (toasts.some(t => t.id === id && t.height !== height)) {
-        set(toasts.map(t => (t.id === id ? { ...t, height } : t)));
+      if (store.get().some(t => t.id === id && t.height !== height)) {
+        store.set(store.get().map(t => (t.id === id ? { ...t, height } : t)));
       }
     },
-    subscribe: listener => {
-      listeners.add(listener);
-      return () => {
-        listeners.delete(listener);
-      };
-    },
-    getSnapshot: () => toasts,
+    subscribe: store.subscribe,
+    getSnapshot: store.get,
   };
 
   return manager;

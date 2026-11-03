@@ -3,6 +3,7 @@ export { canScrollToward, isElement, isHTMLElement, opensKeyboard } from './dom'
 export { Freeze, type FreezeProps } from './freeze';
 export { isHoverOpen, isKeyboardEvent, isKeyboardOpen } from './interaction-modality';
 export { resolveSideOffset, type SideOffset } from './side-offset';
+export { createStore, type Store, useStore } from './store';
 export {
   type ComponentProps,
   type DefaultProps,

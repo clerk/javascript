@@ -1358,3 +1358,45 @@ describe('Autocomplete', () => {
     });
   });
 });
+
+describe('Autocomplete option renders', () => {
+  it('re-renders only the options whose highlight changes', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    render(
+      <Autocomplete.Root defaultOpen>
+        <Autocomplete.Input placeholder='Search fruits...' />
+        <Autocomplete.Positioner>
+          <Autocomplete.Popup>
+            {fruits.map(f => (
+              <Autocomplete.Option
+                key={f.value}
+                value={f.value}
+                label={f.label}
+                render={props => {
+                  renders.push(f.value);
+                  return <div {...props} />;
+                }}
+              >
+                {f.label}
+              </Autocomplete.Option>
+            ))}
+          </Autocomplete.Popup>
+        </Autocomplete.Positioner>
+      </Autocomplete.Root>,
+    );
+    await user.click(screen.getByPlaceholderText('Search fruits...'));
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('data-active');
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['apple', 'banana']));
+
+    renders.length = 0;
+    await user.hover(screen.getByRole('option', { name: 'Date' }));
+    expect(screen.getByRole('option', { name: 'Date' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'date']));
+  });
+});

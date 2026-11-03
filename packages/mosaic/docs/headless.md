@@ -138,6 +138,12 @@ Any new part with an exit transition needs one of the two;
 animated element). Add `cssVars()` to floating-ui middleware **after** `arrow()`,
 or the transform origin won't follow the arrow.
 
+When many parts read one value that changes often (the highlighted option in a
+long list), keep it in a `createStore` and read it with
+`useStore(store, selector)`, so only the parts whose selected value changed
+re-render. Context re-renders every consumer. `primitives/combobox` is the
+example.
+
 ## Reading direction
 
 Read the direction with `useDirection()` from `primitives/direction-provider`, never from the DOM

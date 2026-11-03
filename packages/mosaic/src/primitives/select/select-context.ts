@@ -8,6 +8,7 @@ import type {
 import { createContext, type CSSProperties, type RefObject, useContext } from 'react';
 
 import type { TransitionProps } from '../hooks/use-transition';
+import type { Store } from '../utils';
 
 export interface SelectItem {
   label: string;
@@ -23,7 +24,6 @@ export interface SelectContextValue {
   placement: Placement;
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
-  getItemProps: UseInteractionsReturn['getItemProps'];
   activeIndex: number | null;
   setActiveIndex: React.Dispatch<React.SetStateAction<number | null>>;
   selectedIndex: number | null;
@@ -56,6 +56,30 @@ export function useSelectContext() {
   const ctx = useContext(SelectContext);
   if (!ctx) {
     throw new Error('Select compound components must be used within <Select.Root>');
+  }
+  return ctx;
+}
+
+export interface SelectHighlight {
+  activeIndex: number | null;
+  selectedValues: string[];
+}
+
+export interface SelectOptionsContextValue {
+  store: Store<SelectHighlight>;
+  getItemProps: UseInteractionsReturn['getItemProps'];
+  handleSelect: (value: string, index: number) => void;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  valueToLabelRef: React.MutableRefObject<Map<string, string>>;
+  selectedItemRef: React.MutableRefObject<HTMLElement | null>;
+}
+
+export const SelectOptionsContext = createContext<SelectOptionsContextValue | null>(null);
+
+export function useSelectOptionsContext() {
+  const ctx = useContext(SelectOptionsContext);
+  if (!ctx) {
+    throw new Error('Select.Option must be used within <Select.Root>');
   }
   return ctx;
 }

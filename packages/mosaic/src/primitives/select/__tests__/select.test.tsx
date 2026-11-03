@@ -1077,3 +1077,58 @@ describe('Select.Group', () => {
     expect(() => render(<Select.GroupLabel>Fruits</Select.GroupLabel>)).toThrow(/within <Select.Group>/);
   });
 });
+
+describe('Select option renders', () => {
+  it('re-renders only the options whose highlight or selection changes', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    const options = [...fruits, { label: 'Date', value: 'date' }];
+    render(
+      <Select.Root
+        items={options}
+        alignItemWithTrigger={false}
+        multiple
+        defaultValue={['banana']}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            {options.map(({ label, value }) => (
+              <Select.Option
+                key={value}
+                value={value}
+                label={label}
+                render={props => {
+                  renders.push(value);
+                  return (
+                    <button
+                      type='button'
+                      {...props}
+                    />
+                  );
+                }}
+              >
+                {label}
+              </Select.Option>
+            ))}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
+
+    renders.length = 0;
+    await user.keyboard('{Enter}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
+  });
+});

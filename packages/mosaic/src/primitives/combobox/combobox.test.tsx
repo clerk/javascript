@@ -612,3 +612,56 @@ describe('Combobox', () => {
     });
   });
 });
+
+describe('Combobox option renders', () => {
+  it('re-renders only the options whose highlight changes', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    function Fixture({ value }: { value: string }) {
+      return (
+        <Combobox.Root value={value}>
+          <Combobox.Input aria-label='Fruit' />
+          <Combobox.Trigger aria-label='Show fruits' />
+          <Combobox.Positioner>
+            <Combobox.Popup>
+              {fruits.map(fruit => (
+                <Combobox.Option
+                  key={fruit.value}
+                  value={fruit.value}
+                  label={fruit.label}
+                  render={props => {
+                    renders.push(fruit.value);
+                    return <div {...props} />;
+                  }}
+                >
+                  {fruit.label}
+                </Combobox.Option>
+              ))}
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Root>
+      );
+    }
+    const { rerender } = render(<Fixture value='banana' />);
+    await user.click(screen.getByRole('button', { name: 'Show fruits' }));
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+    expect(screen.getByRole('combobox')).toHaveAttribute(
+      'aria-activedescendant',
+      screen.getByRole('option', { name: 'Cherry' }).id,
+    );
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
+
+    renders.length = 0;
+    await user.hover(screen.getByRole('option', { name: 'Apple' }));
+    expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['cherry', 'apple']));
+
+    rerender(<Fixture value='cherry' />);
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+  });
+});

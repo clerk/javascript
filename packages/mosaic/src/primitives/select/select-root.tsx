@@ -20,14 +20,22 @@ import {
   useRole,
   useTypeahead,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
+import { createStore } from '../utils/store';
 import { alignSelectedItem } from './align-selected-item';
-import { SelectContext, type SelectContextValue, type SelectItem } from './select-context';
+import {
+  SelectContext,
+  type SelectContextValue,
+  type SelectHighlight,
+  type SelectItem,
+  SelectOptionsContext,
+  type SelectOptionsContextValue,
+} from './select-context';
 
 export type { SelectItem } from './select-context';
 
@@ -99,6 +107,11 @@ function SelectInner(props: SelectProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<string, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const [store] = useState(() => createStore<SelectHighlight>({ activeIndex, selectedValues }));
+  useLayoutEffect(() => {
+    store.set({ activeIndex, selectedValues });
+  }, [store, activeIndex, selectedValues]);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
@@ -186,9 +199,8 @@ function SelectInner(props: SelectProps) {
   const handleSelect = useCallback(
     (value: string, index: number) => {
       if (multiple) {
-        const next = selectedValues.includes(value)
-          ? selectedValues.filter(selected => selected !== value)
-          : [...selectedValues, value];
+        const current = store.get().selectedValues;
+        const next = current.includes(value) ? current.filter(selected => selected !== value) : [...current, value];
         setSelectedValues(next);
         onMultipleValueChange?.(next);
         if (next.length === 0) {
@@ -211,15 +223,7 @@ function SelectInner(props: SelectProps) {
         handleOpenChange(false);
       }
     },
-    [
-      multiple,
-      selectedValues,
-      isControlled,
-      setSelectedValues,
-      handleOpenChange,
-      onSingleValueChange,
-      onMultipleValueChange,
-    ],
+    [store, multiple, isControlled, setSelectedValues, handleOpenChange, onSingleValueChange, onMultipleValueChange],
   );
 
   const handleTypeaheadMatch = useCallback(
@@ -268,7 +272,6 @@ function SelectInner(props: SelectProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       setActiveIndex,
       selectedIndex,
@@ -298,7 +301,6 @@ function SelectInner(props: SelectProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       setActiveIndex,
       selectedIndex,
@@ -315,9 +317,16 @@ function SelectInner(props: SelectProps) {
     ],
   );
 
+  const optionsContextValue = useMemo<SelectOptionsContextValue>(
+    () => ({ store, getItemProps, handleSelect, setSelectedIndex, valueToLabelRef, selectedItemRef }),
+    [store, getItemProps, handleSelect],
+  );
+
   return (
     <FloatingNode id={nodeId}>
-      <SelectContext.Provider value={contextValue}>{children}</SelectContext.Provider>
+      <SelectContext.Provider value={contextValue}>
+        <SelectOptionsContext.Provider value={optionsContextValue}>{children}</SelectOptionsContext.Provider>
+      </SelectContext.Provider>
     </FloatingNode>
   );
 }

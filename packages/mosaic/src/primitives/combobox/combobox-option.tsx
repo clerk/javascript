@@ -3,8 +3,8 @@
 import { useListItem } from '@floating-ui/react';
 import React, { useEffect, useId } from 'react';
 
-import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender } from '../utils';
-import { useComboboxContext } from './combobox-context';
+import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender, useStore } from '../utils';
+import { useComboboxOptionsContext } from './combobox-context';
 import { ComboboxOptionContext } from './combobox-option-context';
 
 export interface ComboboxOptionProps extends ComponentProps<'div'> {
@@ -16,36 +16,28 @@ export interface ComboboxOptionProps extends ComponentProps<'div'> {
 export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionProps>(
   function ComboboxOption(props, ref) {
     const { render, value, label, disabled, ...otherProps } = props;
-    const {
-      activeIndex,
-      selectedValue,
-      getItemProps,
-      handleSelect,
-      valuesByIndexRef,
-      registerSelectedIndex,
-      registerOption,
-      refs,
-    } = useComboboxContext();
+    const { store, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, registerOption, refs } =
+      useComboboxOptionsContext();
 
     const id = useId();
     const displayLabel = label ?? value;
     const { ref: itemRef, index } = useListItem({ label: displayLabel });
 
-    const isSelected = selectedValue === value;
-    const isActive = activeIndex === index;
+    const isSelected = useStore(store, state => state.selectedValue === value);
+    const isActive = useStore(store, state => state.activeIndex === index);
 
     useEffect(() => {
       const map = valuesByIndexRef.current;
       if (!disabled) {
         map.set(index, value);
       }
-      const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel);
+      const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel, isSelected);
       registerOption(index);
       return () => {
         map.delete(index);
         unregisterSelectedIndex?.();
       };
-    }, [index, value, displayLabel, disabled, valuesByIndexRef, registerSelectedIndex, registerOption]);
+    }, [index, value, displayLabel, disabled, isSelected, valuesByIndexRef, registerSelectedIndex, registerOption]);
 
     const state = {
       selected: isSelected,

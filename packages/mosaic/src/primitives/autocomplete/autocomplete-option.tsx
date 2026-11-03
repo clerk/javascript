@@ -3,8 +3,8 @@
 import { useListItem } from '@floating-ui/react';
 import React, { useEffect, useId } from 'react';
 
-import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender } from '../utils';
-import { useAutocompleteContext } from './autocomplete-context';
+import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender, useStore } from '../utils';
+import { useAutocompleteOptionsContext } from './autocomplete-context';
 
 export interface AutocompleteOptionProps extends ComponentProps<'div'> {
   value: string;
@@ -15,26 +15,26 @@ export interface AutocompleteOptionProps extends ComponentProps<'div'> {
 export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteOptionProps>(
   function AutocompleteOption(props, ref) {
     const { render, value, label, disabled, ...otherProps } = props;
-    const { activeIndex, selectedValue, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, refs } =
-      useAutocompleteContext();
+    const { store, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, refs } =
+      useAutocompleteOptionsContext();
 
     const id = useId();
     const displayLabel = label ?? value;
     const { ref: itemRef, index } = useListItem({ label: displayLabel });
 
-    const isSelected = selectedValue === value;
-    const isActive = activeIndex === index;
+    const isSelected = useStore(store, state => state.selectedValue === value);
+    const isActive = useStore(store, state => state.activeIndex === index);
 
     useEffect(() => {
       const map = valuesByIndexRef.current;
       if (!disabled) {
         map.set(index, value);
       }
-      registerSelectedIndex(index, value);
+      registerSelectedIndex(index, isSelected);
       return () => {
         map.delete(index);
       };
-    }, [index, value, disabled, valuesByIndexRef, registerSelectedIndex]);
+    }, [index, value, disabled, isSelected, valuesByIndexRef, registerSelectedIndex]);
 
     const state = {
       selected: isSelected,

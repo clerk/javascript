@@ -8,6 +8,7 @@ import type {
 import { createContext, type CSSProperties, useContext } from 'react';
 
 import type { TransitionProps } from '../hooks/use-transition';
+import type { Store } from '../utils';
 
 export interface ComboboxContextValue {
   open: boolean;
@@ -20,7 +21,6 @@ export interface ComboboxContextValue {
   placement: Placement;
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
-  getItemProps: UseInteractionsReturn['getItemProps'];
   activeIndex: number | null;
   selectedIndex: number | null;
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
@@ -35,8 +35,6 @@ export interface ComboboxContextValue {
   setOpen: (open: boolean) => void;
   focusInput: () => void;
   popupId: string | undefined;
-  registerSelectedIndex: (index: number, value: string, label: string) => (() => void) | undefined;
-  registerOption: (index: number) => void;
   mounted: boolean;
   transitionProps: TransitionProps;
 }
@@ -47,6 +45,31 @@ export function useComboboxContext() {
   const ctx = useContext(ComboboxContext);
   if (!ctx) {
     throw new Error('Combobox compound components must be used within <Combobox>');
+  }
+  return ctx;
+}
+
+export interface ComboboxHighlight {
+  activeIndex: number | null;
+  selectedValue: string | null;
+}
+
+export interface ComboboxOptionsContextValue {
+  store: Store<ComboboxHighlight>;
+  getItemProps: UseInteractionsReturn['getItemProps'];
+  handleSelect: (value: string, index: number, label: string) => void;
+  refs: ExtendedRefs<ReferenceType>;
+  valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
+  registerSelectedIndex: (index: number, value: string, label: string, selected: boolean) => (() => void) | undefined;
+  registerOption: (index: number) => void;
+}
+
+export const ComboboxOptionsContext = createContext<ComboboxOptionsContextValue | null>(null);
+
+export function useComboboxOptionsContext() {
+  const ctx = useContext(ComboboxOptionsContext);
+  if (!ctx) {
+    throw new Error('Combobox.Option must be used within <Combobox>');
   }
   return ctx;
 }
