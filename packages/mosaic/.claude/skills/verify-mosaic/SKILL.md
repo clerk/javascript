@@ -36,16 +36,16 @@ Run it first, and again whenever anything looks off. It only reads.
 
 ```console
 $ CS doctor
-ok    agent-browser installed (agent-browser 0.27.0)
+ok    agent-browser 0.27 or newer (found 0.27.0)
 ok    state file <repo>/packages/mosaic/.verify/instance.env
 ok    process 3722 alive
 ok    port 6008 served from this worktree (<repo>/packages/swingset)
 ok    http://localhost:6008/components/button returns 200
-ok    started at HEAD 9f579d368f (now 9f579d368f)
+info  started at HEAD 9f579d368f (now 9f579d368f)
 info  session verify-mosaic-057349b4
 ```
 
-Each `FAIL` line has a `fix`. The exit code is 1 when any check fails.
+Each `FAIL` line has a `fix`. The exit code is 1 when any check fails. Swingset reloads source edits, so a different `HEAD` is only information. After a dependency rebuild, run `down` and `up`.
 
 ## Drive
 
@@ -90,7 +90,7 @@ Proof standards:
 - A screenshot alone proves nothing about state. Pair it with the ARIA snapshot or the attribute dump that shows the claimed value.
 - For a styling change, check both themes (`Dark mode` switch) and RTL when the change touches layout.
 - Name the feature file and entry point you used. Report every entry point you could not reach, and why, instead of claiming it through another one.
-- Evidence lives in `packages/mosaic/.verify/evidence/`, which git ignores. `CS down` keeps it.
+- Evidence lives in `packages/mosaic/.verify/evidence/`, which git ignores. `CS down` keeps it. Each folder's `source.env` records the commit it was made at and whether the tree had uncommitted changes.
 
 ## Attach
 
@@ -101,10 +101,10 @@ $ CS attach "$E" --pr <n> --before "$CONTROL"
 attached 3 screenshots with befores to https://github.com/clerk/javascript/pull/<n>
 ```
 
-- It writes a block between `<!-- verify-evidence:mosaic -->` and `<!-- /verify-evidence:mosaic -->`. A line names the evidence folders and the pull request's head commit. With `--before`, a table shows each control screenshot beside the screenshot of the same name. Without it, the screenshots sit two across under their names.
+- It writes a block between `<!-- verify-evidence:mosaic -->` and `<!-- /verify-evidence:mosaic -->`. A line names each evidence folder with the commit it was captured at, and the pull request's head commit when it was attached. With `--before`, a table shows each control screenshot beside the screenshot of the same name. Without it, the screenshots sit two across under their names.
 - Run it again to replace the block. Nothing outside the markers changes.
-- It refuses when local `HEAD` is not the pull request's head, when a marker appears twice or alone, when the markers hold text it did not write, or when the description ends in an unclosed code fence. Markers inside a code fence do not count.
-- `--before` keeps only the screenshots both folders have, and names each one it skips.
+- It refuses when a marker appears twice or alone, when the markers hold text it did not write, or when the description ends in an unclosed code fence. Markers inside a code fence do not count.
+- `--before` keeps only the screenshots both folders have, and names each one it skips. Save the control screenshots under the same names.
 - It needs `gh` 2.99 or newer for `gh pr edit --attach`. `--dry-run` prints the command without changing the pull request.
 - Only `.png` files go up. ARIA snapshots and attribute dumps stay local; quote the line that proves the claim in the description instead.
 
@@ -117,7 +117,11 @@ stopped pid 3722
 kept    evidence in <repo>/packages/mosaic/.verify/evidence
 ```
 
-`down` closes only this worktree's browser session and stops only the process `up` started. It never kills by process name. Run it after a failed attempt too. A failed `up` runs it for you.
+`down` closes only this worktree's browser session and stops only the process `up` started, after checking that the process runs from `packages/swingset`. It never kills by process name. Run it after a failed attempt too. A failed `up` runs it for you.
+
+## Changing the script
+
+`bin/test-control-swingset` tests `bin/control-swingset` without starting swingset. Run it after every change to the script, and add a case that fails without your change.
 
 ## Not covered
 

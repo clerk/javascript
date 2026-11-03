@@ -68,9 +68,10 @@ cmd_up() {
   PID="$(cat "$VERIFY_DIR/pid")"
   rm -f "$VERIFY_DIR/pid"
   echo "start   pid $PID  log $LOG_FILE"
+  write_state
 
   URL="$(wait_for_url)"
-  printf 'PID=%s\nURL=%s\nSESSION=%s\nHEAD=%s\n' "$PID" "$URL" "$SESSION" "$(git rev-parse --short HEAD)" >"$STATE_FILE"
+  write_state
   echo "listen  $URL"
 
   wait_for_render
@@ -87,16 +88,18 @@ cmd_doctor() {
       failed=1
     fi
   }
-  check "agent-browser installed ($(agent-browser --version 2>/dev/null || echo missing))" \
-    "command -v agent-browser >/dev/null" "install agent-browser 0.27+ (brew install agent-browser)"
+  local browser install="brew install agent-browser"
+  browser="$(agent-browser --version 2>/dev/null | sed -nE 's/^agent-browser ([0-9.]+).*/\1/p' || true)"
+  [ -z "$browser" ] || install="brew upgrade agent-browser"
+  check "agent-browser 0.27 or newer (found ${browser:-none})" "version_at_least '$browser' 0.27" "$install"
   check "state file $STATE_FILE" "load_state" "run control-swingset up"
-  if [ "$failed" -eq 0 ]; then
+  if load_state; then
     check "process $PID alive" "kill -0 $PID 2>/dev/null" "run control-swingset down, then up"
     check "port $(port_of "$URL") served from this worktree ($SWINGSET_DIR)" "listener_is_ours" \
       "another process owns the port; run control-swingset down, then up"
     check "$URL$READY_PATH returns 200" "[ \"\$(http_status \"$URL$READY_PATH\")\" = 200 ]" \
       "read $LOG_FILE for the compile error"
-    check "started at HEAD $HEAD (now $(git rev-parse --short HEAD))" "true"
+    echo "info  started at HEAD $HEAD (now $(git rev-parse --short HEAD))"
     echo "info  session $SESSION"
   fi
   return "$failed"
@@ -119,6 +122,7 @@ cmd_evidence() {
   local dir
   dir="$EVIDENCE_ROOT/$(date -u +%Y%m%dT%H%M%SZ)-$feature"
   mkdir -p "$dir"
+  printf 'COMMIT=%s\nDIRTY=%s\n' "$(git rev-parse HEAD)" "$([ -z "$(git status --porcelain)" ] && echo 0 || echo 1)" >"$dir/source.env"
   echo "$dir"
 }
 
@@ -159,12 +163,7 @@ cmd_attach() {
   url="$(gh pr view "$pr" --json url -q .url)"
   repo="${url#https://github.com/}"
   repo="${repo%/pull/*}"
-  if [ "$head" != "$(git rev-parse HEAD)" ]; then
-    echo "refuse  local HEAD is not the head of pull request #$pr ($head)" >&2
-    echo "fix     push this branch, or check out the pull request, then attach again" >&2
-    exit 1
-  fi
-  local line="$BLOCK_LINE_START from evidence \`$(basename "$after")\`${before:+, before \`$(basename "$before")\`}, at [\`${head:0:12}\`](${url%/pull/*}/commit/$head)."
+  local line="$BLOCK_LINE_START from evidence $(evidence_label "$after")${before:+; before $(evidence_label "$before")}. Attached at pull request head [\`${head:0:12}\`](${url%/pull/*}/commit/$head)."
 
   local files=()
   {
@@ -219,7 +218,9 @@ cmd_down() {
     echo "no instance state; nothing to stop"
     return
   fi
-  if kill -0 "$PID" 2>/dev/null; then
+  if kill -0 "$PID" 2>/dev/null && [ "$(cwd_of "$PID")" != "$SWINGSET_DIR" ]; then
+    echo "skip    pid $PID: it was not started from $SWINGSET_DIR"
+  elif kill -0 "$PID" 2>/dev/null; then
     kill -TERM "$PID"
     for _ in $(seq 1 30); do
       kill -0 "$PID" 2>/dev/null || break
@@ -238,6 +239,10 @@ instance_alive() {
   load_state && kill -0 "$PID" 2>/dev/null && listener_is_ours
 }
 
+write_state() {
+  printf 'PID=%s\nURL=%s\nSESSION=%s\nHEAD=%s\n' "$PID" "${URL:-}" "$SESSION" "$(git rev-parse --short HEAD)" >"$STATE_FILE"
+}
+
 load_state() {
   [ -f "$STATE_FILE" ] || return 1
   # shellcheck disable=SC1090
@@ -245,19 +250,17 @@ load_state() {
 }
 
 listener_is_ours() {
-  local pid cwd
-  for pid in $(lsof -nP -iTCP:"$(port_of "$URL")" -sTCP:LISTEN -t 2>/dev/null); do
-    cwd="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')"
-    [ "$cwd" = "$SWINGSET_DIR" ] && return 0
+  local pid
+  for pid in $(listener_pids "$(port_of "$URL")"); do
+    [ "$(cwd_of "$pid")" = "$SWINGSET_DIR" ] && return 0
   done
   return 1
 }
 
 refuse_foreign_instance() {
-  local pid cwd
-  for pid in $(pgrep -f "next dev" 2>/dev/null); do
-    cwd="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')"
-    if [ "$cwd" = "$SWINGSET_DIR" ]; then
+  local pid
+  for pid in $(pgrep -f "next dev" 2>/dev/null || true); do
+    if [ "$(cwd_of "$pid")" = "$SWINGSET_DIR" ]; then
       echo "refuse  pid $pid already runs swingset in this worktree and was not started by control-swingset" >&2
       echo "fix     stop it yourself (it shares packages/swingset/.next), then rerun up" >&2
       exit 1
@@ -306,10 +309,25 @@ fail_start() {
 
 require_gh_attach() {
   local version
-  version="$(gh --version 2>/dev/null | sed -nE '1s/^gh version ([0-9]+)\.([0-9]+).*/\1 \2/p')"
-  if [ -z "$version" ] || [ "${version% *}" -lt 2 ] || { [ "${version% *}" -eq 2 ] && [ "${version#* }" -lt 99 ]; }; then
-    echo "refuse  attach needs gh 2.99 or newer for gh pr edit --attach (found ${version/ /.})" >&2
+  version="$(gh --version 2>/dev/null | sed -nE '1s/^gh version ([0-9.]+).*/\1/p' || true)"
+  if ! version_at_least "$version" 2.99; then
+    echo "refuse  attach needs gh 2.99 or newer for gh pr edit --attach (found ${version:-none})" >&2
     exit 1
+  fi
+}
+
+evidence_label() {
+  local COMMIT="" DIRTY=0
+  if [ -f "$1/source.env" ]; then
+    # shellcheck disable=SC1091
+    . "$1/source.env"
+  fi
+  if [ -z "$COMMIT" ]; then
+    echo "\`$(basename "$1")\`, captured at an unrecorded commit"
+  elif [ "$DIRTY" = 1 ]; then
+    echo "\`$(basename "$1")\`, captured at \`${COMMIT:0:12}\` with uncommitted changes"
+  else
+    echo "\`$(basename "$1")\`, captured at \`${COMMIT:0:12}\`"
   fi
 }
 
@@ -395,8 +413,28 @@ http_status() {
   curl -s -o /dev/null -w '%{http_code}' --max-time 120 "$1" || true
 }
 
+listener_pids() {
+  if command -v ss >/dev/null; then
+    ss -ltnpH "sport = :$1" | grep -o 'pid=[0-9]*' | cut -d= -f2
+  else
+    lsof -nP -iTCP:"$1" -sTCP:LISTEN -t
+  fi 2>/dev/null || true
+}
+
+cwd_of() {
+  if [ -d "/proc/$1" ]; then
+    readlink "/proc/$1/cwd"
+  else
+    lsof -a -p "$1" -d cwd -Fn | sed -n 's/^n//p'
+  fi 2>/dev/null || true
+}
+
+version_at_least() {
+  [ -n "$1" ] && [ "$(printf '%s\n%s\n' "$2" "$1" | sort -t. -k1,1n -k2,2n -k3,3n | head -1)" = "$2" ]
+}
+
 port_of() {
   echo "${1##*:}"
 }
 
-main "$@"
+[ "${BASH_SOURCE[0]}" != "$0" ] || main "$@"
