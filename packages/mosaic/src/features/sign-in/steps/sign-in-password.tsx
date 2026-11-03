@@ -70,14 +70,14 @@ export function SignInPassword({
       <Card.Header>
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
-      </Card.Header>
-      <Card.Content>
         <SignInIdentityPreview
           identifier={identifier}
           editLabel={messages.identityEditLabel}
           disabled={isPending}
           onEdit={onEditIdentifier}
         />
+      </Card.Header>
+      <Card.Content>
         <Form
           id={formId}
           onSubmit={handleSubmit}
