@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
 import { Icon } from '../../../components/icon';
-import { Text } from '../../../components/text';
 import { Pen } from '../../../icons/glyphs/pen';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from '../sign-in.styles';
@@ -16,14 +16,8 @@ export interface SignInIdentityPreviewProps {
 
 export function SignInIdentityPreview({ identifier, editLabel, disabled = false, onEdit }: SignInIdentityPreviewProps) {
   return (
-    <div {...stylex.props(styles.identity)}>
-      <Text
-        size='sm'
-        color='foreground-secondary'
-        xstyle={[styles.identityText, truncationStyles.singleLine]}
-      >
-        {identifier}
-      </Text>
+    <Card.Description xstyle={styles.identity}>
+      <span {...stylex.props(styles.identityText, truncationStyles.singleLine)}>{identifier}</span>
       {onEdit ? (
         <Button
           type='button'
@@ -37,6 +31,6 @@ export function SignInIdentityPreview({ identifier, editLabel, disabled = false,
           <Icon glyph={Pen} />
         </Button>
       ) : null}
-    </div>
+    </Card.Description>
   );
 }

@@ -267,7 +267,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
 
   return (
     <>
-      <Card.Root>
+      <Card.Root align='center'>
         <SignInView
           step={step}
           direction={direction}
@@ -379,7 +379,7 @@ function StepPanel({
   const methods = stage === 'first' ? firstFactors.slice(1) : secondFactors.slice(1);
 
   return (
-    <Card.Root>
+    <Card.Root align='center'>
       <SignInView
         step={step}
         applicationName={APPLICATION_NAME}

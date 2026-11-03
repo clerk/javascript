@@ -78,6 +78,7 @@ export const header = stylex.create({
     flexDirection: 'column',
     flexGrow: '1',
     rowGap: HEADER_ROW_GAP,
+    minWidth: 0,
   },
   contentBesideCloseButton: {
     paddingInlineStart: `calc(${CLOSE_BUTTON_WIDTH} + ${HEADER_COLUMN_GAP})`,
@@ -104,8 +105,14 @@ export const header = stylex.create({
 export const headerAlign = stylex.create({
   start: {},
   center: {
-    alignItems: 'center',
     textAlign: 'center',
+  },
+});
+
+export const mediaAlign = stylex.create({
+  start: {},
+  center: {
+    justifyContent: 'center',
   },
 });
 
