@@ -131,6 +131,25 @@ describe('TagInput', () => {
       expect(tagValues()).toEqual(['a@clerk.dev']);
     });
 
+    it('reports the text not yet added as a tag', async () => {
+      const user = userEvent.setup();
+      const onInputValueChange = vi.fn();
+      render(
+        <TagInput.Root>
+          <TagInput.Input
+            aria-label='Email'
+            onInputValueChange={onInputValueChange}
+          />
+        </TagInput.Root>,
+      );
+
+      await user.type(input(), 'a@clerk.dev,b@c');
+      expect(onInputValueChange).toHaveBeenLastCalledWith('b@c');
+
+      await user.tab();
+      expect(onInputValueChange).toHaveBeenLastCalledWith('');
+    });
+
     it('ignores empty text and duplicates', async () => {
       const user = userEvent.setup();
       render(<Harness defaultValue={['a@clerk.dev']} />);

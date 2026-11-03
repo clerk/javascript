@@ -302,6 +302,22 @@ describe('CreateOrganization', () => {
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/dashboard'));
     });
 
+    it('sends a valid address still in the input', async () => {
+      const { fapi } = await renderCreateOrganization();
+      const user = userEvent.setup();
+
+      await create(user, 'Acme');
+      await user.click(await screen.findByRole('combobox', { name: /Role/ }));
+      await user.click(await screen.findByRole('option', { name: 'Member' }));
+      await user.type(screen.getByRole('textbox', { name: 'Email' }), 'grace@example.com');
+      await user.click(screen.getByRole('button', { name: 'Send invitations' }));
+
+      expect(await screen.findByRole('heading', { name: 'Invitations sent' })).toBeVisible();
+      expect(fapi.organizationInvitations.map(item => [item.email_address, item.role])).toEqual([
+        ['grace@example.com', 'org:member'],
+      ]);
+    });
+
     it('starts on the instance default role', async () => {
       await renderCreateOrganization(
         signedIn({

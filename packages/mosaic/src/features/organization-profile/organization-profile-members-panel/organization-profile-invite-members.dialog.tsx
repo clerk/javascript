@@ -15,6 +15,8 @@ export interface OrganizationProfileInviteMembersDialogProps {
   finalFocus?: DialogFocusTarget;
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
+  emailDraft: string;
+  onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses?: string[];
   roles: SelectItem[];
   role: string | null;
@@ -31,6 +33,8 @@ export function OrganizationProfileInviteMembersDialog({
   finalFocus,
   emailAddresses,
   onEmailAddressesChange,
+  emailDraft,
+  onEmailDraftChange,
   rejectedEmailAddresses = [],
   roles,
   role,
@@ -43,7 +47,7 @@ export function OrganizationProfileInviteMembersDialog({
   const m = useMessages('organizationProfile').members.invite;
   const formId = useId();
   const emailInput = useRef<HTMLInputElement>(null);
-  const canSubmit = canSendInvitations({ emailAddresses, rejectedEmailAddresses, role });
+  const canSubmit = canSendInvitations({ emailAddresses, emailDraft, rejectedEmailAddresses, role });
 
   return (
     <Dialog.Root
@@ -89,6 +93,7 @@ export function OrganizationProfileInviteMembersDialog({
               emailInputRef={emailInput}
               emailAddresses={emailAddresses}
               onEmailAddressesChange={onEmailAddressesChange}
+              onEmailDraftChange={onEmailDraftChange}
               rejectedEmailAddresses={rejectedEmailAddresses}
               roles={roles}
               role={role}

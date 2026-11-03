@@ -84,6 +84,7 @@ export function useCreateOrganizationController(
 
 interface InviteValues {
   emailAddresses: string[];
+  emailDraft: string;
   role: string | null;
 }
 
@@ -98,6 +99,8 @@ export interface CreateOrganizationInviteControllerOptions {
 export interface CreateOrganizationInviteController {
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
+  emailDraft: string;
+  onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses: string[];
   roles: SelectItem[];
   role: string | null;
@@ -121,7 +124,7 @@ export function useCreateOrganizationInviteController({
   const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
 
   const form = useForm<InviteValues, boolean>({
-    initialValues: { emailAddresses: [], role: null },
+    initialValues: { emailAddresses: [], emailDraft: '', role: null },
     errorFallback: m.invite.error,
     onSubmit: async ({ emailAddresses, role }) => {
       const selected = role ?? initialRole;
@@ -141,6 +144,8 @@ export function useCreateOrganizationInviteController({
   return {
     emailAddresses: form.values.emailAddresses,
     onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
+    emailDraft: form.values.emailDraft,
+    onEmailDraftChange: emailDraft => form.setValue('emailDraft', emailDraft),
     rejectedEmailAddresses,
     roles: (roles?.roles ?? []).map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
     role: form.values.role ?? initialRole,

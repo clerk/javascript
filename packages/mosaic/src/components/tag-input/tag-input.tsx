@@ -27,7 +27,8 @@ type TagInputRootProps = Pick<
 export interface TagInputProps
   extends
     Omit<MosaicComponentProps<'input'>, keyof TagInputRootProps | 'render' | 'children' | 'type'>,
-    TagInputRootProps {
+    TagInputRootProps,
+    Pick<PrimitiveTagInputInputProps, 'onInputValueChange'> {
   removeLabel?: (value: string) => string;
 }
 

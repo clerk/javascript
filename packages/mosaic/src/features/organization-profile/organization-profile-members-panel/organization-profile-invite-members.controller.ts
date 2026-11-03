@@ -10,6 +10,7 @@ import type { InviteMembersInput } from './organization-profile-invite-members.m
 
 interface InviteMembersValues {
   emailAddresses: string[];
+  emailDraft: string;
   role: string | null;
 }
 
@@ -30,7 +31,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
 
   const form = useForm<InviteMembersValues, boolean>({
-    initialValues: { emailAddresses: [], role: initialRole },
+    initialValues: { emailAddresses: [], emailDraft: '', role: initialRole },
     errorFallback: m.error,
     onSubmit: async ({ emailAddresses, role }) => {
       if (!invite || !roles || role === null) {
@@ -56,7 +57,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     if (form.isSubmitting) {
       return;
     }
-    form.reset({ emailAddresses: [], role: initialRole });
+    form.reset({ emailAddresses: [], emailDraft: '', role: initialRole });
     setRejectedEmailAddresses([]);
     setOpen(next);
   };
@@ -76,6 +77,8 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     finalFocus: trigger,
     emailAddresses: form.values.emailAddresses,
     onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
+    emailDraft: form.values.emailDraft,
+    onEmailDraftChange: emailDraft => form.setValue('emailDraft', emailDraft),
     rejectedEmailAddresses,
     roles: roles.roles.map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
     role: form.values.role,

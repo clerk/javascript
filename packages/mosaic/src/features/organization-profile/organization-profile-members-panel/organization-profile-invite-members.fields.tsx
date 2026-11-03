@@ -12,6 +12,7 @@ const isEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value);
 
 interface InviteMembersValidity {
   emailAddresses: string[];
+  emailDraft?: string;
   rejectedEmailAddresses?: string[];
   role: string | null;
 }
@@ -27,9 +28,18 @@ export function hasInvalidEmailAddresses({
   return !emailAddresses.every(value => isValidEmail(value, rejectedEmailAddresses));
 }
 
-export function canSendInvitations({ emailAddresses, rejectedEmailAddresses = [], role }: InviteMembersValidity) {
+export function canSendInvitations({
+  emailAddresses,
+  emailDraft = '',
+  rejectedEmailAddresses = [],
+  role,
+}: InviteMembersValidity) {
+  const draft = emailDraft.trim();
+  const pending = draft ? [...emailAddresses, draft] : emailAddresses;
   return (
-    emailAddresses.length > 0 && !hasInvalidEmailAddresses({ emailAddresses, rejectedEmailAddresses }) && role !== null
+    pending.length > 0 &&
+    !hasInvalidEmailAddresses({ emailAddresses: pending, rejectedEmailAddresses }) &&
+    role !== null
   );
 }
 
@@ -37,6 +47,7 @@ export interface InviteMembersFieldsProps {
   emailInputRef?: Ref<HTMLInputElement>;
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
+  onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses?: string[];
   roles: SelectItem[];
   role: string | null;
@@ -49,6 +60,7 @@ export function InviteMembersFields({
   emailInputRef,
   emailAddresses,
   onEmailAddressesChange,
+  onEmailDraftChange,
   rejectedEmailAddresses = [],
   roles,
   role,
@@ -77,6 +89,7 @@ export function InviteMembersFields({
           delimiters={[',', ' ']}
           value={emailAddresses}
           onValueChange={onEmailAddressesChange}
+          onInputValueChange={onEmailDraftChange}
           validate={value => isValidEmail(value, rejectedEmailAddresses)}
           removeLabel={email => fill(m.removeEmail, { email })}
         />
