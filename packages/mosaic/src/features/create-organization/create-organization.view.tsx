@@ -1,36 +1,24 @@
 import { useMergeRefs } from '@floating-ui/react';
-import * as stylex from '@stylexjs/stylex';
 import { useId, useState } from 'react';
 
-import { Avatar } from '../../components/avatar';
+import { AvatarUpload } from '../../blocks/avatar-upload';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
 import { Flow, useFlowAutoFocus } from '../../components/flow';
 import type { UseFormResult } from '../../components/form';
 import { Input } from '../../components/input';
-import { Text } from '../../components/text';
 import type { LocalizableError } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
-import type { FileRejectionReason } from '../../primitives/file-upload';
 import { FileUpload } from '../../primitives/file-upload';
 import { Form } from '../../primitives/form';
+import { AVATAR_REJECTION_ERRORS } from '../../utils/avatar-upload';
 import {
   canSendInvitations,
   InviteMembersFields,
 } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.fields';
 import type { CreateOrganizationInviteController } from './create-organization.controller';
-import { styles } from './create-organization.styles';
 import type { CreateOrganizationStep, CreateOrganizationValues } from './create-organization.types';
-
-const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-const LOGO_MAX_BYTES = 10 * 1000 * 1000;
-
-const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
-  accept: { code: 'avatar_file_type_invalid' },
-  size: { code: 'avatar_file_size_exceeded' },
-  overflow: { code: 'avatar_file_count_exceeded' },
-};
 
 export interface CreateOrganizationStepsProps {
   step: CreateOrganizationStep;
@@ -181,84 +169,43 @@ function LogoField({
   const errorText = useErrorText();
   const [rejection, setRejection] = useState<LocalizableError>();
   const previewUrl = FileUpload.useObjectUrl(logo ?? undefined);
-  const labelId = useId();
-  const initials = name
-    .split(/\s+/)
-    .map(part => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
 
   return (
-    <FileUpload.Root
+    <Field.Root
       disabled={disabled}
-      accept={LOGO_MIME_TYPES}
-      maxSize={LOGO_MAX_BYTES}
-      aria-labelledby={labelId}
-      onReject={rejections => {
-        const rejected = rejections[0];
-        setRejection(rejected ? REJECTION_ERRORS[rejected.reason] : undefined);
-      }}
-      onValueChange={files => {
-        const file = files[0];
-        if (file) {
+      invalid={Boolean(rejection)}
+    >
+      <AvatarUpload.Root
+        name={name}
+        imageUrl={previewUrl}
+        hasImage={Boolean(logo)}
+        onChange={file => {
           setRejection(undefined);
           onChange(file);
-        }
-      }}
-    >
-      <div {...stylex.props(styles.logo)}>
-        <Avatar.Root
-          shape='square'
-          size='lg'
-        >
-          <Avatar.Image
-            alt=''
-            src={previewUrl}
+        }}
+        onReject={rejections => {
+          const rejected = rejections[0];
+          setRejection(rejected ? AVATAR_REJECTION_ERRORS[rejected.reason] : undefined);
+        }}
+        onRemove={() => {
+          setRejection(undefined);
+          onChange(null);
+        }}
+      >
+        <AvatarUpload.Dropzone>
+          <AvatarUpload.Image
+            shape='square'
+            size='lg'
           />
-          <Avatar.Fallback>{initials}</Avatar.Fallback>
-        </Avatar.Root>
-        <div {...stylex.props(styles.logoContent)}>
-          <Text
-            id={labelId}
-            render={<span />}
-          >
-            {m.create.logoLabel}
-          </Text>
-          <Text
-            size='xs'
-            color={rejection ? 'negative' : 'foreground-secondary'}
-            role={rejection ? 'alert' : undefined}
-          >
-            {rejection ? errorText(rejection) : m.create.logoDescription}
-          </Text>
-        </div>
-        <div {...stylex.props(styles.logoActions)}>
-          {logo ? (
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='sm'
-              disabled={disabled}
-              onClick={() => onChange(null)}
-            >
-              {m.create.removeLogo}
-            </Button>
-          ) : null}
-          <FileUpload.Trigger
-            render={
-              <Button
-                variant='outline'
-                color='neutral'
-                size='sm'
-              />
-            }
-          >
-            {m.create.uploadLogo}
-          </FileUpload.Trigger>
-        </div>
-      </div>
-    </FileUpload.Root>
+          <Field.Content>
+            <Field.Label>{m.create.logo.label}</Field.Label>
+            <Field.Description>{m.create.logo.description}</Field.Description>
+          </Field.Content>
+          <AvatarUpload.Actions labels={m.create.logo} />
+        </AvatarUpload.Dropzone>
+      </AvatarUpload.Root>
+      <Field.Feedback feedback={rejection ? { type: 'error', message: errorText(rejection) } : undefined} />
+    </Field.Root>
   );
 }
 
