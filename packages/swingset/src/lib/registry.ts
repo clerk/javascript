@@ -306,11 +306,6 @@ import {
   meta as segmentedControlMeta,
 } from '../stories/segmented-control.stories';
 import {
-  Default as SeparatorDefault,
-  Labelled as SeparatorLabelled,
-  meta as separatorMeta,
-} from '../stories/separator.stories';
-import {
   Controlled as SelectComponentControlled,
   Default as SelectComponentDefault,
   Descriptions as SelectComponentDescriptions,
@@ -320,6 +315,11 @@ import {
   Placeholder as SelectComponentPlaceholder,
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
 import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
