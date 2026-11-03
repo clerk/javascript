@@ -15,6 +15,7 @@ import type { ModalSurfaces } from './modals/modal.types';
 import { ModalHost } from './modals/modal-host';
 import type { TextDirection } from './primitives/direction-provider';
 import { DirectionProvider } from './primitives/direction-provider';
+import { VirtualUrlProvider } from './routing/virtual-url';
 
 export interface MosaicProviderProps {
   children: React.ReactNode;
@@ -51,10 +52,12 @@ export function MosaicProvider({
           <MosaicNowProvider value={now}>
             <MosaicExperimentalProvider value={experimentalValue}>
               <ToastProvider>
-                <ModalHost surfaces={modalSurfaces}>
-                  <UserProfileModalReturn />
-                  {children}
-                </ModalHost>
+                <VirtualUrlProvider>
+                  <ModalHost surfaces={modalSurfaces}>
+                    <UserProfileModalReturn />
+                    {children}
+                  </ModalHost>
+                </VirtualUrlProvider>
               </ToastProvider>
             </MosaicExperimentalProvider>
           </MosaicNowProvider>
