@@ -83,9 +83,7 @@ export function OrganizationProfileInviteMembersDialog({
                 id={formId}
                 onSubmit={event => {
                   event.preventDefault();
-                  if (canSubmit && !isPending) {
-                    void onSubmit();
-                  }
+                  void onSubmit();
                 }}
               />
             }

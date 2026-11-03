@@ -1,8 +1,11 @@
 const isEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value);
 
-interface InviteMembersValidity {
+interface InviteMembersDraft {
   emailAddresses: string[];
   emailDraft: string;
+}
+
+interface InviteMembersValidity extends InviteMembersDraft {
   rejectedEmailAddresses: string[];
   role: string | null;
 }
@@ -15,15 +18,14 @@ export function hasInvalidEmailAddresses(emailAddresses: string[], rejectedEmail
   return !emailAddresses.every(value => isValidEmail(value, rejectedEmailAddresses));
 }
 
-export function pendingEmailAddresses({
-  emailAddresses,
-  emailDraft,
-}: Pick<InviteMembersValidity, 'emailAddresses' | 'emailDraft'>) {
+export function emailAddressesToInvite({ emailAddresses, emailDraft }: InviteMembersDraft) {
   const draft = emailDraft.trim();
   return draft && !emailAddresses.includes(draft) ? [...emailAddresses, draft] : emailAddresses;
 }
 
-export function canSendInvitations({ rejectedEmailAddresses, role, ...input }: InviteMembersValidity) {
-  const pending = pendingEmailAddresses(input);
-  return pending.length > 0 && !hasInvalidEmailAddresses(pending, rejectedEmailAddresses) && role !== null;
+export function canSendInvitations({ rejectedEmailAddresses, role, ...draft }: InviteMembersValidity) {
+  const emailAddresses = emailAddressesToInvite(draft);
+  return (
+    emailAddresses.length > 0 && !hasInvalidEmailAddresses(emailAddresses, rejectedEmailAddresses) && role !== null
+  );
 }

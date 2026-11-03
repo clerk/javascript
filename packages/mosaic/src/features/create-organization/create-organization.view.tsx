@@ -228,9 +228,7 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
             id={formId}
             onSubmit={event => {
               event.preventDefault();
-              if (invite.canSubmit && !invite.isPending) {
-                invite.onSubmit();
-              }
+              invite.onSubmit();
             }}
           />
         }

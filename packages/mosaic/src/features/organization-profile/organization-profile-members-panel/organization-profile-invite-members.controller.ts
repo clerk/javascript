@@ -7,7 +7,7 @@ import { plural, useLocale, useMessages } from '../../../localization';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
 import type { InviteMembersInput } from './organization-profile-invite-members.model';
-import { canSendInvitations, pendingEmailAddresses } from './organization-profile-invite-members.utils';
+import { canSendInvitations, emailAddressesToInvite } from './organization-profile-invite-members.utils';
 
 interface InviteMembersValues {
   emailAddresses: string[];
@@ -31,29 +31,24 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
   const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
 
-  const form = useForm<InviteMembersValues, boolean>({
+  const form = useForm<InviteMembersValues, string[] | null>({
     initialValues: { emailAddresses: [], emailDraft: '', role: initialRole },
     errorFallback: m.error,
     canSubmit: values => canSendInvitations({ ...values, rejectedEmailAddresses }),
-    onSubmit: async values => {
-      const { role } = values;
+    onSubmit: async ({ role, ...draft }) => {
       if (!invite || !roles || role === null) {
-        return false;
+        return null;
       }
-      await invite({
-        emailAddresses: pendingEmailAddresses(values),
-        role,
-        roles,
-        onRejected: setRejectedEmailAddresses,
-      });
-      return true;
+      const emailAddresses = emailAddressesToInvite(draft);
+      await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
+      return emailAddresses;
     },
-    onSuccess: (invited, values) => {
+    onSuccess: invited => {
       if (!invited) {
         return;
       }
       setOpen(false);
-      toast.add({ type: 'success', label: plural(m.sent, pendingEmailAddresses(values).length, locale) });
+      toast.add({ type: 'success', label: plural(m.sent, invited.length, locale) });
     },
   });
 

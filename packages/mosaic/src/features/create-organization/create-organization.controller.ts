@@ -8,7 +8,7 @@ import type { MembersRoles } from '../organization-profile/organization-profile-
 import { resolveDefaultRole } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
 import {
   canSendInvitations,
-  pendingEmailAddresses,
+  emailAddressesToInvite,
 } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.utils';
 import type { CreateOrganizationModel } from './create-organization.model';
 import type {
@@ -138,7 +138,7 @@ export function useCreateOrganizationInviteController({
         return false;
       }
       await onInvite(organizationId, {
-        emailAddresses: pendingEmailAddresses(values),
+        emailAddresses: emailAddressesToInvite(values),
         role: selected,
         onRejected: setRejectedEmailAddresses,
       });
