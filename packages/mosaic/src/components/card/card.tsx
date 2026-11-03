@@ -175,12 +175,17 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   { render, xstyle, ...rest },
   ref,
 ) {
+  const align = React.useContext(CardContext)?.align ?? 'start';
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-media'), stylex.props(reset.base, slots.header.media, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('card-media'),
+        stylex.props(reset.base, slots.header.media, slots.mediaAlign[align], xstyle),
+        rest,
+      ),
     },
   });
 });
