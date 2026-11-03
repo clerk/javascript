@@ -132,7 +132,7 @@ function beginPreparation(ctx: ReverificationContext): Partial<ReverificationCon
   if (!method || !needsPrepare(method)) {
     throw new Error('Expected a preparable reverification method');
   }
-  const resendAvailableAt = Date.now() + RESEND_COOLDOWN_MS;
+  const resendAvailableAt = resendUnlockTime(CODE_RESEND_SECONDS);
   const promise = ctx.deps.prepare(method).then<PreparationSettlement, PreparationSettlement>(
     result => ({ status: 'sent', method, resendAvailableAt, ...result }),
     (error: unknown) => ({ status: 'failed', method, resendAvailableAt, error }),
@@ -169,11 +169,11 @@ const bindRun = assign<Extract<ReverificationEvent, { type: 'START' }>>((_, even
 }));
 const runEvents = {
   RESET: 'inactive',
-  START: { target: 'starting', actions: bindRun },
+  START: { target: 'starting' as const, actions: bindRun },
 } as const;
 const interruptionEvents = {
-  RESET: { target: 'draining', actions: assign(clearRun) },
-  START: { target: 'draining', actions: bindRun },
+  RESET: { target: 'draining' as const, actions: assign(clearRun) },
+  START: { target: 'draining' as const, actions: bindRun },
 } as const;
 const clearOperation = assign(() => ({ operation: null }));
 const resumeRun = ({ context }: { context: ReverificationContext }) => ({
@@ -297,7 +297,7 @@ const factorEvents = {
     const reusable = retained && sameMethod(method, retained.method) && retained.expiresAt > Date.now();
     const prepare = needsPrepare(method) && !reusable;
     return {
-      target: prepare ? 'preparing' : 'verifying',
+      target: prepare ? ('preparing' as const) : ('verifying' as const),
       context: {
         ...selection,
         overlay: prepare ? ctx.overlay : [],
@@ -330,7 +330,7 @@ export const reverificationMachine = createMachine({
   states: {
     inactive: {
       entry: assign(() => ({ ...clearRun(), operation: null })),
-      on: { START: { target: 'starting', actions: bindRun } },
+      on: { START: { target: 'starting' as const, actions: bindRun } },
     },
 
     starting: {
@@ -438,8 +438,8 @@ export const reverificationMachine = createMachine({
         RESET: { actions: assign(clearRun) },
         START: { actions: bindRun },
       },
-      invoke: fromPromise<unknown>(
-        ctx => {
+      invoke: fromPromise(
+        (ctx): Promise<unknown> => {
           if (!ctx.operation) {
             throw new Error('Expected an operation to drain');
           }
