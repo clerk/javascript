@@ -14,7 +14,7 @@ export interface TagInputTagProps extends ComponentProps<'div'> {
 export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
   function TagInputTag(props, forwardedRef) {
     const { render, value: tagValue, ...otherProps } = props;
-    const { value, tags, disabled, remove, registerTag, onTagExited } = useTagInputContext();
+    const { value, tags, disabled, remove, registerTag, onTagExited, navigateFromTag } = useTagInputContext();
 
     const present = value.includes(tagValue);
     const invalid = tags.find(tag => tag.value === tagValue)?.invalid ?? false;
@@ -56,7 +56,9 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
           if (!disabled) {
             remove(tagValue, event.key === 'Backspace' ? 'previous' : 'next');
           }
+          return;
         }
+        navigateFromTag(event);
       },
     } satisfies DefaultProps<'div'>;
 

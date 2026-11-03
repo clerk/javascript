@@ -335,6 +335,33 @@ describe('TagInput', () => {
       expect(input()).toHaveFocus();
     });
 
+    it('keeps arrow-key navigation when a tag handler stops propagation', async () => {
+      const user = userEvent.setup();
+      render(
+        <TagInput.Root defaultValue={['a', 'b']}>
+          <TagInput.List aria-label='Emails'>
+            {['a', 'b'].map(value => (
+              <TagInput.Tag
+                key={value}
+                value={value}
+                onKeyDown={event => event.stopPropagation()}
+              >
+                {value}
+              </TagInput.Tag>
+            ))}
+          </TagInput.List>
+          <TagInput.Input aria-label='Email' />
+        </TagInput.Root>,
+      );
+
+      await user.click(input());
+      await user.keyboard('{ArrowLeft}{ArrowLeft}');
+      expect(tag('a')).toHaveFocus();
+
+      await user.keyboard('{ArrowRight}{ArrowRight}');
+      expect(input()).toHaveFocus();
+    });
+
     it('follows reading order in RTL', async () => {
       const user = userEvent.setup();
       render(

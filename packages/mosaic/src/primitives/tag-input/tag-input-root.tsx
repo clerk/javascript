@@ -174,6 +174,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       registerInput,
       registerTag,
       onTagExited,
+      navigateFromTag: composite.handleKeyDown,
     }),
     [
       value,
@@ -188,6 +189,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       registerInput,
       registerTag,
       onTagExited,
+      composite.handleKeyDown,
     ],
   );
 
@@ -231,7 +233,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
           disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
           empty: (v: boolean) => (v ? { 'data-empty': '' } : null),
         },
-        props: mergeProps<'div'>({ ...defaultProps, onKeyDown: composite.handleKeyDown }, otherProps),
+        props: mergeProps<'div'>(defaultProps, otherProps),
       })}
     </TagInputContext.Provider>
   );
