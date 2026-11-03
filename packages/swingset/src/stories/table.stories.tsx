@@ -562,7 +562,6 @@ export function ClickableRows() {
                     render={
                       <Button
                         color='neutral'
-                        fullWidth
                         variant='outline'
                       />
                     }

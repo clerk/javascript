@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
+import { dragFilesOver, dropFiles } from '../../../../__tests__/feature/drag';
 import {
   demandReverificationOnce,
   type FakeFapiSeed,
@@ -147,6 +148,33 @@ describe('the user profile profile section', () => {
     expect(screen.getByRole('menuitem', { name: 'Change avatar' }).querySelector('svg')).toBeNull();
     expect(screen.getByRole('menuitem', { name: 'Remove avatar' }).querySelector('svg')).toBeNull();
     expect(screen.getByRole('menuitem', { name: 'Remove avatar' })).toHaveAttribute('data-color', 'negative');
+  });
+
+  it('marks the row while a file is dragged over it and uploads the file dropped on it', async () => {
+    await renderSection();
+    const row = screen.getByText('Profile picture');
+    const file = new File(['x'], 'me.png', { type: 'image/png' });
+
+    dragFilesOver(row, file);
+    expect(row.closest('[data-dragging]')).not.toBeNull();
+
+    dropFiles(row, file);
+    expect(row.closest('[data-dragging]')).toBeNull();
+    expect(await screen.findByRole('button', { name: 'Manage profile picture' })).toBeInTheDocument();
+  });
+
+  it('turns away a dropped file of the wrong type without uploading it', async () => {
+    await renderSection();
+    const upload = holdRequests('post', '/v1/me/profile_image');
+    const row = screen.getByText('Profile picture');
+    const file = new File(['x'], 'notes.pdf', { type: 'application/pdf' });
+
+    dragFilesOver(row, file);
+    dropFiles(row, file);
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(upload.requests).toHaveLength(0);
+    upload.release();
   });
 
   it('says why an upload was refused', async () => {

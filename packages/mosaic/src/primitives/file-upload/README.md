@@ -107,7 +107,7 @@ added.
 | ------------------------ | --------------- | ------------------------------------------------------------------- |
 | `FileUpload.Root`        | `<div>`         | Owns the file state + hidden input, provides context                |
 | `FileUpload.Trigger`     | `<button>`      | Opens the native file picker                                        |
-| `FileUpload.Dropzone`    | `<div>`         | Drag-and-drop target; filters dropped files by `accept`             |
+| `FileUpload.Dropzone`    | `<div>`         | Drag-and-drop target; ignores non-file drags, filters by `accept`   |
 | `FileUpload.Item`        | `<div>`         | Wraps a single selected file, provides item context                 |
 | `FileUpload.ItemPreview` | `<img>`         | Image thumbnail for the item's file (renders nothing for non-image) |
 | `FileUpload.ItemDelete`  | `<button>`      | Removes the item's file                                             |
@@ -152,12 +152,12 @@ standard HTML attributes for their default element.
 
 ## Data Attributes
 
-| Attribute       | Applies To                          | Description                                 |
-| --------------- | ----------------------------------- | ------------------------------------------- |
-| `data-empty`    | Root                                | Present when no files are selected          |
-| `data-dragging` | Dropzone                            | Present while a valid drag is over the zone |
-| `data-image`    | Item                                | Present when the item's file is an image    |
-| `data-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                       |
+| Attribute       | Applies To                          | Description                                |
+| --------------- | ----------------------------------- | ------------------------------------------ |
+| `data-empty`    | Root                                | Present when no files are selected         |
+| `data-dragging` | Dropzone                            | Present while a file drag is over the zone |
+| `data-image`    | Item                                | Present when the item's file is an image   |
+| `data-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                      |
 
 ## ARIA
 

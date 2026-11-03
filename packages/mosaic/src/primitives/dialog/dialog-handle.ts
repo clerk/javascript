@@ -48,13 +48,13 @@ export interface DialogHandle<Payload = unknown> {
   /**
    * Opens the attached root. Ignored while no root is mounted.
    *
-   * The optional `payload` is the programmatic counterpart of a trigger's: it reaches the root's
+   * The `payload` is the programmatic counterpart of a trigger's: it reaches the root's
    * children-as-function as `{ payload }`, so an imperative open can carry the content the dialog
    * is about — what a confirmation is asking, which record is being deleted — without the caller
    * holding a second piece of state alongside `open`. A trigger-driven open supersedes it, since
    * a trigger names its own payload.
    */
-  open(payload?: Payload): void;
+  open(payload: Payload): void;
   /** Closes the attached root. Ignored while no root is mounted. */
   close(): void;
   /** Whether the attached root is open. `false` while no root is mounted. */
@@ -90,7 +90,7 @@ export interface DialogHandle<Payload = unknown> {
  * detached trigger can drive the dialog. The type parameter types the `payload` carried from
  * each trigger into the root's children render function.
  */
-export function createDialogHandle<Payload = unknown>(): DialogHandle<Payload> {
+export function createDialogHandle<Payload = void>(): DialogHandle<Payload> {
   const triggers = new Map<string, DialogTriggerRegistration<Payload>>();
   const listeners = new Set<() => void>();
   let root: DialogRootController<Payload> | null = null;

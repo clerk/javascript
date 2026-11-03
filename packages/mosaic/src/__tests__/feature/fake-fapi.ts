@@ -16,6 +16,7 @@ import type {
   SessionWithActivitiesJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
+  WaitlistJSON,
   Web3WalletJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
@@ -77,6 +78,7 @@ export interface FakeFapiState {
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
   passwordUpdates: URLSearchParams[];
+  waitlistEntries: string[];
   enterpriseConnections: EnterpriseConnectionJSON[];
   enterpriseLinking: FakeEnterpriseLinking;
   mfa: FakeMfaState;
@@ -316,6 +318,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],
+    waitlistEntries: [],
     enterpriseConnections: [],
     deviceTrackingEnabled: true,
     mfa: createMfaState(),
@@ -574,6 +577,33 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       target.status = 'revoked';
       return envelope({ ...deviceSessionPayload(target), user: requester.user, status: 'revoked' }, state.client);
     }),
+    http.post(fapiUrl('/v1/waitlist'), async ({ request }) => {
+      const emailAddress = new URLSearchParams(await request.text()).get('email_address') ?? '';
+      if (!/^[^\s@]+@[^\s@]+$/.test(emailAddress)) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_format_invalid',
+                message: 'is invalid',
+                long_message: 'email_address must be a valid email address.',
+                meta: { param_name: 'email_address' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      state.waitlistEntries.push(emailAddress);
+      const now = Date.now();
+      const entry: WaitlistJSON = {
+        object: 'waitlist',
+        id: `wle_${state.waitlistEntries.length}`,
+        created_at: now,
+        updated_at: now,
+      };
+      return envelope(entry, null);
+    }),
     http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
       const session = findSession(state, state.client.last_active_session_id);
       if (!session) {
@@ -754,6 +784,63 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       leaveOrganization(state, membership.organization.id, user.id);
       return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
+    }),
+    http.post(fapiUrl('/v1/organizations'), async ({ request }) => {
+      const body = new URLSearchParams(await request.text());
+      const name = body.get('name') ?? '';
+      const slug = body.get('slug');
+      if (!name) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_missing',
+                message: 'name must be included.',
+                long_message: 'Enter name.',
+                meta: { param_name: 'name' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      if (slug && state.memberships.some(m => m.organization.slug === slug)) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_identifier_exists',
+                message: 'is taken',
+                long_message: 'This slug is taken. Please try another.',
+                meta: { param_name: 'slug' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const organizationId = `org_created_${state.memberships.length + 1}`;
+      const organization = fapiOrganization({
+        id: organizationId,
+        name,
+        slug: slug ?? '',
+        max_allowed_memberships: state.environment.organization_settings.max_allowed_memberships,
+      });
+      const membership = fapiMembership(organization, {
+        role: 'org:admin',
+        role_name: 'Admin',
+        permissions: ['org:sys_memberships:manage', 'org:sys_memberships:read', 'org:sys_profile:manage'],
+      });
+      state.memberships = [...state.memberships, membership];
+      updateActiveUser(state, current => ({
+        ...current,
+        organization_memberships: [...current.organization_memberships, membership],
+      }));
+      return envelope(organization, state.client);
     }),
     http.get(fapiUrl('/v1/organizations/:organizationId'), ({ params }) => {
       const membership = state.memberships.find(m => m.organization.id === params.organizationId);

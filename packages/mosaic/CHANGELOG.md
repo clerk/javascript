@@ -1,5 +1,32 @@
 # @clerk/mosaic
 
+## 0.2.1
+
+### Patch Changes
+
+- Tighten component motion. Input hover and focus now appear instantly and fade on the way out, toasts leave faster than they arrive, hover and press feedback on `Checkbox`, `Radio`, the `Drawer` handle, the switcher trigger and the tag remove button responds instantly, and the `Table` expand icon respects `prefers-reduced-motion`. ([#10578](https://github.com/clerk/javascript/pull/10578)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Preserve verification code delivery errors and resend cooldowns when navigating to other methods or help and back in UserProfile. ([#10564](https://github.com/clerk/javascript/pull/10564)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Show the generic error message in the `UserProfile` add email and add phone dialogs when sending a verification fails with a Clerk response that carries no error details. Previously these dialogs showed no message. ([#10563](https://github.com/clerk/javascript/pull/10563)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `Card.Media`, a slot for a logo, icon or image at the top of `Card.Header`, with 24px of space below it. Style it with `.cl-card-media`. `Card.Header` also takes an `align` prop, `start` by default, so `align='center'` centers its content. ([#10590](https://github.com/clerk/javascript/pull/10590)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Align the corners of `Select`, `Combobox`, `Menu` and `PhoneInput` options and `ActionBar` buttons with their surrounding surface. These radii now follow `--cl-radius-lg` and `--cl-spacing` rather than `--cl-radius-md`, so an override of `--cl-radius-md` no longer changes them. ([#10579](https://github.com/clerk/javascript/pull/10579)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Center the pending spinner on an `OrganizationList` row in a trailing column that mirrors the row's avatar, instead of pressing it against the row's edge. ([#10607](https://github.com/clerk/javascript/pull/10607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- When users are asked to confirm their identity again, they can now use a passkey set up as their second step, as long as their browser supports passkeys. ([#10570](https://github.com/clerk/javascript/pull/10570)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Add `<UserAvatar />`, which shows the signed-in user's profile image. It takes `shape`, `size` and `fallback`, renders nothing when nobody is signed in, and can be styled through `.cl-user-avatar`. ([#10500](https://github.com/clerk/javascript/pull/10500)) by [@kylemac](https://github.com/kylemac)
+
+- Fix the `OrganizationList` loading skeleton. Avatar placeholders now match the size of the loaded avatars instead of shrinking to the width of the initials, and the personal account row is shown unless `hidePersonal` is set. ([#10608](https://github.com/clerk/javascript/pull/10608)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Preserve all errors during UserProfile reverification. Show errors for the active password or code beside that field, and unrelated errors in a banner without marking the field invalid. ([#10558](https://github.com/clerk/javascript/pull/10558)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
 ## 0.2.0
 
 ### Minor Changes

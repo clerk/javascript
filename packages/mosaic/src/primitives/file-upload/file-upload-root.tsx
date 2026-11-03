@@ -3,7 +3,7 @@
 import React, { type CSSProperties, type ReactNode, useCallback, useId, useMemo, useRef } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { isFileAccepted } from './accept';
 import { FileUploadContext, type FileUploadContextValue } from './file-upload-context';
 
@@ -136,7 +136,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadProps>(
 
   const state = { disabled, empty: files.length === 0 };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     children: (
       <>
         <input
@@ -164,7 +164,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadProps>(
         {children}
       </>
     ),
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <FileUploadContext.Provider value={contextValue}>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { TableHeaderContext, useTableContext } from './table-context';
 
 export type TableHeaderProps = ComponentProps<'thead'>;
@@ -12,9 +12,9 @@ export const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeader
     const { render, children, ...otherProps } = props;
     useTableContext();
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       children: <tr>{children}</tr>,
-    };
+    } satisfies DefaultProps<'thead'>;
 
     return (
       <TableHeaderContext.Provider value>

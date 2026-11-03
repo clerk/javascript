@@ -1,15 +1,13 @@
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
+import { AvatarDropzone } from '../../../components/avatar-dropzone';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
+import { AVATAR_UPLOAD } from '../../../utils/avatar-upload';
 import type { UserProfilePictureController } from './user-profile-picture.controller';
-
-const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-/** Matches the limit the row's own description advertises. */
-const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
 
 export interface UserProfilePictureRowViewProps extends UserProfilePictureController {
   name: string;
@@ -38,9 +36,8 @@ export function UserProfilePictureRowView({
 
   return (
     <FileUpload.Root
-      accept={PROFILE_PICTURE_MIME_TYPES}
-      maxSize={PROFILE_PICTURE_MAX_BYTES}
-      disabled={isPending}
+      {...AVATAR_UPLOAD}
+      disabled={isPending || !onChange}
       aria-busy={isPending || undefined}
       render={<Section.Row />}
       onReject={onReject}
@@ -51,7 +48,7 @@ export function UserProfilePictureRowView({
         }
       }}
     >
-      <Section.Item>
+      <AvatarDropzone.Root render={<Section.Item />}>
         <Section.Media size='lg'>
           <Avatar.Root size='fit'>
             <Avatar.Image
@@ -59,6 +56,7 @@ export function UserProfilePictureRowView({
               src={previewUrl ?? imageUrl}
             />
             <Avatar.Fallback>{initials}</Avatar.Fallback>
+            <AvatarDropzone.Overlay />
           </Avatar.Root>
         </Section.Media>
         <Section.Content>
@@ -70,7 +68,7 @@ export function UserProfilePictureRowView({
           hasImage={hasImage}
           onRemove={onRemove}
         />
-      </Section.Item>
+      </AvatarDropzone.Root>
       <Section.Error>{error}</Section.Error>
     </FileUpload.Root>
   );

@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import {
   colorVars,
   durationVars,
+  easingVars,
   focusVars,
   fontWeightVars,
   radiusVars,
@@ -29,7 +30,7 @@ export const styles = stylex.create({
   search: { maxWidth: '100%', width: '17rem' },
   noWrap: { whiteSpace: 'nowrap' },
   shell: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
@@ -72,7 +73,7 @@ export const styles = stylex.create({
         ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-surface-subtle'],
       },
     },
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     cursor: { default: null, ':where([data-actionable])': 'pointer' },
@@ -156,7 +157,11 @@ export const styles = stylex.create({
       [stylex.when.ancestor('[data-expanded]', tableStateMarker)]: 'rotate(90deg)',
     },
     transitionDuration: durationVars['--cl-duration-fast'],
-    transitionProperty: 'transform',
+    transitionProperty: {
+      default: 'transform',
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    transitionTimingFunction: easingVars['--cl-ease-default'],
   },
 });
 

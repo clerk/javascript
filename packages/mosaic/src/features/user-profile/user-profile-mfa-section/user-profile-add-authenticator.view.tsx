@@ -79,7 +79,6 @@ export function UserProfileAddAuthenticatorView({
           type='button'
           variant='outline'
           color='neutral'
-          fullWidth
           disabled={isPending}
           onClick={onBack}
         >
@@ -89,7 +88,6 @@ export function UserProfileAddAuthenticatorView({
           ref={actionRef}
           type='submit'
           form={formId}
-          fullWidth
           isPending={isPending}
           disabled={code.length !== 6}
           focusableWhenDisabled

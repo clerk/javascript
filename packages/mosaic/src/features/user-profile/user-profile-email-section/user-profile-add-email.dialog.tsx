@@ -190,7 +190,6 @@ function EnterEmailStep(props: EnterEmailStepProps) {
       <Card.Footer>
         <SubmitButton
           form={emailFormId}
-          fullWidth
           disabled={!props.canSubmit}
           isPending={props.isPending}
           pendingLabel={m.email.pending}
@@ -275,7 +274,6 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -283,7 +281,6 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
         </Dialog.Close>
         <SubmitButton
           form={verifyFormId}
-          fullWidth
           isPending={props.isPending}
           disabled={!props.canSubmit || props.isResending}
           pendingLabel={m.verify.pending}
@@ -332,7 +329,6 @@ function VerifyLinkStep(props: VerifyLinkStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -406,7 +402,6 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >

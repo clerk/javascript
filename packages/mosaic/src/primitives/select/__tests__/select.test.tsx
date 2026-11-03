@@ -702,6 +702,38 @@ describe('Select', () => {
     });
   });
 
+  describe('Arrow', () => {
+    it('forwards a ref to the arrow element', async () => {
+      const user = userEvent.setup();
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick a fruit...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.Arrow ref={ref} />
+              <Select.Option
+                value='apple'
+                label='Apple'
+              >
+                Apple
+              </Select.Option>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      expect(ref.current).toBeInstanceOf(SVGSVGElement);
+    });
+  });
+
   describe('Home/End navigation honors aria-disabled value', () => {
     it('treats aria-disabled="false" as enabled when pressing Home', async () => {
       const user = userEvent.setup();

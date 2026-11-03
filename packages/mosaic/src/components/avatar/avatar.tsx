@@ -6,6 +6,7 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
+import { mediaSizes } from '../../styles/media-size.styles';
 import { reset } from '../../styles/reset.styles';
 import { skeletonStyles } from '../../styles/skeleton.styles';
 import { shapes, sizes, styles } from './avatar.styles';
@@ -55,6 +56,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
           reset.base,
           styles.base,
           shapes[shape],
+          size !== 'fit' && mediaSizes[size],
           sizes[size],
           interactive && styles.interactive,
           interactive && focusOutline.visible,

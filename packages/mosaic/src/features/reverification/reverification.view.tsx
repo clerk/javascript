@@ -73,7 +73,6 @@ export function ReverificationError({ reason, onClose }: { reason: Reverificatio
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             onClick={onClose}
           >
             {m.error.close}
@@ -103,6 +102,7 @@ export function ReverificationPending() {
         <Button
           type='button'
           disabled
+          fullWidth={false}
           xstyle={styles.pendingAction}
         >
           {m.continue}
@@ -128,6 +128,7 @@ export function ReverificationView({
   value,
   onValueChange,
   errorMessage,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onShowMethods,
@@ -195,6 +196,7 @@ export function ReverificationView({
               }}
               value={value}
               errorMessage={errorMessage}
+              globalErrorMessage={globalErrorMessage}
               isPending={isPending}
               onValueChange={onValueChange}
               onSubmit={onSubmit}
@@ -210,7 +212,7 @@ export function ReverificationView({
                 description: m.passkey.description,
                 ...actions,
               }}
-              errorMessage={errorMessage}
+              errorMessage={globalErrorMessage}
               isPending={isPending}
               onSubmit={onSubmit}
               onCancel={hasAlternatives ? onShowMethods : undefined}
@@ -228,6 +230,7 @@ export function ReverificationView({
               }}
               value={value}
               errorMessage={errorMessage}
+              globalErrorMessage={globalErrorMessage}
               isPending={isPending}
               resend={resend}
               onValueChange={onValueChange}
@@ -251,6 +254,7 @@ export function ReverificationView({
               }}
               value={value}
               errorMessage={errorMessage}
+              globalErrorMessage={globalErrorMessage}
               isPending={isPending}
               onValueChange={onValueChange}
               onSubmit={onSubmit}

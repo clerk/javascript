@@ -5,7 +5,8 @@ description: >-
   tokens, `themeProps`), or building a flow — writing the model (the Clerk
   adapter), the controller (local state, in React state or a state machine:
   `setup`, states/guards/`invoke`, wired to React with `useMachine`/`useActor`/
-  `useSelector`), or the view (rendering), testing a feature, or
+  `useSelector`), or the view (rendering, including moving between screens with
+  the `Flow` component), testing a feature, or
   migrating a legacy / pre-Mosaic component into the model / controller / view
   split. Use when building, styling, debugging, testing, or migrating anything
   Mosaic. `packages/mosaic/ARCHITECTURE.md` holds the design-system
@@ -25,6 +26,12 @@ Two things live under Mosaic, and this skill covers the how-to for both:
   from_ → _what the user is doing to it_ → _what that looks like_. What crosses
   each boundary is plain data: no Clerk resource reaches the controller, no
   machine snapshot reaches the view.
+
+"Flow" means two things here. A feature's model, controller and view are its
+flow. `Flow` from `src/components/flow/` is the component that moves between
+screens on one card or dialog. If a screen replaces another on the same surface,
+use the component: a conditional makes the new screen pop in. See "Moving between
+screens on one surface" in `packages/mosaic/docs/views.md`.
 
 ```text
 model       Clerk adapter: reads Clerk hooks and resources, resolves the

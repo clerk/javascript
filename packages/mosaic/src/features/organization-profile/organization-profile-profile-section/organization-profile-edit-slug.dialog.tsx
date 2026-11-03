@@ -85,7 +85,6 @@ export function OrganizationProfileEditSlugDialog({
                 <Button
                   variant='outline'
                   color='neutral'
-                  fullWidth
                 />
               }
             >
@@ -93,7 +92,6 @@ export function OrganizationProfileEditSlugDialog({
             </Dialog.Close>
             <SubmitButton
               form={form.id}
-              fullWidth
               isPending={form.isSubmitting}
               disabled={!form.canSubmit}
               focusableWhenDisabled
