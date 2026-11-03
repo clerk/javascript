@@ -1635,6 +1635,14 @@ export const arSA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1646,6 +1654,22 @@ export const arSA: LocalizationResource = {
       resendButton: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: undefined,

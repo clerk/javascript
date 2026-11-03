@@ -1647,6 +1647,14 @@ export const viVN: LocalizationResource = {
       subtitle: 'Nhập mật khẩu hiện tại để tiếp tục',
       title: 'Xác minh yêu cầu',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
@@ -1658,6 +1666,22 @@ export const viVN: LocalizationResource = {
       resendButton: 'Không nhận được mã? Gửi lại',
       subtitle: 'Nhập mã đã gửi đến điện thoại của bạn để tiếp tục',
       title: 'Xác minh yêu cầu',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Mã xác minh',
