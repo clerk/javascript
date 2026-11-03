@@ -274,8 +274,11 @@ $ integration/expo-native/bin/control-clerk-expo down
 $ git switch <branch>
 $ integration/expo-native/bin/control-clerk-expo up --platform ios --backend remote
 $ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform ios
+$ gh pr create --draft
 $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot <label> --before <before-run-id>
 $ integration/expo-native/bin/control-clerk-expo down
+$ gh pr view <n> --json body   # wait for the verify-evidence block, about a minute after down
+$ gh pr ready <n>
 $ git push origin --delete <branch>-before && git branch -D <branch>-before
 ```
 
