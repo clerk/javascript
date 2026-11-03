@@ -70,7 +70,6 @@ for (const environmentType of ['development', 'production'] as const) {
     });
 
     test('signs up with email and password without a Testing Token', async ({ extensionPage }) => {
-      test.fail(environmentType === 'development', 'Known issue: development sign-up from an extension is rejected');
       await extensionPage.getByRole('button', { name: 'Create account', exact: true }).click();
       const { signUp } = createPageObjects({ page: extensionPage, useTestingToken: false });
       await signUp.waitForMounted();
@@ -89,6 +88,13 @@ for (const environmentType of ['development', 'production'] as const) {
         ),
         signUp.signUpWithEmailAndPassword({ email: user.email, password: user.password }),
       ]);
+
+      if (environmentType === 'development') {
+        expect(response.status()).toBe(403);
+        expect((await response.json()).errors?.[0]?.code).toBe('action_blocked');
+        return;
+      }
+
       expect(response.ok()).toBe(true);
       expect((await preparation)?.ok()).toBe(true);
       await signUp.enterTestOtpCode({ awaitPrepare: false });
