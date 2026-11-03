@@ -440,6 +440,68 @@ jobs:
           retention-days: 1
           if-no-files-found: ignore
 
+  mosaic-visual-tests:
+    needs: [check-permissions, build-packages]
+    name: Mosaic Visual Tests
+    permissions:
+      contents: read
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        uses: $/.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build Mosaic and its dependencies
+        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/mosaic...
+
+      - name: Run visual tests
+        id: visual
+        run: |
+          status=0
+          bash packages/mosaic/scripts/test-visual.sh compare || status=$?
+          if [[ "$status" -ne 0 ]] && find packages/mosaic/.vitest/attachments -name '*.png' -print -quit 2>/dev/null | grep -q .; then
+            echo "differences=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$status" -ne 0 ]]; then
+            exit "$status"
+          fi
+
+      - name: Report visual differences
+        if: ${{ steps.visual.outputs.differences == 'true' }}
+        run: |
+          echo "::warning title=Mosaic visual differences::Screenshots differ from baselines. Download mosaic-visual-failure-artifacts-${{ github.run_id }}-${{ github.run_attempt }} to review."
+          echo "### Mosaic screenshots differ from baselines" >> "$GITHUB_STEP_SUMMARY"
+          find packages/mosaic/.vitest/attachments -name '*.png' -printf '- %P\n' >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Upload failure artifacts
+        if: ${{ steps.visual.outputs.differences == 'true' }}
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: mosaic-visual-failure-artifacts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            packages/mosaic/.vitest/attachments
+            packages/mosaic/src/**/__screenshots__/**/*-chromium-linux.png
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: warn
+
   integration-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
