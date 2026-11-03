@@ -1,5 +1,7 @@
 import { createContext, useContext } from 'react';
 
+import type { CompositeKeyEvent } from '../hooks/use-composite';
+
 export interface TagInputTag {
   value: string;
   present: boolean;
@@ -21,6 +23,7 @@ export interface TagInputContextValue {
   registerInput: (element: HTMLInputElement | null) => void;
   registerTag: (value: string, element: HTMLElement | null) => void;
   onTagExited: (value: string) => void;
+  navigateFromTag: (event: CompositeKeyEvent) => void;
 }
 
 export const TagInputContext = createContext<TagInputContextValue | null>(null);

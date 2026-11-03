@@ -1,7 +1,5 @@
 import {
   autoUpdate,
-  Composite,
-  CompositeItem,
   FloatingFocusManager,
   getOverflowAncestors,
   hide,
@@ -16,14 +14,22 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { X } from '../../icons/glyphs/x';
-import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
+import {
+  CompositeItemsProvider,
+  useAnimationsFinished,
+  useComposite,
+  useCompositeItem,
+  useCompositeItems,
+  useTransitionStatus,
+} from '../../primitives/hooks';
 import { Portal } from '../../primitives/portal';
-import { isElement, isRef, mergeProps, useRender } from '../../primitives/utils';
+import { isElement, mergeProps, useRender } from '../../primitives/utils';
 import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { useHeldMessage } from '../../utils/feedback';
 import type { ButtonProps } from '../button';
 import { Button } from '../button';
 import { Icon } from '../icon';
@@ -76,12 +82,16 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   ref,
 ) {
   const barRef = React.useRef<HTMLDivElement | null>(null);
+  const [bar, setBar] = React.useState<HTMLDivElement | null>(null);
+  const items = useCompositeItems();
+  const composite = useComposite(bar, {
+    getItems: items.getItems,
+    orientation: 'horizontal',
+    homeEnd: false,
+  });
   const countId = React.useId();
   const context = React.useMemo(() => ({ countId }), [countId]);
-  const openChildrenRef = React.useRef(children);
-  if (open) {
-    openChildrenRef.current = children;
-  }
+  const heldChildren = useHeldMessage(children, open);
 
   const wasOpenRef = React.useRef(false);
   const [status, setStatus] = React.useState('');
@@ -89,6 +99,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     const wasOpen = wasOpenRef.current;
     wasOpenRef.current = open;
     if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- The live region must commit empty before its text arrives, or a bar mounted open is never announced.
       setStatus('');
     } else if (!wasOpen) {
       setStatus(openAnnouncement ?? announcement ?? '');
@@ -194,53 +205,30 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
                 stylex.props(reset.base, styles.positioner, positionerXstyle),
               )}
             >
-              <Composite
-                orientation='horizontal'
-                loop
-                render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-                  const { ref: compositeRef, ...merged } = mergeProps<'div'>(
-                    {
-                      'aria-describedby': countId,
-                      ...mergeStyleProps(
-                        themeProps('action-bar', { open }),
-                        stylex.props(reset.base, styles.bar, xstyle),
-                        rest,
-                      ),
-                    },
-                    compositeProps,
-                  );
-                  // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
-                  return useRender({
-                    defaultTagName: 'div',
-                    render,
-                    ref: [barRef, isRef(compositeRef) ? compositeRef : undefined],
-                    props: {
-                      ...merged,
-                      ...(transitionStatus === 'starting'
-                        ? { 'data-starting-style': '', style: { transition: 'none' } }
-                        : null),
-                      ...(transitionStatus === 'ending' ? { 'data-ending-style': '' } : null),
-                      'data-open': open,
-                      role: 'toolbar',
-                      onFocus: () => {
-                        focusWithinRef.current = true;
-                      },
-                      onBlur: () => {
-                        focusWithinRef.current = false;
-                      },
-                      children: (
-                        <div
-                          role='presentation'
-                          onKeyDown={guardPortalledKeys}
-                          {...stylex.props(styles.items)}
-                        >
-                          {open ? children : openChildrenRef.current}
-                        </div>
-                      ),
-                    },
-                  });
+              <Bar
+                render={render}
+                barRefs={[barRef, setBar]}
+                onCompositeKeyDown={composite.handleKeyDown}
+                transitionStatus={transitionStatus}
+                open={open}
+                onFocusWithinChange={within => {
+                  focusWithinRef.current = within;
                 }}
-              />
+                {...mergeStyleProps(
+                  themeProps('action-bar', { open }),
+                  stylex.props(reset.base, styles.bar, xstyle),
+                  rest,
+                )}
+                aria-describedby={countId}
+              >
+                <div
+                  role='presentation'
+                  onKeyDown={guardPortalledKeys}
+                  {...stylex.props(styles.items)}
+                >
+                  <CompositeItemsProvider value={items}>{heldChildren}</CompositeItemsProvider>
+                </div>
+              </Bar>
             </div>
           </FloatingFocusManager>
         </Portal>
@@ -249,28 +237,50 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   );
 });
 
+interface BarProps extends MosaicComponentProps<'div'> {
+  barRefs: React.Ref<HTMLDivElement>[];
+  onCompositeKeyDown: React.KeyboardEventHandler<HTMLDivElement>;
+  open: boolean;
+  transitionStatus: ReturnType<typeof useTransitionStatus>['transitionStatus'];
+  onFocusWithinChange: (within: boolean) => void;
+}
+
+function Bar({ render, barRefs, onCompositeKeyDown, open, transitionStatus, onFocusWithinChange, ...props }: BarProps) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref: barRefs,
+    props: {
+      ...mergeProps<'div'>(props, {
+        onKeyDown: onCompositeKeyDown,
+        onFocus: () => onFocusWithinChange(true),
+        onBlur: () => onFocusWithinChange(false),
+      }),
+      ...(transitionStatus === 'starting' ? { 'data-starting-style': '', style: { transition: 'none' } } : null),
+      ...(transitionStatus === 'ending' ? { 'data-ending-style': '' } : null),
+      'data-open': open,
+      role: 'toolbar',
+      'aria-orientation': 'horizontal',
+    },
+  });
+}
+
 export type ActionBarActionProps = ButtonProps;
 
 const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(function ActionBarAction(
   { color, xstyle, ...rest },
   ref,
 ) {
+  const compositeItem = useCompositeItem();
+  const mergedRef = useMergeRefs([compositeItem, ref]);
   return (
-    <CompositeItem
-      render={(itemProps: React.HTMLAttributes<HTMLElement>) => {
-        const { ref: itemRef, ...merged } = mergeProps<'button'>(rest, itemProps);
-        return (
-          <Button
-            variant='ghost'
-            size='md'
-            {...merged}
-            color={color}
-            // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's CompositeItem calls this render callback synchronously during its own render, so the hook keeps a stable position.
-            ref={useMergeRefs<unknown>([ref, isRef(itemRef) ? itemRef : undefined])}
-            xstyle={[color === 'negative' && styles.destructive, xstyle]}
-          />
-        );
-      }}
+    <Button
+      variant='ghost'
+      size='md'
+      {...rest}
+      color={color}
+      ref={mergedRef}
+      xstyle={[color === 'negative' && styles.destructive, xstyle]}
     />
   );
 });

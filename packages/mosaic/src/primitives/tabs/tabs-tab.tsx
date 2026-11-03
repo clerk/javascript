@@ -1,9 +1,9 @@
 'use client';
 
-import { CompositeItem } from '@floating-ui/react';
 import React, { useCallback } from 'react';
 
-import { type ComponentProps, type DefaultProps, isRef, mergeProps, useRender } from '../utils';
+import { useCompositeItem } from '../hooks/use-composite';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsTabProps extends ComponentProps<'button'> {
@@ -12,8 +12,10 @@ export interface TabsTabProps extends ComponentProps<'button'> {
 }
 
 export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(function TabsTab(props, ref) {
-  const { render, value: tabValue, disabled, children, ...otherProps } = props;
+  const { render, value: tabValue, disabled, ...otherProps } = props;
   const { value: selectedValue, setValue, activationMode, tabsId, registerTab } = useTabsContext();
+
+  const compositeItem = useCompositeItem(tabValue);
 
   const isSelected = selectedValue === tabValue;
   const tabId = `${tabsId}-tab-${tabValue}`;
@@ -28,78 +30,50 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
     disabled: !!disabled,
   };
 
-  return (
-    <CompositeItem
-      ref={register}
-      disabled={disabled}
-      render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-        const defaultProps: DefaultProps<'button'> = {
-          id: tabId,
-          role: 'tab',
-          type: 'button',
-          'aria-selected': isSelected,
-          'aria-controls': panelId,
-          'aria-disabled': disabled || undefined,
-        };
+  const defaultProps: DefaultProps<'button'> = {
+    role: 'tab',
+    type: 'button',
+    disabled,
+    'aria-selected': isSelected,
+    'aria-controls': panelId,
+    'aria-disabled': disabled || undefined,
+  };
 
-        if (activationMode === 'automatic') {
-          defaultProps.onFocus = () => {
-            if (!disabled) {
-              setValue(tabValue);
-            }
-          };
-        } else {
-          defaultProps.onClick = () => {
-            if (!disabled) {
-              setValue(tabValue);
-            }
-          };
-          defaultProps.onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-            if (!disabled && (event.key === 'Enter' || event.key === ' ')) {
-              event.preventDefault();
-              setValue(tabValue);
-            }
-          };
-        }
+  if (activationMode === 'automatic') {
+    defaultProps.onFocus = () => {
+      if (!disabled) {
+        setValue(tabValue);
+      }
+    };
+  } else {
+    defaultProps.onClick = () => {
+      if (!disabled) {
+        setValue(tabValue);
+      }
+    };
+    defaultProps.onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (!disabled && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        setValue(tabValue);
+      }
+    };
+  }
 
-        // Merge: defaultProps first, then consumer props, then composite props last
-        // (composite needs to win on tabIndex, data-active, onFocus, ref)
-        const merged = mergeProps<'button'>(mergeProps<'button'>(defaultProps, otherProps), compositeProps);
+  const merged = mergeProps<'button'>(defaultProps, otherProps);
 
-        // The wired id is owned by the primitive: a consumer-supplied id must not
-        // override it, or the tab/panel aria pairing would silently break.
-        merged.id = tabId;
+  // The wired id is owned by the primitive: a consumer-supplied id must not
+  // override it, or the tab/panel aria pairing would silently break.
+  merged.id = tabId;
 
-        // CompositeItem injects its roving-tabindex ref via compositeProps; hand it to
-        // useRender's ref param (which owns ref-merging) instead of leaving it in props,
-        // where useRender's merged ref would overwrite it and break focus navigation.
-        const { ref: compositeRef, ...mergedProps } = merged;
-
-        // The state markers lead: React writes changed attributes in key order, and Chrome flushes
-        // style when `tabindex` changes on the focused element, so a `data-selected` written after
-        // the roving `tabindex` is missing from that flush and a CSS anchor named on it snaps for a
-        // recalc. Only the key position is claimed here; `useRender` sets the values.
-        const orderedProps = {
-          ...(isSelected ? { 'data-selected': '' } : null),
-          ...(disabled ? { 'data-disabled': '' } : null),
-          ...mergedProps,
-        };
-
-        // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
-        return useRender({
-          defaultTagName: 'button',
-          render,
-          ref: [register, isRef(compositeRef) ? compositeRef : undefined, ref],
-          state,
-          stateAttributesMapping: {
-            selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
-            disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
-          },
-          props: orderedProps,
-        });
-      }}
-    >
-      {children}
-    </CompositeItem>
-  );
+  return useRender({
+    defaultTagName: 'button',
+    render,
+    ref: [compositeItem, register, ref],
+    state,
+    stateAttributesMapping: {
+      selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
+    },
+    props: merged,
+  });
 });

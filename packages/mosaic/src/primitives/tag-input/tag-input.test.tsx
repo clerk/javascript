@@ -310,6 +310,13 @@ describe('TagInput', () => {
       expect(input()).toHaveValue('x');
     });
 
+    it('claims the previous key on the first tag, without letting it scroll the page', async () => {
+      render(<Harness defaultValue={['a']} />);
+      tag('a').focus();
+      expect(fireEvent.keyDown(tag('a'), { key: 'ArrowLeft' })).toBe(false);
+      expect(tag('a')).toHaveFocus();
+    });
+
     it('moves between tags and back to the input with arrow keys', async () => {
       const user = userEvent.setup();
       render(<Harness defaultValue={['a', 'b']} />);
@@ -322,6 +329,33 @@ describe('TagInput', () => {
       expect(tag('a')).toHaveFocus();
 
       await user.keyboard('{ArrowLeft}');
+      expect(tag('a')).toHaveFocus();
+
+      await user.keyboard('{ArrowRight}{ArrowRight}');
+      expect(input()).toHaveFocus();
+    });
+
+    it('keeps arrow-key navigation when a tag handler stops propagation', async () => {
+      const user = userEvent.setup();
+      render(
+        <TagInput.Root defaultValue={['a', 'b']}>
+          <TagInput.List aria-label='Emails'>
+            {['a', 'b'].map(value => (
+              <TagInput.Tag
+                key={value}
+                value={value}
+                onKeyDown={event => event.stopPropagation()}
+              >
+                {value}
+              </TagInput.Tag>
+            ))}
+          </TagInput.List>
+          <TagInput.Input aria-label='Email' />
+        </TagInput.Root>,
+      );
+
+      await user.click(input());
+      await user.keyboard('{ArrowLeft}{ArrowLeft}');
       expect(tag('a')).toHaveFocus();
 
       await user.keyboard('{ArrowRight}{ArrowRight}');
