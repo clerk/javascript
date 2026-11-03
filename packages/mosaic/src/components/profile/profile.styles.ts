@@ -60,7 +60,7 @@ export const styles = stylex.create({
 
   // A fixed height so switching pages never resizes the surface.
   layout: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: {
       [compact]: 0,
       default: radiusVars['--cl-radius-xl'],
@@ -104,7 +104,6 @@ export const styles = stylex.create({
   },
 
   layoutInDialog: {
-    borderWidth: '0px',
     blockSize: 'auto',
     boxShadow: {
       [compact]: 'none',
@@ -120,6 +119,7 @@ export const styles = stylex.create({
 
   layoutFullscreen: {
     borderRadius: 0,
+    borderWidth: '0px',
     boxShadow: 'none',
   },
 
@@ -129,7 +129,7 @@ export const styles = stylex.create({
 
   nav: {
     padding: space['4'],
-    borderInlineEndColor: colorVars['--cl-color-border'],
+    borderInlineEndColor: colorVars['--cl-color-border-subtle'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: '1px',
     // Hidden in CSS too, so the column never shows on a phone before measuring.

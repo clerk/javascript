@@ -58,7 +58,7 @@ export const item = stylex.create({
   },
 
   outline: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderStyle: 'solid',
     borderWidth: '1px',
   },

@@ -22,6 +22,9 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
     const defaultProps = {
       'aria-disabled': disabled || undefined,
       onDragEnter: (event: DragEvent<HTMLDivElement>) => {
+        if (!carriesFiles(event)) {
+          return;
+        }
         event.preventDefault();
         if (disabled) {
           return;
@@ -30,6 +33,9 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
         setDragging(true);
       },
       onDragOver: (event: DragEvent<HTMLDivElement>) => {
+        if (!carriesFiles(event)) {
+          return;
+        }
         // Required for the element to be a valid drop target.
         event.preventDefault();
         if (!disabled) {
@@ -37,6 +43,9 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
         }
       },
       onDragLeave: (event: DragEvent<HTMLDivElement>) => {
+        if (!carriesFiles(event)) {
+          return;
+        }
         event.preventDefault();
         if (disabled) {
           return;
@@ -48,6 +57,9 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
         }
       },
       onDrop: (event: DragEvent<HTMLDivElement>) => {
+        if (!carriesFiles(event)) {
+          return;
+        }
         event.preventDefault();
         dragDepth.current = 0;
         setDragging(false);
@@ -74,3 +86,7 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
     });
   },
 );
+
+function carriesFiles(event: DragEvent<HTMLElement>) {
+  return Array.from(event.dataTransfer.types).includes('Files');
+}

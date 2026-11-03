@@ -92,7 +92,7 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
 });
 
 /**
- * Square leading column that centers its media (icon, image, or avatar). Takes
+ * Square column that centers its media (icon, image, avatar, or spinner). Takes
  * its width from the `size` on the enclosing `Item.Root`, falling back to the
  * default when rendered on its own.
  */

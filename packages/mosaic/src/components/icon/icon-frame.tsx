@@ -4,17 +4,18 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { mediaSizes } from '../../styles/media-size.styles';
 import { reset } from '../../styles/reset.styles';
-import { sizes, styles } from './icon-frame.styles';
+import { styles } from './icon-frame.styles';
 
 export interface IconFrameProps extends MosaicComponentProps<'span'> {
   bordered?: boolean;
   filled?: boolean;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
 export const IconFrame = React.forwardRef<HTMLSpanElement, IconFrameProps>(function MosaicIconFrame(
-  { bordered = true, filled = false, size = 'xl', render, xstyle, ...rest },
+  { bordered = true, filled = false, size = 'md', render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -27,7 +28,7 @@ export const IconFrame = React.forwardRef<HTMLSpanElement, IconFrameProps>(funct
         stylex.props(
           reset.base,
           styles.base,
-          sizes[size],
+          mediaSizes[size],
           bordered && styles.bordered,
           filled && styles.filled,
           xstyle,
