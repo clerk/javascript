@@ -2,4 +2,4 @@
 '@clerk/react': patch
 ---
 
-When a Clerk instance passed to `<ClerkProvider>` on iOS and Android fails to load and later finishes loading, `<ClerkProvider>` now reports it as loaded and runs the calls it queued while loading, without needing a new instance.
+In `@clerk/expo` apps on iOS and Android, when Clerk fails to load and later finishes loading, `<ClerkProvider>` now reports Clerk as loaded and runs the calls made while it was loading. Previously `isLoaded` stayed `false` until the app restarted.

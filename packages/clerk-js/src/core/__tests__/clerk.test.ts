@@ -1222,6 +1222,40 @@ describe('Clerk singleton', () => {
         });
       });
     });
+
+    describe('__internal_reloadInitialResources after a failed standard browser load', () => {
+      const unsupportedAppVersion = () =>
+        new ClerkAPIResponseError('Unsupported app version', { data: [], status: 403 });
+
+      it('does not finish the failed load', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        mockClientFetch.mockRejectedValueOnce(unsupportedAppVersion());
+        await expect(sut.load()).rejects.toBeInstanceOf(ClerkAPIResponseError);
+        const statuses: string[] = [];
+        sut.on('status', status => statuses.push(status));
+        mockClientFetch.mockResolvedValueOnce({ signedInSessions: [] });
+
+        await sut.__internal_reloadInitialResources();
+
+        expect(sut.status).toBe('error');
+        expect(statuses).toEqual([]);
+      });
+
+      it('does not finish a load that fails after a reload succeeded during it', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        const loadClientFetch = createDeferredPromise();
+        mockClientFetch.mockReturnValueOnce(loadClientFetch.promise);
+
+        const load = sut.load();
+        await vi.waitFor(() => expect(mockClientFetch).toHaveBeenCalledTimes(1));
+        mockClientFetch.mockResolvedValueOnce({ signedInSessions: [] });
+        await sut.__internal_reloadInitialResources();
+        loadClientFetch.reject(unsupportedAppVersion());
+
+        await expect(load).rejects.toBeInstanceOf(ClerkAPIResponseError);
+        expect(sut.status).toBe('error');
+      });
+    });
   });
 
   describe('updateSessionCookie monotonic backstop', () => {
