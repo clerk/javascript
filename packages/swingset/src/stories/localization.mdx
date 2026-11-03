@@ -129,6 +129,26 @@ The Spanish catalog from the example above with one string overridden for this a
   storyModule={LocalizationStories}
 />
 
+## Terms
+
+`terms` holds words used across many strings. Mosaic has one today, the word for an organization:
+
+```tsx
+<MosaicProvider
+  localization={{
+    overrides: {
+      terms: { organization: { one: 'workspace', other: 'workspaces' } },
+    },
+  }}
+>
+  <App />
+</MosaicProvider>;
+```
+
+The term fills four placeholders: `{organization}`, `{organizations}`, `{Organization}` and `{Organizations}`. The singular is the form the locale picks for one, the plural is `other`, and the capitalized versions follow the locale's rules. Other plural categories are accepted but no built-in string counts organizations, so they have no effect yet.
+
+Any string can use these placeholders, and a specific key still wins over a term. Messages Clerk sends from the server for error codes missing from the catalog are not changed. A term replaces one word, so a language whose surrounding words change with the noun needs its own strings for those keys.
+
 ## Locale
 
 `locale` is a BCP 47 tag and does one thing: it is handed to `Intl.PluralRules`, which picks the

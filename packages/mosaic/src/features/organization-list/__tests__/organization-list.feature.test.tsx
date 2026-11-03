@@ -102,7 +102,7 @@ describe('OrganizationList', () => {
     it('leaves the personal account out with hidePersonal', async () => {
       await renderOrganizationList(signedIn(), { hidePersonal: true });
 
-      expect(screen.getByRole('heading', { name: 'Choose an organization' })).toBeVisible();
+      expect(screen.getByRole('heading', { name: 'Choose your organization' })).toBeVisible();
       expect(screen.getByRole('button', { name: 'Acme' })).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Personal account' })).toBeNull();
     });
@@ -112,7 +112,7 @@ describe('OrganizationList', () => {
       seed.environment = fapiEnvironment({ organization_settings: { force_organization_selection: true } });
       await renderOrganizationList(seed);
 
-      expect(screen.getByRole('heading', { name: 'Choose an organization' })).toBeVisible();
+      expect(screen.getByRole('heading', { name: 'Choose your organization' })).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Personal account' })).toBeNull();
     });
   });

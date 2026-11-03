@@ -1,18 +1,18 @@
 export const createOrganizationMessages = {
   create: {
-    title: 'Create organization',
+    title: 'Create {organization}',
     logoLabel: 'Logo',
     logoDescription: 'Recommended size 1:1, up to 10MB.',
     uploadLogo: 'Upload',
     removeLogo: 'Remove',
     nameLabel: 'Name',
-    namePlaceholder: 'Organization name',
+    namePlaceholder: '{Organization} name',
     slugLabel: 'Slug',
     slugPlaceholder: 'my-org',
     slugInvalid: 'Use lowercase letters, numbers and hyphens only.',
-    submit: 'Create organization',
+    submit: 'Create {organization}',
     cancel: 'Cancel',
-    error: 'Unable to create the organization. Please try again.',
+    error: 'Unable to create the {organization}. Please try again.',
   },
   invite: {
     title: 'Invite new members',

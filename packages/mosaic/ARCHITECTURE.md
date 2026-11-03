@@ -225,7 +225,9 @@ helper takes the messages as a parameter rather than importing them.
 ```
 
 `messages` is the catalog for `locale`, `overrides` the app's own changes on top, and
-English sits under both. `locale` only feeds `Intl.PluralRules`. Strings are resolved
+English sits under both. `locale` only feeds `Intl.PluralRules`. The `terms` namespace holds
+words shared across strings: `{organization}` in any message resolves from it after the
+layers merge, so a view never passes a term to `fill`. Strings are resolved
 with the helpers in `src/localization/messages.ts`, never with `.replace` or `.split`
 on the string:
 

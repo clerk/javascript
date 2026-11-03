@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { MosaicLocalization } from './catalog';
 import type { MosaicMessages } from './registry';
-import { mosaicMessages } from './registry';
+import { applyTerms, messageTemplates, mosaicMessages } from './registry';
 
 interface MosaicLocalizationValue {
   messages: MosaicMessages;
@@ -51,9 +51,11 @@ function resolveLocale(locale: string | undefined): string {
 
 export function resolveLocalization(localization: MosaicLocalization | undefined): MosaicLocalizationValue {
   const layers = [localization?.messages, localization?.overrides];
+  const templates = layers.reduce<unknown>(merge, messageTemplates) as MosaicMessages;
+  const locale = resolveLocale(localization?.locale);
   return {
-    messages: layers.reduce<unknown>(merge, mosaicMessages) as MosaicMessages,
-    locale: resolveLocale(localization?.locale),
+    messages: templates === messageTemplates ? mosaicMessages : applyTerms(templates, locale),
+    locale,
   };
 }
 

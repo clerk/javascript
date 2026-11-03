@@ -12,7 +12,7 @@ export const apiKeysTableMessages = {
   noKeys: 'No API Keys created',
   noKeysDescription: {
     user: 'API keys allow apps and scripts to access your account without signing in.',
-    organization: 'API keys allow apps and scripts to access your organization without signing in.',
+    organization: 'API keys allow apps and scripts to access your {organization} without signing in.',
   },
   clearSearch: 'Clear search',
   pagination: 'API keys pages',

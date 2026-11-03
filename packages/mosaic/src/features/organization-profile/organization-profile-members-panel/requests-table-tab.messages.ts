@@ -13,7 +13,7 @@ export const requestsTableTabMessages = {
   declineRequest: 'Decline {name}',
   invite: 'Invite',
   noRequests: 'No pending requests',
-  noRequestsDescription: 'Requests to join this organization will show up here.',
+  noRequestsDescription: 'Requests to join this {organization} will show up here.',
   loading: 'Loading requests',
   loaded: 'Requests loaded',
   loadError: 'Unable to load requests',
