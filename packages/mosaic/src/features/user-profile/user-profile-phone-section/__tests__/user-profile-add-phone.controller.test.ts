@@ -84,5 +84,10 @@ describe('useUserProfileAddPhoneController', () => {
     await act(async () => vi.advanceTimersByTimeAsync(1000));
 
     expect(result.current.resendSeconds).toBe(0);
+    await act(async () => {
+      result.current.onResend();
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(sendCode).toHaveBeenCalledTimes(2);
   });
 });

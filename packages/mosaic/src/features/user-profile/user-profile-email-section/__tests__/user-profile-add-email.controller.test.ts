@@ -34,8 +34,9 @@ describe('useUserProfileAddEmailController', () => {
 
   it('unlocks resend by the clock when timers were held up', async () => {
     vi.useFakeTimers();
+    const email = verifier();
     const { result } = renderHook(() =>
-      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: created }),
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: () => Promise.resolve(email) }),
     );
     act(() => result.current.onOpenChange(true));
     act(() => result.current.onEmailAddressChange('new@example.com'));
@@ -49,6 +50,8 @@ describe('useUserProfileAddEmailController', () => {
     await act(async () => vi.advanceTimersByTimeAsync(1000));
 
     expect(result.current.resendSeconds).toBe(0);
+    act(() => result.current.onResend());
+    expect(email.start).toHaveBeenCalledTimes(2);
   });
 
   it('keeps the resend countdown running while verification is pending', async () => {
