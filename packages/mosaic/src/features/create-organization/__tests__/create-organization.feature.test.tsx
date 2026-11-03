@@ -307,7 +307,9 @@ describe('CreateOrganization', () => {
       const user = userEvent.setup();
 
       await create(user, 'Acme');
-      await user.click(await screen.findByRole('combobox', { name: /Role/ }));
+      const role = await screen.findByRole('combobox', { name: /Role/ });
+      await waitFor(() => expect(role).toBeEnabled());
+      await user.click(role);
       await user.click(await screen.findByRole('option', { name: 'Member' }));
       await user.type(screen.getByRole('textbox', { name: 'Email' }), 'grace@example.com');
       await user.click(screen.getByRole('button', { name: 'Send invitations' }));
