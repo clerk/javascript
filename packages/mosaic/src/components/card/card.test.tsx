@@ -454,6 +454,54 @@ describe('Mosaic Card', () => {
     expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
   });
 
+  it('reflects the header alignment, starting by default', () => {
+    render(
+      <Card.Root>
+        <Card.Header data-testid='default' />
+        <Card.Header
+          align='center'
+          data-testid='center'
+        />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('default')).toHaveAttribute('data-align', 'start');
+    expect(screen.getByTestId('center')).toHaveAttribute('data-align', 'center');
+  });
+
+  it('renders media in the header, above the title', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Media data-testid='media'>Logo</Card.Media>
+          <Card.Title data-testid='title'>Review terms</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    const media = screen.getByTestId('media');
+    expect(media).toHaveClass('cl-card-media');
+    expect(media.tagName).toBe('DIV');
+    expect(media.nextElementSibling).toBe(screen.getByTestId('title'));
+  });
+
+  it('composes caller xstyle, refs and render onto the media', () => {
+    const ref = React.createRef<HTMLElement>();
+    render(
+      <Card.Media
+        ref={ref}
+        xstyle={callerStyles.header}
+        data-testid='media'
+        render={props => <figure {...props} />}
+      />,
+    );
+
+    const media = screen.getByTestId('media');
+    expect(media.tagName).toBe('FIGURE');
+    expect(ref.current).toBe(media);
+    expect(media).toHaveClass('cl-card-media', stylex.props(callerStyles.header).className ?? '');
+  });
+
   it('renders the title and description slots', () => {
     render(
       <Card.Root>

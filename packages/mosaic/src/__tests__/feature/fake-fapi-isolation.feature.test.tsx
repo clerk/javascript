@@ -44,4 +44,17 @@ describe('fake FAPI isolation between tests', () => {
     expect(await clerk.session?.getToken()).toEqual(expect.any(String));
     expect(document.cookie).not.toMatch(/(?:^|; )__session/);
   });
+
+  it('clears authentication cookies when the test iframe leaves the page', async () => {
+    const user = fapiUser({ id: 'user_1' });
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+    await renderWithClerk(<div />, { standardBrowser: true });
+    window.dispatchEvent(new Event('focus'));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(document.cookie).toContain('__session=');
+
+    window.dispatchEvent(new PageTransitionEvent('pagehide'));
+
+    expect(document.cookie).toBe('');
+  });
 });

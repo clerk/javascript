@@ -59,12 +59,16 @@ export const sizes = stylex.create({
   lg: { width: '36.25rem' },
 });
 
+const HEADER_ROW_GAP = space['0.5'];
+const HEADER_COLUMN_GAP = space['1'];
+const CLOSE_BUTTON_WIDTH = space['7'];
+
 export const header = stylex.create({
   // `row-reverse` so the dismiss button leads in the DOM — and so takes the dialog's opening
   // focus — while sitting at the inline end.
   base: {
     paddingInline: space['5'],
-    columnGap: space['1'],
+    columnGap: HEADER_COLUMN_GAP,
     display: 'flex',
     flexDirection: 'row-reverse',
     paddingBlockStart: space['4'],
@@ -73,7 +77,14 @@ export const header = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: '1',
-    rowGap: space['0.5'],
+    rowGap: HEADER_ROW_GAP,
+  },
+  contentBesideCloseButton: {
+    paddingInlineStart: `calc(${CLOSE_BUTTON_WIDTH} + ${HEADER_COLUMN_GAP})`,
+  },
+  media: {
+    display: 'flex',
+    marginBlockEnd: `calc(${space['6']} - ${HEADER_ROW_GAP})`,
   },
   title: {
     color: colorVars['--cl-color-foreground'],
@@ -87,6 +98,14 @@ export const header = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'pretty',
+  },
+});
+
+export const headerAlign = stylex.create({
+  start: {},
+  center: {
+    alignItems: 'center',
+    textAlign: 'center',
   },
 });
 
