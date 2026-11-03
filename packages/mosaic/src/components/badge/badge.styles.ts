@@ -2,12 +2,9 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-// warning/negative/positive fill with the subtle surface and use the saturated token as text;
-// primary fills with the solid token and uses its `-foreground` for text.
-//
-// Neutral has no subtle surface to fill — `--cl-color-foreground-secondary` is a text gray, and its
-// `-foreground` is a text color rather than an on-fill one, so it is unreadable against the solid
-// 900. It rides the same neutral scrim the button's neutral fill does.
+// Every color but primary fills with its `-subtle` token and uses the saturated token as text;
+// primary fills with the solid token and uses its `-foreground` for text. Every `-subtle` is a
+// wash, so the chip stays visible on the page, the surface and the faded surface alike.
 export const styles = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-full'],
@@ -33,7 +30,7 @@ export const colors = stylex.create({
     color: colorVars['--cl-color-brand-foreground'],
   },
   neutral: {
-    backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
+    backgroundColor: colorVars['--cl-color-neutral-subtle'],
     color: colorVars['--cl-color-foreground'],
   },
   warning: {

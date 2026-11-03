@@ -13,14 +13,20 @@ import {
 import { iconScope } from '../icon/icon.markers.stylex';
 
 // Neutral fills are the three neutral alpha steps, shared across variants:
-//   100 — `filled-neutral` rest, `outline-*`/`ghost-*` hover
-//   200 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
+//   100 — `filled-neutral` rest, `ghost-*` hover
+//   200 — `filled-neutral` hover, `ghost-*` pressed
 //   300 — `filled-neutral` pressed
 
 // Opaque fills blend toward their own on-fill at the same 12%/18%. Neutral has no fill
 // to blend from, so it rides the opacity ramp above.
+// Outline variants fill with the surface, so their hover and pressed tint mixes the neutral or
+// negative color into it.
 const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 12%)`;
 const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 18%)`;
+const outlineNeutralHover = `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 6%, ${colorVars['--cl-color-surface']})`;
+const outlineNeutralActive = `color-mix(in srgb, ${colorVars['--cl-color-neutral']} 8%, ${colorVars['--cl-color-surface']})`;
+const outlineNegativeHover = `color-mix(in srgb, ${colorVars['--cl-color-negative']} 8%, ${colorVars['--cl-color-surface']})`;
+const outlineNegativeActive = `color-mix(in srgb, ${colorVars['--cl-color-negative']} 12%, ${colorVars['--cl-color-surface']})`;
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
@@ -182,12 +188,12 @@ export const variants = stylex.create({
   'outline-primary': {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
-      default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+      default: colorVars['--cl-color-surface'],
+      ':not([data-disabled]):active': outlineNeutralActive,
+      ':not([data-disabled])[data-open]': outlineNeutralActive,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': outlineNeutralHover,
       },
     },
     color: colorVars['--cl-color-brand'],
@@ -195,12 +201,12 @@ export const variants = stylex.create({
   'outline-neutral': {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
-      default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+      default: colorVars['--cl-color-surface'],
+      ':not([data-disabled]):active': outlineNeutralActive,
+      ':not([data-disabled])[data-open]': outlineNeutralActive,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': outlineNeutralHover,
       },
     },
     color: colorVars['--cl-color-foreground'],
@@ -208,12 +214,12 @@ export const variants = stylex.create({
   'outline-negative': {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
-      default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+      default: colorVars['--cl-color-surface'],
+      ':not([data-disabled]):active': outlineNegativeActive,
+      ':not([data-disabled])[data-open]': outlineNegativeActive,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': outlineNegativeHover,
       },
     },
     color: colorVars['--cl-color-negative'],

@@ -66,7 +66,7 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
   pageSizeSelect: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '1px',
@@ -82,7 +82,7 @@ export const styles = stylex.create({
     paddingBlock: space['2'],
     paddingInline: space['3'],
     alignItems: 'center',
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     display: 'flex',
@@ -94,7 +94,7 @@ export const styles = stylex.create({
     display: 'flex',
   },
   row: {
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
   },

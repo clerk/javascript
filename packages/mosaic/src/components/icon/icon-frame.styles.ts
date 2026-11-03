@@ -17,7 +17,7 @@ export const styles = stylex.create({
     justifyContent: 'center',
   },
   bordered: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
   },
   filled: {
     backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
