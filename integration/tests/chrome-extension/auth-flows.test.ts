@@ -97,7 +97,7 @@ for (const environmentType of ['development', 'production'] as const) {
 
       expect(response.ok()).toBe(true);
       expect((await preparation)?.ok()).toBe(true);
-      await signUp.enterTestOtpCode({ awaitPrepare: false });
+      await signUp.enterTestOtpCode({ awaitPrepare: false, awaitAttempt: false });
 
       await expect(extensionPage.getByTestId('user-id')).toHaveText(/^user_/, { timeout: 30_000 });
       await expect(extensionPage.getByTestId('session-id')).toHaveText(/^sess_/);
