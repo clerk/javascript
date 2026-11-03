@@ -1,6 +1,7 @@
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
+import { AvatarDropzone } from '../../../components/avatar-dropzone';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
@@ -36,7 +37,7 @@ export function UserProfilePictureRowView({
   return (
     <FileUpload.Root
       {...AVATAR_UPLOAD}
-      disabled={isPending}
+      disabled={isPending || !onChange}
       aria-busy={isPending || undefined}
       render={<Section.Row />}
       onReject={onReject}
@@ -47,7 +48,7 @@ export function UserProfilePictureRowView({
         }
       }}
     >
-      <Section.Item>
+      <AvatarDropzone.Root render={<Section.Item />}>
         <Section.Media size='lg'>
           <Avatar.Root size='fit'>
             <Avatar.Image
@@ -55,6 +56,7 @@ export function UserProfilePictureRowView({
               src={previewUrl ?? imageUrl}
             />
             <Avatar.Fallback>{initials}</Avatar.Fallback>
+            <AvatarDropzone.Overlay />
           </Avatar.Root>
         </Section.Media>
         <Section.Content>
@@ -66,7 +68,7 @@ export function UserProfilePictureRowView({
           hasImage={hasImage}
           onRemove={onRemove}
         />
-      </Section.Item>
+      </AvatarDropzone.Root>
       <Section.Error>{error}</Section.Error>
     </FileUpload.Root>
   );

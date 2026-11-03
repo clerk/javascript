@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
+import { AvatarDropzone } from '../../../components/avatar-dropzone';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { Pen } from '../../../icons/glyphs/pen';
@@ -52,7 +53,7 @@ export function OrganizationProfileLogoRowView({
 
   return (
     <FileUpload.Root
-      disabled={logo.isPending}
+      disabled={logo.isPending || !onChange}
       aria-busy={logo.isPending || undefined}
       {...AVATAR_UPLOAD}
       render={<Section.Row />}
@@ -69,7 +70,7 @@ export function OrganizationProfileLogoRowView({
         }
       }}
     >
-      <Section.Item>
+      <AvatarDropzone.Root render={<Section.Item />}>
         <Section.Media size='lg'>
           <Avatar.Root
             shape='square'
@@ -80,6 +81,7 @@ export function OrganizationProfileLogoRowView({
               src={logo.previewUrl ?? imageUrl}
             />
             <Avatar.Fallback>{initials}</Avatar.Fallback>
+            <AvatarDropzone.Overlay />
           </Avatar.Root>
         </Section.Media>
         <Section.Content>
@@ -91,7 +93,7 @@ export function OrganizationProfileLogoRowView({
           hasImage={hasImage}
           onRemove={handleRemove}
         />
-      </Section.Item>
+      </AvatarDropzone.Root>
       <Section.Error>{error}</Section.Error>
     </FileUpload.Root>
   );
