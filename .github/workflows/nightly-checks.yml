@@ -74,7 +74,7 @@ jobs:
           if [ "${{ matrix.test-name }}" == "nextjs" ]; then
             E2E_DEBUG=1 E2E_APP_ID=quickstart.next.appRouter pnpm test:integration:base --grep @quickstart 2>&1 | tee "$OUTPUT_FILE"
           else
-            E2E_DEBUG=1 pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only 2>&1 | tee "$OUTPUT_FILE"
+            E2E_DEBUG=1 pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force 2>&1 | tee "$OUTPUT_FILE"
           fi
           echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
         env:

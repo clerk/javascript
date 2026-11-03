@@ -18,6 +18,7 @@
     "format": "turbo format && node scripts/format-non-workspace.mjs",
     "format:check": "turbo format:check && node scripts/format-non-workspace.mjs --check",
     "preinstall": "npx only-allow pnpm",
+    "integration:inputs": "node scripts/integration-test-inputs.mjs",
     "integration:secrets": "node ./scripts/1password-keys.mjs",
     "lint": "node ./scripts/lint.mjs",
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",

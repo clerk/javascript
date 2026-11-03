@@ -85,6 +85,9 @@ jobs:
       - name: Check Dashboard links
         run: pnpm lint:dashboard-links
 
+      - name: Verify integration test inputs are generated
+        run: node scripts/integration-test-inputs.mjs --check
+
       - name: Verify localizations are generated
         run: |
           pnpm --filter @clerk/localizations generate
@@ -700,12 +703,16 @@ jobs:
         id: integration-tests
         timeout-minutes: 25
         run: |
+          if [ "$EVENT" = "merge_group" ]; then
+            TURBO_ARGS="$TURBO_ARGS --force"
+          fi
           if [ "${{ matrix.test-name }}" = "electron" ]; then
             xvfb-run -a pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
           else
             pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
           fi
         env:
+          EVENT: ${{ github.event_name }}
           CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
           CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           E2E_DEBUG: '1'
