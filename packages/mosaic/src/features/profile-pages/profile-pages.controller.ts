@@ -1,22 +1,17 @@
-import { useState } from 'react';
+import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
+import { useRouterScope } from '../../routing/use-router';
 
 export function useProfilePagesController(
   initialPage: string,
   pageIds: readonly string[] | undefined,
-  openingFallbackPage?: string,
+  routing: MosaicLocationOptions,
 ) {
-  const [activePage, setActivePage] = useState(initialPage);
-  const [isOpening, setIsOpening] = useState(true);
+  const firstPage = pageIds?.[0];
+  const fallbackPage = pageIds && firstPage !== undefined && !pageIds.includes(initialPage) ? firstPage : initialPage;
+  const { route, go } = useRouterScope(Object.fromEntries((pageIds ?? [initialPage]).map(id => [id, id])), {
+    ...routing,
+    notFound: fallbackPage,
+  });
 
-  if (pageIds) {
-    if (isOpening) {
-      setIsOpening(false);
-    }
-    const fallbackPage = (isOpening ? openingFallbackPage : undefined) ?? pageIds[0];
-    if (fallbackPage !== undefined && !pageIds.includes(activePage)) {
-      setActivePage(fallbackPage);
-    }
-  }
-
-  return { activePage, onPageChange: setActivePage };
+  return { activePage: route, onPageChange: go };
 }

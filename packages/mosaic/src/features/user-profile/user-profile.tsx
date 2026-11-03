@@ -206,12 +206,16 @@ type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange'
 };
 
 function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
-  const navigation = useProfilePagesController(initialPage, userProfilePageIds(viewProps));
+  const { activePage, onPageChange } = useProfilePagesController(initialPage, userProfilePageIds(viewProps), {
+    routing: 'virtual',
+    path: '/user',
+  });
 
   return (
     <UserProfileView
       {...viewProps}
-      {...navigation}
+      activePage={activePage}
+      onPageChange={onPageChange}
     />
   );
 }
@@ -226,20 +230,18 @@ function CombinedUserProfileView({
     model.status === 'ready'
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
-  const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
-  const navigation = useProfilePagesController(
+  const { activePage, onPageChange } = useProfilePagesController(
     initialPage,
-    pageIds,
-    initialPage.startsWith(ORGANIZATION_PAGE_PREFIX)
-      ? pageIds?.find(id => id.startsWith(ORGANIZATION_PAGE_PREFIX))
-      : undefined,
+    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
+    { routing: 'virtual', path: '/user' },
   );
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <UserProfileView
         {...viewProps}
-        {...navigation}
+        activePage={activePage}
+        onPageChange={onPageChange}
         organization={organization}
       />
     </OrganizationProfileProvider>
