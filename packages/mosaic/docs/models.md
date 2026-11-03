@@ -146,7 +146,9 @@ available in the consuming branch before following this guidance.
 value to pure formatting helpers. For relative labels that refresh each minute,
 use `useNow({ updateInterval: 60_000 })`. Without an interval, the hook retains
 its initial value. Reuse this API instead of adding a feature-specific clock
-provider or timer.
+provider or timer. The one exception is a resend cooldown: keep its unlock time in
+the machine and read the seconds left with `useResendSeconds`, whose timer stops
+once the cooldown ends.
 
 In tests, supply a fixed `Date` through `MosaicNowProvider`, assert the displayed
 label, then advance fake timers across a label boundary and assert the update.
