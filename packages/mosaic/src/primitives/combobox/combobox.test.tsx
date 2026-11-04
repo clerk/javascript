@@ -673,20 +673,28 @@ describe('Combobox selection in a transition', () => {
     throw neverResolves;
   }
 
+  type HoverRender = { option: string; hovered: string | null; active: boolean };
   type OptionRender = { option: string; parentValue: string | null; selected: unknown };
 
   function Fixture({
     update = 'transition',
     onRenderOption,
     suspendSelected = false,
+    hoverInTransition = false,
+    onRenderHover,
+    suspendWhenActive,
   }: {
     update?: 'transition' | 'deferred';
     onRenderOption?: (render: OptionRender) => void;
     suspendSelected?: boolean;
+    hoverInTransition?: boolean;
+    onRenderHover?: (render: HoverRender) => void;
+    suspendWhenActive?: string;
   }) {
     const [value, setValue] = useState<string | null>(null);
     const deferredValue = useDeferredValue(value);
     const [isPending, startTransition] = useTransition();
+    const [hovered, setHovered] = useState<string | null>(null);
     const [loadingMore, setLoadingMore] = useState(false);
     const [isLoadingMore, startLoadingMore] = useTransition();
     const parentValue = update === 'deferred' ? deferredValue : value;
@@ -716,10 +724,24 @@ describe('Combobox selection in a transition', () => {
                   label={option.label}
                   render={props => {
                     onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                    const active = 'data-active' in props;
+                    onRenderHover?.({ option: option.value, hovered, active });
                     return (
-                      <div {...props}>
+                      <div
+                        {...props}
+                        onMouseMove={
+                          hoverInTransition
+                            ? event =>
+                                startTransition(() => {
+                                  setHovered(option.value);
+                                  props.onMouseMove?.(event);
+                                })
+                            : props.onMouseMove
+                        }
+                      >
                         {props.children}
                         {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
+                        {active && suspendWhenActive === option.value ? <Suspends /> : null}
                       </div>
                     );
                   }}
@@ -805,5 +827,37 @@ describe('Combobox selection in a transition', () => {
     expect(banana).toHaveAttribute('data-active');
     expect(screen.getByRole('combobox')).toHaveAttribute('aria-activedescendant', banana.id);
     expect(screen.getByText('Loading more')).toBeInTheDocument();
+  });
+
+  it('renders the hovered option as active in the same render as a hover transition', async () => {
+    const user = userEvent.setup();
+    const renders: HoverRender[] = [];
+    render(
+      <Fixture
+        hoverInTransition
+        onRenderHover={entry => renders.push(entry)}
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+    expect(renders).not.toContainEqual({ option: 'banana', hovered: 'banana', active: false });
+  });
+
+  it('keeps the current options on screen while a hover transition suspends', async () => {
+    const user = userEvent.setup();
+    render(
+      <Fixture
+        hoverInTransition
+        suspendWhenActive='banana'
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+    expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Banana' })).not.toHaveAttribute('data-active');
   });
 });

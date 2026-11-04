@@ -1,6 +1,5 @@
 'use client';
 
-import { useSafeLayoutEffect } from '@clerk/shared/react';
 import {
   arrow,
   autoUpdate,
@@ -23,10 +22,11 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
-import { createStore } from '../utils/store';
 import {
   AutocompleteContext,
   type AutocompleteContextValue,
+  AutocompleteHighlightContext,
+  type AutocompleteHighlightContextValue,
   AutocompleteOptionsContext,
   type AutocompleteOptionsContextValue,
 } from './autocomplete-context';
@@ -77,11 +77,6 @@ function AutocompleteInner(props: AutocompleteProps) {
       setSelectedIndex(index);
     }
   }, []);
-
-  const [activeIndexStore] = useState(() => createStore(activeIndex));
-  useSafeLayoutEffect(() => {
-    activeIndexStore.set(activeIndex);
-  }, [activeIndexStore, activeIndex]);
 
   const previousOpenRef = useRef(open);
   useEffect(() => {
@@ -220,22 +215,27 @@ function AutocompleteInner(props: AutocompleteProps) {
 
   const optionsContextValue = useMemo<AutocompleteOptionsContextValue>(
     () => ({
-      activeIndexStore,
-      selectedValue,
       getItemProps,
       handleSelect,
       refs,
       valuesByIndexRef,
       registerSelectedIndex,
     }),
-    [activeIndexStore, selectedValue, getItemProps, handleSelect, refs, registerSelectedIndex],
+    [getItemProps, handleSelect, refs, registerSelectedIndex],
+  );
+
+  const highlightContextValue = useMemo<AutocompleteHighlightContextValue>(
+    () => ({ activeIndex, selectedValue }),
+    [activeIndex, selectedValue],
   );
 
   return (
     <FloatingNode id={nodeId}>
       <AutocompleteContext.Provider value={contextValue}>
         <AutocompleteOptionsContext.Provider value={optionsContextValue}>
-          {children}
+          <AutocompleteHighlightContext.Provider value={highlightContextValue}>
+            {children}
+          </AutocompleteHighlightContext.Provider>
         </AutocompleteOptionsContext.Provider>
       </AutocompleteContext.Provider>
     </FloatingNode>

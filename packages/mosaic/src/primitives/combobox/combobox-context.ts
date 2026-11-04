@@ -8,7 +8,6 @@ import type {
 import { createContext, type CSSProperties, useContext } from 'react';
 
 import type { TransitionProps } from '../hooks/use-transition';
-import type { Store } from '../utils';
 
 export interface ComboboxContextValue {
   open: boolean;
@@ -50,14 +49,26 @@ export function useComboboxContext() {
 }
 
 export interface ComboboxOptionsContextValue {
-  activeIndexStore: Store<number | null>;
-  selectedValue: string | null;
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: string, index: number, label: string) => void;
   refs: ExtendedRefs<ReferenceType>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   registerSelectedIndex: (index: number, value: string, label: string, selected: boolean) => (() => void) | undefined;
   registerOption: (index: number) => void;
+}
+
+export interface ComboboxHighlightContextValue {
+  activeIndex: number | null;
+  selectedValue: string | null;
+}
+export const ComboboxHighlightContext = createContext<ComboboxHighlightContextValue | null>(null);
+
+export function useComboboxHighlightContext() {
+  const ctx = useContext(ComboboxHighlightContext);
+  if (!ctx) {
+    throw new Error('Combobox.Option must be used within <Combobox>');
+  }
+  return ctx;
 }
 
 export const ComboboxOptionsContext = createContext<ComboboxOptionsContextValue | null>(null);

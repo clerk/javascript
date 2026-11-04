@@ -8,7 +8,6 @@ import type {
 import { createContext, type CSSProperties, useContext } from 'react';
 
 import type { TransitionProps } from '../hooks/use-transition';
-import type { Store } from '../utils';
 
 export interface AutocompleteContextValue {
   open: boolean;
@@ -44,9 +43,21 @@ export function useAutocompleteContext() {
   return ctx;
 }
 
-export interface AutocompleteOptionsContextValue {
-  activeIndexStore: Store<number | null>;
+export interface AutocompleteHighlightContextValue {
+  activeIndex: number | null;
   selectedValue: string | undefined;
+}
+export const AutocompleteHighlightContext = createContext<AutocompleteHighlightContextValue | null>(null);
+
+export function useAutocompleteHighlightContext() {
+  const ctx = useContext(AutocompleteHighlightContext);
+  if (!ctx) {
+    throw new Error('Autocomplete.Option must be used within <Autocomplete>');
+  }
+  return ctx;
+}
+
+export interface AutocompleteOptionsContextValue {
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: string, index: number, label: string) => void;
   refs: ExtendedRefs<ReferenceType>;

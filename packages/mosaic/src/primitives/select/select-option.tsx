@@ -3,8 +3,8 @@
 import { useListItem } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender, useStore } from '../utils';
-import { useSelectOptionsContext } from './select-context';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { useSelectHighlightContext, useSelectOptionsContext } from './select-context';
 
 export interface SelectOptionProps extends ComponentProps<'button'> {
   value: string;
@@ -13,23 +13,36 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
 }
 
 export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function SelectOption(props, ref) {
+  const { activeIndex, selectedValues } = useSelectHighlightContext();
+  const { ref: itemRef, index } = useListItem({ label: props.label ?? props.value });
+  return (
+    <SelectOptionBody
+      {...props}
+      forwardedRef={ref}
+      listItemRef={itemRef}
+      index={index}
+      isActive={activeIndex === index}
+      isSelected={selectedValues.includes(props.value)}
+      isAnchor={selectedValues.at(-1) === props.value}
+    />
+  );
+});
+
+interface SelectOptionBodyProps extends SelectOptionProps {
+  forwardedRef: React.ForwardedRef<HTMLButtonElement>;
+  listItemRef: (node: HTMLElement | null) => void;
+  index: number;
+  isActive: boolean;
+  isSelected: boolean;
+  isAnchor: boolean;
+}
+
+const SelectOptionBody = React.memo(function SelectOptionBody(bodyProps: SelectOptionBodyProps) {
+  const { forwardedRef: ref, listItemRef: itemRef, index, isActive, isSelected, isAnchor, ...props } = bodyProps;
   const { render, value, label, disabled, ...otherProps } = props;
-  const {
-    activeIndexStore,
-    selectedValues,
-    setSelectedIndex,
-    getItemProps,
-    handleSelect,
-    valueToLabelRef,
-    selectedItemRef,
-  } = useSelectOptionsContext();
+  const { setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } = useSelectOptionsContext();
 
   const displayLabel = label ?? value;
-  const { ref: itemRef, index } = useListItem({ label: displayLabel });
-
-  const isSelected = selectedValues.includes(value);
-  const isAnchor = selectedValues.at(-1) === value;
-  const isActive = useStore(activeIndexStore, activeIndex => activeIndex === index);
 
   useEffect(() => {
     const map = valueToLabelRef.current;

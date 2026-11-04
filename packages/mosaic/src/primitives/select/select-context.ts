@@ -8,7 +8,6 @@ import type {
 import { createContext, type CSSProperties, type RefObject, useContext } from 'react';
 
 import type { TransitionProps } from '../hooks/use-transition';
-import type { Store } from '../utils';
 
 export interface SelectItem {
   label: string;
@@ -60,9 +59,21 @@ export function useSelectContext() {
   return ctx;
 }
 
-export interface SelectOptionsContextValue {
-  activeIndexStore: Store<number | null>;
+export interface SelectHighlightContextValue {
+  activeIndex: number | null;
   selectedValues: string[];
+}
+export const SelectHighlightContext = createContext<SelectHighlightContextValue | null>(null);
+
+export function useSelectHighlightContext() {
+  const ctx = useContext(SelectHighlightContext);
+  if (!ctx) {
+    throw new Error('Select.Option must be used within <Select>');
+  }
+  return ctx;
+}
+
+export interface SelectOptionsContextValue {
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: string, index: number) => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;

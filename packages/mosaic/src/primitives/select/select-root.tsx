@@ -1,6 +1,5 @@
 'use client';
 
-import { useSafeLayoutEffect } from '@clerk/shared/react';
 import {
   arrow,
   autoUpdate,
@@ -27,11 +26,12 @@ import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
-import { createStore } from '../utils/store';
 import { alignSelectedItem } from './align-selected-item';
 import {
   SelectContext,
   type SelectContextValue,
+  SelectHighlightContext,
+  type SelectHighlightContextValue,
   type SelectItem,
   SelectOptionsContext,
   type SelectOptionsContextValue,
@@ -107,11 +107,6 @@ function SelectInner(props: SelectProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<string, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-  const [activeIndexStore] = useState(() => createStore(activeIndex));
-  useSafeLayoutEffect(() => {
-    activeIndexStore.set(activeIndex);
-  }, [activeIndexStore, activeIndex]);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
@@ -328,21 +323,26 @@ function SelectInner(props: SelectProps) {
 
   const optionsContextValue = useMemo<SelectOptionsContextValue>(
     () => ({
-      activeIndexStore,
-      selectedValues,
       getItemProps,
       handleSelect,
       setSelectedIndex,
       valueToLabelRef,
       selectedItemRef,
     }),
-    [activeIndexStore, selectedValues, getItemProps, handleSelect],
+    [getItemProps, handleSelect],
+  );
+
+  const highlightContextValue = useMemo<SelectHighlightContextValue>(
+    () => ({ activeIndex, selectedValues }),
+    [activeIndex, selectedValues],
   );
 
   return (
     <FloatingNode id={nodeId}>
       <SelectContext.Provider value={contextValue}>
-        <SelectOptionsContext.Provider value={optionsContextValue}>{children}</SelectOptionsContext.Provider>
+        <SelectOptionsContext.Provider value={optionsContextValue}>
+          <SelectHighlightContext.Provider value={highlightContextValue}>{children}</SelectHighlightContext.Provider>
+        </SelectOptionsContext.Provider>
       </SelectContext.Provider>
     </FloatingNode>
   );

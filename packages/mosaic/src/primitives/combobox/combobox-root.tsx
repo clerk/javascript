@@ -1,6 +1,5 @@
 'use client';
 
-import { useSafeLayoutEffect } from '@clerk/shared/react';
 import {
   arrow,
   autoUpdate,
@@ -23,10 +22,11 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
-import { createStore } from '../utils/store';
 import {
   ComboboxContext,
   type ComboboxContextValue,
+  ComboboxHighlightContext,
+  type ComboboxHighlightContextValue,
   ComboboxOptionsContext,
   type ComboboxOptionsContextValue,
 } from './combobox-context';
@@ -130,11 +130,6 @@ function ComboboxInner(props: ComboboxProps) {
     setSelectedIndex(index);
     return () => setSelectedIndex(current => (current === index ? null : current));
   }, []);
-
-  const [activeIndexStore] = useState(() => createStore(activeIndex));
-  useSafeLayoutEffect(() => {
-    activeIndexStore.set(activeIndex);
-  }, [activeIndexStore, activeIndex]);
 
   const previousOpenRef = useRef(open);
   useEffect(() => {
@@ -302,8 +297,6 @@ function ComboboxInner(props: ComboboxProps) {
 
   const optionsContextValue = useMemo<ComboboxOptionsContextValue>(
     () => ({
-      activeIndexStore,
-      selectedValue,
       getItemProps,
       handleSelect,
       refs,
@@ -311,13 +304,22 @@ function ComboboxInner(props: ComboboxProps) {
       registerSelectedIndex,
       registerOption,
     }),
-    [activeIndexStore, selectedValue, getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+    [getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+  );
+
+  const highlightContextValue = useMemo<ComboboxHighlightContextValue>(
+    () => ({ activeIndex, selectedValue }),
+    [activeIndex, selectedValue],
   );
 
   return (
     <FloatingNode id={nodeId}>
       <ComboboxContext.Provider value={contextValue}>
-        <ComboboxOptionsContext.Provider value={optionsContextValue}>{children}</ComboboxOptionsContext.Provider>
+        <ComboboxOptionsContext.Provider value={optionsContextValue}>
+          <ComboboxHighlightContext.Provider value={highlightContextValue}>
+            {children}
+          </ComboboxHighlightContext.Provider>
+        </ComboboxOptionsContext.Provider>
       </ComboboxContext.Provider>
     </FloatingNode>
   );
