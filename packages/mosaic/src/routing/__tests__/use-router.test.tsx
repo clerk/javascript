@@ -2,11 +2,12 @@ import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 
+import type { SegmentParts } from '../location';
 import type { RouteTable } from '../routes';
 import { MosaicRoutingScope } from '../routing-scope';
 import type { RouterScopeOptions } from '../use-router';
 import { useRouter, useRouterScope } from '../use-router';
-import { useVirtualUrl, useVirtualUrlWrite, VirtualUrlProvider } from '../virtual-url';
+import { useVirtualSegment, useVirtualWrite, VirtualStoreProvider } from '../virtual-store';
 
 const routes = {
   account: 'account',
@@ -21,24 +22,28 @@ function ScopeOf({ options, children }: { options: RouterScopeOptions<typeof rou
   return <MosaicRoutingScope scope={scope}>{children}</MosaicRoutingScope>;
 }
 
-function wrapperAt(initialUrl: string, scopeOptions?: RouterScopeOptions<typeof routes>) {
+function wrapperWith(initial?: Record<string, SegmentParts>, scopeOptions?: RouterScopeOptions<typeof routes>) {
   return ({ children }: { children: ReactNode }) => (
-    <VirtualUrlProvider initialUrl={initialUrl}>
+    <VirtualStoreProvider initial={initial}>
       {scopeOptions ? <ScopeOf options={scopeOptions}>{children}</ScopeOf> : children}
-    </VirtualUrlProvider>
+    </VirtualStoreProvider>
   );
 }
 
+const useUserSegment = () => useVirtualSegment('/user');
+
 describe('useRouterScope', () => {
-  it('derives the route from the page virtual URL', () => {
-    const { result } = renderHook(() => useRouterScope(routes, userScope), { wrapper: wrapperAt('/user/security') });
+  it('derives the route from its entry', () => {
+    const { result } = renderHook(() => useRouterScope(routes, userScope), {
+      wrapper: wrapperWith({ '/user': ['security'] }),
+    });
     expect(result.current.route).toBe('security');
     expect(result.current.params).toEqual({});
   });
 
   it('re-renders with the new route after go', () => {
-    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), url: useVirtualUrl() }), {
-      wrapper: wrapperAt('/user'),
+    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), segment: useUserSegment() }), {
+      wrapper: wrapperWith({ '/user': ['account'] }),
     });
 
     act(() => {
@@ -47,52 +52,85 @@ describe('useRouterScope', () => {
 
     expect(result.current.router.route).toBe('statement');
     expect(result.current.router.params).toEqual({ statementId: 'st_1' });
-    expect(result.current.url).toBe('/user/billing/statement/st_1');
+    expect(result.current.segment).toEqual(['billing', 'statement', 'st_1']);
   });
 
-  it('encodes on write and decodes on read, exactly once', () => {
-    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), url: useVirtualUrl() }), {
-      wrapper: wrapperAt('/user'),
+  it('round-trips any param value', () => {
+    const { result } = renderHook(() => useRouterScope(routes, userScope), {
+      wrapper: wrapperWith({ '/user': ['account'] }),
     });
 
     act(() => {
-      result.current.router.go('statement', { statementId: 'st/1 %2F' });
+      result.current.go('statement', { statementId: 'st/1 %2F' });
     });
 
-    expect(result.current.url).toBe('/user/billing/statement/st%2F1%20%252F');
-    expect(result.current.router.params).toEqual({ statementId: 'st/1 %2F' });
+    expect(result.current.params).toEqual({ statementId: 'st/1 %2F' });
   });
 
-  it('shows the not-found route at once and redirects the location to it', () => {
-    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), url: useVirtualUrl() }), {
-      wrapper: wrapperAt('/user/nowhere'),
-    });
-    expect(result.current.router.route).toBe('account');
-    expect(result.current.url).toBe('/user/account');
-  });
-
-  it('redirects an empty segment to the not-found route', () => {
-    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), url: useVirtualUrl() }), {
-      wrapper: wrapperAt('/'),
+  it('shows the not-found route at once and redirects its entry to it', () => {
+    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), segment: useUserSegment() }), {
+      wrapper: wrapperWith({ '/user': ['nowhere'] }),
     });
     expect(result.current.router.route).toBe('account');
-    expect(result.current.url).toBe('/user/account');
+    expect(result.current.segment).toEqual(['account']);
   });
 
-  it('follows a write made to the page virtual URL by someone else', () => {
-    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), write: useVirtualUrlWrite() }), {
-      wrapper: wrapperAt('/user/security'),
+  it('redirects an empty entry to the not-found route', () => {
+    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), segment: useUserSegment() }), {
+      wrapper: wrapperWith(),
+    });
+    expect(result.current.router.route).toBe('account');
+    expect(result.current.segment).toEqual(['account']);
+  });
+
+  it('follows a write made to its entry by someone else', () => {
+    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), write: useVirtualWrite() }), {
+      wrapper: wrapperWith({ '/user': ['security'] }),
     });
 
     act(() => {
-      result.current.write('/user/billing/statement/st_2');
+      result.current.write('/user', ['billing', 'statement', 'st_2']);
     });
     expect(result.current.router.route).toBe('statement');
   });
 
+  it('ignores writes to other entries', () => {
+    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), write: useVirtualWrite() }), {
+      wrapper: wrapperWith({ '/user': ['security'] }),
+    });
+
+    act(() => {
+      result.current.write('/organization', ['members']);
+    });
+    expect(result.current.router.route).toBe('security');
+  });
+
+  it('lets two owners with different bases coexist', () => {
+    const orgRoutes = { general: 'general', members: 'members' } as const;
+    const { result } = renderHook(
+      () => ({
+        user: useRouterScope(routes, userScope),
+        org: useRouterScope(orgRoutes, { routing: 'virtual', path: '/organization', notFound: 'general' }),
+      }),
+      { wrapper: wrapperWith() },
+    );
+    expect(result.current.user.route).toBe('account');
+    expect(result.current.org.route).toBe('general');
+
+    act(() => {
+      result.current.user.go('security');
+    });
+    act(() => {
+      result.current.org.go('members');
+    });
+
+    expect(result.current.user.route).toBe('security');
+    expect(result.current.org.route).toBe('members');
+  });
+
   it('keeps the same result object between unrelated renders', () => {
     const { result, rerender } = renderHook(() => useRouterScope(routes, userScope), {
-      wrapper: wrapperAt('/user/security'),
+      wrapper: wrapperWith({ '/user': ['security'] }),
     });
     const first = result.current;
     rerender();
@@ -102,7 +140,7 @@ describe('useRouterScope', () => {
   it('keeps the router while an equal table is passed as a new object', () => {
     const { result, rerender } = renderHook(
       ({ table }: { table: RouteTable }) => useRouterScope(table, { ...userScope, notFound: 'account' }),
-      { initialProps: { table: { ...routes } }, wrapper: wrapperAt('/user/security') },
+      { initialProps: { table: { ...routes } }, wrapper: wrapperWith({ '/user': ['security'] }) },
     );
     const { go } = result.current;
 
@@ -119,7 +157,7 @@ describe('useRouterScope', () => {
 
   it('keeps the same scope while the options are unchanged', () => {
     const { result, rerender } = renderHook(() => useRouterScope(routes, { ...userScope }), {
-      wrapper: wrapperAt('/user/security'),
+      wrapper: wrapperWith({ '/user': ['security'] }),
     });
     const { scope } = result.current;
     rerender();
@@ -129,13 +167,15 @@ describe('useRouterScope', () => {
 
 describe('useRouter', () => {
   it('reads the mode and base path from the scope', () => {
-    const { result } = renderHook(() => useRouter(routes), { wrapper: wrapperAt('/user/security', userScope) });
+    const { result } = renderHook(() => useRouter(routes), {
+      wrapper: wrapperWith({ '/user': ['security'] }, userScope),
+    });
     expect(result.current.route).toBe('security');
   });
 
   it('shares the segment with the owner and other nested routers', () => {
     const { result } = renderHook(() => [useRouter(routes), useRouter(routes)] as const, {
-      wrapper: wrapperAt('/user/security', userScope),
+      wrapper: wrapperWith({ '/user': ['security'] }, userScope),
     });
 
     act(() => {
@@ -147,14 +187,14 @@ describe('useRouter', () => {
 
   it('reports no route for a segment a sibling owns, without redirecting', () => {
     const billing = { statement: 'billing/statement/:statementId' } as const;
-    const { result } = renderHook(() => ({ router: useRouter(billing), url: useVirtualUrl() }), {
-      wrapper: wrapperAt('/user/security', userScope),
+    const { result } = renderHook(() => ({ router: useRouter(billing), segment: useUserSegment() }), {
+      wrapper: wrapperWith({ '/user': ['security'] }, userScope),
     });
     expect(result.current.router.route).toBeUndefined();
-    expect(result.current.url).toBe('/user/security');
+    expect(result.current.segment).toEqual(['security']);
   });
 
   it('throws without a scope', () => {
-    expect(() => renderHook(() => useRouter(routes), { wrapper: wrapperAt('/user') })).toThrow('useRouterScope');
+    expect(() => renderHook(() => useRouter(routes), { wrapper: wrapperWith() })).toThrow('useRouterScope');
   });
 });
