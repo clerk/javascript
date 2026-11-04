@@ -13,6 +13,7 @@ import { requestsTableTabMessages } from '../features/organization-profile/organ
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
+import { taskSetupMfaMessages } from '../features/task-setup-mfa/task-setup-mfa.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.messages';
@@ -82,6 +83,7 @@ export const mosaicMessages = {
   errors: errorMessages,
   roles: roleMessages,
   waitlist: waitlistMessages,
+  taskSetupMfa: taskSetupMfaMessages,
 };
 
 export type MosaicMessages = typeof mosaicMessages;

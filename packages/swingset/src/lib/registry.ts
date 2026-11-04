@@ -357,6 +357,13 @@ import {
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
 import {
+  AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
+  Default as TaskSetupMfaDefault,
+  meta as taskSetupMfaMeta,
+  NewPhone as TaskSetupMfaNewPhone,
+  SmsOnly as TaskSetupMfaSmsOnly,
+} from '../stories/task-setup-mfa.stories';
+import {
   Colors as TextColors,
   Default as TextDefault,
   meta as textMeta,
@@ -723,6 +730,14 @@ const userButtonModule: StoryModule = {
   meta: userButtonMeta,
   Combined: UserButtonCombined,
   User: UserButtonUser,
+};
+
+const taskSetupMfaModule: StoryModule = {
+  meta: taskSetupMfaMeta,
+  Default: TaskSetupMfaDefault,
+  SmsOnly: TaskSetupMfaSmsOnly,
+  AuthenticatorOnly: TaskSetupMfaAuthenticatorOnly,
+  NewPhone: TaskSetupMfaNewPhone,
 };
 
 const inviteMembersButtonModule: StoryModule = {
@@ -1152,6 +1167,7 @@ export const registry: StoryModule[] = [
   apiKeysTableModule,
   reverificationModule,
   waitlistModule,
+  taskSetupMfaModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
