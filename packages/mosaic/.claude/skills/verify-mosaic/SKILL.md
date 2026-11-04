@@ -84,14 +84,14 @@ $ CS ab eval '(() => Object.fromEntries([...document.querySelector("[role=dialog
 
 Proof standards:
 
-- Drive the user path: click, type, and press keys on the page. Do not set React state or call story functions from `eval`. Use `eval` only to read.
+- Drive the user path: click, type, and press keys on the page. Do not set React state or call story functions from `eval`. Use `eval` to read, and for the screenshot setup below: injecting a style and adding an id.
 - Capture the action and the state it produced: before and after for a toggle, open and closed for an overlay, the knob value and the preview attribute for a prop.
 - Prove the check can fail. Save your diff to a file, undo the change, confirm the undo took effect, run the same commands into a `CS evidence <feature-id>-control` folder, and show the result differs. Then apply the diff again and run the check once more. A check that passes with and without the change proves nothing.
 - A screenshot alone proves nothing about state. Pair it with the ARIA snapshot or the attribute dump that shows the claimed value.
 - Open every screenshot with the Read tool before you attach it, the control too. Name the part the change touches, such as the footer divider, and confirm it is in frame, uncropped and uncovered. A screenshot that misses that part is not evidence. Retake it.
 - Before each screenshot, hide the Next.js dev badge, which floats over the preview: `CS ab eval '(() => { const s = document.createElement("style"); s.textContent = "nextjs-portal{display:none!important}"; document.head.append(s); })()'`.
 - Set the viewport taller than the element, and scroll the element into view before `screenshot <selector>`. An element screenshot can still come out shifted, with part of the page above it and its bottom cut off. If it does, screenshot the enclosing story preview box instead: the `not-prose` wrapper in `packages/swingset/src/components/StoryPreview.tsx`. Give it an id from `eval` and pass `#<id>`.
-- For the control, check that the undo took effect before you capture anything: run `git status`, and read back the value the change moves. In zsh, `$FILES` does not split on spaces, so keep the file list in an array (`F=(a b); git checkout HEAD~1 -- "${F[@]}"`).
+- For the control, undo with `git diff > change.patch && git apply -R change.patch`, and restore with `git apply change.patch`. Use `git checkout HEAD~1 -- <files>` only when the change is one commit and the tree is otherwise clean. In zsh, `$FILES` does not split on spaces, so keep a file list in an array (`F=(a b); git checkout HEAD~1 -- "${F[@]}"`). Check that the undo took effect before you capture anything: run `git status`, and read back the value the change moves.
 - For a styling change, check both themes (`Dark mode` switch) and RTL when the change touches layout.
 - Name the feature file and entry point you used. Report every entry point you could not reach, and why, instead of claiming it through another one.
 - Evidence lives in `packages/mosaic/.verify/evidence/`, which git ignores. `CS down` keeps it. Each folder's `source.env` records the commit it was made at, whether the tree had uncommitted changes, and whether swingset had an env file loaded.
