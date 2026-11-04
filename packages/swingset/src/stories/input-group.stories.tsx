@@ -151,3 +151,28 @@ export function Invalid(props: Record<string, unknown>) {
     </Field.Root>
   );
 }
+
+export function Counter(props: Record<string, unknown>) {
+  const [value, setValue] = useState('');
+
+  return (
+    <Field.Root xstyle={styles.fieldWidth}>
+      <Field.Label>Display name</Field.Label>
+      <InputGroup.Root {...knobsAsProps(props)}>
+        <InputGroup.Input
+          value={value}
+          maxLength={20}
+          onChange={event => setValue(event.target.value)}
+        />
+        <InputGroup.End>
+          <span
+            role='status'
+            aria-live='polite'
+          >
+            {value.length}/20
+          </span>
+        </InputGroup.End>
+      </InputGroup.Root>
+    </Field.Root>
+  );
+}

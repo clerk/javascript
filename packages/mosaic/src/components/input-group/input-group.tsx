@@ -21,6 +21,48 @@ export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
   size?: InputGroupSize;
 }
 
+const widgetRoles = [
+  'button',
+  'checkbox',
+  'combobox',
+  'grid',
+  'gridcell',
+  'link',
+  'listbox',
+  'menu',
+  'menubar',
+  'menuitem',
+  'menuitemcheckbox',
+  'menuitemradio',
+  'option',
+  'radio',
+  'radiogroup',
+  'scrollbar',
+  'searchbox',
+  'slider',
+  'spinbutton',
+  'switch',
+  'tab',
+  'tablist',
+  'textbox',
+  'tree',
+  'treegrid',
+  'treeitem',
+];
+
+const interactiveSelector = [
+  'button',
+  'input',
+  'select',
+  'textarea',
+  'a[href]',
+  'label',
+  'summary',
+  '[tabindex]',
+  ...widgetRoles.map(role => `[role="${role}"]`),
+  '[contenteditable]:not([contenteditable="false"])',
+].join(', ');
+
 const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function MosaicInputGroupRoot(
   { render, xstyle, onClick, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
   ref,
@@ -52,9 +94,7 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
         if (event.defaultPrevented || disabled || !(event.target instanceof Element)) {
           return;
         }
-        const interactive = event.target.closest(
-          'button, input, select, textarea, a[href], label, summary, [tabindex], [role], [contenteditable]:not([contenteditable="false"])',
-        );
+        const interactive = event.target.closest(interactiveSelector);
         if (
           !event.currentTarget.contains(event.target) ||
           (interactive && interactive !== event.currentTarget && event.currentTarget.contains(interactive))

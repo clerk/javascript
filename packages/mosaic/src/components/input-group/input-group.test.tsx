@@ -42,15 +42,20 @@ describe('Mosaic InputGroup', () => {
         <Input aria-label='Value' />
         <InputGroup.End>
           <span>Decoration</span>
+          <span role='status'>3/20</span>
+          <span role='note'>Optional</span>
+          <span role='presentation'>|</span>
         </InputGroup.End>
       </InputGroup.Root>,
     );
     const input = screen.getByRole('textbox');
     fireEvent.click(screen.getByTestId('group'));
     expect(input).toHaveFocus();
-    input.blur();
-    fireEvent.click(screen.getByText('Decoration'));
-    expect(input).toHaveFocus();
+    for (const text of ['Decoration', '3/20', 'Optional', '|']) {
+      input.blur();
+      fireEvent.click(screen.getByText(text));
+      expect(input).toHaveFocus();
+    }
   });
 
   it('does not focus the input when the group click is canceled or disabled', () => {
@@ -93,10 +98,16 @@ describe('Mosaic InputGroup', () => {
           >
             Custom control
           </span>
+          <span
+            role='switch'
+            aria-checked='false'
+          >
+            Toggle
+          </span>
         </InputGroup.End>
       </InputGroup.Root>,
     );
-    for (const name of ['Action', 'Link', 'Custom control']) {
+    for (const name of ['Action', 'Link', 'Custom control', 'Toggle']) {
       await user.click(screen.getByText(name));
       expect(screen.getByRole('textbox')).not.toHaveFocus();
     }
