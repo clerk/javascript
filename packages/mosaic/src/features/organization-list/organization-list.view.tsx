@@ -98,7 +98,7 @@ function ListStep({
         {error}
       </Card.Banner>
       <Card.Content>
-        <Item.Group variant='outline'>
+        <Item.Group>
           {hidePersonal ? null : (
             <SelectRow
               name={m.personal}

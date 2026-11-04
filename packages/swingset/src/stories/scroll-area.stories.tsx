@@ -3,6 +3,7 @@ import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Item } from '@clerk/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
+import { Text } from '@clerk/mosaic/components/text';
 import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
@@ -14,8 +15,8 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './scroll-area.stories?raw';
 
 const styles = stylex.create({
-  separatorMargin: {
-    marginBlock: space['2'],
+  accountGap: {
+    marginTop: space['2'],
   },
   noMask: {
     maskImage: 'none',
@@ -46,7 +47,6 @@ const accounts = [
 function OrganizationRow({ name }: { name: string }) {
   return (
     <Item.Root
-      size='xs'
       render={({ children, ...props }) => (
         <button
           {...props}
@@ -91,12 +91,12 @@ export function Default() {
       <Item.Group xstyle={scrollAreaViewport()}>
         {accounts.map(({ email, organizations }, index) => (
           <React.Fragment key={email}>
-            {index > 0 ? <Item.Separator xstyle={styles.separatorMargin} /> : null}
-            <Item.Root size='xs'>
-              <Item.Content>
-                <Item.Description>{email}</Item.Description>
-              </Item.Content>
-            </Item.Root>
+            <Text
+              color='foreground-secondary'
+              xstyle={index > 0 && styles.accountGap}
+            >
+              {email}
+            </Text>
             {organizations.map(name => (
               <OrganizationRow
                 key={`${email}-${name}`}
@@ -167,10 +167,7 @@ export function Gutter() {
             >
               <Item.Group xstyle={scrollAreaViewport(gutter)}>
                 {names.map(name => (
-                  <Item.Root
-                    key={name}
-                    size='xs'
-                  >
+                  <Item.Root key={name}>
                     <Item.Media>
                       <Avatar.Root
                         size='fit'
