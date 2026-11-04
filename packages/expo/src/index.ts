@@ -22,5 +22,3 @@ export * from './trusted-devices';
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 
 export type { TokenCache } from './cache/types';
-
-// CI cache probe, reverted in this PR
