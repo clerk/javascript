@@ -4,15 +4,7 @@
     "signature": true
   },
   "ui": "tui",
-  "globalDependencies": [
-    ".github/.cache-version",
-    ".npmrc",
-    "package.json",
-    "pnpm-lock.yaml",
-    "pnpm-workspace.yaml",
-    "tsconfig.json",
-    "tsconfig.*.json"
-  ],
+  "globalDependencies": [".github/.cache-version", ".npmrc", "pnpm-workspace.yaml", "tsconfig.json", "tsconfig.*.json"],
   "globalEnv": [
     "CLERK_*",
     "EXPO_PUBLIC_CLERK_*",
@@ -152,7 +144,6 @@
         "tsdown.config.mts",
         "tsdown.config.ts",
         "tsup.config.ts",
-        "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",
         "!dist/**",

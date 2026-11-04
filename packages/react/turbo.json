@@ -12,7 +12,6 @@
         "tsconfig.json",
         "tsconfig.*.json",
         "tsup.config.ts",
-        "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",
         "!dist/**",

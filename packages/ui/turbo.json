@@ -59,7 +59,6 @@
         "rspack.config.js",
         "vitest.*.mts",
 
-        "!**/__snapshots__/**",
         "!coverage/**",
         "!examples/**",
         "!node_modules/**"

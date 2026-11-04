@@ -58,9 +58,9 @@
         "tsconfig.json",
         "tsconfig.*.json",
         "tsup.config.ts",
+        "vitest.*.mts",
         "webpack.config.js",
 
-        "!**/__snapshots__/**",
         "!coverage/**",
         "!examples/**",
         "!node_modules/**"

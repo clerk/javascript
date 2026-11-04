@@ -21,7 +21,6 @@
         "$TURBO_ROOT$/packages/expo-native-components/android/**",
         "$TURBO_ROOT$/packages/expo-native-components/ios/**",
         "!$TURBO_ROOT$/packages/expo-*/android/build/**",
-        "!**/__snapshots__/**",
         "!CHANGELOG.md",
         "!coverage/**",
         "!dist/**",
