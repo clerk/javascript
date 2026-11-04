@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useState } from 'react';
+import { createRef, useLayoutEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -575,6 +575,44 @@ describe('TagInput', () => {
       await user.type(input(), 'b{Enter}');
 
       expect(screen.getByRole('status')).toHaveTextContent('a|b');
+    });
+
+    it.each([
+      { operation: 'add', expected: ['first', 'second', 'third'] },
+      { operation: 'remove', expected: ['second'] },
+    ])('uses the new controlled tags when a child calls $operation in a layout effect', ({ operation, expected }) => {
+      const onValueChange = vi.fn();
+
+      function EditTags() {
+        const { value, add, remove } = TagInput.useTagInput();
+        useLayoutEffect(() => {
+          if (!value.includes('second')) {
+            return;
+          }
+          if (operation === 'add') {
+            add(['third']);
+          } else {
+            remove('first', 'input');
+          }
+        }, [value, add, remove]);
+        return null;
+      }
+
+      function Controlled({ value }: { value: string[] }) {
+        return (
+          <TagInput.Root
+            value={value}
+            onValueChange={onValueChange}
+          >
+            <EditTags />
+          </TagInput.Root>
+        );
+      }
+
+      const { rerender } = render(<Controlled value={['first']} />);
+      rerender(<Controlled value={['first', 'second']} />);
+
+      expect(onValueChange).toHaveBeenCalledExactlyOnceWith(expected);
     });
 
     it('does not restore an add that a controlled parent rejected', async () => {

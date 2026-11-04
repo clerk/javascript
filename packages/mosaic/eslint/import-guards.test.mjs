@@ -1,54 +1,111 @@
+import { execFile } from 'node:child_process';
+import { cp, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+import { promisify } from 'node:util';
+import { tmpdir } from 'node:os';
+import { pathToFileURL } from 'node:url';
 
-import { ESLint } from 'eslint';
-import noUnneededEffects from 'eslint-plugin-react-you-might-not-need-an-effect';
-import { describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
-const root = path.resolve(import.meta.dirname, '../../..');
-const mosaicRoot = path.resolve(import.meta.dirname, '..');
+const packageRoot = path.resolve(import.meta.dirname, '..');
+let mosaicRoot;
 const featureDir = 'src/features/reverification';
-const layerFixtures = [
-  'src/primitives/sample.ts',
-  'src/components/sample.tsx',
-  'src/hooks/sample.ts',
-  'src/utils/sample.ts',
-  'src/localization/sample.ts',
-  'src/modals/sample.ts',
-  'src/blocks/sample.tsx',
-  'src/queries/sample.ts',
-];
-const flowFixtures = [
-  'sample.view.ts',
-  'sample.view.tsx',
-  'sample.controller.ts',
-  'sample.controller.tsx',
-  'sample.model.ts',
-  'sample.model.tsx',
-  'sample.messages.ts',
-].map(file => `${featureDir}/${file}`);
 const testFixture = 'src/hooks/__tests__/sample.test.ts';
 const partFixture = 'src/primitives/sample-part.tsx';
 const partTestFixture = 'src/primitives/__tests__/sample-part.test.tsx';
-const rootEslint = new ESLint({ cwd: root });
-const eslint = new ESLint({
-  cwd: mosaicRoot,
-  overrideConfig: {
-    languageOptions: {
-      parserOptions: {
-        projectService: {
-          allowDefaultProject: [...flowFixtures, ...layerFixtures, testFixture, partFixture, partTestFixture].map(
-            file => `packages/mosaic/${file}`,
-          ),
-          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 32,
-        },
-      },
-    },
-  },
+const execute = promisify(execFile);
+const require = createRequire(path.join(packageRoot, 'package.json'));
+const oxlint = path.join(path.dirname(require.resolve('oxlint/package.json')), 'bin/oxlint');
+
+beforeAll(async () => {
+  mosaicRoot = await realpath(await mkdtemp(path.join(tmpdir(), 'mosaic-oxlint-')));
+  await cp(path.join(packageRoot, 'src'), path.join(mosaicRoot, 'src'), { recursive: true });
+  for (const file of ['package.json', 'tsconfig.json', 'tsconfig.base.json', 'tsconfig.test.json']) {
+    await cp(path.join(packageRoot, file), path.join(mosaicRoot, file));
+  }
+  await symlink(path.join(packageRoot, 'node_modules'), path.join(mosaicRoot, 'node_modules'), 'dir');
+  const configUrl = pathToFileURL(path.join(packageRoot, 'oxlint.config.mjs')).href;
+  await writeFile(
+    path.join(mosaicRoot, 'oxlint.config.mjs'),
+    `
+import { createRequire } from 'node:module';
+import config from ${JSON.stringify(configUrl)};
+const require = createRequire(${JSON.stringify(path.join(packageRoot, 'package.json'))});
+const resolvePlugin = plugin => typeof plugin === 'string'
+  ? { name: plugin.replace(/^eslint-plugin-/, ''), specifier: require.resolve(plugin) }
+  : { ...plugin, specifier: require.resolve(plugin.specifier) };
+export default {
+  ...config,
+  jsPlugins: config.jsPlugins.map(resolvePlugin),
+  overrides: config.overrides.map(override => ({
+    ...override,
+    ...(override.jsPlugins ? { jsPlugins: override.jsPlugins.map(resolvePlugin) } : {}),
+  })),
+  settings: { ...config.settings, 'boundaries/root-path': import.meta.dirname },
+};
+`,
+  );
+}, 30_000);
+
+afterAll(async () => {
+  if (mosaicRoot) {
+    await rm(mosaicRoot, { recursive: true, force: true });
+  }
 });
 
 async function lintAt(file, source) {
-  const [result] = await eslint.lintText(source, { filePath: path.join(mosaicRoot, file) });
-  return result.messages;
+  const filePath = path.join(mosaicRoot, file);
+  await mkdir(path.dirname(filePath), { recursive: true });
+  const original = await readFile(filePath).catch(error => {
+    if (error.code === 'ENOENT') {
+      return undefined;
+    }
+    throw error;
+  });
+  await writeFile(filePath, source);
+  try {
+    const result = await execute(
+      process.execPath,
+      [
+        oxlint,
+        '--config',
+        path.join(mosaicRoot, 'oxlint.config.mjs'),
+        '--disable-nested-config',
+        '--format',
+        'json',
+        '--threads',
+        '1',
+        filePath,
+      ],
+      {
+        cwd: mosaicRoot,
+        maxBuffer: 10 * 1024 * 1024,
+      },
+    ).catch(error => {
+      if (error.code === 1 && error.stdout) {
+        return error;
+      }
+      throw error;
+    });
+    if (!result.stdout.trimStart().startsWith('{')) {
+      throw new Error(result.stdout);
+    }
+    return JSON.parse(result.stdout).diagnostics.map(diagnostic => ({
+      message: diagnostic.message,
+      ruleId: diagnostic.code
+        .replace(/^([^()]+)\((.+)\)$/, '$1/$2')
+        .replace(/^typescript\//, '@typescript-eslint/')
+        .replace(/^eslint\//, ''),
+      fatal: !diagnostic.code,
+    }));
+  } finally {
+    if (original === undefined) {
+      await rm(filePath);
+    } else {
+      await writeFile(filePath, original);
+    }
+  }
 }
 
 async function lint(file, source) {
@@ -198,7 +255,6 @@ describe('Mosaic import boundaries', { timeout: 30_000 }, () => {
     expect(messages.filter(message => message.ruleId === 'mosaic/no-model-react-state')).toEqual([
       expect.objectContaining({
         message: 'Put interaction state in the controller and pass its results to the view.',
-        messageId: 'controllerState',
       }),
     ]);
   });
@@ -229,7 +285,6 @@ describe('Mosaic import boundaries', { timeout: 30_000 }, () => {
         expect(messages.filter(message => message.ruleId === 'mosaic/no-dynamic-message-catalogs')).toEqual([
           expect.objectContaining({
             message: 'Use useMessages() for localized and overridden copy instead of importing catalog values.',
-            messageId: 'useMessages',
           }),
         ]);
       }
@@ -436,7 +491,10 @@ describe('Mosaic parts', { timeout: 30_000 }, () => {
 
 describe('Mosaic tests', { timeout: 30_000 }, () => {
   async function vitestRules(source) {
-    const messages = await lintAt(testFixture, ["import { describe, expect, test } from 'vitest';", source].join('\n'));
+    const messages = await lintAt(
+      testFixture,
+      ["import { afterAll, beforeAll, describe, expect, test } from 'vitest';", source].join('\n'),
+    );
     expect(messages.find(message => message.fatal)).toBeUndefined();
     return messages.map(message => message.ruleId).filter(rule => rule?.startsWith('vitest/'));
   }
@@ -522,32 +580,36 @@ describe('Mosaic effects', { timeout: 30_000 }, () => {
   });
 });
 
-describe('Mosaic package configuration', { timeout: 30_000 }, () => {
-  test.each([
-    'src/features/sample.view.tsx',
-    'src/features/sample.controller.ts',
-    'src/features/sample.model.ts',
-    'src/styles/sample.styles.ts',
-    'src/primitives/sample.tsx',
-  ])('%s inherits repository rules without enabling guards at the root', async file => {
-    const filePath = path.join(mosaicRoot, file);
-    const rootConfig = await rootEslint.calculateConfigForFile(filePath);
-    const mosaicConfig = await eslint.calculateConfigForFile(filePath);
-    const inheritedRules = { ...mosaicConfig.rules };
-
-    for (const rule of [
-      'boundaries/dependencies',
-      'mosaic/no-model-react-state',
-      'mosaic/no-dynamic-message-catalogs',
-      'mosaic/forward-ref-parts',
-      'mosaic/no-raw-invoke',
-      '@typescript-eslint/no-import-type-side-effects',
-      ...Object.keys(noUnneededEffects.configs.strict.rules),
-    ]) {
-      expect(rootConfig.rules[rule]).toBeUndefined();
-      delete inheritedRules[rule];
+describe('Mosaic package configuration', () => {
+  test('inherits repository rules and keeps Mosaic guards in the package', async () => {
+    const configAt = async cwd => {
+      const { stdout } = await execute(process.execPath, [oxlint, '-c', 'oxlint.config.mjs', '--print-config'], {
+        cwd,
+      });
+      return JSON.parse(stdout);
+    };
+    const rootConfig = await configAt(path.resolve(packageRoot, '../..'));
+    const mosaicConfig = await configAt(packageRoot);
+    expect(mosaicConfig.rules['no-restricted-imports']).toEqual(rootConfig.rules['no-restricted-imports']);
+    const rootRules = [rootConfig.rules, ...rootConfig.overrides.map(override => override.rules)];
+    for (const rules of rootRules) {
+      expect(Object.keys(rules).some(rule => /^(mosaic|boundaries)\//.test(rule))).toBe(false);
     }
+    expect(mosaicConfig.overrides.some(override => override.rules['boundaries/dependencies'])).toBe(true);
+  });
+});
 
-    expect(inheritedRules).toEqual(rootConfig.rules);
+describe('Mosaic migration coverage', { timeout: 30_000 }, () => {
+  test.each([
+    ['@typescript-eslint/no-floating-promises', 'export function load(fetch: () => Promise<void>) { fetch(); }'],
+    ['@typescript-eslint/consistent-type-assertions', 'export const value = 1 as number;'],
+    ['eslint-compat/no-restricted-syntax', 'export function View() { return <form />; }'],
+    [
+      '@stylexjs/enforce-extension',
+      "import * as stylex from '@stylexjs/stylex'; export const tokens = stylex.defineVars({ color: 'red' });",
+    ],
+  ])('preserves %s', async (rule, source) => {
+    const messages = await lint('sample.view.tsx', source);
+    expect(messages.some(message => message.ruleId === rule)).toBe(true);
   });
 });

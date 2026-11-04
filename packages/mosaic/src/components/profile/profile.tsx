@@ -104,6 +104,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const openNav = React.useCallback(() => setNavOpenIn(navLayout), [navLayout]);
   const closeNav = React.useCallback(() => setNavOpenIn(null), []);
   React.useEffect(() => {
+    // eslint-disable-next-line react/set-state-in-effect -- Reset navigation when the active profile panel changes.
     setNavOpenIn(null);
   }, [navLayout]);
   const selectPage = React.useCallback(
@@ -217,6 +218,7 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
   const Tag = `h${useHeadingLevel()}` as const;
   return (
     <VisuallyHidden
+      // eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
       ref={ref as React.Ref<HTMLSpanElement>}
       render={render ?? <Tag />}
       {...mergeStyleProps(themeProps('profile-title'), stylex.props(xstyle), rest)}

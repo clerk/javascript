@@ -1,28 +1,24 @@
 import createMDX from '@next/mdx';
-import stylexPlugin from '@stylexjs/unplugin/webpack';
 import { createRequire } from 'module';
-import { dirname, resolve } from 'path';
-import rehypeRaw from 'rehype-raw';
-import rehypeSlug from 'rehype-slug';
-import remarkGfm from 'remark-gfm';
+import { dirname, relative, resolve } from 'path';
 import { fileURLToPath } from 'url';
-
-import { mosaicLightningCssTargets } from '../mosaic/stylex-lightningcss.config.mjs';
 
 const require = createRequire(import.meta.url);
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const mosaicRoot = resolve(__dirname, '../mosaic');
+const isDev = process.env.NODE_ENV !== 'production';
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [remarkGfm],
+    remarkPlugins: ['remark-gfm'],
     rehypePlugins: [
       [
-        rehypeRaw,
+        'rehype-raw',
         {
           passThrough: ['mdxjsEsm', 'mdxJsxFlowElement', 'mdxJsxTextElement', 'mdxFlowExpression', 'mdxTextExpression'],
         },
       ],
-      rehypeSlug,
+      'rehype-slug',
     ],
     allowDangerousHtml: true,
   },
@@ -31,81 +27,56 @@ const withMDX = createMDX({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['tsx', 'ts', 'mdx'],
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  webpack(config) {
-    // `import src from './foo.stories.tsx?raw'` must return the file's *untransformed* text.
-    // Next's SWC loader matches by extension and ignores the `?raw` query, so on its own it
-    // would compile the file before our `asset/source` rule captures it (yielding `_jsxDEV(…)`
-    // output instead of source). Exclude `?raw` from every existing loader, then emit the raw
-    // bytes ourselves. Story modules self-import this way to expose `__source` for the
-    // `<Story>` code footer.
-    const excludeRawQuery = rules => {
-      for (const rule of rules) {
-        if (!rule || typeof rule !== 'object') {
-          continue;
-        }
-        if (Array.isArray(rule.oneOf)) {
-          excludeRawQuery(rule.oneOf);
-        }
-        if (Array.isArray(rule.rules)) {
-          excludeRawQuery(rule.rules);
-        }
-        if (rule.oneOf || rule.rules || rule.type === 'asset/source') {
-          continue;
-        }
-        if (!rule.resourceQuery) {
-          rule.resourceQuery = { not: [/raw/] };
-        } else if (rule.resourceQuery.not) {
-          rule.resourceQuery.not.push(/raw/);
-        }
-      }
-    };
-    excludeRawQuery(config.module.rules);
-    config.module.rules.push({ resourceQuery: /raw/, type: 'asset/source' });
-
-    // Swingset consumes Mosaic from source, so StyleX (`defineVars`/`create`/`props`) must be
-    // compiled here — otherwise the calls hit the runtime and throw. The unplugin transforms the
-    // StyleX *JS only*, keeping SWC intact so `next/font` and the Emotion transform keep working.
-    //
-    // The `@stylexjs/postcss-plugin` (see `postcss.config.mjs`) is what extracts the CSS — the
-    // token `:root { --cl-* }` defaults and the atoms — in both dev and prod. This unplugin only
-    // transforms the StyleX *calls* in the JS. `runtimeInjection` forks by env:
-    // - Prod: `false`. Atoms are static class refs resolved against the extracted sheet.
-    // - Dev: `true`. On top of the extracted sheet, StyleX also injects each atom at runtime under
-    //   its content hash, so editing a `.styles.ts` file hot-reloads a fresh atom (the extracted
-    //   sheet goes stale because Next won't re-run the `globals.css` PostCSS pass on Mosaic-source
-    //   edits). The `:root` token defaults come from the extraction and never change mid-session,
-    //   so they stay correct — `runtimeInjection` can't emit them (`defineVars` is compile-only).
-    // Both passes share the same babel version/options so atom hashes match.
-    const isDev = process.env.NODE_ENV !== 'production';
-    config.plugins.push(
-      stylexPlugin({
-        dev: isDev,
-        runtimeInjection: isDev,
-        unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../mosaic') },
-        // Stories reach `tokens.stylex.ts` through the same alias; StyleX resolves it itself.
-        aliases: { '@clerk/mosaic/*': [resolve(__dirname, '../mosaic/src/*')] },
-        useCSSLayers: true,
-        lightningcssOptions: { targets: mosaicLightningCssTargets },
-      }),
-    );
-
-    // Dev-only: StyleX's runtime injector drops named `@container` rules after the first per
-    // query — see the loader for the bug. Scoped to that one module.
-    if (isDev) {
-      config.module.rules.push({
-        test: /[\\/]@stylexjs[\\/]stylex[\\/]lib[\\/](es|cjs)[\\/]inject\.(mjs|js)$/,
-        use: [{ loader: resolve(__dirname, 'src/lib/loaders/stylex-inject-named-container.cjs') }],
-      });
-    }
-
-    config.resolve.alias['@clerk/mosaic'] = resolve(__dirname, '../mosaic/src');
-    // Mosaic/headless source imports this. Webpack resolves from the aliased file's
-    // directory, which is outside swingset, so the package has to be named here.
-    config.resolve.alias['@floating-ui/react'] = dirname(require.resolve('@floating-ui/react/package.json'));
-    return config;
+  experimental: { turbopackUseBuiltinBabel: false },
+  turbopack: {
+    root: resolve(__dirname, '../..'),
+    resolveAlias: {
+      '@clerk/mosaic': '../mosaic/src',
+      '@clerk/mosaic/*': '../mosaic/src/*',
+      '@floating-ui/react': relative(__dirname, dirname(require.resolve('@floating-ui/react/package.json'))).replaceAll(
+        '\\',
+        '/',
+      ),
+    },
+    rules: {
+      '*': {
+        condition: { query: /[?&]raw(?:[=&]|$)/ },
+        type: 'raw',
+      },
+      '*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}': {
+        condition: {
+          all: [{ not: 'foreign' }, { not: { query: /[?&]raw(?:[=&]|$)/ } }, { content: /@stylexjs\/stylex/ }],
+        },
+        loaders: [
+          {
+            loader: 'babel-loader',
+            options: {
+              babelrc: false,
+              configFile: false,
+              presets: [require.resolve('@babel/preset-typescript')],
+              plugins: [
+                require.resolve('@babel/plugin-syntax-jsx'),
+                [
+                  require.resolve('@stylexjs/babel-plugin'),
+                  {
+                    dev: isDev,
+                    runtimeInjection: isDev,
+                    unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicRoot },
+                    aliases: { '@clerk/mosaic/*': [resolve(mosaicRoot, 'src/*')] },
+                  },
+                ],
+              ],
+            },
+          },
+        ],
+      },
+      '*.{js,mjs}': {
+        condition: {
+          all: ['development', { path: /@stylexjs\/stylex\/lib\/(es|cjs)\/inject\.(mjs|js)$/ }],
+        },
+        loaders: [resolve(__dirname, 'src/lib/loaders/stylex-inject-named-container.cjs')],
+      },
+    },
   },
 };
 

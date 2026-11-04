@@ -1,7 +1,7 @@
 'use client';
 
 import { inertProps } from '@clerk/shared/inert';
-import React, { useCallback, useContext, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
@@ -39,12 +39,12 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
   const { value, direction, rootRef, registerActiveStep, unregisterActiveStep } = useFlowContext();
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
-  const activeChildrenRef = useRef(children);
+  const [activeChildren, setActiveChildren] = useState(() => children);
   const focusTargetsRef = useRef(new Set<HTMLElement>());
   const wasOpenRef = useRef(open);
 
-  if (open) {
-    activeChildrenRef.current = children;
+  if (open && !Object.is(activeChildren, children)) {
+    setActiveChildren(() => children);
   }
 
   const { mounted, transitionProps } = useTransition({ open, ref: stepRef });
@@ -102,7 +102,7 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
       ...transitionProps.style,
       '--cl-flow-transition-direction': String(direction),
     },
-    children: open ? children : activeChildrenRef.current,
+    children: open ? children : activeChildren,
   };
 
   const element = useRender({

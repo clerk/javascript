@@ -55,7 +55,7 @@
     "dev": "tsdown --config tsdown.config.mts --watch",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "lint": "eslint src",
+    "lint": "oxlint -c oxlint.config.mjs src",
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
     "test": "vitest run --project primitives --project mosaic",
@@ -84,7 +84,6 @@
     "@testing-library/user-event": "^14.6.5",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitest/eslint-plugin": "1.6.28",
     "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
     "eslint-plugin-boundaries": "7.3.0",
@@ -96,6 +95,7 @@
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "tsdown": "catalog:repo",
+    "typescript": "7.0.2",
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {

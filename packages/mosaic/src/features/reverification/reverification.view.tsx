@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import type { Ref } from 'react';
+import type { JSX, Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';

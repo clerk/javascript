@@ -18,13 +18,15 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
     const { mounted, floatingContext, refs, floatingStyles, placement, getFloatingProps, elementsRef, labelsRef } =
       useComboboxContext();
 
+    const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
+
     React.useLayoutEffect(() => {
       if (!anchor) {
         return;
       }
       refs.setPositionReference(anchor);
-      return () => refs.setPositionReference(refs.domReference.current);
-    }, [anchor, refs]);
+      return restoreReference;
+    }, [anchor, refs, restoreReference]);
 
     const side = parsePlacement(placement).side;
 

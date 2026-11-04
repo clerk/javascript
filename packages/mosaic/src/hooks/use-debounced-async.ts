@@ -50,6 +50,7 @@ export function useDebouncedAsync<TValue, TData>(
 
   useEffect(() => {
     if (!enabled) {
+      // eslint-disable-next-line react/set-state-in-effect -- Reset the displayed result when the external async input changes.
       setSettled(undefined);
       return;
     }

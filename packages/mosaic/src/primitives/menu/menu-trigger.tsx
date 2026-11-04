@@ -19,6 +19,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
   let referenceProps: Record<string, unknown>;
 
   if (isNested && parentContext) {
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
     referenceProps = getReferenceProps(parentContext.getItemProps() as React.HTMLProps<HTMLElement>);
   } else {
     referenceProps = getReferenceProps();

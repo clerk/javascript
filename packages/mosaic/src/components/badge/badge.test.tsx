@@ -112,7 +112,6 @@ describe('Mosaic Badge', () => {
     render(
       <Badge
         color='positive'
-        // eslint-disable-next-line jsx-a11y/anchor-has-content -- Badge injects the children into the rendered anchor.
         render={<a href='/status' />}
       >
         Active

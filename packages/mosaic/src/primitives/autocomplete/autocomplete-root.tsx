@@ -108,6 +108,7 @@ function AutocompleteInner(props: AutocompleteProps) {
         },
         padding: 5,
       }),
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       arrow({ element: arrowRef }),
       cssVars({ sideOffset }),
     ],
