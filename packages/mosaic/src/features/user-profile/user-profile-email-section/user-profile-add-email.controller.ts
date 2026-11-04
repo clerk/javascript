@@ -224,9 +224,9 @@ export function useUserProfileAddEmailController({
     step,
     reverification,
     emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
-    canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
+    canSubmitEmail: emailForm.canSubmit,
     code: codeForm.values.code,
-    canSubmitCode: codeForm.canSubmit || codeForm.isSubmitting,
+    canSubmitCode: codeForm.canSubmit,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {
