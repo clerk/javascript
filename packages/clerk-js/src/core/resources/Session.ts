@@ -547,23 +547,32 @@ export class Session extends BaseResource implements SessionResource {
           ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
 
-    const controller = new AbortController();
+    const createToken = (body: Record<string, string | null>, search?: Record<string, string>) => {
+      const controller = new AbortController();
+      return timeLimit(Token.create(path, body, search, controller.signal), TOKEN_REQUEST_TIMEOUT_MS, controller).catch(
+        e => {
+          if (controller.signal.aborted) {
+            throw new ClerkRuntimeError('The session token request timed out.', { code: 'network_error' });
+          }
+          throw e;
+        },
+      );
+    };
     const search = skipCache ? { debug: 'skip_cache' } : undefined;
 
     if (sessionMinterEnabled) {
       // Session Minter sends the token in the body, no expired_token retry needed
-      return timeLimit(Token.create(path, params, search, controller.signal), TOKEN_REQUEST_TIMEOUT_MS, controller);
+      return createToken(params, search);
     }
 
     // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
     const lastActiveToken = this.lastActiveToken?.getRawString();
-    const tokenRequest = Token.create(path, params, search, controller.signal).catch(e => {
+    return createToken(params, search).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
-        return Token.create(path, { ...params }, { expired_token: lastActiveToken }, controller.signal);
+        return createToken({ ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });
-    return timeLimit(tokenRequest, TOKEN_REQUEST_TIMEOUT_MS, controller);
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
