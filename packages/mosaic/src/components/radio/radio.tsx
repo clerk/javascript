@@ -21,6 +21,7 @@ export interface RadioGroupProps
 
 interface RadioGroupContextValue {
   name: string;
+  submits: boolean;
   value: string | undefined;
   setValue: (value: string) => void;
   disabled: boolean | undefined;
@@ -39,7 +40,7 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(function Mo
     }
   });
   const context = React.useMemo<RadioGroupContextValue>(
-    () => ({ name: nameProp ?? generatedName, value, setValue, disabled }),
+    () => ({ name: nameProp ?? generatedName, submits: nameProp !== undefined, value, setValue, disabled }),
     [nameProp, generatedName, value, setValue, disabled],
   );
 
@@ -104,6 +105,7 @@ const RadioItem = React.forwardRef<HTMLInputElement, RadioItemProps>(function Mo
         type='radio'
         value={value}
         name={group?.name ?? nameProp}
+        form={group?.submits === false ? '' : undefined}
         checked={checked}
         onChange={event => {
           onChange?.(event);

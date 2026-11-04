@@ -163,6 +163,14 @@ import {
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
+  Default as OAuthConsentDefault,
+  ManyScopes as OAuthConsentManyScopes,
+  meta as oauthConsentMeta,
+  MultipleOrganizations as OAuthConsentMultipleOrganizations,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
+import {
   Default as OrganizationListDefault,
   Empty as OrganizationListEmpty,
   Loading as OrganizationListLoading,
@@ -321,6 +329,24 @@ import {
   meta as separatorMeta,
 } from '../stories/separator.stories';
 import {
+  BackupCode as SignInBackupCode,
+  Default as SignInDefault,
+  EmailCode as SignInEmailCode,
+  meta as signInMeta,
+  MethodPicker as SignInMethodPicker,
+  Password as SignInPassword,
+  PasswordError as SignInPasswordError,
+  PasswordPending as SignInPasswordPending,
+  SignUp as SignInSignUp,
+  Start as SignInStart,
+  StartError as SignInStartError,
+  StartManyProviders as SignInStartManyProviders,
+  StartProviderPending as SignInStartProviderPending,
+  StartSignInOnly as SignInStartSignInOnly,
+  Totp as SignInTotp,
+  VerifyEmail as SignInVerifyEmail,
+} from '../stories/sign-in.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -356,6 +382,13 @@ import {
   Validation as TagInputComponentValidation,
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
+import {
+  AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
+  Default as TaskSetupMfaDefault,
+  meta as taskSetupMfaMeta,
+  NewPhone as TaskSetupMfaNewPhone,
+  SmsOnly as TaskSetupMfaSmsOnly,
+} from '../stories/task-setup-mfa.stories';
 import {
   Colors as TextColors,
   Default as TextDefault,
@@ -725,6 +758,14 @@ const userButtonModule: StoryModule = {
   User: UserButtonUser,
 };
 
+const taskSetupMfaModule: StoryModule = {
+  meta: taskSetupMfaMeta,
+  Default: TaskSetupMfaDefault,
+  SmsOnly: TaskSetupMfaSmsOnly,
+  AuthenticatorOnly: TaskSetupMfaAuthenticatorOnly,
+  NewPhone: TaskSetupMfaNewPhone,
+};
+
 const inviteMembersButtonModule: StoryModule = {
   meta: inviteMembersButtonMeta,
   Default: InviteMembersButtonDefault,
@@ -1075,6 +1116,15 @@ const apiKeysTableModule: StoryModule = {
   Empty: APIKeysTableEmpty,
 };
 
+const oauthConsentModule: StoryModule = {
+  meta: oauthConsentMeta,
+  Default: OAuthConsentDefault,
+  ScopeList: OAuthConsentScopeList,
+  ManyScopes: OAuthConsentManyScopes,
+  MultipleOrganizations: OAuthConsentMultipleOrganizations,
+  OfflineAccess: OAuthConsentOfflineAccess,
+};
+
 const reverificationModule: StoryModule = {
   meta: reverificationMeta,
   Default: ReverificationDefault,
@@ -1095,6 +1145,25 @@ const reverificationModule: StoryModule = {
   MethodPicker: ReverificationMethodPicker,
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
+};
+
+const signInModule: StoryModule = {
+  meta: signInMeta,
+  Default: SignInDefault,
+  Start: SignInStart,
+  StartSignInOnly: SignInStartSignInOnly,
+  StartManyProviders: SignInStartManyProviders,
+  StartProviderPending: SignInStartProviderPending,
+  StartError: SignInStartError,
+  Password: SignInPassword,
+  PasswordPending: SignInPasswordPending,
+  PasswordError: SignInPasswordError,
+  EmailCode: SignInEmailCode,
+  Totp: SignInTotp,
+  BackupCode: SignInBackupCode,
+  MethodPicker: SignInMethodPicker,
+  SignUp: SignInSignUp,
+  VerifyEmail: SignInVerifyEmail,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
@@ -1150,8 +1219,12 @@ export const registry: StoryModule[] = [
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
+  oauthConsentModule,
   reverificationModule,
   waitlistModule,
+  taskSetupMfaModule,
+  // Authentication
+  signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,

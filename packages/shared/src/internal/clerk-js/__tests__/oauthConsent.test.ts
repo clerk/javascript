@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getRedirectDisplay } from '../utils';
+import { getRedirectDisplay } from '../oauthConsent';
 
 describe('getRedirectDisplay', () => {
   describe('ip literal', () => {

@@ -31,7 +31,7 @@ import { Card } from '@clerk/mosaic/components/card';
 
 `Card.Media` goes first in `Card.Header`, above the title, for a logo, icon or image. It leaves 24px below it.
 
-`Card.Header` takes `align='center'` to center its content.
+`Card.Root` takes `align='center'` to center the content of every `Card.Header` in the card.
 
 `Card.Banner` sits between the header and the content and is always rendered. While its children hold a message, a `Banner` of the given `color` expands into it; once they are empty it collapses again. Give it `role='alert'` so the message is announced.
 
