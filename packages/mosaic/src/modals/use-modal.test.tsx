@@ -1,9 +1,11 @@
+import { logger } from '@clerk/shared/logger';
 import { act, cleanup, render, renderHook, screen, within } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { MosaicProviderProps } from '../mosaic-provider';
 import { MosaicProvider } from '../mosaic-provider';
+import { useRouterScope } from '../routing/use-router';
 import { useVirtualSegment } from '../routing/virtual-store';
 import { defineModalSurface } from './define-modal-surface';
 import type { ModalContentProps, ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
@@ -524,6 +526,83 @@ describe('a modal surface that routes', () => {
     act(() => ref.handle?.open());
     await flush();
     expect(entry()).toEqual([]);
+  });
+
+  describe('with content that routes', () => {
+    const pages = { account: 'account', security: 'security' } as const;
+
+    function RoutingContent({ path }: ModalContentProps<StubOptions>) {
+      const { route } = useRouterScope(pages, { routing: 'virtual', path, notFound: 'account' });
+      return <output data-testid='route'>{route}</output>;
+    }
+
+    function routingSurface() {
+      return defineModalSurface<StubOptions>({
+        id: 'routing',
+        variant: 'card',
+        load: () => Promise.resolve({ default: RoutingContent }),
+        path: '/modal/stub',
+        initialParts: options => (options?.page ? options.page.split('/') : []),
+      });
+    }
+
+    function keepExitPending() {
+      const prototype = Element.prototype as { getAnimations?: unknown };
+      const original = prototype.getAnimations;
+      prototype.getAnimations = () => [{ finished: new Promise<void>(() => {}) }];
+      onTestFinished(() => {
+        if (original) {
+          prototype.getAnimations = original;
+        } else {
+          delete prototype.getAnimations;
+        }
+      });
+    }
+
+    it('keeps the entry cleared after close, without the content redirecting it back', async () => {
+      const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+      const ref = renderRouted(routingSurface());
+
+      act(() => ref.handle?.open({ page: 'security' }));
+      await flush();
+      expect(screen.getByTestId('route').textContent).toBe('security');
+
+      act(() => ref.handle?.close());
+      await flush();
+      expect(entry()).toEqual([]);
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('keeps the entry cleared for the length of the exit transition', async () => {
+      keepExitPending();
+      const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+      const ref = renderRouted(routingSurface());
+
+      act(() => ref.handle?.open({ page: 'security' }));
+      await flush();
+      act(() => ref.handle?.close());
+      await flush();
+
+      expect(screen.getByTestId('route')).toBeInTheDocument();
+      expect(entry()).toEqual([]);
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('opens at the requested page when reopened mid-exit', async () => {
+      keepExitPending();
+      const ref = renderRouted(routingSurface());
+
+      act(() => ref.handle?.open());
+      await flush();
+      expect(entry()).toEqual(['account']);
+      act(() => ref.handle?.close());
+      await flush();
+      act(() => ref.handle?.open({ page: 'security' }));
+      await flush();
+
+      expect(entry()).toEqual(['security']);
+      expect(screen.getByTestId('route').textContent).toBe('security');
+    });
   });
 
   it('hands its base to the content', async () => {
