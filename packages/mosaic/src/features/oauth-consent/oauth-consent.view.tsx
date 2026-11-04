@@ -179,7 +179,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
       </Card.Content>
       <Card.Footer xstyle={styles.centered}>
         <Text
-          size='sm'
+          size='xs'
           color='foreground-secondary'
         >
           {fill(m.signedInAs, { identifier: props.identifier })}
