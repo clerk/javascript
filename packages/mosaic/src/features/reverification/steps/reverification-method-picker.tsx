@@ -1,5 +1,4 @@
 import { useMergeRefs } from '@floating-ui/react';
-import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import { Button } from '../../../components/button';
@@ -12,12 +11,7 @@ import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
 import { ChevronRight } from '../../../icons/glyphs/chevron-right';
 import { rtl } from '../../../styles/rtl.styles';
-
-const styles = stylex.create({
-  helpText: {
-    textAlign: 'center',
-  },
-});
+import { styles } from '../reverification.styles';
 
 export interface ReverificationMethod {
   id: string;
