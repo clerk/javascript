@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import type { MosaicLocation } from './location';
 import { createVirtualLocation } from './virtual-location';
-import { useVirtualUrlWrite } from './virtual-url';
+import { useVirtualWrite } from './virtual-store';
 
 export type MosaicLocationOptions = { routing: 'virtual'; path?: string };
 
@@ -14,7 +14,7 @@ export interface RoutingProps {
 }
 
 export function useMosaicLocation(options: MosaicLocationOptions): MosaicLocation {
-  const writeVirtualUrl = useVirtualUrlWrite();
+  const write = useVirtualWrite();
   const path = options.path ?? '/';
-  return useMemo(() => createVirtualLocation(path, writeVirtualUrl), [path, writeVirtualUrl]);
+  return useMemo(() => createVirtualLocation(path, write), [path, write]);
 }
