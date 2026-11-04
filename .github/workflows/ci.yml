@@ -706,6 +706,7 @@ jobs:
             pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
           fi
         env:
+          TURBO_FORCE: ${{ github.event_name == 'merge_group' }}
           CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
           CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           E2E_DEBUG: '1'
