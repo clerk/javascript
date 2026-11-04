@@ -39,6 +39,19 @@ rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protec
 
 Turn the hits into a behavior inventory, one row per effect, guard, error path, empty or loading state, permission gate, revalidate, reset-on-close and derived label. The table does not cover every behavior; read the files too. For shared answers (`save`, `useReverificationFlow`), use [Reuse before you write](../AGENTS.md#reuse-before-you-write).
 
+Write it to `tmp/mosaic-parity/<feature>.md` (ignored by git) before the model:
+
+```md
+# sign-out-button parity
+
+Legacy: packages/react/src/components/SignOutButton.tsx
+
+## Inventory
+
+- `redirectUrl` defaults to `/`
+- …
+```
+
 ### Screens
 
 Before you build a view, screenshot each legacy screen it replaces and list what the screen shows: each header line (title, description, identity preview), alerts, the primary and secondary actions, fallback links such as "Get help", and what the actions do while a request runs. Build against that list.
@@ -69,6 +82,8 @@ Test with one `*.feature.test.tsx` that uses the feature the way a user would ([
 ## Phase 4: verify parity
 
 Tests cover only the branches you remembered. Run the [Parity audit](parity-audit.md) against the legacy files and the new layers, and place every Phase 1 row as Migrated, Deliberately changed (such as infinite scroll becoming a "Load more" button) or Deferred.
+
+Launch a read-only subagent with the prompt in `parity-audit.md`. Give it the legacy file paths and the new model/controller/view paths. Put its table under `## Parity audit` in `tmp/mosaic-parity/<feature>.md`, next to the Phase 1 inventory. The table guides the work and the PR discussion, and is never committed.
 
 ## Phase 5: ship
 
