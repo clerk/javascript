@@ -150,8 +150,10 @@ How the cache key is built:
   `@clerk/clerk-js`, `@clerk/ui` and `@clerk/testing`, plus the framework packages that suite's apps
   add. Turbo folds those build hashes into the suite hash, and package builds already depend on
   `^build`, so transitive packages such as `@clerk/shared` are covered without being listed.
-- `inputs` covers the harness, the top-level test files, the test directories the suite's tagged tests
-  live in (and import from), and the templates its apps copy. Other suites' directories are not inputs.
+- `inputs` covers the harness, the test directories the suite's tagged tests live in (and import
+  from), and the templates its apps copy. Other suites' directories are not inputs. Tests live under
+  `integration/tests/<suite>/`; a test tagged for several suites lives in `generic/`, and tests no
+  suite runs live in `unscheduled/`.
 - `scripts/integration-deps.test.mjs` derives both lists from `integration/presets` and the tagged
   tests and fails when `turbo.json` drifts. Its failure message prints the block to paste.
 

@@ -10,7 +10,7 @@ const scenarios = [
   ['shared', 'packages/shared/src/index.ts'],
   ['expo', 'packages/expo/src/index.ts'],
   ['mosaic', 'packages/mosaic/src/global.d.ts'],
-  ['test file', 'integration/tests/sign-in-flow.test.ts'],
+  ['test file', 'integration/tests/generic/sign-in-flow.test.ts'],
   ['vue test', 'integration/tests/vue/components.test.ts'],
   ['expo-native', 'integration/expo-native/README.md'],
 ];

@@ -261,7 +261,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
-        "integration/tests/session-token-cache/**",
+        "integration/tests/{generic,session-token-cache}/**",
         "integration/templates/*",
         "integration/templates/{custom-flows-react-vite,next-app-router,react-vite,vue-vite}/**"
       ],
@@ -342,7 +342,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
-        "integration/tests/{nextjs,session-token-cache}/**",
+        "integration/tests/{generic,nextjs,session-token-cache}/**",
         "integration/templates/*",
         "integration/templates/{next-app-router,react-vite}/**"
       ],
@@ -357,7 +357,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
-        "integration/tests/{nextjs,session-token-cache}/**",
+        "integration/tests/{generic,nextjs,session-token-cache}/**",
         "integration/templates/*",
         "integration/templates/{next-app-router,react-vite}/**"
       ],
@@ -379,6 +379,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
+        "integration/tests/quickstart/**",
         "integration/templates/*",
         "integration/templates/next-app-router-quickstart/**"
       ],
@@ -577,7 +578,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
-        "integration/tests/astro/**",
+        "integration/tests/{astro,billing}/**",
         "integration/templates/*",
         "integration/templates/{astro-node,next-app-router,vue-vite}/**"
       ],
@@ -604,7 +605,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
-        "integration/tests/{astro,express,fastify,hono,nuxt,react-router,tanstack-start}/**",
+        "integration/tests/{astro,express,fastify,hono,machine,nuxt,react-router,tanstack-start}/**",
         "integration/templates/*",
         "integration/templates/{astro-node,express-vite,fastify-vite,hono-vite,next-app-router,nuxt-node,react-router-node,tanstack-react-start}/**"
       ],
@@ -619,7 +620,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
-        "integration/tests/custom-flows/**",
+        "integration/tests/{custom-flows,generic}/**",
         "integration/templates/*",
         "integration/templates/{custom-flows-react-vite,react-vite}/**"
       ],
@@ -634,6 +635,7 @@
         "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
         "integration/tests/*",
         "integration/tests/snapshots/**",
+        "integration/tests/cache-components/**",
         "integration/templates/*",
         "integration/templates/next-cache-components/**"
       ],
