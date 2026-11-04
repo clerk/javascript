@@ -296,3 +296,104 @@ export const noRawInvoke = {
     };
   },
 };
+
+export const noRenderClock = {
+  meta: {
+    type: 'problem',
+    schema: [],
+    messages: {
+      useNow:
+        'Read the current time with useNow during render, so the server and the client agree. Date.now() and new Date() belong in effects, event handlers and machine actions.',
+    },
+  },
+  create(context) {
+    return {
+      CallExpression(node) {
+        if (isDateNow(node) && readsDuringRender(node)) {
+          context.report({ node, messageId: 'useNow' });
+        }
+      },
+      NewExpression(node) {
+        if (isCurrentDate(node) && readsDuringRender(node)) {
+          context.report({ node, messageId: 'useNow' });
+        }
+      },
+    };
+  },
+};
+
+const RENDER_CALLBACKS = new Set([
+  'useState',
+  'useMemo',
+  'useReducer',
+  'map',
+  'flatMap',
+  'filter',
+  'find',
+  'findIndex',
+  'some',
+  'every',
+  'reduce',
+  'sort',
+  'toSorted',
+  'forEach',
+]);
+const RENDER_WRAPPERS = new Set(['forwardRef', 'memo']);
+
+function readsDuringRender(node) {
+  for (let fn = enclosingFunction(node); fn; fn = enclosingFunction(fn)) {
+    const call = fn.parent;
+    if (call.type === 'CallExpression' && call.arguments.includes(fn)) {
+      const name = calleeName(call);
+      if (RENDER_CALLBACKS.has(name)) {
+        continue;
+      }
+      if (RENDER_WRAPPERS.has(name)) {
+        return true;
+      }
+    }
+    return /^(use[A-Z0-9]|[A-Z])/.test(functionName(fn) ?? '');
+  }
+  return false;
+}
+
+function isDateNow(node) {
+  const callee = node.callee;
+  return (
+    callee.type === 'MemberExpression' &&
+    callee.object.type === 'Identifier' &&
+    callee.object.name === 'Date' &&
+    propertyName(callee.property, callee.computed) === 'now'
+  );
+}
+
+function isCurrentDate(node) {
+  return node.callee.type === 'Identifier' && node.callee.name === 'Date' && node.arguments.length === 0;
+}
+
+function enclosingFunction(node) {
+  for (let current = node.parent; current; current = current.parent) {
+    if (
+      current.type === 'FunctionDeclaration' ||
+      current.type === 'FunctionExpression' ||
+      current.type === 'ArrowFunctionExpression'
+    ) {
+      return current;
+    }
+  }
+  return undefined;
+}
+
+function calleeName(call) {
+  if (call.callee.type === 'Identifier') {
+    return call.callee.name;
+  }
+  return call.callee.type === 'MemberExpression' ? propertyName(call.callee.property, call.callee.computed) : undefined;
+}
+
+function functionName(fn) {
+  if (fn.id) {
+    return fn.id.name;
+  }
+  return fn.parent.type === 'VariableDeclarator' && fn.parent.id.type === 'Identifier' ? fn.parent.id.name : undefined;
+}
