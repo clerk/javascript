@@ -46,6 +46,7 @@ export function OAuthConsent(options: OAuthConsentProps): ReactElement | null {
   }
   return (
     <Card.Root
+      align='center'
       renderBranding={
         model.status === 'loading'
           ? model.known?.renderBranding === true

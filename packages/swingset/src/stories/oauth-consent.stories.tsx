@@ -51,7 +51,7 @@ export function Default() {
         <SegmentedControl.Item value='ready'>Consent</SegmentedControl.Item>
         <SegmentedControl.Item value='error'>Error</SegmentedControl.Item>
       </SegmentedControl.Root>
-      <Card.Root>
+      <Card.Root align='center'>
         <Flow.Root
           value={status}
           state={props}
@@ -91,7 +91,7 @@ export function Default() {
 export function ScopeList() {
   const props = useOAuthConsentFixture();
   return (
-    <Card.Root>
+    <Card.Root align='center'>
       <OAuthConsentView {...props} />
     </Card.Root>
   );
@@ -100,7 +100,7 @@ export function ScopeList() {
 export function ManyScopes() {
   const props = useOAuthConsentScopeSelectionFixture({}, manyScopes);
   return (
-    <Card.Root>
+    <Card.Root align='center'>
       <OAuthConsentView {...props} />
     </Card.Root>
   );
@@ -117,7 +117,7 @@ export function MultipleOrganizations() {
   const [access, setAccess] = useState<OAuthConsentOrganizationAccess>('all');
   const [selected, setSelected] = useState<string[]>(['org_1']);
   return (
-    <Card.Root>
+    <Card.Root align='center'>
       <OAuthConsentView
         {...props}
         organizationSelection={{ access, onAccessChange: setAccess, selected, onSelectedChange: setSelected }}
@@ -129,7 +129,7 @@ export function MultipleOrganizations() {
 export function OfflineAccess() {
   const props = useOAuthConsentScopeSelectionFixture({ hasOfflineAccess: true });
   return (
-    <Card.Root>
+    <Card.Root align='center'>
       <OAuthConsentView {...props} />
     </Card.Root>
   );

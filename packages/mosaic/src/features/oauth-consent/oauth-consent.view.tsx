@@ -46,7 +46,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
   return (
     <>
       <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>
-      <Card.Header align='center'>
+      <Card.Header>
         <Card.Title>{fill(m.title, { oauthApplicationName, applicationName: props.applicationName })}</Card.Title>
         <Card.Description>
           {rich(m.subtitle, {

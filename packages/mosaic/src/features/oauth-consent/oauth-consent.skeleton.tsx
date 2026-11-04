@@ -41,7 +41,7 @@ export function OAuthConsentSkeleton({
   return (
     <>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-      <Card.Header align='center'>
+      <Card.Header>
         <Card.Title>
           <Skeleton>
             {fill(m.title, { oauthApplicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME, applicationName })}
