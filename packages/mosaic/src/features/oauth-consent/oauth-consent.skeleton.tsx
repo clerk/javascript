@@ -14,7 +14,7 @@ import { styles } from './oauth-consent.styles';
 import type { OAuthConsentKnownData, OAuthConsentMessages } from './oauth-consent.types';
 
 const PLACEHOLDER_OAUTH_APPLICATION_NAME = 'App';
-const PLACEHOLDER_SCOPES = ['View your email address', 'View your profile', 'Verify your identity'];
+const PLACEHOLDER_SCOPES = ['Read your name and profile image', 'Read your email address', 'Verify your identity'];
 const PLACEHOLDER_KNOWN: OAuthConsentKnownData = {
   applicationName: 'Application',
   identifier: 'name@example.com',
@@ -61,9 +61,7 @@ export function OAuthConsentSkeleton({
               items={organizations}
               value={defaultOrganizationId ?? undefined}
             >
-              <Skeleton xstyle={styles.skeletonFill}>
-                <Select.Trigger />
-              </Skeleton>
+              <Select.Trigger />
             </Select.Root>
           </Field.Root>
         ) : null}
@@ -75,9 +73,7 @@ export function OAuthConsentSkeleton({
             size='sm'
             xstyle={styles.scopesTitle}
           >
-            <Skeleton visible={false}>
-              {fill(m.scopeListTitle, { applicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME })}
-            </Skeleton>
+            <Skeleton>{fill(m.scopeListTitle, { applicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME })}</Skeleton>
           </Text>
           <ul {...stylex.props(reset.base, styles.scopeList)}>
             {PLACEHOLDER_SCOPES.map(label => (
@@ -86,9 +82,11 @@ export function OAuthConsentSkeleton({
                 {...stylex.props(styles.scopeRow)}
               >
                 <div {...stylex.props(styles.scopeText)}>
-                  <Text>
-                    <Skeleton>{label}</Skeleton>
-                  </Text>
+                  <div {...stylex.props(styles.scopeLabel)}>
+                    <Text>
+                      <Skeleton>{label}</Skeleton>
+                    </Text>
+                  </div>
                 </div>
               </li>
             ))}

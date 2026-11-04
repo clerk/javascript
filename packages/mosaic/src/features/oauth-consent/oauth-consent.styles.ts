@@ -3,7 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  skeletonFill: { width: '100%' },
   skeletonCentered: { marginInline: 'auto' },
   organizationAccess: { gap: space['3'], display: 'flex', flexDirection: 'column' },
   organizationPicker: { marginBlockStart: `calc(${space['3']} * -1)` },
