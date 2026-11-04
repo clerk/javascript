@@ -45,6 +45,7 @@ import type {
 import { timeLimit } from '@clerk/shared/utils';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
+import { inBrowser } from '@/utils';
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
 import { getTabState, isTabFocused } from '@/utils/isTabFocused';
@@ -548,6 +549,9 @@ export class Session extends BaseResource implements SessionResource {
         };
 
     const createToken = (body: Record<string, string | null>, search?: Record<string, string>) => {
+      if (inBrowser()) {
+        return Token.create(path, body, search);
+      }
       const controller = new AbortController();
       return timeLimit(Token.create(path, body, search, controller.signal), TOKEN_REQUEST_TIMEOUT_MS, controller).catch(
         e => {
