@@ -1,3 +1,9 @@
+---
+paths:
+  - 'src/**/*.controller.ts'
+  - 'src/**/*.controller.tsx'
+---
+
 # Controllers
 
 The controller sits between the view and the outside world. It holds the **local

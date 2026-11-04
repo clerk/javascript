@@ -1,3 +1,9 @@
+---
+paths:
+  - 'src/**/*.model.ts'
+  - 'src/**/*.model.tsx'
+---
+
 # Models
 
 The model is the adapter from Clerk into plain data. It is the **only layer in a
