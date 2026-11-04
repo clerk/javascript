@@ -37,6 +37,11 @@ Quote ONLY the relevant branch from each file (the conditional, the effect, the
 guard). Never dump whole files. Return the result as the table below, most
 severe gaps first, then a short list of any Deferred items that are tracked only
 by a `// TODO` (these are the regressions at risk of shipping).
+
+Then check every row that is not Migrated against packages/mosaic/AGENTS.md and
+packages/mosaic/docs/. List each one that breaks a rule there, with the rule it
+breaks, such as a failure that is never shown or logged. These must be fixed or
+raised with the user; they cannot ship as Deliberately changed.
 ```
 
 To find the legacy behaviors, start from the search in [Migration → Phase 1](migration.md#phase-1-inventory-the-legacy-behavior).
