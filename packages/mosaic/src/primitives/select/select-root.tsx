@@ -1,5 +1,6 @@
 'use client';
 
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import {
   arrow,
   autoUpdate,
@@ -20,7 +21,7 @@ import {
   useRole,
   useTypeahead,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
@@ -108,7 +109,7 @@ function SelectInner(props: SelectProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const [activeIndexStore] = useState(() => createStore(activeIndex));
-  useLayoutEffect(() => {
+  useSafeLayoutEffect(() => {
     activeIndexStore.set(activeIndex);
   }, [activeIndexStore, activeIndex]);
 

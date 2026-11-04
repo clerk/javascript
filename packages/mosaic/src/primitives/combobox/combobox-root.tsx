@@ -1,5 +1,6 @@
 'use client';
 
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import {
   arrow,
   autoUpdate,
@@ -17,7 +18,7 @@ import {
   useListNavigation,
   useRole,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useTransition } from '../hooks/use-transition';
@@ -131,7 +132,7 @@ function ComboboxInner(props: ComboboxProps) {
   }, []);
 
   const [activeIndexStore] = useState(() => createStore(activeIndex));
-  useLayoutEffect(() => {
+  useSafeLayoutEffect(() => {
     activeIndexStore.set(activeIndex);
   }, [activeIndexStore, activeIndex]);
 
