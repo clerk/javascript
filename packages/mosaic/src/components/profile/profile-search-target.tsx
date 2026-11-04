@@ -32,7 +32,7 @@ export const SearchTarget = React.forwardRef<HTMLDivElement, SearchTargetProps>(
     defaultTagName: 'div',
     render,
     ref: [ref, target.ref],
-    props: target.props(stylex.props(reset.base, xstyle), rest),
+    props: target.props(stylex.props(xstyle), rest),
   });
 });
 
