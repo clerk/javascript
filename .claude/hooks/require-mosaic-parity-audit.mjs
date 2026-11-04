@@ -23,13 +23,19 @@ const migrations = [...features].flatMap(([feature, repoRoot]) =>
   legacyCounterparts(repoRoot, feature).map(legacy => ({ feature, legacy })),
 );
 
-const audited = calls.some(call => call.name === 'Agent' && /parity/i.test(JSON.stringify(call.input ?? {})));
+const audits = calls
+  .filter(call => call.name === 'Agent')
+  .map(call => JSON.stringify(call.input ?? {}))
+  .filter(input => /parity/i.test(input));
+const unaudited = migrations.filter(
+  ({ feature, legacy }) => !audits.some(input => input.includes(legacy) || input.includes(`/features/${feature}/`)),
+);
 
-if (migrations.length === 0 || audited) {
+if (unaudited.length === 0) {
   process.exit(0);
 }
 
-const list = migrations.map(({ feature, legacy }) => `${feature} (legacy: ${legacy})`).join(', ');
+const list = unaudited.map(({ feature, legacy }) => `${feature} (legacy: ${legacy})`).join(', ');
 
 process.stdout.write(
   JSON.stringify({

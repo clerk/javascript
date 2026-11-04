@@ -17,11 +17,18 @@ if (!transcript) {
   process.exit(0);
 }
 
-const touched = toolCalls(transcript)
-  .filter(call => call.name !== 'Agent')
-  .map(call => JSON.stringify(call.input ?? {}));
+const READ_TARGETS = {
+  Read: input => input.file_path,
+  Grep: input => input.path,
+  Glob: input => `${input.path ?? ''}/${input.pattern ?? ''}`,
+  Bash: input => input.command,
+};
+
+const reads = toolCalls(transcript)
+  .filter(call => call.name in READ_TARGETS)
+  .map(call => String(READ_TARGETS[call.name](call.input ?? {}) ?? ''));
 const unread = legacyCounterparts(newModel[1], newModel[2]).filter(
-  path => !touched.some(input => input.includes(path)),
+  path => !reads.some(target => target.includes(path)),
 );
 
 if (unread.length > 0) {
