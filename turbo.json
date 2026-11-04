@@ -231,7 +231,15 @@
       "outputs": []
     },
     "//#test:integration:ap-flows": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -252,7 +260,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -281,13 +297,29 @@
         "@clerk/testing#build",
         "@clerk/ui#build"
       ],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:fastify": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -308,7 +340,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:hono": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -329,7 +369,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:mosaic": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -350,7 +398,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -371,7 +427,14 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs:canary": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -394,6 +457,8 @@
     "//#test:integration:quickstart": {
       "env": [
         "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "INTEGRATION_INSTANCE_KEYS",
@@ -420,7 +485,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:astro": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -443,6 +516,8 @@
     "//#test:integration:localhost": {
       "env": [
         "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "INTEGRATION_INSTANCE_KEYS",
@@ -469,7 +544,16 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions": {
-      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "DISABLE_WEB_SECURITY",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NODE_EXTRA_CA_CERTS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -490,7 +574,16 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions:staging": {
-      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "DISABLE_WEB_SECURITY",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NODE_EXTRA_CA_CERTS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -511,7 +604,16 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake": {
-      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "DISABLE_WEB_SECURITY",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NODE_EXTRA_CA_CERTS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -532,7 +634,16 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake:staging": {
-      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "DISABLE_WEB_SECURITY",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NODE_EXTRA_CA_CERTS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -553,7 +664,14 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:expo-web": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -574,7 +692,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:tanstack-react-start": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -595,7 +721,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:vue": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -616,7 +750,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:nuxt": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -637,7 +779,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:react-router": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -658,7 +808,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:billing": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -679,7 +837,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:machine": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -700,7 +866,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:custom": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -722,7 +896,15 @@
     },
     "//#test:integration:cache-components": {
       "dependsOn": ["@clerk/nextjs#build"],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -744,7 +926,14 @@
     },
     "//#test:integration:chrome-extension": {
       "dependsOn": ["@clerk/nextjs#build"],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
@@ -766,7 +955,15 @@
     },
     "//#test:integration:electron": {
       "dependsOn": ["@clerk/electron#build"],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "env": [
+        "CLEANUP",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "DEBUG",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS"
+      ],
       "inputs": [
         "integration/**",
         "packages/*/package.json",
