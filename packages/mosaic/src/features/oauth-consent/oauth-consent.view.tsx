@@ -1,6 +1,5 @@
-import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
-import { type ReactNode, useId, useRef } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import { Badge } from '../../components/badge';
 import { Button, SubmitButton } from '../../components/button';
@@ -11,6 +10,7 @@ import { EmptyState } from '../../components/empty-state';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
 import { Radio } from '../../components/radio';
+import { Reveal } from '../../components/reveal';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Select, type SelectItem } from '../../components/select';
 import { Text } from '../../components/text';
@@ -19,8 +19,6 @@ import { VisuallyHidden } from '../../components/visually-hidden';
 import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { fill, plural, rich, useLocale } from '../../localization';
 import { Form } from '../../primitives/form';
-import { useTransition } from '../../primitives/hooks';
-import { Freeze } from '../../primitives/utils';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { RowAvatar } from '../switcher/switcher-avatar.view';
@@ -305,7 +303,10 @@ function OrganizationAccess({
           </Field.Content>
         </Field.Root>
       </Radio.Group>
-      <OrganizationPicker open={selection.access === 'selected'}>
+      <Reveal
+        open={selection.access === 'selected'}
+        xstyle={styles.organizationPicker}
+      >
         <Select.Root
           multiple
           items={organizations}
@@ -322,27 +323,7 @@ function OrganizationAccess({
           </Select.Trigger>
           <OrganizationPopup organizations={organizations} />
         </Select.Root>
-      </OrganizationPicker>
-    </div>
-  );
-}
-
-function OrganizationPicker({ open, children }: { open: boolean; children: ReactNode }) {
-  const element = useRef<HTMLDivElement | null>(null);
-  const { mounted, transitionProps } = useTransition({ open, ref: element });
-
-  return (
-    <div
-      ref={element}
-      {...transitionProps}
-      {...stylex.props(styles.organizationPicker)}
-    >
-      <div
-        {...inertProps(!open)}
-        {...stylex.props(styles.organizationPickerClip)}
-      >
-        {mounted ? <Freeze frozen={!open}>{children}</Freeze> : null}
-      </div>
+      </Reveal>
     </div>
   );
 }

@@ -1,29 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   skeletonFill: { width: '100%' },
   skeletonCentered: { marginInline: 'auto' },
   organizationAccess: { gap: space['3'], display: 'flex', flexDirection: 'column' },
-  organizationPicker: {
-    display: 'grid',
-    gridTemplateRows: {
-      default: '1fr',
-      ':where(:not([data-open]), [data-starting-style])': '0fr',
-    },
-    marginBlockStart: `calc(${space['3']} * -1)`,
-    transitionDuration: durationVars['--cl-duration-slow'],
-    transitionProperty: {
-      default: 'grid-template-rows',
-      '@media (prefers-reduced-motion: reduce)': 'none',
-    },
-    transitionTimingFunction: {
-      default: easingVars['--cl-ease-enter'],
-      ':where([data-ending-style])': easingVars['--cl-ease-in-out'],
-    },
-  },
-  organizationPickerClip: { overflow: 'clip', minHeight: 0 },
+  organizationPicker: { marginBlockStart: `calc(${space['3']} * -1)` },
   organizationPickerTrigger: { inlineSize: '100%', marginBlockStart: space['3'] },
   organizationAccessLabel: { fontWeight: fontWeightVars['--cl-font-medium'] },
   scopes: {
