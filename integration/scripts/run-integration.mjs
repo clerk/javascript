@@ -15,7 +15,11 @@ if (suite) {
   prepareCiRunner(suite);
 }
 
-run(suite === 'electron' ? 'xvfb-run' : command, suite === 'electron' ? ['-a', command, ...args] : args);
+if (suite === 'electron') {
+  run('xvfb-run', ['-a', command, ...args]);
+} else {
+  run(command, args);
+}
 
 function prepareCiRunner(suite) {
   const turboArgs = required('TURBO_ARGS').split(/\s+/).filter(Boolean);

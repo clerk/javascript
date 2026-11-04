@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -36,20 +36,8 @@ function run(setup, fail = '', env = {}) {
     },
     encoding: 'utf8',
   });
-  const calls = (() => {
-    try {
-      return readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
-    } catch {
-      return [];
-    }
-  })();
-  const marker = (() => {
-    try {
-      return readFileSync(output, 'utf8');
-    } catch {
-      return '';
-    }
-  })();
+  const calls = existsSync(log) ? readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse) : [];
+  const marker = existsSync(output) ? readFileSync(output, 'utf8') : '';
   rmSync(dir, { recursive: true, force: true });
   return { result, calls, marker };
 }
