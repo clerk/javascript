@@ -175,7 +175,9 @@ Rules that keep this correct:
 - Per-job setup lives in `integration/scripts/run-integration.mjs`, which the `test:integration:base`
   script wraps. When `E2E_CI_SETUP` names the suite it builds, publishes to pkglab, installs clerk-js
   and ui into temp dirs, installs Chromium and, for electron, Xvfb, then runs Playwright. Locally
-  `E2E_CI_SETUP` is unset and it only runs Playwright. A cache hit runs none of it, including the
+  `E2E_CI_SETUP` is unset and it only runs Playwright. It drops `CLERK_*` from the build's
+  environment: `CLERK_*` is in `globalEnv`, so the test step's secrets would otherwise change every
+  build hash and miss the Build Packages job's cache. A cache hit runs none of it, including the
   user cleanup step, which is gated on the `tests-started` output the script writes.
 
 Adding a suite:

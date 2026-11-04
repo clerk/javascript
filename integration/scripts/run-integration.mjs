@@ -25,7 +25,8 @@ function prepareCiRunner(suite) {
   ];
   const githubOutput = required('GITHUB_OUTPUT');
 
-  run('pnpm', ['turbo', 'build', ...turboArgs, '--only'], { env: { ...process.env, TURBO_FORCE: 'false' } });
+  const buildEnv = Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith('CLERK_')));
+  run('pnpm', ['turbo', 'build', ...turboArgs, '--only'], { env: { ...buildEnv, TURBO_FORCE: 'false' } });
   run('pkglab', ['pub', '--force']);
   for (const [packageName, dir] of installs) {
     mkdirSync(dir, { recursive: true });

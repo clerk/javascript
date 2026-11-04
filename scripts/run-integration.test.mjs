@@ -11,7 +11,7 @@ function run(setup, fail = '', env = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'run-integration-'));
   const bin = join(dir, 'bin');
   mkdirSync(bin);
-  const command = `#!/usr/bin/env node\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst name = path.basename(process.argv[1]);\nconst args = process.argv.slice(2);\nfs.appendFileSync(process.env.COMMAND_LOG, JSON.stringify({ name, args, cwd: process.cwd(), turboForce: process.env.TURBO_FORCE }) + '\\n');\nprocess.exit(process.env.FAIL_COMMAND === name || process.env.FAIL_COMMAND === name + ' ' + args.join(' ') ? 7 : 0);\n`;
+  const command = `#!/usr/bin/env node\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst name = path.basename(process.argv[1]);\nconst args = process.argv.slice(2);\nfs.appendFileSync(process.env.COMMAND_LOG, JSON.stringify({ name, args, cwd: process.cwd(), turboForce: process.env.TURBO_FORCE, clerkSecret: process.env.CLERK_PLATFORM_API_KEY }) + '\\n');\nprocess.exit(process.env.FAIL_COMMAND === name || process.env.FAIL_COMMAND === name + ' ' + args.join(' ') ? 7 : 0);\n`;
   for (const name of ['pnpm', 'pkglab', 'xvfb-run']) {
     const file = join(bin, name);
     writeFileSync(file, command, { mode: 0o755 });
@@ -31,6 +31,7 @@ function run(setup, fail = '', env = {}) {
       E2E_APP_CLERK_UI_DIR: dir,
       TURBO_ARGS: '--concurrency=2 --output-logs=new-only',
       TURBO_FORCE: 'true',
+      CLERK_PLATFORM_API_KEY: 'secret',
       ...env,
     },
     encoding: 'utf8',
@@ -75,6 +76,11 @@ describe('CI integration runner', () => {
       'pnpm playwright test --grep @case',
     ]);
     expect(calls[0].turboForce).toBe('false');
+    expect(
+      calls[0].clerkSecret,
+      'CLERK_* is in globalEnv, so passing test secrets to the build misses the build job cache',
+    ).toBeUndefined();
+    expect(calls.at(-1).clerkSecret).toBe('secret');
     expect(marker).toBe('tests-started=true\n');
   });
 
