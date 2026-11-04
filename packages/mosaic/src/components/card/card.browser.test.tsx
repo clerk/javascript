@@ -30,14 +30,15 @@ describe('Card.Media', () => {
   });
 });
 
-describe('Card.Header align', () => {
+describe('Card.Root align', () => {
   function CenteredCard() {
     return (
       <Card.Root
+        align='center'
         renderBranding={false}
         data-testid='root'
       >
-        <Card.Header align='center'>
+        <Card.Header>
           <Card.Media data-testid='media'>
             <svg
               width='32'
@@ -62,6 +63,34 @@ describe('Card.Header align', () => {
     render(<CenteredCard />);
 
     expectCentered('media');
+    expectCentered('title');
+  });
+
+  it('keeps a description that does not wrap inside the card', () => {
+    render(
+      <Card.Root
+        align='center'
+        renderBranding={false}
+        data-testid='root'
+      >
+        <Card.Header>
+          <Card.Title>
+            <span data-testid='title'>Title</span>
+          </Card.Title>
+          <Card.Description
+            data-testid='description'
+            style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {'jane@acme.com'.repeat(12)}
+          </Card.Description>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    const root = screen.getByTestId('root').getBoundingClientRect();
+    const description = screen.getByTestId('description').getBoundingClientRect();
+    expect(description.left).toBeGreaterThanOrEqual(root.left);
+    expect(description.right).toBeLessThanOrEqual(root.right);
     expectCentered('title');
   });
 

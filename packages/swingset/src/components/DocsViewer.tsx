@@ -62,6 +62,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
     'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),
   },
+  authentication: {
+    'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
+  },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
     destructive: dynamic(() => import('../stories/destructive.mdx')),

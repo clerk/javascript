@@ -24,13 +24,17 @@ type CardElevation = 'card' | 'flush' | 'overlay';
 
 export type CardSize = keyof typeof slots.sizes;
 
-export type CardHeaderAlign = keyof typeof slots.headerAlign;
+export type CardAlign = keyof typeof slots.headerAlign;
 
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
 // The enclosing card and the dialog it was rendered in. Context crosses portals, so a card in a
 // dialog opened from inside another card is still the dialog's outermost one.
-const CardContext = React.createContext<{ elevation: CardElevation; dialog: DialogContextValue | null } | null>(null);
+const CardContext = React.createContext<{
+  elevation: CardElevation;
+  align: CardAlign;
+  dialog: DialogContextValue | null;
+} | null>(null);
 
 function CardBranding() {
   return (
@@ -45,6 +49,8 @@ export interface CardProps extends MosaicComponentProps<'div'> {
   elevation?: CardElevation;
   /** The card's width. `lg` is for forms that need the room, like a tag input. @default 'md' */
   size?: CardSize;
+  /** Aligns the content of every `Card.Header` in the card. @default 'start' */
+  align?: CardAlign;
   /**
    * Signs the foot of the card with "Secured by Clerk". An instance that has paid the branding off
    * carries none of it, so a connected surface passes `displayConfig.branded` here.
@@ -55,20 +61,29 @@ export interface CardProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
-  { elevation = DEFAULT_ELEVATION, size = 'md', renderBranding = true, render, xstyle, children, ...rest },
+  {
+    elevation = DEFAULT_ELEVATION,
+    size = 'md',
+    align = 'start',
+    renderBranding = true,
+    render,
+    xstyle,
+    children,
+    ...rest
+  },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
   const enclosing = React.useContext(CardContext);
   const isSurface = (enclosing === null || enclosing.dialog !== dialog) && elevation !== 'flush';
-  const context = React.useMemo(() => ({ elevation, dialog }), [elevation, dialog]);
+  const context = React.useMemo(() => ({ elevation, align, dialog }), [elevation, align, dialog]);
   const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('card-root', { elevation, size }),
+        themeProps('card-root', { elevation, size, align }),
         stylex.props(
           reset.base,
           slots.root.base,
@@ -115,15 +130,11 @@ function HeaderCloseButton() {
   );
 }
 
-export interface CardHeaderProps extends MosaicComponentProps<'div'> {
-  /** Aligns the header's content. @default 'start' */
-  align?: CardHeaderAlign;
-}
-
-const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
-  { align = 'start', render, xstyle, children, ...rest },
+const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
+  { render, xstyle, children, ...rest },
   ref,
 ) {
+  const align = React.useContext(CardContext)?.align ?? 'start';
   const dialog = React.useContext(DialogContext);
   const hasCloseButton = isInDialog(dialog) && dialog.showCloseButton;
   return useRender({
@@ -131,11 +142,7 @@ const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHe
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('card-header', { align }),
-        stylex.props(reset.base, slots.header.base, xstyle),
-        rest,
-      ),
+      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base, xstyle), rest),
       children: (
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
@@ -168,12 +175,17 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   { render, xstyle, ...rest },
   ref,
 ) {
+  const align = React.useContext(CardContext)?.align ?? 'start';
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-media'), stylex.props(reset.base, slots.header.media, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('card-media'),
+        stylex.props(reset.base, slots.header.media, slots.mediaAlign[align], xstyle),
+        rest,
+      ),
     },
   });
 });
