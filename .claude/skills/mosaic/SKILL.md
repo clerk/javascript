@@ -107,33 +107,8 @@ Find usages with `git grep -n renderTriggerLabel`.
 
 ## Documenting a component in swingset
 
-`packages/swingset/CLAUDE.md` is the house style — archetypes, required section
-order, `meta` conventions. One rule on top of it, because it is the one agents
-get wrong:
-
-**The docs describe the API as it is. They do not carry the reasoning that
-produced it.** No "not a `size`, because…", no rejected alternatives, no history
-of what the prop used to be. A reader is there to learn what the thing does, and
-every sentence of rationale is a sentence they have to skim past to find it.
-State the behaviour plainly and briefly, then stop.
-
-```mdx
-<!-- no -->
-
-### Variant
-
-Which surface the dialog holds, and so the geometry it is given. Not a `size`,
-because these are different surfaces rather than one surface at two widths — a
-second card width would be a size of the `card` variant, with nowhere to sit on
-this axis.
-
-<!-- yes -->
-
-### Variant
-
-Which surface the dialog holds, and the geometry that comes with it.
-```
-
-Follow the root `AGENTS.md` rule for code comments. Put implementation rationale
-and rejected alternatives in the PR description. Component docs describe the
-resulting API.
+Read [`references/documenting-components.md`](references/documenting-components.md)
+for the house style: layers, `meta` conventions, each archetype's required
+section order, and the finishing checklist. The rule agents most often get wrong
+is under "Writing the prose": the docs describe the API as it is, never the
+reasoning that produced it.
