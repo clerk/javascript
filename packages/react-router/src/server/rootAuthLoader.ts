@@ -8,7 +8,6 @@ import type {
   LoaderFunctionArgsWithAuth,
   LoaderFunctionReturn,
   RootAuthLoaderCallback,
-  RootAuthLoaderOptions,
 } from './types';
 import {
   getResponseClerkState,
@@ -20,7 +19,7 @@ import {
 } from './utils';
 
 interface RootAuthLoader {
-  <Options extends RootAuthLoaderOptions, Callback extends RootAuthLoaderCallback<Options>>(
+  <Callback extends RootAuthLoaderCallback>(
     /**
      * Arguments passed to the loader function.
      */
@@ -29,10 +28,9 @@ interface RootAuthLoader {
      * A loader function with authentication state made available to it. Allows you to fetch route data based on the user's authentication state.
      */
     callback: Callback,
-    options?: Options,
   ): Promise<ReturnType<Callback>>;
 
-  (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
+  (args: LoaderFunctionArgs): Promise<LoaderFunctionReturn>;
 }
 
 /**
@@ -42,7 +40,7 @@ async function processRootAuthLoader(
   args: LoaderFunctionArgs,
   requestState: RequestState,
   additionalState: AdditionalStateOptions,
-  handler?: RootAuthLoaderCallback<any>,
+  handler?: RootAuthLoaderCallback,
 ): Promise<LoaderFunctionReturn> {
   const hasMiddleware = IsOptIntoMiddleware(args.context) && !!args.context.get(authFnContext);
   const includeClerkHeaders = !hasMiddleware;
@@ -59,7 +57,7 @@ async function processRootAuthLoader(
   const argsWithAuth = {
     ...args,
     request: Object.assign(args.request, { auth: requestState.toAuth() }),
-  } as LoaderFunctionArgsWithAuth<any>;
+  } as LoaderFunctionArgsWithAuth;
 
   const handlerResult = await handler(argsWithAuth);
 
@@ -115,9 +113,9 @@ async function processRootAuthLoader(
  */
 export const rootAuthLoader: RootAuthLoader = async (
   args: LoaderFunctionArgs,
-  handlerOrOptions: any,
+  callback?: unknown,
 ): Promise<LoaderFunctionReturn> => {
-  const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : undefined;
+  const handler = typeof callback === 'function' ? (callback as RootAuthLoaderCallback) : undefined;
 
   const hasMiddlewareFlag = IsOptIntoMiddleware(args.context);
   const contextValue = hasMiddlewareFlag && args.context.get(requestStateContext);
