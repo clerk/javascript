@@ -456,7 +456,7 @@ function mediaTables(files, hasBefore, uploaded) {
   );
 }
 
-// `gh pr edit --attach` rewrites only a markdown reference to a file, so the files go up as a list first, and the tables are written from the addresses GitHub gave them.
+// `gh issue edit --attach` rewrites only a markdown reference to a file, so the files go up as a list first, and the tables are written from the addresses GitHub gave them.
 function evidenceBlock(manifest, session, onDisk = file => file.name, uploaded = null) {
   const { start, end } = evidenceMarkers(manifest.platform);
   const { before } = manifest;
@@ -881,7 +881,7 @@ function publishStep({
 
   const bodyFile = path.join(work, 'body.md');
   fs.writeFileSync(bodyFile, next.body, { mode: 0o600 });
-  const editBody = ['pr', 'edit', String(manifest.pr), '--repo', repo, '--body-file', bodyFile];
+  const editBody = ['issue', 'edit', String(manifest.pr), '--repo', repo, '--body-file', bodyFile];
   const args = [...editBody, ...next.files.flatMap(file => ['--attach', `./${onDisk(file)}`])];
   if (dryRun) {
     say('plain', `would run, in ${filesDir}:\ngh ${args.map(quoted).join(' ')}`);
@@ -889,7 +889,7 @@ function publishStep({
   }
   const edited = gh(args, { cwd: filesDir });
   if (edited.status !== 0) {
-    throw new Failed(`gh pr edit failed for pull request #${manifest.pr}\n${printable(edited.stderr)}`);
+    throw new Failed(`gh issue edit failed for pull request #${manifest.pr}\n${printable(edited.stderr)}`);
   }
   if (next.files.length === 0) {
     say(
@@ -914,7 +914,7 @@ function publishStep({
   const arranged = gh(editBody, { cwd: filesDir });
   if (arranged.status !== 0) {
     throw new Failed(
-      `gh pr edit failed to lay out the files in pull request #${manifest.pr}\n${printable(arranged.stderr)}`,
+      `gh issue edit failed to lay out the files in pull request #${manifest.pr}\n${printable(arranged.stderr)}`,
     );
   }
   say(
