@@ -14,3 +14,5 @@ export type { MosaicProfile } from './features/profile-pages/use-mosaic-profile'
 export { MosaicProvider } from './mosaic-provider';
 export type { PortalContainer, PortalProviderProps } from './primitives/portal';
 export { PortalProvider } from './primitives/portal';
+
+// CI cache probe, reverted in this PR
