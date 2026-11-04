@@ -31,7 +31,7 @@ Before you change a file that matches a pattern below, read its guide, even for 
 
 | File                                                               | Read                               |
 | ------------------------------------------------------------------ | ---------------------------------- |
-| `src/**/*.styles.ts`                                               | [StyleX](docs/stylex.md)           |
+| `src/**/*.styles.ts`, `src/**/*.stylex.ts`                         | [StyleX](docs/stylex.md)           |
 | `src/**/*.model.ts(x)`                                             | [Models](docs/models.md)           |
 | `src/**/*.controller.ts(x)`                                        | [Controllers](docs/controllers.md) |
 | `src/**/*.view.tsx`                                                | [Views](docs/views.md)             |
