@@ -7,7 +7,7 @@ import { describe, expect, test } from 'vitest';
 
 const runner = resolve('integration/scripts/run-integration.mjs');
 
-function run(setup, fail = '') {
+function run(setup, fail = '', env = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'run-integration-'));
   const bin = join(dir, 'bin');
   mkdirSync(bin);
@@ -31,10 +31,17 @@ function run(setup, fail = '') {
       E2E_APP_CLERK_UI_DIR: dir,
       TURBO_ARGS: '--concurrency=2 --output-logs=new-only',
       TURBO_FORCE: 'true',
+      ...env,
     },
     encoding: 'utf8',
   });
-  const calls = readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
+  const calls = (() => {
+    try {
+      return readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
+    } catch {
+      return [];
+    }
+  })();
   const marker = (() => {
     try {
       return readFileSync(output, 'utf8');
@@ -69,6 +76,14 @@ describe('CI integration runner', () => {
     ]);
     expect(calls[0].turboForce).toBe('false');
     expect(marker).toBe('tests-started=true\n');
+  });
+
+  test('refuses CI setup without the environment it needs', () => {
+    const { result, calls, marker } = run('generic', '', { TURBO_ARGS: '' });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('TURBO_ARGS must be set when E2E_CI_SETUP is set');
+    expect(calls).toEqual([]);
+    expect(marker).toBe('');
   });
 
   test('does not run tests or set cleanup marker after setup failure', () => {
