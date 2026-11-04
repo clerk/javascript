@@ -35,7 +35,14 @@ interface Recipe {
 
 const PACKAGE_TEMPLATE = 'package.sdk-58.json';
 
-const EXPO_PACKAGES = ['expo-auth-session', 'expo-constants', 'expo-crypto', 'expo-secure-store', 'expo-web-browser'];
+const EXPO_PACKAGES = [
+  'expo-application',
+  'expo-auth-session',
+  'expo-constants',
+  'expo-crypto',
+  'expo-secure-store',
+  'expo-web-browser',
+];
 
 const RECIPES: Readonly<Record<BuildProduct, Recipe>> = {
   'dev-client': {
