@@ -74,8 +74,11 @@ export interface AuthViewProps extends EmbeddedNavigationProps {
    * restore credential, which belongs to the user who most recently signed in. Restore credentials
    * are passkeys named "Android restore key".
    *
-   * When a signed-in session on the device ends, whether from JavaScript or native code, the
-   * device's restore credential is deleted.
+   * On Android, whether or not this prop is set, the device's restore credential is deleted when a
+   * signed-in user leaves the device: they sign out from JavaScript or native code, their session is
+   * revoked, or it times out from inactivity. A session that reaches its maximum lifetime keeps the
+   * credential, so the user can still be restored on a new device. Deletion is best effort: if
+   * Android fails to delete the credential, the failure is logged and not retried.
    *
    * Requires passkeys to be enabled as a first factor for your Clerk instance.
    *
