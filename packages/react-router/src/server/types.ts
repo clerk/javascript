@@ -48,6 +48,24 @@ export type ClerkMiddlewareOptions = {
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl;
 
+/**
+ * @deprecated Use `ClerkMiddlewareOptions` instead. `rootAuthLoader()` no longer accepts options.
+ */
+export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
+  /**
+   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
+   */
+  loadUser?: boolean;
+  /**
+   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
+   */
+  loadSession?: boolean;
+  /**
+   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
+   */
+  loadOrganization?: boolean;
+};
+
 export interface KeylessUrls {
   __keylessClaimUrl?: string;
   __keylessApiKeysUrl?: string;
@@ -69,7 +87,9 @@ export type RequestStateWithRedirectUrls = RequestState &
   SignUpFallbackRedirectUrl &
   KeylessUrls;
 
-export type RootAuthLoaderCallback = (args: LoaderFunctionArgsWithAuth) => RootAuthLoaderCallbackReturn;
+export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions = any> = (
+  args: LoaderFunctionArgsWithAuth<Options>,
+) => RootAuthLoaderCallbackReturn;
 
 type ObjectLike = Record<string, unknown> | null;
 
@@ -88,10 +108,10 @@ type RootAuthLoaderCallbackReturn =
 
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
-export type LoaderFunctionArgsWithAuth = LoaderFunctionArgs & {
-  request: RequestWithAuth;
+export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {
+  request: RequestWithAuth<Options>;
 };
 
-export type RequestWithAuth = LoaderFunctionArgs['request'] & {
+export type RequestWithAuth<_Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
   auth: Omit<SignedInAuthObject | SignedOutAuthObject, 'session' | 'user' | 'organization'>;
 };
