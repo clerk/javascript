@@ -113,7 +113,13 @@ const followImports = seeds => {
   return seen;
 };
 
-const globToRegExp = glob => new RegExp(`^${glob.replace(/[.]/g, '\\.').replace(/\*/g, '.*')}$`);
+const globToRegExp = glob =>
+  new RegExp(
+    `^${glob
+      .split('*')
+      .map(part => part.replace(/[\\^$.+?()[\]{}|]/g, '\\$&'))
+      .join('.*')}$`,
+  );
 
 const braceGlob = (prefix, names) =>
   names.length === 1 ? `${prefix}/${names[0]}/**` : `${prefix}/{${names.join(',')}}/**`;
