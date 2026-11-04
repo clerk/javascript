@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { logger } from '@clerk/shared/logger';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { MosaicLocation } from './location';
+import type { MosaicLocation, SegmentParts } from './location';
 import type { Route, Router } from './router';
 import { createRouter } from './router';
 import type { RouteName, RouteTable } from './routes';
@@ -30,6 +31,10 @@ function useStableTable<Routes extends RouteTable>(routes: Routes): Routes {
   return useStableByKey(routes, Object.entries(routes).flat().join(KEY_SEPARATOR));
 }
 
+function sameParts(a: SegmentParts, b: SegmentParts): boolean {
+  return a.length === b.length && a.every((part, index) => part === b[index]);
+}
+
 function missingScope(): never {
   throw new Error('[clerk] useRouter needs a <MosaicRoutingScope> above it; the segment owner calls useRouterScope.');
 }
@@ -38,6 +43,7 @@ interface Routing<Routes extends RouteTable> {
   location: MosaicLocation;
   table: Routes;
   router: Router<Routes>;
+  parts: SegmentParts;
   matched: Route<Routes> | undefined;
 }
 
@@ -47,7 +53,7 @@ function useRouting<Routes extends RouteTable>(routes: Routes, options: MosaicLo
   const router = useMemo(() => createRouter(table, location), [table, location]);
   const parts = location.useSegmentParts();
   const matched = useMemo(() => router.parse(parts), [router, parts]);
-  return { location, table, router, matched };
+  return { location, table, router, parts, matched };
 }
 
 export interface RouterScopeOptions<Routes extends RouteTable> {
@@ -72,18 +78,31 @@ export function useRouterScope<const Routes extends RouteTable>(
   { routing, path, notFound }: RouterScopeOptions<Routes>,
 ): RouterScope<Routes> {
   const scope = useMemo(() => createRoutingScope({ routing, path }), [routing, path]);
-  const { location, table, router, matched } = useRouting(routes, { routing, path });
+  const { location, table, router, parts, matched } = useRouting(routes, { routing, path });
   const current = useMemo<Route<Routes>>(
     () => matched ?? { name: notFound, params: EMPTY_PARAMS },
     [matched, notFound],
   );
 
   const redirectTo = matched === undefined ? notFound : undefined;
+  const redirected = useRef<{ from: SegmentParts; left: boolean }>(undefined);
   useEffect(() => {
-    if (redirectTo !== undefined) {
-      location.write(routeParts(table, redirectTo), { replace: true });
+    const last = redirected.current;
+    if (last && !sameParts(last.from, parts)) {
+      last.left = true;
     }
-  }, [redirectTo, location, table]);
+    if (redirectTo === undefined) {
+      return;
+    }
+    if (last?.left && sameParts(last.from, parts)) {
+      logger.warnOnce(
+        `[Clerk] The segment "${parts.join('/')}" under "${path ?? '/'}" was not found, but after updating the location to match the fallback page, something wrote back the segment again. Two routers probably share this base; give one of them a different path.`,
+      );
+      return;
+    }
+    redirected.current = { from: parts, left: false };
+    location.write(routeParts(table, redirectTo), { replace: true });
+  }, [parts, redirectTo, location, table, path]);
 
   return useMemo(
     () => ({ route: current.name, params: current.params, go: router.go, scope }),
