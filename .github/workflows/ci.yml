@@ -587,7 +587,7 @@ jobs:
       - name: Validate turbo task
         run: |
           TASK_NAME="test:integration:${{ matrix.test-name }}"
-          node -e 'const pkg = require("./package.json"); const turbo = require("./turbo.json"); const name = process.argv[1]; if (!pkg.scripts[name] || !turbo.tasks[`//#${name}`]) process.exit(1)' "$TASK_NAME"
+          node -e 'const pkg = require("./package.json"); const turbo = require("./turbo.json"); const name = process.argv[1]; if (!pkg.scripts[name] || !turbo.tasks["//#" + name]) process.exit(1)' "$TASK_NAME"
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
