@@ -366,11 +366,7 @@ function OfferRow({ name, imageUrl, actionLabel, note, busy, disabled, onAccept 
       <Item.Content>
         <Item.Label id={labelId}>{name}</Item.Label>
       </Item.Content>
-      {note ? (
-        <Item.Actions>
-          <Item.Description>{note}</Item.Description>
-        </Item.Actions>
-      ) : onAccept ? (
+      {note || onAccept ? (
         <Item.Actions>
           <SubmitButton
             type='button'
@@ -380,12 +376,12 @@ function OfferRow({ name, imageUrl, actionLabel, note, busy, disabled, onAccept 
             isPending={busy}
             pendingLabel={m.pending}
             spinDelay={{ delay: 0 }}
-            disabled={disabled}
+            disabled={disabled || Boolean(note)}
             focusableWhenDisabled
             aria-describedby={labelId}
-            onClick={onAccept}
+            onClick={note ? undefined : onAccept}
           >
-            {actionLabel}
+            {note ?? actionLabel}
           </SubmitButton>
         </Item.Actions>
       ) : null}
