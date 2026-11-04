@@ -383,6 +383,10 @@ jobs:
         if: matrix.node-version == '24.15.0'
         run: pnpm vitest run --root scripts verify-attach verify-flaky
 
+      - name: Run integration harness tests
+        if: matrix.node-version == '24.15.0'
+        run: pnpm vitest run --root integration
+
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4.6.2
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
