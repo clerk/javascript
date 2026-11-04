@@ -13,7 +13,7 @@ The view renders plain props and calls plain callbacks. Nothing else.
   machine guard or works out for itself whether an action is allowed.
 
 ```tsx
-export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: UserButtonProps) {
+export function SwitcherView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: SwitcherViewProps) {
   return (
     <Popover
       open={open}
@@ -22,7 +22,7 @@ export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, .
       {onSignOutAll ? (
         <Item
           onClick={onSignOutAll}
-          busy={pendingKey === userButtonBusyKeys.signOutAll()}
+          busy={pendingKey === switcherBusyKeys.signOutAll()}
         >
           {m.accounts.signOutAll}
         </Item>
@@ -37,7 +37,7 @@ export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, .
 Two shapes, chosen by whether the slice fetches its own data:
 
 - A **wrapper composes** model + controller + view, and the view is a pure
-  function of props (`user-button.tsx`).
+  function of props (`switcher.tsx`).
 - A **leaf view owns its controller** and takes the effect as a prop
   (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
   with its `onSubmit`). Still no Clerk — the effect arrives from above.

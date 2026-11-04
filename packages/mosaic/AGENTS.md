@@ -98,6 +98,22 @@ Stop and check the table if you are writing any of these in a feature:
 
 The form rule applies when you add or rewrite a form. Some existing forms predate it.
 
+## Shaping a fix
+
+A bug in a feature is often a gap in a shared helper. These rules apply to `fix` PRs as much as to features.
+
+- **Fix the owner, don't wrap it.** When a shared helper (`src/hooks/`, `src/blocks/`, `src/components/`, `src/machine/`, or `@clerk/shared`) behaves wrongly, change the helper and its tests, then delete the workarounds. Do not spread a helper's return value to swap one method, copy a `||` that undoes one of its fields, or add a second hook beside it for one caller.
+- **A changed shared signature is a new pattern.** A new parameter, a return type that goes from `void` to a promise, or a returned field whose meaning changes all go through "When nothing fits: ask first".
+- **One source of truth for busy.** When a machine, `usePendingAction` or `useForm` already knows an action is running, derive the flag from it: `isDisabled: actions.isPending || remove.isPending`. Do not mirror it into a second lock, or turn machine state into a promise to feed one.
+- **Handle staleness through lifecycle.** A new identity remounts through a React `key`. A busy state ignores close (Controllers → Rules). Do not thread run ids or `AbortSignal`s through the model, controller and machine.
+- **Extend a contract with an options object.** Make a field required when every caller has it: `connect(strategy, { walletName, onTarget })`, not `connect(strategy, walletName?, onTarget?)`.
+- **Pass shared results through whole.** The view gets `form`, not an object that renames `form.id`, `form.isSubmitting` and `form.handleSubmit`.
+- **Keep controller state off model types.** Pending and error flags the controller sets go on a row type the controller builds, not as optional fields on the type the model returns.
+- **Narrow by mounting.** A hook that needs loaded data takes it non-null. Mount its component once the model is ready instead of checking for `null` inside (Controllers → Composition and dialog lifetime).
+- **Machines:** `assign` stays pure. An effect the machine starts runs in `invoke`. The runtime has no spawned actors, so effects that run side by side, like `useForm`'s per-field `validateAsync`, run in the hook and report back by event, and the machine drops stale results. A phase of an action the user can see (queued, pending, failed) is a named state, not a context field plus a predicate. Screens that can sit on top of any state, like reverification's method picker and help, may be a stack in context, because the runtime has no parallel or history states.
+
+If code or a test contradicts a rule in these docs, do not copy the code. Stop and ask which one is right, and fix the loser in the same PR.
+
 ## Nested radii
 
 A part inset from a rounded surface gets its radius from that surface: `max(0px, calc(outer - border - padding))`. Do not pick a fixed step, or it stops matching when `--cl-radius-*` or `--cl-spacing` is overridden. This applies to small insets. When the inset is about as large as the outer radius or larger (Card content, TagInput tags), the part keeps its own radius.

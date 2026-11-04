@@ -14,10 +14,10 @@ A discriminated union on `status`, so consumers branch on one value instead of a
 scatter of `isLoaded` flags:
 
 ```tsx
-export type UserButtonModel =
+export type SwitcherModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (UserButtonData & UserButtonCallbacks & { status: 'ready'; organizationsEnabled: boolean });
+  | (SwitcherData & SwitcherCallbacks & { status: 'ready'; organizationsEnabled: boolean });
 ```
 
 `hidden` is an **answer**, not an absence: signed out is settled, so the wrapper
@@ -53,17 +53,23 @@ drops the fallback instead of holding the space open. Keep the two apart.
   The view hides the affordance an absent callback drives, so the model never has
   to describe UI.
 
-- **Own revalidate timing.** Call `.revalidate()` / `.reload()` after a mutation,
-  from inside the callback that made it. Deciding _when_ is model logic:
+- **Own cache updates.** Update the cache after a mutation, from inside the
+  callback that made it. Deciding _how_ is model logic: patch the returned
+  resource in with `replaceInPages` on success, and revalidate on failure, since
+  a failed mutation might mean stale state:
 
   ```tsx
   onAcceptSuggestion: async suggestionId => {
     try {
-      await suggestionData.find(s => s.id === suggestionId)?.accept();
-    } finally {
-      // Always revalidate — a failed accept might be stale state. allSettled never throws,
+      const accepted = await suggestionData.find(s => s.id === suggestionId)?.accept();
+      if (accepted) {
+        await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+      }
+    } catch (error) {
+      // A failed accept might be stale state. allSettled never throws,
       // so a failed revalidate doesn't look like a failed accept.
       await Promise.allSettled([userSuggestions.revalidate?.()]);
+      throw error;
     }
   },
   ```

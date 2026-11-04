@@ -83,7 +83,7 @@ const loader = createMachine({
         },
         onError: {
           target: 'failure',
-          actions: assign((_ctx, event) => ({ error: String(event.error) })),
+          actions: assign((_ctx, event) => ({ error: toLocalizableError(event.error) })),
         },
       }),
     },
@@ -137,7 +137,7 @@ const loader = createMachine({
         },
         onError: {
           target: 'failure',
-          actions: assign((_, e) => ({ error: String(e.error) })), // e: ErrorInvokeEvent
+          actions: assign((_, e) => ({ error: toLocalizableError(e.error) })), // e: ErrorInvokeEvent
         },
       }),
     },
@@ -250,7 +250,7 @@ you can't easily click to (a `deleting` state hidden behind a 2-second mutation,
 a guard-gated wizard step), `mockActor` drops you straight in:
 
 ```ts
-const actor = mockActor(loader, { value: 'failure', context: { error: 'Network error' } });
+const actor = mockActor(loader, { value: 'failure', context: { error: { cause: new Error('Network error') } } });
 render(<Loader actor={actor} />); // snapshot a state you'd otherwise have to provoke
 ```
 
