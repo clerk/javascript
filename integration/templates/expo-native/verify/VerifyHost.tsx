@@ -1,6 +1,7 @@
 import {
   ClerkProvider,
   isClerkAPIResponseError,
+  useAppVersionSupport,
   useAuth,
   useClerk,
   useSession,
@@ -98,6 +99,7 @@ function useVerifyLog(state: VerifyState): void {
 
 function RoutedHost({ launch, clientTokenKeptAtLaunch }: RoutedHostProps): ReactElement {
   const status = useClerkStatus();
+  const { isSupported: isAppVersionSupported } = useAppVersionSupport();
   const { isLoaded, isSignedIn, orgId } = useAuth();
   const { user } = useUser();
   const { session } = useSession();
@@ -111,12 +113,12 @@ function RoutedHost({ launch, clientTokenKeptAtLaunch }: RoutedHostProps): React
   const ticketStarted = useRef(false);
 
   useEffect(() => {
-    if (status !== 'error') {
+    if (status !== 'error' || !isAppVersionSupported) {
       return;
     }
     setFailure({ code: 'environment_load_failed', message: 'Clerk failed to load the environment.' });
     setTicket(current => (current === 'pending' ? 'failed' : current));
-  }, [status]);
+  }, [status, isAppVersionSupported]);
 
   useEffect(() => {
     const signInTicket = launch.signInTicket;

@@ -20,7 +20,7 @@ Preconditions:
 - Clerk's `native_app_force_update` flag must be on for the instance. It's on globally, and with it off the call fails.
 - The test app installs `expo-application` (`integration/templates/expo-native/package.sdk-58.json`), so `@clerk/expo` can read its version. Its `version` is `1.0.0` in `app.json`, and its Android version code is Expo's default of `1`. A minimum is a version on iOS and a whole version code on Android, so the spec blocks it with `2.0` and `2`.
 
-- **Signed in.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "signed-in user"` (or `android`). The spec signs in with a ticket, sets the minimum above the build, and relaunches with `keepStorage: true`. It expects `1.0.0` and the store button (screenshot `update-required`). It then lowers the minimum to the build's version, relaunches, and expects the same user and session ID on the home (screenshot `signed-in-after-lowering`).
+- **Signed in.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "signed-in user"` (or `android`). The spec signs in with a ticket, sets the minimum above the build, and relaunches with `keepStorage: true`. It expects `1.0.0`, `Required` on iOS, and the store button (screenshot `update-required`). It then lowers the minimum to the build's version, relaunches, and expects the same user and session ID on the home (screenshot `signed-in-after-lowering`).
 - **Signed out.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "signed-out user"` (or `android`). The spec sets the minimum before the first launch, then expects the update screen and `1.0.0` (screenshot `update-required-signed-out`).
 - **At the minimum.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "at the minimum"` (or `android`). The spec sets the minimum to the build's version, signs in with a ticket, and expects the signed-in home with no update screen.
 - **Proof.** `specs/features/update-required/update-required.e2e.ts` passes on each platform. The video shows the update screen, then the home with the same user and session ID.
@@ -36,8 +36,8 @@ Preconditions:
 
 ## Gotchas
 
-- The version box differs by platform. iOS shows `Your version` and `Required`, and groups each label and value into one element, so the spec uses `getByLabel('Your version, 1.0.0')`. Android shows only `Your version`, as two text nodes, so the spec uses `getByText('1.0.0')`.
-- The store button opens an outside app, so the spec checks that it shows and does not tap it.
+- The version box differs by platform. iOS shows `Your version` and `Required`, and groups each label and value into one element, so `updateRequiredScreen` in `specs/native.ts` uses `getByLabel('Your version, 1.0.0')`. Android shows only `Your version`, as two text nodes, so it uses `getByText('1.0.0')`.
+- The store button opens an outside app, so the spec checks that it shows and does not tap it. On Android, an update URL on another host shows `Update app` instead (`storeButtonText`).
 - The screen has no test IDs, so the spec finds it by its text. A change to that wording changes the spec.
 - A minimum applies to the next request or launch. The spec relaunches instead of waiting for a running app to foreground.
 - The subtitle names the application, which here is the `verify-throwaway-...` name. Don't assert on it.
