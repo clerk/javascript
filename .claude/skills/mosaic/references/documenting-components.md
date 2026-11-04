@@ -13,17 +13,20 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 `meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. Groups in `ALPHABETICAL_GROUPS` (`packages/swingset/src/lib/registry.ts`) sort their entries by `title`; the rest render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
-| Group          | What lives here                                                                                                                      | Archetype   |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| `User Button`  | Composed flow UI (e.g. `UserButton`)                                                                                                 | C           |
-| `User Profile` | Composed flow UI (e.g. `UserProfileProfilePanel`)                                                                                    | C           |
-| `Components`   | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A           |
-| `Primitives`   | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`)                                                           | B           |
-| `Styles`       | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`)                                                              | B (adapted) |
-| `Hooks`        | Headless hooks (`useForm`)                                                                                                           | B (adapted) |
-| `Localization` | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers                                    | B (adapted) |
+| Group                  | What lives here                                                                                                                      | Archetype   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `User Button`          | Composed flow UI (e.g. `UserButton`)                                                                                                 | C           |
+| `User Profile`         | Composed flow UI (e.g. `UserProfileProfilePanel`)                                                                                    | C           |
+| `Organization Profile` | Composed flow UI (e.g. `OrganizationProfileGeneralPanel`)                                                                            | C           |
+| `Misc`                 | Standalone composed components (e.g. `OrganizationSwitcher`, `Waitlist`)                                                             | C           |
+| `Blocks`               | Flows assembled from components, wired by the caller's machine (e.g. `Confirmation`, `Destructive`)                                  | C           |
+| `Components`           | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A           |
+| `Primitives`           | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`)                                                           | B           |
+| `Styles`               | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`)                                                              | B (adapted) |
+| `Hooks`                | Headless hooks (`useForm`)                                                                                                           | B (adapted) |
+| `Localization`         | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers                                    | B (adapted) |
 
-`User Button` / `User Profile` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
+`User Button` / `User Profile` / `Organization Profile` / `Misc` / `Blocks` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
 
 `Styles` and `Hooks` are the non-component layers: there is no element to knob, so they follow
 archetype B's shape (Example → Usage → Parts → Styling) with `Props` replaced by whatever the export
@@ -201,7 +204,7 @@ The story is `meta` (no `styles`) plus a single `Default` export that renders th
 
 **Document the default value for every prop in a dedicated Default column.** Every props table — auto and hand-written — has a **Default** column; the `Type` stays a plain union/enum and the default is named in its own column (the convention every component-doc site and TypeDoc's `@default` tag follow), never inlined into the type. The auto `<PropTable>` renders `Prop | Type | Default | Value` and fills Default from `meta.styles._defaultVariants` (the **Value** column is the live knob seeded with that default); hand-written tables render `Prop | Type | Default | Description` and fill it by hand. Name the default member (`'base'`, `'multiple'`, `'bottom-start'`); use `—` when there is no default (a controlled-only or required prop) and append `(required)` for required props; when the default is behavioral rather than a literal, state it in words (`inherits Root`, `falls back to value`).
 
-## Archetype C — composed layer (`User Button`, `User Profile`)
+## Archetype C — composed layer (`User Button`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`)
 
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
