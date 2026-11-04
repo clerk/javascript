@@ -131,6 +131,43 @@ describe('TagInput', () => {
       expect(tagValues()).toEqual(['a@clerk.dev']);
     });
 
+    it('reports the text not yet added as a tag', async () => {
+      const user = userEvent.setup();
+      const onInputValueChange = vi.fn();
+      render(<Harness onInputValueChange={onInputValueChange} />);
+
+      await user.type(input(), 'a@clerk.dev,b@c');
+      expect(onInputValueChange).toHaveBeenLastCalledWith('b@c');
+
+      await user.tab();
+      expect(onInputValueChange).toHaveBeenLastCalledWith('');
+    });
+
+    it('shows the controlled input value and reports edits without applying them', async () => {
+      const user = userEvent.setup();
+      const onInputValueChange = vi.fn();
+      const { rerender } = render(
+        <Harness
+          inputValue='a@clerk'
+          onInputValueChange={onInputValueChange}
+        />,
+      );
+      expect(input()).toHaveValue('a@clerk');
+
+      await user.type(input(), '.');
+      expect(onInputValueChange).toHaveBeenLastCalledWith('a@clerk.');
+      expect(input()).toHaveValue('a@clerk');
+
+      rerender(
+        <Harness
+          inputValue=''
+          onInputValueChange={onInputValueChange}
+        />,
+      );
+      expect(input()).toHaveValue('');
+      expect(tagValues()).toEqual([]);
+    });
+
     it('ignores empty text and duplicates', async () => {
       const user = userEvent.setup();
       render(<Harness defaultValue={['a@clerk.dev']} />);

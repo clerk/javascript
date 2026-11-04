@@ -7,9 +7,11 @@ import { plural, useLocale, useMessages } from '../../../localization';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
 import type { InviteMembersInput } from './organization-profile-invite-members.model';
+import { canSendInvitations, emailAddressesToInvite } from './organization-profile-invite-members.utils';
 
 interface InviteMembersValues {
   emailAddresses: string[];
+  emailDraft: string;
   role: string | null;
 }
 
@@ -29,22 +31,24 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
   const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
 
-  const form = useForm<InviteMembersValues, boolean>({
-    initialValues: { emailAddresses: [], role: initialRole },
+  const form = useForm<InviteMembersValues, string[] | null>({
+    initialValues: { emailAddresses: [], emailDraft: '', role: initialRole },
     errorFallback: m.error,
-    onSubmit: async ({ emailAddresses, role }) => {
+    canSubmit: values => canSendInvitations({ ...values, rejectedEmailAddresses }),
+    onSubmit: async ({ role, ...draft }) => {
       if (!invite || !roles || role === null) {
-        return false;
+        return null;
       }
+      const emailAddresses = emailAddressesToInvite(draft);
       await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
-      return true;
+      return emailAddresses;
     },
-    onSuccess: (invited, { emailAddresses }) => {
+    onSuccess: invited => {
       if (!invited) {
         return;
       }
       setOpen(false);
-      toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
+      toast.add({ type: 'success', label: plural(m.sent, invited.length, locale) });
     },
   });
 
@@ -56,7 +60,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     if (form.isSubmitting) {
       return;
     }
-    form.reset({ emailAddresses: [], role: initialRole });
+    form.reset({ emailAddresses: [], emailDraft: '', role: initialRole });
     setRejectedEmailAddresses([]);
     setOpen(next);
   };
@@ -76,11 +80,14 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     finalFocus: trigger,
     emailAddresses: form.values.emailAddresses,
     onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
+    emailDraft: form.values.emailDraft,
+    onEmailDraftChange: emailDraft => form.setValue('emailDraft', emailDraft),
     rejectedEmailAddresses,
     roles: roles.roles.map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
     role: form.values.role,
     onRoleChange: role => form.setValue('role', role),
     isRoleDisabled: roles.hasRoleSetMigration,
+    canSubmit: form.canSubmit || form.isSubmitting,
     isPending: form.isSubmitting,
     error: form.error ?? null,
     onSubmit: form.submit,

@@ -7,36 +7,14 @@ import { Select } from '../../../components/select';
 import { TagInput } from '../../../components/tag-input';
 import { fill, useMessages } from '../../../localization';
 import { styles } from './organization-profile-invite-members.styles';
-
-const isEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value);
-
-interface InviteMembersValidity {
-  emailAddresses: string[];
-  rejectedEmailAddresses?: string[];
-  role: string | null;
-}
-
-function isValidEmail(value: string, rejectedEmailAddresses: string[]) {
-  return isEmail(value) && !rejectedEmailAddresses.includes(value);
-}
-
-export function hasInvalidEmailAddresses({
-  emailAddresses,
-  rejectedEmailAddresses = [],
-}: Omit<InviteMembersValidity, 'role'>) {
-  return !emailAddresses.every(value => isValidEmail(value, rejectedEmailAddresses));
-}
-
-export function canSendInvitations({ emailAddresses, rejectedEmailAddresses = [], role }: InviteMembersValidity) {
-  return (
-    emailAddresses.length > 0 && !hasInvalidEmailAddresses({ emailAddresses, rejectedEmailAddresses }) && role !== null
-  );
-}
+import { hasInvalidEmailAddresses, isValidEmail } from './organization-profile-invite-members.utils';
 
 export interface InviteMembersFieldsProps {
   emailInputRef?: Ref<HTMLInputElement>;
   emailAddresses: string[];
   onEmailAddressesChange: (emailAddresses: string[]) => void;
+  emailDraft: string;
+  onEmailDraftChange: (emailDraft: string) => void;
   rejectedEmailAddresses?: string[];
   roles: SelectItem[];
   role: string | null;
@@ -49,6 +27,8 @@ export function InviteMembersFields({
   emailInputRef,
   emailAddresses,
   onEmailAddressesChange,
+  emailDraft,
+  onEmailDraftChange,
   rejectedEmailAddresses = [],
   roles,
   role,
@@ -57,7 +37,7 @@ export function InviteMembersFields({
   isPending,
 }: InviteMembersFieldsProps) {
   const m = useMessages('organizationProfile').members.invite;
-  const hasInvalid = hasInvalidEmailAddresses({ emailAddresses, rejectedEmailAddresses });
+  const hasInvalid = hasInvalidEmailAddresses(emailAddresses, rejectedEmailAddresses);
 
   return (
     <>
@@ -77,6 +57,8 @@ export function InviteMembersFields({
           delimiters={[',', ' ']}
           value={emailAddresses}
           onValueChange={onEmailAddressesChange}
+          inputValue={emailDraft}
+          onInputValueChange={onEmailDraftChange}
           validate={value => isValidEmail(value, rejectedEmailAddresses)}
           removeLabel={email => fill(m.removeEmail, { email })}
         />
