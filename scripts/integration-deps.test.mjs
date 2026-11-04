@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -30,6 +31,27 @@ describe('integration suite tasks in turbo.json', () => {
       `ci.yml runs ${suite} but turbo.json has no task for it`,
     ).toBeDefined();
   });
+
+  test('turbo hashes the package source each suite imports directly', () => {
+    const imported = [...derived.entries()].filter(([, task]) => task.external.length);
+    expect(imported.map(([suite]) => suite)).toContain('chrome-extension');
+    const result = spawnSync(
+      'pnpm',
+      ['turbo', 'run', ...imported.map(([suite]) => `test:integration:${suite}`), '--dry=json'],
+      {
+        cwd: root,
+        encoding: 'utf8',
+      },
+    );
+    expect(result.status, result.stderr).toBe(0);
+    const dry = JSON.parse(result.stdout.slice(result.stdout.search(/^\{/m)));
+    for (const [suite, task] of imported) {
+      const hashed = Object.keys(dry.tasks.find(t => t.taskId === `//#test:integration:${suite}`).inputs);
+      for (const file of task.external) {
+        expect(hashed, `${file} is imported by the ${suite} suite but turbo does not hash it`).toContain(file);
+      }
+    }
+  }, 120_000);
 
   test.each([...derived.entries()])('%s depends on the packages its apps install', (suite, expected) => {
     const task = turbo.tasks[`//#test:integration:${suite}`];

@@ -91,26 +91,35 @@ const withoutImplied = (graph, names) =>
       HARNESS_PACKAGES.includes(name) || !names.some(other => other !== name && transitiveDeps(graph, other).has(name)),
   );
 
+const INTEGRATION = path.join(root, 'integration');
+
+const resolveImport = (from, specifier) => {
+  const target = path.resolve(path.dirname(from), specifier);
+  return [target, `${target}.ts`, `${target}.tsx`, path.join(target, 'index.ts')].find(
+    candidate => fs.existsSync(candidate) && fs.statSync(candidate).isFile(),
+  );
+};
+
 const followImports = seeds => {
-  const seen = new Map(seeds.map(file => [file, read(file)]));
-  const queue = [...seen.keys()];
+  const sources = new Map(seeds.map(file => [file, read(file)]));
+  const external = new Set();
+  const queue = [...sources.keys()];
   while (queue.length) {
     const file = queue.pop();
-    for (const match of seen.get(file).matchAll(/from '(\.{1,2}\/[^']+)'/g)) {
-      const target = path.resolve(path.dirname(file), match[1]);
-      if (!target.startsWith(TESTS)) {
+    for (const match of sources.get(file).matchAll(/from '(\.{1,2}\/[^']+)'/g)) {
+      const resolved = resolveImport(file, match[1]);
+      if (!resolved || sources.has(resolved) || external.has(resolved)) {
         continue;
       }
-      const resolved = [target, `${target}.ts`, path.join(target, 'index.ts')].find(
-        candidate => fs.existsSync(candidate) && fs.statSync(candidate).isFile(),
-      );
-      if (resolved && !seen.has(resolved)) {
-        seen.set(resolved, read(resolved));
+      if (resolved.startsWith(TESTS + path.sep)) {
+        sources.set(resolved, read(resolved));
         queue.push(resolved);
+      } else if (!resolved.startsWith(INTEGRATION + path.sep) && resolved.startsWith(root + path.sep)) {
+        external.add(resolved);
       }
     }
   }
-  return seen;
+  return { sources, external: [...external].map(file => path.relative(root, file)).sort() };
 };
 
 const globToRegExp = glob =>
@@ -160,7 +169,7 @@ export const deriveIntegrationTasks = async () => {
     const tagged = tag
       ? testFiles.filter(file => new RegExp(`@${tag}(?![a-z-])`).test(read(file)))
       : testFiles.filter(file => file.startsWith(path.join(TESTS, base) + path.sep));
-    const sources = followImports(tagged);
+    const { sources, external } = followImports(tagged);
 
     const patterns = script.match(/E2E_APP_ID=([^ ]+)/)?.[1].split(',') ?? [];
     const configNames = new Set();
@@ -204,7 +213,9 @@ export const deriveIntegrationTasks = async () => {
         ...(testDirs.size ? [braceGlob('integration/tests', [...testDirs].sort())] : []),
         'integration/templates/*',
         ...(templates.size ? [braceGlob('integration/templates', [...templates].sort())] : []),
+        ...external,
       ],
+      external,
       configs: [...configNames].sort(),
     });
   }

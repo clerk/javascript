@@ -13,6 +13,7 @@ const scenarios = [
   ['test file', 'integration/tests/generic/sign-in-flow.test.ts'],
   ['vue test', 'integration/tests/vue/components.test.ts'],
   ['expo-native', 'integration/expo-native/README.md'],
+  ['js fixture', 'packages/clerk-js/src/test/fixtures.ts'],
 ];
 
 const turbo = JSON.parse(readFileSync(resolve(root, 'turbo.json'), 'utf8'));
@@ -25,7 +26,7 @@ function hashes() {
   if (result.status !== 0) {
     throw new Error(result.stderr);
   }
-  const json = JSON.parse(result.stdout.slice(result.stdout.indexOf('{')));
+  const json = JSON.parse(result.stdout.slice(result.stdout.search(/^\{/m)));
   return new Map(
     json.tasks
       .filter(task => task.taskId.startsWith('//#test:integration:'))
@@ -65,10 +66,10 @@ for (const [label, file] of scenarios) {
 }
 
 const pad = (value, width) => String(value).padEnd(width);
-console.log(`${pad('suite', 22)} ${pad('inputs', 6)} ${columns.map(([label]) => pad(label, 11)).join('')}`);
+console.log(`${pad('suite', 22)} ${pad('inputs', 6)} ${columns.map(([label]) => pad(label, 12)).join('')}`);
 for (const suite of [...baseline.keys()].sort()) {
   const cells = columns.map(([, result]) =>
-    pad(result.get(suite).hash === baseline.get(suite).hash ? '.' : 'RERUN', 11),
+    pad(result.get(suite).hash === baseline.get(suite).hash ? '.' : 'RERUN', 12),
   );
   console.log(`${pad(suite, 22)} ${pad(baseline.get(suite).inputs, 6)} ${cells.join('')}`);
 }

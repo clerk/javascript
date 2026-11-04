@@ -263,7 +263,8 @@
         "integration/tests/snapshots/**",
         "integration/tests/{generic,session-token-cache}/**",
         "integration/templates/*",
-        "integration/templates/{custom-flows-react-vite,next-app-router,react-vite,vue-vite}/**"
+        "integration/templates/{custom-flows-react-vite,next-app-router,react-vite,vue-vite}/**",
+        "packages/backend/src/tokens/types.ts"
       ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
@@ -344,7 +345,8 @@
         "integration/tests/snapshots/**",
         "integration/tests/{generic,nextjs,session-token-cache}/**",
         "integration/templates/*",
-        "integration/templates/{next-app-router,react-vite}/**"
+        "integration/templates/{next-app-router,react-vite}/**",
+        "packages/backend/src/tokens/types.ts"
       ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
@@ -359,7 +361,8 @@
         "integration/tests/snapshots/**",
         "integration/tests/{generic,nextjs,session-token-cache}/**",
         "integration/templates/*",
-        "integration/templates/{next-app-router,react-vite}/**"
+        "integration/templates/{next-app-router,react-vite}/**",
+        "packages/backend/src/tokens/types.ts"
       ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
@@ -657,7 +660,8 @@
         "integration/tests/snapshots/**",
         "integration/tests/chrome-extension/**",
         "integration/templates/*",
-        "integration/templates/{chrome-extension-vite,react-vite}/**"
+        "integration/templates/{chrome-extension-vite,react-vite}/**",
+        "packages/clerk-js/src/test/fixtures.ts"
       ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"

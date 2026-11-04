@@ -151,7 +151,8 @@ How the cache key is built:
   add. Turbo folds those build hashes into the suite hash, and package builds already depend on
   `^build`, so transitive packages such as `@clerk/shared` are covered without being listed.
 - `inputs` covers the harness, the test directories the suite's tagged tests live in (and import
-  from), and the templates its apps copy. Other suites' directories are not inputs. Tests live under
+  from), the templates its apps copy, and any package source file a test imports directly, such as a
+  `packages/*/src/test` fixture the package build excludes. Other suites' directories are not inputs. Tests live under
   `integration/tests/<suite>/`; a test tagged for several suites lives in `generic/`, and tests no
   suite runs live in `unscheduled/`.
 - `scripts/integration-deps.test.mjs` derives both lists from `integration/presets` and the tagged
