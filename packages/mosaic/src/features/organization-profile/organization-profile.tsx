@@ -29,6 +29,12 @@ export interface OrganizationProfileProps
    */
   defaultPage?: OrganizationProfileViewProps['activePage'];
   /**
+   * The base the profile's pages are nested under. Two profiles on one page need different bases.
+   *
+   * @default '/organization'
+   */
+  path?: string;
+  /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that there is no active
    * organization.
    */
@@ -83,6 +89,7 @@ export function OrganizationProfile({
   customPages,
   pageOrder,
   defaultPage,
+  path = '/organization',
   afterLeaveOrganizationUrl,
   fallback,
   apiKeysProps,
@@ -92,7 +99,7 @@ export function OrganizationProfile({
   const { activePage, onPageChange } = useProfilePagesController(
     defaultPage ?? pageOrder?.[0] ?? 'general',
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
-    { routing: 'virtual', path: '/organization' },
+    { routing: 'virtual', path },
   );
 
   if (model.status === 'loading') {

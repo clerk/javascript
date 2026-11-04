@@ -4,7 +4,11 @@ import React from 'react';
 import { UserProfileSurface } from './user-profile';
 import type { UserProfileModalContentProps } from './user-profile.modal.types';
 
-export default function UserProfileModalContent({ options, close }: UserProfileModalContentProps): React.ReactElement {
+export default function UserProfileModalContent({
+  options,
+  close,
+  path,
+}: UserProfileModalContentProps): React.ReactElement {
   const { isLoaded, user } = useUser();
   const signedOut = isLoaded && !user;
 
@@ -19,6 +23,7 @@ export default function UserProfileModalContent({ options, close }: UserProfileM
     <UserProfileSurface
       {...props}
       presentation='modal'
+      path={path}
       defaultPage={page}
     />
   );

@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { MosaicProviderProps } from '../mosaic-provider';
 import { MosaicProvider } from '../mosaic-provider';
+import { useVirtualSegment } from '../routing/virtual-store';
 import { defineModalSurface } from './define-modal-surface';
 import type { ModalContentProps, ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 import { ModalHost } from './modal-host';
@@ -456,5 +457,90 @@ describe('useModal', () => {
         />,
       ),
     ).toThrow(/unknown.*MosaicProvider/);
+  });
+});
+
+describe('a modal surface that routes', () => {
+  function Entry() {
+    return <output data-testid='entry'>{JSON.stringify(useVirtualSegment('/modal/stub'))}</output>;
+  }
+
+  function routedSurface() {
+    return defineModalSurface<StubOptions>({
+      id: 'routed',
+      variant: 'card',
+      load: () => Promise.resolve({ default: StubContent }),
+      path: '/modal/stub',
+      initialParts: options => (options?.page ? options.page.split('/') : []),
+    });
+  }
+
+  function renderRouted(surface = routedSurface()) {
+    const ref: { handle: ModalHandle<StubOptions> | undefined } = { handle: undefined };
+    renderWithModals(
+      [surface],
+      <>
+        <Caller
+          surface={surface}
+          onHandle={h => (ref.handle = h)}
+        />
+        <Entry />
+      </>,
+    );
+    return ref;
+  }
+
+  const entry = () => JSON.parse(screen.getByTestId('entry').textContent ?? 'null');
+
+  it('writes an empty entry under its base when opened with no page', async () => {
+    const ref = renderRouted();
+
+    act(() => ref.handle?.open());
+    await flush();
+
+    expect(entry()).toEqual([]);
+  });
+
+  it('writes the page it was opened at', async () => {
+    const ref = renderRouted();
+
+    act(() => ref.handle?.open({ page: 'organization/general' }));
+    await flush();
+
+    expect(entry()).toEqual(['organization', 'general']);
+  });
+
+  it('clears its entry when closed, so it reopens fresh', async () => {
+    const ref = renderRouted();
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(entry()).toEqual(['security']);
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(entry()).toEqual([]);
+
+    act(() => ref.handle?.open());
+    await flush();
+    expect(entry()).toEqual([]);
+  });
+
+  it('hands its base to the content', async () => {
+    const surface = defineModalSurface<StubOptions>({
+      id: 'based',
+      variant: 'card',
+      load: () =>
+        Promise.resolve({
+          default: ({ path }: ModalContentProps<StubOptions>) => <output data-testid='base'>{path}</output>,
+        }),
+      path: '/modal/based',
+    });
+    const ref = renderRouted(surface);
+
+    act(() => ref.handle?.open());
+    await flush();
+
+    expect(screen.getByTestId('base').textContent).toBe('/modal/based');
   });
 });

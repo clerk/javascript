@@ -38,6 +38,12 @@ export interface UserProfileProps
    */
   defaultPage?: UserProfileViewProps['activePage'];
   /**
+   * The base the profile's pages are nested under. Two profiles on one page need different bases.
+   *
+   * @default '/user'
+   */
+  path?: string;
+  /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that nobody is signed in.
    */
   fallback?: ReactNode;
@@ -136,6 +142,7 @@ export function UserProfileSurface({
   customPages,
   pageOrder,
   defaultPage,
+  path = '/user',
   additionalOAuthScopes,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
@@ -152,6 +159,7 @@ export function UserProfileSurface({
 
   const viewProps: AccountViewProps = {
     elevation: 'flush',
+    path,
     initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
     customPages,
     pageOrder,
@@ -182,12 +190,13 @@ export function UserProfileSurface({
 
 type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
   initialPage: UserProfileViewProps['activePage'];
+  path: string;
 };
 
-function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
+function AccountUserProfileView({ initialPage, path, ...viewProps }: AccountViewProps) {
   const { activePage, onPageChange } = useProfilePagesController(initialPage, userProfilePageIds(viewProps), {
     routing: 'virtual',
-    path: '/user',
+    path,
   });
 
   return (
@@ -201,6 +210,7 @@ function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps)
 
 function CombinedUserProfileView({
   initialPage,
+  path,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
 }: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
@@ -212,7 +222,7 @@ function CombinedUserProfileView({
   const { activePage, onPageChange } = useProfilePagesController(
     initialPage,
     model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
-    { routing: 'virtual', path: '/user' },
+    { routing: 'virtual', path },
   );
 
   return (
