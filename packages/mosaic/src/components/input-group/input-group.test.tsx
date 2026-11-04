@@ -1,12 +1,22 @@
+import * as stylex from '@stylexjs/stylex';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { space } from '../../tokens.stylex';
 import { Button } from '../button';
 import { Field } from '../field';
 import { Input } from '../input';
 import { InputGroup } from './input-group';
+import { styles as groupStyles } from './input-group.styles';
+
+const probe = stylex.create({
+  xsBox: { height: space['6'], width: space['6'] },
+});
+
+const atoms = (style: stylex.StyleXStyles) =>
+  (stylex.props(style).className ?? '').split(' ').filter(name => name && !name.includes('__'));
 
 describe('Mosaic InputGroup', () => {
   it('exposes slots rather than a separate action component', () => {
@@ -125,6 +135,7 @@ describe('Mosaic InputGroup', () => {
     );
     for (const button of screen.getAllByRole('button')) {
       expect(button).toHaveAttribute('data-size', buttonSize);
+      expect(button).toHaveClass(...atoms(groupStyles.buttonSize));
     }
   });
 
@@ -255,7 +266,12 @@ describe('Mosaic InputGroup', () => {
       </InputGroup.Root>,
     );
 
-    expect(screen.getByRole('button', { name: 'Show options' })).toHaveAttribute('data-size', 'xs');
+    const button = screen.getByRole('button', { name: 'Show options' });
+    expect(button).toHaveAttribute('data-size', 'xs');
+    expect(button).toHaveClass(...atoms(probe.xsBox));
+    for (const atom of [...atoms(groupStyles.buttonSize), ...atoms(groupStyles.iconButton)]) {
+      expect(button).not.toHaveClass(atom);
+    }
   });
 
   it('inherits Field state and associates its label and messages with the input', () => {

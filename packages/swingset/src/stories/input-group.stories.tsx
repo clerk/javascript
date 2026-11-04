@@ -151,3 +151,25 @@ export function Invalid(props: Record<string, unknown>) {
     </Field.Root>
   );
 }
+
+export function ButtonSize(props: Record<string, unknown>) {
+  return (
+    <Field.Root xstyle={styles.fieldWidth}>
+      <Field.Label>Search</Field.Label>
+      <InputGroup.Root
+        {...knobsAsProps(props)}
+        size='lg'
+      >
+        <InputGroup.Input placeholder='Search' />
+        <InputGroup.End>
+          <Button
+            type='button'
+            size='xs'
+          >
+            Clear
+          </Button>
+        </InputGroup.End>
+      </InputGroup.Root>
+    </Field.Root>
+  );
+}
