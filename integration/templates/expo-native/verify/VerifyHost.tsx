@@ -111,9 +111,17 @@ function RoutedHost({ launch, clientTokenKeptAtLaunch }: RoutedHostProps): React
   const [ticket, setTicket] = useState<VerifyTicket>(launch.signInTicket ? 'pending' : 'none');
   const [failure, setFailure] = useState<VerifyFailure | null>(null);
   const ticketStarted = useRef(false);
+  const loadFailedWhileBlocked = useRef(false);
 
   useEffect(() => {
-    if (status !== 'error' || !isAppVersionSupported) {
+    if (status !== 'error') {
+      loadFailedWhileBlocked.current = false;
+      return;
+    }
+    if (!isAppVersionSupported) {
+      loadFailedWhileBlocked.current = true;
+    }
+    if (loadFailedWhileBlocked.current) {
       return;
     }
     setFailure({ code: 'environment_load_failed', message: 'Clerk failed to load the environment.' });
