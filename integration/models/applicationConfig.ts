@@ -153,6 +153,9 @@ export const applicationConfig = () => {
     get scripts() {
       return scripts;
     },
+    get template() {
+      return template;
+    },
     get pkglabDependencies() {
       return [...dependencies.entries()].filter(([, version]) => version === PKGLAB).map(([name]) => name);
     },
