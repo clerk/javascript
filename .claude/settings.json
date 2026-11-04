@@ -42,7 +42,8 @@
           {
             "type": "command",
             "command": "node \"$(git rev-parse --show-toplevel)/scripts/mosaic-parity-gate.mjs\" write",
-            "timeout": 10
+            "timeout": 10,
+            "if": "Write(/packages/mosaic/src/features/**)"
           }
         ]
       }
