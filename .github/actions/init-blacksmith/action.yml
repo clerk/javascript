@@ -9,6 +9,10 @@ inputs:
     description: 'Enable Playwright?'
     required: false
     default: 'false'
+  playwright-install-enabled:
+    description: 'Install Playwright browsers after restoring the cache?'
+    required: false
+    default: 'true'
   turbo-summarize:
     description: 'The token to use for Turbo task summaries'
     required: false
@@ -146,7 +150,7 @@ runs:
         key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}-v2
 
     - name: Install Playwright Browsers
-      if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+      if: inputs.playwright-enabled == 'true' && inputs.playwright-install-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
         pnpm playwright install chromium

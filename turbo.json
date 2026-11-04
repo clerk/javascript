@@ -229,7 +229,23 @@
     "//#test:integration:ap-flows": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router-quickstart/**",
+        "integration/templates/next-app-router-quickstart-v6/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -242,28 +258,90 @@
         "@clerk/vue#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/react-vite/**",
+        "integration/templates/next-app-router/**",
+        "integration/templates/vue-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:express": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/express#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/express-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:fastify": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/fastify#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/fastify-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:hono": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/hono#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/hono-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -276,21 +354,66 @@
         "@clerk/ui#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router-mosaic/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nuxt,react-router,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs:canary": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nuxt,react-router,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -304,14 +427,45 @@
         "INTEGRATION_STAGING_INSTANCE_KEYS",
         "VERCEL_AUTOMATION_BYPASS_SECRET"
       ],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router-quickstart/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:astro": {
       "dependsOn": ["@clerk/astro#build", "@clerk/clerk-js#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/astro-node/**",
+        "integration/templates/astro-hybrid/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -325,42 +479,132 @@
         "INTEGRATION_STAGING_INSTANCE_KEYS",
         "NODE_EXTRA_CA_CERTS"
       ],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions:staging": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake:staging": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:expo-web": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/expo#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/expo-web/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -372,28 +616,89 @@
         "@clerk/ui#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,vue}/**/*.test.ts",
+        "integration/templates/tanstack-react-start/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:vue": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/testing#build", "@clerk/ui#build", "@clerk/vue#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start}/**/*.test.ts",
+        "integration/templates/vue-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nuxt": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nuxt#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/nuxt-node/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:react-router": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/react-router#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/react-router-node/**",
+        "integration/templates/react-router-library/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -407,7 +712,24 @@
         "@clerk/vue#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-app-router/**",
+        "integration/templates/vue-vite/**",
+        "integration/templates/astro-node/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -426,21 +748,73 @@
         "@clerk/ui#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{chrome-extension,custom-flows,electron,expo-web,handshake,localhost,mosaic,next-account-portal,nextjs,session-token-cache,sessions,vue}/**/*.test.ts",
+        "integration/templates/astro-node/**",
+        "integration/templates/express-vite/**",
+        "integration/templates/fastify-vite/**",
+        "integration/templates/hono-vite/**",
+        "integration/templates/next-app-router/**",
+        "integration/templates/nuxt-node/**",
+        "integration/templates/react-router-node/**",
+        "integration/templates/tanstack-react-start/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:custom": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/react#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/custom-flows-react-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:cache-components": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/nextjs#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/next-cache-components/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
@@ -452,14 +826,45 @@
         "@clerk/ui#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,custom-flows,electron,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/chrome-extension-vite/**",
+        "integration/templates/react-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:electron": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/electron#build", "@clerk/testing#build", "@clerk/ui#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**", "!integration/expo-native/**"],
+      "passThroughEnv": [
+        "TURBO_ARGS",
+        "TURBO_CACHE",
+        "TURBO_TEAM",
+        "TURBO_TOKEN",
+        "TURBO_REMOTE_CACHE_SIGNATURE_KEY",
+        "GITHUB_OUTPUT"
+      ],
+      "inputs": [
+        "integration/*",
+        "integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**",
+        "integration/templates/*",
+        "integration/tests/**",
+        "!integration/tests/{astro,chrome-extension,custom-flows,expo-web,express,fastify,handshake,hono,localhost,mosaic,next-account-portal,nextjs,nuxt,react-router,session-token-cache,sessions,tanstack-start,vue}/**/*.test.ts",
+        "integration/templates/electron-vite/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
