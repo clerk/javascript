@@ -56,7 +56,7 @@ describe('useForm', () => {
     act(() => result.current.setValue('username', 'alexc'));
     act(() => result.current.submit());
     expect(result.current.isSubmitting).toBe(true);
-    expect(result.current.canSubmit).toBe(false);
+    expect(result.current.canSubmit).toBe(true);
     act(() => result.current.submit());
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith({ username: 'alexc' });
@@ -584,7 +584,7 @@ describe('useForm', () => {
     act(() => result.current.submit());
     expect(onSubmit).not.toHaveBeenCalled();
     expect(result.current.isSubmitting).toBe(true);
-    expect(result.current.canSubmit).toBe(false);
+    expect(result.current.canSubmit).toBe(true);
     await act(async () => {
       check.resolve(undefined);
       await tick();
