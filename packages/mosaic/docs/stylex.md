@@ -1,8 +1,3 @@
----
-paths:
-  - 'src/**/*.styles.ts'
----
-
 # Styling a component with StyleX
 
 Mosaic is styled with **StyleX**: compile-time atomic CSS, where the style objects

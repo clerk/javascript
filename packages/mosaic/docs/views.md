@@ -1,8 +1,3 @@
----
-paths:
-  - 'src/**/*.view.tsx'
----
-
 # Views
 
 The view renders plain props and calls plain callbacks. Nothing else.

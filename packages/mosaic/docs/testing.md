@@ -1,10 +1,3 @@
----
-paths:
-  - 'src/**/__tests__/**'
-  - 'src/**/*.test.ts'
-  - 'src/**/*.test.tsx'
----
-
 # Testing a Mosaic flow
 
 We follow [Write tests. Not too many. Mostly integration.](https://kentcdodds.com/blog/write-tests):
