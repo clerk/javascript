@@ -60,11 +60,13 @@ beforeAll(async () => {
   ({ appConfigs } = await import('..'));
 });
 
-const packagesLoadedBy = (suite: string) => {
+const appsLoadedBy = (suite: string) => {
   const { appIds, tag } = parseScript(suite);
-  const longRunning = (
-    appConfigs.longRunningApps.getByPattern(appIds!) as unknown as { config: ApplicationConfig }[]
-  ).map(app => app.config);
+  const longRunning = appIds
+    ? (appConfigs.longRunningApps.getByPattern(appIds) as unknown as { config: ApplicationConfig }[]).map(
+        app => app.config,
+      )
+    : [];
 
   const tagPattern = new RegExp(`${tag}(?![\\w-])`);
   const taggedSources = listTestFiles(testsDir)
@@ -80,7 +82,12 @@ const packagesLoadedBy = (suite: string) => {
     [...source.matchAll(/addDependency\(\s*'(@clerk\/[\w-]+)',\s*PKGLAB\s*\)/g)].map(([, name]) => name),
   );
 
-  return [...[...longRunning, ...referenced].flatMap(config => config.pkglabDependencies), ...addedInTests];
+  return { configs: [...longRunning, ...referenced], addedInTests };
+};
+
+const packagesLoadedBy = (suite: string) => {
+  const { configs, addedInTests } = appsLoadedBy(suite);
+  return [...configs.flatMap(config => config.pkglabDependencies), ...addedInTests];
 };
 
 describe('scoped integration suites declare the builds they load', () => {
@@ -93,11 +100,14 @@ describe('scoped integration suites declare the builds they load', () => {
   });
 
   describe.each(scopedSuites)('$suite', ({ suite, dependsOn }) => {
-    it('selects its apps with E2E_APP_ID and a --grep tag', () => {
-      const { script, appIds, tag } = parseScript(suite);
+    it('selects its tests with a --grep tag and its apps by id or from its tagged tests', () => {
+      const { script, tag } = parseScript(suite);
       expect(script, `package.json has no test:integration:${suite} script`).toBeDefined();
-      expect(appIds, `test:integration:${suite} must set E2E_APP_ID to be scoped`).toBeDefined();
       expect(tag, `test:integration:${suite} must pass --grep @tag to be scoped`).toBeDefined();
+      expect(
+        appsLoadedBy(suite).configs.length,
+        `test:integration:${suite} must set E2E_APP_ID or its tagged tests must use appConfigs apps to be scoped`,
+      ).toBeGreaterThan(0);
     });
 
     it('depends on exactly the builds of the packages its fixtures and harness load', () => {
