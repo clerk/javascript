@@ -64,12 +64,12 @@ const LINK_RESEND_SECONDS = 60;
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
 const resend = {
-  target: 'starting',
+  target: 'starting' as const,
   guard: (context: Context) => context.resendSeconds === 0,
   actions: assign(() => ({ error: undefined })),
 };
 const start = {
-  target: 'starting',
+  target: 'starting' as const,
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
     verifyingId: event.id,
     emailAddress: event.emailAddress,

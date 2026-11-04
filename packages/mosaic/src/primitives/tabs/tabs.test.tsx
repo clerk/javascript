@@ -29,6 +29,42 @@ function renderTabs(props: Partial<React.ComponentProps<typeof Tabs.Root>> = {})
 }
 
 describe('Tabs', () => {
+  describe('item registration', () => {
+    it('leaves a standalone trigger inside the list out of keyboard navigation', async () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Trigger value='tab2'>Settings</Tabs.Trigger>
+            <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      screen.getByRole('tab', { name: 'Account' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(screen.getByRole('tab', { name: 'Billing' })).toHaveFocus();
+    });
+
+    it('keeps a tab in keyboard navigation when its role is overridden', async () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab
+              value='tab2'
+              role='button'
+            >
+              Settings
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      screen.getByRole('tab', { name: 'Account' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(screen.getByRole('button', { name: 'Settings' })).toHaveFocus();
+    });
+  });
+
   describe('ARIA attributes', () => {
     it('list has role=tablist', () => {
       renderTabs();
@@ -541,6 +577,12 @@ describe('Tabs', () => {
       expect(screen.getByText('Billing')).toHaveAttribute('tabindex', '-1');
     });
 
+    it('puts the tab stop on a selected tab that is not first', () => {
+      renderTabs({ defaultValue: 'tab2' });
+      expect(screen.getByText('Settings')).toHaveAttribute('tabindex', '0');
+      expect(screen.getByText('Account')).toHaveAttribute('tabindex', '-1');
+    });
+
     it('tabIndex updates when selection changes', async () => {
       const user = userEvent.setup();
       renderTabs();
@@ -810,5 +852,53 @@ describe('Tabs', () => {
       </Tabs.Root>,
     );
     expect(ref.current).toBe(screen.getByRole('tablist'));
+  });
+
+  describe('consumer key handlers', () => {
+    function HandlerTabs({ onTab, onParent }: { onTab?: (key: string) => void; onParent?: (key: string) => void }) {
+      return (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- Test host; the keys come from the focusable items inside it.
+        <div onKeyDown={event => onParent?.(event.key)}>
+          <Tabs.Root defaultValue='a'>
+            <Tabs.List>
+              <Tabs.Tab
+                value='a'
+                onKeyDown={event => onTab?.(event.key)}
+              >
+                A
+              </Tabs.Tab>
+              <Tabs.Tab value='b'>B</Tabs.Tab>
+              <Tabs.Tab value='c'>C</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.Root>
+        </div>
+      );
+    }
+
+    it('calls a tab onKeyDown for navigation keys', async () => {
+      const onTab = vi.fn();
+      render(<HandlerTabs onTab={onTab} />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(onTab).toHaveBeenCalledWith('ArrowRight');
+      expect(screen.getByRole('tab', { name: 'B' })).toHaveFocus();
+    });
+
+    it('stops arrows at the list but lets End reach a parent', async () => {
+      const onParent = vi.fn();
+      render(<HandlerTabs onParent={onParent} />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(onParent).not.toHaveBeenCalled();
+      await userEvent.keyboard('{End}');
+      expect(onParent).toHaveBeenCalledWith('End');
+    });
+
+    it.each(['{Shift>}', '{Control>}', '{Meta>}', '{Alt>}'])('moves with %s held', async modifier => {
+      render(<HandlerTabs />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard(`${modifier}{ArrowRight}`);
+      expect(screen.getByRole('tab', { name: 'B' })).toHaveFocus();
+    });
   });
 });

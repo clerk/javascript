@@ -1,6 +1,11 @@
-import { contains } from '@floating-ui/react/utils';
 import React from 'react';
 
+import {
+  type CompositeKeyEvent,
+  type SetTabIndex,
+  useComposite,
+  type UseCompositeReturn,
+} from '../hooks/use-composite';
 import { isRtl, isTextEntry } from './table-dom';
 
 const WIDGET_SELECTOR = 'button, a[href], input, select, textarea, [tabindex]';
@@ -13,165 +18,112 @@ interface Position {
 const ROW_COLUMN = -1;
 
 export function useGridNavigation(table: HTMLTableElement | null, enabled: boolean, excluded: WeakSet<Element>) {
-  const activeRef = React.useRef<HTMLElement | null>(null);
   const positionRef = React.useRef<Position | null>(null);
   const editingRef = React.useRef<HTMLTableCellElement | null>(null);
-  const focusedRef = React.useRef(false);
-  const originalTabIndexes = React.useRef(new Map<HTMLElement, string | null>());
 
-  const setTabIndex = React.useCallback((element: HTMLElement, tabIndex: number | null) => {
-    if (!originalTabIndexes.current.has(element)) {
-      originalTabIndexes.current.set(element, element.getAttribute('tabindex'));
-    }
-    if (tabIndex === null) {
-      element.removeAttribute('tabindex');
-    } else {
-      element.tabIndex = tabIndex;
-    }
-  }, []);
-
-  const sync = React.useCallback(() => {
-    if (!table) {
-      return;
-    }
-    const lostActive = !isActivatable(table, activeRef.current);
-    if (lostActive) {
-      activeRef.current = itemAt(table, positionRef.current ?? initialPosition(table, excluded), excluded) ?? null;
-    }
-    for (const element of originalTabIndexes.current.keys()) {
-      if (!element.isConnected) {
-        originalTabIndexes.current.delete(element);
-      }
-    }
-    for (const row of Array.from(table.rows)) {
-      syncRow(row, activeRef.current, editingRef.current, excluded, setTabIndex);
-    }
-    if (lostActive && focusedRef.current && !contains(table, table.ownerDocument.activeElement)) {
-      activeRef.current?.focus();
-    }
-  }, [table, excluded, setTabIndex]);
-
-  const activate = React.useCallback(
-    (element: HTMLElement, position: Position, editing: HTMLTableCellElement | null) => {
-      activeRef.current = element;
-      positionRef.current = position;
-      editingRef.current = editing;
-      sync();
+  const composite: UseCompositeReturn = useComposite(table, {
+    enabled,
+    recoverFocus: true,
+    stopPropagation: 'all',
+    getItems: () => (table ? gridItems(table, excluded) : []),
+    preferred: {
+      getItem: () =>
+        table ? itemAt(table, positionRef.current ?? initialPosition(table, excluded), excluded) : undefined,
     },
-    [sync],
-  );
-
-  const leaveCell = React.useCallback(
-    (target: Element) => {
-      const cell = table ? owningCell(table, target) : null;
-      if (!cell || editingRef.current !== cell) {
-        return false;
+    resolveFocus: target => {
+      if (!table) {
+        return null;
       }
-      activate(cell, positionOf(cell), null);
-      cell.focus();
-      return true;
+      if (target instanceof HTMLTableRowElement && isRowItem(target, excluded) && target.closest('table') === table) {
+        editingRef.current = null;
+        return target;
+      }
+      const cell = owningCell(table, target);
+      if (!cell) {
+        return null;
+      }
+      if (target === cell || target === focusTarget(cell, excluded)) {
+        editingRef.current = null;
+        return target;
+      }
+      editingRef.current = cell;
+      return cell;
     },
-    [table, activate],
-  );
-
-  React.useLayoutEffect(() => {
-    if (enabled) {
-      sync();
-    }
+    getNextItem: (event, target) => {
+      if (!table) {
+        return null;
+      }
+      const row = target instanceof HTMLTableRowElement && target.closest('table') === table ? target : null;
+      const cell = row ? null : owningCell(table, target);
+      if (cell && editingRef.current === cell) {
+        return null;
+      }
+      if (cell && target === cell && (event.key === 'Enter' || event.key === 'F2')) {
+        const [firstWidget] = cellWidgets(cell, excluded);
+        if (firstWidget) {
+          event.preventDefault();
+          editingRef.current = cell;
+          composite.setActive(cell);
+          firstWidget.focus();
+        }
+        return null;
+      }
+      const position = row
+        ? rowMove(table, row, event, excluded)
+        : cell
+          ? cellMove(table, cell, event, excluded)
+          : null;
+      const next = position ? itemAt(table, position, excluded) : null;
+      if (next) {
+        editingRef.current = null;
+      }
+      return next ?? null;
+    },
+    syncTabIndexes: (active, setTabIndex) => {
+      if (!table) {
+        return;
+      }
+      if (active) {
+        positionRef.current = positionOf(active);
+      }
+      for (const row of Array.from(table.rows)) {
+        syncRow(row, active, editingRef.current, excluded, setTabIndex);
+      }
+    },
   });
 
   React.useLayoutEffect(() => {
     if (!enabled || !table) {
       return;
     }
-    const originals = originalTabIndexes.current;
-    const observer = new MutationObserver(sync);
-    observer.observe(table, { childList: true, subtree: true });
-
-    const moveTo = (position: Position) => {
-      const element = itemAt(table, position, excluded);
-      if (element) {
-        activate(element, positionOf(element), null);
-        element.focus();
-      }
-    };
-
-    const onFocusIn = (event: FocusEvent) => {
-      const { target } = event;
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
-      focusedRef.current = true;
-      if (target instanceof HTMLTableRowElement && isRowItem(target, excluded) && target.closest('table') === table) {
-        activate(target, positionOf(target), null);
-        return;
-      }
-      const cell = owningCell(table, target);
-      if (!cell) {
-        return;
-      }
-      if (target === cell || target === focusTarget(cell, excluded)) {
-        activate(target, positionOf(cell), null);
-      } else {
-        activate(cell, positionOf(cell), cell);
-      }
-    };
-
-    const onFocusOut = (event: FocusEvent) => {
-      const { target, relatedTarget } = event;
-      if (
-        target instanceof Element &&
-        target.isConnected &&
-        !(relatedTarget instanceof Element && contains(table, relatedTarget))
-      ) {
-        focusedRef.current = false;
-      }
-    };
-
     const onKeyDown = (event: KeyboardEvent) => {
-      const { target } = event;
-      if (event.defaultPrevented || event.altKey || !(target instanceof HTMLElement)) {
-        return;
+      if (!event.defaultPrevented && !event.altKey) {
+        composite.handleKeyDown(event);
       }
-      const row = target instanceof HTMLTableRowElement && target.closest('table') === table ? target : null;
-      const cell = row ? null : owningCell(table, target);
-
-      if (cell && editingRef.current === cell) {
-        return;
-      }
-
-      if (cell && target === cell && (event.key === 'Enter' || event.key === 'F2')) {
-        const [firstWidget] = cellWidgets(cell, excluded);
-        if (firstWidget) {
-          event.preventDefault();
-          activate(cell, positionOf(cell), cell);
-          firstWidget.focus();
-        }
-        return;
-      }
-
-      const next = row ? rowMove(table, row, event, excluded) : cell ? cellMove(table, cell, event, excluded) : null;
-      if (!next) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      moveTo(next);
     };
-
-    table.addEventListener('focusin', onFocusIn);
-    table.addEventListener('focusout', onFocusOut);
     table.addEventListener('keydown', onKeyDown, true);
-    return () => {
-      observer.disconnect();
-      table.removeEventListener('focusin', onFocusIn);
-      table.removeEventListener('focusout', onFocusOut);
-      table.removeEventListener('keydown', onKeyDown, true);
-      restoreTabIndexes(originals);
-    };
-  }, [enabled, table, excluded, sync, activate]);
+    return () => table.removeEventListener('keydown', onKeyDown, true);
+  }, [enabled, table, composite]);
 
-  return leaveCell;
+  return (target: Element) => {
+    const cell = table ? owningCell(table, target) : null;
+    if (!cell || editingRef.current !== cell) {
+      return false;
+    }
+    editingRef.current = null;
+    composite.setActive(cell);
+    cell.focus();
+    return true;
+  };
+}
+
+function gridItems(table: HTMLTableElement, excluded: WeakSet<Element>) {
+  return Array.from(table.rows)
+    .filter(row => !isDisabledRow(row))
+    .flatMap<HTMLElement>(row => [
+      ...(isRowItem(row, excluded) ? [row] : []),
+      ...Array.from(row.cells).flatMap(cell => [cell, focusTarget(cell, excluded)]),
+    ]);
 }
 
 function syncRow(
@@ -179,7 +131,7 @@ function syncRow(
   active: HTMLElement | null,
   editing: HTMLTableCellElement | null,
   excluded: WeakSet<Element>,
-  setTabIndex: (element: HTMLElement, tabIndex: number | null) => void,
+  setTabIndex: SetTabIndex,
 ) {
   const disabled = isDisabledRow(row);
   if (isRowItem(row, excluded)) {
@@ -193,21 +145,10 @@ function syncRow(
   }
 }
 
-function restoreTabIndexes(originals: Map<HTMLElement, string | null>) {
-  for (const [element, tabIndex] of originals) {
-    if (tabIndex === null) {
-      element.removeAttribute('tabindex');
-    } else {
-      element.setAttribute('tabindex', tabIndex);
-    }
-  }
-  originals.clear();
-}
-
 function rowMove(
   table: HTMLTableElement,
   row: HTMLTableRowElement,
-  event: KeyboardEvent,
+  event: CompositeKeyEvent,
   excluded: WeakSet<Element>,
 ): Position | null {
   const { forward, backward } = arrowKeys(table);
@@ -238,7 +179,7 @@ function rowMove(
 function cellMove(
   table: HTMLTableElement,
   cell: HTMLTableCellElement,
-  event: KeyboardEvent,
+  event: CompositeKeyEvent,
   excluded: WeakSet<Element>,
 ): Position | null {
   const { forward, backward } = arrowKeys(table);
@@ -365,11 +306,6 @@ function arrowKeys(table: HTMLTableElement) {
   return isRtl(table)
     ? { forward: 'ArrowLeft', backward: 'ArrowRight' }
     : { forward: 'ArrowRight', backward: 'ArrowLeft' };
-}
-
-function isActivatable(table: HTMLTableElement, element: HTMLElement | null) {
-  const row = element?.closest('tr');
-  return !!element?.isConnected && contains(table, element) && !!row && !isDisabledRow(row);
 }
 
 function rovingTabIndex(active: boolean) {

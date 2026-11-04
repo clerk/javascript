@@ -395,7 +395,8 @@ describe('Renaming a passkey', () => {
     const rename = holdRequests('post', '/v1/me/passkeys/pk_1');
     await user.click(save);
     await waitFor(() => expect(rename.requests).toHaveLength(1));
-    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('aria-disabled', 'true');
+    expect(input).toHaveAttribute('readonly');
     expect(save).toHaveAttribute('aria-busy', 'true');
     await user.keyboard('{Escape}');
     expect(dialog).toBeVisible();

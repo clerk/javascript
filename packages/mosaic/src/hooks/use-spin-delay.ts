@@ -58,6 +58,7 @@ export function useSpinDelay<T>(value: T | null, options: SpinDelayOptions = {})
     if (value !== shown) {
       setShown(value);
     }
+    return undefined;
   }, [value, shown, delay, minDuration]);
 
   return shown;

@@ -1,20 +1,18 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { clerkSetup, setupClerkTestingToken } from '@clerk/testing/playwright';
+import type { BrowserContext, Page } from '@playwright/test';
 import { chromium } from '@playwright/test';
-import type { BrowserContext } from '@playwright/test';
 
 import type { EnvironmentConfig } from '../../models/environment';
 import { withRetry } from '../../testUtils/retryableClerkClient';
-import { createUserService } from '../../testUtils/usersService';
 import type { FakeUser, PlaywrightTest } from '../../testUtils/usersService';
+import { createUserService } from '../../testUtils/usersService';
 
 /**
  * Query the background service worker for auth state via chrome.runtime.sendMessage.
  */
-export function getAuthFromBackground(
-  page: import('@playwright/test').Page,
-): Promise<{ userId: string | null; sessionId: string | null }> {
+export function getAuthFromBackground(page: Page): Promise<{ userId: string | null; sessionId: string | null }> {
   return page.evaluate(() => {
     return new Promise(resolve => {
       chrome.runtime.sendMessage({ type: 'GET_AUTH' }, (response: any) => {
@@ -50,7 +48,10 @@ export async function setupClerkTestingEnv(env: EnvironmentConfig) {
 /**
  * Launch a persistent Chromium context with a Chrome extension loaded.
  */
-export async function launchExtensionContext(extensionDistPath: string, opts?: { bypassCSP?: boolean }) {
+export async function launchExtensionContext(
+  extensionDistPath: string,
+  opts?: { bypassCSP?: boolean; testingToken?: boolean },
+) {
   const context = await chromium.launchPersistentContext('', {
     headless: false,
     bypassCSP: opts?.bypassCSP,
@@ -61,7 +62,9 @@ export async function launchExtensionContext(extensionDistPath: string, opts?: {
     ],
   });
 
-  await setupClerkTestingToken({ context });
+  if (opts?.testingToken !== false) {
+    await setupClerkTestingToken({ context });
+  }
   return context;
 }
 

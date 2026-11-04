@@ -154,6 +154,24 @@ describe('User profile MFA interaction boundaries', () => {
     );
   });
 
+  it('keeps focus on the code field while authenticator verification is pending', async () => {
+    const fapi = await renderMfa();
+    const held = holdRequests('post', '/v1/me/totp/attempt_verification');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
+    await user.type(code, '123456');
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      await waitFor(() => expect(screen.getByRole('progressbar', { name: 'Verifying code' })).toBeVisible());
+      expect(screen.getByRole('textbox', { name: 'Character 6 of 6' })).toHaveFocus();
+    } finally {
+      held.release();
+    }
+    await waitFor(() => expect(fapi.mfa.totpAttempts).toEqual(['123456']));
+  });
+
   it('blocks duplicate authenticator verification through the native form while pending', async () => {
     const fapi = await renderMfa();
     const held = holdRequests('post', '/v1/me/totp/attempt_verification');

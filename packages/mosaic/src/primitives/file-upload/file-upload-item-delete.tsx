@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useFileUploadContext, useFileUploadItemContext } from './file-upload-context';
 
 export type FileUploadItemDeleteProps = ComponentProps<'button'>;
@@ -15,7 +15,7 @@ export const FileUploadItemDelete = React.forwardRef<HTMLButtonElement, FileUplo
 
     const state = { disabled };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       type: 'button' as const,
       disabled,
       onClick: () => {
@@ -23,7 +23,7 @@ export const FileUploadItemDelete = React.forwardRef<HTMLButtonElement, FileUplo
           remove();
         }
       },
-    };
+    } satisfies DefaultProps<'button'>;
 
     return useRender({
       defaultTagName: 'button',

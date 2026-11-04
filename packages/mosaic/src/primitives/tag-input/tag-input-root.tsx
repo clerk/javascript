@@ -2,8 +2,10 @@
 
 import React, { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
+import { readingDirectionKeys, useDirection } from '../direction-provider';
+import { useComposite } from '../hooks/use-composite';
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import {
   type FocusAfterRemove,
   TagInputContext,
@@ -19,11 +21,15 @@ export interface TagInputProps extends Omit<ComponentProps<'div'>, 'defaultValue
   value?: string[];
   defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
+  inputValue?: string;
+  defaultInputValue?: string;
+  onInputValueChange?: (inputValue: string) => void;
   validate?: (value: string) => boolean;
   delimiters?: string[];
   name?: string;
   form?: string;
   disabled?: boolean;
+  focusableWhenDisabled?: boolean;
   children: ReactNode;
 }
 
@@ -33,16 +39,21 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
     value: valueProp,
     defaultValue = EMPTY,
     onValueChange,
+    inputValue: inputValueProp,
+    defaultInputValue = '',
+    onInputValueChange,
     validate,
     delimiters = DEFAULT_DELIMITERS,
     name,
     form,
     disabled = false,
+    focusableWhenDisabled = false,
     children,
     ...otherProps
   } = props;
 
   const [value, setValue] = useControllableState(valueProp, defaultValue, onValueChange);
+  const [inputValue, setInputValue] = useControllableState(inputValueProp, defaultInputValue, onInputValueChange);
   const valueRef = useRef(value);
   valueRef.current = value;
 
@@ -67,6 +78,31 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       tagRefs.current.delete(tagValue);
     }
   }, []);
+
+  const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const direction = useDirection();
+  const { previousKey, nextKey } = readingDirectionKeys(direction);
+  const presentTags = () => value.flatMap(tagValue => tagRefs.current.get(tagValue) ?? []);
+
+  const composite = useComposite(element, {
+    getItems: presentTags,
+    orientation: 'horizontal',
+    loop: false,
+    rtl: direction === 'rtl',
+    stopPropagation: 'none',
+    syncTabIndexes: () => {},
+    getNextItem: (event, target, defaultNext) => {
+      const tags = presentTags();
+      if (event.key === nextKey && target === tags.at(-1)) {
+        return inputRef.current;
+      }
+      if (event.key === previousKey && target === tags[0]) {
+        event.preventDefault();
+        return null;
+      }
+      return defaultNext();
+    },
+  });
 
   const focusInput = useCallback(() => {
     inputRef.current?.focus();
@@ -135,8 +171,11 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
     () => ({
       value,
       tags,
+      inputValue,
+      setInputValue,
       delimiters,
       disabled,
+      focusableWhenDisabled,
       add,
       remove,
       focusInput,
@@ -144,13 +183,30 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
       registerInput,
       registerTag,
       onTagExited,
+      navigateFromTag: composite.handleKeyDown,
     }),
-    [value, tags, delimiters, disabled, add, remove, focusInput, focusTag, registerInput, registerTag, onTagExited],
+    [
+      value,
+      tags,
+      inputValue,
+      setInputValue,
+      delimiters,
+      disabled,
+      focusableWhenDisabled,
+      add,
+      remove,
+      focusInput,
+      focusTag,
+      registerInput,
+      registerTag,
+      onTagExited,
+      composite.handleKeyDown,
+    ],
   );
 
   const state = { disabled, empty: value.length === 0 };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     onMouseDown: (event: React.MouseEvent<HTMLDivElement>) => {
       if (disabled || !(event.target instanceof Element) || event.target.closest('input, [role="listitem"]')) {
         return;
@@ -175,14 +231,14 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
           : null}
       </>
     ),
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <TagInputContext.Provider value={contextValue}>
       {useRender({
         defaultTagName: 'div',
         render,
-        ref: forwardedRef,
+        ref: [setElement, forwardedRef],
         state,
         stateAttributesMapping: {
           disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),

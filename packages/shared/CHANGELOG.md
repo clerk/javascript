@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.44.0
+
+### Minor Changes
+
+- Add the experimental `NativeAppSettingsJSON`, `IOSMinimumVersionJSON` and `AndroidMinimumVersionJSON` types for the minimum app versions in the environment's `native_app_settings`. These may change in minor releases. ([#10343](https://github.com/clerk/javascript/pull/10343)) by [@seanperez29](https://github.com/seanperez29)
+
+### Patch Changes
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 4.43.1
 
 ### Patch Changes

@@ -27,19 +27,7 @@ export function needsPrepare(method: ReverificationMethod): method is Reverifica
 function pickStartingFirstFactor(
   methods: readonly ReverificationMethod[],
   preferredSignInStrategy: PreferredSignInStrategy | undefined,
-  webAuthnSupported: boolean,
 ): ReverificationMethod | null {
-  if (methods.length === 0) {
-    return null;
-  }
-
-  if (webAuthnSupported) {
-    const passkey = methods.find(method => method.strategy === 'passkey');
-    if (passkey) {
-      return passkey;
-    }
-  }
-
   if (preferredSignInStrategy === 'password') {
     return methods.find(method => method.strategy === 'password') ?? methods[0] ?? null;
   }
@@ -61,9 +49,11 @@ function pickStartingSecondFactor(methods: readonly ReverificationMethod[]): Rev
 export function pickStartingMethod(
   methods: readonly ReverificationMethod[],
   preferredSignInStrategy: PreferredSignInStrategy | undefined,
-  webAuthnSupported: boolean,
 ): ReverificationMethod | null {
-  return methods[0]?.stage === 'second'
-    ? pickStartingSecondFactor(methods)
-    : pickStartingFirstFactor(methods, preferredSignInStrategy, webAuthnSupported);
+  return (
+    methods.find(method => method.strategy === 'passkey') ??
+    (methods[0]?.stage === 'second'
+      ? pickStartingSecondFactor(methods)
+      : pickStartingFirstFactor(methods, preferredSignInStrategy))
+  );
 }

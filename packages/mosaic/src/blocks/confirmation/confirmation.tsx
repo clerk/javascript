@@ -57,7 +57,6 @@ export function Confirmation<Payload = void>({ color = 'negative', ...props }: C
                 <Button
                   color='neutral'
                   variant='outline'
-                  fullWidth
                 >
                   {cancelLabel}
                 </Button>
@@ -65,7 +64,6 @@ export function Confirmation<Payload = void>({ color = 'negative', ...props }: C
             />
             <SubmitButton
               type='button'
-              fullWidth
               color={color}
               isPending={isPending}
               onClick={confirm}

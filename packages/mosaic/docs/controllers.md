@@ -313,6 +313,8 @@ every successful removal drops focus on the floor.
 - **No machine snapshot in the return value.** Return the plain props the view
   reads (`open`, `pendingKey`, `isDeleting`, `errorMessage`), never `snapshot`
   and `send`.
+- A transition shared across states in a `const` needs `target: 'name' as const`.
+  Without it the target widens to `string` and the machine rejects it.
 - Dismissing must not abandon an in-flight effect. Model `open` as context, and
   give `OPEN`/`CLOSE` no target in the busy state so they don't leave it:
 
@@ -333,6 +335,11 @@ One path, so every error a user sees goes through the `errors.*` catalog:
   `toLocalizableError(cause)` from `utils/errors.ts`. Use one of them instead of
   catching in a feature. A controller with its own machine maps in the machine's
   `onError` (`user-profile-rename-passkey.controller.ts`).
+- **Machines that display all errors use `toLocalizableErrors(cause)`.** It
+  preserves each error and its parameter name. Reverification stores this array,
+  routes matching parameters to the active field and everything else to the
+  global banner, then localizes each message at render. Single-error owners keep
+  using `toLocalizableError`, including its global-first `SaveError` behavior.
 - **Forms map through `save`.** A model wraps a form's Clerk call in
   `save(run, fields, params)` from `utils/errors.ts`, which rethrows a Clerk
   error as a `SaveError` with each error routed to the field it names. The form

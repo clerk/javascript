@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 import { readingDirectionKeys, useDirection } from '../direction-provider';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useTagInputContext } from './tag-input-context';
 import { splitTags } from './tag-input-utils';
 
@@ -12,19 +12,32 @@ export type TagInputInputProps = Omit<ComponentProps<'input'>, 'value' | 'defaul
 export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputProps>(
   function TagInputInput(props, forwardedRef) {
     const { render, ...otherProps } = props;
-    const { value, delimiters, disabled, add, focusTag, registerInput } = useTagInputContext();
-    const [text, setText] = useState('');
+    const {
+      value,
+      inputValue: text,
+      setInputValue: setText,
+      delimiters,
+      disabled,
+      focusableWhenDisabled,
+      add,
+      focusTag,
+      registerInput,
+    } = useTagInputContext();
     const { previousKey } = readingDirectionKeys(useDirection());
 
     const commit = () => {
+      if (disabled) {
+        return;
+      }
       add([text]);
       setText('');
     };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       type: 'text',
       value: text,
-      disabled,
+      disabled: disabled && !focusableWhenDisabled,
+      ...(disabled && focusableWhenDisabled ? { readOnly: true, 'aria-disabled': true } : null),
       autoComplete: 'off',
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         const parts = splitTags(event.currentTarget.value, delimiters);
@@ -33,6 +46,9 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
         setText(pending);
       },
       onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => {
+        if (disabled) {
+          return;
+        }
         const parts = splitTags(event.clipboardData.getData('text'), delimiters);
         if (parts.length < 2) {
           return;
@@ -61,7 +77,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
           focusTag(value[value.length - 1]);
         }
       },
-    };
+    } satisfies DefaultProps<'input'>;
 
     return useRender({
       defaultTagName: 'input',

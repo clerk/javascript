@@ -122,6 +122,7 @@ function ComboboxInner(props: ComboboxProps) {
         setSelectedIndex(index);
         return () => setSelectedIndex(current => (current === index ? null : current));
       }
+      return undefined;
     },
     [selectedValue],
   );

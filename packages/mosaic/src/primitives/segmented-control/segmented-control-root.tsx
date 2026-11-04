@@ -1,11 +1,11 @@
 'use client';
 
-import { Composite } from '@floating-ui/react';
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useDirection } from '../direction-provider';
+import { CompositeItemsProvider, useComposite, useCompositeItems } from '../hooks/use-composite';
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { type ComponentProps, mergeProps, useRender } from '../utils';
 import {
   SegmentedControlContext,
   type SegmentedControlContextValue,
@@ -25,13 +25,11 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
 
     const [value, setValue] = useControllableState(valueProp, defaultValue ?? '', onValueChange);
     const [direction, setDirection] = useState<SegmentedControlDirection>('forward');
-    const [activeIndex, setActiveIndex] = useState(0);
     const readingDirection = useDirection();
-    const rootRef = useRef<HTMLDivElement>(null);
+    const [element, setElement] = useState<HTMLDivElement | null>(null);
     const selectedIndexRef = useRef(-1);
-    const navigatedIndexRef = useRef<number | null>(null);
 
-    const getRadios = () => Array.from(rootRef.current?.querySelectorAll<HTMLElement>('[role="radio"]') ?? []);
+    const items = useCompositeItems();
 
     const select = useCallback(
       (nextValue: string) => {
@@ -42,25 +40,28 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
       [value, setValue],
     );
 
+    const composite = useComposite(element, {
+      getItems: items.getItems,
+      preferred: { key: value, getItem: () => items.getItem(value) },
+      orientation: 'horizontal',
+      loop: false,
+      rtl: readingDirection === 'rtl',
+      onNavigate: item => {
+        const nextValue = items.getValue(item);
+        if (nextValue !== undefined) {
+          select(nextValue);
+        }
+      },
+    });
+
     useLayoutEffect(() => {
-      const index = getRadios().findIndex(radio => radio.getAttribute('value') === value);
+      const index = items.getItems().findIndex(item => items.getValue(item) === value);
       const previousIndex = selectedIndexRef.current;
       selectedIndexRef.current = index;
-      if (index === -1) {
-        return;
-      }
-      if (previousIndex !== -1 && previousIndex !== index) {
+      if (index !== -1 && previousIndex !== -1 && previousIndex !== index) {
         setDirection(index > previousIndex ? 'forward' : 'backward');
       }
-      setActiveIndex(index);
-    }, [value]);
-
-    const onNavigate = (index: number) => {
-      setActiveIndex(index);
-      if (navigatedIndexRef.current !== null) {
-        navigatedIndexRef.current = index;
-      }
-    };
+    }, [value, items]);
 
     const contextValue = useMemo<SegmentedControlContextValue>(
       () => ({ value, select, disabled, direction }),
@@ -71,52 +72,27 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
 
     return (
       <SegmentedControlContext.Provider value={contextValue}>
-        <Composite
-          orientation='horizontal'
-          loop={false}
-          rtl={readingDirection === 'rtl'}
-          activeIndex={activeIndex}
-          onNavigate={onNavigate}
-          render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-            const { onKeyDown: compositeKeyDown, ...otherCompositeProps } = compositeProps;
-            const defaultProps: Record<string, unknown> = {
-              role: 'radiogroup' as const,
-              onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
-                navigatedIndexRef.current = -1;
-                if (event.key === 'Home' || event.key === 'End') {
-                  event.preventDefault();
-                  const enabled = getRadios().filter(radio => radio.getAttribute('aria-disabled') !== 'true');
-                  (event.key === 'Home' ? enabled[0] : enabled.at(-1))?.focus();
-                }
-                compositeKeyDown?.(event);
-                const index = navigatedIndexRef.current;
-                navigatedIndexRef.current = null;
-                const nextValue = getRadios()[index]?.getAttribute('value');
-                if (nextValue != null) {
-                  select(nextValue);
-                }
+        <CompositeItemsProvider value={items}>
+          {useRender({
+            defaultTagName: 'div',
+            render,
+            ref: [setElement, ref],
+            state,
+            stateAttributesMapping: {
+              disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
+            },
+            props: mergeProps<'div'>(
+              {
+                role: 'radiogroup',
+                'aria-orientation': 'horizontal',
+                onKeyDown: composite.handleKeyDown,
+                'aria-disabled': disabled || undefined,
+                children,
               },
-              'aria-disabled': disabled || undefined,
-            };
-
-            const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, otherCompositeProps));
-            const { ref: compositeRef, ...mergedProps } = merged;
-
-            // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
-            return useRender({
-              defaultTagName: 'div',
-              render,
-              ref: [isRef(compositeRef) ? compositeRef : undefined, rootRef, ref],
-              state,
-              stateAttributesMapping: {
-                disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
-              },
-              props: mergedProps,
-            });
-          }}
-        >
-          {children}
-        </Composite>
+              otherProps,
+            ),
+          })}
+        </CompositeItemsProvider>
       </SegmentedControlContext.Provider>
     );
   },

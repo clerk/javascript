@@ -139,6 +139,12 @@ import {
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
 import {
+  CustomElement as InviteMembersButtonCustomElement,
+  Default as InviteMembersButtonDefault,
+  meta as inviteMembersButtonMeta,
+  Unavailable as InviteMembersButtonUnavailable,
+} from '../stories/invite-members-button.stories';
+import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -310,6 +316,29 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
+import {
+  BackupCode as SignInBackupCode,
+  Default as SignInDefault,
+  EmailCode as SignInEmailCode,
+  meta as signInMeta,
+  MethodPicker as SignInMethodPicker,
+  Password as SignInPassword,
+  PasswordError as SignInPasswordError,
+  PasswordPending as SignInPasswordPending,
+  SignUp as SignInSignUp,
+  Start as SignInStart,
+  StartError as SignInStartError,
+  StartManyProviders as SignInStartManyProviders,
+  StartProviderPending as SignInStartProviderPending,
+  StartSignInOnly as SignInStartSignInOnly,
+  Totp as SignInTotp,
+  VerifyEmail as SignInVerifyEmail,
+} from '../stories/sign-in.stories';
+import {
   CustomElement as SignInButtonCustomElement,
   Default as SignInButtonDefault,
   meta as signInButtonMeta,
@@ -369,6 +398,13 @@ import {
   Validation as TagInputComponentValidation,
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
+import {
+  AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
+  Default as TaskSetupMfaDefault,
+  meta as taskSetupMfaMeta,
+  NewPhone as TaskSetupMfaNewPhone,
+  SmsOnly as TaskSetupMfaSmsOnly,
+} from '../stories/task-setup-mfa.stories';
 import {
   Colors as TextColors,
   Default as TextDefault,
@@ -738,6 +774,21 @@ const userButtonModule: StoryModule = {
   User: UserButtonUser,
 };
 
+const taskSetupMfaModule: StoryModule = {
+  meta: taskSetupMfaMeta,
+  Default: TaskSetupMfaDefault,
+  SmsOnly: TaskSetupMfaSmsOnly,
+  AuthenticatorOnly: TaskSetupMfaAuthenticatorOnly,
+  NewPhone: TaskSetupMfaNewPhone,
+};
+
+const inviteMembersButtonModule: StoryModule = {
+  meta: inviteMembersButtonMeta,
+  Default: InviteMembersButtonDefault,
+  CustomElement: InviteMembersButtonCustomElement,
+  Unavailable: InviteMembersButtonUnavailable,
+};
+
 const waitlistModule: StoryModule = {
   meta: waitlistMeta,
   Default: WaitlistDefault,
@@ -942,6 +993,12 @@ const segmentedControlModule: StoryModule = {
   Disabled: SegmentedControlDisabled,
 };
 
+const separatorModule: StoryModule = {
+  meta: separatorMeta,
+  Default: SeparatorDefault,
+  Labelled: SeparatorLabelled,
+};
+
 const switchModule: StoryModule = {
   meta: switchMeta,
   Default: SwitchDefault,
@@ -1124,6 +1181,25 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+
+const signInModule: StoryModule = {
+  meta: signInMeta,
+  Default: SignInDefault,
+  Start: SignInStart,
+  StartSignInOnly: SignInStartSignInOnly,
+  StartManyProviders: SignInStartManyProviders,
+  StartProviderPending: SignInStartProviderPending,
+  StartError: SignInStartError,
+  Password: SignInPassword,
+  PasswordPending: SignInPasswordPending,
+  PasswordError: SignInPasswordError,
+  EmailCode: SignInEmailCode,
+  Totp: SignInTotp,
+  BackupCode: SignInBackupCode,
+  MethodPicker: SignInMethodPicker,
+  SignUp: SignInSignUp,
+  VerifyEmail: SignInVerifyEmail,
+};
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
   Default: OrganizationProfileApiKeysPanelDefault,
@@ -1176,13 +1252,17 @@ export const registry: StoryModule[] = [
   createOrganizationModule,
   organizationListModule,
   userAvatarModule,
+  inviteMembersButtonModule,
   apiKeysTableModule,
   reverificationModule,
   waitlistModule,
+  taskSetupMfaModule,
   signInButtonModule,
   signInWithMetamaskButtonModule,
   signUpButtonModule,
   signOutButtonModule,
+  // Authentication
+  signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
@@ -1221,6 +1301,7 @@ export const registry: StoryModule[] = [
   revealModule,
   sectionModule,
   segmentedControlModule,
+  separatorModule,
   selectComponentModule,
   switchModule,
   tableModule,

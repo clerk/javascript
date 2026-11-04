@@ -74,7 +74,6 @@ export function UserProfileEditUsernameDialog({
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             >
               {m.cancel}
             </Button>
@@ -82,7 +81,6 @@ export function UserProfileEditUsernameDialog({
         />
         <SubmitButton
           form={form.id}
-          fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled
