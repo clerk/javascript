@@ -5,4 +5,6 @@ export const organizationProfileModal = defineModalSurface<OrganizationProfileMo
   id: 'organizationProfile',
   variant: 'profile',
   load: () => import('./organization-profile.modal-content'),
+  path: '/modal/organization',
+  initialParts: options => options?.page?.split('/').filter(Boolean) ?? [],
 });

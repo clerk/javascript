@@ -7,6 +7,7 @@ import { useMessages } from '../localization';
 import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
+import { useMosaicLocation } from '../routing/use-mosaic-location';
 import type { ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 
 export function ModalHost({
@@ -42,18 +43,28 @@ export function ModalSurfaceHost<Options>({
     openCount: 0,
   });
 
+  const routed = surface.path !== undefined;
+  const location = useMosaicLocation({ routing: 'virtual', path: surface.path ?? `/modal/${surface.id}` });
   const modal = React.useMemo<ModalHandle<Options>>(() => {
     const preload = () => surface.loader.send({ type: 'LOAD' });
     return {
       open: (options, container) => {
         preload();
+        if (routed) {
+          location.write(surface.initialParts?.(options) ?? [], { replace: true });
+        }
         setState(previous => ({ open: true, options, container, openCount: previous.openCount + 1 }));
       },
-      close: () => setState(previous => (previous.open ? { ...previous, open: false } : previous)),
+      close: () => {
+        if (routed && state.open) {
+          location.clear();
+        }
+        setState(previous => (previous.open ? { ...previous, open: false } : previous));
+      },
       preload,
       isOpen: state.open,
     };
-  }, [surface, state.open]);
+  }, [surface, routed, location, state.open]);
 
   return (
     <surface.context.Provider value={modal}>
@@ -95,6 +106,7 @@ function ModalSlot<Options>({
             key={state.openCount}
             options={state.options}
             close={close}
+            path={surface.path}
           />
         ) : failed ? (
           <LoadFailed />

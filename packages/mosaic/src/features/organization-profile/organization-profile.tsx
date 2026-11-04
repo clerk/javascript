@@ -19,8 +19,8 @@ import { OrganizationProfileMembersPanel } from './organization-profile-members-
 /** Everything `<OrganizationProfile />` takes: your own pages and their order, the page it opens on, and where leaving the organization lands. */
 export interface OrganizationProfileProps
   extends
-    Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder'>,
-    Pick<OrganizationProfileOptions, 'afterLeaveOrganizationUrl'> {
+  Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder'>,
+  Pick<OrganizationProfileOptions, 'afterLeaveOrganizationUrl'> {
   /**
    * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
    * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
@@ -29,6 +29,12 @@ export interface OrganizationProfileProps
    * @default the first page in the navigation
    */
   defaultPage?: OrganizationProfileViewProps['activePage'];
+  /**
+   * The base the profile's pages are nested under. Two profiles on one page need different bases.
+   *
+   * @default '/organization'
+   */
+  path?: string;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that there is no active
    * organization.
@@ -86,6 +92,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
     customPages = organizationProfileProps?.customPages,
     pageOrder = organizationProfileProps?.pageOrder,
     defaultPage,
+    path = '/organization',
     afterLeaveOrganizationUrl = organizationProfileProps?.afterLeaveOrganizationUrl,
     fallback,
     apiKeysProps = organizationProfileProps?.apiKeysProps,
@@ -95,7 +102,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
   const { activePage, onPageChange } = useProfilePagesController(
     defaultPage ?? pageOrder?.[0] ?? 'general',
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
-    { routing: 'virtual', path: '/organization' },
+    { routing: 'virtual', path },
   );
 
   if (model.status === 'loading') {
