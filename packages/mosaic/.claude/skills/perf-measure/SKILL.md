@@ -65,12 +65,12 @@ const scanning = await page.evaluate(() => {
 });
 console.log(scanning ? 'dev: read the render counts' : 'production: read the times');
 
-async function measure(label, action, repeat = 5) {
+async function measure(label, action, { repeat = 5, arg } = {}) {
   const times = [];
   let renders = {};
   for (let i = 0; i < repeat; i++) {
     await page.evaluate(() => (window.__perfRenders = {}));
-    times.push(await page.evaluate(action));
+    times.push(await page.evaluate(action, arg));
     await page.waitForTimeout(300);
     renders = await page.evaluate(() => window.__perfRenders);
   }
@@ -84,22 +84,26 @@ async function measure(label, action, repeat = 5) {
   }
 }
 
-await measure(
-  'open',
-  () => window.__perfTime(() => document.querySelector('button[aria-label^="Country"]').click()),
-  1,
-);
-await measure('arrowdown', () =>
-  window.__perfTime(() =>
-    document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })),
-  ),
-);
+await measure('open', () => window.__perfTime(() => document.querySelector('button[aria-label^="Country"]').click()), {
+  repeat: 1,
+});
+for (const key of ['ArrowDown', 'ArrowUp']) {
+  await measure(
+    key,
+    key =>
+      window.__perfTime(() =>
+        document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })),
+      ),
+    { arg: key },
+  );
+}
 
 await browser.close();
 ```
 
 - Each action runs inside the page and is timed from the event to the next frame, so Playwright's own round trips are not counted. Dispatch events in the page rather than using `page.click` or `page.hover`.
-- An action that opens something runs once per page load (`repeat` 1), or close it between runs.
+- An action that opens something runs once per page load (`repeat: 1`), or close it between runs.
+- An action is sent to the page as source code, so it can't use variables from the script. Pass a value in with `arg`, as the key loop does.
 - To check how cost scales with size, measure the same action on a story with more items.
 
 ## 3. Read it
@@ -115,6 +119,21 @@ To see renders while you click around yourself, open Swingset dev: react-scan ou
 
 ## 4. Compare before and after fairly
 
-Run the base code first, then the change, with the same server, CPU rate, page, actions and repeat count. Report medians from at least 3 runs of the script. Never compare numbers from different scripts or different runs of a larger sweep.
+Run the base code first, then the change, with the same server, CPU rate, page, actions and repeat count. After starting a server, run the script once and discard it, because the first page load is cold. Then run it at least 3 times on each side. Never compare numbers from different scripts or different runs of a larger sweep.
 
-Report the numbers, the CPU rate, and the pages and actions you used.
+## 5. Report it
+
+Give the result as a before and after table, one row per action for the time and one for the render count of the component that changed, with every run's p50:
+
+| Action                             | Base           | Change        |
+| ---------------------------------- | -------------- | ------------- |
+| ArrowDown p50 (4x CPU)             | 20 / 23 / 21ms | 10 / 10 / 9ms |
+| ArrowDown `ComboboxOption` renders | 476            | 2             |
+
+Head the columns with the base and the change branch names. Under the table, add one line in this form and nothing more:
+
+```text
+Swingset `/components/phone-input`, open then ArrowDown and ArrowUp ×5, 4x CPU, 3 runs each, measured with the `perf-measure` skill.
+```
+
+When the change is in a pull request, put the table and that line in the description section of the PR, and give the same in chat.
