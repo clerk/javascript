@@ -67,16 +67,20 @@ const packagesLoadedBy = (suite: string) => {
   ).map(app => app.config);
 
   const tagPattern = new RegExp(`${tag}(?![\\w-])`);
-  const referenced = listTestFiles(testsDir)
+  const taggedSources = listTestFiles(testsDir)
     .map(file => readFileSync(file, 'utf8'))
-    .filter(source => tagPattern.test(source))
+    .filter(source => tagPattern.test(source));
+  const referenced = taggedSources
     .flatMap(source => [...source.matchAll(/appConfigs\.(\w+)\.(\w+)/g)])
     .filter(([, group]) => group !== 'envs' && group !== 'longRunningApps')
     .map(
       ([, group, name]) => (appConfigs as unknown as Record<string, Record<string, ApplicationConfig>>)[group][name],
     );
+  const addedInTests = taggedSources.flatMap(source =>
+    [...source.matchAll(/addDependency\(\s*'(@clerk\/[\w-]+)',\s*PKGLAB\s*\)/g)].map(([, name]) => name),
+  );
 
-  return [...longRunning, ...referenced].flatMap(config => config.pkglabDependencies);
+  return [...[...longRunning, ...referenced].flatMap(config => config.pkglabDependencies), ...addedInTests];
 };
 
 describe('scoped integration suites declare the builds they load', () => {
