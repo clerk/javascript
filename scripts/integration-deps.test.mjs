@@ -52,6 +52,15 @@ describe('integration suite tasks in turbo.json', () => {
     for (const dir of packages) {
       const { scripts = {} } = JSON.parse(readFileSync(join(root, 'packages', dir, 'package.json'), 'utf8'));
       expect(scripts['build:inputs'], `packages/${dir} defines a build:inputs script`).toBeUndefined();
+      const packageTurbo = join(root, 'packages', dir, 'turbo.json');
+      if (!existsSync(packageTurbo)) {
+        continue;
+      }
+      const { tasks = {} } = JSON.parse(readFileSync(packageTurbo, 'utf8'));
+      expect(
+        tasks['build:inputs']?.inputs,
+        `packages/${dir}/turbo.json overrides build inputs, so its build:inputs must list the same inputs`,
+      ).toEqual(tasks.build?.inputs);
     }
   });
 

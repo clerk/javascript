@@ -28,6 +28,27 @@
       ],
       "outputs": ["*/package.json", "dist/**"]
     },
+    "build:inputs": {
+      "inputs": [
+        "*.d.ts",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.base.json",
+        "tsconfig.src.json",
+        "rspack.config.js",
+        "tsdown.config.mts",
+
+        "!**/*.test.*",
+        "!**/test/**",
+        "!**/tests/**",
+        "!**/__tests__/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ]
+    },
     "test": {
       "inputs": [
         "*.d.ts",

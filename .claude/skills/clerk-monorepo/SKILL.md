@@ -164,7 +164,8 @@ Rules that keep this correct:
 
 - The integration test step must never pass `--only`. It drops dependency hashes from the task hash,
   so package changes would stop invalidating suites.
-- Keep `build:inputs` identical to `build`'s inputs; `integration-deps.test.mjs` enforces it.
+- Keep `build:inputs` identical to `build`'s inputs, in the root `turbo.json` and in every package
+  `turbo.json` that overrides `build.inputs`; `integration-deps.test.mjs` enforces both.
 - The harness's workspace dependencies live in `integration/package.json`, never the root
   `package.json`. Turbo folds every file of a root workspace dependency, tests and READMEs included,
   into the global hash, so any edit to it would rerun every task in the repo.

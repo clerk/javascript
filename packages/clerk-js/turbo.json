@@ -20,6 +20,25 @@
         "!node_modules/**"
       ]
     },
+    "build:inputs": {
+      "inputs": [
+        "*.d.ts",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.declarations.json",
+        "rspack.config.mjs",
+
+        "!**/*.test.*",
+        "!**/test/**",
+        "!**/tests/**",
+        "!**/__tests__/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ]
+    },
     "build:sandbox": {
       "dependsOn": ["^build", "@clerk/localizations#build"],
       "inputs": ["sandbox/**"],

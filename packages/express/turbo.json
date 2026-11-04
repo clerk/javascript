@@ -14,6 +14,20 @@
         "!coverage/**",
         "!node_modules/**"
       ]
+    },
+    "build:inputs": {
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "src/**",
+        "tsconfig.json",
+        "tsup.config.ts",
+
+        "!**/__tests__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!node_modules/**"
+      ]
     }
   }
 }
