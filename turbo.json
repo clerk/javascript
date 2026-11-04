@@ -29,10 +29,14 @@
     "VERCEL",
     "VERCEL_PROJECT_PRODUCTION_URL",
     "VERCEL_TARGET_ENV",
-    "VITE_CLERK_*"
+    "VITE_CLERK_*",
+    "!CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+    "!CLERK_PLATFORM_API_KEY"
   ],
   "globalPassThroughEnv": [
     "AWS_SECRET_KEY",
+    "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+    "CLERK_PLATFORM_API_KEY",
     "GITHUB_TOKEN",
     "INTEGRATION_TEST_RUN_KEY",
     "ACTIONS_RUNNER_DEBUG",
@@ -271,23 +275,16 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:express": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": [
-        "integration/**",
-        "packages/*/package.json",
-        "packages/*/src/**",
-        "packages/*/tsconfig.json",
-        "packages/*/tsconfig.build.json",
-        "packages/*/tsconfig.declarations.json",
-        "packages/*/tsdown.config.*",
-        "packages/*/tsup.config.*",
-        "packages/*/rspack.config.*",
-        "packages/*/vite.config.*",
-        "!packages/*/src/**/*.test.*",
-        "!packages/*/src/**/__tests__/**",
-        "!packages/*/src/**/__mocks__/**",
-        "!packages/*/src/**/__snapshots__/**"
+      "dependsOn": [
+        "@clerk/backend#build",
+        "@clerk/clerk-js#build",
+        "@clerk/express#build",
+        "@clerk/shared#build",
+        "@clerk/testing#build",
+        "@clerk/ui#build"
       ],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
