@@ -1,6 +1,6 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, StrictMode, useState } from 'react';
+import { createRef, StrictMode, Suspense, useDeferredValue, useState, useTransition } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Combobox, type ComboboxTriggerProps } from './index';
@@ -663,5 +663,147 @@ describe('Combobox option renders', () => {
     rerender(<Fixture value='cherry' />);
     expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+  });
+});
+
+describe('Combobox selection in a transition', () => {
+  const neverResolves = new Promise<never>(() => {});
+  function Suspends(): never {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- Suspending is React's thrown-thenable protocol; `React.use()` needs React 19.
+    throw neverResolves;
+  }
+
+  type OptionRender = { option: string; parentValue: string | null; selected: unknown };
+
+  function Fixture({
+    update = 'transition',
+    onRenderOption,
+    suspendSelected = false,
+  }: {
+    update?: 'transition' | 'deferred';
+    onRenderOption?: (render: OptionRender) => void;
+    suspendSelected?: boolean;
+  }) {
+    const [value, setValue] = useState<string | null>(null);
+    const deferredValue = useDeferredValue(value);
+    const [isPending, startTransition] = useTransition();
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [isLoadingMore, startLoadingMore] = useTransition();
+    const parentValue = update === 'deferred' ? deferredValue : value;
+    return (
+      <>
+        <button
+          type='button'
+          onClick={() => startLoadingMore(() => setLoadingMore(true))}
+        >
+          Load more
+        </button>
+        <p>{isLoadingMore ? 'Loading more' : 'Loaded'}</p>
+        <Suspense fallback={<p>Loading more fallback</p>}>{loadingMore ? <Suspends /> : null}</Suspense>
+        <Suspense fallback={<p>Loading</p>}>
+          <p>{isPending || value !== deferredValue ? 'Pending' : 'Idle'}</p>
+          <Combobox.Root
+            open
+            value={parentValue}
+            onValueChange={next => (update === 'deferred' ? setValue(next) : startTransition(() => setValue(next)))}
+          >
+            <Combobox.Input aria-label='Fruit' />
+            <Combobox.List>
+              {fruits.map(option => (
+                <Combobox.Option
+                  key={option.value}
+                  value={option.value}
+                  label={option.label}
+                  render={props => {
+                    onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                    return (
+                      <div {...props}>
+                        {props.children}
+                        {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
+                      </div>
+                    );
+                  }}
+                >
+                  {option.label}
+                </Combobox.Option>
+              ))}
+            </Combobox.List>
+          </Combobox.Root>
+        </Suspense>
+      </>
+    );
+  }
+
+  describe.each(['transition', 'deferred'] as const)('when the parent updates the value with %s', update => {
+    it('renders each option with the selection its parent passed down', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(screen.getByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders).not.toContainEqual({ option: 'banana', parentValue: 'banana', selected: false });
+    });
+
+    it('renders the new selection in the same render as its parent, with no second pass', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(screen.getByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders.filter(entry => entry.option === 'banana' && entry.parentValue === 'banana')).toEqual([
+        { option: 'banana', parentValue: 'banana', selected: true },
+      ]);
+    });
+
+    it('keeps the current options on screen while a selection suspends', async () => {
+      const user = userEvent.setup();
+      render(
+        <Fixture
+          update={update}
+          suspendSelected
+        />,
+      );
+
+      await user.click(screen.getByRole('option', { name: 'Banana' }));
+
+      await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+      expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+
+  it('moves the highlight with arrow keys while an unrelated transition is pending', async () => {
+    const user = userEvent.setup();
+    render(<Fixture />);
+
+    await user.click(screen.getByRole('button', { name: 'Load more' }));
+    await waitFor(() => expect(screen.getByText('Loading more')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('combobox'));
+    await user.keyboard('{ArrowDown}');
+    await user.keyboard('{ArrowDown}');
+
+    const banana = screen.getByRole('option', { name: 'Banana' });
+    expect(banana).toHaveAttribute('data-active');
+    expect(screen.getByRole('combobox')).toHaveAttribute('aria-activedescendant', banana.id);
+    expect(screen.getByText('Loading more')).toBeInTheDocument();
   });
 });

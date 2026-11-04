@@ -49,13 +49,9 @@ export function useComboboxContext() {
   return ctx;
 }
 
-export interface ComboboxHighlight {
-  activeIndex: number | null;
-  selectedValue: string | null;
-}
-
 export interface ComboboxOptionsContextValue {
-  store: Store<ComboboxHighlight>;
+  activeIndexStore: Store<number | null>;
+  selectedValue: string | null;
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: string, index: number, label: string) => void;
   refs: ExtendedRefs<ReferenceType>;

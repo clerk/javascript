@@ -14,15 +14,22 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
 
 export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function SelectOption(props, ref) {
   const { render, value, label, disabled, ...otherProps } = props;
-  const { store, setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
-    useSelectOptionsContext();
+  const {
+    activeIndexStore,
+    selectedValues,
+    setSelectedIndex,
+    getItemProps,
+    handleSelect,
+    valueToLabelRef,
+    selectedItemRef,
+  } = useSelectOptionsContext();
 
   const displayLabel = label ?? value;
   const { ref: itemRef, index } = useListItem({ label: displayLabel });
 
-  const isSelected = useStore(store, state => state.selectedValues.includes(value));
-  const isAnchor = useStore(store, state => state.selectedValues.at(-1) === value);
-  const isActive = useStore(store, state => state.activeIndex === index);
+  const isSelected = selectedValues.includes(value);
+  const isAnchor = selectedValues.at(-1) === value;
+  const isActive = useStore(activeIndexStore, activeIndex => activeIndex === index);
 
   useEffect(() => {
     const map = valueToLabelRef.current;

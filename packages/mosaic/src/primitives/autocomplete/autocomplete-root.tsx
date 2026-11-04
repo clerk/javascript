@@ -26,7 +26,6 @@ import { createStore } from '../utils/store';
 import {
   AutocompleteContext,
   type AutocompleteContextValue,
-  type AutocompleteHighlight,
   AutocompleteOptionsContext,
   type AutocompleteOptionsContextValue,
 } from './autocomplete-context';
@@ -78,10 +77,10 @@ function AutocompleteInner(props: AutocompleteProps) {
     }
   }, []);
 
-  const [store] = useState(() => createStore<AutocompleteHighlight>({ activeIndex, selectedValue }));
+  const [activeIndexStore] = useState(() => createStore(activeIndex));
   useLayoutEffect(() => {
-    store.set({ activeIndex, selectedValue });
-  }, [store, activeIndex, selectedValue]);
+    activeIndexStore.set(activeIndex);
+  }, [activeIndexStore, activeIndex]);
 
   const previousOpenRef = useRef(open);
   useEffect(() => {
@@ -219,8 +218,16 @@ function AutocompleteInner(props: AutocompleteProps) {
   );
 
   const optionsContextValue = useMemo<AutocompleteOptionsContextValue>(
-    () => ({ store, getItemProps, handleSelect, refs, valuesByIndexRef, registerSelectedIndex }),
-    [store, getItemProps, handleSelect, refs, registerSelectedIndex],
+    () => ({
+      activeIndexStore,
+      selectedValue,
+      getItemProps,
+      handleSelect,
+      refs,
+      valuesByIndexRef,
+      registerSelectedIndex,
+    }),
+    [activeIndexStore, selectedValue, getItemProps, handleSelect, refs, registerSelectedIndex],
   );
 
   return (

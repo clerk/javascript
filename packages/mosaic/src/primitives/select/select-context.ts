@@ -60,13 +60,9 @@ export function useSelectContext() {
   return ctx;
 }
 
-export interface SelectHighlight {
-  activeIndex: number | null;
-  selectedValues: string[];
-}
-
 export interface SelectOptionsContextValue {
-  store: Store<SelectHighlight>;
+  activeIndexStore: Store<number | null>;
+  selectedValues: string[];
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: string, index: number) => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;

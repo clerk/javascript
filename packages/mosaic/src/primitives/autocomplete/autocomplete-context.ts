@@ -44,13 +44,9 @@ export function useAutocompleteContext() {
   return ctx;
 }
 
-export interface AutocompleteHighlight {
-  activeIndex: number | null;
-  selectedValue: string | undefined;
-}
-
 export interface AutocompleteOptionsContextValue {
-  store: Store<AutocompleteHighlight>;
+  activeIndexStore: Store<number | null>;
+  selectedValue: string | undefined;
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: string, index: number, label: string) => void;
   refs: ExtendedRefs<ReferenceType>;

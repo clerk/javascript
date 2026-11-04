@@ -31,7 +31,6 @@ import { alignSelectedItem } from './align-selected-item';
 import {
   SelectContext,
   type SelectContextValue,
-  type SelectHighlight,
   type SelectItem,
   SelectOptionsContext,
   type SelectOptionsContextValue,
@@ -108,10 +107,10 @@ function SelectInner(props: SelectProps) {
   const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<string, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const [store] = useState(() => createStore<SelectHighlight>({ activeIndex, selectedValues }));
+  const [activeIndexStore] = useState(() => createStore(activeIndex));
   useLayoutEffect(() => {
-    store.set({ activeIndex, selectedValues });
-  }, [store, activeIndex, selectedValues]);
+    activeIndexStore.set(activeIndex);
+  }, [activeIndexStore, activeIndex]);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
@@ -199,8 +198,9 @@ function SelectInner(props: SelectProps) {
   const handleSelect = useCallback(
     (value: string, index: number) => {
       if (multiple) {
-        const current = store.get().selectedValues;
-        const next = current.includes(value) ? current.filter(selected => selected !== value) : [...current, value];
+        const next = selectedValues.includes(value)
+          ? selectedValues.filter(selected => selected !== value)
+          : [...selectedValues, value];
         setSelectedValues(next);
         onMultipleValueChange?.(next);
         if (next.length === 0) {
@@ -223,7 +223,15 @@ function SelectInner(props: SelectProps) {
         handleOpenChange(false);
       }
     },
-    [store, multiple, isControlled, setSelectedValues, handleOpenChange, onSingleValueChange, onMultipleValueChange],
+    [
+      multiple,
+      selectedValues,
+      isControlled,
+      setSelectedValues,
+      handleOpenChange,
+      onSingleValueChange,
+      onMultipleValueChange,
+    ],
   );
 
   const handleTypeaheadMatch = useCallback(
@@ -318,8 +326,16 @@ function SelectInner(props: SelectProps) {
   );
 
   const optionsContextValue = useMemo<SelectOptionsContextValue>(
-    () => ({ store, getItemProps, handleSelect, setSelectedIndex, valueToLabelRef, selectedItemRef }),
-    [store, getItemProps, handleSelect],
+    () => ({
+      activeIndexStore,
+      selectedValues,
+      getItemProps,
+      handleSelect,
+      setSelectedIndex,
+      valueToLabelRef,
+      selectedItemRef,
+    }),
+    [activeIndexStore, selectedValues, getItemProps, handleSelect],
   );
 
   return (

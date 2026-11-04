@@ -15,15 +15,22 @@ export interface AutocompleteOptionProps extends ComponentProps<'div'> {
 export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteOptionProps>(
   function AutocompleteOption(props, ref) {
     const { render, value, label, disabled, ...otherProps } = props;
-    const { store, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, refs } =
-      useAutocompleteOptionsContext();
+    const {
+      activeIndexStore,
+      selectedValue,
+      getItemProps,
+      handleSelect,
+      valuesByIndexRef,
+      registerSelectedIndex,
+      refs,
+    } = useAutocompleteOptionsContext();
 
     const id = useId();
     const displayLabel = label ?? value;
     const { ref: itemRef, index } = useListItem({ label: displayLabel });
 
-    const isSelected = useStore(store, state => state.selectedValue === value);
-    const isActive = useStore(store, state => state.activeIndex === index);
+    const isSelected = selectedValue === value;
+    const isActive = useStore(activeIndexStore, activeIndex => activeIndex === index);
 
     useEffect(() => {
       const map = valuesByIndexRef.current;

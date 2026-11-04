@@ -26,7 +26,6 @@ import { createStore } from '../utils/store';
 import {
   ComboboxContext,
   type ComboboxContextValue,
-  type ComboboxHighlight,
   ComboboxOptionsContext,
   type ComboboxOptionsContextValue,
 } from './combobox-context';
@@ -131,10 +130,10 @@ function ComboboxInner(props: ComboboxProps) {
     return () => setSelectedIndex(current => (current === index ? null : current));
   }, []);
 
-  const [store] = useState(() => createStore<ComboboxHighlight>({ activeIndex, selectedValue }));
+  const [activeIndexStore] = useState(() => createStore(activeIndex));
   useLayoutEffect(() => {
-    store.set({ activeIndex, selectedValue });
-  }, [store, activeIndex, selectedValue]);
+    activeIndexStore.set(activeIndex);
+  }, [activeIndexStore, activeIndex]);
 
   const previousOpenRef = useRef(open);
   useEffect(() => {
@@ -301,8 +300,17 @@ function ComboboxInner(props: ComboboxProps) {
   );
 
   const optionsContextValue = useMemo<ComboboxOptionsContextValue>(
-    () => ({ store, getItemProps, handleSelect, refs, valuesByIndexRef, registerSelectedIndex, registerOption }),
-    [store, getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+    () => ({
+      activeIndexStore,
+      selectedValue,
+      getItemProps,
+      handleSelect,
+      refs,
+      valuesByIndexRef,
+      registerSelectedIndex,
+      registerOption,
+    }),
+    [activeIndexStore, selectedValue, getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
   );
 
   return (

@@ -138,11 +138,13 @@ Any new part with an exit transition needs one of the two;
 animated element). Add `cssVars()` to floating-ui middleware **after** `arrow()`,
 or the transform origin won't follow the arrow.
 
-When many parts read one value that changes often (the highlighted option in a
-long list), keep it in a `createStore` and read it with
-`useStore(store, selector)`, so only the parts whose selected value changed
-re-render. Context re-renders every consumer. `primitives/combobox` is the
-example.
+When many parts read one value that changes often and only from the
+primitive's own events (the highlighted option in a long list), keep it in a
+`createStore` and read it with `useStore(store, selector)`, so only the parts
+whose selected value changed re-render. Keep values a consumer can pass as
+props, like a controlled `value`, in context: the store updates after commit,
+so parts would render a stale value and lose `startTransition` and Suspense.
+`primitives/combobox` is the example.
 
 ## Reading direction
 
