@@ -6,6 +6,7 @@ import { inviteMembersButtonMessages } from '../features/invite-members-button/i
 import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
+import { accessMessages } from '../features/organization-profile/organization-profile-access-panel/access.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
 import { invitationsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.messages';
 import { membersTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.messages';
@@ -66,6 +67,7 @@ export const mosaicMessages = {
   },
   organizationProfile: {
     ...organizationProfileMessages,
+    access: accessMessages,
     profile: organizationProfileProfileSectionMessages,
     members: {
       list: membersTableTabMessages,

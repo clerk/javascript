@@ -9,6 +9,7 @@ import { colorVars, radiusVars, space } from '../../../tokens.stylex';
 import { Button } from '../../button';
 import { ButtonContext } from '../../button/button.context';
 import { Card } from '../../card';
+import { Profile } from '../../profile';
 import type { DialogVariant } from '../dialog';
 import { Dialog } from '../dialog';
 import { styles as dialogStyles } from '../dialog.styles';
@@ -44,6 +45,33 @@ const nativeTrigger = (label: string) => (props: MosaicComponentProps<'button'>)
 );
 
 describe('Mosaic Dialog', () => {
+  it('contains a profile-scoped dialog and backdrop and restores focus after Escape', async () => {
+    const user = userEvent.setup();
+    render(
+      <Profile.Root
+        value='access'
+        data-testid='profile'
+      >
+        <Profile.Title>Organization</Profile.Title>
+        <Dialog.Root>
+          <Dialog.Trigger render={nativeTrigger('Add connection')} />
+          <Dialog.Popup scope='profile'>
+            <Surface title='Connection setup' />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </Profile.Root>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Add connection' });
+    await user.click(trigger);
+    const profile = screen.getByTestId('profile');
+    expect(profile).toContainElement(screen.getByRole('dialog', { name: 'Connection setup' }));
+    expect(profile).toContainElement(document.querySelector('.cl-dialog-backdrop'));
+    expect(profile).toContainElement(document.querySelector('.cl-dialog-viewport'));
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
   it('renders the trigger and opens the dialog on click', async () => {
     const user = userEvent.setup();
     render(

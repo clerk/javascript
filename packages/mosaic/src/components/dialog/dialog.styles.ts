@@ -41,6 +41,17 @@ const WIDE = '@container cl-dialog (width >= 90rem)';
 const SHEET = '@media (width < 40rem)';
 
 export const styles = stylex.create({
+  containedBackdrop: { position: 'absolute' },
+  containedViewport: {
+    inset: 0,
+    borderRadius: radiusVars['--cl-radius-xl'],
+    overflow: 'auto',
+    overscrollBehavior: 'contain',
+    position: 'absolute',
+    zIndex: 10,
+    height: '100%',
+    minHeight: 0,
+  },
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
   // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
   //

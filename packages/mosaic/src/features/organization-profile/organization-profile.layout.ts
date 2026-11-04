@@ -17,6 +17,7 @@ export const ORGANIZATION_PROFILE_PAGE_IDS: readonly OrganizationProfilePageId[]
   'general',
   'members',
   'security',
+  'access',
   'billing',
   'apiKeys',
 ];
@@ -25,6 +26,7 @@ export const ORGANIZATION_PROFILE_PAGE_ICONS: Record<OrganizationProfilePageId, 
   general: Building,
   members: Users,
   security: SecurityLockSquare,
+  access: SecurityLockSquare,
   billing: CreditCard,
   apiKeys: Key,
 };

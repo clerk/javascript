@@ -270,3 +270,5 @@ The view's behavior (roles, labels, focus) is covered by the feature test. Its
 visual states are swingset stories with plain props. See `testing.md`.
 
 See `packages/mosaic/ARCHITECTURE.md` → "Views" for the layer contract.
+
+For a dialog that must stay inside an Organization Profile, use `Dialog.Popup scope="profile"`. The Profile provides the portal root. The dialog and backdrop use its bounds, keep modal focus handling, and scroll within that area. Other dialogs keep the default page scope.

@@ -15,6 +15,7 @@ import { chaosCompany, chaosSlug } from '@/lib/chaos';
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
+import { useOrganizationProfileAccessFixture } from './organization-profile-access';
 import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { useRequestsTableFixture } from './requests-table-tab';
 import { usePreviewImage } from './use-preview-image';
@@ -51,6 +52,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const [name, setName] = useState(organization.name);
   const [slug, setSlug] = useState(organization.slug);
   const { imageUrl, showFile, clearImage } = usePreviewImage();
+  const access = useOrganizationProfileAccessFixture();
   const apiKeys = useAPIKeysTableFixture({ subjectKind: 'organization' });
   const members = useMembersTableFixture();
   const invitations = useInvitationsTableFixture();
@@ -97,9 +99,17 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
       />
     ),
     security: <OrganizationProfilePlaceholderPanelView page='security' />,
+    access: access.page,
     billing: <OrganizationProfilePlaceholderPanelView page='billing' />,
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
-  return { activePage, setActivePage, pages, profile, name };
+  return {
+    activePage,
+    setActivePage,
+    pages,
+    profile,
+    name,
+    contentLayout: activePage === 'access' ? access.layout : {},
+  };
 }

@@ -5,6 +5,7 @@ export type ProfileNavLayout = 'column' | 'select' | 'sheet';
 export type ProfileDismiss = 'back' | 'corner' | 'none';
 
 export interface ProfileContextValue {
+  overlayRoot: HTMLElement | null;
   titleId: string;
   renderBranding: boolean;
   compact: boolean;

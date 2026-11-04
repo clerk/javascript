@@ -18,6 +18,7 @@ import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
 import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
 import { Icon } from '../icon';
+import { ProfileContext } from '../profile/profile.context';
 import { ToastProvider } from '../toast/toast';
 import {
   backdropMotion,
@@ -127,6 +128,7 @@ export interface DialogCloseButtonProps extends MosaicComponentProps<'button'> {
   'aria-label'?: string;
 }
 export interface DialogPopupProps extends MosaicComponentProps<'div'> {
+  scope?: 'page' | 'profile';
   /** Which surface the dialog holds, and so the geometry it takes. @default 'card' */
   variant?: DialogVariant;
   /**
@@ -285,14 +287,20 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
  * The scrim behind the dialog. Owns no scroll lock or positioning — that is the viewport.
  * Rendered by `Dialog.Popup`, which is also what decides the two things it varies on.
  */
-function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boolean }) {
+function Backdrop({ variant, stacked, contained }: { variant: DialogVariant; stacked: boolean; contained: boolean }) {
   return (
     <Primitive.Backdrop
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
         // `backdrop` outright — across two calls both would emit and the cascade would decide.
-        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[variant]),
+        stylex.props(
+          reset.base,
+          styles.backdrop,
+          stacked && styles.backdropStacked,
+          backdropMotion[variant],
+          contained && styles.containedBackdrop,
+        ),
       )}
     />
   );
@@ -309,10 +317,12 @@ function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boole
 function Viewport({
   variant,
   compactPlacement,
+  contained,
   children,
 }: {
   variant: DialogVariant;
   compactPlacement: DialogCompactPlacement;
+  contained: boolean;
   children: React.ReactNode;
 }) {
   const trackRef = React.useRef<HTMLDivElement>(null);
@@ -321,8 +331,8 @@ function Viewport({
   React.useEffect(() => (trackRef.current ? guardKeyboardFocus(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
-      overlay
-      lockScroll
+      overlay={!contained}
+      lockScroll={!contained}
       {...mergeStyleProps(
         themeProps('dialog-viewport', { variant }),
         stylex.props(
@@ -330,6 +340,7 @@ function Viewport({
           styles.viewport,
           viewportVariants[variant],
           viewportCompactPlacements[compactPlacement],
+          contained && styles.containedViewport,
         ),
       )}
     >
@@ -393,11 +404,21 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
-  { variant = 'card', compactPlacement: compactPlacementProp, initialFocus, finalFocus, xstyle, ...rest },
+  {
+    scope = 'page',
+    variant = 'card',
+    compactPlacement: compactPlacementProp,
+    initialFocus,
+    finalFocus,
+    xstyle,
+    ...rest
+  },
   ref,
 ) {
   // The dialog this one renders inside, read before this popup publishes its own.
   const host = React.useContext(DialogContext);
+  const profile = React.useContext(ProfileContext);
+  const contained = scope === 'profile' && profile?.overlayRoot != null;
   // The headless flag, not the stack check below — the variant rule is about opening a dialog inside
   // ANY dialog, which is broader than the card-on-card case the stacking styles cover.
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
@@ -464,8 +485,10 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     <Viewport
       variant={variant}
       compactPlacement={compactPlacement}
+      contained={contained}
     >
       <Backdrop
+        contained={contained}
         variant={variant}
         // A card stacked on a card paints no scrim of its own — one serves the whole stack.
         // Decided here rather than keyed on `data-stacked`, because whether this is a stack
@@ -477,7 +500,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Portal>
+    <Primitive.Portal root={contained ? profile.overlayRoot : undefined}>
       <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
         {holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}
       </ButtonContext.Provider>

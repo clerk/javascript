@@ -184,6 +184,12 @@ import {
   Overlay as OrganizationProfileOverlay,
 } from '../stories/organization-profile.stories';
 import {
+  Default as OrganizationProfileAccessPanel,
+  Empty as OrganizationProfileAccessPanelEmpty,
+  Errors as OrganizationProfileAccessPanelErrors,
+  meta as organizationProfileAccessPanelMeta,
+} from '../stories/organization-profile-access-panel.stories';
+import {
   Default as OrganizationProfileApiKeysPanelDefault,
   Empty as OrganizationProfileApiKeysPanelEmpty,
   meta as organizationProfileApiKeysPanelMeta,
@@ -1165,6 +1171,14 @@ const signInModule: StoryModule = {
   SignUp: SignInSignUp,
   VerifyEmail: SignInVerifyEmail,
 };
+
+const organizationProfileAccessPanelModule: StoryModule = {
+  meta: organizationProfileAccessPanelMeta,
+  Default: OrganizationProfileAccessPanel,
+  Empty: OrganizationProfileAccessPanelEmpty,
+  Errors: OrganizationProfileAccessPanelErrors,
+};
+
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
   Default: OrganizationProfileApiKeysPanelDefault,
@@ -1207,6 +1221,7 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
+  organizationProfileAccessPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
   // Organization Profile · Sections

@@ -89,6 +89,8 @@ label, so two tabs with the same name stay distinct; the label itself is hidden 
 technology, so the tablist holds only tabs. In the compact listbox the group is a `role=group` named
 by its label.
 
+`Content` accepts an optional `backAction` before its heading and a `footer` outside the scroll viewport. A nested page can change `pageTitle` while its navigation label stays fixed.
+
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog. While compact, `ContentPanel` is a `div[role=group]` named by the page title.
 

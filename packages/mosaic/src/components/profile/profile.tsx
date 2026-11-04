@@ -79,6 +79,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   },
   ref,
 ) {
+  const [overlayRoot, setOverlayRoot] = React.useState<HTMLDivElement | null>(null);
   const dialog = React.useContext(DialogContext);
   const inline = elevation === 'flush' && !isInDialog(dialog);
   const fullscreen = dialog?.variant === 'fullscreen';
@@ -116,6 +117,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   );
   const context = React.useMemo(
     () => ({
+      overlayRoot,
       titleId,
       renderBranding,
       compact,
@@ -134,6 +136,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       dismiss,
     }),
     [
+      overlayRoot,
       titleId,
       renderBranding,
       compact,
@@ -152,7 +155,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref,
+    ref: [ref, setOverlayRoot],
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
@@ -592,11 +595,13 @@ function PageTitle({ title }: { title: React.ReactNode }) {
 export interface ProfileContentProps extends MosaicComponentProps<'div'> {
   /** The selected page's name, shown as the page title. */
   pageTitle: React.ReactNode;
+  backAction?: React.ReactNode;
+  footer?: React.ReactNode;
 }
 
 // A plain `div`, not `main`: the profile often renders inside the host's `main` or a dialog.
 const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function ProfileContent(
-  { pageTitle, children, render, xstyle, ...rest },
+  { pageTitle, backAction, footer, children, render, xstyle, ...rest },
   ref,
 ) {
   const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
@@ -611,33 +616,43 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
         rest,
       ),
       children: (
-        <div
-          {...mergeStyleProps(
-            themeProps('profile-content-viewport'),
-            stylex.props(
-              reset.base,
-              styles.contentViewport,
-              ...(inline ? [styles.contentViewportInline] : contentViewportScroll),
-            ),
-          )}
-        >
-          <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
-            <HeadingLevelProvider>
-              <PageTitle title={pageTitle} />
-            </HeadingLevelProvider>
-            {children}
-            {inline && renderBranding && !compact ? (
-              <div
-                {...mergeStyleProps(
-                  themeProps('profile-branding'),
-                  stylex.props(reset.base, styles.branding, styles.contentBranding),
-                )}
-              >
-                <Branding />
+        <>
+          <div
+            {...mergeStyleProps(
+              themeProps('profile-content-viewport'),
+              stylex.props(
+                reset.base,
+                styles.contentViewport,
+                ...(inline ? [styles.contentViewportInline] : contentViewportScroll),
+              ),
+            )}
+          >
+            <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
+              <div {...mergeStyleProps(themeProps('profile-page-header'), stylex.props(styles.pageHeader))}>
+                {backAction}
+                <HeadingLevelProvider>
+                  <PageTitle title={pageTitle} />
+                </HeadingLevelProvider>
               </div>
-            ) : null}
+              {children}
+              {inline && renderBranding && !compact ? (
+                <div
+                  {...mergeStyleProps(
+                    themeProps('profile-branding'),
+                    stylex.props(reset.base, styles.branding, styles.contentBranding),
+                  )}
+                >
+                  <Branding />
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
+          {footer ? (
+            <div {...mergeStyleProps(themeProps('profile-content-footer'), stylex.props(styles.contentFooter))}>
+              {footer}
+            </div>
+          ) : null}
+        </>
       ),
     },
   });

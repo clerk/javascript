@@ -1,0 +1,32 @@
+import * as Stories from './organization-profile-access-panel.stories';
+
+# OrganizationProfileAccessPanel
+
+Manage organization policies, domains, SSO connections, and Directory Sync. This preview uses local fixture data for all state changes. A completed connection can be attached to the current policy draft.
+
+This page shows the panel alone. Use the [Organization Profile preview](/organization-profile/organization-profile#access) to review the sidebar, profile footer, and contained dialogs.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
+    { name: 'Table', href: '/components/table', layer: 'Components' },
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+  ]}
+/>
+
+## Empty state
+
+Start with the default policy and no connections.
+
+<Story name='Empty' storyModule={Stories} />
+
+## Errors
+
+Saves fail, connection tests return a missing email attribute, and domain checks return an unverified result. Form values remain available for correction.
+
+<Story name='Errors' storyModule={Stories} />

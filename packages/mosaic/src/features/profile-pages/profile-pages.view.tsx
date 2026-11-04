@@ -21,6 +21,9 @@ export interface ProfilePageGroup {
 export interface ProfilePagesViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
   /** Names the surface, and the dialog it opens in. */
   label: string;
+  contentTitle?: ReactNode;
+  contentBackAction?: ReactNode;
+  contentFooter?: ReactNode;
   /** The navigation, in order. A group without a label lists its pages without a heading. */
   groups: readonly ProfilePageGroup[];
   /** The open page's id. One the navigation does not list opens the first page instead. */
@@ -31,7 +34,7 @@ export interface ProfilePagesViewProps extends Omit<ProfileRootProps, 'children'
 
 /** A `Profile` built from groups of pages: their navigation, and the active page beside it. */
 export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesViewProps>(function ProfilePagesView(
-  { label, groups, activePage, onPageChange, ...rest },
+  { label, groups, activePage, onPageChange, contentTitle, contentBackAction, contentFooter, ...rest },
   ref,
 ) {
   const pages = groups.flatMap(group => group.pages);
@@ -62,7 +65,11 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
           ),
         )}
       </Profile.Nav>
-      <Profile.Content pageTitle={activeEntry?.label}>
+      <Profile.Content
+        pageTitle={contentTitle ?? activeEntry?.label}
+        backAction={contentBackAction}
+        footer={contentFooter}
+      >
         {pages.map(page => (
           <Profile.ContentPanel
             key={page.id}
