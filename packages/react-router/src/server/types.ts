@@ -51,20 +51,7 @@ export type ClerkMiddlewareOptions = {
 /**
  * @deprecated Use `ClerkMiddlewareOptions` instead. `rootAuthLoader()` no longer accepts options.
  */
-export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadUser?: boolean;
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadSession?: boolean;
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadOrganization?: boolean;
-};
+export type RootAuthLoaderOptions = ClerkMiddlewareOptions;
 
 export interface KeylessUrls {
   __keylessClaimUrl?: string;
