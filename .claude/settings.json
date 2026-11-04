@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-mosaic-legacy-read.mjs\"",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/mosaic-parity-gate.mjs\" write",
             "timeout": 10
           }
         ]
@@ -62,8 +62,8 @@
           },
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-mosaic-parity-audit.mjs\"",
-            "timeout": 10
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/mosaic-parity-gate.mjs\" stop",
+            "timeout": 30
           }
         ]
       }
