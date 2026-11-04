@@ -23,6 +23,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
 | Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
 | Add a public prop that shows or hides UI  | [Public visibility props](docs/public-props.md)                                   |
+| Document a component in Swingset          | [Documenting components](docs/documenting-components.md)                          |
 | Prove a change in a browser               | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                            |
 
 ## Before editing a file
@@ -146,6 +147,24 @@ Do not solve it locally and mention it at the end. A one-off that duplicates a s
 Docs say what the code cannot: rules, reasons, and which tool fits which problem. For facts the code already holds (lists of exports, tokens, builders or files, and signatures), name the file and give one example. Do not copy the list; a copy goes stale and agents trust it.
 
 A PR that adds, renames or changes the signature of a shared helper in `src/hooks/`, `src/utils/`, `src/blocks/`, `src/components/form/` or `src/machine/` updates the table above, and any doc that names it, in the same PR.
+
+## Breaking changes
+
+While `@clerk/mosaic` is on 0.x, a breaking change is a `minor` changeset. Start its body with `**Breaking:**`, then give an old-to-new table and a search that finds affected usage, so an agent can migrate from the changelog alone. The changelog ships in the npm package at `node_modules/@clerk/mosaic/CHANGELOG.md`.
+
+```md
+---
+'@clerk/mosaic': minor
+---
+
+**Breaking:** Rename a `UserButton` prop. Values and defaults are unchanged; TypeScript flags the old name.
+
+| Before               | After              |
+| -------------------- | ------------------ |
+| `renderTriggerLabel` | `showTriggerLabel` |
+
+Find usages with `git grep -n renderTriggerLabel`.
+```
 
 ## Lint
 
