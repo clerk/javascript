@@ -43,7 +43,7 @@ const cdp = await page.context().newCDPSession(page);
 await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
 
 await page.goto(process.argv[2], { waitUntil: 'networkidle' });
-const scanning = await page.evaluate(() => {
+const loaded = await page.evaluate(() => {
   window.__perfRenders = {};
   window.__perfTime = action =>
     new Promise(resolve => {
@@ -61,26 +61,29 @@ const scanning = await page.evaluate(() => {
       }
     },
   });
-  return Boolean(window.reactScan);
+  return { tag: Boolean(document.querySelector('script[src*="react-scan"]')), scan: Boolean(window.reactScan) };
 });
+if (loaded.tag && !loaded.scan) throw new Error('react-scan is on the page but did not load');
+const scanning = loaded.scan;
 console.log(scanning ? 'dev: read the render counts' : 'production: read the times');
 
 async function measure(label, action, { repeat = 5, arg } = {}) {
   const times = [];
-  let renders = {};
+  await page.evaluate(() => (window.__perfRenders = {}));
   for (let i = 0; i < repeat; i++) {
-    await page.evaluate(() => (window.__perfRenders = {}));
     times.push(await page.evaluate(action, arg));
     await page.waitForTimeout(300);
-    renders = await page.evaluate(() => window.__perfRenders);
   }
+  const renders = await page.evaluate(() => window.__perfRenders);
   const sorted = [...times].sort((a, b) => a - b);
   console.log(label, `p50 ${Math.round(sorted[Math.floor(repeat / 2)])}ms`, `worst ${Math.round(sorted.at(-1))}ms`);
   if (scanning) {
     const top = Object.entries(renders)
+      .map(([name, count]) => [name, Math.round(count / repeat)])
+      .filter(([, count]) => count > 0)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8);
-    console.log('  renders per action:', Object.fromEntries(top));
+    console.log('  renders per action (mean of runs):', Object.fromEntries(top));
   }
 }
 
@@ -97,11 +100,22 @@ for (const key of ['ArrowDown', 'ArrowUp']) {
     { arg: key },
   );
 }
+await measure(
+  'type',
+  text =>
+    window.__perfTime(() => {
+      const input = document.activeElement;
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, text);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }),
+  { repeat: 1, arg: 'uni' },
+);
 
 await browser.close();
 ```
 
 - Each action runs inside the page and is timed from the event to the next frame, so Playwright's own round trips are not counted. Dispatch events in the page rather than using `page.click` or `page.hover`.
+- To type, set the value with the input's native value setter and dispatch an `input` event, as the `type` action does. A dispatched `keydown` does not enter text.
 - An action that opens something runs once per page load (`repeat: 1`), or close it between runs.
 - An action is sent to the page as source code, so it can't use variables from the script. Pass a value in with `arg`, as the key loop does.
 - To check how cost scales with size, measure the same action on a story with more items.
