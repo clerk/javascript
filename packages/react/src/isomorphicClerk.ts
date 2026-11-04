@@ -15,6 +15,7 @@ import type {
   __internal_UserVerificationProps,
   APIKeysNamespace,
   APIKeysProps,
+  ConnectNamespace,
   AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -126,12 +127,14 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
+  | 'connect'
   | 'oauthApplication'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
   billing: BillingNamespace | undefined;
   apiKeys: APIKeysNamespace | undefined;
+  connect: ConnectNamespace | undefined;
   oauthApplication: OAuthApplicationNamespace | undefined;
 };
 
@@ -959,6 +962,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get apiKeys(): APIKeysNamespace | undefined {
     return this.clerkjs?.apiKeys;
+  }
+
+  get connect(): ConnectNamespace | undefined {
+    return this.clerkjs?.connect;
   }
 
   get oauthApplication(): OAuthApplicationNamespace | undefined {

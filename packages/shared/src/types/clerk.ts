@@ -3,6 +3,7 @@ import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
+import type { ConnectNamespace } from './connect';
 import type {
   BillingCheckoutResource,
   BillingNamespace,
@@ -1331,6 +1332,13 @@ export interface Clerk {
    * The `APIKeys` object used for managing API keys.
    */
   apiKeys: APIKeysNamespace;
+
+  /**
+   * The `Connect` object used for managing the current user's connections to external services.
+   *
+   * @experimental Clerk Connect is in development and the API is subject to change.
+   */
+  connect: ConnectNamespace;
 
   /**
    * OAuth application helpers (e.g., consent metadata for custom consent UIs).
