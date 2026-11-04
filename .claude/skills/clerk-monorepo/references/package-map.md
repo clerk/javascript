@@ -61,8 +61,7 @@ error traces back to it, rebuild shared: `pnpm turbo build --filter=@clerk/share
   Strings live in `packages/localizations/src`. `@clerk/ui` is consumed by the
   `react`/`astro`/`vue`/`chrome-extension` adapters; its compiled runtime is delivered alongside
   `clerk-js` (both are backwards-compat sensitive), though `clerk-js` does not declare it as a package
-  dependency. Watch with `pnpm dev:fe-libs`. For the theming/appearance system specifically, read the
-  repo-root `references/theming-architecture.md` (not this skill's own `references/` dir).
+  dependency. Watch with `pnpm dev:fe-libs`.
 - **Backend token verification / JWT / Backend API client**: `packages/backend/src` (JWT logic under
   `packages/backend/src/jwt`). Every server adapter depends on this.
 - **Next.js middleware / route handlers / server components**: `packages/nextjs/src` (client-side

@@ -23,6 +23,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
 | Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
 | Add a public prop that shows or hides UI  | [Public visibility props](docs/public-props.md)                                   |
+| Prove a change in a browser               | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                            |
 
 ## Layers in one paragraph
 
@@ -56,10 +57,12 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                                                       |
 | An organization permission checked with `checkAuthorization`             | `ORGANIZATION_PERMISSIONS` (`src/utils/permissions.ts`)                                                                                |
 | A verification code's length or resend cooldown                          | `CODE_LENGTH`, `CODE_RESEND_SECONDS` (`src/utils/verification.ts`)                                                                     |
+| Backup codes saved to a file or printed                                  | `downloadBackupCodes`, `printBackupCodes` (`src/utils/backup-codes.ts`)                                                                |
 | An avatar or logo file picker and its rejection errors                   | `AVATAR_UPLOAD`, `AVATAR_REJECTION_ERRORS` (`src/utils/avatar-upload.ts`)                                                              |
-| Dropping a file onto an avatar or logo row                               | `AvatarDropzone` (`src/components/avatar-dropzone/`) inside the row's `FileUpload.Root`                                                |
+| An avatar or logo row: picker, drop target, Upload button or manage menu | `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller                                                                   |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                                         |
 | An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                                          |
+| Arrow-key navigation with one tab stop across a group of items           | `useComposite`, with `useCompositeItems` and `useCompositeItem` (`src/primitives/hooks/`)                                              |
 | A panel that animates open and closed to its measured size               | `usePanelSize` (`src/primitives/hooks/`)                                                                                               |
 | One screen replacing another on the same card or dialog                  | `Flow` (`src/components/flow/`), see [Views](docs/views.md)                                                                            |
 | A form on a card or dialog step                                          | `useForm` in the controller, passed to the view as `form`, see [Views](docs/views.md)                                                  |

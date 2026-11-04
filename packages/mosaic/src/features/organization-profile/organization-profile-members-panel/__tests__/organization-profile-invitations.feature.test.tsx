@@ -510,6 +510,77 @@ describe('inviting members', () => {
     expect(dialog.getByRole('button', { name: 'Send invites' })).not.toHaveAttribute('aria-disabled', 'true');
   });
 
+  it('sends a valid address still in the input with the selected role', async () => {
+    const fapi = serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await user.click(dialog.getByRole('combobox', { name: /Role/ }));
+    await user.click(await screen.findByRole('option', { name: 'Admin' }));
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), 'grace@example.com');
+    const send = dialog.getByRole('button', { name: 'Send invites' });
+    expect(send).not.toHaveAttribute('aria-disabled', 'true');
+
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.click(send);
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    const body = new URLSearchParams(await bulk.requests[0]?.text());
+    expect(body.getAll('email_address')).toEqual(['grace@example.com']);
+    expect(body.get('role')).toBe('org:admin');
+    bulk.release();
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitation sent' })).toBeVisible());
+    expect(fapi.organizationInvitations.filter(item => item.status === 'pending')).toHaveLength(2);
+  });
+
+  it.each([
+    ['on its own', []],
+    ['beside a valid address', ['linus@example.com']],
+  ])('keeps Send unavailable for an invalid address still in the input %s', async (_, tags) => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    if (tags.length > 0) {
+      await addEmails(dialog, ...tags);
+    }
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), 'grace@example');
+    const send = dialog.getByRole('button', { name: 'Send invites' });
+    expect(send).toHaveAttribute('aria-disabled', 'true');
+    await user.click(send);
+    expect(bulk.requests).toHaveLength(0);
+    bulk.release();
+  });
+
+  it.each([
+    ['a new address', 'grace@example.com', ['linus@example.com', 'grace@example.com']],
+    ['an address already added', 'linus@example.com', ['linus@example.com']],
+  ])('sends added addresses and %s still in the input once each', async (_, draft, expected) => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await addEmails(dialog, 'linus@example.com');
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), draft);
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.click(dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    const body = new URLSearchParams(await bulk.requests[0]?.text());
+    expect(body.getAll('email_address')).toEqual(expected);
+    bulk.release();
+  });
+
+  it('does not keep a typed address available after closing and reopening', async () => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), 'grace@example.com');
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
+    const reopened = within(await screen.findByRole('dialog', { name: 'Invite members' }));
+    expect(reopened.getByRole('textbox', { name: 'Email' })).toHaveValue('');
+    expect(reopened.getByRole('button', { name: 'Send invites' })).toHaveAttribute('aria-disabled', 'true');
+  });
+
   it('ignores a default role that is not in the role list', async () => {
     serveInvite({ defaultRole: 'org:missing' });
     await renderWithClerk(<OrganizationProfileMembersPanel />);
@@ -707,6 +778,27 @@ describe('inviting members', () => {
     bulk.release();
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
     expect(bulk.requests).toHaveLength(1);
+  });
+
+  it('keeps focus on the email field while the invite is pending', async () => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { dialog } = await openInviteDialog();
+    await addEmails(dialog, 'grace@example.com');
+    const email = dialog.getByRole('textbox', { name: 'Email' });
+    await waitFor(() =>
+      expect(dialog.getByRole('button', { name: 'Send invites' })).not.toHaveAttribute('aria-disabled', 'true'),
+    );
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await browserEvent.keyboard('{Enter}');
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    try {
+      await waitFor(() => expect(email.closest('[data-disabled]')).not.toBeNull());
+      expect(email).toHaveFocus();
+    } finally {
+      bulk.release();
+    }
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
   });
 
   it('clears the draft, rejected addresses and error after closing and reopening', async () => {
