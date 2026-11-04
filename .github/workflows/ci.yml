@@ -381,7 +381,7 @@ jobs:
 
       - name: Run CI script tests
         if: matrix.node-version == '24.15.0'
-        run: pnpm vitest run --root scripts verify-attach verify-flaky run-integration
+        run: pnpm vitest run --root scripts verify-attach verify-flaky run-integration integration-deps
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4.6.2
