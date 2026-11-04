@@ -8,9 +8,27 @@ import { deriveIntegrationTasks, integrationSuites, root, scriptFor } from './in
 const turbo = JSON.parse(readFileSync(join(root, 'turbo.json'), 'utf8'));
 const derived = await deriveIntegrationTasks();
 
+const ciMatrixSuites = () => {
+  const workflow = readFileSync(join(root, '.github/workflows/ci.yml'), 'utf8');
+  const job = workflow.slice(workflow.indexOf('\n  integration-tests:\n'));
+  const matrix = job.slice(job.indexOf('matrix:'), job.indexOf('\n    steps:'));
+  const listed = [...matrix.matchAll(/test-name:\s*\[([^\]]*)\]/gs)].flatMap(m =>
+    [...m[1].matchAll(/'([^']+)'/g)].map(q => q[1]),
+  );
+  const included = [...matrix.matchAll(/- test-name: '([^']+)'/g)].map(m => m[1]);
+  return [...new Set([...listed, ...included])];
+};
+
 describe('integration suite tasks in turbo.json', () => {
   test.each(integrationSuites())('%s has a package.json script', suite => {
     expect(scriptFor(suite), `test:integration:${suite} has no matching script in package.json`).toBeDefined();
+  });
+
+  test.each(ciMatrixSuites())('%s in the ci.yml matrix has a turbo task', suite => {
+    expect(
+      turbo.tasks[`//#test:integration:${suite}`],
+      `ci.yml runs ${suite} but turbo.json has no task for it`,
+    ).toBeDefined();
   });
 
   test.each([...derived.entries()])('%s depends on the packages its apps install', (suite, expected) => {
