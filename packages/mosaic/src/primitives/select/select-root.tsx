@@ -98,7 +98,9 @@ function SelectInner(props: SelectProps) {
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
-  const controlledValues = props.multiple ? props.value : toValues(props.value);
+  const singleValue = props.multiple ? undefined : props.value;
+  const controlledSingle = useMemo(() => toValues(singleValue), [singleValue]);
+  const controlledValues = props.multiple ? props.value : controlledSingle;
   const [selectedValues, setSelectedValues] = useControllableState<string[]>(
     controlledValues,
     (props.multiple ? props.defaultValue : toValues(props.defaultValue)) ?? [],

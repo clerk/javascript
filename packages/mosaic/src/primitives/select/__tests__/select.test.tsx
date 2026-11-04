@@ -1079,7 +1079,7 @@ describe('Select.Group', () => {
 });
 
 describe('Select option renders', () => {
-  it('re-renders only the options whose highlight or selection changes', async () => {
+  it('re-renders only the options whose highlight changes in a multiple select', async () => {
     const user = userEvent.setup();
     const renders: string[] = [];
     const options = [...fruits, { label: 'Date', value: 'date' }];
@@ -1125,10 +1125,55 @@ describe('Select option renders', () => {
     expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
     expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
 
-    renders.length = 0;
     await user.keyboard('{Enter}');
     expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('re-renders only the options whose highlight changes in a controlled single select', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    render(
+      <Select.Root
+        items={fruits}
+        alignItemWithTrigger={false}
+        value='banana'
+        onValueChange={() => {}}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            {fruits.map(({ label, value }) => (
+              <Select.Option
+                key={value}
+                value={value}
+                label={label}
+                render={props => {
+                  renders.push(value);
+                  return (
+                    <button
+                      type='button'
+                      {...props}
+                    />
+                  );
+                }}
+              >
+                {label}
+              </Select.Option>
+            ))}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
   });
 });
 

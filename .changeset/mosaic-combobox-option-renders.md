@@ -2,4 +2,4 @@
 '@clerk/mosaic': patch
 ---
 
-Improve the performance of the `UserProfile` phone number country picker.
+Reduce option re-renders in `Combobox`, `Autocomplete` and `Select`.
