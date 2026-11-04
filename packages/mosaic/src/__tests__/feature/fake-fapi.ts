@@ -4,6 +4,7 @@ import type {
   ClientJSON,
   EmailAddressJSON,
   EnterpriseConnectionJSON,
+  OAuthConsentInfoJSON,
   OAuthProvider,
   OrganizationCreationDefaultsJSON,
   OrganizationInvitationJSON,
@@ -86,6 +87,8 @@ export interface FakeFapiState {
   activeDevices?: ActiveDeviceRecord[];
   deviceTrackingEnabled: boolean;
   organizationCreationDefaults?: OrganizationCreationDefaultsJSON;
+  oauthConsent?: OAuthConsentInfoJSON;
+  oauthConsentRequests: URL[];
 }
 
 export interface ActiveDeviceRecord extends SessionWithActivitiesJSON {
@@ -323,6 +326,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     waitlistEntries: [],
     enterpriseConnections: [],
     deviceTrackingEnabled: true,
+    oauthConsentRequests: [],
     mfa: createMfaState(),
     ...rest,
     verification: createVerificationState(verification),
@@ -958,6 +962,11 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const revoked = { ...key, revoked: true };
       state.apiKeys = state.apiKeys.map(k => (k.id === revoked.id ? revoked : k));
       return HttpResponse.json(revoked);
+    }),
+    http.get(fapiUrl('/v1/me/oauth/consent/:clientId'), ({ request, params }) => {
+      state.oauthConsentRequests.push(new URL(request.url));
+      const consent = state.oauthConsent;
+      return consent?.client_id === params.clientId ? envelope(consent, null) : missing();
     }),
   );
 

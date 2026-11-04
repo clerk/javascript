@@ -127,9 +127,9 @@ export function useForm<TValues extends object, TResult = unknown>(
         return;
       }
       const settle = (feedback: FieldFeedback | undefined) => {
-        const { submitQueued } = actor.getSnapshot().context;
+        const wasQueued = actor.getSnapshot().value === 'queued';
         send({ type: 'VALIDATED', name, value, feedback });
-        if (submitQueued) {
+        if (wasQueued) {
           focusFirstInvalid();
         }
       };
@@ -183,7 +183,6 @@ export function useForm<TValues extends object, TResult = unknown>(
     ref: refFor(name),
   });
 
-  const isSubmitting = snapshot.value === 'submitting' || context.submitQueued;
   const initial = initialOf(context);
   const fields = mapKeys(values, (name): FormField => {
     const feedback = fieldFeedback(context, name);
@@ -203,10 +202,10 @@ export function useForm<TValues extends object, TResult = unknown>(
     error: context.error?.message,
     get isSubmitting() {
       const current = actor.getSnapshot();
-      return current.value === 'submitting' || current.context.submitQueued;
+      return current.value !== 'editing';
     },
     isDirty: keysOf(values).some(name => fields[name].isDirty),
-    canSubmit: !isSubmitting && isValid(context),
+    canSubmit: isValid(context),
     register,
     registerValue,
     setValue,

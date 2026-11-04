@@ -185,6 +185,27 @@ describe('Mosaic Radio', () => {
       expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('name', 'access');
     });
 
+    it('submits its value with a form when it has a name', () => {
+      const { container } = render(
+        <form>
+          <Group
+            name='access'
+            defaultValue='all'
+          />
+        </form>,
+      );
+      expect(formEntries(container)).toEqual([['access', 'all']]);
+    });
+
+    it('submits nothing with a form when it has no name', () => {
+      const { container } = render(
+        <form>
+          <Group defaultValue='all' />
+        </form>,
+      );
+      expect(formEntries(container)).toEqual([]);
+    });
+
     it('disables every item', () => {
       render(<Group disabled />);
       for (const radio of screen.getAllByRole('radio')) {
@@ -205,3 +226,11 @@ describe('Mosaic Radio', () => {
     });
   });
 });
+
+function formEntries(container: HTMLElement) {
+  const form = container.querySelector('form');
+  if (!form) {
+    throw new Error('Expected a form');
+  }
+  return [...new FormData(form).entries()];
+}

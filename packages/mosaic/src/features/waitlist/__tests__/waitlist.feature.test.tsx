@@ -45,7 +45,7 @@ describe('Waitlist', () => {
 
       await waitFor(() => expect(request.requests).toHaveLength(1));
       expect(emailField()).toHaveAttribute('aria-disabled', 'true');
-      await userEvent.setup().click(screen.getByRole('button', { name: /Join the waitlist/ }));
+      await userEvent.setup({ pointerEventsCheck: 0 }).click(screen.getByRole('button', { name: /Join the waitlist/ }));
       expect(request.requests).toHaveLength(1);
 
       request.release();
