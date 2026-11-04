@@ -87,6 +87,7 @@ function ComboboxInner(props: ComboboxProps) {
 
   useEffect(() => {
     if (!open) {
+      // eslint-disable-next-line react/set-state-in-effect -- Reset the query flag when the controlled selection changes.
       setQueryChanged(false);
       highlightFirstRef.current = false;
     }
@@ -100,6 +101,7 @@ function ComboboxInner(props: ComboboxProps) {
     }
   }, [open, props.inline, selectedValue, selectedIndex, inputValue, setInputValue]);
 
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const selectedLabel = selectedValue === null ? '' : (labelsByValueRef.current.get(selectedValue) ?? selectedValue);
   const filterQuery = !queryChanged && inputValue === selectedLabel ? '' : inputValue;
 
@@ -161,6 +163,7 @@ function ComboboxInner(props: ComboboxProps) {
         },
         padding: 5,
       }),
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       arrow({ element: arrowRef }),
       cssVars({ sideOffset }),
     ],

@@ -11,6 +11,7 @@ export function useObjectUrl(file: File | undefined): string | undefined {
 
   useEffect(() => {
     if (!file) {
+      // eslint-disable-next-line react/set-state-in-effect -- Synchronize the object URL with the external file resource.
       setUrl(undefined);
       return;
     }

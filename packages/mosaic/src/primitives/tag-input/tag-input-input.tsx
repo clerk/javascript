@@ -44,6 +44,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
       onBlur: commit,
       onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
+          // eslint-disable-next-line typescript/no-deprecated -- Safari can report composition Enter as keyCode 229 while isComposing is false.
           if (event.nativeEvent.isComposing || event.keyCode === 229) {
             return;
           }

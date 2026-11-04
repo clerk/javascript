@@ -107,6 +107,7 @@ function SelectInner(props: SelectProps) {
   const valueToLabelRef = useRef<Map<string, string>>(new Map());
   const selectedItemRef = useRef<HTMLElement | null>(null);
   const openRef = useRef(open);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   openRef.current = open;
   const openMethodRef = useRef<string | null>(null);
   const updateRef = useRef<() => void>(() => {});
@@ -116,6 +117,7 @@ function SelectInner(props: SelectProps) {
   // Memoized so its held position survives re-renders during the exit transition.
   const align = useMemo(
     () =>
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       alignSelectedItem({
         selectedItemRef,
         openRef,
@@ -159,12 +161,14 @@ function SelectInner(props: SelectProps) {
               });
             },
           }),
+          // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
           arrow({ element: arrowRef }),
           cssVars({ sideOffset }),
         ],
     whileElementsMounted: autoUpdate,
   });
 
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   updateRef.current = update;
 
   const returnFocusRef = useReturnFocus(floatingContext);
@@ -177,6 +181,7 @@ function SelectInner(props: SelectProps) {
   // Reset only once the popup is gone, or the exit transition would reposition.
   useEffect(() => {
     if (!mounted) {
+      // eslint-disable-next-line react/set-state-in-effect -- Recompute positioning fallback after the selected item changes.
       setFallback(false);
     }
   }, [mounted]);

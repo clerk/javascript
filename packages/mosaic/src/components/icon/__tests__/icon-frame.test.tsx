@@ -87,7 +87,6 @@ describe('Mosaic IconFrame', () => {
     render(
       <IconFrame
         data-testid='frame'
-        // eslint-disable-next-line jsx-a11y/anchor-has-content -- IconFrame injects the children into the rendered anchor.
         render={<a href='/status' />}
       >
         Status

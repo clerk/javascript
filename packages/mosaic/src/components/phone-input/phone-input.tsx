@@ -124,6 +124,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       return;
     }
     if (countryProp === undefined && valueProp) {
+      // eslint-disable-next-line react/set-state-in-effect -- Match the country to a phone number supplied by the parent.
       setUncontrolledCountry(parsePhoneString(valueProp).iso);
     }
   }, [countryProp, valueProp]);
@@ -149,6 +150,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     [onValueChange, valueProp],
   );
 
+  // eslint-disable-next-line react/preserve-manual-memoization -- Keep the existing country selection callback.
   const setCountry = React.useCallback(
     (nextCountry: CountryEntry) => {
       if (countryProp === undefined) {
@@ -160,6 +162,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       setQuery('');
       inputRef.current?.focus();
     },
+    // eslint-disable-next-line react/preserve-manual-memoization -- The value callback records its last emission in a ref.
     [countryProp, nationalNumber, onCountryChange, setValue],
   );
 

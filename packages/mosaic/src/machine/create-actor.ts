@@ -53,6 +53,7 @@ export function createActor<TContext extends object, TEvent extends EventObject,
   // Internally the actor operates on the broader `EventObject`: invoke done/error
   // events aren't part of the user's `TEvent` union, so the config is viewed
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
   const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject, TStates>>;
   const emptyState: StateConfig<TContext, EventObject, TStates> = {};
   const stateOf = (id: string): StateConfig<TContext, EventObject, TStates> => {
@@ -107,6 +108,7 @@ export function createActor<TContext extends object, TEvent extends EventObject,
       // SAFETY: raw is a TransitionFn — (args: {context, event}) => TransitionResult | undefined.
       // The cast is required because raw arrives untyped at this internal boundary; callers
       // have already narrowed the event type via StateConfig.on[K].
+      // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
       const result = (raw as TransitionFn<TContext, EventObject, TStates>)({ context, event });
       if (result === undefined) {
         return [];
@@ -116,10 +118,12 @@ export function createActor<TContext extends object, TEvent extends EventObject,
         const patch = result.context;
         // SAFETY: Constructing AssignAction inline avoids importing the assign() helper here.
         // The ASSIGN symbol is the exact tag isAssignAction checks in runActions.
+        // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
         cfg.actions = { type: ASSIGN, assignment: () => patch } as AssignAction<TContext, EventObject>;
       }
       return [cfg];
     }
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
     return toArr(raw as TStates | TransitionConfig<TContext, EventObject, TStates>).map(e =>
       typeof e === 'string' ? { target: e } : e,
     );
@@ -194,6 +198,7 @@ export function createActor<TContext extends object, TEvent extends EventObject,
     // The cast suppresses that mismatch; src implementations receive the INIT event
     // on state entry and typically ignore it. The runtime views events through an
     // event-agnostic lens (line 57) for this reason.
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
     Promise.resolve(invoke.src(context, event as never)).then(
       (output: unknown) => settle(invoke.onDone, { type: INVOKE_DONE, output }),
       (error: unknown) => settle(invoke.onError, { type: INVOKE_ERROR, error }),

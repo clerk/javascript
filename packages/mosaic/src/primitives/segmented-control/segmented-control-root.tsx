@@ -102,7 +102,7 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
             const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, otherCompositeProps));
             const { ref: compositeRef, ...mergedProps } = merged;
 
-            // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
+            // eslint-disable-next-line react/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
             return useRender({
               defaultTagName: 'div',
               render,

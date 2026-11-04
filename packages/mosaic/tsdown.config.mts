@@ -3,11 +3,18 @@ import { defineConfig } from 'tsdown';
 
 import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
 
+const { default: getTypeScriptExecutablePath } = await import(
+  new URL('./lib/getExePath.js', import.meta.resolve('typescript/package.json')).href
+);
+
 export default defineConfig({
   entry: ['./src/index.ts'],
   outDir: './dist',
   format: ['esm'],
-  dts: { sourcemap: true },
+  dts: {
+    sourcemap: true,
+    tsgo: { path: getTypeScriptExecutablePath() },
+  },
   clean: true,
   target: 'es2022',
   platform: 'browser',

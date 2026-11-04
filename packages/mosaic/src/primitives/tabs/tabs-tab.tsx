@@ -85,7 +85,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
           ...mergedProps,
         };
 
-        // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
+        // eslint-disable-next-line react/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
         return useRender({
           defaultTagName: 'button',
           render,

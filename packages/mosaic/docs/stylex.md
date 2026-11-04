@@ -20,7 +20,7 @@ API".
 | `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`), `mergeStyleProps`, the `Mosaic*Props` types |
 | `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                                          |
 
-The `@stylexjs` eslint rules run on `packages/mosaic/src/**` (tests excluded). The `enforce-extension`
+The `@stylexjs` Oxlint rules run on `packages/mosaic/src/**` (tests excluded). The `enforce-extension`
 rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
 `.stylex.ts` file may export nothing but `defineVars` / `defineConsts` /
 `defineMarker` results.** So `stylex.create(...)` lives in a plain `.styles.ts`

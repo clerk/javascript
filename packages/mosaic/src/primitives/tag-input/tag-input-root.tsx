@@ -1,6 +1,6 @@
 'use client';
 
-import React, { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
@@ -44,7 +44,9 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
 
   const [value, setValue] = useControllableState(valueProp, defaultValue, onValueChange);
   const valueRef = useRef(value);
-  valueRef.current = value;
+  useLayoutEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   const [renderList, setRenderList] = useState(value);
   const [syncedValue, setSyncedValue] = useState(value);

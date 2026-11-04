@@ -167,7 +167,6 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.click(screen.getByText('Banana'));
@@ -228,7 +227,6 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.keyboard('{Enter}');
@@ -1037,7 +1035,6 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Pick a fruit...'));
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');
@@ -1052,7 +1049,6 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Cherry'));
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');

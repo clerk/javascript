@@ -116,6 +116,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
       setValue(next);
       queueFocus(Math.min(index + inserted.length, length - 1), next);
     },
+    // eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (disabled) {
         return;

@@ -137,6 +137,7 @@ export function Destructive<Payload = void>({ fieldLabel, confirmationValue, ...
 
   useEffect(() => {
     if (!isOpen) {
+      // eslint-disable-next-line react/set-state-in-effect -- Clear the confirmation text when the dialog closes.
       setTypedValue('');
     }
   }, [isOpen]);

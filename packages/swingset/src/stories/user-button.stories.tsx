@@ -389,6 +389,7 @@ export function LoadingOrganizations(_args: Record<string, unknown>) {
     if (!prototype.open) {
       return;
     }
+    // eslint-disable-next-line react/set-state-in-effect -- Simulate a new organization request each time the popup opens
     setOrganizationsLoading(true);
     const timer = setTimeout(() => setOrganizationsLoading(false), ORGANIZATIONS_LATENCY_MS);
     return () => clearTimeout(timer);
