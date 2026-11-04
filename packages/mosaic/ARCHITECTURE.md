@@ -201,11 +201,11 @@ switcher.tsx                 // composition wrapper and the public props type
 Supporting files carry the parts that would otherwise bloat those four:
 
 ```text
-switcher.types.ts            // the data contract the model and view both agree on
-switcher.messages.ts         // every string the surface renders, as one `as const` object
-switcher.layout.ts           // pure derivation (which affordance goes in which slot)
-switcher.utils.ts            // pure helpers
-switcher.styles.ts           // `stylex.create` atoms (see the StyleX authoring rules)
+<feature>.types.ts           // the data contract the model and view both agree on
+<feature>.messages.ts        // every string the surface renders, as one `as const` object
+<feature>.layout.ts          // pure derivation (which affordance goes in which slot)
+<feature>.utils.ts           // pure helpers
+<feature>.styles.ts          // `stylex.create` atoms (see the StyleX authoring rules)
 <name>.dialog.tsx            // a dialog the view opens, when it would crowd the view file
 ```
 
