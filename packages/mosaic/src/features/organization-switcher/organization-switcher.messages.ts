@@ -15,6 +15,10 @@ export const organizationSwitcherMessages = {
     requested: 'Requested',
     pending: 'pending',
   },
+  groups: {
+    organizations: 'Organizations',
+    organization: 'Organization actions',
+  },
   manage: {
     invite: 'Invite members',
     settings: 'Settings',

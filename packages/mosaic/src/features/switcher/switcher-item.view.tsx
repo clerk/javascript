@@ -96,9 +96,17 @@ export function SwitcherItemTrailing({ xstyle, ...rest }: MosaicElementProps<'di
   );
 }
 
-export function SwitcherGroup({ xstyle, ...rest }: MosaicElementProps<'div'>) {
+export type SwitcherGroupProps = MosaicElementProps<'div'> & { label: string };
+
+export function SwitcherGroup({ label, xstyle, ...rest }: SwitcherGroupProps) {
   const slot = useSlot();
-  return <div {...mergeStyleProps(themeProps(slot('group')), stylex.props(reset.base, styles.group, xstyle), rest)} />;
+  return (
+    <div
+      role='group'
+      {...mergeStyleProps(themeProps(slot('group')), stylex.props(reset.base, styles.group, xstyle), rest)}
+      aria-label={label}
+    />
+  );
 }
 
 export function SwitcherSeparator({ xstyle, ...rest }: MosaicElementProps<'hr'>) {

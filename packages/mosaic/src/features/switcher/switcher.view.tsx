@@ -761,7 +761,10 @@ function OrganizationSection() {
       {/* `auto` rather than `stable`: a reserved gutter insets the rows whether or not the list
           overflows, so short lists would sit their avatars and icons off the edge the header and
           footer align to. */}
-      <SwitcherGroup xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
+      <SwitcherGroup
+        label={m.groups.organizations}
+        xstyle={[scrollAreaViewport('auto'), styles.scroll]}
+      >
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
@@ -856,8 +859,10 @@ interface MenuRow {
 /** What can be done about the lead (manage it, and invite to an organization that leads), and the app's own rows. */
 function ManageSection() {
   const m = useSwitcherMessages();
+  const userButton = useMessages('userButton');
   const data = useSwitcherContext();
-  const targets = settingsTargets(data, leadSelection(data, m), m);
+  const lead = leadSelection(data, m);
+  const targets = settingsTargets(data, lead, m);
 
   const builtIn: MenuRow[] = [];
   for (const action of data.layout.actions.manage) {
@@ -902,7 +907,7 @@ function ManageSection() {
   return (
     <>
       <SwitcherSeparator />
-      <SwitcherGroup>
+      <SwitcherGroup label={lead.kind === 'organization' ? m.groups.organization : userButton.groups.account}>
         {rows.map(r => (
           <React.Fragment key={r.id}>{r.node}</React.Fragment>
         ))}
@@ -965,7 +970,7 @@ function Footer() {
   return (
     <>
       <SwitcherSeparator />
-      <SwitcherGroup>{rows}</SwitcherGroup>
+      <SwitcherGroup label={m.accounts.label}>{rows}</SwitcherGroup>
     </>
   );
 }

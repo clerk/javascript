@@ -111,6 +111,11 @@ const reading = (...names: string[]) =>
     .filter(node => !node.closest('.cl-user-button-header'))
     .map(node => node.textContent);
 
+const groupNames = () =>
+  within(requiredPopup())
+    .getAllByRole('group')
+    .map(group => group.getAttribute('aria-label'));
+
 const current = () =>
   Array.from(requiredPopup().querySelectorAll('[aria-current="true"]')).map(node => node.textContent);
 
@@ -912,6 +917,14 @@ describe('UserButton', () => {
       expect(within(requiredPopup()).queryByText('Acme')).toBeNull();
     });
 
+    it('names its groups as the account actions and the session actions, with no organizations', async () => {
+      await renderUserButton({ mode: 'user' });
+      await open();
+
+      expect(groupNames()).toEqual(['Account actions', 'Session actions']);
+      expect(screen.queryByRole('group', { name: 'Organizations' })).toBeNull();
+    });
+
     it('drops the identifier line when it would only repeat the name', async () => {
       const nameless = fapiUser({ ...alice, first_name: null, last_name: null });
       await renderUserButton(
@@ -997,6 +1010,13 @@ describe('UserButton', () => {
       ]);
       await openSettings(user, 'Manage organization');
       expect(openOrganizationProfile).toHaveBeenCalled();
+    });
+
+    it('names its groups as the organizations, the actions on the active one, and the session actions', async () => {
+      await renderUserButton({}, noOffers());
+      await openWithList();
+
+      expect(groupNames()).toEqual(['Organizations', 'Organization actions', 'Session actions']);
     });
 
     it('keeps the identifier beneath the organization even when it is all that names the account', async () => {
@@ -1203,6 +1223,14 @@ describe('UserButton', () => {
       expect(group('Terms of service')).toBe(group('Settings'));
       expect(group('Switch account')).not.toBe(group('Settings'));
       expect(screen.getByRole('link', { name: 'Support' })).toHaveAttribute('href', '/support');
+    });
+
+    it('sit in the group named for the actions on the active organization', async () => {
+      await renderUserButton({ customMenuItems: [terms] });
+      await open();
+
+      const actions = screen.getByRole('group', { name: 'Organization actions' });
+      expect(within(actions).getByRole('button', { name: 'Terms of service' })).toBeInTheDocument();
     });
 
     it('renders the icon a custom row brings', async () => {

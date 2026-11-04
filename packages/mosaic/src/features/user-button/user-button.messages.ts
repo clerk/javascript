@@ -16,7 +16,13 @@ export const userButtonMessages = {
     /** Names the pending indicator on a row and inside the accept and join buttons, read beside the label. */
     pending: 'pending',
   },
+  groups: {
+    organizations: 'Organizations',
+    organization: 'Organization actions',
+    account: 'Account actions',
+  },
   accounts: {
+    label: 'Session actions',
     switch: 'Switch account',
     add: 'Add account',
     signOut: 'Sign out',

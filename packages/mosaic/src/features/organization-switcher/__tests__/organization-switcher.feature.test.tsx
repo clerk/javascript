@@ -107,6 +107,11 @@ const reading = (...names: string[]) =>
     .filter(node => !node.closest('.cl-organization-switcher-header'))
     .map(node => node.textContent);
 
+const groupNames = () =>
+  within(requiredPopup())
+    .getAllByRole('group')
+    .map(group => group.getAttribute('aria-label'));
+
 describe('OrganizationSwitcher', () => {
   it('renders nothing while Clerk is still loading', async () => {
     serveFapi(signedIn());
@@ -153,6 +158,20 @@ describe('OrganizationSwitcher', () => {
     expect(openOrganizationProfile).toHaveBeenCalled();
   });
 
+  it('groups the organizations apart from the actions on the active one, naming each', async () => {
+    await renderSwitcher({}, noOffers());
+    await openWithList();
+
+    expect(groupNames()).toEqual(['Organizations', 'Organization actions']);
+    const organizations = screen.getByRole('group', { name: 'Organizations' });
+    expect(within(organizations).getByText('Acme').closest('[aria-current="true"]')).not.toBeNull();
+    expect(within(organizations).getByRole('button', { name: 'Other' })).toBeInTheDocument();
+    expect(within(organizations).getByRole('button', { name: 'Add organization' })).toBeInTheDocument();
+    const actions = screen.getByRole('group', { name: 'Organization actions' });
+    expect(within(actions).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
+    expect(within(actions).getByRole('button', { name: 'Invite members' })).toBeInTheDocument();
+  });
+
   it('falls back to the account, with nothing to manage, where no organization is active', async () => {
     await renderSwitcher({}, signedIn({ client: fapiClient([personalSession]) }));
     await open();
@@ -172,6 +191,7 @@ describe('OrganizationSwitcher', () => {
     expect(within(requiredPopup()).queryByText('Alice Smith')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Settings' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Invite members' })).toBeNull();
+    expect(screen.queryByRole('group', { name: 'Organization actions' })).toBeNull();
   });
 
   it('carries no account rows, and trails the organizations with create-organization', async () => {
