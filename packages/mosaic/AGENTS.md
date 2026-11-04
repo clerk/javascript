@@ -29,13 +29,13 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 
 Before you change a file that matches a pattern below, read its guide, even for a one-line change.
 
-| File                                                 | Read                               |
-| ---------------------------------------------------- | ---------------------------------- |
-| `src/**/*.styles.ts`                                 | [StyleX](docs/stylex.md)           |
-| `src/**/*.model.ts(x)`                               | [Models](docs/models.md)           |
-| `src/**/*.controller.ts(x)`                          | [Controllers](docs/controllers.md) |
-| `src/**/*.view.tsx`                                  | [Views](docs/views.md)             |
-| `src/**/__tests__/**`, `*.test.ts(x)`, `*.test-d.ts` | [Testing](docs/testing.md)         |
+| File                                                               | Read                               |
+| ------------------------------------------------------------------ | ---------------------------------- |
+| `src/**/*.styles.ts`                                               | [StyleX](docs/stylex.md)           |
+| `src/**/*.model.ts(x)`                                             | [Models](docs/models.md)           |
+| `src/**/*.controller.ts(x)`                                        | [Controllers](docs/controllers.md) |
+| `src/**/*.view.tsx`                                                | [Views](docs/views.md)             |
+| `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` | [Testing](docs/testing.md)         |
 
 ## Layers in one paragraph
 
