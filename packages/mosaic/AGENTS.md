@@ -25,6 +25,18 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Add a public prop that shows or hides UI  | [Public visibility props](docs/public-props.md)                                   |
 | Prove a change in a browser               | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                            |
 
+## Before editing a file
+
+Before you change a file that matches a pattern below, read its guide, even for a one-line change.
+
+| File                                                               | Read                               |
+| ------------------------------------------------------------------ | ---------------------------------- |
+| `src/**/*.styles.ts`, `src/**/*.stylex.ts`                         | [StyleX](docs/stylex.md)           |
+| `src/**/*.model.ts(x)`                                             | [Models](docs/models.md)           |
+| `src/**/*.controller.ts(x)`                                        | [Controllers](docs/controllers.md) |
+| `src/**/*.view.tsx`                                                | [Views](docs/views.md)             |
+| `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` | [Testing](docs/testing.md)         |
+
 ## Layers in one paragraph
 
 A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is the only file that reads Clerk hooks or calls Clerk resources, and answers with plain data, plain callbacks and a `status`. The **controller** (`*.controller.ts(x)`) holds local state and wraps the model's callbacks for pending, errors and closing. The **view** (`*.view.tsx`) renders plain props. No Clerk resource reaches the controller and no machine snapshot reaches the view.
