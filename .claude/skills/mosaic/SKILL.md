@@ -63,15 +63,20 @@ canonical contract for the whole design system — the `--cl-*` tokens, the
 architecture" section that defines the split. Read it for the _what_; this skill
 is the _how-to_.
 
-`packages/mosaic/src/features/user-button/` is the fullest worked example of the split
-in the repo — model, controller, view, wrapper, types, messages, and a feature
-test. Copy from it. Tests go in its `__tests__/` folder, as
-`packages/mosaic/docs/testing.md` describes under "Test placement".
+`packages/mosaic/src/features/switcher/` is the fullest worked example of the split
+in the repo — model, controller, view, wrapper, types, layout and styles. Copy from
+it. `UserButton` wraps it, and its feature test is in
+`packages/mosaic/src/features/user-button/__tests__/`. Tests go in a `__tests__/`
+folder, as `packages/mosaic/docs/testing.md` describes under "Test placement".
 
 `packages/mosaic/AGENTS.md` loads for any work in the package. It maps common
 problems (errors, pending state, focus after removal, debouncing, confirm steps)
 to the shared helper that already solves them, and says to ask the user before
 adding a new pattern. Check it before writing any of those by hand.
+
+Its "Shaping a fix" section covers bug fixes: fix the shared helper rather than
+wrapping it, and treat a changed shared signature as a new pattern. Read it
+before any `fix` PR.
 
 ## Which reference to read
 

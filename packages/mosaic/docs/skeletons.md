@@ -109,7 +109,7 @@ peaking in the middle, sweeps left to right across two bone widths, over 1.6s
 
 Not decided by the skeleton. The component that owns the loading state shows it for as
 long as the data is loading. The planned gate is
-`useSpinDelay(loading, { delay: 150, minDuration: 500 })` with the skeleton mounted
+`useSpinDelay(loading || null, { delay: 150, minDuration: 500 }) !== null` with the skeleton mounted
 but `visibility: hidden` until the delay passes, so a fast load never flashes it and
 nothing shifts when it appears.
 
