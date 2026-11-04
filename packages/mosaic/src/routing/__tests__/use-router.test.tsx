@@ -1,6 +1,7 @@
+import { logger } from '@clerk/shared/logger';
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { SegmentParts } from '../location';
 import type { RouteTable } from '../routes';
@@ -126,6 +127,40 @@ describe('useRouterScope', () => {
 
     expect(result.current.user.route).toBe('security');
     expect(result.current.org.route).toBe('members');
+  });
+
+  it('redirects again when a different unknown segment is written', () => {
+    const { result } = renderHook(
+      () => ({ router: useRouterScope(routes, userScope), segment: useUserSegment(), write: useVirtualWrite() }),
+      { wrapper: wrapperWith({ '/user': ['nowhere'] }) },
+    );
+    expect(result.current.segment).toEqual(['account']);
+
+    act(() => {
+      result.current.write('/user', ['elsewhere']);
+    });
+    expect(result.current.router.route).toBe('account');
+    expect(result.current.segment).toEqual(['account']);
+  });
+
+  it('stops redirecting when two owners of one base keep writing each other back, and warns', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const orgRoutes = { general: 'general', members: 'members' } as const;
+    const { result } = renderHook(
+      () => ({
+        user: useRouterScope(routes, userScope),
+        org: useRouterScope(orgRoutes, { routing: 'virtual', path: '/user', notFound: 'general' }),
+        segment: useUserSegment(),
+      }),
+      { wrapper: wrapperWith() },
+    );
+
+    expect(result.current.segment).toEqual(['general']);
+    expect(result.current.user.route).toBe('account');
+    expect(result.current.org.route).toBe('general');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('"general" under "/user"');
+    warn.mockRestore();
   });
 
   it('keeps the same result object between unrelated renders', () => {
