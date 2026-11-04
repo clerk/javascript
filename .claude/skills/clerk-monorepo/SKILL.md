@@ -138,6 +138,47 @@ If the editor or a build reports stale types from `@clerk/shared`, rebuild the f
 Integration-test variants (`pnpm test:integration:*`) and canary/snapshot releases are the long tail:
 see [`references/setup-and-footguns.md`](references/setup-and-footguns.md) and `docs/CONTRIBUTING.md`.
 
+## Integration CI caching
+
+Each Playwright suite is a root turbo task, `//#test:integration:<suite>`, run by the `integration-tests`
+matrix in `.github/workflows/ci.yml`. Turbo caches a suite's result, so a PR that cannot change the
+outcome skips the suite entirely: no build, no local registry publish, no browser install.
+
+How the cache key is built:
+
+- `dependsOn` lists the package builds the suite's e2e apps install from the local registry: always
+  `@clerk/clerk-js`, `@clerk/ui` and `@clerk/testing`, plus the framework packages that suite's apps
+  add. Turbo folds those build hashes into the suite hash, and package builds already depend on
+  `^build`, so transitive packages such as `@clerk/shared` are covered without being listed.
+- `inputs` covers the harness, the top-level test files, the test directories the suite's tagged tests
+  live in (and import from), and the templates its apps copy. Other suites' directories are not inputs.
+- `scripts/integration-deps.test.mjs` derives both lists from `integration/presets` and the tagged
+  tests and fails when `turbo.json` drifts. Its failure message prints the block to paste.
+
+Rules that keep this correct:
+
+- The integration test step must never pass `--only`. It drops dependency hashes from the task hash,
+  so package changes would stop invalidating suites.
+- The merge queue sets `TURBO_FORCE=true` on the test step and nightly passes `--force`, so every suite
+  runs for real before a commit lands on `main`. A `dependsOn` gap is a wasted-cache bug on PRs, not a
+  correctness hole on `main`.
+- Per-job setup lives in `integration/scripts/run-integration.mjs`, which the `test:integration:base`
+  script wraps. When `E2E_CI_SETUP` names the suite it builds, publishes to pkglab, installs clerk-js
+  and ui into temp dirs, installs Chromium and, for electron, Xvfb, then runs Playwright. Locally
+  `E2E_CI_SETUP` is unset and it only runs Playwright. A cache hit runs none of it, including the
+  user cleanup step, which is gated on the `tests-started` output the script writes.
+
+Adding a suite:
+
+1. Add `test:integration:<suite>` to the root `package.json`, tagging tests with `@<suite>` and
+   pointing `E2E_APP_ID` at the long-running apps it needs.
+2. Add `//#test:integration:<suite>` to `turbo.json`. Run `pnpm vitest run --root scripts
+integration-deps` and paste the `dependsOn` and `inputs` the failure prints.
+3. Add the suite to the `integration-tests` matrix in `ci.yml`.
+
+To see what a change invalidates, run `node scripts/integration-hash-matrix.mjs` on a clean tree. It
+touches a few representative files, dry-runs turbo, and prints which suites would rerun for each.
+
 ## The hard rules
 
 Each rule below restates `AGENTS.md`; the parenthetical is how it is enforced.
