@@ -25,9 +25,9 @@ beforeAll(async () => {
     await cp(path.join(packageRoot, file), path.join(mosaicRoot, file));
   }
   await symlink(path.join(packageRoot, 'node_modules'), path.join(mosaicRoot, 'node_modules'), 'dir');
-  const configUrl = pathToFileURL(path.join(packageRoot, 'oxlint.config.ts')).href;
+  const configUrl = pathToFileURL(path.join(packageRoot, 'oxlint.config.mjs')).href;
   await writeFile(
-    path.join(mosaicRoot, 'oxlint.config.mts'),
+    path.join(mosaicRoot, 'oxlint.config.mjs'),
     `
 import { createRequire } from 'node:module';
 import config from ${JSON.stringify(configUrl)};
@@ -70,7 +70,7 @@ async function lintAt(file, source) {
       [
         oxlint,
         '--config',
-        path.join(mosaicRoot, 'oxlint.config.mts'),
+        path.join(mosaicRoot, 'oxlint.config.mjs'),
         '--disable-nested-config',
         '--format',
         'json',
@@ -583,7 +583,9 @@ describe('Mosaic effects', { timeout: 30_000 }, () => {
 describe('Mosaic package configuration', () => {
   test('inherits repository rules and keeps Mosaic guards in the package', async () => {
     const configAt = async cwd => {
-      const { stdout } = await execute(process.execPath, [oxlint, '--print-config'], { cwd });
+      const { stdout } = await execute(process.execPath, [oxlint, '-c', 'oxlint.config.mjs', '--print-config'], {
+        cwd,
+      });
       return JSON.parse(stdout);
     };
     const rootConfig = await configAt(path.resolve(packageRoot, '../..'));

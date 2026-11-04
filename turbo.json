@@ -136,7 +136,7 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/eslint.config.mjs",
-        "$TURBO_ROOT$/oxlint.config.mts",
+        "$TURBO_ROOT$/oxlint.config.mjs",
         "$TURBO_ROOT$/scripts/oxlint-*.mjs",
         "**/*.js",
         "**/*.jsx",

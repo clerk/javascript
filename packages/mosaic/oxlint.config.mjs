@@ -3,7 +3,7 @@ import path from 'node:path';
 import noUnneededEffects from 'eslint-plugin-react-you-might-not-need-an-effect';
 import { defineConfig } from 'oxlint';
 
-import rootConfig from '../../oxlint.config.mts';
+import rootConfig from '../../oxlint.config.mjs';
 
 const mosaicRoot = import.meta.dirname;
 const SHARED = ['primitives', 'icons', 'machine', 'utils', 'hooks', 'styles', 'components', 'localization', 'root'];

@@ -1,6 +1,6 @@
 import { defineConfig } from 'oxlint';
 
-import rootConfig from '../../oxlint.config.mts';
+import rootConfig from '../../oxlint.config.mjs';
 
 export default defineConfig({
   ...rootConfig,

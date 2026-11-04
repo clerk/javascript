@@ -8,7 +8,7 @@
     "dev": "node scripts/dev.mjs",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "lint": "oxlint src",
+    "lint": "oxlint -c oxlint.config.mjs src",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "browserslist": [
