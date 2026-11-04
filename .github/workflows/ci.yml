@@ -360,6 +360,14 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Run integration harness tests
+        if: matrix.node-version == '24.15.0'
+        run: |
+          pnpm turbo build $TURBO_ARGS --filter=@clerk/backend --filter=@clerk/shared --filter=@clerk/testing
+          pnpm vitest run --root integration
+        env:
+          NODE_VERSION: ${{ matrix.node-version }}
+
       - name: Run tests in packages
         run: |
           TURBO_ARGS=$(sed -E 's/--concurrency=[0-9]+/--concurrency=1/' <<< "$TURBO_ARGS")
@@ -381,10 +389,6 @@ jobs:
       - name: Run verify script tests
         if: matrix.node-version == '24.22.2'
         run: pnpm vitest run --root scripts verify-attach verify-flaky
-
-      - name: Run integration harness tests
-        if: matrix.node-version == '24.15.0'
-        run: pnpm vitest run --root integration
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4.6.2
