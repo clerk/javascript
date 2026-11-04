@@ -28,7 +28,7 @@ export interface MosaicProviderProps {
   experimental?: MosaicExperimental;
 }
 
-// Exported Mosaic components annotate a React return type deliberately. The package sets
+// Exported Mosaic components annotate a React return type on purpose. The package sets
 // `jsxImportSource: '@emotion/react'`, so an inferred return leaks Emotion's `JSX.Element` into the
 // published `.d.ts`, which React 19 consumers reject as a JSX element type.
 export function MosaicProvider({
