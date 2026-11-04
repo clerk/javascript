@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 
 /** Props for {@link Button}. */
 export interface ButtonProps extends ComponentProps<'button'> {
@@ -64,7 +64,7 @@ export const Button = React.forwardRef<HTMLElement, ButtonProps>(function Button
   // button out of the tab order — the one thing `focusableWhenDisabled` exists to avoid.
   const nativelyDisabled = nativeButton && !focusableWhenDisabled;
 
-  const defaultProps: Record<string, unknown> = nativeButton
+  const defaultProps: DefaultProps<'button'> = nativeButton
     ? { type: 'button', disabled: nativelyDisabled ? disabled : undefined }
     : {
         role: 'button',

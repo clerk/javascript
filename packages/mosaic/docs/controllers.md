@@ -313,6 +313,8 @@ every successful removal drops focus on the floor.
 - **No machine snapshot in the return value.** Return the plain props the view
   reads (`open`, `pendingKey`, `isDeleting`, `errorMessage`), never `snapshot`
   and `send`.
+- A transition shared across states in a `const` needs `target: 'name' as const`.
+  Without it the target widens to `string` and the machine rejects it.
 - Dismissing must not abandon an in-flight effect. Model `open` as context, and
   give `OPEN`/`CLOSE` no target in the busy state so they don't leave it:
 

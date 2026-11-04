@@ -173,7 +173,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       if (feedback) {
         throw new FormSubmitError<UserProfileRenamePasskeyValues>({ fields: { name: feedback.message } });
       }
-      await save(() => passkey.update({ name }), ['name']);
+      await save<keyof UserProfileRenamePasskeyValues>(() => passkey.update({ name }), ['name']);
     },
     onRemove: async id => {
       const passkey = currentUser().passkeys.find(candidate => candidate.id === id);

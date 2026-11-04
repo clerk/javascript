@@ -53,7 +53,7 @@ function missingDependency(): Promise<never> {
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
 const start = {
-  target: 'sending',
+  target: 'sending' as const,
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
     verifyingId: event.id,
     phoneNumber: event.phoneNumber,

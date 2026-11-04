@@ -161,7 +161,6 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
           type='button'
           variant='outline'
           color='neutral'
-          fullWidth
           disabled={props.isPending}
           onClick={props.onBack}
         >
@@ -169,7 +168,6 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
         </Button>
         <SubmitButton
           form={formId}
-          fullWidth
           isPending={props.isPending}
           disabled={!props.selectedPhoneId}
           pendingLabel={m.pending}

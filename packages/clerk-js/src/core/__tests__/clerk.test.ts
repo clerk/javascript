@@ -1106,6 +1106,155 @@ describe('Clerk singleton', () => {
           expect(sut.__internal_getCachedResources).not.toHaveBeenCalled();
         });
       });
+
+      describe('__internal_reloadInitialResources after a failed load', () => {
+        const unsupportedAppVersion = () =>
+          new ClerkAPIResponseError('Unsupported app version', { data: [], status: 403 });
+
+        const loadFailingSut = async () => {
+          const sut = new Clerk(productionPublishableKey);
+          mockClientFetch.mockRejectedValueOnce(unsupportedAppVersion());
+          await expect(sut.load({ standardBrowser: false })).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          const statuses: string[] = [];
+          sut.on('status', status => statuses.push(status));
+          return { sut, statuses };
+        };
+
+        it('finishes loading the same instance once the reload succeeds', async () => {
+          const { sut, statuses } = await loadFailingSut();
+          const client = { signedInSessions: [] };
+          mockClientFetch.mockResolvedValueOnce(client);
+
+          await sut.__internal_reloadInitialResources();
+
+          expect(sut.status).toBe('ready');
+          expect(sut.loaded).toBe(true);
+          expect(sut.client).toBe(client);
+          expect(statuses).toEqual(['ready']);
+        });
+
+        it('stays failed while the reload is rejected, and finishes on a later reload', async () => {
+          const { sut, statuses } = await loadFailingSut();
+          mockClientFetch.mockRejectedValueOnce(unsupportedAppVersion());
+
+          await expect(sut.__internal_reloadInitialResources()).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          expect(sut.status).toBe('error');
+
+          mockClientFetch.mockResolvedValueOnce({ signedInSessions: [] });
+          await sut.__internal_reloadInitialResources();
+
+          expect(sut.status).toBe('ready');
+          expect(statuses).toEqual(['ready']);
+        });
+
+        it('finishes loading once when reloads overlap', async () => {
+          const { sut, statuses } = await loadFailingSut();
+          mockClientFetch.mockResolvedValue({ signedInSessions: [] });
+
+          await Promise.all([sut.__internal_reloadInitialResources(), sut.__internal_reloadInitialResources()]);
+
+          expect(sut.status).toBe('ready');
+          expect(statuses).toEqual(['ready']);
+        });
+
+        it('finishes a load that fails after a reload succeeded while it was running', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          const firstClientFetch = createDeferredPromise();
+          const client = { signedInSessions: [] };
+          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockResolvedValueOnce(client);
+          const statuses: string[] = [];
+          sut.on('status', status => statuses.push(status));
+
+          const load = sut.load({ standardBrowser: false });
+          await sut.__internal_reloadInitialResources();
+          expect(sut.status).toBe('loading');
+
+          firstClientFetch.reject(unsupportedAppVersion());
+          await expect(load).resolves.toBeUndefined();
+          expect(sut.status).toBe('ready');
+          expect(sut.client).toBe(client);
+          expect(statuses.filter(status => status === 'ready')).toHaveLength(1);
+          expect(statuses).not.toContain('error');
+        });
+
+        it('lets a load fail when no reload succeeded while it was running', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          const firstClientFetch = createDeferredPromise();
+          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockRejectedValueOnce(unsupportedAppVersion());
+
+          const load = sut.load({ standardBrowser: false });
+          await expect(sut.__internal_reloadInitialResources()).rejects.toBeInstanceOf(ClerkAPIResponseError);
+
+          firstClientFetch.reject(unsupportedAppVersion());
+          await expect(load).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          expect(sut.status).toBe('error');
+        });
+
+        it('finishes a load that failed while the reload was running', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          const firstClientFetch = createDeferredPromise();
+          const reloadClientFetch = createDeferredPromise();
+          mockClientFetch.mockReturnValueOnce(firstClientFetch.promise).mockReturnValueOnce(reloadClientFetch.promise);
+
+          const load = sut.load({ standardBrowser: false });
+          const reload = sut.__internal_reloadInitialResources();
+          firstClientFetch.reject(unsupportedAppVersion());
+          await expect(load).rejects.toBeInstanceOf(ClerkAPIResponseError);
+          expect(sut.status).toBe('error');
+
+          reloadClientFetch.resolve({ signedInSessions: [] });
+          await reload;
+
+          expect(sut.status).toBe('ready');
+        });
+
+        it('does not report ready again after a load that succeeded', async () => {
+          const sut = new Clerk(productionPublishableKey);
+          mockClientFetch.mockResolvedValue({ signedInSessions: [] });
+          await sut.load({ standardBrowser: false });
+          const statuses: string[] = [];
+          sut.on('status', status => statuses.push(status));
+
+          await sut.__internal_reloadInitialResources();
+
+          expect(sut.status).toBe('ready');
+          expect(statuses).toEqual([]);
+        });
+      });
+    });
+
+    describe('__internal_reloadInitialResources after a failed standard browser load', () => {
+      const unsupportedAppVersion = () =>
+        new ClerkAPIResponseError('Unsupported app version', { data: [], status: 403 });
+
+      it('does not finish the failed load', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        mockClientFetch.mockRejectedValueOnce(unsupportedAppVersion());
+        await expect(sut.load()).rejects.toBeInstanceOf(ClerkAPIResponseError);
+        const statuses: string[] = [];
+        sut.on('status', status => statuses.push(status));
+        mockClientFetch.mockResolvedValueOnce({ signedInSessions: [] });
+
+        await sut.__internal_reloadInitialResources();
+
+        expect(sut.status).toBe('error');
+        expect(statuses).toEqual([]);
+      });
+
+      it('does not finish a load that fails after a reload succeeded during it', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        const loadClientFetch = createDeferredPromise();
+        mockClientFetch.mockReturnValueOnce(loadClientFetch.promise);
+
+        const load = sut.load();
+        await vi.waitFor(() => expect(mockClientFetch).toHaveBeenCalledTimes(1));
+        mockClientFetch.mockResolvedValueOnce({ signedInSessions: [] });
+        await sut.__internal_reloadInitialResources();
+        loadClientFetch.reject(unsupportedAppVersion());
+
+        await expect(load).rejects.toBeInstanceOf(ClerkAPIResponseError);
+        expect(sut.status).toBe('error');
+      });
     });
   });
 
@@ -1273,6 +1422,7 @@ describe('Clerk singleton', () => {
   describe('.signOut()', () => {
     const mockClientDestroy = vi.fn();
     const mockClientRemoveSessions = vi.fn();
+    const mockClientSignOut = vi.fn();
     const mockSession1 = { id: '1', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
     const mockSession2 = { id: '2', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
     const mockSession3 = { id: '3', remove: vi.fn(), status: 'pending', user: {}, getToken: vi.fn() };
@@ -1287,9 +1437,334 @@ describe('Clerk singleton', () => {
     beforeEach(() => {
       mockClientDestroy.mockReset();
       mockClientRemoveSessions.mockReset();
+      mockClientSignOut.mockReset();
+      vi.mocked(Client.isClientResource).mockReturnValue(false);
       mockSession1.remove.mockReset();
       mockSession2.remove.mockReset();
       mockSession3.remove.mockReset();
+    });
+
+    describe('satellite sign-out', () => {
+      beforeEach(() => {
+        Object.defineProperty(window, 'location', { value: new URL('https://satellite.test') });
+        vi.mocked(Client.isClientResource).mockReturnValue(true);
+        mockClientSignOut.mockResolvedValue({ signOutUrl: 'https://primary.test/v1/client/sign_out' });
+        mockClientFetch.mockResolvedValue({
+          ...clientTouchDefaults,
+          cookieExpiresAt: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000),
+          signedInSessions: [mockSession1, mockSession2],
+          sessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
+          __internal_signOut: mockClientSignOut,
+        });
+      });
+
+      it('uses the backend URL even with a long-lived cookie', async () => {
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ redirectUrl: '/after-sign-out?tab=security#settings' });
+
+        expect(mockClientSignOut).toHaveBeenCalledWith({
+          redirectUrl: 'https://satellite.test/after-sign-out?tab=security#settings',
+        });
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+      });
+
+      it.each([false, true])(
+        'does not request repair when persistence is disabled and callback=%s',
+        async withCallback => {
+          const callback = withCallback ? vi.fn() : undefined;
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, experimental: { persistClient: false } });
+          const options = { __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out' };
+          await (callback ? sut.signOut(callback, options) : sut.signOut(options));
+
+          expect(mockClientDestroy).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+          if (callback) {
+            expect(callback).toHaveBeenCalledExactlyOnceWith();
+            expect(sut.navigate).not.toHaveBeenCalled();
+          } else {
+            expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+          }
+        },
+      );
+
+      it.each(['http://satellite.test/signed-out', 'my-app://signed-out', 'https://user:password@satellite.test/'])(
+        'keeps unsupported destination %s on the existing sign-out path',
+        async redirectUrl => {
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true });
+          await sut.signOut({ redirectUrl });
+
+          expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith(redirectUrl);
+        },
+      );
+
+      it.each([true, false])(
+        'removes sessions before malformed destination navigation fails with persistClient=%s',
+        async persistClient => {
+          const error = new TypeError('Invalid navigation URL');
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn().mockRejectedValue(error);
+          await sut.load({ isSatellite: true, experimental: { persistClient } });
+          await expect(sut.signOut({ redirectUrl: 'https://' })).rejects.toBe(error);
+
+          expect(persistClient ? mockClientRemoveSessions : mockClientDestroy).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://');
+        },
+      );
+
+      it.each([true, false])(
+        'preserves callbacks with malformed redirect options and persistClient=%s',
+        async persistClient => {
+          const callback = vi.fn();
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, experimental: { persistClient } });
+          await sut.signOut(callback, {
+            redirectUrl: 'https://',
+            __internal_satelliteSignOutRedirectUrl: 'https://',
+          });
+
+          expect(persistClient ? mockClientRemoveSessions : mockClientDestroy).toHaveBeenCalledOnce();
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(callback).toHaveBeenCalledExactlyOnceWith();
+          expect(sut.navigate).not.toHaveBeenCalled();
+        },
+      );
+
+      it('prefers the backend URL over a cookie refresh', async () => {
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut();
+
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
+      });
+
+      it('keeps the existing redirect when an older backend omits the URL', async () => {
+        mockClientSignOut.mockResolvedValue({});
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ redirectUrl: '/after?tab=security#settings' });
+
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/after?tab=security#settings');
+      });
+
+      it('keeps the cookie refresh fallback when an older backend omits the URL', async () => {
+        mockClientSignOut.mockResolvedValue({});
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut();
+
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://clerk.example.com/v1/client/touch');
+      });
+
+      it.each([true, false])(
+        'completes local sign-out after a network error with persistClient=%s',
+        async persistClient => {
+          (persistClient ? mockClientSignOut : mockClientDestroy).mockRejectedValue(
+            new ClerkRuntimeError('Offline', { code: 'network_error' }),
+          );
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, experimental: { persistClient } });
+          await expect(sut.signOut()).resolves.toBeUndefined();
+
+          expect(sut.session).toBeNull();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+        },
+      );
+
+      it('repairs a built-in callback sign-out', async () => {
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback, {
+          __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out?tab=security#settings',
+        });
+
+        expect(mockClientSignOut).toHaveBeenCalledExactlyOnceWith({
+          redirectUrl: 'https://satellite.test/signed-out?tab=security#settings',
+        });
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
+        expect(callback).not.toHaveBeenCalled();
+      });
+
+      it.each([
+        undefined,
+        '',
+        '/relative',
+        'not a URL',
+        'https://',
+        'javascript:alert(1)',
+        'http://primary.test/repair',
+      ])('preserves the original callback when the repair URL is %s', async signOutUrl => {
+        mockClientSignOut.mockResolvedValue({ signOutUrl });
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback, {
+          __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out',
+        });
+
+        expect(mockClientSignOut).toHaveBeenCalledOnce();
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(sut.navigate).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+      });
+
+      it('propagates the original callback rejection without retrying sign-out', async () => {
+        mockClientSignOut.mockResolvedValue({});
+        const error = new Error('Callback failed');
+        const callback = vi.fn().mockRejectedValue(error);
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await expect(
+          sut.signOut(callback, {
+            __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out',
+          }),
+        ).rejects.toBe(error);
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).toHaveBeenCalledOnce();
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('preserves the callback after a repair request network error', async () => {
+        mockClientSignOut.mockRejectedValue(new ClerkRuntimeError('Offline', { code: 'network_error' }));
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback, { __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out' });
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).toHaveBeenCalledOnce();
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('preserves a custom callback with redirect options and an expiring cookie', async () => {
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback, { redirectUrl: '/signed-out' });
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('keeps sign-out working when an older client resource has no repair method', async () => {
+        const client = await mockClientFetch();
+        delete client.__internal_signOut;
+        vi.mocked(Client.isClientResource).mockReturnValue(false);
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ redirectUrl: '/signed-out' });
+
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/signed-out');
+      });
+
+      it('preserves arbitrary callbacks without opting in', async () => {
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback);
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('does not opt in on a primary domain', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = vi.fn();
+        await sut.load();
+        await sut.signOut();
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      it('does not opt in for a nonstandard browser', async () => {
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true, standardBrowser: false });
+        await sut.signOut();
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      it('does not opt in for development satellites', async () => {
+        const sut = new Clerk(developmentPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true, signInUrl: 'https://primary.test/sign-in' });
+        await sut.signOut();
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      it('keeps targeted multisession removal on a satellite', async () => {
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ sessionId: '1' });
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockSession1.remove).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      mockNativeRuntime(() => {
+        it('does not opt in for native runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, standardBrowser: false });
+          await sut.signOut();
+
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+        });
+      });
     });
 
     it('has no effect if called when no sessions exist', async () => {

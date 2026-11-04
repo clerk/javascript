@@ -6,6 +6,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../../props';
 import { colorVars, radiusVars, space } from '../../../tokens.stylex';
+import { Button } from '../../button';
+import { ButtonContext } from '../../button/button.context';
 import { Card } from '../../card';
 import type { DialogVariant } from '../dialog';
 import { Dialog } from '../dialog';
@@ -392,6 +394,38 @@ describe('stacked backdrops', () => {
     const popups = document.querySelectorAll('.cl-dialog-popup');
     expect(popups[0]).toHaveAttribute('data-stack-base', '');
     expect(popups[1]).not.toHaveAttribute('data-stack-base');
+  });
+});
+
+describe('button defaults', () => {
+  it('does not inherit full width from a card footer it is opened from', () => {
+    render(
+      <Card.Footer>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('does not inherit disabled from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).toBeEnabled();
   });
 });
 

@@ -73,7 +73,6 @@ export function ReverificationError({ reason, onClose }: { reason: Reverificatio
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             onClick={onClose}
           >
             {m.error.close}
@@ -103,6 +102,7 @@ export function ReverificationPending() {
         <Button
           type='button'
           disabled
+          fullWidth={false}
           xstyle={styles.pendingAction}
         >
           {m.continue}

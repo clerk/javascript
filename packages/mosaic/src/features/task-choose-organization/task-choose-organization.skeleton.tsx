@@ -29,15 +29,15 @@ export function TaskChooseOrganizationSkeleton({
         >
           {PLACEHOLDER_ORGANIZATIONS.map(name => (
             <Item.Root key={name}>
-              <Item.Media>
-                <Skeleton>
+              <Skeleton shape='rounded'>
+                <Item.Media>
                   <RowAvatar
                     name={name}
                     shape='square'
                     size='fit'
                   />
-                </Skeleton>
-              </Item.Media>
+                </Item.Media>
+              </Skeleton>
               <Item.Content>
                 <Item.Label>
                   <Skeleton>{name}</Skeleton>

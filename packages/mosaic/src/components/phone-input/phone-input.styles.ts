@@ -51,7 +51,7 @@ export const styles = stylex.create({
     width: space['4'],
   },
   divider: {
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     flexShrink: 0,
     height: space['3.5'],
     width: '1px',
@@ -77,7 +77,7 @@ export const styles = stylex.create({
   countrySearchRow: {
     gap: space['1'],
     alignItems: 'center',
-    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndColor: colorVars['--cl-color-border-subtle'],
     borderBlockEndStyle: 'solid',
     borderBlockEndWidth: '1px',
     display: 'flex',

@@ -120,6 +120,8 @@ export type {
 } from '../components/table';
 export { SegmentedControl } from '../components/segmented-control';
 export type { SegmentedControlItemProps, SegmentedControlRootProps } from '../components/segmented-control';
+export { Separator } from '../components/separator';
+export type { SeparatorProps } from '../components/separator';
 export { Tabs } from '../components/tabs';
 export type {
   TabsListProps,

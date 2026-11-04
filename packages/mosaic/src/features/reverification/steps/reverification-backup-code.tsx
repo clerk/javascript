@@ -98,7 +98,6 @@ export function ReverificationBackupCode({
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={isPending}
             onClick={onCancel}
           >
@@ -107,7 +106,6 @@ export function ReverificationBackupCode({
         ) : null}
         <SubmitButton
           form={formId}
-          fullWidth
           disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}

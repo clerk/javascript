@@ -23,6 +23,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
 | Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
 | Add a public prop that shows or hides UI  | [Public visibility props](docs/public-props.md)                                   |
+| Prove a change in a browser               | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                            |
 
 ## Layers in one paragraph
 
@@ -57,10 +58,14 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | An organization permission checked with `checkAuthorization`             | `ORGANIZATION_PERMISSIONS` (`src/utils/permissions.ts`)                                                                                |
 | A verification code's length or resend cooldown                          | `CODE_LENGTH`, `CODE_RESEND_SECONDS` (`src/utils/verification.ts`)                                                                     |
 | An avatar or logo file picker and its rejection errors                   | `AVATAR_UPLOAD`, `AVATAR_REJECTION_ERRORS` (`src/utils/avatar-upload.ts`)                                                              |
+| An avatar or logo row: picker, drop target, Upload button or manage menu | `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller                                                                   |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                                         |
 | An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                                          |
+| Arrow-key navigation with one tab stop across a group of items           | `useComposite`, with `useCompositeItems` and `useCompositeItem` (`src/primitives/hooks/`)                                              |
 | A panel that animates open and closed to its measured size               | `usePanelSize` (`src/primitives/hooks/`)                                                                                               |
 | One screen replacing another on the same card or dialog                  | `Flow` (`src/components/flow/`), see [Views](docs/views.md)                                                                            |
+| A form on a card or dialog step                                          | `useForm` in the controller, passed to the view as `form`, see [Views](docs/views.md)                                                  |
+| Deciding which part renders `Card.Root`                                  | Only the surface, never a screen or `*Steps`, see [Views](docs/views.md)                                                               |
 | An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                                                       |
 | Styles several components share                                          | `src/styles/*.styles.ts`                                                                                                               |
 
@@ -75,6 +80,10 @@ Stop and check the table if you are writing any of these in a feature:
 - `setTimeout` to debounce or to delay a spinner
 - `stylex.create` inside a `.tsx` file
 - a conditional or early return that swaps one screen for another on the same card or dialog
+- `Card.Root` in a screen or a `*Steps` component
+- a value check, `preventDefault` or `useId` for a form in a view
+
+The form rule applies when you add or rewrite a form. Some existing forms predate it.
 
 ## Nested radii
 

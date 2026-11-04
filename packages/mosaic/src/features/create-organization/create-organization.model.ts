@@ -5,7 +5,7 @@ import type { CreateOrganizationProps, OrganizationResource } from '@clerk/share
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { save } from '../../utils/errors';
-import { rejectedEmailAddresses } from '../organization-profile/organization-profile-members-panel/invitations-table-tab.model';
+import { rejectedEmailAddresses } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.model';
 import { resolveAfterUrl } from '../switcher/switcher.model';
 import type {
   CreatedOrganization,

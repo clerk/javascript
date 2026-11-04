@@ -139,6 +139,12 @@ import {
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
 import {
+  CustomElement as InviteMembersButtonCustomElement,
+  Default as InviteMembersButtonDefault,
+  meta as inviteMembersButtonMeta,
+  Unavailable as InviteMembersButtonUnavailable,
+} from '../stories/invite-members-button.stories';
+import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -309,6 +315,11 @@ import {
   Placeholder as SelectComponentPlaceholder,
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
 import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
@@ -724,6 +735,13 @@ const userButtonModule: StoryModule = {
   User: UserButtonUser,
 };
 
+const inviteMembersButtonModule: StoryModule = {
+  meta: inviteMembersButtonMeta,
+  Default: InviteMembersButtonDefault,
+  CustomElement: InviteMembersButtonCustomElement,
+  Unavailable: InviteMembersButtonUnavailable,
+};
+
 const waitlistModule: StoryModule = {
   meta: waitlistMeta,
   Default: WaitlistDefault,
@@ -909,6 +927,12 @@ const segmentedControlModule: StoryModule = {
   meta: segmentedControlMeta,
   Default: SegmentedControlDefault,
   Disabled: SegmentedControlDisabled,
+};
+
+const separatorModule: StoryModule = {
+  meta: separatorMeta,
+  Default: SeparatorDefault,
+  Labelled: SeparatorLabelled,
 };
 
 const switchModule: StoryModule = {
@@ -1146,6 +1170,7 @@ export const registry: StoryModule[] = [
   organizationListModule,
   taskChooseOrganizationModule,
   userAvatarModule,
+  inviteMembersButtonModule,
   apiKeysTableModule,
   reverificationModule,
   waitlistModule,
@@ -1187,6 +1212,7 @@ export const registry: StoryModule[] = [
   revealModule,
   sectionModule,
   segmentedControlModule,
+  separatorModule,
   selectComponentModule,
   switchModule,
   tableModule,

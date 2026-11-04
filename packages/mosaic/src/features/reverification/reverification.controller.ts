@@ -35,7 +35,7 @@ export type ReverificationController = ReverificationControllerState & {
   visible: boolean;
 };
 
-type OverlayFrom = 'factor' | 'method-picker';
+type Overlay = Extract<ReverificationStep, 'method-picker' | 'help'>;
 
 export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prepare' | 'attempt' | 'finish'>;
 
@@ -48,7 +48,7 @@ interface ReverificationContext {
   resendAvailableAt: number | undefined;
   submitRequested: boolean;
   frozenActiveMethodId: string | undefined;
-  overlayFrom: OverlayFrom;
+  overlay: readonly Overlay[];
   supportEmail: string;
   deps: ReverificationDeps;
 }
@@ -144,29 +144,52 @@ const afterResult = [
   { target: 'verifying' as const, actions: applyResult },
 ];
 
+function topOverlay(ctx: ReverificationContext): Overlay | undefined {
+  return ctx.overlay[ctx.overlay.length - 1];
+}
+
 const factorEvents = {
   TYPE: {
     actions: assign((_, event) => ({ inputValue: event.value, errors: [] })),
   },
   SHOW_METHODS: {
-    target: 'methodPicker',
-    guard: ctx => ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
+    guard: ctx =>
+      ctx.overlay.length === 0 && ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
     actions: assign(ctx => ({
+      overlay: ['method-picker' as const],
       direction: 1 as const,
-      overlayFrom: 'factor' as const,
       submitRequested: false,
       frozenActiveMethodId: ctx.activeMethod?.id,
     })),
   },
   SHOW_HELP: {
-    target: 'help',
-    actions: assign(() => ({
+    guard: ctx => topOverlay(ctx) !== 'help',
+    actions: assign(ctx => ({
+      overlay: [...ctx.overlay, 'help' as const],
       direction: 1 as const,
-      overlayFrom: 'factor' as const,
       submitRequested: false,
     })),
   },
-  RESET: 'inactive',
+  BACK: {
+    guard: ctx => ctx.overlay.length > 0,
+    actions: assign(ctx => ({ overlay: ctx.overlay.slice(0, -1), direction: -1 as const })),
+  },
+  SELECT_METHOD: [
+    {
+      target: 'methodPickerPreparing' as const,
+      guard: (ctx, event) => {
+        const method = ctx.methods.find(candidate => candidate.id === event.id);
+        return topOverlay(ctx) === 'method-picker' && Boolean(method && needsPrepare(method));
+      },
+      actions: assign((ctx, event) => selectMethod(ctx, event.id)),
+    },
+    {
+      target: 'verifying' as const,
+      guard: ctx => topOverlay(ctx) === 'method-picker',
+      actions: assign((ctx, event) => ({ ...selectMethod(ctx, event.id), overlay: [] })),
+    },
+  ],
+  RESET: 'inactive' as const,
 } satisfies NonNullable<StateConfig<ReverificationContext, ReverificationEvent>['on']>;
 
 export const reverificationMachine = createMachine({
@@ -181,7 +204,7 @@ export const reverificationMachine = createMachine({
     resendAvailableAt: undefined,
     submitRequested: false,
     frozenActiveMethodId: undefined,
-    overlayFrom: 'factor',
+    overlay: [],
     supportEmail: '',
     deps: unseatedDeps,
   },
@@ -191,6 +214,7 @@ export const reverificationMachine = createMachine({
         inputValue: '',
         errors: [],
         submitRequested: false,
+        overlay: [],
         ...unlockResend(),
       })),
       on: { START: 'starting' },
@@ -214,6 +238,7 @@ export const reverificationMachine = createMachine({
       on: {
         ...factorEvents,
         SUBMIT: {
+          guard: ctx => ctx.overlay.length === 0,
           actions: assign(() => ({ submitRequested: true })),
         },
       },
@@ -247,10 +272,10 @@ export const reverificationMachine = createMachine({
       entry: assign(() => lockResend()),
       on: { RESET: 'inactive' },
       invoke: fromPromise(prepareActive, {
-        onDone: 'verifying',
+        onDone: { target: 'verifying', actions: assign(() => ({ overlay: [] })) },
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error), ...unlockResend() })),
+          actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error), overlay: [], ...unlockResend() })),
         },
       }),
     },
@@ -259,10 +284,11 @@ export const reverificationMachine = createMachine({
       always: [{ guard: ctx => ctx.activeMethod === null, target: 'unavailable' }],
       on: {
         ...factorEvents,
-        SUBMIT: 'submitting',
+        SUBMIT: { target: 'submitting', guard: ctx => ctx.overlay.length === 0 },
         RESEND: {
           target: 'preparing',
           guard: ctx =>
+            ctx.overlay.length === 0 &&
             Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod)) &&
             (ctx.resendAvailableAt === undefined || Date.now() >= ctx.resendAvailableAt),
           actions: assign(() => ({
@@ -291,42 +317,6 @@ export const reverificationMachine = createMachine({
           },
         ],
       }),
-    },
-
-    methodPicker: {
-      on: {
-        SELECT_METHOD: [
-          {
-            target: 'methodPickerPreparing',
-            guard: (ctx, event) => {
-              const method = ctx.methods.find(candidate => candidate.id === event.id);
-              return Boolean(method && needsPrepare(method));
-            },
-            actions: assign((ctx, event) => selectMethod(ctx, event.id)),
-          },
-          { target: 'verifying', actions: assign((ctx, event) => selectMethod(ctx, event.id)) },
-        ],
-        SHOW_HELP: {
-          target: 'help',
-          actions: assign(() => ({ direction: 1 as const, overlayFrom: 'method-picker' as const })),
-        },
-        BACK: { target: 'verifying', actions: assign(() => ({ direction: -1 as const })) },
-        RESET: 'inactive',
-      },
-    },
-
-    help: {
-      on: {
-        BACK: [
-          {
-            target: 'methodPicker',
-            guard: ctx => ctx.overlayFrom === 'method-picker',
-            actions: assign(() => ({ direction: -1 as const })),
-          },
-          { target: 'verifying', actions: assign(() => ({ direction: -1 as const })) },
-        ],
-        RESET: 'inactive',
-      },
     },
 
     unavailable: {
@@ -377,12 +367,13 @@ function factorStep(method: ReverificationMethod): ReverificationStep {
   return 'otp';
 }
 
-function viewStep(value: string, method: ReverificationMethod | null): ReverificationStep | undefined {
-  if (value === 'methodPicker' || value === 'methodPickerPreparing') {
-    return 'method-picker';
-  }
-  if (value === 'help') {
-    return 'help';
+function viewStep(
+  value: string,
+  overlay: Overlay | undefined,
+  method: ReverificationMethod | null,
+): ReverificationStep | undefined {
+  if (overlay) {
+    return overlay;
   }
   if (
     value === 'verifying' ||
@@ -493,7 +484,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       return { status: 'error', reason: 'generic', onCancel };
     }
 
-    const step = viewStep(state, activeMethod);
+    const step = viewStep(state, topOverlay(context), activeMethod);
 
     if (!step) {
       return { status: 'loading', onCancel };

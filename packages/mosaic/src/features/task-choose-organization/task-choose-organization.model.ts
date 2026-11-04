@@ -89,8 +89,8 @@ export function useTaskChooseOrganizationModel({
     advisory:
       advisory?.code === 'organization_already_exists'
         ? {
-            organizationName: advisory.meta.organization_name ?? '',
-            organizationDomain: advisory.meta.organization_domain ?? '',
+            organizationName: advisory.meta['organization_name'] ?? '',
+            organizationDomain: advisory.meta['organization_domain'] ?? '',
           }
         : undefined,
     createOrganization:
