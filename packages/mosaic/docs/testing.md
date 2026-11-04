@@ -36,8 +36,10 @@ Rule of thumb: **test each behavior once, at the boundary that owns it.**
 | Feature | `*.feature.test.tsx`        | Chromium (`pnpm test:feature`)                | A feature end to end: real `Clerk`, real layers, FAPI faked with MSW    |
 | E2E     | `/integration` (Playwright) | Real apps against a real Clerk backend        | Framework wiring, redirects, real sessions. Not written per Mosaic flow |
 
-Visual states (loading, empty, every error, every variant) are swingset stories
-with plain props, reviewed by eye. Don't duplicate them as view tests.
+Most visual states (loading, empty, every error, every variant) are swingset
+stories with plain props, reviewed by eye. A small screenshot suite covers
+representative compositions, as described in [Screenshot tests](#screenshot-tests).
+Don't duplicate every story as a view or screenshot test.
 
 Each behavior lives in one tier. A feature test owns everything the feature
 does on screen, including edge cases, busy states, and errors. E2E only proves
@@ -99,8 +101,8 @@ pnpm --filter @clerk/mosaic test:browser              # layout tests (Chromium)
 pnpm --filter @clerk/mosaic exec vitest run           # every project
 ```
 
-CI runs feature tests in their own `Mosaic Feature Tests` job, so the repo-wide
-unit test job never needs a browser.
+CI runs feature and screenshot tests in separate `Mosaic Feature Tests` and
+`Mosaic Visual Tests` jobs, so the repo-wide unit test job never needs a browser.
 
 jsdom and happy-dom have no layout engine, so every rect is 0 and a test that
 asserts on position, size or scrolling always passes there. Name such a test
@@ -110,6 +112,56 @@ Feature and browser tests need Chromium: run `pnpm playwright install chromium` 
 import the built `@clerk/clerk-js`, so run `pnpm turbo build --filter=@clerk/clerk-js`
 after changing it. Failure screenshots land in `packages/mosaic/.vitest/`.
 Console output from passing tests only shows with `--reporter=verbose`.
+
+## Screenshot tests
+
+The `visual` project runs `*.visual.test.tsx` in Chromium, using the feature
+project's Clerk and MSW setup. Tests and their fixtures live in Mosaic, beside
+the feature they cover. They do not import Swingset stories or fixtures.
+
+Screenshots are generated and compared only inside one digest-pinned Playwright
+image, locally and in CI, because fonts and Chromium draw slightly differently
+on each operating system.
+
+```bash
+pnpm --filter @clerk/mosaic test:visual
+pnpm --filter @clerk/mosaic test:visual:update
+```
+
+Both commands require Docker. Locally, they mount your checkout into the image
+and install Linux dependencies into Docker volumes, so your own `node_modules`
+is untouched and later runs reuse the install. The first command compares
+screenshots without changing baselines. The second deletes the Linux baselines,
+lets Vitest write every screenshot again, and restores the old ones if the run
+fails, so new screenshots are created and ones no test produces are removed.
+Review the changed images and commit them under each test's `__screenshots__/`
+directory. Failed comparisons write actual, expected, and diff images under
+`packages/mosaic/.vitest/attachments/`.
+
+Use these package commands for screenshots. Calling Vitest directly bypasses
+the pinned image.
+
+Add a screenshot only when it covers a distinct layout or visual state that the
+existing ones miss. Capture the element under test (a dialog, a popup, or the
+rendered container), not `page`, so page padding and unrelated content stay out
+of the baseline. Content taller than the viewport is cut off, so resize the
+viewport to the content's height first, as the user profile tests do.
+
+The suite fixes the viewport before each test, the bundled Inter font, color
+scheme, locale, time zone, and device scale, and compares with zero mismatched
+pixels allowed. The browser setup disables motion and hides carets. Use deterministic
+fixture data and avatar fallbacks, and wait for content before capturing the
+page so portaled menus and overlays are included.
+
+Baselines include the browser and operating system in their filenames. The
+`Mosaic Visual Tests` job builds the workspace on the runner, then compares in
+the same pinned image. Its comparison is advisory: screenshot differences
+appear as a warning and in the job summary without blocking the rest of CI. A
+failed build, or a comparison that crashes before writing images, still fails
+the job. On a difference, download
+`mosaic-visual-failure-artifacts-<run-id>-<run-attempt>` from the run and review
+the images in `.vitest/attachments/`, then run `test:visual:update` locally and
+commit the approved baselines.
 
 ## Feature tests
 

@@ -210,11 +210,13 @@ locale and overrides, so the copy can't be localized.
 ## Blocks
 
 A **block** is a view fragment that owns one piece of state nothing outside it can
-use, and takes the rest as props. There are two:
+use, and takes the rest as props. There are three:
 
 - `blocks/destructive` (`Destructive`) holds the half-typed confirmation phrase
   and compares it.
 - `blocks/confirmation` (`Confirmation`) is a confirm step with no typed phrase.
+- `blocks/avatar-upload` (`AvatarUpload`) is an avatar or logo picker. Its parts
+  share the file input, so the caller places them in its own layout.
 
 Both take a `controller` from `useConfirmController` (`blocks/confirm/`), which
 decides whether the dialog closes or explains itself. The hook runs in the

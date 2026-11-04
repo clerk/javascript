@@ -5,6 +5,7 @@ import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMess
 import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
+import { downloadBackupCodes, printBackupCodes } from '../../../utils/backup-codes';
 import { toLocalizableError } from '../../../utils/errors';
 import { CODE_RESEND_SECONDS } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
@@ -378,38 +379,19 @@ function createBackupCodeActions(
     if (flow.kind !== 'backup' || !flow.codes.length) {
       return;
     }
-    const content = [fill(m.fileIntro, fileValues), m.fileInstructions, '', ...flow.codes].join('\n');
-    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = fill(m.fileName, fileValues);
-    anchor.click();
-    URL.revokeObjectURL(url);
+    downloadBackupCodes({
+      codes: flow.codes,
+      fileName: fill(m.fileName, fileValues),
+      intro: fill(m.fileIntro, fileValues),
+      instructions: m.fileInstructions,
+    });
   };
 
   const print = () => {
     if (flow.kind !== 'backup' || !flow.codes.length) {
       return;
     }
-    const titleText = fill(m.printTitle, fileValues);
-    const printable = window.open('', '_blank', 'width=640,height=720');
-    if (!printable) {
-      send({ type: 'PRINT_FAILED' });
-      return;
-    }
-    try {
-      printable.document.title = titleText;
-      const title = printable.document.createElement('h1');
-      title.textContent = titleText;
-      const codes = printable.document.createElement('pre');
-      codes.textContent = flow.codes.join('\n');
-      printable.document.body.append(title, codes);
-      printable.addEventListener('afterprint', () => printable.close(), { once: true });
-      printable.setTimeout(() => printable.close(), 60_000);
-      printable.focus();
-      printable.print();
-    } catch {
-      printable.close();
+    if (!printBackupCodes({ codes: flow.codes, title: fill(m.printTitle, fileValues) })) {
       send({ type: 'PRINT_FAILED' });
     }
   };

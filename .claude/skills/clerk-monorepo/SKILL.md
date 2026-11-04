@@ -201,8 +201,6 @@ Full decision matrix:
 - `docs/PUBLISH.md`: release process (stable, canary, snapshot, backport, `!allow-major`).
 - `docs/CICD.md`: CI/CD pipeline and automated releases.
 - `docs/SECURITY.md`: vulnerability reporting (do **not** open public issues).
-- `references/theming-architecture.md` (repo root, not this skill's `references/`): deep dive on the
-  `@clerk/ui` appearance/theming system.
 - Bundled: [`setup-and-footguns.md`](references/setup-and-footguns.md),
   [`package-map.md`](references/package-map.md),
   [`breaking-changes.md`](references/breaking-changes.md),

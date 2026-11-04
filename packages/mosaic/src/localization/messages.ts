@@ -54,7 +54,9 @@ function own<T>(record: Partial<Record<string, T>> | undefined, key: string): T 
 
 export function fill<T extends string>(template: T, values: Values<T, string | number>): string;
 export function fill(template: string, values: Partial<MessageValues>): string {
-  return template.replace(/\{(\w+)\}/g, (match, key: string) => String(own(values, key) ?? match));
+  return template
+    .replace(/\{(?:#\w+\/?|\/\w+)\}/g, '')
+    .replace(/\{(\w+)\}/g, (match, key: string) => String(own(values, key) ?? match));
 }
 
 export function plural<F extends PluralForms>(

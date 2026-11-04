@@ -116,8 +116,8 @@ export function WithMedia() {
 
 export function OAuthConsent() {
   return (
-    <Card.Root>
-      <Card.Header align='center'>
+    <Card.Root align='center'>
+      <Card.Header>
         <Card.Media xstyle={styles.connection}>
           <Avatar.Root
             shape='square'

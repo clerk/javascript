@@ -41,7 +41,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'issue_comment' && format('issue-{0}-{1}', github.event.issue.number, github.actor) || github.event_name == 'workflow_dispatch' && format('snapshot-{0}-{1}', inputs.pr_number, inputs.requester) || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'push' || contains(github.event.head_commit.message, 'Version packages') }}
 
 jobs:
   release:
@@ -171,8 +171,8 @@ jobs:
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }
 
-      # Recovery: if the changesets action published to npm but then failed
-      # (e.g. git push --follow-tags error), the `published` output is never
+      # Recovery: if the changesets action published to npm but then failed,
+      # the `published` output is never
       # set and downstream repos are not notified. This step detects that
       # scenario by checking npm for the local package version and dispatches
       # if the packages are already live.

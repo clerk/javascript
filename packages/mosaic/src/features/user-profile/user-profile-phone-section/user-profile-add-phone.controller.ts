@@ -53,7 +53,7 @@ function missingDependency(): Promise<never> {
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
 const start = {
-  target: 'sending' as const,
+  target: 'sendingFirstCode' as const,
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
     verifyingId: event.id,
     phoneNumber: event.phoneNumber,
@@ -94,6 +94,7 @@ const machine = createMachine({
       on: { CANCEL: 'idle', START: start },
     },
     preparing: sendCode,
+    sendingFirstCode: sendCode,
     sending: sendCode,
     verify: {
       on: {
@@ -147,9 +148,10 @@ export function useUserProfileAddPhoneController({
   }, [open, resendSeconds, send]);
 
   const isReverifying = phoneForm.isSubmitting && Boolean(reverification?.visible);
-  const step = isReverifying ? 'reverify' : state === 'phone' ? 'phone' : 'verify';
-  const form = state === 'phone' ? phoneForm : codeForm;
-  const formError = state === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
+  const isPhoneStep = state === 'phone' || state === 'sendingFirstCode';
+  const step = isReverifying ? 'reverify' : isPhoneStep ? 'phone' : 'verify';
+  const form = isPhoneStep ? phoneForm : codeForm;
+  const formError = isPhoneStep ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
@@ -159,10 +161,10 @@ export function useUserProfileAddPhoneController({
     open,
     step,
     reverification,
-    phoneNumber: state === 'phone' ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
+    phoneNumber: isPhoneStep ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
     code: codeForm.values.code,
     errorMessage: formError?.message ?? form.error ?? machineError,
-    isPending: form.isSubmitting,
+    isPending: form.isSubmitting || state === 'sendingFirstCode',
     onOpenChange: open => {
       if (form.isSubmitting) {
         if (open || state !== 'phone' || !reverification?.onCancel) {

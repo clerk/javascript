@@ -67,6 +67,7 @@ export function OrganizationProfileEditNameDialog({
           >
             <Field.Root
               disabled={form.isSubmitting}
+              focusableWhenDisabled
               invalid={feedback?.type === 'error'}
             >
               <Field.Label visuallyHidden>{m.name.fieldLabel}</Field.Label>

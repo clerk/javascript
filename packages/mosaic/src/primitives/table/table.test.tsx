@@ -1249,6 +1249,50 @@ describe('Table', () => {
       expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
     });
 
+    it('leaves focus alone when navigation comes back after focus left', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<LogsTable selectionMode='multiple' />);
+
+      await tabIntoTable(user);
+      rerender(<LogsTable selectionMode='none' />);
+      screen.getByRole('button', { name: 'After' }).focus();
+      rerender(<LogsTable selectionMode='multiple' />);
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
+    });
+
+    it('keeps the tab stop on the same row when navigation comes back', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<LogsTable selectionMode='multiple' />);
+
+      await tabIntoTable(user);
+      await user.keyboard('{End}');
+      rerender(<LogsTable selectionMode='none' />);
+      rerender(<LogsTable selectionMode='multiple' />);
+
+      expect(row('Charlie')).toHaveAttribute('tabindex', '0');
+    });
+
+    it('leaves focus outside the table when rows return after the table emptied', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<LogsTable selectionMode='multiple' />);
+
+      await tabIntoTable(user);
+      rerender(
+        <LogsTable
+          selectionMode='multiple'
+          items={[]}
+        />,
+      );
+      await new Promise(resolve => setTimeout(resolve, 0));
+      screen.getByRole('button', { name: 'After' }).focus();
+      rerender(<LogsTable selectionMode='multiple' />);
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
+    });
+
     it('keeps a tab stop when the focused row becomes disabled', async () => {
       const user = userEvent.setup();
       const { rerender } = render(<LogsTable selectionMode='multiple' />);

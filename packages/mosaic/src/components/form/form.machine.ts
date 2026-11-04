@@ -53,7 +53,6 @@ export interface FormContext<TValues extends object> extends FormDeps<TValues> {
   touched: Partial<Record<keyof TValues, true>>;
   async: Partial<Record<keyof TValues, AsyncFieldState>>;
   error: FormError<TValues> | undefined;
-  submitQueued: boolean;
 }
 
 export type FormEvent<TValues extends object> =
@@ -117,12 +116,12 @@ function submitOrStay<TValues extends object>(
 ): TransitionResult<FormContext<TValues>, FormState> {
   const next = { ...context, ...patch };
   if (!isValid(next)) {
-    return { context: { ...patch, submitQueued: false } };
+    return { target: 'editing', context: patch };
   }
   if (isValidating(next)) {
-    return { context: { ...patch, submitQueued: true } };
+    return { target: 'queued', context: patch };
   }
-  return { target: 'submitting', context: { ...patch, submitQueued: false } };
+  return { target: 'submitting', context: patch };
 }
 
 function displayableFields<TValues extends object>(
@@ -195,7 +194,7 @@ function asyncStateFor<TValues extends object>(
   return { value, feedback: context.async[name]?.feedback, pending: true };
 }
 
-type FormState = 'editing' | 'submitting';
+type FormState = 'editing' | 'queued' | 'submitting';
 
 export function createFormMachine<TValues extends object>(deps: FormDeps<TValues>) {
   const { createMachine, assign, fromPromise } = setup<FormContext<TValues>, FormEvent<TValues>>();
@@ -210,41 +209,29 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
       touched: {},
       async: {},
       error: undefined,
-      submitQueued: false,
     },
     states: {
       editing: {
         on: {
-          CHANGE: ({ context, event }) => ({
-            context: {
-              values: { ...context.values, [event.name]: event.value },
-              async: { ...context.async, [event.name]: asyncStateFor(context, event.name, event.value) },
-              error: withoutField(context.error, event.name),
-              submitQueued: false,
-            },
-          }),
-          TOUCH: ({ context, event }) => ({ context: { touched: { ...context.touched, [event.name]: true } } }),
+          CHANGE: ({ context, event }) => ({ context: changed(context, event) }),
+          TOUCH: ({ context, event }) => ({ context: touched(context, event) }),
           VALIDATED: ({ context, event }) => {
-            if (context.async[event.name]?.value !== event.value) {
-              return undefined;
-            }
-            const async = {
-              ...context.async,
-              [event.name]: { value: event.value, feedback: event.feedback, pending: false },
-            };
-            return context.submitQueued ? submitOrStay(context, { async }) : { context: { async } };
+            const async = validated(context, event);
+            return async === undefined ? undefined : { context: { async } };
           },
           SUBMIT: ({ context }) => submitOrStay(context, { touched: mapKeys(context.values, (): true => true) }),
-          RESET: ({ context, event }) => ({
-            context: {
-              values: event.values ?? context.initialValues,
-              baseline: event.values,
-              touched: {},
-              async: {},
-              error: undefined,
-              submitQueued: false,
-            },
-          }),
+          RESET: ({ context, event }) => ({ context: resetTo(context, event) }),
+        },
+      },
+      queued: {
+        on: {
+          CHANGE: ({ context, event }) => ({ target: 'editing', context: changed(context, event) }),
+          TOUCH: ({ context, event }) => ({ context: touched(context, event) }),
+          VALIDATED: ({ context, event }) => {
+            const async = validated(context, event);
+            return async === undefined ? undefined : submitOrStay(context, { async });
+          },
+          RESET: ({ context, event }) => ({ target: 'editing', context: resetTo(context, event) }),
         },
       },
       submitting: {
@@ -268,4 +255,50 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
       },
     },
   });
+}
+
+type EventOf<TValues extends object, TType extends FormEvent<TValues>['type']> = Extract<
+  FormEvent<TValues>,
+  { type: TType }
+>;
+
+function changed<TValues extends object>(
+  context: FormContext<TValues>,
+  event: EventOf<TValues, 'CHANGE'>,
+): Partial<FormContext<TValues>> {
+  return {
+    values: { ...context.values, [event.name]: event.value },
+    async: { ...context.async, [event.name]: asyncStateFor(context, event.name, event.value) },
+    error: withoutField(context.error, event.name),
+  };
+}
+
+function touched<TValues extends object>(
+  context: FormContext<TValues>,
+  event: EventOf<TValues, 'TOUCH'>,
+): Partial<FormContext<TValues>> {
+  return { touched: { ...context.touched, [event.name]: true } };
+}
+
+function validated<TValues extends object>(
+  context: FormContext<TValues>,
+  event: EventOf<TValues, 'VALIDATED'>,
+): FormContext<TValues>['async'] | undefined {
+  if (context.async[event.name]?.value !== event.value) {
+    return undefined;
+  }
+  return { ...context.async, [event.name]: { value: event.value, feedback: event.feedback, pending: false } };
+}
+
+function resetTo<TValues extends object>(
+  context: FormContext<TValues>,
+  event: EventOf<TValues, 'RESET'>,
+): Partial<FormContext<TValues>> {
+  return {
+    values: event.values ?? context.initialValues,
+    baseline: event.values,
+    touched: {},
+    async: {},
+    error: undefined,
+  };
 }

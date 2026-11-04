@@ -19,7 +19,7 @@ describe('Mosaic IconFrame', () => {
     expect(frame).toHaveClass('cl-icon-frame');
     expect(frame).toHaveAttribute('data-bordered', '');
     expect(frame).not.toHaveAttribute('data-filled');
-    expect(frame).toHaveAttribute('data-size', 'xl');
+    expect(frame).toHaveAttribute('data-size', 'md');
   });
 
   it('reflects its treatment and size', () => {
