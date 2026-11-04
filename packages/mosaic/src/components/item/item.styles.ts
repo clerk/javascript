@@ -11,6 +11,7 @@ export const item = stylex.create({
     // last style that declares it, so the two can't merge.
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     borderRadius: radiusVars['--cl-radius-lg'],
+    borderStyle: 'none',
     paddingInline: space['1.5'],
     alignItems: 'center',
     color: colorVars['--cl-color-foreground-secondary'],
@@ -38,7 +39,7 @@ export const item = stylex.create({
       },
     },
     backgroundColor: {
-      default: null,
+      default: 'transparent',
       ':active:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
@@ -65,9 +66,9 @@ export const item = stylex.create({
 
   interactiveOutline: {
     borderColor: {
-      default: null,
+      default: colorVars['--cl-color-border'],
       '@media (hover: hover)': {
-        default: null,
+        default: colorVars['--cl-color-border'],
         ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-border'],
       },
     },

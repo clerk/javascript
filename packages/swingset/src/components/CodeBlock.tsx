@@ -9,7 +9,7 @@ const cssVariablesTheme = createCssVariablesTheme({ name: 'css-variables', varia
 
 let highlighterPromise: Promise<Highlighter> | null = null;
 
-function getHighlighter(): Promise<Highlighter> {
+export function getHighlighter(): Promise<Highlighter> {
   if (!highlighterPromise) {
     highlighterPromise = createHighlighter({
       themes: [cssVariablesTheme],

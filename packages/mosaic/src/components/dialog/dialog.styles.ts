@@ -389,6 +389,7 @@ const profileSurface = {
   // profile a scroll container, and focusing anything inside it that sits outside its box would
   // scroll the profile itself.
   overflow: 'clip',
+  overflowClipMargin: '1.5rem',
   // Fills the viewport's content box rather than computing a height from `dvh`. The grid row
   // is definite (see `styles.viewport`), so `stretch` lands the profile's edges on exactly the
   // lines a bottom-anchored sheet reaches with `align-self: end`, and clamps to them.

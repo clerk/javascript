@@ -1,6 +1,6 @@
 'use client';
 
-import { FlaskConicalIcon, SearchIcon } from 'lucide-react';
+import { ClapperboardIcon, FlaskConicalIcon, SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -135,6 +135,18 @@ export function AppSidebar({
                   Live Sandbox
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {process.env.NODE_ENV === 'development' && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    className='h-auto py-1 text-xs'
+                    isActive={pathname.startsWith('/studio')}
+                    render={<Link href='/studio' />}
+                  >
+                    <ClapperboardIcon className='size-3.5!' />
+                    Studio
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
