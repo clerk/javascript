@@ -28,6 +28,21 @@ describe('makeAuthObjectSerializable', () => {
       expect(typeof serializableAuthObject[key]).not.toBe('function');
     }
   });
+
+  it('keeps the agent property so it reaches the client initial state', () => {
+    const authObject = signedInAuthObject({} as AuthenticateContext, 'token', {
+      v: 2,
+      sid: 'sessionId',
+      sub: 'userId',
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    } as unknown as JwtPayload);
+
+    expect(makeAuthObjectSerializable(authObject).agent).toEqual({
+      sub: 'agent_123',
+      type: 'agent',
+      task_id: 'agttsk_456',
+    });
+  });
 });
 
 describe('signedInAuthObject', () => {
@@ -45,6 +60,32 @@ describe('signedInAuthObject', () => {
 
     const token = await authObject.getToken();
     expect(token).toBe('token');
+  });
+
+  it('exposes agent task sessions on the auth object', () => {
+    const authObject = signedInAuthObject({} as AuthenticateContext, 'token', {
+      v: 2,
+      sid: 'sessionId',
+      sub: 'userId',
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    } as unknown as JwtPayload);
+
+    expect(authObject.agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+    expect(authObject.actor).toBeUndefined();
+  });
+
+  it('agent is null for sessions without the agt claim', () => {
+    const authObject = signedInAuthObject({} as AuthenticateContext, 'token', {
+      v: 2,
+      sid: 'sessionId',
+      sub: 'userId',
+    } as unknown as JwtPayload);
+
+    expect(authObject.agent).toBeNull();
+  });
+
+  it('agent is null on the signed-out auth object', () => {
+    expect(signedOutAuthObject().agent).toBeNull();
   });
 
   it('redacts raw session and machine tokens from debug output', () => {

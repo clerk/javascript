@@ -28,6 +28,33 @@ describe('deriveState', () => {
     expect(result.orgId).toBe(mockInitialState.orgId);
   });
 
+  it('derives the agent from the SSR initial state', () => {
+    const agent = { sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' };
+    const result = deriveState(false, {} as Resources, { ...mockInitialState, agent } as InitialState);
+    expect(result.agent).toEqual(agent);
+  });
+
+  it('derives the agent from the session when clerk is loaded', () => {
+    const agent = { sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' };
+    const result = deriveState(
+      true,
+      { ...mockResources, session: { ...mockResources.session, agent } } as Resources,
+      undefined,
+    );
+    expect(result.agent).toEqual(agent);
+  });
+
+  it('agent is null on a session without an agent and undefined without a session', () => {
+    const withSession = deriveState(
+      true,
+      { ...mockResources, session: { id: 's', agent: null } } as Resources,
+      undefined,
+    );
+    expect(withSession.agent).toBeNull();
+    const withoutSession = deriveState(true, { ...mockResources, session: undefined } as Resources, undefined);
+    expect(withoutSession.agent).toBeUndefined();
+  });
+
   it('handles !clerkLoaded and undefined initialState', () => {
     const result = deriveState(false, {} as Resources, undefined);
     expect(result.userId).toBeUndefined();

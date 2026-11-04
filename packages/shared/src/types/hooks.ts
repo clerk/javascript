@@ -1,5 +1,5 @@
 import type { SetActive, SignOut } from './clerk';
-import type { ActClaim, JwtPayload } from './jwtv2';
+import type { ActClaim, AgentActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
@@ -50,6 +50,11 @@ export type UseAuthReturn =
        */
       actor: undefined;
       /**
+       * The agent and agent task that created the session. `null` for other sessions, and `undefined` before Clerk has loaded.
+       * `sub` and `task_id` can be `''` if the claim is malformed, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session.
+       */
+      agent: undefined;
+      /**
        * The ID of the user's active Organization.
        */
       orgId: undefined;
@@ -81,6 +86,7 @@ export type UseAuthReturn =
       sessionId: null;
       sessionClaims: null;
       actor: null;
+      agent: null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -95,6 +101,7 @@ export type UseAuthReturn =
       sessionId: string;
       sessionClaims: JwtPayload;
       actor: ActClaim | null;
+      agent: AgentActClaim | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -109,6 +116,7 @@ export type UseAuthReturn =
       sessionId: string;
       sessionClaims: JwtPayload;
       actor: ActClaim | null;
+      agent: AgentActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;

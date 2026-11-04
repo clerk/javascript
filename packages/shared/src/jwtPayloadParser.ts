@@ -1,5 +1,6 @@
 import { splitByScope } from './authorization';
 import type {
+  AgentActClaim,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -98,6 +99,14 @@ function buildOrgPermissions({
   return orgPermissions;
 }
 
+const parseAgentClaim = (agt: unknown): AgentActClaim | null => {
+  if (agt === null || agt === undefined) {
+    return null;
+  }
+  const { id, tsk } = (typeof agt === 'object' ? agt : {}) as { id?: unknown; tsk?: unknown };
+  return { sub: typeof id === 'string' ? id : '', type: 'agent', task_id: typeof tsk === 'string' ? tsk : '' };
+};
+
 /**
  * Resolves the signed-in auth state from JWT claims.
  *
@@ -150,6 +159,7 @@ const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): Sh
     sessionId: claims.sid,
     sessionStatus,
     actor: claims.act,
+    agent: parseAgentClaim(claims.agt),
     userId: claims.sub,
     orgId: orgId,
     orgRole: orgRole,

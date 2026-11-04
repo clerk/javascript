@@ -1,4 +1,4 @@
-import type { ActClaim, JwtPayload, SessionStatusClaim } from './jwtv2';
+import type { ActClaim, AgentActClaim, JwtPayload, SessionStatusClaim } from './jwtv2';
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
 
 /**
@@ -21,6 +21,12 @@ export type SharedSignedInAuthObjectProperties = {
    * Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
    */
   actor: ActClaim | undefined;
+  /**
+   * The agent and agent task that created the session, from the `agt` claim. `null` for other sessions.
+   * `sub` and `task_id` can be `''` if the claim is malformed, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session.
+   * `actor` is not set for agent sessions.
+   */
+  agent: AgentActClaim | null;
   /**
    * The ID of the current user.
    */
