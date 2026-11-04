@@ -15,7 +15,11 @@ Worked example: `src/features/reverification/`.
 
 ## Phase 1: inventory the legacy behavior
 
-Grep the legacy files for the primitives that carry hidden logic. Every hit is a row you must place or consciously drop:
+Locate the legacy files: the prebuilt component under
+`packages/ui/src/components/<Feature>/`, the `@clerk/react` component under
+`packages/react/src/components/`, or both. A headless port of a `@clerk/react`
+button is a migration too. Then grep them for the primitives that carry hidden logic. Every
+hit is a row you must consciously place or drop later:
 
 | Primitive                         | The behavior it usually hides                      |
 | --------------------------------- | -------------------------------------------------- |

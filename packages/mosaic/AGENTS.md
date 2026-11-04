@@ -58,6 +58,15 @@ Before you change a file that matches a pattern below, read its guide, even for 
 - `src/**/*.view.tsx` → [Views](docs/views.md)
 - `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` → [Testing](docs/testing.md)
 
+## Ports of legacy components are migrations
+
+Before you write a new feature, search `packages/react/src/components/` and `packages/ui/src/components/` for its counterpart. If one exists, the work is a [migration](docs/migration.md), including a headless port of a `@clerk/react` button framed as a new feature:
+
+1. Read the counterpart and write the Phase 1 inventory before the model.
+2. Before you call the work done, review it, or open a PR, launch the Explore subagent with the prompt in [Parity audit](docs/parity-audit.md). Reading the doc is not running the audit.
+3. List every **Deliberately changed** and **Deferred** row in the PR description. A difference that is not listed is a regression.
+4. Listing a difference does not make it acceptable. If one breaks a rule in this file or in `docs/`, such as a failure that nobody sees, fix it or ask the user before you finish. Do not label it deliberate.
+
 ## Layers in one paragraph
 
 A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is the only file that reads Clerk hooks or calls Clerk resources, and answers with plain data, plain callbacks and a `status`. The **controller** (`*.controller.ts(x)`) holds local state and wraps the model's callbacks for pending, errors and closing. The **view** (`*.view.tsx`) renders plain props. No Clerk resource reaches the controller and no machine snapshot reaches the view. The file shape and how a wrapper composes the layers are in [Features](docs/features.md).
