@@ -7,7 +7,7 @@ Read this when you review whether a migrated feature kept every legacy behavior,
 - Classify every legacy behavior: each effect, guard, error path, empty or loading state, permission gate, revalidate or reload call, reset-on-close, derived label or count, and pagination trigger.
 - Each one is **Migrated** (points at a state, transition, context field or prop in the new code), **Deliberately changed** (names the new behavior and why) or **Deferred** (not implemented; say whether a ticket tracks it).
 - A Deferred item tracked only by a `// TODO` is a regression at risk of shipping. Surface it as a tracked item.
-- Run it as a read-only subagent that returns a conclusion, not file dumps. The table guides the work and the PR discussion; nothing is committed.
+- Run it as a read-only subagent that returns a conclusion, not file dumps. Put its table under `## Parity audit` in `tmp/mosaic-parity/<feature>.md`, next to the Phase 1 inventory. The table guides the work and the PR discussion; nothing is committed.
 
 ## The subagent prompt
 
