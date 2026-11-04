@@ -42,6 +42,7 @@ import type {
   TokenResource,
   UserResource,
 } from '@clerk/shared/types';
+import { timeLimit } from '@clerk/shared/utils';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
 import { unixEpochToDate } from '@/utils/date';
@@ -56,6 +57,8 @@ import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
+
+const TOKEN_REQUEST_TIMEOUT_MS = 10_000;
 
 const focusedRefresh = (onRefresh: () => void): { onRefresh?: () => void } =>
   isTabFocused() === false ? {} : { onRefresh };
@@ -544,19 +547,23 @@ export class Session extends BaseResource implements SessionResource {
           ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
 
+    const controller = new AbortController();
+    const search = skipCache ? { debug: 'skip_cache' } : undefined;
+
     if (sessionMinterEnabled) {
       // Session Minter sends the token in the body, no expired_token retry needed
-      return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
+      return timeLimit(Token.create(path, params, search, controller.signal), TOKEN_REQUEST_TIMEOUT_MS, controller);
     }
 
     // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
     const lastActiveToken = this.lastActiveToken?.getRawString();
-    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    const tokenRequest = Token.create(path, params, search, controller.signal).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
-        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+        return Token.create(path, { ...params }, { expired_token: lastActiveToken }, controller.signal);
       }
       throw e;
     });
+    return timeLimit(tokenRequest, TOKEN_REQUEST_TIMEOUT_MS, controller);
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {

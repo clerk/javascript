@@ -3704,18 +3704,17 @@ export class Clerk implements ClerkInterface {
 
   #loadInNonStandardBrowser = async (): Promise<void> => {
     let environment: Environment, client: Client;
-    const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
+    const fallsBackToCachedResources = this.shouldFallbackToCachedResources();
     let initializationDegradedCounter = 0;
     try {
-      [environment, client] = await Promise.all([
-        Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
-        Client.getOrCreateInstance().fetch({ fetchMaxTries }),
-      ]);
+      [environment, client] = await this.#fetchInitialResources(
+        fallsBackToCachedResources ? { fetchMaxTries: 1, timeLimited: true } : { timeLimited: false },
+      );
     } catch (err) {
       const isUnavailable =
         (isClerkRuntimeError(err) && err.code === 'network_error') ||
         (isClerkAPIResponseError(err) && err.status >= 500);
-      if (isUnavailable && this.shouldFallbackToCachedResources()) {
+      if (isUnavailable && fallsBackToCachedResources) {
         const cachedResources = await this.__internal_getCachedResources?.();
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
@@ -3732,13 +3731,34 @@ export class Clerk implements ClerkInterface {
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
+  #fetchInitialResources = ({
+    fetchMaxTries,
+    timeLimited,
+  }: {
+    fetchMaxTries?: number;
+    timeLimited: boolean;
+  }): Promise<[Environment, Client]> => {
+    const controller = new AbortController();
+    const resources = Promise.all([
+      Environment.getInstance().fetch({ touch: false, fetchMaxTries, abortSignal: controller.signal }),
+      Client.getOrCreateInstance().fetch({ fetchMaxTries, abortSignal: controller.signal }),
+    ]);
+    if (!timeLimited) {
+      return resources;
+    }
+
+    return timeLimit(resources, INITIALIZATION_TIMEOUT_MS, controller).catch(err => {
+      if (controller.signal.aborted) {
+        throw new ClerkRuntimeError('Loading the initial resources timed out.', { code: 'network_error' });
+      }
+      throw err;
+    });
+  };
+
   // This is used by @clerk/expo. When `load()` failed, such as while the app version was unsupported, a successful
   // reload finishes loading this instance instead of the app having to create a new one.
   __internal_reloadInitialResources = async (): Promise<void> => {
-    const [environment, client] = await Promise.all([
-      Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
-      Client.getOrCreateInstance().fetch({ fetchMaxTries: 1 }),
-    ]);
+    const [environment, client] = await this.#fetchInitialResources({ fetchMaxTries: 1, timeLimited: true });
 
     this.updateClient(client);
     this.updateEnvironment(environment);
