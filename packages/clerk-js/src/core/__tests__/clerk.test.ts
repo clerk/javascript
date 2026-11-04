@@ -1095,6 +1095,47 @@ describe('Clerk singleton', () => {
           expect(sut.status).toBe('degraded');
         });
 
+        describe('when the initial requests stall', () => {
+          beforeEach(() => {
+            vi.useFakeTimers();
+          });
+
+          afterEach(() => {
+            vi.useRealTimers();
+          });
+
+          it('aborts them and falls back to the cached resources', async () => {
+            const clientInstance = { fetch: mockClientFetch, signedInSessions: [] };
+            vi.mocked(Client.getOrCreateInstance)
+              .mockReturnValueOnce(clientInstance as any)
+              .mockReturnValueOnce(clientInstance as any);
+            mockEnvironmentFetch.mockReturnValueOnce(new Promise(() => {}));
+
+            const sut = new Clerk(productionPublishableKey);
+            sut.__internal_getCachedResources = vi.fn(() => Promise.resolve({ client: null, environment: null }));
+            let settled = false;
+            void sut.load({ standardBrowser: false }).finally(() => (settled = true));
+            await vi.advanceTimersByTimeAsync(7_000);
+
+            expect(settled).toBe(true);
+            expect(sut.status).toBe('degraded');
+            expect(mockEnvironmentFetch).toHaveBeenCalledWith(
+              expect.objectContaining({ abortSignal: expect.objectContaining({ aborted: true }) }),
+            );
+          });
+
+          it('keeps waiting for them when there is no cached-resources fallback', async () => {
+            mockEnvironmentFetch.mockReturnValueOnce(new Promise(() => {}));
+
+            const sut = new Clerk(productionPublishableKey);
+            let settled = false;
+            void sut.load({ standardBrowser: false }).finally(() => (settled = true));
+            await vi.advanceTimersByTimeAsync(60_000);
+
+            expect(settled).toBe(false);
+          });
+        });
+
         it('does not fall back to the cached resources on a 4xx API response', async () => {
           const error = new ClerkAPIResponseError('Bad Request', { data: [], status: 400 });
           mockClientFetch.mockRejectedValue(error);
@@ -1145,6 +1186,23 @@ describe('Clerk singleton', () => {
 
           expect(sut.status).toBe('ready');
           expect(statuses).toEqual(['ready']);
+        });
+
+        it('rejects a stalled reload with a network error', async () => {
+          vi.useFakeTimers();
+          try {
+            const { sut } = await loadFailingSut();
+            mockClientFetch.mockReturnValueOnce(new Promise(() => {}));
+
+            let error: unknown;
+            void sut.__internal_reloadInitialResources().catch(e => (error = e));
+            await vi.advanceTimersByTimeAsync(7_000);
+
+            expect(error).toMatchObject({ code: 'network_error' });
+            expect(sut.status).toBe('error');
+          } finally {
+            vi.useRealTimers();
+          }
         });
 
         it('finishes loading once when reloads overlap', async () => {

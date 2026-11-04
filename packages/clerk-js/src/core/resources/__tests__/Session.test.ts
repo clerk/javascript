@@ -648,6 +648,33 @@ describe('Session', () => {
       expect(token3).toEqual(mockJwt);
     });
 
+    it('aborts a stalled token request and mints the token on retry', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+      requestSpy.mockImplementationOnce(() => new Promise(() => {}));
+
+      let token: string | null | undefined;
+      void session.getToken().then(t => (token = t));
+      await vi.advanceTimersByTimeAsync(15_000);
+
+      expect(token).toEqual(mockJwt);
+      expect(requestSpy).toHaveBeenCalledTimes(2);
+      expect(requestSpy.mock.calls[0][0].signal.aborted).toBe(true);
+    });
+
     it('deduplicates concurrent getToken calls with same template', async () => {
       BaseResource.clerk = clerkMock();
 
