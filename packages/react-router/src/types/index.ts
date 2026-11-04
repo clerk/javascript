@@ -19,5 +19,4 @@ export type {
   RequestStateWithRedirectUrls,
   RequestWithAuth,
   RootAuthLoaderCallback,
-  RootAuthLoaderOptions,
 } from '../server/types';

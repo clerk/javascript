@@ -1,4 +1,4 @@
-import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
+import type { VerifyTokenOptions } from '@clerk/backend';
 import type {
   OrganizationSyncOptions,
   RequestState,
@@ -48,21 +48,6 @@ export type ClerkMiddlewareOptions = {
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl;
 
-export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadUser?: boolean;
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadSession?: boolean;
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadOrganization?: boolean;
-};
-
 export interface KeylessUrls {
   __keylessClaimUrl?: string;
   __keylessApiKeysUrl?: string;
@@ -84,9 +69,7 @@ export type RequestStateWithRedirectUrls = RequestState &
   SignUpFallbackRedirectUrl &
   KeylessUrls;
 
-export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
-  args: LoaderFunctionArgsWithAuth<Options>,
-) => RootAuthLoaderCallbackReturn;
+export type RootAuthLoaderCallback = (args: LoaderFunctionArgsWithAuth) => RootAuthLoaderCallbackReturn;
 
 type ObjectLike = Record<string, unknown> | null;
 
@@ -105,12 +88,10 @@ type RootAuthLoaderCallbackReturn =
 
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
-export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {
-  request: RequestWithAuth<Options>;
+export type LoaderFunctionArgsWithAuth = LoaderFunctionArgs & {
+  request: RequestWithAuth;
 };
 
-export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
+export type RequestWithAuth = LoaderFunctionArgs['request'] & {
   auth: Omit<SignedInAuthObject | SignedOutAuthObject, 'session' | 'user' | 'organization'>;
-} & (Options extends { loadSession: true } ? { session: Session | null } : object) &
-  (Options extends { loadUser: true } ? { user: User | null } : object) &
-  (Options extends { loadOrganization: true } ? { organization: Organization | null } : object);
+};
