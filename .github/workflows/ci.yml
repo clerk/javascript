@@ -703,7 +703,7 @@ jobs:
           if [ "${{ matrix.test-name }}" = "electron" ]; then
             xvfb-run -a pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
           else
-            pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+            pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS ${{ matrix.test-name == 'machine' && '--force' || '' }}
           fi
         env:
           CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
