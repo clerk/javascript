@@ -1,10 +1,15 @@
 import stylexPlugin from '@stylexjs/rollup-plugin';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { defineConfig } from 'tsdown';
 
 import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
 
+const require = createRequire(import.meta.url);
+const typescriptDir = dirname(require.resolve('typescript/package.json'));
 const { default: getTypeScriptExecutablePath } = await import(
-  new URL('./lib/getExePath.js', import.meta.resolve('typescript/package.json')).href
+  pathToFileURL(join(typescriptDir, 'lib/getExePath.js')).href
 );
 
 export default defineConfig({
