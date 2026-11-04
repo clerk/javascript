@@ -1,60 +1,35 @@
-import { useId, useRef } from 'react';
+import { useRef } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
-import type { SelectItem } from '../../../components/select';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
+import type { InviteMembersForm } from './organization-profile-invite-members.controller';
 import { InviteMembersFields } from './organization-profile-invite-members.fields';
 
 export interface OrganizationProfileInviteMembersDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   finalFocus?: DialogFocusTarget;
-  emailAddresses: string[];
-  onEmailAddressesChange: (emailAddresses: string[]) => void;
-  emailDraft: string;
-  onEmailDraftChange: (emailDraft: string) => void;
-  rejectedEmailAddresses?: string[];
-  roles: SelectItem[];
-  role: string | null;
-  onRoleChange: (role: string | null) => void;
-  isRoleDisabled?: boolean;
-  canSubmit: boolean;
-  isPending: boolean;
-  error: string | null;
-  onSubmit: () => void | Promise<void>;
+  invite: InviteMembersForm;
 }
 
 export function OrganizationProfileInviteMembersDialog({
   open,
   onOpenChange,
   finalFocus,
-  emailAddresses,
-  onEmailAddressesChange,
-  emailDraft,
-  onEmailDraftChange,
-  rejectedEmailAddresses = [],
-  roles,
-  role,
-  onRoleChange,
-  isRoleDisabled = false,
-  canSubmit,
-  isPending,
-  error,
-  onSubmit,
+  invite,
 }: OrganizationProfileInviteMembersDialogProps) {
   const m = useMessages('organizationProfile').members.invite;
-  const formId = useId();
   const emailInput = useRef<HTMLInputElement>(null);
 
   return (
     <Dialog.Root
       open={open}
       onOpenChange={next => {
-        if (!isPending) {
+        if (!invite.isPending) {
           onOpenChange(next);
         }
       }}
@@ -75,36 +50,24 @@ export function OrganizationProfileInviteMembersDialog({
             role='alert'
             color='negative'
           >
-            {error}
+            {invite.error}
           </Card.Banner>
           <Card.Content
             render={
               <Form
-                id={formId}
-                onSubmit={event => {
-                  event.preventDefault();
-                  void onSubmit();
-                }}
+                id={invite.formId}
+                onSubmit={invite.onSubmit}
               />
             }
           >
             <InviteMembersFields
               emailInputRef={emailInput}
-              emailAddresses={emailAddresses}
-              onEmailAddressesChange={onEmailAddressesChange}
-              emailDraft={emailDraft}
-              onEmailDraftChange={onEmailDraftChange}
-              rejectedEmailAddresses={rejectedEmailAddresses}
-              roles={roles}
-              role={role}
-              onRoleChange={onRoleChange}
-              isRoleDisabled={isRoleDisabled}
-              isPending={isPending}
+              invite={invite}
             />
           </Card.Content>
           <Card.Footer>
             <Dialog.Close
-              disabled={isPending}
+              disabled={invite.isPending}
               render={
                 <Button
                   variant='outline'
@@ -115,9 +78,9 @@ export function OrganizationProfileInviteMembersDialog({
               }
             />
             <SubmitButton
-              form={formId}
-              isPending={isPending}
-              disabled={!canSubmit}
+              form={invite.formId}
+              isPending={invite.isPending}
+              disabled={!invite.canSubmit}
               focusableWhenDisabled
             >
               {m.submit}
