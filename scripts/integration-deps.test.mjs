@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, test } from 'vitest';
@@ -30,6 +30,29 @@ describe('integration suite tasks in turbo.json', () => {
       turbo.tasks[`//#test:integration:${suite}`],
       `ci.yml runs ${suite} but turbo.json has no task for it`,
     ).toBeDefined();
+  });
+
+  test('the root package.json depends on no workspace packages', () => {
+    const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+    const deps = { ...manifest.dependencies, ...manifest.devDependencies, ...manifest.optionalDependencies };
+    const workspace = Object.entries(deps)
+      .filter(([, version]) => version.startsWith('workspace:'))
+      .map(([name]) => name);
+    expect(
+      workspace,
+      'turbo folds every file of a root workspace dependency into the global hash, so any edit to it reruns every task. Declare it in integration/package.json instead.',
+    ).toEqual([]);
+  });
+
+  test('build:inputs hashes the same files as build without running anything', () => {
+    expect(turbo.tasks['build:inputs']).toEqual({ dependsOn: ['^build:inputs'], inputs: turbo.tasks.build.inputs });
+    const packages = readdirSync(join(root, 'packages')).filter(dir =>
+      existsSync(join(root, 'packages', dir, 'package.json')),
+    );
+    for (const dir of packages) {
+      const { scripts = {} } = JSON.parse(readFileSync(join(root, 'packages', dir, 'package.json'), 'utf8'));
+      expect(scripts['build:inputs'], `packages/${dir} defines a build:inputs script`).toBeUndefined();
+    }
   });
 
   test('turbo hashes the package source each suite imports directly', () => {

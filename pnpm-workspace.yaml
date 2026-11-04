@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - packages/electron-passkeys/npm/*
+  - integration
 
 catalogs:
   peer-expo:

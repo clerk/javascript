@@ -8,6 +8,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const scenarios = [
   ['upgrade', 'packages/upgrade/src/cli.js'],
   ['shared', 'packages/shared/src/index.ts'],
+  ['shared test', 'packages/shared/src/types/signUpTimezone.type.test.ts'],
   ['expo', 'packages/expo/src/index.ts'],
   ['mosaic', 'packages/mosaic/src/global.d.ts'],
   ['test file', 'integration/tests/generic/sign-in-flow.test.ts'],

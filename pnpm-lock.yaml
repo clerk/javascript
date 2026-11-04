@@ -125,15 +125,6 @@ importers:
       '@changesets/get-github-info':
         specifier: ^0.8.0
         version: 0.8.0
-      '@clerk/backend':
-        specifier: workspace:*
-        version: link:packages/backend
-      '@clerk/shared':
-        specifier: workspace:*
-        version: link:packages/shared
-      '@clerk/testing':
-        specifier: workspace:*
-        version: link:packages/testing
       '@commitlint/cli':
         specifier: ^20.5.2
         version: 20.5.3(@types/node@22.20.1)(conventional-commits-parser@6.4.0)(typescript@6.0.3)
@@ -362,6 +353,18 @@ importers:
       zx:
         specifier: catalog:repo
         version: 8.8.5
+
+  integration:
+    devDependencies:
+      '@clerk/backend':
+        specifier: workspace:*
+        version: link:../packages/backend
+      '@clerk/shared':
+        specifier: workspace:*
+        version: link:../packages/shared
+      '@clerk/testing':
+        specifier: workspace:*
+        version: link:../packages/testing
 
   packages/astro:
     dependencies:

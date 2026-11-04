@@ -146,10 +146,12 @@ outcome skips the suite entirely: no build, no local registry publish, no browse
 
 How the cache key is built:
 
-- `dependsOn` lists the package builds the suite's e2e apps install from the local registry: always
-  `@clerk/clerk-js`, `@clerk/ui` and `@clerk/testing`, plus the framework packages that suite's apps
-  add. Turbo folds those build hashes into the suite hash, and package builds already depend on
-  `^build`, so transitive packages such as `@clerk/shared` are covered without being listed.
+- `dependsOn` lists `<pkg>#build:inputs` for each package the suite uses: always `@clerk/clerk-js` and
+  `@clerk/ui`, the packages the harness imports (the `devDependencies` of `integration/package.json`),
+  plus the framework packages that suite's apps install from the local registry. `build:inputs` is a transit node: no package defines the script, so it never
+  runs or restores anything, but it hashes the same inputs as `build` and depends on `^build:inputs`,
+  so transitive packages such as `@clerk/shared` are covered without being listed. A cache hit
+  therefore downloads no build outputs; on a miss the runner script builds.
 - `inputs` covers the harness, the test directories the suite's tagged tests live in (and import
   from), the templates its apps copy, and any package source file a test imports directly, such as a
   `packages/*/src/test` fixture the package build excludes. Other suites' directories are not inputs. Tests live under
@@ -162,8 +164,13 @@ Rules that keep this correct:
 
 - The integration test step must never pass `--only`. It drops dependency hashes from the task hash,
   so package changes would stop invalidating suites.
+- Keep `build:inputs` identical to `build`'s inputs; `integration-deps.test.mjs` enforces it.
+- The harness's workspace dependencies live in `integration/package.json`, never the root
+  `package.json`. Turbo folds every file of a root workspace dependency, tests and READMEs included,
+  into the global hash, so any edit to it would rerun every task in the repo.
 - The merge queue sets `TURBO_FORCE=true` on the test step and nightly passes `--force`, so every suite
-  runs for real before a commit lands on `main`. A `dependsOn` gap is a wasted-cache bug on PRs, not a
+  runs for real before a commit lands on `main`. Forcing reaches only the suite and its transit nodes;
+  the runner script's own `turbo build` resets `TURBO_FORCE` so package builds still restore from cache. A `dependsOn` gap is a wasted-cache bug on PRs, not a
   correctness hole on `main`.
 - Per-job setup lives in `integration/scripts/run-integration.mjs`, which the `test:integration:base`
   script wraps. When `E2E_CI_SETUP` names the suite it builds, publishes to pkglab, installs clerk-js

@@ -1,4 +1,11 @@
 {
+  "name": "@clerk/integration",
+  "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@clerk/backend": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@clerk/testing": "workspace:*"
+  }
 }

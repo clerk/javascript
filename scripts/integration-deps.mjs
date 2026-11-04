@@ -6,7 +6,6 @@ export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 
 const TASK_PREFIX = '//#test:integration:';
 const TESTS = path.join(root, 'integration/tests');
-const HARNESS_PACKAGES = ['@clerk/clerk-js', '@clerk/testing', '@clerk/ui'];
 const SHARED_INPUTS = [
   'integration/*',
   'integration/{certs,cleanup,configs,deployments,models,presets,scripts,testUtils}/**',
@@ -32,6 +31,12 @@ const PRESET_GROUPS = {
 
 const read = file => fs.readFileSync(file, 'utf8');
 const readJson = file => JSON.parse(read(file));
+
+const HARNESS_PACKAGES = [
+  '@clerk/clerk-js',
+  '@clerk/ui',
+  ...Object.keys(readJson(path.join(root, 'integration/package.json')).devDependencies ?? {}),
+].sort();
 
 export const integrationSuites = () =>
   Object.keys(readJson(path.join(root, 'turbo.json')).tasks)
@@ -207,7 +212,7 @@ export const deriveIntegrationTasks = async () => {
     );
 
     tasks.set(suite, {
-      dependsOn: withoutImplied(graph, [...packages].sort()).map(pkg => `${pkg}#build`),
+      dependsOn: withoutImplied(graph, [...packages].sort()).map(pkg => `${pkg}#build:inputs`),
       inputs: [
         ...SHARED_INPUTS,
         ...(testDirs.size ? [braceGlob('integration/tests', [...testDirs].sort())] : []),
