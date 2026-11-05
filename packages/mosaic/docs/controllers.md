@@ -191,6 +191,46 @@ Context holds the `ErrorDescription`, never copy (see "Errors"). A machine whose
 surface shows no error still logs it, so a failure is never silent
 (`features/switcher/switcher.controller.tsx`).
 
+### Multi-step flows
+
+A flow with several steps on one surface is one machine and one form. No existing
+flow follows every rule below yet, so each points at the closest example.
+
+- **The machine owns the step.** Each step is a state, and the controller derives
+  the step the view shows from the snapshot (`viewStep` in
+  `reverification.controller.ts`). No `useState` step beside it, and no separate
+  open flag.
+- **Guards live in the machine.** What allows a step to continue is a guard on its
+  event. The controller reads it with `actor.can(event)` rather than writing a
+  `canContinue` that repeats it.
+- **Async work is a named state with `invoke`.** Testing a connection is a
+  `testing` state, not a `pending` field in context and not a call in a transition
+  action. Its result lands in context from `onDone`, beside the state that waited
+  for it, not in a `usePendingAction` flag (`starting` and `submitting` in
+  `reverification.controller.ts`).
+- **One `useForm` holds every step's values.** Its `onSubmit` is the last step's
+  save, and `canSubmit` covers only that save (`create-organization.controller.ts`).
+  Values are not copied into machine context with `TYPE` events.
+- **Navigation is machine events.** Continue and back send `NEXT` and `BACK` with
+  the values the guard needs. A form submit does not choose the next step.
+
+```ts
+const [snapshot, send, actor] = useMachine(machine, { context: { testConnection: model.onTestConnection } });
+const form = useForm<SsoValues, void>({ initialValues, onSubmit: values => model.onSave(values) });
+
+return {
+  step: snapshot.value,
+  form,
+  isTesting: snapshot.value === 'testing',
+  canContinue: actor.can({ type: 'NEXT', values: form.values }),
+  onContinue: () => send({ type: 'NEXT', values: form.values }),
+  onBack: () => send({ type: 'BACK' }),
+};
+```
+
+The view side, one `Flow` and a `SubmitButton` footer, is in `views.md` →
+"Moving between screens on one surface".
+
 ## Responsibilities
 
 - **Hold the interaction state.** In React state or a machine — see "Which one

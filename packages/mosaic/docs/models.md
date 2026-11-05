@@ -135,6 +135,44 @@ drops the fallback instead of holding the space open. Keep the two apart.
   query and returns to page 1). The controller keeps the interaction around it,
   such as the input's value and the debounce, and calls that callback.
 
+## Before the API exists
+
+A feature built from a design before Clerk can back it still starts with its
+model. Write the model's return type first, the same shape a real model returns:
+a `status`, plain data and callbacks. The model hook comes when the API does.
+
+- **`Pick` what Clerk already has.** Search `@clerk/shared/types` before writing a
+  field. A new design often needs types Clerk already has, such as
+  `OrganizationEnrollmentMode` or `EnterpriseConnectionResource`.
+- **Name the rest for the resource it will become.** A type Clerk does not have
+  yet is named for that future resource (`EnterpriseConnectionTest`), not for the
+  screen (`AccessData`). When the resource lands, the type becomes a `Pick`.
+- **The swingset fixture implements that type.** It builds a ready model and
+  passes it to the feature's real controller and view
+  (`ReadyModel` in `swingset/src/stories/create-organization.stories.tsx`).
+- **Composition stays in Mosaic.** The wrapper, and whatever it renders around
+  the view (a title, a back action, a footer), lives in the feature. Swingset
+  supplies data and nothing else, because code there has no feature test and is
+  thrown away when the model lands.
+
+```ts
+export type SsoConnection = Pick<EnterpriseConnectionResource, 'id' | 'name' | 'provider' | 'active' | 'domains'>;
+
+export interface EnterpriseConnectionTest {
+  success: boolean;
+  email?: string;
+}
+
+export type SsoModel =
+  | { status: 'loading' }
+  | {
+      status: 'ready';
+      connections: SsoConnection[];
+      enrollmentMode: OrganizationEnrollmentMode;
+      onTestConnection: (connectionId: string) => Promise<EnterpriseConnectionTest>;
+    };
+```
+
 ## Time-dependent display data
 
 Use the shared `useNow` hook and `MosaicProvider` clock support introduced in

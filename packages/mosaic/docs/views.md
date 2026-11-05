@@ -73,13 +73,19 @@ return makes the new screen pop in instead.
 - **The surface sits outside the flow, and a step renders only what goes inside
   it.** A screen used as a step of another feature cannot bring its own `Card.Root`.
   `ConfirmShell` owns the card and `Reverification` renders only its contents.
-- **Nest a flow when a step has steps of its own.** The outer flow keeps its step
-  mounted, and `useFlowAutoFocus` reaches the inner active step.
+- **One flow per surface.** A step that has steps of its own adds them to the same
+  flow, so the view renders one `Flow.Root`.
 - **The controller owns the step.** Going back is direction `-1`. Derive it from the
   step when each step has one way in, and hold it in the controller when it does not
   (`reverification.controller.ts`).
 - **Mark what takes focus with `useFlowAutoFocus`.** Focus moves only for a step
   that transitions in, so a flow that opens on a step does not take focus.
+- **A multi-step flow gets derived props.** The view renders the `step`, `form`
+  and flags the controller passes and does not work out the step itself. Each
+  step's footer action is a `SubmitButton`: `onClick={onContinue}` with
+  `isPending={isTesting}` and `disabled={!canContinue}` on a middle step, and
+  `form={form.id}` on the last. The controller side is in `controllers.md` →
+  "Multi-step flows".
 
 A loading or error state of a single screen is not a step, and neither is the
 skeleton shown before a feature has data. Those can stay conditionals.
