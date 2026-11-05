@@ -158,7 +158,7 @@ On iOS, locate nodes of the native views with the SDK's identifiers, such as `sc
 
 Every test starts on the standard settings. A test that needs other settings calls `host.useSettings({ config, environment? })`, and the CLI puts every leaf it changed back when the test ends. [Test instances](references/instances.md) has the call, the restore, and the leaves that tests often change. To see which settings are on or off, run `integration/expo-native/bin/control-clerk-expo settings <prefix>`, such as `settings auth_multi_factor`.
 
-A test of the update screen calls `host.useMinimumAppVersion({ minimumVersion, updateUrl })`, which registers the app under test with the application and sets its minimum. The CLI removes the minimum when the test ends, pass or fail. [references/instances.md](references/instances.md) has the details.
+A test of the update screen calls `host.useMinimumAppVersion({ minimumVersion, updateUrl })`, which registers the app under test with the application and sets its minimum. The CLI removes the minimum when the test ends, pass or fail. [Test instances](references/instances.md) has the details.
 
 ### Check your work
 

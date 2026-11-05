@@ -1,6 +1,6 @@
 # Update required
 
-An instance sets a minimum version for an app. A build below it can't use Clerk: `<ClerkProvider>` covers the app with an update screen that shows the build's version and links to the App Store or Google Play. Users stay signed in, so they continue where they left off once the build is allowed again.
+An instance sets a minimum version for an app. Clerk rejects most requests from a build below it, and `<ClerkProvider>` covers the app with an update screen that shows the build's version and links to the App Store or Google Play. Users stay signed in, so they continue where they left off once the build is allowed again.
 
 ## Sub-features
 
@@ -22,7 +22,7 @@ Preconditions:
 
 - **Signed in.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "signed-in user"` (or `android`). The spec signs in with a ticket, sets the minimum above the build, and relaunches with `keepStorage: true`. It expects `1.0.0`, `Required` on iOS, and the store button (screenshot `update-required`). It then lowers the minimum to the build's version, relaunches, and expects the same user and session ID on the home (screenshot `signed-in-after-lowering`).
 - **Signed out.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "signed-out user"` (or `android`). The spec sets the minimum before the first launch, then expects the update screen and `1.0.0` (screenshot `update-required-signed-out`).
-- **At the minimum.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "at the minimum"` (or `android`). The spec sets the minimum to the build's version, signs in with a ticket, and expects the signed-in home with no update screen.
+- **At the minimum.** Run `integration/expo-native/bin/control-clerk-expo run update-required --platform ios --grep "at the minimum"` (or `android`). The spec sets the minimum to the build's version, signs in with a ticket, and expects the signed-in home with no update screen (screenshot `at-the-minimum`).
 - **Proof.** `specs/features/update-required/update-required.e2e.ts` passes on each platform. The video shows the update screen, then the home with the same user and session ID.
 
 ## States a spec cannot reach

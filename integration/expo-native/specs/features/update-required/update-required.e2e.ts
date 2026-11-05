@@ -62,4 +62,5 @@ test('a build at the minimum opens as usual', async ({ host, screen, platform })
   const user = await host.seedUser();
   await host.launch({ signedInAs: user });
   await expect(updateRequiredScreen(screen, platform).title).toHaveCount(0);
+  await host.screenshot('at-the-minimum');
 });
