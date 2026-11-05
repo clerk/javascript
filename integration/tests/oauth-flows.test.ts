@@ -548,5 +548,75 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       // Should redirect and be signed in without error
       await secondTabUtils.po.expect.toBeSignedIn();
     });
+
+    test('sends a single sign-up transfer when SignIn remounts while the transfer is in flight', async ({
+      page,
+      context,
+    }) => {
+      const providerKeys = await resolveInstanceKeys('oauth-provider');
+      const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
+      const users = createUserService(withRetry(providerClient));
+      const newUser = users.createFakeUser(test, { withUsername: true });
+      await users.createBapiUser(newUser);
+
+      const u = await createTestUtils({ app, page, context });
+
+      const transferStatuses: number[] = [];
+      let onSecondTransfer: () => void = () => {};
+      const secondTransfer = new Promise<void>(resolve => {
+        onSecondTransfer = resolve;
+      });
+      let onFirstTransferReleased: () => void = () => {};
+      const firstTransferReleased = new Promise<void>(resolve => {
+        onFirstTransferReleased = resolve;
+      });
+
+      await page.route('**/v1/client/sign_ups*', async route => {
+        const request = route.request();
+        const isTransfer =
+          request.method() === 'POST' &&
+          (new URL(request.url()).searchParams.get('transfer') === 'true' ||
+            request.postData()?.includes('transfer=true'));
+        if (!isTransfer) {
+          return route.continue();
+        }
+
+        const isFirst = transferStatuses.length === 0;
+        transferStatuses.push(0);
+        const index = transferStatuses.length - 1;
+        const response = await route.fetch();
+        transferStatuses[index] = response.status();
+
+        if (isFirst) {
+          await page.evaluate(() => window.dispatchEvent(new Event('e2e:resuspend')));
+          await Promise.race([secondTransfer, new Promise(resolve => setTimeout(resolve, 3000))]);
+          await route.fulfill({ response });
+          onFirstTransferReleased();
+          return;
+        }
+
+        onSecondTransfer();
+        await route.fulfill({ response });
+      });
+
+      try {
+        await u.page.goToRelative('/sign-in-resuspend');
+        await u.po.signIn.waitForMounted();
+        await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+        await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+        await u.po.signIn.setIdentifier(newUser.email);
+        await u.po.signIn.continue();
+        await u.po.signIn.enterTestOtpCode();
+
+        await firstTransferReleased;
+
+        expect(transferStatuses).toEqual([200]);
+        await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
+      } finally {
+        await newUser.deleteIfExists();
+        await u.services.users.deleteIfExists({ email: newUser.email });
+      }
+    });
   },
 );
