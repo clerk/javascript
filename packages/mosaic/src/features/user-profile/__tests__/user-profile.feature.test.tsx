@@ -221,6 +221,54 @@ describe('UserProfile', () => {
     sessions.release();
   });
 
+  it('brings a found section into view once its page has loaded it', async () => {
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+      activeDevices: [],
+      deviceTrackingEnabled: false,
+    });
+    const sessions = holdRequests('get', '/v1/me/sessions/active');
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
+    await waitFor(() => expect(sessions.requests).toHaveLength(1));
+    sessions.release();
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: 'Active devices' }).closest('.cl-profile-search-target'),
+      ).toHaveFocus(),
+    );
+  });
+
+  it('leaves focus where the user moved it while the found section loads', async () => {
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+      activeDevices: [],
+      deviceTrackingEnabled: false,
+    });
+    const sessions = holdRequests('get', '/v1/me/sessions/active');
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
+    await waitFor(() => expect(sessions.requests).toHaveLength(1));
+    await user.click(screen.getByRole('combobox', { name: 'Search' }));
+    sessions.release();
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: 'Active devices' }).closest('.cl-profile-search-target'),
+      ).not.toBeNull(),
+    );
+    expect(screen.getByRole('combobox', { name: 'Search' })).toHaveFocus();
+  });
+
   it('finds a section by the name a localization gives it', async () => {
     serve();
     const user = userEvent.setup();
