@@ -130,6 +130,54 @@ describe('UserProfile', () => {
     expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
   });
 
+  it('keeps its page when remounted under the same provider', async () => {
+    serve();
+    const { rerender } = await renderWithClerk(<UserProfile key='first' />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('tab', { name: 'Security' }));
+    rerender(<UserProfile key='second' />);
+
+    expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeVisible();
+  });
+
+  it('falls back to the default page when the current page disappears', async () => {
+    serve({ userAPIKeysEnabled: true });
+    const { rerender } = await renderWithClerk(<UserProfile defaultPage='security' />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('tab', { name: 'API Keys' }));
+    expect(screen.getByRole('tab', { name: 'API Keys' })).toHaveAttribute('aria-selected', 'true');
+
+    rerender(
+      <UserProfile
+        defaultPage='security'
+        apiKeysProps={{ hide: true }}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true'));
+    expect(tabNames()).toEqual(['Account', 'Security']);
+  });
+
+  it('routes two profiles on one page independently when they have different bases', async () => {
+    serve();
+    await renderWithClerk(
+      <>
+        <UserProfile path='/first' />
+        <UserProfile path='/second' />
+      </>,
+    );
+    const user = userEvent.setup();
+    const [first, second] = screen.getAllByRole('navigation', { name: 'User profile' }).map(nav => within(nav));
+
+    await user.click(first.getByRole('tab', { name: 'Security' }));
+
+    expect(first.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
+    expect(second.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+  });
+
   it('passes additional OAuth scopes to connected accounts', async () => {
     serveFapi(signedIn());
     await renderWithClerk(<UserProfile additionalOAuthScopes={{ google: ['calendar'] }} />);

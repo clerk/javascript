@@ -1,5 +1,5 @@
 import { logger } from '@clerk/shared/logger';
-import { act, cleanup, render, renderHook, screen, within } from '@testing-library/react';
+import { act, cleanup, configure, render, renderHook, screen, within } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
@@ -559,7 +559,14 @@ describe('a modal surface that routes', () => {
       });
     }
 
-    it('keeps the entry cleared after close, without the content redirecting it back', async () => {
+    it.each([
+      { name: 'normally', strict: false },
+      { name: 'in StrictMode', strict: true },
+    ])('keeps the entry cleared after close, without the content redirecting it back, $name', async ({ strict }) => {
+      if (strict) {
+        configure({ reactStrictMode: true });
+        onTestFinished(() => configure({ reactStrictMode: false }));
+      }
       const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
       const ref = renderRouted(routingSurface());
 
