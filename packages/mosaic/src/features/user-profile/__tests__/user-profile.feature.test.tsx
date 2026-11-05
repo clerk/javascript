@@ -15,7 +15,10 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useModal } from '../../../modals/use-modal';
+import { useVirtualSegment } from '../../../routing/virtual-store';
 import { UserProfile } from '../user-profile';
+import { userProfileModal } from '../user-profile.modal';
 import { signedIn } from '../user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
 
 function serve({ userAPIKeysEnabled = false } = {}) {
@@ -29,6 +32,17 @@ beforeAll(() => page.viewport(1280, 800));
 
 function tabNames() {
   return screen.getAllByRole('tab').map(tab => tab.textContent);
+}
+
+function Entry({ base }: { base: string }) {
+  return <output data-testid='entry'>{JSON.stringify(useVirtualSegment(base))}</output>;
+}
+
+const entry = () => JSON.parse(screen.getByTestId('entry').textContent ?? 'null');
+
+function OpenProfile({ page }: { page: string }) {
+  const profile = useModal(userProfileModal);
+  return <button onClick={() => profile.open({ page })}>Open profile</button>;
 }
 
 describe('UserProfile', () => {
@@ -75,14 +89,10 @@ describe('UserProfile', () => {
 
   it('passes the API keys options to the API keys page', async () => {
     serve({ userAPIKeysEnabled: true });
-    await renderWithClerk(
-      <UserProfile
-        defaultPage='apiKeys'
-        apiKeysProps={{ showDescription: true }}
-      />,
-    );
+    await renderWithClerk(<UserProfile apiKeysProps={{ showDescription: true }} />);
     const user = userEvent.setup();
 
+    await user.click(screen.getByRole('tab', { name: 'API Keys' }));
     await screen.findByText('API keys loaded');
     const dialog = await openDialog(user, screen.getByRole('button', { name: 'Create API key' }), {
       name: 'Add new API key',
@@ -116,18 +126,39 @@ describe('UserProfile', () => {
     expect(screen.getByText('Usage this month')).toBeVisible();
   });
 
-  it('opens on the default page without reordering the navigation', async () => {
-    serve();
-    await renderWithClerk(<UserProfile defaultPage='security' />);
-    expect(tabNames()).toEqual(['Account', 'Security']);
-    expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeVisible();
+  it('keeps the root page at the base and writes the segments legacy used', async () => {
+    serve({ userAPIKeysEnabled: true });
+    await renderWithClerk(
+      <>
+        <UserProfile />
+        <Entry base='/user' />
+      </>,
+    );
+    const user = userEvent.setup();
+    expect(entry()).toEqual([]);
+
+    await user.click(screen.getByRole('tab', { name: 'API Keys' }));
+    expect(entry()).toEqual(['api-keys']);
+
+    await user.click(screen.getByRole('tab', { name: 'Account' }));
+    expect(entry()).toEqual([]);
   });
 
-  it('opens on the first page when the default page is unavailable', async () => {
-    serve({ userAPIKeysEnabled: false });
-    await renderWithClerk(<UserProfile defaultPage='apiKeys' />);
-    expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+  it('opens as a modal on the requested page, writing the segment legacy used', async () => {
+    serve({ userAPIKeysEnabled: true });
+    await renderWithClerk(
+      <>
+        <OpenProfile page='apiKeys' />
+        <Entry base='/modal/user' />
+      </>,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Open profile' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'API Keys' })).toHaveAttribute('aria-selected', 'true');
+    expect(entry()).toEqual(['api-keys']);
   });
 
   it('keeps its page when remounted under the same provider', async () => {
@@ -142,22 +173,17 @@ describe('UserProfile', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeVisible();
   });
 
-  it('falls back to the default page when the current page disappears', async () => {
+  it('falls back to the first page when the current page disappears', async () => {
     serve({ userAPIKeysEnabled: true });
-    const { rerender } = await renderWithClerk(<UserProfile defaultPage='security' />);
+    const { rerender } = await renderWithClerk(<UserProfile />);
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('tab', { name: 'API Keys' }));
     expect(screen.getByRole('tab', { name: 'API Keys' })).toHaveAttribute('aria-selected', 'true');
 
-    rerender(
-      <UserProfile
-        defaultPage='security'
-        apiKeysProps={{ hide: true }}
-      />,
-    );
+    rerender(<UserProfile apiKeysProps={{ hide: true }} />);
 
-    await waitFor(() => expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true'));
+    await waitFor(() => expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true'));
     expect(tabNames()).toEqual(['Account', 'Security']);
   });
 
@@ -246,12 +272,10 @@ describe('UserProfile with an active organization', () => {
   it('sends the user to afterLeaveOrganizationUrl after leaving the organization', async () => {
     const fapi = serveWithOrganization();
     const { navigate } = await renderWithClerk(
-      <UserProfile
-        defaultPage='organization/general'
-        organizationProfileProps={{ afterLeaveOrganizationUrl: '/organizations' }}
-      />,
+      <UserProfile organizationProfileProps={{ afterLeaveOrganizationUrl: '/organizations' }} />,
     );
     const user = userEvent.setup();
+    await user.click(screen.getByRole('tab', { name: 'General', description: 'Organization' }));
     const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
       role: 'alertdialog',
     });
@@ -275,9 +299,10 @@ describe('UserProfile with an active organization', () => {
     expect(tabNames()).toEqual(['Account', 'Security']);
   });
 
-  it('opens on an organization page by its prefixed id', async () => {
+  it('switches to an organization page from the navigation', async () => {
     serveWithOrganization();
-    await renderWithClerk(<UserProfile defaultPage='organization/members' />);
+    await renderWithClerk(<UserProfile />);
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Members', description: 'Organization' }));
     expect(screen.getByRole('tab', { name: 'Members', description: 'Organization' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -304,12 +329,12 @@ describe('UserProfile with an active organization', () => {
     serveWithOrganization();
     await renderWithClerk(
       <UserProfile
-        defaultPage='organization/general'
         customPages={[{ path: 'organization/general', label: 'Imposter', content: <p>Imposter content</p> }]}
       />,
     );
 
     expect(tabNames()).toEqual(['Account', 'Security', 'General', 'Members']);
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'General', description: 'Organization' }));
     expect(screen.getByRole('tab', { name: 'General', description: 'Organization' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -342,7 +367,8 @@ describe('UserProfile with an active organization', () => {
       client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: acme.id })]),
       memberships,
     });
-    const { clerk } = await renderWithClerk(<UserProfile defaultPage='organization/members' />);
+    const { clerk } = await renderWithClerk(<UserProfile />);
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Members', description: 'Organization' }));
 
     await act(() => clerk.setActive({ organization: globex.id }));
     await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General']));
@@ -367,7 +393,8 @@ describe('UserProfile with an active organization', () => {
       client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: acme.id })]),
       memberships,
     });
-    const { clerk } = await renderWithClerk(<UserProfile defaultPage='organization/members' />);
+    const { clerk } = await renderWithClerk(<UserProfile />);
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Members', description: 'Organization' }));
 
     await act(() => clerk.setActive({ organization: globex.id }));
     await waitFor(() => expect(clerk.organization?.id).toBe(globex.id));

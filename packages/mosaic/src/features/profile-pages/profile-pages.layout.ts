@@ -2,6 +2,19 @@ import { logger } from '@clerk/shared/logger';
 
 import { isLiteralPattern } from '../../routing/routes';
 
+const BUILT_IN_SEGMENTS: Readonly<Record<string, string>> = {
+  apiKeys: 'api-keys',
+  'organization/apiKeys': 'organization/api-keys',
+};
+
+export function pageSegment(id: string): string {
+  return BUILT_IN_SEGMENTS[id] ?? id;
+}
+
+export function pageParts(page: string | undefined): string[] {
+  return page === undefined ? [] : pageSegment(page).split('/').filter(Boolean);
+}
+
 export function withRoutablePaths<Page extends { path: string }>(pages: readonly Page[]): Page[] {
   return pages.filter(page => {
     if (isLiteralPattern(page.path)) {

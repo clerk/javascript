@@ -21,14 +21,6 @@ export interface OrganizationProfileProps
     Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder'>,
     Pick<OrganizationProfileOptions, 'afterLeaveOrganizationUrl'> {
   /**
-   * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
-   * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
-   * the first page instead.
-   *
-   * @default the first page in the navigation
-   */
-  defaultPage?: OrganizationProfileViewProps['activePage'];
-  /**
    * The base the profile's pages are nested under. Two profiles on one page need different bases.
    *
    * @default '/organization'
@@ -65,12 +57,6 @@ export interface OrganizationProfileProps
  * ```
  *
  * @example
- * `defaultPage` picks the page the profile opens on without moving it in the navigation.
- * ```tsx
- * <OrganizationProfile defaultPage='members' />
- * ```
- *
- * @example
  * `customPages` adds your own pages; `pageOrder` places them among the built-in ones.
  * ```tsx
  * <OrganizationProfile
@@ -88,7 +74,6 @@ export interface OrganizationProfileProps
 export function OrganizationProfile({
   customPages,
   pageOrder,
-  defaultPage,
   path = '/organization',
   afterLeaveOrganizationUrl,
   fallback,
@@ -97,8 +82,7 @@ export function OrganizationProfile({
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
   const { activePage, onPageChange } = useProfilePagesController(
-    defaultPage ?? pageOrder?.[0] ?? 'general',
-    pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
+    pages ? organizationProfilePageIds({ pages, customPages, pageOrder }) : [],
     { routing: 'virtual', path },
   );
 
