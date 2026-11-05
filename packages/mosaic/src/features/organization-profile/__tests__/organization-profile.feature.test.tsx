@@ -14,7 +14,10 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useModal } from '../../../modals/use-modal';
+import { useVirtualEntries } from '../../../routing/virtual-store';
 import { OrganizationProfile } from '../organization-profile';
+import { organizationProfileModal } from '../organization-profile.modal';
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
 
@@ -44,6 +47,17 @@ function tabNames() {
   return profileNav()
     .getAllByRole('tab')
     .map(tab => tab.textContent);
+}
+
+function Entry({ base }: { base: string }) {
+  return <output data-testid='entry'>{JSON.stringify(useVirtualEntries().get(base) ?? null)}</output>;
+}
+
+const entry = () => JSON.parse(screen.getByTestId('entry').textContent ?? 'null');
+
+function OpenProfile({ page }: { page: string }) {
+  const profile = useModal(organizationProfileModal);
+  return <button onClick={() => profile.open({ page })}>Open profile</button>;
 }
 
 describe('OrganizationProfile', () => {
@@ -117,6 +131,52 @@ describe('OrganizationProfile', () => {
       name: 'Add new API key',
     });
     expect(within(dialog).getByRole('textbox', { name: 'Description' })).toBeVisible();
+  });
+
+  it('keeps its page when remounted under the same provider', async () => {
+    serve();
+    const { rerender } = await renderWithClerk(<OrganizationProfile key='first' />);
+    const user = userEvent.setup();
+
+    await user.click(profileNav().getByRole('tab', { name: 'Members' }));
+    rerender(<OrganizationProfile key='second' />);
+
+    expect(profileNav().getByRole('tab', { name: 'Members' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeVisible();
+  });
+
+  it('routes two profiles on one page independently when they have different bases', async () => {
+    serve();
+    await renderWithClerk(
+      <>
+        <OrganizationProfile path='/first' />
+        <OrganizationProfile path='/second' />
+      </>,
+    );
+    const user = userEvent.setup();
+    const [first, second] = screen.getAllByRole('navigation', { name: 'Organization' }).map(nav => within(nav));
+
+    await user.click(first.getByRole('tab', { name: 'Members' }));
+
+    expect(first.getByRole('tab', { name: 'Members' })).toHaveAttribute('aria-selected', 'true');
+    expect(second.getByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('opens as a modal on the requested page, writing the segment legacy used', async () => {
+    serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_memberships:read', 'org:sys_api_keys:read'] });
+    await renderWithClerk(
+      <>
+        <OpenProfile page='apiKeys' />
+        <Entry base='/modal/organization' />
+      </>,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Open profile' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'API Keys' })).toHaveAttribute('aria-selected', 'true');
+    expect(entry()).toEqual(['api-keys']);
   });
 
   it('switches pages from the navigation', async () => {
