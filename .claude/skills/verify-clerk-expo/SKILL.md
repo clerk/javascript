@@ -281,7 +281,8 @@ $ # in a Claude Code cloud session, open the draft with gh api repos/clerk/javas
 $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot <label> --before <before-run-id>
 $ integration/expo-native/bin/control-clerk-expo down
 $ sh -c 'for i in $(seq 40); do gh api repos/clerk/javascript/pulls/<n> --jq .body | sed -n "/<!-- verify-evidence:<platform> -->/,/<!-- \/verify-evidence:<platform> -->/p" | grep -q "| :---:" && exit 0; sleep 15; done; exit 1'
-$ # check the description, as Evidence says, then:
+$ # if that exited 1, stop: leave the pull request a draft and report that the evidence table did not appear
+$ # otherwise check the description, as Evidence says, then:
 $ gh pr ready <n>
 $ # in a Claude Code cloud session, use gh api -X POST repos/clerk/javascript/pulls/<n>/ccr/ready_for_review in place of gh pr ready
 $ git push origin --delete <branch>-before && git branch -D <branch>-before
