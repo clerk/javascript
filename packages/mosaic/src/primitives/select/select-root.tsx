@@ -27,7 +27,15 @@ import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
 import { alignSelectedItem } from './align-selected-item';
-import { SelectContext, type SelectContextValue, type SelectItem } from './select-context';
+import {
+  SelectContext,
+  type SelectContextValue,
+  SelectHighlightContext,
+  type SelectHighlightContextValue,
+  type SelectItem,
+  SelectOptionsContext,
+  type SelectOptionsContextValue,
+} from './select-context';
 
 export type { SelectItem } from './select-context';
 
@@ -90,7 +98,9 @@ function SelectInner(props: SelectProps) {
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
-  const controlledValues = props.multiple ? props.value : toValues(props.value);
+  const singleValue = props.multiple ? undefined : props.value;
+  const controlledSingle = useMemo(() => toValues(singleValue), [singleValue]);
+  const controlledValues = props.multiple ? props.value : controlledSingle;
   const [selectedValues, setSelectedValues] = useControllableState<string[]>(
     controlledValues,
     (props.multiple ? props.defaultValue : toValues(props.defaultValue)) ?? [],
@@ -273,7 +283,6 @@ function SelectInner(props: SelectProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       setActiveIndex,
       selectedIndex,
@@ -303,7 +312,6 @@ function SelectInner(props: SelectProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       setActiveIndex,
       selectedIndex,
@@ -320,9 +328,29 @@ function SelectInner(props: SelectProps) {
     ],
   );
 
+  const optionsContextValue = useMemo<SelectOptionsContextValue>(
+    () => ({
+      getItemProps,
+      handleSelect,
+      setSelectedIndex,
+      valueToLabelRef,
+      selectedItemRef,
+    }),
+    [getItemProps, handleSelect],
+  );
+
+  const highlightContextValue = useMemo<SelectHighlightContextValue>(
+    () => ({ activeIndex, selectedValues }),
+    [activeIndex, selectedValues],
+  );
+
   return (
     <FloatingNode id={nodeId}>
-      <SelectContext.Provider value={contextValue}>{children}</SelectContext.Provider>
+      <SelectContext.Provider value={contextValue}>
+        <SelectOptionsContext.Provider value={optionsContextValue}>
+          <SelectHighlightContext.Provider value={highlightContextValue}>{children}</SelectHighlightContext.Provider>
+        </SelectOptionsContext.Provider>
+      </SelectContext.Provider>
     </FloatingNode>
   );
 }
