@@ -580,6 +580,79 @@ describe('Mosaic effects', { timeout: 30_000 }, () => {
   });
 });
 
+describe('Mosaic clock reads', { timeout: 30_000 }, () => {
+  async function renderClockMessages(file, source) {
+    const messages = await lintAt(file, source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages.filter(message => message.ruleId === 'mosaic/no-render-clock').map(message => message.message);
+  }
+
+  test('rejects a clock read in a hook body', async () => {
+    expect(
+      await renderClockMessages('src/hooks/sample.ts', 'export function useSample() { return Date.now(); }'),
+    ).toEqual([
+      'Read the current time with useNow during render, so the server and the client agree. Date.now() and new Date() belong in effects, event handlers and machine actions.',
+    ]);
+  });
+
+  test.each([
+    ['a component body', 'export function Sample() { const now = new Date(); return now.getTime(); }'],
+    ['an arrow hook', 'export const useSample = () => Date.now();'],
+    [
+      'a useState initializer',
+      "import { useState } from 'react';\nexport function useSample() { return useState(() => Date.now())[0]; }",
+    ],
+    [
+      'a useState initializer reference',
+      "import { useState } from 'react';\nexport function useSample() { return useState(Date.now)[0]; }",
+    ],
+    [
+      'a useMemo callback',
+      "import { useMemo } from 'react';\nexport function useSample() { return useMemo(() => new Date(), []); }",
+    ],
+    ['a useRef value', "import { useRef } from 'react';\nexport function useSample() { return useRef(Date.now()); }"],
+    ['a map callback', 'export function useSample(items: number[]) { return items.map(item => item - Date.now()); }'],
+    ['an Array.from callback', 'export function useSample() { return Array.from([1], () => new Date()); }'],
+    [
+      'a forwardRef render',
+      "import { forwardRef } from 'react';\nexport const Sample = forwardRef(() => { void Date.now(); return null; });",
+    ],
+  ])('rejects a clock read in %s', async (_name, source) => {
+    expect(await renderClockMessages('src/hooks/sample.ts', source)).toHaveLength(1);
+  });
+
+  test.each([
+    [
+      'an effect',
+      "import { useEffect } from 'react';\nexport function useSample() { useEffect(() => { void Date.now(); }, []); }",
+    ],
+    [
+      'a named effect callback',
+      "import { useEffect } from 'react';\nexport function Sample() { useEffect(function RecordTime() { void Date.now(); }, []); return null; }",
+    ],
+    [
+      'a useCallback',
+      "import { useCallback } from 'react';\nexport function useSample() { return useCallback(() => Date.now(), []); }",
+    ],
+    ['an event handler', 'export function useSample() { return { onClick: () => new Date() }; }'],
+    ['a custom hook callback', 'export function useSample() { return usePendingAction(() => Date.now()); }'],
+    ['a timer', 'export function useSample() { return () => setTimeout(() => Date.now(), 0); }'],
+    ['a promise callback', 'export function useSample(load: Promise<void>) { void load.then(() => Date.now()); }'],
+    ['a plain function', 'export function unlockTime(seconds: number) { return Date.now() + seconds * 1000; }'],
+    ['a parsed date', 'export function useSample(value: string) { return new Date(value); }'],
+  ])('allows a clock read in %s', async (_name, source) => {
+    expect(await renderClockMessages('src/hooks/sample.ts', source)).toEqual([]);
+  });
+
+  test.each(['src/hooks/use-now.ts', 'src/mosaic-provider.tsx'])('allows the shared clock in %s', async file => {
+    expect(await renderClockMessages(file, 'export function useSample() { return Date.now(); }')).toEqual([]);
+  });
+
+  test('ignores test files', async () => {
+    expect(await renderClockMessages(testFixture, 'export function useSample() { return Date.now(); }')).toEqual([]);
+  });
+});
+
 describe('Mosaic package configuration', () => {
   test('inherits repository rules and keeps Mosaic guards in the package', async () => {
     const configAt = async cwd => {

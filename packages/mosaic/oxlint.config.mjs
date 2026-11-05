@@ -231,6 +231,19 @@ export default defineConfig({
       },
     },
     {
+      files: ['src/**/*.{ts,tsx}'],
+      excludeFiles: [
+        'src/hooks/use-now.ts',
+        'src/mosaic-provider.tsx',
+        'src/**/__tests__/**',
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.test-d.{ts,tsx}',
+      ],
+      rules: {
+        'mosaic/no-render-clock': 'error',
+      },
+    },
+    {
       files: ['src/features/**/*.{ts,tsx}'],
       excludeFiles: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/**/*.test-d.{ts,tsx}'],
       rules: noUnneededEffects.configs.strict.rules,
