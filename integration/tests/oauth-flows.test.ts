@@ -567,9 +567,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       const secondTransfer = new Promise<void>(resolve => {
         onSecondTransfer = resolve;
       });
-      let onFirstTransferReleased: () => void = () => {};
-      const firstTransferReleased = new Promise<void>(resolve => {
-        onFirstTransferReleased = resolve;
+      let onFirstTransferResponded: () => void = () => {};
+      const firstTransferResponded = new Promise<void>(resolve => {
+        onFirstTransferResponded = resolve;
       });
 
       await page.route('**/v1/client/sign_ups*', async route => {
@@ -585,8 +585,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
         const isFirst = transferStatuses.length === 0;
         transferStatuses.push(0);
         const index = transferStatuses.length - 1;
-        const response = await route.fetch();
-        transferStatuses[index] = response.status();
 
         if (isFirst) {
           await page.evaluate(() => {
@@ -603,13 +601,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
             .then(() => true)
             .catch(() => false);
           await Promise.race([secondTransfer, new Promise(resolve => setTimeout(resolve, 1000))]);
-          await route.fulfill({ response });
-          onFirstTransferReleased();
-          return;
+        } else {
+          onSecondTransfer();
         }
 
-        onSecondTransfer();
-        await route.fulfill({ response });
+        await route.continue();
+        const response = await request.response();
+        transferStatuses[index] = response?.status() ?? 0;
+
+        if (isFirst) {
+          onFirstTransferResponded();
+        }
       });
 
       try {
@@ -622,7 +624,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
         await u.po.signIn.continue();
         await u.po.signIn.enterTestOtpCode();
 
-        await firstTransferReleased;
+        await firstTransferResponded;
 
         expect(callbackCalledAgain).toBe(true);
         expect(transferStatuses).toEqual([200]);
