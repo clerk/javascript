@@ -2,7 +2,7 @@
 '@clerk/mosaic': minor
 ---
 
-**Breaking:** Simplify `Item` to one size and one look. Every row is now bordered, sizes to its content with even padding instead of a fixed height, and `Item.Group` always stacks rows 8px apart. TypeScript flags the removed props.
+**Breaking:** Simplify `Item` to one size and one look. Rows are always bordered and size to their content. TypeScript flags the removed props.
 
 | Before                                       | After                       |
 | -------------------------------------------- | --------------------------- |
