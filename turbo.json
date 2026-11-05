@@ -14,24 +14,15 @@
     "tsconfig.*.json"
   ],
   "globalEnv": [
-    "CLERK_*",
-    "EXPO_PUBLIC_CLERK_*",
     "NEXT_PHASE",
-    "NEXT_PUBLIC_CLERK_*",
     "NODE_ENV",
     "NODE_VERSION",
     "NPM_VERSION",
-    "PLASMO_PUBLIC_CLERK_*",
-    "PUBLIC_CLERK_*",
-    "REACT_APP_CLERK_*",
     "RSDOCTOR",
     "TZ",
     "VERCEL",
     "VERCEL_PROJECT_PRODUCTION_URL",
-    "VERCEL_TARGET_ENV",
-    "VITE_CLERK_*",
-    "!CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-    "!CLERK_PLATFORM_API_KEY"
+    "VERCEL_TARGET_ENV"
   ],
   "globalPassThroughEnv": [
     "E2E_KEYCLOAK_*",
@@ -44,7 +35,14 @@
     "ACTIONS_STEP_DEBUG",
     "VERCEL_AUTOMATION_BYPASS_SECRET",
     "PORT",
-    "UI_PORT"
+    "UI_PORT",
+    "CLERK_*",
+    "EXPO_PUBLIC_CLERK_*",
+    "NEXT_PUBLIC_CLERK_*",
+    "PLASMO_PUBLIC_CLERK_*",
+    "PUBLIC_CLERK_*",
+    "REACT_APP_CLERK_*",
+    "VITE_CLERK_*"
   ],
   "tasks": {
     "build": {
@@ -255,12 +253,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -278,12 +283,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -300,12 +312,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -322,12 +341,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -344,12 +370,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -367,12 +400,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -389,12 +429,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -403,11 +450,18 @@
     "//#test:integration:nextjs:canary": {
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
-        "INTEGRATION_INSTANCE_KEYS"
+        "EXPO_PUBLIC_CLERK_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": [
         "integration/**",
@@ -439,13 +493,20 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
         "INTEGRATION_STAGING_INSTANCE_KEYS",
-        "VERCEL_AUTOMATION_BYPASS_SECRET"
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VERCEL_AUTOMATION_BYPASS_SECRET",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -463,12 +524,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -485,13 +553,20 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
         "INTEGRATION_STAGING_INSTANCE_KEYS",
-        "NODE_EXTRA_CA_CERTS"
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -508,13 +583,20 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "NODE_EXTRA_CA_CERTS"
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -531,13 +613,20 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "NODE_EXTRA_CA_CERTS"
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -554,13 +643,20 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "NODE_EXTRA_CA_CERTS"
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -577,13 +673,20 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "NODE_EXTRA_CA_CERTS"
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -592,11 +695,18 @@
     "//#test:integration:expo-web": {
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
-        "INTEGRATION_INSTANCE_KEYS"
+        "EXPO_PUBLIC_CLERK_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": [
         "integration/**",
@@ -641,12 +751,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -664,12 +781,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -687,12 +811,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -709,12 +840,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -734,12 +872,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -765,12 +910,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -787,12 +939,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -809,12 +968,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -832,11 +998,18 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
-        "INTEGRATION_INSTANCE_KEYS"
+        "EXPO_PUBLIC_CLERK_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
@@ -853,12 +1026,19 @@
       ],
       "env": [
         "CLEANUP",
+        "CLERK_*",
         "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
         "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
         "INTEGRATION_INSTANCE_KEYS",
-        "INTEGRATION_STAGING_INSTANCE_KEYS"
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
       ],
       "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
       "outputs": ["integration/playwright-report/**"],
