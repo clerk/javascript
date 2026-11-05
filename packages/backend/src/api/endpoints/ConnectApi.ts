@@ -96,6 +96,7 @@ export type ConnectConnectorConfigurationParams = {
   pkce?: 'required' | 'preferred' | 'disabled';
   responseMode?: 'query' | 'form_post';
   scopeSeparator?: 'space' | 'comma';
+  tokenRequestContentType?: 'application/x-www-form-urlencoded' | 'application/json';
   authorizationParams?: Record<string, string>;
   tokenParams?: Record<string, string>;
 };
@@ -109,8 +110,9 @@ export type CreateConnectorParams = {
   configuration: ConnectConnectorConfigurationParams;
 };
 
-export type UpdateConnectorParams = Partial<Omit<CreateConnectorParams, 'key' | 'provider'>> & {
+export type UpdateConnectorParams = Partial<Omit<CreateConnectorParams, 'key' | 'provider' | 'target'>> & {
   status?: 'active' | 'disabled';
+  target?: CreateConnectorParams['target'] | null;
 };
 
 export type ConnectConnector = {

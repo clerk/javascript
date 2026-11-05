@@ -58,7 +58,7 @@ export const ConnectionsSection = withCardStateProvider(() => {
   const { componentName, mode } = useUserProfileContext();
   const [failure] = useState(readConnectError);
 
-  useEffect(removeConnectErrorFromUrl, []);
+  useEffect(() => queueMicrotask(removeConnectErrorFromUrl), []);
   useEffect(() => {
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
@@ -113,8 +113,11 @@ export const ConnectionsSection = withCardStateProvider(() => {
       connections.revalidate();
       card.setIdle();
     } catch (err) {
-      handleError(err as Error, [], card.setError);
-      card.setIdle();
+      try {
+        handleError(err as Error, [], card.setError);
+      } finally {
+        card.setIdle();
+      }
     }
   };
 
