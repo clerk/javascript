@@ -21,12 +21,6 @@ import { tabularNumbersStyle } from '../../../styles/typography.styles';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 
-const styles = stylex.create({
-  ssoConnection: {
-    paddingInline: 0,
-  },
-});
-
 export interface UserProfileAddEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -374,7 +368,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
           logoPublicUrl }) to the email address — the connections sign-in would offer for it, oldest
           first — which is the data to render once it lands.
         */}
-        <Item.Root xstyle={styles.ssoConnection}>
+        <Item.Root>
           <Item.Content>
             <Item.Label>{domain}</Item.Label>
             <Item.Description>{m.sso.connection}</Item.Description>

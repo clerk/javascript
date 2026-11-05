@@ -149,7 +149,6 @@ import {
   Group as ItemGroup,
   Interactive as ItemInteractive,
   meta as itemMeta,
-  Scrolling as ItemScrolling,
 } from '../stories/item.stories';
 import {
   Catalog as LocalizationCatalog,
@@ -749,7 +748,6 @@ const itemModule: StoryModule = {
   Default: ItemDefault,
   Interactive: ItemInteractive,
   Group: ItemGroup,
-  Scrolling: ItemScrolling,
 };
 
 const userButtonModule: StoryModule = {
