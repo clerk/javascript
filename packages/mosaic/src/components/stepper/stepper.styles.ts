@@ -43,6 +43,7 @@ export const styles = stylex.create({
   segment: {
     borderRadius: radiusVars['--cl-radius-full'],
     display: 'block',
+    flexShrink: 0,
     transitionDuration: {
       default: durationVars['--cl-duration-slow'],
       [reduceMotion]: durationVars['--cl-duration-instant'],
