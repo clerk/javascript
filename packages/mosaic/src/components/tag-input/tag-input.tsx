@@ -168,6 +168,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
         ref={ref}
         itemProps={itemProps}
         id={fieldProps?.id ?? id}
+        form={form}
         required={required}
         aria-invalid={ariaInvalid}
         aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
