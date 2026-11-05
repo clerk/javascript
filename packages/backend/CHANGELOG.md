@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.27.0
+
+### Minor Changes
+
+- Add `DirectoryGroupWebhookEvent` and `DirectoryGroupMembershipWebhookEvent` to `WebhookEvent`, so `verifyWebhook()` narrows the `directoryGroup.created`, `directoryGroup.updated`, `directoryGroup.synced`, `directoryGroup.deleted`, `directoryGroupMembership.created` and `directoryGroupMembership.deleted` events that Directory Sync sends. Their payload types are exported as `DirectoryGroupWebhookEventJSON`, `DirectoryGroupMembershipWebhookEventJSON` and `DeletedDirectoryGroupMembershipWebhookEventJSON`. ([#10378](https://github.com/clerk/javascript/pull/10378)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+
 ## 3.26.6
 
 ### Patch Changes
