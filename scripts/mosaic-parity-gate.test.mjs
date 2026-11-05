@@ -242,16 +242,22 @@ describe('hook registration', () => {
       const config = JSON.parse(readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'));
       const stop = config.hooks.Stop.flatMap(entry => entry.hooks);
       expect(stop).toHaveLength(2);
-      expect(stop.every(hook => hook.timeout === 180 && hook.command.includes('pnpm exec eslint'))).toBe(true);
+      expect(stop.every(hook => hook.timeout === 180 && hook.command.includes('pnpm lint'))).toBe(true);
       expect(stop.some(hook => hook.command.includes('packages/mosaic'))).toBe(true);
-      expect(stop.some(hook => hook.command.includes('packages/swingset/src'))).toBe(true);
+      expect(stop.some(hook => hook.command.includes('packages/swingset'))).toBe(true);
       expect(config.hooks.UserPromptSubmit).toBeUndefined();
       expect(config.hooks.PostToolUse).toBeUndefined();
       const pre = config.hooks.PreToolUse;
       expect(pre).toHaveLength(1);
       expect(pre[0].matcher).toBe(path.startsWith('.claude') ? 'Write|Edit' : 'apply_patch|Edit|Write');
       expect(pre[0].hooks[0].if).toBeUndefined();
-      expect(pre[0].hooks[0].command).toContain('mosaic-parity-gate.mjs');
+      expect(pre[0].hooks).toEqual([
+        {
+          type: 'command',
+          command: 'node "$(git rev-parse --show-toplevel)/scripts/mosaic-parity-gate.mjs" write',
+          timeout: 10,
+        },
+      ]);
       if (path.startsWith('.claude')) {
         expect(config.disableBypassPermissionsMode).toBe(true);
         expect(config.permissions.deny).toHaveLength(20);
