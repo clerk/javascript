@@ -8,7 +8,7 @@ import { UserCircle } from '../../icons/glyphs/user-circle';
 import { applyOrder } from '../../utils/apply-order';
 import { organizationProfilePageIds } from '../organization-profile/organization-profile.layout';
 import type { OrganizationProfilePageListOptions } from '../organization-profile/organization-profile.types';
-import { withUniquePaths } from '../profile-pages/profile-pages.layout';
+import { withRoutablePaths, withUniquePaths } from '../profile-pages/profile-pages.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
 /** The built-in pages in the order the profile lists them before a consumer reorders anything. */
@@ -47,7 +47,7 @@ export function resolveUserProfilePages(
   customPages: readonly CustomProfilePage[] = [],
   order?: readonly string[],
 ): UserProfileNavEntry[] {
-  const uniqueCustomPages = withUniquePaths(customPages);
+  const uniqueCustomPages = withUniquePaths(withRoutablePaths(customPages));
   const customById = new Map(uniqueCustomPages.map(page => [page.path, page]));
   const builtInIds = new Set<string>(builtIn);
   const entries: UserProfileNavEntry[] = [

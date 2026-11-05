@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildParts, compilePattern, compileRoutes, matchRoute, routeParts } from '../routes';
+import { buildParts, compilePattern, compileRoutes, isLiteralPattern, matchRoute, routeParts } from '../routes';
 
 const routes = compileRoutes({
   index: '',
@@ -69,6 +69,22 @@ describe('compilePattern', () => {
   it('rejects a literal that encoding would change', () => {
     expect(() => compilePattern('api keys')).toThrow('must be plain');
     expect(() => compilePattern('api%20keys')).toThrow('must be plain');
+  });
+});
+
+describe('isLiteralPattern', () => {
+  it('accepts plain parts', () => {
+    expect(isLiteralPattern('api-keys')).toBe(true);
+    expect(isLiteralPattern('organization/general')).toBe(true);
+  });
+
+  it('rejects an empty pattern, a param, and a literal that encoding would change', () => {
+    expect(isLiteralPattern('')).toBe(false);
+    expect(isLiteralPattern('/')).toBe(false);
+    expect(isLiteralPattern(':id')).toBe(false);
+    expect(isLiteralPattern('terms/:id?')).toBe(false);
+    expect(isLiteralPattern('my page')).toBe(false);
+    expect(isLiteralPattern('my%20page')).toBe(false);
   });
 });
 

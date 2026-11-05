@@ -51,7 +51,7 @@ export function ModalSurfaceHost<Options>({
       open: (options, container) => {
         preload();
         if (routed) {
-          location.write(surface.initialParts?.(options) ?? [], { replace: true });
+          location.write(surface.initialParts?.(options) ?? []);
         }
         setState(previous => ({ open: true, options, container, openCount: previous.openCount + 1 }));
       },

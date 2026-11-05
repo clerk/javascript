@@ -84,6 +84,11 @@ export function useRouterScope<const Routes extends RouteTable>(
     [matched, notFound],
   );
 
+  const fallback = useMemo(() => {
+    const target = routeParts(table, notFound);
+    return router.parse(target) ? target : undefined;
+  }, [table, router, notFound]);
+
   const redirectTo = matched === undefined ? notFound : undefined;
   const redirected = useRef<{ from: SegmentParts; left: boolean }>(undefined);
   useEffect(() => {
@@ -94,6 +99,12 @@ export function useRouterScope<const Routes extends RouteTable>(
     if (redirectTo === undefined) {
       return;
     }
+    if (fallback === undefined) {
+      logger.warnOnce(
+        `[Clerk] The notFound route "${redirectTo}" under "${path ?? '/'}" is either missing or needs params, so it cannot be a fallback. Use a route without params.`,
+      );
+      return;
+    }
     if (last?.left && sameParts(last.from, parts)) {
       logger.warnOnce(
         `[Clerk] The segment "${parts.join('/')}" under "${path ?? '/'}" was not found, but after updating the location to match the fallback page, something wrote back the segment again. Two routers probably share this base; give one of them a different path.`,
@@ -101,8 +112,8 @@ export function useRouterScope<const Routes extends RouteTable>(
       return;
     }
     redirected.current = { from: parts, left: false };
-    location.write(routeParts(table, redirectTo), { replace: true });
-  }, [parts, redirectTo, location, table, path]);
+    location.write(fallback, { replace: true });
+  }, [parts, redirectTo, fallback, location, path]);
 
   return useMemo(
     () => ({ route: current.name, params: current.params, go: router.go, scope }),
