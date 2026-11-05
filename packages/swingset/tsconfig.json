@@ -3,16 +3,25 @@
     "target": "ES2022",
     "module": "preserve",
     "moduleResolution": "bundler",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "strict": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
-    "lib": ["ES2023", "DOM"],
+    "lib": [
+      "ES2023",
+      "DOM"
+    ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@clerk/mosaic": ["../mosaic/src"],
-      "@clerk/mosaic/*": ["../mosaic/src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@clerk/mosaic": [
+        "../mosaic/src"
+      ],
+      "@clerk/mosaic/*": [
+        "../mosaic/src/*"
+      ]
     },
     "plugins": [
       {
@@ -32,5 +41,7 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
