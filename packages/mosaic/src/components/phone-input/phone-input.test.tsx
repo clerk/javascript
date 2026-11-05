@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -5,6 +6,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Field } from '../field';
 import { PhoneInput } from './phone-input';
+
+const atoms = stylex.create({
+  spaced: { marginTop: 4 },
+});
 
 describe('Mosaic PhoneInput', () => {
   it('opens the country picker from the keyboard and restores focus when dismissed', async () => {
@@ -482,6 +487,27 @@ describe('Mosaic PhoneInput', () => {
       throw new Error('Expected a form element');
     }
     expect(new FormData(form).get('phoneNumber')).toBe('+12025550123');
+  });
+
+  it('composes xstyle onto the grouped root and forwards input props to the telephone input', () => {
+    render(
+      <PhoneInput
+        aria-label='Phone number'
+        placeholder='202 555 0123'
+        data-testid='phone-number'
+        xstyle={atoms.spaced}
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Phone number' });
+    const xstyleClassName = stylex.props(atoms.spaced).className ?? '';
+    const root = document.querySelector('.cl-phone-input');
+    expect(root).toHaveClass(xstyleClassName);
+    expect(root).toContainElement(input);
+    expect(input).not.toHaveClass(xstyleClassName);
+    expect(input).toHaveClass('cl-phone-input-control');
+    expect(input).toHaveAttribute('placeholder', '202 555 0123');
+    expect(input).toHaveAttribute('data-testid', 'phone-number');
   });
 
   it('inherits Field state and associates its label and messages with the telephone input', () => {
