@@ -16,7 +16,7 @@ import {
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { useModal } from '../../../modals/use-modal';
-import { useVirtualSegment } from '../../../routing/virtual-store';
+import { useVirtualEntries } from '../../../routing/virtual-store';
 import { UserProfile } from '../user-profile';
 import { userProfileModal } from '../user-profile.modal';
 import { signedIn } from '../user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
@@ -35,14 +35,19 @@ function tabNames() {
 }
 
 function Entry({ base }: { base: string }) {
-  return <output data-testid='entry'>{JSON.stringify(useVirtualSegment(base))}</output>;
+  return <output data-testid='entry'>{JSON.stringify(useVirtualEntries().get(base) ?? null)}</output>;
 }
 
 const entry = () => JSON.parse(screen.getByTestId('entry').textContent ?? 'null');
 
-function OpenProfile({ page }: { page: string }) {
+function OpenProfile({ page }: { page?: string }) {
   const profile = useModal(userProfileModal);
-  return <button onClick={() => profile.open({ page })}>Open profile</button>;
+  return (
+    <>
+      <button onClick={() => profile.open(page === undefined ? undefined : { page })}>Open profile</button>
+      <button onClick={() => profile.close()}>Close profile</button>
+    </>
+  );
 }
 
 describe('UserProfile', () => {
@@ -135,7 +140,7 @@ describe('UserProfile', () => {
       </>,
     );
     const user = userEvent.setup();
-    expect(entry()).toEqual([]);
+    expect(entry()).toBeNull();
 
     await user.click(screen.getByRole('tab', { name: 'API Keys' }));
     expect(entry()).toEqual(['api-keys']);
@@ -159,6 +164,42 @@ describe('UserProfile', () => {
 
     expect(await within(dialog).findByRole('tab', { name: 'API Keys' })).toHaveAttribute('aria-selected', 'true');
     expect(entry()).toEqual(['api-keys']);
+  });
+
+  it('opens as a modal on the root page with an empty entry', async () => {
+    serve();
+    await renderWithClerk(
+      <>
+        <OpenProfile page='account' />
+        <Entry base='/modal/user' />
+      </>,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Open profile' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+    await waitFor(() => expect(entry()).toEqual([]));
+  });
+
+  it('clears the modal entry when a profile closes, so it reopens on the first page', async () => {
+    serve();
+    await renderWithClerk(
+      <>
+        <OpenProfile page='security' />
+        <Entry base='/modal/user' />
+      </>,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Open profile' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(await within(dialog).findByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
+
+    await user.click(screen.getByRole('button', { name: 'Close profile' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(entry()).toBeNull();
   });
 
   it('keeps its page when remounted under the same provider', async () => {
