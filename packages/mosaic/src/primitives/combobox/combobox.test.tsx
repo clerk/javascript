@@ -529,6 +529,96 @@ describe('Combobox', () => {
       expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-selected');
     });
 
+    describe('active option reference while filtering a selection', () => {
+      function FilteredPicker() {
+        const [open, setOpen] = useState(false);
+        const [value, setValue] = useState<string | null>('apple');
+        return (
+          <Combobox.Root
+            inline
+            open={open}
+            onOpenChange={setOpen}
+            value={value}
+            onValueChange={setValue}
+          >
+            <button
+              type='button'
+              onClick={() => setOpen(!open)}
+            >
+              {value}
+            </button>
+            {open && (
+              <>
+                <Combobox.Input aria-label='Search fruit' />
+                <Combobox.List>
+                  <Combobox.Collection
+                    items={fruits}
+                    itemToStringLabel={fruit => fruit.label}
+                  >
+                    {fruit => (
+                      <Combobox.Option
+                        key={fruit.value}
+                        value={fruit.value}
+                        label={fruit.label}
+                      >
+                        {fruit.label}
+                      </Combobox.Option>
+                    )}
+                  </Combobox.Collection>
+                </Combobox.List>
+              </>
+            )}
+          </Combobox.Root>
+        );
+      }
+
+      function expectActiveOption(name: string) {
+        const reference = screen.getByRole('combobox').getAttribute('aria-activedescendant');
+        expect(reference === null ? null : document.getElementById(reference)).toBe(
+          screen.getByRole('option', { name }),
+        );
+      }
+
+      it('references the filtered option the input highlights, then selects it', async () => {
+        const user = userEvent.setup();
+        render(<FilteredPicker />);
+        await user.click(screen.getByRole('button', { name: 'apple' }));
+        expectActiveOption('Apple');
+
+        await user.type(screen.getByRole('combobox'), 'Ban');
+        expect(screen.getAllByRole('option')).toHaveLength(1);
+        expectActiveOption('Banana');
+
+        await user.keyboard('{ArrowDown}');
+        expectActiveOption('Banana');
+        await user.keyboard('{ArrowDown}');
+        expectActiveOption('Banana');
+
+        await user.keyboard('{Enter}');
+        expect(screen.getByRole('button', { name: 'banana' })).toBeInTheDocument();
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+      });
+
+      it('drops the reference when filtering leaves no options, and references the selection on reopen', async () => {
+        const user = userEvent.setup();
+        render(<FilteredPicker />);
+        await user.click(screen.getByRole('button', { name: 'apple' }));
+        await user.type(screen.getByRole('combobox'), 'Ban');
+        expectActiveOption('Banana');
+
+        await user.type(screen.getByRole('combobox'), 'x');
+        expect(screen.queryAllByRole('option')).toHaveLength(0);
+        expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-activedescendant');
+        await user.keyboard('{ArrowDown}');
+        expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-activedescendant');
+
+        await user.click(screen.getByRole('button', { name: 'apple' }));
+        await user.click(screen.getByRole('button', { name: 'apple' }));
+        expect(screen.getByRole('combobox')).toHaveValue('');
+        expectActiveOption('Apple');
+      });
+    });
+
     it.each([true, false])('respects a controlled clearing request when accepted=%s', async accept => {
       const user = userEvent.setup();
       const onValueChange = vi.fn();

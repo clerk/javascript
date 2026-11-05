@@ -34,6 +34,7 @@ export interface ComboboxContextValue {
   setOpen: (open: boolean) => void;
   focusInput: () => void;
   popupId: string | undefined;
+  activeOptionId: string | undefined;
   mounted: boolean;
   transitionProps: TransitionProps;
 }
@@ -54,7 +55,8 @@ export interface ComboboxOptionsContextValue {
   refs: ExtendedRefs<ReferenceType>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   registerSelectedIndex: (index: number, value: string, label: string, selected: boolean) => (() => void) | undefined;
-  registerOption: (index: number) => void;
+  registerOption: (index: number) => () => void;
+  popupId: string | undefined;
 }
 
 export interface ComboboxHighlightContextValue {

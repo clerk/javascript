@@ -13,6 +13,7 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
     open,
     inputValue,
     activeIndex,
+    activeOptionId,
     refs,
     getReferenceProps,
     handleInputChange,
@@ -43,6 +44,9 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
     }),
   };
 
+  const merged = mergeProps<'input'>(defaultProps, otherProps);
+  merged['aria-activedescendant'] = activeOptionId;
+
   return useRender({
     defaultTagName: 'input',
     render,
@@ -52,6 +56,6 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
     stateAttributesMapping: {
       open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
     },
-    props: mergeProps<'input'>(defaultProps, otherProps),
+    props: merged,
   });
 });

@@ -209,6 +209,60 @@ describe('Mosaic PhoneInput', () => {
     expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
   });
 
+  describe('active country reference while searching', () => {
+    function expectActiveCountry(name: RegExp) {
+      const reference = screen
+        .getByRole('combobox', { name: 'Search countries' })
+        .getAttribute('aria-activedescendant');
+      expect(reference === null ? null : document.getElementById(reference)).toBe(screen.getByRole('option', { name }));
+    }
+
+    it('references the only matching country through navigation and selection', async () => {
+      const user = userEvent.setup();
+      render(<PhoneInput aria-label='Phone number' />);
+
+      await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+      expectActiveCountry(/United States/);
+
+      await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Greece');
+      expect(screen.getAllByRole('option')).toHaveLength(1);
+      expectActiveCountry(/Greece/);
+
+      await user.keyboard('{ArrowDown}');
+      expectActiveCountry(/Greece/);
+      await user.keyboard('{ArrowDown}');
+      expectActiveCountry(/Greece/);
+
+      await user.keyboard('{Enter}');
+      expect(screen.getByRole('button', { name: 'Country, Greece' })).toBeInTheDocument();
+      expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
+
+      await user.click(screen.getByRole('button', { name: 'Country, Greece' }));
+      expectActiveCountry(/Greece/);
+    });
+
+    it('drops the reference when no country matches, and references the selection on reopen', async () => {
+      const user = userEvent.setup();
+      render(<PhoneInput aria-label='Phone number' />);
+
+      await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+      const searchInput = screen.getByRole('combobox', { name: 'Search countries' });
+      await user.type(searchInput, 'Greece');
+      expectActiveCountry(/Greece/);
+
+      await user.type(searchInput, 'x');
+      expect(screen.queryAllByRole('option')).toHaveLength(0);
+      expect(searchInput).not.toHaveAttribute('aria-activedescendant');
+      await user.keyboard('{ArrowDown}');
+      expect(searchInput).not.toHaveAttribute('aria-activedescendant');
+
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('combobox', { name: 'Search countries' })).not.toBeInTheDocument());
+      await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+      expectActiveCountry(/United States/);
+    });
+  });
+
   it('clears the country search when the popup is dismissed', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);

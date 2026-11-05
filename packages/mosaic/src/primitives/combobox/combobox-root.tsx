@@ -73,6 +73,7 @@ function ComboboxInner(props: ComboboxProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [inlineMode, setInlineMode] = useState(false);
   const [queryChanged, setQueryChanged] = useState(false);
+  const [optionCount, setOptionCount] = useState(0);
   const initialValue = props.value ?? props.defaultValue;
   const labelsByValueRef = useRef(
     new Map<string, string>(
@@ -117,10 +118,12 @@ function ComboboxInner(props: ComboboxProps) {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
   const registerOption = useCallback((index: number) => {
+    setOptionCount(count => count + 1);
     if (index === 0 && highlightFirstRef.current) {
       highlightFirstRef.current = false;
       setActiveIndex(0);
     }
+    return () => setOptionCount(count => count - 1);
   }, []);
   const registerSelectedIndex = useCallback((index: number, value: string, label: string, selected: boolean) => {
     labelsByValueRef.current.set(value, label);
@@ -204,6 +207,10 @@ function ComboboxInner(props: ComboboxProps) {
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav]);
   const referenceProps = getReferenceProps();
   const popupId = typeof referenceProps['aria-controls'] === 'string' ? referenceProps['aria-controls'] : undefined;
+  const activeOptionId =
+    open && popupId !== undefined && activeIndex !== null && activeIndex < optionCount
+      ? `${popupId}-${activeIndex}`
+      : undefined;
 
   const focusInput = useCallback(() => {
     const input = refs.domReference.current;
@@ -269,6 +276,7 @@ function ComboboxInner(props: ComboboxProps) {
       setOpen,
       focusInput,
       popupId,
+      activeOptionId,
       mounted,
       transitionProps,
     }),
@@ -290,6 +298,7 @@ function ComboboxInner(props: ComboboxProps) {
       setOpen,
       focusInput,
       popupId,
+      activeOptionId,
       mounted,
       transitionProps,
     ],
@@ -303,8 +312,9 @@ function ComboboxInner(props: ComboboxProps) {
       valuesByIndexRef,
       registerSelectedIndex,
       registerOption,
+      popupId,
     }),
-    [getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+    [getItemProps, handleSelect, refs, registerSelectedIndex, registerOption, popupId],
   );
 
   const highlightContextValue = useMemo<ComboboxHighlightContextValue>(

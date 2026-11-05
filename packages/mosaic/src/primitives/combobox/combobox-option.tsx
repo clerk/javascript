@@ -1,7 +1,7 @@
 'use client';
 
 import { useListItem } from '@floating-ui/react';
-import React, { useEffect, useId } from 'react';
+import React, { useEffect } from 'react';
 
 import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender } from '../utils';
 import { useComboboxHighlightContext, useComboboxOptionsContext } from './combobox-context';
@@ -41,10 +41,10 @@ interface ComboboxOptionBodyProps extends ComboboxOptionProps {
 const ComboboxOptionBody = React.memo(function ComboboxOptionBody(bodyProps: ComboboxOptionBodyProps) {
   const { forwardedRef: ref, listItemRef: itemRef, index, isActive, isSelected, ...props } = bodyProps;
   const { render, value, label, disabled, ...otherProps } = props;
-  const { getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, registerOption, refs } =
+  const { getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, registerOption, refs, popupId } =
     useComboboxOptionsContext();
 
-  const id = useId();
+  const id = popupId === undefined || index === -1 ? undefined : `${popupId}-${index}`;
   const displayLabel = label ?? value;
 
   useEffect(() => {
@@ -53,10 +53,11 @@ const ComboboxOptionBody = React.memo(function ComboboxOptionBody(bodyProps: Com
       map.set(index, value);
     }
     const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel, isSelected);
-    registerOption(index);
+    const unregisterOption = registerOption(index);
     return () => {
       map.delete(index);
       unregisterSelectedIndex?.();
+      unregisterOption();
     };
   }, [index, value, displayLabel, disabled, isSelected, valuesByIndexRef, registerSelectedIndex, registerOption]);
 
