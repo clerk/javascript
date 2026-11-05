@@ -58,10 +58,10 @@ export const styles = stylex.create({
     cursor: 'pointer',
     position: 'relative',
     '::after': {
-      content: '""',
-      position: 'absolute',
       insetBlock: `calc(-1 * ${space['2']})`,
       insetInline: `calc(-0.5 * ${space['2']})`,
+      content: '""',
+      position: 'absolute',
     },
   },
   upcomingHover: {
@@ -69,8 +69,9 @@ export const styles = stylex.create({
       default: colorVars['--cl-color-neutral-subtle'],
       '@media (hover: hover)': {
         default: null,
-        ':hover': upcomingHover,
+        // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one highlights only the hovered segment.
         [stylex.when.siblingAfter(':hover', stepperSegmentMarker)]: upcomingHover,
+        ':hover': upcomingHover,
       },
     },
   },
