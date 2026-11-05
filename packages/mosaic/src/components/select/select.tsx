@@ -133,6 +133,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
         variant={variant}
         color='neutral'
         size='md'
+        xstyle={slots.trigger.base}
         {...props}
       />
     ));

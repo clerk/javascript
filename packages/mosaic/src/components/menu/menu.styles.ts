@@ -12,9 +12,10 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const popupRadius = radiusVars['--cl-radius-lg'];
-const inset = space['0.5'];
-const itemRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
+const popupRadius = radiusVars['--cl-radius-surface'];
+const popupBorder = '1px';
+const inset = `calc(${space['1.5']} - ${popupBorder})`;
+const itemRadius = `max(0px, calc(${popupRadius} - ${popupBorder} - ${inset}))`;
 
 // Positioning is applied inline by the headless positioner; this only clears the
 // focus outline it receives. No z-index: the portalled, fixed positioner already
@@ -27,7 +28,10 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
+    borderColor: colorVars['--cl-color-border'],
     borderRadius: popupRadius,
+    borderStyle: 'solid',
+    borderWidth: popupBorder,
     outline: 'none',
     backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
@@ -88,9 +92,8 @@ export const item = stylex.create({
   base: {
     borderRadius: itemRadius,
     borderStyle: 'none',
-    gap: space['0.5'],
+    gap: space['1'],
     outline: 'none',
-    paddingInline: space['1.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
@@ -117,6 +120,8 @@ export const item = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
     outlineOffset: 0,
+    paddingInlineEnd: space['1'],
+    paddingInlineStart: space['1'],
     position: 'relative',
     textAlign: 'start',
     height: space['8'],

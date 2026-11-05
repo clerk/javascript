@@ -10,7 +10,7 @@ export const styles = stylex.create({
     // `interactive` rather than gaining a hover branch here: StyleX resolves a property to the
     // last style that declares it, so the two can't merge.
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    borderRadius: radiusVars['--cl-radius-lg'],
+    borderRadius: radiusVars['--cl-radius-md'],
     gap: space['1.5'],
     paddingInline: space['1.5'],
     alignItems: 'center',
