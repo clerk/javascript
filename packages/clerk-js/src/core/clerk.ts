@@ -370,6 +370,8 @@ export class Clerk implements ClerkInterface {
 
   public __internal_setActiveInProgress = false;
 
+  #redirectCallbackInFlight: Promise<unknown> | undefined;
+
   get publishableKey(): string {
     return this.#publishableKey;
   }
@@ -3047,17 +3049,32 @@ export class Clerk implements ClerkInterface {
     if (!this.loaded || !this.environment || !this.client) {
       return;
     }
+
+    // A callback's transfer can only succeed once, so if we get called again, for example because a
+    // component remounted, we return the running promise.
+    // We intentionally ignore params/customNavigate here, there is no way to cancel the first call
+    // or queue up a second one safely, so the only other options would be to fail the second call
+    // or have it race the first one with unpredictable effects.
+    // Reusing the first call's params is always preferable to that.
+    if (this.#redirectCallbackInFlight) {
+      return this.#redirectCallbackInFlight;
+    }
+
     const { signIn, signUp } = this.client;
 
     const resolvedNavigate = customNavigate ?? params.__internal_navigate;
     const navigate = (to: string) =>
       resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
 
-    return this._handleRedirectCallback(params, {
+    this.#redirectCallbackInFlight = this._handleRedirectCallback(params, {
       signUp,
       signIn,
       navigate,
+    }).finally(() => {
+      this.#redirectCallbackInFlight = undefined;
     });
+
+    return this.#redirectCallbackInFlight;
   };
 
   // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
