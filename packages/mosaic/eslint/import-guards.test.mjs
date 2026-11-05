@@ -603,6 +603,10 @@ describe('Mosaic clock reads', { timeout: 30_000 }, () => {
       "import { useState } from 'react';\nexport function useSample() { return useState(() => Date.now())[0]; }",
     ],
     [
+      'a useState initializer reference',
+      "import { useState } from 'react';\nexport function useSample() { return useState(Date.now)[0]; }",
+    ],
+    [
       'a useMemo callback',
       "import { useMemo } from 'react';\nexport function useSample() { return useMemo(() => new Date(), []); }",
     ],
@@ -620,6 +624,10 @@ describe('Mosaic clock reads', { timeout: 30_000 }, () => {
     [
       'an effect',
       "import { useEffect } from 'react';\nexport function useSample() { useEffect(() => { void Date.now(); }, []); }",
+    ],
+    [
+      'a named effect callback',
+      "import { useEffect } from 'react';\nexport function Sample() { useEffect(function RecordTime() { void Date.now(); }, []); return null; }",
     ],
     [
       'a useCallback',

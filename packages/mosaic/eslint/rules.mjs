@@ -309,7 +309,12 @@ export const noRenderClock = {
   create(context) {
     return {
       CallExpression(node) {
-        if (isDateNow(node) && readsDuringRender(node)) {
+        if (isDateNow(node.callee) && readsDuringRender(node)) {
+          context.report({ node, messageId: 'useNow' });
+        }
+      },
+      MemberExpression(node) {
+        if (isDateNow(node) && isRenderCallbackArgument(node) && readsDuringRender(node)) {
           context.report({ node, messageId: 'useNow' });
         }
       },
@@ -348,22 +353,24 @@ function readsDuringRender(node) {
       if (RENDER_CALLBACKS.has(name)) {
         continue;
       }
-      if (RENDER_WRAPPERS.has(name)) {
-        return true;
-      }
+      return RENDER_WRAPPERS.has(name);
     }
     return /^(use[A-Z0-9]|[A-Z])/.test(functionName(fn) ?? '');
   }
   return false;
 }
 
+function isRenderCallbackArgument(node) {
+  const call = node.parent;
+  return call.type === 'CallExpression' && call.arguments.includes(node) && RENDER_CALLBACKS.has(calleeName(call));
+}
+
 function isDateNow(node) {
-  const callee = node.callee;
   return (
-    callee.type === 'MemberExpression' &&
-    callee.object.type === 'Identifier' &&
-    callee.object.name === 'Date' &&
-    propertyName(callee.property, callee.computed) === 'now'
+    node.type === 'MemberExpression' &&
+    node.object.type === 'Identifier' &&
+    node.object.name === 'Date' &&
+    propertyName(node.property, node.computed) === 'now'
   );
 }
 
