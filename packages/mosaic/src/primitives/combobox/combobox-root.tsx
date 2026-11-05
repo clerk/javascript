@@ -48,6 +48,8 @@ export interface ComboboxProps {
   children: ReactNode;
   /** Separate search input inside another surface. Bind open to that surface. */
   inline?: boolean;
+  /** Opens the popup when the input is clicked. Has no effect with `inline`. */
+  openOnInputClick?: boolean;
 }
 
 function ComboboxInner(props: ComboboxProps) {
@@ -246,9 +248,22 @@ function ComboboxInner(props: ComboboxProps) {
     [props.inline, setInputValue, setOpenState, setSelectedValue],
   );
 
+  const clear = useCallback(() => {
+    setQueryChanged(false);
+    setInputValue('');
+    setSelectedValue(null);
+    setSelectedIndex(null);
+    setActiveIndex(null);
+    focusInput();
+  }, [focusInput, setInputValue, setSelectedValue]);
+
+  const hasValue = inputValue !== '' || selectedValue !== null;
+
   const contextValue = useMemo<ComboboxContextValue>(
     () => ({
       open,
+      hasValue,
+      clear,
       inputValue,
       filterQuery,
       selectedValue,
@@ -270,6 +285,7 @@ function ComboboxInner(props: ComboboxProps) {
       handleSelect,
       handleInputChange,
       setOpen,
+      openOnInputClick: Boolean(props.openOnInputClick) && !props.inline,
       focusInput,
       popupId,
       mounted,
@@ -277,6 +293,8 @@ function ComboboxInner(props: ComboboxProps) {
     }),
     [
       open,
+      hasValue,
+      clear,
       inputValue,
       filterQuery,
       selectedValue,
@@ -291,6 +309,8 @@ function ComboboxInner(props: ComboboxProps) {
       handleSelect,
       handleInputChange,
       setOpen,
+      props.openOnInputClick,
+      props.inline,
       focusInput,
       popupId,
       mounted,

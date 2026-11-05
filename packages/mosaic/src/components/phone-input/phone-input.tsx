@@ -24,6 +24,7 @@ import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
+import { phoneTriggerScope } from './phone-input.markers.stylex';
 import { styles } from './phone-input.styles';
 
 const countryOptions = [...IsoToCountryMap.values()];
@@ -214,6 +215,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                       reset.base,
                       focusOutline.visible,
                       buttonStyles.touchTarget,
+                      phoneTriggerScope,
                       styles.trigger,
                       disabled && buttonStyles.disabled,
                     ),
@@ -234,6 +236,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 <Icon
                   glyph={ChevronDown}
                   size='md'
+                  xstyle={styles.chevron}
                 />
               </span>
             </Popover.Trigger>

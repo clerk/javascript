@@ -11,6 +11,8 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
+import { inputGroupScope } from '../input-group/input-group.markers.stylex';
+import { comboboxTriggerScope } from './combobox.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const inset = space['1.5'];
@@ -120,5 +122,46 @@ export const styles = stylex.create({
     justifyContent: 'center',
     marginInlineStart: 'auto',
     width: space['4'],
+  },
+});
+
+export const trigger = stylex.create({
+  base: {
+    placeItems: 'center',
+    backgroundColor: 'transparent',
+    color: {
+      default: colorVars['--cl-color-input-placeholder'],
+      '@media (hover: hover)': {
+        default: null,
+        [stylex.when.ancestor(':hover', inputGroupScope)]: colorVars['--cl-color-foreground'],
+      },
+    },
+    display: 'inline-grid',
+  },
+  icon: {
+    gridColumn: '1',
+    gridRow: '1',
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
+    },
+    transitionProperty: 'opacity, transform',
+    transitionTimingFunction: easingVars['--cl-ease-enter'],
+  },
+  chevron: {
+    opacity: {
+      default: 1,
+      [stylex.when.ancestor('[data-clearing]', comboboxTriggerScope)]: 0,
+    },
+    transform: {
+      default: null,
+      [stylex.when.ancestor('[data-open]', comboboxTriggerScope)]: 'rotate(180deg)',
+    },
+  },
+  clear: {
+    opacity: {
+      default: 0,
+      [stylex.when.ancestor('[data-clearing]', comboboxTriggerScope)]: 1,
+    },
   },
 });

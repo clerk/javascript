@@ -4,21 +4,30 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { Checkmark } from '../../icons/glyphs/checkmark';
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { X } from '../../icons/glyphs/x';
 import type { ComboboxProps } from '../../primitives/combobox';
 import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { Button } from '../button';
 import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { styles } from './combobox.styles';
+import { comboboxTriggerScope } from './combobox.markers.stylex';
+import { styles, trigger } from './combobox.styles';
 
 export type ComboboxRootProps = ComboboxProps;
 export type ComboboxSize = 'sm' | 'md' | 'lg';
-export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
+export interface ComboboxTriggerProps extends MosaicComponentProps<'button'> {
+  /** Swaps the chevron for a clear button while the input has text or a selection. */
+  clearable?: boolean;
+  /** Accessible name while the trigger clears. Defaults to `Clear`. */
+  clearLabel?: string;
+}
 export const ComboboxCollection = HeadlessCombobox.Collection;
 
 const ComboboxAnchorContext = React.createContext<{
@@ -26,13 +35,14 @@ const ComboboxAnchorContext = React.createContext<{
   setAnchor: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
 } | null>(null);
 
-export function ComboboxRoot({ sideOffset = 8, ...props }: ComboboxRootProps) {
+export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
   const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
   return (
     <ComboboxAnchorContext.Provider value={context}>
       <HeadlessCombobox.Root
         sideOffset={sideOffset}
+        openOnInputClick={openOnInputClick}
         {...props}
       />
     </ComboboxAnchorContext.Provider>
@@ -40,16 +50,50 @@ export function ComboboxRoot({ sideOffset = 8, ...props }: ComboboxRootProps) {
 }
 
 export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(function MosaicComboboxTrigger(
-  { xstyle, ...rest },
+  { xstyle, clearable, render, children, ...rest },
   ref,
 ) {
+  const defaultRender: ComboboxTriggerProps['render'] =
+    render ??
+    (children === undefined
+      ? props => (
+          <Button
+            xstyle={[trigger.base, comboboxTriggerScope]}
+            {...props}
+          />
+        )
+      : undefined);
+
   return (
     <HeadlessCombobox.Trigger
       ref={ref}
+      clearable={clearable}
+      render={defaultRender}
       {...mergeStyleProps(themeProps('combobox-trigger'), stylex.props(xstyle), rest)}
-    />
+    >
+      {children ?? <ComboboxTriggerIcons clearable={clearable} />}
+    </HeadlessCombobox.Trigger>
   );
 });
+
+function ComboboxTriggerIcons({ clearable }: { clearable?: boolean }) {
+  return (
+    <>
+      <Icon
+        glyph={ChevronDown}
+        size='md'
+        xstyle={[trigger.icon, trigger.chevron]}
+      />
+      {clearable ? (
+        <Icon
+          glyph={X}
+          size='md'
+          xstyle={[trigger.icon, trigger.clear]}
+        />
+      ) : null}
+    </>
+  );
+}
 
 export interface ComboboxInputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
   size?: ComboboxSize;

@@ -13,6 +13,7 @@ import { useOptionalFieldContext } from '../field/field.context';
 import { Input } from '../input';
 import type { InputGroupSize } from './input-group.context';
 import { InputGroupContext, useInputGroupContext } from './input-group.context';
+import { inputGroupScope } from './input-group.markers.stylex';
 import { sizes, styles, textSizes } from './input-group.styles';
 
 export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
@@ -44,7 +45,15 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
     props: {
       ...mergeStyleProps(
         themeProps('input-group', { size, disabled, invalid }),
-        stylex.props(reset.base, inputStyles.group, styles.root, sizes[size], disabled && inputStyles.disabled, xstyle),
+        stylex.props(
+          reset.base,
+          inputGroupScope,
+          inputStyles.group,
+          styles.root,
+          sizes[size],
+          disabled && inputStyles.disabled,
+          xstyle,
+        ),
         otherProps,
       ),
       onClick: (event: React.MouseEvent<HTMLDivElement>) => {
@@ -62,6 +71,7 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
           return;
         }
         inputElementRef.current?.focus();
+        inputElementRef.current?.click();
       },
     },
   });
