@@ -25,9 +25,33 @@ const removeConnectErrorFromUrl = () => {
   const url = new URL(window.location.href);
   if (url.searchParams.has(CONNECT_ERROR_PARAM)) {
     url.searchParams.delete(CONNECT_ERROR_PARAM);
-    window.history.replaceState(window.history.state, '', url);
+    window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
   }
 };
+
+// Next.js App Router ignores a URL change while its own marker is in the state.
+function withoutNextAppRouterMarker(state: unknown): unknown {
+  if (typeof state !== 'object' || state === null || !('__NA' in state)) {
+    return state;
+  }
+  const copy: object = Object.assign(Array.isArray(state) ? [] : {}, state);
+  Reflect.deleteProperty(copy, '__NA');
+  return copy;
+}
+
+const PAGE_SIZE = 100;
+
+// listAll reads every page, so a user with many services sees all of them.
+async function listAll<T>(fetchPage: (offset: number) => Promise<{ data: T[]; total_count: number }>): Promise<T[]> {
+  const items: T[] = [];
+  for (;;) {
+    const page = await fetchPage(items.length);
+    items.push(...page.data);
+    if (page.data.length === 0 || items.length >= page.total_count) {
+      return items;
+    }
+  }
+}
 
 export const ConnectionsSection = withCardStateProvider(() => {
   const card = useCardState();
@@ -38,11 +62,11 @@ export const ConnectionsSection = withCardStateProvider(() => {
 
   useEffect(removeConnectErrorFromUrl, []);
 
-  const connectors = useFetch(() => clerk.connect.connectors.list({ limit: 100 }), {
+  const connectors = useFetch(() => listAll(offset => clerk.connect.connectors.list({ limit: PAGE_SIZE, offset })), {
     userId: user?.id,
     resource: 'connectors',
   });
-  const connections = useFetch(() => clerk.connect.connections.list({ limit: 100 }), {
+  const connections = useFetch(() => listAll(offset => clerk.connect.connections.list({ limit: PAGE_SIZE, offset })), {
     userId: user?.id,
     resource: 'connections',
   });
@@ -52,8 +76,8 @@ export const ConnectionsSection = withCardStateProvider(() => {
     return null;
   }
 
-  const allConnectors = connectors.data?.data ?? [];
-  const allConnections = connections.data?.data ?? [];
+  const allConnectors = connectors.data ?? [];
+  const allConnections = connections.data ?? [];
   const unconnected = allConnectors.filter(
     connector => !allConnections.some(connection => connection.connector === connector.key),
   );
@@ -73,13 +97,15 @@ export const ConnectionsSection = withCardStateProvider(() => {
     try {
       const result = await command();
       if (result.status === 'requires_action' && result.action) {
+        // Stay loading while the browser leaves, so a second click cannot start
+        // another flow.
         clerkWindowNavigate(clerk, result.action.url);
         return;
       }
       connections.revalidate();
+      card.setIdle();
     } catch (err) {
       handleError(err as Error, [], card.setError);
-    } finally {
       card.setIdle();
     }
   };
@@ -120,6 +146,8 @@ export const ConnectionsSection = withCardStateProvider(() => {
               connection={connection}
               displayName={allConnectors.find(c => c.key === connection.connector)?.displayName ?? connection.connector}
               isLoading={card.isLoading}
+              isReconnecting={card.loadingMetadata === connection.id}
+              canReconnect={allConnectors.some(c => c.key === connection.connector)}
               onReconnect={() => void reconnect(connection)}
               onDisconnected={() => connections.revalidate()}
             />
@@ -192,10 +220,12 @@ const ConnectionItem = (props: {
   connection: CurrentUserConnection;
   displayName: string;
   isLoading: boolean;
+  isReconnecting: boolean;
+  canReconnect: boolean;
   onReconnect: () => void;
   onDisconnected: () => void;
 }) => {
-  const { connection, displayName, isLoading, onReconnect, onDisconnected } = props;
+  const { connection, displayName, isLoading, isReconnecting, canReconnect, onReconnect, onDisconnected } = props;
   const isActive = connection.status === 'active';
   const label = connection.providerAccount?.label;
   const removeAction = `disconnect-${connection.id}`;
@@ -233,11 +263,12 @@ const ConnectionItem = (props: {
         </Flex>
         {connection.status === 'disconnected' ? null : <ConnectionMenu removeAction={removeAction} />}
       </ProfileSection.Item>
-      {isActive ? null : (
+      {isActive || !canReconnect ? null : (
         <Box sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5}` })}>
           <Button
             variant='link'
             isDisabled={isLoading}
+            isLoading={isReconnecting}
             data-connect-action='reconnect'
             localizationKey={localizationKeys('userProfile.start.connectionsSection.actionLabel__reconnect')}
             onClick={onReconnect}

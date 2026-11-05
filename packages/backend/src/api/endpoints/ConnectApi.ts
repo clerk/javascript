@@ -75,7 +75,12 @@ type ConnectorParams = Record<string, unknown> & { key: string };
 export class ConnectConnectorsAPI extends AbstractAPI {
   async create(params: ConnectorParams) {
     return camelize<Record<string, unknown>>(
-      await this.request({ method: 'POST', path: '/connectors', bodyParams: params }),
+      await this.request({
+        method: 'POST',
+        path: '/connectors',
+        bodyParams: params,
+        options: { deepSnakecaseBodyParamKeys: true },
+      }),
     );
   }
 
@@ -95,7 +100,12 @@ export class ConnectConnectorsAPI extends AbstractAPI {
   async update(connectorIdOrKey: string, params: Record<string, unknown>) {
     this.requireId(connectorIdOrKey);
     return camelize<Record<string, unknown>>(
-      await this.request({ method: 'PATCH', path: joinPaths('/connectors', connectorIdOrKey), bodyParams: params }),
+      await this.request({
+        method: 'PATCH',
+        path: joinPaths('/connectors', connectorIdOrKey),
+        bodyParams: params,
+        options: { deepSnakecaseBodyParamKeys: true },
+      }),
     );
   }
 

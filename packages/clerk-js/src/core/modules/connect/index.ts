@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
   AvailableConnector,
   ClerkPaginatedResponse,
@@ -96,7 +97,11 @@ const request = async <T>(init: {
   search?: URLSearchParams;
   body?: Record<string, unknown>;
 }): Promise<T> => {
-  return unwrap<T>(await BaseResource._fetch(init as Parameters<typeof BaseResource._fetch>[0]));
+  const json = await BaseResource._fetch(init as Parameters<typeof BaseResource._fetch>[0]);
+  if (!json) {
+    throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
+  }
+  return unwrap<T>(json);
 };
 
 const list = async <J, T>(

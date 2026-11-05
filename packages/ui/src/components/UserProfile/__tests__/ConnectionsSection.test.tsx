@@ -24,9 +24,9 @@ const connection = {
 const mockConnect = (fixtures: any, { connectors = [connector], connections = [] as unknown[] } = {}) => {
   clearFetchCache();
   const api = {
-    connectors: { list: vi.fn().mockResolvedValue({ data: connectors, totalCount: connectors.length }) },
+    connectors: { list: vi.fn().mockResolvedValue({ data: connectors, total_count: connectors.length }) },
     connections: {
-      list: vi.fn().mockResolvedValue({ data: connections, totalCount: connections.length }),
+      list: vi.fn().mockResolvedValue({ data: connections, total_count: connections.length }),
       connect: vi.fn(),
       reauthorize: vi.fn(),
       disconnect: vi.fn().mockResolvedValue({}),
@@ -67,5 +67,32 @@ describe('ConnectionsSection', () => {
 
     expect(await screen.findByText(/could not be loaded/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /connect service/i })).not.toBeInTheDocument();
+  });
+
+  it('reads every page of connections', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    const api = mockConnect(fixtures, { connectors: [] });
+    const second = {
+      ...connection,
+      id: 'cnn_2',
+      key: 'acme-2',
+      providerAccount: { id: '2', label: 'second@acme.example' },
+    };
+    api.connections.list
+      .mockResolvedValueOnce({ data: [connection], total_count: 2 })
+      .mockResolvedValueOnce({ data: [second], total_count: 2 });
+    render(<ConnectionsSection />, { wrapper });
+
+    expect(await screen.findByText(/second@acme\.example/)).toBeInTheDocument();
+    expect(api.connections.list).toHaveBeenLastCalledWith({ limit: 100, offset: 1 });
+  });
+
+  it('offers no reconnect for a service the user can no longer connect', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    mockConnect(fixtures, { connectors: [], connections: [{ ...connection, status: 'needs_attention' }] });
+    render(<ConnectionsSection />, { wrapper });
+
+    expect(await screen.findByText(/pat@acme\.example/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /reconnect/i })).not.toBeInTheDocument();
   });
 });
