@@ -6,9 +6,6 @@
       "dependsOn": ["build"],
       "persistent": true
     },
-    "build": {
-      "outputs": ["*/package.json", "dist/**"]
-    },
     "test": {
       "inputs": [
         "*.d.ts",
