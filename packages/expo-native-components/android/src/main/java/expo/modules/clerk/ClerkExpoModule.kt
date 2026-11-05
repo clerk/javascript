@@ -21,6 +21,7 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
@@ -215,7 +216,7 @@ class ClerkExpoModule : Module() {
             Clerk.clientFlow.collect { client ->
                 clientInvalidationTracker.observe(clientFingerprint(client))
                 if (signOutDetector.signedOut(client, System.currentTimeMillis())) {
-                    launch { clearRestoreCredential() }
+                    launch(start = CoroutineStart.UNDISPATCHED) { clearRestoreCredential() }
                 }
             }
         }

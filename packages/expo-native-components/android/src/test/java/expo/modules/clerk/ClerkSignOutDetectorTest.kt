@@ -31,6 +31,18 @@ class ClerkSignOutDetectorTest {
     }
 
     @Test
+    fun `a sign-in right after a sign-out clears once`() {
+        val bob = client(session("sess_2", "user_bob"))
+        assertEquals(listOf(false, true, false), detect(alice, signedOut, bob))
+        assertEquals(listOf(false, true, false), detect(alice, signedOut, alice))
+    }
+
+    @Test
+    fun `another user replacing the signed-in user in one update is a sign-out`() {
+        assertEquals(listOf(false, true), detect(alice, client(session("sess_2", "user_bob"))))
+    }
+
+    @Test
     fun `the same user on a new client after a device token swap is not a sign-out`() {
         val aliceOnNewClient = Client(id = "client_2", sessions = listOf(session("sess_9", "user_alice")))
         assertEquals(listOf(false, false, false), detect(alice, Client(), aliceOnNewClient))
