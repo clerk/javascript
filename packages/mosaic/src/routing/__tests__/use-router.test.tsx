@@ -143,6 +143,23 @@ describe('useRouterScope', () => {
     expect(result.current.segment).toEqual(['account']);
   });
 
+  it('does not redirect to a not-found route that cannot match on its own, and warns', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const { result } = renderHook(
+      () => ({
+        router: useRouterScope(routes, { routing: 'virtual', path: '/user', notFound: 'statement' }),
+        segment: useUserSegment(),
+      }),
+      { wrapper: wrapperWith({ '/user': ['nowhere'] }) },
+    );
+
+    expect(result.current.router.route).toBe('statement');
+    expect(result.current.segment).toEqual(['nowhere']);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('"statement" under "/user"');
+    warn.mockRestore();
+  });
+
   it('stops redirecting when two owners of one base keep writing each other back, and warns', () => {
     const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
     const orgRoutes = { general: 'general', members: 'members' } as const;

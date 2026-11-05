@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { logger } from '@clerk/shared/logger';
+import { describe, expect, it, vi } from 'vitest';
 
 import { getAvailableUserProfilePages, resolveUserProfilePages } from '../user-profile.layout';
 import type { CustomProfilePage, UserProfilePages } from '../user-profile.types';
@@ -34,6 +35,20 @@ describe('resolveUserProfilePages', () => {
       { id: 'account', custom: account },
       { id: 'terms', custom: terms },
     ]);
+  });
+
+  it('leaves out a custom page whose path cannot be a route, and warns', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const spaced: CustomProfilePage = { label: 'My page', path: 'my page', content: null };
+    const param: CustomProfilePage = { label: 'Param', path: ':id', content: null };
+
+    expect(resolveUserProfilePages(['account'], [spaced, terms, param])).toEqual([
+      { id: 'account' },
+      { id: 'terms', custom: terms },
+    ]);
+    expect(warn).toHaveBeenCalledTimes(2);
+    expect(warn.mock.calls[0][0]).toContain('"my page"');
+    warn.mockRestore();
   });
 
   it('lists the built-ins, then the custom pages by path', () => {
