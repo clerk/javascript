@@ -1337,6 +1337,7 @@ export interface Clerk {
    * The `Connect` object used for managing the current user's connections to external services.
    *
    * @experimental Clerk Connect is in development and the API is subject to change.
+   * @hidden
    */
   connect: ConnectNamespace;
 

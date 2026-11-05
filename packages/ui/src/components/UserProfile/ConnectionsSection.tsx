@@ -29,7 +29,6 @@ const removeConnectErrorFromUrl = () => {
   }
 };
 
-// Next.js App Router ignores a URL change while its own marker is in the state.
 function withoutNextAppRouterMarker(state: unknown): unknown {
   if (typeof state !== 'object' || state === null || !('__NA' in state)) {
     return state;
@@ -41,7 +40,6 @@ function withoutNextAppRouterMarker(state: unknown): unknown {
 
 const PAGE_SIZE = 100;
 
-// listAll reads every page, so a user with many services sees all of them.
 async function listAll<T>(fetchPage: (offset: number) => Promise<{ data: T[]; total_count: number }>): Promise<T[]> {
   const items: T[] = [];
   for (;;) {
@@ -61,6 +59,15 @@ export const ConnectionsSection = withCardStateProvider(() => {
   const [failure] = useState(readConnectError);
 
   useEffect(removeConnectErrorFromUrl, []);
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        card.setIdle();
+      }
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, [card]);
 
   const connectors = useFetch(() => listAll(offset => clerk.connect.connectors.list({ limit: PAGE_SIZE, offset })), {
     userId: user?.id,
@@ -77,7 +84,6 @@ export const ConnectionsSection = withCardStateProvider(() => {
   }
 
   const allConnectors = connectors.data ?? [];
-  // A disconnected service the user can no longer connect has nothing left to do.
   const allConnections = (connections.data ?? []).filter(
     connection =>
       connection.status !== 'disconnected' || allConnectors.some(connector => connector.key === connection.connector),
@@ -101,8 +107,6 @@ export const ConnectionsSection = withCardStateProvider(() => {
     try {
       const result = await command();
       if (result.status === 'requires_action' && result.action) {
-        // Stay loading while the browser leaves, so a second click cannot start
-        // another flow.
         clerkWindowNavigate(clerk, result.action.url);
         return;
       }

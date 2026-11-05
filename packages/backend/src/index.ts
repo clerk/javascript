@@ -49,6 +49,10 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
  * General Types
  */
 export type {
+  ConnectConnector,
+  ConnectConnectorConfigurationParams,
+  CreateConnectorParams,
+  UpdateConnectorParams,
   ConnectConnection,
   ConnectConnectionCredential,
   ConnectResult,
