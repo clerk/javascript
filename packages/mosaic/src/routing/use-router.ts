@@ -1,5 +1,5 @@
 import { logger } from '@clerk/shared/logger';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { MosaicLocation, SegmentParts } from './location';
 import type { Route, Router } from './router';
@@ -31,8 +31,32 @@ function useStableTable<Routes extends RouteTable>(routes: Routes): Routes {
   return useStableByKey(routes, Object.entries(routes).flat().join(KEY_SEPARATOR));
 }
 
-function sameParts(a: SegmentParts, b: SegmentParts): boolean {
-  return a.length === b.length && a.every((part, index) => part === b[index]);
+const REDIRECT_LIMIT = 10;
+const REDIRECT_WINDOW_MS = 1000;
+
+// A write that gives up after a burst. Not-found redirects are automatic, so two scopes with
+// different fallbacks on one path would redirect each other forever; a scope that has redirected
+// this many times within the window stops and warns instead. No real navigation comes close.
+// All attempts to fix this in a more exact fashion turned out to be unnecessarily complex, we only
+// need a heuristic to not crash and warn on misconfigurations, not an exact fix.
+function withRedirectLimit(location: MosaicLocation, path: string | undefined): MosaicLocation['write'] {
+  let count = 0;
+  let since = 0;
+  return (parts, options) => {
+    const now = Date.now();
+    if (now - since > REDIRECT_WINDOW_MS) {
+      count = 0;
+      since = now;
+    }
+    count += 1;
+    if (count > REDIRECT_LIMIT) {
+      logger.warnOnce(
+        `[Clerk] Stopped redirecting under "${path ?? '/'}" after ${REDIRECT_LIMIT} redirects within a second. Two components are probably configured with this path; give one of them a different path.`,
+      );
+      return;
+    }
+    location.write(parts, options);
+  };
 }
 
 function missingScope(): never {
@@ -89,30 +113,22 @@ export function useRouterScope<const Routes extends RouteTable>(
     return router.parse(target) ? target : undefined;
   }, [table, router, notFound]);
 
+  const redirect = useMemo(() => withRedirectLimit(location, path), [location, path]);
   const redirectTo = matched === undefined ? notFound : undefined;
-  const redirect = useRef<{ from: SegmentParts; to: SegmentParts }>(undefined);
   useEffect(() => {
-    const last = redirect.current;
-    redirect.current = undefined;
     if (redirectTo === undefined) {
       return;
     }
     if (fallback === undefined) {
-      logger.warnOnce(
-        `[Clerk] The notFound route "${redirectTo}" under "${path ?? '/'}" is either missing or needs params, so it cannot be a fallback. Use a route without params.`,
-      );
+      if (Object.keys(table).length > 0) {
+        logger.warnOnce(
+          `[Clerk] The notFound route "${redirectTo}" under "${path ?? '/'}" is either missing or needs params, so it cannot be a fallback. Use a route without params.`,
+        );
+      }
       return;
     }
-    if (last && !sameParts(last.from, parts) && !sameParts(last.to, parts)) {
-      // This breaks what could otherwise be an infinite redirect loop
-      logger.warnOnce(
-        `[Clerk] The segment "${last.from.join('/')}" under "${path ?? '/'}" was not found, but after updating the location to match the fallback page, something wrote "${parts.join('/')}" instead. Two routers probably share this base; give one of them a different path.`,
-      );
-      return;
-    }
-    redirect.current = { from: parts, to: fallback };
-    location.write(fallback, { replace: true });
-  }, [parts, redirectTo, fallback, location, path]);
+    redirect(fallback, { replace: true });
+  }, [parts, redirectTo, fallback, redirect, table, path]);
 
   return useMemo(
     () => ({ route: current.name, params: current.params, go: router.go, scope }),

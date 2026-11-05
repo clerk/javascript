@@ -50,25 +50,31 @@ function partsOf(pattern: string): string[] {
   return pattern.split('/').filter(Boolean);
 }
 
-// Literals are compared against decoded parts, so 'api keys' or 'api%20keys' could never match the way they read.
-function assertPlainLiteral(part: string): void {
-  if (encodeURIComponent(part) !== part) {
-    throw new Error(`[clerk] Route pattern part "${part}" must be plain; patterns are matched against decoded parts.`);
+// Literals are compared against decoded parts, so an encoded literal such as 'api%20keys' could never match the way it reads.
+function isDecodedLiteral(part: string): boolean {
+  return !part.includes('%');
+}
+
+function assertDecodedLiteral(part: string): void {
+  if (!isDecodedLiteral(part)) {
+    throw new Error(
+      `[Clerk] Route pattern part "${part}" must be written decoded; patterns are matched against decoded parts.`,
+    );
   }
 }
 
-// 'api-keys' -> true    'my page' -> false    ':id' -> false    '' -> false
+// 'api-keys' -> true    'my page' -> true    'my%20page' -> false    ':id' -> false    '' -> false
 // Whether a string from outside, such as a custom page path, can be used as a literal route as is.
 export function isLiteralPattern(pattern: string): boolean {
   const parts = partsOf(pattern);
-  return parts.length > 0 && parts.every(part => !part.startsWith(':') && encodeURIComponent(part) === part);
+  return parts.length > 0 && parts.every(part => !part.startsWith(':') && isDecodedLiteral(part));
 }
 
 // 'billing/plans/:planId?' -> [{ param: false, value: 'billing' }, { param: false, value: 'plans' }, { param: true, name: 'planId', optional: true }]
 export function compilePattern(pattern: string): PatternPart[] {
   return partsOf(pattern).map(part => {
     if (!part.startsWith(':')) {
-      assertPlainLiteral(part);
+      assertDecodedLiteral(part);
       return { param: false, value: part };
     }
     const optional = part.endsWith('?');

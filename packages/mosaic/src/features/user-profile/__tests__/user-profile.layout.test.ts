@@ -39,15 +39,31 @@ describe('resolveUserProfilePages', () => {
 
   it('leaves out a custom page whose path cannot be a route, and warns', () => {
     const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
-    const spaced: CustomProfilePage = { label: 'My page', path: 'my page', content: null };
+    const encoded: CustomProfilePage = { label: 'My page', path: 'my%20page', content: null };
     const param: CustomProfilePage = { label: 'Param', path: ':id', content: null };
+    const spaced: CustomProfilePage = { label: 'Spaced', path: 'my page', content: null };
 
-    expect(resolveUserProfilePages(['account'], [spaced, terms, param])).toEqual([
+    expect(resolveUserProfilePages(['account'], [encoded, terms, param, spaced])).toEqual([
       { id: 'account' },
       { id: 'terms', custom: terms },
+      { id: 'my page', custom: spaced },
     ]);
     expect(warn).toHaveBeenCalledTimes(2);
-    expect(warn.mock.calls[0][0]).toContain('"my page"');
+    expect(warn.mock.calls[0][0]).toContain('"my%20page"');
+    warn.mockRestore();
+  });
+
+  it("leaves out a custom page whose path is a built-in page's segment, and warns", () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const apiKeys: CustomProfilePage = { label: 'Keys', path: 'api-keys', content: null };
+
+    expect(resolveUserProfilePages(['account', 'apiKeys'], [apiKeys, terms])).toEqual([
+      { id: 'account' },
+      { id: 'apiKeys' },
+      { id: 'terms', custom: terms },
+    ]);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('"apiKeys"');
     warn.mockRestore();
   });
 
