@@ -12,11 +12,6 @@
             "type": "command",
             "command": "cd \"$(git rev-parse --show-toplevel)/packages/swingset\" || exit 2; files=\"$(git diff --name-only --diff-filter=d HEAD -- ':(glob)src/**/*.ts' ':(glob)src/**/*.tsx' && git ls-files --others --exclude-standard -- ':(glob)src/**/*.ts' ':(glob)src/**/*.tsx')\" || exit 2; if [ -n \"$files\" ]; then pnpm lint >&2 || exit 2; fi",
             "timeout": 180
-          },
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/scripts/mosaic-parity-gate.mjs\" stop",
-            "timeout": 30
           }
         ]
       }

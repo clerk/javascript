@@ -60,14 +60,15 @@ Before you change a file that matches a pattern below, read its guide, even for 
 
 ## Ports of legacy components are migrations
 
-Before you write a new feature, search `packages/react/src/components/` and `packages/ui/src/components/` for its counterpart. If one exists, the work is a [migration](docs/migration.md), including a headless port of a `@clerk/react` button framed as a new feature:
+For a current task that implements or reviews a Mosaic migration, or changes its migrated behavior, search `packages/react/src/components/` and `packages/ui/src/components/` for the counterpart. A headless port framed as a new feature is a [migration](docs/migration.md) too. Unrelated work does not acquire this workflow merely because the branch already contains Mosaic changes.
 
-1. Read the counterpart and write the Phase 1 inventory to `tmp/mosaic-parity/<feature>.md` before the model. The file names the legacy path and has an `## Inventory` section.
+1. Read the counterpart, shared prop types, and relevant helper/runtime calls. Write the Phase 1 inventory to `tmp/mosaic-parity/<feature>.md` before the model. Record the task scope, exact revisions, accepted differences, and exclusions alongside the legacy path and `## Inventory` section.
 2. Before you call the work done, review it, or open a PR, run the [parity audit](docs/parity-audit.md) in a read-only subagent and put its table under `## Parity audit` in the same file. Reading the doc is not running the audit.
-3. List every **Deliberately changed** and **Deferred** row in the PR description. A difference that is not listed is a regression.
-4. Listing a difference does not make it acceptable. If one breaks a rule in this file or in `docs/`, such as a failure that nobody sees, fix it or ask the user before you finish. Do not label it deliberate.
+3. Use the audit's classifications to separate parity gaps, intentional differences needing disclosure, missing verification, and optional improvements. List intentional differences and approved deferrals in the PR description. Do not require inherited improvements or refactors as parity fixes.
+4. Listing a difference does not make it acceptable. Cite any conflicting rule in this file or `docs/`, and fix the gap or raise it with the user. Do not infer intentional behavior from the implementation. Preserve decisions the user already made, and leave unresolved product choices open.
+5. Inspect the actual results of focused type and behavior checks. For relevant async actions, include a representative failure through the existing fake FAPI or supported browser setup. A populated note is process bookkeeping, not proof of parity.
 
-`tmp/` is ignored by git, so the file stays out of the PR. Hooks in `.claude/settings.json` and `.codex/hooks.json` (`scripts/mosaic-parity-gate.mjs`) check it: one blocks writing a new feature's model until the inventory exists, and one blocks finishing until the audit is in.
+`tmp/` is ignored by git, so the file stays out of the PR. The hooks in `.claude/settings.json` and `.codex/hooks.json` (`scripts/mosaic-parity-gate.mjs`) give conditional guidance for the feature paths in the current edit. They do not inspect branch history or notes, deny edits, or block completion. For a read-only parity review, run the explicit scoped command in [Parity audit](docs/parity-audit.md). These reminders do not run the audit or verify its evidence.
 
 ## Layers in one paragraph
 
