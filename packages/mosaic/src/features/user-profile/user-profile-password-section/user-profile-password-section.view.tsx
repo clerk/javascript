@@ -22,7 +22,7 @@ export function UserProfilePasswordSectionView({
   }
 
   return (
-    <Section.Root>
+    <Section.Root searchId='password'>
       <Section.Group>
         <Section.Header>
           <Section.Content>

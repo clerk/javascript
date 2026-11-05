@@ -14,10 +14,14 @@ import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../.
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
+import { useSearchTarget } from '../profile/profile-search-target';
 import { sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
-export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
+export interface SectionRootProps extends Omit<MosaicComponentProps<'section'>, 'title'> {
+  /** Makes the section the element the profile's search reveals for the target with this `id`. */
+  searchId?: string;
+}
 export type SectionGroupProps = MosaicComponentProps<'div'>;
 export type SectionHeaderProps = MosaicComponentProps<'div'>;
 export type SectionTitleProps = Omit<HeadingProps, 'size'>;
@@ -46,12 +50,16 @@ const SectionHeaderContext = React.createContext(false);
 const SectionItemsContext = React.createContext(false);
 const SectionItemWrapContext = React.createContext(false);
 
-const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot({ render, xstyle, ...rest }, ref) {
+const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot(
+  { searchId, render, xstyle, ...rest },
+  ref,
+) {
+  const target = useSearchTarget(searchId);
   return useRender({
     defaultTagName: 'section',
     render,
-    ref,
-    props: mergeStyleProps(themeProps('section'), stylex.props(reset.base, styles.root, xstyle), rest),
+    ref: [ref, target.ref],
+    props: target.props(stylex.props(reset.base, styles.root, xstyle), { ...themeProps('section'), ...rest }),
   });
 });
 

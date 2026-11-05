@@ -1,12 +1,13 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, onTestFinished } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
+  fapiEnterpriseAccount,
   fapiEnvironment,
   fapiMembership,
   fapiOrganization,
@@ -101,6 +102,253 @@ describe('UserProfile', () => {
 
     await user.click(screen.getByRole('tab', { name: 'API Keys' }));
     expect(screen.getByRole('heading', { level: 3, name: 'API Keys' })).toBeVisible();
+  });
+
+  it('finds a search target on a page of your own, and brings it into view', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(
+      <UserProfile
+        showSearch
+        customPages={[
+          {
+            path: 'usage',
+            label: 'Usage',
+            search: [{ id: 'quota', label: 'Quota' }],
+            content: (
+              <UserProfile.SearchTarget
+                id='quota'
+                render={<section />}
+              >
+                <h3>Quota</h3>
+              </UserProfile.SearchTarget>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'quota');
+    expect(screen.getByRole('tablist', { hidden: true }).checkVisibility()).toBe(false);
+    await user.click(screen.getByRole('option', { name: 'Quota' }));
+
+    const quota = screen.getByRole('heading', { name: 'Quota' });
+    expect(quota).toBeVisible();
+    expect(quota.parentElement).toHaveFocus();
+  });
+
+  it('draws the highlight around a found target without positioning the target', async () => {
+    const slowHighlight = document.createElement('style');
+    slowHighlight.textContent = '.cl-profile-search-highlight { animation-duration: 60s !important; }';
+    document.head.append(slowHighlight);
+    onTestFinished(() => slowHighlight.remove());
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(
+      <UserProfile
+        showSearch
+        customPages={[
+          {
+            path: 'usage',
+            label: 'Usage',
+            search: [{ id: 'quota', label: 'Quota' }],
+            content: (
+              <UserProfile.SearchTarget
+                id='quota'
+                render={<section />}
+              >
+                <h3>Quota</h3>
+              </UserProfile.SearchTarget>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'quota');
+    await user.click(screen.getByRole('option', { name: 'Quota' }));
+
+    const target = screen.getByRole('heading', { name: 'Quota' }).closest('section');
+    const highlight = document.querySelector('.cl-profile-search-highlight');
+    if (!target || !highlight) {
+      throw new Error('Expected a highlighted target');
+    }
+    expect(getComputedStyle(target).position).toBe('static');
+    const around = target.getBoundingClientRect();
+    const drawn = highlight.getBoundingClientRect();
+    expect(drawn.left).toBeCloseTo(around.left - 12);
+    expect(drawn.top).toBeCloseTo(around.top - 12);
+    expect(drawn.width).toBeCloseTo(around.width + 24);
+    expect(drawn.height).toBeCloseTo(around.height + 24);
+  });
+
+  it.each([
+    { showSearch: undefined, shown: false },
+    { showSearch: true, shown: true },
+  ])('shows the search only when asked: $showSearch', async ({ showSearch, shown }) => {
+    serve();
+    await renderWithClerk(<UserProfile showSearch={showSearch} />);
+    expect(screen.queryByRole('combobox', { name: 'Search' }) !== null).toBe(shown);
+  });
+
+  it.each([
+    { passkey: false, results: [] },
+    { passkey: true, results: ['Passkeys'] },
+  ])('finds a section only when the instance shows it: passkeys $passkey', async ({ passkey, results }) => {
+    serveFapi({
+      environment: fapiEnvironment({ attributes: { passkey: { enabled: passkey } } }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'passkey');
+
+    expect(screen.queryAllByRole('option').map(option => option.textContent)).toEqual(results);
+  });
+
+  it.each([
+    { disableAdditionalIdentifications: true, results: [] },
+    { disableAdditionalIdentifications: false, results: ['Connected accounts'] },
+  ])(
+    'finds connected accounts only when the section shows: disableAdditionalIdentifications $disableAdditionalIdentifications',
+    async ({ disableAdditionalIdentifications, results }) => {
+      serveFapi({
+        environment: fapiEnvironment({
+          user_settings: {
+            enterprise_sso: { enabled: true, self_serve_sso: false, self_serve_directory_sync: false },
+            social: {
+              oauth_google: {
+                enabled: true,
+                required: false,
+                authenticatable: true,
+                strategy: 'oauth_google',
+                name: 'Google',
+                logo_url: null,
+              },
+            },
+          },
+        }),
+        client: fapiClient([
+          fapiSession({
+            id: 'sess_1',
+            user: fapiUser({
+              id: 'user_1',
+              enterprise_accounts: [
+                fapiEnterpriseAccount(
+                  { id: 'eac_1' },
+                  { disable_additional_identifications: disableAdditionalIdentifications },
+                ),
+              ],
+            }),
+          }),
+        ]),
+      });
+      const user = userEvent.setup();
+      await renderWithClerk(<UserProfile showSearch />);
+
+      await user.type(screen.getByRole('combobox', { name: 'Search' }), 'connected');
+
+      expect(screen.queryAllByRole('option').map(option => option.textContent)).toEqual(results);
+    },
+  );
+
+  it('finds the sections of a closed page without loading it', async () => {
+    serve();
+    const sessions = holdRequests('get', '/v1/me/sessions/active');
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+
+    expect(within(screen.getByRole('group', { name: 'Security' })).getByRole('option')).toHaveTextContent(
+      'Active devices',
+    );
+    expect(sessions.requests).toHaveLength(0);
+    sessions.release();
+  });
+
+  it('brings a found section into view once its page has loaded it', async () => {
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+      activeDevices: [],
+      deviceTrackingEnabled: false,
+    });
+    const sessions = holdRequests('get', '/v1/me/sessions/active');
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
+    await waitFor(() => expect(sessions.requests).toHaveLength(1));
+    sessions.release();
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: 'Active devices' }).closest('.cl-profile-search-target'),
+      ).toHaveFocus(),
+    );
+  });
+
+  it('leaves focus where the user moved it while the found section loads', async () => {
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+      activeDevices: [],
+      deviceTrackingEnabled: false,
+    });
+    const sessions = holdRequests('get', '/v1/me/sessions/active');
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
+    await waitFor(() => expect(sessions.requests).toHaveLength(1));
+    await user.click(screen.getByRole('combobox', { name: 'Search' }));
+    sessions.release();
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: 'Active devices' }).closest('.cl-profile-search-target'),
+      ).not.toBeNull(),
+    );
+    expect(screen.getByRole('combobox', { name: 'Search' })).toHaveFocus();
+  });
+
+  it('finds a section by the name a localization gives it', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(<UserProfile showSearch />, undefined, {
+      overrides: { userProfile: { password: { label: 'Passphrase' } } },
+    });
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'passphrase');
+    await user.click(screen.getByRole('option', { name: 'Passphrase' }));
+
+    expect(screen.getByRole('heading', { name: 'Passphrase' }).closest('.cl-profile-search-target')).toHaveFocus();
+  });
+
+  it('leaves the page where it is when the found target is already in view', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(
+      <div
+        data-testid='scroller'
+        style={{ height: 400, overflowY: 'auto' }}
+      >
+        <UserProfile showSearch />
+      </div>,
+    );
+    const scroller = screen.getByTestId('scroller');
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'password');
+    await user.click(screen.getByRole('option', { name: 'Password' }));
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeVisible();
+    expect(scroller.scrollTop).toBe(0);
   });
 
   it('adds custom pages in the requested order and opens on the first', async () => {

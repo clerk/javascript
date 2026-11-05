@@ -30,7 +30,7 @@ export function UserProfileWeb3WalletsSectionView({
   return (
     <>
       {hasRows ? (
-        <Section.Root>
+        <Section.Root searchId='web3Wallets'>
           <Section.Group
             ref={sectionRef}
             tabIndex={-1}

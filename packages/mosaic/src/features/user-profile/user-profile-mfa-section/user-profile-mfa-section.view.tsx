@@ -71,6 +71,7 @@ export function UserProfileMfaSectionView({
         addLabel={m.addLabel}
         emptyLabel={m.empty}
         hasItems={methods.length > 0}
+        searchId='mfa'
         label={m.label}
       >
         {methods.map(method => (

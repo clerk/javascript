@@ -50,7 +50,7 @@ export function UserProfilePhoneSectionView({
   ) : undefined;
 
   return (
-    <Section.Root>
+    <Section.Root searchId='phone'>
       <UserProfileContactListRowView
         rowRef={rowRef}
         triggerRef={registerTrigger}

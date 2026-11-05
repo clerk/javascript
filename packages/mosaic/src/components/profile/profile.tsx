@@ -28,6 +28,10 @@ import { VisuallyHidden } from '../visually-hidden';
 import type { ProfileContextValue, ProfileDismiss, ProfileNavLayout } from './profile.context';
 import { ContentPanelContext, ProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
+import type { ProfileSearchPage } from './profile-search';
+import { ProfileSearch } from './profile-search';
+import { styles as searchStyles } from './profile-search.styles';
+import { SearchHighlight, SearchPageContext, useProfileSearch } from './profile-search-target';
 
 // The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
 function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
@@ -114,6 +118,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     },
     [onValueChange, closeNav],
   );
+  const search = useProfileSearch({ value, selectPage, pageTitleRef });
   const context = React.useMemo(
     () => ({
       titleId,
@@ -132,6 +137,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       navTriggerRef,
       inline,
       dismiss,
+      search,
     }),
     [
       titleId,
@@ -147,6 +153,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       pageTitleId,
       inline,
       dismiss,
+      search,
     ],
   );
   const element = useRender({
@@ -227,7 +234,10 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
   );
 });
 
-export type ProfileNavProps = MosaicComponentProps<'nav'>;
+export interface ProfileNavProps extends MosaicComponentProps<'nav'> {
+  /** The pages the search lists, with the sections each one declares. Without it the nav has no search. */
+  search?: readonly ProfileSearchPage[];
+}
 
 type NavItemMode = 'tab' | 'option';
 
@@ -275,7 +285,7 @@ function NavBranding() {
  * the page title's select, or a tablist in a sheet on a phone.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
-  { children, render, xstyle, ...rest },
+  { search: searchPages, children, render, xstyle, ...rest },
   ref,
 ) {
   const {
@@ -289,7 +299,10 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
     navTriggerRef,
     inline,
     dismiss,
+    search,
   } = useProfileContext('Profile.Nav');
+  const searchable = Boolean(searchPages) && navLayout === 'column';
+  const searching = searchable && search.query.trim() !== '';
   useSafeLayoutEffect(() => {
     setNavItems(children);
   }, [children, setNavItems]);
@@ -308,7 +321,19 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       children: (
         <>
           {dismiss === 'back' ? <BackButton /> : null}
-          <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
+          {searchable && searchPages ? (
+            <ProfileSearch
+              pages={searchPages}
+              search={search}
+            />
+          ) : null}
+          <Tabs.List
+            hidden={searching}
+            {...mergeStyleProps(
+              themeProps('profile-nav-list'),
+              stylex.props(reset.base, styles.navList, searching && styles.navListHidden),
+            )}
+          >
             {children}
           </Tabs.List>
           {renderBranding && !compact && !inline ? <NavBranding /> : null}
@@ -621,11 +646,17 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
             ),
           )}
         >
-          <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
+          <div
+            {...mergeStyleProps(
+              themeProps('profile-content-body'),
+              stylex.props(reset.base, styles.contentBody, searchStyles.highlightScope),
+            )}
+          >
             <HeadingLevelProvider>
               <PageTitle title={pageTitle} />
             </HeadingLevelProvider>
             {children}
+            <SearchHighlight />
             {inline && renderBranding && !compact ? (
               <div
                 {...mergeStyleProps(
@@ -648,23 +679,31 @@ export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
 }
 
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
-  { value, xstyle, ...rest },
+  { value, xstyle, children, ...rest },
   ref,
 ) {
   const { compact, pageTitleId } = useProfileContext('Profile.ContentPanel');
   return (
-    <ContentPanelContext.Provider value>
-      <HeadingLevelProvider>
-        <Tabs.Panel
-          ref={ref}
-          value={value}
-          aria-labelledby={`${pageTitleId}-label`}
-          // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
-          {...(compact ? { role: 'group', tabIndex: undefined } : null)}
-          {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
-        />
-      </HeadingLevelProvider>
-    </ContentPanelContext.Provider>
+    <SearchPageContext.Provider value={value}>
+      <ContentPanelContext.Provider value>
+        <HeadingLevelProvider>
+          <Tabs.Panel
+            ref={ref}
+            value={value}
+            aria-labelledby={`${pageTitleId}-label`}
+            // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
+            {...(compact ? { role: 'group', tabIndex: undefined } : null)}
+            {...mergeStyleProps(
+              themeProps('profile-content-panel', { value }),
+              stylex.props(styles.contentPanel, xstyle),
+              rest,
+            )}
+          >
+            {children}
+          </Tabs.Panel>
+        </HeadingLevelProvider>
+      </ContentPanelContext.Provider>
+    </SearchPageContext.Provider>
   );
 });
 

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { SearchTarget } from '../../components/profile';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import { organizationProfilePanels } from '../organization-profile/organization-profile';
@@ -17,6 +18,7 @@ import type { UserProfileViewProps } from './user-profile.view';
 import { UserProfileView } from './user-profile.view';
 import { UserProfileApiKeysPanel } from './user-profile-api-keys-panel';
 import { UserProfileProfilePanel } from './user-profile-profile-panel';
+import { useUserProfileSearchModel } from './user-profile-search.model';
 import { UserProfileSecurityPanel } from './user-profile-security-panel';
 import { useUserProfileUserModel } from './user-profile-user.model';
 
@@ -28,7 +30,9 @@ export type UserProfileMode = Exclude<SwitcherMode, 'organization'>;
 
 /** Everything `<UserProfile />` takes: your own pages and their order, the page it opens on, and the OAuth scopes it asks for. */
 export interface UserProfileProps
-  extends Pick<UserProfileViewProps, 'customPages' | 'pageOrder'>, Pick<UserProfileOptions, 'additionalOAuthScopes'> {
+  extends
+    Pick<UserProfileViewProps, 'customPages' | 'pageOrder' | 'showSearch'>,
+    Pick<UserProfileOptions, 'additionalOAuthScopes'> {
   /**
    * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
    * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
@@ -105,6 +109,12 @@ export interface UserProfileProps
  * ```
  *
  * @example
+ * `showSearch` adds a search field above the navigation that finds pages, and the sections on them.
+ * ```tsx
+ * <UserProfile showSearch />
+ * ```
+ *
+ * @example
  * `customPages` adds your own pages; `pageOrder` places them among the built-in ones.
  * ```tsx
  * <UserProfile
@@ -137,11 +147,13 @@ export function UserProfileSurface({
   pageOrder,
   defaultPage,
   additionalOAuthScopes,
+  showSearch,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
 }: UserProfileProps & { presentation: NonNullable<UserProfileOptions['mode']> }) {
   const model = useUserProfileUserModel();
   const builtInPages = useUserProfilePages();
+  const searchSections = useUserProfileSearchModel();
 
   if (model.status === 'loading') {
     return fallback ?? null;
@@ -155,6 +167,8 @@ export function UserProfileSurface({
     initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
     customPages,
     pageOrder,
+    showSearch,
+    searchSections,
     pages: {
       account: <UserProfileProfilePanel />,
       security: <UserProfileSecurityPanel />,
@@ -220,3 +234,5 @@ function CombinedUserProfileView({
     </OrganizationProfileProvider>
   );
 }
+
+UserProfile.SearchTarget = SearchTarget;

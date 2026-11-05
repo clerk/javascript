@@ -7,6 +7,7 @@ import { Plus } from '../../icons/glyphs/plus';
 
 export function UserProfileSecurityList({
   sectionRef,
+  searchId,
   label,
   addLabel,
   emptyLabel,
@@ -16,6 +17,7 @@ export function UserProfileSecurityList({
   children,
 }: {
   sectionRef?: Ref<HTMLDivElement>;
+  searchId?: string;
   label: string;
   addLabel: string;
   emptyLabel: string;
@@ -25,7 +27,7 @@ export function UserProfileSecurityList({
   children: ReactNode;
 }) {
   return (
-    <Section.Root>
+    <Section.Root searchId={searchId}>
       <Section.Group
         ref={sectionRef}
         tabIndex={-1}

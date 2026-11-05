@@ -40,7 +40,7 @@ export function UserProfileActiveDevicesSectionView({
   return (
     <div {...stylex.props(styles.sectionCards)}>
       <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>
-      <Section.Root>
+      <Section.Root searchId='activeDevices'>
         <Section.Group>
           <Section.Header>
             <Section.Content>

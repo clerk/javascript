@@ -256,4 +256,46 @@ describe('UserProfileView', () => {
       expect(document.querySelector('.cl-profile-nav-group')).not.toBeInTheDocument();
     });
   });
+
+  it('shows the search only when asked', () => {
+    const { rerender, props } = renderView();
+    expect(screen.queryByRole('combobox', { name: 'Search' })).toBeNull();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileView
+          {...props}
+          showSearch
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('combobox', { name: 'Search' })).toBeVisible();
+  });
+
+  it('finds a section on a page that is not open, and opens that page', async () => {
+    const onPageChange = vi.fn();
+    const user = userEvent.setup();
+    renderView({ onPageChange, showSearch: true, searchSections: { security: ['password', 'activeDevices'] } });
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    const security = screen.getByRole('group', { name: 'Security' });
+    expect(security).toContainElement(screen.getByRole('option', { name: 'Active devices' }));
+
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
+
+    expect(onPageChange).toHaveBeenCalledWith('security');
+  });
+
+  it('finds a page of your own by its keywords', async () => {
+    const user = userEvent.setup();
+    renderView({
+      showSearch: true,
+      customPages: [{ label: 'Usage', path: 'usage', keywords: ['quota'], content: <p>Usage content</p> }],
+    });
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'quota');
+
+    expect(screen.getByRole('option', { name: 'Usage' })).toBeInTheDocument();
+  });
 });

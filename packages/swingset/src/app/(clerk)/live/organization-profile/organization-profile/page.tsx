@@ -33,7 +33,10 @@ export default function OrganizationProfileLivePage() {
         {isLoaded && isSignedIn && !organization ? (
           <p className='text-muted-foreground text-sm'>Pick an active organization to see its profile.</p>
         ) : null}
-        <OrganizationProfile fallback={<p className='text-muted-foreground text-sm'>Loading…</p>} />
+        <OrganizationProfile
+          showSearch
+          fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}
+        />
       </div>
     </MosaicProvider>
   );
