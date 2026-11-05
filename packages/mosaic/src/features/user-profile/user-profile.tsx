@@ -24,14 +24,6 @@ import { useUserProfileUserModel } from './user-profile-user.model';
 export interface UserProfileProps
   extends Pick<UserProfileViewProps, 'customPages' | 'pageOrder'>, Pick<UserProfileOptions, 'additionalOAuthScopes'> {
   /**
-   * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
-   * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
-   * the first page instead.
-   *
-   * @default the first page in the navigation
-   */
-  defaultPage?: UserProfileViewProps['activePage'];
-  /**
    * The base the profile's pages are nested under. Two profiles on one page need different bases.
    *
    * @default '/user'
@@ -79,13 +71,6 @@ export interface UserProfileProps
  * that nobody is signed in.
  * ```tsx
  * <UserProfile fallback={<ProfileSkeleton />} />
- * ```
- *
- * @example
- * `defaultPage` picks the page the profile opens on without moving it in the navigation. An
- * organization page's id is prefixed with `organization/`.
- * ```tsx
- * <UserProfile defaultPage='security' />
  * ```
  *
  * @example
@@ -162,7 +147,6 @@ export function UserProfileSurface({
   organizationProfileProps,
   customPages,
   pageOrder,
-  defaultPage,
   path = '/user',
   additionalOAuthScopes,
   fallback,
@@ -181,7 +165,6 @@ export function UserProfileSurface({
   const viewProps: AccountViewProps = {
     elevation: 'flush',
     path,
-    initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
     customPages,
     pageOrder,
     pages: {
@@ -210,12 +193,11 @@ export function UserProfileSurface({
 }
 
 type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
-  initialPage: UserProfileViewProps['activePage'];
   path: string;
 };
 
-function AccountUserProfileView({ initialPage, path, ...viewProps }: AccountViewProps) {
-  const { activePage, onPageChange } = useProfilePagesController(initialPage, userProfilePageIds(viewProps), {
+function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
+  const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds(viewProps), {
     routing: 'virtual',
     path,
   });
@@ -230,7 +212,6 @@ function AccountUserProfileView({ initialPage, path, ...viewProps }: AccountView
 }
 
 function CombinedUserProfileView({
-  initialPage,
   path,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
@@ -240,11 +221,10 @@ function CombinedUserProfileView({
     model.status === 'ready'
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
-  const { activePage, onPageChange } = useProfilePagesController(
-    initialPage,
-    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
-    { routing: 'virtual', path },
-  );
+  const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds({ ...viewProps, organization }), {
+    routing: 'virtual',
+    path,
+  });
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>

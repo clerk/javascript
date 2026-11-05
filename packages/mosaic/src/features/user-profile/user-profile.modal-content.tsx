@@ -18,13 +18,12 @@ export default function UserProfileModalContent({
     }
   }, [signedOut, close]);
 
-  const { page, ...props } = options ?? {};
+  const { page: _page, ...props } = options ?? {};
   return (
     <UserProfileSurface
       {...props}
       presentation='modal'
       path={path}
-      defaultPage={page}
     />
   );
 }

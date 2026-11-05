@@ -1,4 +1,5 @@
 import { defineModalSurface } from '../../modals/define-modal-surface';
+import { pageParts } from '../profile-pages/profile-pages.layout';
 import type { OrganizationProfileModalOptions } from './organization-profile.modal.types';
 
 export const organizationProfileModal = defineModalSurface<OrganizationProfileModalOptions>({
@@ -6,5 +7,5 @@ export const organizationProfileModal = defineModalSurface<OrganizationProfileMo
   variant: 'profile',
   load: () => import('./organization-profile.modal-content'),
   path: '/modal/organization',
-  initialParts: options => options?.page?.split('/').filter(Boolean) ?? [],
+  initialParts: options => pageParts(options?.page),
 });

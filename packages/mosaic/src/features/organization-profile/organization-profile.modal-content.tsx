@@ -18,12 +18,11 @@ export default function OrganizationProfileModalContent({
     }
   }, [inactive, close]);
 
-  const { page, ...props } = options ?? {};
+  const { page: _page, ...props } = options ?? {};
   return (
     <OrganizationProfile
       {...props}
       path={path}
-      defaultPage={page}
     />
   );
 }

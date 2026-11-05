@@ -1,4 +1,5 @@
 import { defineModalSurface } from '../../modals/define-modal-surface';
+import { pageParts } from '../profile-pages/profile-pages.layout';
 import type { UserProfileModalOptions } from './user-profile.modal.types';
 
 export const userProfileModal = defineModalSurface<UserProfileModalOptions>({
@@ -6,5 +7,5 @@ export const userProfileModal = defineModalSurface<UserProfileModalOptions>({
   variant: 'profile',
   load: () => import('./user-profile.modal-content'),
   path: '/modal/user',
-  initialParts: options => options?.page?.split('/').filter(Boolean) ?? [],
+  initialParts: options => pageParts(options?.page),
 });
