@@ -2497,6 +2497,21 @@ export const csCZ: LocalizationResource = {
           'Požadované rozsahy byly aktualizovány a můžete zaznamenat omezenou funkcionalitu. Prosím znovu autorizujte tuto aplikaci, abyste se vyhnuli problémům',
         title: 'Připojené účty',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Smazat účet',
         title: 'Smazat účet',

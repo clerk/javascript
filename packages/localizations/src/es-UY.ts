@@ -2498,6 +2498,21 @@ export const esUY: LocalizationResource = {
           'Los permisos requeridos han sido actualizados y podrías experimentar funcionalidad limitada. Por favor, reautoriza esta aplicación para evitar inconvenientes',
         title: 'Cuentas conectadas',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Eliminar cuenta',
         title: 'Eliminar cuenta',

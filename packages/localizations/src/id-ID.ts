@@ -2484,6 +2484,21 @@ export const idID: LocalizationResource = {
         subtitle__reauthorize: undefined,
         title: undefined,
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: undefined,
         title: undefined,

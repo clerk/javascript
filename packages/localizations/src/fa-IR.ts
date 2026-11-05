@@ -2493,6 +2493,21 @@ export const faIR: LocalizationResource = {
           'محدوده‌های مورد نیاز به‌روزرسانی شده‌اند و ممکن است با محدودیت‌هایی در عملکرد مواجه شوید. لطفاً برای جلوگیری از هرگونه مشکل، این برنامه را مجدداً مجاز کنید.',
         title: 'حساب های متصل',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'حذف حساب',
         title: 'حذف حساب',

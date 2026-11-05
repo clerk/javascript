@@ -2502,6 +2502,21 @@ export const caES: LocalizationResource = {
           'Els àmbits requerits han estat actualitzats, i podràs estar experimentant funcionalitat limitada. Si us plau, reautoritza aquesta aplicació per evitar qualsevol problema',
         title: 'Comptes connectats',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Elimina compte',
         title: 'Elimina compte',

@@ -2505,6 +2505,21 @@ export const ptBR: LocalizationResource = {
           'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Excluir Conta',
         title: 'Perigo',

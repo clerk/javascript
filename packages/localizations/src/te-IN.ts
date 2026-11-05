@@ -2515,6 +2515,21 @@ export const teIN: LocalizationResource = {
           'అవసరమైన స్కోప్‌లు నవీకరించబడ్డాయి మరియు మీరు పరిమిత కార్యాచరణను అనుభవించవచ్చు. ఏదైనా సమస్యలను నివారించడానికి దయచేసి ఈ అప్లికేషన్‌ను తిరిగి అధికారం ఇవ్వండి',
         title: 'కనెక్టెడ్ ఖాతాలు',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'ఖాతాను తొలగించండి',
         title: 'ఖాతాను తొలగించండి',

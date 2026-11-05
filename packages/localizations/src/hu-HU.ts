@@ -2516,6 +2516,21 @@ export const huHU: LocalizationResource = {
           'A szükséges hatáskörök megváltozták, előfordulhat, hogy limitált funkcionalitást tapasztalhatsz. Kérlek, újra engedélyezd az alkalmazást, hogy elkerüld a hibákat.',
         title: 'Kapcsolt fiókok',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Fiók törlése',
         title: 'Fiók törlése',

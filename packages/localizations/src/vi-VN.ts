@@ -2505,6 +2505,21 @@ export const viVN: LocalizationResource = {
           'Các phạm vi được yêu cầu đã được cập nhật, và bạn có thể đang gặp phải chức năng giới hạn. Vui lòng xác thực lại ứng dụng này để tránh bất kỳ vấn đề nào',
         title: 'Tài khoản kết nối',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Xóa tài khoản',
         title: 'Xóa tài khoản',

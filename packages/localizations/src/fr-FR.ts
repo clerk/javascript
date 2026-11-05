@@ -2509,6 +2509,21 @@ export const frFR: LocalizationResource = {
           'Les autorisations requises ont été mises à jour, ce qui peut entraîner des fonctionnalités limitées. Veuillez ré-autoriser cette application pour éviter tout problème.',
         title: 'Comptes connectés',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Supprimer le compte',
         title: 'Danger',

@@ -2475,6 +2475,21 @@ export const thTH: LocalizationResource = {
           'ขอบเขตที่ต้องการได้รับการอัปเดตแล้ว และคุณอาจประสบปัญหาการทำงานที่จำกัด โปรดอนุญาตแอปพลิเคชันนี้ใหม่เพื่อหลีกเลี่ยงปัญหา',
         title: 'บัญชีที่เชื่อมต่อ',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'ลบบัญชี',
         title: 'ลบบัญชี',

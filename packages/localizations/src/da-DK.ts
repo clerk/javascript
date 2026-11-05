@@ -2480,6 +2480,21 @@ export const daDK: LocalizationResource = {
           'De krævede tilladelser er blevet opdateret, og du kan opleve begrænset funktionalitet. Godkend venligst denne applikation igen for at undgå eventuelle problemer',
         title: 'Tilknyttede konti',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Slet Konto',
         title: 'Konto afslutning',

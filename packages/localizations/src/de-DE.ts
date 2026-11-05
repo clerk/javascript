@@ -2521,6 +2521,21 @@ export const deDE: LocalizationResource = {
           'Die erforderlichen Berechtigungen wurden aktualisiert, wodurch Ihre Funktionalität möglicherweise eingeschränkt ist. Bitte autorisieren Sie diese Anwendung erneut, um Probleme zu vermeiden.',
         title: 'Verbundene Konten',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Konto löschen',
         title: 'Achtung',

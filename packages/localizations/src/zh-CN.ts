@@ -2449,6 +2449,21 @@ export const zhCN: LocalizationResource = {
           '“所需的权限范围已更新，您可能会遇到功能受限的问题。请重新授权此应用程序，以避免出现任何问题。”',
         title: '已连接的账户',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: '删除账户',
         title: '终止账户',

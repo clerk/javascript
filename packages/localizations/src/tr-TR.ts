@@ -2487,6 +2487,21 @@ export const trTR: LocalizationResource = {
           'Gerekli kapsamlar güncellendi ve sınırlı işlevsellik yaşayabilirsiniz. Sorunları önlemek için lütfen bu uygulamayı yeniden yetkilendirin',
         title: 'Bağlı hesaplar',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Hesabı sil',
         title: 'Tehlike',

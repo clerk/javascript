@@ -2522,6 +2522,21 @@ export const taIN: LocalizationResource = {
           'தேவையான நோக்கங்கள் புதுப்பிக்கப்பட்டுள்ளன, மற்றும் நீங்கள் வரம்பிற்குட்பட்ட செயல்பாட்டை அனுபவிக்கலாம். சிக்கல்களைத் தவிர்க்க இந்த பயன்பாட்டை மீண்டும் அங்கீகரிக்கவும்',
         title: 'இணைக்கப்பட்ட கணக்குகள்',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'கணக்கை நீக்கு',
         title: 'கணக்கை நீக்கு',

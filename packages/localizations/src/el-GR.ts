@@ -2510,6 +2510,21 @@ export const elGR: LocalizationResource = {
           'Τα απαιτούμενα δικαιώματα έχουν ενημερωθεί και ενδέχεται να αντιμετωπίζετε περιορισμένη λειτουργικότητα. Παρακαλώ επανεξουσιοδοτήστε αυτήν την εφαρμογή για να αποφύγετε προβλήματα',
         title: 'Συνδεδεμένοι λογαριασμοί',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Διαγραφή λογαριασμού',
         title: 'Κίνδυνος',

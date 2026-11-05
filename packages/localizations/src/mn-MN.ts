@@ -2486,6 +2486,21 @@ export const mnMN: LocalizationResource = {
           'Шаардлагатай хамрах хүрээг шинэчилсэн бөгөөд танд хязгаарлагдмал ажиллагаатай байж магадгүй. Асуудлаас зайлсхийхийн тулд энэ аппликешныг дахин зөвшөөрнө үү',
         title: 'Холбогдсон бүртгэлүүд',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Бүртгэл устгах',
         title: 'Бүртгэл устгах',

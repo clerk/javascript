@@ -2452,6 +2452,21 @@ export const zhTW: LocalizationResource = {
         subtitle__reauthorize: '必要的權限範圍已更新，您可能會遇到功能受限的情況。請重新授權此應用程式以避免任何問題。',
         title: '已連結的帳戶',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: '刪除帳戶',
         title: '危險',

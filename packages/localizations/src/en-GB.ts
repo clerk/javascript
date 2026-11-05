@@ -2487,6 +2487,21 @@ export const enGB: LocalizationResource = {
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorise this application to avoid any issues',
         title: 'Connected accounts',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Delete account',
         title: 'Delete account',

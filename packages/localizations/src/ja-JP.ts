@@ -2503,6 +2503,21 @@ export const jaJP: LocalizationResource = {
           '必要なスコープが更新され、機能が制限されている可能性があります。問題を避けるために、このアプリケーションを再認証してください。',
         title: '連携アカウント',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'アカウントの削除',
         title: 'アカウントの削除',

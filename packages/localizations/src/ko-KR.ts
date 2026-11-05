@@ -2468,6 +2468,21 @@ export const koKR: LocalizationResource = {
           '필요한 권한 범위가 업데이트되어 일부 기능이 제한될 수 있어요. 문제를 피하려면 이 애플리케이션을 다시 인증해 주세요.',
         title: '연결된 계정',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: '계정 삭제',
         title: '위험',

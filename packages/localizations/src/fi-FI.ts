@@ -2514,6 +2514,21 @@ export const fiFI: LocalizationResource = {
           'Tarvittavat käyttöoikeudet on päivitetty, ja saatat kokea rajoitettua toiminnallisuutta. Valtuuta tämä sovellus välttääksesi mahdolliset ongelmat.',
         title: 'Yhdistetyt tilit',
       },
+      connectionsSection: {
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Poista tili',
         title: 'Poista tili',
