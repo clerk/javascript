@@ -81,11 +81,12 @@ return makes the new screen pop in instead.
 - **Mark what takes focus with `useFlowAutoFocus`.** Focus moves only for a step
   that transitions in, so a flow that opens on a step does not take focus.
 - **A multi-step flow gets derived props.** The view renders the `step`, `form`
-  and flags the controller passes and does not work out the step itself. Each
-  step's footer action is a `SubmitButton`: `onClick={onContinue}` with
-  `isPending={isTesting}` and `disabled={!canContinue}` on a middle step, and
-  `form={form.id}` on the last. The controller side is in `controllers.md` →
-  "Multi-step flows".
+  and flags the controller passes and does not work out the step itself. Every
+  step's `Form` uses `id={form.id}` and the controller's `onSubmit`, and its
+  footer action is a `SubmitButton` with `form={form.id}`. A middle step sets
+  `isPending={isTesting}` and `disabled={!canContinue}`, and the last sets
+  `isPending={form.isSubmitting}` and `disabled={!form.canSubmit}`. The
+  controller side is in `controllers.md` → "Multi-step flows".
 
 A loading or error state of a single screen is not a step, and neither is the
 skeleton shown before a feature has data. Those can stay conditionals.

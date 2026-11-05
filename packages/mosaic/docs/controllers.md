@@ -197,9 +197,9 @@ A flow with several steps on one surface is one machine and one form. No existin
 flow follows every rule below yet, so each points at the closest example.
 
 - **The machine owns the step.** Each step is a state, and the controller derives
-  the step the view shows from the snapshot (`viewStep` in
-  `reverification.controller.ts`). No `useState` step beside it, and no separate
-  open flag.
+  the step the view shows from the snapshot, so an async state maps to the screen
+  that stays up while it runs (`viewStep` in `reverification.controller.ts`). No
+  `useState` step beside it, and no separate open flag.
 - **Guards live in the machine.** What allows a step to continue is a guard on its
   event. The controller reads it with `actor.can(event)` rather than writing a
   `canContinue` that repeats it.
@@ -212,18 +212,28 @@ flow follows every rule below yet, so each points at the closest example.
   save, and `canSubmit` covers only that save (`create-organization.controller.ts`).
   Values are not copied into machine context with `TYPE` events.
 - **Navigation is machine events.** Continue and back send `NEXT` and `BACK` with
-  the values the guard needs. A form submit does not choose the next step.
+  the values the guard needs, and the machine chooses the next step. The
+  controller routes the form's submit by step: a middle step sends `NEXT`, and
+  only the last step runs `form.handleSubmit`, so Enter never saves early.
 
 ```ts
 const [snapshot, send, actor] = useMachine(machine, { context: { testConnection: model.onTestConnection } });
 const form = useForm<SsoValues, void>({ initialValues, onSubmit: values => model.onSave(values) });
+const next = { type: 'NEXT', values: form.values } as const;
 
 return {
-  step: snapshot.value,
+  step: viewStep(snapshot.value),
   form,
   isTesting: snapshot.value === 'testing',
-  canContinue: actor.can({ type: 'NEXT', values: form.values }),
-  onContinue: () => send({ type: 'NEXT', values: form.values }),
+  canContinue: actor.can(next),
+  onSubmit: event => {
+    if (snapshot.value === 'review') {
+      form.handleSubmit(event);
+      return;
+    }
+    event.preventDefault();
+    send(next);
+  },
   onBack: () => send({ type: 'BACK' }),
 };
 ```

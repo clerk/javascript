@@ -149,7 +149,8 @@ a `status`, plain data and callbacks. The model hook comes when the API does.
   screen (`AccessData`). When the resource lands, the type becomes a `Pick`.
 - **The swingset fixture implements that type.** It builds a ready model and
   passes it to the feature's real controller and view
-  (`ReadyModel` in `swingset/src/stories/create-organization.stories.tsx`).
+  (`CreateOrganizationReadyModel` in
+  `packages/swingset/src/stories/create-organization.stories.tsx`).
 - **Composition stays in Mosaic.** The wrapper, and whatever it renders around
   the view (a title, a back action, a footer), lives in the feature. Swingset
   supplies data and nothing else, because code there has no feature test and is
