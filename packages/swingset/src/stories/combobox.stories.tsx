@@ -1,11 +1,8 @@
 'use client';
 
-import { Button } from '@clerk/mosaic/components/button';
 import { Combobox } from '@clerk/mosaic/components/combobox';
 import { Field } from '@clerk/mosaic/components/field';
-import { Icon } from '@clerk/mosaic/components/icon';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
-import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -34,14 +31,9 @@ export function Default() {
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Trigger
+              clearable
               aria-label='Toggle fruit options'
-              render={<Button />}
-            >
-              <Icon
-                glyph={ChevronDown}
-                size='md'
-              />
-            </Combobox.Trigger>
+            />
           </InputGroup.End>
         </InputGroup.Root>
       </Field.Root>
@@ -78,14 +70,9 @@ export function Scrolling() {
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Trigger
+              clearable
               aria-label='Toggle fruit options'
-              render={<Button />}
-            >
-              <Icon
-                glyph={ChevronDown}
-                size='md'
-              />
-            </Combobox.Trigger>
+            />
           </InputGroup.End>
         </InputGroup.Root>
       </Field.Root>
