@@ -1,4 +1,5 @@
 {
   "*.{mjs,js,jsx,ts,tsx,vue}": ["pnpm prettier --write"],
-  "*.{json,md,mdx}": ["pnpm prettier --write"]
+  "*.{json,md,mdx}": ["pnpm prettier --write"],
+  "packages/mosaic/src/**/*.{ts,tsx}": ["pnpm --dir packages/mosaic exec oxlint -c oxlint.config.mjs"]
 }
