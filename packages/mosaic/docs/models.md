@@ -145,8 +145,10 @@ available in the consuming branch before following this guidance.
 `src/hooks/use-now.ts` in the consuming component or controller, then pass the
 value to pure formatting helpers. For relative labels that refresh each minute,
 use `useNow({ updateInterval: 60_000 })`. Without an interval, the hook retains
-its initial value. Reuse this API instead of adding a feature-specific clock
-provider or timer.
+its initial value. Pass `until` to stop ticking once that time is reached, as
+`useResendSeconds` does for a resend cooldown whose unlock time lives in the
+machine. Reuse this API instead of adding a feature-specific clock provider or
+timer.
 
 In tests, supply a fixed `Date` through `MosaicNowProvider`, assert the displayed
 label, then advance fake timers across a label boundary and assert the update.
