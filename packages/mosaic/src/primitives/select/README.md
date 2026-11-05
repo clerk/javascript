@@ -135,11 +135,11 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 ### `Select.Option`
 
-| Prop       | Type      | Default               | Description                            |
-| ---------- | --------- | --------------------- | -------------------------------------- |
-| `value`    | `string`  | **required**          | The option's value                     |
-| `label`    | `string`  | falls back to `value` | Display label, also used for typeahead |
-| `disabled` | `boolean` | —                     | Prevents selection                     |
+| Prop       | Type      | Default               | Description                                   |
+| ---------- | --------- | --------------------- | --------------------------------------------- |
+| `value`    | `unknown` | **required**          | The option's value, compared with `Object.is` |
+| `label`    | `string`  | falls back to `value` | Display label, also used for typeahead        |
+| `disabled` | `boolean` | —                     | Prevents selection                            |
 
 ### `Select.Trigger`, `Select.Positioner`, `Select.Popup`
 

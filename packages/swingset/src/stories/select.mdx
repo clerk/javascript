@@ -60,7 +60,7 @@ const [value, setValue] = useState('apple');
 
 ### Multiple
 
-`multiple` makes the value a `string[]`. Picking an option adds or removes it and keeps the
+`multiple` makes the value an array. Picking an option adds or removes it and keeps the
 popup open. `Select.Value` shows the selected labels joined with commas; pass a function as
 its children to render the selection yourself.
 
@@ -104,36 +104,36 @@ props. `Select.Portal` is optional.
 
 ### `Select.Root`
 
-| Prop                              | Type                                 | Default                     | Description                                                        |
-| --------------------------------- | ------------------------------------ | --------------------------- | ------------------------------------------------------------------ |
-| <code>multiple</code>             | <code>boolean</code>                 | <code>false</code>          | Allow selecting several options                                    |
-| <code>value</code>                | <code>string \| string[]</code>      | —                           | Controlled selected value; an array when `multiple`                |
-| <code>defaultValue</code>         | <code>string \| string[]</code>      | —                           | Initial selected value (uncontrolled); an array when `multiple`    |
-| <code>onValueChange</code>        | <code>(value) => void</code>         | —                           | Called with the new value when the selection changes               |
-| <code>open</code>                 | <code>boolean</code>                 | —                           | Controlled open state                                              |
-| <code>defaultOpen</code>          | <code>boolean</code>                 | <code>false</code>          | Initial open state (uncontrolled)                                  |
-| <code>onOpenChange</code>         | <code>(open: boolean) => void</code> | —                           | Called when the open state changes                                 |
-| <code>items</code>                | <code>SelectItem[]</code>            | —                           | `{ label, value }[]` used to resolve the selected label early      |
-| <code>alignItemWithTrigger</code> | <code>boolean</code>                 | <code>true</code>           | Overlay the selected item on the trigger (native-`<select>` style) |
-| <code>placement</code>            | <code>Placement</code>               | <code>'bottom-start'</code> | Placement when not aligning to the item                            |
-| <code>sideOffset</code>           | <code>number</code>                  | <code>4</code>              | Gap in px (applies only when `alignItemWithTrigger={false}`)       |
+| Prop                              | Type                                  | Default                     | Description                                                          |
+| --------------------------------- | ------------------------------------- | --------------------------- | -------------------------------------------------------------------- |
+| <code>multiple</code>             | <code>boolean</code>                  | <code>false</code>          | Allow selecting several options                                      |
+| <code>value</code>                | <code>Value \| null \| Value[]</code> | —                           | Controlled selected value; `null` for none, an array when `multiple` |
+| <code>defaultValue</code>         | <code>Value \| null \| Value[]</code> | —                           | Initial selected value (uncontrolled); an array when `multiple`      |
+| <code>onValueChange</code>        | <code>(value) => void</code>          | —                           | Called with the new value when the selection changes                 |
+| <code>open</code>                 | <code>boolean</code>                  | —                           | Controlled open state                                                |
+| <code>defaultOpen</code>          | <code>boolean</code>                  | <code>false</code>          | Initial open state (uncontrolled)                                    |
+| <code>onOpenChange</code>         | <code>(open: boolean) => void</code>  | —                           | Called when the open state changes                                   |
+| <code>items</code>                | <code>SelectItem[]</code>             | —                           | `{ label, value }[]` used to resolve the selected label early        |
+| <code>alignItemWithTrigger</code> | <code>boolean</code>                  | <code>true</code>           | Overlay the selected item on the trigger (native-`<select>` style)   |
+| <code>placement</code>            | <code>Placement</code>                | <code>'bottom-start'</code> | Placement when not aligning to the item                              |
+| <code>sideOffset</code>           | <code>number</code>                   | <code>4</code>              | Gap in px (applies only when `alignItemWithTrigger={false}`)         |
 
-`SelectItem` is `{ label: string; value: string }` — disabling is done per-`Option`.
+`SelectItem` is `{ label: string; value: Value }` — disabling is done per-`Option`.
 
 ### `Select.Value`
 
-| Prop                     | Type                                                       | Default | Description                                                           |
-| ------------------------ | ---------------------------------------------------------- | ------- | --------------------------------------------------------------------- |
-| <code>placeholder</code> | <code>ReactNode</code>                                     | —       | Rendered when no value is selected                                    |
-| <code>children</code>    | <code>ReactNode \| ((value: string[]) => ReactNode)</code> | —       | Replaces the selected labels; a function receives the selected values |
+| Prop                     | Type                                                        | Default | Description                                                           |
+| ------------------------ | ----------------------------------------------------------- | ------- | --------------------------------------------------------------------- |
+| <code>placeholder</code> | <code>ReactNode</code>                                      | —       | Rendered when no value is selected                                    |
+| <code>children</code>    | <code>ReactNode \| ((value: unknown[]) => ReactNode)</code> | —       | Replaces the selected labels; a function receives the selected values |
 
 ### `Select.Option`
 
-| Prop                  | Type                 | Default               | Description                                  |
-| --------------------- | -------------------- | --------------------- | -------------------------------------------- |
-| <code>value</code>    | <code>string</code>  | — (required)          | The option's value                           |
-| <code>label</code>    | <code>string</code>  | falls back to `value` | Display label, also used for typeahead       |
-| <code>disabled</code> | <code>boolean</code> | —                     | Prevent selection (stays keyboard-focusable) |
+| Prop                  | Type                 | Default               | Description                                   |
+| --------------------- | -------------------- | --------------------- | --------------------------------------------- |
+| <code>value</code>    | <code>unknown</code> | — (required)          | The option's value, compared with `Object.is` |
+| <code>label</code>    | <code>string</code>  | falls back to `value` | Display label, also used for typeahead        |
+| <code>disabled</code> | <code>boolean</code> | —                     | Prevent selection (stays keyboard-focusable)  |
 
 `Select.Trigger`, `Select.Positioner`, and `Select.Popup` take no additional props beyond
 standard HTML attributes for their default element. `Select.Portal` accepts `root`.
