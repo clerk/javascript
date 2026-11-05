@@ -1,0 +1,41 @@
+{
+  "name": "@clerk/mosaic-site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev --port 6007",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/mosaic": "workspace:*",
+    "@clerk/shared": "workspace:*",
+    "@faker-js/faker": "^10.0.0",
+    "@floating-ui/react": "catalog:repo",
+    "@stylexjs/stylex": "0.19.0",
+    "clsx": "^2.1.1",
+    "next": "^15.0.0",
+    "next-themes": "^0.4.6",
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "tailwind-merge": "^3.6.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-jsx": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@stylexjs/babel-plugin": "0.19.0",
+    "@stylexjs/postcss-plugin": "0.19.0",
+    "@stylexjs/unplugin": "0.19.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "@types/three": "^0.187.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "catalog:repo"
+  }
+}
