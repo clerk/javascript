@@ -3,7 +3,6 @@ import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
-import type { ConnectNamespace } from './connect';
 import type {
   BillingCheckoutResource,
   BillingNamespace,
@@ -13,6 +12,7 @@ import type {
   ForPayerType,
 } from './billing';
 import type { ClientResource } from './client';
+import type { ConnectNamespace } from './connect';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { ClerkAPIResponseError } from './errors';
