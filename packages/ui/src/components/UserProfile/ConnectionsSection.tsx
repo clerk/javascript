@@ -77,7 +77,11 @@ export const ConnectionsSection = withCardStateProvider(() => {
   }
 
   const allConnectors = connectors.data ?? [];
-  const allConnections = connections.data ?? [];
+  // A disconnected service the user can no longer connect has nothing left to do.
+  const allConnections = (connections.data ?? []).filter(
+    connection =>
+      connection.status !== 'disconnected' || allConnectors.some(connector => connector.key === connection.connector),
+  );
   const unconnected = allConnectors.filter(
     connector => !allConnections.some(connection => connection.connector === connector.key),
   );
