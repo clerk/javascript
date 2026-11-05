@@ -7,6 +7,7 @@ import { useFormControlFeedback } from '../../utils/useFormControl';
 
 type FormFieldProviderProps = ReturnType<typeof useFormControlUtil<FieldId>>['props'] & {
   isDisabled: boolean;
+  preserveFocus?: boolean;
 };
 
 type FormFieldContextValue = Omit<FormFieldProviderProps, 'id'> & {
@@ -141,6 +142,7 @@ export const sanitizeInputProps = (
     debouncedFeedback,
     ignorePasswordManager,
     transformer,
+    preserveFocus,
     ...inputProps
   } = obj;
 
