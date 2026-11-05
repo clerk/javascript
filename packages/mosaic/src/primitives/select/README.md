@@ -121,7 +121,7 @@ By default, the selected option visually aligns with the trigger. Disable this f
 | `open`                 | `boolean`                  | —                | Controlled open state                                                |
 | `defaultOpen`          | `boolean`                  | `false`          | Initial open state (uncontrolled)                                    |
 | `onOpenChange`         | `(open: boolean) => void`  | —                | Called when open state changes                                       |
-| `items`                | `SelectItem[]`             | —                | `{ label, value }` pairs for label resolution before options mount   |
+| `items`                | `SelectItem<Value>[]`      | —                | `{ label, value }` pairs for label resolution before options mount   |
 | `alignItemWithTrigger` | `boolean`                  | `true`           | Visually align selected option over the trigger                      |
 | `placement`            | `Placement`                | `"bottom-start"` | Floating UI placement                                                |
 | `sideOffset`           | `number`                   | `4`              | Gap between trigger and popup (px)                                   |
@@ -135,11 +135,11 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 ### `Select.Option`
 
-| Prop       | Type      | Default               | Description                                   |
-| ---------- | --------- | --------------------- | --------------------------------------------- |
-| `value`    | `unknown` | **required**          | The option's value, compared with `Object.is` |
-| `label`    | `string`  | falls back to `value` | Display label, also used for typeahead        |
-| `disabled` | `boolean` | —                     | Prevents selection                            |
+| Prop       | Type      | Default         | Description                                   |
+| ---------- | --------- | --------------- | --------------------------------------------- |
+| `value`    | `unknown` | **required**    | The option's value, compared with `Object.is` |
+| `label`    | `string`  | `String(value)` | Display label, also used for typeahead        |
+| `disabled` | `boolean` | —               | Prevents selection                            |
 
 ### `Select.Trigger`, `Select.Positioner`, `Select.Popup`
 
