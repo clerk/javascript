@@ -934,7 +934,12 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        "packages/clerk-js/src/test/fixtures.ts",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },

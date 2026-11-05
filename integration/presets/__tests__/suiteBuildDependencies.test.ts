@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { dirname, join, resolve, sep } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -31,8 +31,12 @@ const harnessPackages = Object.entries<string>(rootPackage.devDependencies)
   .map(([name]) => name);
 
 const scopedSuites = Object.entries<{ dependsOn?: string[]; inputs: string[] }>(turbo.tasks)
-  .filter(([id, task]) => id.startsWith('//#test:integration:') && !task.inputs.some(i => i.startsWith('packages/')))
-  .map(([id, task]) => ({ suite: id.replace('//#test:integration:', ''), dependsOn: task.dependsOn ?? [] }));
+  .filter(([id, task]) => id.startsWith('//#test:integration:') && !task.inputs.includes('packages/*/src/**'))
+  .map(([id, task]) => ({
+    suite: id.replace('//#test:integration:', ''),
+    dependsOn: task.dependsOn ?? [],
+    inputs: task.inputs,
+  }));
 
 const helperDirs = [testsDir, resolve(repoRoot, 'integration/testUtils')];
 
@@ -97,6 +101,14 @@ const suiteFiles = (suite: string) => {
   return [];
 };
 
+const importsOutsideIntegration = (suite: string) =>
+  suiteFiles(suite).flatMap(file =>
+    [...readFileSync(file, 'utf8').matchAll(/^import (?!type )[^;]*?from '(\.{1,2}\/[^']+)'/gm)]
+      .map(([, specifier]) => resolveImport(file, specifier))
+      .filter((target): target is string => !!target && !target.startsWith(resolve(repoRoot, 'integration') + sep))
+      .map(target => relative(repoRoot, target)),
+  );
+
 let appConfigs: typeof AppConfigs;
 
 beforeAll(async () => {
@@ -154,7 +166,7 @@ describe('scoped integration suites declare the builds they load', () => {
     expect(harnessPackages).toEqual(expect.arrayContaining(['@clerk/backend', '@clerk/shared', '@clerk/testing']));
   });
 
-  describe.each(scopedSuites)('$suite', ({ suite, dependsOn }) => {
+  describe.each(scopedSuites)('$suite', ({ suite, dependsOn, inputs }) => {
     it('selects its tests with a --grep tag or its own config, and its apps by id or from its tests', () => {
       const { script, tag, ownConfig } = parseScript(suite);
       expect(script, `package.json has no test:integration:${suite} script`).toBeDefined();
@@ -173,6 +185,10 @@ describe('scoped integration suites declare the builds they load', () => {
         .map(name => `${name}#build`)
         .sort();
       expect([...dependsOn].sort()).toEqual(expected);
+    });
+
+    it('hashes the files its tests import from outside integration/', () => {
+      expect(inputs).toEqual(expect.arrayContaining(importsOutsideIntegration(suite)));
     });
   });
 });
