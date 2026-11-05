@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+@stylex;
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+}
+
+.dark {
+  --background: #050505;
+  --foreground: #ffffff;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+@property --mx {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --my {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
