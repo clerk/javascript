@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.15.1
+
+### Patch Changes
+
+- `useSignInWithApple` now throws a `ClerkAPIResponseError` when Sign in with Apple on an instance with restricted sign-ups needs the user to verify their email address first. Previously it returned with no session and no error. ([#10644](https://github.com/clerk/javascript/pull/10644)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`805c158`](https://github.com/clerk/javascript/commit/805c1586667807bd973ab9563d7900f7a59d1b1f), [`256153a`](https://github.com/clerk/javascript/commit/256153a1b410e7137b51681abefee8ee7038af95), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc), [`700f375`](https://github.com/clerk/javascript/commit/700f37569453d3b21c773bbb3ffc05d8035fc776)]:
+  - @clerk/clerk-js@6.42.3
+  - @clerk/shared@4.44.1
+  - @clerk/react@6.18.6
+
 ## 4.15.0
 
 ### Minor Changes

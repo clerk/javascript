@@ -1,5 +1,17 @@
 # @clerk/ui
 
+## 1.42.4
+
+### Patch Changes
+
+- Move the OAuth consent redirect domain helper into `@clerk/shared` so it can be shared across UI packages. No behavior change. ([#10218](https://github.com/clerk/javascript/pull/10218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix an issue where annual base-fees were shown with incorrect labels. ([#10660](https://github.com/clerk/javascript/pull/10660)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+  - @clerk/localizations@4.24.6
+
 ## 1.42.3
 
 ### Patch Changes
