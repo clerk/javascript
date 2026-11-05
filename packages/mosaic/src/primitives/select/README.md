@@ -51,7 +51,7 @@ const [value, setValue] = useState('apple');
 
 ### Multiple
 
-`multiple` makes the value a `string[]`. Picking an option adds or removes it and keeps the popup open.
+`multiple` makes the value an array. Picking an option adds or removes it and keeps the popup open.
 
 ```tsx
 <Select.Root
@@ -112,26 +112,26 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 ### `Select.Root`
 
-| Prop                   | Type                      | Default          | Description                                                        |
-| ---------------------- | ------------------------- | ---------------- | ------------------------------------------------------------------ |
-| `multiple`             | `boolean`                 | `false`          | Allow selecting several options                                    |
-| `value`                | `string \| string[]`      | —                | Controlled selected value; an array when `multiple`                |
-| `defaultValue`         | `string \| string[]`      | —                | Initial selected value (uncontrolled); an array when `multiple`    |
-| `onValueChange`        | `(value) => void`         | —                | Called with the new value when the selection changes               |
-| `open`                 | `boolean`                 | —                | Controlled open state                                              |
-| `defaultOpen`          | `boolean`                 | `false`          | Initial open state (uncontrolled)                                  |
-| `onOpenChange`         | `(open: boolean) => void` | —                | Called when open state changes                                     |
-| `items`                | `SelectItem[]`            | —                | `{ label, value }` pairs for label resolution before options mount |
-| `alignItemWithTrigger` | `boolean`                 | `true`           | Visually align selected option over the trigger                    |
-| `placement`            | `Placement`               | `"bottom-start"` | Floating UI placement                                              |
-| `sideOffset`           | `number`                  | `4`              | Gap between trigger and popup (px)                                 |
+| Prop                   | Type                       | Default          | Description                                                          |
+| ---------------------- | -------------------------- | ---------------- | -------------------------------------------------------------------- |
+| `multiple`             | `boolean`                  | `false`          | Allow selecting several options                                      |
+| `value`                | `Value \| null \| Value[]` | —                | Controlled selected value; `null` for none, an array when `multiple` |
+| `defaultValue`         | `Value \| null \| Value[]` | —                | Initial selected value (uncontrolled); an array when `multiple`      |
+| `onValueChange`        | `(value) => void`          | —                | Called with the new value when the selection changes                 |
+| `open`                 | `boolean`                  | —                | Controlled open state                                                |
+| `defaultOpen`          | `boolean`                  | `false`          | Initial open state (uncontrolled)                                    |
+| `onOpenChange`         | `(open: boolean) => void`  | —                | Called when open state changes                                       |
+| `items`                | `SelectItem[]`             | —                | `{ label, value }` pairs for label resolution before options mount   |
+| `alignItemWithTrigger` | `boolean`                  | `true`           | Visually align selected option over the trigger                      |
+| `placement`            | `Placement`                | `"bottom-start"` | Floating UI placement                                                |
+| `sideOffset`           | `number`                   | `4`              | Gap between trigger and popup (px)                                   |
 
 ### `Select.Value`
 
-| Prop          | Type                                            | Default | Description                                                                                                                        |
-| ------------- | ----------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `placeholder` | `ReactNode`                                     | —       | Shown when no value is selected                                                                                                    |
-| `children`    | `ReactNode \| ((value: string[]) => ReactNode)` | —       | Replaces the selected labels; a function receives the selected values, and the placeholder shows instead while nothing is selected |
+| Prop          | Type                                             | Default | Description                                                                                                                        |
+| ------------- | ------------------------------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `placeholder` | `ReactNode`                                      | —       | Shown when no value is selected                                                                                                    |
+| `children`    | `ReactNode \| ((value: unknown[]) => ReactNode)` | —       | Replaces the selected labels; a function receives the selected values, and the placeholder shows instead while nothing is selected |
 
 ### `Select.Option`
 
@@ -173,7 +173,8 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 
 ## Important Notes
 
-- **`label` on `Select.Option`** drives both display in `Select.Value` and typeahead matching. If omitted, `value` is used for both.
+- **`label` on `Select.Option`** drives both display in `Select.Value` and typeahead matching. If omitted, `String(value)` is used for both.
+- **Values can be any type.** They are compared with `Object.is`, and `Value` is inferred from `items`, `value`, `defaultValue` or `onValueChange`.
 - **`items` prop** is only for label resolution — it does not control which options render. You still render `Select.Option` children yourself.
 - **Disabled options** can still receive keyboard focus but cannot be selected.
 - **Popup contents freeze while closing.** The popup outlives `open` by its exit animation, so its children are wrapped in `Freeze` (`../utils`) and hold their last frame: picking an option does not move `data-selected` to the new row under the animation. The popup element itself keeps updating, so `data-closed` / `data-ending-style` still land.

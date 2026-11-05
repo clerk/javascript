@@ -93,8 +93,8 @@ describe('Select', () => {
       expect(value?.textContent).toBe('Pick a fruit...');
     });
 
-    it('shows placeholder when the controlled value is an empty string', () => {
-      renderSelect({ value: '' });
+    it('shows placeholder when the controlled value is null', () => {
+      renderSelect({ value: null });
       const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Pick a fruit...');
     });
@@ -574,7 +574,7 @@ describe('Select', () => {
 
     it('positions like a menu when nothing is selected', async () => {
       const user = userEvent.setup();
-      renderSelect({ alignItemWithTrigger: true, value: '' });
+      renderSelect({ alignItemWithTrigger: true, value: null });
 
       await user.click(screen.getByRole('combobox'));
 

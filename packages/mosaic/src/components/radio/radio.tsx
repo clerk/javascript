@@ -16,11 +16,11 @@ import { firstLine, indicatorSizes, layouts, sizes, styles } from './radio.style
 /** `stack` gives each choice its own row. `grid` fits as many columns of cards as the width allows. */
 export type RadioLayout = 'stack' | 'grid';
 
-export interface RadioGroupProps<T extends string = string>
+export interface RadioGroupProps<Value = string>
   extends Omit<React.ComponentPropsWithoutRef<'div'>, 'defaultValue' | 'className' | 'style'>, MosaicStyleProps {
-  value?: T;
-  defaultValue?: T;
-  onValueChange?: (value: T) => void;
+  value?: Value;
+  defaultValue?: Value;
+  onValueChange?: (value: Value) => void;
   name?: string;
   disabled?: boolean;
   /** @default 'stack' */
@@ -30,24 +30,20 @@ export interface RadioGroupProps<T extends string = string>
 interface RadioGroupContextValue {
   name: string;
   submits: boolean;
-  value: string | undefined;
-  setValue: (value: string) => void;
+  value: unknown;
+  setValue: (value: unknown) => void;
   disabled: boolean | undefined;
 }
 
 const RadioGroupContext = React.createContext<RadioGroupContextValue | null>(null);
 
 // eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the value type parameter; the group only hands back values its caller passed in.
-const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(function MosaicRadioGroup(
+const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps<unknown>>(function MosaicRadioGroup(
   { value: valueProp, defaultValue, onValueChange, name: nameProp, disabled, layout = 'stack', xstyle, ...rest },
   ref,
 ) {
   const generatedName = React.useId();
-  const [value, setValue] = useControllableState<string | undefined>(valueProp, defaultValue, next => {
-    if (next !== undefined) {
-      onValueChange?.(next);
-    }
-  });
+  const [value, setValue] = useControllableState(valueProp, defaultValue, onValueChange);
   const context = React.useMemo<RadioGroupContextValue>(
     () => ({ name: nameProp ?? generatedName, submits: nameProp !== undefined, value, setValue, disabled }),
     [nameProp, generatedName, value, setValue, disabled],
@@ -67,16 +63,14 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(function Mo
       />
     </RadioGroupContext.Provider>
   );
-}) as <T extends string = string>(
-  props: RadioGroupProps<T> & { ref?: React.Ref<HTMLDivElement> },
-) => React.ReactElement;
+}) as <Value = string>(props: RadioGroupProps<Value> & { ref?: React.Ref<HTMLDivElement> }) => React.ReactElement;
 
 export interface RadioItemProps
   extends
     Omit<React.ComponentPropsWithoutRef<'input'>, 'type' | 'size' | 'value' | 'className' | 'style'>,
     MosaicStyleProps {
   size?: 'sm' | 'md';
-  value?: string;
+  value?: unknown;
 }
 
 const RadioItem = React.forwardRef<HTMLInputElement, RadioItemProps>(function MosaicRadioItem(
@@ -106,7 +100,7 @@ const RadioItem = React.forwardRef<HTMLInputElement, RadioItemProps>(function Mo
   });
   const group = React.useContext(RadioGroupContext);
   const disabled = (fieldProps?.disabled ?? disabledProp) || group?.disabled;
-  const checked = group && value !== undefined ? group.value === value : checkedProp;
+  const checked = group && value !== undefined ? Object.is(group.value, value) : checkedProp;
 
   return (
     <span
@@ -118,7 +112,7 @@ const RadioItem = React.forwardRef<HTMLInputElement, RadioItemProps>(function Mo
       <input
         ref={ref}
         type='radio'
-        value={value}
+        value={typeof value === 'string' ? value : undefined}
         name={group?.name ?? nameProp}
         form={group?.submits === false ? '' : undefined}
         checked={checked}
@@ -200,7 +194,7 @@ const RadioSection = React.forwardRef<HTMLFieldSetElement, RadioSectionProps>(fu
 
 export interface RadioCardProps
   extends Omit<React.ComponentPropsWithoutRef<'label'>, 'className' | 'style'>, MosaicStyleProps {
-  value: string;
+  value: unknown;
   disabled?: boolean;
 }
 
@@ -219,7 +213,7 @@ const RadioCard = React.forwardRef<HTMLLabelElement, RadioCardProps>(function Mo
   ref,
 ) {
   const group = React.useContext(RadioGroupContext);
-  const checked = group?.value === value;
+  const checked = group !== null && Object.is(group.value, value);
 
   return (
     <FieldProvider

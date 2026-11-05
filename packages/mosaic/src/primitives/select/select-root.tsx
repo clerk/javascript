@@ -39,9 +39,9 @@ import {
 
 export type { SelectItem } from './select-context';
 
-interface SelectBaseProps<T extends string> {
+interface SelectBaseProps<Value> {
   /** Array of `{ label, value }` items for label resolution before options mount. */
-  items?: SelectItem<T>[];
+  items?: SelectItem<Value>[];
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -58,31 +58,31 @@ interface SelectBaseProps<T extends string> {
   children: ReactNode;
 }
 
-export interface SelectSingleProps<T extends string = string> extends SelectBaseProps<T> {
+export interface SelectSingleProps<Value = string> extends SelectBaseProps<Value> {
   multiple?: false;
-  value?: NoInfer<T>;
-  defaultValue?: NoInfer<T>;
-  onValueChange?: (value: NoInfer<T>) => void;
+  value?: Value | null;
+  defaultValue?: Value | null;
+  onValueChange?: (value: Value) => void;
 }
 
-export interface SelectMultipleProps<T extends string = string> extends SelectBaseProps<T> {
+export interface SelectMultipleProps<Value = string> extends SelectBaseProps<Value> {
   /** Lets several options be selected. Picking an option toggles it and keeps the popup open. */
   multiple: true;
-  value?: NoInfer<T>[];
-  defaultValue?: NoInfer<T>[];
-  onValueChange?: (value: NoInfer<T>[]) => void;
+  value?: Value[];
+  defaultValue?: Value[];
+  onValueChange?: (value: Value[]) => void;
 }
 
-export type SelectProps<T extends string = string> = SelectSingleProps<T> | SelectMultipleProps<T>;
+export type SelectProps<Value = string> = SelectSingleProps<Value> | SelectMultipleProps<Value>;
 
-function toValues(value: string | undefined): string[] | undefined {
+function toValues(value: unknown): unknown[] | undefined {
   if (value === undefined) {
     return undefined;
   }
-  return value === '' ? [] : [value];
+  return value === null ? [] : [value];
 }
 
-function SelectInner(props: SelectProps) {
+function SelectInner(props: SelectProps<unknown>) {
   const {
     items,
     alignItemWithTrigger: alignProp = true,
@@ -101,20 +101,20 @@ function SelectInner(props: SelectProps) {
   const singleValue = props.multiple ? undefined : props.value;
   const controlledSingle = useMemo(() => toValues(singleValue), [singleValue]);
   const controlledValues = props.multiple ? props.value : controlledSingle;
-  const [selectedValues, setSelectedValues] = useControllableState<string[]>(
+  const [selectedValues, setSelectedValues] = useControllableState<unknown[]>(
     controlledValues,
     (props.multiple ? props.defaultValue : toValues(props.defaultValue)) ?? [],
   );
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<string, string>>(new Map());
+  const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<unknown, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
-  const valueToLabelRef = useRef<Map<string, string>>(new Map());
+  const valueToLabelRef = useRef<Map<unknown, string>>(new Map());
   const selectedItemRef = useRef<HTMLElement | null>(null);
   const openRef = useRef(open);
   // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
@@ -199,10 +199,10 @@ function SelectInner(props: SelectProps) {
   const isControlled = controlledValues !== undefined;
 
   const handleSelect = useCallback(
-    (value: string, index: number) => {
+    (value: unknown, index: number) => {
       if (multiple) {
-        const next = selectedValues.includes(value)
-          ? selectedValues.filter(selected => selected !== value)
+        const next = selectedValues.some(selected => Object.is(selected, value))
+          ? selectedValues.filter(selected => !Object.is(selected, value))
           : [...selectedValues, value];
         setSelectedValues(next);
         onMultipleValueChange?.(next);
@@ -219,7 +219,7 @@ function SelectInner(props: SelectProps) {
       // showing a stale label. Only cache labels in uncontrolled mode where
       // the value always persists after selection.
       if (!isControlled) {
-        const label = valueToLabelRef.current.get(value) ?? value;
+        const label = valueToLabelRef.current.get(value) ?? String(value);
         setCachedLabels(prev => new Map(prev).set(value, label));
       }
       if (!multiple) {
@@ -355,8 +355,8 @@ function SelectInner(props: SelectProps) {
   );
 }
 
-// eslint-disable-next-line typescript/consistent-type-assertions -- The root only hands back values from its items, so the item value type carries over to onValueChange.
-export const SelectRoot = function SelectRoot(props: SelectProps) {
+// eslint-disable-next-line typescript/consistent-type-assertions -- The implementation is value-agnostic; the root only hands back values its caller passed in.
+export const SelectRoot = function SelectRoot(props: SelectProps<unknown>) {
   const parentId = useFloatingParentNodeId();
 
   if (parentId === null) {
@@ -368,4 +368,4 @@ export const SelectRoot = function SelectRoot(props: SelectProps) {
   }
 
   return <SelectInner {...props} />;
-} as <T extends string = string>(props: SelectProps<T>) => ReactElement;
+} as <Value = string>(props: SelectProps<Value>) => ReactElement;

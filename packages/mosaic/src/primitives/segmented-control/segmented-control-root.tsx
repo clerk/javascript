@@ -12,22 +12,19 @@ import {
   type SegmentedControlDirection,
 } from './segmented-control-context';
 
-export interface SegmentedControlRootProps<T extends string = string> extends Omit<
-  ComponentProps<'div'>,
-  'defaultValue'
-> {
-  value?: T;
-  defaultValue?: T;
-  onValueChange?: (value: T) => void;
+export interface SegmentedControlRootProps<Value = string> extends Omit<ComponentProps<'div'>, 'defaultValue'> {
+  value?: Value;
+  defaultValue?: Value;
+  onValueChange?: (value: Value) => void;
   disabled?: boolean;
 }
 
 // eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the value type parameter; the root only hands back values its caller passed in.
-export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRootProps>(
+export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRootProps<unknown>>(
   function SegmentedControlRoot(props, ref) {
     const { render, value: valueProp, defaultValue, onValueChange, disabled = false, children, ...otherProps } = props;
 
-    const [value, setValue] = useControllableState(valueProp, defaultValue ?? '', onValueChange);
+    const [value, setValue] = useControllableState(valueProp, defaultValue, onValueChange);
     const [direction, setDirection] = useState<SegmentedControlDirection>('forward');
     const readingDirection = useDirection();
     const [element, setElement] = useState<HTMLDivElement | null>(null);
@@ -36,8 +33,8 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
     const items = useCompositeItems();
 
     const select = useCallback(
-      (nextValue: string) => {
-        if (nextValue !== value) {
+      (nextValue: unknown) => {
+        if (!Object.is(nextValue, value)) {
           setValue(nextValue);
         }
       },
@@ -59,7 +56,7 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
     });
 
     useLayoutEffect(() => {
-      const index = items.getItems().findIndex(item => items.getValue(item) === value);
+      const index = items.getItems().findIndex(item => Object.is(items.getValue(item), value));
       const previousIndex = selectedIndexRef.current;
       selectedIndexRef.current = index;
       if (index !== -1 && previousIndex !== -1 && previousIndex !== index) {
@@ -100,6 +97,6 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
       </SegmentedControlContext.Provider>
     );
   },
-) as <T extends string = string>(
-  props: SegmentedControlRootProps<T> & { ref?: React.Ref<HTMLDivElement> },
+) as <Value = string>(
+  props: SegmentedControlRootProps<Value> & { ref?: React.Ref<HTMLDivElement> },
 ) => React.ReactElement;

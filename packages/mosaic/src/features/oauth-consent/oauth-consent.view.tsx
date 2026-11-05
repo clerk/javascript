@@ -76,7 +76,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
             <Field.Label>{m.organizationLabel}</Field.Label>
             <Select.Root
               items={props.organizations}
-              value={organizationId ?? undefined}
+              value={organizationId}
               alignItemWithTrigger={false}
               onValueChange={props.onOrganizationChange}
             >
@@ -257,7 +257,7 @@ function OrganizationAccess({
 }) {
   const labelId = useId();
   const locale = useLocale();
-  const summarize = (value: string[]) =>
+  const summarize = (value: unknown[]) =>
     value.length === 1
       ? organizations.find(organization => organization.value === value[0])?.label
       : plural(m.organizationCount, value.length, locale);

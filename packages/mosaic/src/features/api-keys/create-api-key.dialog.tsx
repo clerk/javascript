@@ -128,7 +128,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
           <Field.Label>{m.expirationLabel}</Field.Label>
           <Select.Root
             items={expirationValues.map(value => ({ value, label: m.expirationOptions[value] }))}
-            value={expiration ?? undefined}
+            value={expiration}
             onValueChange={value => form.setValue('expiration', value)}
           >
             <Select.Trigger placeholder={m.expirationPlaceholder} />

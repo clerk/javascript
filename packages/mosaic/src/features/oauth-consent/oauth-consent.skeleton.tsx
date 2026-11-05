@@ -59,7 +59,7 @@ export function OAuthConsentSkeleton({
             <Field.Label>{m.organizationLabel}</Field.Label>
             <Select.Root
               items={organizations}
-              value={defaultOrganizationId ?? undefined}
+              value={defaultOrganizationId}
             >
               <Select.Trigger />
             </Select.Root>

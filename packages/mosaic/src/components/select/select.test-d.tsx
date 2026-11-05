@@ -2,18 +2,44 @@ import { describe, expectTypeOf, test } from 'vitest';
 
 import { Select } from './select';
 
-declare const label: string;
+type Expiration = '1d' | '7d';
 
-const expirations = [
-  { value: '1d', label: '1 day' },
-  { value: '7d', label: '7 days' },
-] as const;
+declare const expiration: Expiration | null;
+declare const expirationItems: { value: Expiration; label: string }[];
+declare const onExpirationChange: (expiration: Expiration) => void;
 
 describe('Select.Root onValueChange', () => {
-  test('gives a string when the items carry strings', () => {
+  test('takes the value type from typed items', () => {
     void (
       <Select.Root
-        items={[{ value: label, label }]}
+        items={expirationItems}
+        onValueChange={value => {
+          expectTypeOf(value).toEqualTypeOf<Expiration>();
+        }}
+      >
+        {null}
+      </Select.Root>
+    );
+  });
+
+  test('takes the value type from a typed value, including null for no selection', () => {
+    void (
+      <Select.Root
+        items={[]}
+        value={expiration}
+        onValueChange={value => {
+          expectTypeOf(value).toEqualTypeOf<Expiration>();
+        }}
+      >
+        {null}
+      </Select.Root>
+    );
+  });
+
+  test('gives a string when the items are literals', () => {
+    void (
+      <Select.Root
+        items={[{ value: '1d', label: '1 day' }]}
         onValueChange={value => {
           expectTypeOf(value).toEqualTypeOf<string>();
         }}
@@ -23,26 +49,13 @@ describe('Select.Root onValueChange', () => {
     );
   });
 
-  test('gives the type of the item values', () => {
-    void (
-      <Select.Root
-        items={expirations.map(item => ({ ...item }))}
-        onValueChange={value => {
-          expectTypeOf(value).toEqualTypeOf<'1d' | '7d'>();
-        }}
-      >
-        {null}
-      </Select.Root>
-    );
-  });
-
-  test('gives an array of the item values when multiple', () => {
+  test('gives an array with multiple', () => {
     void (
       <Select.Root
         multiple
-        items={expirations.map(item => ({ ...item }))}
+        items={expirationItems}
         onValueChange={value => {
-          expectTypeOf(value).toEqualTypeOf<Array<'1d' | '7d'>>();
+          expectTypeOf(value).toEqualTypeOf<Expiration[]>();
         }}
       >
         {null}
@@ -50,15 +63,42 @@ describe('Select.Root onValueChange', () => {
     );
   });
 
-  test('rejects a value that is not an item', () => {
+  test('accepts values that are not strings', () => {
     void (
       <Select.Root
-        items={expirations.map(item => ({ ...item }))}
-        // @ts-expect-error -- No item carries this value
-        value='30d'
+        items={[{ value: 10, label: '10' }]}
+        defaultValue={10}
+        onValueChange={value => {
+          expectTypeOf(value).toEqualTypeOf<number>();
+        }}
       >
-        {null}
+        <Select.Option
+          value={10}
+          label='10'
+        />
       </Select.Root>
+    );
+  });
+
+  test('rejects a value or an item the handler does not accept', () => {
+    void (
+      <>
+        <Select.Root
+          items={expirationItems}
+          // @ts-expect-error -- The handler does not accept this value
+          value='30d'
+          onValueChange={onExpirationChange}
+        >
+          {null}
+        </Select.Root>
+        <Select.Root
+          // @ts-expect-error -- The handler does not accept this item
+          items={[{ value: '30d', label: '30 days' }]}
+          onValueChange={onExpirationChange}
+        >
+          {null}
+        </Select.Root>
+      </>
     );
   });
 });
