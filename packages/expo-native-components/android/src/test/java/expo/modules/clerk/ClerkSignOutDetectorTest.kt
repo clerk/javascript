@@ -27,6 +27,7 @@ class ClerkSignOutDetectorTest {
         assertEquals(listOf(false, false), detect(alice, aliceAndBob))
         assertEquals(listOf(false, false), detect(signedOut, alice))
         assertEquals(listOf(false, false), detect(client(session("sess_1", "user_alice", Session.SessionStatus.PENDING)), alice))
+        assertEquals(listOf(false, false), detect(client(session("sess_1", user = null)), alice))
     }
 
     @Test

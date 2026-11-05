@@ -10,9 +10,11 @@ internal class ClerkSignOutDetector {
         if (client?.id == null) return false
         val previous = lastKnownClient
         lastKnownClient = client
-        val remainingUsers = client.signedInSessions().mapTo(mutableSetOf()) { it.userKey() }
+        val remaining = client.signedInSessions()
+        val remainingSessionIds = remaining.mapTo(mutableSetOf()) { it.id }
+        val remainingUsers = remaining.mapTo(mutableSetOf()) { it.userKey() }
         return previous?.signedInSessions().orEmpty().any {
-            it.userKey() !in remainingUsers && !it.hasExpiredBy(nowMillis)
+            it.id !in remainingSessionIds && it.userKey() !in remainingUsers && !it.hasExpiredBy(nowMillis)
         }
     }
 }
