@@ -16,18 +16,11 @@
   "globalEnv": [
     "CLERK_*",
     "EXPO_PUBLIC_CLERK_*",
-    "NEXT_PHASE",
     "NEXT_PUBLIC_CLERK_*",
     "NODE_ENV",
-    "NPM_VERSION",
     "PLASMO_PUBLIC_CLERK_*",
     "PUBLIC_CLERK_*",
     "REACT_APP_CLERK_*",
-    "RSDOCTOR",
-    "TZ",
-    "VERCEL",
-    "VERCEL_PROJECT_PRODUCTION_URL",
-    "VERCEL_TARGET_ENV",
     "VITE_CLERK_*"
   ],
   "globalPassThroughEnv": [
@@ -38,7 +31,11 @@
     "ACTIONS_STEP_DEBUG",
     "VERCEL_AUTOMATION_BYPASS_SECRET",
     "PORT",
-    "UI_PORT"
+    "TZ",
+    "UI_PORT",
+    "VERCEL",
+    "VERCEL_PROJECT_PRODUCTION_URL",
+    "VERCEL_TARGET_ENV"
   ],
   "tasks": {
     "build": {
@@ -106,7 +103,7 @@
     },
     "test": {
       "dependsOn": ["build"],
-      "env": ["NODE_VERSION"],
+      "env": ["NODE_VERSION", "TZ"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "*.d.ts",
