@@ -355,6 +355,12 @@ import {
   TextContent as SkeletonTextContent,
 } from '../stories/skeleton.stories';
 import {
+  Clickable as StepperClickable,
+  meta as stepperMeta,
+  Primary as StepperPrimary,
+  Progress as StepperProgress,
+} from '../stories/stepper.stories';
+import {
   Default as SwitchDefault,
   meta as switchMeta,
   Sizes as SwitchSizes,
@@ -695,6 +701,13 @@ const paginationModule: StoryModule = {
   MiddlePage: PaginationMiddlePage,
   SinglePage: PaginationSinglePage,
   Disabled: PaginationDisabled,
+};
+
+const stepperModule: StoryModule = {
+  meta: stepperMeta,
+  Primary: StepperPrimary,
+  Progress: StepperProgress,
+  Clickable: StepperClickable,
 };
 
 const phoneInputModule: StoryModule = {
@@ -1262,6 +1275,7 @@ export const registry: StoryModule[] = [
   sectionModule,
   segmentedControlModule,
   separatorModule,
+  stepperModule,
   selectComponentModule,
   switchModule,
   tableModule,
