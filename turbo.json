@@ -27,8 +27,6 @@
   "globalPassThroughEnv": [
     "E2E_KEYCLOAK_*",
     "AWS_SECRET_KEY",
-    "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-    "CLERK_PLATFORM_API_KEY",
     "GITHUB_TOKEN",
     "INTEGRATION_TEST_RUN_KEY",
     "ACTIONS_RUNNER_DEBUG",
@@ -249,8 +247,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -279,8 +275,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -308,8 +302,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -337,8 +329,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -366,8 +356,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -396,8 +384,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -425,8 +411,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -446,8 +430,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -489,8 +471,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -520,8 +500,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -549,8 +527,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -579,8 +555,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
@@ -609,8 +583,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
@@ -639,8 +611,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
@@ -669,8 +639,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "DISABLE_WEB_SECURITY",
         "E2E_*",
@@ -691,8 +659,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -747,8 +713,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -777,8 +741,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -807,8 +769,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -836,8 +796,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -868,8 +826,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -906,8 +862,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -935,8 +889,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -964,8 +916,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -994,8 +944,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
@@ -1022,8 +970,6 @@
       "env": [
         "CLEANUP",
         "CLERK_*",
-        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
-        "CLERK_PLATFORM_API_KEY",
         "DEBUG",
         "E2E_*",
         "EXPO_PUBLIC_CLERK_*",
