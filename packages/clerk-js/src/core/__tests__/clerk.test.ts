@@ -261,6 +261,41 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
+      it('sets a session id active after reloading a client that does not list it yet', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        const client = {
+          sessions: [] as (typeof mockSession)[],
+          signedInSessions: [] as (typeof mockSession)[],
+          reload: vi.fn(),
+        };
+        client.reload.mockImplementation(() => {
+          client.sessions = [mockSession];
+          client.signedInSessions = [mockSession];
+          return Promise.resolve(client);
+        });
+        mockClientFetch.mockReturnValue(Promise.resolve(client));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession.id });
+
+        expect(client.reload).toHaveBeenCalledTimes(1);
+        expect(sut.session).toBe(mockSession);
+      });
+
+      it('does not reload the client when it lists the session id', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        const client = { sessions: [mockSession], signedInSessions: [mockSession], reload: vi.fn() };
+        mockClientFetch.mockReturnValue(Promise.resolve(client));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession.id });
+
+        expect(client.reload).not.toHaveBeenCalled();
+        expect(sut.session).toBe(mockSession);
+      });
+
       it('mounts OAuthConsent when mounted while navigating to redirectUrl', async () => {
         mockClientFetch.mockReturnValue(
           Promise.resolve({ signedInSessions: [mockSession], isEligibleForTouch: () => false }),

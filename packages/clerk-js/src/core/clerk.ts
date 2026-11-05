@@ -2004,7 +2004,14 @@ export class Clerk implements ClerkInterface {
       }
 
       if (typeof session === 'string') {
-        session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
+        const sessionId = session;
+        const findSession = () =>
+          (this.client?.sessions.find(x => x.id === sessionId) as SignedInSessionResource | undefined) ?? null;
+        session = findSession();
+        if (!session) {
+          await this.client.reload();
+          session = findSession();
+        }
       }
 
       const onBeforeSetActive: SetActiveHook =
