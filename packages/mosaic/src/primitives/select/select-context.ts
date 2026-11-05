@@ -9,9 +9,9 @@ import { createContext, type CSSProperties, type RefObject, useContext } from 'r
 
 import type { TransitionProps } from '../hooks/use-transition';
 
-export interface SelectItem {
+export interface SelectItem<T extends string = string> {
   label: string;
-  value: string;
+  value: T;
 }
 
 export interface SelectContextValue {

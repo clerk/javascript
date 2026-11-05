@@ -16,11 +16,11 @@ import { firstLine, indicatorSizes, layouts, sizes, styles } from './radio.style
 /** `stack` gives each choice its own row. `grid` fits as many columns of cards as the width allows. */
 export type RadioLayout = 'stack' | 'grid';
 
-export interface RadioGroupProps
+export interface RadioGroupProps<T extends string = string>
   extends Omit<React.ComponentPropsWithoutRef<'div'>, 'defaultValue' | 'className' | 'style'>, MosaicStyleProps {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
+  value?: T;
+  defaultValue?: T;
+  onValueChange?: (value: T) => void;
   name?: string;
   disabled?: boolean;
   /** @default 'stack' */
@@ -37,6 +37,7 @@ interface RadioGroupContextValue {
 
 const RadioGroupContext = React.createContext<RadioGroupContextValue | null>(null);
 
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the value type parameter; the group only hands back values its caller passed in.
 const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(function MosaicRadioGroup(
   { value: valueProp, defaultValue, onValueChange, name: nameProp, disabled, layout = 'stack', xstyle, ...rest },
   ref,
@@ -66,7 +67,9 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(function Mo
       />
     </RadioGroupContext.Provider>
   );
-});
+}) as <T extends string = string>(
+  props: RadioGroupProps<T> & { ref?: React.Ref<HTMLDivElement> },
+) => React.ReactElement;
 
 export interface RadioItemProps
   extends

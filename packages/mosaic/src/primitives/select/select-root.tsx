@@ -20,7 +20,7 @@ import {
   useRole,
   useTypeahead,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactElement, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
@@ -39,9 +39,9 @@ import {
 
 export type { SelectItem } from './select-context';
 
-interface SelectBaseProps {
+interface SelectBaseProps<T extends string> {
   /** Array of `{ label, value }` items for label resolution before options mount. */
-  items?: SelectItem[];
+  items?: SelectItem<T>[];
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -58,22 +58,22 @@ interface SelectBaseProps {
   children: ReactNode;
 }
 
-export interface SelectSingleProps extends SelectBaseProps {
+export interface SelectSingleProps<T extends string = string> extends SelectBaseProps<T> {
   multiple?: false;
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
+  value?: NoInfer<T>;
+  defaultValue?: NoInfer<T>;
+  onValueChange?: (value: NoInfer<T>) => void;
 }
 
-export interface SelectMultipleProps extends SelectBaseProps {
+export interface SelectMultipleProps<T extends string = string> extends SelectBaseProps<T> {
   /** Lets several options be selected. Picking an option toggles it and keeps the popup open. */
   multiple: true;
-  value?: string[];
-  defaultValue?: string[];
-  onValueChange?: (value: string[]) => void;
+  value?: NoInfer<T>[];
+  defaultValue?: NoInfer<T>[];
+  onValueChange?: (value: NoInfer<T>[]) => void;
 }
 
-export type SelectProps = SelectSingleProps | SelectMultipleProps;
+export type SelectProps<T extends string = string> = SelectSingleProps<T> | SelectMultipleProps<T>;
 
 function toValues(value: string | undefined): string[] | undefined {
   if (value === undefined) {
@@ -355,7 +355,8 @@ function SelectInner(props: SelectProps) {
   );
 }
 
-export function SelectRoot(props: SelectProps) {
+// eslint-disable-next-line typescript/consistent-type-assertions -- The root only hands back values from its items, so the item value type carries over to onValueChange.
+export const SelectRoot = function SelectRoot(props: SelectProps) {
   const parentId = useFloatingParentNodeId();
 
   if (parentId === null) {
@@ -367,4 +368,4 @@ export function SelectRoot(props: SelectProps) {
   }
 
   return <SelectInner {...props} />;
-}
+} as <T extends string = string>(props: SelectProps<T>) => ReactElement;

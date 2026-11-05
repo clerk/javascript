@@ -24,8 +24,8 @@ import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { selectOptionScope } from './select.markers.stylex';
 import * as slots from './select.styles';
 
-export interface SelectItem {
-  value: string;
+export interface SelectItem<T extends string = string> {
+  value: T;
   /** Shown in the row and in the trigger once selected; also drives typeahead. */
   label: string;
   /**
@@ -36,23 +36,28 @@ export interface SelectItem {
   disabled?: boolean;
 }
 
-interface SelectItemsProps {
+interface SelectItemsProps<T extends string> {
   /**
    * Every choice. Required, unlike the primitive's: the options only mount while the listbox is
    * open, so this is what lets the closed trigger show the selected label. `Select.Popup`
    * renders them as `Select.Option`s when it is given no children.
    */
-  items: SelectItem[];
+  items: SelectItem<T>[];
 }
 
-export type SelectProps =
-  | (Omit<PrimitiveSelectSingleProps, 'items'> & SelectItemsProps)
-  | (Omit<PrimitiveSelectMultipleProps, 'items'> & SelectItemsProps);
+export type SelectProps<T extends string = string> =
+  | (Omit<PrimitiveSelectSingleProps<T>, 'items'> & SelectItemsProps<T>)
+  | (Omit<PrimitiveSelectMultipleProps<T>, 'items'> & SelectItemsProps<T>);
 
 const ItemsContext = React.createContext<SelectItem[]>([]);
 
 /** Holds the selection and the items; renders no element of its own. */
-export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: SelectProps): React.ReactElement {
+export function SelectRoot<T extends string = string>({
+  items,
+  alignItemWithTrigger,
+  children,
+  ...rest
+}: SelectProps<T>): React.ReactElement {
   const described = items.some(item => item.description !== undefined);
 
   return (

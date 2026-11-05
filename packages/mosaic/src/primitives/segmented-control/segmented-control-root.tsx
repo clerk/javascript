@@ -12,13 +12,17 @@ import {
   type SegmentedControlDirection,
 } from './segmented-control-context';
 
-export interface SegmentedControlRootProps extends Omit<ComponentProps<'div'>, 'defaultValue'> {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
+export interface SegmentedControlRootProps<T extends string = string> extends Omit<
+  ComponentProps<'div'>,
+  'defaultValue'
+> {
+  value?: T;
+  defaultValue?: T;
+  onValueChange?: (value: T) => void;
   disabled?: boolean;
 }
 
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the value type parameter; the root only hands back values its caller passed in.
 export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRootProps>(
   function SegmentedControlRoot(props, ref) {
     const { render, value: valueProp, defaultValue, onValueChange, disabled = false, children, ...otherProps } = props;
@@ -96,4 +100,6 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
       </SegmentedControlContext.Provider>
     );
   },
-);
+) as <T extends string = string>(
+  props: SegmentedControlRootProps<T> & { ref?: React.Ref<HTMLDivElement> },
+) => React.ReactElement;

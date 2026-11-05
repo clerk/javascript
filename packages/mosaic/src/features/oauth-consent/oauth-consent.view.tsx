@@ -78,11 +78,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
               items={props.organizations}
               value={organizationId ?? undefined}
               alignItemWithTrigger={false}
-              onValueChange={value => {
-                if (typeof value === 'string') {
-                  props.onOrganizationChange(value);
-                }
-              }}
+              onValueChange={props.onOrganizationChange}
             >
               <Select.Trigger />
               <OrganizationPopup organizations={props.organizations} />
@@ -279,13 +275,11 @@ function OrganizationAccess({
         aria-labelledby={labelId}
         value={selection.access}
         disabled={disabled}
-        onValueChange={value => {
-          if (value === 'selected') {
-            selection.onAccessChange('selected');
-            return;
+        onValueChange={access => {
+          selection.onAccessChange(access);
+          if (access === 'all') {
+            selection.onSelectedChange([]);
           }
-          selection.onAccessChange('all');
-          selection.onSelectedChange([]);
         }}
       >
         <Field.Root orientation='horizontal'>

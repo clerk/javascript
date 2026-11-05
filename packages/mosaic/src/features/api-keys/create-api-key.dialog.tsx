@@ -129,9 +129,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
           <Select.Root
             items={expirationValues.map(value => ({ value, label: m.expirationOptions[value] }))}
             value={expiration ?? undefined}
-            onValueChange={value =>
-              form.setValue('expiration', expirationValues.find(option => option === value) ?? null)
-            }
+            onValueChange={value => form.setValue('expiration', value)}
           >
             <Select.Trigger placeholder={m.expirationPlaceholder} />
             <Select.Popup />
