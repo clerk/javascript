@@ -560,7 +560,7 @@ jobs:
             exit 0
           fi
 
-          if git diff --name-only HEAD^1 HEAD | grep -q '^\.github/'; then
+          if ! git diff --quiet HEAD^1 HEAD -- .github; then
             echo "This PR changes .github/, so every integration suite runs."
             echo "affected=all" >> "$GITHUB_OUTPUT"
             exit 0
