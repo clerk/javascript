@@ -4,6 +4,8 @@ Read this when you move a legacy component (usually under `packages/ui/src/compo
 
 Worked example: `src/features/reverification/`.
 
+Apply this workflow to the current requested Mosaic work, not every Mosaic change already on the branch. Record the feature scope, original revisions, accepted differences, and exclusions. When reviewing earlier feedback, use the commit the reviewer saw, not a later implementation that may already have addressed it.
+
 ## Rules
 
 - The legacy component is the spec. A legacy file fuses rendering, data fetching and flow logic, and splitting it three ways drops behavior that was only implicit (a per-field error map, a step-up reverification, an empty-state gate, a derived callout) without failing a test or a type check.
@@ -38,6 +40,12 @@ rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protec
 ```
 
 Turn the hits into a behavior inventory, one row per effect, guard, error path, empty or loading state, permission gate, revalidate, reset-on-close and derived label. The table does not cover every behavior; read the files too. For shared answers (`save`, `useReverificationFlow`), use [Reuse before you write](../AGENTS.md#reuse-before-you-write).
+
+Include shared prop contracts and mode-dependent options, callback ordering and
+awaiting, defaults, and error delivery. Follow helpers and Clerk runtime calls
+when they determine the outcome. Record inherited limitations separately from
+introduced gaps. A grep hit list or comparison of component files alone is not
+the complete contract. See [Parity audit](parity-audit.md) for the checks.
 
 Write it to `tmp/mosaic-parity/<feature>.md` (ignored by git) before the model:
 
@@ -81,9 +89,11 @@ Test with one `*.feature.test.tsx` that uses the feature the way a user would ([
 
 ## Phase 4: verify parity
 
-Tests cover only the branches you remembered. Run the [Parity audit](parity-audit.md) against the legacy files and the new layers, and place every Phase 1 row as Migrated, Deliberately changed (such as infinite scroll becoming a "Load more" button) or Deferred.
+For each affected async action, exercise a representative rejection as well as success and pending work. Verify error delivery and the final rendered/resource state, including recovery where promised. Do not replace a Clerk mutation with a method mock when the existing fake FAPI can drive it. Check mode-dependent prop contracts with focused type checks and verify forwarding in the relevant modes.
 
-Launch a read-only subagent with the prompt in `parity-audit.md`. Give it the legacy file paths and the new model/controller/view paths. Put its table under `## Parity audit` in `tmp/mosaic-parity/<feature>.md`, next to the Phase 1 inventory. The table guides the work and the PR discussion, and is never committed.
+Tests only cover branches you remembered to write. Launch a read-only subagent with the prompt in [Parity audit](parity-audit.md). Give it the legacy and new revisions, file paths, shared types, and accepted decisions. Use the classifications and evidence columns there. Distinguish parity gaps, intentional differences needing disclosure, missing verification, and optional improvements. Leave unresolved intent as a decision for the user.
+
+Every inventory row from Phase 1 must have a conclusion and evidence. Put the table under `## Parity audit` in `tmp/mosaic-parity/<feature>.md`, next to the Phase 1 inventory. The table guides the work and the PR discussion, and is never committed. Read the results of its referenced checks before claiming parity. A filled table, a tracked deferral, or a hook reminder is not proof that the behavior works.
 
 ## Phase 5: ship
 
