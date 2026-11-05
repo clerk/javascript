@@ -562,6 +562,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       const u = await createTestUtils({ app, page, context });
 
       const transferStatuses: number[] = [];
+      let callbackCalledAgain = false;
       let onSecondTransfer: () => void = () => {};
       const secondTransfer = new Promise<void>(resolve => {
         onSecondTransfer = resolve;
@@ -588,8 +589,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
         transferStatuses[index] = response.status();
 
         if (isFirst) {
-          await page.evaluate(() => window.dispatchEvent(new Event('e2e:resuspend')));
-          await Promise.race([secondTransfer, new Promise(resolve => setTimeout(resolve, 3000))]);
+          await page.evaluate(() => {
+            const clerk = window.Clerk as any;
+            const handleRedirectCallback = clerk.handleRedirectCallback;
+            clerk.handleRedirectCallback = (...args: unknown[]) => {
+              (window as any).__e2eCallbackCalledAgain = true;
+              return handleRedirectCallback(...args);
+            };
+            window.dispatchEvent(new Event('e2e:resuspend'));
+          });
+          callbackCalledAgain = await page
+            .waitForFunction(() => (window as any).__e2eCallbackCalledAgain === true, undefined, { timeout: 3000 })
+            .then(() => true)
+            .catch(() => false);
+          await Promise.race([secondTransfer, new Promise(resolve => setTimeout(resolve, 1000))]);
           await route.fulfill({ response });
           onFirstTransferReleased();
           return;
@@ -611,6 +624,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
         await firstTransferReleased;
 
+        expect(callbackCalledAgain).toBe(true);
         expect(transferStatuses).toEqual([200]);
         await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
       } finally {

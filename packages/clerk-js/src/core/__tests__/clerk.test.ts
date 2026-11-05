@@ -2352,6 +2352,136 @@ describe('Clerk singleton', () => {
       });
     });
 
+    describe('when called again while a callback is in flight', () => {
+      const loadTransferableClerk = async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            authConfig: {},
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            onWindowLocationHost: () => false,
+          }),
+        );
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: new SignIn({
+              status: 'needs_identifier',
+              first_factor_verification: {
+                status: 'transferable',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: {
+                  code: 'external_account_not_found',
+                  long_message: 'The External Account was not found.',
+                  message: 'Invalid external account',
+                },
+              },
+              second_factor_verification: null,
+              identifier: '',
+              user_data: null,
+              created_session_id: null,
+              created_user_id: null,
+            } as any as SignInJSON),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.setActive = vi.fn();
+        return sut;
+      };
+
+      it('transfers once and resolves both callers', async () => {
+        const sut = await loadTransferableClerk();
+        let resolveTransfer: (value: unknown) => void = () => {};
+        const mockSignUpCreate = vi.fn().mockReturnValue(
+          new Promise(resolve => {
+            resolveTransfer = resolve;
+          }),
+        );
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        const first = sut.handleRedirectCallback();
+        const second = sut.handleRedirectCallback();
+        resolveTransfer({ status: 'complete', createdSessionId: '123' });
+        await Promise.all([first, second]);
+
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(1);
+        expect(sut.setActive).toHaveBeenCalledTimes(1);
+      });
+
+      it('rejects both callers when the transfer fails', async () => {
+        const sut = await loadTransferableClerk();
+        const error = new Error('transfer failed');
+        const mockSignUpCreate = vi.fn().mockRejectedValue(error);
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        const first = sut.handleRedirectCallback();
+        const second = sut.handleRedirectCallback();
+
+        await expect(first).rejects.toBe(error);
+        await expect(second).rejects.toBe(error);
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(1);
+      });
+
+      it.each([
+        ['succeeded', () => Promise.resolve({ status: 'complete', createdSessionId: '123' })],
+        ['failed', () => Promise.reject(new Error('transfer failed'))],
+      ])('runs a later call once the previous one has %s', async (_, transfer) => {
+        const sut = await loadTransferableClerk();
+        const mockSignUpCreate = vi.fn().mockImplementation(transfer);
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        await sut.handleRedirectCallback().catch(() => {});
+        await sut.handleRedirectCallback().catch(() => {});
+
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(2);
+      });
+
+      it('ignores the params and customNavigate of a call that joins a running one', async () => {
+        const sut = await loadTransferableClerk();
+        const mockSignUpCreate = vi.fn();
+        sut.client!.signUp.create = mockSignUpCreate;
+        const firstNavigate = vi.fn().mockResolvedValue(undefined);
+        const secondNavigate = vi.fn().mockResolvedValue(undefined);
+
+        const first = sut.handleRedirectCallback({ transferable: false }, firstNavigate);
+        const second = sut.handleRedirectCallback({}, secondNavigate);
+        await Promise.all([first, second]);
+
+        expect(firstNavigate).toHaveBeenCalledTimes(1);
+        expect(secondNavigate).not.toHaveBeenCalled();
+        expect(mockSignUpCreate).not.toHaveBeenCalled();
+      });
+
+      it('does not make __internal_resumeAfterProtectCheck join a running call', async () => {
+        const sut = await loadTransferableClerk();
+        let resolveTransfer: (value: unknown) => void = () => {};
+        const mockSignUpCreate = vi.fn().mockReturnValue(
+          new Promise(resolve => {
+            resolveTransfer = resolve;
+          }),
+        );
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        const callback = sut.handleRedirectCallback();
+        const resume = sut.__internal_resumeAfterProtectCheck();
+        resolveTransfer({ status: 'complete', createdSessionId: '123' });
+        await Promise.all([callback, resume]);
+
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(2);
+      });
+    });
+
     it('uses __internal_navigateOnSetActive for completed sign in callbacks', async () => {
       const sessionId = 'sess_123';
       const mockSession = { id: sessionId, currentTask: null };
