@@ -117,7 +117,7 @@ export function OAuthConsentSkeleton({
       </Card.Content>
       <Card.Footer xstyle={styles.centered}>
         <Text
-          size='sm'
+          size='xs'
           color='foreground-secondary'
         >
           <Skeleton
