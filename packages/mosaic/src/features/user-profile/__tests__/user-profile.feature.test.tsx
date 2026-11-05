@@ -7,6 +7,7 @@ import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
+  fapiEnterpriseAccount,
   fapiEnvironment,
   fapiMembership,
   fapiOrganization,
@@ -205,6 +206,52 @@ describe('UserProfile', () => {
 
     expect(screen.queryAllByRole('option').map(option => option.textContent)).toEqual(results);
   });
+
+  it.each([
+    { disableAdditionalIdentifications: true, results: [] },
+    { disableAdditionalIdentifications: false, results: ['Connected accounts'] },
+  ])(
+    'finds connected accounts only when the section shows: disableAdditionalIdentifications $disableAdditionalIdentifications',
+    async ({ disableAdditionalIdentifications, results }) => {
+      serveFapi({
+        environment: fapiEnvironment({
+          user_settings: {
+            enterprise_sso: { enabled: true, self_serve_sso: false, self_serve_directory_sync: false },
+            social: {
+              oauth_google: {
+                enabled: true,
+                required: false,
+                authenticatable: true,
+                strategy: 'oauth_google',
+                name: 'Google',
+                logo_url: null,
+              },
+            },
+          },
+        }),
+        client: fapiClient([
+          fapiSession({
+            id: 'sess_1',
+            user: fapiUser({
+              id: 'user_1',
+              enterprise_accounts: [
+                fapiEnterpriseAccount(
+                  { id: 'eac_1' },
+                  { disable_additional_identifications: disableAdditionalIdentifications },
+                ),
+              ],
+            }),
+          }),
+        ]),
+      });
+      const user = userEvent.setup();
+      await renderWithClerk(<UserProfile showSearch />);
+
+      await user.type(screen.getByRole('combobox', { name: 'Search' }), 'connected');
+
+      expect(screen.queryAllByRole('option').map(option => option.textContent)).toEqual(results);
+    },
+  );
 
   it('finds the sections of a closed page without loading it', async () => {
     serve();

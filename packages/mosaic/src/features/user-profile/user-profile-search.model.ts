@@ -4,6 +4,10 @@ import type { EnvironmentResource, UserResource } from '@clerk/shared/types';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { allowsIdentificationCreation } from '../../utils/allows-identification-creation';
 import type { UserProfilePageId } from './user-profile.types';
+import {
+  createProviderCatalog,
+  projectConnectedAccounts,
+} from './user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
 import { toContactAccess } from './user-profile-contact.utils';
 import { projectEnterpriseAccounts } from './user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.model';
 import { offersMfa } from './user-profile-mfa-section/user-profile-mfa-section.model';
@@ -42,14 +46,14 @@ export function useUserProfileSearchModel(): UserProfileSearchSections {
 }
 
 function accountSections(user: UserResource, environment: EnvironmentResource): UserProfileSectionId[] {
-  const { attributes, enterpriseSSO, socialProviderStrategies, web3FirstFactors } = environment.userSettings;
+  const { attributes, enterpriseSSO, social, socialProviderStrategies, web3FirstFactors } = environment.userSettings;
   const canAdd = allowsIdentificationCreation(user, enterpriseSSO);
   const web3Wallet = attributes.web3_wallet;
   return shown([
     ['profile', true],
     ['email', toContactAccess(attributes.email_address, user.emailAddresses.length, canAdd).show],
     ['phone', toContactAccess(attributes.phone_number, user.phoneNumbers.length, canAdd).show],
-    ['connectedAccounts', socialProviderStrategies.length > 0],
+    ['connectedAccounts', showsConnectedAccounts(user, socialProviderStrategies, social, canAdd)],
     [
       'enterpriseAccounts',
       projectEnterpriseAccounts({ enabled: enterpriseSSO.enabled, accounts: user.enterpriseAccounts, connections: [] })
@@ -67,6 +71,21 @@ function accountSections(user: UserResource, environment: EnvironmentResource): 
     ],
     ['danger', user.deleteSelfEnabled],
   ]);
+}
+
+function showsConnectedAccounts(
+  user: UserResource,
+  strategies: EnvironmentResource['userSettings']['socialProviderStrategies'],
+  social: EnvironmentResource['userSettings']['social'],
+  canAdd: boolean,
+) {
+  const projection = projectConnectedAccounts({
+    user,
+    providers: createProviderCatalog(strategies, social, user.externalAccounts),
+    socialEnabled: strategies.length > 0,
+    allowCreation: canAdd,
+  });
+  return projection.status === 'ready' && (projection.accounts.length > 0 || projection.availableProviders.length > 0);
 }
 
 function securitySections(
