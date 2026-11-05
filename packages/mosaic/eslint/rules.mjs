@@ -314,7 +314,7 @@ export const noRenderClock = {
         }
       },
       MemberExpression(node) {
-        if (isDateNow(node) && isRenderCallbackArgument(node) && readsDuringRender(node)) {
+        if (isDateNow(node) && isCallbackArgument(node) && !defersCallback(node.parent) && readsDuringRender(node)) {
           context.report({ node, messageId: 'useNow' });
         }
       },
@@ -327,42 +327,41 @@ export const noRenderClock = {
   },
 };
 
-const RENDER_CALLBACKS = new Set([
-  'useState',
-  'useMemo',
-  'useReducer',
-  'map',
-  'flatMap',
-  'filter',
-  'find',
-  'findIndex',
-  'some',
-  'every',
-  'reduce',
-  'sort',
-  'toSorted',
-  'forEach',
+const RENDER_HOOKS = new Set(['useState', 'useMemo', 'useReducer']);
+const DEFERRED_CALLBACKS = new Set([
+  'setTimeout',
+  'setInterval',
+  'requestAnimationFrame',
+  'queueMicrotask',
+  'addEventListener',
+  'then',
+  'catch',
+  'finally',
 ]);
 const RENDER_WRAPPERS = new Set(['forwardRef', 'memo']);
 
 function readsDuringRender(node) {
   for (let fn = enclosingFunction(node); fn; fn = enclosingFunction(fn)) {
-    const call = fn.parent;
-    if (call.type === 'CallExpression' && call.arguments.includes(fn)) {
-      const name = calleeName(call);
-      if (RENDER_CALLBACKS.has(name)) {
-        continue;
-      }
-      return RENDER_WRAPPERS.has(name);
+    if (!isCallbackArgument(fn)) {
+      return /^(use[A-Z0-9]|[A-Z])/.test(functionName(fn) ?? '');
     }
-    return /^(use[A-Z0-9]|[A-Z])/.test(functionName(fn) ?? '');
+    if (RENDER_WRAPPERS.has(calleeName(fn.parent))) {
+      return true;
+    }
+    if (defersCallback(fn.parent)) {
+      return false;
+    }
   }
   return false;
 }
 
-function isRenderCallbackArgument(node) {
-  const call = node.parent;
-  return call.type === 'CallExpression' && call.arguments.includes(node) && RENDER_CALLBACKS.has(calleeName(call));
+function isCallbackArgument(node) {
+  return node.parent.type === 'CallExpression' && node.parent.arguments.includes(node);
+}
+
+function defersCallback(call) {
+  const name = calleeName(call) ?? '';
+  return DEFERRED_CALLBACKS.has(name) || (/^use[A-Z]/.test(name) && !RENDER_HOOKS.has(name));
 }
 
 function isDateNow(node) {

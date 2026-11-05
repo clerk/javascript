@@ -612,6 +612,7 @@ describe('Mosaic clock reads', { timeout: 30_000 }, () => {
     ],
     ['a useRef value', "import { useRef } from 'react';\nexport function useSample() { return useRef(Date.now()); }"],
     ['a map callback', 'export function useSample(items: number[]) { return items.map(item => item - Date.now()); }'],
+    ['an Array.from callback', 'export function useSample() { return Array.from([1], () => new Date()); }'],
     [
       'a forwardRef render',
       "import { forwardRef } from 'react';\nexport const Sample = forwardRef(() => { void Date.now(); return null; });",
@@ -634,6 +635,9 @@ describe('Mosaic clock reads', { timeout: 30_000 }, () => {
       "import { useCallback } from 'react';\nexport function useSample() { return useCallback(() => Date.now(), []); }",
     ],
     ['an event handler', 'export function useSample() { return { onClick: () => new Date() }; }'],
+    ['a custom hook callback', 'export function useSample() { return usePendingAction(() => Date.now()); }'],
+    ['a timer', 'export function useSample() { return () => setTimeout(() => Date.now(), 0); }'],
+    ['a promise callback', 'export function useSample(load: Promise<void>) { void load.then(() => Date.now()); }'],
     ['a plain function', 'export function unlockTime(seconds: number) { return Date.now() + seconds * 1000; }'],
     ['a parsed date', 'export function useSample(value: string) { return new Date(value); }'],
   ])('allows a clock read in %s', async (_name, source) => {
