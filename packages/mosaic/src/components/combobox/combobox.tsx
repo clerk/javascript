@@ -178,7 +178,7 @@ export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, Combobo
         {children ?? (
           <Icon
             glyph={Checkmark}
-            size='sm'
+            size='md'
           />
         )}
       </HeadlessCombobox.OptionIndicator>

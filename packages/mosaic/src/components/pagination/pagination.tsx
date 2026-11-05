@@ -171,7 +171,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               >
                 <Icon
                   glyph={ChevronDoubleLeft}
-                  size='sm'
+                  size='md'
                   xstyle={rtl.mirror}
                 />
               </Button>
@@ -188,7 +188,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
             >
               <Icon
                 glyph={ChevronLeft}
-                size='sm'
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Button>
@@ -214,7 +214,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
             >
               <Icon
                 glyph={ChevronRight}
-                size='sm'
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Button>
@@ -231,7 +231,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               >
                 <Icon
                   glyph={ChevronDoubleRight}
-                  size='sm'
+                  size='md'
                   xstyle={rtl.mirror}
                 />
               </Button>

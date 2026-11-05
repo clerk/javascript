@@ -384,7 +384,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
               <Icon
                 glyph={ArrowUpRight}
                 placement='inline-end'
-                size='sm'
+                size='md'
               />
             </Button>
           </Item.Actions>
