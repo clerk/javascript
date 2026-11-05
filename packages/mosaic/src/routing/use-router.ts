@@ -90,12 +90,10 @@ export function useRouterScope<const Routes extends RouteTable>(
   }, [table, router, notFound]);
 
   const redirectTo = matched === undefined ? notFound : undefined;
-  const redirected = useRef<{ from: SegmentParts; left: boolean }>(undefined);
+  const redirect = useRef<{ from: SegmentParts; to: SegmentParts }>(undefined);
   useEffect(() => {
-    const last = redirected.current;
-    if (last && !sameParts(last.from, parts)) {
-      last.left = true;
-    }
+    const last = redirect.current;
+    redirect.current = undefined;
     if (redirectTo === undefined) {
       return;
     }
@@ -105,13 +103,14 @@ export function useRouterScope<const Routes extends RouteTable>(
       );
       return;
     }
-    if (last?.left && sameParts(last.from, parts)) {
+    if (last && !sameParts(last.from, parts) && !sameParts(last.to, parts)) {
+      // This breaks what could otherwise be an infinite redirect loop
       logger.warnOnce(
-        `[Clerk] The segment "${parts.join('/')}" under "${path ?? '/'}" was not found, but after updating the location to match the fallback page, something wrote back the segment again. Two routers probably share this base; give one of them a different path.`,
+        `[Clerk] The segment "${last.from.join('/')}" under "${path ?? '/'}" was not found, but after updating the location to match the fallback page, something wrote "${parts.join('/')}" instead. Two routers probably share this base; give one of them a different path.`,
       );
       return;
     }
-    redirected.current = { from: parts, left: false };
+    redirect.current = { from: parts, to: fallback };
     location.write(fallback, { replace: true });
   }, [parts, redirectTo, fallback, location, path]);
 

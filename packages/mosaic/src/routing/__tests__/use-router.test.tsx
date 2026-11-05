@@ -1,7 +1,7 @@
 import { logger } from '@clerk/shared/logger';
-import { act, renderHook } from '@testing-library/react';
+import { act, configure, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { SegmentParts } from '../location';
 import type { RouteTable } from '../routes';
@@ -129,18 +129,37 @@ describe('useRouterScope', () => {
     expect(result.current.org.route).toBe('members');
   });
 
-  it('redirects again when a different unknown segment is written', () => {
+  it('redirects every time an unknown segment is written, the same one included', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
     const { result } = renderHook(
       () => ({ router: useRouterScope(routes, userScope), segment: useUserSegment(), write: useVirtualWrite() }),
       { wrapper: wrapperWith({ '/user': ['nowhere'] }) },
     );
     expect(result.current.segment).toEqual(['account']);
 
-    act(() => {
-      result.current.write('/user', ['elsewhere']);
+    for (const unknown of ['elsewhere', 'nowhere', 'nowhere']) {
+      act(() => {
+        result.current.write('/user', [unknown]);
+      });
+      expect(result.current.router.route).toBe('account');
+      expect(result.current.segment).toEqual(['account']);
+    }
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('redirects under StrictMode without mistaking its own repeated effect for a collision', () => {
+    configure({ reactStrictMode: true });
+    onTestFinished(() => configure({ reactStrictMode: false }));
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), segment: useUserSegment() }), {
+      wrapper: wrapperWith({ '/user': ['nowhere'] }),
     });
+
     expect(result.current.router.route).toBe('account');
     expect(result.current.segment).toEqual(['account']);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 
   it('does not redirect to a not-found route that cannot match on its own, and warns', () => {
@@ -160,7 +179,7 @@ describe('useRouterScope', () => {
     warn.mockRestore();
   });
 
-  it('stops redirecting when two owners of one base keep writing each other back, and warns', () => {
+  it('stops redirecting when another owner of the same base overwrites its redirect, and warns', () => {
     const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
     const orgRoutes = { general: 'general', members: 'members' } as const;
     const { result } = renderHook(
@@ -176,7 +195,7 @@ describe('useRouterScope', () => {
     expect(result.current.user.route).toBe('account');
     expect(result.current.org.route).toBe('general');
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('"general" under "/user"');
+    expect(warn.mock.calls[0][0]).toContain('wrote "general" instead');
     warn.mockRestore();
   });
 
