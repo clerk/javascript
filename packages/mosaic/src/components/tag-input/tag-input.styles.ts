@@ -105,7 +105,7 @@ export const styles = stylex.create({
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
       ':enabled:active': durationVars['--cl-duration-instant'],
-      ':enabled:hover': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': { default: null, ':enabled:hover': durationVars['--cl-duration-instant'] },
     },
     transitionProperty: 'background-color',
     transitionTimingFunction: 'linear',

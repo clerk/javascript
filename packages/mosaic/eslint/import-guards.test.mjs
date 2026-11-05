@@ -14,6 +14,7 @@ const featureDir = 'src/features/reverification';
 const testFixture = 'src/hooks/__tests__/sample.test.ts';
 const partFixture = 'src/primitives/sample-part.tsx';
 const partTestFixture = 'src/primitives/__tests__/sample-part.test.tsx';
+const stylesFixture = 'src/components/sample.styles.ts';
 const execute = promisify(execFile);
 const require = createRequire(path.join(packageRoot, 'package.json'));
 const oxlint = path.join(path.dirname(require.resolve('oxlint/package.json')), 'bin/oxlint');
@@ -486,6 +487,137 @@ describe('Mosaic parts', { timeout: 30_000 }, () => {
         "export function Part(props: { render?: never }) { return useRender({ defaultTagName: 'div', props }); }",
       ),
     ).toEqual([]);
+  });
+});
+
+describe('Mosaic styles', { timeout: 30_000 }, () => {
+  async function restrictedSyntax(file, source) {
+    const messages = await lintAt(file, source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages
+      .filter(message => message.ruleId === 'eslint-compat/no-restricted-syntax')
+      .map(message => message.message);
+  }
+
+  test('a styles file writes the hover and motion guards raw', async () => {
+    expect(
+      await restrictedSyntax(
+        stylesFixture,
+        [
+          "import * as stylex from '@stylexjs/stylex';",
+          'export const styles = stylex.create({',
+          '  base: {',
+          "    color: { default: 'red', '@media (hover: hover)': { default: null, ':hover:not(:disabled)': 'blue' } },",
+          "    opacity: { default: 1, '@media (prefers-reduced-motion: no-preference)': 0.5 },",
+          '  },',
+          '});',
+        ].join('\n'),
+      ),
+    ).toEqual([]);
+  });
+
+  test.each([
+    "{ default: 'red', ':hover:not(:disabled)': 'blue' }",
+    "{ default: 'red', ':not([data-disabled]):hover': 'blue' }",
+    "{ default: 'red', ':is(:hover:not(:disabled), :focus-within)': 'blue' }",
+    "{ default: 'red', '@media (pointer: fine)': { default: null, ':hover:not(:disabled)': 'blue' } }",
+  ])('a styles file rejects :hover outside the hover media guard: %s', async value => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { color: ${value} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([expect.stringContaining("'@media (hover: hover)'")]);
+  });
+
+  test.each([
+    `':hover:not(:disabled, [data-disabled], [aria-disabled="true"])'`,
+    "':hover:not(:disabled):checked'",
+    "':not([data-disabled]):hover'",
+    "':enabled:hover'",
+  ])('a styles file accepts a hover that skips disabled controls: %s', async key => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { color: { default: 'red', '@media (hover: hover)': { default: null, ${key}: 'blue' } } } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([]);
+  });
+
+  test.each(["':hover'", "':hover:not([data-invalid])'"])(
+    'a styles file rejects a hover that still paints disabled controls: %s',
+    async key => {
+      const messages = await restrictedSyntax(
+        stylesFixture,
+        [
+          "import * as stylex from '@stylexjs/stylex';",
+          `export const styles = stylex.create({ base: { color: { default: 'red', '@media (hover: hover)': { default: null, ${key}: 'blue' } } } });`,
+        ].join('\n'),
+      );
+      expect(messages).toEqual([expect.stringContaining('disabled')]);
+    },
+  );
+
+  test.each([
+    "transitionProperty: 'opacity, background-color'",
+    "transitionProperty: '--_cl-scale-color'",
+    "transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'opacity' }",
+    "transform: 'scale(0.5)'",
+    "transform: { default: 'scale(1)', ':where([data-starting-style])': 'scale(0.94)', '@media (prefers-reduced-motion: reduce)': { default: 'scale(1)', ':where([data-starting-style])': 'scale(1)' } }",
+    "translate: { default: null, '@media (prefers-reduced-motion: no-preference)': { default: null, ':where([data-ending-style])': '0 100%' } }",
+  ])('a styles file accepts motion gated on reduced motion: %s', async declaration => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { ${declaration} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([]);
+  });
+
+  test.each([
+    "transitionProperty: 'opacity, transform'",
+    "transitionProperty: 'all'",
+    "transitionProperty: { default: 'translate', ':where([data-open])': 'opacity' }",
+  ])('a styles file rejects a moving transition without a reduced-motion branch: %s', async declaration => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { ${declaration} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([
+      expect.stringContaining("drop the moving property under '@media (prefers-reduced-motion: reduce)'"),
+    ]);
+  });
+
+  test.each([
+    "transform: { default: 'scale(1)', ':where([data-starting-style], [data-ending-style])': 'scale(0.94)' }",
+    "translate: { default: '0 0', ':where([data-ending-style])': '0 100%' }",
+  ])('a styles file rejects an enter or exit offset without a reduced-motion branch: %s', async declaration => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { ${declaration} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([expect.stringContaining('restate the enter and exit values')]);
+  });
+
+  test.each([
+    ['export const Sample = () => <form />;', 'Use `Form` from mosaic/primitives/form'],
+    ["export const Sample = ({ Part }: { Part: 'div' }) => <Part className='x' />;", 'Mosaic parts take `xstyle`'],
+  ])('a component keeps the JSX restrictions: %s', async (source, message) => {
+    const messages = await restrictedSyntax('src/components/sample.tsx', source);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain(message);
   });
 });
 
