@@ -66,24 +66,25 @@ describe('compilePattern', () => {
     ]);
   });
 
-  it('rejects a literal that encoding would change', () => {
-    expect(() => compilePattern('api keys')).toThrow('must be plain');
-    expect(() => compilePattern('api%20keys')).toThrow('must be plain');
+  it('rejects an encoded literal', () => {
+    expect(compilePattern('api keys')).toEqual([{ param: false, value: 'api keys' }]);
+    expect(() => compilePattern('api%20keys')).toThrow('written decoded');
   });
 });
 
 describe('isLiteralPattern', () => {
-  it('accepts plain parts', () => {
+  it('accepts decoded parts', () => {
     expect(isLiteralPattern('api-keys')).toBe(true);
     expect(isLiteralPattern('organization/general')).toBe(true);
+    expect(isLiteralPattern('my page')).toBe(true);
+    expect(isLiteralPattern('café')).toBe(true);
   });
 
-  it('rejects an empty pattern, a param, and a literal that encoding would change', () => {
+  it('rejects an empty pattern, a param, and an encoded literal', () => {
     expect(isLiteralPattern('')).toBe(false);
     expect(isLiteralPattern('/')).toBe(false);
     expect(isLiteralPattern(':id')).toBe(false);
     expect(isLiteralPattern('terms/:id?')).toBe(false);
-    expect(isLiteralPattern('my page')).toBe(false);
     expect(isLiteralPattern('my%20page')).toBe(false);
   });
 });

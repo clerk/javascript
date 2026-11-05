@@ -148,7 +148,7 @@ describe('useRouterScope', () => {
     warn.mockRestore();
   });
 
-  it('redirects under StrictMode without mistaking its own repeated effect for a collision', () => {
+  it('redirects under StrictMode without warning', () => {
     configure({ reactStrictMode: true });
     onTestFinished(() => configure({ reactStrictMode: false }));
     const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
@@ -179,7 +179,7 @@ describe('useRouterScope', () => {
     warn.mockRestore();
   });
 
-  it('stops redirecting when another owner of the same base overwrites its redirect, and warns', () => {
+  it('stops redirecting after a burst when two owners of one base redirect each other, and warns', () => {
     const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
     const orgRoutes = { general: 'general', members: 'members' } as const;
     const { result } = renderHook(
@@ -191,11 +191,17 @@ describe('useRouterScope', () => {
       { wrapper: wrapperWith() },
     );
 
-    expect(result.current.segment).toEqual(['general']);
+    expect(['account', 'general']).toContain(result.current.segment[0]);
     expect(result.current.user.route).toBe('account');
     expect(result.current.org.route).toBe('general');
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('wrote "general" instead');
+    expect(warn.mock.calls[0][0]).toContain('Stopped redirecting under "/user"');
+
+    act(() => {
+      result.current.user.go('security');
+    });
+
+    expect(['security', 'general']).toContain(result.current.segment[0]);
     warn.mockRestore();
   });
 
