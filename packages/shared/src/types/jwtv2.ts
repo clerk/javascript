@@ -245,7 +245,7 @@ export type AgentActClaim = ActClaim & {
   /**
    * The ID of the agent task that was used to create the session.
    */
-  task_id: string;
+  task_id?: string;
 };
 
 /**

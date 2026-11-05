@@ -47,6 +47,7 @@ export type UseAuthReturn =
       sessionClaims: undefined;
       /**
        * The JWT actor for the session. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
+       * After Clerk has loaded, `actor` also holds the agent for agent task sessions. During server rendering it is `null` for these sessions. This will change in a future major version; use `agent` to detect an agent session.
        */
       actor: undefined;
       /**

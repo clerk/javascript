@@ -1,5 +1,6 @@
 import type {
   ActClaim,
+  AgentActClaim,
   SessionActivity,
   SessionActivityJSON,
   SessionWithActivitiesJSON,
@@ -29,6 +30,7 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
   lastActiveAt!: Date;
   latestActivity!: SessionActivity;
   actor!: ActClaim | null;
+  agent!: AgentActClaim | null;
 
   constructor(data: SessionWithActivitiesJSON, pathRoot: string) {
     super();
@@ -70,6 +72,7 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.latestActivity = mapSessionActivityJSONToSessionActivity(data.latest_activity ?? ({} as SessionActivityJSON));
     this.actor = data.actor;
+    this.agent = data.actor?.type === 'agent' ? (data.actor as AgentActClaim) : null;
     return this;
   }
 }

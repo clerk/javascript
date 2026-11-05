@@ -72,6 +72,34 @@ describe('useAuth', () => {
   });
 });
 
+describe('useAuth agent', () => {
+  test('exposes the agent from the initial state', () => {
+    const agent = { sub: 'agt_1', type: 'agent', task_id: 'agttsk_1' };
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <ClerkInstanceContext.Provider value={{ value: { addListener: vi.fn() } as unknown as LoadedClerk }}>
+          <InitialStateProvider
+            initialState={
+              {
+                sessionId: 'sess_1',
+                sessionStatus: 'active',
+                sessionClaims: stubSessionClaims({ sessionId: 'sess_1', userId: 'user_1' }),
+                userId: 'user_1',
+                agent,
+              } as any
+            }
+          >
+            {children}
+          </InitialStateProvider>
+        </ClerkInstanceContext.Provider>
+      ),
+    });
+
+    expect(result.current.agent).toEqual(agent);
+  });
+});
+
 describe('useAuth.getToken', () => {
   test('throws an error if getToken is called in a non-browser environment', async () => {
     const originalWindow = global.window;

@@ -24,7 +24,7 @@ export type SharedSignedInAuthObjectProperties = {
   /**
    * The agent and agent task that created the session, from the `agt` claim. `null` for other sessions.
    * `sub` and `task_id` can be `''` if the claim is malformed, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session.
-   * `actor` is not set for agent sessions.
+   * `actor` is `undefined` for agent sessions, because the session token carries the `agt` claim instead of `act`.
    */
   agent: AgentActClaim | null;
   /**

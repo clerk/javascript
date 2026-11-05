@@ -37,7 +37,7 @@ export type InitialState = Serializable<{
   sessionStatus: SessionStatusClaim;
   session: SessionResource | undefined;
   actor: ActClaim | undefined;
-  agent: AgentActClaim | null | undefined;
+  agent?: AgentActClaim | null;
   userId: string | undefined;
   user: UserResource | undefined;
   orgId: string | undefined;
