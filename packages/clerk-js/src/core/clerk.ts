@@ -68,7 +68,6 @@ import type {
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
-  ConnectNamespace,
   APIKeysProps,
   AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
@@ -85,6 +84,7 @@ import type {
   ClientJSONSnapshot,
   ClientResource,
   ConfigureSSOProps,
+  ConnectNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -196,8 +196,8 @@ import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
-import { Connect } from './modules/connect';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { Connect } from './modules/connect';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
