@@ -1,17 +1,28 @@
 import { joinPaths } from '../../util/path';
 import { AbstractAPI } from './AbstractApi';
 
-const camelize = <T>(value: unknown): T => {
+const PROVIDER_PARAM_KEYS = new Set(['authorization_params', 'token_params', 'authorizationParams', 'tokenParams']);
+
+const convertKeys = (value: unknown, rename: (key: string) => string): unknown => {
   if (Array.isArray(value)) {
-    return value.map(item => camelize(item)) as T;
+    return value.map(item => convertKeys(item, rename));
   }
   if (value && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key.replace(/_([a-z])/g, (_, c) => c.toUpperCase()), camelize(item)]),
-    ) as T;
+      Object.entries(value).map(([key, item]) => [
+        rename(key),
+        PROVIDER_PARAM_KEYS.has(key) ? item : convertKeys(item, rename),
+      ]),
+    );
   }
-  return value as T;
+  return value;
 };
+
+const camelize = <T>(value: unknown): T =>
+  convertKeys(value, key => key.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())) as T;
+
+const snakeize = <T>(value: T): Record<string, unknown> =>
+  convertKeys(value, key => key.replace(/[A-Z]/g, c => `_${c.toLowerCase()}`)) as Record<string, unknown>;
 
 export type ConnectConnection = {
   object: 'connection';
@@ -126,8 +137,7 @@ export class ConnectConnectorsAPI extends AbstractAPI {
       await this.request({
         method: 'POST',
         path: '/connectors',
-        bodyParams: params,
-        options: { deepSnakecaseBodyParamKeys: true },
+        bodyParams: snakeize(params),
       }),
     );
   }
@@ -155,8 +165,7 @@ export class ConnectConnectorsAPI extends AbstractAPI {
       await this.request({
         method: 'PATCH',
         path: joinPaths('/connectors', connectorIdOrKey),
-        bodyParams: params,
-        options: { deepSnakecaseBodyParamKeys: true },
+        bodyParams: snakeize(params),
       }),
     );
   }
