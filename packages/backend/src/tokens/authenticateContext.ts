@@ -3,6 +3,7 @@ import { getAutoProxyUrlFromEnvironment } from '@clerk/shared/proxy';
 import type { Jwt } from '@clerk/shared/types';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 
+import type { PoppyBrowserSession } from '../api/endpoints/PoppyApi';
 import { constants } from '../constants';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { runtime } from '../runtime';
@@ -13,6 +14,7 @@ import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions } from './types';
 
 interface AuthenticateContext extends AuthenticateRequestOptions {
+  poppySession?: PoppyBrowserSession | null;
   // header-based values
   accept: string | undefined;
   forwardedHost: string | undefined;

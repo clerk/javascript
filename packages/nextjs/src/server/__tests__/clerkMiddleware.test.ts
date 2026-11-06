@@ -1,6 +1,7 @@
 // There is no need to execute the complete authenticateRequest to test clerkMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
 import { authenticatedMachineObject, AuthStatus, constants, TokenType } from '@clerk/backend/internal';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { MalformedURLError } from '@clerk/shared/pathMatcher';
 // used to assert the mock
 import assert from 'assert';
@@ -11,6 +12,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, ty
 import { clerkClient } from '../clerkClient';
 import type { ClerkMiddlewareAuth } from '../clerkMiddleware';
 import { clerkMiddleware } from '../clerkMiddleware';
+import { getSessionAuthDataFromRequest } from '../data/getAuthDataFromRequest';
 import { createRouteMatcher } from '../routeMatcher';
 import { decryptClerkRequestData } from '../utils';
 
@@ -1533,5 +1535,322 @@ describe('contentSecurityPolicy option', () => {
 
     const requestCSP = resp?.headers.get('x-middleware-request-content-security-policy');
     expect(requestCSP).toEqual(cspHeader);
+  });
+});
+
+describe('Poppy middleware', () => {
+  const endpoint = 'https://company.example/poppy/browser-session';
+
+  it('returns the Poppy scope challenge without running the application or changing cookies', async () => {
+    authenticateRequestMock.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Scope required', {
+        status: 403,
+        data: [{ code: 'insufficient_scope', message: 'Scope required' }],
+      }),
+    );
+    const handler = vi.fn();
+    const middleware = clerkMiddleware(handler, { __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    const response = await middleware(
+      mockRequest({
+        url: 'https://company.example/',
+        headers: { cookie: '__Host-poppy_session=browser-token; __session=native-session' },
+      }),
+      {} as NextFetchEvent,
+    );
+    assert(response instanceof Response);
+    expect(response.status).toBe(403);
+    expect(response.headers.get('www-authenticate')).toBe(
+      'Bearer error="insufficient_scope", scope="poppy:browser-sign-in"',
+    );
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    expect(response.headers.get('content-type')).toBe('text/plain; charset=utf-8');
+    expect(await response.text()).toBe('Additional authorization is required. Missing scope: poppy:browser-sign-in.');
+    expect(response.headers.getSetCookie()).toEqual([]);
+    expect(response.headers.has('x-middleware-set-cookie')).toBe(false);
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { name: 'Poppy is disabled', enabled: false, status: 403, code: 'insufficient_scope' },
+    { name: 'a different forbidden error', enabled: true, status: 403, code: 'origin_invalid' },
+    { name: 'an infrastructure failure', enabled: true, status: 503, code: 'insufficient_scope' },
+    { name: 'an invalid token', enabled: true, status: 401, code: 'invalid_token' },
+  ])('propagates authentication errors unchanged for $name', async ({ enabled, status, code }) => {
+    const failure = new ClerkAPIResponseError('Authentication failed', {
+      status,
+      data: [{ code, message: 'Authentication failed' }],
+    });
+    authenticateRequestMock.mockRejectedValueOnce(failure);
+    const middleware = clerkMiddleware(enabled ? { __experimental_poppy: { browserSessionEndpoint: endpoint } } : {});
+    await expect(middleware(mockRequest({ url: 'https://company.example/' }), {} as NextFetchEvent)).rejects.toBe(
+      failure,
+    );
+  });
+
+  const metadata = {
+    protocol_version: '0.4',
+    organization: { name: 'Company', domain: 'company.example' },
+    auth: {
+      issuer: 'https://clerk.company.example',
+      scopes: { 'poppy:browser-sign-in': 'Full website access', profile: 'Read profile' },
+    },
+    web: { browser_session_endpoint: endpoint, unscoped: true },
+    extension: { unchanged: true },
+  };
+  const { web: _web, ...partialMetadata } = metadata;
+
+  it.each(['/.well-known/poppy.json', '/.well-known/oauth-protected-resource'])(
+    'serves %s from the Backend API artifact before authentication',
+    async path => {
+      const getMetadata = vi.fn().mockResolvedValue(partialMetadata);
+      vi.mocked(clerkClient).mockResolvedValue(
+        Object.assign(await clerkClient(), { __experimental_poppy: { getMetadata } }),
+      );
+      const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+      const response = await middleware(mockRequest({ url: 'https://company.example' + path }), {} as NextFetchEvent);
+      assert(response instanceof Response);
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual(
+        path === '/.well-known/poppy.json'
+          ? metadata
+          : {
+              resource: 'https://company.example',
+              authorization_servers: ['https://clerk.company.example'],
+              scopes_supported: ['poppy:browser-sign-in', 'profile'],
+              bearer_methods_supported: ['header'],
+            },
+      );
+      expect(response.headers.get('cache-control')).toBe('no-store');
+      expect(getMetadata).toHaveBeenCalledExactlyOnceWith();
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    { path: '/.well-known/poppy.json', method: 'POST' },
+    { path: '/.well-known/poppy.json', method: 'HEAD' },
+    { path: '/.well-known/oauth-protected-resource', method: 'POST' },
+    { path: '/.well-known/oauth-protected-resource', method: 'OPTIONS' },
+  ])('rejects discovery $method $path without fetching the artifact', async ({ path, method }) => {
+    const getMetadata = vi.fn();
+    vi.mocked(clerkClient).mockResolvedValue(
+      Object.assign(await clerkClient(), { __experimental_poppy: { getMetadata } }),
+    );
+    const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    const response = await middleware(
+      mockRequest({ url: 'https://company.example' + path, method }),
+      {} as NextFetchEvent,
+    );
+    assert(response instanceof Response);
+    expect(response.status).toBe(405);
+    expect(response.headers.get('allow')).toBe('GET');
+    expect(getMetadata).not.toHaveBeenCalled();
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
+
+  it.each(['/.well-known/poppy.json', '/.well-known/oauth-protected-resource'])(
+    'keeps %s available to the application when Poppy is off',
+    async path => {
+      const getMetadata = vi.fn();
+      vi.mocked(clerkClient).mockResolvedValue(
+        Object.assign(await clerkClient(), { __experimental_poppy: { getMetadata } }),
+      );
+      const handler = vi.fn().mockResolvedValue(new Response('application discovery'));
+      const middleware = clerkMiddleware(handler);
+      const response = await middleware(mockRequest({ url: 'https://company.example' + path }), {} as NextFetchEvent);
+      assert(response instanceof Response);
+      expect(await response.text()).toBe('application discovery');
+      expect(getMetadata).not.toHaveBeenCalled();
+      expect(handler).toHaveBeenCalledOnce();
+      expect(authenticateRequestMock).toHaveBeenCalledOnce();
+    },
+  );
+
+  it('requires the configured Company origin for discovery', async () => {
+    const getMetadata = vi.fn();
+    vi.mocked(clerkClient).mockResolvedValue(
+      Object.assign(await clerkClient(), { __experimental_poppy: { getMetadata } }),
+    );
+    const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    await middleware(mockRequest({ url: 'https://other.example/.well-known/poppy.json' }), {} as NextFetchEvent);
+    expect(getMetadata).not.toHaveBeenCalled();
+    expect(authenticateRequestMock).toHaveBeenCalledOnce();
+  });
+
+  it('serves discovery for the configured Company host behind a reverse proxy', async () => {
+    const getMetadata = vi.fn().mockResolvedValue(partialMetadata);
+    vi.mocked(clerkClient).mockResolvedValue(
+      Object.assign(await clerkClient(), { __experimental_poppy: { getMetadata } }),
+    );
+    const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    const response = await middleware(
+      mockRequest({
+        url: 'http://localhost:3000/.well-known/poppy.json',
+        headers: { host: 'company.example', 'x-forwarded-proto': 'https' },
+      }),
+      {} as NextFetchEvent,
+    );
+    assert(response instanceof Response);
+    expect(await response.json()).toEqual(metadata);
+    expect(getMetadata).toHaveBeenCalledExactlyOnceWith();
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects discovery when the configured endpoint differs from the artifact origin', async () => {
+    const getMetadata = vi.fn().mockResolvedValue({
+      ...partialMetadata,
+      organization: { ...partialMetadata.organization, domain: 'other.example' },
+    });
+    vi.mocked(clerkClient).mockResolvedValue(
+      Object.assign(await clerkClient(), { __experimental_poppy: { getMetadata } }),
+    );
+    const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    await expect(
+      middleware(mockRequest({ url: 'https://company.example/.well-known/poppy.json' }), {} as NextFetchEvent),
+    ).rejects.toThrow('configured Company origin');
+  });
+
+  it.each(['/.well-known/poppy.json', '/.well-known/oauth-protected-resource'])(
+    'propagates an artifact failure for %s without fabricated discovery',
+    async path => {
+      const failure = new Error('Backend artifact unavailable');
+      const getMetadata = vi.fn().mockRejectedValue(failure);
+      vi.mocked(clerkClient).mockResolvedValue(
+        Object.assign(await clerkClient(), { __experimental_poppy: { getMetadata } }),
+      );
+      const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+      await expect(
+        middleware(mockRequest({ url: 'https://company.example' + path }), {} as NextFetchEvent),
+      ).rejects.toBe(failure);
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    { path: '', method: 'GET' },
+    { path: '', method: 'POST' },
+    { path: '/authorize', method: 'POST' },
+  ])('forwards protocol $method $path before native authentication', async ({ path, method }) => {
+    const forwarded = new Response('protocol-response', { status: 400, headers: { 'Poppy-Version': '0.4' } });
+    const proxyBrowserRequest = vi.fn().mockResolvedValue(forwarded);
+    vi.mocked(clerkClient).mockResolvedValue(
+      Object.assign(await clerkClient(), { __experimental_poppy: { proxyBrowserRequest } }),
+    );
+    const request = mockRequest({ url: endpoint + path, method });
+    const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    const response = await middleware(request, {} as NextFetchEvent);
+    expect(response).toBe(forwarded);
+    expect(proxyBrowserRequest).toHaveBeenCalledWith(request, { browserSessionEndpoint: endpoint });
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
+
+  it('recognizes the configured Company host behind a reverse proxy', async () => {
+    const forwarded = new Response('protocol-response');
+    const proxyBrowserRequest = vi.fn().mockResolvedValue(forwarded);
+    vi.mocked(clerkClient).mockResolvedValue(
+      Object.assign(await clerkClient(), { __experimental_poppy: { proxyBrowserRequest } }),
+    );
+    const request = mockRequest({
+      url: 'http://localhost:3000/poppy/browser-session',
+      headers: { host: 'company.example', 'x-forwarded-proto': 'https' },
+    });
+    const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    expect(await middleware(request, {} as NextFetchEvent)).toBe(forwarded);
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
+
+  it('clears only the ticket response cookie and renders the callback without a native handshake', async () => {
+    const request = mockRequest({
+      url: endpoint + '/callback',
+      headers: { cookie: '__Host-poppy_ticket=one-use-ticket; __session=prior-session' },
+    });
+    const middleware = clerkMiddleware({
+      __experimental_poppy: { browserSessionEndpoint: endpoint, redirectTo: '/cart' },
+      contentSecurityPolicy: { strict: true },
+    });
+    const response = await middleware(request, {} as NextFetchEvent);
+    assert(response instanceof Response);
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    expect(response.headers.get('content-security-policy')).toContain("'strict-dynamic'");
+    expect(response.headers.get('x-middleware-request-content-security-policy')).toBe(
+      response.headers.get('content-security-policy'),
+    );
+    expect(response.headers.get('x-middleware-request-x-nonce')).toBe(response.headers.get('x-nonce'));
+    expect(response.headers.get('x-nonce')).toBeTruthy();
+    expect(response.headers.has('x-middleware-set-cookie')).toBe(false);
+    expect(response.headers.getSetCookie()).toHaveLength(1);
+    expect(response.headers.getSetCookie()[0]).toContain('__Host-poppy_ticket=;');
+    expect(response.headers.getSetCookie()[0]).toContain('Max-Age=0');
+    expect(response.headers.get('x-middleware-request-cookie')).toContain('__Host-poppy_ticket=one-use-ticket');
+    const data = decryptClerkRequestData(
+      response.headers.get('x-middleware-request-' + constants.Headers.ClerkRequestData),
+    );
+    expect(data.__experimental_poppy).toEqual({ browserSessionEndpoint: endpoint, redirectTo: '/cart' });
+    expect(data.secretKey).toBeUndefined();
+  });
+
+  it.each([true, false])('exposes verified identity only on an authenticated agent; signed in=%s', async signedIn => {
+    const identity = {
+      session_id: 'protocol-session',
+      client_id: 'https://agent.example',
+      user_id: 'pseudonym',
+      ...(signedIn
+        ? { account: { user_id: 'user_123', session_id: 'sess_123', scopes: ['poppy:browser-sign-in'] } }
+        : {}),
+    };
+    const token = [
+      JSON.stringify({ alg: 'RS256', typ: 'JWT' }),
+      JSON.stringify({ sub: 'user_123', sid: 'sess_123', agt: { id: identity.client_id }, iat: 0, exp: 9999999999 }),
+      'signature',
+    ]
+      .map(part => Buffer.from(part).toString('base64url'))
+      .join('.');
+    authenticateRequestMock.mockResolvedValueOnce({
+      status: signedIn ? AuthStatus.SignedIn : AuthStatus.SignedOut,
+      token: signedIn ? token : null,
+      tokenType: TokenType.SessionToken,
+      poppy: identity,
+      toAuth: () => ({
+        tokenType: TokenType.SessionToken,
+        isAuthenticated: signedIn,
+        userId: signedIn ? 'user_123' : null,
+        debug: vi.fn(),
+      }),
+      headers: new Headers(),
+      publishableKey,
+    });
+    const middleware = clerkMiddleware({ __experimental_poppy: { browserSessionEndpoint: endpoint } });
+    const response = await middleware(mockRequest({ url: 'https://company.example/cart' }), {} as NextFetchEvent);
+    assert(response instanceof Response);
+    const data = decryptClerkRequestData(
+      response.headers.get('x-middleware-request-' + constants.Headers.ClerkRequestData),
+    );
+    expect(data.poppySession).toEqual(identity);
+    const serverHeaders = new Headers();
+    response.headers.forEach((value, key) => {
+      if (key.startsWith('x-middleware-request-')) {
+        serverHeaders.set(key.slice('x-middleware-request-'.length), value);
+      }
+    });
+    const appAuth = getSessionAuthDataFromRequest(
+      new NextRequest('https://company.example/cart', { headers: serverHeaders }),
+    );
+    expect(appAuth.isAuthenticated).toBe(signedIn);
+    expect(Object.keys(appAuth).filter(key => key.startsWith('__experimental_poppy'))).toEqual([]);
+    if (signedIn) {
+      expect(appAuth.agent).toEqual({
+        type: 'agent',
+        sub: identity.client_id,
+        __experimental_poppyClientId: identity.client_id,
+        __experimental_poppyUserId: identity.user_id,
+        __experimental_poppySessionId: identity.session_id,
+      });
+      expectTypeOf(appAuth.agent?.__experimental_poppySessionId).toEqualTypeOf<string | undefined>();
+    } else {
+      expect(appAuth).not.toHaveProperty('agent');
+    }
+    expect(appAuth.userId).toBe(signedIn ? 'user_123' : null);
+    expect(appAuth).not.toHaveProperty('poppy');
   });
 });

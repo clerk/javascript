@@ -60,6 +60,7 @@ const createAuthOptions = (req: RequestLike, opts: GetAuthDataFromRequestOptions
     authMessage: getAuthKeyFromRequest(req, 'AuthMessage'),
     authReason: getAuthKeyFromRequest(req, 'AuthReason'),
     treatPendingAsSignedOut,
+    poppySession: decryptedRequestData.poppySession,
   };
 };
 

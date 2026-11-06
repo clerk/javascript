@@ -2,6 +2,7 @@
 
 exports[`/server public exports > should not include a breaking change 1`] = `
 [
+  "PoppyCallbackPage",
   "auth",
   "buildClerkProps",
   "clerkClient",

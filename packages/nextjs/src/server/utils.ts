@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend';
+import type { AuthObject, PoppyBrowserSession } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -89,7 +89,7 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode, machineAuthObject);
+    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode, machineAuthObject, requestState.poppy);
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
@@ -210,6 +210,7 @@ export function encryptClerkRequestData(
   requestData: Partial<AuthenticateRequestOptions>,
   keylessModeKeys: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
   machineAuthObject: AuthObject | null,
+  poppySession?: PoppyBrowserSession | null,
 ) {
   const isEmpty = (obj: Record<string, any> | undefined) => {
     if (!obj) {
@@ -218,7 +219,7 @@ export function encryptClerkRequestData(
     return !Object.values(obj).some(v => v !== undefined);
   };
 
-  if (isEmpty(requestData) && isEmpty(keylessModeKeys) && !machineAuthObject) {
+  if (isEmpty(requestData) && isEmpty(keylessModeKeys) && !machineAuthObject && !poppySession) {
     return;
   }
 
@@ -231,7 +232,12 @@ export function encryptClerkRequestData(
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
   return AES.encrypt(
-    JSON.stringify({ ...keylessModeKeys, ...requestData, machineAuthObject: machineAuthObject ?? undefined }),
+    JSON.stringify({
+      ...keylessModeKeys,
+      ...requestData,
+      machineAuthObject: machineAuthObject ?? undefined,
+      poppySession,
+    }),
     maybeKeylessEncryptionKey,
   ).toString();
 }
@@ -242,7 +248,7 @@ export function encryptClerkRequestData(
  */
 export function decryptClerkRequestData(
   encryptedRequestData?: string | undefined | null,
-): Partial<AuthenticateRequestOptions> & { machineAuthObject?: AuthObject } {
+): Partial<AuthenticateRequestOptions> & { machineAuthObject?: AuthObject; poppySession?: PoppyBrowserSession | null } {
   if (!encryptedRequestData) {
     return {};
   }

@@ -203,3 +203,7 @@ export type {
  */
 export type { AuthObject, InvalidTokenAuthObject } from './tokens/authObjects';
 export type { SessionAuthObject, MachineAuthObject } from './tokens/types';
+
+export { createPoppyBrowserSessionHandler } from './poppyBrowserSession';
+export { poppyCookies } from './api/endpoints/PoppyApi';
+export type { PoppyBrowserSession, PoppyOptions } from './api/endpoints/PoppyApi';

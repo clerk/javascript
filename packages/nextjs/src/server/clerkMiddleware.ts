@@ -1,4 +1,5 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
+import { createPoppyBrowserSessionHandler, poppyCookies } from '@clerk/backend';
 import type {
   AuthenticatedState,
   AuthenticateRequestOptions,
@@ -20,6 +21,7 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
@@ -61,6 +63,7 @@ import type {
 import {
   assertKey,
   decorateRequest,
+  encryptClerkRequestData,
   handleMultiDomainAndProxy,
   redirectAdapter,
   setRequestHeadersOnNextResponse,
@@ -206,6 +209,79 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
     return clerkMiddlewareRequestDataStorage.run(requestDataStore, async () => {
       const resolvedClerkClient = await clerkClient();
 
+      if (options.__experimental_poppy) {
+        const proxyPoppy = createPoppyBrowserSessionHandler({
+          ...options.__experimental_poppy,
+          clerkClient: resolvedClerkClient,
+        });
+        const endpoint = new URL(options.__experimental_poppy.browserSessionEndpoint);
+        const poppyRequestUrl = createClerkRequest(request).clerkUrl;
+        if (poppyRequestUrl.origin === endpoint.origin) {
+          if (
+            poppyRequestUrl.pathname === '/.well-known/poppy.json' ||
+            poppyRequestUrl.pathname === '/.well-known/oauth-protected-resource'
+          ) {
+            if (request.method !== 'GET') {
+              return new Response(null, { status: 405, headers: { Allow: 'GET' } });
+            }
+            const metadata = await resolvedClerkClient.__experimental_poppy.getMetadata();
+            if (endpoint.origin !== `https://${metadata.organization.domain}`) {
+              throw new Error('The browser Session endpoint must use the configured Company origin.');
+            }
+            return Response.json(
+              poppyRequestUrl.pathname === '/.well-known/poppy.json'
+                ? { ...metadata, web: { browser_session_endpoint: endpoint.href, unscoped: true } }
+                : {
+                    resource: endpoint.origin,
+                    authorization_servers: [metadata.auth.issuer],
+                    scopes_supported: Object.keys(metadata.auth.scopes),
+                    bearer_methods_supported: ['header'],
+                  },
+              { headers: { 'Cache-Control': 'no-store' } },
+            );
+          }
+          if (
+            (poppyRequestUrl.pathname === endpoint.pathname &&
+              (request.method === 'GET' || request.method === 'POST')) ||
+            (poppyRequestUrl.pathname === endpoint.pathname + '/authorize' && request.method === 'POST')
+          ) {
+            return proxyPoppy(request);
+          }
+          if (poppyRequestUrl.pathname === endpoint.pathname + '/callback' && request.method === 'GET') {
+            const response = NextResponse.next();
+            if (options.contentSecurityPolicy) {
+              const { headers } = createContentSecurityPolicyHeaders(
+                (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
+                options.contentSecurityPolicy,
+              );
+              const cspRequestHeaders: Record<string, string> = {};
+              headers.forEach(([key, value]) => {
+                setHeader(response, key, value);
+                cspRequestHeaders[key] = value;
+              });
+              setRequestHeadersOnNextResponse(response, request, cspRequestHeaders);
+            }
+            response.headers.set('Cache-Control', 'no-store');
+            response.headers.set('Referrer-Policy', 'no-referrer');
+            response.headers.set('X-Frame-Options', 'DENY');
+            response.headers.append(
+              'Set-Cookie',
+              `${poppyCookies.ticket}=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Strict`,
+            );
+            setRequestHeadersOnNextResponse(response, request, {
+              [constants.Headers.AuthStatus]: AuthStatus.SignedOut,
+              [constants.Headers.AuthToken]: '',
+              [constants.Headers.AuthSignature]: '',
+              [constants.Headers.AuthReason]: '',
+              [constants.Headers.AuthMessage]: '',
+              [constants.Headers.ClerkUrl]: poppyRequestUrl.href,
+              [constants.Headers.ClerkRequestData]: encryptClerkRequestData(resolvedParams, {}, null) ?? '',
+            });
+            return response;
+          }
+        }
+      }
+
       if (options.debug) {
         logger.enable();
       }
@@ -225,10 +301,29 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         }));
       }
 
-      const requestState = await resolvedClerkClient.authenticateRequest(
-        clerkRequest,
-        createAuthenticateRequestOptions(clerkRequest, options),
-      );
+      const requestState = await resolvedClerkClient
+        .authenticateRequest(clerkRequest, createAuthenticateRequestOptions(clerkRequest, options))
+        .catch((error: unknown) => {
+          if (
+            !options.__experimental_poppy ||
+            !isClerkAPIResponseError(error) ||
+            error.status !== 403 ||
+            error.errors[0]?.code !== 'insufficient_scope'
+          ) {
+            throw error;
+          }
+          return new NextResponse('Additional authorization is required. Missing scope: poppy:browser-sign-in.', {
+            status: 403,
+            headers: {
+              'WWW-Authenticate': 'Bearer error="insufficient_scope", scope="poppy:browser-sign-in"',
+              'Cache-Control': 'no-store',
+              'Content-Type': 'text/plain; charset=utf-8',
+            },
+          });
+        });
+      if (requestState instanceof NextResponse) {
+        return requestState;
+      }
 
       return runHandlerWithRequestState({
         clerkRequest,
