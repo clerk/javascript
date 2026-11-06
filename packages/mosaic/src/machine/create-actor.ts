@@ -193,16 +193,10 @@ export function createActor<TContext extends object, TEvent extends EventObject,
         commit();
       }
     };
-    // SAFETY: startInvoke is called with the actor's internal EventObject, but
-    // InvokeConfig.src is typed to accept (context, TEvent | DoneInvokeEvent | ErrorInvokeEvent).
-    // The cast suppresses that mismatch; src implementations receive the INIT event
-    // on state entry and typically ignore it. The runtime views events through an
-    // event-agnostic lens (line 57) for this reason.
     const onDone = (output: unknown) => settle(invoke.onDone, { type: INVOKE_DONE, output });
     const onError = (error: unknown) => settle(invoke.onError, { type: INVOKE_ERROR, error });
     try {
-      // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
-      Promise.resolve(invoke.src(context, event as never)).then(onDone, onError);
+      Promise.resolve(invoke.src(context, event)).then(onDone, onError);
     } catch (error) {
       queueMicrotask(() => onError(error));
     }
