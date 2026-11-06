@@ -212,6 +212,26 @@ describe.each(modes)('$name location', mode => {
       expect(entry()).toBeNull();
     });
 
+    it('starts on the root after moving to another base, leaving nothing behind', () => {
+      function Tree({ path }: { path: string }) {
+        return (
+          <Page>
+            <Owner path={path} />
+            <Entry />
+            <Entry base='/account' />
+          </Page>
+        );
+      }
+      const view = render(<Tree path='/user' />);
+      click('Go to security /user');
+      expect(route()).toBe('security');
+
+      view.rerender(<Tree path='/account' />);
+      expect(route('/account')).toBe('index');
+      expect(entry('/account')).toBeNull();
+      expect(entry()).toBeNull();
+    });
+
     it('shows the root after an outside clear while mounted', () => {
       render(
         <Page initial={{ '/user': ['security'] }}>
