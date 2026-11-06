@@ -3,6 +3,7 @@ import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
   EmailCodeConfig,
+  EmailLinkConfig,
   EnterpriseSSOConfig,
   PasskeyAttempt,
   PassKeyConfig,
@@ -31,6 +32,7 @@ import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 import type { Autocomplete } from './utils';
+import type { CreateEmailLinkFlowReturn } from './verification';
 
 /**
  * @inline
@@ -320,6 +322,10 @@ export interface SessionResource extends ClerkResource {
     factor: SessionVerifyPrepareFirstFactorParams,
   ) => Promise<SessionVerificationResource>;
   /**
+   * Creates an email-link reverification flow. The returned promise resolves in the original tab after the link callback completes the active session verification.
+   */
+  createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SessionStartEmailLinkFlowParams, SessionVerificationResource>;
+  /**
    * Attempts to complete the [first factor verification](!first-factor-verification) process.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    * @skipParametersSection
@@ -535,6 +541,7 @@ export type SessionVerifyCreateParams = {
 
 export type SessionVerifyPrepareFirstFactorParams =
   | EmailCodeConfig
+  | EmailLinkConfig
   | PhoneCodeConfig
   | PassKeyConfig
   /**
@@ -545,6 +552,11 @@ export type SessionVerifyPrepareFirstFactorParams =
    * @experimental
    */
   | TrustedDeviceConfig;
+
+export type SessionStartEmailLinkFlowParams = {
+  emailAddressId: string;
+  redirectUrl: string;
+};
 
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt

@@ -1,6 +1,7 @@
 import type {
   BackupCodeFactor,
   EmailCodeFactor,
+  EmailLinkFactor,
   EnterpriseSSOFactor,
   PasskeyFactor,
   PasswordFactor,
@@ -52,6 +53,7 @@ export type SessionVerificationAfterMinutes = number;
 
 export type SessionVerificationFirstFactor =
   | EmailCodeFactor
+  | EmailLinkFactor
   | PhoneCodeFactor
   | PasswordFactor
   | PasskeyFactor
