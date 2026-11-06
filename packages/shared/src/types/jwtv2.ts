@@ -88,6 +88,11 @@ type JWTPayloadBase = {
   act?: ActClaim;
 
   /**
+   * Agent task claim (agt). Present on sessions created from an agent task. These sessions do not carry an `act` claim.
+   */
+  agt?: AgentTaskClaim;
+
+  /**
    * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
    *
    * @experimental This API is experimental and may change at any moment.
@@ -211,11 +216,37 @@ export interface ActClaim {
 }
 
 /**
- * ActClaim narrowed to actor type `'agent'`. Use for session.agent.
+ * Agent task claim (`agt`). Present on sessions created from an agent task.
  *
  * @inline
  */
-export type AgentActClaim = ActClaim & { type: 'agent' };
+export interface AgentTaskClaim {
+  /**
+   * The ID of the agent.
+   */
+  id: string;
+  /**
+   * The ID of the agent task that was used to create the session.
+   */
+  tsk: string;
+  /**
+   * The registry that issued the agent.
+   */
+  reg: string;
+}
+
+/**
+ * ActClaim narrowed to actor type `'agent'`. This shape is shared by `Session.agent` and the `agent` property of the auth object.
+ *
+ * @inline
+ */
+export type AgentActClaim = ActClaim & {
+  type: 'agent';
+  /**
+   * The ID of the agent task that was used to create the session.
+   */
+  task_id?: string;
+};
 
 /**
  * The current state of the session which can only be `active` or `pending`.

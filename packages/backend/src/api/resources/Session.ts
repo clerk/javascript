@@ -1,3 +1,5 @@
+import type { AgentActClaim } from '@clerk/shared/types';
+
 import type { SessionActivityJSON, SessionJSON } from './JSON';
 
 /**
@@ -64,8 +66,10 @@ export class Session {
     readonly lastActiveOrganizationId?: string,
     /** An object that provides additional information about this session, focused around user activity data. */
     readonly latestActivity?: SessionActivity,
-    /** The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation). */
+    /** The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation). For agent task sessions, `actor` also holds the agent today. This will change in a future major version; use `agent` to detect an agent session. */
     readonly actor: Record<string, unknown> | null = null,
+    /** When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and [Agent Task](https://clerk.com/docs/reference/types/agent-task) that was used to create the session. */
+    readonly agent: AgentActClaim | null = null,
   ) {}
 
   static fromJSON(data: SessionJSON): Session {
@@ -82,6 +86,13 @@ export class Session {
       data.last_active_organization_id,
       data.latest_activity && SessionActivity.fromJSON(data.latest_activity),
       data.actor,
+      data.actor?.type === 'agent'
+        ? {
+            sub: typeof data.actor.sub === 'string' ? data.actor.sub : '',
+            type: 'agent',
+            task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : '',
+          }
+        : null,
     );
   }
 }

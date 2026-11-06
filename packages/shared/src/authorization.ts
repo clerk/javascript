@@ -1,5 +1,6 @@
 import type {
   ActClaim,
+  AgentActClaim,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   JwtPayload,
@@ -362,6 +363,7 @@ type AuthStateOptions = {
     sessionStatus?: SessionStatusClaim | null;
     sessionClaims?: JwtPayload | null;
     actor?: ActClaim | null;
+    agent?: AgentActClaim | null;
     orgId?: string | null;
     orgRole?: OrganizationCustomRoleKey | null;
     orgSlug?: string | null;
@@ -385,6 +387,7 @@ const resolveAuthState = ({
     sessionStatus,
     userId,
     actor,
+    agent,
     orgId,
     orgRole,
     orgSlug,
@@ -398,6 +401,7 @@ const resolveAuthState = ({
   if (sessionId === undefined && userId === undefined) {
     return {
       actor: undefined,
+      agent: undefined,
       getToken,
       has: () => false,
       isLoaded: false,
@@ -415,6 +419,7 @@ const resolveAuthState = ({
   if (sessionId === null && userId === null) {
     return {
       actor: null,
+      agent: null,
       getToken,
       has: () => false,
       isLoaded: true,
@@ -432,6 +437,7 @@ const resolveAuthState = ({
   if (treatPendingAsSignedOut && sessionStatus === 'pending') {
     return {
       actor: null,
+      agent: null,
       getToken,
       has: () => false,
       isLoaded: true,
@@ -449,6 +455,7 @@ const resolveAuthState = ({
   if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
       actor: actor || null,
+      agent: agent || null,
       getToken,
       has,
       isLoaded: true,
@@ -466,6 +473,7 @@ const resolveAuthState = ({
   if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
       actor: actor || null,
+      agent: agent || null,
       getToken,
       has,
       isLoaded: true,

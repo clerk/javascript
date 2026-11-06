@@ -1,5 +1,5 @@
 import type { SetActive, SignOut } from './clerk';
-import type { ActClaim, JwtPayload } from './jwtv2';
+import type { ActClaim, AgentActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
@@ -47,8 +47,14 @@ export type UseAuthReturn =
       sessionClaims: undefined;
       /**
        * The JWT actor for the session. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
+       * After Clerk has loaded, `actor` also holds the agent for agent task sessions. During server rendering it is `null` for these sessions. This will change in a future major version; use `agent` to detect an agent session.
        */
       actor: undefined;
+      /**
+       * The agent and agent task that created the session. `null` for other sessions, and `undefined` before Clerk has loaded.
+       * `sub` and `task_id` can be `''` if the claim is malformed, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session.
+       */
+      agent: undefined;
       /**
        * The ID of the user's active Organization.
        */
@@ -81,6 +87,7 @@ export type UseAuthReturn =
       sessionId: null;
       sessionClaims: null;
       actor: null;
+      agent: null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -95,6 +102,7 @@ export type UseAuthReturn =
       sessionId: string;
       sessionClaims: JwtPayload;
       actor: ActClaim | null;
+      agent: AgentActClaim | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -109,6 +117,7 @@ export type UseAuthReturn =
       sessionId: string;
       sessionClaims: JwtPayload;
       actor: ActClaim | null;
+      agent: AgentActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;

@@ -2680,8 +2680,8 @@ describe('Session', () => {
       expect(session.agent).toBeNull();
     });
 
-    it('sets agent to the actor when actor has type "agent"', () => {
-      const actor = { sub: 'user_2', type: 'agent' as const };
+    it('sets agent to only sub, type and task_id when actor has type "agent" and extra fields', () => {
+      const actor = { sub: 'agent_1', type: 'agent' as const, task_id: 'agttsk_1', restricted: true };
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -2694,8 +2694,24 @@ describe('Session', () => {
       } as SessionJSON);
 
       expect(session.actor).toEqual(actor);
-      expect(session.agent).toEqual(actor);
-      expect(session.agent?.type).toBe('agent');
+      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: 'agttsk_1' });
+    });
+
+    it('sets agent task_id to an empty string when an agent actor has no task_id', () => {
+      const actor = { sub: 'agent_1', type: 'agent' as const };
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(session.actor).toEqual(actor);
+      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: '' });
     });
   });
 

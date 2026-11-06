@@ -42,6 +42,72 @@ const authFromFeaturePermissionMask = (fpm: string) => {
 };
 
 describe('JWTPayloadToAuthObjectProperties', () => {
+  test('exposes the agent task session from the agt claim and leaves actor unset', () => {
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    });
+
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+    expect(actor).toBeUndefined();
+  });
+
+  test('exposes the agent from the agt claim on a v1 payload', () => {
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    } as any);
+
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+    expect(actor).toBeUndefined();
+  });
+
+  test('keeps both actor and agent when the payload has act and agt', () => {
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      act: { sub: 'impersonator' },
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    } as any);
+
+    expect(actor).toEqual({ sub: 'impersonator' });
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+  });
+
+  test.each([
+    ['an empty object', {}, { sub: '', type: 'agent', task_id: '' }],
+    ['a missing tsk', { id: 'agent_123' }, { sub: 'agent_123', type: 'agent', task_id: '' }],
+    ['a missing id', { tsk: 'agttsk_456' }, { sub: '', type: 'agent', task_id: 'agttsk_456' }],
+    ['empty strings', { id: '', tsk: '' }, { sub: '', type: 'agent', task_id: '' }],
+    ['non-string fields', { id: 1, tsk: 2 }, { sub: '', type: 'agent', task_id: '' }],
+    ['a string', 'x', { sub: '', type: 'agent', task_id: '' }],
+    ['a number', 1, { sub: '', type: 'agent', task_id: '' }],
+    ['an array', [], { sub: '', type: 'agent', task_id: '' }],
+    ['true', true, { sub: '', type: 'agent', task_id: '' }],
+    ['false', false, { sub: '', type: 'agent', task_id: '' }],
+    ['zero', 0, { sub: '', type: 'agent', task_id: '' }],
+    ['an empty string', '', { sub: '', type: 'agent', task_id: '' }],
+  ])('agent is still non-null for a malformed agt claim: %s', (_name, agt, expected) => {
+    expect(JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2, agt } as any).agent).toEqual(expected);
+  });
+
+  test.each([
+    ['null', null],
+    ['undefined', undefined],
+  ])('agent is null when the agt claim is %s', (_name, agt) => {
+    expect(JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2, agt } as any).agent).toBeNull();
+  });
+
+  test('agent is null when the agt claim is absent', () => {
+    const v2 = JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2 });
+    const v1 = JWTPayloadToAuthObjectProperties({ ...baseClaims, act: { sub: 'impersonator' } } as any);
+
+    expect(v2.agent).toBeNull();
+    expect(v1.agent).toBeNull();
+    expect(v1.actor).toEqual({ sub: 'impersonator' });
+  });
+
   test('auth object with JWT v2 does not produces anything org related if there is no org active', () => {
     const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,

@@ -2,6 +2,7 @@ import { deriveState, type DeriveStateReturnType } from '@clerk/shared/deriveSta
 import { useClerkInstanceContext, useInitialStateContext } from '@clerk/shared/react';
 import type {
   ActClaim,
+  AgentActClaim,
   InitialState,
   JwtPayload,
   OrganizationCustomPermissionKey,
@@ -17,6 +18,7 @@ type AuthStateValue = {
   sessionStatus: SessionStatusClaim | null | undefined;
   sessionClaims: JwtPayload | null | undefined;
   actor: ActClaim | null | undefined;
+  agent: AgentActClaim | null | undefined;
   orgId: string | null | undefined;
   orgRole: OrganizationCustomRoleKey | null | undefined;
   orgSlug: string | null | undefined;
@@ -26,6 +28,7 @@ type AuthStateValue = {
 
 export const defaultDerivedInitialState = {
   actor: undefined,
+  agent: undefined,
   factorVerificationAge: null,
   orgId: undefined,
   orgPermissions: undefined,
@@ -74,6 +77,7 @@ function authStateFromFull(derivedState: DeriveStateReturnType) {
     sessionClaims: derivedState.sessionClaims,
     userId: derivedState.userId,
     actor: derivedState.actor,
+    agent: derivedState.agent,
     orgId: derivedState.orgId,
     orgRole: derivedState.orgRole,
     orgSlug: derivedState.orgSlug,

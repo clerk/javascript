@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createCheckAuthorization, splitByScope } from '../authorization';
+import { createCheckAuthorization, resolveAuthState, splitByScope } from '../authorization';
 
 describe('createCheckAuthorization', () => {
   it('correctly parses features', () => {
@@ -392,5 +392,39 @@ describe('splitByScope', () => {
 
   it('throws an error if the claim element is missing a colon', () => {
     expect(() => splitByScope('reservations,dashboard')).toThrow('Invalid claim element (missing colon): reservations');
+  });
+});
+
+describe('resolveAuthState agent', () => {
+  const agent = { sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' } as const;
+  const base = {
+    userId: 'user_1',
+    sessionId: 'sess_1',
+    sessionClaims: { sid: 'sess_1' } as any,
+    agent,
+    getToken: (async () => null) as any,
+    signOut: (async () => {}) as any,
+    has: () => false,
+  };
+
+  it('exposes the agent for an active session', () => {
+    const result = resolveAuthState({ authObject: { ...base, sessionStatus: 'active' }, options: {} });
+    expect(result?.agent).toEqual(agent);
+  });
+
+  it('gives a null agent for a pending session treated as signed out', () => {
+    const result = resolveAuthState({
+      authObject: { ...base, sessionStatus: 'pending' },
+      options: { treatPendingAsSignedOut: true },
+    });
+    expect(result?.agent).toBeNull();
+  });
+
+  it('gives an undefined agent before the session is known', () => {
+    const result = resolveAuthState({
+      authObject: { ...base, userId: undefined, sessionId: undefined, agent: undefined },
+      options: {},
+    });
+    expect(result?.agent).toBeUndefined();
   });
 });
