@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { Export } from '../../icons/glyphs/export';
+import { External } from '../../icons/glyphs/external';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -44,7 +44,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Mosa
           {external ? (
             <span {...stylex.props(styles.iconSlot)}>
               <Icon
-                glyph={Export}
+                glyph={External}
                 placement='inline-end'
                 size='inherit'
               />

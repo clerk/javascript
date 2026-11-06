@@ -89,7 +89,7 @@ describe('Mosaic Icon', () => {
     'enterprise-connections',
     'envelope',
     'exclamation-circle',
-    'export',
+    'external',
     'eye',
     'eye-slash',
     'face-scan',
