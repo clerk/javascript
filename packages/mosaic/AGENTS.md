@@ -30,7 +30,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
 - Write or debug a state machine → [Controllers → Machines](docs/controllers.md#machines), then [Machine runtime](src/machine/README.md)
 - Write or change a view, a dialog or step it renders, or a feature's copy → [Views](docs/views.md)
-- Add a component, or change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
+- Add a styled component, or change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
 - Write or change a `*.styles.ts` or `*.stylex.ts` file → [StyleX](docs/stylex.md)
 - Add or change a transition, a hover or press color change, or reduced-motion handling → [Motion](docs/motion.md)
 - Add or change a loading skeleton → [Skeletons](docs/skeletons.md)

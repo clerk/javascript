@@ -11,7 +11,7 @@ Worked examples: `src/features/switcher/switcher.controller.tsx` wraps a model; 
 - Pass the model's `status` through (`if (model.status !== 'ready') return { status: model.status };`), so the wrapper branches on one value.
 - An absent model callback stays absent, so a capability the instance lacks never reaches the view as a dead affordance.
 - Only the controller decides what closes the surface. `onSelectOrganization` closes on success; a switch that leaves the menu useful does not; a navigation closes before it hands off.
-- Dismissing must not abandon an in-flight effect. Closing may hide the surface, but the busy action keeps running, and only one action runs at a time. A surface that shows the action's error refuses to close while it runs (`canClose` in `src/blocks/confirm/confirm.controller.ts`).
+- Dismissing must not abandon an in-flight effect. Closing may hide the surface, but the busy action keeps running, and only one action runs at a time. A surface that shows the action's error refuses to close once the action can no longer be cancelled; while a reverification challenge can still be cancelled, closing cancels it (`canClose` in `src/blocks/confirm/confirm.controller.ts`).
 - Check [Reuse before you write](../AGENTS.md#reuse-before-you-write) before holding any state by hand.
 
 ## Which one holds the state

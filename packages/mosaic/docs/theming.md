@@ -1,6 +1,6 @@
 # Theming
 
-Read this when you add a component, or change a token, a part's `.cl-<slot>` class or `data-<axis>` attributes, `MosaicProvider`, or the CSS build. It covers the styling contract consumers rely on; how to write the styles behind it is in [StyleX](stylex.md).
+Read this when you add a styled component, or change a token, a part's `.cl-<slot>` class or `data-<axis>` attributes, `MosaicProvider`, or the CSS build. It covers the styling contract consumers rely on; how to write the styles behind it is in [StyleX](stylex.md).
 
 Worked example: `src/components/button/`.
 

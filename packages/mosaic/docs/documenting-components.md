@@ -6,7 +6,7 @@ Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `p
 
 ## Rules
 
-- A page is a `<name>.stories.tsx` (named `export function` stories plus a `meta`; the code footer extracts only function declarations) and a `<name>.mdx` that embeds them through `<Preview>`, `<PropTable>`, `<Usage>` and `<Story>`.
+- A page is a `<name>.stories.tsx` (a `meta`, plus named `export function` stories where the archetype has them; the code footer extracts only function declarations) and a `<name>.mdx`. The archetype decides which stories the file exports and which of `<Preview>`, `<PropTable>`, `<Usage>` and `<Story>` the page uses.
 - Pick the archetype by the entry's layer (`meta.group`) and follow its section order exactly. Same archetype, same headings in the same order: that uniformity is the point.
 - Always set `meta.source`, as a repo-root-relative path to the file that exports the component.
 - Every props table has a **Default** column ([Document the default value](#document-the-default-value)).
