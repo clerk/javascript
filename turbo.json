@@ -4,6 +4,9 @@
     "signature": true
   },
   "ui": "tui",
+  "futureFlags": {
+    "affectedUsingTaskInputs": true
+  },
   "globalDependencies": [
     ".github/.cache-version",
     ".npmrc",
