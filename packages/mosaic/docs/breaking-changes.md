@@ -1,6 +1,6 @@
 # Breaking changes
 
-Read this when a change removes or renames a public export, prop or `.cl-` / `data-` styling hook, or changes a public type or default. It covers the changeset that ships it.
+Read this when a change removes or renames a public export, prop, `--cl-*` token or `.cl-` / `data-` styling hook, or changes a public type or default. It covers the changeset that ships it.
 
 Worked example:
 

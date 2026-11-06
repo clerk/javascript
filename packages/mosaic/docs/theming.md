@@ -1,6 +1,6 @@
 # Theming
 
-Read this when you change a token, a part's `.cl-<slot>` class or `data-<axis>` attributes, `MosaicProvider`, or the CSS build. It covers the styling contract consumers rely on; how to write the styles behind it is in [StyleX](stylex.md).
+Read this when you add a component, or change a token, a part's `.cl-<slot>` class or `data-<axis>` attributes, `MosaicProvider`, or the CSS build. It covers the styling contract consumers rely on; how to write the styles behind it is in [StyleX](stylex.md).
 
 Worked example: `src/components/button/`.
 
@@ -30,7 +30,7 @@ A theme targets those from plain CSS:
 }
 ```
 
-The `--cl-*` tokens are a second, independent lever: any of them can be overridden at `:root` or any scope to re-theme without touching a component.
+The `--cl-*` tokens are a second, independent lever: any of them can be overridden at `:root` or any scope to re-theme without touching a component. A derived token resolves where it is declared, so a scoped override of `--cl-color-brand` leaves `--cl-color-brand-alpha-*` and the tokens built on them on the `:root` value. Override a seed at `:root`, or override its derived tokens in the same scope.
 
 A theme's CSS wins without any prop because the consumer imports the sheet into a cascade layer (`@import '@clerk/mosaic/styles.css' layer(components)`), and an unlayered rule beats a layered one.
 

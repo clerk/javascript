@@ -29,7 +29,7 @@ Grep the legacy files for the primitives that carry hidden logic. Every hit is a
 | `useInView`                       | infinite-scroll or intersection triggers           |
 
 ```bash
-rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useInView' \
+rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useOrganization|\.reload\(|useInView' \
   packages/ui/src/components/<Feature>/
 ```
 

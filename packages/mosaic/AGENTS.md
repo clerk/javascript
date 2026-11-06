@@ -25,12 +25,12 @@ The docs describe the Mosaic we are building toward. Code that differs from them
 
 Read every line that matches your task. Paths below are relative to this package.
 
-- Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If `packages/ui` has a legacy version, [Migration](docs/migration.md) first
+- Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If the repo's `packages/ui` has a legacy version, [Migration](docs/migration.md) first
 - Write or change a model, or add a Clerk read, mutation or permission check → [Models](docs/models.md)
 - Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
 - Write or debug a state machine → [Controllers → Machines](docs/controllers.md#machines), then [Machine runtime](src/machine/README.md)
 - Write or change a view, a dialog or step it renders, or a feature's copy → [Views](docs/views.md)
-- Change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
+- Add a component, or change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
 - Write or change a `*.styles.ts` or `*.stylex.ts` file → [StyleX](docs/stylex.md)
 - Add or change a transition, a hover or press color change, or reduced-motion handling → [Motion](docs/motion.md)
 - Add or change a loading skeleton → [Skeletons](docs/skeletons.md)
@@ -42,7 +42,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Check that a migration kept every legacy behavior → [Parity audit](docs/parity-audit.md)
 - Add or change a component's Swingset page → [Documenting components](docs/documenting-components.md)
 - Prove a change in a browser → [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)
-- Remove or rename a public export, prop or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)
+- Remove or rename a public export, prop, `--cl-*` token or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)
 - Review a Mosaic change → [Reuse before you write](#reuse-before-you-write), [Shaping a fix](#shaping-a-fix), and the lines for what the change touches
 - Change these docs, `.claude/rules/` or the verify-mosaic skill → [Writing docs](docs/writing-docs.md)
 
@@ -125,7 +125,7 @@ A bug in a feature is often a gap in a shared helper. These rules apply to `fix`
 - **Fix the owner, don't wrap it.** When a shared helper (`src/hooks/`, `src/blocks/`, `src/components/`, `src/machine/`, or `@clerk/shared`) behaves wrongly, change the helper and its tests, then delete the workarounds. Do not spread a helper's return value to swap one method, copy a `||` that undoes one of its fields, or add a second hook beside it for one caller.
 - **A changed shared signature is a new pattern.** A new parameter, a return type that goes from `void` to a promise, or a returned field whose meaning changes all go through "When nothing fits: ask first".
 - **One source of truth for busy.** When a machine, `usePendingAction` or `useForm` already knows an action is running, derive the flag from it: `isDisabled: actions.isPending || remove.isPending`. Do not mirror it into a second lock, or turn machine state into a promise to feed one.
-- **Handle staleness through lifecycle.** A new identity remounts through a React `key`. A busy state ignores close (Controllers → Rules). Do not thread run ids or `AbortSignal`s through the model, controller and machine.
+- **Handle staleness through lifecycle.** A new identity remounts through a React `key`. A busy action keeps running when its surface closes (Controllers → Rules). Do not thread run ids or `AbortSignal`s through the model, controller and machine.
 - **Extend a contract with an options object.** Make a field required when every caller has it: `connect(strategy, { walletName, onTarget })`, not `connect(strategy, walletName?, onTarget?)`.
 - **Pass shared results through whole.** The view gets `form`, not an object that renames `form.id`, `form.isSubmitting` and `form.handleSubmit`.
 - **Keep controller state off model types.** Pending and error flags the controller sets go on a row type the controller builds, not as optional fields on the type the model returns.

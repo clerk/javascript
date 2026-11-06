@@ -11,7 +11,7 @@ Worked examples: `src/features/switcher/switcher.controller.tsx` wraps a model; 
 - Pass the model's `status` through (`if (model.status !== 'ready') return { status: model.status };`), so the wrapper branches on one value.
 - An absent model callback stays absent, so a capability the instance lacks never reaches the view as a dead affordance.
 - Only the controller decides what closes the surface. `onSelectOrganization` closes on success; a switch that leaves the menu useful does not; a navigation closes before it hands off.
-- Dismissing must not abandon an in-flight effect. A busy state ignores close, and only one action runs at a time.
+- Dismissing must not abandon an in-flight effect. Closing may hide the surface, but the busy action keeps running, and only one action runs at a time. A surface that shows the action's error refuses to close while it runs (`canClose` in `src/blocks/confirm/confirm.controller.ts`).
 - Check [Reuse before you write](../AGENTS.md#reuse-before-you-write) before holding any state by hand.
 
 ## Which one holds the state
@@ -104,7 +104,7 @@ A machine is declared in the controller's own file, and the controller is the on
 ## Composition and dialog lifetime
 
 - Prefer one controller-derived contract above the view, forwarding the model's display data through the controller when needed.
-- Mount a component once the model is ready, so its controller receives the narrowed model and takes it non-null, instead of repeating loading branches.
+- Mount a component once the model is ready, so its controller receives the narrowed model and takes it non-null, instead of repeating loading branches. A model that can drop back to `loading` during an action keeps its controller mounted and freezes the model instead ([Wrapping actions](#wrapping-actions)), since unmounting stops the actor and loses the pending state.
 - Decide which dialog state survives closing and reopening, and keep reset behavior consistent with the pending action's lifetime.
 - Route a rejected dynamic import to an error owner rather than leaving an unhandled rejection. When adding lazy loading or Suspense, consider a boundary around the dialog content that leaves the trigger and parent available.
 

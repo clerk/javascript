@@ -39,7 +39,7 @@ The shimmer is CSS only, modeled on React Spectrum's `Skeleton`, and off under r
 
 ## When to show it
 
-The component that owns the loading state shows the skeleton for as long as the data is loading. The planned gate is `useSpinDelay(loading || null, { delay: 150, minDuration: 500 }) !== null`, with the skeleton mounted but `visibility: hidden` until the delay passes, so a fast load never flashes it and nothing shifts when it appears.
+The component that owns the loading state shows the skeleton for as long as the data is loading. The planned gate is `useSpinDelay(loading || null, { delay: 150, minDuration: 500 }) !== null`, with the skeleton mounted but at `opacity: 0` until the delay passes (bones set `visibility: visible`, so `visibility: hidden` does not hide them), so a fast load never flashes it and nothing shifts when it appears.
 
 ## Testing
 

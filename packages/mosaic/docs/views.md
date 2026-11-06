@@ -94,7 +94,7 @@ The key tree follows what the user sees, so a key can be found from the screen:
 
 ### Resolving a string
 
-`MosaicProvider` takes `localization={{ locale, messages, overrides }}`: `messages` is the catalog for `locale`, `overrides` is the app's own changes on top, and English sits under both. `locale` only feeds `Intl.PluralRules`.
+`MosaicProvider` takes `localization={{ locale, messages, overrides }}`: `messages` is the catalog for `locale`, `overrides` is the app's own changes on top, and English sits under both. `locale` feeds `Intl.PluralRules` and `Intl.NumberFormat` in the string helpers, and `useLocale()` exposes it to feature code that formats dates and relative times (`user-profile-active-devices-section.model.ts`).
 
 Resolve strings with the helpers in `src/localization/messages.ts`, never with `.replace` or `.split`:
 
