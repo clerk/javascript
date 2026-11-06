@@ -35,4 +35,20 @@ describe('useProfilePagesController', () => {
     expect(result.current.pages.activePage).toBe('general');
     expect(result.current.segment).toBeUndefined();
   });
+
+  it("canonicalises the root page's own segment to the base", () => {
+    const { result } = renderHook(
+      () => ({
+        pages: useProfilePagesController(['general', 'members'], { routing: 'virtual', path: '/organization' }),
+        segment: useVirtualSegment('/organization'),
+      }),
+      {
+        wrapper: ({ children }) => (
+          <VirtualStoreProvider initial={{ '/organization': ['general'] }}>{children}</VirtualStoreProvider>
+        ),
+      },
+    );
+    expect(result.current.pages.activePage).toBe('general');
+    expect(result.current.segment).toEqual([]);
+  });
 });

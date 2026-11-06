@@ -5,11 +5,10 @@ import { pageSegment } from './profile-pages.layout';
 const NO_PAGE = '';
 
 export function useProfilePagesController(pageIds: readonly string[], options: MosaicLocationOptions) {
-  const rootPage = pageIds[0] ?? NO_PAGE;
-  const { route, go } = useRouterScope(
-    Object.fromEntries(pageIds.map(id => [id, id === rootPage ? '' : pageSegment(id)])),
-    { ...options, notFound: rootPage },
-  );
+  const { route, go } = useRouterScope(Object.fromEntries(pageIds.map(id => [id, pageSegment(id)])), {
+    ...options,
+    root: pageIds[0] ?? NO_PAGE,
+  });
 
   return { activePage: route, onPageChange: go };
 }

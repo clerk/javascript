@@ -532,7 +532,7 @@ describe('a modal surface that routes', () => {
     const pages = { account: 'account', security: 'security' } as const;
 
     function RoutingContent({ path }: ModalContentProps<StubOptions>) {
-      const { route } = useRouterScope(pages, { routing: 'virtual', path, notFound: 'account' });
+      const { route } = useRouterScope(pages, { routing: 'virtual', path, root: 'account' });
       return <output data-testid='route'>{route}</output>;
     }
 
@@ -601,7 +601,7 @@ describe('a modal surface that routes', () => {
 
       act(() => ref.handle?.open());
       await flush();
-      expect(entry()).toEqual(['account']);
+      expect(entry()).toEqual([]);
       act(() => ref.handle?.close());
       await flush();
       act(() => ref.handle?.open({ page: 'security' }));

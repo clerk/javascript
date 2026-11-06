@@ -55,7 +55,7 @@ describe.each(modes)('$name location', mode => {
     afterEach(() => configure({ reactStrictMode: false }));
 
     function Owner({ path = '/user', seen }: { path?: string; seen?: string[] }) {
-      const { route, go } = useRouterScope(routes, { routing: mode.routing, path, notFound: 'index' });
+      const { route, go } = useRouterScope(routes, { routing: mode.routing, path, root: 'index' });
       seen?.push(route);
       return (
         <>
@@ -66,7 +66,7 @@ describe.each(modes)('$name location', mode => {
     }
 
     function OtherOwner({ path = '/user' }: { path?: string }) {
-      const { route, go } = useRouterScope(otherRoutes, { routing: mode.routing, path, notFound: 'general' });
+      const { route, go } = useRouterScope(otherRoutes, { routing: mode.routing, path, root: 'general' });
       return (
         <>
           <output data-testid={`other${path}`}>{route}</output>
@@ -296,7 +296,7 @@ describe.each(modes)('$name location', mode => {
       expect(entry()).toEqual(['security']);
     });
 
-    it('settles and warns when two owners of one base redirect each other', () => {
+    it('lets two owners of one base agree on the base, so neither can loop the other', () => {
       const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
       render(
         <Page initial={{ '/user': ['nowhere'] }}>
@@ -307,11 +307,11 @@ describe.each(modes)('$name location', mode => {
       );
       expect(route()).toBe('index');
       expect(other()).toBe('general');
-      expect([[], ['general']]).toContainEqual(entry());
-      expect(warn).toHaveBeenCalledTimes(1);
+      expect(entry()).toEqual([]);
 
       click('Go to security /user');
-      expect([['security'], ['general']]).toContainEqual(entry());
+      expect(entry()).toEqual([]);
+      expect(warn).not.toHaveBeenCalled();
       warn.mockRestore();
     });
 
