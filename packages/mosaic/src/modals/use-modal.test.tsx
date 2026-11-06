@@ -464,7 +464,7 @@ describe('useModal', () => {
 
 describe('a modal surface that routes', () => {
   function Entry() {
-    return <output data-testid='entry'>{JSON.stringify(useVirtualSegment('/modal/stub'))}</output>;
+    return <output data-testid='entry'>{JSON.stringify(useVirtualSegment('/modal/stub') ?? null)}</output>;
   }
 
   function routedSurface() {
@@ -521,7 +521,7 @@ describe('a modal surface that routes', () => {
 
     act(() => ref.handle?.close());
     await flush();
-    expect(entry()).toEqual([]);
+    expect(entry()).toBeNull();
 
     act(() => ref.handle?.open());
     await flush();
@@ -576,7 +576,7 @@ describe('a modal surface that routes', () => {
 
       act(() => ref.handle?.close());
       await flush();
-      expect(entry()).toEqual([]);
+      expect(entry()).toBeNull();
       expect(warn).not.toHaveBeenCalled();
     });
 
@@ -591,7 +591,7 @@ describe('a modal surface that routes', () => {
       await flush();
 
       expect(screen.getByTestId('route')).toBeInTheDocument();
-      expect(entry()).toEqual([]);
+      expect(entry()).toBeNull();
       expect(warn).not.toHaveBeenCalled();
     });
 

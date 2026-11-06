@@ -19,6 +19,7 @@ function memoryLocation(initial: SegmentParts = []): MosaicLocation & { current:
     clear: () => {
       location.current = [];
     },
+    own: () => () => {},
   };
   return location;
 }

@@ -8,16 +8,16 @@ import type { ModalContentLoader } from './modal-content-loader';
 export interface ModalContentProps<Options> {
   options: Options | undefined;
   close: () => void;
-  path: string | undefined;
+  path: string;
 }
 
 export interface ModalSurfaceConfig<Options> {
   id: string;
   variant: DialogVariant;
   load: () => Promise<{ default: ComponentType<ModalContentProps<Options>> }>;
-  // If path is provided, the modal host writes it before opening and clears it on close
+  // The base of the entry that keeps the modal open, `/modal/<id>` by default
   path?: string;
-  // Optional way to derive the initial segment to be written together with path on open
+  // The parts written on open, derived from the open options; an empty entry by default.
   initialParts?: (options: Options | undefined) => SegmentParts;
 }
 
