@@ -3,8 +3,8 @@ import { createContext, useContext } from 'react';
 export type SegmentedControlDirection = 'forward' | 'backward';
 
 export interface SegmentedControlContextValue {
-  value: string;
-  select: (value: string) => void;
+  value: unknown;
+  select: (value: unknown) => void;
   disabled: boolean;
   direction: SegmentedControlDirection;
 }

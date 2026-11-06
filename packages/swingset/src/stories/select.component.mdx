@@ -200,12 +200,12 @@ const [value, setValue] = useState('member');
 
 ### Multiple
 
-`multiple` makes the value a `string[]`. Picking an option adds or removes it and keeps the list
+`multiple` makes the value an array. Picking an option adds or removes it and keeps the list
 open, and every selected row shows the check. The trigger lists the selected labels separated by
 commas; pass a function as its children to render the value yourself.
 
 ```tsx
-function renderValue(value: string[]) {
+function renderValue(value: unknown[]) {
   if (value.length === 0) {
     return 'Select languages';
   }

@@ -197,6 +197,22 @@ describe('Mosaic Radio', () => {
       expect(formEntries(container)).toEqual([['access', 'all']]);
     });
 
+    it('submits a non-string value as its JSON', () => {
+      const { container } = render(
+        <form>
+          <Radio.Group
+            name='size'
+            defaultValue={10}
+          >
+            <Radio.Item value={10} />
+            <Radio.Item value={{ id: 20 }} />
+          </Radio.Group>
+        </form>,
+      );
+      expect(formEntries(container)).toEqual([['size', '10']]);
+      expect(screen.getAllByRole('radio')[1]).toHaveAttribute('value', '{"id":20}');
+    });
+
     it('submits nothing with a form when it has no name', () => {
       const { container } = render(
         <form>

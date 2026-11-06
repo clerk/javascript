@@ -9,14 +9,14 @@ import { createContext, type CSSProperties, type RefObject, useContext } from 'r
 
 import type { TransitionProps } from '../hooks/use-transition';
 
-export interface SelectItem {
+export interface SelectItem<Value = string> {
   label: string;
-  value: string;
+  value: Value;
 }
 
 export interface SelectContextValue {
   open: boolean;
-  items: SelectItem[] | undefined;
+  items: SelectItem<unknown>[] | undefined;
   floatingContext: FloatingContext;
   refs: ExtendedRefs<ReferenceType>;
   floatingStyles: CSSProperties;
@@ -29,22 +29,22 @@ export interface SelectContextValue {
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   multiple: boolean;
   /** The selection in the order it was made; at most one value unless `multiple`. */
-  selectedValues: string[];
+  selectedValues: unknown[];
   /** Labels of values picked while uncontrolled, kept after the options unmount; `null` when controlled. */
-  cachedLabels: ReadonlyMap<string, string> | null;
+  cachedLabels: ReadonlyMap<unknown, string> | null;
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
   labelsRef: React.MutableRefObject<Array<string | null>>;
   popupRef: RefObject<HTMLDivElement | null>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   /** Where focus goes when the listbox closes, or `null` to leave focus alone. */
   returnFocusRef: React.MutableRefObject<HTMLElement | null>;
-  valueToLabelRef: React.MutableRefObject<Map<string, string>>;
+  valueToLabelRef: React.MutableRefObject<Map<unknown, string>>;
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;
   /** The pointer type of the last press on the trigger, or `'keyboard'`; read when the popup opens. */
   openMethodRef: React.MutableRefObject<string | null>;
   /** Whether the popup is currently overlaying the selected option on the trigger. */
   alignItemWithTrigger: boolean;
-  handleSelect: (value: string, index: number) => void;
+  handleSelect: (value: unknown, index: number) => void;
   mounted: boolean;
   transitionProps: TransitionProps;
 }
@@ -61,7 +61,7 @@ export function useSelectContext() {
 
 export interface SelectHighlightContextValue {
   activeIndex: number | null;
-  selectedValues: string[];
+  selectedValues: unknown[];
 }
 export const SelectHighlightContext = createContext<SelectHighlightContextValue | null>(null);
 
@@ -75,9 +75,9 @@ export function useSelectHighlightContext() {
 
 export interface SelectOptionsContextValue {
   getItemProps: UseInteractionsReturn['getItemProps'];
-  handleSelect: (value: string, index: number) => void;
+  handleSelect: (value: unknown, index: number) => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
-  valueToLabelRef: React.MutableRefObject<Map<string, string>>;
+  valueToLabelRef: React.MutableRefObject<Map<unknown, string>>;
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;
 }
 
