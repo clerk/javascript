@@ -127,7 +127,6 @@ export const styles = stylex.create({
 
 export const trigger = stylex.create({
   base: {
-    placeItems: 'center',
     backgroundColor: 'transparent',
     color: {
       default: colorVars['--cl-color-input-placeholder'],
@@ -136,32 +135,21 @@ export const trigger = stylex.create({
         [stylex.when.ancestor(':hover', inputGroupScope)]: colorVars['--cl-color-foreground'],
       },
     },
-    display: 'inline-grid',
   },
-  icon: {
-    gridColumn: '1',
-    gridRow: '1',
-    transitionDuration: {
-      default: durationVars['--cl-duration-base'],
-      '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
-    },
-    transitionProperty: 'opacity, transform',
-    transitionTimingFunction: easingVars['--cl-ease-enter'],
+  clear: {
+    marginInlineEnd: `calc(-1 * ${space['2']})`,
+    width: space['5.5'],
   },
   chevron: {
-    opacity: {
-      default: 1,
-      [stylex.when.ancestor('[data-clearing]', comboboxTriggerScope)]: 0,
-    },
     transform: {
       default: null,
       [stylex.when.ancestor('[data-open]', comboboxTriggerScope)]: 'rotate(180deg)',
     },
-  },
-  clear: {
-    opacity: {
-      default: 0,
-      [stylex.when.ancestor('[data-clearing]', comboboxTriggerScope)]: 1,
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
     },
+    transitionProperty: 'transform',
+    transitionTimingFunction: easingVars['--cl-ease-enter'],
   },
 });

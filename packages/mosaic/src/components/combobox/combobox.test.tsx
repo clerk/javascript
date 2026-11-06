@@ -356,23 +356,68 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByText('No matches')).toHaveClass('cl-combobox-empty');
   });
 
-  it('clears the input and selection from a clearable trigger', async () => {
-    const user = userEvent.setup();
-    const onValueChange = vi.fn();
-    render(
+  function ClearableCombobox(props?: { onValueChange?: (value: string | null) => void }) {
+    return (
       <Combobox.Root
         defaultValue='apple'
         defaultInputValue='Apple'
-        onValueChange={onValueChange}
+        onValueChange={props?.onValueChange}
       >
         <InputGroup.Root>
           <Combobox.Input aria-label='Fruit' />
           <InputGroup.End>
-            <Combobox.Trigger
-              clearable
-              aria-label='Toggle fruit options'
-            />
+            <Combobox.Clear />
+            <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
+        </InputGroup.Root>
+        <Combobox.Popup>
+          <Combobox.Option
+            value='apple'
+            label='Apple'
+          >
+            Apple
+          </Combobox.Option>
+        </Combobox.Popup>
+      </Combobox.Root>
+    );
+  }
+
+  it('clears the input and selection from the Clear button and keeps focus on the input', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<ClearableCombobox onValueChange={onValueChange} />);
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+
+    expect(onValueChange).toHaveBeenCalledWith(null);
+    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveValue('');
+    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
+  });
+
+  it('renders Clear only while there is an input value or a selection', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <InputGroup.Root>
+          <Combobox.Input aria-label='Fruit' />
+          <InputGroup.End>
+            <Combobox.Clear />
+          </InputGroup.End>
+        </InputGroup.Root>
+      </Combobox.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+    await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
+  });
+
+  it('opens the list when the padding of its input group is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <InputGroup.Root data-testid='fruit-group'>
+          <Combobox.Input aria-label='Fruit' />
         </InputGroup.Root>
         <Combobox.Popup>
           <Combobox.Option
@@ -385,19 +430,23 @@ describe('Mosaic Combobox', () => {
       </Combobox.Root>,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Clear' }));
+    await user.click(screen.getByTestId('fruit-group'));
 
-    expect(onValueChange).toHaveBeenCalledWith(null);
-    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveValue('');
+    expect(await screen.findByRole('listbox')).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
-    expect(screen.getByRole('button', { name: 'Toggle fruit options' })).toBeInTheDocument();
   });
 
-  it('keeps toggling the list when the trigger is not clearable', async () => {
+  it('keeps the trigger toggling the list with its own name while there is text', async () => {
     const user = userEvent.setup();
-    render(<FloatingCombobox />);
+    render(<ClearableCombobox />);
 
-    await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'ap');
-    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+    const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 });

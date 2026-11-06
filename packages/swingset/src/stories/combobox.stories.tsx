@@ -30,10 +30,8 @@ export function Default() {
         <InputGroup.Root>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
-            <Combobox.Trigger
-              clearable
-              aria-label='Toggle fruit options'
-            />
+            <Combobox.Clear aria-label='Clear fruit' />
+            <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
         </InputGroup.Root>
       </Field.Root>
@@ -69,10 +67,8 @@ export function Scrolling() {
         <InputGroup.Root>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
-            <Combobox.Trigger
-              clearable
-              aria-label='Toggle fruit options'
-            />
+            <Combobox.Clear aria-label='Clear fruit' />
+            <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
         </InputGroup.Root>
       </Field.Root>

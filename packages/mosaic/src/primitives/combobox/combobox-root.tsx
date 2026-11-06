@@ -9,6 +9,7 @@ import {
   offset,
   type Placement,
   size,
+  useClick,
   useDismiss,
   useFloating,
   useFloatingNodeId,
@@ -206,7 +207,8 @@ function ComboboxInner(props: ComboboxProps) {
     scrollItemIntoView: true,
   });
 
-  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav]);
+  const click = useClick(floatingContext, { enabled: Boolean(props.openOnInputClick) && !props.inline, toggle: false });
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav, click]);
   const referenceProps = getReferenceProps();
   const popupId = typeof referenceProps['aria-controls'] === 'string' ? referenceProps['aria-controls'] : undefined;
 
@@ -257,12 +259,9 @@ function ComboboxInner(props: ComboboxProps) {
     focusInput();
   }, [focusInput, setInputValue, setSelectedValue]);
 
-  const hasValue = inputValue !== '' || selectedValue !== null;
-
   const contextValue = useMemo<ComboboxContextValue>(
     () => ({
       open,
-      hasValue,
       clear,
       inputValue,
       filterQuery,
@@ -285,7 +284,6 @@ function ComboboxInner(props: ComboboxProps) {
       handleSelect,
       handleInputChange,
       setOpen,
-      openOnInputClick: Boolean(props.openOnInputClick) && !props.inline,
       focusInput,
       popupId,
       mounted,
@@ -293,7 +291,6 @@ function ComboboxInner(props: ComboboxProps) {
     }),
     [
       open,
-      hasValue,
       clear,
       inputValue,
       filterQuery,
@@ -309,8 +306,6 @@ function ComboboxInner(props: ComboboxProps) {
       handleSelect,
       handleInputChange,
       setOpen,
-      props.openOnInputClick,
-      props.inline,
       focusInput,
       popupId,
       mounted,

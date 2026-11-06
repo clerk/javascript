@@ -15,8 +15,6 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
     activeIndex,
     refs,
     getReferenceProps,
-    openOnInputClick,
-    setOpen,
     handleInputChange,
     handleSelect,
     labelsRef,
@@ -31,11 +29,6 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
       'aria-autocomplete': 'list' as const,
       onChange(event: React.ChangeEvent<HTMLInputElement>) {
         handleInputChange(event.target.value);
-      },
-      onClick() {
-        if (openOnInputClick) {
-          setOpen(true);
-        }
       },
       onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
         if (event.key === 'Enter' && activeIndex != null) {

@@ -22,12 +22,8 @@ import { styles, trigger } from './combobox.styles';
 
 export type ComboboxRootProps = ComboboxProps;
 export type ComboboxSize = 'sm' | 'md' | 'lg';
-export interface ComboboxTriggerProps extends MosaicComponentProps<'button'> {
-  /** Swaps the chevron for a clear button while the input has text or a selection. */
-  clearable?: boolean;
-  /** Accessible name while the trigger clears. Defaults to `Clear`. */
-  clearLabel?: string;
-}
+export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
+export type ComboboxClearProps = MosaicComponentProps<'button'>;
 export const ComboboxCollection = HeadlessCombobox.Collection;
 
 const ComboboxAnchorContext = React.createContext<{
@@ -38,6 +34,23 @@ const ComboboxAnchorContext = React.createContext<{
 export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
   const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
+  React.useEffect(() => {
+    if (!anchor || !openOnInputClick || props.inline) {
+      return;
+    }
+    const openFromPadding = (event: MouseEvent) => {
+      if (event.defaultPrevented || !(event.target instanceof Element)) {
+        return;
+      }
+      const interactive = event.target.closest('input, button, a[href], select, textarea');
+      if (interactive && anchor.contains(interactive)) {
+        return;
+      }
+      anchor.querySelector('input')?.click();
+    };
+    anchor.addEventListener('click', openFromPadding);
+    return () => anchor.removeEventListener('click', openFromPadding);
+  }, [anchor, openOnInputClick, props.inline]);
   return (
     <ComboboxAnchorContext.Provider value={context}>
       <HeadlessCombobox.Root
@@ -50,50 +63,61 @@ export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props
 }
 
 export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(function MosaicComboboxTrigger(
-  { xstyle, clearable, render, children, ...rest },
+  { xstyle, render, children, ...rest },
   ref,
 ) {
-  const defaultRender: ComboboxTriggerProps['render'] =
-    render ??
-    (children === undefined
-      ? props => (
+  return (
+    <HeadlessCombobox.Trigger
+      ref={ref}
+      render={
+        render ??
+        (props => (
           <Button
             xstyle={[trigger.base, comboboxTriggerScope]}
             {...props}
           />
-        )
-      : undefined);
-
-  return (
-    <HeadlessCombobox.Trigger
-      ref={ref}
-      clearable={clearable}
-      render={defaultRender}
+        ))
+      }
       {...mergeStyleProps(themeProps('combobox-trigger'), stylex.props(xstyle), rest)}
     >
-      {children ?? <ComboboxTriggerIcons clearable={clearable} />}
+      {children ?? (
+        <Icon
+          glyph={ChevronDown}
+          size='md'
+          xstyle={trigger.chevron}
+        />
+      )}
     </HeadlessCombobox.Trigger>
   );
 });
 
-function ComboboxTriggerIcons({ clearable }: { clearable?: boolean }) {
+export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearProps>(function MosaicComboboxClear(
+  { xstyle, render, children, ...rest },
+  ref,
+) {
   return (
-    <>
-      <Icon
-        glyph={ChevronDown}
-        size='md'
-        xstyle={[trigger.icon, trigger.chevron]}
-      />
-      {clearable ? (
+    <HeadlessCombobox.Clear
+      ref={ref}
+      render={
+        render ??
+        (props => (
+          <Button
+            xstyle={[trigger.base, trigger.clear]}
+            {...props}
+          />
+        ))
+      }
+      {...mergeStyleProps(themeProps('combobox-clear'), stylex.props(xstyle), rest)}
+    >
+      {children ?? (
         <Icon
           glyph={X}
           size='md'
-          xstyle={[trigger.icon, trigger.clear]}
         />
-      ) : null}
-    </>
+      )}
+    </HeadlessCombobox.Clear>
   );
-}
+});
 
 export interface ComboboxInputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
   size?: ComboboxSize;
@@ -249,6 +273,7 @@ export const Combobox = {
   Collection: ComboboxCollection,
   Input: ComboboxInput,
   Trigger: ComboboxTrigger,
+  Clear: ComboboxClear,
   Popup: ComboboxPopup,
   List: ComboboxList,
   Option: ComboboxOption,

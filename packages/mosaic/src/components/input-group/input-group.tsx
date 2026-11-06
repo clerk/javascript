@@ -71,7 +71,6 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
           return;
         }
         inputElementRef.current?.focus();
-        inputElementRef.current?.click();
       },
     },
   });

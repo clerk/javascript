@@ -49,7 +49,8 @@ so closing resets the search, not the selection.
 | --------------------- | --------------------------------------------------------------------------- |
 | `Combobox.Root`       | Owns input, selection, open state, and keyboard navigation.                 |
 | `Combobox.Input`      | Search input; renders Mosaic `Input` unless composed through another input. |
-| `Combobox.Trigger`    | Opens the list; `clearable` swaps the chevron for a clear X.                |
+| `Combobox.Trigger`    | Opens and closes the option list while keeping focus on the input.          |
+| `Combobox.Clear`      | Empties the input and selection; shown only while there is a value.         |
 | `Combobox.Popup`      | Portals, positions, surfaces, and scrolls a floating option list.           |
 | `Combobox.List`       | Scrollable inline listbox.                                                  |
 | `Combobox.Collection` | Filters items and renders each option, with an optional empty state.        |
