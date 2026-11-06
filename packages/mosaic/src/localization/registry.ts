@@ -2,7 +2,6 @@ import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
 import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
-import { demoMessages } from '../features/demo/demo.messages';
 import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
 import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
@@ -42,7 +41,6 @@ import { errorMessages } from './errors.messages';
 import { roleMessages } from './roles.messages';
 
 export const mosaicMessages = {
-  demo: demoMessages,
   userButton: userButtonMessages,
   organizationSwitcher: organizationSwitcherMessages,
   userProfile: {

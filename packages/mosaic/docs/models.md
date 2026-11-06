@@ -184,24 +184,27 @@ Keep query keys compatible with the cached data type. Use separate keys for raw
 API data and Clerk resources, and invalidate related queries after a write.
 The controller still uses
 `useForm` or `usePendingAction` for the interaction. Return a promise that covers
-the write and required cache work. See `src/features/demo/demo.model.ts` for an
-example. The `/demo` route is a test fixture, not a deployed endpoint.
+the write and required cache work.
 
-Keep request construction in plain functions beside the query hook, as in
-`src/queries/demo.requests.ts`. These functions receive the request capability
-and own the endpoint, parameters, response types, and required response checks.
-The hook owns query keys, identity checks, request state, and invalidation.
-For example, its query function calls `getDemoInstance(mFetch, { signal })`.
+Keep request construction in plain functions beside the query hook. These
+functions receive the request capability and own the endpoint, parameters,
+response types, and required response checks. The hook owns query keys,
+identity checks, request state, and invalidation.
 Use `mFetch` for the value returned by `useMosaicFetch`. Its type is
 `MosaicFetch`, and it calls `runtime.fetch`. Unlike global `fetch`, it accepts
-Clerk request options, returns parsed data, and throws Clerk errors. A write
-uses `updateDemoInstance(mFetch, params)`.
+Clerk request options, returns parsed data, and throws Clerk errors.
 This keeps the endpoint code usable without React or a resource class.
 
-The demo uses the existing sign-out query cleanup. As with the other Mosaic
-query hooks, cleanup runs while the hook is mounted; inactive entries otherwise
-remain until query garbage collection. Identity is part of the cache key, and
-late writes must not populate a new session's cache.
+Use a separate hook for each query or mutation operation. Return the TanStack
+result directly so callers retain its state and methods. Compose these hooks
+in the model when a screen needs both reads and writes. Each mutation hook
+owns invalidation and can run without mounting the query hook. Its
+`mutateAsync` promise resolves after the write and required cache work finish.
+Query state and mutation state remain separate. The controller still owns the
+form's pending state through the promise returned by the model.
+
+Include identity in cache keys. Late writes must not populate a new session or
+organization's cache.
 
 ## Testing
 

@@ -23,7 +23,6 @@ import type {
 import { http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
 
-import { demoHandlers, type FakeDemoInstance } from './fake-fapi/demo';
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
 import { organizationMemberHandlers } from './fake-fapi/organization-members';
@@ -65,7 +64,6 @@ export const publishableKey = () => `pk_live_${btoa(`${fapiHost}$`)}`;
 export const fapiUrl = (path: string) => `https://${fapiHost}${path}`;
 
 export interface FakeFapiState {
-  demo: FakeDemoInstance;
   environment: FapiEnvironment;
   client: ClientJSON;
   country?: string;
@@ -312,7 +310,6 @@ export function verifyEmailOutOfBand(state: FakeFapiState, id: string): void {
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   const { verification, enterpriseLinking, passkeys, ...rest } = seed;
   const state: FakeFapiState = {
-    demo: { id: 'ins_demo', name: 'Demo', environment: 'development' },
     environment: fapiEnvironment(),
     client: fapiClient(),
     memberships: [],
@@ -342,7 +339,6 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   let identifications = 0;
 
   worker.use(
-    ...demoHandlers(state, fapiUrl),
     ...organizationMemberHandlers(state, fapiUrl),
     ...verificationHandlers(state, fapiUrl),
     ...enterpriseHandlers(state, fapiUrl),

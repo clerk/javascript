@@ -2,8 +2,6 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   generic: 'Something went wrong. Please try again.',
   mosaic_request_unavailable: 'Update Clerk to use this feature.',
   mosaic_request_context_changed: 'Your session or organization changed. Please try again.',
-  mosaic_demo_session_changed: 'Your session changed. Please try again.',
-  mosaic_demo_unavailable: 'The instance data is not available. Please try again.',
   already_a_member_in_organization: 'Some of these email addresses already belong to members of this organization.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
   active_device_unavailable: 'This device is no longer available. Please try again.',
