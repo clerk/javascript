@@ -74,7 +74,7 @@ export const styles = stylex.create({
     minWidth: 0,
   },
   tagInvalid: {
-    backgroundColor: colorVars['--cl-color-negative-alpha-100'],
+    backgroundColor: colorVars['--cl-color-negative-subtle'],
     color: colorVars['--cl-color-negative'],
   },
   tagLabel: {
@@ -120,7 +120,7 @@ export const styles = stylex.create({
     paddingInline: space['1'],
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-foreground'],
-    cursor: { default: null, ':disabled': 'not-allowed' },
+    cursor: { default: null, ':disabled': 'not-allowed', ':read-only': 'not-allowed' },
     flexBasis: '8ch',
     flexGrow: 1,
     fontFamily: 'inherit',

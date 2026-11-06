@@ -55,6 +55,20 @@ describe('Passkey interactions across resource changes', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('aria-disabled', 'true');
   });
 
+  it('keeps focus on the name field while saving', async () => {
+    accounts();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    const { user, input } = await openRename();
+    await user.type(input, ' edited');
+    const held = holdRequests('post', '/v1/me/passkeys/pk_a');
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    expect(input).toHaveFocus();
+    held.release();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.getByText('Alice laptop edited')).toBeVisible());
+  });
+
   it('drops a held rename failure after switching users', async () => {
     accounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);

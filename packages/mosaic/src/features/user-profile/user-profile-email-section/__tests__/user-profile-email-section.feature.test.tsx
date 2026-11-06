@@ -1,15 +1,18 @@
 import type { EmailAddressJSON, EnterpriseAccountConnectionJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
   demandReverificationOnce,
   type FakeFapiSeed,
+  fapiUrl,
   holdRequests,
   serveFapi,
   VERIFICATION_CODE,
   verifyEmailOutOfBand,
+  worker,
 } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -81,6 +84,21 @@ describe('the user profile email section', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(emailsListed()).toEqual(['new@example.com']);
     expect(emailRow()).not.toHaveTextContent('Unverified');
+  });
+
+  it('says something went wrong when sending the code fails without details', async () => {
+    const { actor } = await renderSection(signedInWithEmails([]));
+    worker.use(
+      http.post(fapiUrl('/v1/me/email_addresses/:id/prepare_verification'), () =>
+        HttpResponse.json({ errors: [] }, { status: 500 }),
+      ),
+    );
+
+    await actor.click(screen.getByRole('button', { name: 'Add email' }));
+    await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
+    await actor.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
   });
 
   it('holds the code field until the code has been sent', async () => {

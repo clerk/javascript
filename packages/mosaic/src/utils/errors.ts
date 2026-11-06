@@ -114,11 +114,19 @@ export function toLocalizableError(cause: unknown): ErrorDescription {
   return { cause };
 }
 
+export function toLocalizableErrors(cause: unknown): ErrorDescription[] {
+  const errors =
+    cause instanceof SaveError
+      ? [cause.formError.global, ...Object.values(cause.formError.fields ?? {})].filter(error => error !== undefined)
+      : toClerkErrors(cause);
+  return errors?.length ? errors : [toLocalizableError(cause)];
+}
+
 /** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */
 export function toFormError(cause: unknown): FormError {
   if (cause instanceof SaveError) {
     const { global, fields } = cause.formError;
-    return { global, fields };
+    return global || fields ? { global, fields } : { global: UNEXPECTED_ERROR };
   }
   console.error('[Clerk] Could not localize error', cause);
   return { global: UNEXPECTED_ERROR };

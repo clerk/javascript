@@ -2,15 +2,99 @@ import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';
 
 import { useForm } from '../../../components/form';
+import type { SelectItem } from '../../../components/select';
 import { useToastManager } from '../../../components/toast';
 import { plural, useLocale, useMessages } from '../../../localization';
-import type { InviteMembersInput } from './invitations-table-tab.model';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
+import type { InviteMembersInput } from './organization-profile-invite-members.model';
+import { canSendInvitations, emailAddressesToInvite } from './organization-profile-invite-members.utils';
 
 interface InviteMembersValues {
   emailAddresses: string[];
+  emailDraft: string;
   role: string | null;
+}
+
+const EMPTY_INVITE: InviteMembersValues = { emailAddresses: [], emailDraft: '', role: null };
+
+export interface InviteMembersForm {
+  formId: string;
+  emailAddresses: string[];
+  onEmailAddressesChange: (emailAddresses: string[]) => void;
+  emailDraft: string;
+  onEmailDraftChange: (emailDraft: string) => void;
+  rejectedEmailAddresses: string[];
+  roles: SelectItem[];
+  role: string | null;
+  onRoleChange: (role: string | null) => void;
+  isRoleDisabled: boolean;
+  canSubmit: boolean;
+  isPending: boolean;
+  error: string | undefined;
+  onSubmit: (event: { preventDefault: () => void }) => void;
+}
+
+export interface InviteMembersFormOptions {
+  roles: MembersRoles | null;
+  defaultRole: string | null;
+  errorFallback: string;
+  send: ((input: InviteMembersInput) => Promise<void>) | undefined;
+  onSent: (emailAddresses: string[]) => void;
+}
+
+export function useInviteMembersForm({ roles, defaultRole, errorFallback, send, onSent }: InviteMembersFormOptions) {
+  const roleNames = useMessages('roles');
+  const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
+  const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
+
+  const form = useForm<InviteMembersValues, string[] | null>({
+    initialValues: EMPTY_INVITE,
+    errorFallback,
+    canSubmit: values => canSendInvitations({ ...values, role: values.role ?? initialRole, rejectedEmailAddresses }),
+    onSubmit: async ({ role, ...draft }) => {
+      const selected = role ?? initialRole;
+      if (!send || !roles || selected === null) {
+        return null;
+      }
+      const emailAddresses = emailAddressesToInvite(draft);
+      await send({ emailAddresses, role: selected, roles, onRejected: setRejectedEmailAddresses });
+      return emailAddresses;
+    },
+    onSuccess: invited => {
+      if (invited) {
+        onSent(invited);
+      }
+    },
+  });
+
+  const invite: InviteMembersForm = {
+    formId: form.id,
+    emailAddresses: form.values.emailAddresses,
+    onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
+    emailDraft: form.values.emailDraft,
+    onEmailDraftChange: emailDraft => form.setValue('emailDraft', emailDraft),
+    rejectedEmailAddresses,
+    roles: (roles?.roles ?? []).map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
+    role: form.values.role ?? initialRole,
+    onRoleChange: role => form.setValue('role', role),
+    isRoleDisabled: !roles || roles.hasRoleSetMigration,
+    canSubmit: form.canSubmit || form.isSubmitting,
+    isPending: form.isSubmitting,
+    error: form.error,
+    onSubmit: form.handleSubmit,
+  };
+
+  return {
+    invite,
+    get isSubmitting() {
+      return form.isSubmitting;
+    },
+    reset: () => {
+      form.reset();
+      setRejectedEmailAddresses([]);
+    },
+  };
 }
 
 export interface InviteMembersControllerOptions {
@@ -21,30 +105,18 @@ export interface InviteMembersControllerOptions {
 
 export function useInviteMembersController({ roles, defaultRole, invite }: InviteMembersControllerOptions) {
   const m = useMessages('organizationProfile').members.invite;
-  const roleNames = useMessages('roles');
   const locale = useLocale();
   const toast = useToastManager();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
-  const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
-  const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
-
-  const form = useForm<InviteMembersValues, boolean>({
-    initialValues: { emailAddresses: [], role: initialRole },
+  const inviteForm = useInviteMembersForm({
+    roles,
+    defaultRole,
     errorFallback: m.error,
-    onSubmit: async ({ emailAddresses, role }) => {
-      if (!invite || !roles || role === null) {
-        return false;
-      }
-      await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
-      return true;
-    },
-    onSuccess: (invited, { emailAddresses }) => {
-      if (!invited) {
-        return;
-      }
+    send: invite,
+    onSent: invited => {
       setOpen(false);
-      toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
+      toast.add({ type: 'success', label: plural(m.sent, invited.length, locale) });
     },
   });
 
@@ -53,11 +125,10 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
   }
 
   const onOpenChange = (next: boolean) => {
-    if (form.isSubmitting) {
+    if (inviteForm.isSubmitting) {
       return;
     }
-    form.reset({ emailAddresses: [], role: initialRole });
-    setRejectedEmailAddresses([]);
+    inviteForm.reset();
     setOpen(next);
   };
 
@@ -74,16 +145,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     open,
     onOpenChange,
     finalFocus: trigger,
-    emailAddresses: form.values.emailAddresses,
-    onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
-    rejectedEmailAddresses,
-    roles: roles.roles.map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
-    role: form.values.role,
-    onRoleChange: role => form.setValue('role', role),
-    isRoleDisabled: roles.hasRoleSetMigration,
-    isPending: form.isSubmitting,
-    error: form.error ?? null,
-    onSubmit: form.submit,
+    invite: inviteForm.invite,
   };
 
   return { onInvite, isInviteDisabled: false, inviteDialog };

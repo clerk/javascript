@@ -1,8 +1,8 @@
 # Migrating a component into Mosaic
 
 Migrating a legacy component means taking logic that was fused into one file and
-pulling it apart into the model / controller / view layers (see the skill
-overview and `packages/mosaic/ARCHITECTURE.md` → "Flow and data architecture").
+pulling it apart into the model / controller / view layers (see
+`packages/mosaic/ARCHITECTURE.md` → "Flow and data architecture").
 `packages/mosaic/src/features/reverification/` is a compact worked example of the
 finished shape: model, controller, view, types, messages, wrapper, and a feature test.
 

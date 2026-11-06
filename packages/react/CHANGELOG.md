@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.18.6
+
+### Patch Changes
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+
+## 6.18.5
+
+### Patch Changes
+
+- In `@clerk/expo` apps on iOS and Android, when Clerk fails to load and later finishes loading, `<ClerkProvider>` now reports Clerk as loaded and runs the calls made while it was loading. Previously `isLoaded` stayed `false` until the app restarted. ([#10461](https://github.com/clerk/javascript/pull/10461)) by [@seanperez29](https://github.com/seanperez29)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
 ## 6.18.4
 
 ### Patch Changes

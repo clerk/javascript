@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
+import { dragFilesOver, dropFiles } from '../../../__tests__/feature/drag';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -153,6 +154,21 @@ describe('OrganizationProfileGeneralPanel', () => {
       await waitFor(() => expect(screen.getByText('Acme Inc')).toBeVisible());
     });
 
+    it('keeps focus on the name field while saving', async () => {
+      await renderPanel();
+      const user = userEvent.setup();
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit name' }));
+      const input = within(dialog).getByRole('textbox', { name: 'Name' });
+      await user.type(input, ' Inc');
+      const update = holdRequests('post', '/v1/organizations/:organizationId');
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(update.requests).toHaveLength(1));
+      expect(input).toHaveFocus();
+      update.release();
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.getByText('Acme Inc')).toBeVisible());
+    });
+
     it('drops an open edit when the organization changes', async () => {
       const other = fapiOrganization({ id: 'org_2', name: 'Other' });
       const { clerk } = await renderPanel(signedIn({ organizations: [acme, other] }));
@@ -256,6 +272,21 @@ describe('OrganizationProfileGeneralPanel', () => {
       expect(fapi.memberships[0]?.organization.name).toBe('Acme');
     });
 
+    it('keeps focus on the slug field while saving', async () => {
+      await renderPanel();
+      const user = userEvent.setup();
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit slug' }));
+      const input = within(dialog).getByRole('textbox', { name: 'Slug' });
+      await user.type(input, '-inc');
+      const update = holdRequests('post', '/v1/organizations/:organizationId');
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(update.requests).toHaveLength(1));
+      expect(input).toHaveFocus();
+      update.release();
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.getByText('acme-inc')).toBeVisible());
+    });
+
     it('keeps the slug field accessible with hidden label and explanatory copy', async () => {
       await renderPanel();
       const user = userEvent.setup();
@@ -351,6 +382,33 @@ describe('OrganizationProfileGeneralPanel', () => {
       remove.release();
       await waitFor(() => expect(fapi.memberships[0]?.organization.has_image).toBe(false));
       expect(await screen.findByRole('button', { name: 'Upload' })).toBeVisible();
+    });
+
+    it('marks the row while a file is dragged over it and uploads the file dropped on it', async () => {
+      const { fapi } = await renderPanel();
+      const row = await screen.findByText('Logo');
+      const file = new File(['image'], 'logo.png', { type: 'image/png' });
+
+      dragFilesOver(row, file);
+      expect(row.closest('[data-dragging]')).not.toBeNull();
+
+      dropFiles(row, file);
+      expect(row.closest('[data-dragging]')).toBeNull();
+      await waitFor(() => expect(fapi.memberships[0]?.organization.has_image).toBe(true));
+    });
+
+    it('ignores a file dragged over the logo without manage permission', async () => {
+      await renderPanel(signedIn({ permissions: [] }));
+      const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
+      const row = await screen.findByText('Logo');
+      const file = new File(['image'], 'logo.png', { type: 'image/png' });
+
+      dragFilesOver(row, file);
+      expect(row.closest('[data-dragging]')).toBeNull();
+
+      dropFiles(row, file);
+      expect(upload.requests).toHaveLength(0);
+      upload.release();
     });
 
     it('localizes an oversized image rejection without sending a request', async () => {

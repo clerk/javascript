@@ -36,11 +36,13 @@ const livePages = new Set([
   '/organization-profile/organization-profile-danger-section',
   '/user-profile/user-profile-passkeys-section',
   '/user-profile/user-profile-web3wallets-section',
+  '/misc/invite-members-button',
   '/misc/api-keys-table',
   '/misc/reverification',
   '/misc/create-organization',
   '/misc/organization-list',
   '/misc/waitlist',
+  '/misc/task-setup-mfa',
   '/user-button/user-button',
 ]);
 

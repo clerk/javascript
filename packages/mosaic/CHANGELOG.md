@@ -1,5 +1,63 @@
 # @clerk/mosaic
 
+## 0.2.2
+
+### Patch Changes
+
+- Drop an image onto the profile picture row in `UserProfile` or the logo row in `OrganizationProfile` to upload it. While a file is dragged over the row, the avatar darkens and shows an upload icon. `FileUpload.Dropzone` now ignores drags that carry no files, such as selected text or links. ([#10601](https://github.com/clerk/javascript/pull/10601)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The logo picker in `CreateOrganization` now matches `UserProfile` and `OrganizationProfile`: once a logo is chosen, the Upload button is replaced by a menu to change or remove it, and an image can be dropped onto the row. Clicking the Logo label opens the file picker, and a rejected file's error now shows below the row instead of replacing the description. In all three, dragging a file of an unsupported type over the avatar shows a blocked icon instead of the upload arrow. In `OrganizationProfile`, the logo menu no longer shows icons, and its Remove item now uses the destructive color, as in `UserProfile`. ([#10604](https://github.com/clerk/javascript/pull/10604)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Controls such as inputs, selects, checkboxes, radios and outline buttons keep the stronger `--cl-color-border`, while containers and dividers (cards, sections, tables, menus, the profile nav) use `--cl-color-border-subtle`. The two are now 12 and 8 percent washes in both modes, which makes light-mode controls firmer and leaves containers close to where they were. The profile opened in a dialog draws a border. Outline buttons fill with the surface color, and their hover and pressed states tint that fill. Banners, badges, toasts and the tag-input error use the `-subtle` tokens, and the neutral badge and banner use `--cl-color-neutral-subtle`. ([#10496](https://github.com/clerk/javascript/pull/10496)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+- Fix keyboard navigation in tabs and accordions. The tab stop now lands on the selected tab even when it isn't the first, and arrow keys pressed in a field inside an accordion panel stay with that field. `ActionBar.Root` now calls `onFocus` and `onBlur` handlers passed by consumers. ([#10573](https://github.com/clerk/javascript/pull/10573)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Confirm dialogs now stay busy until their action finishes, even after you cancel a reverification prompt, and they can't be reopened or confirmed a second time while the request is in flight. ([#10628](https://github.com/clerk/javascript/pull/10628)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Keep keyboard focus on the input while saving an organization name or slug, renaming a passkey, verifying an authenticator code, or sending organization invitations. Focus previously dropped to the page. ([#10618](https://github.com/clerk/javascript/pull/10618)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- - Fixed an issue where an outgoing Flow step could show content from an update that never appeared on screen. ([#10651](https://github.com/clerk/javascript/pull/10651)) by [@dstaley](https://github.com/dstaley)
+
+  - Fixed an issue where adding a tag while a controlled TagInput update was still pending could use the pending tag list instead of the list shown on screen.
+
+- Move the OAuth consent redirect domain helper into `@clerk/shared` so it can be shared across UI packages. No behavior change. ([#10218](https://github.com/clerk/javascript/pull/10218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Form submit buttons now show their pending state and keep focus while the form submits, instead of looking disabled. ([#10627](https://github.com/clerk/javascript/pull/10627)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `IconFrame` and `Avatar` now share one size scale and set of corner radii: `xs`, `sm`, `md` and `lg` are 24, 32, 40 and 48px. `IconFrame` sizes are now `xs`, `sm`, `md` and `lg` and the default is `md` (40px), replacing `sm`, `md`, `lg` and `xl`. `Avatar` `md` is 40px instead of 38px, square `Avatar` at `md` has a 6px radius instead of 8px, and provider icons in the connected accounts, enterprise accounts and Web3 wallets sections are 16px instead of 20px. ([#10600](https://github.com/clerk/javascript/pull/10600)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+- Keep the phone entry screen pending until the first verification code is sent in `UserProfile`. Disable Cancel while verifying or resending a phone verification code. ([#10561](https://github.com/clerk/javascript/pull/10561)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+
+## 0.2.1
+
+### Patch Changes
+
+- Tighten component motion. Input hover and focus now appear instantly and fade on the way out, toasts leave faster than they arrive, hover and press feedback on `Checkbox`, `Radio`, the `Drawer` handle, the switcher trigger and the tag remove button responds instantly, and the `Table` expand icon respects `prefers-reduced-motion`. ([#10578](https://github.com/clerk/javascript/pull/10578)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Preserve verification code delivery errors and resend cooldowns when navigating to other methods or help and back in UserProfile. ([#10564](https://github.com/clerk/javascript/pull/10564)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Show the generic error message in the `UserProfile` add email and add phone dialogs when sending a verification fails with a Clerk response that carries no error details. Previously these dialogs showed no message. ([#10563](https://github.com/clerk/javascript/pull/10563)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `Card.Media`, a slot for a logo, icon or image at the top of `Card.Header`, with 24px of space below it. Style it with `.cl-card-media`. `Card.Header` also takes an `align` prop, `start` by default, so `align='center'` centers its content. ([#10590](https://github.com/clerk/javascript/pull/10590)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Align the corners of `Select`, `Combobox`, `Menu` and `PhoneInput` options and `ActionBar` buttons with their surrounding surface. These radii now follow `--cl-radius-lg` and `--cl-spacing` rather than `--cl-radius-md`, so an override of `--cl-radius-md` no longer changes them. ([#10579](https://github.com/clerk/javascript/pull/10579)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Center the pending spinner on an `OrganizationList` row in a trailing column that mirrors the row's avatar, instead of pressing it against the row's edge. ([#10607](https://github.com/clerk/javascript/pull/10607)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- When users are asked to confirm their identity again, they can now use a passkey set up as their second step, as long as their browser supports passkeys. ([#10570](https://github.com/clerk/javascript/pull/10570)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Add `<UserAvatar />`, which shows the signed-in user's profile image. It takes `shape`, `size` and `fallback`, renders nothing when nobody is signed in, and can be styled through `.cl-user-avatar`. ([#10500](https://github.com/clerk/javascript/pull/10500)) by [@kylemac](https://github.com/kylemac)
+
+- Fix the `OrganizationList` loading skeleton. Avatar placeholders now match the size of the loaded avatars instead of shrinking to the width of the initials, and the personal account row is shown unless `hidePersonal` is set. ([#10608](https://github.com/clerk/javascript/pull/10608)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Preserve all errors during UserProfile reverification. Show errors for the active password or code beside that field, and unrelated errors in a banner without marking the field invalid. ([#10558](https://github.com/clerk/javascript/pull/10558)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
 ## 0.2.0
 
 ### Minor Changes

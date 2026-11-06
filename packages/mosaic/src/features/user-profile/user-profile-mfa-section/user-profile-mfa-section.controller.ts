@@ -1,12 +1,13 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useEffect } from 'react';
 
+import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
+import { downloadBackupCodes, printBackupCodes } from '../../../utils/backup-codes';
 import { toLocalizableError } from '../../../utils/errors';
-import { CODE_RESEND_SECONDS } from '../../../utils/verification';
+import { CODE_RESEND_SECONDS, resendUnlockTime } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type {
   SmsEnrollmentResult,
@@ -46,7 +47,7 @@ interface MfaContext {
   pending?: MfaAction;
   pendingMethods: readonly UserProfileMfaAddableMethod[];
   dismissed: boolean;
-  resendSeconds: number;
+  resendAvailableAt?: number;
   run: () => Promise<MfaFlow>;
   resolve: () => void;
   reject: (error: unknown) => void;
@@ -63,7 +64,6 @@ type MfaEvent =
   | { type: 'EDIT_PHONE_NUMBER'; value: string }
   | { type: 'EDIT_CODE'; value: string }
   | { type: 'PRINT_FAILED' }
-  | { type: 'TICK' }
   | {
       type: 'RUN';
       key: MfaAction;
@@ -79,7 +79,6 @@ const PENDING_METHODS: Partial<Record<MfaAction, NonNullable<UserProfileMfaSetup
   prepareAuthenticator: 'authenticator',
   generate: 'backup-codes',
 };
-const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 
 const mfaMachine = createMachine({
   id: 'userProfileMfa',
@@ -87,7 +86,6 @@ const mfaMachine = createMachine({
   context: {
     flow: { kind: 'closed' },
     dismissed: false,
-    resendSeconds: 0,
     pendingMethods: [],
     run: () => Promise.resolve({ kind: 'closed' }),
     resolve: () => undefined,
@@ -98,9 +96,8 @@ const mfaMachine = createMachine({
       on: {
         OPEN: { actions: assign(() => ({ flow: { kind: 'select' } })) },
         CLOSE: {
-          actions: assign(() => ({ flow: { kind: 'closed' }, savedSetup: undefined, resendSeconds: 0 })),
+          actions: assign(() => ({ flow: { kind: 'closed' }, savedSetup: undefined, resendAvailableAt: undefined })),
         },
-        TICK: tick,
         SELECT_SMS: {
           actions: assign((_, event) => ({
             flow: {
@@ -208,11 +205,10 @@ const mfaMachine = createMachine({
           actions: assign(() => ({
             flow: { kind: 'closed' },
             savedSetup: undefined,
-            resendSeconds: 0,
+            resendAvailableAt: undefined,
             dismissed: true,
           })),
         },
-        TICK: tick,
       },
       invoke: fromPromise(context => context.run(), {
         onDone: {
@@ -233,11 +229,11 @@ const mfaMachine = createMachine({
                       : context.savedSetup,
                 pending: undefined,
                 dismissed: false,
-                resendSeconds:
+                resendAvailableAt:
                   context.pending === 'resend' ||
                   (context.pending === 'sms' && event.output.kind === 'sms' && event.output.step === 'verify')
-                    ? CODE_RESEND_SECONDS
-                    : context.resendSeconds,
+                    ? resendUnlockTime(CODE_RESEND_SECONDS)
+                    : context.resendAvailableAt,
               };
             }),
           ],
@@ -378,38 +374,19 @@ function createBackupCodeActions(
     if (flow.kind !== 'backup' || !flow.codes.length) {
       return;
     }
-    const content = [fill(m.fileIntro, fileValues), m.fileInstructions, '', ...flow.codes].join('\n');
-    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = fill(m.fileName, fileValues);
-    anchor.click();
-    URL.revokeObjectURL(url);
+    downloadBackupCodes({
+      codes: flow.codes,
+      fileName: fill(m.fileName, fileValues),
+      intro: fill(m.fileIntro, fileValues),
+      instructions: m.fileInstructions,
+    });
   };
 
   const print = () => {
     if (flow.kind !== 'backup' || !flow.codes.length) {
       return;
     }
-    const titleText = fill(m.printTitle, fileValues);
-    const printable = window.open('', '_blank', 'width=640,height=720');
-    if (!printable) {
-      send({ type: 'PRINT_FAILED' });
-      return;
-    }
-    try {
-      printable.document.title = titleText;
-      const title = printable.document.createElement('h1');
-      title.textContent = titleText;
-      const codes = printable.document.createElement('pre');
-      codes.textContent = flow.codes.join('\n');
-      printable.document.body.append(title, codes);
-      printable.addEventListener('afterprint', () => printable.close(), { once: true });
-      printable.setTimeout(() => printable.close(), 60_000);
-      printable.focus();
-      printable.print();
-    } catch {
-      printable.close();
+    if (!printBackupCodes({ codes: flow.codes, title: fill(m.printTitle, fileValues) })) {
       send({ type: 'PRINT_FAILED' });
     }
   };
@@ -438,6 +415,7 @@ function createSetupProps(
   errorText: ReturnType<typeof useErrorText>,
   reverification: ReverificationController,
   reverifying: boolean,
+  resendSeconds: number,
 ): UserProfileMfaSetupViewProps {
   const flow = context.flow;
   const errorMessage = flow.error ? errorText(flow.error) : undefined;
@@ -478,7 +456,7 @@ function createSetupProps(
       onResend: actions.resendSms,
       isPending: context.pending === 'sms',
       isResending: context.pending === 'resend',
-      resendSeconds: context.resendSeconds,
+      resendSeconds,
       errorMessage,
     },
     authenticator: authenticator
@@ -516,7 +494,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
       send({ type: 'RUN', key, methods: model.addableMethods, run: action, resolve, reject });
     });
   };
-  const { resendSeconds } = context;
+  const resendSeconds = useResendSeconds(context.resendAvailableAt, CODE_RESEND_SECONDS);
   const flow = context.flow;
   // The machine guarantees that only one is running/visible at a time
   const reverification =
@@ -526,13 +504,6 @@ export function useUserProfileMfaController(model: ReadyModel) {
   const hasPendingReverification = context.pending !== undefined && REVERIFIABLE_ACTIONS.includes(context.pending);
   const reverifying = hasPendingReverification && reverification.visible;
   const dialogOpen = flow.kind !== 'closed' || reverifying;
-  useEffect(() => {
-    if (!dialogOpen || resendSeconds === 0) {
-      return;
-    }
-    const timer = setTimeout(() => send({ type: 'TICK' }), 1000);
-    return () => clearTimeout(timer);
-  }, [dialogOpen, resendSeconds, send]);
   const { prepareAuthenticator, verifyAuthenticator } = createAuthenticatorActions(model, flow, run);
   const { submitSms, resendSms } = createSmsActions(model, flow, resendSeconds, run);
   const { generateBackupCodes, copy, download, print } = createBackupCodeActions(
@@ -582,6 +553,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
     errorText,
     reverification,
     reverifying,
+    resendSeconds,
   );
 
   const sectionProps: UserProfileMfaSectionViewProps = {

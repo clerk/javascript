@@ -48,7 +48,6 @@ export function ReverificationPasskey({
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={isPending}
             onClick={onCancel}
           >
@@ -58,7 +57,6 @@ export function ReverificationPasskey({
         <SubmitButton
           ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()])}
           type='button'
-          fullWidth
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
           onClick={onSubmit}

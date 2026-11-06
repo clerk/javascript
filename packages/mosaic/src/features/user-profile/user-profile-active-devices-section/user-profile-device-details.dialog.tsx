@@ -136,7 +136,6 @@ function DeviceDetails({
         {onSignOut && !device.isCurrent ? (
           <SubmitButton
             type='button'
-            fullWidth
             isPending={isSigningOut}
             onClick={onSignOut}
           >
@@ -147,7 +146,6 @@ function DeviceDetails({
             render={
               <Button
                 color='neutral'
-                fullWidth
                 variant='outline'
               />
             }

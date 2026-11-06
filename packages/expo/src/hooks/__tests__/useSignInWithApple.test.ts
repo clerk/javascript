@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIError, ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -269,6 +269,50 @@ describe('useSignInWithApple', () => {
       const { result } = renderHook(() => useSignInWithApple());
 
       await expect(result.current.startAppleAuthenticationFlow()).rejects.toThrow('Sign-ups restricted');
+    });
+
+    test('should throw the first factor error when the fallback sign-in needs email verification', async () => {
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: 'mock-identity-token',
+        fullName: null,
+      });
+
+      mockSignUp.create.mockRejectedValue(
+        new ClerkAPIResponseError('Sign-ups restricted', {
+          data: [{ code: 'sign_up_mode_restricted', message: 'Sign-ups restricted' }],
+          status: 403,
+        }),
+      );
+
+      const mockSignInNeedsVerification = {
+        ...mockSignIn,
+        createdSessionId: null,
+        firstFactorVerification: {
+          status: 'unverified',
+          error: new ClerkAPIError({
+            code: 'external_account_email_address_verification_required',
+            message: 'Email address verification required',
+            long_message:
+              'Your associated email address is required to be verified, because it was initially created as unverified.',
+          }),
+        },
+      };
+      mocks.useSignIn.mockReturnValue({
+        signIn: mockSignInNeedsVerification,
+        setActive: mockSetActive,
+        isLoaded: true,
+      });
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      const error = await result.current.startAppleAuthenticationFlow().catch((e: unknown) => e);
+      expect(isClerkAPIResponseError(error)).toBe(true);
+      expect((error as ClerkAPIResponseError).errors[0].code).toBe(
+        'external_account_email_address_verification_required',
+      );
+      expect((error as ClerkAPIResponseError).message).toBe(
+        'Your associated email address is required to be verified, because it was initially created as unverified.',
+      );
     });
 
     test('should rethrow sign-up errors that are not sign-up restrictions', async () => {

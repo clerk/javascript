@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { type CSSProperties } from 'react';
 
 import { usePanelSize } from '../hooks/use-panel-size';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useCollapsibleContext } from './collapsible-context';
 
 export type CollapsiblePanelProps = ComponentProps<'div'>;
@@ -17,17 +17,19 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
 
     const state = { open };
 
-    const defaultProps: Record<string, unknown> = {
+    const style: CSSProperties & Record<`--${string}`, string | undefined> = {
+      '--collapsible-panel-height': height != null ? `${height}px` : undefined,
+      '--collapsible-panel-width': width != null ? `${width}px` : undefined,
+      ...transitionProps.style,
+    };
+
+    const defaultProps = {
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
       ...transitionProps,
-      style: {
-        '--collapsible-panel-height': height != null ? `${height}px` : undefined,
-        '--collapsible-panel-width': width != null ? `${width}px` : undefined,
-        ...transitionProps.style,
-      },
-    };
+      style,
+    } satisfies DefaultProps<'div'>;
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not

@@ -3,7 +3,7 @@
 import React, { type ReactNode, useId, useMemo } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { CollapsibleContext, type CollapsibleContextValue } from './collapsible-context';
 
 export interface CollapsibleProps extends ComponentProps<'div'> {
@@ -34,9 +34,9 @@ export const CollapsibleRoot = React.forwardRef<HTMLDivElement, CollapsibleProps
 
   const state = { open, disabled };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     children,
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <CollapsibleContext.Provider value={contextValue}>

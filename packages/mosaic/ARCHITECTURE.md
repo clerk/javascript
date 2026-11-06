@@ -25,7 +25,7 @@ export const colorVars = stylex.defineVars({
 
 Each exported `*Vars` const in that file is one group (`colorVars`, `radiusVars`, …); the file is the list. `space` is also declared with `defineVars`, but its keys are not `--cl-*` names, so its steps compile to hashed custom properties that are internal, not part of the contract.
 
-There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-surface-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-surface` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp. The exception is the borders: `--cl-color-border` (controls) and `--cl-color-border-subtle` (containers and dividers) are neutral washes, 7 and 4 percent in light mode and 12 and 8 percent in dark mode, so they keep the same step over the surface and the faded surface alike. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
+There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-surface-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-surface` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp. The exception is the borders: `--cl-color-border` (controls) and `--cl-color-border-subtle` (containers and dividers) are neutral washes, 12 and 8 percent in both modes, so they keep the same step over the surface and the faded surface alike. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
 
 The seeds are `--cl-color-page`, `--cl-color-neutral`, `--cl-color-brand`, `--cl-color-negative`, `--cl-color-positive` and `--cl-color-warning`. Brand and the three statuses share one shape: the seed, `-foreground` (white in light mode; in dark mode the surface color for brand, positive and warning, where the fills are light, and white for negative), `-subtle` (the 8 percent wash, 12 in dark mode) and `-border` (the 12 percent wash), so both work over the page, the surface or a faded fill and `-alpha-100|200|300` washes. Neutral has the same slots under its own names: `--cl-color-surface-subtle`, `--cl-color-neutral-subtle` (the same wash as the accent `-subtle`, for chips such as the neutral badge) and `--cl-color-border`. Only the seeds and the `-foreground` pairs are set by hand, so retinting a seed retints its companions.
 
@@ -59,10 +59,15 @@ A theme styles a part from CSS, against that class and its attributes:
 }
 ```
 
-A part exposes no `className` or `style` prop. Inside `@clerk/mosaic`, code that renders a part and needs to nudge it passes StyleX atoms through `xstyle`, declared in its own `stylex.create` and composed last so they win:
+A part exposes no `className` or `style` prop. Inside `@clerk/mosaic`, code that renders a part and needs to nudge it passes StyleX atoms through `xstyle`, declared in its own `*.styles.ts` file and composed last so they win:
+
+```ts
+// reverification.styles.ts
+export const styles = stylex.create({ helpText: { textAlign: 'center' } });
+```
 
 ```tsx
-const styles = stylex.create({ helpText: { textAlign: 'center' } });
+import { styles } from './reverification.styles';
 
 <Text
   size='xs'
@@ -187,20 +192,20 @@ and neither can its tests. `src/machine/ADOPTION.md` holds the criteria.
 A flow slice lives under `src/features/<feature>/` and is split by role, one file per layer, prefixed with the feature name. Use `.ts` unless the file renders JSX:
 
 ```text
-user-button.model.ts(x)      // Clerk adapter — the only file that imports Clerk
-user-button.controller.ts(x) // local state (React state or a machine) + action wrapping
-user-button.view.tsx         // rendering only
-user-button.tsx              // composition wrapper and the public props type
+switcher.model.ts(x)         // Clerk adapter — the only file that imports Clerk
+switcher.controller.ts(x)    // local state (React state or a machine) + action wrapping
+switcher.view.tsx            // rendering only
+switcher.tsx                 // composition wrapper and the public props type
 ```
 
 Supporting files carry the parts that would otherwise bloat those four:
 
 ```text
-user-button.types.ts         // the data contract the model and view both agree on
-user-button.messages.ts      // every string the surface renders, as one `as const` object
-user-button.layout.ts        // pure derivation (which affordance goes in which slot)
-user-button.utils.ts         // pure helpers
-user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring rules)
+<feature>.types.ts           // the data contract the model and view both agree on
+<feature>.messages.ts        // every string the surface renders, as one `as const` object
+<feature>.layout.ts          // pure derivation (which affordance goes in which slot)
+<feature>.utils.ts           // pure helpers
+<feature>.styles.ts          // `stylex.create` atoms (see the StyleX authoring rules)
 <name>.dialog.tsx            // a dialog the view opens, when it would crowd the view file
 ```
 
@@ -270,10 +275,10 @@ Two shapes, chosen by whether the slice fetches its own data.
 wrapper resolves the model, hands it to the controller, and branches on `status`:
 
 ```tsx
-export function UserButton(props: UserButtonProps = {}) {
+export function Switcher(props: SwitcherProps = {}) {
   const { showTriggerLabel, mode, fallback, ...options } = props;
-  const model = useUserButtonModel(options);
-  const controller = useUserButtonController(model, { mode });
+  const model = useSwitcherModel(options);
+  const controller = useSwitcherController(model, { mode });
 
   if (controller.status === 'loading') {
     return <>{fallback}</>;
@@ -285,7 +290,7 @@ export function UserButton(props: UserButtonProps = {}) {
 
   const { status: _status, ...viewController } = controller;
   return (
-    <UserButtonView
+    <SwitcherView
       {...viewController}
       showTriggerLabel={showTriggerLabel}
     />
@@ -313,12 +318,12 @@ branches on one value rather than on a scatter of `isLoaded` flags. Every callba
 it exposes is a plain function over plain ids — never a Clerk resource:
 
 ```tsx
-export type UserButtonModel =
+export type SwitcherModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (UserButtonData & UserButtonCallbacks & { status: 'ready'; organizationsEnabled: boolean });
+  | (SwitcherData & SwitcherCallbacks & { status: 'ready'; organizationsEnabled: boolean });
 
-export function useUserButtonModel(options?: UserButtonModelOptions): UserButtonModel {
+export function useSwitcherModel(options?: SwitcherModelOptions): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const clerk = useClerk();
@@ -353,19 +358,19 @@ local state, wraps the model's actions to drive pending state, keeps the surface
 stable while an action runs, and closes the surface on the actions that should
 close it.
 
-How it holds that state is a complexity call. `UserButton` earns a machine — an
+How it holds that state is a complexity call. `Switcher` earns a machine — an
 action is async, `open` and `pendingKey` constrain each other, and dismissing
 must not abandon an in-flight invoke — so the machine is declared in the same
 file with `setup<Context, Event>()`, and its context carries the injected effect.
 Abridged from `features/switcher/switcher.controller.tsx`:
 
 ```tsx
-const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, UserButtonMachineEvent>();
+const { createMachine, assign, fromPromise } = setup<SwitcherMachineContext, SwitcherMachineEvent>();
 
 const settled = { pendingKey: null, frozenModel: null };
 
-const userButtonMachine = createMachine({
-  id: 'userButton',
+const switcherMachine = createMachine({
+  id: 'switcher',
   initial: 'idle',
   context: { open: false, pendingKey: null, frozenModel: null, run: () => Promise.resolve(), closeOnSuccess: false },
   states: {
@@ -400,14 +405,20 @@ const userButtonMachine = createMachine({
           },
           { target: 'idle', actions: assign(() => settled) },
         ],
-        onError: { target: 'idle', actions: assign(() => settled) },
+        onError: {
+          target: 'idle',
+          actions: [
+            assign(() => settled),
+            (_, event) => console.error('[Clerk] User button action failed', event.error),
+          ],
+        },
       }),
     },
   },
 });
 
-export function useUserButtonController(model: UserButtonModel, options = {}): UserButtonController {
-  const [{ context }, send] = useMachine(userButtonMachine);
+export function useSwitcherController(model: SwitcherModel, options = {}): SwitcherController {
+  const [{ context }, send] = useMachine(switcherMachine);
   const displayPendingKey = useSpinDelay(context.pendingKey, { delay: 0 });
 
   // While an action runs, render the model it started from, not the live one.
@@ -433,7 +444,7 @@ export function useUserButtonController(model: UserButtonModel, options = {}): U
     open: context.open,
     onOpenChange: next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' }),
     pendingKey: displayPendingKey,
-    onSelectOrganization: runAction(userButtonBusyKeys.selectOrganization, resolvedModel.onSelectOrganization, true),
+    onSelectOrganization: runAction(switcherBusyKeys.selectOrganization, resolvedModel.onSelectOrganization, true),
     // …
   };
 }
@@ -474,7 +485,7 @@ export function useUserProfileEditUsernameController({ username = '', required =
 ```
 
 Reaching for a machine here would produce a two-state machine with one event,
-which is a boolean spelled long. Reaching for `useState` in `UserButton` would
+which is a boolean spelled long. Reaching for `useState` in `Switcher` would
 produce the flag soup the machine exists to prevent. `src/machine/ADOPTION.md` has
 the criteria and worked before/afters for the calls in between.
 
@@ -485,7 +496,7 @@ derived — `open`, `pendingKey`, an absent callback — never on a machine snap
 so the view needs neither the machine nor Clerk:
 
 ```tsx
-export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: UserButtonProps) {
+export function SwitcherView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: SwitcherViewProps) {
   return (
     <Popover
       open={open}
@@ -495,7 +506,7 @@ export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, .
       {onSignOutAll ? (
         <Item
           onClick={onSignOutAll}
-          busy={pendingKey === userButtonBusyKeys.signOutAll()}
+          busy={pendingKey === switcherBusyKeys.signOutAll()}
         >
           {m.accounts.signOutAll}
         </Item>

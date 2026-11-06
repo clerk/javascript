@@ -65,7 +65,7 @@ error and releases the lock. It is not for:
 
 `useConfirmController` earns a machine: the confirm is async, a failure must land
 back on the confirming step with a reason, and a cancelled reverification must
-close without one. `useUserButtonController` earns one because `open` and
+close without one. `useSwitcherController` earns one because `open` and
 `pendingKey` constrain each other and dismissing must not abandon an in-flight
 invoke.
 
@@ -161,34 +161,35 @@ it. The runtime is documented next to the code:
 are the full API. Shared async test helpers are in
 `src/__tests__/async.ts`.
 
-A machine never calls Clerk. The effect it invokes arrives through context as a
-plain function, seated by `useMachine(machine, { context })`, which re-seats
-context every render so the machine always invokes the latest one. From
-`user-profile-rename-passkey.controller.ts`:
+A machine never calls Clerk. The effect it runs arrives as a plain function. An
+effect that differs per action rides on the event and is assigned to context.
+From `blocks/confirm/confirm.controller.ts`:
 
 ```ts
-saving: {
-  invoke: fromPromise(async context => context.onRename?.(context.passkeyId, context.name), {
-    onDone: { target: 'idle' },
+confirming: {
+  on: {
+    CONFIRM: { target: 'pending', actions: assign((_, event) => ({ run: event.run, error: undefined })) },
+  },
+},
+pending: {
+  invoke: fromPromise(context => context.run(), {
+    onDone: { target: 'idle', actions: assign(() => ({ error: undefined, open: false })) },
     onError: {
-      target: 'editing',
+      target: 'confirming',
       actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
     },
   }),
-}
-
-const [snapshot, send] = useMachine(userProfileRenamePasskeyMachine, {
-  context: { passkeyId: id, savedName: name, onRename },
-});
+},
 ```
 
-An effect that differs per action can ride on the event instead and be assigned
-to context, as `confirmationMachine` does with `CONFIRM`
-(`blocks/confirmation/confirmation.controller.ts`).
+An effect fixed for the controller's lifetime is seated by
+`useMachine(machine, { context })`, which re-seats context every render so the
+machine always runs the latest one (`onRedirect` in
+`features/waitlist/waitlist.controller.ts`).
 
 Context holds the `ErrorDescription`, never copy (see "Errors"). A machine whose
 surface shows no error still logs it, so a failure is never silent
-(`user-button.controller.tsx`).
+(`features/switcher/switcher.controller.tsx`).
 
 ## Responsibilities
 
@@ -313,6 +314,8 @@ every successful removal drops focus on the floor.
 - **No machine snapshot in the return value.** Return the plain props the view
   reads (`open`, `pendingKey`, `isDeleting`, `errorMessage`), never `snapshot`
   and `send`.
+- A transition shared across states in a `const` needs `target: 'name' as const`.
+  Without it the target widens to `string` and the machine rejects it.
 - Dismissing must not abandon an in-flight effect. Model `open` as context, and
   give `OPEN`/`CLOSE` no target in the busy state so they don't leave it:
 
@@ -332,7 +335,12 @@ One path, so every error a user sees goes through the `errors.*` catalog:
   dialogs), or `useForm` (forms). The first two call
   `toLocalizableError(cause)` from `utils/errors.ts`. Use one of them instead of
   catching in a feature. A controller with its own machine maps in the machine's
-  `onError` (`user-profile-rename-passkey.controller.ts`).
+  `onError` (`organization-list.controller.ts`).
+- **Machines that display all errors use `toLocalizableErrors(cause)`.** It
+  preserves each error and its parameter name. Reverification stores this array,
+  routes matching parameters to the active field and everything else to the
+  global banner, then localizes each message at render. Single-error owners keep
+  using `toLocalizableError`, including its global-first `SaveError` behavior.
 - **Forms map through `save`.** A model wraps a form's Clerk call in
   `save(run, fields, params)` from `utils/errors.ts`, which rethrows a Clerk
   error as a `SaveError` with each error routed to the field it names. The form

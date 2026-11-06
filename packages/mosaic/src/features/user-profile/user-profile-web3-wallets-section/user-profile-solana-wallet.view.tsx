@@ -79,7 +79,6 @@ export function UserProfileSolanaWalletView({
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
               disabled={pending}
             >
               {m.solanaDialog.cancel}

@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -296,6 +296,48 @@ describe('Accordion', () => {
   });
 
   describe('keyboard navigation', () => {
+    it('keeps a nested accordion separate from its parent', async () => {
+      const user = userEvent.setup();
+      render(
+        <Accordion.Root defaultValue={['outer1']}>
+          <Accordion.Item value='outer1'>
+            <Accordion.Header>
+              <Accordion.Trigger>Outer 1</Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel>
+              <Accordion.Root>
+                <Accordion.Item value='inner1'>
+                  <Accordion.Header>
+                    <Accordion.Trigger>Inner 1</Accordion.Trigger>
+                  </Accordion.Header>
+                </Accordion.Item>
+                <Accordion.Item value='inner2'>
+                  <Accordion.Header>
+                    <Accordion.Trigger>Inner 2</Accordion.Trigger>
+                  </Accordion.Header>
+                </Accordion.Item>
+              </Accordion.Root>
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value='outer2'>
+            <Accordion.Header>
+              <Accordion.Trigger>Outer 2</Accordion.Trigger>
+            </Accordion.Header>
+          </Accordion.Item>
+        </Accordion.Root>,
+      );
+
+      screen.getByRole('button', { name: 'Outer 1' }).focus();
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('button', { name: 'Outer 2' })).toHaveFocus();
+
+      screen.getByRole('button', { name: 'Inner 1' }).focus();
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('button', { name: 'Inner 2' })).toHaveFocus();
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('button', { name: 'Inner 1' })).toHaveFocus();
+    });
+
     it('moves focus down with ArrowDown', async () => {
       const user = userEvent.setup();
       renderAccordion();
@@ -473,5 +515,30 @@ describe('Accordion', () => {
     expect(refs.item.current).toBe(screen.getByTestId('accordion-item'));
     expect(refs.header.current).toBe(screen.getByRole('heading'));
     expect(refs.trigger.current).toBe(screen.getByRole('button', { name: 'Section 1' }));
+  });
+
+  it('leaves arrow keys inside a panel to the field that has focus', async () => {
+    render(
+      <Accordion.Root defaultValue={['item1']}>
+        <Accordion.Item value='item1'>
+          <Accordion.Header>
+            <Accordion.Trigger>Section 1</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel>
+            <textarea aria-label='Notes' />
+          </Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value='item2'>
+          <Accordion.Header>
+            <Accordion.Trigger>Section 2</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel>Content 2</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const notes = screen.getByRole('textbox', { name: 'Notes' });
+    await userEvent.type(notes, 'a{Enter}b');
+    expect(fireEvent.keyDown(notes, { key: 'ArrowUp' })).toBe(true);
+    expect(notes).toHaveFocus();
   });
 });

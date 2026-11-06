@@ -6,7 +6,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 
 `SKILL.md` under Launch has the setup and the commands. These facts hold for every recipe here, on both platforms.
 
-- The standard settings have every auth method and signed-in feature that these recipes use. The `settings` check of `doctor` compares the live instance with the standard file once the worktree holds an application.
+- The standard settings have every auth method and signed-in feature that these recipes use, except a minimum app version, which a spec sets with `host.useMinimumAppVersion`. The `settings` check of `doctor` compares the live instance with the standard file once the worktree holds an application.
 - Every launch gets a new `verifyStorageScope`, so no spec inherits a session from another spec. A launch with `keepStorage: true` reuses the scope of the launch before it in the same test.
 - `down` deletes this worktree's application, and with it every user and organization a run created, including users created through the sign-up form. `down --platform <p>` keeps the application while the other platform still holds a lease in this worktree. It deletes the application when the other platform holds no lease.
 
@@ -47,7 +47,7 @@ The iOS identifiers come from `Sources/ClerkKitUI/Components/Auth/ClerkAccessibi
 
 ## Feature entry contract
 
-Each feature file starts with an H1 title and one paragraph describing the user-visible behavior, then exactly four H2 sections in this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with verify`, and `Gotchas`. `Driving it with verify` starts with `Preconditions:` and names the specs that prove each sub-feature. A feature file lists only entry points that a spec drives.
+Each feature file starts with an H1 title and one paragraph describing the user-visible behavior, then these four required H2 sections in this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with verify`, and `Gotchas`. `Driving it with verify` starts with `Preconditions:` and names the specs that prove each sub-feature. A feature file lists only entry points that a spec drives. A feature with states that no spec can reach adds an optional fifth H2, `States a spec cannot reach`, before `Gotchas`, which names each state, where the app decides it, and what it takes.
 
 ## Features
 
@@ -57,8 +57,9 @@ Each feature file starts with an H1 title and one paragraph describing the user-
 - [Custom sign-up flow](./custom-flow-sign-up.md) covers an email and password sign-up built on `useSignUp`.
 - [Token cache persistence](./token-cache-persistence.md) covers restoring the same session after a relaunch.
 - [Native and JS session sync](./native-js-sync.md) covers a native sign-out and a native password sign-in reaching `useAuth`, `useUser`, and `useSession`, that sign-in surviving a relaunch, a second native sign-in in one process, a ticket sign-in reaching the native profile, and a JS sign-out clearing the hooks.
-- [Native modules](./native-modules.md) covers `useSignInWithGoogle` opening the native Google sign-in, a cancel of it on iOS, and `useBiometricCredentials` reporting what its native module found on the device.
+- [Native modules](./native-modules.md) covers `useSignInWithGoogle` opening the native Google sign-in, a cancel of it on iOS, and on Android when back closes Google's page, and `useBiometricCredentials` reporting what its native module found on the device.
+- [Update required](./update-required.md) covers the update screen for a signed-in and a signed-out user on a build below the minimum, the same session returning once the minimum is lowered, and a build at the minimum, on both platforms, and it lists the states no spec reaches.
 
-Not mapped yet: SSO through `useSSO` (no real OAuth on simulators), a Google or Apple native sign-in with a real account, passkeys, enrolling or using a biometric (no associated domains or Secure Enclave on the simulator), and session tasks in the native views.
+Not mapped yet: SSO through `useSSO` (no real OAuth on simulators), sign-in and sign-up in Account Portal through `useHostedAuth` from `@clerk/expo/hosted-auth`, which opens a browser that no spec drives and the test app has no button for (`packages/expo/src/hooks/useHostedAuth.ts`), a Google or Apple native sign-in with a real account, passkeys, enrolling or using a biometric (no associated domains or Secure Enclave on the simulator), session tasks in the native views.
 
 Organizations have no page, because a user of the test app has no way to reach organization UI. This holds for the native components only. `@clerk/expo/web` exports the clerk-js OrganizationProfile, OrganizationSwitcher, OrganizationList, and CreateOrganization for Expo web, but the test app runs native only. `@clerk/expo-native-components` exports AuthView, UserButton, and UserProfileView and no OrganizationSwitcher or OrganizationProfileView. The profile that the UserButton opens lists `Manage account`, `Security`, `Add account`, and `Sign out`, with `Switch account` once a second session exists, and no organization row, in the pinned clerk-ios and clerk-android releases, though the standard settings turn organizations on. The one organization screen that a native view shows is a session task in AuthView, choose or create an organization, which needs `force_organization_selection` on. The harness seeds users, sign-in tickets, and, through `host.seedOrganization`, organizations whose members hold one of the harness roles. It cannot seed invitations, so no spec can reach a choose-organization task that lists an invitation. Today such a state can be shown only with a local patch that is not committed, and the description of the pull request that shows it says so.

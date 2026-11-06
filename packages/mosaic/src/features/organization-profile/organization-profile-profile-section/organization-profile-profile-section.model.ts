@@ -4,6 +4,8 @@ import type { OrganizationResource } from '@clerk/shared/types';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/errors';
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
+import type { OrganizationProfileEditNameValue } from './organization-profile-edit-name.dialog';
+import type { OrganizationProfileEditSlugValue } from './organization-profile-edit-slug.dialog';
 import type { OrganizationProfileProfileSectionViewProps } from './organization-profile-profile-section.view';
 
 type OrganizationProfileProfileSectionModel =
@@ -52,10 +54,11 @@ export function useOrganizationProfileProfileSectionModel(): OrganizationProfile
     ...profile,
     onLogoChange: file => save(() => currentOrganization().setLogo({ file })),
     onRemoveLogo: organization.hasImage ? () => save(() => currentOrganization().setLogo({ file: null })) : undefined,
-    onSubmitName: name => save(() => currentOrganization().update({ name }), ['name']),
+    onSubmitName: name =>
+      save<keyof OrganizationProfileEditNameValue>(() => currentOrganization().update({ name }), ['name']),
     onSubmitSlug: !environment.organizationSettings.slug.disabled
       ? slug =>
-          save(() => {
+          save<keyof OrganizationProfileEditSlugValue>(() => {
             const current = currentOrganization();
             return current.update({ name: current.name, slug });
           }, ['slug'])

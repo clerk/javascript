@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useState } from 'react';
+import { createRef, useLayoutEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -129,6 +129,43 @@ describe('TagInput', () => {
       await user.tab();
 
       expect(tagValues()).toEqual(['a@clerk.dev']);
+    });
+
+    it('reports the text not yet added as a tag', async () => {
+      const user = userEvent.setup();
+      const onInputValueChange = vi.fn();
+      render(<Harness onInputValueChange={onInputValueChange} />);
+
+      await user.type(input(), 'a@clerk.dev,b@c');
+      expect(onInputValueChange).toHaveBeenLastCalledWith('b@c');
+
+      await user.tab();
+      expect(onInputValueChange).toHaveBeenLastCalledWith('');
+    });
+
+    it('shows the controlled input value and reports edits without applying them', async () => {
+      const user = userEvent.setup();
+      const onInputValueChange = vi.fn();
+      const { rerender } = render(
+        <Harness
+          inputValue='a@clerk'
+          onInputValueChange={onInputValueChange}
+        />,
+      );
+      expect(input()).toHaveValue('a@clerk');
+
+      await user.type(input(), '.');
+      expect(onInputValueChange).toHaveBeenLastCalledWith('a@clerk.');
+      expect(input()).toHaveValue('a@clerk');
+
+      rerender(
+        <Harness
+          inputValue=''
+          onInputValueChange={onInputValueChange}
+        />,
+      );
+      expect(input()).toHaveValue('');
+      expect(tagValues()).toEqual([]);
     });
 
     it('ignores empty text and duplicates', async () => {
@@ -310,6 +347,13 @@ describe('TagInput', () => {
       expect(input()).toHaveValue('x');
     });
 
+    it('claims the previous key on the first tag, without letting it scroll the page', async () => {
+      render(<Harness defaultValue={['a']} />);
+      tag('a').focus();
+      expect(fireEvent.keyDown(tag('a'), { key: 'ArrowLeft' })).toBe(false);
+      expect(tag('a')).toHaveFocus();
+    });
+
     it('moves between tags and back to the input with arrow keys', async () => {
       const user = userEvent.setup();
       render(<Harness defaultValue={['a', 'b']} />);
@@ -322,6 +366,33 @@ describe('TagInput', () => {
       expect(tag('a')).toHaveFocus();
 
       await user.keyboard('{ArrowLeft}');
+      expect(tag('a')).toHaveFocus();
+
+      await user.keyboard('{ArrowRight}{ArrowRight}');
+      expect(input()).toHaveFocus();
+    });
+
+    it('keeps arrow-key navigation when a tag handler stops propagation', async () => {
+      const user = userEvent.setup();
+      render(
+        <TagInput.Root defaultValue={['a', 'b']}>
+          <TagInput.List aria-label='Emails'>
+            {['a', 'b'].map(value => (
+              <TagInput.Tag
+                key={value}
+                value={value}
+                onKeyDown={event => event.stopPropagation()}
+              >
+                {value}
+              </TagInput.Tag>
+            ))}
+          </TagInput.List>
+          <TagInput.Input aria-label='Email' />
+        </TagInput.Root>,
+      );
+
+      await user.click(input());
+      await user.keyboard('{ArrowLeft}{ArrowLeft}');
       expect(tag('a')).toHaveFocus();
 
       await user.keyboard('{ArrowRight}{ArrowRight}');
@@ -401,6 +472,63 @@ describe('TagInput', () => {
     });
   });
 
+  describe('focusableWhenDisabled', () => {
+    async function pendingWithDraft() {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      const { rerender } = render(
+        <Harness
+          name='emails'
+          defaultValue={['a']}
+          onValueChange={onValueChange}
+          focusableWhenDisabled
+        />,
+      );
+      await user.type(input(), 'draft');
+      rerender(
+        <Harness
+          name='emails'
+          defaultValue={['a']}
+          onValueChange={onValueChange}
+          focusableWhenDisabled
+          disabled
+        />,
+      );
+      return { user, onValueChange };
+    }
+
+    it('keeps the focused input focused and read-only', async () => {
+      await pendingWithDraft();
+
+      expect(input()).toHaveFocus();
+      expect(input()).not.toBeDisabled();
+      expect(input()).toHaveAttribute('readonly');
+      expect(input()).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Remove a' })).toBeDisabled();
+      expect(document.querySelector('input[name="emails"]')).toBeDisabled();
+    });
+
+    it('does not add tags from typing, paste, Enter or blur', async () => {
+      const { user, onValueChange } = await pendingWithDraft();
+
+      await user.keyboard('x,');
+      fireEvent.paste(input(), { clipboardData: { getData: () => 'b,c' } });
+      await user.keyboard('{Enter}');
+      await user.tab();
+
+      expect(onValueChange).not.toHaveBeenCalled();
+      expect(tagValues()).toEqual(['a']);
+      expect(input()).toHaveValue('draft');
+    });
+
+    it('stays natively disabled without the option', () => {
+      render(<Harness disabled />);
+
+      expect(input()).toBeDisabled();
+      expect(input()).not.toHaveAttribute('readonly');
+    });
+  });
+
   describe('root', () => {
     it('focuses the input when the empty area of the root is pressed', async () => {
       const user = userEvent.setup();
@@ -447,6 +575,44 @@ describe('TagInput', () => {
       await user.type(input(), 'b{Enter}');
 
       expect(screen.getByRole('status')).toHaveTextContent('a|b');
+    });
+
+    it.each([
+      { operation: 'add', expected: ['first', 'second', 'third'] },
+      { operation: 'remove', expected: ['second'] },
+    ])('uses the new controlled tags when a child calls $operation in a layout effect', ({ operation, expected }) => {
+      const onValueChange = vi.fn();
+
+      function EditTags() {
+        const { value, add, remove } = TagInput.useTagInput();
+        useLayoutEffect(() => {
+          if (!value.includes('second')) {
+            return;
+          }
+          if (operation === 'add') {
+            add(['third']);
+          } else {
+            remove('first', 'input');
+          }
+        }, [value, add, remove]);
+        return null;
+      }
+
+      function Controlled({ value }: { value: string[] }) {
+        return (
+          <TagInput.Root
+            value={value}
+            onValueChange={onValueChange}
+          >
+            <EditTags />
+          </TagInput.Root>
+        );
+      }
+
+      const { rerender } = render(<Controlled value={['first']} />);
+      rerender(<Controlled value={['first', 'second']} />);
+
+      expect(onValueChange).toHaveBeenCalledExactlyOnceWith(expected);
     });
 
     it('does not restore an add that a controlled parent rejected', async () => {

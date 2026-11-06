@@ -13,7 +13,7 @@ The view renders plain props and calls plain callbacks. Nothing else.
   machine guard or works out for itself whether an action is allowed.
 
 ```tsx
-export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: UserButtonProps) {
+export function SwitcherView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: SwitcherViewProps) {
   return (
     <Popover
       open={open}
@@ -22,7 +22,7 @@ export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, .
       {onSignOutAll ? (
         <Item
           onClick={onSignOutAll}
-          busy={pendingKey === userButtonBusyKeys.signOutAll()}
+          busy={pendingKey === switcherBusyKeys.signOutAll()}
         >
           {m.accounts.signOutAll}
         </Item>
@@ -37,7 +37,7 @@ export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, .
 Two shapes, chosen by whether the slice fetches its own data:
 
 - A **wrapper composes** model + controller + view, and the view is a pure
-  function of props (`user-button.tsx`).
+  function of props (`switcher.tsx`).
 - A **leaf view owns its controller** and takes the effect as a prop
   (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
   with its `onSubmit`). Still no Clerk — the effect arrives from above.
@@ -87,6 +87,97 @@ skeleton shown before a feature has data. Those can stay conditionals.
 The parts, data attributes and CSS variables are in
 `src/primitives/flow/README.md`.
 
+### Who renders `Card.Root`
+
+Only the part that creates the surface renders `Card.Root`, and cards do not nest.
+
+| Layer   | Renders                                                        | Example                   |
+| ------- | -------------------------------------------------------------- | ------------------------- |
+| Surface | `Card.Root`, inside a dialog or popover when there is one      | `CreateOrganizationView`  |
+| Steps   | `Flow.Root` and its steps, no card                             | `CreateOrganizationSteps` |
+| Screen  | `Card.Header`, `Card.Banner`, `Card.Content` and `Card.Footer` | A step of the flow        |
+
+A feature's skeleton is a surface too. A feature that another feature can embed
+exports its steps, and its view is `Card.Root` around them.
+
+Chrome that stays across steps goes under the surface, outside the flow. A step's
+`Card.Footer` must be a sibling of its `Card.Content`, so a step on a surface with a
+shared footer puts its submit button in `Card.Content` (`waitlist.view.tsx`).
+
+## Forms on a card
+
+The controller owns the form with `useForm`, including what `canSubmit` allows, and
+passes `form` to the view. The view does not check values, call `preventDefault` or
+create the form's id. This applies when you add or rewrite a form. Some existing forms
+predate it.
+
+```tsx
+function EditNameStep({ form, messages, onCancel }: EditNameStepProps) {
+  const { feedback } = form.fields.name;
+
+  return (
+    <>
+      <Card.Header>
+        <Card.Title>{messages.title}</Card.Title>
+      </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {form.error}
+      </Card.Banner>
+      <Card.Content
+        render={
+          <Form
+            id={form.id}
+            onSubmit={form.handleSubmit}
+          />
+        }
+      >
+        <Field.Root
+          disabled={form.isSubmitting}
+          invalid={feedback?.type === 'error'}
+        >
+          <Field.Label>{messages.label}</Field.Label>
+          <Input {...form.register('name')} />
+          <Field.Feedback feedback={feedback} />
+        </Field.Root>
+      </Card.Content>
+      <Card.Footer>
+        <Button
+          variant='outline'
+          color='neutral'
+          fullWidth
+          disabled={form.isSubmitting}
+          onClick={onCancel}
+        >
+          {messages.cancel}
+        </Button>
+        <SubmitButton
+          form={form.id}
+          fullWidth
+          isPending={form.isSubmitting}
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
+        >
+          {messages.save}
+        </SubmitButton>
+      </Card.Footer>
+    </>
+  );
+}
+```
+
+- **Errors:** a form-level error goes in `Card.Banner`, and a field error in
+  `Field.Feedback`.
+- **Focus:** `initialFocus` on `Dialog.Popup` covers the step a dialog opens on, and
+  `useFlowAutoFocus` covers each step entered after it. A field that can be either uses
+  both.
+- **Closing while pending:** the controller's `onOpenChange` ignores the close, and the
+  view does not guard it again.
+- **No values to submit:** a step with no values does not need `useForm`
+  (`CopyKeyStep` uses `Form` only so Enter copies the key).
+
 ## Where the strings live
 
 Every string a view renders comes from the feature's `*.messages.ts`, shaped the
@@ -119,11 +210,13 @@ locale and overrides, so the copy can't be localized.
 ## Blocks
 
 A **block** is a view fragment that owns one piece of state nothing outside it can
-use, and takes the rest as props. There are two:
+use, and takes the rest as props. There are three:
 
 - `blocks/destructive` (`Destructive`) holds the half-typed confirmation phrase
   and compares it.
 - `blocks/confirmation` (`Confirmation`) is a confirm step with no typed phrase.
+- `blocks/avatar-upload` (`AvatarUpload`) is an avatar or logo picker. Its parts
+  share the file input, so the caller places them in its own layout.
 
 Both take a `controller` from `useConfirmController` (`blocks/confirm/`), which
 decides whether the dialog closes or explains itself. The hook runs in the

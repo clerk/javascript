@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Button, SubmitButton } from '../button';
+import { ButtonContext } from '../button/button.context';
 import { Dialog } from '../dialog';
 import { Flow } from '../flow';
 import { Card } from './card';
@@ -452,6 +454,54 @@ describe('Mosaic Card', () => {
     expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
   });
 
+  it('reflects the alignment on the root, starting by default', () => {
+    render(
+      <>
+        <Card.Root data-testid='default' />
+        <Card.Root
+          align='center'
+          data-testid='center'
+        />
+      </>,
+    );
+
+    expect(screen.getByTestId('default')).toHaveAttribute('data-align', 'start');
+    expect(screen.getByTestId('center')).toHaveAttribute('data-align', 'center');
+  });
+
+  it('renders media in the header, above the title', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Media data-testid='media'>Logo</Card.Media>
+          <Card.Title data-testid='title'>Review terms</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    const media = screen.getByTestId('media');
+    expect(media).toHaveClass('cl-card-media');
+    expect(media.tagName).toBe('DIV');
+    expect(media.nextElementSibling).toBe(screen.getByTestId('title'));
+  });
+
+  it('composes caller xstyle, refs and render onto the media', () => {
+    const ref = React.createRef<HTMLElement>();
+    render(
+      <Card.Media
+        ref={ref}
+        xstyle={callerStyles.header}
+        data-testid='media'
+        render={props => <figure {...props} />}
+      />,
+    );
+
+    const media = screen.getByTestId('media');
+    expect(media.tagName).toBe('FIGURE');
+    expect(ref.current).toBe(media);
+    expect(media).toHaveClass('cl-card-media', stylex.props(callerStyles.header).className ?? '');
+  });
+
   it('renders the title and description slots', () => {
     render(
       <Card.Root>
@@ -750,6 +800,55 @@ describe('Mosaic Card', () => {
     expect(screen.getByText('Content').tagName).toBe('MAIN');
     expect(screen.getByText('Footer').tagName).toBe('FOOTER');
     expect(screen.getByText('Header').closest('section')).toHaveClass('cl-card-root');
+  });
+});
+
+describe('Card.Footer buttons', () => {
+  it('makes buttons full width by default', () => {
+    render(
+      <Card.Footer>
+        <Button>Cancel</Button>
+        <SubmitButton>Save</SubmitButton>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveAttribute('data-full-width', '');
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('data-full-width', '');
+  });
+
+  it('lets a button opt out', () => {
+    render(
+      <Card.Footer>
+        <Button fullWidth={false}>Sign in</Button>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('keeps button defaults from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Card.Footer>
+          <Button>Save</Button>
+        </Card.Footer>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('leaves buttons outside the footer alone', () => {
+    render(
+      <Card.Root>
+        <Card.Content>
+          <Button>Inside content</Button>
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside content' })).not.toHaveAttribute('data-full-width');
   });
 });
 

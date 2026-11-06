@@ -25,7 +25,7 @@ export interface FlowStepProps extends Omit<MosaicComponentProps<'div'>, 'id'> {
 function FlowRoot<State>(
   { value, direction, state, render, xstyle, children, ...rest }: FlowRootProps<State>,
   ref: React.ForwardedRef<HTMLDivElement>,
-): JSX.Element {
+): React.JSX.Element {
   return (
     <HeadlessFlow.Root
       {...mergeStyleProps(themeProps('flow-root', { value }), stylex.props(reset.base, styles.root, xstyle), rest)}
@@ -43,6 +43,7 @@ type FlowRootComponent = <State>(
   props: FlowRootProps<State> & React.RefAttributes<HTMLDivElement>,
 ) => React.ReactElement;
 
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
 const Root = React.forwardRef(FlowRoot) as FlowRootComponent;
 
 const Step = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(

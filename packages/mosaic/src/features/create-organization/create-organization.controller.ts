@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 import type { UseFormResult } from '../../components/form';
 import { useForm } from '../../components/form';
-import type { SelectItem } from '../../components/select';
 import { useMessages } from '../../localization';
 import type { MembersRoles } from '../organization-profile/organization-profile-members-panel/members-table-tab.types';
-import { resolveDefaultRole } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
+import type { InviteMembersForm } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
+import { useInviteMembersForm } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
 import type { CreateOrganizationModel } from './create-organization.model';
 import type {
   CreatedOrganization,
@@ -82,11 +82,6 @@ export function useCreateOrganizationController(
   };
 }
 
-interface InviteValues {
-  emailAddresses: string[];
-  role: string | null;
-}
-
 export interface CreateOrganizationInviteControllerOptions {
   organizationId: string | null;
   roles: MembersRoles | null;
@@ -95,59 +90,19 @@ export interface CreateOrganizationInviteControllerOptions {
   onSent: () => void;
 }
 
-export interface CreateOrganizationInviteController {
-  emailAddresses: string[];
-  onEmailAddressesChange: (emailAddresses: string[]) => void;
-  rejectedEmailAddresses: string[];
-  roles: SelectItem[];
-  role: string | null;
-  onRoleChange: (role: string | null) => void;
-  isRoleDisabled: boolean;
-  isPending: boolean;
-  error: string | undefined;
-  onSubmit: () => void;
-}
-
 export function useCreateOrganizationInviteController({
   organizationId,
   roles,
   defaultRole,
   onInvite,
   onSent,
-}: CreateOrganizationInviteControllerOptions): CreateOrganizationInviteController {
+}: CreateOrganizationInviteControllerOptions): InviteMembersForm {
   const m = useMessages('createOrganization');
-  const roleNames = useMessages('roles');
-  const [rejectedEmailAddresses, setRejectedEmailAddresses] = useState<string[]>([]);
-  const initialRole = roles ? resolveDefaultRole(roles, defaultRole) : null;
-
-  const form = useForm<InviteValues, boolean>({
-    initialValues: { emailAddresses: [], role: null },
+  return useInviteMembersForm({
+    roles,
+    defaultRole,
     errorFallback: m.invite.error,
-    onSubmit: async ({ emailAddresses, role }) => {
-      const selected = role ?? initialRole;
-      if (!organizationId || selected === null) {
-        return false;
-      }
-      await onInvite(organizationId, { emailAddresses, role: selected, onRejected: setRejectedEmailAddresses });
-      return true;
-    },
-    onSuccess: sent => {
-      if (sent) {
-        onSent();
-      }
-    },
-  });
-
-  return {
-    emailAddresses: form.values.emailAddresses,
-    onEmailAddressesChange: emailAddresses => form.setValue('emailAddresses', emailAddresses),
-    rejectedEmailAddresses,
-    roles: (roles?.roles ?? []).map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })),
-    role: form.values.role ?? initialRole,
-    onRoleChange: role => form.setValue('role', role),
-    isRoleDisabled: !roles || roles.hasRoleSetMigration,
-    isPending: form.isSubmitting,
-    error: form.error,
-    onSubmit: form.submit,
-  };
+    send: organizationId ? input => onInvite(organizationId, input) : undefined,
+    onSent,
+  }).invite;
 }

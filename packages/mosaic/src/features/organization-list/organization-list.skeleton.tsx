@@ -23,30 +23,43 @@ export function OrganizationListSkeleton({
       />
       <Card.Content>
         <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-        <Item.Group
-          variant='outline'
-          aria-hidden
-        >
+        <Item.Group aria-hidden>
+          {hidePersonal ? null : (
+            <SkeletonRow
+              name={m.personal}
+              shape='circle'
+            />
+          )}
           {PLACEHOLDER_ORGANIZATIONS.map(name => (
-            <Item.Root key={name}>
-              <Item.Media>
-                <Skeleton>
-                  <RowAvatar
-                    name={name}
-                    shape='square'
-                    size='fit'
-                  />
-                </Skeleton>
-              </Item.Media>
-              <Item.Content>
-                <Item.Label>
-                  <Skeleton>{name}</Skeleton>
-                </Item.Label>
-              </Item.Content>
-            </Item.Root>
+            <SkeletonRow
+              key={name}
+              name={name}
+              shape='square'
+            />
           ))}
         </Item.Group>
       </Card.Content>
     </Card.Root>
+  );
+}
+
+function SkeletonRow({ name, shape }: { name: string; shape: 'circle' | 'square' }) {
+  return (
+    <Item.Root>
+      <Skeleton shape={shape === 'circle' ? 'pill' : 'rounded'}>
+        <Item.Media>
+          <RowAvatar
+            name={name}
+            shape={shape}
+            size='fit'
+          />
+        </Item.Media>
+      </Skeleton>
+      <Item.Content>
+        <Item.Label>
+          <Skeleton>{name}</Skeleton>
+        </Item.Label>
+      </Item.Content>
+    </Item.Root>
   );
 }

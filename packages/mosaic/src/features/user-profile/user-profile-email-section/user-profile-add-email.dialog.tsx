@@ -21,12 +21,6 @@ import { tabularNumbersStyle } from '../../../styles/typography.styles';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 
-const styles = stylex.create({
-  ssoConnection: {
-    paddingInline: 0,
-  },
-});
-
 export interface UserProfileAddEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -190,7 +184,6 @@ function EnterEmailStep(props: EnterEmailStepProps) {
       <Card.Footer>
         <SubmitButton
           form={emailFormId}
-          fullWidth
           disabled={!props.canSubmit}
           isPending={props.isPending}
           pendingLabel={m.email.pending}
@@ -275,7 +268,6 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -283,7 +275,6 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
         </Dialog.Close>
         <SubmitButton
           form={verifyFormId}
-          fullWidth
           isPending={props.isPending}
           disabled={!props.canSubmit || props.isResending}
           pendingLabel={m.verify.pending}
@@ -332,7 +323,6 @@ function VerifyLinkStep(props: VerifyLinkStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -378,7 +368,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
           logoPublicUrl }) to the email address — the connections sign-in would offer for it, oldest
           first — which is the data to render once it lands.
         */}
-        <Item.Root xstyle={styles.ssoConnection}>
+        <Item.Root>
           <Item.Content>
             <Item.Label>{domain}</Item.Label>
             <Item.Description>{m.sso.connection}</Item.Description>
@@ -406,7 +396,6 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >

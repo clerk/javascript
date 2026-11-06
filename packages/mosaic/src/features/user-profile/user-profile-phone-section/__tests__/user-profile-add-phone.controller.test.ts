@@ -76,4 +76,18 @@ describe('useUserProfileAddPhoneController', () => {
     expect(sendCode).toHaveBeenCalledTimes(2);
     expect(result.current.resendSeconds).toBe(30);
   });
+
+  it('unlocks resend by the clock when timers were held up', async () => {
+    const result = await sendFirstCode();
+
+    vi.setSystemTime(Date.now() + 60_000);
+    await act(async () => vi.advanceTimersByTimeAsync(1000));
+
+    expect(result.current.resendSeconds).toBe(0);
+    await act(async () => {
+      result.current.onResend();
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(sendCode).toHaveBeenCalledTimes(2);
+  });
 });

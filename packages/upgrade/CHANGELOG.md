@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 2.0.11
+
+### Patch Changes
+
+- Published packages no longer include compiled test files, test type declarations, or test fixtures. ([#10522](https://github.com/clerk/javascript/pull/10522)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 2.0.10
 
 ### Patch Changes

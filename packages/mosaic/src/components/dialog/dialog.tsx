@@ -16,6 +16,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
+import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';
 import {
@@ -200,6 +201,7 @@ function Root<Payload = unknown>({
 }
 
 /** Opens the dialog. Renders a `<button>`; `render` swaps in another element. */
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
 const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger(
   { xstyle, ...rest },
   ref,
@@ -475,7 +477,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Portal>{holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
+    <Primitive.Portal>
+      <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
+        {holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}
+      </ButtonContext.Provider>
+    </Primitive.Portal>
   );
 });
 

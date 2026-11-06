@@ -1,15 +1,16 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
+import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
-import { CODE_RESEND_SECONDS } from '../../../utils/verification';
+import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
@@ -33,7 +34,7 @@ interface Context {
   phoneNumber: string;
   verifier: UserProfilePhoneVerifier | undefined;
   error: FormError | undefined;
-  resendSeconds: number;
+  resendAvailableAt: number | undefined;
 }
 
 type Event =
@@ -41,8 +42,7 @@ type Event =
   | { type: 'START'; id?: string; phoneNumber: string; verifier: UserProfilePhoneVerifier }
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
-  | { type: 'RESEND' }
-  | { type: 'TICK' };
+  | { type: 'RESEND' };
 
 const { createMachine, assign, fromPromise } = setup<Context, Event>();
 
@@ -50,22 +50,21 @@ function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Phone verification is missing'));
 }
 
-const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
 const start = {
-  target: 'sending',
+  target: 'sendingFirstCode' as const,
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
     verifyingId: event.id,
     phoneNumber: event.phoneNumber,
     verifier: event.verifier,
     error: undefined,
-    resendSeconds: 0,
+    resendAvailableAt: undefined,
   })),
 };
 
 const sendCode = {
   invoke: fromPromise((context: Context) => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
-    onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
+    onDone: { target: 'verify', actions: assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) })) },
     onError: { target: 'verify', actions: fail },
   }),
 };
@@ -78,14 +77,19 @@ const machine = createMachine({
     phoneNumber: '',
     verifier: undefined,
     error: undefined,
-    resendSeconds: 0,
+    resendAvailableAt: undefined,
   },
   states: {
     idle: {
       on: {
         ADD: {
           target: 'phone',
-          actions: assign(() => ({ verifyingId: undefined, verifier: undefined, error: undefined, resendSeconds: 0 })),
+          actions: assign(() => ({
+            verifyingId: undefined,
+            verifier: undefined,
+            error: undefined,
+            resendAvailableAt: undefined,
+          })),
         },
         START: { ...start, target: 'preparing' },
       },
@@ -94,15 +98,15 @@ const machine = createMachine({
       on: { CANCEL: 'idle', START: start },
     },
     preparing: sendCode,
+    sendingFirstCode: sendCode,
     sending: sendCode,
     verify: {
       on: {
         CANCEL: 'idle',
-        TICK: tick,
         VERIFIED: 'idle',
         RESEND: {
           target: 'sending',
-          guard: context => context.resendSeconds === 0,
+          guard: context => isResendUnlocked(context.resendAvailableAt),
           actions: assign(() => ({ error: undefined })),
         },
       },
@@ -117,7 +121,8 @@ export function useUserProfileAddPhoneController({
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
-  const { resendSeconds, error } = snapshot.context;
+  const { resendAvailableAt, error } = snapshot.context;
+  const resendSeconds = useResendSeconds(resendAvailableAt, CODE_RESEND_SECONDS);
   const phoneForm = useForm({
     initialValues: { phoneNumber: '' },
     onSubmit: async ({ phoneNumber }) => {
@@ -138,18 +143,12 @@ export function useUserProfileAddPhoneController({
   });
   const state = snapshot.value;
   const open = state !== 'idle' && state !== 'preparing';
-  useEffect(() => {
-    if (!open || resendSeconds === 0) {
-      return;
-    }
-    const timer = setTimeout(() => send({ type: 'TICK' }), 1000);
-    return () => clearTimeout(timer);
-  }, [open, resendSeconds, send]);
 
   const isReverifying = phoneForm.isSubmitting && Boolean(reverification?.visible);
-  const step = isReverifying ? 'reverify' : state === 'phone' ? 'phone' : 'verify';
-  const form = state === 'phone' ? phoneForm : codeForm;
-  const formError = state === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
+  const isPhoneStep = state === 'phone' || state === 'sendingFirstCode';
+  const step = isReverifying ? 'reverify' : isPhoneStep ? 'phone' : 'verify';
+  const form = isPhoneStep ? phoneForm : codeForm;
+  const formError = isPhoneStep ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
@@ -159,10 +158,10 @@ export function useUserProfileAddPhoneController({
     open,
     step,
     reverification,
-    phoneNumber: state === 'phone' ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
+    phoneNumber: isPhoneStep ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
     code: codeForm.values.code,
     errorMessage: formError?.message ?? form.error ?? machineError,
-    isPending: form.isSubmitting,
+    isPending: form.isSubmitting || state === 'sendingFirstCode',
     onOpenChange: open => {
       if (form.isSubmitting) {
         if (open || state !== 'phone' || !reverification?.onCancel) {

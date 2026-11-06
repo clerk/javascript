@@ -74,7 +74,7 @@ export type StateAttributesMapping<S> = {
 
 type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
   | React.ComponentPropsWithRef<Tag>
-  | Record<string, unknown>;
+  | (React.ComponentPropsWithRef<Tag> & Record<`data-${string}`, string | undefined>);
 
 /**
  * Merges two props objects. Event handlers are chained (both fire),
@@ -86,8 +86,12 @@ type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
 export function mergeProps<Tag extends keyof React.JSX.IntrinsicElements>(
   a: PropsInput<Tag>,
   b: PropsInput<Tag>,
-): Record<string, unknown>;
+): DefaultProps<Tag>;
 export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
+  return mergeRecords(a, b);
+}
+
+function mergeRecords(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
   const merged: Record<string, unknown> = { ...a };
 
   for (const key of Object.keys(b)) {
@@ -131,6 +135,7 @@ function mergeStyles(aVal: unknown, bVal: unknown): unknown {
   if (!aVal) {
     return bVal;
   }
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The render boundary merges element props whose specific type is not available here.
   return { ...(aVal as object), ...(bVal as object) };
 }
 
@@ -173,10 +178,12 @@ function getReactElementRef(element: React.ReactElement): React.Ref<unknown> | u
   // SAFETY: `@types/react` types `props`/`ref` too loosely to read `ref` off an
   // arbitrary element without a cast. React guarantees `ref` is a `React.Ref` when
   // present; both shapes are checked and either branch is undefined-safe.
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The render boundary merges element props whose specific type is not available here.
   const fromProps = (element.props as { ref?: React.Ref<unknown> }).ref;
   if (fromProps != null) {
     return fromProps;
   }
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The render boundary merges element props whose specific type is not available here.
   return (element as { ref?: React.Ref<unknown> }).ref ?? undefined;
 }
 
@@ -229,6 +236,7 @@ export function useRender<
   Tag extends keyof React.JSX.IntrinsicElements,
   State extends Record<string, unknown> = Record<string, never>,
 >(params: UseRenderParamsConditional<Tag, State>): React.ReactElement | null;
+// eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
 export function useRender<
   Tag extends keyof React.JSX.IntrinsicElements,
   State extends Record<string, unknown> = Record<string, never>,
@@ -263,12 +271,14 @@ export function useRender<
   }
 
   if (React.isValidElement(render)) {
-    // SAFETY: `@types/react` types element `props` as `unknown`; mergeProps reads it
+    // SAFETY: `@types/react` types element `props` as `unknown`; mergeRecords reads it
     // as an untyped bag of props, which is exactly what a cloned element carries.
-    const merged = mergeProps<Tag>(computedProps, render.props as Record<string, unknown>);
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The render boundary merges element props whose specific type is not available here.
+    const merged = mergeRecords(computedProps, render.props as Record<string, unknown>);
     // SAFETY: cloneElement's prop type omits `ref`, but React re-associates a ref passed
     // here at runtime (base-ui clones render elements the same way). Asserting the element's
     // props as an untyped bag lets the merged props + ref through the index signature.
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The render boundary merges element props whose specific type is not available here.
     return React.cloneElement(render as React.ReactElement<Record<string, unknown>>, { ...merged, ref: mergedRef });
   }
 
