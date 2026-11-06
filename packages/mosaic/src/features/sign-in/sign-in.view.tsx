@@ -16,6 +16,7 @@ import { ReverificationHelp } from '../reverification/steps/reverification-help'
 import { ReverificationMethodPicker } from '../reverification/steps/reverification-method-picker';
 import { ReverificationOTP } from '../reverification/steps/reverification-otp';
 import type { SignInMethod, SignInViewProps } from './sign-in.types';
+import { inboxLink } from './sign-in.utils';
 import { SignInPassword } from './steps/sign-in-password';
 import { SignInStart } from './steps/sign-in-start';
 import { SignUpDetailsStep } from './steps/sign-up-details';
@@ -30,6 +31,11 @@ const methodIcon = {
   totp: SecurityLockSquare,
   backup_code: Key,
 } as const satisfies Record<SignInMethod['strategy'], IconComponent>;
+
+function inbox(email: string, template: Messages['emailCode']['openInbox']) {
+  const link = inboxLink(email);
+  return link ? { label: fill(template, { provider: link.provider }), href: link.href } : undefined;
+}
 
 function methodLabel(method: SignInMethod, m: Messages): string {
   const identifier = 'identifier' in method ? method.identifier : '';
@@ -191,6 +197,7 @@ export function SignInView({
               errorMessage={errorMessage}
               isPending={isPending}
               resend={resend}
+              inbox={inbox(identifier, m.emailCode.openInbox)}
               onValueChange={onValueChange}
               onComplete={otpSubmit}
               onSubmit={onSubmit}
@@ -313,6 +320,7 @@ export function SignInView({
               errorMessage={errorMessage}
               isPending={isPending}
               resend={resend}
+              inbox={inbox(signUpDetails.emailAddress, m.verifyEmail.openInbox)}
               onValueChange={onValueChange}
               onComplete={otpSubmit}
               onSubmit={onSubmit}

@@ -39,3 +39,12 @@ export function removeAt(current: string, index: number): string {
   }
   return current.slice(0, index) + current.slice(index + 1);
 }
+
+/**
+ * Reads pasted text as a whole code: spaces and dashes are dropped, and what is left must be exactly
+ * `length` allowed characters. Returns `null` otherwise, so a stray paste never fills the field.
+ */
+export function parseCode(text: string, pattern: OtpPattern, length: number): string | null {
+  const code = text.replace(/[\s-]/g, '');
+  return code.length === length && sanitize(code, pattern, length) === code ? code : null;
+}

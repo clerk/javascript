@@ -6,6 +6,7 @@ import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
+import { Link } from '../../../components/link';
 import { Otp } from '../../../components/otp';
 import { Form } from '../../../primitives/form';
 import { CODE_LENGTH } from '../../../utils/verification';
@@ -26,6 +27,11 @@ export interface ReverificationOtpResend {
   onClick: () => void;
 }
 
+export interface ReverificationOtpInbox {
+  label: string;
+  href: string;
+}
+
 export interface ReverificationOTPProps {
   messages: ReverificationOtpMessages;
   value: string;
@@ -34,6 +40,7 @@ export interface ReverificationOTPProps {
   globalErrorMessage?: string;
   isPending?: boolean;
   resend?: ReverificationOtpResend;
+  inbox?: ReverificationOtpInbox;
   onValueChange: (value: string) => void;
   onComplete?: (value: string) => void;
   onSubmit: () => void;
@@ -49,6 +56,7 @@ export function ReverificationOTP({
   globalErrorMessage,
   isPending = false,
   resend,
+  inbox,
   onValueChange,
   onComplete,
   onSubmit,
@@ -71,6 +79,18 @@ export function ReverificationOTP({
       <Card.Header>
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
+        {inbox ? (
+          <Card.Description>
+            <Link
+              href={inbox.href}
+              target='_blank'
+              rel='noopener noreferrer'
+              size='sm'
+            >
+              {inbox.label}
+            </Link>
+          </Card.Description>
+        ) : null}
       </Card.Header>
       <Card.Banner
         role='alert'

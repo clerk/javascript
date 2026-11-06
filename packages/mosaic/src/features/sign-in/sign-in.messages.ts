@@ -21,6 +21,7 @@ export const signInMessages = {
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
+    openInbox: 'Open {provider}',
   },
   totpMfa: {
     title: 'Two-step verification',
@@ -62,6 +63,7 @@ export const signInMessages = {
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
+    openInbox: 'Open {provider}',
   },
   backButton: 'Back',
   footerActionLinkUseAnotherMethod: 'Use another method',

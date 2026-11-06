@@ -14,7 +14,7 @@ import React, {
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { type FirstInputLabel, OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
-import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
+import { inputModeForPattern, type OtpPattern, parseCode, sanitize } from './otp-utils';
 
 export interface OtpProps extends Omit<ComponentProps<'div'>, 'value' | 'defaultValue' | 'onChange'> {
   /** The number of slots (characters) in the code. */
@@ -155,6 +155,26 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
     }
   }, [value, focus]);
 
+  useEffect(() => {
+    if (disabled) {
+      return;
+    }
+    const onPaste = (event: ClipboardEvent) => {
+      if (event.defaultPrevented || isTextEntry(document.activeElement)) {
+        return;
+      }
+      const code = parseCode(event.clipboardData?.getData('text') ?? '', pattern, length);
+      if (code === null) {
+        return;
+      }
+      event.preventDefault();
+      setValue(code);
+      queueFocus(length - 1, code);
+    };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, [disabled, pattern, length, setValue, queueFocus]);
+
   // Fire `onComplete` on the transition into a full value (typing the last
   // character or pasting a full code), not on every keystroke while full.
   useEffect(() => {
@@ -264,3 +284,7 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
     </OtpContext.Provider>
   );
 });
+
+function isTextEntry(element: Element | null): boolean {
+  return element instanceof HTMLElement && (element.isContentEditable || element.matches('input, textarea'));
+}
