@@ -109,6 +109,31 @@ describe('OAuthConsent', () => {
     });
   });
 
+  it('toggles only the selected scope when its description is clicked', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo),
+    });
+
+    const { findByRole, getByText, userEvent, baseElement } = render(<OAuthConsent />, { wrapper });
+
+    const identity = await findByRole('checkbox', { name: 'View your identity' });
+    const email = await findByRole('checkbox', { name: 'Access your email address' });
+    expect(identity).toBeChecked();
+    expect(email).toBeChecked();
+    expect(email).toHaveClass('cl-listGroupItemCheckbox');
+
+    await userEvent.click(getByText('Access your email address'));
+
+    expect(email).not.toBeChecked();
+    expect(identity).toBeChecked();
+    expect(new FormData(baseElement.querySelector('form')!).getAll('scope')).toEqual(['openid']);
+  });
+
   it('identifies private metadata as potentially sensitive data set by the Clerk application', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['jane@example.com'] });
@@ -127,7 +152,7 @@ describe('OAuthConsent', () => {
     expect(queryByText('Your private metadata')).toBeNull();
   });
 
-  it('hides the scope list when only offline_access is requested', async () => {
+  it('keeps offline_access checked and disabled when it is the only requested scope', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['jane@example.com'] });
     });
@@ -140,12 +165,18 @@ describe('OAuthConsent', () => {
       }),
     });
 
-    const { getByText, queryByText } = render(<OAuthConsent />, { wrapper });
+    const { getByText, findByRole, baseElement, userEvent } = render(<OAuthConsent />, { wrapper });
 
     await waitFor(() => {
       expect(getByText(/You'll stay signed in until you sign out or revoke access\./)).toBeVisible();
     });
-    expect(queryByText('This will allow Clerk CLI access to:')).toBeNull();
+    const checkbox = await findByRole('checkbox', { name: 'Offline access' });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toBeDisabled();
+    await userEvent.click(getByText('Offline access'));
+    expect(checkbox).toBeChecked();
+    const form = baseElement.querySelector('form')!;
+    expect(new FormData(form).getAll('scope')).toEqual(['offline_access']);
   });
 
   it('supports localizing the private metadata scope description', async () => {
@@ -256,6 +287,129 @@ describe('OAuthConsent', () => {
     expect(submitted).toBe(true);
   });
 
+  describe('scope selection', () => {
+    it.each(['Allow', 'Deny'])('submits only checked scopes on %s and preserves OAuth parameters', async action => {
+      const search =
+        '?client_id=client_test&redirect_uri=https%3A%2F%2Fapp.example%2Fcallback&scope=openid+email&scope=email&state=original_state&nonce=original_nonce&code_challenge=challenge&code_challenge_method=S256&resource=https%3A%2F%2Fmcp.example&consented=true';
+      window.location.search = search;
+      window.location.href = `https://app.example/${search}`;
+
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+      props.setProps({ componentName: 'OAuthConsent' } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { findByRole, getByRole, baseElement, userEvent } = render(<OAuthConsent />, { wrapper });
+      const email = await findByRole('checkbox', { name: 'Access your email address' });
+      expect(email).toBeChecked();
+      expect(getByRole('checkbox', { name: 'View your identity' })).toBeChecked();
+      await userEvent.click(email);
+
+      const form = baseElement.querySelector('form')!;
+      const submitted = vi.fn();
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        submitted(new FormData(form, event.submitter));
+      });
+      await userEvent.click(getByRole('button', { name: action }));
+
+      expect(submitted).toHaveBeenCalledOnce();
+      const data = submitted.mock.calls[0][0] as FormData;
+      expect(data.getAll('scope')).toEqual(['openid']);
+      expect(data.getAll('consented')).toEqual([action === 'Allow' ? 'true' : 'false']);
+      expect(data.get('client_id')).toBe('client_test');
+      expect(data.get('redirect_uri')).toBe('https://app.example/callback');
+      expect(data.get('state')).toBe('original_state');
+      expect(data.get('nonce')).toBe('original_nonce');
+      expect(data.get('code_challenge')).toBe('challenge');
+      expect(data.get('code_challenge_method')).toBe('S256');
+      expect(data.get('resource')).toBe('https://mcp.example');
+    });
+
+    it('lets users select a scope again with the keyboard', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+      props.setProps({ componentName: 'OAuthConsent' } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { findByRole, baseElement, userEvent } = render(<OAuthConsent />, { wrapper });
+      const checkbox = await findByRole('checkbox', { name: 'Access your email address' });
+      await userEvent.click(checkbox);
+      expect(checkbox).not.toBeChecked();
+      await userEvent.keyboard(' ');
+      expect(checkbox).toBeChecked();
+      expect(new FormData(baseElement.querySelector('form')!).getAll('scope')).toEqual(['openid email']);
+      expect(fixtures.clerk.oauthApplication.getConsentInfo).toHaveBeenCalledOnce();
+    });
+
+    it.each([false, true])(
+      'submits offline_access alone when all optional scopes are cleared (returned: %s)',
+      async returned => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withUser({ email_addresses: ['jane@example.com'] });
+        });
+        props.setProps({ componentName: 'OAuthConsent' } as any);
+        mockOAuthApplication(fixtures.clerk, {
+          getConsentInfo: vi.fn().mockResolvedValue({
+            ...fakeConsentInfo,
+            scopes: [
+              ...fakeConsentInfo.scopes,
+              ...(returned ? [{ scope: 'offline_access', description: 'Offline access', requiresConsent: true }] : []),
+            ],
+          }),
+        });
+
+        const { findByRole, getByRole, queryByRole, baseElement, userEvent } = render(<OAuthConsent />, { wrapper });
+        await userEvent.click(await findByRole('checkbox', { name: 'View your identity' }));
+        await userEvent.click(getByRole('checkbox', { name: 'Access your email address' }));
+        if (returned) {
+          const offline = getByRole('checkbox', { name: 'Offline access' });
+          expect(offline).toBeChecked();
+          expect(offline).toBeDisabled();
+        } else {
+          expect(queryByRole('checkbox', { name: 'Offline access' })).toBeNull();
+        }
+        expect(getByRole('button', { name: 'Allow' })).toBeEnabled();
+        expect(new FormData(baseElement.querySelector('form')!).getAll('scope')).toEqual(['offline_access']);
+      },
+    );
+
+    it('does not treat requiresConsent as a required-scope flag', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+      props.setProps({ componentName: 'OAuthConsent' } as any);
+      mockOAuthApplication(fixtures.clerk, {
+        getConsentInfo: vi.fn().mockResolvedValue({
+          ...fakeConsentInfo,
+          scopes: [{ scope: 'email', description: 'Access your email address', requiresConsent: false }],
+        }),
+      });
+
+      const { findByRole, userEvent } = render(<OAuthConsent />, { wrapper });
+      const checkbox = await findByRole('checkbox', { name: 'Access your email address' });
+      expect(checkbox).toBeEnabled();
+      await userEvent.click(checkbox);
+      expect(checkbox).not.toBeChecked();
+    });
+
+    it('clears scope choices when the OAuth client changes', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+      props.setProps({ componentName: 'OAuthConsent' } as any);
+      mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
+
+      const { findByRole, getByRole, rerender, userEvent } = render(<OAuthConsent />, { wrapper });
+      await userEvent.click(await findByRole('checkbox', { name: 'Access your email address' }));
+      props.setProps({ componentName: 'OAuthConsent', oauthClientId: 'another_client' } as any);
+      rerender(<OAuthConsent />);
+      await waitFor(() => expect(getByRole('checkbox', { name: 'Access your email address' })).toBeChecked());
+    });
+  });
+
   it('renders nothing when unauthenticated', async () => {
     const { wrapper, fixtures, props } = await createFixtures();
 
@@ -328,7 +482,7 @@ describe('OAuthConsent', () => {
 
     mockOAuthApplication(fixtures.clerk, { getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo) });
 
-    const { getByText, baseElement } = render(<OAuthConsent />, { wrapper });
+    const { getByText, getByRole, baseElement, userEvent } = render(<OAuthConsent />, { wrapper });
 
     // Context values win: the displayed name is the accounts portal one, not 'Clerk CLI'.
     await waitFor(() => expect(getByText('Accounts Portal App')).toBeVisible());
@@ -339,9 +493,18 @@ describe('OAuthConsent', () => {
     const forwardedInputs = form.querySelectorAll('input[type="hidden"]');
     expect(forwardedInputs.length).toBe(0);
 
+    const checkbox = getByRole('checkbox', { name: 'Identity' });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toBeDisabled();
+    await userEvent.click(getByText('Identity'));
+    expect(checkbox).toBeChecked();
+
     // Clicking Allow invokes the context callback, not a form submission.
     getByText('Allow').click();
     expect(onAllowSpy).toHaveBeenCalledTimes(1);
+    expect(onAllowSpy).toHaveBeenCalledWith();
+    getByText('Deny').click();
+    expect(onDenySpy).toHaveBeenCalledWith();
 
     // The hook should NOT fire a FAPI request on the accounts portal path.
     expect(fixtures.clerk.oauthApplication.getConsentInfo).not.toHaveBeenCalled();
@@ -418,6 +581,35 @@ describe('OAuthConsent', () => {
   });
 
   describe('org selection', () => {
+    it('removes organization selection and its form parameter when user:org:read is unchecked', async () => {
+      const search =
+        '?client_id=client_test&redirect_uri=https%3A%2F%2Fapp.example%2Fcallback&scope=openid+email+user%3Aorg%3Aread&organization_id=stale_org';
+      window.location.search = search;
+      window.location.href = `https://app.example/${search}`;
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({
+          email_addresses: ['jane@example.com'],
+          organization_memberships: [{ id: 'org_1', name: 'Acme Corp' }],
+        });
+        f.withOrganizations();
+      });
+      props.setProps({ componentName: 'OAuthConsent' } as any);
+      mockOAuthApplication(fixtures.clerk, {
+        getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfoWithOrgScope),
+      });
+
+      const { findByRole, queryByRole, baseElement, userEvent } = render(<OAuthConsent />, { wrapper });
+      const checkbox = await findByRole('checkbox', { name: 'Access your organizations' });
+      const form = baseElement.querySelector('form')!;
+      expect(new FormData(form).getAll('organization_id')).toEqual(['org_1']);
+      await userEvent.click(checkbox);
+      expect(queryByRole('combobox')).toBeNull();
+      expect(new FormData(form).getAll('organization_id')).toEqual([]);
+      expect(new FormData(form).getAll('scope')).toEqual(['openid email']);
+      await userEvent.click(checkbox);
+      expect(new FormData(form).getAll('organization_id')).toEqual(['org_1']);
+    });
+
     it('does not render the org selector when user:org:read scope is absent', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({
