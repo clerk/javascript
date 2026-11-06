@@ -7,7 +7,7 @@
         "**/package.json",
         "src/**",
         "tsconfig.json",
-        "tsup.config.ts",
+        "tsdown.config.mts",
 
         "!**/__tests__/**",
         "!**/__snapshots__/**",
