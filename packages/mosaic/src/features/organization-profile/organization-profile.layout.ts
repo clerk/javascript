@@ -45,7 +45,7 @@ export function resolveOrganizationProfilePages(
   customPages: readonly CustomOrganizationProfilePage[] = [],
   order?: readonly string[],
 ): OrganizationProfileNavEntry[] {
-  const uniqueCustomPages = withUniquePaths(withRoutablePaths(customPages));
+  const uniqueCustomPages = withUniquePaths(withRoutablePaths(customPages, ORGANIZATION_PROFILE_PAGE_IDS));
   const customById = new Map(uniqueCustomPages.map(page => [page.path, page]));
   const builtInIds = new Set<string>(builtIn);
   const entries: OrganizationProfileNavEntry[] = [

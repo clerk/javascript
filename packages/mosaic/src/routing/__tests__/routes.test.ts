@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildParts, compilePattern, compileRoutes, isLiteralPattern, matchRoute, routeParts } from '../routes';
+import { buildParts, compilePattern, compileRoutes, matchRoute, routeParts } from '../routes';
 
 const routes = compileRoutes({
   index: '',
@@ -70,22 +70,11 @@ describe('compilePattern', () => {
     expect(compilePattern('api keys')).toEqual([{ param: false, value: 'api keys' }]);
     expect(() => compilePattern('api%20keys')).toThrow('written decoded');
   });
-});
 
-describe('isLiteralPattern', () => {
-  it('accepts decoded parts', () => {
-    expect(isLiteralPattern('api-keys')).toBe(true);
-    expect(isLiteralPattern('organization/general')).toBe(true);
-    expect(isLiteralPattern('my page')).toBe(true);
-    expect(isLiteralPattern('café')).toBe(true);
-  });
-
-  it('rejects an empty pattern, a param, and an encoded literal', () => {
-    expect(isLiteralPattern('')).toBe(false);
-    expect(isLiteralPattern('/')).toBe(false);
-    expect(isLiteralPattern(':id')).toBe(false);
-    expect(isLiteralPattern('terms/:id?')).toBe(false);
-    expect(isLiteralPattern('my%20page')).toBe(false);
+  it('rejects a required part after an optional one', () => {
+    expect(() => compilePattern('a/:b?/c')).toThrow('optional parts come last');
+    expect(() => compilePattern('a/:b?/:c')).toThrow('optional parts come last');
+    expect(compilePattern('a/:b?/:c?')).toHaveLength(3);
   });
 });
 

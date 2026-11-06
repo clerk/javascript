@@ -1,7 +1,5 @@
 import { logger } from '@clerk/shared/logger';
 
-import { isLiteralPattern } from '../../routing/routes';
-
 const BUILT_IN_SEGMENTS: Readonly<Record<string, string>> = {
   apiKeys: 'api-keys',
   'organization/apiKeys': 'organization/api-keys',
@@ -15,24 +13,44 @@ export function pageParts(page: string | undefined): string[] {
   return page === undefined ? [] : pageSegment(page).split('/').filter(Boolean);
 }
 
-const BUILT_IN_SEGMENT_IDS = new Map(Object.entries(BUILT_IN_SEGMENTS).map(([id, segment]) => [segment, id]));
-
-export function withRoutablePaths<Page extends { path: string }>(pages: readonly Page[]): Page[] {
+// A custom page's path becomes a route literal and is compared raw elsewhere, so it has to be
+// exactly its own segment: decoded, without a leading colon, and without the slashes the codec
+// would strip.
+export function withRoutablePaths<Page extends { path: string }>(
+  pages: readonly Page[],
+  builtInIds: readonly string[],
+): Page[] {
+  const shadowed = new Map(builtInIds.filter(id => pageSegment(id) !== id).map(id => [pageSegment(id), id]));
   return pages.filter(page => {
-    const builtIn = BUILT_IN_SEGMENT_IDS.get(page.path);
+    const builtIn = shadowed.get(page.path);
     if (builtIn !== undefined) {
       logger.warnOnce(
         `[Clerk] Custom page path "${page.path}" is the segment of the built-in "${builtIn}" page, so the page is left out. Use "${builtIn}" as the path to replace that page.`,
       );
       return false;
     }
-    if (isLiteralPattern(page.path)) {
-      return true;
+    if (page.path === '') {
+      logger.warnOnce('[Clerk] A custom page needs a path, so a page without one is left out.');
+      return false;
     }
-    logger.warnOnce(
-      `[Clerk] Custom page path "${page.path}" cannot be a route, so the page is left out. Write it decoded, without a leading colon.`,
-    );
-    return false;
+    const parts = pageParts(page.path);
+    if (parts.join('/') !== page.path) {
+      logger.warnOnce(
+        `[Clerk] Custom page path "${page.path}" has a leading, trailing or doubled slash, so the page is left out. Use "${parts.join('/')}".`,
+      );
+      return false;
+    }
+    if (parts.some(part => part.startsWith(':'))) {
+      logger.warnOnce(`[Clerk] Custom page path "${page.path}" cannot start with a colon, so the page is left out.`);
+      return false;
+    }
+    if (parts.some(part => part.includes('%'))) {
+      logger.warnOnce(
+        `[Clerk] Custom page path "${page.path}" contains percent-encoding, so the page is left out. Write it as plain text.`,
+      );
+      return false;
+    }
+    return true;
   });
 }
 

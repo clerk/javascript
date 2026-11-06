@@ -63,16 +63,9 @@ function assertDecodedLiteral(part: string): void {
   }
 }
 
-// 'api-keys' -> true    'my page' -> true    'my%20page' -> false    ':id' -> false    '' -> false
-// Whether a string from outside, such as a custom page path, can be used as a literal route as is.
-export function isLiteralPattern(pattern: string): boolean {
-  const parts = partsOf(pattern);
-  return parts.length > 0 && parts.every(part => !part.startsWith(':') && isDecodedLiteral(part));
-}
-
 // 'billing/plans/:planId?' -> [{ param: false, value: 'billing' }, { param: false, value: 'plans' }, { param: true, name: 'planId', optional: true }]
 export function compilePattern(pattern: string): PatternPart[] {
-  return partsOf(pattern).map(part => {
+  const parts = partsOf(pattern).map<PatternPart>(part => {
     if (!part.startsWith(':')) {
       assertDecodedLiteral(part);
       return { param: false, value: part };
@@ -80,6 +73,13 @@ export function compilePattern(pattern: string): PatternPart[] {
     const optional = part.endsWith('?');
     return { param: true, name: part.slice(1, optional ? -1 : undefined), optional };
   });
+  const firstOptional = parts.findIndex(part => part.param && part.optional);
+  if (firstOptional !== -1 && parts.slice(firstOptional).some(part => !part.param || !part.optional)) {
+    throw new Error(
+      `[clerk] Route pattern "${pattern}" has a required part after an optional one; optional parts come last.`,
+    );
+  }
+  return parts;
 }
 
 // 'billing/plans/:planId?' -> 2    'billing/statement/:id' -> 3

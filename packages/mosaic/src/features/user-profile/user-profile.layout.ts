@@ -47,7 +47,7 @@ export function resolveUserProfilePages(
   customPages: readonly CustomProfilePage[] = [],
   order?: readonly string[],
 ): UserProfileNavEntry[] {
-  const uniqueCustomPages = withUniquePaths(withRoutablePaths(customPages));
+  const uniqueCustomPages = withUniquePaths(withRoutablePaths(customPages, USER_PROFILE_PAGE_IDS));
   const customById = new Map(uniqueCustomPages.map(page => [page.path, page]));
   const builtInIds = new Set<string>(builtIn);
   const entries: UserProfileNavEntry[] = [

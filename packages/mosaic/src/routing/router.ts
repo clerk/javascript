@@ -1,3 +1,5 @@
+import { logger } from '@clerk/shared/logger';
+
 import type { MosaicLocation, SegmentParts, WriteOptions } from './location';
 import {
   buildParts,
@@ -37,8 +39,13 @@ export function createRouter<const Routes extends RouteTable>(
       return match ? { name: match.name, params: match.params } : undefined;
     },
     go: (name, ...args) => {
+      const pattern = patternsByName.get(name);
+      if (pattern === undefined) {
+        logger.warnOnce(`[Clerk] "${name}" is not a route of this router, so nothing was navigated to.`);
+        return;
+      }
       const [params = {}, options] = args;
-      location.write(buildParts(patternsByName.get(name) ?? [], params), options);
+      location.write(buildParts(pattern, params), options);
     },
   };
 }
