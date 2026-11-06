@@ -11,6 +11,7 @@ import { PlaygroundProvider } from './PlaygroundContext';
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
+    'profile-permutations': dynamic(() => import('../stories/profile-permutations.mdx')),
   },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
@@ -52,6 +53,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
   },
   misc: {
+    'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
     'organization-list': dynamic(() => import('../stories/organization-list.mdx')),

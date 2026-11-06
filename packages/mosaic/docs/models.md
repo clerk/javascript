@@ -38,7 +38,7 @@ export type SwitcherModel =
   ```
 
 - **Cache updates.** Update the cache from inside the callback that mutated. On success patch the returned resource in with `replaceInPages`; on failure revalidate with `Promise.allSettled`, since a failed mutation may mean stale state and a failed revalidate must not look like a failed mutation (`onAcceptSuggestion` in `switcher.model.tsx`).
-- **Navigation vs modal.** A consumer's URL is the whole opt-in. Type the pair so it cannot contradict itself: `{ userProfileUrl: string; userProfileMode?: 'navigation' } | { userProfileUrl?: never; userProfileMode?: 'modal' }`.
+- **Navigation vs modal.** A consumer's URL is the whole opt-in. Type the pair so it cannot contradict itself: `{ createOrganizationUrl: string; createOrganizationMode?: 'navigation' } | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' }` (`CreateOrganizationMode` in `switcher.model.tsx`).
 
 ## Errors
 
