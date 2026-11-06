@@ -30,13 +30,11 @@ export type UserProfileMode = Exclude<SwitcherMode, 'organization'>;
 export interface UserProfileProps
   extends Pick<UserProfileViewProps, 'customPages' | 'pageOrder'>, Pick<UserProfileOptions, 'additionalOAuthScopes'> {
   /**
-   * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
-   * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
-   * the first page instead.
+   * The base the profile's pages are nested under. Two profiles on one page need different bases.
    *
-   * @default the first page in the navigation
+   * @default '/user'
    */
-  defaultPage?: UserProfileViewProps['activePage'];
+  path?: string;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that nobody is signed in.
    */
@@ -79,13 +77,6 @@ export interface UserProfileProps
  * that nobody is signed in.
  * ```tsx
  * <UserProfile fallback={<ProfileSkeleton />} />
- * ```
- *
- * @example
- * `defaultPage` picks the page the profile opens on without moving it in the navigation. An
- * organization page's id is prefixed with `organization/`.
- * ```tsx
- * <UserProfile defaultPage='security' />
  * ```
  *
  * @example
@@ -135,7 +126,7 @@ export function UserProfileSurface({
   organizationProfileProps,
   customPages,
   pageOrder,
-  defaultPage,
+  path = '/user',
   additionalOAuthScopes,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
@@ -152,7 +143,7 @@ export function UserProfileSurface({
 
   const viewProps: AccountViewProps = {
     elevation: 'flush',
-    initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
+    path,
     customPages,
     pageOrder,
     pages: {
@@ -174,6 +165,7 @@ export function UserProfileSurface({
         <CombinedUserProfileView
           {...viewProps}
           organizationProfileProps={organizationProfileProps}
+          fallback={fallback}
         />
       )}
     </UserProfileProvider>
@@ -181,40 +173,54 @@ export function UserProfileSurface({
 }
 
 type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
-  initialPage: UserProfileViewProps['activePage'];
+  path: string;
 };
 
-function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
-  const navigation = useProfilePagesController(initialPage, userProfilePageIds(viewProps));
+function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
+  const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds(viewProps), {
+    routing: 'virtual',
+    path,
+  });
+
+  if (activePage === undefined) {
+    return null;
+  }
 
   return (
     <UserProfileView
       {...viewProps}
-      {...navigation}
+      activePage={activePage}
+      onPageChange={onPageChange}
     />
   );
 }
 
 function CombinedUserProfileView({
-  initialPage,
+  path,
+  fallback,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
-}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
+}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps' | 'fallback'>) {
   const model = useOrganizationProfileModel();
   const organization =
     model.status === 'ready'
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
-  const navigation = useProfilePagesController(
-    initialPage,
+  const { activePage, onPageChange } = useProfilePagesController(
     model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
+    { routing: 'virtual', path },
   );
+
+  if (activePage === undefined) {
+    return fallback ?? null;
+  }
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <UserProfileView
         {...viewProps}
-        {...navigation}
+        activePage={activePage}
+        onPageChange={onPageChange}
         organization={organization}
       />
     </OrganizationProfileProvider>

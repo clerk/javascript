@@ -49,6 +49,7 @@ export default defineConfig({
       })),
       { type: 'queries', pattern: 'src/queries', partialMatch: false },
       { type: 'modals', pattern: 'src/modals', partialMatch: false },
+      { type: 'routing', pattern: 'src/routing', partialMatch: false },
       { type: 'blocks', pattern: 'src/blocks', partialMatch: false },
       { type: 'features', pattern: 'src/features/*', partialMatch: false, capture: ['feature'] },
       { type: 'root', pattern: 'src', partialMatch: false },
@@ -269,7 +270,7 @@ export default defineConfig({
             checkUnknownLocals: true,
             checkInternals: true,
             message:
-              'Mosaic layers import down: features, then blocks, modals and queries, then components, hooks, utils and styles, then primitives. Move the shared piece down a layer, or pass it in as a prop.',
+              'Mosaic layers import down: features, then blocks, modals, queries and routing, then components, hooks, utils and styles, then primitives. Move the shared piece down a layer, or pass it in as a prop.',
             policies: [
               { allow: { to: { module: { origin: ['external', 'core'] } } } },
               { allow: { to: { element: { type: '{{ from.element.type }}' } } } },
@@ -279,6 +280,7 @@ export default defineConfig({
                 from: { element: { type: ['utils', 'hooks', 'styles', 'components', 'localization', 'modals'] } },
                 allow: { to: { element: { type: SHARED } } },
               },
+              { from: { element: { type: 'modals' } }, allow: { to: { element: { type: 'routing' } } } },
               {
                 from: { element: { type: 'localization' } },
                 allow: { to: { file: { categories: 'messages' } } },
@@ -292,7 +294,7 @@ export default defineConfig({
               },
               {
                 from: { element: { type: 'features' } },
-                allow: { to: { element: { type: [...SHARED, 'queries', 'modals', 'blocks'] } } },
+                allow: { to: { element: { type: [...SHARED, 'queries', 'modals', 'blocks', 'routing'] } } },
               },
               {
                 from: FLOW_UI,

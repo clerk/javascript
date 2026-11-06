@@ -375,6 +375,8 @@ describe('Mosaic layers', { timeout: 30_000 }, () => {
     ['src/modals/sample.ts', "import { Confirmation } from '../blocks/confirmation';"],
     ['src/blocks/sample.tsx', "import { UserButton } from '../features/user-button/user-button';"],
     ['src/queries/sample.ts', "import { Button } from '../components/button';"],
+    ['src/routing/sample.ts', "import { ModalHost } from '../modals/modal-host';"],
+    ['src/components/sample.tsx', "import { useRouter } from '../routing/use-router';"],
   ])('%s cannot import up: %s', async (file, source) => {
     const messages = await boundaryMessagesAt(file, source);
     expect(messages).toHaveLength(1);
@@ -398,6 +400,8 @@ describe('Mosaic layers', { timeout: 30_000 }, () => {
     [`${featureDir}/sample.view.tsx`, "import { Confirmation } from '../../blocks/confirmation';"],
     [`${featureDir}/sample.view.tsx`, "import { useModal } from '../../modals/use-modal';"],
     [`${featureDir}/sample.view.tsx`, "import { UserButton } from '../user-button/user-button';"],
+    ['src/modals/sample.ts', "import { useMosaicLocation } from '../routing/use-mosaic-location';"],
+    [`${featureDir}/sample.controller.ts`, "import { useRouterScope } from '../../routing/use-router';"],
     ['src/styles/index.ts', "export { UserButton } from '../features/user-button/user-button';"],
   ])('%s may import down or across: %s', async (file, source) => {
     expect(await boundaryMessagesAt(file, source)).toEqual([]);
