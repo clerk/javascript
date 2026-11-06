@@ -11,6 +11,7 @@ Clerk's JavaScript SDK and library monorepo.
 - Every PR needs a changeset. Agents write `.changeset/<name>.md` directly, because `pnpm changeset` prompts interactively. Empty changesets, for tooling/repo-only changes, are two `---` delimiters with no body. A changeset is a changelog entry for users upgrading the package, not a summary of the work done in the PR. Describe the user-facing change (what changed for someone consuming the library and how it affects them) rather than the implementation details of the diff. If a change has no user-facing impact, use an empty changeset.
 - Reuse existing patterns before writing new ones. Before adding a helper, hook, or a local way of handling errors, pending state, focus or similar cross-cutting concerns, search the package for one that already solves it. If none fits, stop and ask the user before introducing a new pattern: say what the problem is, what you checked, and what you propose.
 - PR descriptions follow `.github/PULL_REQUEST_TEMPLATE.md` and add no sections of their own. Never add a "Testing" (or "Test plan" / "How to test") section summarizing the tests written or the checks run; the Checklist covers that and reviewers read the diff. Describe the change, not the work done on it.
+- Before editing any file under `packages/mosaic`, read `packages/mosaic/AGENTS.md`. It names the guide to read for each kind of file.
 
 ## Verifying changes
 
@@ -19,7 +20,6 @@ The skill is `.claude/skills/verify-clerk-expo/`, and the tests and the CLI that
 
 ## References
 
-- For questions about theming, appearance customization, or the styled system, see `references/theming-architecture.md`.
-- For the Mosaic design system (tokens, StyleX authoring, `MosaicProvider`, the model/controller/view split, migration from the existing system), see `packages/mosaic/ARCHITECTURE.md`. Work under `packages/mosaic` also follows `packages/mosaic/AGENTS.md`.
+- For the Mosaic design system (tokens, StyleX authoring, `MosaicProvider`, the model/controller/view split, migration from the existing system), start at `packages/mosaic/AGENTS.md`, which routes each task to its guide in `packages/mosaic/docs/`.
 - For dev setup, testing, JSDoc/Typedoc, publishing, changesets, and commit conventions, see `docs/CONTRIBUTING.md`.
 - For working in the repo day to day (setup ordering and footguns, the package map, dev-loop recipes, and the breaking-change checklist), the `clerk-monorepo` Claude Code skill in `.claude/skills/clerk-monorepo/` restates these rules in actionable form.

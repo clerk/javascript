@@ -282,9 +282,8 @@ export const CheckoutForm = withCardStateProvider(() => {
             />
             {totals.baseFee ? (
               <LineItems.Description
-                prefix={planPeriod === 'annual' ? 'x12' : undefined}
                 text={$(totals.baseFee)}
-                suffix={localizationKeys('billing.checkout.perMonth')}
+                suffix={planPeriod === 'month' ? localizationKeys('billing.checkout.perMonth') : undefined}
               />
             ) : null}
           </LineItems.Group>

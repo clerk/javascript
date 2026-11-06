@@ -1,6 +1,6 @@
 {
   "name": "@clerk/mosaic",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Clerk Mosaic UI components",
   "keywords": [
     "clerk",
@@ -55,13 +55,15 @@
     "dev": "tsdown --config tsdown.config.mts --watch",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "lint": "eslint src",
+    "lint": "oxlint -c oxlint.config.mjs src",
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
     "test": "vitest run --project primitives --project mosaic",
     "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
+    "test:visual": "bash ./scripts/test-visual.sh compare",
+    "test:visual:update": "bash ./scripts/test-visual.sh update",
     "test:webkit": "vitest run --project webkit",
     "typecheck": "tsc --noEmit"
   },
@@ -82,7 +84,6 @@
     "@testing-library/user-event": "^14.6.5",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitest/eslint-plugin": "1.6.28",
     "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
     "eslint-plugin-boundaries": "7.3.0",
@@ -94,6 +95,7 @@
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "tsdown": "catalog:repo",
+    "typescript": "7.0.2",
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {

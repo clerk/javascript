@@ -4,6 +4,7 @@ import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messag
 import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
 import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
 import { logsTableMessages } from '../features/logs/logs-table.messages';
+import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
@@ -14,6 +15,9 @@ import { requestsTableTabMessages } from '../features/organization-profile/organ
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
+import { signInMessages } from '../features/sign-in/sign-in.messages';
+import { taskChooseOrganizationMessages } from '../features/task-choose-organization/task-choose-organization.messages';
+import { taskSetupMfaMessages } from '../features/task-setup-mfa/task-setup-mfa.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.messages';
@@ -78,12 +82,16 @@ export const mosaicMessages = {
   logsTable: logsTableMessages,
   createOrganization: createOrganizationMessages,
   organizationList: organizationListMessages,
+  taskChooseOrganization: taskChooseOrganizationMessages,
   reverification: reverificationMessages,
   profile: profileMessages,
   form: formMessages,
   errors: errorMessages,
   roles: roleMessages,
+  oauthConsent: oauthConsentMessages,
   waitlist: waitlistMessages,
+  signIn: signInMessages,
+  taskSetupMfa: taskSetupMfaMessages,
 };
 
 export type MosaicMessages = typeof mosaicMessages;

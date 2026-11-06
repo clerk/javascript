@@ -3,6 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { dropFiles } from '../../../__tests__/feature/drag';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -179,11 +180,42 @@ describe('CreateOrganization', () => {
       });
 
       await user.upload(input, new File(['logo'], 'logo.png', { type: 'image/png' }));
-      expect(screen.getByRole('button', { name: 'Remove' })).toBeVisible();
       await create(user, 'Acme');
 
       expect(await screen.findByRole('heading', { name: 'Invite new members' })).toBeVisible();
       expect(fapi.memberships[0]?.organization.has_image).toBe(true);
+    });
+
+    it('swaps the upload button for a menu once a logo is chosen, and back when it is removed', async () => {
+      await renderCreateOrganization();
+      const user = userEvent.setup();
+      const row = await screen.findByText('Logo');
+
+      dropFiles(row, new File(['logo'], 'logo.png', { type: 'image/png' }));
+
+      expect(screen.queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Manage logo' }));
+      expect(await screen.findByRole('menuitem', { name: 'Change logo' })).toBeVisible();
+      await user.click(screen.getByRole('menuitem', { name: 'Remove logo' }));
+
+      expect(await screen.findByRole('button', { name: 'Upload' })).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Manage logo' })).not.toBeInTheDocument();
+    });
+
+    it('opens the file picker when the Logo label is clicked', async () => {
+      const { container } = await renderCreateOrganization();
+      const user = userEvent.setup();
+      const label = await screen.findByText('Logo');
+      const picker = container.querySelector('input[type="file"]');
+      let opened = false;
+      picker?.addEventListener('click', event => {
+        opened = true;
+        event.preventDefault();
+      });
+
+      await user.click(label);
+
+      expect(opened).toBe(true);
     });
   });
 
@@ -268,6 +300,24 @@ describe('CreateOrganization', () => {
       ]);
       await user.click(screen.getByRole('button', { name: 'Finish' }));
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/dashboard'));
+    });
+
+    it('sends a valid address still in the input', async () => {
+      const { fapi } = await renderCreateOrganization();
+      const user = userEvent.setup();
+
+      await create(user, 'Acme');
+      const role = await screen.findByRole('combobox', { name: /Role/ });
+      await waitFor(() => expect(role).toBeEnabled());
+      await user.click(role);
+      await user.click(await screen.findByRole('option', { name: 'Member' }));
+      await user.type(screen.getByRole('textbox', { name: 'Email' }), 'grace@example.com');
+      await user.click(screen.getByRole('button', { name: 'Send invitations' }));
+
+      expect(await screen.findByRole('heading', { name: 'Invitations sent' })).toBeVisible();
+      expect(fapi.organizationInvitations.map(item => [item.email_address, item.role])).toEqual([
+        ['grace@example.com', 'org:member'],
+      ]);
     });
 
     it('starts on the instance default role', async () => {

@@ -32,6 +32,28 @@ function saveError(message: string, field?: 'emailAddress' | 'code') {
 describe('useUserProfileAddEmailController', () => {
   afterEach(() => vi.useRealTimers());
 
+  it('unlocks resend by the clock when timers were held up', async () => {
+    vi.useFakeTimers();
+    const email = verifier();
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: () => Promise.resolve(email) }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
+    await act(async () => {
+      result.current.onSubmit();
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(result.current.resendSeconds).toBe(30);
+
+    vi.setSystemTime(Date.now() + 60_000);
+    await act(async () => vi.advanceTimersByTimeAsync(1000));
+
+    expect(result.current.resendSeconds).toBe(0);
+    act(() => result.current.onResend());
+    expect(email.start).toHaveBeenCalledTimes(2);
+  });
+
   it('keeps the resend countdown running while verification is pending', async () => {
     vi.useFakeTimers();
     const verification = createDeferredPromise();

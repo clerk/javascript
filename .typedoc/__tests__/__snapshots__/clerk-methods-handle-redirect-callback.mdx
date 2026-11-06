@@ -2,6 +2,8 @@
 
 Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](/docs/reference/objects/sign-up).
 
+If this is called while a previous call is still running, it returns the promise of the running call, and the `params` and `customNavigate` passed to the later call are ignored.
+
 ```typescript
 function handleRedirectCallback(params: HandleOAuthCallbackParams, customNavigate?: (to: string) => Promise<unknown>): Promise<unknown>
 ```

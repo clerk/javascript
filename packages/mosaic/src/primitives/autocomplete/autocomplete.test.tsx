@@ -1,6 +1,6 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useState } from 'react';
+import { createRef, Suspense, useDeferredValue, useState, useTransition } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Popover } from '../popover/index';
@@ -167,7 +167,6 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.click(screen.getByText('Banana'));
@@ -228,7 +227,6 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.keyboard('{Enter}');
@@ -1037,7 +1035,6 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Pick a fruit...'));
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');
@@ -1052,7 +1049,6 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Cherry'));
 
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');
@@ -1356,5 +1352,245 @@ describe('Autocomplete', () => {
       expect(option.id).not.toBe('consumer-id');
       expect(option.id).not.toBe('');
     });
+  });
+});
+
+describe('Autocomplete option renders', () => {
+  it('re-renders only the options whose highlight changes', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    render(
+      <Autocomplete.Root defaultOpen>
+        <Autocomplete.Input placeholder='Search fruits...' />
+        <Autocomplete.Positioner>
+          <Autocomplete.Popup>
+            {fruits.map(f => (
+              <Autocomplete.Option
+                key={f.value}
+                value={f.value}
+                label={f.label}
+                render={props => {
+                  renders.push(f.value);
+                  return <div {...props} />;
+                }}
+              >
+                {f.label}
+              </Autocomplete.Option>
+            ))}
+          </Autocomplete.Popup>
+        </Autocomplete.Positioner>
+      </Autocomplete.Root>,
+    );
+    await user.click(screen.getByPlaceholderText('Search fruits...'));
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('data-active');
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['apple', 'banana']));
+
+    renders.length = 0;
+    await user.hover(screen.getByRole('option', { name: 'Date' }));
+    expect(screen.getByRole('option', { name: 'Date' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'date']));
+  });
+});
+
+describe('Autocomplete selection in a transition', () => {
+  const neverResolves = new Promise<never>(() => {});
+  function Suspends(): never {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- Suspending is React's thrown-thenable protocol; `React.use()` needs React 19.
+    throw neverResolves;
+  }
+
+  type HoverRender = { option: string; hovered: string | null; active: boolean };
+  type OptionRender = { option: string; parentValue: string; selected: unknown };
+
+  function Fixture({
+    update = 'transition',
+    onRenderOption,
+    suspendSelected = false,
+    hoverInTransition = false,
+    onRenderHover,
+    suspendWhenActive,
+  }: {
+    update?: 'transition' | 'deferred';
+    onRenderOption?: (render: OptionRender) => void;
+    suspendSelected?: boolean;
+    hoverInTransition?: boolean;
+    onRenderHover?: (render: HoverRender) => void;
+    suspendWhenActive?: string;
+  }) {
+    const [value, setValue] = useState<string>('');
+    const deferredValue = useDeferredValue(value);
+    const [isPending, startTransition] = useTransition();
+    const [hovered, setHovered] = useState<string | null>(null);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [isLoadingMore, startLoadingMore] = useTransition();
+    const parentValue = update === 'deferred' ? deferredValue : value;
+    return (
+      <>
+        <button
+          type='button'
+          onClick={() => startLoadingMore(() => setLoadingMore(true))}
+        >
+          Load more
+        </button>
+        <p>{isLoadingMore ? 'Loading more' : 'Loaded'}</p>
+        <Suspense fallback={<p>Loading more fallback</p>}>{loadingMore ? <Suspends /> : null}</Suspense>
+        <Suspense fallback={<p>Loading</p>}>
+          <p>{isPending || value !== deferredValue ? 'Pending' : 'Idle'}</p>
+          <Autocomplete.Root
+            open
+            value={parentValue}
+            onValueChange={next => (update === 'deferred' ? setValue(next) : startTransition(() => setValue(next)))}
+          >
+            <Autocomplete.Input placeholder='Search fruits...' />
+            <Autocomplete.Positioner>
+              <Autocomplete.Popup>
+                {fruits.map(option => (
+                  <Autocomplete.Option
+                    key={option.value}
+                    value={option.value}
+                    label={option.label}
+                    render={props => {
+                      onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                      const active = 'data-active' in props;
+                      onRenderHover?.({ option: option.value, hovered, active });
+                      return (
+                        <div
+                          {...props}
+                          onMouseMove={
+                            hoverInTransition
+                              ? event =>
+                                  startTransition(() => {
+                                    setHovered(option.value);
+                                    props.onMouseMove?.(event);
+                                  })
+                              : props.onMouseMove
+                          }
+                        >
+                          {props.children}
+                          {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
+                          {active && suspendWhenActive === option.value ? <Suspends /> : null}
+                        </div>
+                      );
+                    }}
+                  >
+                    {option.label}
+                  </Autocomplete.Option>
+                ))}
+              </Autocomplete.Popup>
+            </Autocomplete.Positioner>
+          </Autocomplete.Root>
+        </Suspense>
+      </>
+    );
+  }
+
+  describe.each(['transition', 'deferred'] as const)('when the parent updates the value with %s', update => {
+    it('renders each option with the selection its parent passed down', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders).not.toContainEqual({ option: 'banana', parentValue: 'banana', selected: false });
+    });
+
+    it('renders the new selection in the same render as its parent, with no second pass', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders.filter(entry => entry.option === 'banana' && entry.parentValue === 'banana')).toEqual([
+        { option: 'banana', parentValue: 'banana', selected: true },
+      ]);
+    });
+
+    it('keeps the current options on screen while a selection suspends', async () => {
+      const user = userEvent.setup();
+      render(
+        <Fixture
+          update={update}
+          suspendSelected
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+      expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+
+  it('moves the highlight with arrow keys while an unrelated transition is pending', async () => {
+    const user = userEvent.setup();
+    render(<Fixture />);
+
+    await user.click(screen.getByText('Load more'));
+    await waitFor(() => expect(screen.getByText('Loading more')).toBeInTheDocument());
+
+    await user.click(screen.getByPlaceholderText('Search fruits...'));
+    await user.keyboard('{ArrowDown}');
+    await user.keyboard('{ArrowDown}');
+
+    const banana = screen.getByRole('option', { name: 'Banana' });
+    expect(banana).toHaveAttribute('data-active');
+    expect(screen.getByPlaceholderText('Search fruits...')).toHaveAttribute('aria-activedescendant', banana.id);
+    expect(screen.getByText('Loading more')).toBeInTheDocument();
+  });
+
+  it('renders the hovered option as active in the same render as a hover transition', async () => {
+    const user = userEvent.setup();
+    const renders: HoverRender[] = [];
+    render(
+      <Fixture
+        hoverInTransition
+        onRenderHover={entry => renders.push(entry)}
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+    expect(renders).not.toContainEqual({ option: 'banana', hovered: 'banana', active: false });
+  });
+
+  it('keeps the current options on screen while a hover transition suspends', async () => {
+    const user = userEvent.setup();
+    render(
+      <Fixture
+        hoverInTransition
+        suspendWhenActive='banana'
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+    expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Banana' })).not.toHaveAttribute('data-active');
   });
 });

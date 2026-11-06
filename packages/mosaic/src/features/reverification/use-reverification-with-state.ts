@@ -117,6 +117,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
     },
   });
 
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The wrapper preserves the generic return type of useReverification.
   const singleFlight = useCallback(
     (...args: Parameters<F>) => {
       // Only a single handler call is allowed to be in progress at the same time

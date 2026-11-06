@@ -6,10 +6,16 @@ import { radioInputMarker } from './radio.markers.stylex';
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
 
 export const styles = stylex.create({
-  group: {
-    gap: space['3'],
-    display: 'flex',
-    flexDirection: 'column',
+  section: {
+    margin: 0,
+    padding: 0,
+    borderStyle: 'none',
+    minInlineSize: 0,
+    width: '100%',
+  },
+  sectionLabel: {
+    padding: 0,
+    marginBottom: space['3'],
   },
   root: {
     display: 'inline-flex',
@@ -41,7 +47,10 @@ export const styles = stylex.create({
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
       ':checked': durationVars['--cl-duration-instant'],
-      ':hover': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'background-color, border-color',
     transitionTimingFunction: 'linear',
@@ -88,4 +97,22 @@ export const firstLine = stylex.create({
 export const indicatorSizes = stylex.create({
   sm: { height: space['1.5'], width: space['1.5'] },
   md: { height: space['1.5'], width: space['1.5'] },
+});
+
+export const layouts = stylex.create({
+  stack: {
+    gap: {
+      default: space['3'],
+      ':has(> fieldset)': space['5'],
+    },
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
+  grid: {
+    gap: space['3'],
+    display: 'grid',
+    gridTemplateColumns: `repeat(auto-fill, minmax(min(14rem, 100%), 1fr))`,
+    width: '100%',
+  },
 });

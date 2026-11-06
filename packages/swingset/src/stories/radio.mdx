@@ -36,11 +36,17 @@ import { Radio } from '@clerk/mosaic/components/radio';
 
 ## Parts
 
-| Part          | Slot                    | Description                                                                              |
-| ------------- | ----------------------- | ---------------------------------------------------------------------------------------- |
-| `Radio.Group` | `radio-group`           | The `radiogroup`. Owns `value`, `defaultValue`, `onValueChange`, `name` and `disabled`.  |
-| `Radio.Item`  | `radio` / `radio-input` | One choice. `data-size`, `data-disabled`. Forwards its ref and input props to the input. |
-| ↳ indicator   | `radio-indicator`       | The dot, shown while the item is checked.                                                |
+| Part            | Slot                    | Description                                                                                                      |
+| --------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `Radio.Group`   | `radio-group`           | The `radiogroup`. Owns `value`, `defaultValue`, `onValueChange`, `name`, `disabled` and `layout`. `data-layout`. |
+| `Radio.Item`    | `radio` / `radio-input` | One choice. `data-size`, `data-disabled`. Forwards its ref and input props to the input.                         |
+| ↳ indicator     | `radio-indicator`       | The dot, shown while the item is checked.                                                                        |
+| `Radio.Card`    | `radio-card` / `item`   | One choice laid out as an [Item](/components/item) row. `data-checked`, `data-disabled`.                         |
+| ↳ media         | `item-media`            | `Radio.Media`, the icon or logo at the start of the card.                                                        |
+| ↳ content       | `item-content`          | `Radio.Content`, which holds `Radio.Label` (`item-label`) and `Radio.Description` (`item-description`).          |
+| `Radio.Section` | `radio-section`         | A `<fieldset>` of choices titled by `label`, with its own `layout`. `data-layout`.                               |
+| ↳ label         | `text`                  | The `<legend>`.                                                                                                  |
+| ↳ content       | `radio-section-content` | Lays out the section's choices.                                                                                  |
 
 ---
 
@@ -64,5 +70,31 @@ import { Radio } from '@clerk/mosaic/components/radio';
 
 <Story
   name='Sizes'
+  storyModule={RadioStories}
+/>
+
+### Cards
+
+`Radio.Card` is one choice laid out as an Item row: a `<label>` around a visually hidden radio, so a click anywhere on it picks the card. Fill it with `Radio.Media` and `Radio.Content`. Its `Radio.Label` names the radio, and an optional `Radio.Description` describes it. `layout='grid'` fits as many columns of cards as the width allows.
+
+<Story
+  name='Cards'
+  storyModule={RadioStories}
+  composition={[{ name: 'Item', href: '/components/item', layer: 'Components' }]}
+/>
+
+### Sections
+
+One `Radio.Group` holds the value. `Radio.Section` renders a `<fieldset>` with its `label` as the `<legend>`, and its own `layout`. Sections sit further apart than the cards inside them. Every radio shares the group's `name`, so arrow keys move across sections and the picker is one Tab stop.
+
+<Story
+  name='Sections'
+  storyModule={RadioStories}
+/>
+
+### Disabled cards
+
+<Story
+  name='CardsDisabled'
   storyModule={RadioStories}
 />

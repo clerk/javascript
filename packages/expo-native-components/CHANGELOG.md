@@ -1,5 +1,21 @@
 # @clerk/expo-native-components
 
+## 0.4.4
+
+### Patch Changes
+
+- Published packages no longer include compiled test files, test type declarations, or test fixtures. ([#10522](https://github.com/clerk/javascript/pull/10522)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.3.0` to `1.4.0`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.4.0. ([#10594](https://github.com/clerk/javascript/pull/10594)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.4.0` to `1.4.1`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.4.1. ([#10611](https://github.com/clerk/javascript/pull/10611)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.6.2` to `1.7.0`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.7.0. ([#10595](https://github.com/clerk/javascript/pull/10595)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.7.0` to `1.7.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.7.1. ([#10606](https://github.com/clerk/javascript/pull/10606)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Let `@clerk/expo` turn off the native iOS and Android SDKs' own update-required screens. `<ClerkProvider>` turns them off when it shows its own update screen, or when you set `updateRequiredViewEnabled={false}`, so an app whose version is older than its minimum sees one screen. Older versions of `@clerk/expo`, and apps without `expo-application`, which `@clerk/expo` needs to identify the app, keep the native screen. ([#10343](https://github.com/clerk/javascript/pull/10343)) by [@seanperez29](https://github.com/seanperez29)
+
 ## 0.4.3
 
 ### Patch Changes

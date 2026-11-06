@@ -11,6 +11,7 @@ import { PlaygroundProvider } from './PlaygroundContext';
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
+    'profile-permutations': dynamic(() => import('../stories/profile-permutations.mdx')),
   },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
@@ -53,15 +54,22 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-logs-panel': dynamic(() => import('../stories/organization-profile-logs-panel.mdx')),
   },
   misc: {
+    'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
     'organization-list': dynamic(() => import('../stories/organization-list.mdx')),
+    'task-choose-organization': dynamic(() => import('../stories/task-choose-organization.mdx')),
     'user-avatar': dynamic(() => import('../stories/user-avatar.mdx')),
     'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
     'logs-table': dynamic(() => import('../stories/logs-table.mdx')),
+    'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
+    'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),
+  },
+  authentication: {
+    'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
@@ -84,6 +92,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
     pagination: dynamic(() => import('../stories/pagination.mdx')),
     'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
+    stepper: dynamic(() => import('../stories/stepper.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     drawer: dynamic(() => import('../stories/drawer.component.mdx')),
@@ -100,6 +109,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     radio: dynamic(() => import('../stories/radio.mdx')),
     reveal: dynamic(() => import('../stories/reveal.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    separator: dynamic(() => import('../stories/separator.mdx')),
     'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
     switch: dynamic(() => import('../stories/switch.mdx')),

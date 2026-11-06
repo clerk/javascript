@@ -1,54 +1,112 @@
+import { execFile } from 'node:child_process';
+import { cp, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createRequire } from 'node:module';
+import { promisify } from 'node:util';
+import { tmpdir } from 'node:os';
+import { pathToFileURL } from 'node:url';
 
-import { ESLint } from 'eslint';
-import noUnneededEffects from 'eslint-plugin-react-you-might-not-need-an-effect';
-import { describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
-const root = path.resolve(import.meta.dirname, '../../..');
-const mosaicRoot = path.resolve(import.meta.dirname, '..');
+const packageRoot = path.resolve(import.meta.dirname, '..');
+let mosaicRoot;
 const featureDir = 'src/features/reverification';
-const layerFixtures = [
-  'src/primitives/sample.ts',
-  'src/components/sample.tsx',
-  'src/hooks/sample.ts',
-  'src/utils/sample.ts',
-  'src/localization/sample.ts',
-  'src/modals/sample.ts',
-  'src/blocks/sample.tsx',
-  'src/queries/sample.ts',
-];
-const flowFixtures = [
-  'sample.view.ts',
-  'sample.view.tsx',
-  'sample.controller.ts',
-  'sample.controller.tsx',
-  'sample.model.ts',
-  'sample.model.tsx',
-  'sample.messages.ts',
-].map(file => `${featureDir}/${file}`);
 const testFixture = 'src/hooks/__tests__/sample.test.ts';
 const partFixture = 'src/primitives/sample-part.tsx';
 const partTestFixture = 'src/primitives/__tests__/sample-part.test.tsx';
-const rootEslint = new ESLint({ cwd: root });
-const eslint = new ESLint({
-  cwd: mosaicRoot,
-  overrideConfig: {
-    languageOptions: {
-      parserOptions: {
-        projectService: {
-          allowDefaultProject: [...flowFixtures, ...layerFixtures, testFixture, partFixture, partTestFixture].map(
-            file => `packages/mosaic/${file}`,
-          ),
-          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 32,
-        },
-      },
-    },
-  },
+const stylesFixture = 'src/components/sample.styles.ts';
+const execute = promisify(execFile);
+const require = createRequire(path.join(packageRoot, 'package.json'));
+const oxlint = path.join(path.dirname(require.resolve('oxlint/package.json')), 'bin/oxlint');
+
+beforeAll(async () => {
+  mosaicRoot = await realpath(await mkdtemp(path.join(tmpdir(), 'mosaic-oxlint-')));
+  await cp(path.join(packageRoot, 'src'), path.join(mosaicRoot, 'src'), { recursive: true });
+  for (const file of ['package.json', 'tsconfig.json', 'tsconfig.base.json', 'tsconfig.test.json']) {
+    await cp(path.join(packageRoot, file), path.join(mosaicRoot, file));
+  }
+  await symlink(path.join(packageRoot, 'node_modules'), path.join(mosaicRoot, 'node_modules'), 'dir');
+  const configUrl = pathToFileURL(path.join(packageRoot, 'oxlint.config.mjs')).href;
+  await writeFile(
+    path.join(mosaicRoot, 'oxlint.config.mjs'),
+    `
+import { createRequire } from 'node:module';
+import config from ${JSON.stringify(configUrl)};
+const require = createRequire(${JSON.stringify(path.join(packageRoot, 'package.json'))});
+const resolvePlugin = plugin => typeof plugin === 'string'
+  ? { name: plugin.replace(/^eslint-plugin-/, ''), specifier: require.resolve(plugin) }
+  : { ...plugin, specifier: require.resolve(plugin.specifier) };
+export default {
+  ...config,
+  jsPlugins: config.jsPlugins.map(resolvePlugin),
+  overrides: config.overrides.map(override => ({
+    ...override,
+    ...(override.jsPlugins ? { jsPlugins: override.jsPlugins.map(resolvePlugin) } : {}),
+  })),
+  settings: { ...config.settings, 'boundaries/root-path': import.meta.dirname },
+};
+`,
+  );
+}, 30_000);
+
+afterAll(async () => {
+  if (mosaicRoot) {
+    await rm(mosaicRoot, { recursive: true, force: true });
+  }
 });
 
 async function lintAt(file, source) {
-  const [result] = await eslint.lintText(source, { filePath: path.join(mosaicRoot, file) });
-  return result.messages;
+  const filePath = path.join(mosaicRoot, file);
+  await mkdir(path.dirname(filePath), { recursive: true });
+  const original = await readFile(filePath).catch(error => {
+    if (error.code === 'ENOENT') {
+      return undefined;
+    }
+    throw error;
+  });
+  await writeFile(filePath, source);
+  try {
+    const result = await execute(
+      process.execPath,
+      [
+        oxlint,
+        '--config',
+        path.join(mosaicRoot, 'oxlint.config.mjs'),
+        '--disable-nested-config',
+        '--format',
+        'json',
+        '--threads',
+        '1',
+        filePath,
+      ],
+      {
+        cwd: mosaicRoot,
+        maxBuffer: 10 * 1024 * 1024,
+      },
+    ).catch(error => {
+      if (error.code === 1 && error.stdout) {
+        return error;
+      }
+      throw error;
+    });
+    if (!result.stdout.trimStart().startsWith('{')) {
+      throw new Error(result.stdout);
+    }
+    return JSON.parse(result.stdout).diagnostics.map(diagnostic => ({
+      message: diagnostic.message,
+      ruleId: diagnostic.code
+        .replace(/^([^()]+)\((.+)\)$/, '$1/$2')
+        .replace(/^typescript\//, '@typescript-eslint/')
+        .replace(/^eslint\//, ''),
+      fatal: !diagnostic.code,
+    }));
+  } finally {
+    if (original === undefined) {
+      await rm(filePath);
+    } else {
+      await writeFile(filePath, original);
+    }
+  }
 }
 
 async function lint(file, source) {
@@ -198,7 +256,6 @@ describe('Mosaic import boundaries', { timeout: 30_000 }, () => {
     expect(messages.filter(message => message.ruleId === 'mosaic/no-model-react-state')).toEqual([
       expect.objectContaining({
         message: 'Put interaction state in the controller and pass its results to the view.',
-        messageId: 'controllerState',
       }),
     ]);
   });
@@ -229,7 +286,6 @@ describe('Mosaic import boundaries', { timeout: 30_000 }, () => {
         expect(messages.filter(message => message.ruleId === 'mosaic/no-dynamic-message-catalogs')).toEqual([
           expect.objectContaining({
             message: 'Use useMessages() for localized and overridden copy instead of importing catalog values.',
-            messageId: 'useMessages',
           }),
         ]);
       }
@@ -349,6 +405,47 @@ describe('Mosaic layers', { timeout: 30_000 }, () => {
   });
 });
 
+describe('Mosaic machines', { timeout: 30_000 }, () => {
+  async function rawInvokeMessages(file, source) {
+    const messages = await lintAt(file, source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages.filter(message => message.ruleId === 'mosaic/no-raw-invoke').map(message => message.message);
+  }
+
+  test('rejects an invoke written without fromPromise', async () => {
+    expect(
+      await rawInvokeMessages(
+        `${featureDir}/sample.controller.ts`,
+        'export const state = { invoke: { src: () => Promise.resolve(1), onDone: { target: "idle" } } };',
+      ),
+    ).toEqual(['Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.']);
+  });
+
+  test.each([
+    ['a quoted src key', 'export const state = { invoke: { "src": () => Promise.resolve(1) } };'],
+    ['a quoted invoke key', 'export const state = { "invoke": { src: () => Promise.resolve(1) } };'],
+    ['an as cast', 'export const state = { invoke: { src: () => Promise.resolve(1) } as object };'],
+    ['satisfies', 'export const state = { invoke: { src: () => Promise.resolve(1) } satisfies object };'],
+  ])('rejects a raw invoke written with %s', async (_name, source) => {
+    expect(await rawInvokeMessages(`${featureDir}/sample.controller.ts`, source)).toHaveLength(1);
+  });
+
+  test('allows an invoke from fromPromise', async () => {
+    expect(
+      await rawInvokeMessages(
+        `${featureDir}/sample.controller.ts`,
+        'declare const fromPromise: (run: () => Promise<number>) => object;\nexport const state = { invoke: fromPromise(() => Promise.resolve(1)) };',
+      ),
+    ).toEqual([]);
+  });
+
+  test('ignores test files', async () => {
+    expect(
+      await rawInvokeMessages(testFixture, 'export const state = { invoke: { src: () => Promise.resolve(1) } };'),
+    ).toEqual([]);
+  });
+});
+
 describe('Mosaic parts', { timeout: 30_000 }, () => {
   async function forwardRefMessages(file, source) {
     const messages = await lintAt(
@@ -393,9 +490,147 @@ describe('Mosaic parts', { timeout: 30_000 }, () => {
   });
 });
 
+describe('Mosaic styles', { timeout: 30_000 }, () => {
+  async function restrictedSyntax(file, source) {
+    const messages = await lintAt(file, source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages
+      .filter(message => message.ruleId === 'eslint-compat/no-restricted-syntax')
+      .map(message => message.message);
+  }
+
+  test('a styles file writes the hover and motion guards raw', async () => {
+    expect(
+      await restrictedSyntax(
+        stylesFixture,
+        [
+          "import * as stylex from '@stylexjs/stylex';",
+          'export const styles = stylex.create({',
+          '  base: {',
+          "    color: { default: 'red', '@media (hover: hover)': { default: null, ':hover:not(:disabled)': 'blue' } },",
+          "    opacity: { default: 1, '@media (prefers-reduced-motion: no-preference)': 0.5 },",
+          '  },',
+          '});',
+        ].join('\n'),
+      ),
+    ).toEqual([]);
+  });
+
+  test.each([
+    "{ default: 'red', ':hover:not(:disabled)': 'blue' }",
+    "{ default: 'red', ':not([data-disabled]):hover': 'blue' }",
+    "{ default: 'red', ':is(:hover:not(:disabled), :focus-within)': 'blue' }",
+    "{ default: 'red', '@media (pointer: fine)': { default: null, ':hover:not(:disabled)': 'blue' } }",
+  ])('a styles file rejects :hover outside the hover media guard: %s', async value => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { color: ${value} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([expect.stringContaining("'@media (hover: hover)'")]);
+  });
+
+  test.each([
+    `':hover:not(:disabled, [data-disabled], [aria-disabled="true"])'`,
+    "':hover:not(:disabled):checked'",
+    "':not([data-disabled]):hover'",
+    "':hover:not(:active):not(:disabled)'",
+  ])('a styles file accepts a hover that skips disabled controls: %s', async key => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { color: { default: 'red', '@media (hover: hover)': { default: null, ${key}: 'blue' } } } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([]);
+  });
+
+  test.each(["':hover'", "':hover:not([data-invalid])'", "':enabled:hover'", "':hover:disabled'"])(
+    'a styles file rejects a hover that still paints disabled controls: %s',
+    async key => {
+      const messages = await restrictedSyntax(
+        stylesFixture,
+        [
+          "import * as stylex from '@stylexjs/stylex';",
+          `export const styles = stylex.create({ base: { color: { default: 'red', '@media (hover: hover)': { default: null, ${key}: 'blue' } } } });`,
+        ].join('\n'),
+      );
+      expect(messages).toEqual([expect.stringContaining('disabled')]);
+    },
+  );
+
+  test.each([
+    "transitionProperty: 'opacity, background-color'",
+    "transitionProperty: '--_cl-scale-color'",
+    "transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'opacity' }",
+    "transitionProperty: { default: 'opacity', '@media (prefers-reduced-motion: no-preference)': 'opacity, transform' }",
+    "transform: 'scale(0.5)'",
+    "transform: { default: 'scale(1)', ':where([data-starting-style])': 'scale(0.94)', '@media (prefers-reduced-motion: reduce)': { default: 'scale(1)', ':where([data-starting-style])': 'scale(1)' } }",
+    "translate: { default: null, '@media (prefers-reduced-motion: no-preference)': { default: null, ':where([data-ending-style])': '0 100%' } }",
+  ])('a styles file accepts motion gated on reduced motion: %s', async declaration => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { ${declaration} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([]);
+  });
+
+  test.each([
+    "transitionProperty: 'opacity, transform'",
+    "transitionProperty: 'all'",
+    "transitionProperty: { default: 'translate', ':where([data-open])': 'opacity' }",
+    "transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'opacity, transform' }",
+    "transitionProperty: { default: 'transform', '@media (prefers-reduced-motion: no-preference)': 'transform' }",
+  ])('a styles file rejects a moving transition without a reduced-motion branch: %s', async declaration => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { ${declaration} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([
+      expect.stringContaining("drop the moving property under '@media (prefers-reduced-motion: reduce)'"),
+    ]);
+  });
+
+  test.each([
+    "transform: { default: 'scale(1)', ':where([data-starting-style], [data-ending-style])': 'scale(0.94)' }",
+    "translate: { default: '0 0', ':where([data-ending-style])': '0 100%' }",
+    "transform: { default: 'scale(1)', ':where([data-starting-style])': 'scale(0.94)', '@media (prefers-reduced-motion: no-preference)': { default: null } }",
+  ])('a styles file rejects an enter or exit offset without a reduced-motion branch: %s', async declaration => {
+    const messages = await restrictedSyntax(
+      stylesFixture,
+      [
+        "import * as stylex from '@stylexjs/stylex';",
+        `export const styles = stylex.create({ base: { ${declaration} } });`,
+      ].join('\n'),
+    );
+    expect(messages).toEqual([expect.stringContaining('restate the enter and exit values')]);
+  });
+
+  test.each([
+    ['export const Sample = () => <form />;', 'Use `Form` from mosaic/primitives/form'],
+    ["export const Sample = ({ Part }: { Part: 'div' }) => <Part className='x' />;", 'Mosaic parts take `xstyle`'],
+  ])('a component keeps the JSX restrictions: %s', async (source, message) => {
+    const messages = await restrictedSyntax('src/components/sample.tsx', source);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain(message);
+  });
+});
+
 describe('Mosaic tests', { timeout: 30_000 }, () => {
   async function vitestRules(source) {
-    const messages = await lintAt(testFixture, ["import { describe, expect, test } from 'vitest';", source].join('\n'));
+    const messages = await lintAt(
+      testFixture,
+      ["import { afterAll, beforeAll, describe, expect, test } from 'vitest';", source].join('\n'),
+    );
     expect(messages.find(message => message.fatal)).toBeUndefined();
     return messages.map(message => message.ruleId).filter(rule => rule?.startsWith('vitest/'));
   }
@@ -481,31 +716,109 @@ describe('Mosaic effects', { timeout: 30_000 }, () => {
   });
 });
 
-describe('Mosaic package configuration', { timeout: 30_000 }, () => {
+describe('Mosaic clock reads', { timeout: 30_000 }, () => {
+  async function renderClockMessages(file, source) {
+    const messages = await lintAt(file, source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages.filter(message => message.ruleId === 'mosaic/no-render-clock').map(message => message.message);
+  }
+
+  test('rejects a clock read in a hook body', async () => {
+    expect(
+      await renderClockMessages('src/hooks/sample.ts', 'export function useSample() { return Date.now(); }'),
+    ).toEqual([
+      'Read the current time with useNow during render, so the server and the client agree. Date.now() and new Date() belong in effects, event handlers and machine actions.',
+    ]);
+  });
+
   test.each([
-    'src/features/sample.view.tsx',
-    'src/features/sample.controller.ts',
-    'src/features/sample.model.ts',
-    'src/styles/sample.styles.ts',
-    'src/primitives/sample.tsx',
-  ])('%s inherits repository rules without enabling guards at the root', async file => {
-    const filePath = path.join(mosaicRoot, file);
-    const rootConfig = await rootEslint.calculateConfigForFile(filePath);
-    const mosaicConfig = await eslint.calculateConfigForFile(filePath);
-    const inheritedRules = { ...mosaicConfig.rules };
+    ['a component body', 'export function Sample() { const now = new Date(); return now.getTime(); }'],
+    ['an arrow hook', 'export const useSample = () => Date.now();'],
+    [
+      'a useState initializer',
+      "import { useState } from 'react';\nexport function useSample() { return useState(() => Date.now())[0]; }",
+    ],
+    [
+      'a useState initializer reference',
+      "import { useState } from 'react';\nexport function useSample() { return useState(Date.now)[0]; }",
+    ],
+    [
+      'a useMemo callback',
+      "import { useMemo } from 'react';\nexport function useSample() { return useMemo(() => new Date(), []); }",
+    ],
+    ['a useRef value', "import { useRef } from 'react';\nexport function useSample() { return useRef(Date.now()); }"],
+    ['a map callback', 'export function useSample(items: number[]) { return items.map(item => item - Date.now()); }'],
+    ['an Array.from callback', 'export function useSample() { return Array.from([1], () => new Date()); }'],
+    [
+      'a forwardRef render',
+      "import { forwardRef } from 'react';\nexport const Sample = forwardRef(() => { void Date.now(); return null; });",
+    ],
+  ])('rejects a clock read in %s', async (_name, source) => {
+    expect(await renderClockMessages('src/hooks/sample.ts', source)).toHaveLength(1);
+  });
 
-    for (const rule of [
-      'boundaries/dependencies',
-      'mosaic/no-model-react-state',
-      'mosaic/no-dynamic-message-catalogs',
-      'mosaic/forward-ref-parts',
-      '@typescript-eslint/no-import-type-side-effects',
-      ...Object.keys(noUnneededEffects.configs.strict.rules),
-    ]) {
-      expect(rootConfig.rules[rule]).toBeUndefined();
-      delete inheritedRules[rule];
+  test.each([
+    [
+      'an effect',
+      "import { useEffect } from 'react';\nexport function useSample() { useEffect(() => { void Date.now(); }, []); }",
+    ],
+    [
+      'a named effect callback',
+      "import { useEffect } from 'react';\nexport function Sample() { useEffect(function RecordTime() { void Date.now(); }, []); return null; }",
+    ],
+    [
+      'a useCallback',
+      "import { useCallback } from 'react';\nexport function useSample() { return useCallback(() => Date.now(), []); }",
+    ],
+    ['an event handler', 'export function useSample() { return { onClick: () => new Date() }; }'],
+    ['a custom hook callback', 'export function useSample() { return usePendingAction(() => Date.now()); }'],
+    ['a timer', 'export function useSample() { return () => setTimeout(() => Date.now(), 0); }'],
+    ['a promise callback', 'export function useSample(load: Promise<void>) { void load.then(() => Date.now()); }'],
+    ['a plain function', 'export function unlockTime(seconds: number) { return Date.now() + seconds * 1000; }'],
+    ['a parsed date', 'export function useSample(value: string) { return new Date(value); }'],
+  ])('allows a clock read in %s', async (_name, source) => {
+    expect(await renderClockMessages('src/hooks/sample.ts', source)).toEqual([]);
+  });
+
+  test.each(['src/hooks/use-now.ts', 'src/mosaic-provider.tsx'])('allows the shared clock in %s', async file => {
+    expect(await renderClockMessages(file, 'export function useSample() { return Date.now(); }')).toEqual([]);
+  });
+
+  test('ignores test files', async () => {
+    expect(await renderClockMessages(testFixture, 'export function useSample() { return Date.now(); }')).toEqual([]);
+  });
+});
+
+describe('Mosaic package configuration', () => {
+  test('inherits repository rules and keeps Mosaic guards in the package', async () => {
+    const configAt = async cwd => {
+      const { stdout } = await execute(process.execPath, [oxlint, '-c', 'oxlint.config.mjs', '--print-config'], {
+        cwd,
+      });
+      return JSON.parse(stdout);
+    };
+    const rootConfig = await configAt(path.resolve(packageRoot, '../..'));
+    const mosaicConfig = await configAt(packageRoot);
+    expect(mosaicConfig.rules['no-restricted-imports']).toEqual(rootConfig.rules['no-restricted-imports']);
+    const rootRules = [rootConfig.rules, ...rootConfig.overrides.map(override => override.rules)];
+    for (const rules of rootRules) {
+      expect(Object.keys(rules).some(rule => /^(mosaic|boundaries)\//.test(rule))).toBe(false);
     }
+    expect(mosaicConfig.overrides.some(override => override.rules['boundaries/dependencies'])).toBe(true);
+  });
+});
 
-    expect(inheritedRules).toEqual(rootConfig.rules);
+describe('Mosaic migration coverage', { timeout: 30_000 }, () => {
+  test.each([
+    ['@typescript-eslint/no-floating-promises', 'export function load(fetch: () => Promise<void>) { fetch(); }'],
+    ['@typescript-eslint/consistent-type-assertions', 'export const value = 1 as number;'],
+    ['eslint-compat/no-restricted-syntax', 'export function View() { return <form />; }'],
+    [
+      '@stylexjs/enforce-extension',
+      "import * as stylex from '@stylexjs/stylex'; export const tokens = stylex.defineVars({ color: 'red' });",
+    ],
+  ])('preserves %s', async (rule, source) => {
+    const messages = await lint('sample.view.tsx', source);
+    expect(messages.some(message => message.ruleId === rule)).toBe(true);
   });
 });

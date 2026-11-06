@@ -51,7 +51,7 @@ export const styles = stylex.create({
     width: space['4'],
   },
   divider: {
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     flexShrink: 0,
     height: space['3.5'],
     width: '1px',
@@ -77,7 +77,7 @@ export const styles = stylex.create({
   countrySearchRow: {
     gap: space['1'],
     alignItems: 'center',
-    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndColor: colorVars['--cl-color-border-subtle'],
     borderBlockEndStyle: 'solid',
     borderBlockEndWidth: '1px',
     display: 'flex',
@@ -140,7 +140,7 @@ export const styles = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {

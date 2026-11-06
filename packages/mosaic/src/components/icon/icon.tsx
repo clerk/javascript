@@ -45,6 +45,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
     //
     // SAFETY: React 18 types `ReactElement.props` as `any`; we only read an optional className.
     // cloneElement re-validates the merged props against the element's real type at render.
+    // eslint-disable-next-line typescript/consistent-type-assertions -- Read the optional class name from an externally supplied element.
     const overrideClassName = (override.props as { className?: string }).className;
     return React.cloneElement(override, mergeStyleProps(props, { className: overrideClassName }));
   }

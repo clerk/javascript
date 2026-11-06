@@ -18,18 +18,20 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
     const { mounted, floatingContext, refs, floatingStyles, placement, getFloatingProps, elementsRef, labelsRef } =
       useComboboxContext();
 
+    const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
+
     React.useLayoutEffect(() => {
       if (!anchor) {
         return;
       }
       refs.setPositionReference(anchor);
-      return () => refs.setPositionReference(refs.domReference.current);
-    }, [anchor, refs]);
+      return restoreReference;
+    }, [anchor, refs, restoreReference]);
 
     const side = parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps();
-    const wiredId = floatingProps.id;
+    const wiredId = floatingProps['id'];
 
     const ownProps = {
       'data-side': side,
@@ -41,7 +43,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not
     // override it, or the aria-controls pairing would silently break.
-    if (wiredId != null) {
+    if (typeof wiredId === 'string') {
       merged.id = wiredId;
     }
 

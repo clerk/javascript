@@ -108,6 +108,7 @@ export function useForm<TValues extends object, TResult = unknown>(
   if (machineRef.current === null) {
     machineRef.current = createFormMachine(deps);
   }
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const [snapshot, send, actor] = useMachine(machineRef.current, { context: deps });
   const context = { ...snapshot.context, ...deps };
   const { values } = context;
@@ -127,9 +128,9 @@ export function useForm<TValues extends object, TResult = unknown>(
         return;
       }
       const settle = (feedback: FieldFeedback | undefined) => {
-        const { submitQueued } = actor.getSnapshot().context;
+        const wasQueued = actor.getSnapshot().value === 'queued';
         send({ type: 'VALIDATED', name, value, feedback });
-        if (submitQueued) {
+        if (wasQueued) {
           focusFirstInvalid();
         }
       };
@@ -183,7 +184,6 @@ export function useForm<TValues extends object, TResult = unknown>(
     ref: refFor(name),
   });
 
-  const isSubmitting = snapshot.value === 'submitting' || context.submitQueued;
   const initial = initialOf(context);
   const fields = mapKeys(values, (name): FormField => {
     const feedback = fieldFeedback(context, name);
@@ -203,10 +203,10 @@ export function useForm<TValues extends object, TResult = unknown>(
     error: context.error?.message,
     get isSubmitting() {
       const current = actor.getSnapshot();
-      return current.value === 'submitting' || current.context.submitQueued;
+      return current.value !== 'editing';
     },
     isDirty: keysOf(values).some(name => fields[name].isDirty),
-    canSubmit: !isSubmitting && isValid(context),
+    canSubmit: isValid(context),
     register,
     registerValue,
     setValue,

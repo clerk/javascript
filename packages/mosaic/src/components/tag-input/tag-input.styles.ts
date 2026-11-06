@@ -74,7 +74,7 @@ export const styles = stylex.create({
     minWidth: 0,
   },
   tagInvalid: {
-    backgroundColor: colorVars['--cl-color-negative-alpha-100'],
+    backgroundColor: colorVars['--cl-color-negative-subtle'],
     color: colorVars['--cl-color-negative'],
   },
   tagLabel: {
@@ -94,7 +94,8 @@ export const styles = stylex.create({
       ':enabled:active': colorVars['--cl-color-neutral-alpha-300'],
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral-alpha-200'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"], :active)':
+          colorVars['--cl-color-neutral-alpha-200'],
       },
     },
     color: 'inherit',
@@ -105,7 +106,10 @@ export const styles = stylex.create({
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
       ':enabled:active': durationVars['--cl-duration-instant'],
-      ':enabled:hover': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'background-color',
     transitionTimingFunction: 'linear',
@@ -120,7 +124,7 @@ export const styles = stylex.create({
     paddingInline: space['1'],
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-foreground'],
-    cursor: { default: null, ':disabled': 'not-allowed' },
+    cursor: { default: null, ':disabled': 'not-allowed', ':read-only': 'not-allowed' },
     flexBasis: '8ch',
     flexGrow: 1,
     fontFamily: 'inherit',

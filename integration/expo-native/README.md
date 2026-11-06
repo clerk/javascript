@@ -40,7 +40,7 @@ To run against a dev client instead, `integration/expo-native/bin/control-clerk-
 
 ## The instance
 
-The tests expect the settings in `src/core/instances/base.json` of `@clerk/internal-mobile-e2e`, which the CLI puts on the application it creates. On an instance with those settings, every test file that has no settings file beside it passes by hand.
+The tests expect the settings in `src/core/instances/base.json` of `@clerk/internal-mobile-e2e`, which the CLI puts on the application it creates. On an instance with those settings, every test that calls neither `host.useSettings` nor `host.useMinimumAppVersion` passes by hand.
 
 An instance left at Clerk's defaults passes only part of the suite. The tests that sign in with a ticket, or sign up with an email address and a password, pass. The tests that need a phone number, an email code at sign-in, organizations, or a second account on the device fail, because a new instance has none of those turned on.
 
@@ -48,11 +48,12 @@ Every run creates users with addresses like `maya.7c1e+clerk_test@example.com` a
 
 ## Test files that need the CLI
 
-This test file has a `.settings.json` file beside it, and passes only on an instance with those settings:
+These test files call `host.useSettings` or `host.useMinimumAppVersion` to change the instance, and pass only under the CLI:
 
 - `specs/features/native-modules/biometric-availability.e2e.ts`
+- `specs/features/update-required/update-required.e2e.ts`
 
-The CLI's `run` puts the instance on the declared settings before the file starts, and e2e alone does not. Run them through the CLI, for example `integration/expo-native/bin/control-clerk-expo run native-modules` from the repo root.
+The CLI holds the Platform API key that changes the settings, and it puts them back when the test ends. In a run by hand, both fail, because e2e alone has no such key. Run them through the CLI, for example `integration/expo-native/bin/control-clerk-expo run native-modules` from the repo root.
 
 ## What a run by hand does not do
 

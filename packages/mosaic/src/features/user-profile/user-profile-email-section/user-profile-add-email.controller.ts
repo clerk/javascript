@@ -3,13 +3,14 @@ import { useEffect, useMemo } from 'react';
 import type { DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
+import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
-import { CODE_LENGTH, CODE_RESEND_SECONDS } from '../../../utils/verification';
+import { CODE_LENGTH, CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type {
   UserProfileEmail,
@@ -40,7 +41,7 @@ interface Context {
   verifier: UserProfileEmailVerifier | undefined;
   verification: UserProfileEmailVerification | undefined;
   error: FormError | undefined;
-  resendSeconds: number;
+  resendAvailableAt: number | undefined;
   held: boolean;
 }
 
@@ -50,8 +51,7 @@ type Event =
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
   | { type: 'CONNECT' }
-  | { type: 'RESEND' }
-  | { type: 'TICK' };
+  | { type: 'RESEND' };
 
 const { createMachine, assign, fromPromise } = setup<Context, Event>();
 
@@ -61,22 +61,21 @@ function missingDependency(): Promise<never> {
 
 const LINK_RESEND_SECONDS = 60;
 
-const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
 const resend = {
-  target: 'starting',
-  guard: (context: Context) => context.resendSeconds === 0,
+  target: 'starting' as const,
+  guard: (context: Context) => isResendUnlocked(context.resendAvailableAt),
   actions: assign(() => ({ error: undefined })),
 };
 const start = {
-  target: 'starting',
+  target: 'starting' as const,
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
     verifyingId: event.id,
     emailAddress: event.emailAddress,
     verifier: event.verifier,
     verification: undefined,
     error: undefined,
-    resendSeconds: 0,
+    resendAvailableAt: undefined,
     held: false,
   })),
 };
@@ -85,7 +84,10 @@ const sendCode = {
   invoke: fromPromise(
     (context: Context) => (context.verification?.method === 'code' ? context.verification.sent : missingDependency()),
     {
-      onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS, held: false })) },
+      onDone: {
+        target: 'verify',
+        actions: assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS), held: false })),
+      },
       onError: { target: 'verify', actions: [fail, assign(() => ({ held: false }))] },
     },
   ),
@@ -100,7 +102,7 @@ const machine = createMachine({
     verifier: undefined,
     verification: undefined,
     error: undefined,
-    resendSeconds: 0,
+    resendAvailableAt: undefined,
     held: false,
   },
   states: {
@@ -113,7 +115,7 @@ const machine = createMachine({
             verifier: undefined,
             verification: undefined,
             error: undefined,
-            resendSeconds: 0,
+            resendAvailableAt: undefined,
           })),
         },
         START: { ...start, actions: [start.actions, assign(() => ({ held: true }))] },
@@ -135,13 +137,16 @@ const machine = createMachine({
         if (method === 'sso') {
           return { target: 'connecting' };
         }
-        return { target: 'waiting', context: { resendSeconds: method === 'link' ? LINK_RESEND_SECONDS : 0 } };
+        return {
+          target: 'waiting',
+          context: { resendAvailableAt: method === 'link' ? resendUnlockTime(LINK_RESEND_SECONDS) : undefined },
+        };
       },
     },
     preparing: sendCode,
     sending: sendCode,
     waiting: {
-      on: { CANCEL: 'idle', TICK: tick, RESEND: resend },
+      on: { CANCEL: 'idle', RESEND: resend },
       invoke: fromPromise(
         context => (context.verification?.method === 'link' ? context.verification.verified : missingDependency()),
         {
@@ -163,7 +168,7 @@ const machine = createMachine({
       ),
     },
     verify: {
-      on: { CANCEL: 'idle', TICK: tick, RESEND: resend, VERIFIED: 'idle' },
+      on: { CANCEL: 'idle', RESEND: resend, VERIFIED: 'idle' },
     },
   },
 });
@@ -177,7 +182,11 @@ export function useUserProfileAddEmailController({
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
-  const { resendSeconds, error, verification } = snapshot.context;
+  const { resendAvailableAt, error, verification } = snapshot.context;
+  const resendSeconds = useResendSeconds(
+    resendAvailableAt,
+    verification?.method === 'link' ? LINK_RESEND_SECONDS : CODE_RESEND_SECONDS,
+  );
   const emailForm = useForm({
     initialValues: { emailAddress: initialEmailAddress },
     canSubmit: values => values.emailAddress !== '' && values.emailAddress !== username,
@@ -202,13 +211,6 @@ export function useUserProfileAddEmailController({
   const open = state !== 'idle' && state !== 'preparing';
   const waitingFor = state === 'waiting' && verification?.method === 'link' ? verification : undefined;
   useEffect(() => waitingFor?.cancel, [waitingFor]);
-  useEffect(() => {
-    if (!open || resendSeconds === 0) {
-      return;
-    }
-    const timer = setTimeout(() => send({ type: 'TICK' }), 1000);
-    return () => clearTimeout(timer);
-  }, [open, resendSeconds, send]);
 
   const isReverifying = emailForm.isSubmitting && reverification.visible;
   const step = isReverifying ? 'reverify' : toStep(state, verification);
@@ -224,9 +226,9 @@ export function useUserProfileAddEmailController({
     step,
     reverification,
     emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
-    canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
+    canSubmitEmail: emailForm.canSubmit,
     code: codeForm.values.code,
-    canSubmitCode: codeForm.canSubmit || codeForm.isSubmitting,
+    canSubmitCode: codeForm.canSubmit,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {

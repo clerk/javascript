@@ -68,22 +68,13 @@ export function OrganizationListView({
 function ListStep({
   applicationName,
   hidePersonal,
-  personalImageUrl,
-  memberships,
-  invitations,
-  suggestions,
-  paging: { ref: loadMoreRef, hasMore },
   pendingKey,
   error,
-  onSelectOrganization,
-  onAcceptInvitation,
-  onAcceptSuggestion,
   onCreateOrganization,
+  ...rows
 }: OrganizationListStepProps) {
   const m = useMessages('organizationList');
   const createButton = useFlowAutoFocus();
-  const listed = new Set(memberships.map(membership => membership.organizationId));
-  const visibleInvitations = invitations.filter(i => i.status === 'pending' || !listed.has(i.organizationId));
 
   return (
     <>
@@ -98,52 +89,11 @@ function ListStep({
         {error}
       </Card.Banner>
       <Card.Content>
-        <Item.Group variant='outline'>
-          {hidePersonal ? null : (
-            <SelectRow
-              name={m.personal}
-              imageUrl={personalImageUrl}
-              shape='circle'
-              {...busyState(pendingKey, organizationListBusyKeys.selectOrganization(null))}
-              onSelect={onSelectOrganization ? () => onSelectOrganization(null) : undefined}
-            />
-          )}
-          {memberships.map(membership => (
-            <MembershipRow
-              key={membership.organizationId}
-              membership={membership}
-              pendingKey={pendingKey}
-              onSelectOrganization={onSelectOrganization}
-            />
-          ))}
-          {visibleInvitations.map(invitation => (
-            <InvitationRow
-              key={invitation.id}
-              invitation={invitation}
-              pendingKey={pendingKey}
-              onSelectOrganization={onSelectOrganization}
-              onAcceptInvitation={onAcceptInvitation}
-            />
-          ))}
-          {suggestions.map(suggestion => (
-            <SuggestionRow
-              key={suggestion.id}
-              suggestion={suggestion}
-              pendingKey={pendingKey}
-              onAcceptSuggestion={onAcceptSuggestion}
-            />
-          ))}
-          {hasMore ? (
-            <Item.Root ref={loadMoreRef}>
-              <Item.Media>
-                <Spinner
-                  size='sm'
-                  label={m.loading}
-                />
-              </Item.Media>
-            </Item.Root>
-          ) : null}
-        </Item.Group>
+        <OrganizationListRows
+          hidePersonal={hidePersonal}
+          pendingKey={pendingKey}
+          {...rows}
+        />
       </Card.Content>
       {onCreateOrganization ? (
         <Card.Footer>
@@ -161,6 +111,90 @@ function ListStep({
         </Card.Footer>
       ) : null}
     </>
+  );
+}
+
+export type OrganizationListRowsProps = Pick<
+  OrganizationListViewProps,
+  | 'hidePersonal'
+  | 'personalImageUrl'
+  | 'memberships'
+  | 'invitations'
+  | 'suggestions'
+  | 'paging'
+  | 'pendingKey'
+  | 'onSelectOrganization'
+  | 'onAcceptInvitation'
+  | 'onAcceptSuggestion'
+> & {
+  children?: ReactNode;
+};
+
+export function OrganizationListRows({
+  hidePersonal,
+  personalImageUrl,
+  memberships,
+  invitations,
+  suggestions,
+  paging: { ref: loadMoreRef, hasMore },
+  pendingKey,
+  onSelectOrganization,
+  onAcceptInvitation,
+  onAcceptSuggestion,
+  children,
+}: OrganizationListRowsProps) {
+  const m = useMessages('organizationList');
+  const listed = new Set(memberships.map(membership => membership.organizationId));
+  const visibleInvitations = invitations.filter(i => i.status === 'pending' || !listed.has(i.organizationId));
+
+  return (
+    <Item.Group>
+      {hidePersonal ? null : (
+        <SelectRow
+          name={m.personal}
+          imageUrl={personalImageUrl}
+          shape='circle'
+          {...busyState(pendingKey, organizationListBusyKeys.selectOrganization(null))}
+          onSelect={onSelectOrganization ? () => onSelectOrganization(null) : undefined}
+        />
+      )}
+      {memberships.map(membership => (
+        <MembershipRow
+          key={membership.organizationId}
+          membership={membership}
+          pendingKey={pendingKey}
+          onSelectOrganization={onSelectOrganization}
+        />
+      ))}
+      {visibleInvitations.map(invitation => (
+        <InvitationRow
+          key={invitation.id}
+          invitation={invitation}
+          pendingKey={pendingKey}
+          onSelectOrganization={onSelectOrganization}
+          onAcceptInvitation={onAcceptInvitation}
+        />
+      ))}
+      {suggestions.map(suggestion => (
+        <SuggestionRow
+          key={suggestion.id}
+          suggestion={suggestion}
+          pendingKey={pendingKey}
+          onAcceptSuggestion={onAcceptSuggestion}
+        />
+      ))}
+      {hasMore ? (
+        <Item.Root ref={loadMoreRef}>
+          <Item.Media>
+            <Spinner
+              size='sm'
+              label={m.loading}
+            />
+          </Item.Media>
+        </Item.Root>
+      ) : null}
+      {children}
+    </Item.Group>
   );
 }
 
@@ -294,12 +328,12 @@ function SelectRow({ name, imageUrl, shape, busy, disabled, onSelect }: SelectRo
         <Item.Label>{name}</Item.Label>
       </Item.Content>
       {busy ? (
-        <Item.Actions>
+        <Item.Media>
           <Spinner
             size='sm'
             label={m.pending}
           />
-        </Item.Actions>
+        </Item.Media>
       ) : null}
     </Item.Root>
   );
@@ -332,11 +366,7 @@ function OfferRow({ name, imageUrl, actionLabel, note, busy, disabled, onAccept 
       <Item.Content>
         <Item.Label id={labelId}>{name}</Item.Label>
       </Item.Content>
-      {note ? (
-        <Item.Actions>
-          <Item.Description>{note}</Item.Description>
-        </Item.Actions>
-      ) : onAccept ? (
+      {note || onAccept ? (
         <Item.Actions>
           <SubmitButton
             type='button'
@@ -346,12 +376,12 @@ function OfferRow({ name, imageUrl, actionLabel, note, busy, disabled, onAccept 
             isPending={busy}
             pendingLabel={m.pending}
             spinDelay={{ delay: 0 }}
-            disabled={disabled}
+            disabled={disabled || Boolean(note)}
             focusableWhenDisabled
             aria-describedby={labelId}
-            onClick={onAccept}
+            onClick={note ? undefined : onAccept}
           >
-            {actionLabel}
+            {note ?? actionLabel}
           </SubmitButton>
         </Item.Actions>
       ) : null}

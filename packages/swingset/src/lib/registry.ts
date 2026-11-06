@@ -149,7 +149,6 @@ import {
   Group as ItemGroup,
   Interactive as ItemInteractive,
   meta as itemMeta,
-  Scrolling as ItemScrolling,
 } from '../stories/item.stories';
 import {
   Catalog as LocalizationCatalog,
@@ -168,6 +167,15 @@ import {
 } from '../stories/logs-table.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
+import {
+  Default as OAuthConsentDefault,
+  ManyScopes as OAuthConsentManyScopes,
+  meta as oauthConsentMeta,
+  MultipleOrganizations as OAuthConsentMultipleOrganizations,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
 import {
   Default as OrganizationListDefault,
   Empty as OrganizationListEmpty,
@@ -256,6 +264,7 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
+import { meta as profilePermutationsMeta } from '../stories/profile-permutations.stories';
 import {
   Default as ProviderButtonDefault,
   Many as ProviderButtonMany,
@@ -326,6 +335,29 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
+import {
+  BackupCode as SignInBackupCode,
+  Default as SignInDefault,
+  EmailCode as SignInEmailCode,
+  meta as signInMeta,
+  MethodPicker as SignInMethodPicker,
+  Password as SignInPassword,
+  PasswordError as SignInPasswordError,
+  PasswordPending as SignInPasswordPending,
+  SignUp as SignInSignUp,
+  Start as SignInStart,
+  StartError as SignInStartError,
+  StartManyProviders as SignInStartManyProviders,
+  StartProviderPending as SignInStartProviderPending,
+  StartSignInOnly as SignInStartSignInOnly,
+  Totp as SignInTotp,
+  VerifyEmail as SignInVerifyEmail,
+} from '../stories/sign-in.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -334,6 +366,12 @@ import {
   Shapes as SkeletonShapes,
   TextContent as SkeletonTextContent,
 } from '../stories/skeleton.stories';
+import {
+  Clickable as StepperClickable,
+  meta as stepperMeta,
+  Primary as StepperPrimary,
+  Progress as StepperProgress,
+} from '../stories/stepper.stories';
 import {
   Default as SwitchDefault,
   meta as switchMeta,
@@ -361,6 +399,23 @@ import {
   Validation as TagInputComponentValidation,
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
+import {
+  Default as TaskChooseOrganizationDefault,
+  Empty as TaskChooseOrganizationEmpty,
+  Loading as TaskChooseOrganizationLoading,
+  meta as taskChooseOrganizationMeta,
+  Unavailable as TaskChooseOrganizationUnavailable,
+  WithDefaults as TaskChooseOrganizationWithDefaults,
+  WithError as TaskChooseOrganizationWithError,
+  WithoutCreate as TaskChooseOrganizationWithoutCreate,
+} from '../stories/task-choose-organization.stories';
+import {
+  AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
+  Default as TaskSetupMfaDefault,
+  meta as taskSetupMfaMeta,
+  NewPhone as TaskSetupMfaNewPhone,
+  SmsOnly as TaskSetupMfaSmsOnly,
+} from '../stories/task-setup-mfa.stories';
 import {
   Colors as TextColors,
   Default as TextDefault,
@@ -670,6 +725,13 @@ const paginationModule: StoryModule = {
   Disabled: PaginationDisabled,
 };
 
+const stepperModule: StoryModule = {
+  meta: stepperMeta,
+  Primary: StepperPrimary,
+  Progress: StepperProgress,
+  Clickable: StepperClickable,
+};
+
 const phoneInputModule: StoryModule = {
   meta: phoneInputMeta,
   Default: PhoneInputDefault,
@@ -721,13 +783,20 @@ const itemModule: StoryModule = {
   Default: ItemDefault,
   Interactive: ItemInteractive,
   Group: ItemGroup,
-  Scrolling: ItemScrolling,
 };
 
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
   Combined: UserButtonCombined,
   User: UserButtonUser,
+};
+
+const taskSetupMfaModule: StoryModule = {
+  meta: taskSetupMfaMeta,
+  Default: TaskSetupMfaDefault,
+  SmsOnly: TaskSetupMfaSmsOnly,
+  AuthenticatorOnly: TaskSetupMfaAuthenticatorOnly,
+  NewPhone: TaskSetupMfaNewPhone,
 };
 
 const inviteMembersButtonModule: StoryModule = {
@@ -772,6 +841,17 @@ const organizationListModule: StoryModule = {
   Loading: OrganizationListLoading,
   Empty: OrganizationListEmpty,
   WithError: OrganizationListWithError,
+};
+
+const taskChooseOrganizationModule: StoryModule = {
+  meta: taskChooseOrganizationMeta,
+  Default: TaskChooseOrganizationDefault,
+  WithoutCreate: TaskChooseOrganizationWithoutCreate,
+  Empty: TaskChooseOrganizationEmpty,
+  WithDefaults: TaskChooseOrganizationWithDefaults,
+  Unavailable: TaskChooseOrganizationUnavailable,
+  Loading: TaskChooseOrganizationLoading,
+  WithError: TaskChooseOrganizationWithError,
 };
 
 const headingModule: StoryModule = {
@@ -911,6 +991,12 @@ const segmentedControlModule: StoryModule = {
   meta: segmentedControlMeta,
   Default: SegmentedControlDefault,
   Disabled: SegmentedControlDisabled,
+};
+
+const separatorModule: StoryModule = {
+  meta: separatorMeta,
+  Default: SeparatorDefault,
+  Labelled: SeparatorLabelled,
 };
 
 const switchModule: StoryModule = {
@@ -1074,6 +1160,15 @@ const apiKeysTableModule: StoryModule = {
   Empty: APIKeysTableEmpty,
 };
 
+const oauthConsentModule: StoryModule = {
+  meta: oauthConsentMeta,
+  Default: OAuthConsentDefault,
+  ScopeList: OAuthConsentScopeList,
+  ManyScopes: OAuthConsentManyScopes,
+  MultipleOrganizations: OAuthConsentMultipleOrganizations,
+  OfflineAccess: OAuthConsentOfflineAccess,
+};
+
 const reverificationModule: StoryModule = {
   meta: reverificationMeta,
   Default: ReverificationDefault,
@@ -1094,6 +1189,25 @@ const reverificationModule: StoryModule = {
   MethodPicker: ReverificationMethodPicker,
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
+};
+
+const signInModule: StoryModule = {
+  meta: signInMeta,
+  Default: SignInDefault,
+  Start: SignInStart,
+  StartSignInOnly: SignInStartSignInOnly,
+  StartManyProviders: SignInStartManyProviders,
+  StartProviderPending: SignInStartProviderPending,
+  StartError: SignInStartError,
+  Password: SignInPassword,
+  PasswordPending: SignInPasswordPending,
+  PasswordError: SignInPasswordError,
+  EmailCode: SignInEmailCode,
+  Totp: SignInTotp,
+  BackupCode: SignInBackupCode,
+  MethodPicker: SignInMethodPicker,
+  SignUp: SignInSignUp,
+  VerifyEmail: SignInVerifyEmail,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
@@ -1123,6 +1237,7 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
+  { meta: profilePermutationsMeta },
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1156,15 +1271,21 @@ export const registry: StoryModule[] = [
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
   // Misc
+  { meta: mosaicProviderMeta },
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
+  taskChooseOrganizationModule,
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
   logsTableModule,
+  oauthConsentModule,
   reverificationModule,
   waitlistModule,
+  taskSetupMfaModule,
+  // Authentication
+  signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
@@ -1203,6 +1324,8 @@ export const registry: StoryModule[] = [
   revealModule,
   sectionModule,
   segmentedControlModule,
+  separatorModule,
+  stepperModule,
   selectComponentModule,
   switchModule,
   tableModule,

@@ -68,6 +68,7 @@ export function createLayoutAnimator(container: HTMLElement): () => void {
     animation.finished.then(settle, settle);
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
   function run() {
     const timing = readTiming(container);
     const fromHeight = animations.has(container) ? readHeight(container) : height;

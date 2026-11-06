@@ -27,8 +27,10 @@ export function useMessageHeight(active: HTMLElement | null) {
 export function useHeldMessage(children: React.ReactNode, open: boolean) {
   const held = React.useRef(children);
   if (open) {
+    // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
     held.current = children;
   }
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   return held.current;
 }
 
@@ -37,7 +39,7 @@ export function FeedbackBody({ icon, children }: { icon: IconComponent; children
     <>
       <Icon
         glyph={icon}
-        size='sm'
+        size='md'
         xstyle={feedbackStyles.icon}
       />
       <span>{children}</span>

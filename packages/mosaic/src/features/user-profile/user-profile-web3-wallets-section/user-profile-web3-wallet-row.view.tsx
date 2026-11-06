@@ -14,6 +14,7 @@ import { UserProfileProviderMedia } from '../user-profile-provider-media';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.types';
 
+// eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
 export function UserProfileWeb3WalletRowView({
   wallet,
   triggerRef,
@@ -99,7 +100,7 @@ export function UserProfileWeb3WalletRowView({
                 <Icon
                   glyph={ArrowUpRight}
                   placement='inline-end'
-                  size='sm'
+                  size='md'
                 />
               </SubmitButton>
             ) : null}
