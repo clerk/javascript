@@ -25,13 +25,21 @@ export const styles = stylex.create({
     height: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
   },
   iconButton: {
-    width: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
+    backgroundColor: 'transparent',
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
+      },
+    },
+    width: `calc(2 * (${space['5']} - var(--_cl-input-group-inset)))`,
   },
   start: {
     borderEndStartRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
     borderStartStartRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
     paddingInlineStart: {
-      default: space['3'],
+      default: `calc(${space['3']} - 1px)`,
       [stylex.when.descendant(':where(*)', buttonScope)]: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
     },
   },
@@ -39,7 +47,7 @@ export const styles = stylex.create({
     borderEndEndRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
     borderStartEndRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
     paddingInlineEnd: {
-      default: space['3'],
+      default: `calc(${space['3']} - 1px)`,
       [stylex.when.descendant(':where(*)', buttonScope)]: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
     },
   },

@@ -12,8 +12,8 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const popupRadius = radiusVars['--cl-radius-lg'];
-const inset = space['1'];
+const popupRadius = radiusVars['--cl-radius-xl'];
+const inset = space['1.5'];
 const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 
 export const styles = stylex.create({
@@ -72,7 +72,7 @@ export const styles = stylex.create({
   },
   option: {
     borderRadius: optionRadius,
-    gap: space['2'],
+    gap: space['1'],
     outline: {
       default: 'none',
       '@media (forced-colors: active)': {
@@ -80,7 +80,6 @@ export const styles = stylex.create({
         ':is([data-active])': '2px solid CanvasText',
       },
     },
-    paddingInline: space['2'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
@@ -102,7 +101,9 @@ export const styles = stylex.create({
       default: 1,
       ':is([data-disabled])': 0.5,
     },
-    height: space['9'],
+    paddingInlineEnd: space['1.5'],
+    paddingInlineStart: space['1.5'],
+    height: space['8'],
   },
   empty: {
     paddingBlock: space['6'],
@@ -116,6 +117,8 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'inline-flex',
     flexShrink: 0,
+    justifyContent: 'center',
     marginInlineStart: 'auto',
+    width: space['4'],
   },
 });
