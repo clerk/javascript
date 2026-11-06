@@ -1,0 +1,14 @@
+import * as ColorTokenStories from './color-tokens.stories';
+
+# Color Tokens
+
+**Presets** set the page and the neutral together, for both modes: Gray, Warm gray and Cool gray. They are also in the Palette menu in the header, so you can switch while you browse other pages. Editing any token afterwards switches the palette to Custom.
+
+The color tokens in two groups. **Set by you** are the seeds: `--cl-color-page`, `--cl-color-neutral`, `--cl-color-brand`, the three status colors and their `-foreground` pairs. Each token shows the mode selected by the dark mode toggle, and edits apply to that mode only; flip the toggle to set the other. Click a swatch to open the browser's color picker, which has a color wheel and takes hex codes, or type any CSS color (hex, `oklch()`, `rgb()`) into the cell. Either way that mode is overridden for the whole preview and the other mode keeps its default. Reset drops the current mode's override. The picker works in sRGB hex, so a color you pick is converted from `oklch` and rounded. **Generated** tokens are derived from the seeds, so they show their resolved color for the current mode but can't be edited here; change a seed and watch them follow.
+
+Overrides are applied to the document root, so every other page in the preview shows the change, and they survive navigation until you reload.
+
+<Story
+  name='Default'
+  storyModule={ColorTokenStories}
+/>
