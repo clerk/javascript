@@ -2,6 +2,12 @@ import type { OAuthProvider, OAuthProviderData, OAuthStrategy } from './types';
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
+    provider: 'chatgpt',
+    strategy: 'oauth_chatgpt',
+    name: 'ChatGPT',
+    docsUrl: 'https://developers.openai.com/siwc/website',
+  },
+  {
     provider: 'google',
     strategy: 'oauth_google',
     name: 'Google',
