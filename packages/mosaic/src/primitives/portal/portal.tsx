@@ -53,7 +53,7 @@ function usePortalRoot(): HTMLElement | null | undefined {
   const container = React.useContext(InsidePortalContext) ? undefined : provided;
   const [root, setRoot] = React.useState<HTMLElement | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- A ref's `current` changes without a re-render, so every render checks it again; setting the same element is a no-op.
+  // eslint-disable-next-line react/exhaustive-deps -- A ref's `current` changes without a re-render, so every render checks it again; setting the same element is a no-op.
   React.useEffect(() => {
     if (container !== undefined) {
       setRoot(resolve(container));

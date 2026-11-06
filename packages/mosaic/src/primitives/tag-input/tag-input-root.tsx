@@ -1,6 +1,6 @@
 'use client';
 
-import React, { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { useComposite } from '../hooks/use-composite';
@@ -55,7 +55,9 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
   const [value, setValue] = useControllableState(valueProp, defaultValue, onValueChange);
   const [inputValue, setInputValue] = useControllableState(inputValueProp, defaultInputValue, onInputValueChange);
   const valueRef = useRef(value);
-  valueRef.current = value;
+  useLayoutEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   const [renderList, setRenderList] = useState(value);
   const [syncedValue, setSyncedValue] = useState(value);
@@ -116,39 +118,37 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
 
   const add = useCallback(
     (values: string[]) => {
-      const current = valueRef.current;
-      const next = [...current];
+      const next = [...value];
       for (const candidate of values) {
         const trimmed = candidate.trim();
         if (trimmed && !next.includes(trimmed)) {
           next.push(trimmed);
         }
       }
-      if (next.length !== current.length) {
+      if (next.length !== value.length) {
         setValue(next);
       }
     },
-    [setValue],
+    [setValue, value],
   );
 
   const remove = useCallback(
     (tagValue: string, focusAfter: FocusAfterRemove) => {
-      const current = valueRef.current;
-      const index = current.indexOf(tagValue);
+      const index = value.indexOf(tagValue);
       if (index === -1) {
         return;
       }
-      const previous = current[index - 1];
-      const next = current[index + 1];
+      const previous = value[index - 1];
+      const next = value[index + 1];
       const target = focusAfter === 'previous' ? (previous ?? next) : focusAfter === 'next' ? next : undefined;
       if (target === undefined) {
         focusInput();
       } else {
         focusTag(target);
       }
-      setValue(current.filter(item => item !== tagValue));
+      setValue(value.filter(item => item !== tagValue));
     },
-    [setValue, focusInput, focusTag],
+    [setValue, focusInput, focusTag, value],
   );
 
   const onTagExited = useCallback((tagValue: string) => {

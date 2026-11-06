@@ -20,7 +20,7 @@ API".
 | `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`), `mergeStyleProps`, the `Mosaic*Props` types |
 | `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                                          |
 
-The `@stylexjs` eslint rules run on `packages/mosaic/src/**` (tests excluded). The `enforce-extension`
+The `@stylexjs` Oxlint rules run on `packages/mosaic/src/**` (tests excluded). The `enforce-extension`
 rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
 `.stylex.ts` file may export nothing but `defineVars` / `defineConsts` /
 `defineMarker` results.** So `stylex.create(...)` lives in a plain `.styles.ts`
@@ -222,7 +222,7 @@ device, while touch devices look correct.
 
   ```tsx
   // item.tsx — the ring is an atom in the chain, not a property in the styles file
-  stylex.props(reset.base, focusOutline.visible, slots.item.base, slots.item[size]);
+  stylex.props(reset.base, focusOutline.visible, slots.item.base, xstyle);
   ```
 
   It uses `:focus-visible`, never bare `:focus`, and `:has(:focus-visible)` for the

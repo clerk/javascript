@@ -16,6 +16,7 @@ export function useMembersTableModel(query: string) {
     memberships: canRead ? { pageSize: PAGE_SIZE, keepPreviousData: true, query: query || undefined } : undefined,
   });
   const fetchPage = useRef(memberships?.fetchPage);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   fetchPage.current = memberships?.fetchPage;
   useEffect(() => {
     fetchPage.current?.(1);

@@ -24,6 +24,7 @@ export interface DialogPopupProps extends ComponentProps<'div'> {
 // Focuses a text-field `initialFocus` inside the opening tap, the only focus iOS raises the keyboard for.
 // A child, not a hook: React runs child layout effects first, so this lands before the focus manager's.
 function OpeningFocus({ target }: { target: ResolvedInitialFocus }) {
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const openingTarget = React.useRef(target).current;
   React.useLayoutEffect(() => {
     const element = typeof openingTarget === 'number' ? null : openingTarget.current;

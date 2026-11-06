@@ -733,7 +733,9 @@ function OrganizationSection() {
   const { showOrganizations } = data.layout;
 
   const actions: ReactNode[] = [];
+  // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
   for (const action of data.layout.actions.organizationsFooter) {
+    // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
     if (action === 'createOrganization' && data.onCreateOrganization) {
       actions.push(
         <ActionRow
@@ -745,6 +747,7 @@ function OrganizationSection() {
             />
           }
           label={m.manage.createOrganization}
+          // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
           onClick={data.onCreateOrganization}
         />,
       );
@@ -766,6 +769,7 @@ function OrganizationSection() {
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
         {showOrganizations ? (
+          // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
           data.organizationsLoading ? (
             <OrganizationListLoadingRow />
           ) : (
@@ -773,6 +777,7 @@ function OrganizationSection() {
               <PersonalRow />
               <MembershipRows />
               <PendingRows />
+              {/* eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data. */}
               {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
             </>
           )

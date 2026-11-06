@@ -401,11 +401,15 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     onAcceptSuggestion: async suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
       try {
-        await suggestion?.accept();
-      } finally {
-        // We always revalidate, a failed accept might be because of old state
+        const accepted = await suggestion?.accept();
+        if (accepted) {
+          await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+        }
+      } catch (error) {
+        // A failed accept might be because of old state
         // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
         await Promise.allSettled([userSuggestions.revalidate?.()]);
+        throw error;
       }
     },
     onAcceptInvitation: async invitationId => {

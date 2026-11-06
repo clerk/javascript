@@ -794,8 +794,8 @@ collocated with the value that drives it.
 
 The controllers that already made this call are the best reference:
 
-- `blocks/confirmation/confirmation.controller.ts`: a machine
-- `blocks/destructive/destructive.controller.ts`: one `useState` holding a status union
+- `blocks/confirm/confirm.controller.ts`: a machine
+- `features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`: one `useState` beside `useForm`
 - `features/switcher/switcher.controller.tsx`: a machine
 - `hooks/use-pending-action.ts`: keyed `useState` plus a lock
 

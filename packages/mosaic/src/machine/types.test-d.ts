@@ -181,7 +181,7 @@ describe('Actor.send — signature is (event: TEvent) => void, not AnyEventObjec
   });
 
   test('send does not widen to Record<string, unknown>', () => {
-    expectTypeOf(actor.send).not.toMatchTypeOf<(event: Record<string, unknown>) => void>();
+    expectTypeOf(actor.send).not.toExtend<(event: Record<string, unknown>) => void>();
   });
 });
 
@@ -254,7 +254,7 @@ describe('setup — eliminates repetitive generic params', () => {
       context: { count: 0, label: '' },
       states: { idle: { on: { SIMPLE: 'idle' } } },
     });
-    expectTypeOf(m).toMatchTypeOf<StateMachine<TestContext, TestEvent>>();
+    expectTypeOf(m).toExtend<StateMachine<TestContext, TestEvent>>();
   });
 
   test('assign in on handler infers the narrowed event type — no Extract<> needed', () => {

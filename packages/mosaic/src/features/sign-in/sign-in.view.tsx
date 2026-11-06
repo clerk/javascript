@@ -83,7 +83,7 @@ export function SignInView({
   signUpErrors,
   onSignUpDetailChange,
   focusRef,
-}: SignInViewProps & { focusRef?: Ref<HTMLElement> }): JSX.Element {
+}: SignInViewProps & { focusRef?: Ref<HTMLElement> }) {
   const m = useMessages('signIn');
 
   const actions = {

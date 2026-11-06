@@ -23,6 +23,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
 | Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
 | Add a public prop that shows or hides UI  | [Public visibility props](docs/public-props.md)                                   |
+| Document a component in Swingset          | [Documenting components](docs/documenting-components.md)                          |
 | Prove a change in a browser               | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                            |
 
 ## Before editing a file
@@ -62,13 +63,14 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A placeholder for content that is still loading                          | `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)                                                            |
 | A date shown to the user                                                 | `formatDate` (`src/utils/format-date.ts`)                                                                                              |
 | A value turned into kebab case, e.g. for a `data-*` attribute            | `kebabCase` (`src/utils/kebab-case.ts`)                                                                                                |
-| Current time for display labels                                          | `useNow` (`src/hooks/`)                                                                                                                |
+| Any current time read during render                                      | `useNow` (`src/hooks/`), with `until` to stop ticking at a deadline                                                                    |
 | Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                                         |
 | An inline message row; height is undefined until measured                | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts`                      |
 | Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)                                       |
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                                                       |
 | An organization permission checked with `checkAuthorization`             | `ORGANIZATION_PERMISSIONS` (`src/utils/permissions.ts`)                                                                                |
-| A verification code's length or resend cooldown                          | `CODE_LENGTH`, `CODE_RESEND_SECONDS` (`src/utils/verification.ts`)                                                                     |
+| A verification code's length or resend cooldown                          | `CODE_LENGTH`, `CODE_RESEND_SECONDS`, `resendUnlockTime`, `isResendUnlocked` (`src/utils/verification.ts`)                             |
+| The seconds left on a resend cooldown, for display                       | `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine                                                 |
 | Backup codes saved to a file or printed                                  | `downloadBackupCodes`, `printBackupCodes` (`src/utils/backup-codes.ts`)                                                                |
 | An avatar or logo file picker and its rejection errors                   | `AVATAR_UPLOAD`, `AVATAR_REJECTION_ERRORS` (`src/utils/avatar-upload.ts`)                                                              |
 | An avatar or logo row: picker, drop target, Upload button or manage menu | `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller                                                                   |
@@ -97,6 +99,22 @@ Stop and check the table if you are writing any of these in a feature:
 - a value check, `preventDefault` or `useId` for a form in a view
 
 The form rule applies when you add or rewrite a form. Some existing forms predate it.
+
+## Shaping a fix
+
+A bug in a feature is often a gap in a shared helper. These rules apply to `fix` PRs as much as to features.
+
+- **Fix the owner, don't wrap it.** When a shared helper (`src/hooks/`, `src/blocks/`, `src/components/`, `src/machine/`, or `@clerk/shared`) behaves wrongly, change the helper and its tests, then delete the workarounds. Do not spread a helper's return value to swap one method, copy a `||` that undoes one of its fields, or add a second hook beside it for one caller.
+- **A changed shared signature is a new pattern.** A new parameter, a return type that goes from `void` to a promise, or a returned field whose meaning changes all go through "When nothing fits: ask first".
+- **One source of truth for busy.** When a machine, `usePendingAction` or `useForm` already knows an action is running, derive the flag from it: `isDisabled: actions.isPending || remove.isPending`. Do not mirror it into a second lock, or turn machine state into a promise to feed one.
+- **Handle staleness through lifecycle.** A new identity remounts through a React `key`. A busy state ignores close (Controllers → Rules). Do not thread run ids or `AbortSignal`s through the model, controller and machine.
+- **Extend a contract with an options object.** Make a field required when every caller has it: `connect(strategy, { walletName, onTarget })`, not `connect(strategy, walletName?, onTarget?)`.
+- **Pass shared results through whole.** The view gets `form`, not an object that renames `form.id`, `form.isSubmitting` and `form.handleSubmit`.
+- **Keep controller state off model types.** Pending and error flags the controller sets go on a row type the controller builds, not as optional fields on the type the model returns.
+- **Narrow by mounting.** A hook that needs loaded data takes it non-null. Mount its component once the model is ready instead of checking for `null` inside (Controllers → Composition and dialog lifetime).
+- **Machines:** `assign` stays pure. An effect the machine starts runs in `invoke`. The runtime has no spawned actors, so effects that run side by side, like `useForm`'s per-field `validateAsync`, run in the hook and report back by event, and the machine drops stale results. A phase of an action the user can see (queued, pending, failed) is a named state, not a context field plus a predicate. Screens that can sit on top of any state, like reverification's method picker and help, may be a stack in context, because the runtime has no parallel or history states.
+
+If code or a test contradicts a rule in these docs, do not copy the code. Stop and ask which one is right, and fix the loser in the same PR.
 
 ## Nested radii
 
@@ -131,11 +149,29 @@ Docs say what the code cannot: rules, reasons, and which tool fits which problem
 
 A PR that adds, renames or changes the signature of a shared helper in `src/hooks/`, `src/utils/`, `src/blocks/`, `src/components/form/` or `src/machine/` updates the table above, and any doc that names it, in the same PR.
 
+## Breaking changes
+
+While `@clerk/mosaic` is on 0.x, a breaking change is a `minor` changeset. Start its body with `**Breaking:**`, then give an old-to-new table and a search that finds affected usage, so an agent can migrate from the changelog alone. The changelog ships in the npm package at `node_modules/@clerk/mosaic/CHANGELOG.md`.
+
+```md
+---
+'@clerk/mosaic': minor
+---
+
+**Breaking:** Rename a `UserButton` prop. Values and defaults are unchanged; TypeScript flags the old name.
+
+| Before               | After              |
+| -------------------- | ------------------ |
+| `renderTriggerLabel` | `showTriggerLabel` |
+
+Find usages with `git grep -n renderTriggerLabel`.
+```
+
 ## Lint
 
-Mosaic runs stricter lint rules than the rest of the repo: the `packages/mosaic` block in the root `eslint.config.mjs`, plus the layer boundaries, test rules and effect rules in `packages/mosaic/eslint/config.mjs`, which only load through `packages/mosaic/eslint.config.mjs`. Lint with `pnpm lint` from `packages/mosaic`. Running `eslint` from the repo root skips them.
+Mosaic uses Oxlint and runs stricter lint rules than the rest of the repo. Lint with `pnpm lint` from `packages/mosaic`.
 
-Every disable directive in `src` needs a `-- reason` (`@eslint-community/eslint-comments/require-description`). The reason is not a code comment under the root no-comments rule. Write why the rule does not apply here, not what the code does; it is what a reviewer judges.
+Every disable directive in `src` needs a `-- reason`. The reason is not a code comment, so the root no-comments rule does not apply. Write why the lint rule does not apply here, not what the code does; it is what a reviewer judges.
 
 ### When `sonarjs/cognitive-complexity` fires
 

@@ -14,10 +14,10 @@ A discriminated union on `status`, so consumers branch on one value instead of a
 scatter of `isLoaded` flags:
 
 ```tsx
-export type UserButtonModel =
+export type SwitcherModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (UserButtonData & UserButtonCallbacks & { status: 'ready'; organizationsEnabled: boolean });
+  | (SwitcherData & SwitcherCallbacks & { status: 'ready'; organizationsEnabled: boolean });
 ```
 
 `hidden` is an **answer**, not an absence: signed out is settled, so the wrapper
@@ -53,17 +53,23 @@ drops the fallback instead of holding the space open. Keep the two apart.
   The view hides the affordance an absent callback drives, so the model never has
   to describe UI.
 
-- **Own revalidate timing.** Call `.revalidate()` / `.reload()` after a mutation,
-  from inside the callback that made it. Deciding _when_ is model logic:
+- **Own cache updates.** Update the cache after a mutation, from inside the
+  callback that made it. Deciding _how_ is model logic: patch the returned
+  resource in with `replaceInPages` on success, and revalidate on failure, since
+  a failed mutation might mean stale state:
 
   ```tsx
   onAcceptSuggestion: async suggestionId => {
     try {
-      await suggestionData.find(s => s.id === suggestionId)?.accept();
-    } finally {
-      // Always revalidate — a failed accept might be stale state. allSettled never throws,
+      const accepted = await suggestionData.find(s => s.id === suggestionId)?.accept();
+      if (accepted) {
+        await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+      }
+    } catch (error) {
+      // A failed accept might be stale state. allSettled never throws,
       // so a failed revalidate doesn't look like a failed accept.
       await Promise.allSettled([userSuggestions.revalidate?.()]);
+      throw error;
     }
   },
   ```
@@ -139,8 +145,10 @@ available in the consuming branch before following this guidance.
 `src/hooks/use-now.ts` in the consuming component or controller, then pass the
 value to pure formatting helpers. For relative labels that refresh each minute,
 use `useNow({ updateInterval: 60_000 })`. Without an interval, the hook retains
-its initial value. Reuse this API instead of adding a feature-specific clock
-provider or timer.
+its initial value. Pass `until` to stop ticking once that time is reached, as
+`useResendSeconds` does for a resend cooldown whose unlock time lives in the
+machine. Reuse this API instead of adding a feature-specific clock provider or
+timer.
 
 In tests, supply a fixed `Date` through `MosaicNowProvider`, assert the displayed
 label, then advance fake timers across a label boundary and assert the update.

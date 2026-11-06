@@ -34,6 +34,7 @@ export type DialogTriggerProps<Payload = unknown> = ComponentProps<'button'> & {
  * reference element for ARIA and return focus. Give each trigger an `id`
  * to name it in controlled mode via the root's `triggerId`.
  */
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
 export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
   function DialogTrigger(props, ref) {
     const { render, handle, payload, ...otherProps } = props;

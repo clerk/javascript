@@ -23,7 +23,6 @@ export interface SelectContextValue {
   placement: Placement;
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
-  getItemProps: UseInteractionsReturn['getItemProps'];
   activeIndex: number | null;
   setActiveIndex: React.Dispatch<React.SetStateAction<number | null>>;
   selectedIndex: number | null;
@@ -56,6 +55,38 @@ export function useSelectContext() {
   const ctx = useContext(SelectContext);
   if (!ctx) {
     throw new Error('Select compound components must be used within <Select.Root>');
+  }
+  return ctx;
+}
+
+export interface SelectHighlightContextValue {
+  activeIndex: number | null;
+  selectedValues: string[];
+}
+export const SelectHighlightContext = createContext<SelectHighlightContextValue | null>(null);
+
+export function useSelectHighlightContext() {
+  const ctx = useContext(SelectHighlightContext);
+  if (!ctx) {
+    throw new Error('Select.Option must be used within <Select>');
+  }
+  return ctx;
+}
+
+export interface SelectOptionsContextValue {
+  getItemProps: UseInteractionsReturn['getItemProps'];
+  handleSelect: (value: string, index: number) => void;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  valueToLabelRef: React.MutableRefObject<Map<string, string>>;
+  selectedItemRef: React.MutableRefObject<HTMLElement | null>;
+}
+
+export const SelectOptionsContext = createContext<SelectOptionsContextValue | null>(null);
+
+export function useSelectOptionsContext() {
+  const ctx = useContext(SelectOptionsContext);
+  if (!ctx) {
+    throw new Error('Select.Option must be used within <Select.Root>');
   }
   return ctx;
 }

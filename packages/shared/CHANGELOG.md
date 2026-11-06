@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.44.1
+
+### Patch Changes
+
+- Move the OAuth consent redirect domain helper into `@clerk/shared` so it can be shared across UI packages. No behavior change. ([#10218](https://github.com/clerk/javascript/pull/10218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.44.0
 
 ### Minor Changes

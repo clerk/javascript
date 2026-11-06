@@ -41,7 +41,7 @@ const emptySignUp: SignUpDetails = { firstName: '', lastName: '', emailAddress: 
 
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
 
-function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void }): JSX.Element {
+function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void }) {
   const [step, setStep] = useState<SignInStep>('start');
   const [direction, setDirection] = useState<-1 | 1>(1);
   const [identifier, setIdentifier] = useState('');
@@ -326,7 +326,7 @@ function outcomeLabel(outcome: Outcome): string {
   }
 }
 
-export function Default(): JSX.Element {
+export function Default() {
   const [runId, setRunId] = useState(0);
   const [outcome, setOutcome] = useState<Outcome>();
 
@@ -373,7 +373,7 @@ function StepPanel({
   pendingProviderId?: string;
   providers?: SignInSocialProvider[];
   stage?: 'first' | 'second';
-}): JSX.Element {
+}) {
   const [value, setValue] = useState(errorMessage && step !== 'start' ? 'incorrect' : '');
   const [details, setDetails] = useState<SignUpDetails>({ ...emptySignUp, emailAddress: 'new@acme.com' });
   const methods = stage === 'first' ? firstFactors.slice(1) : secondFactors.slice(1);
@@ -414,11 +414,11 @@ function StepPanel({
   );
 }
 
-export function Start(): JSX.Element {
+export function Start() {
   return <StepPanel step='start' />;
 }
 
-export function StartSignInOnly(): JSX.Element {
+export function StartSignInOnly() {
   return (
     <StepPanel
       step='start'
@@ -427,7 +427,7 @@ export function StartSignInOnly(): JSX.Element {
   );
 }
 
-export function StartManyProviders(): JSX.Element {
+export function StartManyProviders() {
   return (
     <StepPanel
       step='start'
@@ -440,7 +440,7 @@ export function StartManyProviders(): JSX.Element {
   );
 }
 
-export function StartProviderPending(): JSX.Element {
+export function StartProviderPending() {
   return (
     <StepPanel
       step='start'
@@ -449,7 +449,7 @@ export function StartProviderPending(): JSX.Element {
   );
 }
 
-export function StartError(): JSX.Element {
+export function StartError() {
   return (
     <StepPanel
       step='start'
@@ -458,11 +458,11 @@ export function StartError(): JSX.Element {
   );
 }
 
-export function Password(): JSX.Element {
+export function Password() {
   return <StepPanel step='password' />;
 }
 
-export function PasswordPending(): JSX.Element {
+export function PasswordPending() {
   return (
     <StepPanel
       step='password'
@@ -471,7 +471,7 @@ export function PasswordPending(): JSX.Element {
   );
 }
 
-export function PasswordError(): JSX.Element {
+export function PasswordError() {
   return (
     <StepPanel
       step='password'
@@ -480,11 +480,11 @@ export function PasswordError(): JSX.Element {
   );
 }
 
-export function EmailCode(): JSX.Element {
+export function EmailCode() {
   return <StepPanel step='email-code' />;
 }
 
-export function Totp(): JSX.Element {
+export function Totp() {
   return (
     <StepPanel
       step='totp'
@@ -493,7 +493,7 @@ export function Totp(): JSX.Element {
   );
 }
 
-export function BackupCode(): JSX.Element {
+export function BackupCode() {
   return (
     <StepPanel
       step='backup-code'
@@ -502,14 +502,14 @@ export function BackupCode(): JSX.Element {
   );
 }
 
-export function MethodPicker(): JSX.Element {
+export function MethodPicker() {
   return <StepPanel step='method-picker' />;
 }
 
-export function SignUp(): JSX.Element {
+export function SignUp() {
   return <StepPanel step='sign-up' />;
 }
 
-export function VerifyEmail(): JSX.Element {
+export function VerifyEmail() {
   return <StepPanel step='verify-email' />;
 }

@@ -1,9 +1,7 @@
-import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
-import { Item } from '@clerk/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
+import { colorVars, fontFamilyVars, radiusVars, space, typeScaleVars } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -14,8 +12,28 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './scroll-area.stories?raw';
 
 const styles = stylex.create({
-  separatorMargin: {
-    marginBlock: space['2'],
+  list: {
+    margin: 0,
+    padding: 0,
+    listStyle: 'none',
+  },
+  row: {
+    paddingBlock: space['2'],
+    paddingInline: space['3'],
+    borderBottomColor: colorVars['--cl-color-border-subtle'],
+    borderBottomStyle: 'solid',
+    borderBottomWidth: { default: '1px', ':last-child': 0 },
+    gap: space['3'],
+    color: colorVars['--cl-color-foreground'],
+    display: 'flex',
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    justifyContent: 'space-between',
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+  },
+  offset: {
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontVariantNumeric: 'tabular-nums',
   },
   noMask: {
     maskImage: 'none',
@@ -37,41 +55,55 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/scroll-area/scroll-area.styles.ts',
 };
 
-const accounts = [
-  { email: 'cameron.walker@gmail.com', organizations: ['Clerk', 'Acme Corporation', 'Globex'] },
-  { email: 'cameron@clerk.com', organizations: ['Clerk', 'Initech', 'Umbrella Health'] },
-  { email: 'cam@designcloud.io', organizations: ['Clerk', 'DesignCloud'] },
+const timeZones = [
+  { city: 'Honolulu', offset: 'UTC−10:00' },
+  { city: 'Anchorage', offset: 'UTC−09:00' },
+  { city: 'Los Angeles', offset: 'UTC−08:00' },
+  { city: 'Denver', offset: 'UTC−07:00' },
+  { city: 'Chicago', offset: 'UTC−06:00' },
+  { city: 'New York', offset: 'UTC−05:00' },
+  { city: 'São Paulo', offset: 'UTC−03:00' },
+  { city: 'London', offset: 'UTC+00:00' },
+  { city: 'Lagos', offset: 'UTC+01:00' },
+  { city: 'Berlin', offset: 'UTC+01:00' },
+  { city: 'Cairo', offset: 'UTC+02:00' },
+  { city: 'Moscow', offset: 'UTC+03:00' },
+  { city: 'Dubai', offset: 'UTC+04:00' },
+  { city: 'Mumbai', offset: 'UTC+05:30' },
+  { city: 'Bangkok', offset: 'UTC+07:00' },
+  { city: 'Singapore', offset: 'UTC+08:00' },
+  { city: 'Tokyo', offset: 'UTC+09:00' },
+  { city: 'Sydney', offset: 'UTC+10:00' },
+  { city: 'Auckland', offset: 'UTC+12:00' },
 ];
 
-function OrganizationRow({ name }: { name: string }) {
+interface TimeZoneListProps {
+  zones: typeof timeZones;
+  viewport: ReturnType<typeof stylex.props>;
+  label?: string;
+}
+
+function TimeZoneList({ zones, viewport, label = 'Time zones' }: TimeZoneListProps) {
   return (
-    <Item.Root
-      size='xs'
-      render={({ children, ...props }) => (
-        <button
-          {...props}
-          type='button'
-        >
-          {children}
-        </button>
-      )}
+    <div
+      role='region'
+      aria-label={label}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Safari does not focus an overflowing scroll container on its own, and the list holds nothing focusable.
+      tabIndex={0}
+      {...viewport}
     >
-      <Item.Media>
-        <Avatar.Root
-          size='fit'
-          shape='square'
-        >
-          <Avatar.Image
-            src='https://github.com/clerk.png'
-            alt={name}
-          />
-          <Avatar.Fallback>{name[0]}</Avatar.Fallback>
-        </Avatar.Root>
-      </Item.Media>
-      <Item.Content>
-        <Item.Label>{name}</Item.Label>
-      </Item.Content>
-    </Item.Root>
+      <ul {...stylex.props(styles.list)}>
+        {zones.map(zone => (
+          <li
+            key={zone.city}
+            {...stylex.props(styles.row)}
+          >
+            <span>{zone.city}</span>
+            <span {...stylex.props(styles.offset)}>{zone.offset}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -88,24 +120,10 @@ export function Default() {
       className={`${root.className} border-border w-full border`}
       style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
-      <Item.Group xstyle={scrollAreaViewport()}>
-        {accounts.map(({ email, organizations }, index) => (
-          <React.Fragment key={email}>
-            {index > 0 ? <Item.Separator xstyle={styles.separatorMargin} /> : null}
-            <Item.Root size='xs'>
-              <Item.Content>
-                <Item.Description>{email}</Item.Description>
-              </Item.Content>
-            </Item.Root>
-            {organizations.map(name => (
-              <OrganizationRow
-                key={`${email}-${name}`}
-                name={name}
-              />
-            ))}
-          </React.Fragment>
-        ))}
-      </Item.Group>
+      <TimeZoneList
+        zones={timeZones}
+        viewport={stylex.props(scrollAreaViewport())}
+      />
     </div>
   );
 }
@@ -120,19 +138,13 @@ export function NotScrollable() {
       className={`${root.className} border-border w-full border`}
       style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
-      <Item.Group xstyle={scrollAreaViewport()}>
-        {accounts[0].organizations.map(name => (
-          <OrganizationRow
-            key={name}
-            name={name}
-          />
-        ))}
-      </Item.Group>
+      <TimeZoneList
+        zones={timeZones.slice(0, 3)}
+        viewport={stylex.props(scrollAreaViewport())}
+      />
     </div>
   );
 }
-
-const gutterRows = ['Clerk', 'DesignCloud', 'Acme Corporation', 'Globex', 'Initech', 'Umbrella Health'];
 
 /**
  * Toggling the row count is the whole demonstration: `auto` jumps its content left by the lane's
@@ -141,7 +153,7 @@ const gutterRows = ['Clerk', 'DesignCloud', 'Acme Corporation', 'Globex', 'Inite
 export function Gutter() {
   const [scrollable, setScrollable] = React.useState(false);
   const root = stylex.props(scrollAreaRoot);
-  const names = scrollable ? gutterRows : gutterRows.slice(0, 2);
+  const zones = scrollable ? timeZones.slice(0, 6) : timeZones.slice(0, 2);
 
   return (
     <div className='flex w-full flex-col items-start gap-4'>
@@ -165,32 +177,11 @@ export function Gutter() {
               className={`${root.className} border-border border`}
               style={{ height: 140, borderRadius: radiusVars['--cl-radius-sm'] }}
             >
-              <Item.Group xstyle={scrollAreaViewport(gutter)}>
-                {names.map(name => (
-                  <Item.Root
-                    key={name}
-                    size='xs'
-                  >
-                    <Item.Media>
-                      <Avatar.Root
-                        size='fit'
-                        shape='square'
-                      >
-                        <Avatar.Image
-                          src='https://github.com/clerk.png'
-                          alt={name}
-                        />
-                        <Avatar.Fallback>{name[0]}</Avatar.Fallback>
-                      </Avatar.Root>
-                    </Item.Media>
-                    <Item.Content>
-                      <Item.Label>{name}</Item.Label>
-                    </Item.Content>
-                    {/* The shift is only legible against something reaching the content's right edge. */}
-                    <div className='bg-border h-4 w-8 rounded-full' />
-                  </Item.Root>
-                ))}
-              </Item.Group>
+              <TimeZoneList
+                zones={zones}
+                viewport={stylex.props(scrollAreaViewport(gutter))}
+                label={`Time zones, ${gutter} gutter`}
+              />
             </div>
           </div>
         ))}
@@ -199,7 +190,7 @@ export function Gutter() {
   );
 }
 
-const manyRows = [
+const teamMembers = [
   'Clerk',
   'Acme Corporation',
   'Globex',
@@ -238,7 +229,7 @@ export function Horizontal() {
         tabIndex={0}
         {...stylex.props(...scrollAreaViewport('auto', 'inline'), styles.strip)}
       >
-        {manyRows.map(name => (
+        {teamMembers.map(name => (
           <Badge
             key={name}
             color='neutral'
@@ -270,14 +261,10 @@ export function HoverReveal() {
         '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)',
       }}
     >
-      <Item.Group xstyle={scrollAreaViewport()}>
-        {manyRows.map(name => (
-          <OrganizationRow
-            key={name}
-            name={name}
-          />
-        ))}
-      </Item.Group>
+      <TimeZoneList
+        zones={timeZones}
+        viewport={stylex.props(scrollAreaViewport())}
+      />
     </div>
   );
 }
@@ -311,14 +298,10 @@ export function ThemedScrollbar() {
           '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
         }}
       >
-        <Item.Group xstyle={scrollAreaViewport()}>
-          {manyRows.map(name => (
-            <OrganizationRow
-              key={name}
-              name={name}
-            />
-          ))}
-        </Item.Group>
+        <TimeZoneList
+          zones={timeZones}
+          viewport={stylex.props(scrollAreaViewport())}
+        />
       </div>
     </>
   );
@@ -344,21 +327,21 @@ export function ShadowIndicators() {
   return (
     <>
       <style>{`
-        .demo-scroll-shadows .cl-item-group::before,
-        .demo-scroll-shadows .cl-item-group::after {
+        .demo-scroll-shadows [role='region']::before,
+        .demo-scroll-shadows [role='region']::after {
           content: '';
           position: absolute;
           inset-inline: 0;
           height: var(--cl-scroll-fade-size);
           pointer-events: none;
         }
-        .demo-scroll-shadows .cl-item-group::before {
+        .demo-scroll-shadows [role='region']::before {
           top: 0;
           background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-start);
           transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
         }
-        .demo-scroll-shadows .cl-item-group::after {
+        .demo-scroll-shadows [role='region']::after {
           bottom: 0;
           background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-end);
@@ -370,14 +353,10 @@ export function ShadowIndicators() {
         className={`${root.className} demo-scroll-shadows border-border w-full overflow-hidden border`}
         style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
       >
-        <Item.Group xstyle={[scrollAreaViewport(), styles.noMask]}>
-          {manyRows.map(name => (
-            <OrganizationRow
-              key={name}
-              name={name}
-            />
-          ))}
-        </Item.Group>
+        <TimeZoneList
+          zones={timeZones}
+          viewport={stylex.props(scrollAreaViewport(), styles.noMask)}
+        />
       </div>
     </>
   );

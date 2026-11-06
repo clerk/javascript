@@ -1,6 +1,6 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
+import { createRef, Suspense, useDeferredValue, useState, useTransition } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -1075,5 +1075,304 @@ describe('Select.Group', () => {
   it('throws when the label is used outside <Select.Group>', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Select.GroupLabel>Fruits</Select.GroupLabel>)).toThrow(/within <Select.Group>/);
+  });
+});
+
+describe('Select option renders', () => {
+  it('re-renders only the options whose highlight changes in a multiple select', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    const options = [...fruits, { label: 'Date', value: 'date' }];
+    render(
+      <Select.Root
+        items={options}
+        alignItemWithTrigger={false}
+        multiple
+        defaultValue={['banana']}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            {options.map(({ label, value }) => (
+              <Select.Option
+                key={value}
+                value={value}
+                label={label}
+                render={props => {
+                  renders.push(value);
+                  return (
+                    <button
+                      type='button'
+                      {...props}
+                    />
+                  );
+                }}
+              >
+                {label}
+              </Select.Option>
+            ))}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
+
+    await user.keyboard('{Enter}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('re-renders only the options whose highlight changes in a controlled single select', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    render(
+      <Select.Root
+        items={fruits}
+        alignItemWithTrigger={false}
+        value='banana'
+        onValueChange={() => {}}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            {fruits.map(({ label, value }) => (
+              <Select.Option
+                key={value}
+                value={value}
+                label={label}
+                render={props => {
+                  renders.push(value);
+                  return (
+                    <button
+                      type='button'
+                      {...props}
+                    />
+                  );
+                }}
+              >
+                {label}
+              </Select.Option>
+            ))}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
+  });
+});
+
+describe('Select selection in a transition', () => {
+  const neverResolves = new Promise<never>(() => {});
+  function Suspends(): never {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- Suspending is React's thrown-thenable protocol; `React.use()` needs React 19.
+    throw neverResolves;
+  }
+
+  type HoverRender = { option: string; hovered: string | null; active: boolean };
+  type OptionRender = { option: string; parentValue: string; selected: unknown };
+
+  function Fixture({
+    update = 'transition',
+    onRenderOption,
+    suspendSelected = false,
+    hoverInTransition = false,
+    onRenderHover,
+    suspendWhenActive,
+  }: {
+    update?: 'transition' | 'deferred';
+    onRenderOption?: (render: OptionRender) => void;
+    suspendSelected?: boolean;
+    hoverInTransition?: boolean;
+    onRenderHover?: (render: HoverRender) => void;
+    suspendWhenActive?: string;
+  }) {
+    const [value, setValue] = useState<string>('');
+    const deferredValue = useDeferredValue(value);
+    const [isPending, startTransition] = useTransition();
+    const [hovered, setHovered] = useState<string | null>(null);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [isLoadingMore, startLoadingMore] = useTransition();
+    const parentValue = update === 'deferred' ? deferredValue : value;
+    return (
+      <>
+        <button
+          type='button'
+          onClick={() => startLoadingMore(() => setLoadingMore(true))}
+        >
+          Load more
+        </button>
+        <p>{isLoadingMore ? 'Loading more' : 'Loaded'}</p>
+        <Suspense fallback={<p>Loading more fallback</p>}>{loadingMore ? <Suspends /> : null}</Suspense>
+        <Suspense fallback={<p>Loading</p>}>
+          <p>{isPending || value !== deferredValue ? 'Pending' : 'Idle'}</p>
+          <Select.Root
+            open
+            items={fruits}
+            alignItemWithTrigger={false}
+            value={parentValue}
+            onValueChange={next => (update === 'deferred' ? setValue(next) : startTransition(() => setValue(next)))}
+          >
+            <Select.Trigger>
+              <Select.Value placeholder='Pick a fruit...' />
+            </Select.Trigger>
+            <Select.Positioner>
+              <Select.Popup>
+                {fruits.map(option => (
+                  <Select.Option
+                    key={option.value}
+                    value={option.value}
+                    label={option.label}
+                    render={props => {
+                      onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                      const active = 'data-active' in props;
+                      onRenderHover?.({ option: option.value, hovered, active });
+                      return (
+                        <button
+                          type='button'
+                          {...props}
+                          onMouseMove={
+                            hoverInTransition
+                              ? event =>
+                                  startTransition(() => {
+                                    setHovered(option.value);
+                                    props.onMouseMove?.(event);
+                                  })
+                              : props.onMouseMove
+                          }
+                        >
+                          {props.children}
+                          {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
+                          {active && suspendWhenActive === option.value ? <Suspends /> : null}
+                        </button>
+                      );
+                    }}
+                  >
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select.Popup>
+            </Select.Positioner>
+          </Select.Root>
+        </Suspense>
+      </>
+    );
+  }
+
+  describe.each(['transition', 'deferred'] as const)('when the parent updates the value with %s', update => {
+    it('renders each option with the selection its parent passed down', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders).not.toContainEqual({ option: 'banana', parentValue: 'banana', selected: false });
+    });
+
+    it('renders the new selection in the same render as its parent, with no second pass', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders.filter(entry => entry.option === 'banana' && entry.parentValue === 'banana')).toEqual([
+        { option: 'banana', parentValue: 'banana', selected: true },
+      ]);
+    });
+
+    it('keeps the current options on screen while a selection suspends', async () => {
+      const user = userEvent.setup();
+      render(
+        <Fixture
+          update={update}
+          suspendSelected
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+      expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+
+  it('moves the highlight with arrow keys while an unrelated transition is pending', async () => {
+    const user = userEvent.setup();
+    render(<Fixture />);
+
+    await user.click(screen.getByRole('button', { name: 'Load more' }));
+    await waitFor(() => expect(screen.getByText('Loading more')).toBeInTheDocument());
+
+    screen.getByRole('option', { name: 'Apple' }).focus();
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+    expect(screen.getByText('Loading more')).toBeInTheDocument();
+  });
+
+  it('renders the hovered option as active in the same render as a hover transition', async () => {
+    const user = userEvent.setup();
+    const renders: HoverRender[] = [];
+    render(
+      <Fixture
+        hoverInTransition
+        onRenderHover={entry => renders.push(entry)}
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+    expect(renders).not.toContainEqual({ option: 'banana', hovered: 'banana', active: false });
+  });
+
+  it('keeps the current options on screen while a hover transition suspends', async () => {
+    const user = userEvent.setup();
+    render(
+      <Fixture
+        hoverInTransition
+        suspendWhenActive='banana'
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+    expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Banana' })).not.toHaveAttribute('data-active');
   });
 });

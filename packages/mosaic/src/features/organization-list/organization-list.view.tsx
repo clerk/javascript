@@ -148,7 +148,7 @@ export function OrganizationListRows({
   const visibleInvitations = invitations.filter(i => i.status === 'pending' || !listed.has(i.organizationId));
 
   return (
-    <Item.Group variant='outline'>
+    <Item.Group>
       {hidePersonal ? null : (
         <SelectRow
           name={m.personal}

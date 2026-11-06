@@ -14,7 +14,7 @@ pnpm build --filter @clerk/swingset  # next build
 pnpm format --filter @clerk/swingset # format-package.mjs (--check for CI)
 ```
 
-There is no lint script in this package.
+Run `pnpm --filter @clerk/swingset lint` for Oxlint.
 
 Swingset has no tests, and none should be added. Don't add test files, a Vitest config, or a `test` script here. Test components and flows in `@clerk/mosaic`, next to the code they cover. Stories and fixtures exist only to drive the explorer, so don't add options or exports to them for tests.
 
@@ -22,7 +22,7 @@ Swingset has no tests, and none should be added. Don't add test files, a Vitest 
 
 These require reading several files together; the `README.md` covers the step-by-step "add a component" workflow.
 
-- **Consumes Mosaic from source, not build.** `@clerk/mosaic` is aliased to `../mosaic/src` in _three_ places that must stay in sync: `tsconfig.json` (`paths`), and in `next.config.mjs` both the webpack `resolve.alias` and the StyleX plugin's `aliases`. Editing Mosaic source in `packages/mosaic` reflects live in swingset's dev server — no rebuild of `@clerk/mosaic` needed.
+- **Consumes Mosaic from source, not build.** `@clerk/mosaic` is aliased to `../mosaic/src` in _three_ places that must stay in sync: `tsconfig.json` (`paths`), and in `next.config.mjs` both `turbopack.resolveAlias` and the StyleX Babel plugin's `aliases`. Editing Mosaic source in `packages/mosaic` reflects live in swingset's dev server — no rebuild of `@clerk/mosaic` needed.
 
 - **Knobs are generated from a story's declared variant surface.** A story's `meta.styles` is a hand-written `{ _variants, _defaultVariants }` object describing the component's variant props — StyleX compiles its styles away, so there is no runtime recipe to derive this from. `src/lib/generateKnobs.ts` turns each variant into a control: variants whose keys are only `true`/`false` become boolean toggles, everything else becomes a select. Knob values are passed as props straight into the story component. This is why story functions take `Record<string, unknown>` and cast to the real prop type.
 
@@ -44,10 +44,10 @@ These require reading several files together; the `README.md` covers the step-by
 - **MDX.** `mdx-components.tsx` injects custom components into all MDX: `<Preview>` (→ `StoryPreview`), `<Story>` (→ `StoryEmbed`, static), `<PropTable>` (→ interactive `PropTable`), `<Usage>` (→ `UsageBlock`, a live code snippet that reflects the current knob values), and a `<pre>` override routing fenced code through Shiki (`CodeBlock`). `next.config.mjs` configures `remark-gfm` and `rehype-raw` (with MDX node pass-through) so raw HTML in tables works.
 
 - **`<Story>` examples can show their source in a collapsible code footer.** When a story module exposes its own source as `__source` — via a `?raw` self-import (`export { default as __source } from './x.stories?raw'`) — `StoryEmbed` runs `extractStorySource` (`src/lib/extractStorySource.ts`) to pull the _previewed story function's_ source out of that raw text, then `toUsageSnippet` (`src/lib/exampleSnippet.ts`) to reduce that knob harness to a clean usage snippet (unwraps `export function …() { return (…) }` down to the returned JSX and strips the `{...knobsAsProps(props)}` / `{...props}` knob plumbing), and renders a `CodeFooter` (`CodeFooter.tsx`): a "View code" toggle that's collapsed by default and reveals the snippet with a height animation (Base UI's `--collapsible-panel-height` + `data-starting/ending-style`). It's **opt-in per module** — only modules that export `__source` get a footer, and it's keyed to whichever story `name` the `<Story>` renders, so each example shows its own code. Shiki highlighting is shared with the `<pre>`/`CodeBlock` path through the `useShikiHtml` hook. A `<Story>` can carry both a code footer and a `composition` footer; they stack under the preview.
-  - The `?raw` query is wired in `next.config.mjs`: an `asset/source` rule handles `?raw` imports, and — crucially — a recursive `excludeRawQuery` pass adds `resourceQuery: { not: [/raw/] }` to every _other_ loader so Next's SWC loader doesn't compile the file first (otherwise `__source` would contain `_jsxDEV(…)` output instead of the authored source).
+  - The `?raw` query uses Turbopack's native `raw` module type in `next.config.mjs`. The StyleX Babel loader excludes these imports so the footer receives the authored source.
 
 - **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's _own_ chrome (sidebar, tabs, inputs). The components being _documented_ come from `@clerk/mosaic`. Don't confuse the two.
 
 ## Documenting Mosaic components
 
-Before adding a component page or restructuring a story or MDX page, read the house style in `.claude/skills/mosaic/references/documenting-components.md`: layers, `meta` conventions, each archetype's required section order, and the finishing checklist.
+Before adding a component page or restructuring a story or MDX page, read the house style in `packages/mosaic/docs/documenting-components.md`: layers, `meta` conventions, each archetype's required section order, and the finishing checklist.

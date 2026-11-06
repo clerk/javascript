@@ -564,7 +564,3 @@ describe('Passkey reverification', () => {
   it.todo('completes reverification before creating, renaming, or removing a passkey');
   it.todo('cancels reverification without changing passkeys and permits retry');
 });
-
-describe('Passkey follow-ups', () => {
-  it.todo('rerenders passkey eligibility when a replaced or fetched environment changes policy');
-});

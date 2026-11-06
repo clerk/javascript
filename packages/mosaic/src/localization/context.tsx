@@ -52,6 +52,7 @@ function resolveLocale(locale: string | undefined): string {
 export function resolveLocalization(localization: MosaicLocalization | undefined): MosaicLocalizationValue {
   const layers = [localization?.messages, localization?.overrides];
   return {
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The merge preserves the message catalog shape while applying partial overrides.
     messages: layers.reduce<unknown>(merge, mosaicMessages) as MosaicMessages,
     locale: resolveLocale(localization?.locale),
   };

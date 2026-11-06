@@ -149,7 +149,6 @@ import {
   Group as ItemGroup,
   Interactive as ItemInteractive,
   meta as itemMeta,
-  Scrolling as ItemScrolling,
 } from '../stories/item.stories';
 import {
   Catalog as LocalizationCatalog,
@@ -355,6 +354,12 @@ import {
   Shapes as SkeletonShapes,
   TextContent as SkeletonTextContent,
 } from '../stories/skeleton.stories';
+import {
+  Clickable as StepperClickable,
+  meta as stepperMeta,
+  Primary as StepperPrimary,
+  Progress as StepperProgress,
+} from '../stories/stepper.stories';
 import {
   Default as SwitchDefault,
   meta as switchMeta,
@@ -708,6 +713,13 @@ const paginationModule: StoryModule = {
   Disabled: PaginationDisabled,
 };
 
+const stepperModule: StoryModule = {
+  meta: stepperMeta,
+  Primary: StepperPrimary,
+  Progress: StepperProgress,
+  Clickable: StepperClickable,
+};
+
 const phoneInputModule: StoryModule = {
   meta: phoneInputMeta,
   Default: PhoneInputDefault,
@@ -759,7 +771,6 @@ const itemModule: StoryModule = {
   Default: ItemDefault,
   Interactive: ItemInteractive,
   Group: ItemGroup,
-  Scrolling: ItemScrolling,
 };
 
 const userButtonModule: StoryModule = {
@@ -1286,6 +1297,7 @@ export const registry: StoryModule[] = [
   sectionModule,
   segmentedControlModule,
   separatorModule,
+  stepperModule,
   selectComponentModule,
   switchModule,
   tableModule,

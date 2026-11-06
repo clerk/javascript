@@ -108,6 +108,7 @@ export function useForm<TValues extends object, TResult = unknown>(
   if (machineRef.current === null) {
     machineRef.current = createFormMachine(deps);
   }
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const [snapshot, send, actor] = useMachine(machineRef.current, { context: deps });
   const context = { ...snapshot.context, ...deps };
   const { values } = context;

@@ -102,6 +102,7 @@ function* tokenize(template: string): Generator<Token> {
   }
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
 function fold(
   tokens: Iterator<Token>,
   stopTag: string | undefined,

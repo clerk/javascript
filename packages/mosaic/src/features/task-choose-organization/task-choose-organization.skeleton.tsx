@@ -23,10 +23,7 @@ export function TaskChooseOrganizationSkeleton({
       <TaskChooseOrganizationHeader canCreate={canCreate} />
       <Card.Content>
         <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-        <Item.Group
-          variant='outline'
-          aria-hidden
-        >
+        <Item.Group aria-hidden>
           {PLACEHOLDER_ORGANIZATIONS.map(name => (
             <Item.Root key={name}>
               <Skeleton shape='rounded'>
