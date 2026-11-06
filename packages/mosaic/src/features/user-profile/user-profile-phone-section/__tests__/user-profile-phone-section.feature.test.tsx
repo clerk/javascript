@@ -135,11 +135,11 @@ describe('the user profile phone section', () => {
       <MosaicProvider
         localization={{
           overrides: {
-            'userProfile.phone.addDialog.phone.countryTriggerLabel': 'Land: {country}',
-            'userProfile.phone.addDialog.phone.countryPopupLabel': 'Land wählen',
-            'userProfile.phone.addDialog.phone.countrySearchLabel': 'Länder durchsuchen',
+            'userProfile.phone.addDialog.phone.selectedCountry': 'Land: {country}',
+            'userProfile.phone.addDialog.phone.chooseCountry': 'Land wählen',
+            'userProfile.phone.addDialog.phone.searchCountries': 'Länder durchsuchen',
             'userProfile.phone.addDialog.phone.countrySearchPlaceholder': 'Suchen',
-            'userProfile.phone.addDialog.phone.countrySearchEmpty': 'Keine Länder gefunden',
+            'userProfile.phone.addDialog.phone.noCountries': 'Keine Länder gefunden',
           },
         }}
       >
