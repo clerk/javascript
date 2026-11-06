@@ -2,8 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 
 import {
   colorVars,
-  durationVars,
-  easingVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -11,7 +9,6 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
-import { phoneTriggerScope } from './phone-input.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const listInset = space['1.5'];
@@ -44,18 +41,6 @@ export const styles = stylex.create({
     paddingInlineEnd: 0,
     paddingInlineStart: `calc(${space['2']} + var(--_cl-input-group-inset))`,
     userSelect: 'none',
-  },
-  chevron: {
-    transform: {
-      default: null,
-      [stylex.when.ancestor('[aria-expanded="true"]', phoneTriggerScope)]: 'rotate(180deg)',
-    },
-    transitionDuration: {
-      default: durationVars['--cl-duration-base'],
-      '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
-    },
-    transitionProperty: 'transform',
-    transitionTimingFunction: easingVars['--cl-ease-enter'],
   },
   triggerContent: {
     gap: space['0.5'],

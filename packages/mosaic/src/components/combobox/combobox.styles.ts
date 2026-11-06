@@ -12,7 +12,6 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 import { inputGroupScope } from '../input-group/input-group.markers.stylex';
-import { comboboxTriggerScope } from './combobox.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const inset = space['1.5'];
@@ -139,17 +138,5 @@ export const trigger = stylex.create({
   clear: {
     marginInlineEnd: `calc(-1 * ${space['2']})`,
     width: space['5.5'],
-  },
-  chevron: {
-    transform: {
-      default: null,
-      [stylex.when.ancestor('[data-open]', comboboxTriggerScope)]: 'rotate(180deg)',
-    },
-    transitionDuration: {
-      default: durationVars['--cl-duration-base'],
-      '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
-    },
-    transitionProperty: 'transform',
-    transitionTimingFunction: easingVars['--cl-ease-enter'],
   },
 });

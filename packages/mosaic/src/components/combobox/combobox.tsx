@@ -17,7 +17,6 @@ import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { comboboxTriggerScope } from './combobox.markers.stylex';
 import { styles, trigger } from './combobox.styles';
 
 export type ComboboxRootProps = ComboboxProps;
@@ -73,7 +72,7 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
         render ??
         (props => (
           <Button
-            xstyle={[trigger.base, comboboxTriggerScope]}
+            xstyle={trigger.base}
             {...props}
           />
         ))
@@ -84,7 +83,6 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
         <Icon
           glyph={ChevronDown}
           size='md'
-          xstyle={trigger.chevron}
         />
       )}
     </HeadlessCombobox.Trigger>
