@@ -158,7 +158,7 @@ itself guarantee agreement between server and client.
 
 ## Private API requests
 
-Use `useMosaicRequest` from `src/hooks/use-mosaic-request.ts` when a new Mosaic
+Use `useMosaicFetch` from `src/hooks/use-mosaic-fetch.ts` when a new Mosaic
 flow needs an API request before its resource API is stable. The hook loads the
 request capability through the existing Clerk module manager. The core request
 layer still owns authentication, serialization, API errors, and client updates.
@@ -191,7 +191,11 @@ Keep request construction in plain functions beside the query hook, as in
 `src/queries/demo.requests.ts`. These functions receive the request capability
 and own the endpoint, parameters, response types, and required response checks.
 The hook owns query keys, identity checks, request state, and invalidation.
-For example, its query function calls `getDemoInstance(request, { signal })`.
+For example, its query function calls `getDemoInstance(mFetch, { signal })`.
+Use `mFetch` for the value returned by `useMosaicFetch`. Its type is
+`MosaicFetch`, and it calls `runtime.fetch`. Unlike global `fetch`, it accepts
+Clerk request options, returns parsed data, and throws Clerk errors. A write
+uses `updateDemoInstance(mFetch, params)`.
 This keeps the endpoint code usable without React or a resource class.
 
 The demo uses the existing sign-out query cleanup. As with the other Mosaic

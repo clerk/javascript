@@ -1,4 +1,4 @@
-export type MosaicRequestInit = Omit<RequestInit, 'body'> & {
+export type MosaicFetchInit = Omit<RequestInit, 'body'> & {
   path: string;
   search?: ConstructorParameters<typeof URLSearchParams>[0];
   body?: BodyInit | Record<string, unknown>;
@@ -6,14 +6,14 @@ export type MosaicRequestInit = Omit<RequestInit, 'body'> & {
   pathPrefix?: string;
 };
 
-export type MosaicRequestOptions = {
+export type MosaicFetchOptions = {
   forceUpdateClient?: boolean;
   skipUpdateClient?: boolean;
   fetchMaxTries?: number;
 };
 
-export type MosaicRequest = <T>(init: MosaicRequestInit, options?: MosaicRequestOptions) => Promise<T | null>;
+export type MosaicFetch = <T>(init: MosaicFetchInit, options?: MosaicFetchOptions) => Promise<T | null>;
 
 export type MosaicRuntime = {
-  request: MosaicRequest;
+  fetch: MosaicFetch;
 };

@@ -6,10 +6,10 @@ import {
   useSession,
 } from '@clerk/shared/react';
 
+import { useMosaicFetch } from '../hooks/use-mosaic-fetch';
 import { useMosaicMutation } from '../hooks/use-mosaic-mutation';
 import { useMosaicQuery } from '../hooks/use-mosaic-query';
 import { useMosaicQueryClient } from '../hooks/use-mosaic-query-client';
-import { useMosaicRequest } from '../hooks/use-mosaic-request';
 import { getDemoInstance, updateDemoInstance, type UpdateDemoParams } from './demo.requests';
 
 function useDemoScope() {
@@ -37,19 +37,19 @@ function useDemoScope() {
 }
 
 export function useDemoQuery() {
-  const request = useMosaicRequest();
+  const mFetch = useMosaicFetch();
   const { queryKey, enabled } = useDemoScope();
 
   return useMosaicQuery({
     queryKey,
     enabled,
     retry: false,
-    queryFn: ({ signal }) => getDemoInstance(request, { signal }),
+    queryFn: ({ signal }) => getDemoInstance(mFetch, { signal }),
   });
 }
 
 export function useUpdateDemo() {
-  const request = useMosaicRequest();
+  const mFetch = useMosaicFetch();
   const { queryKey, enabled, isCurrent } = useDemoScope();
   const client = useMosaicQueryClient();
 
@@ -60,7 +60,7 @@ export function useUpdateDemo() {
       if (!enabled || !isCurrent()) {
         throw new ClerkRuntimeError('The active session changed.', { code: 'mosaic_demo_session_changed' });
       }
-      return updateDemoInstance(request, params);
+      return updateDemoInstance(mFetch, params);
     },
     onSuccess: async data => {
       if (!isCurrent()) {

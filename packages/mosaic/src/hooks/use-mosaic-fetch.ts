@@ -1,12 +1,12 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import type { MosaicRequest } from '@clerk/shared/internal/clerk-js/mosaicRuntime';
+import type { MosaicFetch } from '@clerk/shared/internal/clerk-js/mosaicRuntime';
 import { useClerk } from '@clerk/shared/react';
 import { useCallback } from 'react';
 
-export function useMosaicRequest(): MosaicRequest {
+export function useMosaicFetch(): MosaicFetch {
   const clerk = useClerk();
 
-  return useCallback<MosaicRequest>(
+  return useCallback<MosaicFetch>(
     async (init, options) => {
       const sessionId = clerk.session?.id;
       const organizationId = clerk.organization?.id;
@@ -20,7 +20,7 @@ export function useMosaicRequest(): MosaicRequest {
         throw new ClerkRuntimeError('The active request context changed.', { code: 'mosaic_request_context_changed' });
       }
       init.signal?.throwIfAborted();
-      return runtime.request(init, options);
+      return runtime.fetch(init, options);
     },
     [clerk],
   );

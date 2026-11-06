@@ -52,14 +52,14 @@ describe('Mosaic runtime requests', () => {
   it('loads through the existing module manager', async () => {
     fetchMock.mockResolvedValue(response({ response: { id: 'ins_demo' } }));
     const runtime = await new ModuleManager().import('@clerk/mosaic-runtime');
-    await expect(runtime?.request({ path: '/demo' })).resolves.toEqual({ id: 'ins_demo' });
+    await expect(runtime?.fetch({ path: '/demo' })).resolves.toEqual({ id: 'ins_demo' });
   });
   it('uses FAPI routing, session parameters, form serialization, and method rewriting', async () => {
     fetchMock.mockResolvedValue(response({ response: { id: 'ins_demo', name: 'New name' } }));
     const controller = new AbortController();
 
     await expect(
-      mosaicRuntime.request({ path: '/demo', method: 'PUT', body: { name: 'New name' }, signal: controller.signal }),
+      mosaicRuntime.fetch({ path: '/demo', method: 'PUT', body: { name: 'New name' }, signal: controller.signal }),
     ).resolves.toEqual({ id: 'ins_demo', name: 'New name' });
 
     const [input, init] = fetchMock.mock.calls[0];
@@ -75,7 +75,7 @@ describe('Mosaic runtime requests', () => {
     fetchMock.mockResolvedValueOnce(
       response({ errors: [{ code: 'session_expired', long_message: 'Sign in again.' }] }, 401),
     );
-    await expect(mosaicRuntime.request({ path: '/demo' })).rejects.toBeInstanceOf(ClerkAPIResponseError);
+    await expect(mosaicRuntime.fetch({ path: '/demo' })).rejects.toBeInstanceOf(ClerkAPIResponseError);
     expect(handleUnauthenticated).toHaveBeenCalledOnce();
 
     fetchMock.mockResolvedValueOnce(
@@ -83,7 +83,7 @@ describe('Mosaic runtime requests', () => {
         'retry-after': '30',
       }),
     );
-    await expect(mosaicRuntime.request({ path: '/demo' })).rejects.toMatchObject({ status: 429, retryAfter: 30 });
+    await expect(mosaicRuntime.fetch({ path: '/demo' })).rejects.toMatchObject({ status: 429, retryAfter: 30 });
   });
 
   it('runs fraud protection and applies client updates from mutation responses', async () => {
@@ -92,24 +92,24 @@ describe('Mosaic runtime requests', () => {
       response({ response: { id: 'ins_demo' }, client: { id: 'client_demo', sessions: [] } }),
     );
 
-    await mosaicRuntime.request({ path: '/demo', method: 'PUT', body: { name: 'Demo' } });
+    await mosaicRuntime.fetch({ path: '/demo', method: 'PUT', body: { name: 'Demo' } });
 
     expect(execute).toHaveBeenCalledOnce();
     expect(updateClient).toHaveBeenCalledWith(expect.objectContaining({ id: 'client_demo' }));
     updateClient.mockClear();
 
-    await mosaicRuntime.request({ path: '/demo', method: 'PUT' }, { skipUpdateClient: true });
+    await mosaicRuntime.fetch({ path: '/demo', method: 'PUT' }, { skipUpdateClient: true });
     expect(updateClient).not.toHaveBeenCalled();
   });
 
   it('supports GET options and empty responses without creating a resource', async () => {
     fetchMock.mockResolvedValueOnce(response({ response: { id: 'ins_demo' } }));
     await expect(
-      mosaicRuntime.request<{ id: string }>({ path: '/demo', method: 'GET', search: { view: 'summary' } }),
+      mosaicRuntime.fetch<{ id: string }>({ path: '/demo', method: 'GET', search: { view: 'summary' } }),
     ).resolves.toEqual({ id: 'ins_demo' });
     expect((fetchMock.mock.calls[0][0] as URL).searchParams.get('view')).toBe('summary');
 
     fetchMock.mockResolvedValueOnce(response(null, 204));
-    await expect(mosaicRuntime.request({ path: '/demo', method: 'PUT' })).resolves.toBeNull();
+    await expect(mosaicRuntime.fetch({ path: '/demo', method: 'PUT' })).resolves.toBeNull();
   });
 });

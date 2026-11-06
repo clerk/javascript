@@ -338,7 +338,7 @@ export default defineConfig({
                   to: { element: { type: 'hooks' } },
                   dependency: {
                     kind: 'value',
-                    specifiers: ['useMosaicRequest', 'useMosaicQueryClient', 'useMosaicQuery', 'useMosaicMutation'],
+                    specifiers: ['useMosaicFetch', 'useMosaicQueryClient', 'useMosaicQuery', 'useMosaicMutation'],
                   },
                 },
                 message: 'Make Mosaic requests in the model or query layer and pass plain callbacks to the controller.',
