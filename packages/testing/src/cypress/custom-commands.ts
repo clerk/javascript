@@ -10,7 +10,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       /**
-       * Signs in a user using Clerk. This custom command supports only password, phone_code and email_code first factor strategies.
+       * Signs in a user using Clerk. This custom command supports only the password, phone_code, email_code and ticket sign-in strategies.
        * Multi-factor is not supported.
        * This helper is using the `setupClerkTestingToken` internally.
        * It is required to call `cy.visit` before calling this command, and navigate to a not protected page that loads Clerk.
@@ -18,11 +18,13 @@ declare global {
        * If the strategy is password, the command will sign in the user using the provided password and identifier.
        * If the strategy is phone_code, you are required to have a user with a test phone number as an identifier (e.g. +15555550100).
        * If the strategy is email_code, you are required to have a user with a test email as an identifier (e.g. your_email+clerk_test@example.com).
+       * If the strategy is ticket, the command will sign in the user using the provided sign-in token. Create the token in a Cypress task, because creating one requires your Secret Key.
        *
        * @param signInParams - The sign in parameters.
-       * @param signInParams.strategy - The sign in strategy. Supported strategies are 'password', 'phone_code' and 'email_code'.
-       * @param signInParams.identifier - The user's identifier. Could be a username, a phone number or an email.
+       * @param signInParams.strategy - The sign in strategy. Supported strategies are 'password', 'phone_code', 'email_code' and 'ticket'.
+       * @param signInParams.identifier - The user's identifier. Could be a username, a phone number or an email. Required unless the strategy is 'ticket'.
        * @param signInParams.password - The user's password. Required only if the strategy is 'password'.
+       * @param signInParams.ticket - A sign-in token. Required only if the strategy is 'ticket'.
        *
        * @example
        *  it("sign in", () => {
