@@ -67,7 +67,7 @@ function Tags({ removeLabel, itemProps }: { removeLabel: (value: string) => stri
       >
         <Icon
           glyph={X}
-          size='sm'
+          size='md'
         />
       </Primitive.TagRemove>
     </Primitive.Tag>

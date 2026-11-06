@@ -100,7 +100,7 @@ export function UserProfileWeb3WalletRowView({
                 <Icon
                   glyph={ArrowUpRight}
                   placement='inline-end'
-                  size='sm'
+                  size='md'
                 />
               </SubmitButton>
             ) : null}

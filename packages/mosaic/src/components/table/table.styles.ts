@@ -152,8 +152,10 @@ export const styles = stylex.create({
     cursor: 'pointer',
     display: 'inline-flex',
     justifyContent: 'center',
-    marginInlineEnd: space['1'],
+    marginInlineEnd: space['0.5'],
     verticalAlign: 'middle',
+    height: space['4'],
+    width: space['4'],
   },
   expandIcon: {
     transform: {

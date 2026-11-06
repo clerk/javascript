@@ -252,7 +252,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           icon: (
             <Icon
               glyph={Cog6Teeth}
-              size='sm'
+              size='md'
             />
           ),
           onClick: () => {},

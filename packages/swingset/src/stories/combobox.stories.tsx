@@ -39,7 +39,7 @@ export function Default() {
             >
               <Icon
                 glyph={ChevronDown}
-                size='sm'
+                size='md'
               />
             </Combobox.Trigger>
           </InputGroup.End>
@@ -83,7 +83,7 @@ export function Scrolling() {
             >
               <Icon
                 glyph={ChevronDown}
-                size='sm'
+                size='md'
               />
             </Combobox.Trigger>
           </InputGroup.End>

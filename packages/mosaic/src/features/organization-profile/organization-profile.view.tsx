@@ -50,7 +50,7 @@ export function organizationProfilePageList(
           icon: (
             <Icon
               glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
-              size='sm'
+              size='md'
             />
           ),
           content: options.pages[entry.id],

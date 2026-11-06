@@ -43,7 +43,7 @@ export function UserProfilePhoneSectionView({
       <Icon
         glyph={Plus}
         placement='inline-start'
-        size='sm'
+        size='md'
       />
       {messages.contact.add}
     </Dialog.Trigger>

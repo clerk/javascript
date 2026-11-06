@@ -48,7 +48,7 @@ export function UserProfileSecurityList({
                 <Icon
                   glyph={Plus}
                   placement='inline-start'
-                  size='sm'
+                  size='md'
                 />
                 Add
               </Button>
