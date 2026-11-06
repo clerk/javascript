@@ -30,7 +30,7 @@ export const trigger = stylex.create({
       default: colorVars['--cl-color-foreground-secondary'],
       '@media (hover: hover)': {
         default: null,
-        ':hover': colorVars['--cl-color-foreground'],
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
       },
     },
     paddingInlineEnd: `calc(${space['3']} - 1px)`,
