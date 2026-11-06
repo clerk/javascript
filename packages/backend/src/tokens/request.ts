@@ -5,6 +5,7 @@ import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { MachineTokenVerificationError, TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
+import { parsePoppyCookie } from '../poppyBrowserSession';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
@@ -146,7 +147,7 @@ export interface AuthenticateRequest {
   (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<SessionTokenType>>;
 }
 
-export const authenticateRequest: AuthenticateRequest = (async (
+const authenticateRequestWithoutPoppyCheck: AuthenticateRequest = (async (
   request: Request,
   options: AuthenticateRequestOptions,
 ): Promise<RequestState<TokenType> | UnauthenticatedState<null>> => {
@@ -924,6 +925,74 @@ export const authenticateRequest: AuthenticateRequest = (async (
 /**
  * @internal
  */
+export const authenticateRequest: AuthenticateRequest = (async (
+  request: Request,
+  options: AuthenticateRequestOptions,
+) => {
+  const clerkRequest = createClerkRequest(request);
+  const accepted = options.acceptsToken;
+  const headerToken = clerkRequest.headers.get('authorization')?.replace(/^Bearer /, '');
+  if (
+    (accepted &&
+      accepted !== 'any' &&
+      accepted !== TokenType.SessionToken &&
+      (!Array.isArray(accepted) || !accepted.includes(TokenType.SessionToken))) ||
+    (headerToken && isMachineToken(headerToken))
+  ) {
+    return authenticateRequestWithoutPoppyCheck(request, options);
+  }
+  const rejectPoppyAccount = async () =>
+    signedOut({
+      tokenType: TokenType.SessionToken,
+      authenticateContext: await createAuthenticateContext(clerkRequest, options),
+      reason: AuthErrorReason.PoppyAccountInvalid,
+      message: 'Poppy browser account authority is no longer valid.',
+    });
+  const rawPoppyCookie = clerkRequest.cookies.get('__Host-poppy_session');
+  let joined;
+  if (rawPoppyCookie) {
+    const cookie = parsePoppyCookie(rawPoppyCookie);
+    if (!cookie || new URL(cookie.endpoint).origin !== clerkRequest.clerkUrl.origin || !options.apiClient) {
+      return rejectPoppyAccount();
+    }
+    try {
+      joined = await options.apiClient.poppy.readBrowserSession(cookie.endpoint, cookie.token);
+    } catch {
+      return rejectPoppyAccount();
+    }
+    if (!joined.account && joined.replaced_sign_in) {
+      return rejectPoppyAccount();
+    }
+  }
+  const state = await authenticateRequestWithoutPoppyCheck(request, options);
+  if (state.isAuthenticated && state.tokenType !== TokenType.SessionToken) {
+    return state;
+  }
+  if (!state.isAuthenticated) {
+    return joined?.account && state.status !== 'handshake' ? rejectPoppyAccount() : state;
+  }
+  const auth = (state as SignedInState).toAuth();
+  if (joined?.account && (joined.account.session_id !== auth.sessionId || joined.account.user_id !== auth.userId)) {
+    return rejectPoppyAccount();
+  }
+  const agent = auth.sessionClaims.agt as { poppy?: unknown } | undefined;
+  if (!agent?.poppy) {
+    return state;
+  }
+  try {
+    if (!options.apiClient) {
+      return rejectPoppyAccount();
+    }
+    const account = joined?.account ?? (await options.apiClient.poppy.verifyBrowserSession(state.token));
+    if (account.session_id !== auth.sessionId || account.user_id !== auth.userId) {
+      return rejectPoppyAccount();
+    }
+    return state;
+  } catch {
+    return rejectPoppyAccount();
+  }
+}) as AuthenticateRequest;
+
 export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, isAuthenticated, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, isAuthenticated, proxyUrl, reason, message, publishableKey, isSatellite, domain };

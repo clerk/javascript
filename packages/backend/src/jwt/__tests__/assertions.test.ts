@@ -192,24 +192,24 @@ describe('assertHeaderAlgorithm(alg)', () => {
   });
 
   it('throws error if algorithm is missing', () => {
-    expect(() => assertHeaderAlgorithm('')).toThrow(`Invalid JWT algorithm "". Supported: RS256,RS384,RS512.`);
+    expect(() => assertHeaderAlgorithm('')).toThrow(`Invalid JWT algorithm "". Supported: RS256,RS384,RS512,EdDSA.`);
   });
 
   it('throws error if algorithm is not supported', () => {
     expect(() => assertHeaderAlgorithm('ES256')).toThrow(
-      `Invalid JWT algorithm "ES256". Supported: RS256,RS384,RS512.`,
+      `Invalid JWT algorithm "ES256". Supported: RS256,RS384,RS512,EdDSA.`,
     );
     expect(() => assertHeaderAlgorithm('ES384')).toThrow(
-      `Invalid JWT algorithm "ES384". Supported: RS256,RS384,RS512.`,
+      `Invalid JWT algorithm "ES384". Supported: RS256,RS384,RS512,EdDSA.`,
     );
     expect(() => assertHeaderAlgorithm('ES512')).toThrow(
-      `Invalid JWT algorithm "ES512". Supported: RS256,RS384,RS512.`,
+      `Invalid JWT algorithm "ES512". Supported: RS256,RS384,RS512,EdDSA.`,
     );
     expect(() => assertHeaderAlgorithm('PS512')).toThrow(
-      `Invalid JWT algorithm "PS512". Supported: RS256,RS384,RS512.`,
+      `Invalid JWT algorithm "PS512". Supported: RS256,RS384,RS512,EdDSA.`,
     );
     expect(() => assertHeaderAlgorithm('Aloha')).toThrow(
-      `Invalid JWT algorithm "Aloha". Supported: RS256,RS384,RS512.`,
+      `Invalid JWT algorithm "Aloha". Supported: RS256,RS384,RS512,EdDSA.`,
     );
   });
 });

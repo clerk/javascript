@@ -118,6 +118,7 @@ export const AuthErrorReason = {
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   ActiveOrganizationMismatch: 'active-organization-mismatch',
   TokenTypeMismatch: 'token-type-mismatch',
+  PoppyAccountInvalid: 'poppy-account-invalid',
   UnexpectedError: 'unexpected-error',
 } as const;
 

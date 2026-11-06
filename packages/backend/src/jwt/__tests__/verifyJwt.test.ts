@@ -16,6 +16,8 @@ import {
   someOtherPublicKey,
 } from '../../fixtures';
 import { mockSignedOAuthAccessTokenJwt, mockSignedOAuthAccessTokenJwtApplicationTyp } from '../../fixtures/machine';
+import { runtime } from '../../runtime';
+import { verifyToken } from '../../tokens/verify';
 import { signJwt } from '../signJwt';
 import { decodeJwt, hasValidSignature, verifyJwt } from '../verifyJwt';
 
@@ -25,6 +27,38 @@ const invalidTokenError = {
 };
 
 describe('hasValidSignature(jwt, key)', () => {
+  it('verifies Ed25519 signatures and rejects a changed payload or another key', async () => {
+    const pair = await runtime.crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+    const other = await runtime.crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+    const privateKey = await runtime.crypto.subtle.exportKey('jwk', pair.privateKey);
+    const publicKey = await runtime.crypto.subtle.exportKey('jwk', pair.publicKey);
+    const otherKey = await runtime.crypto.subtle.exportKey('jwk', other.publicKey);
+    const { data: signed } = await signJwt(
+      {
+        sub: 'user_test',
+        exp: Math.floor(Date.now() / 1000) + 60,
+        nbf: Math.floor(Date.now() / 1000) - 10,
+        iss: 'https://clerk.example.com',
+      },
+      privateKey,
+      { algorithm: 'EdDSA', header: { kid: 'ed25519-test', typ: 'JWT' } },
+    );
+    expect(signed).toBeDefined();
+    const { data: decoded } = decodeJwt(signed!);
+    expect((await hasValidSignature(decoded!, publicKey)).data).toBe(true);
+    const spki = await runtime.crypto.subtle.exportKey('spki', pair.publicKey);
+    const pem =
+      '-----BEGIN PUBLIC KEY-----\n' +
+      btoa(String.fromCharCode(...new Uint8Array(spki))) +
+      '\n-----END PUBLIC KEY-----';
+    expect((await verifyToken(signed!, { jwtKey: pem })).data?.sub).toBe('user_test');
+    expect((await hasValidSignature(decoded!, otherKey)).data).toBe(false);
+    const tampered = { ...decoded!, raw: { ...decoded!.raw, payload: decoded!.raw.payload + 'A' } };
+    expect((await hasValidSignature(tampered, publicKey)).data).toBe(false);
+    const rsaHeader = { ...decoded!, header: { ...decoded!.header, alg: 'RS256' } };
+    expect((await hasValidSignature(rsaHeader, publicKey)).data).not.toBe(true);
+  });
+
   it('verifies the signature with a JWK formatted key', async () => {
     const { data: decodedResult } = decodeJwt(signedJwt);
     const { data: signatureResult } = decodedResult
