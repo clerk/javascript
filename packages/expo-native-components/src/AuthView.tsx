@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
-import { Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
 import type { AuthViewProps } from './AuthView.types';
 import NativeClerkAuthView from './specs/NativeClerkAuthView';
@@ -45,6 +45,7 @@ export function AuthView({
   mode = 'signInOrUp',
   isDismissible = true,
   logoMaxHeight,
+  enableRestoreCredentials = false,
   onDismiss,
   onHostBack,
 }: AuthViewProps) {
@@ -75,6 +76,7 @@ export function AuthView({
       mode={mode}
       isDismissible={isDismissible}
       logoMaxHeight={logoMaxHeight}
+      enableRestoreCredentials={Platform.OS === 'android' ? enableRestoreCredentials : undefined}
       hostBackButton={!!onHostBack}
       onAuthEvent={handleAuthEvent}
       onHostBack={onHostBack ? () => onHostBack() : undefined}
