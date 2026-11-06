@@ -307,6 +307,13 @@ export default defineConfig({
               {
                 from: FLOW_UI,
                 disallow: {
+                  dependency: { source: '@tanstack/react-query', kind: 'value' },
+                },
+                message: 'Use React Query in the model or query layer and pass plain data to controllers and views.',
+              },
+              {
+                from: FLOW_UI,
+                disallow: {
                   to: { file: { categories: 'messages' } },
                   dependency: { kind: 'value', nodeKind: ['import', 'export'] },
                 },
@@ -329,7 +336,10 @@ export default defineConfig({
                 from: FLOW_UI,
                 disallow: {
                   to: { element: { type: 'hooks' } },
-                  dependency: { kind: 'value', specifiers: 'useMosaicRequest' },
+                  dependency: {
+                    kind: 'value',
+                    specifiers: ['useMosaicRequest', 'useMosaicQueryClient', 'useMosaicQuery', 'useMosaicMutation'],
+                  },
                 },
                 message: 'Make Mosaic requests in the model or query layer and pass plain callbacks to the controller.',
               },

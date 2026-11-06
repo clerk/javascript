@@ -70,6 +70,7 @@
   "dependencies": {
     "@clerk/shared": "workspace:^",
     "@floating-ui/react": "catalog:repo",
+    "@tanstack/react-query": "catalog:repo",
     "@wallet-standard/core": "catalog:module-manager"
   },
   "devDependencies": {

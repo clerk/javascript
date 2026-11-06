@@ -165,8 +165,24 @@ layer still owns authentication, serialization, API errors, and client updates.
 An older runtime without this capability rejects the request with a localized
 error. No legacy UI provider is required.
 
-Keep endpoint types and query hooks private to Mosaic. Use the shared query and
-mutation hooks for request state and cache updates; the controller still uses
+The hook rejects a request if the session or organization changes while the
+runtime module loads. This check covers the loading step only. It does not
+cancel a request already sent or protect later waits inside the request layer,
+such as a CAPTCHA challenge.
+
+Keep endpoint types and query hooks private to Mosaic. Use `useMosaicQuery` and
+`useMosaicMutation` from `src/hooks/`. They call the official React Query hooks
+and supply the client through `useMosaicQueryClient`. Use that client hook
+directly when a callback needs to update or invalidate cached data. It returns
+the existing shared client in the browser and a client local to the hook
+during server rendering. Queries do not run
+during server rendering. Do not replace the client while a hook is mounted.
+
+Do not add a `QueryClientProvider` or mount the shared client here. This keeps
+the application query context and existing focus/reconnect behavior unchanged.
+Keep query keys compatible with the cached data type. Use separate keys for raw
+API data and Clerk resources, and invalidate related queries after a write.
+The controller still uses
 `useForm` or `usePendingAction` for the interaction. Return a promise that covers
 the write and required cache work. See `src/features/demo/demo.model.ts` for an
 example. The `/demo` route is a test fixture, not a deployed endpoint.

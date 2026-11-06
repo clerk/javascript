@@ -2,13 +2,13 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import {
   __internal_createCacheKeys,
   __internal_useClearQueriesOnSignOut,
-  __internal_useClerkMutation,
-  __internal_useClerkQuery,
-  getClerkQueryClient,
   useClerk,
   useSession,
 } from '@clerk/shared/react';
 
+import { useMosaicMutation } from '../hooks/use-mosaic-mutation';
+import { useMosaicQuery } from '../hooks/use-mosaic-query';
+import { useMosaicQueryClient } from '../hooks/use-mosaic-query-client';
 import { useMosaicRequest } from '../hooks/use-mosaic-request';
 import { getDemoInstance, updateDemoInstance, type UpdateDemoParams } from './demo.requests';
 
@@ -40,7 +40,7 @@ export function useDemoQuery() {
   const request = useMosaicRequest();
   const { queryKey, enabled } = useDemoScope();
 
-  return __internal_useClerkQuery({
+  return useMosaicQuery({
     queryKey,
     enabled,
     retry: false,
@@ -51,9 +51,9 @@ export function useDemoQuery() {
 export function useUpdateDemo() {
   const request = useMosaicRequest();
   const { queryKey, enabled, isCurrent } = useDemoScope();
-  const client = getClerkQueryClient();
+  const client = useMosaicQueryClient();
 
-  return __internal_useClerkMutation({
+  return useMosaicMutation({
     mutationKey: [...queryKey, 'update'],
     retry: false,
     mutationFn: (params: UpdateDemoParams) => {
@@ -66,12 +66,12 @@ export function useUpdateDemo() {
       if (!isCurrent()) {
         return;
       }
-      await client?.cancelQueries({ queryKey, exact: true });
+      await client.cancelQueries({ queryKey, exact: true });
       if (!isCurrent()) {
         return;
       }
-      client?.setQueryData(queryKey, data);
-      await client?.invalidateQueries({ queryKey, exact: true });
+      client.setQueryData(queryKey, data);
+      await client.invalidateQueries({ queryKey, exact: true });
     },
   });
 }

@@ -1,7 +1,12 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
-import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams } from '@clerk/shared/types';
+import type {
+  ClerkAPIErrorJSON,
+  ClerkResourceJSON,
+  ClerkResourceReloadParams,
+  DeletedObjectJSON,
+} from '@clerk/shared/types';
 
 import { debugLogger } from '@/utils/debug';
 
@@ -79,7 +84,7 @@ export abstract class BaseResource {
   }
 
   // TODO @userland-errors:
-  static async _fetch<J>(
+  static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
@@ -87,7 +92,7 @@ export abstract class BaseResource {
   }
 
   // TODO @userland-errors:
-  protected static async _baseFetch<J>(
+  protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
