@@ -200,6 +200,22 @@ describe('useRouterScope', () => {
     warn.mockRestore();
   });
 
+  it('reports no route and writes nothing while not ready, then resolves the entry once it is', () => {
+    const { result, rerender } = renderHook(
+      ({ ready }: { ready: boolean }) => ({
+        router: useRouterScope(routes, { ...userScope, ready }),
+        segment: useUserSegment(),
+      }),
+      { initialProps: { ready: false }, wrapper: wrapperWith({ '/user': ['security'] }) },
+    );
+    expect(result.current.router.route).toBeUndefined();
+    expect(result.current.segment).toEqual(['security']);
+
+    rerender({ ready: true });
+    expect(result.current.router.route).toBe('security');
+    expect(result.current.segment).toEqual(['security']);
+  });
+
   it('keeps the same result object between unrelated renders', () => {
     const { result, rerender } = renderHook(() => useRouterScope(routes, userScope), {
       wrapper: wrapperWith({ '/user': ['security'] }),

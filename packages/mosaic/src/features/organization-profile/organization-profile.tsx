@@ -85,14 +85,14 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
   const { activePage, onPageChange } = useProfilePagesController(
-    pages ? organizationProfilePageIds({ pages, customPages, pageOrder }) : [],
+    pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
     { routing: 'virtual', path },
   );
 
   if (model.status === 'loading') {
     return fallback ?? null;
   }
-  if (!pages) {
+  if (!pages || activePage === undefined) {
     return null;
   }
 

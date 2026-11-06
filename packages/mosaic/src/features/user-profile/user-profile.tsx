@@ -184,6 +184,7 @@ export function UserProfileSurface({
         <CombinedUserProfileView
           {...viewProps}
           organizationProfileProps={organizationProfileProps}
+          fallback={fallback}
         />
       ) : (
         <AccountUserProfileView {...viewProps} />
@@ -202,6 +203,10 @@ function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
     path,
   });
 
+  if (activePage === undefined) {
+    return null;
+  }
+
   return (
     <UserProfileView
       {...viewProps}
@@ -213,18 +218,23 @@ function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
 
 function CombinedUserProfileView({
   path,
+  fallback,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
-}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
+}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps' | 'fallback'>) {
   const model = useOrganizationProfileModel();
   const organization =
     model.status === 'ready'
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
-  const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds({ ...viewProps, organization }), {
-    routing: 'virtual',
-    path,
-  });
+  const { activePage, onPageChange } = useProfilePagesController(
+    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
+    { routing: 'virtual', path },
+  );
+
+  if (activePage === undefined) {
+    return fallback ?? null;
+  }
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
