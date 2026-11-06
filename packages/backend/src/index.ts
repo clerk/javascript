@@ -103,6 +103,9 @@ export type {
   SMSMessageJSON,
   UserJSON,
   UserDeletedJSON,
+  DirectoryGroupWebhookEventJSON,
+  DirectoryGroupMembershipWebhookEventJSON,
+  DeletedDirectoryGroupMembershipWebhookEventJSON,
   VerificationJSON,
   WaitlistEntryJSON,
   Web3WalletJSON,
@@ -173,6 +176,8 @@ export type {
  */
 export type {
   EmailWebhookEvent,
+  EmailBounceType,
+  EmailDeliveryWebhookEvent,
   OrganizationWebhookEvent,
   OrganizationDomainWebhookEvent,
   OrganizationInvitationAcceptedWebhookEvent,
@@ -182,6 +187,8 @@ export type {
   PermissionWebhookEvent,
   SessionWebhookEvent,
   SMSWebhookEvent,
+  DirectoryGroupWebhookEvent,
+  DirectoryGroupMembershipWebhookEvent,
   UserWebhookEvent,
   WaitlistEntryWebhookEvent,
   WebhookEvent,

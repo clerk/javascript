@@ -1,27 +1,29 @@
 'use client';
 
 import type { CountryEntry, CountryIso } from '@clerk/shared/phone';
-import {
-  extractDigits,
-  formatPhoneNumber,
-  getFlagEmojiFromCountryIso,
-  IsoToCountryMap,
-  parsePhoneString,
-} from '@clerk/shared/phone';
+import { extractDigits, getFlagEmojiFromCountryIso, IsoToCountryMap, parsePhoneString } from '@clerk/shared/phone';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { Button } from '../../primitives/button';
+import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
+import { useFormattedInput } from '../../primitives/hooks';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
-import { Button } from '../button';
-import { Combobox } from '../combobox';
+import { styles as buttonStyles } from '../button/button.styles';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
+import { sizes as inputSizes, styles as inputStyles } from '../input/input.styles';
 import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
+import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
+import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
 import { styles } from './phone-input.styles';
 
 const countryOptions = [...IsoToCountryMap.values()];
@@ -44,16 +46,6 @@ function getInitialCountry(value: string | undefined, defaultCountry: CountryIso
   return value ? parsePhoneString(value).iso : getCountry(defaultCountry).iso;
 }
 
-function getNationalNumber(value: string, country: CountryEntry): string {
-  const digits = extractDigits(value);
-  return digits.startsWith(country.code) ? digits.slice(country.code.length) : digits;
-}
-
-function toE164(country: CountryEntry, nationalNumber: string): string {
-  const number = extractDigits(nationalNumber);
-  return number ? `+${country.code}${number}` : '';
-}
-
 export interface PhoneInputProps extends Omit<
   MosaicElementProps<'input'>,
   'type' | 'size' | 'value' | 'defaultValue' | 'onChange'
@@ -72,10 +64,6 @@ export interface PhoneInputProps extends Omit<
   size?: 'sm' | 'md' | 'lg';
   countrySearchPlaceholder?: string;
   noResultsMessage?: string;
-  /** Applied to the grouped root. */
-  className?: string;
-  /** Applied to the grouped root. */
-  style?: React.CSSProperties;
 }
 
 export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(function MosaicPhoneInput(
@@ -87,7 +75,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     defaultCountry,
     onCountryChange,
     size = 'md',
-    countrySearchPlaceholder = 'Search country or code',
+    countrySearchPlaceholder = 'Search',
     noResultsMessage = 'No countries found',
     disabled: disabledProp,
     required: requiredProp,
@@ -115,9 +103,10 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const [uncontrolledCountry, setUncontrolledCountry] = React.useState<CountryIso>(() =>
     getInitialCountry(valueProp ?? defaultValue, defaultCountry),
   );
+  const emittedValueRef = React.useRef<string | null>(null);
   const country = getCountry(countryProp ?? uncontrolledCountry);
   const nationalNumber = getNationalNumber(value, country);
-  const formattedNumber = formatPhoneNumber(nationalNumber, country.pattern, country.code);
+  const formattedNumber = formatNationalNumber(nationalNumber, country.pattern);
   const [open, setOpen] = React.useState(false);
   const [anchor, setAnchor] = React.useState<HTMLDivElement | null>(null);
   const [query, setQuery] = React.useState('');
@@ -125,16 +114,16 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const mergedInputRef = useMergeRefs([inputRef, forwardedRef]);
 
   React.useEffect(() => {
+    const emittedValue = emittedValueRef.current;
+    emittedValueRef.current = null;
+    if (valueProp === undefined || valueProp === emittedValue) {
+      return;
+    }
     if (countryProp === undefined && valueProp) {
+      // eslint-disable-next-line react/set-state-in-effect -- Match the country to a phone number supplied by the parent.
       setUncontrolledCountry(parsePhoneString(valueProp).iso);
     }
   }, [countryProp, valueProp]);
-
-  React.useEffect(() => {
-    if (!open) {
-      setQuery('');
-    }
-  }, [open]);
 
   const filteredCountries = React.useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -148,6 +137,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
 
   const setValue = React.useCallback(
     (nextValue: string) => {
+      emittedValueRef.current = nextValue;
       if (valueProp === undefined) {
         setUncontrolledValue(nextValue);
       }
@@ -156,6 +146,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     [onValueChange, valueProp],
   );
 
+  // eslint-disable-next-line react/preserve-manual-memoization -- Keep the existing country selection callback.
   const setCountry = React.useCallback(
     (nextCountry: CountryEntry) => {
       if (countryProp === undefined) {
@@ -164,25 +155,32 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       onCountryChange?.(nextCountry.iso);
       setValue(toE164(nextCountry, nationalNumber));
       setOpen(false);
+      setQuery('');
       inputRef.current?.focus();
     },
+    // eslint-disable-next-line react/preserve-manual-memoization -- The value callback records its last emission in a ref.
     [countryProp, nationalNumber, onCountryChange, setValue],
   );
 
-  const handleNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextValue = event.target.value;
-    if (nextValue.includes('+')) {
-      const parsed = parsePhoneString(nextValue);
-      const parsedCountry = getCountry(parsed.iso);
-      if (countryProp === undefined) {
-        setUncontrolledCountry(parsedCountry.iso);
+  const numberInput = useFormattedInput({
+    value: formattedNumber,
+    accept: /[\d+]/,
+    format: nextValue =>
+      nextValue.includes('+') ? nextValue : formatNationalNumber(extractDigits(nextValue), country.pattern),
+    onChange: nextValue => {
+      if (nextValue.includes('+')) {
+        const parsed = parsePhoneString(nextValue);
+        const parsedCountry = getCountry(parsed.iso);
+        if (countryProp === undefined) {
+          setUncontrolledCountry(parsedCountry.iso);
+        }
+        onCountryChange?.(parsedCountry.iso);
+        setValue(toE164(parsedCountry, parsed.number));
+        return;
       }
-      onCountryChange?.(parsedCountry.iso);
-      setValue(toE164(parsedCountry, parsed.number));
-      return;
-    }
-    setValue(toE164(country, nextValue));
-  };
+      setValue(toE164(country, nextValue));
+    },
+  });
 
   return (
     <>
@@ -196,18 +194,30 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       >
         <Popover.Root
           open={open}
-          onOpenChange={setOpen}
+          onOpenChange={nextOpen => {
+            setOpen(nextOpen);
+            if (!nextOpen) {
+              setQuery('');
+            }
+          }}
           initialFocus='first'
           placement='bottom-start'
           sideOffset={8}
         >
-          <InputGroup.Start>
+          <InputGroup.Start xstyle={styles.triggerStart}>
             <Popover.Trigger
               render={
                 <Button
-                  size='xs'
-                  shape='default'
-                  {...themeProps('phone-input-country-trigger')}
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-trigger'),
+                    stylex.props(
+                      reset.base,
+                      focusOutline.visible,
+                      buttonStyles.touchTarget,
+                      styles.trigger,
+                      disabled && buttonStyles.disabled,
+                    ),
+                  )}
                 />
               }
               type='button'
@@ -217,15 +227,12 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               <span {...stylex.props(reset.base, styles.triggerContent)}>
                 <span
                   aria-hidden='true'
-                  {...mergeStyleProps(
-                    themeProps('phone-input-flag'),
-                    stylex.props(reset.base, styles.flag, styles.triggerFlag),
-                  )}
+                  {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
                 >
                   {getFlagEmojiFromCountryIso(country.iso)}
                 </span>
                 <Icon
-                  name='chevron-down'
+                  glyph={ChevronDown}
                   size='md'
                 />
               </span>
@@ -238,7 +245,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
             {...themeProps('phone-input-popup')}
             xstyle={[reset.base, styles.popup]}
           >
-            <Combobox.Root
+            <HeadlessCombobox.Root
               open
               inputValue={query}
               onInputValueChange={setQuery}
@@ -250,51 +257,73 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 }
               }}
             >
-              <Field.Root xstyle={styles.countrySearchContainer}>
-                <InputGroup.Root
-                  size='md'
-                  {...themeProps('phone-input-country-search')}
+              <Field.Root>
+                <label
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-search'),
+                    stylex.props(reset.base, styles.countrySearchRow),
+                  )}
                 >
-                  <InputGroup.Start>
+                  <span {...stylex.props(reset.base, styles.countrySearchIcon)}>
                     <Icon
-                      name='magnifying-glass'
-                      size='sm'
+                      glyph={MagnifyingGlass}
+                      size='md'
                     />
-                  </InputGroup.Start>
-                  <Combobox.Input
+                  </span>
+                  <HeadlessCombobox.Input
                     aria-label='Search countries'
                     placeholder={countrySearchPlaceholder}
                     spellCheck={false}
+                    {...mergeStyleProps(
+                      themeProps('combobox-input', { size: 'md', variant: 'ghost' }),
+                      themeProps('input', { size: 'md', variant: 'ghost', disabled: false }),
+                      stylex.props(
+                        reset.base,
+                        inputStyles.base,
+                        inputSizes.md,
+                        inputStyles.ghost,
+                        styles.countrySearchInput,
+                      ),
+                    )}
                   />
-                </InputGroup.Root>
+                </label>
               </Field.Root>
-              <Combobox.List {...themeProps('phone-input-country-list')}>
+              <HeadlessCombobox.List
+                {...mergeStyleProps(
+                  themeProps('combobox-list'),
+                  themeProps('phone-input-country-list'),
+                  stylex.props(reset.base, scrollAreaRoot, ...scrollAreaViewport(), styles.countryList),
+                )}
+              >
                 {filteredCountries.length > 0 ? (
                   filteredCountries.map(option => (
-                    <Combobox.Option
+                    <HeadlessCombobox.Option
                       key={option.iso}
                       value={option.iso}
                       label={option.name}
-                      {...themeProps('phone-input-country-option')}
+                      {...mergeStyleProps(
+                        themeProps('combobox-option'),
+                        themeProps('phone-input-country-option'),
+                        stylex.props(reset.base, styles.option),
+                      )}
                     >
                       <span
                         aria-hidden='true'
-                        {...stylex.props(reset.base, styles.flag)}
+                        {...stylex.props(reset.base, styles.optionFlag)}
                       >
-                        {getFlagEmojiFromCountryIso(option.iso)}
+                        <span {...stylex.props(reset.base, styles.flag)}>{getFlagEmojiFromCountryIso(option.iso)}</span>
                       </span>
                       <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
                       <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                      <span {...stylex.props(styles.indicatorSlot)}>
-                        <Combobox.OptionIndicator />
-                      </span>
-                    </Combobox.Option>
+                    </HeadlessCombobox.Option>
                   ))
                 ) : (
-                  <Combobox.Empty>{noResultsMessage}</Combobox.Empty>
+                  <p {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty))}>
+                    {noResultsMessage}
+                  </p>
                 )}
-              </Combobox.List>
-            </Combobox.Root>
+              </HeadlessCombobox.List>
+            </HeadlessCombobox.Root>
           </Popover.Popup>
         </Popover.Root>
 
@@ -316,7 +345,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           {...inputProps}
           id={id}
           type='tel'
-          value={formattedNumber}
+          {...numberInput}
           disabled={disabledProp}
           required={requiredProp}
           form={form}
@@ -327,7 +356,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           aria-invalid={ariaInvalidProp}
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
-          onChange={handleNumberChange}
         />
       </InputGroup.Root>
       {name ? (

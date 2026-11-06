@@ -22,5 +22,6 @@ export function assign<TContext, TEvent extends EventObject = EventObject>(
 export function isAssignAction<TContext, TEvent extends EventObject>(
   action: unknown,
 ): action is AssignAction<TContext, TEvent> {
+  // eslint-disable-next-line typescript/consistent-type-assertions -- Check the unknown action discriminator before accepting the action type.
   return typeof action === 'object' && action !== null && (action as { type?: unknown }).type === ASSIGN;
 }

@@ -1,4 +1,5 @@
-import * as stylex from '@stylexjs/stylex';
+import { useMergeRefs } from '@floating-ui/react';
+import type { Ref } from 'react';
 
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -8,19 +9,15 @@ import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
+import { ChevronRight } from '../../../icons/glyphs/chevron-right';
 import { rtl } from '../../../styles/rtl.styles';
-
-const styles = stylex.create({
-  helpText: {
-    textAlign: 'center',
-  },
-});
+import { styles } from '../reverification.styles';
 
 export interface ReverificationMethod {
   id: string;
   label: string;
   description?: string;
-  icon: IconProps['name'];
+  icon: IconProps['glyph'];
 }
 
 export interface ReverificationMethodPickerMessages {
@@ -38,6 +35,7 @@ export interface ReverificationMethodPickerProps {
   onSelect: (methodId: string) => void;
   onHelp: () => void;
   onBack?: () => void;
+  focusRef?: Ref<HTMLElement>;
 }
 
 export function ReverificationMethodPicker({
@@ -47,8 +45,9 @@ export function ReverificationMethodPicker({
   onSelect,
   onHelp,
   onBack,
+  focusRef,
 }: ReverificationMethodPickerProps) {
-  const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
+  const firstMethodRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLDivElement>()]);
 
   return (
     <>
@@ -57,14 +56,13 @@ export function ReverificationMethodPicker({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <Item.Group variant='outline'>
+        <Item.Group>
           {methods.map((method, index) => {
             const isPending = pendingMethodId === method.id;
             return (
               <Item.Root
                 key={method.id}
                 ref={index === 0 ? firstMethodRef : undefined}
-                size='lg'
                 render={
                   <button
                     type='button'
@@ -74,8 +72,11 @@ export function ReverificationMethodPicker({
                 }
               >
                 <Item.Media>
-                  <IconFrame filled>
-                    <Icon name={method.icon} />
+                  <IconFrame
+                    filled
+                    bordered={false}
+                  >
+                    <Icon glyph={method.icon} />
                   </IconFrame>
                 </Item.Media>
                 <Item.Content>
@@ -87,7 +88,7 @@ export function ReverificationMethodPicker({
                     <Spinner size='sm' />
                   ) : (
                     <Icon
-                      name='chevron-right'
+                      glyph={ChevronRight}
                       xstyle={rtl.mirror}
                     />
                   )}
@@ -95,18 +96,18 @@ export function ReverificationMethodPicker({
               </Item.Root>
             );
           })}
+          {onBack ? (
+            <Button
+              type='button'
+              color='neutral'
+              variant='ghost'
+              disabled={Boolean(pendingMethodId)}
+              onClick={onBack}
+            >
+              {messages.backButton}
+            </Button>
+          ) : null}
         </Item.Group>
-        {onBack ? (
-          <Button
-            type='button'
-            variant='ghost'
-            fullWidth
-            disabled={Boolean(pendingMethodId)}
-            onClick={onBack}
-          >
-            {messages.backButton}
-          </Button>
-        ) : null}
         <Text
           size='xs'
           xstyle={styles.helpText}
@@ -115,6 +116,7 @@ export function ReverificationMethodPicker({
           <Button
             type='button'
             size='sm'
+            color='neutral'
             variant='link'
             disabled={Boolean(pendingMethodId)}
             onClick={() => {

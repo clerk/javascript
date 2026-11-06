@@ -13,6 +13,11 @@ import {
 } from '../../tokens.stylex';
 import { selectOptionScope } from './select.markers.stylex';
 
+const popupRadius = radiusVars['--cl-radius-lg'];
+const popupBorder = '1px';
+const inset = space['0.5'];
+const optionRadius = `max(0px, calc(${popupRadius} - ${popupBorder} - ${inset}))`;
+
 // With `alignItemWithTrigger` the selected option's box lands over the trigger's, so the two
 // boxes must inset their text identically: the trigger is a `md` Button (32px, 1px border, 12px
 // inline padding, sm text), and the option gets the same 13px from the popup's 1px border, the
@@ -36,11 +41,11 @@ export const popup = stylex.create({
   base: {
     // Transparent, not removed: it holds the 1px of layout the alignment counts on, and forced colors paints it.
     borderColor: 'transparent',
-    borderRadius: radiusVars['--cl-radius-lg'],
+    borderRadius: popupRadius,
     borderStyle: 'solid',
-    borderWidth: '1px',
+    borderWidth: popupBorder,
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
@@ -77,7 +82,7 @@ export const popup = stylex.create({
 
 export const viewport = stylex.create({
   base: {
-    padding: space['0.5'],
+    padding: inset,
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
@@ -86,7 +91,7 @@ export const viewport = stylex.create({
 
 export const option = stylex.create({
   base: {
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: optionRadius,
     borderStyle: 'none',
     gap: space['2'],
     outline: 'none',
@@ -98,7 +103,7 @@ export const option = stylex.create({
       ':where([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       '@media (hover: hover)': {
         default: null,
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     color: colorVars['--cl-color-foreground'],
@@ -129,6 +134,18 @@ export const option = stylex.create({
   },
 });
 
+export const media = stylex.create({
+  base: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['5'],
+  },
+});
+
 export const content = stylex.create({
   base: {
     display: 'flex',
@@ -148,10 +165,12 @@ export const description = stylex.create({
 // Rendered on every row and shown only on the selected one, so labels never shift with selection.
 export const indicator = stylex.create({
   base: {
+    alignSelf: 'flex-start',
     color: colorVars['--cl-color-foreground-secondary'],
     visibility: {
       default: 'hidden',
       [stylex.when.ancestor('[data-selected]', selectOptionScope)]: 'visible',
     },
+    height: space['5'],
   },
 });

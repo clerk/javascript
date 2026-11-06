@@ -1,5 +1,7 @@
 import type { PhoneNumberResource } from '@clerk/shared/types';
 
+import type { ReverificationController } from '../../reverification';
+
 export interface UserProfileMfaMethod {
   id: string;
   type: 'sms' | 'authenticator' | 'backup-codes';
@@ -36,7 +38,7 @@ export type UserProfileMfaModel =
       methods: readonly UserProfileMfaMethod[];
       addableMethods: readonly UserProfileMfaAddableMethod[];
       phones: readonly MfaPhone[];
-      findOrCreatePhone?: (phoneNumber: string) => Promise<MfaPhone>;
+      enrollPhoneNumber?: (phoneNumber: string) => Promise<SmsEnrollmentResult>;
       enrollSms?: (phoneId: string, code?: string) => Promise<SmsEnrollmentResult>;
       resendSms?: (phoneId: string) => Promise<void>;
       createAuthenticator?: () => Promise<{ secret: string; uri: string }>;
@@ -44,4 +46,10 @@ export type UserProfileMfaModel =
       generateBackupCodes?: () => Promise<readonly string[]>;
       remove: (methodId: string) => Promise<void>;
       setDefault?: (phoneId: string) => Promise<void>;
+      removeReverification: ReverificationController;
+      setDefaultReverification: ReverificationController;
+      backupCodesReverification: ReverificationController;
+      createPhoneReverification: ReverificationController;
+      enrollSmsReverification: ReverificationController;
+      authenticatorReverification: ReverificationController;
     };

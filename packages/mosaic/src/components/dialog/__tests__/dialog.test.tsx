@@ -6,6 +6,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../../props';
 import { colorVars, radiusVars, space } from '../../../tokens.stylex';
+import { Button } from '../../button';
+import { ButtonContext } from '../../button/button.context';
 import { Card } from '../../card';
 import type { DialogVariant } from '../dialog';
 import { Dialog } from '../dialog';
@@ -96,6 +98,17 @@ describe('Mosaic Dialog', () => {
     expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-variant', 'profile');
   });
 
+  it('reflects the fullscreen variant as data-variant on the popup and the viewport', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup variant='fullscreen'>Body</Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-variant', 'fullscreen');
+    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-variant', 'fullscreen');
+  });
+
   it('composes consumer xstyle onto the popup', () => {
     const caller = stylex.create({ popup: { marginTop: '8px' } });
     render(
@@ -161,6 +174,57 @@ describe('Mosaic Dialog', () => {
     );
 
     expect(ref.current).toBe(document.querySelector('.cl-dialog-popup'));
+  });
+});
+
+describe('shouldCloseOnInteractOutside', () => {
+  function Verify({ shouldCloseOnInteractOutside }: { shouldCloseOnInteractOutside?: boolean }) {
+    return (
+      <Dialog.Root
+        defaultOpen
+        shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+      >
+        <Dialog.Popup>
+          <Surface title='Verify it is you' />
+        </Dialog.Popup>
+      </Dialog.Root>
+    );
+  }
+
+  it('closes on an outside press by default', async () => {
+    const user = userEvent.setup();
+    render(<Verify />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('stays open on an outside press when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.getByRole('dialog', { name: 'Verify it is you' })).toBeInTheDocument();
+  });
+
+  it('still closes on Escape when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('keeps the corner dismiss when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
 
@@ -231,13 +295,13 @@ describe('nested Mosaic Dialogs', () => {
     render(<Nested />);
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.style.overflowY).toBe('hidden');
 
     await user.keyboard('{Escape}');
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.style.overflowY).toBe('hidden');
 
     await user.keyboard('{Escape}');
-    expect(document.body.style.overflow).toBe('');
+    expect(document.body.style.overflowY).toBe('');
   });
 
   it('warns when a profile opens inside another dialog', async () => {
@@ -248,7 +312,16 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="profile"'));
-    warn.mockRestore();
+  });
+
+  it('warns when a fullscreen profile opens inside another dialog', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<Nested innerVariant='fullscreen' />);
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
   });
 
   // A card over a profile is the delete-account confirmation: a `Card` inside a `card` dialog.
@@ -260,7 +333,6 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });
 
@@ -322,6 +394,38 @@ describe('stacked backdrops', () => {
     const popups = document.querySelectorAll('.cl-dialog-popup');
     expect(popups[0]).toHaveAttribute('data-stack-base', '');
     expect(popups[1]).not.toHaveAttribute('data-stack-base');
+  });
+});
+
+describe('button defaults', () => {
+  it('does not inherit full width from a card footer it is opened from', () => {
+    render(
+      <Card.Footer>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('does not inherit disabled from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).toBeEnabled();
   });
 });
 
@@ -390,7 +494,6 @@ describe('Dialog.CloseButton', () => {
     );
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('alert dialog'));
-    warn.mockRestore();
   });
 });
 
@@ -515,7 +618,7 @@ describe('popup surface', () => {
   // an atom from its property and value, so a probe with the popup's own values yields the very
   // atoms `styles.popup` declares.
   const probe = stylex.create({
-    background: { backgroundColor: colorVars['--cl-color-background'] },
+    background: { backgroundColor: colorVars['--cl-color-page'] },
     radius: { borderRadius: radiusVars['--cl-radius-xl'] },
   });
 
@@ -592,7 +695,13 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
-    warn.mockRestore();
+  });
+
+  it('warns when a fullscreen profile is given a placement', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement('sheet', 'fullscreen');
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
   });
 
   it('keeps a profile centered by default without warning', () => {
@@ -601,7 +710,6 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
-    warn.mockRestore();
   });
 });
 
@@ -683,7 +791,6 @@ describe('accessible name warning', () => {
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining(`<${titlePart}>`));
-    warn.mockRestore();
   });
 
   it('does not warn when the card inside it supplies the name', async () => {
@@ -699,7 +806,6 @@ describe('accessible name warning', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   // The name can come from the consumer instead of from a Title, and an `aria-label` on the popup
@@ -715,6 +821,5 @@ describe('accessible name warning', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });

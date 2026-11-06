@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode, Ref } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { Panel } from '../../components/panel';
 import { themeProps } from '../../props';
@@ -11,43 +11,14 @@ export type { UserProfileNameAttribute } from './user-profile-profile-section/us
 export type { UserProfileEditNameValue } from './user-profile-profile-section/user-profile-edit-name.dialog';
 
 export interface UserProfileProfilePanelViewProps {
-  titleRef?: Ref<HTMLDivElement>;
-  profileSlot?: ReactNode;
-  emailSlot?: ReactNode;
-  phoneSlot?: ReactNode;
-  connectedAccountsSlot?: ReactNode;
-  web3WalletsSlot?: ReactNode;
-  enterpriseAccountsSlot?: ReactNode;
-  dangerSlot?: ReactNode;
+  children?: ReactNode;
 }
 
-export function UserProfileProfilePanelView({
-  titleRef,
-  profileSlot,
-  emailSlot,
-  phoneSlot,
-  connectedAccountsSlot,
-  web3WalletsSlot,
-  enterpriseAccountsSlot,
-  dangerSlot,
-}: UserProfileProfilePanelViewProps): ReactElement {
+export function UserProfileProfilePanelView({ children }: UserProfileProfilePanelViewProps): ReactElement {
   return (
     <Panel.Root render={<div {...themeProps('user-profile-profile-panel')} />}>
-      <Panel.Title
-        ref={titleRef}
-        tabIndex={-1}
-      >
-        Account
-      </Panel.Title>
-      <Panel.Sections>
-        {profileSlot}
-        {emailSlot}
-        {phoneSlot}
-        {connectedAccountsSlot}
-        {enterpriseAccountsSlot}
-        {web3WalletsSlot}
-        {dangerSlot}
-      </Panel.Sections>
+      <Panel.Title>Account</Panel.Title>
+      <Panel.Sections>{children}</Panel.Sections>
     </Panel.Root>
   );
 }

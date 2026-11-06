@@ -1,7 +1,8 @@
 'use client';
 
-import { FloatingPortal } from '@floating-ui/react';
 import type { ReactNode, RefObject } from 'react';
+
+import { Portal } from '../portal';
 
 export interface ToastPortalProps {
   children: ReactNode;
@@ -9,5 +10,5 @@ export interface ToastPortalProps {
 }
 
 export function ToastPortal(props: ToastPortalProps) {
-  return <FloatingPortal root={props.root}>{props.children}</FloatingPortal>;
+  return <Portal root={props.root}>{props.children}</Portal>;
 }

@@ -12,7 +12,7 @@ export function maybeCompleteAuthSession(): void {
     WebBrowser.maybeCompleteAuthSession();
   } catch (e) {
     if (__DEV__) {
-      console.warn('[ClerkProvider] expo-web-browser not available, OAuth/SSO on web will not work:', e);
+      console.warn('Clerk: expo-web-browser not available, OAuth/SSO on web will not work:', e);
     }
   }
 }

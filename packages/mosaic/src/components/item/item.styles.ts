@@ -10,8 +10,12 @@ export const item = stylex.create({
     // `interactive` rather than gaining a hover branch here: StyleX resolves a property to the
     // last style that declares it, so the two can't merge.
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
+    padding: space['3'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-lg'],
-    paddingInline: space['1.5'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    gap: space['3'],
     alignItems: 'center',
     color: colorVars['--cl-color-foreground-secondary'],
     display: 'flex',
@@ -22,59 +26,56 @@ export const item = stylex.create({
     width: '100%',
   },
 
-  // interactive rows (rendered as a link/button via `render`) gain hover + cursor. Only these
-  // promote on hover: a static row is not pointing at anything, so its icon and label hold.
-  // A row that is standing down while another action runs keeps its look rather than dimming, so
-  // it holds its opacity where `Button` drops to 0.5. The pointer still reaches it, which is what
-  // shows `not-allowed`, so every hover branch has to exclude a standing-down row itself. Both
-  // spellings count: a row that has to stay focusable while it waits carries `aria-disabled`
-  // instead of the native attribute.
+  // interactive rows (rendered as a link, button or radio card via `render`) gain hover + cursor.
+  // Only these promote on hover: a static row is not pointing at anything, so its icon and label
+  // hold. A row that is standing down while another action runs keeps its look rather than
+  // dimming, so it holds its opacity where `Button` drops to 0.5. The pointer still reaches it,
+  // which is what shows `not-allowed`, so every hover branch has to exclude a standing-down row
+  // itself. Both spellings count: a row that has to stay focusable while it waits carries
+  // `aria-disabled` instead of the native attribute. A radio card reflects its own state as
+  // `data-checked` and `data-disabled`; only a `data-disabled` row dims.
   interactive: {
     '--_cl-icon-color': {
       default: colorVars['--cl-color-foreground-secondary'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
+        ':hover:not(:disabled, [aria-disabled="true"], [data-disabled])': colorVars['--cl-color-neutral'],
+      },
+    },
+    borderColor: {
+      default: colorVars['--cl-color-border-subtle'],
+      ':where([data-checked])': colorVars['--cl-color-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [aria-disabled="true"], [data-disabled], [data-checked])':
+          colorVars['--cl-color-border'],
       },
     },
     backgroundColor: {
       default: null,
-      ':active:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-200'],
+      ':active:not(:disabled, [aria-disabled="true"], [data-disabled])': colorVars['--cl-color-neutral-alpha-200'],
+      ':where([data-checked])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [aria-disabled="true"], [data-disabled], [data-checked])':
+          colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
       default: colorVars['--cl-color-foreground-secondary'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
+        ':hover:not(:disabled, [aria-disabled="true"], [data-disabled])': colorVars['--cl-color-foreground'],
       },
     },
     cursor: {
       default: 'pointer',
-      ':is(:disabled, [aria-disabled="true"])': 'not-allowed',
+      ':is(:disabled, [aria-disabled="true"], [data-disabled])': 'not-allowed',
     },
-  },
-
-  outline: {
-    borderColor: colorVars['--cl-color-border'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-  },
-
-  xs: {
-    gap: space['1.5'],
-    height: space['8'],
-  },
-  md: {
-    gap: space['3'],
-    height: space['13'],
-  },
-  lg: {
-    gap: space['3'],
-    paddingInline: space['3'],
-    height: space['16'],
+    opacity: {
+      default: null,
+      ':where([data-disabled])': 0.5,
+    },
+    position: 'relative',
   },
 });
 
@@ -85,11 +86,8 @@ export const media = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
+    width: space['10'],
   },
-
-  xs: { width: space['5'] },
-  md: { width: space['10'] },
-  lg: { width: space['10'] },
 });
 
 export const content = stylex.create({
@@ -139,28 +137,9 @@ export const actions = stylex.create({
 
 export const group = stylex.create({
   base: {
-    width: '100%',
-  },
-
-  // The gutter belongs to the variant rather than `base`: `outline` has none, and holding it here
-  // keeps the two from overriding each other.
-  default: {
-    padding: space['1.5'],
-  },
-  // Bordered rows read as separate cards, so the group drops its gutter and spaces them instead.
-  outline: {
     gap: space['2'],
     display: 'flex',
     flexDirection: 'column',
-  },
-});
-
-export const separator = stylex.create({
-  base: {
-    borderStyle: 'none',
-    backgroundColor: colorVars['--cl-color-border-subtle'],
-    flexShrink: 0,
-    height: '1px',
     width: '100%',
   },
 });

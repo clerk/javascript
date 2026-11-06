@@ -1,4 +1,4 @@
-import { useClerk, useSession } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -17,8 +17,6 @@ type UVFactorOnePasskeysCard = {
 export const UVFactorOnePasskeysCard = (props: UVFactorOnePasskeysCard) => {
   const { onShowAlternativeMethodsClicked } = props;
   const { session } = useSession();
-  // @ts-expect-error - This is not a public API
-  const { __internal_isWebAuthnSupported } = useClerk();
   const { handleVerificationResponse } = useAfterVerification();
 
   const card = useCardState();

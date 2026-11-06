@@ -2,7 +2,7 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import React from 'react';
 
 import { Icon } from '../components/icon';
-import type { IconName } from '../icons/registry';
+import type { IconComponent } from '../icons/glyph';
 import { autoUpdate, getDimensions } from '../primitives/utils/dom';
 import { feedbackStyles } from '../styles/feedback.styles';
 
@@ -11,7 +11,7 @@ export function hasMessage(children: React.ReactNode) {
 }
 
 export function useMessageHeight(active: HTMLElement | null) {
-  const [height, setHeight] = React.useState(0);
+  const [height, setHeight] = React.useState<number | undefined>(undefined);
 
   useSafeLayoutEffect(() => {
     if (!active) {
@@ -27,17 +27,19 @@ export function useMessageHeight(active: HTMLElement | null) {
 export function useHeldMessage(children: React.ReactNode, open: boolean) {
   const held = React.useRef(children);
   if (open) {
+    // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
     held.current = children;
   }
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   return held.current;
 }
 
-export function FeedbackBody({ icon, children }: { icon: IconName; children: React.ReactNode }) {
+export function FeedbackBody({ icon, children }: { icon: IconComponent; children: React.ReactNode }) {
   return (
     <>
       <Icon
-        name={icon}
-        size='sm'
+        glyph={icon}
+        size='md'
         xstyle={feedbackStyles.icon}
       />
       <span>{children}</span>

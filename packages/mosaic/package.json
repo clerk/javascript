@@ -1,6 +1,6 @@
 {
   "name": "@clerk/mosaic",
-  "version": "0.1.8",
+  "version": "0.2.2",
   "description": "Clerk Mosaic UI components",
   "keywords": [
     "clerk",
@@ -42,7 +42,8 @@
     "dist",
     "!dist/**/*.d.ts.map",
     "!dist/**/*.d.mts.map",
-    "styles.css.d.ts"
+    "styles.css.d.ts",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "pnpm build:js && pnpm build:css && pnpm check:bundle && pnpm typecheck",
@@ -54,12 +55,16 @@
     "dev": "tsdown --config tsdown.config.mts --watch",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "lint": "eslint src",
+    "lint": "oxlint -c oxlint.config.mjs src",
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
     "test": "vitest run --project primitives --project mosaic",
+    "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
+    "test:visual": "bash ./scripts/test-visual.sh compare",
+    "test:visual:update": "bash ./scripts/test-visual.sh update",
+    "test:webkit": "vitest run --project webkit",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -81,6 +86,8 @@
     "@types/react-dom": "catalog:react",
     "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
+    "eslint-plugin-boundaries": "7.3.0",
+    "eslint-plugin-react-you-might-not-need-an-effect": "1.0.2",
     "happy-dom": "^20.8.9",
     "msw": "2.15.0",
     "playwright": "1.62.1",
@@ -88,6 +95,7 @@
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "tsdown": "catalog:repo",
+    "typescript": "7.0.2",
     "vitest-axe": "^0.1.0"
   },
   "peerDependencies": {

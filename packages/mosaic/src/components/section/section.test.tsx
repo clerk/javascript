@@ -313,7 +313,7 @@ describe('Section', () => {
     const icon = error.querySelector('.cl-icon');
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveAttribute('aria-hidden', 'true');
-    expect(icon).toHaveAttribute('data-size', 'sm');
+    expect(icon).toHaveAttribute('data-size', 'md');
   });
 
   it('renders nothing while the row has no message', () => {

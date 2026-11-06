@@ -332,7 +332,6 @@ describe('Mosaic Field', () => {
     expect(control).toHaveAttribute('aria-describedby', description?.id);
 
     await act(() => root?.unmount());
-    consoleError.mockRestore();
   });
 
   it('warns when Root contains more than one form control', () => {
@@ -349,7 +348,6 @@ describe('Mosaic Field', () => {
     expect(consoleWarn).toHaveBeenCalledWith(
       '[Clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
     );
-    consoleWarn.mockRestore();
   });
 
   it('updates registered control and message IDs as parts change', () => {
@@ -492,7 +490,7 @@ describe('Mosaic Field', () => {
     expect(error?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('mounts through the headless enter transition and animates the message height', () => {
+  it('animates the registered message height while initially present feedback stays at rest', () => {
     const probe = stylex.create({
       message: {
         transitionProperty: {
@@ -527,7 +525,7 @@ describe('Mosaic Field', () => {
     expect(atoms(probe.feedback)).toHaveLength(3);
     expect(error).toHaveClass(...atoms(probe.feedback));
     expect(error).toHaveAttribute('data-open');
-    expect(error).toHaveAttribute('data-starting-style');
+    expect(error).not.toHaveAttribute('data-starting-style');
   });
 
   it('renders nothing without a message', () => {
@@ -723,7 +721,6 @@ describe('Mosaic Field', () => {
     expect(trigger).toHaveFocus();
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(consoleWarn).not.toHaveBeenCalled();
-    consoleWarn.mockRestore();
   });
 
   it('keeps a native label for a select when htmlFor is explicit', () => {
@@ -748,7 +745,6 @@ describe('Mosaic Field', () => {
     render(<Field.Label render={<div />}>Email</Field.Label>);
 
     expect(consoleWarn).toHaveBeenCalledWith('[Clerk] <Field.Label> must render a native `<label>` element.');
-    consoleWarn.mockRestore();
   });
 });
 

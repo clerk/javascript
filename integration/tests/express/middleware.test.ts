@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -23,7 +23,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test('auth object contains userId and sessionId when signed in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
 
       await u.po.signIn.waitForMounted();
@@ -55,7 +55,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test('multiple sequential requests maintain session', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
 
       await u.po.signIn.waitForMounted();

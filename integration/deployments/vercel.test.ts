@@ -19,7 +19,7 @@ test.describe('vercel deployment', () => {
       test.beforeAll(async () => {
         test.setTimeout(120_000);
         app = await vercelDeployment(config);
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser(test);
+        fakeUser = (await createTestUtils({ app })).services.users.createFakeUser(test);
       });
 
       test.afterAll(async () => {
@@ -28,7 +28,7 @@ test.describe('vercel deployment', () => {
       });
 
       test('sign up', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signUp.goTo();
         await u.po.signUp.signUpWithEmailAndPassword({ email: fakeUser.email, password: fakeUser.password });
         await u.po.signUp.enterOtpCode(await u.services.email.getCodeForEmailAddress(fakeUser.email));
@@ -36,7 +36,7 @@ test.describe('vercel deployment', () => {
       });
 
       test('sign in', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
         await u.po.expect.toBeSignedIn();

@@ -24,7 +24,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/dialog/dialog.tsx',
   styles: {
     _variants: {
-      variant: { card: {}, profile: {} },
+      variant: { card: {}, profile: {}, fullscreen: {} },
       compactPlacement: { center: {}, sheet: {} },
     },
     _defaultVariants: {
@@ -122,21 +122,11 @@ export function Alert() {
             </Card.Description>
           </Card.Header>
           <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  fullWidth
-                />
-              }
-            >
-              Cancel
-            </Dialog.Close>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
             {/* Not a `Dialog.Close`: the action is where the work happens, so the caller closes
                 once it resolves rather than the button closing on press. */}
             <Button
               color='negative'
-              fullWidth
               onClick={() => setOpen(false)}
             >
               Delete organization
@@ -203,20 +193,10 @@ export function Sheet() {
             />
           </Card.Content>
           <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  fullWidth
-                />
-              }
-            >
-              Cancel
-            </Dialog.Close>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
             <Button
               type='submit'
               form='add-email'
-              fullWidth
             >
               Add
             </Button>
@@ -291,16 +271,7 @@ export function Stacked() {
                 tree — which is what escape ordering, the stacking styles and the refcounted
                 scroll lock all read. */}
             <Dialog.Root role='alertdialog'>
-              <Dialog.Trigger
-                render={
-                  <Button
-                    variant='outline'
-                    fullWidth
-                  />
-                }
-              >
-                Cancel
-              </Dialog.Trigger>
+              <Dialog.Trigger render={<Button variant='outline' />}>Cancel</Dialog.Trigger>
               <Dialog.Popup finalFocus={nameRef}>
                 <Card.Root
                   elevation='overlay'
@@ -311,19 +282,9 @@ export function Stacked() {
                     <Card.Description>Your edits will be lost.</Card.Description>
                   </Card.Header>
                   <Card.Footer>
-                    <Dialog.Close
-                      render={
-                        <Button
-                          variant='outline'
-                          fullWidth
-                        />
-                      }
-                    >
-                      Keep editing
-                    </Dialog.Close>
+                    <Dialog.Close render={<Button variant='outline' />}>Keep editing</Dialog.Close>
                     <Button
                       color='negative'
-                      fullWidth
                       onClick={close}
                     >
                       Discard
@@ -506,13 +467,12 @@ export function CardSurface() {
                 <Button
                   {...props}
                   variant='outline'
-                  fullWidth
                 >
                   Cancel
                 </Button>
               )}
             />
-            <Button fullWidth>Continue</Button>
+            <Button>Continue</Button>
           </Card.Footer>
         </Card.Root>
       </Dialog.Popup>

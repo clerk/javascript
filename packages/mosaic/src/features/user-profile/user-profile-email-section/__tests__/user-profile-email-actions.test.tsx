@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { clerkApiError } from '../../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { SaveError } from '../../../../utils/errors';
+import type { ReverificationController } from '../../../reverification';
 import { useUserProfileEmailSectionController } from '../user-profile-email-section.controller';
 import type { ReadyEmailSectionModel } from '../user-profile-email-section.types';
 import { UserProfileEmailSectionView } from '../user-profile-email-section.view';
@@ -17,14 +18,26 @@ const codeVerifier = {
 };
 
 type EmailSectionProps = Partial<Omit<ReadyEmailSectionModel, 'status' | 'userId'>>;
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
 
 function EmailSection({
   emails = [{ id: 'email_1', value: 'test@example.com', isDefault: false, isVerified: true }],
   getEmailVerifier = () => codeVerifier,
   onSetPrimaryEmail = () => Promise.resolve(),
+  removeReverification = idleReverification,
+  setPrimaryReverification = idleReverification,
+  createReverification = idleReverification,
   ...rest
 }: EmailSectionProps) {
-  const controller = useUserProfileEmailSectionController({ emails, getEmailVerifier, onSetPrimaryEmail, ...rest });
+  const controller = useUserProfileEmailSectionController({
+    emails,
+    getEmailVerifier,
+    onSetPrimaryEmail,
+    removeReverification,
+    setPrimaryReverification,
+    createReverification,
+    ...rest,
+  });
   return <UserProfileEmailSectionView {...controller} />;
 }
 
@@ -111,7 +124,6 @@ describe('email actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
-    log.mockRestore();
   });
 
   it('keeps removal pending and lets the user retry a failure in the dialog', async () => {
@@ -195,6 +207,26 @@ describe('email actions', () => {
       }),
     );
     expect(onRemoveEmail).toHaveBeenCalledWith('email_secondary');
+  });
+
+  it('returns focus to the row that opened verification when the dialog closes', async () => {
+    const user = userEvent.setup();
+    renderEmail({
+      emails: [
+        { id: 'email_1', value: 'primary@clerk.dev', isDefault: true, isVerified: true },
+        { id: 'email_2', value: 'unverified@clerk.dev', isDefault: false, isVerified: false },
+      ],
+    });
+    const trigger = screen.getByRole('button', { name: 'Manage unverified@clerk.dev' });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+    expect(await screen.findByRole('dialog', { name: 'Verify your email' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 
   it.each([

@@ -9,7 +9,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test, {
       withPhoneNumber: true,
       withUsername: true,
@@ -85,14 +85,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
   ];
 
   const signIn = async ({ app, page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
   };
 
   const signOut = async ({ app, page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.waitForClerkJsLoaded();
     await u.page.evaluate(async () => {
       await window.Clerk.signOut();
@@ -106,7 +106,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('component
         await signIn({ app, page, context });
       }
 
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative(component.path, { waitUntil: 'commit' });
       await expect(u.page.getByText(component.fallback)).toBeVisible();
 

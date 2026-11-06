@@ -101,7 +101,11 @@ export default defineNuxtModule<ModuleOptions>({
     // Optimize @clerk/vue to avoid missing injection Symbol key errors
     nuxt.options.vite.optimizeDeps = nuxt.options.vite.optimizeDeps || {};
     nuxt.options.vite.optimizeDeps.include = nuxt.options.vite.optimizeDeps.include || [];
-    nuxt.options.vite.optimizeDeps.include.push('@clerk/vue');
+    nuxt.options.vite.optimizeDeps.include.push(
+      '@clerk/nuxt > @clerk/vue',
+      '@clerk/nuxt > @clerk/vue/internal',
+      '@clerk/nuxt > @clerk/shared/loadClerkJsScript',
+    );
 
     // Add the `@clerk/vue` plugin
     addPlugin(resolver.resolve('./runtime/plugin'));

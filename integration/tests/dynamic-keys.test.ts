@@ -30,7 +30,7 @@ test.describe('dynamic keys @nextjs', () => {
 
             const count = await client.users?.getCount();
 
-            if (count){
+            if (count !== undefined){
               return NextResponse.redirect(new URL('/users-count', request.url));
             }
           }
@@ -66,7 +66,7 @@ test.describe('dynamic keys @nextjs', () => {
   });
 
   test('redirects to `signInUrl` on `await auth.protect()`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToAppHome();
 
@@ -78,19 +78,19 @@ test.describe('dynamic keys @nextjs', () => {
   });
 
   test('resolves auth signature with `secretKey` on `await auth.protect()`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/page-protected');
     await u.page.waitForURL(/foobar/);
   });
 
   test('calls `clerkClient` with dynamic keys from application runtime', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/users-count');
     await expect(u.page.getByText(/Users count/i)).toBeVisible();
   });
 
   test('calls `clerkClient` with dynamic keys from middleware runtime', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/fetch-bapi-from-middleware');
     await u.page.waitForAppUrl('/users-count');
     await expect(u.page.getByText(/Users count/i)).toBeVisible();

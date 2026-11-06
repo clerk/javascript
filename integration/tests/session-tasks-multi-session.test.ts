@@ -13,7 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     let user2: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
 
       user1 = u.services.users.createFakeUser(test);
       user2 = u.services.users.createFakeUser(test);
@@ -23,7 +23,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await user1.deleteIfExists();
       await user2.deleteIfExists();
       await u.services.organizations.deleteAll();
@@ -31,7 +31,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test('when switching sessions, navigate to task', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // TODO -> Figure out why test is flaky on Next.js 14
       if (u.nextJsVersion === '14') {

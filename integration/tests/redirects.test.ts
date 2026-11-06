@@ -10,7 +10,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
@@ -25,14 +25,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
   });
 
   test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.signOut();
     await u.page.context().clearCookies();
   });
 
   test.describe('SignInButton', () => {
     test('sign in button respects forceRedirectUrl', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/buttons');
       await u.page.waitForClerkJsLoaded();
@@ -49,7 +49,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
     });
 
     test('sign in button respects fallbackRedirectUrl', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/buttons');
       await u.page.waitForClerkJsLoaded();
@@ -68,7 +68,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
 
   test.describe('SignUpButton', () => {
     test('sign up button respects forceRedirectUrl', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -98,7 +98,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
     });
 
     test('sign up button respects fallbackRedirectUrl', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,

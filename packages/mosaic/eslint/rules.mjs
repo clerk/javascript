@@ -77,3 +77,329 @@ export const noDynamicMessageCatalogs = {
     };
   },
 };
+
+function isForwardRefCall(node) {
+  if (node?.type !== 'CallExpression') {
+    return false;
+  }
+  const callee = node.callee;
+  if (callee.type === 'Identifier') {
+    return callee.name === 'forwardRef';
+  }
+  return (
+    callee.type === 'MemberExpression' &&
+    callee.object.type === 'Identifier' &&
+    callee.object.name === 'React' &&
+    propertyName(callee.property, callee.computed) === 'forwardRef'
+  );
+}
+
+function unwrapExpression(node) {
+  let current = node;
+  while (current && ['TSAsExpression', 'TSSatisfiesExpression', 'TSNonNullExpression'].includes(current.type)) {
+    current = current.expression;
+  }
+  return current;
+}
+
+function isFunction(node) {
+  return ['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression'].includes(node?.type);
+}
+
+function useRenderCalls(fn, visitorKeys) {
+  const calls = [];
+  const visit = node => {
+    if (!node || typeof node.type !== 'string') {
+      return;
+    }
+    if (node.type === 'CallExpression' && node.callee.type === 'Identifier' && node.callee.name === 'useRender') {
+      calls.push(node);
+    }
+    for (const key of visitorKeys[node.type] ?? []) {
+      const child = node[key];
+      if (Array.isArray(child)) {
+        child.forEach(visit);
+      } else {
+        visit(child);
+      }
+    }
+  };
+  visit(fn);
+  return calls;
+}
+
+function includesRef(value, refName, scope) {
+  const node = unwrapExpression(value);
+  if (node?.type === 'Identifier') {
+    if (node.name === refName) {
+      return true;
+    }
+    const variable = findVariable(scope, node.name);
+    const definition = variable?.defs.length === 1 ? variable.defs[0] : undefined;
+    return definition?.node.type === 'VariableDeclarator' && includesRef(definition.node.init, refName, scope);
+  }
+  if (node?.type === 'LogicalExpression') {
+    return includesRef(node.left, refName, scope);
+  }
+  if (node?.type === 'ConditionalExpression') {
+    return includesRef(node.consequent, refName, scope) && includesRef(node.alternate, refName, scope);
+  }
+  return node?.type === 'ArrayExpression' && node.elements.some(element => includesRef(element, refName, scope));
+}
+
+function findVariable(scope, name) {
+  for (let current = scope; current; current = current.upper) {
+    const variable = current.set.get(name);
+    if (variable) {
+      return variable;
+    }
+  }
+  return undefined;
+}
+
+function passesRef(call, refName, scope) {
+  const [options] = call.arguments;
+  if (options?.type !== 'ObjectExpression') {
+    return true;
+  }
+  return options.properties.some(
+    property =>
+      property.type === 'Property' &&
+      propertyName(property.key, property.computed) === 'ref' &&
+      includesRef(property.value, refName, scope),
+  );
+}
+
+export const forwardRefParts = {
+  meta: {
+    type: 'problem',
+    schema: [],
+    messages: {
+      forwardRef:
+        'Parts that render through useRender must use React.forwardRef and pass the ref to useRender (see primitives/select/select-trigger.tsx).',
+    },
+  },
+  create(context) {
+    const isComponentName = name => /^[A-Z]/.test(name);
+
+    const check = (reportNode, init) => {
+      const expression = unwrapExpression(init);
+      const wrapped = isForwardRefCall(expression);
+      const fn = wrapped ? unwrapExpression(expression.arguments[0]) : expression;
+      if (!isFunction(fn)) {
+        return;
+      }
+      const calls = useRenderCalls(fn, context.sourceCode.visitorKeys);
+      if (calls.length === 0) {
+        return;
+      }
+      const refName = fn.params[1]?.type === 'Identifier' ? fn.params[1].name : undefined;
+      if (!wrapped || calls.some(call => !passesRef(call, refName, context.sourceCode.getScope(call)))) {
+        context.report({ node: reportNode, messageId: 'forwardRef' });
+      }
+    };
+
+    const checkDeclaration = declaration => {
+      if (declaration?.type === 'FunctionDeclaration' && declaration.id && isComponentName(declaration.id.name)) {
+        check(declaration.id, declaration);
+      }
+      if (declaration?.type === 'VariableDeclaration') {
+        for (const declarator of declaration.declarations) {
+          if (declarator.id.type === 'Identifier' && isComponentName(declarator.id.name) && declarator.init) {
+            check(declarator.id, declarator.init);
+          }
+        }
+      }
+    };
+
+    return {
+      Program(program) {
+        const localDeclarations = new Map();
+        for (const statement of program.body) {
+          const declaration = statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
+          if (declaration?.type === 'FunctionDeclaration' && declaration.id) {
+            localDeclarations.set(declaration.id.name, declaration);
+          }
+          if (declaration?.type === 'VariableDeclaration') {
+            for (const declarator of declaration.declarations) {
+              if (declarator.id.type === 'Identifier') {
+                localDeclarations.set(declarator.id.name, { type: 'VariableDeclaration', declarations: [declarator] });
+              }
+            }
+          }
+        }
+
+        const checked = new Set();
+        const checkOnce = declaration => {
+          if (declaration && !checked.has(declaration)) {
+            checked.add(declaration);
+            checkDeclaration(declaration);
+          }
+        };
+
+        for (const statement of program.body) {
+          if (statement.type === 'ExportNamedDeclaration') {
+            if (statement.declaration?.type === 'FunctionDeclaration') {
+              checkOnce(localDeclarations.get(statement.declaration.id?.name));
+            } else if (statement.declaration?.type === 'VariableDeclaration') {
+              for (const declarator of statement.declaration.declarations) {
+                if (declarator.id.type === 'Identifier') {
+                  checkOnce(localDeclarations.get(declarator.id.name));
+                }
+              }
+            } else if (!statement.source) {
+              for (const specifier of statement.specifiers) {
+                if (specifier.local.type === 'Identifier' && isComponentName(specifier.exported.name ?? '')) {
+                  checkOnce(localDeclarations.get(specifier.local.name));
+                }
+              }
+            }
+          }
+          if (statement.type === 'ExportDefaultDeclaration') {
+            const declaration = statement.declaration;
+            if (declaration.type === 'Identifier') {
+              checkOnce(localDeclarations.get(declaration.name));
+            } else if (declaration.type === 'FunctionDeclaration' && declaration.id) {
+              checkOnce(localDeclarations.get(declaration.id.name));
+            }
+          }
+        }
+      },
+    };
+  },
+};
+
+export const noRawInvoke = {
+  meta: {
+    type: 'problem',
+    schema: [],
+    messages: {
+      useFromPromise: 'Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.',
+    },
+  },
+  create(context) {
+    return {
+      Property(node) {
+        if (propertyName(node.key, node.computed) !== 'invoke') {
+          return;
+        }
+        const invoke = unwrapExpression(node.value);
+        if (
+          invoke.type === 'ObjectExpression' &&
+          invoke.properties.some(
+            property => property.type === 'Property' && propertyName(property.key, property.computed) === 'src',
+          )
+        ) {
+          context.report({ node: invoke, messageId: 'useFromPromise' });
+        }
+      },
+    };
+  },
+};
+
+export const noRenderClock = {
+  meta: {
+    type: 'problem',
+    schema: [],
+    messages: {
+      useNow:
+        'Read the current time with useNow during render, so the server and the client agree. Date.now() and new Date() belong in effects, event handlers and machine actions.',
+    },
+  },
+  create(context) {
+    return {
+      CallExpression(node) {
+        if (isDateNow(node.callee) && readsDuringRender(node)) {
+          context.report({ node, messageId: 'useNow' });
+        }
+      },
+      MemberExpression(node) {
+        if (isDateNow(node) && isCallbackArgument(node) && !defersCallback(node.parent) && readsDuringRender(node)) {
+          context.report({ node, messageId: 'useNow' });
+        }
+      },
+      NewExpression(node) {
+        if (isCurrentDate(node) && readsDuringRender(node)) {
+          context.report({ node, messageId: 'useNow' });
+        }
+      },
+    };
+  },
+};
+
+const RENDER_HOOKS = new Set(['useState', 'useMemo', 'useReducer']);
+const DEFERRED_CALLBACKS = new Set([
+  'setTimeout',
+  'setInterval',
+  'requestAnimationFrame',
+  'queueMicrotask',
+  'addEventListener',
+  'then',
+  'catch',
+  'finally',
+]);
+const RENDER_WRAPPERS = new Set(['forwardRef', 'memo']);
+
+function readsDuringRender(node) {
+  for (let fn = enclosingFunction(node); fn; fn = enclosingFunction(fn)) {
+    if (!isCallbackArgument(fn)) {
+      return /^(use[A-Z0-9]|[A-Z])/.test(functionName(fn) ?? '');
+    }
+    if (RENDER_WRAPPERS.has(calleeName(fn.parent))) {
+      return true;
+    }
+    if (defersCallback(fn.parent)) {
+      return false;
+    }
+  }
+  return false;
+}
+
+function isCallbackArgument(node) {
+  return node.parent.type === 'CallExpression' && node.parent.arguments.includes(node);
+}
+
+function defersCallback(call) {
+  const name = calleeName(call) ?? '';
+  return DEFERRED_CALLBACKS.has(name) || (/^use[A-Z]/.test(name) && !RENDER_HOOKS.has(name));
+}
+
+function isDateNow(node) {
+  return (
+    node.type === 'MemberExpression' &&
+    node.object.type === 'Identifier' &&
+    node.object.name === 'Date' &&
+    propertyName(node.property, node.computed) === 'now'
+  );
+}
+
+function isCurrentDate(node) {
+  return node.callee.type === 'Identifier' && node.callee.name === 'Date' && node.arguments.length === 0;
+}
+
+function enclosingFunction(node) {
+  for (let current = node.parent; current; current = current.parent) {
+    if (
+      current.type === 'FunctionDeclaration' ||
+      current.type === 'FunctionExpression' ||
+      current.type === 'ArrowFunctionExpression'
+    ) {
+      return current;
+    }
+  }
+  return undefined;
+}
+
+function calleeName(call) {
+  if (call.callee.type === 'Identifier') {
+    return call.callee.name;
+  }
+  return call.callee.type === 'MemberExpression' ? propertyName(call.callee.property, call.callee.computed) : undefined;
+}
+
+function functionName(fn) {
+  if (fn.id) {
+    return fn.id.name;
+  }
+  return fn.parent.type === 'VariableDeclarator' && fn.parent.id.type === 'Identifier' ? fn.parent.id.name : undefined;
+}

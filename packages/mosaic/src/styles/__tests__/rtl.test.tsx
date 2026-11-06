@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { Icon } from '../../components/icon';
+import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { rtl } from '../rtl.styles';
 
 // StyleX generates the same atom for the same property+value across separate `create` calls, so a
@@ -25,7 +26,7 @@ describe('Mosaic rtl styles', () => {
   it('lands on an icon that composes it through xstyle', () => {
     const { container } = render(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         xstyle={rtl.mirror}
       />,
     );

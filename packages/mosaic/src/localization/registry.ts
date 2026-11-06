@@ -1,13 +1,22 @@
 import { formMessages } from '../components/form/form.messages';
+import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
-import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
-import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
+import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
+import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
+import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
+import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
-import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-invite-members.messages';
+import { invitationsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.messages';
+import { membersTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.messages';
+import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.messages';
+import { requestsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.messages';
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
-import { requestsTableTabMessages } from '../features/organization-profile/requests-table-tab.messages';
+import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
+import { signInMessages } from '../features/sign-in/sign-in.messages';
+import { taskChooseOrganizationMessages } from '../features/task-choose-organization/task-choose-organization.messages';
+import { taskSetupMfaMessages } from '../features/task-setup-mfa/task-setup-mfa.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.messages';
@@ -15,51 +24,72 @@ import { userProfileConnectedAccountsMessages } from '../features/user-profile/u
 import { userProfileContactMessages } from '../features/user-profile/user-profile-contact.messages';
 import { userProfileDangerSectionMessages } from '../features/user-profile/user-profile-danger-section/user-profile-danger-section.messages';
 import { userProfileAddEmailMessages } from '../features/user-profile/user-profile-email-section/user-profile-add-email.messages';
+import { userProfileEmailSectionMessages } from '../features/user-profile/user-profile-email-section/user-profile-email-section.messages';
 import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.messages';
 import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-add-authenticator.messages';
 import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-add-sms.messages';
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-backup-codes.messages';
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-section.messages';
-import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section.messages';
+import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
 import { userProfileAddPhoneMessages } from '../features/user-profile/user-profile-phone-section/user-profile-add-phone.messages';
+import { userProfilePhoneSectionMessages } from '../features/user-profile/user-profile-phone-section/user-profile-phone-section.messages';
 import { userProfileProfileSectionMessages } from '../features/user-profile/user-profile-profile-section/user-profile-profile-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
+import { waitlistMessages } from '../features/waitlist/waitlist.messages';
 import { errorMessages } from './errors.messages';
 import { roleMessages } from './roles.messages';
 
 export const mosaicMessages = {
-  apiKeysTable: apiKeysTableMessages,
+  userButton: userButtonMessages,
+  organizationSwitcher: organizationSwitcherMessages,
+  userProfile: {
+    ...userProfileMessages,
+    profile: userProfileProfileSectionMessages,
+    contact: userProfileContactMessages,
+    email: { ...userProfileEmailSectionMessages, addDialog: userProfileAddEmailMessages },
+    phone: { ...userProfilePhoneSectionMessages, addDialog: userProfileAddPhoneMessages },
+    connectedAccounts: userProfileConnectedAccountsMessages,
+    enterpriseAccounts: userProfileEnterpriseAccountsMessages,
+    web3Wallets: userProfileWeb3WalletsMessages,
+    password: userProfilePasswordSectionMessages,
+    passkeys: userProfilePasskeysMessages,
+    mfa: {
+      ...userProfileMfaMessages,
+      addSms: userProfileAddSmsMessages,
+      addAuthenticator: userProfileAddAuthenticatorMessages,
+      authenticatorSetup: userProfileAuthenticatorSetupMessages,
+      backupCodes: userProfileBackupCodesMessages,
+    },
+    activeDevices: userProfileActiveDevicesMessages,
+    danger: userProfileDangerSectionMessages,
+  },
+  organizationProfile: {
+    ...organizationProfileMessages,
+    profile: organizationProfileProfileSectionMessages,
+    members: {
+      list: membersTableTabMessages,
+      invitations: invitationsTableTabMessages,
+      requests: requestsTableTabMessages,
+      invite: organizationProfileInviteMembersMessages,
+    },
+    danger: organizationProfileDangerSectionMessages,
+  },
+  inviteMembersButton: inviteMembersButtonMessages,
+  apiKeys: apiKeysTableMessages,
+  createOrganization: createOrganizationMessages,
+  organizationList: organizationListMessages,
+  taskChooseOrganization: taskChooseOrganizationMessages,
+  reverification: reverificationMessages,
+  profile: profileMessages,
+  form: formMessages,
   errors: errorMessages,
   roles: roleMessages,
-  form: formMessages,
-  membersTableTab: membersTableTabMessages,
-  invitationsTableTab: invitationsTableTabMessages,
-  requestsTableTab: requestsTableTabMessages,
-  organizationProfile: organizationProfileMessages,
-  organizationProfileDangerSection: organizationProfileDangerSectionMessages,
-  organizationProfileProfileSection: organizationProfileProfileSectionMessages,
-  organizationProfileInviteMembers: organizationProfileInviteMembersMessages,
-  reverification: reverificationMessages,
-  userButton: userButtonMessages,
-  userProfile: userProfileMessages,
-  userProfileActiveDevices: userProfileActiveDevicesMessages,
-  userProfileAddEmail: userProfileAddEmailMessages,
-  userProfileAddPhone: userProfileAddPhoneMessages,
-  userProfileAddAuthenticator: userProfileAddAuthenticatorMessages,
-  userProfileAddSms: userProfileAddSmsMessages,
-  userProfileAuthenticatorSetup: userProfileAuthenticatorSetupMessages,
-  userProfileBackupCodes: userProfileBackupCodesMessages,
-  userProfileConnectedAccounts: userProfileConnectedAccountsMessages,
-  userProfileContact: userProfileContactMessages,
-  userProfileDangerSection: userProfileDangerSectionMessages,
-  userProfileEnterpriseAccountsSection: userProfileEnterpriseAccountsMessages,
-  userProfileMfa: userProfileMfaMessages,
-  userProfilePasskeys: userProfilePasskeysMessages,
-  userProfilePasswordSection: userProfilePasswordSectionMessages,
-  userProfileProfileSection: userProfileProfileSectionMessages,
-  userProfileWeb3Wallets: userProfileWeb3WalletsMessages,
+  oauthConsent: oauthConsentMessages,
+  waitlist: waitlistMessages,
+  signIn: signInMessages,
+  taskSetupMfa: taskSetupMfaMessages,
 };
 
 export type MosaicMessages = typeof mosaicMessages;

@@ -38,6 +38,28 @@ describe('useUserProfileAddPhoneController', () => {
     expect(result.current.resendSeconds).toBe(29);
   });
 
+  it('owns which number is being verified until the next add', async () => {
+    const { result } = renderHook(() => useUserProfileAddPhoneController({ onCreate }));
+    const verifier = { sendCode, verifyCode: () => Promise.resolve() };
+    expect(result.current.verifyingId).toBeUndefined();
+
+    act(() => result.current.onVerifyPhone({ id: 'phone_2', value: '+18015550101' }, verifier));
+    expect(result.current.verifyingId).toBe('phone_2');
+    await act(async () => vi.advanceTimersByTimeAsync(0));
+    expect(result.current.step).toBe('verify');
+
+    act(() => result.current.onVerifyPhone({ id: 'phone_3', value: '+18015550102' }, verifier));
+    expect(result.current.verifyingId).toBe('phone_2');
+    expect(result.current.phoneNumber).toBe('+18015550101');
+
+    act(() => result.current.onOpenChange(false));
+    expect(result.current.open).toBe(false);
+    expect(result.current.verifyingId).toBe('phone_2');
+
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.verifyingId).toBeUndefined();
+  });
+
   it('ignores a resend until the countdown runs out, then restarts it', async () => {
     const result = await sendFirstCode();
 
@@ -53,5 +75,19 @@ describe('useUserProfileAddPhoneController', () => {
     });
     expect(sendCode).toHaveBeenCalledTimes(2);
     expect(result.current.resendSeconds).toBe(30);
+  });
+
+  it('unlocks resend by the clock when timers were held up', async () => {
+    const result = await sendFirstCode();
+
+    vi.setSystemTime(Date.now() + 60_000);
+    await act(async () => vi.advanceTimersByTimeAsync(1000));
+
+    expect(result.current.resendSeconds).toBe(0);
+    await act(async () => {
+      result.current.onResend();
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(sendCode).toHaveBeenCalledTimes(2);
   });
 });

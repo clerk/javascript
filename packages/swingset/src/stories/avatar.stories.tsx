@@ -1,6 +1,7 @@
 import type { AvatarProps } from '@clerk/mosaic/components/avatar';
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { Pen } from '@clerk/mosaic/icons/glyphs/pen';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -92,7 +93,7 @@ export function Interactive(props: Record<string, unknown>) {
       />
       <Avatar.Fallback>CL</Avatar.Fallback>
       <Avatar.Icon>
-        <Icon name='pen' />
+        <Icon glyph={Pen} />
       </Avatar.Icon>
     </Avatar.Root>
   );

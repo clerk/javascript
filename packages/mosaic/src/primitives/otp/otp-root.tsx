@@ -1,9 +1,18 @@
 'use client';
 
-import { type CSSProperties, type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { type FirstInputLabel, OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
 import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
 
@@ -50,12 +59,12 @@ const visuallyHiddenInputStyle: CSSProperties = {
   padding: 0,
   margin: -1,
   overflow: 'hidden',
-  clip: 'rect(0, 0, 0, 0)',
+  clipPath: 'inset(50%)',
   whiteSpace: 'nowrap',
   border: 0,
 };
 
-export function OtpRoot(props: OtpProps) {
+export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRoot(props, ref) {
   const {
     render,
     length,
@@ -70,6 +79,8 @@ export function OtpRoot(props: OtpProps) {
     focusableWhenDisabled = false,
     required = false,
     id: idProp,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     children,
     ...otherProps
   } = props;
@@ -81,8 +92,6 @@ export function OtpRoot(props: OtpProps) {
   // The first slot is what a `<label>` targets and where focus lands, so it takes the field's
   // name instead of its positional one; otherwise its accessible name would contradict the
   // visible label. With no name here the slot is left to a native `<label>`.
-  const ariaLabel = otherProps['aria-label'];
-  const ariaLabelledBy = otherProps['aria-labelledby'];
   const firstInputLabel = useMemo<FirstInputLabel | undefined>(() => {
     if (ariaLabelledBy) {
       return { 'aria-labelledby': ariaLabelledBy };
@@ -213,8 +222,10 @@ export function OtpRoot(props: OtpProps) {
 
   const state = { disabled, complete, empty: value.length === 0 };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     role: 'group',
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     children: (
       <>
         {children}
@@ -234,12 +245,13 @@ export function OtpRoot(props: OtpProps) {
         ) : null}
       </>
     ),
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <OtpContext.Provider value={contextValue}>
       {useRender({
         defaultTagName: 'div',
+        ref,
         render,
         state,
         stateAttributesMapping: {
@@ -251,4 +263,4 @@ export function OtpRoot(props: OtpProps) {
       })}
     </OtpContext.Provider>
   );
-}
+});

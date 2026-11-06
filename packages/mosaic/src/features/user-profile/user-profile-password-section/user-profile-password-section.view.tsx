@@ -16,25 +16,27 @@ export function UserProfilePasswordSectionView({
   hasPassword = false,
   managedBy,
 }: UserProfilePasswordSectionViewProps) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   if (!hasPassword && !managedBy && !action) {
     return null;
   }
 
   return (
-    <Section.Group>
-      <Section.Header>
-        <Section.Content>
-          <Section.Title>{m.label}</Section.Title>
-        </Section.Content>
-      </Section.Header>
-      <Section.Body>
-        <UserProfilePasswordRowView
-          action={action}
-          hasPassword={hasPassword}
-          managedBy={managedBy}
-        />
-      </Section.Body>
-    </Section.Group>
+    <Section.Root>
+      <Section.Group>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>{m.label}</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          <UserProfilePasswordRowView
+            action={action}
+            hasPassword={hasPassword}
+            managedBy={managedBy}
+          />
+        </Section.Body>
+      </Section.Group>
+    </Section.Root>
   );
 }

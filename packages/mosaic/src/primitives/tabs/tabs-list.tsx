@@ -1,55 +1,40 @@
 'use client';
 
-import { Composite } from '@floating-ui/react';
 import React, { useState } from 'react';
 
-import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
+import { useDirection } from '../direction-provider';
+import { CompositeItemsProvider, useComposite, useCompositeItems } from '../hooks/use-composite';
+import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export type TabsListProps = ComponentProps<'div'>;
 
-export function TabsList(props: TabsListProps) {
-  const { render, children, ...otherProps } = props;
-  const { orientation } = useTabsContext();
-  const [rtl, setRtl] = useState(false);
+export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function TabsList(props, ref) {
+  const { render, ...otherProps } = props;
+  const { orientation, value } = useTabsContext();
+  const direction = useDirection();
+  const [element, setElement] = useState<HTMLDivElement | null>(null);
+
+  const items = useCompositeItems();
+
+  const composite = useComposite(element, {
+    getItems: items.getItems,
+    preferred: { key: value, getItem: () => items.getItem(value) },
+    orientation,
+    rtl: orientation === 'horizontal' && direction === 'rtl',
+  });
 
   return (
-    <Composite
-      orientation={orientation}
-      rtl={orientation === 'horizontal' && rtl}
-      render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-        const defaultProps: Record<string, unknown> = {
-          role: 'tablist' as const,
-          onFocus: (event: React.FocusEvent<HTMLElement>) => {
-            setRtl((event.currentTarget.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl');
-          },
-          onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
-            if (event.key !== 'Home' && event.key !== 'End') {
-              return;
-            }
-            event.preventDefault();
-            const items = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])'));
-            (event.key === 'Home' ? items.at(0) : items.at(-1))?.focus();
-          },
-        };
-
-        const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, compositeProps));
-
-        // Composite may inject a ref via compositeProps; hand it to useRender's ref
-        // param (which owns ref-merging) instead of leaving it in props, where
-        // useRender's merged ref would overwrite it.
-        const { ref: compositeRef, ...mergedProps } = merged;
-
-        // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
-        return useRender({
-          defaultTagName: 'div',
-          render,
-          ref: isRef(compositeRef) ? compositeRef : undefined,
-          props: mergedProps,
-        });
-      }}
-    >
-      {children}
-    </Composite>
+    <CompositeItemsProvider value={items}>
+      {useRender({
+        defaultTagName: 'div',
+        render,
+        ref: [setElement, ref],
+        props: mergeProps<'div'>(
+          { role: 'tablist', 'aria-orientation': orientation, onKeyDown: composite.handleKeyDown },
+          otherProps,
+        ),
+      })}
+    </CompositeItemsProvider>
   );
-}
+});

@@ -1,16 +1,18 @@
 import * as stylex from '@stylexjs/stylex';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, isInaccessible, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { UserCircle } from '../../icons/glyphs/user-circle';
 import { MosaicProvider } from '../../mosaic-provider';
+import { axe } from '../../primitives/test-utils/axe';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
-import { Panel } from '../panel';
+import { Panel, usePanelTitle } from '../panel';
 import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
 import { Profile } from './profile';
@@ -27,7 +29,7 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
       <Profile.Nav>
         <Profile.NavItem
           value='account'
-          icon={<Icon name='user-circle' />}
+          icon={<Icon glyph={UserCircle} />}
         >
           Account
         </Profile.NavItem>
@@ -61,6 +63,30 @@ function renderSurface(props: Partial<ProfileRootProps> = {}) {
     <MosaicProvider>
       <Surface {...props} />
     </MosaicProvider>,
+  );
+}
+
+function GroupedSurface(rootProps: Partial<ProfileRootProps>) {
+  return (
+    <Profile.Root
+      value='account'
+      {...rootProps}
+    >
+      <Profile.Title>Settings</Profile.Title>
+      <Profile.Nav>
+        <Profile.NavGroup label='Personal'>
+          <Profile.NavItem value='account'>Account</Profile.NavItem>
+          <Profile.NavItem value='security'>Security</Profile.NavItem>
+        </Profile.NavGroup>
+        <Profile.NavGroup label='Acme Inc'>
+          <Profile.NavItem value='organization/general'>General</Profile.NavItem>
+          <Profile.NavItem value='organization/security'>Security</Profile.NavItem>
+        </Profile.NavGroup>
+      </Profile.Nav>
+      <Profile.Content pageTitle='Account'>
+        <Profile.ContentPanel value='account'>Account page</Profile.ContentPanel>
+      </Profile.Content>
+    </Profile.Root>
   );
 }
 
@@ -141,7 +167,7 @@ describe('Profile', () => {
     expect(account).toHaveAttribute('aria-selected', 'true');
     expect(account).toHaveAttribute('aria-controls', page.id);
     expect(page).toHaveTextContent('Email addresses');
-    expect(screen.getByText('Security page')).not.toBeVisible();
+    expect(screen.queryByText('Security page')).not.toBeInTheDocument();
   });
 
   it('reports a selection, and moves it with the arrow keys', async () => {
@@ -288,6 +314,42 @@ describe('Profile', () => {
   });
 
   // The sentinel reports 1px column, 2px select, 3px sheet.
+  describe('navigation groups', () => {
+    it('labels each group and describes its tabs by that label', () => {
+      render(<GroupedSurface />);
+
+      const label = screen.getByText('Acme Inc');
+      expect(label).toHaveClass('cl-profile-nav-group-label');
+      expect(label.closest('.cl-profile-nav-group')).toContainElement(
+        screen.getByRole('tab', { name: 'General', description: 'Acme Inc' }),
+      );
+      expect(screen.getByRole('tab', { name: 'Security', description: 'Personal' })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'Security', description: 'Acme Inc' })).toBeInTheDocument();
+    });
+
+    it('keeps the group labels out of the tablist for assistive tech', () => {
+      render(<GroupedSurface />);
+
+      expect(isInaccessible(screen.getByText('Personal'))).toBe(true);
+      expect(isInaccessible(screen.getByText('Acme Inc'))).toBe(true);
+    });
+
+    it('moves between groups with the arrow keys', async () => {
+      const user = userEvent.setup();
+      render(<GroupedSurface />);
+
+      screen.getByRole('tab', { name: 'Security', description: 'Personal' }).focus();
+      await user.keyboard('{ArrowDown}');
+
+      expect(screen.getByRole('tab', { name: 'General' })).toHaveFocus();
+    });
+
+    it('has no accessibility violations', async () => {
+      const { container } = render(<GroupedSurface />);
+      expect((await axe(container)).violations).toEqual([]);
+    });
+  });
+
   describe('compact', () => {
     let observe: ((width: number) => void) | null = null;
     const original = globalThis.ResizeObserver;
@@ -364,6 +426,25 @@ describe('Profile', () => {
       await user.click(screen.getByRole('option', { name: 'Security' }));
       expect(onValueChange).toHaveBeenCalledWith('security');
       await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    });
+
+    it('groups the listbox options under each group label', async () => {
+      const user = userEvent.setup();
+      render(
+        <MosaicProvider>
+          <GroupedSurface />
+        </MosaicProvider>,
+      );
+      act(() => observe?.(2));
+
+      await user.click(screen.getByRole('combobox', { name: 'Account' }));
+
+      expect(screen.getByRole('group', { name: 'Acme Inc' })).toContainElement(
+        screen.getByRole('option', { name: 'General' }),
+      );
+      expect(screen.getByRole('group', { name: 'Personal' })).toContainElement(
+        screen.getByRole('option', { name: 'Account' }),
+      );
     });
 
     it('opens the listbox from the keyboard, picks with the arrows, and keeps focus on the title', async () => {
@@ -469,6 +550,28 @@ describe('Profile', () => {
     it.each([
       ['sheet', 3],
       ['select', 2],
+    ])('falls back to the corner dismiss in a fullscreen dialog in the %s layout', (_, width) => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup variant='fullscreen'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('button', { name: 'Back to app' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+
+      act(() => observe?.(width));
+
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['sheet', 3],
+      ['select', 2],
     ])('shows the page as a group named by the page title in the %s layout', (_, width) => {
       renderSurface();
       act(() => observe?.(width));
@@ -529,6 +632,36 @@ describe('Profile', () => {
       expect(titleRef.current).toBe(title());
     });
 
+    it('makes the page title the panel title inside a profile page', () => {
+      let panelTitle: () => HTMLDivElement | null = () => null;
+      function ReadPanelTitle() {
+        panelTitle = usePanelTitle();
+        return null;
+      }
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content pageTitle='Account'>
+              <Profile.ContentPanel value='account'>
+                <Panel.Root>
+                  <Panel.Title>Account</Panel.Title>
+                  <Panel.Sections>
+                    <ReadPanelTitle />
+                  </Panel.Sections>
+                </Panel.Root>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+
+      expect(panelTitle()).toBe(screen.getByRole('heading', { level: 3, name: 'Account' }));
+    });
+
     it('returns the tablist to the column when the width comes back', () => {
       renderSurface();
       act(() => observe?.(3));
@@ -554,17 +687,24 @@ describe('Profile', () => {
   });
 
   describe('inside a dialog', () => {
-    function renderInDialog() {
+    function renderInDialog(props: Partial<ProfileRootProps> = {}) {
       return render(
         <MosaicProvider>
           <Dialog.Root defaultOpen>
             <Dialog.Popup variant='profile'>
-              <Surface />
+              <Surface {...props} />
             </Dialog.Popup>
           </Dialog.Root>
         </MosaicProvider>,
       );
     }
+
+    it('brings its own surface even when asked to be flush', () => {
+      renderInDialog({ elevation: 'flush' });
+
+      expect(document.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'card');
+      expect(document.querySelector('.cl-profile-content')).not.toHaveAttribute('data-inline');
+    });
 
     it('names the dialog and carries its dismiss', () => {
       renderInDialog();
@@ -594,6 +734,76 @@ describe('Profile', () => {
       expect(screen.getByRole('alertdialog', { name: 'User profile' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+
+    describe('fullscreen', () => {
+      function renderFullscreen(
+        onOpenChange = vi.fn(),
+        localization?: React.ComponentProps<typeof MosaicProvider>['localization'],
+      ) {
+        return render(
+          <MosaicProvider localization={localization}>
+            <Dialog.Root
+              defaultOpen
+              onOpenChange={onOpenChange}
+            >
+              <Dialog.Popup variant='fullscreen'>
+                <Surface />
+              </Dialog.Popup>
+            </Dialog.Root>
+          </MosaicProvider>,
+        );
+      }
+
+      it('puts a back button first in the navigation in place of the corner dismiss', () => {
+        renderFullscreen();
+
+        const back = screen.getByRole('button', { name: 'Back to app' });
+        expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(back);
+        expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+        expect(back.compareDocumentPosition(screen.getByRole('tablist'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+
+      it('dismisses the dialog from the back button', async () => {
+        const onOpenChange = vi.fn();
+        renderFullscreen(onOpenChange);
+
+        await userEvent.setup().click(screen.getByRole('button', { name: 'Back to app' }));
+
+        expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+      });
+
+      it('reads the back button label from the catalog', () => {
+        renderFullscreen(vi.fn(), { overrides: { 'profile.backToApp': 'Retour à l’application' } });
+
+        expect(screen.getByRole('button', { name: 'Retour à l’application' })).toBeInTheDocument();
+      });
+    });
+
+    it('has no back button in a profile dialog, or standalone', () => {
+      const standalone = renderSurface();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+      standalone.unmount();
+
+      renderInDialog();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+    });
+
+    it('follows showCloseButton on the dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            showCloseButton={false}
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
     });
 
     it('carries no dismiss standalone', () => {

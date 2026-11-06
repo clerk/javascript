@@ -1,10 +1,11 @@
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import { UserProfileBillingPanelView } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import type {
   UserProfileEmail,
@@ -12,15 +13,18 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
 import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
 import { UserProfileEmailSectionView } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.view';
-import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
+import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
+import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.view';
+import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
+import { UserProfileSecurityPanelView } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
+import { chaosEmail, chaosPhone, chaosPick, chaosRows } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
@@ -34,8 +38,8 @@ import { useUserProfileProfileFixture } from './user-profile-profile';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export function UserProfileDangerPreview() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 const exampleEmails: UserProfileEmail[] = [
@@ -58,12 +62,18 @@ const examplePaymentMethods: UserProfilePaymentMethod[] = [
   { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
 ];
 
+const chaosPaymentMethods = [
+  { label: 'American Express •••• 1005', expiryLabel: 'Expires 11/2031' },
+  { label: 'Mastercard •••• 4444', expiryLabel: 'Expired 03/2026' },
+  { label: 'SEPA Direct Debit •••• 3000', expiryLabel: undefined },
+  { label: 'Cartes Bancaires •••• 1001', expiryLabel: 'Expires 07/2028' },
+];
+
 /**
  * Every page of the user profile, backed by local state so the actions on them do something. For
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture() {
-  const titleRef = useRef<HTMLDivElement>(null);
   const connections = useConnectedAccountsFixture();
   const wallets = useWeb3WalletsFixture();
   const profile = useUserProfileProfileFixture();
@@ -71,13 +81,19 @@ export function useUserProfileFixture() {
   const mfa = useUserProfileMfaExample();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const seedEmails = useChaosFixture(exampleEmails, items =>
-    chaosRows(items, 8).map((email, index) => ({ ...email, value: chaosEmail(index), isDefault: index === 0 })),
+    chaosRows(items, 8).map((email, index) => ({
+      ...email,
+      value: chaosEmail(index),
+      isDefault: index === 0,
+      isVerified: index % 3 !== 2,
+    })),
   );
   const seedPhones = useChaosFixture(examplePhones, items =>
     chaosRows(items, 6).map((phone, index) => ({
       ...phone,
-      value: `${phone.value} ext. 1234567890`,
+      value: chaosPhone(index),
       isDefault: index === 0,
+      isVerified: index % 3 !== 2,
     })),
   );
   const emails = useUserProfileEmailsFixture({
@@ -88,16 +104,16 @@ export function useUserProfileFixture() {
   const passkeys = usePasskeysFixture();
   const activeDevices = useUserProfileActiveDevicesFixture();
 
-  const seedSubscription = useChaosFixture(exampleSubscription, subscription => ({
-    planName: chaosText(subscription.planName),
-    priceLabel: '$1,234,567.89 / Month',
-    totalDueLabel: '$1,234,567.89',
-    renewsAtLabel: chaosText(subscription.renewsAtLabel),
+  const seedSubscription = useChaosFixture(exampleSubscription, () => ({
+    planName: 'Business Plus (annual, billed in EUR)',
+    priceLabel: '€1.234.567,89 / Year',
+    totalDueLabel: '€1.234.567,89',
+    renewsAtLabel: 'Renews September 26th, 2027',
   }));
   const seedPaymentMethods = useChaosFixture(examplePaymentMethods, items =>
     chaosRows(items, 8).map((method, index) => ({
       ...method,
-      label: chaosText(method.label),
+      ...chaosPick(chaosPaymentMethods, index),
       isDefault: index === 0,
     })),
   );
@@ -106,72 +122,71 @@ export function useUserProfileFixture() {
   const [historyPageSize, setHistoryPageSize] = useState(10);
   const apiKeys = useAPIKeysTableFixture();
   const pages: UserProfileViewProps['pages'] = {
-    account: {
-      titleRef,
-      profileSlot: <UserProfileProfileSectionView {...profile} />,
-      emailSlot: <UserProfileEmailSectionView {...emails} />,
-      phoneSlot: <UserProfilePhoneSectionView {...phones} />,
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
-      dangerSlot: <UserProfileDangerPreview />,
-    },
-    security: {
-      passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
-      passkeysSlot: <UserProfilePasskeysSectionView {...passkeys} />,
-      ...mfa.security,
-      activeDevicesSlot: <UserProfileActiveDevicesSectionView {...activeDevices} />,
-    },
-    billing: {
-      subscription,
-      paymentMethods,
-      historyItems: [
-        {
-          id: 'stmt_202605_0644',
-          dateLabel: 'May 26, 2026',
-          invoiceLabel: 'stmt_202605_...us64a',
-          amountLabel: '$25.00',
-          statusLabel: 'Paid',
-        },
-      ],
-      historyPagination: { page: 1, pageCount: 1, pageSize: historyPageSize },
-      onAddPaymentMethod: () =>
-        setPaymentMethods(current => [
-          ...current,
-          { id: `card-${Date.now()}`, label: 'Visa •••• 4242', expiryLabel: 'Expires 08/2030' },
-        ]),
-      onChangePlan: () =>
-        setSubscription(current =>
-          current.planName === 'Basic Plan'
-            ? {
-                planName: 'Pro Plan',
-                priceLabel: '$25 / Month',
-                totalDueLabel: '$25.00',
-                renewsAtLabel: 'Renews Aug 26',
-              }
-            : {
-                planName: 'Basic Plan',
-                priceLabel: '$12 / Month',
-                totalDueLabel: '$12.00',
-                renewsAtLabel: 'Renews Aug 26',
-              },
-        ),
-      onMakeDefaultPaymentMethod: id =>
-        setPaymentMethods(current => current.map(method => ({ ...method, isDefault: method.id === id }))),
-      onRemovePaymentMethod: id =>
-        setPaymentMethods(current => current.filter(paymentMethod => paymentMethod.id !== id)),
-      onBillingHistoryPageSizeChange: setHistoryPageSize,
-      onViewInvoice: () => undefined,
-    },
+    account: (
+      <UserProfileProfilePanelView>
+        <UserProfileProfileSectionView {...profile} />
+        <UserProfileEmailSectionView {...emails} />
+        <UserProfilePhoneSectionView {...phones} />
+        <UserProfileConnectedAccountsSectionView {...connections} />
+        <UserProfileWeb3WalletsSectionView {...wallets} />
+        <UserProfileDangerPreview />
+      </UserProfileProfilePanelView>
+    ),
+    security: (
+      <UserProfileSecurityPanelView>
+        <UserProfilePasswordSectionView {...editPassword} />
+        <UserProfilePasskeysSectionView {...passkeys} />
+        <UserProfileMfaSectionView {...mfa.section} />
+        <UserProfileActiveDevicesSectionView {...activeDevices} />
+      </UserProfileSecurityPanelView>
+    ),
+    billing: (
+      <UserProfileBillingPanelView
+        subscription={subscription}
+        paymentMethods={paymentMethods}
+        historyItems={[
+          {
+            id: 'stmt_202605_0644',
+            dateLabel: 'May 26, 2026',
+            invoiceLabel: 'stmt_202605_...us64a',
+            amountLabel: '$25.00',
+            statusLabel: 'Paid',
+          },
+        ]}
+        historyPagination={{ page: 1, pageCount: 1, pageSize: historyPageSize }}
+        onAddPaymentMethod={() =>
+          setPaymentMethods(current => [
+            ...current,
+            { id: `card-${Date.now()}`, label: 'Visa •••• 4242', expiryLabel: 'Expires 08/2030' },
+          ])
+        }
+        onChangePlan={() =>
+          setSubscription(current =>
+            current.planName === 'Basic Plan'
+              ? {
+                  planName: 'Pro Plan',
+                  priceLabel: '$25 / Month',
+                  totalDueLabel: '$25.00',
+                  renewsAtLabel: 'Renews Aug 26',
+                }
+              : {
+                  planName: 'Basic Plan',
+                  priceLabel: '$12 / Month',
+                  totalDueLabel: '$12.00',
+                  renewsAtLabel: 'Renews Aug 26',
+                },
+          )
+        }
+        onMakeDefaultPaymentMethod={id =>
+          setPaymentMethods(current => current.map(method => ({ ...method, isDefault: method.id === id })))
+        }
+        onRemovePaymentMethod={id =>
+          setPaymentMethods(current => current.filter(paymentMethod => paymentMethod.id !== id))
+        }
+        onBillingHistoryPageSizeChange={setHistoryPageSize}
+        onViewInvoice={() => undefined}
+      />
+    ),
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 

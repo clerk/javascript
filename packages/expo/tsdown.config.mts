@@ -30,7 +30,6 @@ export default defineConfig(overrideOptions => {
       PACKAGE_NAME: `"${pkgJson.name}"`,
       PACKAGE_VERSION: `"${pkgJson.version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsPkgJson.version}"`,
-      __DEV__: `${isWatch}`,
     },
   };
 

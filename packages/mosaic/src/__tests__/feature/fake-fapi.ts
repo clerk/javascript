@@ -4,7 +4,9 @@ import type {
   ClientJSON,
   EmailAddressJSON,
   EnterpriseConnectionJSON,
+  OAuthConsentInfoJSON,
   OAuthProvider,
+  OrganizationCreationDefaultsJSON,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -16,6 +18,7 @@ import type {
   SessionWithActivitiesJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
+  WaitlistJSON,
   Web3WalletJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
@@ -77,11 +80,15 @@ export interface FakeFapiState {
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
   passwordUpdates: URLSearchParams[];
+  waitlistEntries: string[];
   enterpriseConnections: EnterpriseConnectionJSON[];
   enterpriseLinking: FakeEnterpriseLinking;
   mfa: FakeMfaState;
   activeDevices?: ActiveDeviceRecord[];
   deviceTrackingEnabled: boolean;
+  organizationCreationDefaults?: OrganizationCreationDefaultsJSON;
+  oauthConsent?: OAuthConsentInfoJSON;
+  oauthConsentRequests: URL[];
 }
 
 export interface ActiveDeviceRecord extends SessionWithActivitiesJSON {
@@ -316,8 +323,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],
+    waitlistEntries: [],
     enterpriseConnections: [],
     deviceTrackingEnabled: true,
+    oauthConsentRequests: [],
     mfa: createMfaState(),
     ...rest,
     verification: createVerificationState(verification),
@@ -500,14 +509,20 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         : missing();
     }),
     http.post(fapiUrl('/v1/client/sessions/:id/touch'), async ({ params, request }) => {
+      const body = new URLSearchParams(await request.text());
       const session = findSession(state, params.id);
       if (!session) {
         return missing();
       }
-      const body = new URLSearchParams(await request.text());
       const organizationId = body.get('active_organization_id') || null;
+      const choosesOrganization = organizationId !== null && session.tasks?.[0]?.key === 'choose-organization';
+      const remainingTasks = choosesOrganization ? (session.tasks?.slice(1) ?? []) : session.tasks;
       const touched = {
         ...session,
+        ...(choosesOrganization && {
+          tasks: remainingTasks?.length ? remainingTasks : null,
+          status: remainingTasks?.length ? session.status : ('active' as const),
+        }),
         last_active_organization_id: organizationId,
         last_active_token: fapiToken({ sid: session.id, sub: session.user.id, org_id: organizationId }),
       };
@@ -574,6 +589,33 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       target.status = 'revoked';
       return envelope({ ...deviceSessionPayload(target), user: requester.user, status: 'revoked' }, state.client);
     }),
+    http.post(fapiUrl('/v1/waitlist'), async ({ request }) => {
+      const emailAddress = new URLSearchParams(await request.text()).get('email_address') ?? '';
+      if (!/^[^\s@]+@[^\s@]+$/.test(emailAddress)) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_format_invalid',
+                message: 'is invalid',
+                long_message: 'email_address must be a valid email address.',
+                meta: { param_name: 'email_address' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      state.waitlistEntries.push(emailAddress);
+      const now = Date.now();
+      const entry: WaitlistJSON = {
+        object: 'waitlist',
+        id: `wle_${state.waitlistEntries.length}`,
+        created_at: now,
+        updated_at: now,
+      };
+      return envelope(entry, null);
+    }),
     http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
       const session = findSession(state, state.client.last_active_session_id);
       if (!session) {
@@ -601,6 +643,18 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const body = new URLSearchParams(await request.text());
       const user = updateActiveUser(state, user => patchUser(user, body));
       return user ? envelope(user, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me'), ({ request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const sessions = state.client.sessions.filter(session => session.user.id !== user.id);
+      state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
+      return envelope({ object: 'user', id: user.id, deleted: true }, state.client);
     }),
     http.post(fapiUrl('/v1/me/profile_image'), async ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') === 'DELETE') {
@@ -743,6 +797,70 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       leaveOrganization(state, membership.organization.id, user.id);
       return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
     }),
+    http.post(fapiUrl('/v1/organizations'), async ({ request }) => {
+      const body = new URLSearchParams(await request.text());
+      const name = body.get('name') ?? '';
+      const slug = body.get('slug');
+      if (!name) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_missing',
+                message: 'name must be included.',
+                long_message: 'Enter name.',
+                meta: { param_name: 'name' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      if (slug && state.memberships.some(m => m.organization.slug === slug)) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_identifier_exists',
+                message: 'is taken',
+                long_message: 'This slug is taken. Please try another.',
+                meta: { param_name: 'slug' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const organizationId = `org_created_${state.memberships.length + 1}`;
+      const organization = fapiOrganization({
+        id: organizationId,
+        name,
+        slug: slug ?? '',
+        max_allowed_memberships: state.environment.organization_settings.max_allowed_memberships,
+      });
+      const membership = fapiMembership(organization, {
+        role: 'org:admin',
+        role_name: 'Admin',
+        permissions: ['org:sys_memberships:manage', 'org:sys_memberships:read', 'org:sys_profile:manage'],
+      });
+      state.memberships = [...state.memberships, membership];
+      updateActiveUser(state, current => ({
+        ...current,
+        organization_memberships: [...current.organization_memberships, membership],
+      }));
+      return envelope(organization, state.client);
+    }),
+    http.get(fapiUrl('/v1/me/organization_creation_defaults'), () =>
+      state.organizationCreationDefaults ? envelope(state.organizationCreationDefaults, state.client) : missing(),
+    ),
+    http.get(fapiUrl('/v1/organizations/:organizationId'), ({ params }) => {
+      const membership = state.memberships.find(m => m.organization.id === params.organizationId);
+      return membership ? envelope(membership.organization, null) : missing();
+    }),
     http.post(fapiUrl('/v1/organizations/:organizationId'), async ({ params, request }) => {
       const method = new URL(request.url).searchParams.get('_method');
       if (method === 'PATCH') {
@@ -818,7 +936,8 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       return HttpResponse.json(page(keys, url));
     }),
     http.post(fapiUrl('/api_keys'), async ({ request }) => {
-      const body: { name: string; subject: string; seconds_until_expiration?: number } = await request.json();
+      const body: { name: string; subject: string; description?: string; seconds_until_expiration?: number } =
+        await request.json();
       if (state.apiKeys.some(key => !key.revoked && key.subject === body.subject && key.name === body.name)) {
         return error('token_creation_conflict', 409);
       }
@@ -827,6 +946,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         id: `ak_${state.apiKeys.length + 1}`,
         name: body.name,
         subject: body.subject,
+        description: body.description ?? null,
         expiration: body.seconds_until_expiration ? now + body.seconds_until_expiration * 1000 : null,
         created_at: now,
         updated_at: now,
@@ -842,6 +962,11 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const revoked = { ...key, revoked: true };
       state.apiKeys = state.apiKeys.map(k => (k.id === revoked.id ? revoked : k));
       return HttpResponse.json(revoked);
+    }),
+    http.get(fapiUrl('/v1/me/oauth/consent/:clientId'), ({ request, params }) => {
+      state.oauthConsentRequests.push(new URL(request.url));
+      const consent = state.oauthConsent;
+      return consent?.client_id === params.clientId ? envelope(consent, null) : missing();
     }),
   );
 
@@ -870,7 +995,32 @@ export function takeUnsettledHolds(): string[] {
   return holds.map(hold => hold.name);
 }
 
-export function holdRequests(method: 'get' | 'post', path: string): HeldRequests {
+/** Answers the next POST to `path` with a reverification demand, then lets later requests through. */
+export function demandReverificationOnce(path: string): void {
+  let demanded = false;
+  worker.use(
+    http.post(fapiUrl(path), () => {
+      if (demanded) {
+        return undefined;
+      }
+      demanded = true;
+      return HttpResponse.json(
+        {
+          errors: [
+            {
+              code: 'session_reverification_required',
+              message: 'Verification required',
+              long_message: 'Verification required',
+            },
+          ],
+        },
+        { status: 403 },
+      );
+    }),
+  );
+}
+
+export function holdRequests(method: 'get' | 'post', path: string, query: Record<string, string> = {}): HeldRequests {
   const requests: Request[] = [];
   let resolveGate: (response: Response | undefined) => void = () => {};
   const gate = new Promise<Response | undefined>(resolve => {
@@ -885,6 +1035,10 @@ export function holdRequests(method: 'get' | 'post', path: string): HeldRequests
 
   worker.use(
     http[method](fapiUrl(path), ({ request }) => {
+      const { searchParams } = new URL(request.url);
+      if (Object.entries(query).some(([key, value]) => searchParams.get(key) !== value)) {
+        return undefined;
+      }
       requests.push(request.clone());
       return gate;
     }),

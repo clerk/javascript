@@ -1,5 +1,143 @@
 # Change Log
 
+## 4.15.1
+
+### Patch Changes
+
+- `useSignInWithApple` now throws a `ClerkAPIResponseError` when Sign in with Apple on an instance with restricted sign-ups needs the user to verify their email address first. Previously it returned with no session and no error. ([#10644](https://github.com/clerk/javascript/pull/10644)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`805c158`](https://github.com/clerk/javascript/commit/805c1586667807bd973ab9563d7900f7a59d1b1f), [`256153a`](https://github.com/clerk/javascript/commit/256153a1b410e7137b51681abefee8ee7038af95), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc), [`700f375`](https://github.com/clerk/javascript/commit/700f37569453d3b21c773bbb3ffc05d8035fc776)]:
+  - @clerk/clerk-js@6.42.3
+  - @clerk/shared@4.44.1
+  - @clerk/react@6.18.6
+
+## 4.15.0
+
+### Minor Changes
+
+- Support the minimum app versions set in the Clerk Dashboard. When your iOS or Android app's version is older than its minimum, Clerk rejects the app's requests until the user updates, and `<ClerkProvider>` shows an update screen over your app with a link to the store and, when your instance has a support email, a way to contact support. ([#10343](https://github.com/clerk/javascript/pull/10343)) by [@seanperez29](https://github.com/seanperez29)
+
+  To show your own screen instead, set `updateRequiredViewEnabled={false}` on `<ClerkProvider>` and read the new `useAppVersionSupport()` hook, which returns `isSupported`, `currentVersion`, `minimumVersion`, and `updateUrl`.
+
+  Install `expo-application` (`npx expo install expo-application`), which Clerk uses to read your app's bundle ID or package name and its version. Without it, `useAppVersionSupport()` always reports the app as supported, Clerk doesn't block requests made from JavaScript, and `<ClerkProvider>` shows no update screen. If you use `@clerk/expo-native-components`, the native iOS and Android SDKs still identify the app themselves, so their requests are blocked and they show their own update screen. Apps in Expo Go and web apps are never blocked.
+
+### Patch Changes
+
+- Updated dependencies [[`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`5bb8efc`](https://github.com/clerk/javascript/commit/5bb8efca8f3ba658f77c2d1331c6facd8fc8df7d), [`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/clerk-js@6.42.2
+  - @clerk/react@6.18.5
+  - @clerk/shared@4.44.0
+
+## 4.14.5
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`690edf2`](https://github.com/clerk/javascript/commit/690edf28f799996cf5d274bb7a1193f8435e3689), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0), [`1bce44b`](https://github.com/clerk/javascript/commit/1bce44bed5c54b2c788262462d3ac80391c090f7)]:
+  - @clerk/react@6.18.4
+  - @clerk/clerk-js@6.42.1
+  - @clerk/shared@4.43.1
+
+## 4.14.4
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/clerk-js@6.42.0
+  - @clerk/shared@4.43.0
+  - @clerk/react@6.18.3
+
+## 4.14.3
+
+### Patch Changes
+
+- Fix native components such as `UserButton` occasionally staying signed out after a JS sign-in. When the sign-in finished while the SDK was syncing a change from the native SDK, the native SDK was never refreshed with the new session. ([#10431](https://github.com/clerk/javascript/pull/10431)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`eec2699`](https://github.com/clerk/javascript/commit/eec2699f2050084f0bd1059efee95b5e94fe9607)]:
+  - @clerk/clerk-js@6.41.1
+
+## 4.14.2
+
+### Patch Changes
+
+- Fix an intermittent `No session was found with id sess_...` error right after signing in when native components are installed. A request that the JS or native SDK sent with the client token from before the sign-in could leave both SDKs on a new, empty client. The SDK now keeps the client that the sign-in created, and no longer briefly reports the user as signed out while it recovers. ([#10407](https://github.com/clerk/javascript/pull/10407)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/clerk-js@6.41.0
+  - @clerk/shared@4.42.0
+  - @clerk/react@6.18.2
+
+## 4.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+  - @clerk/clerk-js@6.40.1
+  - @clerk/react@6.18.1
+
+## 4.14.0
+
+### Minor Changes
+
+- Rewrite the sync between the Clerk JS client and the native Clerk SDK. Both now share a single device token stored by the native SDK. This fixes a stale token in the app's `tokenCache` signing out a session that was signed in natively, and the two SDKs ending up on different tokens when both rotated the device token at the same time. ([#9956](https://github.com/clerk/javascript/pull/9956)) by [@mikepitre](https://github.com/mikepitre)
+
+  If you use the native components, update `@clerk/expo-native-components` to 0.3.0 or later and ship a new app build. Builds made with an older version render the native components blank, so don't deliver this version to them as an over-the-air update. With EAS Update, the `fingerprint` runtime version policy keeps those builds from receiving it. With any other policy, change your runtime version when you make this upgrade.
+
+### Patch Changes
+
+- Show `@clerk/expo` warnings and errors in development builds. The build previously removed them. ([#10319](https://github.com/clerk/javascript/pull/10319)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+  - @clerk/clerk-js@6.40.0
+  - @clerk/react@6.18.0
+
+## 4.13.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`c0ba3bc`](https://github.com/clerk/javascript/commit/c0ba3bc728d76bd40f80c2c4c506cbfeb5d0807a), [`560ff50`](https://github.com/clerk/javascript/commit/560ff507af494b43210fd2d9a7bd109c4eb6902c)]:
+  - @clerk/clerk-js@6.39.1
+
+## 4.12.0
+
+### Minor Changes
+
+- Fix iOS users being signed out when the keychain can't be read for a moment, for example when the app launches in the background before the device has been unlocked since a restart. ([#10199](https://github.com/clerk/javascript/pull/10199)) by [@jescalan](https://github.com/jescalan)
+  - On iOS, `getToken()` from the `tokenCache` in `@clerk/expo/token-cache` now rejects with the keychain error instead of deleting the stored client token, unless the read starts and fails while the app is active.
+  - When reading the client token fails, Clerk waits until the app is active and reads it again before sending the request. Requests made in the background wait until the app is opened.
+  - If your custom `tokenCache` deletes the token and returns `null` when a read fails, it can still sign users out in this case. Rethrow the error instead, unless `AppState.currentState` is `active` both when the read starts and when it fails.
+
+### Patch Changes
+
+- Native components now respect the `proxyUrl` passed to `<ClerkProvider>` and route Frontend API requests through the configured proxy. Applying the proxy requires a new app binary; a JS-only OTA update safely keeps the previous behavior. ([#9373](https://github.com/clerk/javascript/pull/9373)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.11.0
+
+### Minor Changes
+
+- Introduce `@clerk/expo-native-components`, a new package that the native components (`AuthView`, `UserButton`, `UserProfileView`) now require. Install it and rebuild your app. ([#9955](https://github.com/clerk/javascript/pull/9955)) by [@mikepitre](https://github.com/mikepitre)
+
+  ```sh
+  npx expo install @clerk/expo-native-components
+  ```
+
+  If it's missing, rendering a native component throws an error with these same steps. Install the package before you ship this version in an over-the-air update, because the error is thrown at runtime and not at build time.
+
+  Import the native components and their hooks from `@clerk/expo/native-components`. `@clerk/expo/native` is deprecated. It still works and logs a warning in development.
+
+  Apps that don't install the package no longer include the Clerk iOS and Android SDKs and no longer require iOS 17. On Android, those apps also stop migrating biometric credentials enrolled with earlier versions of `@clerk/expo`, so users who weren't migrated by an earlier release need to enroll again.
+
 ## 4.10.1
 
 ### Patch Changes

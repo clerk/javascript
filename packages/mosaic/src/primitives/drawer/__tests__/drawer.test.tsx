@@ -847,8 +847,6 @@ describe('Drawer', () => {
         expect(added).toBeGreaterThan(0);
         expect(removed).toBe(added);
       } finally {
-        add.mockRestore();
-        remove.mockRestore();
         if (hadPlatform) {
           Object.defineProperty(navigator, 'platform', hadPlatform);
         } else {

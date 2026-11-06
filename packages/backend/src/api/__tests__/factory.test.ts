@@ -41,6 +41,30 @@ describe('api.client', () => {
     expect(response.publicMetadata.zodiac_sign).toBe('leo');
   });
 
+  it('parses the deprovisioned flag on a user, defaulting to false when absent', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deprovisioned`,
+        validateHeaders(() => {
+          return HttpResponse.json({ ...userJson, deprovisioned: true });
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json(userJson);
+        }),
+      ),
+    );
+
+    const deprovisionedUser = await apiClient.users.getUser('user_deprovisioned');
+    const user = await apiClient.users.getUser('user_deadbeef');
+
+    expect(deprovisionedUser.deprovisioned).toBe(true);
+    expect(deprovisionedUser.banned).toBe(false);
+    expect(user.deprovisioned).toBe(false);
+  });
+
   it('executes 2 backend API request for users.getUserList()', async () => {
     server.use(
       http.get(

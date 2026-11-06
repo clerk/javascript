@@ -8,7 +8,7 @@ export { default as __source } from './user-profile-enterprise-accounts-section.
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'UserProfileEnterpriseAccountsSection',
   label: 'Enterprise accounts',
   navigation: { category: 'Sections' },

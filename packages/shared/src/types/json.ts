@@ -102,6 +102,38 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   partitioned_cookies?: boolean;
   user_settings: UserSettingsJSON;
   protect_config: ProtectConfigJSON;
+  /**
+   * @experimental
+   */
+  native_app_settings?: NativeAppSettingsJSON;
+}
+
+/**
+ * @experimental
+ */
+export interface NativeAppSettingsJSON {
+  minimum_supported_version: {
+    ios: IOSMinimumVersionJSON[];
+    android: AndroidMinimumVersionJSON[];
+  };
+}
+
+/**
+ * @experimental
+ */
+export interface IOSMinimumVersionJSON {
+  bundle_id: string;
+  minimum_version: string;
+  update_url: string;
+}
+
+/**
+ * @experimental
+ */
+export interface AndroidMinimumVersionJSON {
+  package_name: string;
+  minimum_version: string;
+  update_url: string;
 }
 
 export type LastAuthenticationStrategy =
@@ -476,6 +508,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   admin_delete_enabled: boolean;
   max_allowed_memberships: number;
   self_serve_sso_enabled?: boolean;
+  self_serve_directory_sync_enabled?: boolean;
   exclusive_membership?: boolean;
 }
 

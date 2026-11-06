@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { Checkmark } from '../../../icons/glyphs/checkmark';
 import { Icon } from '../icon';
 import { IconFrame } from '../icon-frame';
 
@@ -18,7 +19,7 @@ describe('Mosaic IconFrame', () => {
     expect(frame).toHaveClass('cl-icon-frame');
     expect(frame).toHaveAttribute('data-bordered', '');
     expect(frame).not.toHaveAttribute('data-filled');
-    expect(frame).toHaveAttribute('data-size', 'xl');
+    expect(frame).toHaveAttribute('data-size', 'md');
   });
 
   it('reflects its treatment and size', () => {
@@ -40,7 +41,7 @@ describe('Mosaic IconFrame', () => {
   it('composes with an Icon', () => {
     const { container } = render(
       <IconFrame>
-        <Icon name='checkmark' />
+        <Icon glyph={Checkmark} />
       </IconFrame>,
     );
     const frame = container.querySelector('.cl-icon-frame');
@@ -86,7 +87,6 @@ describe('Mosaic IconFrame', () => {
     render(
       <IconFrame
         data-testid='frame'
-        // eslint-disable-next-line jsx-a11y/anchor-has-content -- IconFrame injects the children into the rendered anchor.
         render={<a href='/status' />}
       >
         Status

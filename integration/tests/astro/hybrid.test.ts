@@ -14,7 +14,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
     let fakeOrganization2: FakeOrganization;
 
     test.beforeAll(async () => {
-      const m = createTestUtils({ app });
+      const m = await createTestUtils({ app });
       fakeAdmin = m.services.users.createFakeUser(test);
       const admin = await m.services.users.createBapiUser(fakeAdmin);
       fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
@@ -34,7 +34,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
     });
 
     test('render SignedIn and SignedOut contents (prerendered)', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
       await u.page.waitForClerkJsLoaded();
@@ -54,7 +54,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
     });
 
     test('render SignedIn and SignedOut contents (SSR)', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/ssr');
 
       await u.page.waitForClerkJsLoaded();
@@ -74,7 +74,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
     });
 
     test('render Protect contents for admin', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
       await u.page.waitForClerkJsLoaded();
@@ -95,7 +95,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
     });
 
     test('render Show fallback', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
       await u.page.waitForClerkJsLoaded();

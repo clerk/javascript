@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const RotateLeftRight = glyph(
+  'rotate-left-right',
   <g transform='translate(0.048 0)'>
     <path
       d='M3.33325 5.33336C4.25541 3.73922 6.02583 2.66669 7.99992 2.66669C10.9455 2.66669 13.3333 5.0545 13.3333 8.00002'

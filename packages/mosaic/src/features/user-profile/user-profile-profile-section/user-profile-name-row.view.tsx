@@ -12,7 +12,7 @@ export interface UserProfileNameRowViewProps {
 }
 
 export function UserProfileNameRowView({ name, managedBy, action }: UserProfileNameRowViewProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
 
   return (
     <Section.Row>

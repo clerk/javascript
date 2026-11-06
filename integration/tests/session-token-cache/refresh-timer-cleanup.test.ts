@@ -21,7 +21,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -33,7 +33,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
     test('touch does not cause clustered token refresh requests', async ({ page, context }) => {
       test.setTimeout(120_000);
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });

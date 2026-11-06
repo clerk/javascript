@@ -1,8 +1,11 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
-import type { AttributeData, EnterpriseAccountResource } from '@clerk/shared/types';
+import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
+import { save } from '../../../utils/errors';
+import { useReverificationFlow } from '../../reverification';
 import { isAttributeAvailable } from '../user-profile.utils';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { providerId } from '../user-profile-provider.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
@@ -16,7 +19,7 @@ function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfil
     return undefined;
   }
   const connection = account.enterpriseConnection;
-  return { name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, '') };
+  return { name: connection?.name || providerId(account.provider) };
 }
 
 function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {
@@ -25,11 +28,14 @@ function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameA
 
 export function useUserProfileProfileSectionModel(): UserProfileProfileSectionModel {
   const model = useUserProfileUserModel();
+  const [updateUsername, usernameReverification] = useReverificationFlow(
+    (currentUser: () => UserResource, username: string) => currentUser().update({ username }),
+  );
   if (model.status !== 'ready') {
     return model;
   }
 
-  const { user, environment, saveAsUser } = model;
+  const { user, environment, currentUser, saveAsUser } = model;
   const { attributes, usernameSettings } = environment.userSettings;
   const usernameImmutable = Boolean(attributes.username?.immutable);
   const showUsername = isAttributeAvailable(attributes.username) && !(usernameImmutable && !user.username);
@@ -60,10 +66,11 @@ export function useUserProfileProfileSectionModel(): UserProfileProfileSectionMo
     onSubmitUsername:
       showUsername && !usernameImmutable
         ? username =>
-            saveAsUser(current => current.update({ username }), USERNAME_FIELDS, {
+            save(() => updateUsername(currentUser, username), USERNAME_FIELDS, {
               min_length: usernameSettings.min_length,
               max_length: usernameSettings.max_length,
             })
         : undefined,
+    usernameReverification,
   };
 }

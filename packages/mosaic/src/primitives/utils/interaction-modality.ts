@@ -16,6 +16,7 @@ export function isKeyboardEvent(event: Event): boolean {
   // SAFETY: the remaining events come from `useClick`/`useHover`/`useDismiss`, which only ever
   // hand us pointer or mouse events here. `isVirtualClick` reads optional MouseEvent fields and
   // returns false for anything that lacks them.
+  // eslint-disable-next-line typescript/consistent-type-assertions -- Floating UI supplies pointer or mouse events after the keyboard check.
   return isVirtualClick(event as MouseEvent);
 }
 
@@ -28,6 +29,12 @@ export function isKeyboardOpen(context: Pick<FloatingContext, 'dataRef'>): boole
   const openEvent = context.dataRef.current.openEvent;
 
   return openEvent ? isKeyboardEvent(openEvent) : false;
+}
+
+export function isHoverOpen(context: Pick<FloatingContext, 'dataRef'>): boolean {
+  const type = context.dataRef.current.openEvent?.type;
+
+  return type != null && type.includes('mouse') && type !== 'mousedown';
 }
 
 /**

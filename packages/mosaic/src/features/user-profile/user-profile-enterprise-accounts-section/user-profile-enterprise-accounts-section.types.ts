@@ -2,6 +2,7 @@ export interface UserProfileEnterpriseConnection {
   id: string;
   name: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   connectError?: string;
 }
 

@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef, Suspense, useDeferredValue, useState, useTransition } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -90,6 +91,32 @@ describe('Select', () => {
       renderSelect();
       const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Pick a fruit...');
+    });
+
+    it('shows placeholder when the controlled value is null', () => {
+      renderSelect({ value: null });
+      const value = document.querySelector('[data-testid="select-value"]');
+      expect(value?.textContent).toBe('Pick a fruit...');
+    });
+
+    it('shows placeholder over a function child when no value is selected', () => {
+      render(
+        <Select.Root
+          items={fruits}
+          multiple
+        >
+          <Select.Trigger>
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick fruits...'
+            >
+              {(values: string[]) => `${values.length} fruits`}
+            </Select.Value>
+          </Select.Trigger>
+        </Select.Root>,
+      );
+      const value = document.querySelector('[data-testid="select-value"]');
+      expect(value?.textContent).toBe('Pick fruits...');
     });
 
     it('resolves label from items before options mount', () => {
@@ -297,120 +324,6 @@ describe('Select', () => {
         expect(options[1]).toHaveAttribute('data-active', '');
       },
     );
-
-    it('scrolls options into view on arrow key navigation', async () => {
-      const manyItems = Array.from({ length: 20 }, (_, i) => ({
-        label: `Item ${i + 1}`,
-        value: `item-${i + 1}`,
-      }));
-
-      const user = userEvent.setup();
-      render(
-        <Select.Root
-          items={manyItems}
-          alignItemWithTrigger={false}
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </div>
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      await user.click(screen.getByRole('combobox'));
-
-      // Navigate down through many items to force scrolling
-      for (let i = 0; i < 15; i++) {
-        await user.keyboard('{ArrowDown}');
-      }
-
-      const activeOption = document.querySelector('[role="option"][data-active]');
-      expect(activeOption).toBeInTheDocument();
-
-      // The active item should be visible within its scroll container
-      const scrollContainer = activeOption!.closest('div[style]') as HTMLElement;
-      const optionRect = activeOption!.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
-      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
-    });
-
-    it('scrolls selected item into view when reopening', async () => {
-      const manyItems = Array.from({ length: 20 }, (_, i) => ({
-        label: `Item ${i + 1}`,
-        value: `item-${i + 1}`,
-      }));
-
-      const user = userEvent.setup();
-      render(
-        <Select.Root
-          items={manyItems}
-          alignItemWithTrigger={false}
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              <div style={{ maxHeight: '100px', overflow: 'auto' }}>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </div>
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      const trigger = screen.getByRole('combobox');
-
-      // Open, navigate to item near the bottom, select it
-      await user.click(trigger);
-      for (let i = 0; i < 15; i++) {
-        await user.keyboard('{ArrowDown}');
-      }
-      await user.keyboard('{Enter}');
-
-      // Reopen — the selected item should be scrolled into view
-      await user.click(trigger);
-
-      const selectedOption = document.querySelector('[role="option"][data-selected]');
-      expect(selectedOption).toBeInTheDocument();
-
-      const scrollContainer = selectedOption!.closest('div[style]') as HTMLElement;
-      const optionRect = selectedOption!.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
-
-      expect(optionRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
-      expect(optionRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
-    });
   });
 
   describe('option state attributes', () => {
@@ -512,7 +425,7 @@ describe('Select', () => {
     });
   });
 
-  describe('ARIA attributes', () => {
+  describe('ARIA roles and states', () => {
     it('options have role=option', () => {
       renderSelect({ defaultOpen: true });
 
@@ -640,119 +553,33 @@ describe('Select', () => {
       // Standard Floating UI positioning uses position: absolute with transform
       expect(positioner.style.position).toBe('absolute');
     });
-
-    const manyItems: SelectItem[] = Array.from({ length: 20 }, (_, i) => ({
-      label: `Item ${i + 1}`,
-      value: `item-${i + 1}`,
-    }));
-
-    it('aligns selected item with trigger vertically', () => {
-      render(
-        <Select.Root
-          items={manyItems}
-          defaultOpen
-          defaultValue='item-10'
-        >
-          <Select.Trigger>
-            <Select.Value
-              data-testid='select-value'
-              placeholder='Pick...'
-            />
-          </Select.Trigger>
-          <Select.Positioner data-testid='select-positioner'>
-            <Select.Popup data-testid='select-popup'>
-              {manyItems.map(({ label, value }) => (
-                <Select.Option
-                  key={value}
-                  value={value}
-                  label={label}
-                >
-                  {label}
-                </Select.Option>
-              ))}
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Root>,
-      );
-
-      const trigger = screen.getByRole('combobox');
-      const selectedOption = document.querySelector('[role="option"][data-selected]');
-      expect(selectedOption).toBeInTheDocument();
-
-      const triggerRect = trigger.getBoundingClientRect();
-      const selectedRect = selectedOption!.getBoundingClientRect();
-
-      // The selected item should be positioned near the trigger's vertical position
-      expect(Math.abs(selectedRect.top - triggerRect.top)).toBeLessThan(50);
-    });
-
-    // Requires real layout engine — getBoundingClientRect returns 0 in happy-dom
-    it.skip('repositions when ancestor scrolls', async () => {
-      const user = userEvent.setup();
-      render(
-        <div
-          data-testid='scroll-container'
-          style={{ height: '200px', overflow: 'auto', paddingTop: '300px' }}
-        >
-          <Select.Root
-            items={manyItems}
-            defaultValue='item-5'
-          >
-            <Select.Trigger>
-              <Select.Value
-                data-testid='select-value'
-                placeholder='Pick...'
-              />
-            </Select.Trigger>
-            <Select.Positioner data-testid='select-positioner'>
-              <Select.Popup data-testid='select-popup'>
-                {manyItems.map(({ label, value }) => (
-                  <Select.Option
-                    key={value}
-                    value={value}
-                    label={label}
-                  >
-                    {label}
-                  </Select.Option>
-                ))}
-              </Select.Popup>
-            </Select.Positioner>
-          </Select.Root>
-          <div style={{ height: '500px' }} />
-        </div>,
-      );
-
-      await user.click(screen.getByRole('combobox'));
-
-      const positioner = document.querySelector('[data-testid="select-positioner"]') as HTMLElement;
-      const initialTop = positioner.getBoundingClientRect().top;
-
-      // Scroll the container
-      const scrollContainer = screen.getByTestId('scroll-container');
-      scrollContainer.scrollTop = 100;
-      scrollContainer.dispatchEvent(new Event('scroll'));
-
-      // autoUpdate repositions on scroll — wait for the update
-      await waitFor(() => {
-        const newTop = positioner.getBoundingClientRect().top;
-        expect(newTop).not.toBe(initialTop);
-      });
-    });
   });
 
-  describe('alignItemWithTrigger', () => {
+  describe('alignItemWithTrigger positioning', () => {
     it('marks the positioner with data-side="none" and blocks page scrolling while open', async () => {
       const user = userEvent.setup();
-      renderSelect({ alignItemWithTrigger: true });
+      renderSelect({ alignItemWithTrigger: true, defaultValue: 'banana' });
+      const trigger = screen.getByRole('combobox');
+      trigger.getBoundingClientRect = () => new DOMRect(0, 300, 120, 32);
 
-      await user.click(screen.getByRole('combobox'));
+      await user.click(trigger);
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'none');
-      expect(document.body).toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).toHaveStyle({ overflowY: 'hidden' });
 
       await user.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByTestId('select-positioner')).not.toBeInTheDocument());
-      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
+    });
+
+    it('positions like a menu when nothing is selected', async () => {
+      const user = userEvent.setup();
+      renderSelect({ alignItemWithTrigger: true, value: null });
+
+      await user.click(screen.getByRole('combobox'));
+
+      await waitFor(() => expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom'));
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 
     it('positions like a menu when opened by touch', async () => {
@@ -763,7 +590,7 @@ describe('Select', () => {
       await user.pointer({ keys: '[TouchA]', target: trigger });
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom');
-      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 
     it('positions like a menu when the trigger hugs the viewport edge', async () => {
@@ -875,6 +702,38 @@ describe('Select', () => {
     });
   });
 
+  describe('Arrow', () => {
+    it('forwards a ref to the arrow element', async () => {
+      const user = userEvent.setup();
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick a fruit...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.Arrow ref={ref} />
+              <Select.Option
+                value='apple'
+                label='Apple'
+              >
+                Apple
+              </Select.Option>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      expect(ref.current).toBeInstanceOf(SVGSVGElement);
+    });
+  });
+
   describe('Home/End navigation honors aria-disabled value', () => {
     it('treats aria-disabled="false" as enabled when pressing Home', async () => {
       const user = userEvent.setup();
@@ -922,5 +781,598 @@ describe('Select', () => {
       expect(options[0]).toHaveAttribute('aria-disabled', 'false');
       expect(options[0]).toHaveAttribute('data-active');
     });
+  });
+
+  describe('multiple', () => {
+    function renderMultiple(
+      props: Omit<React.ComponentProps<typeof Select.Root>, 'multiple' | 'children'> & {
+        value?: string[];
+        defaultValue?: string[];
+        onValueChange?: (value: string[]) => void;
+        renderValue?: (value: string[]) => React.ReactNode;
+        disabledValue?: string;
+      },
+    ) {
+      const { renderValue, disabledValue, ...rootProps } = props;
+      return render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+          {...rootProps}
+          multiple
+        >
+          <Select.Trigger>
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick fruits...'
+            >
+              {renderValue}
+            </Select.Value>
+          </Select.Trigger>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
+              {fruits.map(({ label, value }) => (
+                <Select.Option
+                  key={value}
+                  value={value}
+                  label={label}
+                  disabled={value === disabledValue}
+                >
+                  {label}
+                </Select.Option>
+              ))}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+    }
+
+    function valueText() {
+      return document.querySelector('[data-testid="select-value"]')?.textContent;
+    }
+
+    it('adds and removes values on click and keeps the popup open', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiple({ defaultValue: ['apple'], onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Cherry'));
+      expect(onValueChange).toHaveBeenLastCalledWith(['apple', 'cherry']);
+
+      await user.click(screen.getByText('Apple'));
+      expect(onValueChange).toHaveBeenLastCalledWith(['cherry']);
+
+      expect(screen.getByRole('combobox')).toHaveAttribute('data-open', '');
+      const options = screen.getAllByRole('option');
+      expect(options[0]).toHaveAttribute('aria-selected', 'false');
+      expect(options[2]).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('toggles the active option with Enter and keeps the popup open', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiple({ onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{Enter}');
+
+      expect(onValueChange).toHaveBeenCalledTimes(1);
+      expect(onValueChange.mock.calls[0]?.[0]).toHaveLength(1);
+      expect(screen.getByRole('combobox')).toHaveAttribute('data-open', '');
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('combobox')).toHaveAttribute('data-closed', '');
+    });
+
+    it('marks every selected option and the listbox as multiselectable', () => {
+      renderMultiple({ defaultValue: ['apple', 'cherry'], defaultOpen: true });
+
+      const options = screen.getAllByRole('option');
+      expect(options.map(option => option.getAttribute('aria-selected'))).toEqual(['true', 'false', 'true']);
+      expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
+    });
+
+    it('shows the placeholder for an empty selection', () => {
+      renderMultiple({ defaultValue: [] });
+      expect(valueText()).toBe('Pick fruits...');
+    });
+
+    it('joins the selected labels in value order', () => {
+      renderMultiple({ defaultValue: ['cherry', 'apple'] });
+      expect(valueText()).toBe('Cherry, Apple');
+    });
+
+    it('passes the selected values to a Value render function', () => {
+      renderMultiple({
+        defaultValue: ['banana', 'cherry'],
+        renderValue: value => `${value.length} selected`,
+      });
+      expect(valueText()).toBe('2 selected');
+    });
+
+    it('keeps the labels after the popup closes', async () => {
+      const user = userEvent.setup();
+      renderMultiple({});
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Banana'));
+      await user.click(screen.getByText('Apple'));
+      await user.keyboard('{Escape}');
+
+      expect(valueText()).toBe('Banana, Apple');
+    });
+
+    it('keeps the displayed values when the controlled parent rejects the change', async () => {
+      const user = userEvent.setup();
+      renderMultiple({ value: ['apple'], onValueChange: () => {} });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Banana'));
+
+      expect(valueText()).toBe('Apple');
+      expect(screen.getAllByRole('option')[1]).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('does not toggle a disabled option', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiple({ onValueChange, disabledValue: 'banana' });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Banana'));
+
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('opens on the last selected value', async () => {
+      const user = userEvent.setup();
+      renderMultiple({ defaultValue: ['apple', 'cherry'] });
+
+      const trigger = screen.getByRole('combobox');
+      trigger.focus();
+      await user.keyboard('{ArrowDown}');
+
+      const options = screen.getAllByRole('option');
+      await waitFor(() => expect(document.activeElement).toBe(options[2]));
+      expect(options[2]).toHaveAttribute('data-active', '');
+    });
+
+    it('reopens on the first option after the last value is removed', async () => {
+      const user = userEvent.setup();
+      renderMultiple({ defaultValue: ['cherry'] });
+
+      const trigger = screen.getByRole('combobox');
+      await user.click(trigger);
+      await user.click(screen.getByRole('option', { name: 'Cherry' }));
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+
+      trigger.focus();
+      await user.keyboard('{ArrowDown}');
+
+      const options = screen.getAllByRole('option');
+      await waitFor(() => expect(document.activeElement).toBe(options[0]));
+    });
+  });
+
+  it('forwards refs to the value and the options', () => {
+    const value = createRef<HTMLSpanElement>();
+    const option = createRef<HTMLButtonElement>();
+    render(
+      <Select.Root
+        items={fruits}
+        defaultOpen
+        alignItemWithTrigger={false}
+      >
+        <Select.Trigger>
+          <Select.Value
+            ref={value}
+            data-testid='select-value'
+            placeholder='Pick a fruit...'
+          />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            <Select.Option
+              ref={option}
+              value='apple'
+              label='Apple'
+            >
+              Apple
+            </Select.Option>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    expect(value.current).toBe(screen.getByTestId('select-value'));
+    expect(option.current).toBe(screen.getByRole('option', { name: 'Apple' }));
+  });
+});
+
+describe('Select.Group', () => {
+  function renderGrouped(props: { defaultOpen?: boolean; defaultValue?: string } = { defaultOpen: true }) {
+    return render(
+      <Select.Root
+        items={fruits}
+        alignItemWithTrigger={false}
+        {...props}
+      >
+        <Select.Trigger aria-label='Fruit'>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            <Select.Group>
+              <Select.GroupLabel>Pome</Select.GroupLabel>
+              <Select.Option
+                value='apple'
+                label='Apple'
+              >
+                Apple
+              </Select.Option>
+            </Select.Group>
+            <Select.Group>
+              <Select.GroupLabel>Other</Select.GroupLabel>
+              <Select.Option
+                value='banana'
+                label='Banana'
+              >
+                Banana
+              </Select.Option>
+              <Select.Option
+                value='cherry'
+                label='Cherry'
+              >
+                Cherry
+              </Select.Option>
+            </Select.Group>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+  }
+
+  it('names each group by its label', () => {
+    renderGrouped();
+    const pome = screen.getByRole('group', { name: 'Pome' });
+    const other = screen.getByRole('group', { name: 'Other' });
+    expect(pome).toContainElement(screen.getByRole('option', { name: 'Apple' }));
+    expect(other).toContainElement(screen.getByRole('option', { name: 'Cherry' }));
+  });
+
+  it('moves the active option across groups with the arrow keys', async () => {
+    const user = userEvent.setup();
+    renderGrouped({ defaultValue: 'apple' });
+    screen.getByRole('combobox').focus();
+    await user.keyboard('{ArrowDown}');
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Apple' })).toHaveFocus());
+
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveFocus();
+  });
+
+  it('has no violations when open', async () => {
+    renderGrouped();
+    expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+  });
+
+  it('forwards refs to the group and its label', () => {
+    const groupRef = createRef<HTMLDivElement>();
+    const labelRef = createRef<HTMLDivElement>();
+    render(
+      <Select.Group ref={groupRef}>
+        <Select.GroupLabel ref={labelRef}>Pome</Select.GroupLabel>
+      </Select.Group>,
+    );
+
+    expect(groupRef.current).toBe(screen.getByRole('group', { name: 'Pome' }));
+    expect(labelRef.current).toHaveTextContent('Pome');
+  });
+
+  it('throws when the label is used outside <Select.Group>', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<Select.GroupLabel>Fruits</Select.GroupLabel>)).toThrow(/within <Select.Group>/);
+  });
+});
+
+describe('Select option renders', () => {
+  it('re-renders only the options whose highlight changes in a multiple select', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    const options = [...fruits, { label: 'Date', value: 'date' }];
+    render(
+      <Select.Root
+        items={options}
+        alignItemWithTrigger={false}
+        multiple
+        defaultValue={['banana']}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            {options.map(({ label, value }) => (
+              <Select.Option
+                key={value}
+                value={value}
+                label={label}
+                render={props => {
+                  renders.push(value);
+                  return (
+                    <button
+                      type='button'
+                      {...props}
+                    />
+                  );
+                }}
+              >
+                {label}
+              </Select.Option>
+            ))}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
+
+    await user.keyboard('{Enter}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('re-renders only the options whose highlight changes in a controlled single select', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    render(
+      <Select.Root
+        items={fruits}
+        alignItemWithTrigger={false}
+        value='banana'
+        onValueChange={() => {}}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        <Select.Positioner>
+          <Select.Popup>
+            {fruits.map(({ label, value }) => (
+              <Select.Option
+                key={value}
+                value={value}
+                label={label}
+                render={props => {
+                  renders.push(value);
+                  return (
+                    <button
+                      type='button'
+                      {...props}
+                    />
+                  );
+                }}
+              >
+                {label}
+              </Select.Option>
+            ))}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Root>,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'cherry']));
+  });
+});
+
+describe('Select selection in a transition', () => {
+  const neverResolves = new Promise<never>(() => {});
+  function Suspends(): never {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- Suspending is React's thrown-thenable protocol; `React.use()` needs React 19.
+    throw neverResolves;
+  }
+
+  type HoverRender = { option: string; hovered: string | null; active: boolean };
+  type OptionRender = { option: string; parentValue: string; selected: unknown };
+
+  function Fixture({
+    update = 'transition',
+    onRenderOption,
+    suspendSelected = false,
+    hoverInTransition = false,
+    onRenderHover,
+    suspendWhenActive,
+  }: {
+    update?: 'transition' | 'deferred';
+    onRenderOption?: (render: OptionRender) => void;
+    suspendSelected?: boolean;
+    hoverInTransition?: boolean;
+    onRenderHover?: (render: HoverRender) => void;
+    suspendWhenActive?: string;
+  }) {
+    const [value, setValue] = useState<string>('');
+    const deferredValue = useDeferredValue(value);
+    const [isPending, startTransition] = useTransition();
+    const [hovered, setHovered] = useState<string | null>(null);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [isLoadingMore, startLoadingMore] = useTransition();
+    const parentValue = update === 'deferred' ? deferredValue : value;
+    return (
+      <>
+        <button
+          type='button'
+          onClick={() => startLoadingMore(() => setLoadingMore(true))}
+        >
+          Load more
+        </button>
+        <p>{isLoadingMore ? 'Loading more' : 'Loaded'}</p>
+        <Suspense fallback={<p>Loading more fallback</p>}>{loadingMore ? <Suspends /> : null}</Suspense>
+        <Suspense fallback={<p>Loading</p>}>
+          <p>{isPending || value !== deferredValue ? 'Pending' : 'Idle'}</p>
+          <Select.Root
+            open
+            items={fruits}
+            alignItemWithTrigger={false}
+            value={parentValue}
+            onValueChange={next => (update === 'deferred' ? setValue(next) : startTransition(() => setValue(next)))}
+          >
+            <Select.Trigger>
+              <Select.Value placeholder='Pick a fruit...' />
+            </Select.Trigger>
+            <Select.Positioner>
+              <Select.Popup>
+                {fruits.map(option => (
+                  <Select.Option
+                    key={option.value}
+                    value={option.value}
+                    label={option.label}
+                    render={props => {
+                      onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                      const active = 'data-active' in props;
+                      onRenderHover?.({ option: option.value, hovered, active });
+                      return (
+                        <button
+                          type='button'
+                          {...props}
+                          onMouseMove={
+                            hoverInTransition
+                              ? event =>
+                                  startTransition(() => {
+                                    setHovered(option.value);
+                                    props.onMouseMove?.(event);
+                                  })
+                              : props.onMouseMove
+                          }
+                        >
+                          {props.children}
+                          {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
+                          {active && suspendWhenActive === option.value ? <Suspends /> : null}
+                        </button>
+                      );
+                    }}
+                  >
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select.Popup>
+            </Select.Positioner>
+          </Select.Root>
+        </Suspense>
+      </>
+    );
+  }
+
+  describe.each(['transition', 'deferred'] as const)('when the parent updates the value with %s', update => {
+    it('renders each option with the selection its parent passed down', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders).not.toContainEqual({ option: 'banana', parentValue: 'banana', selected: false });
+    });
+
+    it('renders the new selection in the same render as its parent, with no second pass', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders.filter(entry => entry.option === 'banana' && entry.parentValue === 'banana')).toEqual([
+        { option: 'banana', parentValue: 'banana', selected: true },
+      ]);
+    });
+
+    it('keeps the current options on screen while a selection suspends', async () => {
+      const user = userEvent.setup();
+      render(
+        <Fixture
+          update={update}
+          suspendSelected
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+      expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+
+  it('moves the highlight with arrow keys while an unrelated transition is pending', async () => {
+    const user = userEvent.setup();
+    render(<Fixture />);
+
+    await user.click(screen.getByRole('button', { name: 'Load more' }));
+    await waitFor(() => expect(screen.getByText('Loading more')).toBeInTheDocument());
+
+    screen.getByRole('option', { name: 'Apple' }).focus();
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+    expect(screen.getByText('Loading more')).toBeInTheDocument();
+  });
+
+  it('renders the hovered option as active in the same render as a hover transition', async () => {
+    const user = userEvent.setup();
+    const renders: HoverRender[] = [];
+    render(
+      <Fixture
+        hoverInTransition
+        onRenderHover={entry => renders.push(entry)}
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+    expect(renders).not.toContainEqual({ option: 'banana', hovered: 'banana', active: false });
+  });
+
+  it('keeps the current options on screen while a hover transition suspends', async () => {
+    const user = userEvent.setup();
+    render(
+      <Fixture
+        hoverInTransition
+        suspendWhenActive='banana'
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+    expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Banana' })).not.toHaveAttribute('data-active');
   });
 });

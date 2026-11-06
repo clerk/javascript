@@ -9,7 +9,7 @@ export { default as __source } from './user-profile-email-section.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'UserProfileEmailSection',
   label: 'Email',
   navigation: { category: 'Sections' },

@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Checkmark } from '../../icons/glyphs/checkmark';
 import type { ComboboxProps } from '../../primitives/combobox';
 import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useRender } from '../../primitives/utils';
@@ -176,8 +177,8 @@ export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, Combobo
       >
         {children ?? (
           <Icon
-            name='checkmark'
-            size='sm'
+            glyph={Checkmark}
+            size='md'
           />
         )}
       </HeadlessCombobox.OptionIndicator>

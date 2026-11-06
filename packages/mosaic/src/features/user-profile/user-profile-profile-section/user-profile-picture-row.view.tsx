@@ -1,15 +1,7 @@
-import type { ActionMenuAction } from '../../../components/action-menu';
-import { ActionMenu } from '../../../components/action-menu';
-import { Avatar } from '../../../components/avatar';
-import { Button } from '../../../components/button';
+import { AvatarUpload } from '../../../blocks/avatar-upload';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
-import { FileUpload } from '../../../primitives/file-upload';
 import type { UserProfilePictureController } from './user-profile-picture.controller';
-
-const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-/** Matches the limit the row's own description advertises. */
-const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
 
 export interface UserProfilePictureRowViewProps extends UserProfilePictureController {
   name: string;
@@ -28,103 +20,34 @@ export function UserProfilePictureRowView({
   onReject,
   onRemove,
 }: UserProfilePictureRowViewProps) {
-  const m = useMessages('userProfileProfileSection');
-  const initials = name
-    .split(/\s+/)
-    .map(part => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const m = useMessages('userProfile').profile;
 
   return (
-    <FileUpload.Root
-      accept={PROFILE_PICTURE_MIME_TYPES}
-      maxSize={PROFILE_PICTURE_MAX_BYTES}
+    <AvatarUpload.Root
+      name={name}
+      imageUrl={previewUrl ?? imageUrl}
+      hasImage={hasImage}
       disabled={isPending}
       aria-busy={isPending || undefined}
       render={<Section.Row />}
+      onChange={onChange}
       onReject={onReject}
-      onValueChange={files => {
-        const file = files[0];
-        if (file) {
-          onChange?.(file);
-        }
-      }}
+      onRemove={onRemove}
     >
-      <Section.Item>
+      <AvatarUpload.Dropzone render={<Section.Item />}>
         <Section.Media size='lg'>
-          <Avatar.Root size='fit'>
-            <Avatar.Image
-              alt={name}
-              src={previewUrl ?? imageUrl}
-            />
-            <Avatar.Fallback>{initials}</Avatar.Fallback>
-          </Avatar.Root>
+          <AvatarUpload.Image size='fit' />
         </Section.Media>
         <Section.Content>
           <Section.Label>{m.picture.label}</Section.Label>
           <Section.Description>{m.picture.description}</Section.Description>
         </Section.Content>
-        <ProfilePictureActions
-          canChange={Boolean(onChange)}
-          hasImage={hasImage}
-          onRemove={onRemove}
+        <AvatarUpload.Actions
+          labels={m.picture}
+          render={<Section.Actions />}
         />
-      </Section.Item>
+      </AvatarUpload.Dropzone>
       <Section.Error>{error}</Section.Error>
-    </FileUpload.Root>
+    </AvatarUpload.Root>
   );
-}
-
-function ProfilePictureActions({
-  hasImage,
-  canChange,
-  onRemove,
-}: {
-  hasImage: boolean;
-  canChange: boolean;
-  onRemove?: () => void;
-}) {
-  const m = useMessages('userProfileProfileSection');
-  const { openFilePicker } = FileUpload.useFileUpload();
-  const actions: ActionMenuAction[] = [];
-
-  if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
-  }
-
-  if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
-  }
-
-  if (actions.length > 0) {
-    return (
-      <Section.Actions>
-        <ActionMenu
-          actions={actions}
-          label={m.picture.manage}
-        />
-      </Section.Actions>
-    );
-  }
-
-  if (!hasImage && canChange) {
-    return (
-      <Section.Actions>
-        <FileUpload.Trigger
-          render={
-            <Button
-              color='neutral'
-              size='sm'
-              variant='outline'
-            />
-          }
-        >
-          {m.picture.upload}
-        </FileUpload.Trigger>
-      </Section.Actions>
-    );
-  }
-
-  return null;
 }

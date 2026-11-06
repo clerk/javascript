@@ -1,7 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { CheckmarkCircle } from '../../icons/glyphs/checkmark-circle';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
+import { InformationCircle } from '../../icons/glyphs/information-circle';
+import { XCircle } from '../../icons/glyphs/x-circle';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -13,11 +17,11 @@ type BannerColor = 'neutral' | 'warning' | 'negative' | 'positive';
 
 const DEFAULT_COLOR: BannerColor = 'neutral';
 
-const ICONS: Record<BannerColor, IconName> = {
-  neutral: 'information-circle',
-  warning: 'exclamation-circle',
-  negative: 'x-circle',
-  positive: 'checkmark-circle',
+const ICONS: Record<BannerColor, IconComponent> = {
+  neutral: InformationCircle,
+  warning: ExclamationCircle,
+  negative: XCircle,
+  positive: CheckmarkCircle,
 };
 
 const BannerColorContext = React.createContext<BannerColor>(DEFAULT_COLOR);
@@ -45,7 +49,7 @@ const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBa
       children: (
         <>
           <Icon
-            name={ICONS[color]}
+            glyph={ICONS[color]}
             xstyle={[styles.icon, iconColors[color]]}
             {...themeProps('banner-icon')}
           />

@@ -1,5 +1,11 @@
 # @clerk/expo-google-signin
 
+## 1.1.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.0.4
 
 ### Patch Changes

@@ -37,6 +37,7 @@ import {
   navigateIfTaskExists,
   warnMissingPendingTaskHandlers,
 } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { isValidUrl } from '@clerk/shared/internal/clerk-js/url';
 import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -279,6 +280,7 @@ export class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
   #status: ClerkInterface['status'] = 'loading';
+  #initialResourcesReloadedDuringLoad = false;
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
@@ -367,6 +369,8 @@ export class Clerk implements ClerkInterface {
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
 
   public __internal_setActiveInProgress = false;
+
+  #redirectCallbackInFlight: Promise<unknown> | undefined;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -598,7 +602,9 @@ export class Clerk implements ClerkInterface {
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
-    this.#protect = new Protect();
+    if (!__BUILD_DISABLE_RHC__) {
+      this.#protect = new Protect();
+    }
   }
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
@@ -680,31 +686,41 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.#loadInNonStandardBrowser();
       }
-      const telemetry = this.#options.telemetry;
-      const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
-
-      const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
-      const hasClientDebugMode = Boolean(this.environment?.clientDebugMode);
-      const isProd = this.environment?.isProduction?.() ?? false;
-
-      const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
-      const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
-
-      if (shouldEnable) {
-        initDebugLogger({
-          enabled: true,
-          ...(logLevel ? { logLevel } : {}),
-          ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
-        });
-      }
-      this.#protect?.load(this.environment as Environment);
-      debugLogger.info('load() complete', {}, 'clerk');
+      this.#finishLoad();
     } catch (error) {
+      // A reload that succeeded while this load was running already applied newer resources, so the load finishes.
+      if (!this.#options.standardBrowser && this.#initialResourcesReloadedDuringLoad && this.#status === 'loading') {
+        this.#finishLoad();
+        this.#publicEventBus.emit(clerkEvents.Status, 'ready');
+        return;
+      }
       this.#publicEventBus.emit(clerkEvents.Status, 'error');
       debugLogger.error('load() failed', { error }, 'clerk');
       // bubble up the error
       throw error;
     }
+  };
+
+  #finishLoad = (): void => {
+    const telemetry = this.#options.telemetry;
+    const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
+
+    const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
+    const hasClientDebugMode = Boolean(this.environment?.clientDebugMode);
+    const isProd = this.environment?.isProduction?.() ?? false;
+
+    const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
+    const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
+
+    if (shouldEnable) {
+      initDebugLogger({
+        enabled: true,
+        ...(logLevel ? { logLevel } : {}),
+        ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
+      });
+    }
+    this.#protect?.load(this.environment as Environment, this.frontendApi);
+    debugLogger.info('load() complete', {}, 'clerk');
   };
 
   #isCombinedSignInOrUpFlow(): boolean {
@@ -748,26 +764,34 @@ export class Clerk implements ClerkInterface {
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
+    let debugRedirectUrl: string | undefined;
+    try {
+      debugRedirectUrl = stripOrigin(redirectUrl);
+    } catch {
+      debugRedirectUrl = undefined;
+    }
     debugLogger.debug(
       'signOut() start',
       {
         hasClient: Boolean(this.client),
         multiSessionCount: this.client?.signedInSessions.length ?? 0,
-        redirectUrl,
+        redirectUrl: debugRedirectUrl,
         sessionTarget: opts?.sessionId ?? null,
       },
       'clerk',
     );
     const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
-    const executeSignOut = async () => {
+    const executeSignOut = async (signOutUrl?: string) => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       // Notify other tabs that user is signing out and clean up cookies.
       eventBus.emit(events.UserSignOut, null);
 
       await tracker.track(async () => {
-        if (signOutCallback) {
+        if (signOutUrl) {
+          await this.navigate(signOutUrl);
+        } else if (signOutCallback) {
           await signOutCallback();
         } else {
           // The client outlives sign-out and is what Client Trust uses to recognize a
@@ -795,8 +819,33 @@ export class Clerk implements ClerkInterface {
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       this.#setTransitiveState();
 
+      const persistClient = this.#options.experimental?.persistClient ?? true;
+      let repairRedirectUrl: URL | undefined;
+      if (
+        persistClient &&
+        (!signOutCallback || !!opts.__internal_satelliteSignOutRedirectUrl) &&
+        this.#instanceType === 'production' &&
+        this.#options.standardBrowser &&
+        inBrowser() &&
+        typeof window.location !== 'undefined' &&
+        this.isSatellite
+      ) {
+        try {
+          const target = new URL(opts.__internal_satelliteSignOutRedirectUrl || redirectUrl, window.location.href);
+          if (target.protocol === 'https:' && !target.username && !target.password) {
+            repairRedirectUrl = target;
+          }
+        } catch {
+          repairRedirectUrl = undefined;
+        }
+      }
+      let signOutUrl: string | undefined;
       try {
-        if (this.#options.experimental?.persistClient ?? true) {
+        if (repairRedirectUrl && Client.isClientResource(this.client)) {
+          ({ signOutUrl } = await this.client.__internal_signOut({
+            redirectUrl: repairRedirectUrl.href,
+          }));
+        } else if (persistClient) {
           await this.client.removeSessions();
         } else {
           await this.client.destroy();
@@ -807,9 +856,10 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      await executeSignOut();
+      const repairUrl = isValidUrl(signOutUrl) && signOutUrl?.startsWith('https://') ? signOutUrl : undefined;
+      await executeSignOut(repairUrl);
 
-      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
+      debugLogger.info('signOut() complete', { redirectUrl: debugRedirectUrl }, 'clerk');
       return;
     }
 
@@ -821,7 +871,7 @@ export class Clerk implements ClerkInterface {
       this.#setTransitiveState();
       await session?.remove();
       await executeSignOut();
-      debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
+      debugLogger.info('signOut() complete', { redirectUrl: debugRedirectUrl }, 'clerk');
     } else {
       await session?.remove();
     }
@@ -1956,7 +2006,14 @@ export class Clerk implements ClerkInterface {
       }
 
       if (typeof session === 'string') {
-        session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
+        const sessionId = session;
+        const findSession = () =>
+          (this.client?.sessions.find(x => x.id === sessionId) as SignedInSessionResource | undefined) ?? null;
+        session = findSession();
+        if (!session) {
+          await this.client.reload();
+          session = findSession();
+        }
       }
 
       const onBeforeSetActive: SetActiveHook =
@@ -2992,17 +3049,32 @@ export class Clerk implements ClerkInterface {
     if (!this.loaded || !this.environment || !this.client) {
       return;
     }
+
+    // A callback's transfer can only succeed once, so if we get called again, for example because a
+    // component remounted, we return the running promise.
+    // We intentionally ignore params/customNavigate here, there is no way to cancel the first call
+    // or queue up a second one safely, so the only other options would be to fail the second call
+    // or have it race the first one with unpredictable effects.
+    // Reusing the first call's params is always preferable to that.
+    if (this.#redirectCallbackInFlight) {
+      return this.#redirectCallbackInFlight;
+    }
+
     const { signIn, signUp } = this.client;
 
     const resolvedNavigate = customNavigate ?? params.__internal_navigate;
     const navigate = (to: string) =>
       resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
 
-    return this._handleRedirectCallback(params, {
+    this.#redirectCallbackInFlight = this._handleRedirectCallback(params, {
       signUp,
       signIn,
       navigate,
+    }).finally(() => {
+      this.#redirectCallbackInFlight = undefined;
     });
+
+    return this.#redirectCallbackInFlight;
   };
 
   // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
@@ -3656,15 +3728,17 @@ export class Clerk implements ClerkInterface {
 
   #loadInNonStandardBrowser = async (): Promise<void> => {
     let environment: Environment, client: Client;
-    const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
+    const fallsBackToCachedResources = this.shouldFallbackToCachedResources();
     let initializationDegradedCounter = 0;
     try {
-      [environment, client] = await Promise.all([
-        Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
-        Client.getOrCreateInstance().fetch({ fetchMaxTries }),
-      ]);
+      [environment, client] = await this.#fetchInitialResources(
+        fallsBackToCachedResources ? { fetchMaxTries: 1, timeLimited: true } : { timeLimited: false },
+      );
     } catch (err) {
-      if (isClerkRuntimeError(err) && err.code === 'network_error' && this.shouldFallbackToCachedResources()) {
+      const isUnavailable =
+        (isClerkRuntimeError(err) && err.code === 'network_error') ||
+        (isClerkAPIResponseError(err) && err.status >= 500);
+      if (isUnavailable && fallsBackToCachedResources) {
         const cachedResources = await this.__internal_getCachedResources?.();
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
@@ -3681,15 +3755,46 @@ export class Clerk implements ClerkInterface {
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
-  // This is used by @clerk/expo
-  __internal_reloadInitialResources = async (): Promise<void> => {
-    const [environment, client] = await Promise.all([
-      Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
-      Client.getOrCreateInstance().fetch({ fetchMaxTries: 1 }),
+  #fetchInitialResources = ({
+    fetchMaxTries,
+    timeLimited,
+  }: {
+    fetchMaxTries?: number;
+    timeLimited: boolean;
+  }): Promise<[Environment, Client]> => {
+    const controller = new AbortController();
+    const resources = Promise.all([
+      Environment.getInstance().fetch({ touch: false, fetchMaxTries, abortSignal: controller.signal }),
+      Client.getOrCreateInstance().fetch({ fetchMaxTries, abortSignal: controller.signal }),
     ]);
+    if (!timeLimited) {
+      return resources;
+    }
+
+    return timeLimit(resources, INITIALIZATION_TIMEOUT_MS, controller).catch(err => {
+      if (controller.signal.aborted) {
+        throw new ClerkRuntimeError('Loading the initial resources timed out.', { code: 'network_error' });
+      }
+      throw err;
+    });
+  };
+
+  // This is used by @clerk/expo. When `load()` failed, such as while the app version was unsupported, a successful
+  // reload finishes loading this instance instead of the app having to create a new one.
+  __internal_reloadInitialResources = async (): Promise<void> => {
+    const [environment, client] = await this.#fetchInitialResources({ fetchMaxTries: 1, timeLimited: true });
 
     this.updateClient(client);
     this.updateEnvironment(environment);
+
+    // A load that is still running finishes with these resources if it fails. An overlapping reload may have finished
+    // loading first.
+    if (!this.#options.standardBrowser && this.#status === 'error') {
+      this.#finishLoad();
+      this.#publicEventBus.emit(clerkEvents.Status, 'ready');
+    } else if (this.#status === 'loading') {
+      this.#initialResourcesReloadedDuringLoad = true;
+    }
 
     this.#emit();
   };

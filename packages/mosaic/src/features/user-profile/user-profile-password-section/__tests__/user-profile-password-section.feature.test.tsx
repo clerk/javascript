@@ -2,7 +2,7 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEmailAddress,
@@ -21,6 +21,23 @@ async function renderPassword(user = alice, environment = fapiEnvironment()) {
   const fapi = serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
   await renderWithClerk(<UserProfilePasswordSection />);
   return fapi;
+}
+
+async function renderWithReverification(prepare?: () => void) {
+  const fapi = serveFapi({
+    environment: fapiEnvironment({ auth_config: { reverification: true } }),
+    client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]),
+    verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+  });
+  prepare?.();
+  demandReverificationOnce('/v1/me/change_password');
+  await renderWithClerk(<UserProfilePasswordSection />);
+  const user = userEvent.setup();
+  await user.click(screen.getByRole('button', { name: 'Change password' }));
+  await user.type(screen.getByLabelText('New password'), 'new-password-123');
+  await user.type(screen.getByLabelText('Confirm password'), 'new-password-123');
+  await user.click(screen.getByRole('button', { name: 'Save changes' }));
+  return { fapi, user };
 }
 
 async function fillPassword() {
@@ -117,30 +134,24 @@ describe('Changing a password', () => {
     if (!clerk.user) {
       throw new Error('Expected a signed-in user');
     }
-    const update = vi.spyOn(clerk.user, 'updatePassword').mockRejectedValueOnce(new Error('Connection interrupted'));
-    try {
-      const user = await fillPassword();
-      const dialog = screen.getByRole('dialog');
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    vi.spyOn(clerk.user, 'updatePassword').mockRejectedValueOnce(new Error('Connection interrupted'));
+    const user = await fillPassword();
+    const dialog = screen.getByRole('dialog');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      await waitFor(() =>
-        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
-      );
-      expect(dialog).not.toHaveTextContent('Connection interrupted');
-      expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
-      expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
-      expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
-      expect(fapi.passwordUpdates).toHaveLength(0);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    expect(dialog).not.toHaveTextContent('Connection interrupted');
+    expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+    expect(fapi.passwordUpdates).toHaveLength(0);
 
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      expect(fapi.passwordUpdates).toHaveLength(1);
-    } finally {
-      update.mockRestore();
-    }
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(1);
   });
 
-  it('shows feedback when the password strength checker cannot load', async () => {
+  it('keeps showing the length rule when the strength checker cannot load, then reports the failure', async () => {
     const environment = fapiEnvironment();
     environment.user_settings.password_settings.show_zxcvbn = true;
     serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
@@ -149,21 +160,23 @@ describe('Changing a password', () => {
     if (!modules) {
       throw new Error('Expected a module manager');
     }
-    const load = vi.spyOn(modules, 'import').mockRejectedValue(new Error('Failed to load password strength checker'));
-    try {
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Change password' }));
-      await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
-      await user.type(screen.getByLabelText('New password'), 'new-password-123');
+    vi.spyOn(modules, 'import').mockRejectedValue(new Error('Failed to load password strength checker'));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
+    await user.type(screen.getByLabelText('New password'), 'new');
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain 8 or more characters.',
+      ),
+    );
+    await user.type(screen.getByLabelText('New password'), '-password-123');
 
-      await waitFor(() =>
-        expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
-          'Something went wrong. Please try again.',
-        ),
-      );
-    } finally {
-      load.mockRestore();
-    }
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Something went wrong. Please try again.',
+      ),
+    );
   });
 
   it('sends the update to Clerk and closes after it succeeds', async () => {
@@ -197,6 +210,83 @@ describe('Changing a password', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
+  it('skips the current password and asks to verify before saving when reverification is on', async () => {
+    const { fapi, user } = await renderWithReverification();
+
+    expect(screen.queryByLabelText('Current password')).toBeNull();
+    const field = await screen.findByPlaceholderText('Enter your password');
+    expect(fapi.passwordUpdates).toHaveLength(0);
+    await user.type(field, 'hunter2{Enter}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(1);
+  });
+
+  it('closes without saving when verification is dismissed, and reopens on an empty form', async () => {
+    const { fapi, user } = await renderWithReverification();
+
+    await screen.findByPlaceholderText('Enter your password');
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(0);
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    expect(screen.getByLabelText('New password')).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeVisible();
+  });
+
+  it('cancels an in-progress password verification when the active session changes', async () => {
+    const fapi = serveFapi({
+      environment: fapiEnvironment({ auth_config: { reverification: true } }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: alice }), fapiSession({ id: 'sess_2', user: alice })]),
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+    });
+    demandReverificationOnce('/v1/me/change_password');
+    const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    await user.type(screen.getByLabelText('New password'), 'new-password-123');
+    await user.type(screen.getByLabelText('Confirm password'), 'new-password-123');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByPlaceholderText('Enter your password');
+
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(0);
+  });
+
+  it('returns to the form with the field error when the save fails after verifying', async () => {
+    const updates: Array<ReturnType<typeof holdRequests>> = [];
+    const { fapi, user } = await renderWithReverification(() => {
+      updates.push(holdRequests('post', '/v1/me/change_password'));
+    });
+    const update = updates[0];
+
+    await user.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_password_pwned', undefined, 'new_password');
+
+    const field = await screen.findByLabelText('New password');
+    expect(field).toHaveValue('new-password-123');
+    await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
+    await waitFor(() => expect(field).toHaveFocus());
+    expect(fapi.passwordUpdates).toHaveLength(0);
+  });
+
+  it('closes the dialog from the verification error card', async () => {
+    const { fapi, user } = await renderWithReverification(() =>
+      holdRequests('post', '/v1/client/sessions/sess_1/verify').fail('some_new_error', 'Nope'),
+    );
+
+    expect(await screen.findByText('Something went wrong')).toBeVisible();
+    const buttons = screen.getAllByRole('button', { name: 'Close' });
+    await user.click(buttons[buttons.length - 1]);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(0);
+  });
+
   it('shows a direct API error and keeps the draft without retrying automatically', async () => {
     const fapi = await renderPassword();
     const user = await fillPassword();
@@ -204,11 +294,10 @@ describe('Changing a password', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(update.requests).toHaveLength(1));
-    update.fail('session_reverification_required');
+    update.fail('form_param_invalid');
 
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('session_reverification_required'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_param_invalid'));
     expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
-    expect(screen.queryByText('Verification required')).toBeNull();
     expect(update.requests).toHaveLength(1);
     serveFapi(fapi);
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -442,12 +531,10 @@ describe('Changing a password', () => {
     await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
     await user.type(screen.getByLabelText('New password'), 'longpassword');
 
-    await waitFor(
-      () =>
-        expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
-          'Your password must contain a number and an uppercase letter.',
-        ),
-      { timeout: 2500 },
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain a number and an uppercase letter.',
+      ),
     );
   });
 
@@ -468,10 +555,23 @@ describe('Changing a password', () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(fapi.passwordUpdates).toHaveLength(1));
   });
+
+  it('does not judge password strength when the instance turns the checker off', async () => {
+    const environment = fapiEnvironment();
+    environment.user_settings.password_settings.min_zxcvbn_strength = 3;
+    await renderPassword(alice, environment);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    await user.type(screen.getByLabelText('New password'), 'password123');
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password meets all the necessary requirements.',
+      ),
+    );
+  });
 });
 
 describe('Deferred password behavior', () => {
   it.todo('shows a password section skeleton while loading without a custom fallback');
-  it.todo('reverifies the session and retries the password update when Clerk requires verification');
-  it.todo('omits the current password when session reverification is enabled');
 });

@@ -12,6 +12,10 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
+const popupRadius = radiusVars['--cl-radius-lg'];
+const inset = space['0.5'];
+const itemRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
+
 // Positioning is applied inline by the headless positioner; this only clears the
 // focus outline it receives. No z-index: the portalled, fixed positioner already
 // paints above page content, and consumers own their own stacking order.
@@ -23,9 +27,9 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
-    borderRadius: radiusVars['--cl-radius-lg'],
+    borderRadius: popupRadius,
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
@@ -73,7 +77,7 @@ export const viewport = stylex.create({
     // The inset belongs to the scrolling box, not the popup: `Menu.Separator` bleeds through it
     // with a negative margin, and from inside a viewport that clips its inline axis a bleed past
     // the popup's own padding would be cut off instead.
-    padding: space['0.5'],
+    padding: inset,
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
@@ -82,7 +86,7 @@ export const viewport = stylex.create({
 
 export const item = stylex.create({
   base: {
-    borderRadius: '0.375rem',
+    borderRadius: itemRadius,
     borderStyle: 'none',
     gap: space['0.5'],
     outline: 'none',
@@ -92,7 +96,14 @@ export const item = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
+      },
+    },
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      ':is([data-active])': colorVars['--cl-color-foreground'],
+      '@media (hover: hover)': {
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
@@ -102,7 +113,7 @@ export const item = stylex.create({
     flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
     outlineOffset: 0,
@@ -123,7 +134,7 @@ export const item = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-negative-alpha-200'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-negative-alpha-200'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -153,12 +164,23 @@ export const label = stylex.create({
   },
 });
 
+export const indicator = stylex.create({
+  base: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['4'],
+  },
+});
+
 export const separator = stylex.create({
   base: {
     // Full-bleed across the popup: cancel the viewport's inline padding.
     marginBlock: space['0.5'],
-    marginInline: `calc(-1 * ${space['0.5']})`,
-    backgroundColor: colorVars['--cl-color-border'],
+    marginInline: `calc(-1 * ${inset})`,
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     blockSize: '1px',
     flexShrink: 0,
   },

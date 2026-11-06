@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const Grip = glyph(
+  'grip',
   <path
     d='M2 8H14M2 4H14M2 12H14'
     stroke='currentColor'

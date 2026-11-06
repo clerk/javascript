@@ -98,7 +98,7 @@ test.describe('resource-based route protection @nuxt', () => {
   });
 
   test('guard API route with resource-based auth check', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
 

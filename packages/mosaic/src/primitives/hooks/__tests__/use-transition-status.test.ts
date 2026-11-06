@@ -33,19 +33,19 @@ describe('useTransitionStatus', () => {
   }
 
   it('returns mounted=false and status=undefined when open=false', () => {
-    const { result } = renderHook(() => useTransitionStatus(false));
+    const { result } = renderHook(() => useTransitionStatus({ open: false }));
     expect(result.current.mounted).toBe(false);
     expect(result.current.transitionStatus).toBeUndefined();
   });
 
-  it("returns mounted=true and status='starting' when open=true", () => {
-    const { result } = renderHook(() => useTransitionStatus(true));
+  it('mounts initially open content without an entrance by default', () => {
+    const { result } = renderHook(() => useTransitionStatus({ open: true }));
     expect(result.current.mounted).toBe(true);
-    expect(result.current.transitionStatus).toBe('starting');
+    expect(result.current.transitionStatus).toBeUndefined();
   });
 
   it('synchronously sets mounted and starting when open flips true', () => {
-    const { result, rerender } = renderHook(({ open }) => useTransitionStatus(open), {
+    const { result, rerender } = renderHook(({ open }) => useTransitionStatus({ open }), {
       initialProps: { open: false },
     });
     expect(result.current.mounted).toBe(false);
@@ -58,7 +58,7 @@ describe('useTransitionStatus', () => {
   });
 
   it('clears starting status after one rAF', () => {
-    const { result } = renderHook(() => useTransitionStatus(true));
+    const { result } = renderHook(() => useTransitionStatus({ open: true, animateOnMount: true }));
     expect(result.current.transitionStatus).toBe('starting');
 
     act(() => flushRaf());
@@ -67,10 +67,10 @@ describe('useTransitionStatus', () => {
   });
 
   it('sets ending status synchronously when open flips false', () => {
-    const { result, rerender } = renderHook(({ open }) => useTransitionStatus(open), {
+    const { result, rerender } = renderHook(({ open }) => useTransitionStatus({ open }), {
       initialProps: { open: true },
     });
-    act(() => flushRaf()); // clear starting
+    act(() => flushRaf());
 
     rerender({ open: false });
 
@@ -79,7 +79,7 @@ describe('useTransitionStatus', () => {
   });
 
   it('stays mounted until setMounted(false) is called', () => {
-    const { result, rerender } = renderHook(({ open }) => useTransitionStatus(open), {
+    const { result, rerender } = renderHook(({ open }) => useTransitionStatus({ open }), {
       initialProps: { open: true },
     });
     act(() => flushRaf());
@@ -92,7 +92,7 @@ describe('useTransitionStatus', () => {
   });
 
   it('clears transitionStatus when unmounted', () => {
-    const { result, rerender } = renderHook(({ open }) => useTransitionStatus(open), {
+    const { result, rerender } = renderHook(({ open }) => useTransitionStatus({ open }), {
       initialProps: { open: true },
     });
     act(() => flushRaf());
@@ -105,7 +105,7 @@ describe('useTransitionStatus', () => {
   });
 
   it('handles rapid open→close before rAF fires', () => {
-    const { result, rerender } = renderHook(({ open }) => useTransitionStatus(open), {
+    const { result, rerender } = renderHook(({ open }) => useTransitionStatus({ open }), {
       initialProps: { open: false },
     });
 
@@ -122,5 +122,18 @@ describe('useTransitionStatus', () => {
     // The rAF from opening should be cancelled, not interfere
     act(() => flushRaf());
     expect(result.current.transitionStatus).toBe('ending');
+  });
+
+  it('does not replay an entrance when the mount option changes', () => {
+    const { result, rerender } = renderHook(
+      ({ animateOnMount }) => useTransitionStatus({ open: true, animateOnMount }),
+      {
+        initialProps: { animateOnMount: false },
+      },
+    );
+
+    rerender({ animateOnMount: true });
+
+    expect(result.current.transitionStatus).toBeUndefined();
   });
 });

@@ -1,8 +1,10 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { axe } from '../test-utils/axe';
 import { Tabs } from './index';
 
@@ -27,6 +29,42 @@ function renderTabs(props: Partial<React.ComponentProps<typeof Tabs.Root>> = {})
 }
 
 describe('Tabs', () => {
+  describe('item registration', () => {
+    it('leaves a standalone trigger inside the list out of keyboard navigation', async () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Trigger value='tab2'>Settings</Tabs.Trigger>
+            <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      screen.getByRole('tab', { name: 'Account' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(screen.getByRole('tab', { name: 'Billing' })).toHaveFocus();
+    });
+
+    it('keeps a tab in keyboard navigation when its role is overridden', async () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab
+              value='tab2'
+              role='button'
+            >
+              Settings
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      screen.getByRole('tab', { name: 'Account' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(screen.getByRole('button', { name: 'Settings' })).toHaveFocus();
+    });
+  });
+
   describe('ARIA attributes', () => {
     it('list has role=tablist', () => {
       renderTabs();
@@ -104,7 +142,7 @@ describe('Tabs', () => {
     it('shows selected panel content', () => {
       renderTabs();
       expect(screen.getByText('Account content')).toBeVisible();
-      expect(screen.getByText('Settings content')).not.toBeVisible();
+      expect(screen.queryByText('Settings content')).not.toBeInTheDocument();
     });
 
     it('selects tab on click', async () => {
@@ -208,7 +246,7 @@ describe('Tabs', () => {
     it('follows the visual order of arrow keys in RTL', async () => {
       const user = userEvent.setup();
       render(
-        <div dir='rtl'>
+        <DirectionProvider direction='rtl'>
           <Tabs.Root defaultValue='tab2'>
             <Tabs.List>
               <Tabs.Tab value='tab1'>Account</Tabs.Tab>
@@ -219,7 +257,7 @@ describe('Tabs', () => {
             <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
             <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
           </Tabs.Root>
-        </div>,
+        </DirectionProvider>,
       );
 
       await user.click(screen.getByText('Settings'));
@@ -228,6 +266,28 @@ describe('Tabs', () => {
 
       await user.keyboard('{ArrowRight}');
       expect(document.activeElement).toBe(screen.getByText('Settings'));
+    });
+
+    it('follows a direction change while a tab has focus', async () => {
+      const user = userEvent.setup();
+      const tabs = (direction: 'ltr' | 'rtl') => (
+        <DirectionProvider direction={direction}>
+          <Tabs.Root defaultValue='tab2'>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.Root>
+        </DirectionProvider>
+      );
+      const { rerender } = render(tabs('ltr'));
+
+      await user.click(screen.getByText('Settings'));
+      rerender(tabs('rtl'));
+      await user.keyboard('{ArrowLeft}');
+
+      expect(document.activeElement).toBe(screen.getByText('Billing'));
     });
 
     it('uses ArrowDown/ArrowUp for vertical orientation', async () => {
@@ -517,6 +577,12 @@ describe('Tabs', () => {
       expect(screen.getByText('Billing')).toHaveAttribute('tabindex', '-1');
     });
 
+    it('puts the tab stop on a selected tab that is not first', () => {
+      renderTabs({ defaultValue: 'tab2' });
+      expect(screen.getByText('Settings')).toHaveAttribute('tabindex', '0');
+      expect(screen.getByText('Account')).toHaveAttribute('tabindex', '-1');
+    });
+
     it('tabIndex updates when selection changes', async () => {
       const user = userEvent.setup();
       renderTabs();
@@ -578,16 +644,173 @@ describe('Tabs', () => {
     it('marks deselected panels inert and leaves the selected panel interactive', () => {
       renderTabs({ defaultValue: 'tab1' });
 
-      const selected = screen.getByText('Account content');
-      const deselected = screen.getByText('Settings content');
+      const [selected, deselected] = screen.getAllByRole('tabpanel', { hidden: true });
 
       expect(selected).not.toHaveAttribute('inert');
       expect(deselected).toHaveAttribute('inert');
     });
   });
 
+  describe('panel children', () => {
+    function mockAnimations() {
+      let finish = () => {};
+      const finished = new Promise<void>(resolve => {
+        finish = resolve;
+      });
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [{ finished }];
+      return {
+        finish: () =>
+          act(async () => {
+            finish();
+            await finished;
+          }),
+        restore: () => {
+          if (original) {
+            (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+          } else {
+            delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+          }
+        },
+      };
+    }
+
+    it('renders every panel element but only the selected panel children', () => {
+      renderTabs();
+
+      expect(screen.getAllByRole('tabpanel', { hidden: true })).toHaveLength(3);
+      expect(screen.getByText('Account content')).toBeVisible();
+      expect(screen.queryByText('Settings content')).not.toBeInTheDocument();
+      expect(screen.queryByText('Billing content')).not.toBeInTheDocument();
+    });
+
+    it('swaps children when the selection changes', async () => {
+      const user = userEvent.setup();
+      renderTabs();
+
+      await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+      expect(screen.getByText('Settings content')).toBeVisible();
+      expect(screen.queryByText('Account content')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('tabpanel', { hidden: true })[0]).toHaveAttribute('hidden');
+    });
+
+    it('keeps the leaving panel visible with its children until its exit animation finishes', async () => {
+      const user = userEvent.setup();
+      renderTabs();
+      const [leaving] = screen.getAllByRole('tabpanel', { hidden: true });
+      const animations = mockAnimations();
+      try {
+        await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+        expect(leaving).toHaveAttribute('data-ending-style');
+        expect(leaving).toHaveAttribute('inert');
+        expect(leaving).not.toHaveAttribute('hidden');
+        expect(screen.getByText('Account content')).toBeInTheDocument();
+
+        await animations.finish();
+
+        expect(leaving).toHaveAttribute('hidden');
+        expect(screen.queryByText('Account content')).not.toBeInTheDocument();
+      } finally {
+        animations.restore();
+      }
+    });
+
+    it('marks a newly selected panel with data-starting-style, but not the initial one', () => {
+      function Controlled({ value }: { value: string }) {
+        return (
+          <Tabs.Root value={value}>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+          </Tabs.Root>
+        );
+      }
+      const view = render(<Controlled value='tab1' />);
+      const [first, second] = screen.getAllByRole('tabpanel', { hidden: true });
+      expect(first).not.toHaveAttribute('data-starting-style');
+
+      view.rerender(<Controlled value='tab2' />);
+
+      expect(second).toHaveAttribute('data-starting-style');
+      expect(second.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
+    });
+
+    it('renders children before selection with keepMounted', () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+          <Tabs.Panel
+            value='tab2'
+            keepMounted
+          >
+            Settings content
+          </Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      expect(screen.getByText('Settings content')).not.toBeVisible();
+    });
+
+    it('holds the leaving panel content while its exit animation runs', async () => {
+      function Controlled() {
+        const [value, setValue] = useState('tab1');
+        return (
+          <Tabs.Root
+            value={value}
+            onValueChange={setValue}
+          >
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account for {value}</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+          </Tabs.Root>
+        );
+      }
+      const user = userEvent.setup();
+      render(<Controlled />);
+      const animations = mockAnimations();
+      try {
+        await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+        expect(screen.getByText('Account for tab1')).toBeInTheDocument();
+        expect(screen.queryByText('Account for tab2')).not.toBeInTheDocument();
+
+        await animations.finish();
+      } finally {
+        animations.restore();
+      }
+    });
+
+    it('server-renders only the selected panel children', () => {
+      const html = renderToString(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+          <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      expect(html).toContain('Account content');
+      expect(html).not.toContain('Settings content');
+    });
+  });
+
   describe('transition direction', () => {
-    function renderForceMounted() {
+    function renderTwoTabs() {
       return render(
         <Tabs.Root
           defaultValue='tab1'
@@ -597,27 +820,17 @@ describe('Tabs', () => {
             <Tabs.Tab value='tab1'>One</Tabs.Tab>
             <Tabs.Tab value='tab2'>Two</Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel
-            value='tab1'
-            shouldForceMount
-          >
-            One content
-          </Tabs.Panel>
-          <Tabs.Panel
-            value='tab2'
-            shouldForceMount
-          >
-            Two content
-          </Tabs.Panel>
+          <Tabs.Panel value='tab1'>One content</Tabs.Panel>
+          <Tabs.Panel value='tab2'>Two content</Tabs.Panel>
         </Tabs.Root>,
       );
     }
 
     it('does not flip direction backward when re-selecting the active tab', async () => {
       const user = userEvent.setup();
-      renderForceMounted();
+      renderTwoTabs();
 
-      const panel = screen.getByText('Two content');
+      const panel = screen.getAllByRole('tabpanel', { hidden: true })[1];
 
       // Moving forward to tab2 sets direction = 1.
       await user.click(screen.getByRole('tab', { name: 'Two' }));
@@ -626,6 +839,66 @@ describe('Tabs', () => {
       // Re-selecting the already-active tab must not flip direction to -1.
       await user.click(screen.getByRole('tab', { name: 'Two' }));
       expect(panel.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
+    });
+  });
+
+  it('forwards a ref to the list', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Tabs.Root defaultValue='tab1'>
+        <Tabs.List ref={ref}>
+          <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('tablist'));
+  });
+
+  describe('consumer key handlers', () => {
+    function HandlerTabs({ onTab, onParent }: { onTab?: (key: string) => void; onParent?: (key: string) => void }) {
+      return (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- Test host; the keys come from the focusable items inside it.
+        <div onKeyDown={event => onParent?.(event.key)}>
+          <Tabs.Root defaultValue='a'>
+            <Tabs.List>
+              <Tabs.Tab
+                value='a'
+                onKeyDown={event => onTab?.(event.key)}
+              >
+                A
+              </Tabs.Tab>
+              <Tabs.Tab value='b'>B</Tabs.Tab>
+              <Tabs.Tab value='c'>C</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.Root>
+        </div>
+      );
+    }
+
+    it('calls a tab onKeyDown for navigation keys', async () => {
+      const onTab = vi.fn();
+      render(<HandlerTabs onTab={onTab} />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(onTab).toHaveBeenCalledWith('ArrowRight');
+      expect(screen.getByRole('tab', { name: 'B' })).toHaveFocus();
+    });
+
+    it('stops arrows at the list but lets End reach a parent', async () => {
+      const onParent = vi.fn();
+      render(<HandlerTabs onParent={onParent} />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(onParent).not.toHaveBeenCalled();
+      await userEvent.keyboard('{End}');
+      expect(onParent).toHaveBeenCalledWith('End');
+    });
+
+    it.each(['{Shift>}', '{Control>}', '{Meta>}', '{Alt>}'])('moves with %s held', async modifier => {
+      render(<HandlerTabs />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard(`${modifier}{ArrowRight}`);
+      expect(screen.getByRole('tab', { name: 'B' })).toHaveFocus();
     });
   });
 });

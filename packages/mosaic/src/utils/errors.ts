@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import type { ClerkAPIError } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
@@ -85,6 +85,11 @@ export async function save<TField extends string = never>(
   try {
     await run();
   } catch (cause) {
+    // A cancelled reverification is the user backing out, not a failure to show, so it passes
+    // through for the owner to recognise.
+    if (isReverificationCancelledError(cause)) {
+      throw cause;
+    }
     const formError = toClerkFormError(cause, fields, params);
     if (!formError) {
       throw cause;
@@ -109,11 +114,19 @@ export function toLocalizableError(cause: unknown): ErrorDescription {
   return { cause };
 }
 
+export function toLocalizableErrors(cause: unknown): ErrorDescription[] {
+  const errors =
+    cause instanceof SaveError
+      ? [cause.formError.global, ...Object.values(cause.formError.fields ?? {})].filter(error => error !== undefined)
+      : toClerkErrors(cause);
+  return errors?.length ? errors : [toLocalizableError(cause)];
+}
+
 /** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */
 export function toFormError(cause: unknown): FormError {
   if (cause instanceof SaveError) {
     const { global, fields } = cause.formError;
-    return { global, fields };
+    return global || fields ? { global, fields } : { global: UNEXPECTED_ERROR };
   }
   console.error('[Clerk] Could not localize error', cause);
   return { global: UNEXPECTED_ERROR };

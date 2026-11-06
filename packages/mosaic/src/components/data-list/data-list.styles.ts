@@ -4,12 +4,12 @@ import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../
 
 export const list = stylex.create({
   base: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-lg'],
     borderStyle: 'solid',
     borderWidth: '1px',
     paddingInline: space['3'],
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
@@ -25,7 +25,7 @@ export const item = stylex.create({
     justifyContent: 'space-between',
   },
   divided: {
-    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndColor: colorVars['--cl-color-border-subtle'],
     borderBlockEndStyle: 'solid',
     borderBlockEndWidth: {
       default: '1px',

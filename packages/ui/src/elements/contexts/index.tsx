@@ -123,6 +123,7 @@ export type FlowMetadata = {
     | 'phoneCode2Fa'
     | 'totp2Fa'
     | 'backupCode2Fa'
+    | 'passkey2Fa'
     | 'password'
     | 'resetPassword'
     | 'emailLink'

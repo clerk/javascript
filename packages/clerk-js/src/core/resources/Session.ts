@@ -1,11 +1,12 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import { isValidBrowserOnline } from '@clerk/shared/browser';
 import {
   ClerkOfflineError,
   ClerkRuntimeError,
   ClerkWebAuthnError,
   is4xxError,
   is429Error,
+  isClerkAPIResponseError,
   MissingExpiredTokenError,
 } from '@clerk/shared/error';
 import {
@@ -37,23 +38,28 @@ import type {
   SessionVerifyCreateParams,
   SessionVerifyPrepareFirstFactorParams,
   SessionVerifyPrepareSecondFactorParams,
+  SessionVerifyWithPasskeyParams,
   TokenResource,
   UserResource,
 } from '@clerk/shared/types';
+import { timeLimit } from '@clerk/shared/utils';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
+import { inBrowser } from '@/utils';
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
 import { getTabState, isTabFocused } from '@/utils/isTabFocused';
 import { TokenId } from '@/utils/tokenId';
 
-import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
+import { clerkInvalidStrategy, clerkInvalidVerificationLevel, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
+
+const TOKEN_REQUEST_TIMEOUT_MS = 10_000;
 
 const focusedRefresh = (onRefresh: () => void): { onRefresh?: () => void } =>
   isTabFocused() === false ? {} : { onRefresh };
@@ -192,8 +198,8 @@ export class Session extends BaseResource implements SessionResource {
 
       return result;
     } catch (error) {
-      // If the browser is offline after retries, throw ClerkOfflineError
-      if (!isValidBrowserOnline()) {
+      // If FAPI fetch fails and the browser is offline after retries, throw ClerkOfflineError
+      if (!isClerkAPIResponseError(error) && !isValidBrowserOnline()) {
         throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
       }
       throw error;
@@ -324,10 +330,29 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
-  verifyWithPasskey = async (): Promise<SessionVerificationResource> => {
-    const prepareResponse = await this.prepareFirstFactorVerification({ strategy: 'passkey' });
+  /**
+   * Initiates a reverification flow using passkeys.
+   *
+   * By default the passkey verifies the first factor. Pass `{ level: 'second_factor' }` to satisfy
+   * the second factor of an in-progress multi-factor reverification instead. Any other `level`
+   * value is rejected.
+   *
+   * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails.
+   * @returns A `SessionVerification` instance with its status and supported factors.
+   */
+  verifyWithPasskey = async (params?: SessionVerifyWithPasskeyParams): Promise<SessionVerificationResource> => {
+    const level = params?.level ?? 'first_factor';
+    if (level !== 'first_factor' && level !== 'second_factor') {
+      clerkInvalidVerificationLevel('Session.verifyWithPasskey', level);
+    }
 
-    const { nonce = null } = prepareResponse.firstFactorVerification;
+    const prepareResponse =
+      level === 'second_factor'
+        ? await this.prepareSecondFactorVerification({ strategy: 'passkey' })
+        : await this.prepareFirstFactorVerification({ strategy: 'passkey' });
+
+    const { nonce = null } =
+      level === 'second_factor' ? prepareResponse.secondFactorVerification : prepareResponse.firstFactorVerification;
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -357,6 +382,13 @@ export class Session extends BaseResource implements SessionResource {
       throw error;
     }
 
+    if (level === 'second_factor') {
+      return this.attemptSecondFactorVerification({
+        strategy: 'passkey',
+        publicKeyCredential,
+      });
+    }
+
     return this.attemptFirstFactorVerification({
       strategy: 'passkey',
       publicKeyCredential,
@@ -380,11 +412,23 @@ export class Session extends BaseResource implements SessionResource {
   attemptSecondFactorVerification = async (
     attemptFactor: SessionVerifyAttemptSecondFactorParams,
   ): Promise<SessionVerificationResource> => {
+    let config;
+    switch (attemptFactor.strategy) {
+      case 'passkey': {
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+        };
+        break;
+      }
+      default:
+        config = { ...attemptFactor };
+    }
+
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
-        body: attemptFactor as any,
+        body: { ...config, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
@@ -466,15 +510,13 @@ export class Session extends BaseResource implements SessionResource {
     if (cacheResult) {
       // Proactive refresh is handled by timers scheduled in the cache
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
-      const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
+      const cachedToken = cacheResult.token ?? (await cacheResult.tokenResolver);
       // Only emit token updates when we have an actual token — emitting with an empty
       // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
       if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       result = cachedToken.getRawString() || null;
-    } else if (!isBrowserOnline()) {
-      throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
     } else {
       result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
     }
@@ -506,16 +548,32 @@ export class Session extends BaseResource implements SessionResource {
           ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
 
+    const createToken = (body: Record<string, string | null>, search?: Record<string, string>) => {
+      if (inBrowser()) {
+        return Token.create(path, body, search);
+      }
+      const controller = new AbortController();
+      return timeLimit(Token.create(path, body, search, controller.signal), TOKEN_REQUEST_TIMEOUT_MS, controller).catch(
+        e => {
+          if (controller.signal.aborted) {
+            throw new ClerkRuntimeError('The session token request timed out.', { code: 'network_error' });
+          }
+          throw e;
+        },
+      );
+    };
+    const search = skipCache ? { debug: 'skip_cache' } : undefined;
+
     if (sessionMinterEnabled) {
       // Session Minter sends the token in the body, no expired_token retry needed
-      return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
+      return createToken(params, search);
     }
 
     // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
     const lastActiveToken = this.lastActiveToken?.getRawString();
-    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    return createToken(params, search).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
-        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+        return createToken({ ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });

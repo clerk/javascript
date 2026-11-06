@@ -4,11 +4,16 @@ import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
+import { Skeleton } from '../../../components/skeleton';
 import { Text } from '../../../components/text';
+import { Clipboard } from '../../../icons/glyphs/clipboard';
+import { Download } from '../../../icons/glyphs/download';
 import { useMessages } from '../../../localization';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { reset } from '../../../styles/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';
+
+const PLACEHOLDER_CODE = 'xxxxxxxx';
 
 export interface UserProfileBackupCodesViewProps {
   onCancel: () => void;
@@ -33,7 +38,7 @@ export function UserProfileBackupCodesView({
   pendingAction,
   errorMessage,
 }: UserProfileBackupCodesViewProps) {
-  const m = useMessages('userProfileBackupCodes');
+  const m = useMessages('userProfile').mfa.backupCodes;
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const hasCodes = codes.length > 0 && pendingAction !== 'generate';
   const showSaveActions = hasCodes || pendingAction === 'generate';
@@ -83,10 +88,9 @@ export function UserProfileBackupCodesView({
                 aria-hidden='true'
                 {...stylex.props(reset.base, styles.cell)}
               >
-                <Text
-                  render={<span />}
-                  xstyle={styles.skeleton}
-                />
+                <Text render={<span />}>
+                  <Skeleton>{PLACEHOLDER_CODE}</Skeleton>
+                </Text>
               </div>
             ))}
           </div>
@@ -100,7 +104,6 @@ export function UserProfileBackupCodesView({
                 type='button'
                 variant='outline'
                 color='neutral'
-                fullWidth
                 disabled={!hasCodes}
                 onClick={onPrint}
               >
@@ -111,14 +114,13 @@ export function UserProfileBackupCodesView({
               type='button'
               variant='outline'
               color='neutral'
-              fullWidth
               isPending={pendingAction === 'download'}
               disabled={!hasCodes || pendingAction === 'copy'}
               pendingLabel={m.downloading}
               onClick={onDownload}
             >
               <Icon
-                name='download'
+                glyph={Download}
                 placement='inline-start'
               />
               {m.download}
@@ -129,7 +131,6 @@ export function UserProfileBackupCodesView({
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             disabled={Boolean(pendingAction)}
             onClick={onBack ?? onCancel}
           >
@@ -138,7 +139,6 @@ export function UserProfileBackupCodesView({
         )}
         <SubmitButton
           type='button'
-          fullWidth
           isPending={pendingAction === 'copy'}
           disabled={showSaveActions && (!hasCodes || pendingAction === 'download')}
           focusableWhenDisabled
@@ -148,7 +148,7 @@ export function UserProfileBackupCodesView({
         >
           {showSaveActions ? (
             <Icon
-              name='clipboard'
+              glyph={Clipboard}
               placement='inline-start'
             />
           ) : null}

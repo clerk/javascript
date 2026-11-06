@@ -79,6 +79,7 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
 
   // Latest options, read at event time so the handlers can stay referentially stable.
   const cfg = useRef(opts);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   cfg.current = opts;
 
   // Record when the drawer opened so the grace window can suppress drag while the
@@ -114,9 +115,11 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     // scroll, so a stale value would drag the sheet where a list should have scrolled.
     cfg.current.setSwipe(0);
     cfg.current.setVar(DrawerCssVars.swipeProgress, '0');
+    // eslint-disable-next-line react/set-state-in-effect -- Clear dragging state when the drawer closes.
     setIsDragging(false);
   }, [open]);
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
   const shouldDrag = useCallback((target: EventTarget | null, down: boolean): boolean => {
     if (!isElement(target)) {
       return false;

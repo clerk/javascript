@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { clerkApiError } from '../../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { SaveError } from '../../../../utils/errors';
+import type { ReverificationController } from '../../../reverification';
 import { useUserProfilePhoneSectionController } from '../user-profile-phone-section.controller';
 import type { ReadyPhoneSectionModel } from '../user-profile-phone-section.types';
 import { UserProfilePhoneSectionView } from '../user-profile-phone-section.view';
@@ -13,14 +14,26 @@ import { UserProfilePhoneSectionView } from '../user-profile-phone-section.view'
 const phoneVerifier = { sendCode: () => Promise.resolve(), verifyCode: () => Promise.resolve() };
 
 type PhoneSectionProps = Partial<Omit<ReadyPhoneSectionModel, 'status' | 'userId'>>;
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
 
 function PhoneSection({
   phones = [{ id: 'phone_1', value: '+18015550100', isDefault: false, isVerified: true }],
   getPhoneVerifier = () => phoneVerifier,
   onSetPrimaryPhone = () => Promise.resolve(),
+  removeReverification = idleReverification,
+  setPrimaryReverification = idleReverification,
+  createReverification = idleReverification,
   ...rest
 }: PhoneSectionProps) {
-  const controller = useUserProfilePhoneSectionController({ phones, getPhoneVerifier, onSetPrimaryPhone, ...rest });
+  const controller = useUserProfilePhoneSectionController({
+    phones,
+    getPhoneVerifier,
+    onSetPrimaryPhone,
+    removeReverification,
+    setPrimaryReverification,
+    createReverification,
+    ...rest,
+  });
   return <UserProfilePhoneSectionView {...controller} />;
 }
 
@@ -33,19 +46,13 @@ function renderPhone(overrides: PhoneSectionProps = {}) {
 }
 
 describe('phone actions', () => {
-  it('ignores backdrop clicks and allows Escape to cancel removal', async () => {
+  it('keeps the phone when removal is canceled with Escape', async () => {
     const user = userEvent.setup();
     const onRemovePhone = vi.fn();
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
     const dialog = screen.getByRole('alertdialog', { name: 'Remove phone number?' });
-    const backdrop = document.querySelector('.cl-dialog-backdrop');
-    if (!backdrop) {
-      throw new Error('Expected a dialog backdrop');
-    }
-    await user.click(backdrop);
-    expect(dialog).toBeInTheDocument();
     await user.keyboard('{Escape}');
     await waitFor(() => expect(dialog).not.toBeInTheDocument());
     expect(onRemovePhone).not.toHaveBeenCalled();
@@ -124,7 +131,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(screen.getByText('Primary')).toBeInTheDocument();
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Manage +1 (801) 555-0100' })).not.toBeInTheDocument();
   });
 
@@ -139,7 +146,7 @@ describe('phone actions', () => {
     expect(onRemovePhone).not.toHaveBeenCalled();
   });
 
-  it('keeps the phone when removal is canceled with Escape', async () => {
+  it('keeps the phone when removal opened from the keyboard is canceled with Escape', async () => {
     const user = userEvent.setup();
     const onRemovePhone = vi.fn();
     renderPhone({
@@ -221,7 +228,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledExactlyOnceWith('phone_1');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Not verified yet.'));
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('shows the generic message and logs a primary update that threw unexpectedly', async () => {
@@ -234,7 +241,6 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
-    log.mockRestore();
   });
   it('requires confirmation before removing a phone number', async () => {
     const user = userEvent.setup();
@@ -312,5 +318,25 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
     expect(getPhoneVerifier).toHaveBeenCalledExactlyOnceWith('phone_unverified');
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('returns focus to the row that opened verification when the dialog closes', async () => {
+    const user = userEvent.setup();
+    renderPhone({
+      phones: [
+        { id: 'phone_1', value: '+18015550100', isDefault: true, isVerified: true },
+        { id: 'phone_2', value: '+18015550101', isDefault: false, isVerified: false },
+      ],
+    });
+    const trigger = screen.getByRole('button', { name: 'Manage +1 (801) 555-0101' });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
+    expect(await screen.findByRole('dialog', { name: 'Verify your phone number' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 });

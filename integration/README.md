@@ -246,7 +246,7 @@ In this step-by-step instruction you'll learn how to create a new integration te
      });
 
      test('your test', async ({ page, context }) => {
-       const u = createTestUtils({ app, page, context });
+       const u = await createTestUtils({ app, page, context });
 
        // Your tests
      });
@@ -271,7 +271,7 @@ If you need a fake user to login to the test site, use `createTestUtils`.
      test.beforeAll(async () => {
        // ...
 
-       const m = createTestUtils({ app });
+       const m = await createTestUtils({ app });
        fakeUser = m.services.users.createFakeUser(test);
        await m.services.users.createBapiUser(fakeUser);
      });
@@ -302,7 +302,7 @@ If you need a fake user to login to the test site, use `createTestUtils`.
      });
 
      test('can sign in', async ({ page, context }) => {
-       const u = createTestUtils({ app, page, context });
+       const u = await createTestUtils({ app, page, context });
        await u.po.signIn.goTo();
        await u.po.signIn.waitForMounted();
        await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -628,7 +628,7 @@ The `createTestUtils` helper is the main abstraction you'll be using while writi
 
 ```ts
 test('...', async ({ page, context }) => {
-  const u = createTestUtils({ app, page, context, browser });
+  const u = await createTestUtils({ app, page, context, browser });
   await u.po.signUp.goTo();
 });
 ```

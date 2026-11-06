@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useAccessibleDescriptionWarning } from '../../hooks/use-accessible-description-warning';
 import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
+import { X } from '../../icons/glyphs/x';
 import type {
   DialogFocusTarget,
   DialogHandle,
@@ -10,10 +11,12 @@ import type {
   DialogRole,
 } from '../../primitives/dialog';
 import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
+import type { TriggerPayloadRequirement } from '../../primitives/dialog/dialog-trigger';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
+import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';
 import {
@@ -28,16 +31,21 @@ import {
   viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
+import { guardKeyboardFocus } from './keyboard-focus';
 import { acquireKeyboardInset } from './keyboard-inset';
 import { guardKeyboardTouch } from './keyboard-touch';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
- * card's width, `profile` a `Profile` filling the height. Not a `size`, because these are
- * different surfaces rather than one surface at two widths — a second card width would be a size
- * of the `card` variant.
+ * card's width, `profile` a `Profile` filling the height, `fullscreen` a `Profile` filling the
+ * viewport. Not a `size`, because these are different surfaces rather than one surface at two
+ * widths — a second card width would be a size of the `card` variant.
  */
 export type DialogVariant = keyof typeof variants;
+
+function holdsProfile(variant: DialogVariant): boolean {
+  return variant !== 'card';
+}
 
 /**
  * Where the surface sits in the compact band — a window under `40rem`. `center`
@@ -74,9 +82,13 @@ export interface DialogContextValue {
    * the one way out an alert must not offer.
    */
   role: DialogRole;
+  /** Whether `Card.Header` renders its dismiss. From `showCloseButton` on the root. */
+  showCloseButton: boolean;
 }
 
 export const DialogContext = React.createContext<DialogContextValue | null>(null);
+
+const ShowCloseButtonContext = React.createContext(true);
 
 /**
  * In a dialog, as opposed to standalone. A surface that can be rendered either way — `Card`,
@@ -105,7 +117,7 @@ export type DialogTriggerProps<Payload = unknown> = MosaicComponentProps<'button
    * children-as-function receives it as `{ payload }`.
    */
   payload?: Payload;
-};
+} & TriggerPayloadRequirement<Payload>;
 export type DialogCloseProps = MosaicComponentProps<'button'>;
 export interface DialogCloseButtonProps extends MosaicComponentProps<'button'> {
   /**
@@ -136,36 +148,60 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
 type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 'closedBy'>;
 
 /**
- * `role` is the whole dismissal API: it decides how the dialog announces itself AND what closes it,
- * with no prop to contradict either.
+ * `role` decides how the dialog announces itself; `shouldCloseOnInteractOutside` decides whether
+ * an outside press closes it; `showCloseButton` decides whether the surface renders its dismiss.
+ * Escape always closes.
  *
  * - `alertdialog` announces as an interruption rather than as a surface the user navigated to, and
- *   cannot be dismissed by an outside press. A dialog asking a question it needs an answer to must
- *   not be answerable by clicking next to it. Escape still closes, which is the keyboard's
- *   equivalent of the cancel button that is always present;
- * - `dialog` dismisses on an outside press as well.
+ *   never closes on an outside press. A dialog asking a question it needs an answer to must not be
+ *   answerable by clicking next to it. Escape is the keyboard's equivalent of the cancel button
+ *   that is always present;
+ * - `dialog` closes on an outside press unless `shouldCloseOnInteractOutside` is `false`, for a
+ *   task an accidental press would throw away, such as entering a verification code.
  *
  * It says nothing about the variant: an alert is a `Card` like every other dialog.
  */
-export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> & {
-  /** The popup's ARIA role, and with it what dismisses the dialog. @default 'dialog' */
-  role?: DialogRole;
-};
+export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
+  (
+    | {
+        /** The popup's ARIA role. @default 'dialog' */
+        role?: 'dialog';
+        /** Whether an outside press closes the dialog. @default true */
+        shouldCloseOnInteractOutside?: boolean;
+        /** Whether the surface renders its dismiss. @default true */
+        showCloseButton?: boolean;
+      }
+    | {
+        role: 'alertdialog';
+        shouldCloseOnInteractOutside?: false;
+        /** Whether the surface renders its dismiss, for a step past the question. @default false */
+        showCloseButton?: boolean;
+      }
+  );
 
 /** Owns the open state and the decisions — role, dismissal — every part reads. */
-function Root<Payload = unknown>({ role = 'dialog', children, ...rest }: DialogRootProps<Payload>) {
+function Root<Payload = unknown>({
+  role = 'dialog',
+  shouldCloseOnInteractOutside = role === 'dialog',
+  showCloseButton = role === 'dialog',
+  children,
+  ...rest
+}: DialogRootProps<Payload>) {
   return (
-    <Primitive.Root<Payload>
-      {...rest}
-      role={role}
-      closedBy={role === 'alertdialog' ? 'closerequest' : 'any'}
-    >
-      {children}
-    </Primitive.Root>
+    <ShowCloseButtonContext.Provider value={showCloseButton}>
+      <Primitive.Root<Payload>
+        {...rest}
+        role={role}
+        closedBy={shouldCloseOnInteractOutside ? 'any' : 'closerequest'}
+      >
+        {children}
+      </Primitive.Root>
+    </ShowCloseButtonContext.Provider>
   );
 }
 
 /** Opens the dialog. Renders a `<button>`; `render` swaps in another element. */
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
 const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger(
   { xstyle, ...rest },
   ref,
@@ -191,8 +227,8 @@ const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function Dia
 });
 
 /**
- * Warns when the corner dismiss is rendered inside an alert dialog, where a corner X is a way out
- * without answering the question.
+ * Warns when the corner dismiss is rendered inside an alert dialog that has not opted in with
+ * `showCloseButton`, where a corner X is a way out without answering the question.
  */
 function useCloseButtonWarning(isAlert: boolean) {
   React.useEffect(() => {
@@ -219,9 +255,10 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
   ref,
 ) {
   const surface = React.useContext(DialogContext);
+  const showCloseButton = React.useContext(ShowCloseButtonContext);
   const { role } = useHeadlessDialogContext();
   const variant = surface?.variant ?? 'card';
-  useCloseButtonWarning(role === 'alertdialog');
+  useCloseButtonWarning(role === 'alertdialog' && !showCloseButton);
   return (
     <span {...stylex.props(styles.closeButton, closeInsets[variant])}>
       <Primitive.Close
@@ -229,6 +266,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         aria-label={ariaLabel}
         render={props => (
           <Button
+            color='neutral'
             variant='ghost'
             shape='circle'
             size='sm'
@@ -237,7 +275,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         )}
         {...mergeStyleProps(themeProps('dialog-close-button'), stylex.props(xstyle), rest)}
       >
-        <Icon name='x' />
+        <Icon glyph={X} />
       </Primitive.Close>
     </span>
   );
@@ -280,6 +318,7 @@ function Viewport({
   const trackRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => acquireKeyboardInset(), []);
   React.useEffect(() => (trackRef.current ? guardKeyboardTouch(trackRef.current) : undefined), []);
+  React.useEffect(() => (trackRef.current ? guardKeyboardFocus(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
       overlay
@@ -317,11 +356,11 @@ function Viewport({
  */
 function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVariant) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || variant !== 'profile') {
+    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || !holdsProfile(variant)) {
       return;
     }
     console.warn(
-      '[Clerk] a variant="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.',
+      `[Clerk] a variant="${variant}" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.`,
     );
   }, [isNestedInDialog, variant]);
 }
@@ -336,14 +375,14 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
   React.useEffect(() => {
     if (
       process.env.NODE_ENV === 'production' ||
-      variant !== 'profile' ||
+      !holdsProfile(variant) ||
       placement === undefined ||
       placement === 'center'
     ) {
       return;
     }
     console.warn(
-      `[Clerk] <Dialog.Popup variant="profile" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
+      `[Clerk] <Dialog.Popup variant="${variant}" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
     );
   }, [variant, placement]);
 }
@@ -362,20 +401,21 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // The headless flag, not the stack check below — the variant rule is about opening a dialog inside
   // ANY dialog, which is broader than the card-on-card case the stacking styles cover.
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
+  const showCloseButton = React.useContext(ShowCloseButtonContext);
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
-  const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : (compactPlacementProp ?? 'sheet');
+  const compactPlacement: DialogCompactPlacement = holdsProfile(variant) ? 'center' : (compactPlacementProp ?? 'sheet');
   useCompactPlacementWarning(variant, compactPlacementProp);
   useNestedVariantWarning(isNestedInDialog, variant);
 
   const surface = React.useMemo(
-    () => ({ labelId, descriptionId, variant, role }),
-    [labelId, descriptionId, variant, role],
+    () => ({ labelId, descriptionId, variant, role, showCloseButton }),
+    [labelId, descriptionId, variant, role, showCloseButton],
   );
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog', variant === 'profile' ? 'Profile.Title' : 'Card.Title');
+  useAccessibleNameWarning(node, 'Dialog', holdsProfile(variant) ? 'Profile.Title' : 'Card.Title');
   // A name alone is enough for an ordinary dialog; an alert is announced as an interruption and
   // its description is what says which decision is being asked for.
   useAccessibleDescriptionWarning(isAlert ? node : null, 'Dialog', 'Card.Description');
@@ -437,7 +477,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Portal>{variant === 'profile' ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
+    <Primitive.Portal>
+      <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
+        {holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}
+      </ButtonContext.Provider>
+    </Primitive.Portal>
   );
 });
 
