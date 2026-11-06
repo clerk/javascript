@@ -86,7 +86,13 @@ export class Session {
       data.last_active_organization_id,
       data.latest_activity && SessionActivity.fromJSON(data.latest_activity),
       data.actor,
-      data.actor?.type === 'agent' ? (data.actor as AgentActClaim) : null,
+      data.actor?.type === 'agent'
+        ? {
+            sub: typeof data.actor.sub === 'string' ? data.actor.sub : '',
+            type: 'agent',
+            task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : '',
+          }
+        : null,
     );
   }
 }

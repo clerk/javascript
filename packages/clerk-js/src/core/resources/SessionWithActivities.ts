@@ -72,7 +72,14 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.latestActivity = mapSessionActivityJSONToSessionActivity(data.latest_activity ?? ({} as SessionActivityJSON));
     this.actor = data.actor;
-    this.agent = data.actor?.type === 'agent' ? (data.actor as AgentActClaim) : null;
+    this.agent =
+      data.actor?.type === 'agent'
+        ? {
+            sub: data.actor.sub,
+            type: 'agent',
+            task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : '',
+          }
+        : null;
     return this;
   }
 }

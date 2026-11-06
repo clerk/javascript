@@ -20,12 +20,20 @@ const build = (actor: SessionWithActivitiesJSON['actor']) =>
   );
 
 describe('SessionWithActivities', () => {
-  it('sets agent and keeps actor when the actor has type "agent"', () => {
-    const actor = { sub: 'agent_1', type: 'agent', task_id: 'task_1' };
+  it('sets agent to only sub, type and task_id and keeps the full actor when the actor has type "agent"', () => {
+    const actor = { sub: 'agent_1', type: 'agent', task_id: 'task_1', restricted: true };
     const session = build(actor as SessionWithActivitiesJSON['actor']);
 
     expect(session.actor).toEqual(actor);
-    expect(session.agent).toEqual(actor);
+    expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: 'task_1' });
+  });
+
+  it('sets agent task_id to an empty string when an agent actor has no task_id', () => {
+    const actor = { sub: 'agent_1', type: 'agent' };
+    const session = build(actor as SessionWithActivitiesJSON['actor']);
+
+    expect(session.actor).toEqual(actor);
+    expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: '' });
   });
 
   it('sets actor and a null agent for an impersonation session', () => {
