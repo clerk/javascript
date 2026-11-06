@@ -115,10 +115,14 @@ export interface RouterScopeOptions<Routes extends RouteTable> {
   // `route` below is never undefined, and because every owner's fallback is its base, two owners
   // of one base cannot redirect each other.
   root: RouteName<Routes>;
+  // Whether the table is settled. While false the scope reports no route and writes nothing, so an
+  // entry the table cannot match yet is kept until it can. Pass it when the routes depend on data
+  // that has not arrived, and handle the undefined route that comes with it.
+  ready?: boolean;
 }
 
-export interface RouterScope<Routes extends RouteTable> {
-  route: RouteName<Routes>;
+export interface RouterScope<Routes extends RouteTable, Name = RouteName<Routes>> {
+  route: Name;
   params: Record<string, string>;
   go: Router<Routes>['go'];
   scope: RoutingScope;
@@ -128,16 +132,27 @@ export interface RouterScope<Routes extends RouteTable> {
 // and it is the only router that redirects.
 export function useRouterScope<const Routes extends RouteTable>(
   routes: Routes,
-  { routing, path, root }: RouterScopeOptions<Routes>,
-): RouterScope<Routes> {
+  options: RouterScopeOptions<Routes> & { ready: boolean },
+): RouterScope<Routes, RouteName<Routes> | undefined>;
+export function useRouterScope<const Routes extends RouteTable>(
+  routes: Routes,
+  options: Omit<RouterScopeOptions<Routes>, 'ready'>,
+): RouterScope<Routes>;
+export function useRouterScope<const Routes extends RouteTable>(
+  routes: Routes,
+  { routing, path, root, ready = true }: RouterScopeOptions<Routes>,
+): RouterScope<Routes, RouteName<Routes> | undefined> {
   const scope = useMemo(() => createRoutingScope({ routing, path }), [routing, path]);
   const rooted: Routes = Object.assign({}, routes, { [root]: '' });
   const { location, router, entry } = useRouting(rooted, { routing, path });
   const held = useOwnedSegment(location, entry, routing === 'virtual');
   const { parts, matched } = useMatch(router, held);
-  const current = useMemo<Route<Routes>>(() => matched ?? { name: root, params: EMPTY_PARAMS }, [matched, root]);
+  const current = useMemo<Route<Routes> | undefined>(
+    () => (ready ? (matched ?? { name: root, params: EMPTY_PARAMS }) : undefined),
+    [ready, matched, root],
+  );
 
-  const unmatched = matched === undefined;
+  const unmatched = ready && matched === undefined;
   useEffect(() => {
     if (unmatched) {
       location.write(EMPTY_PARTS, { replace: true });
@@ -145,7 +160,7 @@ export function useRouterScope<const Routes extends RouteTable>(
   }, [parts, unmatched, location]);
 
   return useMemo(
-    () => ({ route: current.name, params: current.params, go: router.go, scope }),
+    () => ({ route: current?.name, params: current?.params ?? EMPTY_PARAMS, go: router.go, scope }),
     [router, scope, current],
   );
 }
