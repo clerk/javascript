@@ -1,5 +1,4 @@
 ---
-'@clerk/shared': patch
 '@clerk/mosaic': patch
 ---
 
