@@ -48,6 +48,7 @@ describe('useEnabledThirdPartyProviders', () => {
       'oauth_instagram',
       'oauth_line',
       'oauth_linear',
+      'oauth_link',
       'oauth_linkedin',
       'oauth_linkedin_oidc',
       'oauth_microsoft',
