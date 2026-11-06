@@ -12,7 +12,7 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const popupRadius = radiusVars['--cl-radius-surface'];
+const popupRadius = radiusVars['--cl-radius-xl'];
 const inset = space['1.5'];
 const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 

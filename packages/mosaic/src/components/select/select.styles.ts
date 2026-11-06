@@ -13,7 +13,7 @@ import {
 } from '../../tokens.stylex';
 import { selectOptionScope } from './select.markers.stylex';
 
-const popupRadius = radiusVars['--cl-radius-surface'];
+const popupRadius = radiusVars['--cl-radius-xl'];
 const popupBorder = '1px';
 const inset = space['1.5'];
 const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;

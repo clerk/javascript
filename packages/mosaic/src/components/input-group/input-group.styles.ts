@@ -26,8 +26,14 @@ export const styles = stylex.create({
   },
   iconButton: {
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-foreground-secondary'],
-    width: 'calc(2 * (1.25rem - var(--_cl-input-group-inset)))',
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
+      },
+    },
+    width: `calc(2 * (${space['5']} - var(--_cl-input-group-inset)))`,
   },
   start: {
     borderEndStartRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',

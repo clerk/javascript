@@ -28,7 +28,7 @@ export const styles = stylex.create({
 
   triggerLabelled: {
     padding: space['1.5'],
-    borderRadius: radiusVars['--cl-radius-surface'],
+    borderRadius: radiusVars['--cl-radius-xl'],
     gap: space['1.5'],
     backgroundColor: {
       default: 'transparent',

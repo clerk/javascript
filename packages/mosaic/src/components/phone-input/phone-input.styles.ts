@@ -10,7 +10,7 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const popupRadius = radiusVars['--cl-radius-surface'];
+const popupRadius = radiusVars['--cl-radius-xl'];
 const listInset = space['1.5'];
 const optionRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
 
@@ -82,7 +82,6 @@ export const styles = stylex.create({
     borderBlockEndWidth: '1px',
     display: 'flex',
     flexShrink: 0,
-    paddingBlockStart: space['1'],
     paddingInlineEnd: space['2'],
     paddingInlineStart: space['3'],
     height: space['9'],
@@ -176,7 +175,6 @@ export const styles = stylex.create({
     width: space['4'],
   },
   optionName: {
-    padding: space['0.5'],
     overflow: 'hidden',
     flexGrow: 1,
     textOverflow: 'ellipsis',

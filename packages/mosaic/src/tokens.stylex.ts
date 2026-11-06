@@ -102,7 +102,6 @@ const radiusDefaults = {
   '--cl-radius-md': '0.375rem',
   '--cl-radius-lg': '0.5rem',
   '--cl-radius-xl': '0.75rem',
-  '--cl-radius-surface': 'calc(var(--cl-radius-md) + var(--cl-spacing) * 1.5)',
   '--cl-radius-2xl': '1.5rem',
   '--cl-radius-full': 'calc(infinity * 1px)',
 } as const;
