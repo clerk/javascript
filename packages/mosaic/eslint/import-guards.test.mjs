@@ -536,7 +536,7 @@ describe('Mosaic styles', { timeout: 30_000 }, () => {
     `':hover:not(:disabled, [data-disabled], [aria-disabled="true"])'`,
     "':hover:not(:disabled):checked'",
     "':not([data-disabled]):hover'",
-    "':enabled:hover'",
+    "':hover:not(:active):not(:disabled)'",
   ])('a styles file accepts a hover that skips disabled controls: %s', async key => {
     const messages = await restrictedSyntax(
       stylesFixture,
@@ -548,7 +548,7 @@ describe('Mosaic styles', { timeout: 30_000 }, () => {
     expect(messages).toEqual([]);
   });
 
-  test.each(["':hover'", "':hover:not([data-invalid])'"])(
+  test.each(["':hover'", "':hover:not([data-invalid])'", "':enabled:hover'", "':hover:disabled'"])(
     'a styles file rejects a hover that still paints disabled controls: %s',
     async key => {
       const messages = await restrictedSyntax(
@@ -566,6 +566,7 @@ describe('Mosaic styles', { timeout: 30_000 }, () => {
     "transitionProperty: 'opacity, background-color'",
     "transitionProperty: '--_cl-scale-color'",
     "transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'opacity' }",
+    "transitionProperty: { default: 'opacity', '@media (prefers-reduced-motion: no-preference)': 'opacity, transform' }",
     "transform: 'scale(0.5)'",
     "transform: { default: 'scale(1)', ':where([data-starting-style])': 'scale(0.94)', '@media (prefers-reduced-motion: reduce)': { default: 'scale(1)', ':where([data-starting-style])': 'scale(1)' } }",
     "translate: { default: null, '@media (prefers-reduced-motion: no-preference)': { default: null, ':where([data-ending-style])': '0 100%' } }",
@@ -584,6 +585,8 @@ describe('Mosaic styles', { timeout: 30_000 }, () => {
     "transitionProperty: 'opacity, transform'",
     "transitionProperty: 'all'",
     "transitionProperty: { default: 'translate', ':where([data-open])': 'opacity' }",
+    "transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'opacity, transform' }",
+    "transitionProperty: { default: 'transform', '@media (prefers-reduced-motion: no-preference)': 'transform' }",
   ])('a styles file rejects a moving transition without a reduced-motion branch: %s', async declaration => {
     const messages = await restrictedSyntax(
       stylesFixture,
@@ -600,6 +603,7 @@ describe('Mosaic styles', { timeout: 30_000 }, () => {
   test.each([
     "transform: { default: 'scale(1)', ':where([data-starting-style], [data-ending-style])': 'scale(0.94)' }",
     "translate: { default: '0 0', ':where([data-ending-style])': '0 100%' }",
+    "transform: { default: 'scale(1)', ':where([data-starting-style])': 'scale(0.94)', '@media (prefers-reduced-motion: no-preference)': { default: null } }",
   ])('a styles file rejects an enter or exit offset without a reduced-motion branch: %s', async declaration => {
     const messages = await restrictedSyntax(
       stylesFixture,
