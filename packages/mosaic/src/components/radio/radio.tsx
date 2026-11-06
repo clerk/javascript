@@ -112,7 +112,7 @@ const RadioItem = React.forwardRef<HTMLInputElement, RadioItemProps>(function Mo
       <input
         ref={ref}
         type='radio'
-        value={typeof value === 'string' ? value : undefined}
+        value={value === undefined ? undefined : toFormValue(value)}
         name={group?.name ?? nameProp}
         form={group?.submits === false ? '' : undefined}
         checked={checked}
@@ -151,6 +151,23 @@ const RadioItem = React.forwardRef<HTMLInputElement, RadioItemProps>(function Mo
     </span>
   );
 });
+
+function toFormValue(value: unknown): string {
+  if (value === null) {
+    return '';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return '';
+  }
+}
 
 export interface RadioSectionProps
   extends Omit<React.ComponentPropsWithoutRef<'fieldset'>, 'className' | 'style'>, MosaicStyleProps {
