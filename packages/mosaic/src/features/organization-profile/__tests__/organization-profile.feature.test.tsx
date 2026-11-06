@@ -133,16 +133,17 @@ describe('OrganizationProfile', () => {
     expect(within(dialog).getByRole('textbox', { name: 'Description' })).toBeVisible();
   });
 
-  it('keeps its page when remounted under the same provider', async () => {
+  it('starts on the first page again after it was unmounted', async () => {
     serve();
     const { rerender } = await renderWithClerk(<OrganizationProfile key='first' />);
     const user = userEvent.setup();
 
     await user.click(profileNav().getByRole('tab', { name: 'Members' }));
+    rerender(<p>Elsewhere</p>);
     rerender(<OrganizationProfile key='second' />);
 
-    expect(profileNav().getByRole('tab', { name: 'Members' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeVisible();
+    expect(profileNav().getByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('heading', { level: 3, name: 'General' })).toBeVisible();
   });
 
   it('routes two profiles on one page independently when they have different bases', async () => {

@@ -17,7 +17,7 @@ describe('RouteParams', () => {
 });
 
 describe('Router', () => {
-  const location: MosaicLocation = { useSegmentParts: () => [], write: () => {}, clear: () => {} };
+  const location: MosaicLocation = { useSegmentParts: () => [], write: () => {}, clear: () => {}, own: () => () => {} };
   const router = createRouter(
     { index: '', security: 'security', statement: 'billing/statement/:statementId' },
     location,

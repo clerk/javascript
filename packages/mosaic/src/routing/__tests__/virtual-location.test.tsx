@@ -1,11 +1,12 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, render, renderHook, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { useEffect, useMemo } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { normalizeBase } from '../base-path';
 import type { SegmentParts } from '../location';
 import { createVirtualLocation } from '../virtual-location';
-import { useVirtualEntries, useVirtualWrite, VirtualStoreProvider } from '../virtual-store';
+import { useVirtualActions, useVirtualEntries, VirtualStoreProvider } from '../virtual-store';
 
 describe('normalizeBase', () => {
   it('strips surrounding slashes and collapses the root', () => {
@@ -23,7 +24,8 @@ function wrapperWith(initial?: Record<string, SegmentParts>) {
 }
 
 function useLocationAt(basePath: string) {
-  const location = createVirtualLocation(basePath, useVirtualWrite());
+  const actions = useVirtualActions();
+  const location = useMemo(() => createVirtualLocation(basePath, actions), [basePath, actions]);
   return { location, parts: location.useSegmentParts(), entries: useVirtualEntries() };
 }
 
@@ -35,9 +37,9 @@ describe('createVirtualLocation', () => {
     expect(result.current.parts).toEqual(['security']);
   });
 
-  it('reads no parts when it has no entry', () => {
+  it('reads undefined when it has no entry', () => {
     const { result } = renderHook(() => useLocationAt('/user'), { wrapper: wrapperWith() });
-    expect(result.current.parts).toEqual([]);
+    expect(result.current.parts).toBeUndefined();
   });
 
   it('writes its entry verbatim', () => {
@@ -58,7 +60,7 @@ describe('createVirtualLocation', () => {
       result.current.location.clear();
     });
 
-    expect(result.current.parts).toEqual([]);
+    expect(result.current.parts).toBeUndefined();
     expect(result.current.entries.has('/user')).toBe(false);
   });
 
@@ -76,7 +78,7 @@ describe('createVirtualLocation', () => {
       wrapper: wrapperWith({ '/user': ['security'] }),
     });
     expect(result.current[0].parts).toEqual(['security']);
-    expect(result.current[1].parts).toEqual([]);
+    expect(result.current[1].parts).toBeUndefined();
 
     act(() => {
       result.current[1].location.write(['members']);
@@ -89,8 +91,79 @@ describe('createVirtualLocation', () => {
       result.current[0].location.clear();
     });
 
-    expect(result.current[0].parts).toEqual([]);
+    expect(result.current[0].parts).toBeUndefined();
     expect(result.current[1].parts).toEqual(['members']);
+  });
+
+  describe('ownership', () => {
+    function Owner({ base }: { base: string }) {
+      const actions = useVirtualActions();
+      const location = useMemo(() => createVirtualLocation(base, actions), [base, actions]);
+      useEffect(() => location.own(), [location]);
+      return null;
+    }
+    function Entries() {
+      return <output data-testid='entries'>{JSON.stringify(Object.fromEntries(useVirtualEntries()))}</output>;
+    }
+    const entries = () => JSON.parse(screen.getByTestId('entries').textContent ?? '{}');
+    const seeded = { '/user': ['security'] };
+
+    it('drops an entry when its last owner leaves', () => {
+      const view = render(
+        <VirtualStoreProvider initial={seeded}>
+          <Owner base='/user' />
+          <Entries />
+        </VirtualStoreProvider>,
+      );
+      expect(entries()).toEqual({ '/user': ['security'] });
+
+      view.rerender(
+        <VirtualStoreProvider initial={seeded}>
+          <Entries />
+        </VirtualStoreProvider>,
+      );
+      expect(entries()).toEqual({});
+      view.unmount();
+    });
+
+    it('keeps an entry that never had an owner', () => {
+      const view = render(
+        <VirtualStoreProvider initial={seeded}>
+          <Owner base='/organization' />
+          <Entries />
+        </VirtualStoreProvider>,
+      );
+      view.rerender(
+        <VirtualStoreProvider initial={seeded}>
+          <Entries />
+        </VirtualStoreProvider>,
+      );
+      expect(entries()).toEqual({ '/user': ['security'] });
+      view.unmount();
+    });
+
+    it('keeps an entry when one owner replaces another in the same commit', () => {
+      const view = render(
+        <VirtualStoreProvider initial={seeded}>
+          <Owner
+            key='first'
+            base='/user'
+          />
+          <Entries />
+        </VirtualStoreProvider>,
+      );
+      view.rerender(
+        <VirtualStoreProvider initial={seeded}>
+          <Owner
+            key='second'
+            base='/user'
+          />
+          <Entries />
+        </VirtualStoreProvider>,
+      );
+      expect(entries()).toEqual({ '/user': ['security'] });
+      view.unmount();
+    });
   });
 
   it('treats base spellings alike', () => {

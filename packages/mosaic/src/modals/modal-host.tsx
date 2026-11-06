@@ -37,34 +37,31 @@ export function ModalSurfaceHost<Options>({
   children: React.ReactNode;
 }): React.ReactElement {
   const [state, setState] = React.useState<ModalState<Options>>({
-    open: false,
     options: undefined,
     container: undefined,
     openCount: 0,
   });
 
-  const routed = surface.path !== undefined;
-  const location = useMosaicLocation({ routing: 'virtual', path: surface.path ?? `/modal/${surface.id}` });
+  // The modal open state is derived from the routing state, so there is no state to sync and
+  // opening/closing is just writing to the appropriate routing state. This means that in a mode
+  // that writes to the url, the modal opens automatically on page load if the url says so,
+  // the Back button just works etc. The public modal open/close are just routing writes.
+  const base = surface.path ?? `/modal/${surface.id}`;
+  const location = useMosaicLocation({ routing: 'virtual', path: base });
+  const open = location.useSegmentParts() !== undefined;
   const modal = React.useMemo<ModalHandle<Options>>(() => {
     const preload = () => surface.loader.send({ type: 'LOAD' });
     return {
       open: (options, container) => {
         preload();
-        if (routed) {
-          location.write(surface.initialParts?.(options) ?? []);
-        }
-        setState(previous => ({ open: true, options, container, openCount: previous.openCount + 1 }));
+        setState(previous => ({ options, container, openCount: previous.openCount + 1 }));
+        location.write(surface.initialParts?.(options) ?? []);
       },
-      close: () => {
-        if (routed && state.open) {
-          location.clear();
-        }
-        setState(previous => (previous.open ? { ...previous, open: false } : previous));
-      },
+      close: () => location.clear(),
       preload,
-      isOpen: state.open,
+      isOpen: open,
     };
-  }, [surface, routed, location, state.open]);
+  }, [surface, location, open]);
 
   return (
     <surface.context.Provider value={modal}>
@@ -72,6 +69,8 @@ export function ModalSurfaceHost<Options>({
       <ModalSlot
         surface={surface}
         state={state}
+        open={open}
+        base={base}
         close={modal.close}
       />
     </surface.context.Provider>
@@ -81,10 +80,14 @@ export function ModalSurfaceHost<Options>({
 function ModalSlot<Options>({
   surface,
   state,
+  open,
+  base,
   close,
 }: {
   surface: ModalSurface<Options>;
   state: ModalState<Options>;
+  open: boolean;
+  base: string;
   close: () => void;
 }) {
   const [content] = useActor(surface.loader);
@@ -93,7 +96,7 @@ function ModalSlot<Options>({
 
   const dialog = (
     <Dialog.Root
-      open={state.open && (Content !== undefined || failed)}
+      open={open && (Content !== undefined || failed)}
       onOpenChange={open => {
         if (!open) {
           close();
@@ -106,7 +109,7 @@ function ModalSlot<Options>({
             key={state.openCount}
             options={state.options}
             close={close}
-            path={surface.path}
+            path={base}
           />
         ) : failed ? (
           <LoadFailed />
@@ -130,7 +133,6 @@ function LoadFailed() {
 }
 
 interface ModalState<Options> {
-  open: boolean;
   options: Options | undefined;
   container: PortalContainer | undefined;
   openCount: number;

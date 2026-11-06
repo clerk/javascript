@@ -202,16 +202,17 @@ describe('UserProfile', () => {
     expect(entry()).toBeNull();
   });
 
-  it('keeps its page when remounted under the same provider', async () => {
+  it('starts on the first page again after it was unmounted', async () => {
     serve();
     const { rerender } = await renderWithClerk(<UserProfile key='first' />);
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('tab', { name: 'Security' }));
+    rerender(<p>Elsewhere</p>);
     rerender(<UserProfile key='second' />);
 
-    expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeVisible();
+    expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeVisible();
   });
 
   it('falls back to the first page when the current page disappears', async () => {

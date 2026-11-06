@@ -19,7 +19,7 @@ describe('useProfilePagesController', () => {
       { wrapper },
     );
 
-    expect(result.current.segment).toEqual([]);
+    expect(result.current.segment).toBeUndefined();
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
@@ -33,6 +33,6 @@ describe('useProfilePagesController', () => {
       { wrapper },
     );
     expect(result.current.pages.activePage).toBe('general');
-    expect(result.current.segment).toEqual([]);
+    expect(result.current.segment).toBeUndefined();
   });
 });
