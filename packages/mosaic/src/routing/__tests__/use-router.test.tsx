@@ -16,7 +16,7 @@ const routes = {
   statement: 'billing/statement/:statementId',
 } as const;
 
-const userScope: RouterScopeOptions<typeof routes> = { routing: 'virtual', path: '/user', notFound: 'account' };
+const userScope: RouterScopeOptions<typeof routes> = { routing: 'virtual', path: '/user', root: 'account' };
 
 function ScopeOf({ options, children }: { options: RouterScopeOptions<typeof routes>; children: ReactNode }) {
   const { scope } = useRouterScope(routes, options);
@@ -68,20 +68,33 @@ describe('useRouterScope', () => {
     expect(result.current.params).toEqual({ statementId: 'st/1 %2F' });
   });
 
-  it('shows the not-found route at once and redirects its entry to it', () => {
+  it('shows the root for an unknown segment at once and replaces the entry with the base', () => {
     const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), segment: useUserSegment() }), {
       wrapper: wrapperWith({ '/user': ['nowhere'] }),
     });
     expect(result.current.router.route).toBe('account');
-    expect(result.current.segment).toEqual(['account']);
+    expect(result.current.segment).toEqual([]);
   });
 
-  it('redirects an empty entry to the not-found route', () => {
+  it('shows the root for an absent entry without writing', () => {
     const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), segment: useUserSegment() }), {
       wrapper: wrapperWith(),
     });
     expect(result.current.router.route).toBe('account');
-    expect(result.current.segment).toEqual(['account']);
+    expect(result.current.segment).toBeUndefined();
+  });
+
+  it("canonicalises the root's own segment to the base", () => {
+    const { result } = renderHook(() => ({ router: useRouterScope(routes, userScope), segment: useUserSegment() }), {
+      wrapper: wrapperWith({ '/user': ['account'] }),
+    });
+    expect(result.current.router.route).toBe('account');
+    expect(result.current.segment).toEqual([]);
+
+    act(() => {
+      result.current.router.go('account');
+    });
+    expect(result.current.segment).toEqual([]);
   });
 
   it('follows a write made to its entry by someone else', () => {
@@ -111,7 +124,7 @@ describe('useRouterScope', () => {
     const { result } = renderHook(
       () => ({
         user: useRouterScope(routes, userScope),
-        org: useRouterScope(orgRoutes, { routing: 'virtual', path: '/organization', notFound: 'general' }),
+        org: useRouterScope(orgRoutes, { routing: 'virtual', path: '/organization', root: 'general' }),
       }),
       { wrapper: wrapperWith() },
     );
@@ -135,14 +148,14 @@ describe('useRouterScope', () => {
       () => ({ router: useRouterScope(routes, userScope), segment: useUserSegment(), write: useVirtualWrite() }),
       { wrapper: wrapperWith({ '/user': ['nowhere'] }) },
     );
-    expect(result.current.segment).toEqual(['account']);
+    expect(result.current.segment).toEqual([]);
 
     for (const unknown of ['elsewhere', 'nowhere', 'nowhere']) {
       act(() => {
         result.current.write('/user', [unknown]);
       });
       expect(result.current.router.route).toBe('account');
-      expect(result.current.segment).toEqual(['account']);
+      expect(result.current.segment).toEqual([]);
     }
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
@@ -157,51 +170,33 @@ describe('useRouterScope', () => {
     });
 
     expect(result.current.router.route).toBe('account');
-    expect(result.current.segment).toEqual(['account']);
+    expect(result.current.segment).toEqual([]);
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
 
-  it('does not redirect to a not-found route that cannot match on its own, and warns', () => {
-    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
-    const { result } = renderHook(
-      () => ({
-        router: useRouterScope(routes, { routing: 'virtual', path: '/user', notFound: 'statement' }),
-        segment: useUserSegment(),
-      }),
-      { wrapper: wrapperWith({ '/user': ['nowhere'] }) },
-    );
-
-    expect(result.current.router.route).toBe('statement');
-    expect(result.current.segment).toEqual(['nowhere']);
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('"statement" under "/user"');
-    warn.mockRestore();
-  });
-
-  it('stops redirecting after a burst when two owners of one base redirect each other, and warns', () => {
+  it('lets two owners of one base agree on the base, without a warning', () => {
     const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
     const orgRoutes = { general: 'general', members: 'members' } as const;
     const { result } = renderHook(
       () => ({
         user: useRouterScope(routes, userScope),
-        org: useRouterScope(orgRoutes, { routing: 'virtual', path: '/user', notFound: 'general' }),
+        org: useRouterScope(orgRoutes, { routing: 'virtual', path: '/user', root: 'general' }),
         segment: useUserSegment(),
       }),
-      { wrapper: wrapperWith() },
+      { wrapper: wrapperWith({ '/user': ['nowhere'] }) },
     );
 
-    expect(['account', 'general']).toContain(result.current.segment[0]);
+    expect(result.current.segment).toEqual([]);
     expect(result.current.user.route).toBe('account');
     expect(result.current.org.route).toBe('general');
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('Stopped redirecting under "/user"');
 
     act(() => {
       result.current.user.go('security');
     });
 
-    expect(['security', 'general']).toContain(result.current.segment[0]);
+    expect(result.current.segment).toEqual([]);
+    expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
 
@@ -216,7 +211,7 @@ describe('useRouterScope', () => {
 
   it('keeps the router while an equal table is passed as a new object', () => {
     const { result, rerender } = renderHook(
-      ({ table }: { table: RouteTable }) => useRouterScope(table, { ...userScope, notFound: 'account' }),
+      ({ table }: { table: RouteTable }) => useRouterScope(table, { ...userScope, root: 'account' }),
       { initialProps: { table: { ...routes } }, wrapper: wrapperWith({ '/user': ['security'] }) },
     );
     const { go } = result.current;

@@ -1,11 +1,9 @@
-import { logger } from '@clerk/shared/logger';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { MosaicLocation, SegmentParts } from './location';
 import type { Route, Router } from './router';
 import { createRouter } from './router';
 import type { RouteName, RouteTable } from './routes';
-import { routeParts } from './routes';
 import type { RoutingScope } from './routing-scope';
 import { createRoutingScope, useInheritedScope } from './routing-scope';
 import type { MosaicLocationOptions } from './use-mosaic-location';
@@ -30,34 +28,6 @@ function useStableByKey<Value>(value: Value, key: string): Value {
 
 function useStableTable<Routes extends RouteTable>(routes: Routes): Routes {
   return useStableByKey(routes, Object.entries(routes).flat().join(KEY_SEPARATOR));
-}
-
-const REDIRECT_LIMIT = 10;
-const REDIRECT_WINDOW_MS = 1000;
-
-// A write that gives up after a burst. Not-found redirects are automatic, so two scopes with
-// different fallbacks on one path would redirect each other forever; a scope that has redirected
-// this many times within the window stops and warns instead. No real navigation comes close.
-// All attempts to fix this in a more exact fashion turned out to be unnecessarily complex, we only
-// need a heuristic to not crash and warn on misconfigurations, not an exact fix.
-function withRedirectLimit(location: MosaicLocation, path: string | undefined): MosaicLocation['write'] {
-  let count = 0;
-  let since = 0;
-  return (parts, options) => {
-    const now = Date.now();
-    if (now - since > REDIRECT_WINDOW_MS) {
-      count = 0;
-      since = now;
-    }
-    count += 1;
-    if (count > REDIRECT_LIMIT) {
-      logger.warnOnce(
-        `[Clerk] Stopped redirecting under "${path ?? '/'}" after ${REDIRECT_LIMIT} redirects within a second. Two components are probably configured with this path; give one of them a different path.`,
-      );
-      return;
-    }
-    location.write(parts, options);
-  };
 }
 
 // The scope owns its base while its effects are live, and returns the entry it should render from.
@@ -138,9 +108,13 @@ function useMatch<Routes extends RouteTable>(router: Router<Routes>, entry: Segm
 export interface RouterScopeOptions<Routes extends RouteTable> {
   routing: MosaicLocationOptions['routing'];
   path?: string;
-  // The route a segment no route matches redirects to, with replace. The owner of a segment always
-  // decides what an unknown segment means, so `route` below is never undefined.
-  notFound: RouteName<Routes>;
+  // The route that lives at the base. It is matched by the empty segment and `go` writes the
+  // empty segment for it, whatever pattern the table gives it; that pattern is accepted too and
+  // canonicalised to the base. Any other segment no route matches shows the root and is replaced
+  // with the base as well. The owner of a segment always decides what an unknown segment means, so
+  // `route` below is never undefined, and because every owner's fallback is its base, two owners
+  // of one base cannot redirect each other.
+  root: RouteName<Routes>;
 }
 
 export interface RouterScope<Routes extends RouteTable> {
@@ -154,38 +128,21 @@ export interface RouterScope<Routes extends RouteTable> {
 // and it is the only router that redirects.
 export function useRouterScope<const Routes extends RouteTable>(
   routes: Routes,
-  { routing, path, notFound }: RouterScopeOptions<Routes>,
+  { routing, path, root }: RouterScopeOptions<Routes>,
 ): RouterScope<Routes> {
   const scope = useMemo(() => createRoutingScope({ routing, path }), [routing, path]);
-  const { location, table, router, entry } = useRouting(routes, { routing, path });
+  const rooted: Routes = Object.assign({}, routes, { [root]: '' });
+  const { location, router, entry } = useRouting(rooted, { routing, path });
   const held = useOwnedSegment(location, entry, routing === 'virtual');
   const { parts, matched } = useMatch(router, held);
-  const current = useMemo<Route<Routes>>(
-    () => matched ?? { name: notFound, params: EMPTY_PARAMS },
-    [matched, notFound],
-  );
+  const current = useMemo<Route<Routes>>(() => matched ?? { name: root, params: EMPTY_PARAMS }, [matched, root]);
 
-  const fallback = useMemo(() => {
-    const target = routeParts(table, notFound);
-    return router.parse(target) ? target : undefined;
-  }, [table, router, notFound]);
-
-  const redirect = useMemo(() => withRedirectLimit(location, path), [location, path]);
-  const redirectTo = matched === undefined ? notFound : undefined;
+  const unmatched = matched === undefined;
   useEffect(() => {
-    if (redirectTo === undefined) {
-      return;
+    if (unmatched) {
+      location.write(EMPTY_PARTS, { replace: true });
     }
-    if (fallback === undefined) {
-      if (Object.keys(table).length > 0) {
-        logger.warnOnce(
-          `[Clerk] The notFound route "${redirectTo}" under "${path ?? '/'}" is either missing or needs params, so it cannot be a fallback. Use a route without params.`,
-        );
-      }
-      return;
-    }
-    redirect(fallback, { replace: true });
-  }, [parts, redirectTo, fallback, redirect, table, path]);
+  }, [parts, unmatched, location]);
 
   return useMemo(
     () => ({ route: current.name, params: current.params, go: router.go, scope }),
