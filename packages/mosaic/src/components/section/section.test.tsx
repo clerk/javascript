@@ -392,6 +392,24 @@ describe('Section', () => {
     expect(note.parentElement).toBe(screen.getByTestId('item'));
   });
 
+  it('renders a frame with its theme class', () => {
+    render(
+      <Section.Frame data-testid='frame'>
+        <Section.Body data-testid='body' />
+      </Section.Frame>,
+    );
+
+    expect(screen.getByTestId('frame')).toHaveClass('cl-section-frame');
+    expect(screen.getByTestId('frame')).toContainElement(screen.getByTestId('body'));
+  });
+
+  it('renders a footer with its theme class', () => {
+    render(<Section.Footer data-testid='footer'>Changing plans</Section.Footer>);
+
+    expect(screen.getByTestId('footer')).toHaveClass('cl-section-footer');
+    expect(screen.getByTestId('footer')).toHaveTextContent('Changing plans');
+  });
+
   it('leaves out the glyph slot when the note carries no icon', () => {
     render(<Section.Note data-testid='note'>Managed by Acme SSO</Section.Note>);
 
