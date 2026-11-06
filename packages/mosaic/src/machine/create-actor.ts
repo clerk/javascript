@@ -286,11 +286,14 @@ function runActor<
       invocationAbort = undefined;
       clearAfterTimers();
     }
+    const before = context;
     applyContext(taken.context);
     effects.push(...taken.effects);
     if (taken.target !== undefined) {
       value = resolveChoice(taken.target, event);
       enterState(event);
+    } else if (context !== before) {
+      takeAlways(event);
     }
   }
 
@@ -303,14 +306,31 @@ function runActor<
       return;
     }
 
-    const immediate = evaluate(stateConfig.always, event, { context });
-    if (immediate && immediate.target !== undefined) {
-      takeTransition(immediate, event);
+    if (takeAlways(event)) {
       return;
     }
 
     startInvoke(event);
     startAfterTimers();
+  }
+
+  function takeAlways(event: EventObject): boolean {
+    for (;;) {
+      const immediate = evaluate(stateOf(value).always, event, { context });
+      if (!immediate) {
+        return false;
+      }
+      if (immediate.target !== undefined) {
+        takeTransition(immediate, event);
+        return true;
+      }
+      const before = context;
+      applyContext(immediate.context);
+      effects.push(...immediate.effects);
+      if (context === before) {
+        return false;
+      }
+    }
   }
 
   function startInvoke(event: EventObject): void {

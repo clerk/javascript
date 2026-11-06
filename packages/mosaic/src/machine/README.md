@@ -196,8 +196,11 @@ types `onDone`'s `event.output`.
 
 You've already seen `states`, `on`, `context`, and `invoke`. The rest:
 
-- **`always`** — an eventless transition, checked once when the state is
-  entered. Good for "on arrival, skip ahead if X is already true."
+- **`always`** — an eventless transition, checked when the state is entered
+  and again after any transition that changes context while staying in it.
+  A result with only `context` is applied, then `always` is checked again.
+  Listeners see one snapshot, after `always` settles. Good for "leave as soon
+  as X is true."
 - **`after`** — `{ [ms]: transition }`. The timer is cancelled when the state is
   left or the actor stops.
 - **`entry` / `exit`** — run on entering or leaving a state. They can return a

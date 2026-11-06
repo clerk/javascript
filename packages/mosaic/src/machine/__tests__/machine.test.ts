@@ -328,6 +328,84 @@ describe('createActor — always', () => {
 
     expect(createActor(machine).start().getSnapshot().value).toBe('check');
   });
+
+  it('re-checks always after an event that only changes context', () => {
+    const machine = setup<{ ready: boolean }, { type: 'READY' }>().createMachine({
+      initial: 'check',
+      context: { ready: false },
+      states: {
+        check: {
+          always: ({ context }) => (context.ready ? { target: 'done' } : undefined),
+          on: { READY: () => ({ context: { ready: true } }) },
+        },
+        done: {},
+      },
+    });
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'READY' });
+
+    expect(actor.getSnapshot().value).toBe('done');
+  });
+
+  it('re-checks always after an invoke settles with only a context change', async () => {
+    const ready = setup<{ ready: boolean }, { type: 'never' }>();
+    const machine = ready.createMachine({
+      initial: 'check',
+      context: { ready: false },
+      states: {
+        check: {
+          always: ({ context }) => (context.ready ? { target: 'done' } : undefined),
+          invoke: ready.createInvoke({
+            src: () => Promise.resolve(),
+            onDone: () => ({ context: { ready: true } }),
+          }),
+        },
+        done: {},
+      },
+    });
+    const actor = createActor(machine).start();
+
+    await tick();
+
+    expect(actor.getSnapshot().value).toBe('done');
+  });
+
+  it('applies a context-only always result and checks again', () => {
+    const machine = setup<{ count: number }, { type: 'never' }>().createMachine({
+      initial: 'count',
+      context: { count: 0 },
+      states: {
+        count: {
+          always: ({ context }) => (context.count < 3 ? { context: { count: context.count + 1 } } : { target: 'done' }),
+        },
+        done: {},
+      },
+    });
+
+    expect(createActor(machine).start().getSnapshot()).toMatchObject({ value: 'done', context: { count: 3 } });
+  });
+
+  it('notifies once for an event whose always transition follows', () => {
+    const machine = setup<{ ready: boolean }, { type: 'READY' }>().createMachine({
+      initial: 'check',
+      context: { ready: false },
+      states: {
+        check: {
+          always: ({ context }) => (context.ready ? { target: 'done' } : undefined),
+          on: { READY: () => ({ context: { ready: true } }) },
+        },
+        done: {},
+      },
+    });
+    const actor = createActor(machine).start();
+    const seen: string[] = [];
+    actor.subscribe(snapshot => seen.push(snapshot.value));
+
+    actor.send({ type: 'READY' });
+
+    expect(seen).toEqual(['done']);
+  });
 });
 
 describe('createActor — inline invoke', () => {

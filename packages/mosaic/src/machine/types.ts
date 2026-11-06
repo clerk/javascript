@@ -198,7 +198,7 @@ export interface StateConfig<
   on?: {
     [K in TEvent['type']]?: Transition<TContext, Extract<TEvent, { type: K }>, TStates, TActions, TEvent>;
   };
-  /** Eventless / immediate transition, evaluated on entry. */
+  /** Eventless / immediate transition, evaluated on entry and after each context change in this state. */
   always?: TransitionFn<TContext, EventObject, TStates, TActions, TEvent>;
   /**
    * Delayed transitions — each key is a delay in milliseconds. The matching
