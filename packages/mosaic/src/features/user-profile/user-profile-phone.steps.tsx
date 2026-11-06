@@ -68,6 +68,11 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
             value={props.phoneNumber}
             onValueChange={props.onPhoneNumberChange}
             defaultCountry={props.defaultCountry}
+            countryTriggerLabel={m.phone.countryTriggerLabel}
+            countryPopupLabel={m.phone.countryPopupLabel}
+            countrySearchLabel={m.phone.countrySearchLabel}
+            countrySearchPlaceholder={m.phone.countrySearchPlaceholder}
+            noResultsMessage={m.phone.countrySearchEmpty}
           />
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>

@@ -38,7 +38,28 @@ describe('Mosaic PhoneInput', () => {
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
 
+    expect(screen.getByRole('dialog', { name: 'Choose a country' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('placeholder', 'Search');
+  });
+
+  it('uses custom accessible names for the country trigger, popup, and search', async () => {
+    const user = userEvent.setup();
+    render(
+      <PhoneInput
+        aria-label='Phone number'
+        countryTriggerLabel='{country} selected'
+        countryPopupLabel='Pick a region'
+        countrySearchLabel='Filter regions'
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'United States selected' }));
+
+    expect(screen.getByRole('dialog', { name: 'Pick a region' })).toBeInTheDocument();
+    await user.type(screen.getByRole('combobox', { name: 'Filter regions' }), 'Greece');
+    await user.keyboard('{ArrowDown}{Enter}');
+
+    expect(screen.getByRole('button', { name: 'Greece selected' })).toBeInTheDocument();
   });
 
   it('uses a custom country search placeholder', async () => {
