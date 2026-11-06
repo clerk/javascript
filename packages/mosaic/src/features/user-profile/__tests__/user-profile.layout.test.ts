@@ -67,6 +67,23 @@ describe('resolveUserProfilePages', () => {
     warn.mockRestore();
   });
 
+  it('leaves out a custom page whose path is not written as its segment, and warns', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const trailing: CustomProfilePage = { label: 'Security', path: 'security/', content: null };
+    const leading: CustomProfilePage = { label: 'Terms', path: '/terms', content: null };
+    const empty: CustomProfilePage = { label: 'Empty', path: '', content: null };
+
+    expect(resolveUserProfilePages(['account', 'security'], [trailing, leading, empty, help])).toEqual([
+      { id: 'account' },
+      { id: 'security' },
+      { id: 'help', custom: help },
+    ]);
+    expect(warn).toHaveBeenCalledTimes(3);
+    expect(warn.mock.calls[0][0]).toContain('slash');
+    expect(warn.mock.calls[0][0]).toContain('Use "security"');
+    warn.mockRestore();
+  });
+
   it('lists the built-ins, then the custom pages by path', () => {
     expect(resolveUserProfilePages(['account', 'security'], [terms, help])).toEqual([
       { id: 'account' },

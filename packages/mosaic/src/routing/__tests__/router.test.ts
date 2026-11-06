@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { MosaicLocation, SegmentParts } from '../location';
@@ -50,6 +51,18 @@ describe('createRouter go', () => {
 
     router.go('statement', { statementId: 'st 1' });
     expect(location.current).toEqual(['billing', 'statement', 'st 1']);
+  });
+
+  it('ignores an unknown route name and warns', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const location = memoryLocation(['account']);
+    const router = createRouter(routes as Record<string, string>, location);
+
+    router.go('nowhere');
+
+    expect(location.current).toEqual(['account']);
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
   });
 
   it('passes write options through', () => {

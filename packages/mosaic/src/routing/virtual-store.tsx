@@ -80,16 +80,27 @@ export function VirtualStoreProvider({ initial, children }: VirtualStoreProvider
     };
   });
 
+  // The sweep runs after the commit in which a count reached zero. A write can land in between,
+  // when a click opens a modal before the passive effects of the unmount commit have flushed, so
+  // it only deletes the entry that was committed with the zero count, never a newer one.
   const previousOwners = useRef(owners);
   useEffect(() => {
     const previous = previousOwners.current;
     previousOwners.current = owners;
     for (const [base, had] of previous) {
       if (had > 0 && (owners.get(base) ?? 0) === 0) {
-        actions.write(base, undefined);
+        const expected = entries.get(base);
+        setEntries(current => {
+          if (expected === undefined || current.get(base) !== expected) {
+            return current;
+          }
+          const next = new Map(current);
+          next.delete(base);
+          return next;
+        });
       }
     }
-  }, [owners, actions]);
+  }, [owners, entries]);
 
   return (
     <VirtualActionsContext.Provider value={actions}>
