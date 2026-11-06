@@ -75,9 +75,6 @@ export function useUserProfileWeb3WalletsController({
           provider.id,
           walletName,
           target => {
-            if (signal.aborted) {
-              return;
-            }
             setOwner({ kind: 'connect', providerId: provider.id, target });
             if (provider.walletPicker === 'solana' && target.kind === 'wallet') {
               setPicker({ open: false });
@@ -85,15 +82,11 @@ export function useUserProfileWeb3WalletsController({
           },
           signal,
         );
-        if (!signal.aborted) {
-          setPicker({ open: false });
-        }
+        setPicker({ open: false });
       } finally {
-        if (!signal.aborted) {
-          setPicker(current =>
-            current.open && current.kind === 'connect' ? { ...current, walletName: undefined } : current,
-          );
-        }
+        setPicker(current =>
+          current.open && current.kind === 'connect' ? { ...current, walletName: undefined } : current,
+        );
       }
     });
 
@@ -106,9 +99,7 @@ export function useUserProfileWeb3WalletsController({
       try {
         await verify(walletId, walletName, signal);
       } finally {
-        if (!signal.aborted) {
-          setPicker({ open: false });
-        }
+        setPicker({ open: false });
       }
     });
 
