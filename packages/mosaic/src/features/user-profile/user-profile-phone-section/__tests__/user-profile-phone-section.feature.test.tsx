@@ -26,6 +26,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePhoneSection } from '../user-profile-phone-section';
 
 const HOME = fapiPhoneNumber({
@@ -155,6 +156,35 @@ describe('the user profile phone section', () => {
 
     expect(screen.getByRole('button', { name: 'Country, Germany' })).toBeInTheDocument();
     expect(screen.getByText('+49')).toBeInTheDocument();
+  });
+
+  it('uses the localization of its provider for the country picker', async () => {
+    serveFapi(signedIn([], { country: 'de' }));
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{
+          overrides: {
+            'userProfile.phone.addDialog.phone.selectedCountry': 'Land: {country}',
+            'userProfile.phone.addDialog.phone.chooseCountry': 'Land wählen',
+            'userProfile.phone.addDialog.phone.searchCountries': 'Länder durchsuchen',
+            'userProfile.phone.addDialog.phone.countrySearchPlaceholder': 'Suchen',
+            'userProfile.phone.addDialog.phone.noCountries': 'Keine Länder gefunden',
+          },
+        }}
+      >
+        <UserProfilePhoneSection />
+      </MosaicProvider>,
+    );
+    const actor = userEvent.setup();
+
+    await actor.click(screen.getByRole('button', { name: 'Add phone number' }));
+    await actor.click(await screen.findByRole('button', { name: 'Land: Germany' }));
+
+    const picker = await screen.findByRole('dialog', { name: 'Land wählen' });
+    const search = within(picker).getByRole('combobox', { name: 'Länder durchsuchen' });
+    expect(search).toHaveAttribute('placeholder', 'Suchen');
+    await actor.type(search, 'zzzz');
+    await waitFor(() => expect(picker).toHaveTextContent('Keine Länder gefunden'));
   });
 
   it('says something went wrong when sending the code fails without details', async () => {

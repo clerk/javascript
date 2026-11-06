@@ -69,7 +69,12 @@ export interface UseFormResult<TValues extends object> {
    * `register`.
    *
    * @example
-   * <PhoneInput {...form.registerValue('phoneNumber')} />
+   * <PhoneInput
+   *   {...form.registerValue('phoneNumber')}
+   *   countryTriggerLabel='Country, {country}'
+   *   countryPopupLabel='Choose a country'
+   *   countrySearchLabel='Search countries'
+   * />
    */
   registerValue: <K extends keyof TValues>(name: K) => RegisteredValueField<TValues, K>;
   setValue: <K extends keyof TValues>(name: K, value: TValues[K]) => void;
