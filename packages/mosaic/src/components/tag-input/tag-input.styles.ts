@@ -94,7 +94,8 @@ export const styles = stylex.create({
       ':enabled:active': colorVars['--cl-color-neutral-alpha-300'],
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral-alpha-200'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"], :active)':
+          colorVars['--cl-color-neutral-alpha-200'],
       },
     },
     color: 'inherit',
@@ -105,7 +106,10 @@ export const styles = stylex.create({
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
       ':enabled:active': durationVars['--cl-duration-instant'],
-      ':enabled:hover': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'background-color',
     transitionTimingFunction: 'linear',
