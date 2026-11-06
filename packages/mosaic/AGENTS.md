@@ -24,19 +24,21 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
 | Add a public prop that shows or hides UI  | [Public visibility props](docs/public-props.md)                                   |
 | Document a component in Swingset          | [Documenting components](docs/documenting-components.md)                          |
+| Route a component's pages or steps        | [Routing](docs/routing.md)                                                        |
 | Prove a change in a browser               | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                            |
 
 ## Before editing a file
 
 Before you change a file that matches a pattern below, read its guide, even for a one-line change.
 
-| File                                                               | Read                               |
-| ------------------------------------------------------------------ | ---------------------------------- |
-| `src/**/*.styles.ts`, `src/**/*.stylex.ts`                         | [StyleX](docs/stylex.md)           |
-| `src/**/*.model.ts(x)`                                             | [Models](docs/models.md)           |
-| `src/**/*.controller.ts(x)`                                        | [Controllers](docs/controllers.md) |
-| `src/**/*.view.tsx`                                                | [Views](docs/views.md)             |
-| `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` | [Testing](docs/testing.md)         |
+| File                                                               | Read                                     |
+| ------------------------------------------------------------------ | ---------------------------------------- |
+| `src/**/*.styles.ts`, `src/**/*.stylex.ts`                         | [StyleX](docs/stylex.md)                 |
+| `src/**/*.model.ts(x)`                                             | [Models](docs/models.md)                 |
+| `src/**/*.controller.ts(x)`                                        | [Controllers](docs/controllers.md)       |
+| `src/**/*.view.tsx`                                                | [Views](docs/views.md)                   |
+| `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` | [Testing](docs/testing.md)               |
+| `src/routing/**`, `src/modals/modal-host.tsx`                      | [Routing decisions](docs/edrs/README.md) |
 
 ## Layers in one paragraph
 
