@@ -2,6 +2,9 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
+const groupInset = space['1.5'];
+const cardRadius = radiusVars['--cl-radius-xl'];
+
 export const styles = stylex.create({
   root: {
     // The icon in the media column rides the row's text strength rather than its own, the way
@@ -10,7 +13,7 @@ export const styles = stylex.create({
     // `interactive` rather than gaining a hover branch here: StyleX resolves a property to the
     // last style that declares it, so the two can't merge.
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    borderRadius: radiusVars['--cl-radius-md'],
+    borderRadius: `max(0px, calc(${cardRadius} - ${groupInset}))`,
     gap: space['1.5'],
     paddingInline: space['1.5'],
     alignItems: 'center',
@@ -112,7 +115,7 @@ export const styles = stylex.create({
   },
 
   group: {
-    padding: space['1.5'],
+    padding: groupInset,
     width: '100%',
   },
 
