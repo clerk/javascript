@@ -58,6 +58,18 @@ Before you change a file that matches a pattern below, read its guide, even for 
 - `src/**/*.view.tsx` → [Views](docs/views.md)
 - `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` → [Testing](docs/testing.md)
 
+## Ports of legacy components are migrations
+
+For a current task that implements or reviews a Mosaic migration, or changes its migrated behavior, search `packages/react/src/components/` and `packages/ui/src/components/` for the counterpart. A headless port framed as a new feature is a [migration](docs/migration.md) too. Unrelated work does not acquire this workflow merely because the branch already contains Mosaic changes.
+
+1. Read the counterpart, shared prop types, and relevant helper/runtime calls. Write the Phase 1 inventory to `tmp/mosaic-parity/<feature>.md` before the model. Record the task scope, exact revisions, accepted differences, and exclusions alongside the legacy path and `## Inventory` section.
+2. Before you call the work done, review it, or open a PR, run the [parity audit](docs/parity-audit.md) in a read-only subagent and put its table under `## Parity audit` in the same file. Reading the doc is not running the audit.
+3. Use the audit's classifications to separate parity gaps, intentional differences needing disclosure, missing verification, and optional improvements. List intentional differences and approved deferrals in the PR description. Do not require inherited improvements or refactors as parity fixes.
+4. Listing a difference does not make it acceptable. Cite any conflicting rule in this file or `docs/`, and fix the gap or raise it with the user. Do not infer intentional behavior from the implementation. Preserve decisions the user already made, and leave unresolved product choices open.
+5. Inspect the actual results of focused type and behavior checks. For relevant async actions, include a representative failure through the existing fake FAPI or supported browser setup. A populated note is process bookkeeping, not proof of parity.
+
+`tmp/` is ignored by git, so the file stays out of the PR. The hooks in `.claude/settings.json` and `.codex/hooks.json` (`scripts/mosaic-parity-gate.mjs`) give conditional guidance for the feature paths in the current edit. They do not inspect branch history or notes, deny edits, or block completion. For a read-only parity review, run the explicit scoped command in [Parity audit](docs/parity-audit.md). These reminders do not run the audit or verify its evidence.
+
 ## Layers in one paragraph
 
 A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is the only file that reads Clerk hooks or calls Clerk resources, and answers with plain data, plain callbacks and a `status`. The **controller** (`*.controller.ts(x)`) holds local state and wraps the model's callbacks for pending, errors and closing. The **view** (`*.view.tsx`) renders plain props. No Clerk resource reaches the controller and no machine snapshot reaches the view. The file shape and how a wrapper composes the layers are in [Features](docs/features.md).
