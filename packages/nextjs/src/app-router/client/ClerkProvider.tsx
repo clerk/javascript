@@ -56,7 +56,13 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
         if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
           resolve(); // noop
         } else {
-          void invalidateCacheAction().then(() => resolve());
+          void invalidateCacheAction().then(
+            () => resolve(),
+            () => {
+              router.refresh();
+              resolve();
+            },
+          );
         }
       });
     };
