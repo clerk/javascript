@@ -127,6 +127,7 @@ export function useAPIKeysTableFixture({
   const pageCount = Math.ceil(filtered.length / pageSize);
   useEffect(() => {
     if (page > Math.max(1, pageCount)) {
+      // eslint-disable-next-line react/set-state-in-effect -- Keep the fixture page within range after its data changes
       setPage(Math.max(1, pageCount));
     }
   }, [page, pageCount]);

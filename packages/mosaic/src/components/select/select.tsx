@@ -24,8 +24,8 @@ import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { selectOptionScope } from './select.markers.stylex';
 import * as slots from './select.styles';
 
-export interface SelectItem {
-  value: string;
+export interface SelectItem<Value = string> {
+  value: Value;
   /** Shown in the row and in the trigger once selected; also drives typeahead. */
   label: string;
   /**
@@ -36,23 +36,28 @@ export interface SelectItem {
   disabled?: boolean;
 }
 
-interface SelectItemsProps {
+interface SelectItemsProps<Value> {
   /**
    * Every choice. Required, unlike the primitive's: the options only mount while the listbox is
    * open, so this is what lets the closed trigger show the selected label. `Select.Popup`
    * renders them as `Select.Option`s when it is given no children.
    */
-  items: SelectItem[];
+  items: SelectItem<Value>[];
 }
 
-export type SelectProps =
-  | (Omit<PrimitiveSelectSingleProps, 'items'> & SelectItemsProps)
-  | (Omit<PrimitiveSelectMultipleProps, 'items'> & SelectItemsProps);
+export type SelectProps<Value = string> =
+  | (Omit<PrimitiveSelectSingleProps<Value>, 'items'> & SelectItemsProps<Value>)
+  | (Omit<PrimitiveSelectMultipleProps<Value>, 'items'> & SelectItemsProps<Value>);
 
-const ItemsContext = React.createContext<SelectItem[]>([]);
+const ItemsContext = React.createContext<SelectItem<unknown>[]>([]);
 
 /** Holds the selection and the items; renders no element of its own. */
-export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: SelectProps): React.ReactElement {
+export function SelectRoot<Value = string>({
+  items,
+  alignItemWithTrigger,
+  children,
+  ...rest
+}: SelectProps<Value>): React.ReactElement {
   const described = items.some(item => item.description !== undefined);
 
   return (
@@ -84,7 +89,7 @@ export type SelectTriggerProps = Omit<MosaicComponentProps<'button'>, 'children'
    * Content that replaces the selected label. A function renders inside the value slot and
    * receives the selected values; anything else replaces the value slot entirely.
    */
-  children?: React.ReactNode | ((value: string[]) => React.ReactNode);
+  children?: React.ReactNode | ((value: unknown[]) => React.ReactNode);
 };
 
 /**
@@ -164,7 +169,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       )}
       <Icon
         glyph={ChevronDown}
-        size='sm'
+        size='md'
         placement='inline-end'
         {...themeProps('select-trigger-icon')}
       />
@@ -208,9 +213,10 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
             )}
           >
             {children ??
-              items.map(item => (
+              items.map((item, index) => (
                 <SelectOption
-                  key={item.value}
+                  // eslint-disable-next-line react/no-array-index-key -- Values can be any type, so position is the only key; a row keeps no state that a reorder would misplace.
+                  key={index}
                   {...item}
                 />
               ))}
@@ -222,7 +228,10 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
 });
 
 export interface SelectOptionProps
-  extends Omit<PrimitiveSelectOptionProps, 'label' | 'children' | 'className' | 'style'>, MosaicStyleProps, SelectItem {
+  extends
+    Omit<PrimitiveSelectOptionProps, 'label' | 'children' | 'className' | 'style'>,
+    MosaicStyleProps,
+    SelectItem<unknown> {
   /**
    * The row's content, composed from `Select.Media` and `Select.Content`. Without children the row
    * shows `label` and `description`.
@@ -276,7 +285,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
       </OptionContext.Provider>
       <Icon
         glyph={Checkmark}
-        size='sm'
+        size='md'
         xstyle={slots.indicator.base}
         {...themeProps('select-option-indicator')}
       />

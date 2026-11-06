@@ -132,6 +132,8 @@
     "json5": "2.2.3",
     "jsonwebtoken": "9.0.3",
     "lint-staged": "^14.0.1",
+    "oxlint": "1.90.0",
+    "oxlint-tsgolint": "7.0.2005",
     "pkglab": "0.17.1",
     "prettier": "3.8.3",
     "prettier-plugin-astro": "^0.14.1",

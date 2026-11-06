@@ -4,7 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputLogs": "new-only",
-      "outputs": ["components/**", "dist/**"]
+      "outputs": ["components/**", "dist/**", "types.ts"]
     }
   }
 }

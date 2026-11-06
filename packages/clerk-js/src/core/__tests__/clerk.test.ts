@@ -261,6 +261,41 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
+      it('sets a session id active after reloading a client that does not list it yet', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        const client = {
+          sessions: [] as (typeof mockSession)[],
+          signedInSessions: [] as (typeof mockSession)[],
+          reload: vi.fn(),
+        };
+        client.reload.mockImplementation(() => {
+          client.sessions = [mockSession];
+          client.signedInSessions = [mockSession];
+          return Promise.resolve(client);
+        });
+        mockClientFetch.mockReturnValue(Promise.resolve(client));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession.id });
+
+        expect(client.reload).toHaveBeenCalledTimes(1);
+        expect(sut.session).toBe(mockSession);
+      });
+
+      it('does not reload the client when it lists the session id', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        const client = { sessions: [mockSession], signedInSessions: [mockSession], reload: vi.fn() };
+        mockClientFetch.mockReturnValue(Promise.resolve(client));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession.id });
+
+        expect(client.reload).not.toHaveBeenCalled();
+        expect(sut.session).toBe(mockSession);
+      });
+
       it('mounts OAuthConsent when mounted while navigating to redirectUrl', async () => {
         mockClientFetch.mockReturnValue(
           Promise.resolve({ signedInSessions: [mockSession], isEligibleForTouch: () => false }),
@@ -1095,6 +1130,47 @@ describe('Clerk singleton', () => {
           expect(sut.status).toBe('degraded');
         });
 
+        describe('when the initial requests stall', () => {
+          beforeEach(() => {
+            vi.useFakeTimers();
+          });
+
+          afterEach(() => {
+            vi.useRealTimers();
+          });
+
+          it('aborts them and falls back to the cached resources', async () => {
+            const clientInstance = { fetch: mockClientFetch, signedInSessions: [] };
+            vi.mocked(Client.getOrCreateInstance)
+              .mockReturnValueOnce(clientInstance as any)
+              .mockReturnValueOnce(clientInstance as any);
+            mockEnvironmentFetch.mockReturnValueOnce(new Promise(() => {}));
+
+            const sut = new Clerk(productionPublishableKey);
+            sut.__internal_getCachedResources = vi.fn(() => Promise.resolve({ client: null, environment: null }));
+            let settled = false;
+            void sut.load({ standardBrowser: false }).finally(() => (settled = true));
+            await vi.advanceTimersByTimeAsync(7_000);
+
+            expect(settled).toBe(true);
+            expect(sut.status).toBe('degraded');
+            expect(mockEnvironmentFetch).toHaveBeenCalledWith(
+              expect.objectContaining({ abortSignal: expect.objectContaining({ aborted: true }) }),
+            );
+          });
+
+          it('keeps waiting for them when there is no cached-resources fallback', async () => {
+            mockEnvironmentFetch.mockReturnValueOnce(new Promise(() => {}));
+
+            const sut = new Clerk(productionPublishableKey);
+            let settled = false;
+            void sut.load({ standardBrowser: false }).finally(() => (settled = true));
+            await vi.advanceTimersByTimeAsync(60_000);
+
+            expect(settled).toBe(false);
+          });
+        });
+
         it('does not fall back to the cached resources on a 4xx API response', async () => {
           const error = new ClerkAPIResponseError('Bad Request', { data: [], status: 400 });
           mockClientFetch.mockRejectedValue(error);
@@ -1145,6 +1221,23 @@ describe('Clerk singleton', () => {
 
           expect(sut.status).toBe('ready');
           expect(statuses).toEqual(['ready']);
+        });
+
+        it('rejects a stalled reload with a network error', async () => {
+          vi.useFakeTimers();
+          try {
+            const { sut } = await loadFailingSut();
+            mockClientFetch.mockReturnValueOnce(new Promise(() => {}));
+
+            let error: unknown;
+            void sut.__internal_reloadInitialResources().catch(e => (error = e));
+            await vi.advanceTimersByTimeAsync(7_000);
+
+            expect(error).toMatchObject({ code: 'network_error' });
+            expect(sut.status).toBe('error');
+          } finally {
+            vi.useRealTimers();
+          }
         });
 
         it('finishes loading once when reloads overlap', async () => {
@@ -2256,6 +2349,136 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata });
         expect(mockSetActive).toHaveBeenCalled();
+      });
+    });
+
+    describe('when called again while a callback is in flight', () => {
+      const loadTransferableClerk = async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            authConfig: {},
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            onWindowLocationHost: () => false,
+          }),
+        );
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: new SignIn({
+              status: 'needs_identifier',
+              first_factor_verification: {
+                status: 'transferable',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: {
+                  code: 'external_account_not_found',
+                  long_message: 'The External Account was not found.',
+                  message: 'Invalid external account',
+                },
+              },
+              second_factor_verification: null,
+              identifier: '',
+              user_data: null,
+              created_session_id: null,
+              created_user_id: null,
+            } as any as SignInJSON),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.setActive = vi.fn();
+        return sut;
+      };
+
+      it('transfers once and resolves both callers', async () => {
+        const sut = await loadTransferableClerk();
+        let resolveTransfer: (value: unknown) => void = () => {};
+        const mockSignUpCreate = vi.fn().mockReturnValue(
+          new Promise(resolve => {
+            resolveTransfer = resolve;
+          }),
+        );
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        const first = sut.handleRedirectCallback();
+        const second = sut.handleRedirectCallback();
+        resolveTransfer({ status: 'complete', createdSessionId: '123' });
+        await Promise.all([first, second]);
+
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(1);
+        expect(sut.setActive).toHaveBeenCalledTimes(1);
+      });
+
+      it('rejects both callers when the transfer fails', async () => {
+        const sut = await loadTransferableClerk();
+        const error = new Error('transfer failed');
+        const mockSignUpCreate = vi.fn().mockRejectedValue(error);
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        const first = sut.handleRedirectCallback();
+        const second = sut.handleRedirectCallback();
+
+        await expect(first).rejects.toBe(error);
+        await expect(second).rejects.toBe(error);
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(1);
+      });
+
+      it.each([
+        ['succeeded', () => Promise.resolve({ status: 'complete', createdSessionId: '123' })],
+        ['failed', () => Promise.reject(new Error('transfer failed'))],
+      ])('runs a later call once the previous one has %s', async (_, transfer) => {
+        const sut = await loadTransferableClerk();
+        const mockSignUpCreate = vi.fn().mockImplementation(transfer);
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        await sut.handleRedirectCallback().catch(() => {});
+        await sut.handleRedirectCallback().catch(() => {});
+
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(2);
+      });
+
+      it('ignores the params and customNavigate of a call that joins a running one', async () => {
+        const sut = await loadTransferableClerk();
+        const mockSignUpCreate = vi.fn();
+        sut.client!.signUp.create = mockSignUpCreate;
+        const firstNavigate = vi.fn().mockResolvedValue(undefined);
+        const secondNavigate = vi.fn().mockResolvedValue(undefined);
+
+        const first = sut.handleRedirectCallback({ transferable: false }, firstNavigate);
+        const second = sut.handleRedirectCallback({}, secondNavigate);
+        await Promise.all([first, second]);
+
+        expect(firstNavigate).toHaveBeenCalledTimes(1);
+        expect(secondNavigate).not.toHaveBeenCalled();
+        expect(mockSignUpCreate).not.toHaveBeenCalled();
+      });
+
+      it('does not make __internal_resumeAfterProtectCheck join a running call', async () => {
+        const sut = await loadTransferableClerk();
+        let resolveTransfer: (value: unknown) => void = () => {};
+        const mockSignUpCreate = vi.fn().mockReturnValue(
+          new Promise(resolve => {
+            resolveTransfer = resolve;
+          }),
+        );
+        sut.client!.signUp.create = mockSignUpCreate;
+
+        const callback = sut.handleRedirectCallback();
+        const resume = sut.__internal_resumeAfterProtectCheck();
+        resolveTransfer({ status: 'complete', createdSessionId: '123' });
+        await Promise.all([callback, resume]);
+
+        expect(mockSignUpCreate).toHaveBeenCalledTimes(2);
       });
     });
 

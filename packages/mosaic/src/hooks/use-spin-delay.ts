@@ -33,6 +33,7 @@ export function useSpinDelay<T>(value: T | null, options: SpinDelayOptions = {})
       }
       if (delay <= 0) {
         shownAt.current = Date.now();
+        // eslint-disable-next-line react/set-state-in-effect -- Synchronize the delayed indicator with its timer and input.
         setShown(value);
         return;
       }

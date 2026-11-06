@@ -3,6 +3,7 @@ import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
 import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
 import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
+import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
@@ -18,6 +19,7 @@ import { signInButtonMessages } from '../features/sign-in-button/sign-in-button.
 import { signInWithMetamaskButtonMessages } from '../features/sign-in-with-metamask-button/sign-in-with-metamask-button.messages';
 import { signOutButtonMessages } from '../features/sign-out-button/sign-out-button.messages';
 import { signUpButtonMessages } from '../features/sign-up-button/sign-up-button.messages';
+import { taskChooseOrganizationMessages } from '../features/task-choose-organization/task-choose-organization.messages';
 import { taskSetupMfaMessages } from '../features/task-setup-mfa/task-setup-mfa.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
@@ -82,11 +84,13 @@ export const mosaicMessages = {
   apiKeys: apiKeysTableMessages,
   createOrganization: createOrganizationMessages,
   organizationList: organizationListMessages,
+  taskChooseOrganization: taskChooseOrganizationMessages,
   reverification: reverificationMessages,
   profile: profileMessages,
   form: formMessages,
   errors: errorMessages,
   roles: roleMessages,
+  oauthConsent: oauthConsentMessages,
   waitlist: waitlistMessages,
   signIn: signInMessages,
   taskSetupMfa: taskSetupMfaMessages,

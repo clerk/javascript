@@ -40,9 +40,19 @@ Any leaf of the instance config works, not only the leaves in `base.json`. Clerk
 
 To find the name of an `environment` leaf, read `environment` in `base.json`. A leaf that is not there has the dotted path of its value in the JSON that the instance's public `/v1/environment` returns. The Platform API cannot set reverification, the development-mode banner, test mode, or PII protection off.
 
+## Require a minimum app version
+
+A minimum app version isn't a leaf that `host.useSettings` can name, because the bundle ID or package name in its path holds dots and the app must be registered first. A test calls this instead:
+
+```ts
+await host.useMinimumAppVersion({ minimumVersion: '2.0', updateUrl: 'https://apps.apple.com/app/id000000000' });
+```
+
+`minimumVersion` is a version on iOS and a whole version code on Android. The CLI registers the app under test with the application, which a later call finds already done, and sets the minimum through the Platform API config key `native_app_minimum_versions`. It then waits until `native_app_settings.minimum_supported_version` in the public `/v1/environment` shows it. Call it again in the same test to change the minimum. Clerk's `native_app_force_update` flag must be on for the instance.
+
 ## Restore
 
-When a test ends, pass or fail, the CLI puts back every leaf that the test changed, to the value it read before the first change. A leaf changed twice goes back to its value before the first change. The next test starts on the standard settings again.
+When a test ends, pass or fail, the CLI puts back every leaf that the test changed, to the value it read before the first change. A leaf changed twice goes back to its value before the first change. It deletes any minimum app version the test set and leaves the app registered. The next test starts on the standard settings again.
 
 The restore runs in three places, so a crash does not leave the application changed:
 
@@ -50,7 +60,7 @@ The restore runs in three places, so a crash does not leave the application chan
 - `run` restores after e2e exits, in case e2e was stopped before the fixture could.
 - The next `run` or `up` restores what a crashed CLI left. The CLI writes the old values to the worktree's state file before it changes anything, so it can always put them back.
 
-`run.json` has one `settings` entry per call: `at` is the spec line that called `host.useSettings`, `changed` lists each leaf with `from` and `to`, `shown` lists the environment leaves that showed the change, and `restored` says the leaves went back. `attach` refuses a run with an entry that was not restored.
+`run.json` has one `settings` entry per call: `at` is the spec line that called `host.useSettings` or `host.useMinimumAppVersion`, `changed` lists each leaf with `from` and `to`, `shown` lists the environment leaves that showed the change, and `restored` says the leaves went back. `attach` refuses a run with an entry that was not restored.
 
 ## See the settings
 

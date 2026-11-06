@@ -46,11 +46,13 @@ export function useMachine<TContext extends object, TEvent extends EventObject, 
     actorRef.current = createActor(machine, options);
   }
   const actor = actorRef.current;
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
 
   useEffect(() => {
     actor.start();
     return () => actor.stop();
+    // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   }, [actor]);
 
   // Keep injected context (e.g. a function from props) current on every render.
@@ -63,6 +65,7 @@ export function useMachine<TContext extends object, TEvent extends EventObject, 
   });
 
   const onDoneRef = useRef(options?.onDone);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   onDoneRef.current = options?.onDone;
   const doneReportedRef = useRef(false);
   useEffect(() => {
@@ -72,6 +75,7 @@ export function useMachine<TContext extends object, TEvent extends EventObject, 
     }
   }, [snapshot.status]);
 
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   return [snapshot, actor.send, actor];
 }
 
@@ -99,7 +103,9 @@ export function useSelector<
 ): TSelected {
   const selectorRef = useRef(selector);
   const equalsRef = useRef(equals);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   selectorRef.current = selector;
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   equalsRef.current = equals;
 
   const selectedRef = useRef<{ value: TSelected } | null>(null);

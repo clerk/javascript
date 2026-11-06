@@ -59,6 +59,7 @@ Thumbs.db
 
 lerna-debug.log
 .next
+next-env.d.ts
 .dev.vars
 .env.local
 

@@ -183,6 +183,7 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
       <Card.Footer>
         {props.secondaryAction ?? (
           <Dialog.Close
+            disabled={props.isPending || props.isResending}
             render={
               <Button
                 variant='outline'

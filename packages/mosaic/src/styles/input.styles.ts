@@ -17,7 +17,7 @@ export const inputStyles = stylex.create({
       ':focus-visible:where([aria-invalid="true"])': colorVars['--cl-color-negative'],
       ':where([aria-invalid="true"])': colorVars['--cl-color-negative'],
       '@media (hover: hover)': {
-        ':hover:not([aria-invalid="true"])': hoverBorderColor,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"]):not([aria-invalid="true"])': hoverBorderColor,
       },
     },
     borderStyle: 'solid',
@@ -46,7 +46,11 @@ export const inputStyles = stylex.create({
       default: durationVars['--cl-duration-base'],
       ':focus-visible': durationVars['--cl-duration-instant'],
       ':focus-visible:where([aria-invalid="true"])': durationVars['--cl-duration-base'],
-      ':hover:not([aria-invalid="true"])': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"]):not([aria-invalid="true"])':
+          durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'color, background-color, border-color, box-shadow',
     transitionTimingFunction: 'linear',
@@ -58,7 +62,7 @@ export const inputStyles = stylex.create({
       ':has(input:focus-visible, textarea:focus-visible)': hoverBorderColor,
       ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': colorVars['--cl-color-negative'],
       '@media (hover: hover)': {
-        ':hover:not([data-invalid])': hoverBorderColor,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"]):not([data-invalid])': hoverBorderColor,
       },
     },
     borderStyle: 'solid',
@@ -85,9 +89,13 @@ export const inputStyles = stylex.create({
     },
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
-      ':hover:not([data-invalid])': durationVars['--cl-duration-instant'],
       ':has(input:focus-visible, textarea:focus-visible)': durationVars['--cl-duration-instant'],
       ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': durationVars['--cl-duration-base'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"]):not([data-invalid])':
+          durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'color, background-color, border-color, box-shadow',
     transitionTimingFunction: 'linear',

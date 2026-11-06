@@ -201,6 +201,7 @@ function Root<Payload = unknown>({
 }
 
 /** Opens the dialog. Renders a `<button>`; `render` swaps in another element. */
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
 const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger(
   { xstyle, ...rest },
   ref,

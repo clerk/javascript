@@ -81,6 +81,7 @@ export function setup<TContext extends object, TEvent extends EventObject>() {
       // (context, event) for parity with state-entry event access. The extra event
       // parameter is unused; callers receive only context at runtime. The config's
       // inference slots are all forms of Transition.
+      // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
       ({ src: fn, ...config }) as unknown as InvokeConfig<TContext, TEvent, TOutput, TDone | TError>,
   };
 }

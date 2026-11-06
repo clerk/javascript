@@ -66,7 +66,7 @@ export function UserProfileConnectProviderRowView({
             <Icon
               glyph={ArrowUpRight}
               placement='inline-end'
-              size='sm'
+              size='md'
             />
           </SubmitButton>
         </Section.Actions>

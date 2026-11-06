@@ -41,6 +41,7 @@ export function useAPIKeysTableModel(subject: string, pageSize: number, query: s
     enabled: isAvailable && canRead,
   });
   const fetchPage = useRef(apiKeys.fetchPage);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   fetchPage.current = apiKeys.fetchPage;
   useEffect(() => {
     fetchPage.current(1);

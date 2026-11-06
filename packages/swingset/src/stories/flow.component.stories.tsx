@@ -14,7 +14,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/flow/flow.tsx',
 };
 
-function FlowDemo(): JSX.Element {
+function FlowDemo() {
   const [step, setStep] = useState('details');
   const [direction, setDirection] = useState<FlowDirection>(1);
 
@@ -67,11 +67,11 @@ function FlowDemo(): JSX.Element {
   );
 }
 
-export function Default(): JSX.Element {
+export function Default() {
   return <FlowDemo />;
 }
 
-export function Customized(): JSX.Element {
+export function Customized() {
   return (
     <div>
       <style>{`
