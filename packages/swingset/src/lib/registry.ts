@@ -151,6 +151,12 @@ import {
   meta as itemMeta,
 } from '../stories/item.stories';
 import {
+  External as LinkExternal,
+  ExternalWrapping as LinkExternalWrapping,
+  meta as linkMeta,
+  Primary as LinkPrimary,
+} from '../stories/link.stories';
+import {
   Catalog as LocalizationCatalog,
   CatalogWithOverrides as LocalizationCatalogWithOverrides,
   Fallback as LocalizationFallback,
@@ -670,6 +676,13 @@ const skeletonModule: StoryModule = {
   Shapes: SkeletonShapes,
   HoldSpace: SkeletonHoldSpace,
   NotShown: SkeletonNotShown,
+};
+
+const linkModule: StoryModule = {
+  meta: linkMeta,
+  Primary: LinkPrimary,
+  External: LinkExternal,
+  ExternalWrapping: LinkExternalWrapping,
 };
 
 const badgeModule: StoryModule = {
@@ -1272,6 +1285,7 @@ export const registry: StoryModule[] = [
   skeletonModule,
   bannerModule,
   buttonModule,
+  linkModule,
   cardComponentModule,
   checkboxModule,
   comboboxModule,
