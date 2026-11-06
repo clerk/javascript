@@ -27,8 +27,10 @@ Read every line that matches your task. Paths below are relative to this package
 
 - Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If the repo's `packages/ui` has a legacy version, [Migration](docs/migration.md) first
 - Write or change a model, or add a Clerk read, mutation or permission check → [Models](docs/models.md)
+- Build a feature from a design before Clerk's API can back it → [Models → Before the API exists](docs/models.md#before-the-api-exists)
 - Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
 - Write or debug a state machine → [Controllers → Machines](docs/controllers.md#machines), then [Machine runtime](src/machine/README.md)
+- Build a flow with several steps on one surface → [Controllers → Multi-step flows](docs/controllers.md#multi-step-flows), then [Views → Moving between screens](docs/views.md#moving-between-screens-on-one-surface)
 - Write or change a view, a dialog or step it renders, or a feature's copy → [Views](docs/views.md)
 - Add a styled component, or change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
 - Write or change a `*.styles.ts` or `*.stylex.ts` file → [StyleX](docs/stylex.md)
@@ -83,6 +85,8 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - Data read from a Clerk resource that should be cached across mounts → A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)
 - The seconds left on a resend cooldown, for display → `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine
 - An avatar or logo row: picker, drop target, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
+- Any other file picker or drop zone, such as a metadata or key file → `FileUpload` (`src/primitives/file-upload/`), see its `README.md`
+- An inline notice inside content: info, warning, error or success → `Banner` (`src/components/banner/`); a form-level error on a card uses `Card.Banner`
 - Siblings that slide when an item is added or removed → `useLayoutAnimation` (`src/primitives/hooks/`)
 - An input that reformats as the user types without moving the caret → `useFormattedInput` (`src/primitives/hooks/`)
 - Arrow-key navigation with one tab stop across a group of items → `useComposite`, with `useCompositeItems` and `useCompositeItem` (`src/primitives/hooks/`)

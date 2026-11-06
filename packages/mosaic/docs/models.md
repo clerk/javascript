@@ -1,6 +1,6 @@
 # Models
 
-Read this when you write or change a `*.model.ts(x)`, or add a Clerk read, mutation or permission check to a feature. It covers the model's shape, what it owns and how it reports errors; the layer split is in [Features](features.md).
+Read this when you write or change a `*.model.ts(x)`, add a Clerk read, mutation or permission check to a feature, or build a feature from a design before Clerk's API can back it. It covers the model's shape, what it owns and how it reports errors; the layer split is in [Features](features.md).
 
 Worked example: `src/features/switcher/switcher.model.tsx`.
 
@@ -56,6 +56,33 @@ An action Clerk may interrupt for reverification wraps its Clerk call in `useRev
 - Return the `reverification` controller beside the callbacks. A confirmation action passes it to `useConfirmController`; a direct action passes it to `ReverificationDialog` (`src/blocks/reverification/`) in the view.
 
 A cancelled challenge rejects the callback with a `reverification_cancelled` error, which `save` lets through for the controller to recognise.
+
+## Before the API exists
+
+A feature built from a design before Clerk can back it still starts with its model. Write the model's return type first, the same shape a real model returns: a `status`, plain data and callbacks. The model hook comes when the API does.
+
+- **`Pick` what Clerk already has.** Search `@clerk/shared/types` before writing a field. A new design often needs types Clerk already has, such as `OrganizationEnrollmentMode` or `EnterpriseConnectionResource`.
+- **Name the rest for the resource it will become.** A type Clerk does not have yet is named for that future resource (`EnterpriseConnectionTest`), not for the screen (`AccessData`). When the resource lands, the type becomes a `Pick`.
+- **The swingset fixture implements that type.** It builds a ready model and passes it to the feature's real controller and view (`CreateOrganizationReadyModel` in `packages/swingset/src/stories/create-organization.stories.tsx`).
+- **Composition stays in Mosaic.** The wrapper, and whatever it renders around the view (a title, a back action, a footer), lives in the feature. Swingset supplies data and nothing else, because code there has no feature test and is thrown away when the model lands.
+
+```ts
+export type SsoConnection = Pick<EnterpriseConnectionResource, 'id' | 'name' | 'provider' | 'active' | 'domains'>;
+
+export interface EnterpriseConnectionTest {
+  success: boolean;
+  email?: string;
+}
+
+export type SsoModel =
+  | { status: 'loading' }
+  | {
+      status: 'ready';
+      connections: SsoConnection[];
+      enrollmentMode: OrganizationEnrollmentMode;
+      onTestConnection: (connectionId: string) => Promise<EnterpriseConnectionTest>;
+    };
+```
 
 ## Time-dependent display data
 

@@ -39,9 +39,10 @@ When one screen replaces another on the same card or dialog, render both as step
 ```
 
 - **The surface sits outside the flow, and a step renders only what goes inside it.** A screen used as a step of another feature cannot bring its own `Card.Root`: `ConfirmShell` owns the card and `Reverification` renders only its contents.
-- **Nest a flow when a step has steps of its own.** The outer flow keeps its step mounted, and `useFlowAutoFocus` reaches the inner active step.
+- **One flow per surface.** A step that has steps of its own adds them to the same flow, so the view renders one `Flow.Root`.
 - **The controller owns the step.** Going back is direction `-1`. Derive it from the step when each step has one way in, and hold it in the controller when it does not (`reverification.controller.ts`).
 - **Mark what takes focus with `useFlowAutoFocus`.** Focus moves only for a step that transitions in, so a flow that opens on a step does not take focus.
+- **A multi-step flow gets derived props.** The view renders the `step`, `form` and flags the controller passes and does not work out the step itself. Every step's `Form` uses `id={form.id}` and the controller's `onSubmit`, and its footer action is a `SubmitButton form={form.id}`: `isPending={isTesting}` and `disabled={!canContinue}` on a middle step, `isPending={form.isSubmitting}` and `disabled={!form.canSubmit}` on the last. The controller side is in [Controllers → Multi-step flows](controllers.md#multi-step-flows).
 - A loading or error state of one screen is not a step, and neither is the skeleton shown before a feature has data. Those stay conditionals.
 
 The parts, data attributes and CSS variables are in `src/primitives/flow/README.md`.
