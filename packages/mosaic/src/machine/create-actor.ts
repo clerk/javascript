@@ -1,40 +1,96 @@
 import { logger } from '@clerk/shared/logger';
 
-import { isAssignAction } from './assign';
 import type {
-  Actions,
+  ActionMap,
   Actor,
+  ActorMap,
+  ActorRef,
+  ActorStatus,
   AfterEvent,
   AnyEventObject,
-  AssignAction,
+  AsyncLogic,
   CreateActorOptions,
+  Enqueue,
   EventObject,
+  InputArgs,
+  PersistedSnapshot,
+  RouteEvent,
+  SettledInvoke,
   Snapshot,
   SnapshotListener,
-  StateConfig,
   StateMachine,
-  TransitionConfig,
-  TransitionFn,
+  TransitionArgs,
   Unsubscribe,
 } from './types';
-import { AFTER, ASSIGN, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types';
+import { AFTER, INIT, INVOKE_DONE, INVOKE_ERROR, ROUTE } from './types';
 
 const INIT_EVENT: AnyEventObject = { type: INIT };
+
+type Effect = () => void;
+
+type RuntimeTransitionFn<TContext, TStates extends string> = (
+  args: TransitionArgs<TContext, EventObject>,
+  enq: Enqueue,
+) => { target?: TStates; context?: Partial<TContext> } | undefined | void;
+
+type RuntimeTransition<TContext, TStates extends string> = { target: TStates } | RuntimeTransitionFn<TContext, TStates>;
+
+interface RuntimeInvoke<TContext, TStates extends string> {
+  src?: string;
+  input?: (args: InputArgs<TContext, EventObject>) => unknown;
+  onDone?: RuntimeTransition<TContext, TStates>;
+  onError?: RuntimeTransition<TContext, TStates>;
+  run?: (
+    args: InputArgs<TContext, EventObject>,
+    signal: AbortSignal,
+    settle: (settled: SettledInvoke<TContext, EventObject, TStates>) => void,
+  ) => void;
+}
+
+interface RuntimeState<TContext, TStates extends string> {
+  id?: string;
+  on?: Record<string, RuntimeTransition<TContext, TStates> | undefined>;
+  always?: RuntimeTransitionFn<TContext, TStates>;
+  after?: Record<number, RuntimeTransition<TContext, TStates> | undefined>;
+  invoke?: RuntimeInvoke<TContext, TStates>;
+  entry?: RuntimeTransitionFn<TContext, TStates>;
+  exit?: RuntimeTransitionFn<TContext, TStates>;
+  route?:
+    | ((args: TransitionArgs<TContext, EventObject>) => boolean | { context?: Partial<TContext> } | undefined)
+    | { context?: Partial<TContext> };
+  type?: 'final' | 'choice';
+  choice?: (args: TransitionArgs<TContext, EventObject>) => { target: TStates };
+}
+
+interface RuntimeMachine<TContext, TStates extends string> {
+  initial: TStates;
+  states: Record<string, RuntimeState<TContext, TStates> | undefined>;
+  config: { context: TContext | ((args: { input: unknown }) => TContext) };
+  implementations: { actions: ActionMap; actors: Record<string, AsyncLogic<unknown, unknown> | undefined> };
+}
+
+interface Taken<TContext, TStates extends string> {
+  target: TStates | undefined;
+  context: Partial<TContext> | undefined;
+  effects: Effect[];
+}
+
+interface At<TContext, TStates extends string> {
+  value: TStates;
+  context: TContext;
+  status: ActorStatus;
+}
 
 interface AfterTimer {
   id: ReturnType<typeof setTimeout>;
   delay: number;
-  transitionConfig: unknown;
 }
-
-// Collapse toArray into single helper: returns empty array, original if array, or wrapped value
-const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? v : [v]);
 
 /**
  * Wrap a machine definition in a running instance (an "actor").
  *
- * Construction is lazy: the snapshot reflects the initial state, but entry
- * actions, immediate (`always`) transitions, and invokes don't run until
+ * Construction is lazy: the snapshot reflects the initial state, but entry,
+ * immediate (`always`) transitions, and invokes don't run until
  * {@link Actor.start} is called.
  *
  * ```ts
@@ -44,135 +100,217 @@ const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? 
  * actor.send({ type: 'TOGGLE' });
  * ```
  */
-export function createActor<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
-  machine: StateMachine<TContext, TEvent, TStates>,
-  options: CreateActorOptions<TContext, TStates> = {},
+export function createActor<
+  TContext extends object,
+  TEvent extends EventObject,
+  TStates extends string,
+  TActions extends ActionMap,
+  TActors extends ActorMap,
+  TInput,
+>(
+  machine: StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput>,
+  options: CreateActorOptions<TInput> = {},
 ): Actor<TContext, TEvent, TStates> {
-  const teleport = options.snapshot;
+  return runActor(machine, options.input, undefined);
+}
 
-  // Internally the actor operates on the broader `EventObject`: invoke done/error
-  // events aren't part of the user's `TEvent` union, so the config is viewed
-  // through an event-agnostic lens to keep the runtime helpers honestly typed.
+/**
+ * Create an actor seated in a snapshot from `machine.resolveState(...)`. Restoring runs
+ * no entry, `always` or invoke for that state; `start()` then resumes it.
+ *
+ * ```ts
+ * const actor = restoreActor(machine, machine.resolveState({ value: 'deleting', context })).start();
+ * ```
+ */
+export function restoreActor<
+  TContext extends object,
+  TEvent extends EventObject,
+  TStates extends string,
+  TActions extends ActionMap,
+  TActors extends ActorMap,
+  TInput,
+>(
+  machine: StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput>,
+  snapshot: PersistedSnapshot<TContext, TStates>,
+): Actor<TContext, TEvent, TStates> {
+  return runActor(machine, undefined, snapshot);
+}
+
+function runActor<
+  TContext extends object,
+  TEvent extends EventObject,
+  TStates extends string,
+  TActions extends ActionMap,
+  TActors extends ActorMap,
+  TInput,
+>(
+  machine: StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput>,
+  input: TInput | undefined,
+  restored: PersistedSnapshot<TContext, TStates> | undefined,
+): Actor<TContext, TEvent, TStates> {
   // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
-  const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject, TStates>>;
-  const emptyState: StateConfig<TContext, EventObject, TStates> = {};
-  const stateOf = (id: string): StateConfig<TContext, EventObject, TStates> => {
-    const state = states[id];
+  const logic = machine as unknown as RuntimeMachine<TContext, TStates>;
+  const emptyState: RuntimeState<TContext, TStates> = {};
+  const stateOf = (id: string): RuntimeState<TContext, TStates> => {
+    const state = logic.states[id];
     if (state) {
       return state;
     }
-    if (Object.keys(states).length > 0) {
+    if (Object.keys(logic.states).length > 0) {
       logger.warnOnce(`[Clerk] Machine has no state "${id}".`);
     }
     return emptyState;
   };
 
-  // Tracks the latest setContext patch so it survives a stop/start cycle.
-  let liveContextPatch: Partial<TContext> = options.context ?? {};
-  let context: TContext = { ...machine.context, ...liveContextPatch, ...teleport?.context };
-  // `initial` may be derived from context (e.g. furthest-reachable step).
-  const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
-  let value = teleport?.value ?? resolveInitial();
+  const self: ActorRef<TContext, EventObject> = {
+    send: event => send(event),
+    getSnapshot: () => snapshot,
+  };
+  const argsFor = <TArgEvent extends EventObject>(event: TArgEvent, at: { context: TContext }) => ({
+    context: at.context,
+    event,
+    self,
+    actions: logic.implementations.actions,
+  });
 
-  // A teleported actor is already "started" and inert: start() must not re-run
-  // entry/always/invoke for the state it was dropped into.
-  let started = teleport !== undefined;
-  let initialized = started;
-  let status: Snapshot<TContext>['status'] = stateOf(value).type === 'final' ? 'done' : 'active';
+  let context: TContext = restored ? restored.context : initialContext();
+  let value: TStates = restored ? restored.value : resolveChoice(logic.initial, INIT_EVENT);
+  let status: ActorStatus = restored ? restored.status : stateOf(value).type === 'final' ? 'done' : 'active';
 
-  // Bumped whenever we leave an invoking state, so a stale promise resolving
-  // after the fact is ignored — no transition.
+  let started = false;
+  let initialized = restored !== undefined;
+
   let invocationToken = 0;
+  let invocationAbort: AbortController | undefined;
   const deferred: (() => boolean)[] = [];
+  const mailbox: (() => boolean)[] = [];
+  let processing = false;
+  let effects: Effect[] = [];
 
-  // Pending `after` timers — cleared when the state is exited, paused while the actor is stopped.
   let afterTimers: AfterTimer[] = [];
   let pausedAfterTimers: AfterTimer[] = [];
 
-  // The snapshot is cached and only replaced on an actual change, so
-  // getSnapshot() is referentially stable for useSyncExternalStore.
-  let snapshot: Snapshot<TContext, TStates> = { value, context, status };
+  let snapshot: Snapshot<TContext, TStates, TEvent> = makeSnapshot();
 
-  const listeners: SnapshotListener<TContext, TStates>[] = [];
+  const listeners: SnapshotListener<TContext, TStates, TEvent>[] = [];
 
-  /**
-   * Normalise a raw `Transition` value into a `TransitionConfig[]` the runtime
-   * can process uniformly. Handles all four arms of the `Transition` union:
-   * - string → `{ target: string }`
-   * - `TransitionConfig` → as-is
-   * - `TransitionConfig[]` → as-is
-   * - `TransitionFn` → called immediately; `undefined` return → `[]` (unhandled)
-   */
-  function normalizeTransition(raw: unknown, event: EventObject): TransitionConfig<TContext, EventObject, TStates>[] {
-    if (typeof raw === 'function') {
-      // SAFETY: raw is a TransitionFn — (args: {context, event}) => TransitionResult | undefined.
-      // The cast is required because raw arrives untyped at this internal boundary; callers
-      // have already narrowed the event type via StateConfig.on[K].
-      // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
-      const result = (raw as TransitionFn<TContext, EventObject, TStates>)({ context, event });
-      if (result === undefined) {
-        return [];
-      }
-      const cfg: TransitionConfig<TContext, EventObject, TStates> = { target: result.target };
-      if (result.context !== undefined) {
-        const patch = result.context;
-        // SAFETY: Constructing AssignAction inline avoids importing the assign() helper here.
-        // The ASSIGN symbol is the exact tag isAssignAction checks in runActions.
-        // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
-        cfg.actions = { type: ASSIGN, assignment: () => patch } as AssignAction<TContext, EventObject>;
-      }
-      return [cfg];
-    }
-    // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
-    return toArr(raw as TStates | TransitionConfig<TContext, EventObject, TStates>).map(e =>
-      typeof e === 'string' ? { target: e } : e,
-    );
+  function initialContext(): TContext {
+    const source = logic.config.context;
+    return isContextFn(source) ? source({ input }) : source;
   }
 
-  function runActions(actions: Actions<TContext, EventObject> | undefined, event: EventObject): void {
-    for (const action of toArr(actions)) {
-      if (isAssignAction<TContext, EventObject>(action)) {
-        context = { ...context, ...action.assignment(context, event) };
-      } else {
-        action(context, event);
-      }
+  function resolveChoice(id: TStates, event: EventObject): TStates {
+    let current = id;
+    for (let state = stateOf(current); state.type === 'choice' && state.choice; state = stateOf(current)) {
+      current = state.choice(argsFor(event, { context })).target;
     }
+    return current;
   }
 
-  function pickTransition(
-    transitions: TransitionConfig<TContext, EventObject, TStates>[],
+  function makeSnapshot(): Snapshot<TContext, TStates, TEvent> {
+    const at: At<TContext, TStates> = { value, context, status };
+    return { ...at, can: (event: EventObject) => at.status === 'active' && evaluateEvent(event, at) !== undefined };
+  }
+
+  function evaluate(
+    transition: RuntimeTransition<TContext, TStates> | undefined,
     event: EventObject,
-  ): TransitionConfig<TContext, EventObject, TStates> | undefined {
-    return transitions.find(transition => !transition.guard || transition.guard(context, event));
-  }
-
-  /** Whether a target state's entry guard currently permits landing on it. */
-  function canEnter(stateId: string, event: EventObject): boolean {
-    const guard = stateOf(stateId).guard;
-    return !guard || guard(context, event);
-  }
-
-  /**
-   * Run a chosen transition: exit (if external) → actions → enter target.
-   * Returns `false` — a true no-op — when the target's entry guard blocks it, so
-   * the caller skips the commit and subscribers are never notified.
-   */
-  function takeTransition(transition: TransitionConfig<TContext, EventObject, TStates>, event: EventObject): boolean {
-    const { target } = transition;
-    if (target !== undefined && !canEnter(target, event)) {
-      return false; // entry guard blocks landing → snapshot unchanged, no notify
+    at: { context: TContext },
+  ): Taken<TContext, TStates> | undefined {
+    if (transition === undefined) {
+      return undefined;
     }
-    if (target !== undefined) {
-      runActions(stateOf(value).exit, event);
-      invocationToken++; // abandon the invoke of the state we're leaving
+    if (typeof transition !== 'function') {
+      return { target: transition.target, context: undefined, effects: [] };
+    }
+    const queued: Effect[] = [];
+    const enq: Enqueue = (fn, ...args) => {
+      queued.push(() => fn(...args));
+    };
+    const result = transition(argsFor(event, at), enq);
+    if (!result) {
+      return queued.length === 0 ? undefined : { target: undefined, context: undefined, effects: queued };
+    }
+    return { target: result.target, context: result.context, effects: queued };
+  }
+
+  function evaluateRoute(event: EventObject, at: { context: TContext }): Taken<TContext, TStates> | undefined {
+    if (!isRouteEvent(event)) {
+      return undefined;
+    }
+    const id = event.to.slice(1);
+    for (const target of Object.keys(machine.states)) {
+      const { id: stateId, route } = stateOf(target);
+      if (stateId !== id || route === undefined) {
+        continue;
+      }
+      const allowed = typeof route === 'function' ? route(argsFor(event, at)) : route;
+      if (!allowed || !isState(target)) {
+        return undefined;
+      }
+      return { target, context: allowed === true ? undefined : allowed.context, effects: [] };
+    }
+    return undefined;
+  }
+
+  function isState(id: string): id is TStates {
+    return id in machine.states;
+  }
+
+  function evaluateEvent(
+    event: EventObject,
+    at: { value: TStates; context: TContext },
+  ): Taken<TContext, TStates> | undefined {
+    return evaluate(stateOf(at.value).on?.[event.type], event, at) ?? evaluateRoute(event, at);
+  }
+
+  function runEntryExit(fn: RuntimeTransitionFn<TContext, TStates> | undefined, event: EventObject): void {
+    const taken = evaluate(fn, event, { context });
+    if (taken) {
+      applyContext(taken.context);
+      effects.push(...taken.effects);
+    }
+  }
+
+  function applyContext(patch: Partial<TContext> | undefined): void {
+    if (patch) {
+      context = { ...context, ...patch };
+    }
+  }
+
+  function takeTransition(taken: Taken<TContext, TStates>, event: EventObject): void {
+    if (taken.target !== undefined) {
+      runEntryExit(stateOf(value).exit, event);
+      invocationToken++;
+      invocationAbort?.abort();
+      invocationAbort = undefined;
       clearAfterTimers();
     }
-    runActions(transition.actions, event);
-    if (target !== undefined) {
-      value = target;
+    applyContext(taken.context);
+    effects.push(...taken.effects);
+    if (taken.target !== undefined) {
+      value = resolveChoice(taken.target, event);
       enterState(event);
     }
-    return true;
+  }
+
+  function enterState(event: EventObject): void {
+    const stateConfig = stateOf(value);
+    runEntryExit(stateConfig.entry, event);
+
+    if (stateConfig.type === 'final') {
+      status = 'done';
+      return;
+    }
+
+    const immediate = evaluate(stateConfig.always, event, { context });
+    if (immediate && immediate.target !== undefined) {
+      takeTransition(immediate, event);
+      return;
+    }
+
+    startInvoke(event);
+    startAfterTimers();
   }
 
   function startInvoke(event: EventObject): void {
@@ -181,30 +319,51 @@ export function createActor<TContext extends object, TEvent extends EventObject,
       return;
     }
     const token = ++invocationToken;
-    const settle = (transitionConfig: unknown, settledEvent: AnyEventObject) => {
+    const abort = new AbortController();
+    invocationAbort = abort;
+    const settle = ({ event: settledEvent, transition }: SettledInvoke<TContext, EventObject, TStates>) => {
       if (token !== invocationToken) {
         return;
       }
+      const apply = () => {
+        const taken = token === invocationToken ? evaluate(transition, settledEvent, { context }) : undefined;
+        if (taken) {
+          takeTransition(taken, settledEvent);
+        }
+        return taken !== undefined;
+      };
       if (status === 'stopped') {
-        deferred.push(() => token === invocationToken && takeInvokeTransition(transitionConfig, settledEvent));
-        return;
-      }
-      if (status === 'active' && takeInvokeTransition(transitionConfig, settledEvent)) {
-        commit();
+        deferred.push(apply);
+      } else if (status === 'active') {
+        process(apply);
       }
     };
-    const onDone = (output: unknown) => settle(invoke.onDone, { type: INVOKE_DONE, output });
-    const onError = (error: unknown) => settle(invoke.onError, { type: INVOKE_ERROR, error });
+    const onError = (error: unknown) => settle({ event: { type: INVOKE_ERROR, error }, transition: invoke.onError });
+    const onDone = (output: unknown) => settle({ event: { type: INVOKE_DONE, output }, transition: invoke.onDone });
     try {
-      Promise.resolve(invoke.src(context, event)).then(onDone, onError);
+      runInvoke(invoke, { context, event, self }, abort.signal, settle, onDone, onError);
     } catch (error) {
       queueMicrotask(() => onError(error));
     }
   }
 
-  function takeInvokeTransition(transitionConfig: unknown, event: EventObject): boolean {
-    const transition = pickTransition(normalizeTransition(transitionConfig, event), event);
-    return transition !== undefined && takeTransition(transition, event);
+  function runInvoke(
+    invoke: RuntimeInvoke<TContext, TStates>,
+    args: InputArgs<TContext, EventObject>,
+    signal: AbortSignal,
+    settle: (settled: SettledInvoke<TContext, EventObject, TStates>) => void,
+    onDone: (output: unknown) => void,
+    onError: (error: unknown) => void,
+  ): void {
+    if (invoke.run) {
+      invoke.run(args, signal, settle);
+      return;
+    }
+    const named = invoke.src === undefined ? undefined : logic.implementations.actors[invoke.src];
+    if (!named) {
+      throw new Error(`[Clerk] Machine has no actor "${String(invoke.src)}".`);
+    }
+    named.run({ input: invoke.input?.(args), signal }).then(onDone, onError);
   }
 
   function clearAfterTimers(): void {
@@ -219,81 +378,72 @@ export function createActor<TContext extends object, TEvent extends EventObject,
     if (!afterConfig) {
       return;
     }
-    for (const [delayStr, raw] of Object.entries(afterConfig)) {
-      scheduleAfterTimer(Number(delayStr), raw);
+    for (const delay of Object.keys(afterConfig)) {
+      scheduleAfterTimer(Number(delay));
     }
   }
 
-  function scheduleAfterTimer(delay: number, transitionConfig: unknown): void {
+  function scheduleAfterTimer(delay: number): void {
     const timer: AfterTimer = {
       delay,
-      transitionConfig,
       id: setTimeout(() => {
         afterTimers = afterTimers.filter(t => t !== timer);
         if (status !== 'active') {
           return;
         }
         const afterEvent: AfterEvent = { type: AFTER, delay };
-        const transition = pickTransition(normalizeTransition(transitionConfig, afterEvent), afterEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, afterEvent)) {
-          commit();
-        }
+        process(() => {
+          const taken = evaluate(stateOf(value).after?.[delay], afterEvent, { context });
+          if (taken) {
+            takeTransition(taken, afterEvent);
+          }
+          return taken !== undefined;
+        });
       }, delay),
     };
     afterTimers.push(timer);
-  }
-
-  function resume(): void {
-    status = stateOf(value).type === 'final' ? 'done' : 'active';
-    for (const timer of pausedAfterTimers) {
-      scheduleAfterTimer(timer.delay, timer.transitionConfig);
-    }
-    pausedAfterTimers = [];
-  }
-
-  function applyDeferred(): void {
-    while (status === 'active') {
-      const apply = deferred.shift();
-      if (!apply) {
-        return;
-      }
-      apply();
-    }
   }
 
   function takeEventTransition(event: EventObject): boolean {
     if (status !== 'active') {
       return false;
     }
-    const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
-    return transition !== undefined && takeTransition(transition, event);
+    const taken = evaluateEvent(event, { value, context });
+    if (taken) {
+      takeTransition(taken, event);
+    }
+    return taken !== undefined;
   }
 
-  /** Entry side of a state: entry actions, then immediate/invoke resolution. */
-  function enterState(event: EventObject): void {
-    const stateConfig = stateOf(value);
-    runActions(stateConfig.entry, event);
-
-    if (stateConfig.type === 'final') {
-      status = 'done';
+  function process(step: () => boolean): void {
+    mailbox.push(step);
+    if (processing) {
       return;
     }
-
-    const immediate = pickTransition(normalizeTransition(stateConfig.always, event), event);
-    if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
-      return;
+    processing = true;
+    try {
+      for (let next = mailbox.shift(); next; next = mailbox.shift()) {
+        if (next()) {
+          commit();
+        }
+      }
+    } finally {
+      processing = false;
     }
-
-    startInvoke(event);
-    startAfterTimers();
   }
 
   function commit(): void {
-    snapshot = { value, context, status };
+    flush();
     notifyListeners();
+  }
+
+  function flush(): void {
+    const queued = effects;
+    effects = [];
+    for (const effect of queued) {
+      effect();
+    }
+    snapshot = makeSnapshot();
   }
 
   function notifyListeners(): void {
@@ -304,24 +454,45 @@ export function createActor<TContext extends object, TEvent extends EventObject,
     }
   }
 
+  function send(event: EventObject): void {
+    if (!started) {
+      deferred.push(() => takeEventTransition(event));
+      return;
+    }
+    process(() => takeEventTransition(event));
+  }
+
   const actor: Actor<TContext, TEvent, TStates> = {
     start() {
       if (started) {
         return actor;
       }
       started = true;
-      if (initialized) {
-        resume();
-      } else {
-        initialized = true;
-        status = 'active';
-        // The first start seats on the initial state resolved from the latest injected context.
-        context = { ...machine.context, ...liveContextPatch };
-        value = resolveInitial();
-        enterState(INIT_EVENT);
-      }
-      applyDeferred();
-      commit();
+      process(() => {
+        if (initialized) {
+          status = stateOf(value).type === 'final' ? 'done' : 'active';
+          for (const timer of pausedAfterTimers) {
+            scheduleAfterTimer(timer.delay);
+          }
+          pausedAfterTimers = [];
+        } else {
+          initialized = true;
+          status = 'active';
+          enterState(INIT_EVENT);
+        }
+        flush();
+        while (status === 'active') {
+          const apply = deferred.shift();
+          if (!apply) {
+            break;
+          }
+          if (apply()) {
+            flush();
+          }
+        }
+        notifyListeners();
+        return false;
+      });
       return actor;
     },
 
@@ -329,35 +500,22 @@ export function createActor<TContext extends object, TEvent extends EventObject,
       if (status === 'stopped') {
         return;
       }
-      started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
+      started = false;
       status = 'stopped';
       pausedAfterTimers = afterTimers;
       clearAfterTimers();
-      snapshot = { value, context, status };
+      snapshot = makeSnapshot();
       notifyListeners();
       listeners.length = 0;
     },
 
-    send(event) {
-      if (!started) {
-        deferred.push(() => takeEventTransition(event));
-        return;
-      }
-      if (takeEventTransition(event)) {
-        commit();
-      }
-    },
+    send,
 
     getSnapshot() {
       return snapshot;
     },
 
-    // Standard observable contract: `subscribe(cb)` returns an unsubscribe fn.
-    // This is deliberately the same shape as a nanostores atom's `subscribe`, so
-    // if nanostores is adopted repo-wide later a `toAtom(actor)` adapter is a
-    // trivial, non-breaking wrapper over `subscribe` + `getSnapshot` — no need to
-    // pull the dependency in now.
-    subscribe(listener: SnapshotListener<TContext, TStates>): Unsubscribe {
+    subscribe(listener): Unsubscribe {
       listeners.push(listener);
       return () => {
         const i = listeners.indexOf(listener);
@@ -366,76 +524,17 @@ export function createActor<TContext extends object, TEvent extends EventObject,
         }
       };
     },
-
-    can(event) {
-      if (status !== 'active') {
-        return false;
-      }
-      const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
-      if (!transition) {
-        return false;
-      }
-      return transition.target === undefined || canEnter(transition.target, event);
-    },
-
-    setContext(patch: Partial<TContext>) {
-      liveContextPatch = { ...liveContextPatch, ...patch };
-      context = { ...context, ...patch };
-      if (!initialized) {
-        value = resolveInitial();
-      }
-    },
-
-    recheck() {
-      if (status !== 'active') {
-        return;
-      }
-      const event = { type: RECHECK };
-
-      // Self-correct first: if live external data has made the *current* state
-      // unenterable (its entry guard no longer holds), re-seat to the freshly
-      // resolved initial state — the same derivation used on start (e.g. the
-      // Wizard's furthest-reachable step). `resolveInitial` always lands on an
-      // enterable step, so this is provably one-shot and cannot loop.
-      if (!canEnter(value, event)) {
-        const reseated = resolveInitial();
-        if (reseated !== value) {
-          runActions(stateOf(value).exit, event);
-          invocationToken++; // abandon the invoke of the state we're leaving
-          clearAfterTimers();
-          value = reseated;
-          enterState(event);
-          commit();
-        }
-        return;
-      }
-
-      const immediate = pickTransition(normalizeTransition(stateOf(value).always, event), event);
-      if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
-        commit(); // nothing applies → no commit, no notify
-      }
-    },
   };
 
   return actor;
 }
 
-/**
- * Create an actor teleported to an arbitrary `{ value, context }`.
- *
- * The actor is started but inert: no entry actions, immediate transitions, or
- * invokes run for the teleported state. This is the key docs/testing affordance
- * — transient states (e.g. a `deleting` step hidden behind a 2s mutation) can't
- * be reached by clicking through, so teleport straight to them for a snapshot.
- *
- * ```ts
- * const actor = mockActor(machine, { value: 'deleting', context: { error: null } });
- * actor.getSnapshot(); // → { value: 'deleting', context: {...}, status: 'active' }
- * ```
- */
-export function mockActor<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
-  machine: StateMachine<TContext, TEvent, TStates>,
-  snapshot: { value: TStates; context?: Partial<TContext> },
-): Actor<TContext, TEvent, TStates> {
-  return createActor(machine, { snapshot });
+function isContextFn<TContext>(
+  source: TContext | ((args: { input: unknown }) => TContext),
+): source is (args: { input: unknown }) => TContext {
+  return typeof source === 'function';
+}
+
+function isRouteEvent(event: EventObject): event is RouteEvent {
+  return event.type === ROUTE && 'to' in event && typeof event.to === 'string' && event.to.startsWith('#');
 }

@@ -1,11 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { assign } from '../assign';
-import { createActor, mockActor } from '../create-actor';
-import { createMachine } from '../create-machine';
-import type { StateConfig, StateMachine } from '../types';
+import { createActor, restoreActor } from '../create-actor';
+import { setup } from '../setup';
+import type { Actor, StateConfig, StateMachine } from '../types';
 import { useActor, useMachine, useSelector } from '../use-machine';
 
 /**
@@ -42,20 +40,19 @@ import { useActor, useMachine, useSelector } from '../use-machine';
  * ── AFTER (this file) ──────────────────────────────────────────────────────────
  *
  * `createWizardMachine(descriptors)` builds the same flow as an introspectable
- * machine. The reducer's three concepts map one-to-one:
+ * machine. The reducer's concepts map one-to-one:
  *   - `snapshot.value`          ↔ `state.current`
  *   - `snapshot.context`        ↔ `{ direction, hasNavigated }`
- *   - state-node entry `guard`  ↔ `guardHolds` (gates every transition landing
- *                                  on the step, checked uniformly by the actor)
- *   - derived `initial`         ↔ `initialState` furthest-reachable derivation
- *   - guard-blocked transition  ↔ `takeTransition` returns false → no commit, so
- *     returns false (no commit)    `getSnapshot()` is referentially unchanged AND
- *                                  subscribers are not notified (the reducer's
- *                                  `=== state` no-op, for free)
+ *   - a transition function     ↔ `guardHolds` on the target step; it returns
+ *     that checks the target       `undefined` when the guard fails
+ *   - the `seat` choice state   ↔ `initialState` furthest-reachable derivation
+ *   - an unhandled event        ↔ no commit, so `getSnapshot()` is referentially
+ *                                  unchanged AND subscribers are not notified (the
+ *                                  reducer's `=== state` no-op, for free)
  *
  * The seam's render-phase boilerplate collapses:
- *   - **re-seat** becomes `actor.recheck()` (re-validates the current entry guard
- *     and re-seats via the initial resolver — demonstrated below);
+ *   - **re-seat** becomes routing to `#seat` when the current step's guard stops
+ *     holding (demonstrated below);
  *   - **deferred advance** disappears: it only existed to paper over React's
  *     render-phase staleness (a stale `configRef` within one tick). An actor
  *     holds live state OUTSIDE React, so `send` reads live guards synchronously —
@@ -79,23 +76,25 @@ interface WizardContext {
 
 type WizardEvent = { type: 'NEXT' } | { type: 'PREV' } | { type: 'GOTO'; step: string };
 
+const SEAT = 'seat';
+
+const INITIAL_CONTEXT: WizardContext = { direction: 0, hasNavigated: false };
+
 const guardHolds = (d: StepDescriptor): boolean => (d.guard ? d.guard() : true);
+
+const wizard = setup<WizardContext, WizardEvent>();
 
 /**
  * Build the wizard flow from a runtime `descriptors[]` array (a data-driven graph
- * — the states are not a static literal). The result is a fully introspectable
- * machine: `Object.keys(machine.states)` enumerates the steps in declaration
- * order, and each state node carries its entry guard.
+ * — the states are not a static literal). The result is introspectable:
+ * `machine.states` lists the steps in declaration order, after the `seat` choice
+ * state that picks where the wizard starts.
  */
-function createWizardMachine(descriptors: StepDescriptor[]): StateMachine<WizardContext, WizardEvent> {
-  const ids = descriptors.map(d => d.id);
-
-  // Furthest contiguously-reachable step (mirrors reducer.ts `initialState`):
-  // walk forward while the NEXT step's guard holds, stop at the first gate.
+function createWizardMachine(
+  descriptors: StepDescriptor[],
+  options: { initial?: string } = {},
+): StateMachine<WizardContext, WizardEvent> {
   const furthestReachable = (): string => {
-    if (descriptors.length === 0) {
-      return '';
-    }
     let i = 0;
     while (i + 1 < descriptors.length && guardHolds(descriptors[i + 1])) {
       i++;
@@ -103,65 +102,62 @@ function createWizardMachine(descriptors: StepDescriptor[]): StateMachine<Wizard
     return descriptors[i].id;
   };
 
-  const navigated = (direction: 1 | -1 | 0) =>
-    assign<WizardContext, WizardEvent>(() => ({ direction, hasNavigated: true }));
+  const enter = (step: StepDescriptor | undefined, direction: 1 | -1 | 0) =>
+    step && guardHolds(step) ? { target: step.id, context: { direction, hasNavigated: true } } : undefined;
 
   const states: Record<string, StateConfig<WizardContext, WizardEvent>> = {};
+  if (descriptors.length > 0) {
+    states[SEAT] = { id: SEAT, route: {}, type: 'choice', choice: () => ({ target: furthestReachable() }) };
+  }
   descriptors.forEach((d, i) => {
-    const nextId = ids[i + 1];
-    const prevId = ids[i - 1];
+    const next = descriptors[i + 1];
+    const prev = descriptors[i - 1];
     states[d.id] = {
-      // STATE entry guard — gates EVERY transition that targets this step (NEXT
-      // from the predecessor, PREV from the successor, any GOTO). When it fails
-      // the transition is a true no-op (same snapshot ref, no notify).
-      guard: d.guard,
       on: {
         // One slot forward / back only — positional, never a skip-satisfied walk.
         // No handler at the boundary (terminal NEXT / first PREV) ⇒ ignored event
         // ⇒ same-ref no-op, the exact signal a parent link would bubble on.
-        ...(nextId ? { NEXT: { target: nextId, actions: navigated(1) } } : {}),
-        ...(prevId ? { PREV: { target: prevId, actions: navigated(-1) } } : {}),
-        // One GOTO candidate per OTHER step; the first whose transition guard
-        // matches `event.step` wins, then the target's entry guard gates landing.
+        ...(next ? { NEXT: () => enter(next, 1) } : {}),
+        ...(prev ? { PREV: () => enter(prev, -1) } : {}),
         // Excluding self makes GOTO-to-current match nothing → no-op.
-        GOTO: descriptors
-          .filter(t => t.id !== d.id)
-          .map(t => ({
-            target: t.id,
-            guard: (_ctx: WizardContext, e: WizardEvent) => e.type === 'GOTO' && e.step === t.id,
-            actions: navigated(0),
-          })),
+        GOTO: ({ event }) =>
+          enter(
+            descriptors.find(t => t.id === event.step && t.id !== d.id),
+            0,
+          ),
       },
     };
   });
 
-  return createMachine<WizardContext, WizardEvent>({
+  return wizard.createMachine({
     id: 'wizard',
-    initial: furthestReachable,
-    context: { direction: 0, hasNavigated: false },
+    initial: options.initial ?? (descriptors.length > 0 ? SEAT : ''),
+    context: INITIAL_CONTEXT,
     states,
   });
 }
 
 /**
  * The stepper view (`isCompleted` positional / `isReachable` guard-driven),
- * derived purely by INTROSPECTION — no running instance, just `machine.states` +
- * the current step id. This is the swingset seam: docs can enumerate and render
- * every step without clicking through the flow.
+ * derived from the descriptors and the current step id — no running instance.
+ * This is the swingset seam: docs can enumerate and render every step without
+ * clicking through the flow.
  */
-const deriveStepper = (machine: StateMachine<WizardContext, WizardEvent>, current: string) => {
-  const ids = Object.keys(machine.states);
-  const currentIndex = ids.indexOf(current);
-  return ids.map((id, i) => {
-    const guard = machine.states[id].guard;
-    return {
-      id,
-      isCompleted: currentIndex >= 0 && i < currentIndex,
-      // Same predicate the reducer's `guardHolds` / the stepper's `isReachable`
-      // bind to. The guards are nullary closures, so the args are inert.
-      isReachable: guard ? guard({ direction: 0, hasNavigated: false }, { type: 'NEXT' }) : true,
-    };
-  });
+const deriveStepper = (descriptors: StepDescriptor[], current: string) => {
+  const currentIndex = descriptors.findIndex(d => d.id === current);
+  return descriptors.map((d, i) => ({
+    id: d.id,
+    isCompleted: currentIndex >= 0 && i < currentIndex,
+    isReachable: guardHolds(d),
+  }));
+};
+
+/** Re-seat when the current step's guard stops holding (the seam's render-phase clamp). */
+const reseat = (actor: Actor<WizardContext, WizardEvent>, descriptors: StepDescriptor[]) => {
+  const current = descriptors.find(d => d.id === actor.getSnapshot().value);
+  if (current && !guardHolds(current)) {
+    actor.send({ type: 'machine.route', to: `#${SEAT}` });
+  }
 };
 
 /** A representative monotonic guard set over 4 steps — mirrors reducer.test.ts. */
@@ -172,10 +168,10 @@ const monotonic = (g1: boolean, g2: boolean, g3: boolean): StepDescriptor[] => [
   { id: 'd', guard: () => g3 },
 ];
 
-/** Start an actor teleported to `value` so a parity test can assert from any step. */
+/** Start an actor restored at `value` so a parity test can assert from any step. */
 const actorAt = (descriptors: StepDescriptor[], value: string) => {
-  const actor = createActor(createWizardMachine(descriptors), { snapshot: { value } });
-  return actor;
+  const machine = createWizardMachine(descriptors);
+  return restoreActor(machine, machine.resolveState({ value, context: INITIAL_CONTEXT })).start();
 };
 
 describe('Wizard AFTER — derived initial (furthest contiguously-reachable step)', () => {
@@ -333,10 +329,9 @@ describe('Wizard AFTER — GOTO guard-gated', () => {
   });
 });
 
-describe('Wizard AFTER — stepper view derived by introspection', () => {
+describe('Wizard AFTER — stepper view derived without running the machine', () => {
   it('isCompleted is positional; isReachable is guard-driven', () => {
-    const machine = createWizardMachine([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => false }]);
-    const view = deriveStepper(machine, 'b');
+    const view = deriveStepper([{ id: 'a' }, { id: 'b', guard: () => true }, { id: 'c', guard: () => false }], 'b');
     expect(view).toEqual([
       { id: 'a', isCompleted: true, isReachable: true }, // before current, no guard
       { id: 'b', isCompleted: false, isReachable: true }, // current, guard holds
@@ -346,13 +341,13 @@ describe('Wizard AFTER — stepper view derived by introspection', () => {
 
   it('enumerates every step in declaration order without running anything', () => {
     const machine = createWizardMachine([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
-    expect(Object.keys(machine.states)).toEqual(['a', 'b', 'c']);
+    expect(Object.keys(machine.states)).toEqual([SEAT, 'a', 'b', 'c']);
   });
 });
 
-describe('Wizard AFTER — re-seat replaces the render-phase clamp (via recheck)', () => {
+describe('Wizard AFTER — re-seat replaces the render-phase clamp (via the seat route)', () => {
   // The seam's render-phase "clamp" (re-seat off a step whose entry guard broke)
-  // becomes a single `actor.recheck()` call when external data changes.
+  // becomes a route to `#seat` when external data changes.
   it('re-seats to the furthest-reachable step when the active guard breaks', () => {
     let cOpen = true;
     const descriptors: StepDescriptor[] = [
@@ -365,7 +360,7 @@ describe('Wizard AFTER — re-seat replaces the render-phase clamp (via recheck)
     expect(actor.getSnapshot().value).toBe('c'); // furthest reachable
 
     cOpen = false; // the connection backing c is deleted elsewhere
-    actor.recheck();
+    reseat(actor, descriptors);
     expect(actor.getSnapshot().value).toBe('b'); // re-seated to furthest reachable
   });
 
@@ -381,17 +376,17 @@ describe('Wizard AFTER — re-seat replaces the render-phase clamp (via recheck)
     expect(actor.getSnapshot().value).toBe('c');
 
     unlocked = false;
-    actor.recheck();
+    reseat(actor, descriptors);
     expect(actor.getSnapshot().value).toBe('a');
   });
 
   it('does NOT move when a later guard opens while the current step still holds', () => {
     let bOpen = false;
     const descriptors: StepDescriptor[] = [{ id: 'a' }, { id: 'b', guard: () => bOpen }];
-    const actor = createActor(createWizardMachine(descriptors), { snapshot: { value: 'a' } });
+    const actor = actorAt(descriptors, 'a');
 
-    bOpen = true; // b opens, but a still holds → recheck must not yank forward
-    actor.recheck();
+    bOpen = true; // b opens, but a still holds → re-seat must not yank forward
+    reseat(actor, descriptors);
     expect(actor.getSnapshot().value).toBe('a');
   });
 });
@@ -404,7 +399,7 @@ describe('Wizard AFTER — deferred advance is unnecessary outside React', () =>
   it('a NEXT blocked by an unmet guard advances on the next send once data lands', () => {
     let bReady = false;
     const descriptors: StepDescriptor[] = [{ id: 'a' }, { id: 'b', guard: () => bReady }];
-    const actor = createActor(createWizardMachine(descriptors), { snapshot: { value: 'a' } });
+    const actor = actorAt(descriptors, 'a');
 
     actor.send({ type: 'NEXT' }); // b not ready → blocked no-op
     expect(actor.getSnapshot().value).toBe('a');
@@ -421,7 +416,7 @@ describe('Wizard AFTER — scope-boundary signal (the seam parent-link would hoo
   it('terminal NEXT is a no-op AND `can` reports false (the bubble trigger)', () => {
     const actor = actorAt([{ id: 'only' }], 'only'); // single step ⇒ terminal
     const before = actor.getSnapshot();
-    expect(actor.can({ type: 'NEXT' })).toBe(false);
+    expect(before.can({ type: 'NEXT' })).toBe(false);
     actor.send({ type: 'NEXT' });
     expect(actor.getSnapshot()).toBe(before); // unchanged → a parent would bubble
   });
@@ -431,7 +426,7 @@ describe('Wizard AFTER — scope-boundary signal (the seam parent-link would hoo
     // tell them apart — the seam used the index to decide bubble vs hard-stop.
     const descriptors = [{ id: 'a' }, { id: 'b', guard: () => false }];
     const actor = actorAt(descriptors, 'a');
-    expect(actor.can({ type: 'NEXT' })).toBe(false); // blocked, but...
+    expect(actor.getSnapshot().can({ type: 'NEXT' })).toBe(false); // blocked, but...
     const ids = Object.keys(createWizardMachine(descriptors).states);
     expect(ids.indexOf('a')).not.toBe(ids.length - 1); // ...not terminal → hard stop, not bubble
   });
@@ -448,13 +443,13 @@ describe('Wizard AFTER — driven through useMachine', () => {
       { id: 'details', guard: () => true },
       { id: 'review', guard: () => true },
     ];
-    const machine = createWizardMachine(descriptors);
+    // Seed at the first step (the seam's `initialStepId`). A guardless wizard's
+    // furthest-reachable derivation would otherwise mount on the LAST step — so
+    // a linear "click through" demo starts the machine at the head explicitly.
+    const machine = createWizardMachine(descriptors, { initial: 'intro' });
 
     function Wizard() {
-      // Seed at the first step (the seam's `initialStepId`). A guardless wizard's
-      // furthest-reachable derivation would otherwise mount on the LAST step — so
-      // a linear "click through" demo starts the actor at the head explicitly.
-      const [snapshot, send] = useMachine(machine, { snapshot: { value: 'intro' } });
+      const [snapshot, send] = useMachine(machine);
       return (
         <div>
           <output data-testid='step'>{STEP_LABEL[snapshot.value]}</output>
@@ -484,10 +479,8 @@ describe('Wizard AFTER — driven through useMachine', () => {
 
 describe('Wizard AFTER — useSelector scopes re-renders to the step slice', () => {
   it('a stepper re-renders on navigation but not on an unrelated context change', () => {
-    const machine = createWizardMachine([{ id: 'intro' }, { id: 'details', guard: () => true }]);
     // Seed at 'intro' (furthest-reachable would land on 'details' otherwise).
-    const actor = createActor(machine, { snapshot: { value: 'intro' } });
-    actor.start();
+    const actor = actorAt([{ id: 'intro' }, { id: 'details', guard: () => true }], 'intro');
 
     const renders = vi.fn();
     function StepIndicator() {
@@ -511,12 +504,12 @@ describe('Wizard AFTER — useSelector scopes re-renders to the step slice', () 
   });
 });
 
-describe('Wizard AFTER — mockActor teleports into an otherwise-unreachable step', () => {
+describe('Wizard AFTER — restoreActor seats an otherwise-unreachable step', () => {
   it('renders a gated step the user could never click into (the swingset seam)', () => {
-    // `locked` is gated out, so no sequence of NEXT/GOTO reaches it. Teleport in to
+    // `locked` is gated out, so no sequence of NEXT/GOTO reaches it. Restore it to
     // snapshot its content — exactly the docs use case.
     const machine = createWizardMachine([{ id: 'intro' }, { id: 'locked', guard: () => false }]);
-    const actor = mockActor(machine, { value: 'locked' });
+    const actor = restoreActor(machine, machine.resolveState({ value: 'locked', context: INITIAL_CONTEXT }));
 
     function Step() {
       const [snapshot] = useActor(actor);

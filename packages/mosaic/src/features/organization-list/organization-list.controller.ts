@@ -23,10 +23,7 @@ type OrganizationListMachineEvent<M> =
   | { type: 'DISMISS' };
 
 function createOrganizationListMachine<M>() {
-  const { createMachine, assign, fromPromise } = setup<
-    OrganizationListMachineContext<M>,
-    OrganizationListMachineEvent<M>
-  >();
+  const { createMachine, createInvoke } = setup<OrganizationListMachineContext<M>, OrganizationListMachineEvent<M>>();
   const settled = { pendingKey: null, frozenModel: null };
 
   return createMachine({
@@ -41,25 +38,19 @@ function createOrganizationListMachine<M>() {
     states: {
       idle: {
         on: {
-          RUN: {
+          RUN: ({ event }) => ({
             target: 'busy',
-            actions: assign((_, event) => ({
-              pendingKey: event.key,
-              frozenModel: event.frozenModel,
-              run: event.run,
-              error: undefined,
-            })),
-          },
-          DISMISS: { actions: assign(() => ({ error: undefined })) },
+            context: { pendingKey: event.key, frozenModel: event.frozenModel, run: event.run, error: undefined },
+          }),
+          DISMISS: () => ({ context: { error: undefined } }),
         },
       },
       busy: {
-        invoke: fromPromise(context => context.run(), {
-          onDone: { target: 'idle', actions: assign(() => settled) },
-          onError: {
-            target: 'idle',
-            actions: assign((_, event) => ({ ...settled, error: toLocalizableError(event.error) })),
-          },
+        invoke: createInvoke({
+          input: ({ context }) => context.run,
+          src: ({ input }) => input(),
+          onDone: () => ({ target: 'idle', context: settled }),
+          onError: ({ event }) => ({ target: 'idle', context: { ...settled, error: toLocalizableError(event.error) } }),
         }),
       },
     },

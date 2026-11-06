@@ -115,66 +115,51 @@ Problems:
 ### After
 
 ```ts
-import { setup } from '../../machine/setup';
+import { createAsyncLogic, setup } from '../../machine/setup';
 
 type Context = { emailAddress: string; error: string | null };
-type Event = { type: 'SUBMIT'; emailAddress: string } | { type: 'NAVIGATE_DONE' };
+type Event = { type: 'SUBMIT'; emailAddress: string };
 
-type WaitlistDeps = {
-  joinWaitlist: (args: { emailAddress: string }) => Promise<void>;
-  navigate: (url: string) => void;
-  afterJoinWaitlistUrl?: string;
-};
+const { createMachine } = setup<Context, Event>();
 
-const { createMachine, assign, fromPromise } = setup<Context, Event>();
-
-function createWaitlistMachine(deps: WaitlistDeps) {
-  return createMachine({
-    id: 'waitlist',
-    initial: 'idle',
-    context: { emailAddress: '', error: null },
-    states: {
-      idle: {
-        on: {
-          SUBMIT: {
-            target: 'submitting',
-            actions: assign((_ctx, e) => ({ emailAddress: e.emailAddress })),
-          },
-        },
-      },
-      submitting: {
-        // Double-submit is impossible: SUBMIT is not handled here.
-        invoke: fromPromise(ctx => deps.joinWaitlist({ emailAddress: ctx.emailAddress }), {
-          onDone: {
-            target: 'success',
-            actions: assign(() => ({ error: null })),
-          },
-          onError: {
-            target: 'idle',
-            actions: assign((_ctx, e) => ({ error: String(e.error) })),
-          },
-        }),
-      },
-      success: {
-        // Optional auto-navigate on entry:
-        entry: [
-          () => {
-            if (deps.afterJoinWaitlistUrl) {
-              setTimeout(() => deps.navigate(deps.afterJoinWaitlistUrl), 2000);
-            }
-          },
-        ],
+const waitlistMachine = createMachine({
+  id: 'waitlist',
+  initial: 'idle',
+  context: { emailAddress: '', error: null },
+  actions: { redirect: (): void => {} },
+  actors: { join: createAsyncLogic<string, void>(() => Promise.resolve()) },
+  states: {
+    idle: {
+      on: {
+        SUBMIT: ({ event }) => ({ target: 'submitting', context: { emailAddress: event.emailAddress } }),
       },
     },
-  });
-}
+    submitting: {
+      // Double-submit is impossible: SUBMIT is not handled here.
+      invoke: {
+        src: 'join',
+        input: ({ context }) => context.emailAddress,
+        onDone: () => ({ target: 'success', context: { error: null } }),
+        onError: ({ event }) => ({ target: 'idle', context: { error: String(event.error) } }),
+      },
+    },
+    success: {
+      after: { 2000: ({ actions }, enq) => enq(actions.redirect) },
+    },
+  },
+});
 ```
 
-In React:
+In React, `provide` passes the props in. `useMachine` re-applies them on every render, so the
+machine always calls the latest callbacks:
 
 ```tsx
-const machine = createWaitlistMachine({ joinWaitlist: clerk.joinWaitlist, navigate, afterJoinWaitlistUrl });
-const [snapshot, send] = useMachine(machine);
+const [snapshot, send] = useMachine(
+  waitlistMachine.provide({
+    actions: { redirect: () => navigate(afterJoinWaitlistUrl) },
+    actors: { join: createAsyncLogic<string, void>(({ input }) => clerk.joinWaitlist({ emailAddress: input })) },
+  }),
+);
 
 <Form.Root
   onSubmit={e => {
@@ -263,25 +248,24 @@ type ModalEvent =
   | { type: 'COPY'; apiKey: APIKeyResource }
   | { type: 'CLOSE' };
 
-const apiKeyModalMachine = createMachine<{ modal: ModalContext }, ModalEvent>({
+const { createMachine } = setup<{ modal: ModalContext }, ModalEvent>();
+
+const apiKeyModalMachine = createMachine({
   id: 'apiKeyModal',
   initial: 'closed',
   context: { modal: { mode: 'closed' } },
   states: {
     closed: {
       on: {
-        REVOKE: {
+        REVOKE: ({ event }) => ({
           target: 'revoking',
-          actions: assign((_ctx, e) => ({ modal: { mode: 'revoking', id: e.id, name: e.name } })),
-        },
-        COPY: {
-          target: 'copying',
-          actions: assign((_ctx, e) => ({ modal: { mode: 'copying', apiKey: e.apiKey } })),
-        },
+          context: { modal: { mode: 'revoking', id: event.id, name: event.name } },
+        }),
+        COPY: ({ event }) => ({ target: 'copying', context: { modal: { mode: 'copying', apiKey: event.apiKey } } }),
       },
     },
-    revoking: { on: { CLOSE: { target: 'closed', actions: assign(() => ({ modal: { mode: 'closed' } })) } } },
-    copying: { on: { CLOSE: { target: 'closed', actions: assign(() => ({ modal: { mode: 'closed' } })) } } },
+    revoking: { on: { CLOSE: () => ({ target: 'closed', context: { modal: { mode: 'closed' } } }) } },
+    copying: { on: { CLOSE: () => ({ target: 'closed', context: { modal: { mode: 'closed' } } }) } },
   },
 });
 ```
@@ -379,7 +363,7 @@ type SignInEvent =
   | { type: 'CLEAR_PROVIDER' }
   | { type: 'SUBMIT'; identifier: string };
 
-const { createMachine, assign, fromPromise } = setup<SignInContext, SignInEvent>();
+const { createMachine, createInvoke } = setup<SignInContext, SignInEvent>();
 
 const signInStartMachine = createMachine({
   id: 'signInStart',
@@ -388,35 +372,25 @@ const signInStartMachine = createMachine({
   states: {
     idle: {
       on: {
-        SELECT_PROVIDER: {
+        SELECT_PROVIDER: ({ event }) => ({
           target: 'provider_selected',
-          actions: assign((_ctx, e) => ({ selectedProvider: e.provider, error: null })),
-        },
-        SUBMIT: {
-          target: 'submitting',
-          actions: assign((_ctx, e) => ({ identifier: e.identifier })),
-        },
+          context: { selectedProvider: event.provider, error: null },
+        }),
+        SUBMIT: ({ event }) => ({ target: 'submitting', context: { identifier: event.identifier } }),
       },
     },
     provider_selected: {
       on: {
-        CLEAR_PROVIDER: {
-          target: 'idle',
-          actions: assign(() => ({ selectedProvider: null })),
-        },
-        SUBMIT: {
-          target: 'submitting',
-          actions: assign((_ctx, e) => ({ identifier: e.identifier })),
-        },
+        CLEAR_PROVIDER: () => ({ target: 'idle', context: { selectedProvider: null } }),
+        SUBMIT: ({ event }) => ({ target: 'submitting', context: { identifier: event.identifier } }),
       },
     },
     submitting: {
-      invoke: fromPromise(ctx => signIn.create({ identifier: ctx.identifier }), {
-        onDone: { target: 'idle', actions: assign(() => ({ error: null })) },
-        onError: {
-          target: 'idle',
-          actions: assign((_ctx, e) => ({ error: String(e.error) })),
-        },
+      invoke: createInvoke({
+        input: ({ context }) => context.identifier,
+        src: ({ input }) => signIn.create({ identifier: input }),
+        onDone: () => ({ target: 'idle', context: { error: null } }),
+        onError: ({ event }) => ({ target: 'idle', context: { error: String(event.error) } }),
       }),
     },
   },
@@ -512,13 +486,14 @@ from calling `setLoading` simultaneously.
 A single `submitting` state with `activeStrategy` in context replaces both hooks:
 
 ```ts
-import { setup } from '../../machine/setup';
+import { createAsyncLogic, setup } from '../../machine/setup';
+
+type Strategy = OAuthStrategy | 'email';
 
 interface SignInStartContext {
-  activeStrategy: OAuthStrategy | 'email' | null;
+  activeStrategy: Strategy | null;
   identifier: string;
   error: string | null;
-  signInFn: (params: SignInCreateParams) => Promise<SignInResource>;
 }
 
 type SignInStartEvent =
@@ -526,61 +501,50 @@ type SignInStartEvent =
   | { type: 'TYPE_IDENTIFIER'; value: string }
   | { type: 'SUBMIT_IDENTIFIER' };
 
-const { createMachine, assign, fromPromise } = setup<SignInStartContext, SignInStartEvent>();
+const { createMachine } = setup<SignInStartContext, SignInStartEvent>();
 
-export function createSignInStartMachine(deps: { signInFn: SignInStartContext['signInFn'] }) {
-  return createMachine({
-    initial: 'idle',
-    context: { activeStrategy: null, identifier: '', error: null, signInFn: deps.signInFn },
-    states: {
-      idle: {
-        on: {
-          CLICK_SOCIAL: {
-            target: 'submitting',
-            actions: assign((_, e) => ({ activeStrategy: e.strategy })),
-          },
-          TYPE_IDENTIFIER: {
-            actions: assign((_, e) => ({ identifier: e.value, error: null })),
-          },
-          SUBMIT_IDENTIFIER: {
-            target: 'submitting',
-            actions: assign(() => ({ activeStrategy: 'email' as const })),
-          },
-        },
+export const signInStartMachine = createMachine({
+  initial: 'idle',
+  context: { activeStrategy: null, identifier: '', error: null },
+  actors: {
+    signIn: createAsyncLogic<SignInCreateParams, SignInResource>(() => Promise.reject(new Error('not provided'))),
+  },
+  states: {
+    idle: {
+      on: {
+        CLICK_SOCIAL: ({ event }) => ({ target: 'submitting', context: { activeStrategy: event.strategy } }),
+        TYPE_IDENTIFIER: ({ event }) => ({ context: { identifier: event.value, error: null } }),
+        SUBMIT_IDENTIFIER: () => ({ target: 'submitting', context: { activeStrategy: 'email' } }),
       },
-      submitting: {
-        // Both entry points converge here. idle's on-handlers are inactive,
-        // so a second CLICK_SOCIAL while already submitting is dropped automatically.
-        invoke: fromPromise(
-          ctx =>
-            ctx.activeStrategy === 'email'
-              ? ctx.signInFn({ identifier: ctx.identifier })
-              : ctx.signInFn({ strategy: ctx.activeStrategy! }),
-          {
-            onDone: 'success',
-            onError: {
-              target: 'idle',
-              actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
-            },
-          },
-        ),
-      },
-      success: { type: 'final' },
     },
-  });
-}
+    submitting: {
+      // Both entry points converge here. idle's on-handlers are inactive,
+      // so a second CLICK_SOCIAL while already submitting is dropped automatically.
+      invoke: {
+        src: 'signIn',
+        input: ({ context }) =>
+          context.activeStrategy === 'email' || context.activeStrategy === null
+            ? { identifier: context.identifier }
+            : { strategy: context.activeStrategy },
+        onDone: { target: 'success' },
+        onError: ({ event }) => ({ target: 'idle', context: { error: String(event.error), activeStrategy: null } }),
+      },
+    },
+    success: { type: 'final' },
+  },
+});
 ```
 
-In React, `isLocked` replaces `card.setLoading()` and `activeStrategy`
-replaces the per-button `status.isLoading` check:
+In React, `provide` passes the Clerk call in. `isLocked` replaces `card.setLoading()` and
+`activeStrategy` replaces the per-button `status.isLoading` check:
 
 ```tsx
-const signInFn = params => signIn.create(params);
-const machine = useMemo(() => createSignInStartMachine({ signInFn }), []);
-const [snapshot, send] = useMachine(machine, {
-  context: { signInFn },
-  onDone: () => setActive({ session: signIn.createdSessionId }),
-});
+const [snapshot, send] = useMachine(
+  signInStartMachine.provide({
+    actors: { signIn: createAsyncLogic<SignInCreateParams, SignInResource>(({ input }) => signIn.create(input)) },
+  }),
+  { onDone: () => setActive({ session: signIn.createdSessionId }) },
+);
 
 const isLocked = snapshot.value === 'submitting';
 const active = snapshot.context.activeStrategy;
@@ -657,20 +621,20 @@ createMachine({
   context: { ticket: '', pendingStatus: '' },
   states: {
     redeeming: {
-      invoke: fromPromise(ctx => signIn.create({ strategy: 'ticket', ticket: ctx.ticket }), {
-        onDone: {
-          target: 'routing',
-          actions: assign((_, e) => ({ pendingStatus: e.output.status })),
-        },
+      invoke: createInvoke({
+        input: ({ context }) => context.ticket,
+        src: ({ input }) => signIn.create({ strategy: 'ticket', ticket: input }),
+        onDone: ({ event }) => ({ target: 'routing', context: { pendingStatus: event.output.status } }),
         onError: { target: 'failed' },
       }),
     },
     routing: {
-      always: [
-        { target: 'firstFactor', guard: ctx => ctx.pendingStatus === 'needs_first_factor' },
-        { target: 'secondFactor', guard: ctx => ctx.pendingStatus === 'needs_second_factor' },
-        { target: 'complete' },
-      ],
+      type: 'choice',
+      choice: ({ context }) => {
+        if (context.pendingStatus === 'needs_first_factor') return { target: 'firstFactor' };
+        if (context.pendingStatus === 'needs_second_factor') return { target: 'secondFactor' };
+        return { target: 'complete' };
+      },
     },
     firstFactor: {},
     secondFactor: {},
@@ -684,7 +648,7 @@ The component renders `<LoadingCard />` while `snapshot.value === 'redeeming'` a
 lets the router layer (which maps state → route) handle navigation. No domain
 knowledge in the component.
 
-> Proved in `patterns.test.ts` — Pattern 7.
+> Proved in `patterns.test.ts` — "post-invoke routing via a choice state".
 
 ---
 
@@ -701,27 +665,30 @@ useEffect(() => {
 }, []);
 ```
 
-The machine receives the external data as context at creation time. An `initial`
-function routes immediately — no effect, no imperative call:
+The machine receives the external data as `input` when the actor starts. A `choice`
+initial state routes immediately — no effect, no imperative call:
 
 ```ts
-createMachine({
-  initial: ctx => (ctx.oauthError ? 'oauthError' : 'idle'),
-  context: { oauthError: null, ... },
+const { createMachine } = setup<Context, Event, { oauthError: string | null }>();
+
+const signInStartMachine = createMachine({
+  initial: 'starting',
+  context: ({ input }) => ({ oauthError: input.oauthError, ... }),
   states: {
+    starting: {
+      type: 'choice',
+      choice: ({ context }) => (context.oauthError ? { target: 'oauthError' } : { target: 'idle' }),
+    },
     oauthError: {
       // entry could fire the signIn.create({}) reset if needed
-      on: { DISMISS: 'idle' },
+      on: { DISMISS: { target: 'idle' } },
     },
     idle: { ... },
   },
 });
 
-// At creation, pass the external error in:
-const machine = createSignInStartMachine({
-  signInFn: ...,
-  oauthError: signIn.firstFactorVerification?.error ?? null,
-});
+// At start, pass the external error in:
+useMachine(signInStartMachine, { input: { oauthError: signIn.firstFactorVerification?.error ?? null } });
 ```
 
 The component reads `snapshot.context.oauthError` or branches on
@@ -750,43 +717,38 @@ The machine puts the same guard inside the `TYPE` event handler. The switch and
 the loop-prevention flag (`hasAutoSwitched`) update atomically with the value:
 
 ```ts
-TYPE: {
-  actions: assign((ctx, e) => {
-    const shouldSwitch =
-      phoneEnabled &&
-      e.value.startsWith('+') &&
-      ctx.fieldType !== 'phone' &&
-      !ctx.hasAutoSwitched;
-    if (shouldSwitch) {
-      return { value: e.value, fieldType: 'phone', hasAutoSwitched: true };
-    }
-    return { value: e.value };
-  }),
+TYPE: ({ context, event }) => {
+  const shouldSwitch =
+    phoneEnabled &&
+    event.value.startsWith('+') &&
+    context.fieldType !== 'phone' &&
+    !context.hasAutoSwitched;
+  if (shouldSwitch) {
+    return { context: { value: event.value, fieldType: 'phone', hasAutoSwitched: true } };
+  }
+  return { context: { value: event.value } };
 },
-SWITCH_FIELD: {
-  // Manual switch resets the guard so autofill can trigger once more
-  actions: assign(ctx => ({
-    fieldType: ctx.fieldType === 'text' ? 'phone' : 'text',
-    hasAutoSwitched: false,
-  })),
-},
+// Manual switch resets the check so autofill can trigger once more
+SWITCH_FIELD: ({ context }) => ({
+  context: { fieldType: context.fieldType === 'text' ? 'phone' : 'text', hasAutoSwitched: false },
+}),
 ```
 
-`hasSwitchedByAutofill` disappears as a `useState` — it's `ctx.hasAutoSwitched`,
+`hasSwitchedByAutofill` disappears as a `useState` — it's `context.hasAutoSwitched`,
 collocated with the value that drives it.
 
-> Proved in `patterns.test.ts` — Pattern 8.
+> Proved in `patterns.test.ts` — "reactive value auto-switch".
 
 ---
 
 ### The rule
 
-| If you see…                                     | It maps to…                                           |
-| ----------------------------------------------- | ----------------------------------------------------- |
-| `useEffect(fn, [])` — async on mount            | Initial state with `invoke`                           |
-| `useEffect(fn, [])` — read external on mount    | `initial` as a function, or `always` in initial state |
-| `useLayoutEffect(fn, [value])` — react to value | `assign` guard inside the event that changes `value`  |
-| `useEffect(fn, [a, b])` — sync two values       | Transition that updates both atomically               |
+| If you see…                                     | It maps to…                                   |
+| ----------------------------------------------- | --------------------------------------------- |
+| `useEffect(fn, [])` — async on mount            | Initial state with `invoke`                   |
+| `useEffect(fn, [])` — read external on mount    | `input`, then a `choice` initial state        |
+| `useLayoutEffect(fn, [value])` — react to value | A check inside the event that changes `value` |
+| `useEffect(fn, [a, b])` — sync two values       | Transition that updates both atomically       |
 
 ---
 

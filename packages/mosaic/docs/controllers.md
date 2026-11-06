@@ -108,12 +108,13 @@ const form = useForm({
 
 A machine is declared in the controller's own file, and the controller is the only thing that sends to it. `src/machine/README.md` covers the runtime, and shared async test helpers are in `src/__tests__/async.ts`.
 
-- A machine never calls Clerk. An effect that differs per action rides on the event and is assigned to context, then runs in `invoke` (`src/blocks/confirm/confirm.controller.ts`). An effect fixed for the controller's lifetime is seated by `useMachine(machine, { context })`, which re-seats context every render (`onRedirect` in `waitlist.controller.ts`).
-- `assign` stays pure. An effect the machine starts runs in `invoke`.
+- A machine never calls Clerk. An effect that differs per action rides on the event, is stored in context, then runs in `invoke` (`src/blocks/confirm/confirm.controller.ts`). An effect or value fixed for the controller's lifetime is a named action or actor on the machine, supplied with `machine.provide({ actions, actors })`. `useMachine` re-applies the implementations on every render, so they always see the latest props (`redirect` in `waitlist.controller.ts`, `prepare` in `task-setup-mfa.controller.ts`). A value needed only to build the first context goes in `useMachine(machine, { input })`.
+- A transition is `({ context, event, actions }, enq) => ({ target, context })`, or `{ target: 'name' }` when it only moves. It returns `undefined` when the event does not apply, and stays pure: a fire-and-forget effect is queued with `enq(fn, ...args)`, and an effect the machine waits on runs in `invoke`.
 - The runtime has no spawned actors, parallel states or history states. Effects that run side by side, like `useForm`'s per-field `validateAsync`, run in the hook and report back by event, and the machine drops stale results. Screens that can sit on top of any state, like reverification's method picker and help, may be a stack in context.
 - A phase of an action the user can see (queued, pending, failed) is a named state, not a context field plus a predicate.
-- To keep dismissal from abandoning an effect, model `open` as context and give `OPEN`/`CLOSE` no target in the busy state: `busy: { on: { CLOSE: { actions: assign(() => ({ open: false })) } }, invoke: … }`.
-- A transition shared across states in a `const` needs `target: 'name' as const`, or the target widens to `string` and the machine rejects it.
+- To keep dismissal from abandoning an effect, model `open` as context and give `OPEN`/`CLOSE` no target in the busy state: `busy: { on: { CLOSE: () => ({ context: { open: false } }) }, invoke: … }`.
+- A transition written outside `createMachine` widens its `target` to `string`, and the machine rejects it. Inline it, give it the return type `TransitionResult<Context, 'name'>`, or check a shared `on` map with `satisfies` (`factorEvents` in `reverification.controller.ts`).
+- A start state derived from input is a `choice` state: `initial: 'starting'` with `starting: { type: 'choice', choice: ({ context }) => ({ target: … }) }` (`task-setup-mfa.controller.ts`).
 - Context holds the `ErrorDescription`, never copy. A machine whose surface shows no error still logs it, so a failure is never silent (`switcher.controller.tsx`).
 
 ### Multi-step flows
@@ -121,13 +122,15 @@ A machine is declared in the controller's own file, and the controller is the on
 A flow with several steps on one surface is one machine and one form. No existing flow follows every rule below yet, so each names the closest example.
 
 - **The machine owns the step.** Each step is a state, and the controller derives the step the view shows from the snapshot, so an async state maps to the screen that stays up while it runs (`viewStep` in `reverification.controller.ts`). No `useState` step beside it, and no separate open flag.
-- **Guards live in the machine.** What allows a step to continue is a guard on its event. The controller reads it with `actor.can(event)` rather than writing a `canContinue` that repeats it.
+- **The machine decides what may continue.** A transition that does not apply returns `undefined`. The controller reads that with `snapshot.can(event)` rather than writing a `canContinue` that repeats the check.
 - **Async work is a named state with `invoke`.** Testing a connection is a `testing` state, not a `pending` field in context and not a call in a transition action. Its result lands in context from `onDone`, beside the state that waited for it, not in a `usePendingAction` flag (`starting` and `submitting` in `reverification.controller.ts`).
 - **One `useForm` holds every step's values.** Its `onSubmit` is the last step's save, and `canSubmit` covers only that save (`create-organization.controller.ts`). Values are not copied into machine context with `TYPE` events.
-- **Navigation is machine events.** Continue and back send `NEXT` and `BACK` with the values the guard needs, and the machine chooses the next step. The controller routes the form's submit by step: a middle step sends `NEXT`, and only the last step runs `form.handleSubmit`, so Enter never saves early.
+- **Navigation is machine events.** Continue and back send `NEXT` and `BACK` with the values the transition needs, and the machine chooses the next step. The controller routes the form's submit by step: a middle step sends `NEXT`, and only the last step runs `form.handleSubmit`, so Enter never saves early.
 
 ```ts
-const [snapshot, send, actor] = useMachine(machine, { context: { testConnection: model.onTestConnection } });
+const [snapshot, send] = useMachine(
+  machine.provide({ actors: { testConnection: createAsyncLogic(() => model.onTestConnection()) } }),
+);
 const form = useForm<SsoValues, void>({ initialValues, onSubmit: values => model.onSave(values) });
 const next = { type: 'NEXT', values: form.values } as const;
 
@@ -135,7 +138,7 @@ return {
   step: viewStep(snapshot.value),
   form,
   isTesting: snapshot.value === 'testing',
-  canContinue: actor.can(next),
+  canContinue: snapshot.can(next),
   onSubmit: event => {
     if (snapshot.value === 'review') {
       form.handleSubmit(event);

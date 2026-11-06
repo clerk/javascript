@@ -16,26 +16,31 @@ export type ModalContentLoader<Options> = Actor<ModalContentContext<Options>, Mo
 export function createModalContentLoader<Options>(
   importContent: ModalSurfaceConfig<Options>['load'],
 ): ModalContentLoader<Options> {
-  const { createMachine, assign, fromPromise } = setup<ModalContentContext<Options>, ModalContentEvent>();
+  const { createMachine, createInvoke } = setup<ModalContentContext<Options>, ModalContentEvent>();
 
   const machine = createMachine({
     initial: 'idle',
     context: { Content: undefined },
     states: {
-      idle: { on: { LOAD: 'loading' } },
+      idle: { on: { LOAD: { target: 'loading' } } },
       loading: {
-        invoke: fromPromise(() => importContent(), {
-          onDone: { target: 'loaded', actions: assign((_, event) => ({ Content: event.output.default })) },
-          onError: {
-            target: 'failed',
-            actions: (_, event) => console.error('[Clerk] Could not load the modal content', event.error),
+        invoke: createInvoke({
+          src: () => importContent(),
+          onDone: ({ event }) => ({ target: 'loaded', context: { Content: event.output.default } }),
+          onError: ({ event }, enq) => {
+            enq(logLoadError, event.error);
+            return { target: 'failed' };
           },
         }),
       },
       loaded: {},
-      failed: { on: { LOAD: 'loading' } },
+      failed: { on: { LOAD: { target: 'loading' } } },
     },
   });
 
   return createActor(machine).start();
+}
+
+function logLoadError(error: unknown): void {
+  console.error('[Clerk] Could not load the modal content', error);
 }

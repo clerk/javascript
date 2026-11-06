@@ -64,31 +64,29 @@ run it.
 ```ts
 import { setup } from '../../machine/setup';
 
-const { createMachine, assign, fromPromise } = setup<LoaderContext, LoaderEvent>();
+const { createMachine, createInvoke } = setup<LoaderContext, LoaderEvent>();
 
 const loader = createMachine({
   initial: 'idle', // where it starts
-  context: { data: null, error: null }, // the data that rides along
+  context: { query: '', data: null, error: null }, // the data that rides along
   states: {
     idle: {
-      on: { FETCH: 'loading' }, // event FETCH → go to 'loading'
+      on: {
+        SET_QUERY: ({ event }) => ({ context: { query: event.query } }), // stay put, patch context
+        FETCH: { target: 'loading' }, // event FETCH → go to 'loading'
+      },
     },
     loading: {
       // `invoke` runs a promise on entry and branches on the result.
-      invoke: fromPromise(() => fetchThing(), {
-        onDone: {
-          target: 'success',
-          // copy the resolved value into context
-          actions: assign((_ctx, event) => ({ data: event.output })),
-        },
-        onError: {
-          target: 'failure',
-          actions: assign((_ctx, event) => ({ error: toLocalizableError(event.error) })),
-        },
+      invoke: createInvoke({
+        input: ({ context }) => context.query,
+        src: ({ input }) => fetchThing(input),
+        onDone: ({ event }) => ({ target: 'success', context: { data: event.output } }),
+        onError: ({ event }) => ({ target: 'failure', context: { error: toLocalizableError(event.error) } }),
       }),
     },
     success: {},
-    failure: { on: { FETCH: 'loading' } }, // allow a retry
+    failure: { on: { FETCH: { target: 'loading' } } }, // allow a retry
   },
 });
 ```
@@ -96,66 +94,29 @@ const loader = createMachine({
 That's the whole flow, as one readable object. Notice there's no way to be in
 `loading` _and_ have an `error` — the shape forbids it.
 
-### Eliminating boilerplate with `setup`
+### Transitions
 
-Once a machine grows beyond a few states, explicitly repeating the context and
-event types on every `assign` call gets noisy:
-
-```ts
-// Without setup — types must be restated every time
-assign<LoaderContext, Extract<LoaderEvent, { type: 'SET_QUERY' }>>((_, e) => ({
-  query: e.query,
-}));
-```
-
-`setup<TContext, TEvent>()` pre-binds both types once per file and returns
-factory functions that don't require repeating them:
+A transition is either `{ target: 'state' }` or a function:
 
 ```ts
-import { setup } from '../../machine/setup';
-
-const { createMachine, assign, fromPromise } = setup<LoaderContext, LoaderEvent>();
-
-const loader = createMachine({
-  // no <LoaderContext, LoaderEvent> needed
-  initial: 'idle',
-  context: { query: '', data: null, error: null },
-  states: {
-    idle: {
-      on: {
-        SET_QUERY: {
-          actions: assign((_, e) => ({ query: e.query })), // e: { type: 'SET_QUERY'; query: string } ✓
-        },
-        FETCH: 'loading',
-      },
-    },
-    loading: {
-      invoke: fromPromise(ctx => fetchData(ctx.query), {
-        onDone: {
-          target: 'success',
-          actions: assign((_, e) => ({ data: e.output, error: null })), // e.output: what fetchData resolves to
-        },
-        onError: {
-          target: 'failure',
-          actions: assign((_, e) => ({ error: toLocalizableError(e.error) })), // e: ErrorInvokeEvent
-        },
-      }),
-    },
-    success: {},
-    failure: { on: { FETCH: 'loading' } },
-  },
-});
+(({ context, event, self, actions }, enq) => ({ target?, context? }) | undefined)
 ```
 
-The `assign` returned by `setup` narrows the event type from its position:
+- `target` is the state to enter. Leave it out to stay in the current state.
+- `context` is a shallow patch merged into context.
+- Returning `undefined` with nothing queued means the event does not apply here.
+  That is how a condition is written: `context.ready ? { target: 'next' } : undefined`.
+- `enq(fn, ...args)` queues a fire-and-forget effect. Queued effects run after the
+  transition is decided and before subscribers see the new snapshot. Never call
+  an effect directly inside a transition.
 
-- Inside `on['SET_QUERY']` → `e: { type: 'SET_QUERY'; query: string }`
-- Inside `onDone` → `e: DoneInvokeEvent<unknown>`
-- Inside `onError` → `e: ErrorInvokeEvent`
-- Inside `after[delay]` → `e: AfterEvent`
+`setup<TContext, TEvent, TInput>()` binds the types once per file, so `event` is
+narrowed by position: `on.SET_QUERY` sees `{ type: 'SET_QUERY'; query: string }`,
+`onDone` sees the invoke's output, `onError` sees `{ error: unknown }`, and
+`after[delay]` sees the timer event.
 
-You no longer need to import `DoneInvokeEvent`, `ErrorInvokeEvent`, or `AfterEvent`
-in machine files — they flow through contextual typing automatically.
+A transition written outside `createMachine` widens `target` to `string`. Inline
+it, or give it the return type `TransitionResult<Context, 'state'>`.
 
 ### Running it
 
@@ -169,15 +130,15 @@ const actor = createActor(loader);
 
 actor.subscribe(snapshot => {
   console.log(snapshot.value); // 'idle' | 'loading' | 'success' | 'failure'
-  console.log(snapshot.context); // { data, error }
+  console.log(snapshot.context); // { query, data, error }
 });
 
 actor.start();
 actor.send({ type: 'FETCH' }); // → 'loading', then 'success'/'failure' when the promise settles
 ```
 
-`actor.getSnapshot()` returns the current `{ value, context, status }` at any
-time. `value` is the state name; `context` is the riding data.
+`actor.getSnapshot()` returns the current `{ value, context, status }`, and
+`snapshot.can(event)` says whether an event would do anything right now.
 
 ### In React
 
@@ -198,59 +159,86 @@ function Loader() {
 
 The component is now a straight mapping from state → UI. No boolean juggling.
 
+### Props: `input` and `provide`
+
+A machine is declared once at module level, so it can't close over props. There
+are two ways in:
+
+- **`input`** builds the first context. Declare `context: ({ input }) => ({ … })`
+  and pass `useMachine(machine, { input })`. It is read once, when the actor is
+  created.
+- **Named `actions` and `actors`** carry anything that should stay live. Declare
+  defaults on the machine, read them in transitions (`actions.redirect`) or invoke
+  them by name (`invoke: { src: 'save', input }`), and supply the real ones with
+  `machine.provide({ actions, actors })`. `useMachine` re-applies the provided
+  implementations on every render, so they always see the latest props.
+
+```ts
+const waitlistMachine = createMachine({
+  initial: 'form',
+  context: {},
+  actions: { redirect: (): void => {} },
+  states: {
+    form: { on: { JOINED: { target: 'joined' } } },
+    joined: { after: { 2000: ({ actions }, enq) => enq(actions.redirect) } },
+  },
+});
+
+useMachine(waitlistMachine.provide({ actions: { redirect: () => onRedirect?.() } }));
+```
+
+A named actor is `createAsyncLogic(({ input, signal }) => promise)`. Its output
+types `onDone`'s `event.output`.
+
 ---
 
 ## A few more building blocks
 
-You've already seen `states`, `on`, `context`, `assign`, and `invoke`. The rest:
+You've already seen `states`, `on`, `context`, and `invoke`. The rest:
 
-- **`guard`** — a condition on a transition. "CONFIRM only works once the typed
-  name matches":
-  ```ts
-  CONFIRM: { target: 'deleting', guard: context => context.confirmValue === context.name }
-  ```
-- **state-node `guard`** — a condition on _entering a state at all_ ("may
-  navigation land here right now?"). Every transition that targets the state
-  checks it. This is what gates wizard steps.
-- **`always`** — an eventless transition that fires the moment its guard is true,
-  with no event sent. Good for "as soon as X is ready, move on."
-- **`entry` / `exit`** — actions to run when a state is entered or left.
+- **`always`** — an eventless transition, checked once when the state is
+  entered. Good for "on arrival, skip ahead if X is already true."
+- **`after`** — `{ [ms]: transition }`. The timer is cancelled when the state is
+  left or the actor stops.
+- **`entry` / `exit`** — run on entering or leaving a state. They can return a
+  `context` patch and queue effects, but not change state.
+- **`type: 'choice'`** — a state that picks a target immediately:
+  `{ type: 'choice', choice: ({ context }) => ({ target: … }) }`. Use it with
+  `initial` when the start state is derived, such as from `input`.
+- **`route`** — lets `send({ type: 'machine.route', to: '#id' })` jump to a state
+  with that `id`. `route: {}` always allows it; a function can refuse or patch
+  context.
 - **`type: 'final'`** — a terminal state; the flow is done, further events are
   ignored.
-- **`initial` as a function** — `(context) => stateId`, when the starting step is
-  computed (e.g. a wizard resuming on the furthest step the user has unlocked).
 
 ### API at a glance
 
-The exports live in `create-machine.ts`, `setup.ts`, `assign.ts`, `create-actor.ts` and `use-machine.ts`; their JSDoc is the reference. Which React hook to reach for:
+The exports live in `create-machine.ts`, `setup.ts`, `create-actor.ts` and `use-machine.ts`; their JSDoc is the reference. Which React hook to reach for:
 
-- `useMachine(machine)` when the component owns the actor for its lifetime.
-- `useActor(actor)` when the actor is shared or passed in, including a `mockActor` that renders a step directly.
+- `useMachine(machine, { input })` when the component owns the actor for its lifetime.
+- `useActor(actor)` when the actor is shared or passed in, including one from `restoreActor` that renders a step directly.
 - `useSelector(actor, selector)` when a component needs one slice and should re-render only when that slice changes.
 
-### Two behaviors worth knowing
+### Behaviors worth knowing
 
-**Nothing happens on a no-op.** If an event is blocked by a guard or isn't
-handled in the current state, the snapshot is returned _by reference unchanged_
-and subscribers are **not** notified. That's what lets `useSelector` skip
-re-renders, and lets a caller detect "the flow didn't move" with a `===` check.
+**Nothing happens on a no-op.** If no transition applies, the snapshot is
+returned _by reference unchanged_ and subscribers are **not** notified. That's
+what lets `useSelector` skip re-renders, and lets a caller detect "the flow
+didn't move" with a `===` check.
 
-**`recheck()` for guards that read the outside world.** A guard can read live
-external data (an SWR cache, a store) through a closure, not just `context`.
-When that data changes, call `actor.recheck()`. It re-seats the flow if the
-current step is no longer valid, and fires any `always` transition that was
-waiting on the data. (This is the seam the wizard's "the connection backing this
-step was just deleted" handling sits on.)
+**Effects before notify.** Effects queued with `enq` run before the snapshot
+swaps, and subscribers are notified after. A listener never sees a state whose
+effects have not run.
 
 ### Testing & docs
 
 Because a machine runs without React, most tests just drive the actor in plain
 JS — see [`__tests__/machine.test.ts`](./__tests__/machine.test.ts). For a step
-you can't easily click to (a `deleting` state hidden behind a 2-second mutation,
-a guard-gated wizard step), `mockActor` drops you straight in:
+you can't easily click to (a `deleting` state hidden behind a 2-second mutation),
+`restoreActor` drops you straight in:
 
 ```ts
-const actor = mockActor(loader, { value: 'failure', context: { error: { cause: new Error('Network error') } } });
+const actor = restoreActor(loader, loader.resolveState({ value: 'failure', context: failedContext }));
 render(<Loader actor={actor} />); // snapshot a state you'd otherwise have to provoke
 ```
 
@@ -259,162 +247,19 @@ A component that takes an actor reads it with `useActor(actor)` instead of
 
 ---
 
-<details>
-<summary><strong>Worked example: migrating the ConfigureSSO Wizard (before → after)</strong></summary>
+## Worked example: the ConfigureSSO wizard
 
-The wizard engine at `components/ConfigureSSO/elements/Wizard/` was hand-built as
-a pure reducer (`reducer.ts`) plus a React seam (`useWizardMachine.ts`). It's the
-strongest existing proof that this abstraction earns its keep, and it maps onto
-the library one-to-one. The live migration test —
-[`__tests__/wizard-migration.test.tsx`](./__tests__/wizard-migration.test.tsx) —
-ports the reducer's test cases to the machine.
+[`__tests__/wizard-migration.test.tsx`](./__tests__/wizard-migration.test.tsx)
+ports the ConfigureSSO wizard's hand-written reducer and its React seam onto a
+machine, and replays the reducer's test cases against it. Its header maps each
+reducer concept to the machine one:
 
-### What the wizard does
-
-Steps come from a runtime `descriptors[]` array. Each step has an **entry guard**
-("may navigation land here?"). On load the wizard seats on the _furthest step
-reachable by a contiguous run of holding guards_. `NEXT`/`PREV` move one slot;
-`GOTO` jumps to any reachable step.
-
-### Before: a reducer + a React seam full of workarounds
-
-The pure reducer is clean:
-
-```ts
-// reducer.ts (abridged)
-type WizardEvent = { type: 'NEXT' } | { type: 'PREV' } | { type: 'GOTO'; step: string };
-const guardHolds = step => (step.guard ? step.guard() : true);
-
-export const reduce = (state, event, config) => {
-  const steps = config.descriptors;
-  switch (event.type) {
-    case 'NEXT': {
-      const i = steps.findIndex(s => s.id === state.current);
-      if (i < 0) return state; // unknown current → no-op
-      const next = steps[i + 1];
-      if (!next) return state; // terminal → same ref (host bubbles)
-      if (!guardHolds(next)) return state; // blocked → same ref
-      return { current: next.id, direction: 1, hasNavigated: true };
-    }
-    // …PREV mirrors NEXT; GOTO rejects unknown / current / blocked…
-  }
-};
-```
-
-The complexity is in the **React seam** — because the state lived inside React,
-it needed ref-mirrors and two "adjust-state-during-render" passes:
-
-```ts
-// useWizardMachine.ts (abridged)
-const [state, setState] = useState(() => initialState(config));
-const [pendingNextFrom, setPendingNextFrom] = useState(null);
-
-const configRef = useRef(config);
-configRef.current = config; // mirror for stable handlers
-const stateRef = useRef(state);
-stateRef.current = state; // mirror
-
-// #1 re-seat off a step whose guard broke (during render)
-if (!isNested) {
-  /* …if current step's guard is false, setState(initialState(config))… */
-}
-
-// #2 resolve a parked NEXT once its guard catches up to a just-resolved await
-if (pendingNextFrom !== null) {
-  /* …re-reduce NEXT against the FRESH config… */
-}
-
-const goNext = useCallback(() => {
-  const next = reduce(stateRef.current, { type: 'NEXT' }, configRef.current);
-  if (next !== stateRef.current) {
-    setState(next);
-    return;
-  }
-  // same-ref: terminal → bubble to parent, else blocked → park a deferred advance
-}, []);
-```
-
-### After: a machine factory
-
-Each descriptor becomes a state node whose entry `guard` gates every transition
-landing on it; `initial` is the derived furthest-reachable step.
-
-```ts
-function createWizardMachine(descriptors) {
-  const ids = descriptors.map(d => d.id);
-  const guardHolds = d => (d.guard ? d.guard() : true);
-
-  const furthestReachable = () => {
-    if (descriptors.length === 0) return '';
-    let i = 0;
-    while (i + 1 < descriptors.length && guardHolds(descriptors[i + 1])) i++;
-    return descriptors[i].id;
-  };
-  const navigated = direction => assign(() => ({ direction, hasNavigated: true }));
-
-  const states = {};
-  descriptors.forEach((d, i) => {
-    const nextId = ids[i + 1];
-    const prevId = ids[i - 1];
-    states[d.id] = {
-      guard: d.guard, // entry guard — gates every transition that targets this step
-      on: {
-        ...(nextId ? { NEXT: { target: nextId, actions: navigated(1) } } : {}),
-        ...(prevId ? { PREV: { target: prevId, actions: navigated(-1) } } : {}),
-        GOTO: descriptors
-          .filter(t => t.id !== d.id)
-          .map(t => ({ target: t.id, guard: (_c, e) => e.step === t.id, actions: navigated(0) })),
-      },
-    };
-  });
-
-  return createMachine({
-    id: 'wizard',
-    initial: furthestReachable,
-    context: { direction: 0, hasNavigated: false },
-    states,
-  });
-}
-```
-
-Driving it needs no refs and no render-phase passes:
-
-```ts
-const actor = createActor(createWizardMachine(descriptors));
-actor.start(); // seats on the furthest-reachable step
-actor.send({ type: 'NEXT' }); // advances iff the next step's entry guard holds
-actor.recheck(); // external data changed → re-seat off a now-broken step
-```
-
-### What collapses, and why
-
-| Seam concern (before)                      | Machine primitive (after)                                                                                                                                            |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `reduce` event union + `guardHolds`        | `on` transitions + state-node `guard`                                                                                                                                |
-| `initialState` furthest-reachable walk     | derived `initial: furthestReachable`                                                                                                                                 |
-| every no-op returns `=== state`            | no-op = same snapshot ref + no notify, for free                                                                                                                      |
-| `configRef` / `stateRef` render mirrors    | the actor _is_ the live state — `send` reads it synchronously                                                                                                        |
-| re-seat clamp (adjust-state-during-render) | `actor.recheck()`                                                                                                                                                    |
-| `pendingNextFrom` deferred advance         | **gone** — that race only existed because React owned the state; an actor reads live guards synchronously, so `await mutation; send({ type: 'NEXT' })` just advances |
-| terminal/first bubble detection            | the same same-ref no-op signal (`!actor.can(event)` at a boundary)                                                                                                   |
-
-The reducer modelled a state machine by hand; the seam existed only to paper over
-React owning the state. Moving the state into an actor deletes that second half.
-
-### Stepper view by introspection
-
-The breadcrumb (`isCompleted` positional / `isReachable` guard-driven) reads
-straight off `machine.states` — no running instance, which is how docs enumerate
-every step without clicking through:
-
-```ts
-const deriveStepper = (machine, current) => {
-  const ids = Object.keys(machine.states);
-  const currentIndex = ids.indexOf(current);
-  return ids.map((id, i) => ({
-    id,
-    isCompleted: currentIndex >= 0 && i < currentIndex,
-    isReachable: machine.states[id].guard ? machine.states[id].guard() : true,
-  }));
-};
-```
+| Seam concern (before)                      | Machine (after)                                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `reduce` event union + `guardHolds`        | `on` transitions that return `undefined` when the target step's guard fails                            |
+| `initialState` furthest-reachable walk     | `initial: 'seat'`, a `choice` state that picks the furthest reachable step                             |
+| every no-op returns `=== state`            | no-op = same snapshot ref + no notify                                                                  |
+| `configRef` / `stateRef` render mirrors    | the actor _is_ the live state — `send` reads it synchronously                                          |
+| re-seat clamp (adjust-state-during-render) | `send({ type: 'machine.route', to: '#seat' })` when the current step's guard stops holding             |
+| `pendingNextFrom` deferred advance         | **gone** — an actor reads live guards synchronously, so `await mutation; send({ type: 'NEXT' })` works |
+| terminal/first bubble detection            | the same no-op signal (`!snapshot.can(event)` at a boundary)                                           |

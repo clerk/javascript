@@ -1,9 +1,8 @@
 /**
  * Shared types for the Mosaic state-machine library.
  *
- * The design mirrors XState v5's config-object shape (so a machine is statically
- * introspectable — see {@link StateMachine.states}) but is trimmed to a tiny,
- * dependency-free core: no parallel states, history, SCXML, or spawned actors.
+ * A machine is a static config object (so it is introspectable — see {@link StateMachine.states})
+ * trimmed to a tiny, dependency-free core: no parallel states, history, SCXML, or spawned actors.
  */
 
 /** The minimum shape every event must have. */
@@ -16,39 +15,41 @@ export interface AnyEventObject extends EventObject {
   [key: string]: unknown;
 }
 
-/** Pure predicate that gates a transition. */
-export type Guard<TContext, TEvent extends EventObject> = (context: TContext, event: TEvent) => boolean;
+export type AnyFunction = (...args: never[]) => unknown;
 
-/** A side-effecting action — runs for its effect, returns nothing. */
-export type ActionFunction<TContext, TEvent extends EventObject> = (context: TContext, event: TEvent) => void;
+export type ActionMap = Record<string, AnyFunction>;
 
-/** Internal tag identifying an {@link assign} action. A symbol so it can never collide with a user value. */
-export const ASSIGN = Symbol('assign');
-
-/**
- * The object produced by {@link assign}. Tagged so the runtime can tell a
- * context-updating action apart from a plain side-effect action.
- */
-export interface AssignAction<TContext, TEvent extends EventObject> {
-  type: typeof ASSIGN;
-  assignment: (context: TContext, event: TEvent) => Partial<TContext>;
+export interface AsyncArgs<TInput> {
+  input: TInput;
+  signal: AbortSignal;
 }
 
-/** Either a side-effect or an `assign` context update. */
-export type Action<TContext, TEvent extends EventObject> =
-  | ActionFunction<TContext, TEvent>
-  | AssignAction<TContext, TEvent>;
+export interface AsyncLogic<TInput, TOutput> {
+  run: (args: AsyncArgs<TInput>) => Promise<TOutput>;
+}
 
-export type Actions<TContext, TEvent extends EventObject> = Action<TContext, TEvent> | Action<TContext, TEvent>[];
+export type ActorMap = Record<string, AsyncLogic<never, unknown>>;
 
-/** The long form of a transition. */
-export interface TransitionConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
-  /** State to enter. Omit for an internal transition (runs actions, stays put). */
-  target?: NoInfer<TStates>;
-  /** Actions to run during the transition, in order. */
-  actions?: Actions<TContext, TEvent>;
-  /** Only take this transition when the guard passes. */
-  guard?: Guard<TContext, TEvent>;
+export type InputOf<TLogic> = TLogic extends AsyncLogic<infer TInput, unknown> ? TInput : never;
+export type OutputOf<TLogic> = TLogic extends AsyncLogic<never, infer TOutput> ? TOutput : never;
+
+export type Enqueue = <TArgs extends unknown[]>(fn: (...args: TArgs) => unknown, ...args: TArgs) => void;
+
+export interface ActorRef<TContext, TEvent extends EventObject> {
+  send: (event: TEvent | RouteEvent) => void;
+  getSnapshot: () => Snapshot<TContext, string, TEvent>;
+}
+
+export interface TransitionArgs<
+  TContext,
+  TEvent extends EventObject,
+  TActions extends ActionMap = ActionMap,
+  TMachineEvent extends EventObject = TEvent,
+> {
+  context: TContext;
+  event: TEvent;
+  self: ActorRef<TContext, TMachineEvent>;
+  actions: TActions;
 }
 
 /** What an inline transition function returns. `undefined` means the event is unhandled. */
@@ -59,25 +60,29 @@ export interface TransitionResult<TContext, TStates extends string = string> {
   context?: Partial<TContext>;
 }
 
-/**
- * Inline transition function. Replaces the `guard` + `actions: [assign(...)]`
- * combo for the common case. Returning `undefined` means the event is unhandled
- * (equivalent to a failing guard).
- */
-export type TransitionFn<TContext, TEvent extends EventObject, TStates extends string = string> = (args: {
-  context: TContext;
-  event: TEvent;
-}) => TransitionResult<TContext, TStates> | undefined;
+export type TransitionFn<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+  TMachineEvent extends EventObject = TEvent,
+> = (
+  args: TransitionArgs<TContext, TEvent, TActions, TMachineEvent>,
+  enq: Enqueue,
+) => TransitionResult<TContext, TStates> | undefined | void;
 
-/**
- * A transition may be a bare target string, a config object, an array of
- * configs evaluated in order (first passing guard wins), or an inline function.
- */
-export type Transition<TContext, TEvent extends EventObject, TStates extends string = string> =
-  | NoInfer<TStates>
-  | TransitionConfig<TContext, TEvent, TStates>
-  | TransitionConfig<TContext, TEvent, TStates>[]
-  | TransitionFn<TContext, TEvent, TStates>;
+export type Transition<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+  TMachineEvent extends EventObject = TEvent,
+> = { target: NoInfer<TStates> } | TransitionFn<TContext, TEvent, TStates, TActions, TMachineEvent>;
+
+export type EntryExitFn<TContext, TEvent extends EventObject, TActions extends ActionMap = ActionMap> = (
+  args: TransitionArgs<TContext, EventObject, TActions, TEvent>,
+  enq: Enqueue,
+) => { context?: Partial<TContext> } | undefined | void;
 
 /** The event type fired when an invoked promise resolves. */
 export const INVOKE_DONE = 'machine.invoke.done';
@@ -85,10 +90,9 @@ export const INVOKE_DONE = 'machine.invoke.done';
 export const INVOKE_ERROR = 'machine.invoke.error';
 /** The event delivered to a state on entry (and to the initial state on start). */
 export const INIT = 'machine.init';
-/** The event delivered to guards when {@link Actor.recheck} re-evaluates `always` transitions. */
-export const RECHECK = 'machine.recheck';
 /** The event type delivered to an `after` transition when its timer fires. */
 export const AFTER = 'machine.after';
+export const ROUTE = 'machine.route';
 
 /** Event delivered to `onDone` when an invoked promise resolves. */
 export interface DoneInvokeEvent<TOutput = unknown> extends EventObject {
@@ -108,106 +112,173 @@ export interface AfterEvent extends EventObject {
   delay: number;
 }
 
-/** Invoke a promise on state entry and branch on its settlement. */
-export interface InvokeConfig<
-  TContext,
-  TEvent extends EventObject,
-  TOutput = unknown,
-  TStates extends string = string,
-> {
-  /** Started on entry. The resolved value lands on `onDone` events as `output`. */
-  src: (context: TContext, event: TEvent | DoneInvokeEvent | ErrorInvokeEvent) => Promise<TOutput>;
-  onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
-  onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
+export interface RouteEvent extends EventObject {
+  type: typeof ROUTE;
+  to: `#${string}`;
 }
 
-export interface StateConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
-  /**
-   * Entry precondition — "may navigation LAND on this state right now?". Checked
-   * uniformly by *every* transition (and the derived initial) that targets this
-   * state: when it fails, the transition is a true no-op (snapshot unchanged, no
-   * notify). Distinct from a transition `guard`, which gates a single edge. An
-   * omitted entry guard means "always enterable". Often reads live external data
-   * via closure rather than `context` — pair with {@link Actor.recheck}.
-   */
-  guard?: Guard<TContext, TEvent>;
+export interface InputArgs<TContext, TEvent extends EventObject> {
+  context: TContext;
+  event: EventObject;
+  self: ActorRef<TContext, TEvent>;
+}
+
+export interface SettledInvoke<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+> {
+  event: DoneInvokeEvent | ErrorInvokeEvent;
+  transition: Transition<TContext, EventObject, TStates, TActions, TEvent> | undefined;
+}
+
+export interface CreatedInvoke<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+> {
+  run: (
+    args: InputArgs<TContext, TEvent>,
+    signal: AbortSignal,
+    settle: (settled: SettledInvoke<TContext, TEvent, TStates, TActions>) => void,
+  ) => void;
+}
+
+type NamedInvoke<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string,
+  TActions extends ActionMap,
+  TActors extends ActorMap,
+> = {
+  [K in keyof TActors & string]: {
+    src: K;
+    onDone?: Transition<TContext, DoneInvokeEvent<OutputOf<TActors[K]>>, TStates, TActions, TEvent>;
+    onError?: Transition<TContext, ErrorInvokeEvent, TStates, TActions, TEvent>;
+  } & ({ input: (args: InputArgs<TContext, TEvent>) => InputOf<TActors[K]> } | OptionalInput<InputOf<TActors[K]>>);
+}[keyof TActors & string];
+
+type OptionalInput<TInput> = undefined extends TInput ? { input?: undefined } : never;
+
+export type Invoke<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+  TActors extends ActorMap = ActorMap,
+> = NamedInvoke<TContext, TEvent, TStates, TActions, TActors> | CreatedInvoke<TContext, TEvent, TStates, TActions>;
+
+export type ChoiceFn<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+> = (args: TransitionArgs<TContext, EventObject, TActions, TEvent>) => { target: NoInfer<TStates> };
+
+export type RouteFn<TContext, TEvent extends EventObject, TActions extends ActionMap = ActionMap> = (
+  args: TransitionArgs<TContext, RouteEvent, TActions, TEvent>,
+) => boolean | { context?: Partial<TContext> } | undefined;
+
+export interface StateConfig<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+  TActors extends ActorMap = ActorMap,
+> {
+  id?: string;
   /**
    * Event-name → transition map. Each key is constrained to `TEvent['type']`
-   * and the transition's guards/actions receive the narrowed event member —
-   * e.g. a guard under `on['SUBMIT']` sees `Extract<TEvent, { type: 'SUBMIT' }>`,
+   * and the transition receives the narrowed event member —
+   * e.g. a transition under `on['SUBMIT']` sees `Extract<TEvent, { type: 'SUBMIT' }>`,
    * not the full union.
    */
-  on?: { [K in TEvent['type']]?: Transition<TContext, Extract<TEvent, { type: K }>, TStates> };
-  /** Eventless / immediate transitions, evaluated on entry and on {@link Actor.recheck}. */
-  always?: Transition<TContext, TEvent, TStates>;
+  on?: {
+    [K in TEvent['type']]?: Transition<TContext, Extract<TEvent, { type: K }>, TStates, TActions, TEvent>;
+  };
+  /** Eventless / immediate transition, evaluated on entry. */
+  always?: TransitionFn<TContext, EventObject, TStates, TActions, TEvent>;
   /**
    * Delayed transitions — each key is a delay in milliseconds. The matching
    * transition fires automatically after the delay unless the state is exited
    * first (by an explicit event, `always`, or `invoke`). Timers are cancelled
    * on exit and on `stop()`, so they never outlive the state or the actor.
-   *
-   * ```ts
-   * codeSent: {
-   *   after: { 60_000: 'expired' },
-   *   on: { SUBMIT: 'verifying' },
-   * }
-   * ```
    */
-  after?: { [delay: number]: Transition<TContext, AfterEvent, TStates> };
-  /**
-   * A promise to invoke on entry. Use {@link PromiseSrc} (created by
-   * `setup().fromPromise`) to carry the resolved type to `onDone.actions`.
-   * A raw `src` function is also accepted — `e.output` is `any` in that case, so
-   * `mosaic/no-raw-invoke` rejects it outside tests.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Each state invokes its own output type, and TypeScript cannot express that per-state type here; `unknown` would reject typed `onDone` handlers.
-  invoke?: InvokeConfig<TContext, TEvent, any, TStates>;
-  /** Actions run when the state is entered. */
-  entry?: Actions<TContext, TEvent>;
-  /** Actions run when the state is exited. */
-  exit?: Actions<TContext, TEvent>;
-  /** A terminal state — no further events are processed once reached. */
-  type?: 'final';
+  after?: { [delay: number]: Transition<TContext, AfterEvent, TStates, TActions, TEvent> };
+  invoke?: Invoke<TContext, TEvent, TStates, TActions, TActors>;
+  entry?: EntryExitFn<TContext, TEvent, TActions>;
+  exit?: EntryExitFn<TContext, TEvent, TActions>;
+  route?: RouteFn<TContext, TEvent, TActions> | { context?: Partial<TContext> };
+  type?: 'final' | 'choice';
+  choice?: ChoiceFn<TContext, TEvent, TStates, TActions>;
 }
 
-/**
- * The initial state may be a static id or derived from context at start time
- * (e.g. the Wizard computes the "furthest-reachable" step from its entry guards).
- */
-export type InitialResolver<TContext, TStates extends string = string> = (context: TContext) => TStates;
-
-export interface MachineConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
+export interface MachineConfig<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+  TActors extends ActorMap = ActorMap,
+  TInput = undefined,
+> {
   id?: string;
-  initial: NoInfer<TStates> | InitialResolver<TContext, NoInfer<TStates>>;
-  context?: TContext;
-  states: Record<TStates, StateConfig<TContext, TEvent, NoInfer<TStates>>>;
+  initial: NoInfer<TStates>;
+  context: TContext | ((args: { input: TInput }) => TContext);
+  actions?: TActions;
+  actors?: TActors;
+  states: Record<TStates, StateConfig<TContext, TEvent, NoInfer<TStates>, NoInfer<TActions>, NoInfer<TActors>>>;
+}
+
+export interface Implementations<TActions extends ActionMap, TActors extends ActorMap> {
+  actions?: Partial<TActions>;
+  actors?: Partial<TActors>;
 }
 
 /**
- * The static, runnable-instance-free machine definition returned by
- * {@link createMachine}. `states` is exposed so docs/tests can enumerate every
- * step without running anything.
+ * The static machine definition returned by {@link createMachine}. `states` is exposed so
+ * docs and tests can enumerate every step without running anything.
  */
-export interface StateMachine<TContext, TEvent extends EventObject, TStates extends string = string> {
+export interface StateMachine<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActions extends ActionMap = ActionMap,
+  TActors extends ActorMap = ActorMap,
+  TInput = undefined,
+> {
   id: string | undefined;
-  initial: TStates | InitialResolver<TContext, TStates>;
-  context: TContext;
-  states: Record<TStates, StateConfig<TContext, TEvent, TStates>>;
-  config: MachineConfig<TContext, TEvent, TStates>;
+  initial: TStates;
+  states: Record<TStates, StateConfig<TContext, TEvent, TStates, TActions, TActors>>;
+  config: MachineConfig<TContext, TEvent, TStates, TActions, TActors, TInput>;
+  implementations: { actions: TActions; actors: TActors };
+  provide: (
+    implementations: Implementations<TActions, TActors>,
+  ) => StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput>;
+  resolveState: (state: { value: TStates; context: TContext }) => PersistedSnapshot<TContext, TStates>;
 }
 
 export type ActorStatus = 'active' | 'done' | 'stopped';
 
-/** A point-in-time view of a running actor. */
-export interface Snapshot<TContext, TStates extends string = string> {
+export interface PersistedSnapshot<TContext, TStates extends string = string> {
   value: TStates;
   context: TContext;
   status: ActorStatus;
 }
 
+/** A point-in-time view of a running actor. */
+export interface Snapshot<
+  TContext,
+  TStates extends string = string,
+  TEvent extends EventObject = EventObject,
+> extends PersistedSnapshot<TContext, TStates> {
+  can(event: TEvent | RouteEvent): boolean;
+}
+
 /** A subscriber receives the latest snapshot on every transition. */
-export type SnapshotListener<TContext, TStates extends string = string> = (
-  snapshot: Snapshot<TContext, TStates>,
+export type SnapshotListener<TContext, TStates extends string = string, TEvent extends EventObject = EventObject> = (
+  snapshot: Snapshot<TContext, TStates, TEvent>,
 ) => void;
 
 /** Standard observable contract: `subscribe` returns its own unsubscribe fn. */
@@ -215,54 +286,21 @@ export type Unsubscribe = () => void;
 
 export interface Actor<TContext, TEvent extends EventObject, TStates extends string = string> {
   /**
-   * Run entry actions / immediate transitions / invokes of the initial state,
-   * then apply the events sent before this first start, in order. After a `stop()`, resume in the current state instead: re-arm its `after`
-   * timers, then apply the invoke results and events that arrived while stopped,
-   * in arrival order.
+   * Run the initial state's entry, `always` and invoke, then apply the events sent before
+   * this first start, in order. After a `stop()`, resume in the current state instead:
+   * re-arm its `after` timers, then apply the invoke results and events that arrived
+   * while stopped, in arrival order.
    */
   start: () => Actor<TContext, TEvent, TStates>;
   /** Stop the actor, pausing its `after` timers and holding in-flight invoke results and sent events for a later `start()`. */
   stop: () => void;
   /** Send an event. Ignored once the actor is `done`; queued until `start()` before the first start and while `stopped`. */
-  send: (event: TEvent) => void;
-  getSnapshot: () => Snapshot<TContext, TStates>;
+  send: (event: TEvent | RouteEvent) => void;
+  getSnapshot: () => Snapshot<TContext, TStates, TEvent>;
   /** Subscribe to snapshots; returns an unsubscribe fn (usable with `useSyncExternalStore`). */
-  subscribe: (listener: SnapshotListener<TContext, TStates>) => Unsubscribe;
-  /** Whether the event would be handled (a guard-passing, enterable transition exists) right now. */
-  can: (event: TEvent) => boolean;
-  /**
-   * Silently merge a partial context patch into the running actor — no snapshot
-   * emitted, no transitions triggered. Use this to keep injected dependencies
-   * (e.g. an async function from a React prop) current without restarting the actor.
-   * Patches survive a stop/start cycle (e.g. React StrictMode).
-   */
-  setContext: (patch: Partial<TContext>) => void;
-  /**
-   * Re-evaluate the current state against live data. Call this when external data
-   * a guard reads (an SWR cache, a store) has changed, so the machine can
-   * self-correct:
-   *  - if the *current* state's entry guard no longer holds, re-seat to the
-   *    freshly resolved initial state (e.g. the Wizard's furthest-reachable step);
-   *  - otherwise re-run the current state's `always` transitions, resolving one
-   *    that was parked waiting on the now-arrived data.
-   * A no-op (no notify) when the current state is still enterable and no `always`
-   * transition applies.
-   */
-  recheck: () => void;
+  subscribe: (listener: SnapshotListener<TContext, TStates, TEvent>) => Unsubscribe;
 }
 
-export interface CreateActorOptions<TContext, TStates extends string = string> {
-  /**
-   * Runtime context merged over machine defaults at actor creation time.
-   * Use this to inject dependencies (e.g. an async function from a hook)
-   * without putting them in the module-level machine definition.
-   * Snapshot context takes precedence when both are provided.
-   */
-  context?: Partial<TContext>;
-  /**
-   * Start the actor teleported to this snapshot instead of the machine's
-   * initial state. Used by {@link mockActor} — the actor is inert (no entry
-   * actions, immediates, or invokes run for the teleported state).
-   */
-  snapshot?: { value: TStates; context?: Partial<TContext> };
+export interface CreateActorOptions<TInput> {
+  input?: TInput;
 }

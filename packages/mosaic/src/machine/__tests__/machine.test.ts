@@ -1,534 +1,724 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred, tick } from '../../__tests__/async';
-import { assign, isAssignAction } from '../assign';
-import { createActor, mockActor } from '../create-actor';
-import { createMachine } from '../create-machine';
-import type { DoneInvokeEvent } from '../types';
-import {
-  createDeleteOrgMachine,
-  createLoaderMachine,
-  type DeleteOrgContext,
-  type DeleteOrgEvent,
-} from './delete-organization-machine';
+import { createActor, restoreActor } from '../create-actor';
+import { createAsyncLogic, setup } from '../setup';
+import type { AsyncArgs } from '../types';
+import { createDeleteOrgMachine, createLoaderMachine } from './delete-organization-machine';
 
-describe('createMachine — introspection (the swingset seam)', () => {
+type Empty = Record<string, never>;
+
+function toggleMachine() {
+  return setup<Empty, { type: 'GO' } | { type: 'BACK' }>().createMachine({
+    initial: 'a',
+    context: {},
+    states: {
+      a: { on: { GO: { target: 'b' } } },
+      b: { on: { BACK: { target: 'a' } } },
+    },
+  });
+}
+
+describe('createMachine — introspection', () => {
   it('exposes states, initial, context and id without running anything', () => {
-    const machine = createDeleteOrgMachine(() => Promise.resolve());
+    const entry = vi.fn();
+    const machine = setup<{ n: number }, { type: 'GO' }>().createMachine({
+      id: 'probe',
+      initial: 'a',
+      context: { n: 1 },
+      states: { a: { entry, on: { GO: { target: 'b' } } }, b: {} },
+    });
 
-    expect(machine.id).toBe('deleteOrg');
-    expect(machine.initial).toBe('idle');
-    expect(machine.context).toEqual({ name: 'Acme Inc', confirmValue: '', error: null });
-    // Every step is enumerable statically — docs can navigate to each one.
-    expect(Object.keys(machine.states)).toEqual(['idle', 'confirming', 'deleting', 'deleted']);
+    expect(machine.id).toBe('probe');
+    expect(machine.initial).toBe('a');
+    expect(Object.keys(machine.states)).toEqual(['a', 'b']);
+    expect(machine.config.context).toEqual({ n: 1 });
+    expect(entry).not.toHaveBeenCalled();
   });
 
-  it('defaults context to an empty object when omitted', () => {
-    const machine = createMachine({ initial: 'a', states: { a: {} } });
-    expect(machine.context).toEqual({});
+  it('resolves a persisted snapshot, marking a final state done', () => {
+    const machine = createDeleteOrgMachine(() => Promise.resolve());
+    const context = { name: 'Acme Inc', confirmValue: '', error: null };
+
+    expect(machine.resolveState({ value: 'confirming', context })).toEqual({
+      value: 'confirming',
+      context,
+      status: 'active',
+    });
+    expect(machine.resolveState({ value: 'deleted', context }).status).toBe('done');
   });
 });
 
-describe('createActor — pre-start safety', () => {
-  it('send() before start() runs no transition until start()', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    const before = actor.getSnapshot();
+describe('createActor — before start', () => {
+  it('runs no transition for events sent before start()', () => {
+    const actor = createActor(toggleMachine());
+    actor.send({ type: 'GO' });
 
-    actor.send({ type: 'OPEN' });
-
-    expect(actor.getSnapshot()).toBe(before);
+    expect(actor.getSnapshot().value).toBe('a');
     actor.start();
-    expect(actor.getSnapshot().value).toBe('confirming');
+    expect(actor.getSnapshot().value).toBe('b');
   });
 
-  it('can() before start() answers for the initial state', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    expect(actor.can({ type: 'OPEN' })).toBe(true);
-    expect(actor.can({ type: 'CANCEL' })).toBe(false);
-  });
+  it('answers snapshot.can() for the initial state', () => {
+    const actor = createActor(toggleMachine());
 
-  it('can() before start() answers for the initial state resolved from setContext()', () => {
-    const actor = createActor(
-      createMachine<{ done: boolean }, { type: 'GO' }>({
-        initial: context => (context.done ? 'end' : 'start'),
-        context: { done: false },
-        states: { start: { on: { GO: 'end' } }, end: {} },
-      }),
-    );
-
-    actor.setContext({ done: true });
-
-    expect(actor.can({ type: 'GO' })).toBe(false);
+    expect(actor.getSnapshot().can({ type: 'GO' })).toBe(true);
+    expect(actor.getSnapshot().can({ type: 'BACK' })).toBe(false);
   });
 });
 
 describe('createActor — transitions', () => {
-  it('starts in the initial state', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('idle');
-    expect(actor.getSnapshot().status).toBe('active');
-  });
-
   it('moves between states on handled events', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
+    const actor = createActor(toggleMachine()).start();
 
-    actor.send({ type: 'OPEN' });
-    expect(actor.getSnapshot().value).toBe('confirming');
-
-    actor.send({ type: 'CANCEL' });
-    expect(actor.getSnapshot().value).toBe('idle');
-  });
-
-  it('ignores events the current state does not handle', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
-
-    // `idle` has no `CONFIRM` handler — the snapshot is untouched.
-    const before = actor.getSnapshot();
-    actor.send({ type: 'CONFIRM' });
-    expect(actor.getSnapshot()).toBe(before);
-    expect(actor.getSnapshot().value).toBe('idle');
-  });
-});
-
-describe('createActor — guards', () => {
-  it('blocks a transition while the guard fails and allows it once it passes', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
-    actor.send({ type: 'OPEN' });
-
-    // Typed name does not match yet → CONFIRM is blocked.
-    actor.send({ type: 'CONFIRM' });
-    expect(actor.getSnapshot().value).toBe('confirming');
-
-    actor.send({ type: 'TYPE', value: 'Acme Inc' });
-    actor.send({ type: 'CONFIRM' });
-    expect(actor.getSnapshot().value).toBe('deleting');
-  });
-
-  it('takes the first transition whose guard passes', () => {
-    type Ctx = { score: number };
-    type Ev = { type: 'GRADE' };
-    const machine = createMachine<Ctx, Ev>({
-      initial: 'grading',
-      context: { score: 75 },
-      states: {
-        grading: {
-          on: {
-            GRADE: [
-              { target: 'a', guard: c => c.score >= 90 },
-              { target: 'b', guard: c => c.score >= 70 },
-              { target: 'c' },
-            ],
-          },
-        },
-        a: {},
-        b: {},
-        c: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'GRADE' });
+    actor.send({ type: 'GO' });
     expect(actor.getSnapshot().value).toBe('b');
-  });
-});
-
-describe('createActor — assign & action order', () => {
-  it('updates context via assign', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'TYPE', value: 'Ac' });
-    expect(actor.getSnapshot().context.confirmValue).toBe('Ac');
-    actor.send({ type: 'TYPE', value: 'Acme' });
-    expect(actor.getSnapshot().context.confirmValue).toBe('Acme');
+    actor.send({ type: 'BACK' });
+    expect(actor.getSnapshot().value).toBe('a');
   });
 
-  it('runs multiple actions in order, later assigns seeing earlier updates', () => {
-    const order: string[] = [];
-    type Ctx = { count: number };
-    type Ev = { type: 'GO' };
-    const machine = createMachine<Ctx, Ev>({
+  it('ignores an unhandled event without a new snapshot or a notify', () => {
+    const actor = createActor(toggleMachine()).start();
+    const before = actor.getSnapshot();
+    const listener = vi.fn();
+    actor.subscribe(listener);
+
+    actor.send({ type: 'BACK' });
+
+    expect(actor.getSnapshot()).toBe(before);
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('treats a transition fn that returns undefined as unhandled', () => {
+    const machine = setup<{ ok: boolean }, { type: 'GO' }>().createMachine({
       initial: 'a',
-      context: { count: 0 },
+      context: { ok: false },
+      states: { a: { on: { GO: ({ context }) => (context.ok ? { target: 'b' } : undefined) } }, b: {} },
+    });
+    const actor = createActor(machine).start();
+    const before = actor.getSnapshot();
+
+    actor.send({ type: 'GO' });
+
+    expect(actor.getSnapshot()).toBe(before);
+  });
+
+  it('patches context and stays when the fn returns only context', () => {
+    const machine = setup<{ value: string; other: number }, { type: 'TYPE'; value: string }>().createMachine({
+      initial: 'a',
+      context: { value: '', other: 1 },
+      states: { a: { on: { TYPE: ({ event }) => ({ context: { value: event.value } }) } } },
+    });
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'TYPE', value: 'x' });
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'a', context: { value: 'x', other: 1 } });
+  });
+
+  it('patches context and moves when the fn returns both', () => {
+    const machine = setup<{ n: number }, { type: 'GO'; n: number }>().createMachine({
+      initial: 'a',
+      context: { n: 0 },
+      states: { a: { on: { GO: ({ event }) => ({ target: 'b', context: { n: event.n } }) } }, b: {} },
+    });
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'GO', n: 3 });
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'b', context: { n: 3 } });
+  });
+
+  it('treats a fn that only enqueues an effect as handled, without moving', () => {
+    const effect = vi.fn();
+    const machine = setup<Empty, { type: 'PING' }>().createMachine({
+      initial: 'a',
+      context: {},
       states: {
         a: {
           on: {
-            GO: {
-              target: 'b',
-              actions: [
-                assign<Ctx, Ev>(c => ({ count: c.count + 1 })),
-                c => order.push(`side-effect saw count=${c.count}`),
-                assign<Ctx, Ev>(c => ({ count: c.count * 10 })),
-              ],
+            PING: (_, enq) => {
+              enq(effect, 'pinged');
+            },
+          },
+        },
+      },
+    });
+    const actor = createActor(machine).start();
+
+    expect(actor.getSnapshot().can({ type: 'PING' })).toBe(true);
+    actor.send({ type: 'PING' });
+
+    expect(effect).toHaveBeenCalledWith('pinged');
+    expect(actor.getSnapshot().value).toBe('a');
+  });
+});
+
+describe('createActor — effects', () => {
+  it('runs exit, transition and entry effects in that order', () => {
+    const calls: string[] = [];
+    const log = (name: string) => calls.push(name);
+    const machine = setup<Empty, { type: 'GO' }>().createMachine({
+      initial: 'a',
+      context: {},
+      states: {
+        a: {
+          exit: (_, enq) => enq(log, 'exit a'),
+          on: {
+            GO: (_, enq) => {
+              enq(log, 'transition');
+              return { target: 'b' };
+            },
+          },
+        },
+        b: { entry: (_, enq) => enq(log, 'entry b') },
+      },
+    });
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'GO' });
+
+    expect(calls).toEqual(['exit a', 'transition', 'entry b']);
+  });
+
+  it('evaluates the transition against event-time context, then merges exit, transition and entry patches', () => {
+    const machine = setup<{ trail: string; exit: boolean; entry: boolean }, { type: 'GO' }>().createMachine({
+      initial: 'a',
+      context: { trail: 'start', exit: false, entry: false },
+      states: {
+        a: {
+          exit: ({ context }) => ({ context: { trail: `${context.trail}+exit`, exit: true } }),
+          on: { GO: ({ context }) => ({ target: 'b', context: { trail: `${context.trail}+transition` } }) },
+        },
+        b: { entry: ({ context }) => ({ context: { trail: `${context.trail}+entry`, entry: true } }) },
+      },
+    });
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'GO' });
+
+    expect(actor.getSnapshot().context).toEqual({ trail: 'start+transition+entry', exit: true, entry: true });
+  });
+
+  it('runs effects before the snapshot moves to the target state and before listeners are notified', () => {
+    const calls: string[] = [];
+    const machine = setup<Empty, { type: 'GO' }>().createMachine({
+      initial: 'a',
+      context: {},
+      states: {
+        a: { on: { GO: { target: 'b' } } },
+        b: {
+          entry: ({ self }, enq) => enq(() => calls.push(`effect sees ${self.getSnapshot().value}`)),
+        },
+      },
+    });
+    const actor = createActor(machine).start();
+    actor.subscribe(snapshot => calls.push(`listener sees ${snapshot.value}`));
+
+    actor.send({ type: 'GO' });
+
+    expect(calls).toEqual(['effect sees a', 'listener sees b']);
+  });
+
+  it('processes an event sent from an effect after the current step', () => {
+    const seen: string[] = [];
+    const machine = setup<Empty, { type: 'GO' }>().createMachine({
+      initial: 'a',
+      context: {},
+      states: {
+        a: { on: { GO: { target: 'b' } } },
+        b: { entry: ({ self }, enq) => enq(() => self.send({ type: 'GO' })), on: { GO: { target: 'c' } } },
+        c: {},
+      },
+    });
+    const actor = createActor(machine).start();
+    actor.subscribe(snapshot => seen.push(snapshot.value));
+
+    actor.send({ type: 'GO' });
+
+    expect(seen).toEqual(['b', 'c']);
+  });
+
+  it('runs an initial entry effect on start, not on creation', () => {
+    const effect = vi.fn();
+    const machine = setup<Empty, { type: 'never' }>().createMachine({
+      initial: 'a',
+      context: {},
+      states: { a: { entry: (_, enq) => enq(effect) } },
+    });
+    const actor = createActor(machine);
+
+    expect(effect).not.toHaveBeenCalled();
+    actor.start();
+    expect(effect).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('createActor — named actions', () => {
+  function notifyMachine(notify: (message: string) => void) {
+    return setup<Empty, { type: 'GO' }>().createMachine({
+      initial: 'a',
+      context: {},
+      actions: { notify },
+      states: {
+        a: {
+          on: {
+            GO: ({ actions }, enq) => {
+              enq(actions.notify, 'went');
+              return { target: 'b' };
             },
           },
         },
         b: {},
       },
     });
-    const actor = createActor(machine);
-    actor.start();
+  }
+
+  it('runs the action given to the machine', () => {
+    const notify = vi.fn();
+    const actor = createActor(notifyMachine(notify)).start();
+
     actor.send({ type: 'GO' });
 
-    expect(actor.getSnapshot().context.count).toBe(10);
-    expect(order).toEqual(['side-effect saw count=1']);
+    expect(notify).toHaveBeenCalledWith('went');
   });
 
-  it('runs entry and exit actions around a transition', () => {
-    const log: string[] = [];
-    type Ev = { type: 'NEXT' };
-    const machine = createMachine<Record<string, never>, Ev>({
+  it('runs the action from provide() and leaves the original machine as it was', () => {
+    const original = vi.fn();
+    const provided = vi.fn();
+    const machine = notifyMachine(original);
+    const withProvided = machine.provide({ actions: { notify: provided } });
+
+    createActor(withProvided).start().send({ type: 'GO' });
+    createActor(machine).start().send({ type: 'GO' });
+
+    expect(withProvided.config).toBe(machine.config);
+    expect(provided).toHaveBeenCalledTimes(1);
+    expect(original).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('createActor — always', () => {
+  it('takes an always transition on entry when it returns a target', () => {
+    const machine = setup<{ ready: boolean }, { type: 'GO' }>().createMachine({
       initial: 'a',
+      context: { ready: true },
       states: {
-        a: { exit: () => log.push('exit-a'), on: { NEXT: 'b' } },
-        b: { entry: () => log.push('entry-b') },
+        a: { on: { GO: { target: 'check' } } },
+        check: { always: ({ context }) => (context.ready ? { target: 'done' } : undefined) },
+        done: {},
       },
     });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'NEXT' });
-    expect(log).toEqual(['exit-a', 'entry-b']);
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'GO' });
+
+    expect(actor.getSnapshot().value).toBe('done');
+  });
+
+  it('stays when always returns undefined', () => {
+    const machine = setup<{ ready: boolean }, { type: 'never' }>().createMachine({
+      initial: 'check',
+      context: { ready: false },
+      states: {
+        check: { always: ({ context }) => (context.ready ? { target: 'done' } : undefined) },
+        done: {},
+      },
+    });
+
+    expect(createActor(machine).start().getSnapshot().value).toBe('check');
   });
 });
 
-describe('createActor — immediate (always) transitions', () => {
-  it('takes a guarded eventless transition on entry', () => {
-    type Ctx = { authed: boolean };
-    type Ev = { type: 'LOGIN' };
-    const machine = createMachine<Ctx, Ev>({
-      initial: 'idle',
-      context: { authed: true },
-      states: {
-        idle: { on: { LOGIN: 'checking' } },
-        // No event handler — resolves immediately based on context.
-        checking: {
-          always: [{ target: 'granted', guard: c => c.authed }, { target: 'denied' }],
-        },
-        granted: {},
-        denied: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'LOGIN' });
-    // Never observably rests in `checking`.
-    expect(actor.getSnapshot().value).toBe('granted');
-  });
-});
-
-describe('createActor — invoke (async)', () => {
+describe('createActor — inline invoke', () => {
   it('lands the resolved output in context via onDone', async () => {
-    const actor = createActor(createLoaderMachine(() => Promise.resolve('payload')));
-    actor.start();
-    actor.send({ type: 'FETCH' });
-    expect(actor.getSnapshot().value).toBe('loading');
+    const actor = createActor(createLoaderMachine(() => Promise.resolve('payload'))).start();
 
+    actor.send({ type: 'FETCH' });
     await tick();
-    expect(actor.getSnapshot().value).toBe('success');
-    expect(actor.getSnapshot().context.data).toBe('payload');
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'success', context: { data: 'payload' } });
   });
 
-  it('routes a rejection to onError with the error in context', async () => {
-    const actor = createActor(createLoaderMachine(() => Promise.reject(new Error('boom'))));
-    actor.start();
-    actor.send({ type: 'FETCH' });
+  it('routes a rejection to onError', async () => {
+    const actor = createActor(createLoaderMachine(() => Promise.reject(new Error('boom')))).start();
 
+    actor.send({ type: 'FETCH' });
     await tick();
-    expect(actor.getSnapshot().value).toBe('failure');
-    expect(actor.getSnapshot().context.error).toContain('boom');
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'failure', context: { error: 'Error: boom' } });
   });
 
   it('routes a synchronous throw from src to onError', async () => {
     const actor = createActor(
       createLoaderMachine(() => {
-        throw new Error('boom');
+        throw new Error('sync');
       }),
-    );
-    actor.start();
+    ).start();
+
     actor.send({ type: 'FETCH' });
-    expect(actor.getSnapshot().value).toBe('loading');
-
-    await tick();
-    expect(actor.getSnapshot().value).toBe('failure');
-    expect(actor.getSnapshot().context.error).toContain('boom');
-  });
-
-  it('passes the resolved value to onDone as event.output', async () => {
-    const onDone = vi.fn();
-    const machine = createMachine<{ out: string | null }, { type: 'GO' }>({
-      initial: 'idle',
-      context: { out: null },
-      states: {
-        idle: { on: { GO: 'running' } },
-        running: {
-          invoke: {
-            src: () => Promise.resolve('the-output'),
-            onDone: {
-              target: 'done',
-              actions: [
-                (_c, e) => onDone((e as DoneInvokeEvent<string>).output),
-                assign<{ out: string | null }, DoneInvokeEvent<string>>((_, e) => ({ out: e.output })),
-              ],
-            },
-          },
-        },
-        done: { type: 'final' },
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'GO' });
     await tick();
 
-    expect(onDone).toHaveBeenCalledWith('the-output');
-    expect(actor.getSnapshot().context.out).toBe('the-output');
+    expect(actor.getSnapshot()).toMatchObject({ value: 'failure', context: { error: 'Error: sync' } });
   });
 
-  it('does not transition when stopped mid-flight (no work after stop)', async () => {
+  it('passes the mapped input to src', async () => {
+    const destroy = vi.fn(() => Promise.resolve());
+    const actor = createActor(createDeleteOrgMachine(destroy)).start();
+
+    actor.send({ type: 'OPEN' });
+    actor.send({ type: 'TYPE', value: 'Acme Inc' });
+    actor.send({ type: 'CONFIRM' });
+    await tick();
+
+    expect(destroy).toHaveBeenCalledWith({ name: 'Acme Inc', confirmValue: 'Acme Inc', error: null });
+    expect(actor.getSnapshot()).toMatchObject({ value: 'deleted', status: 'done' });
+  });
+
+  it('runs no transition when stopped mid-flight', async () => {
     const gate = deferred<string>();
-    const actor = createActor(createLoaderMachine(() => gate.promise));
-    actor.start();
+    const actor = createActor(createLoaderMachine(() => gate.promise)).start();
     actor.send({ type: 'FETCH' });
-    expect(actor.getSnapshot().value).toBe('loading');
 
     actor.stop();
-    gate.resolve('too-late');
+    gate.resolve('late');
     await tick();
 
-    expect(actor.getSnapshot().value).toBe('loading');
-    expect(actor.getSnapshot().status).toBe('stopped');
-    expect(actor.getSnapshot().context.data).toBeNull();
+    expect(actor.getSnapshot()).toMatchObject({ value: 'loading', status: 'stopped' });
   });
 
-  it('abandons an in-flight invoke when the state is left via an event', async () => {
+  it('drops the result and aborts the signal when the state is left first', async () => {
     const gate = deferred<string>();
-    const machine = createMachine<Record<string, never>, { type: 'GO' } | { type: 'CANCEL' }>({
-      initial: 'idle',
+    let signal: AbortSignal | undefined;
+    const flow = setup<{ data: string }, { type: 'CANCEL' }>();
+    const machine = flow.createMachine({
+      initial: 'loading',
+      context: { data: '' },
       states: {
-        idle: { on: { GO: 'working' } },
-        working: {
-          invoke: { src: () => gate.promise, onDone: 'done' },
-          on: { CANCEL: 'idle' },
+        loading: {
+          invoke: flow.createInvoke({
+            src: (args: AsyncArgs<undefined>) => {
+              signal = args.signal;
+              return gate.promise;
+            },
+            onDone: ({ event }) => ({ target: 'done', context: { data: event.output } }),
+          }),
+          on: { CANCEL: { target: 'idle' } },
         },
+        idle: {},
         done: {},
       },
     });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'GO' });
-    expect(actor.getSnapshot().value).toBe('working');
+    const actor = createActor(machine).start();
 
-    actor.send({ type: 'CANCEL' }); // leave `working` before the promise settles
-    expect(actor.getSnapshot().value).toBe('idle');
-
+    actor.send({ type: 'CANCEL' });
     gate.resolve('late');
     await tick();
-    expect(actor.getSnapshot().value).toBe('idle'); // stale onDone did not fire
+
+    expect(signal?.aborted).toBe(true);
+    expect(actor.getSnapshot()).toMatchObject({ value: 'idle', context: { data: '' } });
+  });
+});
+
+describe('createActor — named actors', () => {
+  type LoadContext = { id: string; out: string; error: string };
+  const load = setup<LoadContext, { type: 'never' }>();
+
+  function loadMachine(fetchById: (id: string) => Promise<string>) {
+    return load.createMachine({
+      initial: 'loading',
+      context: { id: 'u1', out: '', error: '' },
+      actors: { fetch: createAsyncLogic(({ input }: AsyncArgs<string>) => fetchById(input)) },
+      states: {
+        loading: {
+          invoke: {
+            src: 'fetch',
+            input: ({ context }) => context.id,
+            onDone: ({ event }) => ({ target: 'done', context: { out: event.output } }),
+            onError: ({ event }) => ({ target: 'failed', context: { error: String(event.error) } }),
+          },
+        },
+        done: {},
+        failed: {},
+      },
+    });
+  }
+
+  it('invokes the named actor with the mapped input', async () => {
+    const fetchById = vi.fn((id: string) => Promise.resolve(`user ${id}`));
+    const actor = createActor(loadMachine(fetchById)).start();
+    await tick();
+
+    expect(fetchById).toHaveBeenCalledWith('u1');
+    expect(actor.getSnapshot()).toMatchObject({ value: 'done', context: { out: 'user u1' } });
+  });
+
+  it('invokes the actor from provide()', async () => {
+    const machine = loadMachine(() => Promise.resolve('original')).provide({
+      actors: { fetch: createAsyncLogic(({ input }: AsyncArgs<string>) => Promise.resolve(`provided ${input}`)) },
+    });
+    const actor = createActor(machine).start();
+    await tick();
+
+    expect(actor.getSnapshot().context.out).toBe('provided u1');
+  });
+
+  it('routes a missing actor to onError', async () => {
+    const machine = setup<{ error: string }, { type: 'never' }>().createMachine({
+      initial: 'loading',
+      context: { error: '' },
+      actors: { fetch: createAsyncLogic(() => Promise.resolve('')) },
+      states: {
+        loading: {
+          invoke: {
+            src: 'fetch',
+            onError: ({ event }) => ({ target: 'failed', context: { error: String(event.error) } }),
+          },
+        },
+        failed: {},
+      },
+    });
+    const actor = createActor(machine.provide({ actors: { fetch: undefined } })).start();
+    await tick();
+
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'failed',
+      context: { error: 'Error: [Clerk] Machine has no actor "fetch".' },
+    });
   });
 });
 
 describe('createActor — final states', () => {
   it('marks the snapshot done and ignores further events', async () => {
-    const actor = createActor(createLoaderMachine(() => Promise.resolve('x')));
-    actor.start();
+    const actor = createActor(createLoaderMachine(() => Promise.resolve('x'))).start();
     actor.send({ type: 'FETCH' });
     await tick();
+    const done = actor.getSnapshot();
 
-    expect(actor.getSnapshot().value).toBe('success');
-    expect(actor.getSnapshot().status).toBe('done');
-
-    // `success` is final — even a normally-handled event is a no-op now.
     actor.send({ type: 'FETCH' });
-    expect(actor.getSnapshot().value).toBe('success');
+
+    expect(done.status).toBe('done');
+    expect(actor.getSnapshot()).toBe(done);
+    expect(done.can({ type: 'FETCH' })).toBe(false);
   });
 });
 
-describe('createActor — can()', () => {
-  it('reports whether the current state would handle an event', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
+describe('snapshot.can()', () => {
+  it('evaluates the transition fn without running its effects', () => {
+    const effect = vi.fn();
+    const machine = setup<{ ok: boolean }, { type: 'GO' }>().createMachine({
+      initial: 'a',
+      context: { ok: true },
+      states: {
+        a: {
+          on: {
+            GO: ({ context }, enq) => {
+              enq(effect);
+              return context.ok ? { target: 'b' } : undefined;
+            },
+          },
+        },
+        b: {},
+      },
+    });
+    const actor = createActor(machine).start();
 
-    expect(actor.can({ type: 'OPEN' })).toBe(true);
-    expect(actor.can({ type: 'CONFIRM' })).toBe(false); // not handled in idle
+    expect(actor.getSnapshot().can({ type: 'GO' })).toBe(true);
+    expect(effect).not.toHaveBeenCalled();
+    expect(actor.getSnapshot().value).toBe('a');
+  });
 
-    actor.send({ type: 'OPEN' });
-    // CONFIRM is handled but its guard fails → not currently takeable.
-    expect(actor.can({ type: 'CONFIRM' })).toBe(false);
-    expect(actor.can({ type: 'CANCEL' })).toBe(true);
+  it('answers for the snapshot it was read from', () => {
+    const actor = createActor(toggleMachine()).start();
+    const before = actor.getSnapshot();
 
-    actor.send({ type: 'TYPE', value: 'Acme Inc' });
-    expect(actor.can({ type: 'CONFIRM' })).toBe(true); // guard now passes
+    actor.send({ type: 'GO' });
+
+    expect(before.can({ type: 'GO' })).toBe(true);
+    expect(actor.getSnapshot().can({ type: 'GO' })).toBe(false);
   });
 
   it('returns false once stopped', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
+    const actor = createActor(toggleMachine()).start();
     actor.stop();
-    expect(actor.can({ type: 'OPEN' })).toBe(false);
+
+    expect(actor.getSnapshot().can({ type: 'GO' })).toBe(false);
   });
 });
 
-describe('createActor — state entry guards', () => {
-  // Entry guards read live external data via closure — the Wizard's core need.
-  function makeGatedMachine(canEnterB: () => boolean) {
-    return createMachine<Record<string, never>, { type: 'GO' }>({
+describe('createActor — input', () => {
+  it('builds context lazily from input', () => {
+    const machine = setup<{ name: string; draft: string }, { type: 'never' }, { name: string }>().createMachine({
       initial: 'a',
+      context: ({ input }) => ({ name: input.name, draft: '' }),
+      states: { a: {} },
+    });
+
+    expect(createActor(machine, { input: { name: 'Acme' } }).getSnapshot().context).toEqual({
+      name: 'Acme',
+      draft: '',
+    });
+  });
+});
+
+describe('createActor — choice states', () => {
+  type Ctx = { hasAuthenticator: boolean };
+  const choose = setup<Ctx, { type: 'RESET' }, Ctx>();
+
+  function choiceMachine() {
+    return choose.createMachine({
+      initial: 'start',
+      context: ({ input }) => input,
       states: {
-        a: { on: { GO: 'b' } },
-        b: { guard: canEnterB },
+        start: {
+          type: 'choice',
+          choice: ({ context }) => (context.hasAuthenticator ? { target: 'verify' } : { target: 'pick' }),
+        },
+        pick: {},
+        verify: { on: { RESET: () => ({ target: 'start', context: { hasAuthenticator: false } }) } },
       },
     });
   }
 
-  it('blocks a transition whose target entry guard fails — a true no-op (same ref, no notify)', () => {
-    const actor = createActor(makeGatedMachine(() => false));
-    actor.start();
-    const seen: string[] = [];
-    actor.subscribe(s => seen.push(s.value));
+  it('resolves the initial choice before start', () => {
+    expect(createActor(choiceMachine(), { input: { hasAuthenticator: true } }).getSnapshot().value).toBe('verify');
+    expect(createActor(choiceMachine(), { input: { hasAuthenticator: false } }).getSnapshot().value).toBe('pick');
+  });
 
+  it('resolves a choice reached by a transition', () => {
+    const actor = createActor(choiceMachine(), { input: { hasAuthenticator: true } }).start();
+
+    actor.send({ type: 'RESET' });
+
+    expect(actor.getSnapshot().value).toBe('pick');
+  });
+});
+
+describe('createActor — route states', () => {
+  type Ctx = { verified: boolean; step: string };
+  const wizard = setup<Ctx, { type: 'VERIFY' }>();
+
+  function wizardMachine(entry = vi.fn()) {
+    return wizard.createMachine({
+      initial: 'profile',
+      context: { verified: false, step: '' },
+      states: {
+        profile: { id: 'profile', route: { context: { step: 'profile' } }, entry },
+        security: { id: 'security', route: ({ context }) => context.verified },
+        hidden: { on: { VERIFY: () => ({ context: { verified: true } }) } },
+      },
+    });
+  }
+
+  it('moves to a route state once its route allows it', () => {
+    const actor = createActor(
+      wizard.createMachine({
+        initial: 'a',
+        context: { verified: false, step: '' },
+        states: {
+          a: { on: { VERIFY: () => ({ context: { verified: true } }) } },
+          b: { id: 'b', route: ({ context }) => context.verified },
+        },
+      }),
+    ).start();
+    expect(actor.getSnapshot().can({ type: 'machine.route', to: '#b' })).toBe(false);
+
+    actor.send({ type: 'VERIFY' });
+    actor.send({ type: 'machine.route', to: '#b' });
+
+    expect(actor.getSnapshot().value).toBe('b');
+  });
+
+  it('blocks a route state whose route returns false', () => {
+    const actor = createActor(wizardMachine()).start();
     const before = actor.getSnapshot();
-    actor.send({ type: 'GO' });
 
-    expect(actor.getSnapshot()).toBe(before); // referentially unchanged
-    expect(actor.getSnapshot().value).toBe('a');
-    expect(seen).toEqual([]); // subscribers NOT notified on a no-op
+    actor.send({ type: 'machine.route', to: '#security' });
+
+    expect(actor.getSnapshot()).toBe(before);
   });
 
-  it('allows the transition once the entry guard holds, and reflects it in can()', () => {
-    let open = false;
-    const actor = createActor(makeGatedMachine(() => open));
-    actor.start();
+  it('applies the context a route returns', () => {
+    const actor = createActor(wizardMachine()).start();
 
-    expect(actor.can({ type: 'GO' })).toBe(false);
-    actor.send({ type: 'GO' });
-    expect(actor.getSnapshot().value).toBe('a'); // still blocked
+    actor.send({ type: 'machine.route', to: '#profile' });
 
-    open = true;
-    expect(actor.can({ type: 'GO' })).toBe(true);
-    actor.send({ type: 'GO' });
-    expect(actor.getSnapshot().value).toBe('b');
+    expect(actor.getSnapshot().context.step).toBe('profile');
   });
-});
 
-describe('createActor — derived initial state', () => {
-  it('computes the start state from context via an initial resolver', () => {
-    const machine = createMachine<{ resumeAt: string }, { type: 'X' }>({
-      initial: context => context.resumeAt,
-      context: { resumeAt: 'c' },
-      states: { a: {}, b: {}, c: {} },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('c');
+  it('re-enters the current state when routed to it', () => {
+    const entry = vi.fn();
+    const actor = createActor(wizardMachine(entry)).start();
+
+    actor.send({ type: 'machine.route', to: '#profile' });
+
+    expect(entry).toHaveBeenCalledTimes(2);
+  });
+
+  it('ignores an id with no route', () => {
+    const snapshot = createActor(wizardMachine()).start().getSnapshot();
+
+    expect(snapshot.can({ type: 'machine.route', to: '#hidden' })).toBe(false);
+    expect(snapshot.can({ type: 'machine.route', to: '#missing' })).toBe(false);
   });
 });
 
-describe('createActor — recheck (always re-evaluated on external-data change)', () => {
-  it('takes a parked always transition once external data lets its guard pass', () => {
-    let ready = false;
-    const machine = createMachine<Record<string, never>, { type: never }>({
-      initial: 'waiting',
-      states: {
-        waiting: { always: { target: 'ready', guard: () => ready } },
-        ready: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    // Guard was false on entry → still parked in `waiting`.
-    expect(actor.getSnapshot().value).toBe('waiting');
+describe('restoreActor', () => {
+  const context = { name: 'Acme Inc', confirmValue: '', error: 'shown' };
 
-    const seen: string[] = [];
-    actor.subscribe(s => seen.push(s.value));
+  it('seats the actor in the given state and context', () => {
+    const machine = createDeleteOrgMachine(() => Promise.resolve());
+    const actor = restoreActor(machine, machine.resolveState({ value: 'confirming', context }));
 
-    actor.recheck(); // data not ready yet → no-op, no notify
-    expect(actor.getSnapshot().value).toBe('waiting');
-    expect(seen).toEqual([]);
-
-    ready = true;
-    actor.recheck(); // external data changed → advance
-    expect(actor.getSnapshot().value).toBe('ready');
-    expect(seen).toEqual(['ready']);
+    expect(actor.getSnapshot()).toMatchObject({ value: 'confirming', status: 'active', context });
   });
 
-  it('re-seats to the resolved initial state when live data makes the current step unenterable', () => {
-    // Self-correction: the actor is sitting on a step whose entry guard reads live
-    // external data, and that data changes so the step is no longer enterable. A
-    // recheck() re-seats to the freshly-resolved initial state — the seam the
-    // Wizard's render-phase "clamp" stands on.
-    let bReachable = true;
-    const machine = createMachine<Record<string, never>, { type: never }>({
-      initial: () => (bReachable ? 'b' : 'a'),
-      states: {
-        a: {},
-        b: { guard: () => bReachable },
-      },
-    });
-    const actor = createActor(machine);
+  it('runs no invoke for the restored state, across a restart too', async () => {
+    const destroy = vi.fn(() => Promise.resolve());
+    const machine = createDeleteOrgMachine(destroy);
+    const actor = restoreActor(machine, machine.resolveState({ value: 'deleting', context })).start();
+
+    actor.stop();
     actor.start();
-    expect(actor.getSnapshot().value).toBe('b'); // initial resolver landed on b
+    await tick();
 
-    const seen: string[] = [];
-    actor.subscribe(s => seen.push(s.value));
-
-    actor.recheck(); // b still enterable → no-op, no notify
-    expect(actor.getSnapshot().value).toBe('b');
-    expect(seen).toEqual([]);
-
-    bReachable = false;
-    actor.recheck(); // b unenterable → re-seat to the resolved initial (a)
-    expect(actor.getSnapshot().value).toBe('a');
-    expect(seen).toEqual(['a']);
+    expect(destroy).not.toHaveBeenCalled();
+    expect(actor.getSnapshot()).toMatchObject({ value: 'deleting', status: 'active' });
   });
 
-  it('does not re-seat while the current step is still enterable (a guard opening elsewhere does not yank)', () => {
-    // Mirrors the Wizard's "create-style change" invariant: a later guard going
-    // TRUE while the current step still holds must NOT move the user.
-    let bReachable = false;
-    const machine = createMachine<Record<string, never>, { type: never }>({
-      initial: 'a',
-      states: {
-        a: {},
-        b: { guard: () => bReachable },
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    const seen: string[] = [];
-    actor.subscribe(s => seen.push(s.value));
+  it('reports done for a final state', () => {
+    const machine = createDeleteOrgMachine(() => Promise.resolve());
+    const actor = restoreActor(machine, machine.resolveState({ value: 'deleted', context }));
 
-    bReachable = true; // b becomes reachable, but a still holds → no re-seat
-    actor.recheck();
-    expect(actor.getSnapshot().value).toBe('a');
-    expect(seen).toEqual([]);
+    expect(actor.getSnapshot().status).toBe('done');
+  });
+
+  it('takes events from the restored state', () => {
+    const machine = createDeleteOrgMachine(() => Promise.resolve());
+    const actor = restoreActor(machine, machine.resolveState({ value: 'confirming', context })).start();
+
+    actor.send({ type: 'CANCEL' });
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'idle', context: { error: null } });
   });
 });
 
 describe('createActor — observable contract', () => {
   it('notifies subscribers on each transition and stops after unsubscribe', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
-
+    const actor = createActor(toggleMachine()).start();
     const seen: string[] = [];
     const unsubscribe = actor.subscribe(snapshot => seen.push(snapshot.value));
 
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'CANCEL' });
-    expect(seen).toEqual(['confirming', 'idle']);
-
+    actor.send({ type: 'GO' });
+    actor.send({ type: 'BACK' });
     unsubscribe();
-    actor.send({ type: 'OPEN' });
-    expect(seen).toEqual(['confirming', 'idle']); // no further notifications
+    actor.send({ type: 'GO' });
+
+    expect(seen).toEqual(['b', 'a']);
   });
 
   it('does not notify a listener another listener unsubscribed during the same pass', () => {
-    const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'b' } }, b: {} } }));
-    actor.start();
-
+    const actor = createActor(toggleMachine()).start();
     const calls: string[] = [];
     const unsubscribeA = actor.subscribe(() => calls.push('A'));
     actor.subscribe(() => {
@@ -537,201 +727,62 @@ describe('createActor — observable contract', () => {
     });
 
     actor.send({ type: 'GO' });
+
     expect(calls).toEqual(['B']);
   });
 
-  it('getSnapshot is referentially stable until a change occurs', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
-
+  it('keeps getSnapshot referentially stable until a change', () => {
+    const actor = createActor(toggleMachine()).start();
     const first = actor.getSnapshot();
-    expect(actor.getSnapshot()).toBe(first); // same reference, no change
 
-    actor.send({ type: 'OPEN' });
-    expect(actor.getSnapshot()).not.toBe(first); // new reference after transition
-  });
-});
-
-describe('createActor — context init option', () => {
-  type Ctx = { label: string; count: number };
-  type Ev = { type: 'GO' };
-
-  const machine = createMachine<Ctx, Ev>({
-    initial: 'idle',
-    context: { label: 'default', count: 0 },
-    states: { idle: { on: { GO: 'done' } }, done: { type: 'final' } },
-  });
-
-  it('merges runtime context over machine defaults', () => {
-    const actor = createActor(machine, { context: { label: 'runtime' } });
-    actor.start();
-    expect(actor.getSnapshot().context).toEqual({ label: 'runtime', count: 0 });
-  });
-
-  it('leaves unspecified fields at their machine defaults', () => {
-    const actor = createActor(machine, { context: { count: 42 } });
-    actor.start();
-    expect(actor.getSnapshot().context).toEqual({ label: 'default', count: 42 });
-  });
-
-  it('snapshot.context takes precedence over context init', () => {
-    const actor = createActor(machine, {
-      context: { label: 'runtime' },
-      snapshot: { value: 'idle', context: { label: 'teleport' } },
-    });
-    expect(actor.getSnapshot().context).toEqual({ label: 'teleport', count: 0 });
-  });
-});
-
-describe('mockActor — teleport', () => {
-  it('drops the actor into an arbitrary state + context', () => {
-    const actor = mockActor(
-      createDeleteOrgMachine(() => Promise.resolve()),
-      {
-        value: 'confirming',
-        context: { confirmValue: 'Acme Inc' },
-      },
-    );
-    const snapshot = actor.getSnapshot();
-    expect(snapshot.value).toBe('confirming');
-    // Provided context is merged over the machine defaults.
-    expect(snapshot.context).toEqual({ name: 'Acme Inc', confirmValue: 'Acme Inc', error: null });
-    expect(snapshot.status).toBe('active');
-  });
-
-  it('is inert: teleporting into an invoking state does not fire the invoke', async () => {
-    const destroyOrg = vi.fn(() => Promise.resolve());
-    const actor = mockActor(createDeleteOrgMachine(destroyOrg), { value: 'deleting' });
-
-    await tick();
-    expect(destroyOrg).not.toHaveBeenCalled();
-    expect(actor.getSnapshot().value).toBe('deleting');
-  });
-
-  it('reports done status when teleported into a final state', () => {
-    const actor = mockActor(
-      createDeleteOrgMachine(() => Promise.resolve()),
-      { value: 'deleted' },
-    );
-    expect(actor.getSnapshot().status).toBe('done');
-  });
-
-  it('is still live — can take events from the teleported state', () => {
-    const actor = mockActor(
-      createDeleteOrgMachine(() => Promise.resolve()),
-      { value: 'confirming' },
-    );
-    actor.send({ type: 'CANCEL' });
-    expect(actor.getSnapshot().value).toBe('idle');
-  });
-});
-
-describe('pure helpers (testable without an actor)', () => {
-  it('a guard is just a (context, event) predicate', () => {
-    const nameMatches = (context: DeleteOrgContext) => context.confirmValue === context.name;
-    expect(nameMatches({ name: 'Acme Inc', confirmValue: 'Acme Inc', error: null })).toBe(true);
-    expect(nameMatches({ name: 'Acme Inc', confirmValue: 'nope', error: null })).toBe(false);
-  });
-
-  it('assign builds a tagged action wrapping a pure updater', () => {
-    const action = assign<DeleteOrgContext, DeleteOrgEvent>((_, event) =>
-      event.type === 'TYPE' ? { confirmValue: event.value } : {},
-    );
-    expect(isAssignAction(action)).toBe(true);
-    // The updater itself is pure and unit-testable in isolation.
-    expect(
-      action.assignment({ name: 'Acme Inc', confirmValue: '', error: null }, { type: 'TYPE', value: 'hi' }),
-    ).toEqual({ confirmValue: 'hi' });
-  });
-
-  it('isAssignAction rejects plain side-effect actions', () => {
-    expect(isAssignAction(() => undefined)).toBe(false);
-    expect(isAssignAction(null)).toBe(false);
-    expect(isAssignAction({ type: 'other' })).toBe(false);
-  });
-});
-
-describe('actor restart — StrictMode start/stop/start cycle', () => {
-  it('send works after stop() + start() (simulates StrictMode effect cleanup)', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('idle');
-
-    // StrictMode cleanup runs the effect teardown…
-    actor.stop();
-    expect(actor.getSnapshot().status).toBe('stopped');
-
-    // …then remounts and runs the effect again.
-    actor.start();
-    expect(actor.getSnapshot().status).toBe('active');
-
-    actor.send({ type: 'OPEN' });
-    expect(actor.getSnapshot().value).toBe('confirming');
-  });
-
-  it('does not re-fire an in-flight invoke when restarted from an invoke state', async () => {
-    const gate = deferred<void>();
-    let invokeCount = 0;
-    const actor = createActor(
-      createDeleteOrgMachine(() => {
-        invokeCount++;
-        return gate.promise;
-      }),
-    );
-
-    actor.start();
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'TYPE', value: 'Acme Inc' });
-    actor.send({ type: 'CONFIRM' });
-    expect(actor.getSnapshot().value).toBe('deleting');
-    expect(invokeCount).toBe(1);
-
-    // Stopped mid-invoke (e.g. Suspense remount) then restarted.
-    actor.stop();
-    actor.start();
-    expect(actor.getSnapshot()).toMatchObject({ value: 'deleting', status: 'active' });
-    // The invoke must not fire a second time.
-    expect(invokeCount).toBe(1);
+    expect(actor.getSnapshot()).toBe(first);
+    actor.send({ type: 'GO' });
+    expect(actor.getSnapshot()).not.toBe(first);
   });
 });
 
 describe('actor restart — stop/start resumes the current state', () => {
-  it('stays in a state without an invoke', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
+  it('takes events after stop() and start()', () => {
+    const actor = createActor(toggleMachine()).start();
+    actor.stop();
+    expect(actor.getSnapshot().status).toBe('stopped');
+
     actor.start();
+    actor.send({ type: 'GO' });
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'b', status: 'active' });
+  });
+
+  it('does not re-run an in-flight invoke on restart', () => {
+    const destroy = vi.fn(() => deferred<void>().promise);
+    const actor = createActor(createDeleteOrgMachine(destroy)).start();
     actor.send({ type: 'OPEN' });
-    actor.send({ type: 'TYPE', value: 'Acme' });
+    actor.send({ type: 'TYPE', value: 'Acme Inc' });
+    actor.send({ type: 'CONFIRM' });
 
     actor.stop();
     actor.start();
 
-    expect(actor.getSnapshot()).toMatchObject({ value: 'confirming', status: 'active' });
-    expect(actor.getSnapshot().context.confirmValue).toBe('Acme');
-    actor.send({ type: 'CANCEL' });
-    expect(actor.getSnapshot().value).toBe('idle');
+    expect(actor.getSnapshot()).toMatchObject({ value: 'deleting', status: 'active' });
+    expect(destroy).toHaveBeenCalledTimes(1);
   });
 
   it('applies an invoke that resolved while stopped once started again', async () => {
     const gate = deferred<string>();
-    const actor = createActor(createLoaderMachine(() => gate.promise));
-    actor.start();
+    const actor = createActor(createLoaderMachine(() => gate.promise)).start();
     actor.send({ type: 'FETCH' });
 
     actor.stop();
     gate.resolve('loaded');
     await tick();
-    expect(actor.getSnapshot()).toMatchObject({ value: 'loading', status: 'stopped' });
-
     actor.start();
-    expect(actor.getSnapshot()).toMatchObject({ value: 'success', status: 'done' });
-    expect(actor.getSnapshot().context.data).toBe('loaded');
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'success', status: 'done', context: { data: 'loaded' } });
   });
 
   it('applies an invoke that rejected while stopped once started again', async () => {
     const gate = deferred<string>();
-    const actor = createActor(createLoaderMachine(() => gate.promise));
-    actor.start();
+    const actor = createActor(createLoaderMachine(() => gate.promise)).start();
     actor.send({ type: 'FETCH' });
 
     actor.stop();
@@ -739,15 +790,13 @@ describe('actor restart — stop/start resumes the current state', () => {
     await tick();
     actor.start();
 
-    expect(actor.getSnapshot()).toMatchObject({ value: 'failure', status: 'active' });
-    expect(actor.getSnapshot().context.error).toBe('boom');
+    expect(actor.getSnapshot()).toMatchObject({ value: 'failure', status: 'active', context: { error: 'boom' } });
   });
 
   it('handles an invoke that settles after the restart exactly once', async () => {
     const gate = deferred<string>();
     const seen: string[] = [];
-    const actor = createActor(createLoaderMachine(() => gate.promise));
-    actor.start();
+    const actor = createActor(createLoaderMachine(() => gate.promise)).start();
     actor.send({ type: 'FETCH' });
 
     actor.stop();
@@ -756,27 +805,24 @@ describe('actor restart — stop/start resumes the current state', () => {
     gate.resolve('late');
     await tick();
 
-    expect(actor.getSnapshot().value).toBe('success');
-    expect(actor.getSnapshot().context.data).toBe('late');
+    expect(actor.getSnapshot()).toMatchObject({ value: 'success', context: { data: 'late' } });
     expect(seen).toEqual(['success']);
   });
 
-  it('runs entry actions and the invoke once across a StrictMode start/stop/start', async () => {
-    const entry = vi.fn();
+  it('runs entry effects and the invoke once across start/stop/start', async () => {
+    const effect = vi.fn();
     const src = vi.fn(() => Promise.resolve('ok'));
-    const machine = createMachine<{ out: string }, { type: 'never' }>({
+    const working = setup<{ out: string }, { type: 'never' }>();
+    const machine = working.createMachine({
       initial: 'working',
       context: { out: '' },
       states: {
         working: {
-          entry,
-          invoke: {
+          entry: (_, enq) => enq(effect),
+          invoke: working.createInvoke({
             src,
-            onDone: {
-              target: 'done',
-              actions: assign<{ out: string }, DoneInvokeEvent<string>>((_, event) => ({ out: event.output })),
-            },
-          },
+            onDone: ({ event }) => ({ target: 'done', context: { out: event.output } }),
+          }),
         },
         done: { type: 'final' },
       },
@@ -788,7 +834,7 @@ describe('actor restart — stop/start resumes the current state', () => {
     actor.start();
     await tick();
 
-    expect(entry).toHaveBeenCalledTimes(1);
+    expect(effect).toHaveBeenCalledTimes(1);
     expect(src).toHaveBeenCalledTimes(1);
     expect(actor.getSnapshot()).toMatchObject({ value: 'done', status: 'done', context: { out: 'ok' } });
   });
@@ -797,22 +843,25 @@ describe('actor restart — stop/start resumes the current state', () => {
     vi.useFakeTimers();
     try {
       const gate = deferred<string>();
-      const machine = createMachine<Record<string, never>, { type: 'never' }>({
+      const working = setup<Empty, { type: 'never' }>();
+      const machine = working.createMachine({
         initial: 'working',
+        context: {},
         states: {
-          working: { invoke: { src: () => gate.promise, onDone: 'done' }, after: { 1000: 'done' } },
+          working: {
+            invoke: working.createInvoke({ src: () => gate.promise, onDone: { target: 'done' } }),
+            after: { 1000: { target: 'done' } },
+          },
           done: {},
         },
       });
-      const actor = createActor(machine);
-      actor.start();
+      const actor = createActor(machine).start();
       const listener = vi.fn();
       actor.subscribe(listener);
 
       actor.stop();
       listener.mockClear();
       expect(vi.getTimerCount()).toBe(0);
-
       gate.resolve('ignored');
       await vi.runAllTimersAsync();
 
@@ -823,9 +872,8 @@ describe('actor restart — stop/start resumes the current state', () => {
     }
   });
 
-  it('queues events sent while stopped and applies them in order on start', () => {
-    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
-    actor.start();
+  it('queues events sent while stopped and applies them in order on start with one notify', () => {
+    const actor = createActor(createDeleteOrgMachine(() => Promise.resolve())).start();
     actor.stop();
     const listener = vi.fn();
     actor.subscribe(listener);
@@ -834,18 +882,19 @@ describe('actor restart — stop/start resumes the current state', () => {
     actor.send({ type: 'TYPE', value: 'Acme' });
     expect(actor.getSnapshot()).toMatchObject({ value: 'idle', status: 'stopped' });
     expect(listener).not.toHaveBeenCalled();
-
     actor.start();
 
-    expect(actor.getSnapshot()).toMatchObject({ value: 'confirming', status: 'active' });
-    expect(actor.getSnapshot().context.confirmValue).toBe('Acme');
+    expect(actor.getSnapshot()).toMatchObject({
+      value: 'confirming',
+      status: 'active',
+      context: { confirmValue: 'Acme' },
+    });
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
   it('applies an invoke result and events in the order they arrived while stopped', async () => {
     const gate = deferred<void>();
-    const actor = createActor(createDeleteOrgMachine(() => gate.promise));
-    actor.start();
+    const actor = createActor(createDeleteOrgMachine(() => gate.promise)).start();
     actor.send({ type: 'OPEN' });
     actor.send({ type: 'TYPE', value: 'Acme Inc' });
     actor.send({ type: 'CONFIRM' });
@@ -864,16 +913,20 @@ describe('actor restart — stop/start resumes the current state', () => {
 
   it('drops an invoke result when an event queued before it leaves the invoking state', async () => {
     const gate = deferred<string>();
-    const machine = createMachine<Record<string, never>, { type: 'GO' } | { type: 'CANCEL' }>({
+    const flow = setup<Empty, { type: 'GO' } | { type: 'CANCEL' }>();
+    const machine = flow.createMachine({
       initial: 'idle',
+      context: {},
       states: {
-        idle: { on: { GO: 'working' } },
-        working: { invoke: { src: () => gate.promise, onDone: 'done' }, on: { CANCEL: 'idle' } },
+        idle: { on: { GO: { target: 'working' } } },
+        working: {
+          invoke: flow.createInvoke({ src: () => gate.promise, onDone: { target: 'done' } }),
+          on: { CANCEL: { target: 'idle' } },
+        },
         done: {},
       },
     });
-    const actor = createActor(machine);
-    actor.start();
+    const actor = createActor(machine).start();
     actor.send({ type: 'GO' });
 
     actor.stop();
@@ -887,16 +940,17 @@ describe('actor restart — stop/start resumes the current state', () => {
 
   it('applies events sent before the first start in order, after entering the initial state', () => {
     const entered: string[] = [];
-    const actor = createActor(
-      createMachine<object, { type: 'NEXT' }>({
-        initial: 'a',
-        states: {
-          a: { entry: () => entered.push('a'), on: { NEXT: 'b' } },
-          b: { entry: () => entered.push('b'), on: { NEXT: 'c' } },
-          c: { entry: () => entered.push('c') },
-        },
-      }),
-    );
+    const enter = (name: string) => entered.push(name);
+    const machine = setup<Empty, { type: 'NEXT' }>().createMachine({
+      initial: 'a',
+      context: {},
+      states: {
+        a: { entry: (_, enq) => enq(enter, 'a'), on: { NEXT: { target: 'b' } } },
+        b: { entry: (_, enq) => enq(enter, 'b'), on: { NEXT: { target: 'c' } } },
+        c: { entry: (_, enq) => enq(enter, 'c') },
+      },
+    });
+    const actor = createActor(machine);
     actor.send({ type: 'NEXT' });
     actor.send({ type: 'NEXT' });
 
@@ -907,40 +961,29 @@ describe('actor restart — stop/start resumes the current state', () => {
     expect(actor.getSnapshot().value).toBe('c');
   });
 
-  it('keeps events sent before the first start when the initial entry stops the actor', () => {
-    let stopOnEntry = () => {};
-    const actor = createActor(
-      createMachine<object, { type: 'NEXT' }>({
-        initial: 'a',
-        states: { a: { entry: () => stopOnEntry(), on: { NEXT: 'b' } }, b: {} },
-      }),
-    );
-    stopOnEntry = () => {
-      stopOnEntry = () => {};
+  it('keeps events sent before the first start when an initial entry effect stops the actor', () => {
+    let stopOnce = () => {};
+    const machine = setup<Empty, { type: 'NEXT' }>().createMachine({
+      initial: 'a',
+      context: {},
+      states: { a: { entry: (_, enq) => enq(() => stopOnce()), on: { NEXT: { target: 'b' } } }, b: {} },
+    });
+    const actor = createActor(machine);
+    stopOnce = () => {
+      stopOnce = () => {};
       actor.stop();
     };
     actor.send({ type: 'NEXT' });
 
     actor.start();
-    expect(actor.getSnapshot().value).toBe('a');
+    expect(actor.getSnapshot()).toMatchObject({ value: 'a', status: 'stopped' });
     actor.start();
 
     expect(actor.getSnapshot().value).toBe('b');
   });
-
-  it('keeps a teleported actor inert across a restart', () => {
-    const src = vi.fn(() => Promise.resolve());
-    const actor = mockActor(createDeleteOrgMachine(src), { value: 'deleting', context: { error: 'shown' } });
-
-    actor.stop();
-    actor.start();
-
-    expect(actor.getSnapshot()).toMatchObject({ value: 'deleting', status: 'active', context: { error: 'shown' } });
-    expect(src).not.toHaveBeenCalled();
-  });
 });
 
-describe('createActor — after (delayed transitions)', () => {
+describe('createActor — after', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -948,395 +991,99 @@ describe('createActor — after (delayed transitions)', () => {
     vi.useRealTimers();
   });
 
-  it('auto-advances to the target state after the delay', () => {
-    const machine = createMachine<Record<string, never>, { type: 'SUBMIT' }>({
-      id: 'otp',
+  const otp = setup<{ expiredAt: number }, { type: 'SUBMIT' }>();
+
+  function otpMachine() {
+    return otp.createMachine({
       initial: 'codeSent',
-      context: {},
+      context: { expiredAt: 0 },
       states: {
         codeSent: {
-          after: { 60_000: 'expired' },
-          on: { SUBMIT: 'verifying' },
+          after: { 60_000: ({ event }) => ({ target: 'expired', context: { expiredAt: event.delay } }) },
+          on: { SUBMIT: { target: 'verifying' } },
         },
         expired: {},
         verifying: {},
       },
     });
+  }
 
-    const actor = createActor(machine);
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('codeSent');
+  it('moves after the delay and passes the delay on the event', () => {
+    const actor = createActor(otpMachine()).start();
 
     vi.advanceTimersByTime(59_999);
     expect(actor.getSnapshot().value).toBe('codeSent');
-
     vi.advanceTimersByTime(1);
-    expect(actor.getSnapshot().value).toBe('expired');
+
+    expect(actor.getSnapshot()).toMatchObject({ value: 'expired', context: { expiredAt: 60_000 } });
   });
 
-  it('cancels the timer when an explicit event fires first', () => {
-    const machine = createMachine<Record<string, never>, { type: 'SUBMIT' }>({
-      id: 'otp',
-      initial: 'codeSent',
-      context: {},
-      states: {
-        codeSent: {
-          after: { 60_000: 'expired' },
-          on: { SUBMIT: 'verifying' },
-        },
-        expired: {},
-        verifying: {},
-      },
-    });
-
-    const actor = createActor(machine);
-    actor.start();
+  it('cancels the timer when an event leaves the state first', () => {
+    const actor = createActor(otpMachine()).start();
 
     actor.send({ type: 'SUBMIT' });
-    expect(actor.getSnapshot().value).toBe('verifying');
-
     vi.advanceTimersByTime(60_000);
+
     expect(actor.getSnapshot().value).toBe('verifying');
   });
 
-  it('cancels the timer on stop()', () => {
-    const visited: string[] = [];
-    const machine = createMachine<Record<string, never>, { type: 'never' }>({
-      id: 'otp',
-      initial: 'codeSent',
-      context: {},
-      states: {
-        codeSent: { after: { 60_000: 'expired' } },
-        expired: {},
-      },
-    });
-
-    const actor = createActor(machine);
-    actor.subscribe(snap => visited.push(snap.value));
-    actor.start();
-    actor.stop();
-
-    vi.advanceTimersByTime(60_000);
-    expect(visited).not.toContain('expired');
-  });
-
-  it('when two after keys exist, the first to fire clears the other', () => {
-    const machine = createMachine<Record<string, never>, { type: 'never' }>({
-      id: 'race',
+  it('clears the other timer when the first one fires', () => {
+    const machine = otp.createMachine({
       initial: 'waiting',
-      context: {},
+      context: { expiredAt: 0 },
       states: {
-        waiting: {
-          after: {
-            500: 'first',
-            1_000: 'second',
-          },
-        },
+        waiting: { after: { 1000: { target: 'first' }, 2000: { target: 'second' } } },
         first: {},
         second: {},
       },
     });
+    const actor = createActor(machine).start();
 
-    const actor = createActor(machine);
-    actor.start();
+    vi.advanceTimersByTime(1000);
 
-    vi.advanceTimersByTime(500);
+    expect(vi.getTimerCount()).toBe(0);
     expect(actor.getSnapshot().value).toBe('first');
-
-    vi.advanceTimersByTime(500);
-    expect(actor.getSnapshot().value).toBe('first'); // the 1000ms timer was cancelled
   });
 
-  it('passes AfterEvent with the correct delay to transition actions', () => {
-    let capturedDelay: number | undefined;
-    const machine = createMachine<Record<string, never>, { type: 'never' }>({
-      id: 'timed',
+  it('stays when the after transition returns undefined', () => {
+    const machine = otp.createMachine({
       initial: 'waiting',
-      context: {},
+      context: { expiredAt: 0 },
       states: {
-        waiting: {
-          after: {
-            500: {
-              target: 'done',
-              actions: [
-                (_ctx, event) => {
-                  capturedDelay = event.delay;
-                },
-              ],
-            },
-          },
-        },
-        done: { type: 'final' },
-      },
-    });
-
-    const actor = createActor(machine);
-    actor.start();
-    vi.advanceTimersByTime(500);
-
-    expect(capturedDelay).toBe(500);
-    expect(actor.getSnapshot().value).toBe('done');
-  });
-
-  it('supports a guard on an after transition', () => {
-    const machine = createMachine<{ allow: boolean }, { type: 'never' }>({
-      id: 'guarded',
-      initial: 'waiting',
-      context: { allow: false },
-      states: {
-        waiting: {
-          after: {
-            500: { target: 'done', guard: ctx => ctx.allow },
-          },
-        },
+        waiting: { after: { 1000: ({ context }) => (context.expiredAt > 0 ? { target: 'done' } : undefined) } },
         done: {},
       },
     });
+    const actor = createActor(machine).start();
 
-    const actor = createActor(machine);
-    actor.start();
+    vi.advanceTimersByTime(1000);
 
-    vi.advanceTimersByTime(500);
-    expect(actor.getSnapshot().value).toBe('waiting'); // guard blocked it
-
-    // Guards on after transitions are evaluated at fire-time, not schedule-time.
-    // A failing guard leaves the state unchanged (same as event transitions).
+    expect(actor.getSnapshot().value).toBe('waiting');
   });
 
-  it('restarts cleanly after stop/start (StrictMode cycle)', () => {
-    const machine = createMachine<Record<string, never>, { type: 'never' }>({
-      id: 'otp',
-      initial: 'codeSent',
-      context: {},
-      states: {
-        codeSent: { after: { 60_000: 'expired' } },
-        expired: {},
-      },
-    });
-
-    const actor = createActor(machine);
-    actor.start();
-    actor.stop(); // StrictMode cleanup
-
-    actor.start(); // StrictMode remount — must reschedule the timer
-    vi.advanceTimersByTime(60_000);
-    expect(actor.getSnapshot().value).toBe('expired');
-  });
-
-  it('does not fire while stopped and re-arms the timer of the current state on start', () => {
-    const machine = createMachine<Record<string, never>, { type: 'SEND' }>({
-      initial: 'idle',
-      states: {
-        idle: { on: { SEND: 'codeSent' } },
-        codeSent: { after: { 60_000: 'expired' } },
-        expired: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'SEND' });
+  it('pauses on stop() and re-arms on start()', () => {
+    const actor = createActor(otpMachine()).start();
 
     actor.stop();
-    vi.advanceTimersByTime(120_000);
-    expect(actor.getSnapshot()).toMatchObject({ value: 'codeSent', status: 'stopped' });
-
-    actor.start();
-    vi.advanceTimersByTime(59_999);
+    expect(vi.getTimerCount()).toBe(0);
+    vi.advanceTimersByTime(60_000);
     expect(actor.getSnapshot().value).toBe('codeSent');
-    vi.advanceTimersByTime(1);
+
+    actor.start();
+    vi.advanceTimersByTime(60_000);
     expect(actor.getSnapshot().value).toBe('expired');
-  });
-});
-
-describe('createActor — inline transition functions (TransitionFn)', () => {
-  it('takes transition when function returns a target', () => {
-    const machine = createMachine<{ step: number }, { type: 'NEXT' }>({
-      initial: 'a',
-      context: { step: 0 },
-      states: {
-        a: { on: { NEXT: () => ({ target: 'b' }) } },
-        b: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'NEXT' });
-    expect(actor.getSnapshot().value).toBe('b');
-  });
-
-  it('treats undefined return as unhandled — snapshot unchanged, no notify', () => {
-    const machine = createMachine<{ allowed: boolean }, { type: 'NEXT' }>({
-      initial: 'a',
-      context: { allowed: false },
-      states: {
-        a: {
-          on: { NEXT: ({ context }) => (context.allowed ? { target: 'b' } : undefined) },
-        },
-        b: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    const seen: string[] = [];
-    actor.subscribe(s => seen.push(s.value));
-    const before = actor.getSnapshot();
-    actor.send({ type: 'NEXT' });
-    expect(actor.getSnapshot()).toBe(before);
-    expect(actor.getSnapshot().value).toBe('a');
-    expect(seen).toEqual([]);
-  });
-
-  it('applies context patch without navigation when function returns { context }', () => {
-    const machine = createMachine<{ name: string }, { type: 'SET'; value: string }>({
-      initial: 'active',
-      context: { name: '' },
-      states: {
-        active: {
-          on: { SET: ({ event }) => ({ context: { name: event.value } }) },
-        },
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'SET', value: 'Alice' });
-    expect(actor.getSnapshot().value).toBe('active');
-    expect(actor.getSnapshot().context.name).toBe('Alice');
-  });
-
-  it('applies context patch and navigates when function returns { target, context }', () => {
-    const machine = createMachine<{ email: string }, { type: 'SUBMIT'; value: string }>({
-      initial: 'filling',
-      context: { email: '' },
-      states: {
-        filling: {
-          on: {
-            SUBMIT: ({ event }) => ({ target: 'submitting' as const, context: { email: event.value } }),
-          },
-        },
-        submitting: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'SUBMIT', value: 'a@b.com' });
-    expect(actor.getSnapshot().value).toBe('submitting');
-    expect(actor.getSnapshot().context.email).toBe('a@b.com');
-  });
-
-  it('receives the narrowed event type via the args object', () => {
-    const captured: string[] = [];
-    const machine = createMachine<Record<string, never>, { type: 'GO'; payload: string }>({
-      initial: 'a',
-      context: {},
-      states: {
-        a: {
-          on: {
-            GO: ({ event }) => {
-              captured.push(event.payload);
-              return { target: 'b' };
-            },
-          },
-        },
-        b: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    actor.send({ type: 'GO', payload: 'hello' });
-    expect(captured).toEqual(['hello']);
-  });
-
-  it('always function form navigates when it returns a target', () => {
-    const machine = createMachine<{ done: boolean }, { type: never }>({
-      initial: 'checking',
-      context: { done: true },
-      states: {
-        checking: {
-          always: ({ context }) => (context.done ? { target: 'complete' } : undefined),
-        },
-        complete: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('complete');
-  });
-
-  it('always function form stays when it returns undefined', () => {
-    const machine = createMachine<{ done: boolean }, { type: never }>({
-      initial: 'checking',
-      context: { done: false },
-      states: {
-        checking: {
-          always: ({ context }) => (context.done ? { target: 'complete' } : undefined),
-        },
-        complete: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('checking');
-  });
-
-  it('always function form is re-evaluated by recheck()', () => {
-    let ready = false;
-    const machine = createMachine<Record<string, never>, { type: never }>({
-      initial: 'waiting',
-      context: {},
-      states: {
-        waiting: {
-          always: () => (ready ? { target: 'done' } : undefined),
-        },
-        done: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    expect(actor.getSnapshot().value).toBe('waiting');
-
-    ready = true;
-    actor.recheck();
-    expect(actor.getSnapshot().value).toBe('done');
-  });
-
-  it('can() returns true when TransitionFn would return a takeable transition', () => {
-    const machine = createMachine<{ allowed: boolean }, { type: 'GO' }>({
-      initial: 'a',
-      context: { allowed: true },
-      states: {
-        a: {
-          on: { GO: ({ context }) => (context.allowed ? { target: 'b' } : undefined) },
-        },
-        b: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    expect(actor.can({ type: 'GO' })).toBe(true);
-  });
-
-  it('can() returns false when TransitionFn returns undefined', () => {
-    const machine = createMachine<{ allowed: boolean }, { type: 'GO' }>({
-      initial: 'a',
-      context: { allowed: false },
-      states: {
-        a: {
-          on: { GO: ({ context }) => (context.allowed ? { target: 'b' } : undefined) },
-        },
-        b: {},
-      },
-    });
-    const actor = createActor(machine);
-    actor.start();
-    expect(actor.can({ type: 'GO' })).toBe(false);
   });
 });
 
 describe('createActor — unknown states', () => {
   it('warns when a transition targets a state the machine does not define', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'ghost' } } } }));
-    actor.start();
+    const machine = setup<Empty, { type: 'GO' }>().createMachine<string>({
+      initial: 'a',
+      context: {},
+      states: { a: { on: { GO: { target: 'ghost' } } } },
+    });
+    const actor = createActor(machine).start();
 
     actor.send({ type: 'GO' });
 
@@ -1345,8 +1092,9 @@ describe('createActor — unknown states', () => {
 
   it('does not warn for an empty graph', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const actor = createActor(createMachine({ initial: '', states: {} }));
-    actor.start();
+    const machine = setup<Empty, { type: 'GO' }>().createMachine<string>({ initial: '', context: {}, states: {} });
+
+    createActor(machine).start();
 
     expect(warn).not.toHaveBeenCalled();
   });

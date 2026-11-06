@@ -1,12 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 
 import { createActor } from './create-actor';
-import type { Actor, CreateActorOptions, EventObject, Snapshot, StateMachine } from './types';
+import type { ActionMap, Actor, ActorMap, CreateActorOptions, EventObject, Snapshot, StateMachine } from './types';
 
-export interface UseMachineOptions<TContext, TStates extends string = string> extends CreateActorOptions<
-  TContext,
-  TStates
-> {
+export interface UseMachineOptions<TInput> extends CreateActorOptions<TInput> {
   /** Called once when the machine reaches a final state (`type: 'final'`). */
   onDone?: () => void;
 }
@@ -16,12 +13,12 @@ export interface UseMachineOptions<TContext, TStates extends string = string> ex
  *
  * Use this for a **shared** actor (one instance several components read from).
  * The actor's lifecycle (`start`/`stop`) is the caller's responsibility — this
- * hook only subscribes. A {@link mockActor} can be passed directly to render a
- * teleported step.
+ * hook only subscribes. A {@link restoreActor} can be passed directly to render a
+ * restored step.
  */
 export function useActor<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
   actor: Actor<TContext, TEvent, TStates>,
-): [Snapshot<TContext, TStates>, Actor<TContext, TEvent, TStates>['send']] {
+): [Snapshot<TContext, TStates, TEvent>, Actor<TContext, TEvent, TStates>['send']] {
   const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
   return [snapshot, actor.send];
 }
@@ -37,15 +34,26 @@ export function useActor<TContext extends object, TEvent extends EventObject, TS
  * return <button onClick={() => send({ type: 'TOGGLE' })}>{snapshot.value}</button>;
  * ```
  */
-export function useMachine<TContext extends object, TEvent extends EventObject, TStates extends string = string>(
-  machine: StateMachine<TContext, TEvent, TStates>,
-  options?: UseMachineOptions<TContext, TStates>,
-): [Snapshot<TContext, TStates>, Actor<TContext, TEvent, TStates>['send'], Actor<TContext, TEvent, TStates>] {
-  const actorRef = useRef<Actor<TContext, TEvent, TStates> | null>(null);
-  if (actorRef.current === null) {
-    actorRef.current = createActor(machine, options);
+export function useMachine<
+  TContext extends object,
+  TEvent extends EventObject,
+  TStates extends string,
+  TActions extends ActionMap,
+  TActors extends ActorMap,
+  TInput,
+>(
+  machine: StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput>,
+  options?: UseMachineOptions<TInput>,
+): [Snapshot<TContext, TStates, TEvent>, Actor<TContext, TEvent, TStates>['send'], Actor<TContext, TEvent, TStates>] {
+  const ownedRef = useRef<{
+    logic: StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput>;
+    actor: Actor<TContext, TEvent, TStates>;
+  } | null>(null);
+  if (ownedRef.current === null) {
+    const logic = machine.provide({});
+    ownedRef.current = { logic, actor: createActor(logic, options) };
   }
-  const actor = actorRef.current;
+  const { logic, actor } = ownedRef.current;
   // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
 
@@ -55,12 +63,9 @@ export function useMachine<TContext extends object, TEvent extends EventObject, 
     // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   }, [actor]);
 
-  // Keep injected context (e.g. a function from props) current on every render.
-  // useLayoutEffect with no deps runs synchronously after every render, before
-  // paint — ensuring setContext fires before any user event triggers an invoke.
   useLayoutEffect(() => {
-    if (options?.context) {
-      actor.setContext(options.context);
+    if (machine.config === logic.config) {
+      logic.implementations = machine.implementations;
     }
   });
 
@@ -98,7 +103,7 @@ export function useSelector<
   TStates extends string = string,
 >(
   actor: Actor<TContext, TEvent, TStates>,
-  selector: (snapshot: Snapshot<TContext, TStates>) => TSelected,
+  selector: (snapshot: Snapshot<TContext, TStates, TEvent>) => TSelected,
   equals: (a: TSelected, b: TSelected) => boolean = Object.is,
 ): TSelected {
   const selectorRef = useRef(selector);
@@ -135,7 +140,10 @@ export function useSelector<
  *
  * Output: `[deleteOrg] idle → confirming {error: null}`
  */
-export function useMachineLogger<TContext extends object>(label: string, snapshot: Snapshot<TContext>): void {
+export function useMachineLogger<TContext extends object>(
+  label: string,
+  snapshot: Pick<Snapshot<TContext>, 'value' | 'context'>,
+): void {
   const prevValue = useRef<string | undefined>(undefined);
 
   useEffect(() => {

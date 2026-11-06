@@ -242,13 +242,6 @@ export default defineConfig({
     },
     {
       files: ['src/**/*.{ts,tsx}'],
-      excludeFiles: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/**/*.test-d.{ts,tsx}'],
-      rules: {
-        'mosaic/no-raw-invoke': 'error',
-      },
-    },
-    {
-      files: ['src/**/*.{ts,tsx}'],
       excludeFiles: [
         'src/hooks/use-now.ts',
         'src/mosaic-provider.tsx',

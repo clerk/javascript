@@ -405,47 +405,6 @@ describe('Mosaic layers', { timeout: 30_000 }, () => {
   });
 });
 
-describe('Mosaic machines', { timeout: 30_000 }, () => {
-  async function rawInvokeMessages(file, source) {
-    const messages = await lintAt(file, source);
-    expect(messages.find(message => message.fatal)).toBeUndefined();
-    return messages.filter(message => message.ruleId === 'mosaic/no-raw-invoke').map(message => message.message);
-  }
-
-  test('rejects an invoke written without fromPromise', async () => {
-    expect(
-      await rawInvokeMessages(
-        `${featureDir}/sample.controller.ts`,
-        'export const state = { invoke: { src: () => Promise.resolve(1), onDone: { target: "idle" } } };',
-      ),
-    ).toEqual(['Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.']);
-  });
-
-  test.each([
-    ['a quoted src key', 'export const state = { invoke: { "src": () => Promise.resolve(1) } };'],
-    ['a quoted invoke key', 'export const state = { "invoke": { src: () => Promise.resolve(1) } };'],
-    ['an as cast', 'export const state = { invoke: { src: () => Promise.resolve(1) } as object };'],
-    ['satisfies', 'export const state = { invoke: { src: () => Promise.resolve(1) } satisfies object };'],
-  ])('rejects a raw invoke written with %s', async (_name, source) => {
-    expect(await rawInvokeMessages(`${featureDir}/sample.controller.ts`, source)).toHaveLength(1);
-  });
-
-  test('allows an invoke from fromPromise', async () => {
-    expect(
-      await rawInvokeMessages(
-        `${featureDir}/sample.controller.ts`,
-        'declare const fromPromise: (run: () => Promise<number>) => object;\nexport const state = { invoke: fromPromise(() => Promise.resolve(1)) };',
-      ),
-    ).toEqual([]);
-  });
-
-  test('ignores test files', async () => {
-    expect(
-      await rawInvokeMessages(testFixture, 'export const state = { invoke: { src: () => Promise.resolve(1) } };'),
-    ).toEqual([]);
-  });
-});
-
 describe('Mosaic parts', { timeout: 30_000 }, () => {
   async function forwardRefMessages(file, source) {
     const messages = await lintAt(
