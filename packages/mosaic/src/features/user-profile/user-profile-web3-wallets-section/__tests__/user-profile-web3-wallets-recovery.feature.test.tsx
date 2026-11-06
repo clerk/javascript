@@ -99,3 +99,28 @@ it.each(['resolve', 'reject'] as const)(
     expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.web3_wallet).toBe('0xnew');
   },
 );
+
+it('keeps only the new wallet when MetaMask approves an abandoned request after the section closed', async () => {
+  const abandoned = deferred<string[]>();
+  const request = vi.fn(({ method }: { method: string }) =>
+    method === 'eth_requestAccounts' ? abandoned.promise : Promise.resolve('signature'),
+  );
+  vi.stubGlobal('ethereum', { request });
+  const fapi = serveFapi(signedInWallets(['web3_metamask_signature']));
+  const view = await renderWithClerk(<UserProfileWeb3WalletsSection />);
+  const user = userEvent.setup();
+
+  await user.click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
+  await waitFor(() => expect(request).toHaveBeenCalledWith({ method: 'eth_requestAccounts' }));
+  view.rerender(<div />);
+  await act(() => abandoned.resolve(['0xabandoned']));
+
+  request.mockImplementation(({ method }) =>
+    Promise.resolve(method === 'eth_requestAccounts' ? ['0xnew'] : 'signature'),
+  );
+  view.rerender(<UserProfileWeb3WalletsSection />);
+  await user.click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
+
+  await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
+  expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.web3_wallet)).toEqual(['0xnew']);
+});
