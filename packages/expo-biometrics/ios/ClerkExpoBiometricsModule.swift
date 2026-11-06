@@ -17,17 +17,17 @@ final class ClerkBiometricsException: Exception {
 
 @Record
 struct BiometricAvailabilityResult {
-  var biometryType: String = "none"
-  var canEvaluateBiometrics: Bool = false
-  var canEvaluateDeviceOwner: Bool = false
+  var biometryType: String
+  var canEvaluateBiometrics: Bool
+  var canEvaluateDeviceOwner: Bool
   var errorCode: String?
-  var secureKeyStorageAvailable: Bool = false
+  var secureKeyStorageAvailable: Bool
 }
 
 @Record
 struct BiometricCredentialKeyResult {
-  var localKeyId: String = ""
-  var publicKeyJwk: String = ""
+  var localKeyId: String
+  var publicKeyJwk: String
 }
 
 @Record
@@ -49,7 +49,7 @@ struct SaveRecordOptions {
 
 @Record
 struct InstallationMarkerResult {
-  var wiped: Bool = false
+  var wiped: Bool
 }
 
 @ExpoModule("ClerkExpoBiometrics")
