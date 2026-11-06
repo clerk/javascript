@@ -49,6 +49,13 @@ export function ModalSurfaceHost<Options>({
   const base = surface.path ?? `/modal/${surface.id}`;
   const location = useMosaicLocation({ routing: 'virtual', path: base });
   const open = location.useSegmentParts() !== undefined;
+  // The entry may appear without `open` being called, written from outside or restored by a URL,
+  // so the content loads whenever the modal is open, not only when the handle opened it.
+  React.useEffect(() => {
+    if (open) {
+      surface.loader.send({ type: 'LOAD' });
+    }
+  }, [open, surface]);
   const modal = React.useMemo<ModalHandle<Options>>(() => {
     const preload = () => surface.loader.send({ type: 'LOAD' });
     return {
