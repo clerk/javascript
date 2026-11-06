@@ -1,12 +1,12 @@
 import { logger } from '@clerk/shared/logger';
-import { act, cleanup, configure, render, renderHook, screen, within } from '@testing-library/react';
+import { act, cleanup, configure, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { MosaicProviderProps } from '../mosaic-provider';
 import { MosaicProvider } from '../mosaic-provider';
 import { useRouterScope } from '../routing/use-router';
-import { useVirtualSegment } from '../routing/virtual-store';
+import { useVirtualSegment, useVirtualWrite } from '../routing/virtual-store';
 import { defineModalSurface } from './define-modal-surface';
 import type { ModalContentProps, ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 import { ModalHost } from './modal-host';
@@ -610,6 +610,41 @@ describe('a modal surface that routes', () => {
       expect(entry()).toEqual(['security']);
       expect(screen.getByTestId('route').textContent).toBe('security');
     });
+  });
+
+  it('opens and closes with outside writes to its base, and isOpen follows', async () => {
+    const surface = routedSurface();
+    const ref: { handle: ModalHandle<StubOptions> | undefined; write: ReturnType<typeof useVirtualWrite> | undefined } =
+      {
+        handle: undefined,
+        write: undefined,
+      };
+    function Outside({ onWrite }: { onWrite: (write: ReturnType<typeof useVirtualWrite>) => void }) {
+      onWrite(useVirtualWrite());
+      return null;
+    }
+    renderWithModals(
+      [surface],
+      <>
+        <Caller
+          surface={surface}
+          onHandle={h => (ref.handle = h)}
+        />
+        <Outside onWrite={w => (ref.write = w)} />
+        <Entry />
+      </>,
+    );
+    expect(ref.handle?.isOpen).toBe(false);
+
+    act(() => ref.write?.('/modal/stub', ['security']));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    act(() => ref.write?.('/modal/stub', undefined));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('hands its base to the content', async () => {

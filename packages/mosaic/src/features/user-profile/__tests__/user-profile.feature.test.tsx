@@ -166,6 +166,24 @@ describe('UserProfile', () => {
     expect(entry()).toEqual(['api-keys']);
   });
 
+  it('opens as a modal on the first page when the requested page is unavailable', async () => {
+    serve({ userAPIKeysEnabled: false });
+    await renderWithClerk(
+      <>
+        <OpenProfile page='apiKeys' />
+        <Entry base='/modal/user' />
+      </>,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Open profile' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+    expect(within(dialog).queryByRole('tab', { name: 'API Keys' })).not.toBeInTheDocument();
+    await waitFor(() => expect(entry()).toEqual([]));
+  });
+
   it('opens as a modal on the root page with an empty entry', async () => {
     serve();
     await renderWithClerk(
