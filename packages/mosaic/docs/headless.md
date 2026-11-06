@@ -1,155 +1,73 @@
 # Headless primitives
 
-`packages/mosaic/src/primitives/` is the unstyled, accessible primitive layer
-inside Mosaic, one folder per primitive (Dialog, Menu, Select, …). Every part emits **zero
-styles** — positioning, popup list navigation, focus management, dismiss, and ARIA are
-delegated to `@floating-ui/react`, and roving-tabindex groups use `useComposite`,
-with items registering through `useCompositeItem`
-(`primitives/hooks/use-composite.ts`); all appearance is applied externally via
-`data-*` selectors and consumer classNames.
+Read this when you write or change a part under `src/primitives/`, add a primitive, or give a part an enter or exit transition. It covers the conventions every primitive shares: `useRender`, file layout, the animation lifecycle, frozen exits and reading direction. Each primitive's own API (parts, props, keyboard, data attributes, ARIA) is in its `src/primitives/<name>/README.md`, and `src/primitives/README.md` is the overview.
 
-Internal to `@clerk/mosaic`: import by relative path; there is no subpath export.
+Worked example: `src/primitives/select/` (`select-trigger.tsx` is the reference part).
 
-## Read this for the _what_
+## Rules
 
-Per-primitive API docs (parts, props, keyboard, data attributes, ARIA) live
-**next to the code** and are the source of truth:
-
-- **`packages/mosaic/src/primitives/<name>/README.md`** — one per primitive (TagInput has none yet).
-- **`packages/mosaic/src/primitives/README.md`** — overview, plus the (not yet
-  used) guide to consuming from `@clerk/ui`.
-
-This file is the _how-to_ for the conventions every primitive shares.
+- A primitive emits no styles. Positioning, list navigation, focus, dismiss and ARIA come from `@floating-ui/react`, and roving-tabindex groups use `useComposite` with `useCompositeItem` (`src/primitives/hooks/use-composite.ts`). Appearance is applied from outside through `data-*` selectors and classes.
+- Import primitives by relative path inside Mosaic; there is no subpath export.
+- Every part that renders a DOM element calls `useRender` (`src/primitives/utils/use-render.tsx`) instead of returning JSX, is a `React.forwardRef`, and passes its `ref` to `useRender` (`mosaic/forward-ref-parts` enforces this).
+- Type authored defaults with `ownProps satisfies DefaultProps<Tag>`, not `as`.
+- `mergeProps(internal, consumer)`: internal first. Handlers chain (internal, then consumer), `style` shallow-merges, `className` concatenates, and the consumer overwrites anything else, ARIA included.
+- `index.ts` re-exports every public prop type, or a `.d.ts` rollup of a consumer hits TS2742 (`src/primitives/README.md`).
+- A part with an exit transition freezes its children while closed ([Exiting content must be frozen](#exiting-content-must-be-frozen)).
+- Read direction with `useDirection()`, never from the DOM ([Reading direction](#reading-direction)).
 
 ## Consuming a primitive
 
-Every primitive is a compound component exported as a namespace: render
-`Root` + parts (`<Select.Root>`, `<Select.Trigger>`, …). Usage is in each
-primitive's README.
+A primitive is a compound component exported as a namespace: `Root` plus parts (`<Select.Root>`, `<Select.Trigger>`). Each element-rendering part accepts native props for its tag and a `render` prop; pass-through parts (`Root`, `Portal`) render no element. Style a part by class or `data-*`; primitives emit no slot attribute.
 
-- **Each element-rendering part accepts native props for its tag plus a `render`
-  prop.** Pass-through parts (`Root`, `Portal`) render no element of their own.
-- **Style by className/`data-*`**, never by a slot attribute — the primitives
-  don't emit one.
-- **`render` takes a function or an element.** `render={props => <X {...props} />}`
-  or `render={<Link />}`; the element is cloned with the part's computed props
-  and refs merged in.
+`render` takes a function (`render={props => <X {...props} />}`) or an element (`render={<Link />}`), which is cloned with the part's props and refs merged in. A render function must apply the computed props and ref, or it drops the primitive's behavior.
 
-## Authoring a part: the useRender contract
+## Authoring a part
 
-Every part that renders a DOM element calls **`useRender`** (from
-`primitives/utils`) instead of returning JSX. It is the single mechanism behind
-`render` overrides, state→`data-*` mapping, and ref merging.
+Copy `select-trigger.tsx`; `useRender`'s params are documented on `UseRenderParams*`. `useRender` is the one mechanism behind `render` overrides, state-to-`data-*` mapping and ref merging.
 
-Copy `src/primitives/select/select-trigger.tsx`: it is the reference part. Its
-params are documented on `UseRenderParams*` in `utils/use-render.tsx`.
+- **State to data attributes.** Map each `state` key to a `data-*` object or `null`. Use presence (`null` when off) for flags like `selected` and `disabled`, and a pair (`data-open` / `data-closed`) only when consumers style the off state.
+- **Positioners pass `enabled: mounted`**, so the floating DOM does not exist until the first frame (`select-positioner.tsx`).
+- **Shared hooks and utils.** `src/primitives/hooks/index.ts` and `src/primitives/utils/index.ts` are the lists. Use `useControllableState` for a controlled/uncontrolled prop pair and `useTransition` for any part with enter or exit. Add `cssVars()` to the floating-ui middleware after `arrow()`, or the transform origin will not follow the arrow.
 
-- **Forward the ref.** Every part that renders through `useRender` is a
-  `React.forwardRef` and passes its `ref` to `useRender`;
-  `mosaic/forward-ref-parts` enforces this.
-- **`ownProps satisfies DefaultProps<Tag>`** for authored defaults, not `as`.
-- **`mergeProps(internal, consumer)` — internal first, consumer second.** Event
-  handlers chain (internal fires, then consumer), `style` shallow-merges,
-  `className` concatenates, everything else the consumer overwrites. This lets
-  consumers extend event handlers while retaining the internal handlers. ARIA
-  attributes can be overwritten. A render function must apply the computed props
-  and ref to preserve the primitive's behavior.
-- **Positioners pass `enabled: mounted`**, so the floating DOM doesn't exist
-  until the first frame (`select/select-positioner.tsx`).
+## File layout
 
-### state → data-attribute mapping
+Mirror `src/primitives/select/`:
 
-Map each `state` key to a `data-*` object or `null`. Use presence (`null` when
-off) for flags like `selected`/`disabled`. Use a pair (`data-open` /
-`data-closed`) only when consumers need to style the off state.
+- `<name>-root.tsx`, the context provider
+- one `<name>-<part>.tsx` per part
+- `<name>-context.ts`, with a guard hook that throws outside `Root`
+- `parts.ts`, aliasing each part
+- `index.ts`, exporting the namespace and every public prop type
+- a test and a `README.md`
 
-## File layout of a primitive
+## Animation lifecycle
 
-Mirror `src/primitives/select/`: `<name>-root.tsx` (context provider), one
-`<name>-<part>.tsx` per part, `<name>-context.ts` with a guard hook that throws
-outside Root, `parts.ts` aliasing each part, `index.ts` exporting the namespace,
-plus a test and a README.
+Enter and exit timing lives in CSS. The primitive only toggles `data-*` attributes and unmounts off the Web Animations API. Root spreads `transitionProps` from `useTransition` onto the popup.
 
-`index.ts` must also re-export every public prop type (`select/index.ts`).
-Without them, a `.d.ts` rollup that consumes the part hits TS2742 (see
-`primitives/README.md`).
+- **Initially open:** `mounted` is true, with `data-open` and no starting style. Set `animateOnMount: true` to play an entrance on mount.
+- **Opened after mount:** the first committed frame carries `data-open`, `data-starting-style` and an inline `transition: none`. One frame later `data-starting-style` clears and the CSS transitions run to the resting style.
+- **Close:** `data-closed` and `data-ending-style` are applied. Once every animation on the element finishes (`useAnimationsFinished`), `mounted` flips false and the element unmounts.
 
-## Animation lifecycle (`data-*` driven)
-
-All enter/exit timing lives in **CSS**; the primitives only toggle `data-*`
-attributes and drive unmount off the Web Animations API. Root spreads
-`transitionProps` (from `useTransition`) onto the Popup; the lifecycle:
-
-- **Initially open** → `mounted=true`, with `data-open` and no starting style by
-  default. Set `animateOnMount: true` to start an entrance on mount.
-- **Open after mount** → synchronously `mounted=true`, status `'starting'`: first
-  committed frame carries `data-open` + `data-starting-style` + inline
-  `transition: none` (snapshot frame). One rAF later `data-starting-style`
-  clears → CSS transitions fire toward the resting style.
-- **Close** → status `'ending'`: `data-closed` + `data-ending-style` applied.
-  After all animations on the element finish (`useAnimationsFinished`),
-  `mounted` flips false and the element unmounts.
-
-Styling off these in StyleX: `stylex.md` → "Reacting to `data-*` state".
+How to style off these attributes is in [StyleX → State on another element](stylex.md#state-on-another-element), and which curve each phase takes is in [Motion](motion.md).
 
 ### Exiting content must be frozen
 
-Anything that animates out outlives `open` by the length of its exit, and
-whatever closed it has usually already changed the data behind it — picking a
-menu item, selecting an option, switching account, a machine returning to `idle`,
-a form clearing. The subtree re-renders with the new data and swaps visibly under
-the exit, which reads as a flash of the next screen. This applies to **every part
-with an exit transition**, not only popups: a sheet, a panel, a step, an inline
-region that fades out all have the same window.
+Anything that animates out outlives `open` by the length of its exit, and whatever closed it has usually changed the data behind it: a picked menu item, a selected option, a switched account, a machine back at `idle`, a cleared form. The subtree re-renders with the new data under the exit and flashes the next screen. This applies to every part with an exit transition: popups, sheets, panels, steps and inline regions.
 
-Two ways to hold the old frame, depending on whether the part re-renders for
-reasons of its own while closed:
+- **`Freeze` (the default).** Wrap the children and keep the animating element live: `children: <Freeze frozen={!open}>{children}</Freeze>` (`select-popup.tsx`).
+- **A held snapshot**, when the outgoing content is a distinct value you still have. `FlowStep` keeps the last open `children` in a ref and renders them while closed, because its `children` change when the step moves on.
 
-**`Freeze`** — wrap the children, keep the animating element live:
-`children: <Freeze frozen={!open}>{children}</Freeze>` (`select/select-popup.tsx`).
+Either way:
 
-**A held snapshot** — keep the last open `children` in a ref and render those
-while closed. `FlowStep` does this: its `children` prop genuinely changes when the
-step value moves on, so there is a correct old value to render rather than a frame
-to hold.
+- Gate on `!open`, never `!mounted`. `mounted` stays true through the whole exit, so `!mounted` freezes nothing.
+- Freeze the children, not the animating element, which has to stay live for `data-ending-style` to land and the animation to run.
 
-```tsx
-if (open) activeChildrenRef.current = children;
-// ...
-children: open ? children : activeChildrenRef.current,
-```
-
-Reach for `Freeze` by default; reach for the snapshot when the outgoing content is
-a distinct element you still have.
-
-Two things to get right either way:
-
-- Gate on **`!open`**, never `!mounted`. `mounted` stays true through the whole
-  exit — that is precisely the window this covers, so `!mounted` freezes nothing.
-- Freeze the **children**, not the animating element. It has to stay live for
-  `data-closed` / `data-ending-style` to land on it and for the animation to run.
-
-Any new part with an exit transition needs one of the two;
-`grep -rn 'Freeze frozen' src/primitives` shows the current users.
-
-## Shared hooks and utils
-
-`primitives/hooks/index.ts` and `primitives/utils/index.ts` are the lists. Use
-`useControllableState` for any controlled/uncontrolled prop pair, and
-`useTransition` for any part with enter/exit (spread `transitionProps` on the
-animated element). Add `cssVars()` to floating-ui middleware **after** `arrow()`,
-or the transform origin won't follow the arrow.
+`grep -rn 'Freeze frozen' src/primitives` lists the current users.
 
 ## Reading direction
 
-Read the direction with `useDirection()` from `primitives/direction-provider`, never from the DOM
-`dir` attribute or computed style. It returns `ltr` outside a `DirectionProvider`. Use
-`readingDirectionKeys(direction)` for the previous and next arrow keys, or pass
-`rtl: direction === 'rtl'` to `useComposite` or floating-ui's `useListNavigation`
-(`tabs/tabs-list.tsx`). `MosaicProvider` renders the `DirectionProvider` from its `direction` prop.
+Read the direction with `useDirection()` from `src/primitives/direction-provider`, never from the DOM `dir` attribute or computed style. It returns `ltr` outside a `DirectionProvider`. Use `readingDirectionKeys(direction)` for the previous and next arrow keys, or pass `rtl: direction === 'rtl'` to `useComposite` or floating-ui's `useListNavigation` (`tabs/tabs-list.tsx`). `MosaicProvider` renders the `DirectionProvider` from its `direction` prop.
 
 ## Testing
 
-Primitive tests run on **happy-dom** (the `primitives` project in Mosaic's
-`vitest.config.mts`), and `toHaveNoViolations` (axe) is registered in
-`src/primitives/test-utils/vitest.setup.ts`.
+Primitive tests run on happy-dom (the `primitives` project in `vitest.config.mts`), and `toHaveNoViolations` (axe) is registered in `src/primitives/test-utils/vitest.setup.ts`.
