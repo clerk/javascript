@@ -92,6 +92,37 @@ describe('api.client', () => {
     expect(totalCount).toBe(2);
   });
 
+  it('sends startingAfter only to the users list request', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('starting_after')).toBe('user_previous');
+          expect(url.searchParams.has('startingAfter')).toBe(false);
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/count`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.has('starting_after')).toBe(false);
+          expect(url.searchParams.has('startingAfter')).toBe(false);
+          return HttpResponse.json({ object: 'total_count', total_count: 2 });
+        }),
+      ),
+    );
+
+    const { data, totalCount } = await apiClient.users.getUserList({
+      startingAfter: 'user_previous',
+      orderBy: '-created_at',
+    });
+
+    expect(data[0].id).toBe('user_cafebabe');
+    expect(totalCount).toBe(2);
+  });
+
   it('executes users.getUserList() with last_sign_in_at filters', async () => {
     const afterTimestamp = 1640000000;
     const beforeTimestamp = 1700000000;
