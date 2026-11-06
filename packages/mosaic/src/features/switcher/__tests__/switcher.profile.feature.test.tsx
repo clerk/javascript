@@ -59,7 +59,7 @@ const withOrganizationApiKeys: FakeFapiSeed = {
 
 const terms = { label: 'Terms', path: 'terms', content: <p>Terms body</p> };
 const accountTabs = ['Account', 'Security'];
-const organizationTabs = ['General', 'Members'];
+const organizationTabs = ['General', 'Members', 'Logs'];
 const allTabs = [...accountTabs, ...organizationTabs];
 const separate: MosaicProfile = { combined: false };
 
@@ -195,8 +195,8 @@ describe('the profile the switchers open', () => {
   });
 
   it.each([
-    { name: 'separate', combined: false, expected: ['General'] },
-    { name: 'combined', combined: true, expected: ['Account', 'Security', 'General'] },
+    { name: 'separate', combined: false, expected: ['General', 'Logs'] },
+    { name: 'combined', combined: true, expected: ['Account', 'Security', 'General', 'Logs'] },
   ])("hides the organization's API keys from the profile a switcher opens: $name", async ({ combined, expected }) => {
     await renderWithProfile(
       <OrganizationSwitcher />,
@@ -266,7 +266,9 @@ describe('the profile the switchers open', () => {
 
     await clickSettings(trigger);
 
-    await waitFor(() => expect(tabs()).toEqual(['Account', 'Terms', 'Security', 'Audit', 'General', 'Members']));
+    await waitFor(() =>
+      expect(tabs()).toEqual(['Account', 'Terms', 'Security', 'Audit', 'General', 'Members', 'Logs']),
+    );
   });
 
   it("hands the provider's custom pages to Clerk's modals without newProfiles", async () => {
@@ -303,7 +305,7 @@ describe('a mounted OrganizationProfile under a provider profile', () => {
       },
     });
 
-    await waitFor(() => expect(tabs()).toEqual(['Audit', 'General', 'Members']));
+    await waitFor(() => expect(tabs()).toEqual(['Audit', 'General', 'Members', 'Logs']));
   });
 
   it('lets its own props win over the provider', async () => {
@@ -311,7 +313,7 @@ describe('a mounted OrganizationProfile under a provider profile', () => {
       organizationProfileProps: { customPages: [audit] },
     });
 
-    await waitFor(() => expect(tabs()).toEqual(['General', 'Members', 'Own']));
+    await waitFor(() => expect(tabs()).toEqual(['General', 'Members', 'Logs', 'Own']));
   });
 
   it('lands where the provider says after leaving the organization', async () => {
@@ -330,7 +332,7 @@ describe('a mounted UserProfile under a provider profile', () => {
       organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }], pageOrder: ['general'] },
     });
 
-    await waitFor(() => expect(tabs()).toEqual(['Account', 'Security', 'Members', 'General', 'Audit']));
+    await waitFor(() => expect(tabs()).toEqual(['Account', 'Security', 'Members', 'General', 'Logs', 'Audit']));
   });
 
   it('lands where the provider says after leaving the organization', async () => {
@@ -359,7 +361,9 @@ describe('a mounted UserProfile under a provider profile', () => {
       organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }] },
     });
 
-    await waitFor(() => expect(tabs()).toEqual(['Account', 'Security', 'Terms', 'General', 'Members', 'Audit']));
+    await waitFor(() =>
+      expect(tabs()).toEqual(['Account', 'Security', 'Terms', 'General', 'Members', 'Logs', 'Audit']),
+    );
   });
 
   it('lets its own props win over the provider', async () => {
@@ -367,6 +371,6 @@ describe('a mounted UserProfile under a provider profile', () => {
       userProfileProps: { customPages: [terms] },
     });
 
-    await waitFor(() => expect(tabs()).toEqual(['Account', 'Security', 'Own', 'General', 'Members']));
+    await waitFor(() => expect(tabs()).toEqual(['Account', 'Security', 'Own', 'General', 'Members', 'Logs']));
   });
 });
