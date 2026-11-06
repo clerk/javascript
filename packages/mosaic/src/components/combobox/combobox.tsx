@@ -33,23 +33,6 @@ const ComboboxAnchorContext = React.createContext<{
 export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
   const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
-  React.useEffect(() => {
-    if (!anchor || !openOnInputClick || props.inline) {
-      return;
-    }
-    const openFromPadding = (event: MouseEvent) => {
-      if (event.defaultPrevented || !(event.target instanceof Element)) {
-        return;
-      }
-      const interactive = event.target.closest('input, button, a[href], select, textarea');
-      if (interactive && anchor.contains(interactive)) {
-        return;
-      }
-      anchor.querySelector('input')?.click();
-    };
-    anchor.addEventListener('click', openFromPadding);
-    return () => anchor.removeEventListener('click', openFromPadding);
-  }, [anchor, openOnInputClick, props.inline]);
   return (
     <ComboboxAnchorContext.Provider value={context}>
       <HeadlessCombobox.Root

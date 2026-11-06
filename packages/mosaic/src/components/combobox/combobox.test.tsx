@@ -412,30 +412,6 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
   });
 
-  it('opens the list when the padding of its input group is clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <Combobox.Root>
-        <InputGroup.Root data-testid='fruit-group'>
-          <Combobox.Input aria-label='Fruit' />
-        </InputGroup.Root>
-        <Combobox.Popup>
-          <Combobox.Option
-            value='apple'
-            label='Apple'
-          >
-            Apple
-          </Combobox.Option>
-        </Combobox.Popup>
-      </Combobox.Root>,
-    );
-
-    await user.click(screen.getByTestId('fruit-group'));
-
-    expect(await screen.findByRole('listbox')).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
-  });
-
   it('keeps the trigger toggling the list with its own name while there is text', async () => {
     const user = userEvent.setup();
     render(<ClearableCombobox />);
