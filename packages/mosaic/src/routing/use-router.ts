@@ -60,39 +60,54 @@ function withRedirectLimit(location: MosaicLocation, path: string | undefined): 
   };
 }
 
-// The scope owns its base while its effects are live. When the last owner leaves, the location
-// drops the entry, so the next mount starts fresh the way a URL would after the host navigated
-// away. Effects also stop when React parks the component without unmounting it (Activity), and
-// then the component's state survives. In virtual mode the cleanup therefore parks the entry in
-// state and the effects that run on resume write it back, unless something else wrote the base in
-// between. The ownership effect's dependencies never change on a navigation, so its cleanup only
-// runs on hide or unmount; it reads the entry to park from a ref that is written in an effect and
-// read nowhere else. The parked value is consumed during render as soon as an entry is present
-// again, so a mounted scope never falls back to it, and an entry cleared from outside shows the
-// root. A URL mode holds the segment in its carrier and parks nothing.
-function useOwnedSegment(location: MosaicLocation, entry: SegmentParts | undefined, parks: boolean): void {
-  const [parked, setParked] = useState<SegmentParts | undefined>(undefined);
-  if (parked !== undefined && entry !== undefined) {
+// The scope owns its base while its effects are live, and returns the entry it should render from.
+// When the last owner leaves, the location drops the entry, so the next mount starts fresh the way
+// a URL would after the host navigated away. Effects also stop when React parks the component
+// without unmounting it (Activity), and then the component's state survives. In virtual mode the
+// cleanup therefore parks the entry in state, the scope keeps rendering from the parked entry while
+// it is hidden, so the page's subtree keeps its state, and the effects that run on resume write it
+// back, unless something else wrote the base in between. The ownership effect's dependencies never
+// change on a navigation, so its cleanup only runs on hide, unmount or a change of location; it
+// reads the entry to park from a ref that is written in an effect and read nowhere else. A park
+// is tied to the location it was taken from, so a scope that moves to another base does not carry
+// its page along. The parked value is consumed during render as soon as an entry is present again,
+// so a mounted scope never falls back to it, and an entry cleared from outside shows the root. A
+// URL mode holds the segment in its carrier and parks nothing.
+interface ParkedSegment {
+  location: MosaicLocation;
+  parts: SegmentParts;
+}
+
+function useOwnedSegment(
+  location: MosaicLocation,
+  entry: SegmentParts | undefined,
+  parks: boolean,
+): SegmentParts | undefined {
+  const [parked, setParked] = useState<ParkedSegment | undefined>(undefined);
+  if (parked !== undefined && (entry !== undefined || parked.location !== location)) {
     setParked(undefined);
   }
+  const held = parked !== undefined && parked.location === location ? parked.parts : undefined;
   const latest = useRef(entry);
   useEffect(() => {
     latest.current = entry;
   }, [entry]);
   useEffect(() => {
-    if (parks && parked !== undefined && entry === undefined) {
-      location.write(parked, { replace: true });
+    if (parks && held !== undefined && entry === undefined) {
+      location.write(held, { replace: true });
     }
-  }, [location, parks, parked, entry]);
+  }, [location, parks, held, entry]);
   useEffect(() => {
     const release = location.own();
     return () => {
-      if (parks) {
-        setParked(latest.current);
+      const parts = latest.current;
+      if (parks && parts !== undefined) {
+        setParked({ location, parts });
       }
       release();
     };
   }, [location, parks]);
+  return entry ?? held;
 }
 
 function missingScope(): never {
@@ -104,8 +119,6 @@ interface Routing<Routes extends RouteTable> {
   table: Routes;
   router: Router<Routes>;
   entry: SegmentParts | undefined;
-  parts: SegmentParts;
-  matched: Route<Routes> | undefined;
 }
 
 function useRouting<Routes extends RouteTable>(routes: Routes, options: MosaicLocationOptions): Routing<Routes> {
@@ -113,9 +126,13 @@ function useRouting<Routes extends RouteTable>(routes: Routes, options: MosaicLo
   const table = useStableTable(routes);
   const router = useMemo(() => createRouter(table, location), [table, location]);
   const entry = location.useSegmentParts();
+  return { location, table, router, entry };
+}
+
+function useMatch<Routes extends RouteTable>(router: Router<Routes>, entry: SegmentParts | undefined) {
   const parts = entry ?? EMPTY_PARTS;
   const matched = useMemo(() => router.parse(parts), [router, parts]);
-  return { location, table, router, entry, parts, matched };
+  return { parts, matched };
 }
 
 export interface RouterScopeOptions<Routes extends RouteTable> {
@@ -140,7 +157,9 @@ export function useRouterScope<const Routes extends RouteTable>(
   { routing, path, notFound }: RouterScopeOptions<Routes>,
 ): RouterScope<Routes> {
   const scope = useMemo(() => createRoutingScope({ routing, path }), [routing, path]);
-  const { location, table, router, entry, parts, matched } = useRouting(routes, { routing, path });
+  const { location, table, router, entry } = useRouting(routes, { routing, path });
+  const held = useOwnedSegment(location, entry, routing === 'virtual');
+  const { parts, matched } = useMatch(router, held);
   const current = useMemo<Route<Routes>>(
     () => matched ?? { name: notFound, params: EMPTY_PARAMS },
     [matched, notFound],
@@ -150,8 +169,6 @@ export function useRouterScope<const Routes extends RouteTable>(
     const target = routeParts(table, notFound);
     return router.parse(target) ? target : undefined;
   }, [table, router, notFound]);
-
-  useOwnedSegment(location, entry, routing === 'virtual');
 
   const redirect = useMemo(() => withRedirectLimit(location, path), [location, path]);
   const redirectTo = matched === undefined ? notFound : undefined;
@@ -185,7 +202,8 @@ export interface NestedRouter<Routes extends RouteTable> {
 // For anything rendered inside a segment owner. It matches its own table against the segment and
 // reports no route when the segment belongs to a sibling; it never redirects.
 export function useRouter<const Routes extends RouteTable>(routes: Routes): NestedRouter<Routes> {
-  const { router, matched } = useRouting(routes, useInheritedScope() ?? missingScope());
+  const { router, entry } = useRouting(routes, useInheritedScope() ?? missingScope());
+  const { matched } = useMatch(router, entry);
 
   return useMemo(
     () => ({ route: matched?.name, params: matched?.params ?? EMPTY_PARAMS, go: router.go }),
