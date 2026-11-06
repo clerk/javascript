@@ -33,7 +33,7 @@ interface PendingActionFailure<TKey extends string> {
 /**
  * Runs inline actions, such as row buttons, under one lock and tracks which key is pending, which key ran last, and which key last failed.
  * `run` resolves `true` on success and `false` on failure or cancellation, ignores calls while a run owns the lock, and clears the last error when it starts.
- * Unmount aborts the action signal; callers guard their own side effects and completion UI.
+ * Unmount aborts the action signal; callers guard their own side effects.
  */
 export function usePendingAction<TKey extends string = string>({
   errorFallback,
