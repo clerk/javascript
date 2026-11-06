@@ -27,4 +27,4 @@ Worked example: `showTriggerLabel` on `UserButton`.
 
 These match the `@clerk/shared` types and keep their names: `hidePersonal` and `apiKeysProps.hide`.
 
-Renaming an existing public prop is a breaking change ([Breaking changes](../AGENTS.md#breaking-changes)).
+Renaming an existing public prop is a breaking change ([Breaking changes](breaking-changes.md)).

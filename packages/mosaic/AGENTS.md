@@ -2,7 +2,7 @@
 
 Mosaic is Clerk's next-generation component library. These rules apply to everything under `packages/mosaic`, on top of the repo-root `AGENTS.md`.
 
-This file holds the rules every change follows. `docs/` holds one guide per task; each opens with a "Read this when" line that matches its row below.
+This file holds the rules every change follows. `docs/` holds one guide per task; each opens with a "Read this when" line that matches its line below.
 
 Every line under a `## Rules` heading is a requirement. To break one, ask first ([When nothing fits](#when-nothing-fits-ask-first)). "Prefer" marks a default you may leave with a reason in the PR.
 
@@ -23,42 +23,38 @@ The docs describe the Mosaic we are building toward. Code that differs from them
 
 ## Task guides
 
-Read every row that matches your task. Paths below are relative to this package.
+Read every line that matches your task. Paths below are relative to this package.
 
-| Task                                                                                                   | Read                                                                                                                                           |
-| ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add a feature, or a file to one                                                                        | [Features](docs/features.md), then the guide for each layer below. If `packages/ui` has a legacy version, [Migration](docs/migration.md) first |
-| Write or change a model, or add a Clerk read, mutation or permission check                             | [Models](docs/models.md)                                                                                                                       |
-| Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus | [Controllers](docs/controllers.md)                                                                                                             |
-| Write or debug a state machine                                                                         | [Controllers → Machines](docs/controllers.md#machines), then [Machine runtime](src/machine/README.md)                                          |
-| Write or change a view, a dialog or step it renders, or a feature's copy                               | [Views](docs/views.md)                                                                                                                         |
-| Change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build    | [Theming](docs/theming.md)                                                                                                                     |
-| Write or change a `*.styles.ts` or `*.stylex.ts` file                                                  | [StyleX](docs/stylex.md)                                                                                                                       |
-| Add or change a transition, a hover or press color change, or reduced-motion handling                  | [Motion](docs/motion.md)                                                                                                                       |
-| Add or change a loading skeleton                                                                       | [Skeletons](docs/skeletons.md)                                                                                                                 |
-| Write or change a headless primitive under `src/primitives/`                                           | [Headless primitives](docs/headless.md)                                                                                                        |
-| Add or rename a public prop that shows, hides or configures part of a component                        | [Public visibility props](docs/public-props.md)                                                                                                |
-| Write, move or review a test                                                                           | [Testing](docs/testing.md)                                                                                                                     |
-| Fix or silence a lint error                                                                            | [Lint](docs/lint.md)                                                                                                                           |
-| Move a legacy component's logic or styles into Mosaic                                                  | [Migration](docs/migration.md)                                                                                                                 |
-| Check that a migration kept every legacy behavior                                                      | [Parity audit](docs/parity-audit.md)                                                                                                           |
-| Add or change a component's Swingset page                                                              | [Documenting components](docs/documenting-components.md)                                                                                       |
-| Prove a change in a browser                                                                            | [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)                                                                                         |
-| Release a breaking change                                                                              | [Breaking changes](#breaking-changes)                                                                                                          |
-| Review a Mosaic change                                                                                 | [Reuse before you write](#reuse-before-you-write), [Shaping a fix](#shaping-a-fix), and the rows for what the change touches                   |
-| Change these docs                                                                                      | [Keep the docs true](#keep-the-docs-true)                                                                                                      |
+- Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If `packages/ui` has a legacy version, [Migration](docs/migration.md) first
+- Write or change a model, or add a Clerk read, mutation or permission check → [Models](docs/models.md)
+- Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
+- Write or debug a state machine → [Controllers → Machines](docs/controllers.md#machines), then [Machine runtime](src/machine/README.md)
+- Write or change a view, a dialog or step it renders, or a feature's copy → [Views](docs/views.md)
+- Change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
+- Write or change a `*.styles.ts` or `*.stylex.ts` file → [StyleX](docs/stylex.md)
+- Add or change a transition, a hover or press color change, or reduced-motion handling → [Motion](docs/motion.md)
+- Add or change a loading skeleton → [Skeletons](docs/skeletons.md)
+- Write or change a headless primitive under `src/primitives/` → [Headless primitives](docs/headless.md)
+- Add or rename a public prop that shows, hides or configures part of a component → [Public visibility props](docs/public-props.md)
+- Write, move or review a test → [Testing](docs/testing.md)
+- Fix or silence a lint error → [Lint](docs/lint.md)
+- Move a legacy component's logic or styles into Mosaic → [Migration](docs/migration.md)
+- Check that a migration kept every legacy behavior → [Parity audit](docs/parity-audit.md)
+- Add or change a component's Swingset page → [Documenting components](docs/documenting-components.md)
+- Prove a change in a browser → [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)
+- Remove or rename a public export, prop or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)
+- Review a Mosaic change → [Reuse before you write](#reuse-before-you-write), [Shaping a fix](#shaping-a-fix), and the lines for what the change touches
+- Change these docs, `.claude/rules/` or the verify-mosaic skill → [Writing docs](docs/writing-docs.md)
 
 ## Before editing a file
 
 Before you change a file that matches a pattern below, read its guide, even for a one-line change.
 
-| File                                                               | Read                               |
-| ------------------------------------------------------------------ | ---------------------------------- |
-| `src/**/*.styles.ts`, `src/**/*.stylex.ts`                         | [StyleX](docs/stylex.md)           |
-| `src/**/*.model.ts(x)`                                             | [Models](docs/models.md)           |
-| `src/**/*.controller.ts(x)`                                        | [Controllers](docs/controllers.md) |
-| `src/**/*.view.tsx`                                                | [Views](docs/views.md)             |
-| `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` | [Testing](docs/testing.md)         |
+- `src/**/*.styles.ts`, `src/**/*.stylex.ts` → [StyleX](docs/stylex.md)
+- `src/**/*.model.ts(x)` → [Models](docs/models.md)
+- `src/**/*.controller.ts(x)` → [Controllers](docs/controllers.md)
+- `src/**/*.view.tsx` → [Views](docs/views.md)
+- `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` → [Testing](docs/testing.md)
 
 ## Layers in one paragraph
 
@@ -66,41 +62,39 @@ A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is th
 
 ## Reuse before you write
 
-Most problems a feature hits already have a shared answer. Find the row for your problem and use it. Do not write a local version, even a small one.
+Most problems a feature hits already have a shared answer. Find the line for your problem and use it. Do not write a local version, even a small one. A PR that adds, renames or changes the signature of a shared helper in `src/hooks/`, `src/utils/`, `src/blocks/`, `src/components/form/` or `src/machine/` updates this list, and any doc that names it, in the same PR.
 
-| Problem                                                                                                 | Use                                                                                                                                    |
-| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| An async action from a button or row: pending, an error, one lock                                       | `usePendingAction` (`src/hooks/`)                                                                                                      |
-| A form: values, validation, submit, field errors, success UI                                            | `useForm` (`src/components/form/`), with `validateAsync` for server checks and `onSuccess` for mounted success UI                      |
-| A `<form>` element, without the browser's validation popup                                              | `Form` (`src/primitives/form/`)                                                                                                        |
-| A model save whose Clerk errors should land on form fields                                              | `save` (`src/utils/errors.ts`) in the model, or reject with `FormSubmitError`                                                          |
-| A confirm step before an action                                                                         | `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)                                        |
-| A delete that needs the user to type a phrase                                                           | `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)                                          |
-| An action that may need step-up verification                                                            | `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`                                |
-| A direct action that needs step-up verification                                                         | `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view                           |
-| Showing any error to the user                                                                           | One of the owners above. They call `toLocalizableError` (or `toLocalizableErrors` for all errors) and resolve copy with `useErrorText` |
-| Moving focus after a list row is removed                                                                | `useListRemovalFocus` (`src/hooks/`)                                                                                                   |
-| A debounced, abortable async check as the user types                                                    | `useDebouncedAsync` (`src/hooks/`)                                                                                                     |
-| A spinner that should not flash or flicker                                                              | `useSpinDelay` (`src/hooks/`)                                                                                                          |
-| A placeholder for content that is still loading                                                         | `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)                                                            |
-| A date shown to the user                                                                                | `formatDate` (`src/utils/format-date.ts`)                                                                                              |
-| Any current time read during render                                                                     | `useNow` (`src/hooks/`), with `until` to stop ticking at a deadline                                                                    |
-| An inline message row; height is undefined until measured                                               | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts`                      |
-| Data read from a Clerk resource that should be cached across mounts                                     | A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)                                       |
-| The seconds left on a resend cooldown, for display                                                      | `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine                                                 |
-| An avatar or logo row: picker, drop target, Upload button or manage menu                                | `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller                                                                   |
-| Siblings that slide when an item is added or removed                                                    | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                                         |
-| An input that reformats as the user types without moving the caret                                      | `useFormattedInput` (`src/primitives/hooks/`)                                                                                          |
-| Arrow-key navigation with one tab stop across a group of items                                          | `useComposite`, with `useCompositeItems` and `useCompositeItem` (`src/primitives/hooks/`)                                              |
-| A panel that animates open and closed to its measured size                                              | `usePanelSize` (`src/primitives/hooks/`)                                                                                               |
-| One screen replacing another on the same card or dialog                                                 | `Flow` (`src/components/flow/`), see [Views](docs/views.md)                                                                            |
-| An interaction with an async lifecycle or two values that move together                                 | A machine in the controller file, via `setup()` (`src/machine/`)                                                                       |
-| Styles several components share                                                                         | `src/styles/*.styles.ts`                                                                                                               |
-| Anything else small: a date, a permission, verification codes, backup codes, avatar files, a list patch | List `src/utils/`, `src/hooks/` and `src/primitives/hooks/` first; most of these already have a helper                                 |
+- An async action from a button or row: pending, an error, one lock → `usePendingAction` (`src/hooks/`)
+- A form: values, validation, submit, field errors, success UI → `useForm` (`src/components/form/`), with `validateAsync` for server checks and `onSuccess` for mounted success UI
+- A `<form>` element, without the browser's validation popup → `Form` (`src/primitives/form/`)
+- A model save whose Clerk errors should land on form fields → `save` (`src/utils/errors.ts`) in the model, or reject with `FormSubmitError`
+- A confirm step before an action → `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)
+- A delete that needs the user to type a phrase → `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)
+- An action that may need step-up verification → `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`
+- A direct action that needs step-up verification → `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view
+- Showing any error to the user → One of the owners above. They call `toLocalizableError` (or `toLocalizableErrors` for all errors) and resolve copy with `useErrorText`
+- Moving focus after a list row is removed → `useListRemovalFocus` (`src/hooks/`)
+- A debounced, abortable async check as the user types → `useDebouncedAsync` (`src/hooks/`)
+- A spinner that should not flash or flicker → `useSpinDelay` (`src/hooks/`)
+- A placeholder for content that is still loading → `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)
+- A date shown to the user → `formatDate` (`src/utils/format-date.ts`)
+- Any current time read during render → `useNow` (`src/hooks/`), with `until` to stop ticking at a deadline
+- An inline message row; height is undefined until measured → `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts`
+- Data read from a Clerk resource that should be cached across mounts → A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)
+- The seconds left on a resend cooldown, for display → `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine
+- An avatar or logo row: picker, drop target, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
+- Siblings that slide when an item is added or removed → `useLayoutAnimation` (`src/primitives/hooks/`)
+- An input that reformats as the user types without moving the caret → `useFormattedInput` (`src/primitives/hooks/`)
+- Arrow-key navigation with one tab stop across a group of items → `useComposite`, with `useCompositeItems` and `useCompositeItem` (`src/primitives/hooks/`)
+- A panel that animates open and closed to its measured size → `usePanelSize` (`src/primitives/hooks/`)
+- One screen replacing another on the same card or dialog → `Flow` (`src/components/flow/`), see [Views](docs/views.md)
+- An interaction with an async lifecycle or two values that move together → A machine in the controller file, via `setup()` (`src/machine/`)
+- Styles several components share → `src/styles/*.styles.ts`
+- Anything else small: a permission, verification codes, backup codes, avatar files, a list patch → List `src/utils/`, `src/hooks/` and `src/primitives/hooks/` first; most of these already have a helper
 
 ## Signs you are about to invent a pattern
 
-Stop and check the table if you are writing any of these in a feature:
+Stop and check the list above if you are writing any of these in a feature:
 
 - `try`/`catch` around a Clerk call in a controller or view
 - `useState` for a pending flag, or for "which row is busy"
@@ -116,7 +110,7 @@ The form rule applies when you add or rewrite a form. Some existing forms predat
 
 ## When nothing fits: ask first
 
-If no row fits, or a shared helper almost fits but would need a change, **stop and ask the user before writing code**. Say:
+If no line fits, or a shared helper almost fits but would need a change, **stop and ask the user before writing code**. Say:
 
 1. the problem, in one sentence
 2. which shared helpers you checked and why each does not fit
@@ -136,34 +130,3 @@ A bug in a feature is often a gap in a shared helper. These rules apply to `fix`
 - **Pass shared results through whole.** The view gets `form`, not an object that renames `form.id`, `form.isSubmitting` and `form.handleSubmit`.
 - **Keep controller state off model types.** Pending and error flags the controller sets go on a row type the controller builds, not as optional fields on the type the model returns.
 - **Narrowing and machines** follow [Controllers → Composition](docs/controllers.md#composition-and-dialog-lifetime) and [Controllers → Machines](docs/controllers.md#machines).
-
-## Keep the docs true
-
-Docs say what the code cannot: rules, reasons, and which tool fits which problem. For facts the code already holds (lists of exports, tokens, builders or files, and signatures), name the file and give one example. Do not copy the list; a copy goes stale and agents trust it.
-
-A PR that adds, renames or changes the signature of a shared helper in `src/hooks/`, `src/utils/`, `src/blocks/`, `src/components/form/` or `src/machine/` updates the table above, and any doc that names it, in the same PR.
-
-Each rule has one home: this file for the rules every change follows, and one guide in `docs/` for each task. Edit the owning section and link to it from elsewhere; do not restate it. When you change these docs:
-
-- Keep each guide's shape: a `Read this when …` line that names the files and tasks it covers, a worked example, `## Rules`, then the how-to. Change its row in [Task guides](#task-guides) to match when the line changes.
-- Check every link, anchor and source path you touched, and that each path rule in `.claude/rules/` still names a guide that exists.
-- Compare the removed text with where it went, so no rule is lost in a move.
-- Walk two unlike real tasks through the new text, such as a styling fix and a new feature section, and check each reaches every rule it needs.
-
-## Breaking changes
-
-While `@clerk/mosaic` is on 0.x, a breaking change is a `minor` changeset. Start its body with `**Breaking:**`, then give an old-to-new table and a search that finds affected usage, so an agent can migrate from the changelog alone. The changelog ships in the npm package at `node_modules/@clerk/mosaic/CHANGELOG.md`.
-
-```md
----
-'@clerk/mosaic': minor
----
-
-**Breaking:** Rename a `UserButton` prop. Values and defaults are unchanged; TypeScript flags the old name.
-
-| Before               | After              |
-| -------------------- | ------------------ |
-| `renderTriggerLabel` | `showTriggerLabel` |
-
-Find usages with `git grep -n renderTriggerLabel`.
-```
