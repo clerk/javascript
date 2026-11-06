@@ -64,10 +64,6 @@ export interface PhoneInputProps extends Omit<
   size?: 'sm' | 'md' | 'lg';
   countrySearchPlaceholder?: string;
   noResultsMessage?: string;
-  /** Applied to the grouped root. */
-  className?: string;
-  /** Applied to the grouped root. */
-  style?: React.CSSProperties;
 }
 
 export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(function MosaicPhoneInput(

@@ -222,7 +222,7 @@ device, while touch devices look correct.
 
   ```tsx
   // item.tsx — the ring is an atom in the chain, not a property in the styles file
-  stylex.props(reset.base, focusOutline.visible, slots.item.base, slots.item[size]);
+  stylex.props(reset.base, focusOutline.visible, slots.item.base, xstyle);
   ```
 
   It uses `:focus-visible`, never bare `:focus`, and `:has(:focus-visible)` for the
