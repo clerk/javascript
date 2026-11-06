@@ -156,56 +156,6 @@ If a feature supports SSR, also verify matching initial times during server
 rendering and hydration. Sharing time within one provider tree does not by
 itself guarantee agreement between server and client.
 
-## Private API requests
-
-Use `useMosaicFetch` from `src/hooks/use-mosaic-fetch.ts` when a new Mosaic
-flow needs an API request before its resource API is stable. The hook loads the
-request capability through the existing Clerk module manager. The core request
-layer still owns authentication, serialization, API errors, and client updates.
-An older runtime without this capability rejects the request with a localized
-error. No legacy UI provider is required.
-
-The hook rejects a request if the session or organization changes while the
-runtime module loads. This check covers the loading step only. It does not
-cancel a request already sent or protect later waits inside the request layer,
-such as a CAPTCHA challenge.
-
-Keep endpoint types and query hooks private to Mosaic. Use `useMosaicQuery` and
-`useMosaicMutation` from `src/hooks/`. They call the official React Query hooks
-and supply the client through `useMosaicQueryClient`. Use that client hook
-directly when a callback needs to update or invalidate cached data. It returns
-the existing shared client in the browser and a client local to the hook
-during server rendering. Queries do not run
-during server rendering. Do not replace the client while a hook is mounted.
-
-Do not add a `QueryClientProvider` or mount the shared client here. This keeps
-the application query context and existing focus/reconnect behavior unchanged.
-Keep query keys compatible with the cached data type. Use separate keys for raw
-API data and Clerk resources, and invalidate related queries after a write.
-The controller still uses
-`useForm` or `usePendingAction` for the interaction. Return a promise that covers
-the write and required cache work.
-
-Keep request construction in plain functions beside the query hook. These
-functions receive the request capability and own the endpoint, parameters,
-response types, and required response checks. The hook owns query keys,
-identity checks, request state, and invalidation.
-Use `mFetch` for the value returned by `useMosaicFetch`. Its type is
-`MosaicFetch`, and it calls `runtime.fetch`. Unlike global `fetch`, it accepts
-Clerk request options, returns parsed data, and throws Clerk errors.
-This keeps the endpoint code usable without React or a resource class.
-
-Use a separate hook for each query or mutation operation. Return the TanStack
-result directly so callers retain its state and methods. Compose these hooks
-in the model when a screen needs both reads and writes. Each mutation hook
-owns invalidation and can run without mounting the query hook. Its
-`mutateAsync` promise resolves after the write and required cache work finish.
-Query state and mutation state remain separate. The controller still owns the
-form's pending state through the promise returned by the model.
-
-Include identity in cache keys. Late writes must not populate a new session or
-organization's cache.
-
 ## Testing
 
 The feature test covers the model by default, running it against a real Clerk
