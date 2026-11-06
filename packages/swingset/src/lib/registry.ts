@@ -165,6 +165,12 @@ import {
   Overrides as LocalizationOverrides,
   PluralRules as LocalizationPluralRules,
 } from '../stories/localization.stories';
+import {
+  Default as LogsTableDefault,
+  Empty as LogsTableEmpty,
+  meta as logsTableMeta,
+  NoPermission as LogsTableNoPermission,
+} from '../stories/logs-table.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
@@ -205,6 +211,10 @@ import {
   meta as organizationProfileGeneralPanelMeta,
   ReadOnly as OrganizationProfileGeneralPanelReadOnly,
 } from '../stories/organization-profile-general-panel.stories';
+import {
+  Default as OrganizationProfileLogsPanelDefault,
+  meta as organizationProfileLogsPanelMeta,
+} from '../stories/organization-profile-logs-panel.stories';
 import {
   Empty as OrganizationProfileMembersPanelEmpty,
   Legacy as OrganizationProfileMembersPanelLegacy,
@@ -1218,6 +1228,18 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
+const organizationProfileLogsPanelModule: StoryModule = {
+  meta: organizationProfileLogsPanelMeta,
+  Default: OrganizationProfileLogsPanelDefault,
+};
+
+const logsTableModule: StoryModule = {
+  meta: logsTableMeta,
+  Default: LogsTableDefault,
+  Empty: LogsTableEmpty,
+  NoPermission: LogsTableNoPermission,
+};
+
 const organizationProfileMembersPanelModule: StoryModule = {
   meta: organizationProfileMembersPanelMeta,
   Legacy: OrganizationProfileMembersPanelLegacy,
@@ -1257,6 +1279,7 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
+  organizationProfileLogsPanelModule,
   // Organization Profile · Sections
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
@@ -1269,6 +1292,7 @@ export const registry: StoryModule[] = [
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
+  logsTableModule,
   oauthConsentModule,
   reverificationModule,
   waitlistModule,

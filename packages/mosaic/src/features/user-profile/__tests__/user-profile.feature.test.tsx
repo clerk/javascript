@@ -177,18 +177,18 @@ describe('UserProfile with an active organization', () => {
     serveWithOrganization();
     await renderWithClerk(<UserProfile />);
     expect(tabsDescribedBy('Account')).toEqual(['Account', 'Security']);
-    expect(tabsDescribedBy('Organization')).toEqual(['General', 'Members']);
+    expect(tabsDescribedBy('Organization')).toEqual(['General', 'Members', 'Logs']);
   });
 
   it('lists only the organization pages the user may see', async () => {
     serveWithOrganization({ permissions: [] });
     await renderWithClerk(<UserProfile />);
-    expect(tabsDescribedBy('Organization')).toEqual(['General']);
+    expect(tabsDescribedBy('Organization')).toEqual(['General', 'Logs']);
   });
 
   it.each([
-    { hide: true, tabs: ['General'] },
-    { hide: false, tabs: ['General', 'API Keys'] },
+    { hide: true, tabs: ['General', 'Logs'] },
+    { hide: false, tabs: ['General', 'API Keys', 'Logs'] },
   ])('lists the organization API keys only when they are not hidden: $hide', async ({ hide, tabs }) => {
     serveWithOrganization({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'] });
     await renderWithClerk(<UserProfile organizationProfileProps={{ apiKeysProps: { hide } }} />);
@@ -237,6 +237,16 @@ describe('UserProfile with an active organization', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeVisible();
   });
 
+  it('opens the organization logs page by its prefixed id', async () => {
+    serveWithOrganization();
+    await renderWithClerk(<UserProfile defaultPage='organization/logs' />);
+    expect(screen.getByRole('tab', { name: 'Logs', description: 'Organization' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByText('You don’t have access to logs')).toBeVisible();
+  });
+
   it('opens the organization page that shares an account page name', async () => {
     serveWithOrganization();
     await renderWithClerk(
@@ -261,7 +271,7 @@ describe('UserProfile with an active organization', () => {
       />,
     );
 
-    expect(tabNames()).toEqual(['Account', 'Security', 'General', 'Members']);
+    expect(tabNames()).toEqual(['Account', 'Security', 'General', 'Members', 'Logs']);
     expect(screen.getByRole('tab', { name: 'General', description: 'Organization' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -279,7 +289,7 @@ describe('UserProfile with an active organization', () => {
         }}
       />,
     );
-    expect(tabsDescribedBy('Organization')).toEqual(['Audit log', 'General', 'Members']);
+    expect(tabsDescribedBy('Organization')).toEqual(['Audit log', 'General', 'Members', 'Logs']);
   });
 
   it('keeps the shown page after the open organization page leaves the navigation', async () => {
@@ -297,9 +307,9 @@ describe('UserProfile with an active organization', () => {
     const { clerk } = await renderWithClerk(<UserProfile defaultPage='organization/members' />);
 
     await act(() => clerk.setActive({ organization: globex.id }));
-    await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General']));
+    await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General', 'Logs']));
     await act(() => clerk.setActive({ organization: acme.id }));
-    await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General', 'Members']));
+    await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General', 'Members', 'Logs']));
 
     expect(screen.getByRole('tab', { name: 'Account', description: 'Account' })).toHaveAttribute(
       'aria-selected',
