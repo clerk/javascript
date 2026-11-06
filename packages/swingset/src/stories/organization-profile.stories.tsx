@@ -5,6 +5,7 @@ import { OrganizationProfileView } from '@clerk/mosaic/features/organization-pro
 import type { StoryMeta } from '@/lib/types';
 
 import { useOrganizationProfileFixture } from './fixtures/organization-profile';
+import { useOrganizationProfileAccessFixture } from './fixtures/organization-profile-access';
 
 export { default as __source } from './organization-profile.stories?raw';
 
@@ -19,21 +20,22 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
+  const { activePage, setActivePage, pages, contentLayout } = useOrganizationProfileFixture();
   return (
     <OrganizationProfileView
+      {...contentLayout}
       activePage={activePage}
       pages={pages}
       onPageChange={setActivePage}
-      elevation='flush'
     />
   );
 }
 
 function OverlayProfile() {
-  const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
+  const { activePage, setActivePage, pages, contentLayout } = useOrganizationProfileFixture();
   return (
     <OrganizationProfileView
+      {...contentLayout}
       activePage={activePage}
       pages={pages}
       onPageChange={setActivePage}
@@ -60,5 +62,41 @@ export function Fullscreen() {
         <OverlayProfile />
       </Dialog.Popup>
     </Dialog.Root>
+  );
+}
+
+export function Access() {
+  const access = useOrganizationProfileAccessFixture();
+  return (
+    <OrganizationProfileView
+      activePage='access'
+      onPageChange={() => undefined}
+      pages={{ general: null, access: access.page }}
+      {...access.layout}
+    />
+  );
+}
+
+export function EmptyAccess() {
+  const access = useOrganizationProfileAccessFixture({ empty: true });
+  return (
+    <OrganizationProfileView
+      activePage='access'
+      onPageChange={() => undefined}
+      pages={{ general: null, access: access.page }}
+      {...access.layout}
+    />
+  );
+}
+
+export function AccessErrors() {
+  const access = useOrganizationProfileAccessFixture({ failSave: true, failTest: true, failVerification: true });
+  return (
+    <OrganizationProfileView
+      activePage='access'
+      onPageChange={() => undefined}
+      pages={{ general: null, access: access.page }}
+      {...access.layout}
+    />
   );
 }

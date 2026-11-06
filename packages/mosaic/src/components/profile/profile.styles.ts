@@ -155,6 +155,7 @@ export const styles = stylex.create({
     minBlockSize: 0,
   },
 
+  pageHeader: { gap: space['2'], alignItems: 'baseline', display: 'flex' },
   pageTitle: {
     marginBlockEnd: space['6'],
   },
@@ -287,12 +288,25 @@ export const styles = stylex.create({
     marginBlockStart: 'auto',
   },
 
+  contentFooter: {
+    gap: space['2'],
+    paddingBlock: space['4'],
+    paddingInline: { [compact]: space['6'], default: space['16'] },
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'flex-end',
+  },
   // The clip edge sits inside the frame's corners; the scroller gives the padding back.
   content: {
     paddingBlock: {
       [compact]: 0,
       default: SCROLL_INSET,
     },
+    display: 'flex',
+    flexDirection: 'column',
     minWidth: 0,
   },
   contentInline: {
@@ -309,6 +323,7 @@ export const styles = stylex.create({
   },
 
   contentViewport: {
+    flex: '1',
     paddingBlock: {
       [compact]: space['6'],
       default: `calc(${space['16']} - ${SCROLL_INSET})`,
@@ -317,6 +332,7 @@ export const styles = stylex.create({
       [compact]: space['6'],
       default: space['16'],
     },
+    minHeight: 0,
   },
 
   contentBody: {

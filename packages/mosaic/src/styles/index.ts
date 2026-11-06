@@ -247,3 +247,4 @@ export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profi
 export { MembersTableTabView } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.view';
 export { InvitationsTableTabView } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.view';
 export { RequestsTableTabView } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.view';
+export * as accessStyles from '../features/organization-profile/organization-profile-access-panel/access.styles';

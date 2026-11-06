@@ -4,6 +4,7 @@ export const organizationProfileMessages = {
     general: 'General',
     members: 'Members',
     security: 'Security',
+    access: 'Access',
     billing: 'Billing',
     apiKeys: 'API Keys',
   },
