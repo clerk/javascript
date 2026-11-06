@@ -140,7 +140,7 @@ export const styles = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {

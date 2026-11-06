@@ -1,17 +1,17 @@
-# Parity audit — Phase 4 reference
+# Parity audit
 
-The parity audit is the confidence step of a Mosaic migration. It diffs the
-legacy component against the new model/controller/view and classifies every
-legacy behavior, so behavior that lived implicitly in the old blob can't be
-silently dropped.
+Read this when you review whether a migrated feature kept every legacy behavior, or before you open a migration PR. It covers how to run the audit and how to report it; the migration itself is in [Migration](migration.md).
 
-Run it as an **Explore subagent** (read-only, returns a conclusion, not file
-dumps). It is **ephemeral** — the table guides the work and the PR discussion,
-then is discarded. Nothing is committed.
+## Rules
+
+- Classify every legacy behavior: each effect, guard, error path, empty or loading state, permission gate, revalidate or reload call, reset-on-close, derived label or count, and pagination trigger.
+- Each one is **Migrated** (points at a state, transition, context field or prop in the new code), **Deliberately changed** (names the new behavior and why) or **Deferred** (not implemented; say whether a ticket tracks it).
+- A Deferred item tracked only by a `// TODO` is a regression at risk of shipping. Surface it as a tracked item.
+- Run it as a read-only subagent that returns a conclusion, not file dumps. The table guides the work and the PR discussion; nothing is committed.
 
 ## The subagent prompt
 
-Fill in the two file lists and hand this to an Explore agent:
+Fill in the two file lists and hand this to a read-only agent:
 
 ```
 In the repo at <repo-root>, audit a Mosaic migration for behavioral parity.
@@ -38,39 +38,18 @@ severe gaps first, then a short list of any Deferred items that are tracked only
 by a `// TODO` (these are the regressions at risk of shipping).
 ```
 
-## Output table format
+To find the legacy behaviors, start from the search in [Migration → Phase 1](migration.md#phase-1-inventory-the-legacy-behavior).
+
+## Output
 
 | Legacy behavior                                         | Layer it should live in | Status                      | Evidence (legacy → new)                                                    |
 | ------------------------------------------------------- | ----------------------- | --------------------------- | -------------------------------------------------------------------------- |
 | Per-field error mapping via `handleError(err, [field])` | controller/view         | Deferred (only a `// TODO`) | `AddDomainForm.tsx` handleError → `*.controller.tsx` single `errorMessage` |
 
-`Status` is one of: **Migrated** · **Deliberately changed** · **Deferred**.
+## What it catches
 
-## Grep list (shared with Phase 1)
+An audit of the organization domains section, migrated before Mosaic was its own package (that code is not in `packages/mosaic`), found three dropped behaviors, each tracked only by a `// TODO` and none failing a test or typecheck:
 
-```bash
-rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useInView' \
-  packages/ui/src/components/<Feature>/
-```
-
-## Worked example — `OrganizationProfileDomainsSection`
-
-A historical example: the domains section was migrated before Mosaic became
-its own package, and that code is not in `packages/mosaic` today. The audit
-run against the finished migration surfaced three behaviors
-that the model/controller/view split dropped, each tracked only by a buried
-`// TODO` (i.e. invisible at review time):
-
-1. **Per-field error mapping.** Legacy `handleError(err, [field])` mapped errors
-   to the specific field; the new add/verify flow collapses every failure to one
-   `errorMessage` string in the controller's machine context.
-2. **Step-up reverification on domain delete.** Legacy `RemoveDomainForm` left a
-   TODO to wrap `domain.delete()` in `useReverification`; the new remove flow
-   omits the step-up entirely.
-3. **Pending-invitations callout.** Legacy `useCalloutLabel` computed a count
-   from `totalPendingInvitations + totalPendingSuggestions`; the new view
-   receives the counts but never renders the callout.
-
-None of these failed a test or a typecheck. They are exactly the class of
-regression this audit exists to catch — surface them as tracked Deferred items,
-not `// TODO`s.
+1. Per-field error mapping: every add or verify failure collapsed to one `errorMessage`.
+2. Step-up reverification on domain delete was omitted.
+3. The pending-invitations callout count reached the view but was never rendered.

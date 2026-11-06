@@ -20,6 +20,6 @@ The skill is `.claude/skills/verify-clerk-expo/`, and the tests and the CLI that
 
 ## References
 
-- For the Mosaic design system (tokens, StyleX authoring, `MosaicProvider`, the model/controller/view split, migration from the existing system), see `packages/mosaic/ARCHITECTURE.md`. Work under `packages/mosaic` also follows `packages/mosaic/AGENTS.md`.
+- For the Mosaic design system (tokens, StyleX authoring, `MosaicProvider`, the model/controller/view split, migration from the existing system), start at `packages/mosaic/AGENTS.md`, which routes each task to its guide in `packages/mosaic/docs/`.
 - For dev setup, testing, JSDoc/Typedoc, publishing, changesets, and commit conventions, see `docs/CONTRIBUTING.md`.
 - For working in the repo day to day (setup ordering and footguns, the package map, dev-loop recipes, and the breaking-change checklist), the `clerk-monorepo` Claude Code skill in `.claude/skills/clerk-monorepo/` restates these rules in actionable form.

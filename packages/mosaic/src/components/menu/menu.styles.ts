@@ -95,14 +95,14 @@ export const item = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
       default: colorVars['--cl-color-foreground-secondary'],
       ':is([data-active])': colorVars['--cl-color-foreground'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-foreground'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
@@ -135,7 +135,7 @@ export const item = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-negative-alpha-200'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-negative-alpha-200'],
       },
     },
     color: colorVars['--cl-color-negative'],

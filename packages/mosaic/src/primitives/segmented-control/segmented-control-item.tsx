@@ -6,8 +6,8 @@ import { useCompositeItem } from '../hooks/use-composite';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useSegmentedControlContext } from './segmented-control-context';
 
-export interface SegmentedControlItemProps extends ComponentProps<'button'> {
-  value: string;
+export interface SegmentedControlItemProps extends Omit<ComponentProps<'button'>, 'value'> {
+  value: unknown;
   disabled?: boolean;
 }
 
@@ -19,7 +19,7 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
     const compositeItem = useCompositeItem(itemValue);
 
     const disabled = groupDisabled || !!disabledProp;
-    const isSelected = selectedValue === itemValue;
+    const isSelected = Object.is(selectedValue, itemValue);
 
     const state = {
       selected: isSelected,
@@ -31,7 +31,7 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
       type: 'button',
       'aria-checked': isSelected,
       'aria-disabled': disabled || undefined,
-      value: itemValue,
+      value: typeof itemValue === 'string' ? itemValue : undefined,
       onClick: () => {
         if (!disabled) {
           select(itemValue);

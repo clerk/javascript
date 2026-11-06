@@ -4,35 +4,29 @@ import type { ReactElement } from 'react';
 
 import type { SwitcherProps } from '../switcher/switcher';
 import { Switcher } from '../switcher/switcher';
-import type { SwitcherMode } from '../switcher/switcher.types';
 import type { SwitcherTriggerVariant } from '../switcher/switcher.view';
 
-/**
- * Which switchers the surface carries. `combined` is both; `user` is an account switcher that never
- * shows an organization, even when one is active.
- */
-export type UserButtonMode = Exclude<SwitcherMode, 'organization'>;
-
-/** Which switchers the surface carries. */
-export interface UserButtonModeProps {
+/** What the menu lists, and how much its trigger carries. */
+export interface UserButtonMenuProps {
   /**
-   * Which switchers the popup carries: both, or accounts alone.
+   * Whether the menu lists organizations beside accounts. `false` lists accounts alone, and never shows
+   * an organization, even when one is active. The profile's shape is set by `MosaicProvider`'s `profile`.
    *
-   * @default 'combined'
+   * @default true
    */
-  mode?: UserButtonMode;
+  combined?: boolean;
   /**
-   * How much the labelled trigger carries in `combined` mode: `full` badges the active organization
-   * with the account at a larger size, `condensed` shows the lead's avatar alone. `user` mode is
-   * always `condensed`.
+   * How much the labelled trigger carries when `combined`: `full` badges the active organization with
+   * the account at a larger size, `condensed` shows the lead's avatar alone. Otherwise it is always
+   * `condensed`.
    *
    * @default 'full'
    */
   triggerVariant?: SwitcherTriggerVariant;
 }
 
-/** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profiles it opens. */
-export type UserButtonProps = SwitcherProps & UserButtonModeProps;
+/** Everything `<UserButton />` takes: trigger content, and the app's own menu rows. */
+export type UserButtonProps = SwitcherProps & UserButtonMenuProps;
 
 /**
  * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an account,
@@ -50,9 +44,9 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  * ```
  *
  * @example
- * `mode` narrows the menu to the account switcher.
+ * `combined={false}` narrows the menu to the account switcher.
  * ```tsx
- * <UserButton mode='user' />
+ * <UserButton combined={false} />
  * ```
  *
  * @example
@@ -62,13 +56,12 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  * ```
  *
  * @example
- * Passing a URL routes to a page of your own instead of opening Clerk's modal; that is the whole
- * opt-in. `afterSelectOrganizationUrl` is where switching organization lands, and takes a `:param`
- * template, a plain path, or a function. `afterSwitchSessionUrl` is where switching account lands.
+ * `afterSelectOrganizationUrl` is where switching organization lands, and takes a `:param` template,
+ * a plain path, or a function. `afterSwitchSessionUrl` is where switching account lands. Set
+ * `userProfileUrl` and `organizationProfileUrl` on `MosaicProvider`'s `profile` to route Settings to
+ * pages of your own.
  * ```tsx
  * <UserButton
- *   userProfileUrl='/account'
- *   organizationProfileUrl='/settings/organization'
  *   afterSelectOrganizationUrl='/orgs/:slug'
  *   afterSwitchSessionUrl='/dashboard'
  * />
@@ -82,18 +75,10 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  * ```
  *
  * @example
- * `customPages` adds your own pages to either profile this button opens; `customMenuItems` adds your
- * own rows beside Settings, each one either an `onClick` action or an `href` link.
+ * `customMenuItems` adds your own rows beside Settings, each one either an `onClick` action or an
+ * `href` link. The profile's own pages are set on `MosaicProvider`'s `profile`.
  * ```tsx
  * <UserButton
- *   userProfileProps={{
- *     customPages: [{ path: 'usage', label: 'Usage', icon: <ChartIcon />, content: <UsagePage /> }],
- *     pageOrder: ['account', 'usage', 'security'],
- *   }}
- *   organizationProfileProps={{
- *     customPages: [{ path: 'audit', label: 'Audit log', icon: <ListIcon />, content: <AuditPage /> }],
- *     pageOrder: ['general', 'members', 'audit'],
- *   }}
  *   customMenuItems={[
  *     { id: 'docs', label: 'Documentation', icon: <BookIcon />, href: 'https://example.com/docs' },
  *     { id: 'support', label: 'Contact support', icon: <ChatIcon />, onClick: () => openSupportChat() },
@@ -102,8 +87,7 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  * />
  * ```
  */
-export function UserButton({ mode, triggerVariant = 'full', ...props }: UserButtonProps = {}): ReactElement {
-  const combined = mode !== 'user';
+export function UserButton({ combined = true, triggerVariant = 'full', ...props }: UserButtonProps = {}): ReactElement {
   return (
     <Switcher
       {...props}

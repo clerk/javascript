@@ -47,7 +47,10 @@ export const styles = stylex.create({
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
       ':checked': durationVars['--cl-duration-instant'],
-      ':hover': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'background-color, border-color',
     transitionTimingFunction: 'linear',

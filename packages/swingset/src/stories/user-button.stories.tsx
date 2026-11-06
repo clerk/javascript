@@ -301,7 +301,7 @@ function FixtureUserProfile({ options }: UserProfileModalContentProps) {
       pages={pages}
       customPages={options?.customPages}
       pageOrder={options?.pageOrder}
-      organization={options?.mode === 'user' ? undefined : { pages: organization.pages }}
+      organization={options?.combined === false ? undefined : { pages: organization.pages }}
       onPageChange={setActivePage}
     />
   );
@@ -364,7 +364,7 @@ function ProfileModalTriggers() {
       </Button>
       <Button
         variant='outline'
-        onClick={() => userProfile.open({ mode: 'user', customPages: [integrationsPage] })}
+        onClick={() => userProfile.open({ combined: false, customPages: [integrationsPage] })}
         onPointerEnter={userProfile.preload}
       >
         Open account only

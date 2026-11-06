@@ -137,23 +137,10 @@ export default defineConfig({
         '@stylexjs/valid-styles': 'error',
         'eslint-compat/no-restricted-syntax': [
           'error',
-          {
-            selector: "Property > Literal.key[value='&:hover']",
-            message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
-          },
           noLeakedConditionalJsx,
           {
             selector: "JSXOpeningElement[name.name='form']",
             message: 'Use `Form` from mosaic/primitives/form, which turns off the browser validation popup.',
-          },
-          {
-            selector: "Property > Literal.key[value='@media (hover: hover)']",
-            message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
-          },
-          {
-            selector: "Property > Literal.key[value='@media (prefers-reduced-motion: no-preference)']",
-            message:
-              "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
           },
           {
             selector:
@@ -188,7 +175,37 @@ export default defineConfig({
     {
       files: ['src/**/*.styles.ts'],
       rules: {
-        'eslint-compat/no-restricted-syntax': 'off',
+        'eslint-compat/no-restricted-syntax': [
+          'error',
+          {
+            selector: "Property[key.value=/:hover/]:not(Property[key.value='@media (hover: hover)'] Property)",
+            message:
+              "Put :hover inside '@media (hover: hover)' so it does not stick after a tap on touch devices (docs/stylex.md).",
+          },
+          {
+            selector: 'Property[key.value=/:hover/]:not([key.value=/:not\\([^)]*disabled/])',
+            message:
+              'Skip disabled controls in a :hover key, e.g. \':hover:not(:disabled, [data-disabled], [aria-disabled="true"])\'. Browsers still match :hover on disabled elements (docs/stylex.md).',
+          },
+          {
+            selector:
+              "Property[key.name='transitionProperty']:not(:has(Property[key.value=/prefers-reduced-motion: reduce/])) Literal[value=/(^|,)\\s*(transform|translate|scale|rotate|all)\\s*(,|$)/]:not(Property[key.value=/prefers-reduced-motion: no-preference/] Literal)",
+            message:
+              "A transition that moves something must drop the moving property under '@media (prefers-reduced-motion: reduce)' (docs/motion.md).",
+          },
+          {
+            selector:
+              "Property[key.name='transitionProperty'] Property[key.value=/prefers-reduced-motion: reduce/] Literal[value=/(^|,)\\s*(transform|translate|scale|rotate|all)\\s*(,|$)/]",
+            message:
+              "A transition that moves something must drop the moving property under '@media (prefers-reduced-motion: reduce)' (docs/motion.md).",
+          },
+          {
+            selector:
+              'Property[key.name=/^(transform|translate|scale|rotate)$/]:not(:has(Property[key.value=/prefers-reduced-motion: reduce/])) Property[key.value=/data-(starting|ending)-style/]:not(Property[key.value=/prefers-reduced-motion: no-preference/] Property)',
+            message:
+              "An enter or exit offset must restate the enter and exit values inside '@media (prefers-reduced-motion: reduce)', or it snaps there instead (docs/motion.md).",
+          },
+        ],
       },
     },
     {
