@@ -264,3 +264,26 @@ describe('usePendingAction', () => {
     expect(result.current.errorKey).toBeUndefined();
   });
 });
+
+it.each(['resolve', 'reject'] as const)('ignores a late %s after unmount', async outcome => {
+  const pending = deferred<void>();
+  const { result, unmount } = renderHook(() => usePendingAction());
+  let signal: AbortSignal | undefined;
+  let run: Promise<boolean> | undefined;
+  act(() => {
+    run = result.current.run('a', current => {
+      signal = current;
+      return pending.promise;
+    });
+  });
+  unmount();
+  expect(signal?.aborted).toBe(true);
+  await act(async () => {
+    if (outcome === 'resolve') {
+      pending.resolve();
+    } else {
+      pending.reject(blocked());
+    }
+    expect(await run).toBe(false);
+  });
+});

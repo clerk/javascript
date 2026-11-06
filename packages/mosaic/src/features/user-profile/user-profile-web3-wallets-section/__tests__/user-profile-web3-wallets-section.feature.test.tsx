@@ -1064,8 +1064,4 @@ describe('Web3 wallets', () => {
 
   // TODO: Share Solana discovery and filtering only after verifying parity with the legacy UI.
   // TODO: Share identification sorting only after verifying parity for legacy email, phone, and wallet sections.
-  // TODO: Add recovery for abandoned MetaMask connections. In Brave, closing the locked wallet prompt
-  // left wallet_requestPermissions pending. Refresh cleared Clerk's error, but a new connection returned -32002.
-  // Clerk cancellation must release the UI and ignore late responses without claiming to cancel the wallet request.
-  // The injected MetaMask API exposes no supported method to cancel that request, and clerk_go cannot clear it.
 });

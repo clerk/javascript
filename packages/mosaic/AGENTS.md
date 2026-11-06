@@ -66,7 +66,7 @@ A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is th
 
 Most problems a feature hits already have a shared answer. Find the line for your problem and use it. Do not write a local version, even a small one. A PR that adds, renames or changes the signature of a shared helper in `src/hooks/`, `src/utils/`, `src/blocks/`, `src/components/form/` or `src/machine/` updates this list, and any doc that names it, in the same PR.
 
-- An async action from a button or row: pending, an error, one lock → `usePendingAction` (`src/hooks/`)
+- An async action from a button or row: pending, an error, one lock, unmount cancellation → `usePendingAction` (`src/hooks/`)
 - A form: values, validation, submit, field errors, success UI → `useForm` (`src/components/form/`), with `validateAsync` for server checks and `onSuccess` for mounted success UI
 - A `<form>` element, without the browser's validation popup → `Form` (`src/primitives/form/`)
 - A model save whose Clerk errors should land on form fields → `save` (`src/utils/errors.ts`) in the model, or reject with `FormSubmitError`
