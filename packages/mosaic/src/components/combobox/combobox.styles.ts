@@ -136,6 +136,13 @@ export const trigger = stylex.create({
     },
   },
   clear: {
+    color: {
+      default: colorVars['--cl-color-input-placeholder'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
+      },
+    },
     marginInlineEnd: `calc(-1 * ${space['2']})`,
     width: space['5.5'],
   },
