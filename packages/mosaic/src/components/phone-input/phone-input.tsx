@@ -64,9 +64,9 @@ export interface PhoneInputProps extends Omit<
   onCountryChange?: (country: CountryIso) => void;
   size?: 'sm' | 'md' | 'lg';
   /** The country trigger's accessible name, with `{country}` filled in. */
-  countryTriggerLabel?: string;
-  countryPopupLabel?: string;
-  countrySearchLabel?: string;
+  countryTriggerLabel: string;
+  countryPopupLabel: string;
+  countrySearchLabel: string;
   countrySearchPlaceholder?: string;
   noResultsMessage?: string;
 }
@@ -80,9 +80,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     defaultCountry,
     onCountryChange,
     size = 'md',
-    countryTriggerLabel = 'Country, {country}',
-    countryPopupLabel = 'Choose a country',
-    countrySearchLabel = 'Search countries',
+    countryTriggerLabel,
+    countryPopupLabel,
+    countrySearchLabel,
     countrySearchPlaceholder = 'Search',
     noResultsMessage = 'No countries found',
     disabled: disabledProp,
