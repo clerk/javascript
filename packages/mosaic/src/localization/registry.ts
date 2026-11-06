@@ -15,6 +15,7 @@ import { organizationProfileProfileSectionMessages } from '../features/organizat
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { signInMessages } from '../features/sign-in/sign-in.messages';
+import { taskChooseOrganizationMessages } from '../features/task-choose-organization/task-choose-organization.messages';
 import { taskSetupMfaMessages } from '../features/task-setup-mfa/task-setup-mfa.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
@@ -79,6 +80,7 @@ export const mosaicMessages = {
   apiKeys: apiKeysTableMessages,
   createOrganization: createOrganizationMessages,
   organizationList: organizationListMessages,
+  taskChooseOrganization: taskChooseOrganizationMessages,
   reverification: reverificationMessages,
   profile: profileMessages,
   form: formMessages,

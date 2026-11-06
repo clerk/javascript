@@ -151,6 +151,12 @@ import {
   meta as itemMeta,
 } from '../stories/item.stories';
 import {
+  External as LinkExternal,
+  ExternalWrapping as LinkExternalWrapping,
+  meta as linkMeta,
+  Primary as LinkPrimary,
+} from '../stories/link.stories';
+import {
   Catalog as LocalizationCatalog,
   CatalogWithOverrides as LocalizationCatalogWithOverrides,
   Fallback as LocalizationFallback,
@@ -389,6 +395,16 @@ import {
   Validation as TagInputComponentValidation,
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
+import {
+  Default as TaskChooseOrganizationDefault,
+  Empty as TaskChooseOrganizationEmpty,
+  Loading as TaskChooseOrganizationLoading,
+  meta as taskChooseOrganizationMeta,
+  Unavailable as TaskChooseOrganizationUnavailable,
+  WithDefaults as TaskChooseOrganizationWithDefaults,
+  WithError as TaskChooseOrganizationWithError,
+  WithoutCreate as TaskChooseOrganizationWithoutCreate,
+} from '../stories/task-choose-organization.stories';
 import {
   AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
   Default as TaskSetupMfaDefault,
@@ -662,6 +678,13 @@ const skeletonModule: StoryModule = {
   NotShown: SkeletonNotShown,
 };
 
+const linkModule: StoryModule = {
+  meta: linkMeta,
+  Primary: LinkPrimary,
+  External: LinkExternal,
+  ExternalWrapping: LinkExternalWrapping,
+};
+
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
@@ -821,6 +844,17 @@ const organizationListModule: StoryModule = {
   Loading: OrganizationListLoading,
   Empty: OrganizationListEmpty,
   WithError: OrganizationListWithError,
+};
+
+const taskChooseOrganizationModule: StoryModule = {
+  meta: taskChooseOrganizationMeta,
+  Default: TaskChooseOrganizationDefault,
+  WithoutCreate: TaskChooseOrganizationWithoutCreate,
+  Empty: TaskChooseOrganizationEmpty,
+  WithDefaults: TaskChooseOrganizationWithDefaults,
+  Unavailable: TaskChooseOrganizationUnavailable,
+  Loading: TaskChooseOrganizationLoading,
+  WithError: TaskChooseOrganizationWithError,
 };
 
 const headingModule: StoryModule = {
@@ -1231,6 +1265,7 @@ export const registry: StoryModule[] = [
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
+  taskChooseOrganizationModule,
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
@@ -1250,6 +1285,7 @@ export const registry: StoryModule[] = [
   skeletonModule,
   bannerModule,
   buttonModule,
+  linkModule,
   cardComponentModule,
   checkboxModule,
   comboboxModule,

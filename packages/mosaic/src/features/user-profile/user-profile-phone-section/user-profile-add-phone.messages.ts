@@ -6,6 +6,11 @@ export const userProfileAddPhoneMessages = {
     label: 'Phone',
     submit: 'Send code',
     pending: 'Sending code',
+    selectedCountry: 'Country, {country}',
+    chooseCountry: 'Choose a country',
+    searchCountries: 'Search countries',
+    countrySearchPlaceholder: 'Search',
+    noCountries: 'No countries found',
   },
   verify: {
     title: 'Verify your phone number',
