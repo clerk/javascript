@@ -3,7 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, VERIFICATION_CODE, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  VERIFICATION_CODE,
+  worker,
+} from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -601,5 +608,81 @@ describe('User profile MFA', () => {
     await user.type(screen.getByRole('textbox', { name: 'Verification code' }), VERIFICATION_CODE);
     expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.phoneUpdates).toEqual([{ id: 'phone_1', reserved: true, default: undefined }]);
+  });
+});
+
+describe('User profile MFA: closing while an action runs', () => {
+  async function typeAuthenticatorCode(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    const attempt = holdRequests('post', '/v1/me/totp/attempt_verification');
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    await waitFor(() => expect(attempt.requests).toHaveLength(1));
+    return attempt;
+  }
+
+  function settled() {
+    return act(() => new Promise(resolve => setTimeout(resolve, 50)));
+  }
+
+  it('still shows the backup codes when the code is accepted after the dialog was closed', async () => {
+    await renderMfa();
+    const user = userEvent.setup();
+    const attempt = await typeAuthenticatorCode(user);
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    attempt.release();
+
+    expect(await screen.findByText('CODE0001')).toBeVisible();
+  });
+
+  it('stays closed and shows no error when the code fails after the dialog was closed', async () => {
+    await renderMfa();
+    const user = userEvent.setup();
+    const attempt = await typeAuthenticatorCode(user);
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    attempt.fail('action_blocked', 'Raw server sentence.');
+    await settled();
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('button', { name: /Authenticator app/ })).toBeVisible();
+    expect(dialog).not.toHaveTextContent(/Please try again later or contact support/);
+  });
+
+  it('cannot be reopened until the closed action finishes', async () => {
+    await renderMfa();
+    const user = userEvent.setup();
+    const attempt = await typeAuthenticatorCode(user);
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+    expect(screen.getByRole('button', { name: 'Add verification method' })).toBeDisabled();
+    attempt.fail('action_blocked', 'Raw server sentence.');
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toBeEnabled());
+  });
+
+  it('closes quietly when step-up verification is cancelled, and can start again', async () => {
+    const fapi = await renderMfa(undefined, undefined, { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/totp');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await screen.findByText('Enter your current password to continue');
+
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await settled();
+    expect(fapi.mfa.totpCreations).toBe(0);
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('button', { name: /Authenticator app/ })).toBeVisible();
+    expect(dialog).not.toHaveTextContent(/Please try again later or contact support/);
   });
 });
