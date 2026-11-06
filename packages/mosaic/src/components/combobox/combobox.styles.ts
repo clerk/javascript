@@ -11,6 +11,7 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
+import { inputGroupScope } from '../input-group/input-group.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const inset = space['1.5'];
@@ -120,5 +121,29 @@ export const styles = stylex.create({
     justifyContent: 'center',
     marginInlineStart: 'auto',
     width: space['4'],
+  },
+});
+
+export const trigger = stylex.create({
+  base: {
+    backgroundColor: 'transparent',
+    color: {
+      default: colorVars['--cl-color-input-placeholder'],
+      '@media (hover: hover)': {
+        default: null,
+        [stylex.when.ancestor(':hover', inputGroupScope)]: colorVars['--cl-color-foreground'],
+      },
+    },
+  },
+  clear: {
+    color: {
+      default: colorVars['--cl-color-input-placeholder'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
+      },
+    },
+    marginInlineEnd: `calc(-1 * ${space['2']})`,
+    width: space['5.5'],
   },
 });

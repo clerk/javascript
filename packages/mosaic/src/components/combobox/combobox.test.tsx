@@ -212,6 +212,15 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByRole('option', { name: 'Apple' }).closest('.cl-combobox-viewport')).toBe(viewport);
   });
 
+  it('opens its options when the input is clicked', async () => {
+    const user = userEvent.setup();
+    render(<FloatingCombobox />);
+
+    await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
+
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
   it('selects an option and restores its label to the input', async () => {
     const onValueChange = vi.fn();
     const user = userEvent.setup();
@@ -345,5 +354,75 @@ describe('Mosaic Combobox', () => {
     render(<Combobox.Empty>No matches</Combobox.Empty>);
 
     expect(screen.getByText('No matches')).toHaveClass('cl-combobox-empty');
+  });
+
+  function ClearableCombobox(props?: { onValueChange?: (value: string | null) => void }) {
+    return (
+      <Combobox.Root
+        defaultValue='apple'
+        defaultInputValue='Apple'
+        onValueChange={props?.onValueChange}
+      >
+        <InputGroup.Root>
+          <Combobox.Input aria-label='Fruit' />
+          <InputGroup.End>
+            <Combobox.Clear />
+            <Combobox.Trigger aria-label='Toggle fruit options' />
+          </InputGroup.End>
+        </InputGroup.Root>
+        <Combobox.Popup>
+          <Combobox.Option
+            value='apple'
+            label='Apple'
+          >
+            Apple
+          </Combobox.Option>
+        </Combobox.Popup>
+      </Combobox.Root>
+    );
+  }
+
+  it('clears the input and selection from the Clear button and keeps focus on the input', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<ClearableCombobox onValueChange={onValueChange} />);
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+
+    expect(onValueChange).toHaveBeenCalledWith(null);
+    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveValue('');
+    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
+  });
+
+  it('renders Clear only while there is an input value or a selection', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <InputGroup.Root>
+          <Combobox.Input aria-label='Fruit' />
+          <InputGroup.End>
+            <Combobox.Clear />
+          </InputGroup.End>
+        </InputGroup.Root>
+      </Combobox.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+    await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
+  });
+
+  it('keeps the trigger toggling the list with its own name while there is text', async () => {
+    const user = userEvent.setup();
+    render(<ClearableCombobox />);
+
+    const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 });
