@@ -18,7 +18,7 @@ export interface UserProfileEnterpriseAccountsControllerOptions {
 export interface UserProfileEnterpriseAccountsController {
   accounts: UserProfileEnterpriseAccount[];
   connections: UserProfileEnterpriseConnection[];
-  pendingId: string | undefined;
+  isDisabled: boolean;
   onConnect: (connectionId: string) => void;
   connectReverification: ReverificationController;
 }
@@ -34,10 +34,12 @@ export function useUserProfileEnterpriseAccountsController({
 
   return {
     accounts,
-    connections: connections.map(connection =>
-      actions.errorKey === connection.id ? { ...connection, connectError: actions.error } : connection,
-    ),
-    pendingId: actions.pendingKey,
+    connections: connections.map(connection => ({
+      ...connection,
+      isPending: actions.pendingKey === connection.id,
+      connectError: actions.errorKey === connection.id ? actions.error : undefined,
+    })),
+    isDisabled: actions.isPending,
     onConnect: id =>
       void actions.run(id, async () => {
         if ((await onConnect(id)) === 'redirecting') {

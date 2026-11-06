@@ -11,7 +11,7 @@ import type {
 export interface UserProfileEnterpriseAccountsSectionViewProps {
   accounts: UserProfileEnterpriseAccount[];
   connections?: UserProfileEnterpriseConnection[];
-  pendingId?: string;
+  isDisabled?: boolean;
   onConnect?: (id: string) => void;
   connectReverification?: ReverificationController;
 }
@@ -19,7 +19,7 @@ export interface UserProfileEnterpriseAccountsSectionViewProps {
 export function UserProfileEnterpriseAccountsSectionView({
   accounts,
   connections = [],
-  pendingId,
+  isDisabled = false,
   onConnect,
   connectReverification,
 }: UserProfileEnterpriseAccountsSectionViewProps) {
@@ -49,8 +49,7 @@ export function UserProfileEnterpriseAccountsSectionView({
                     key={connection.id}
                     account={connection}
                     onConnect={onConnect}
-                    isPending={pendingId === connection.id}
-                    disabled={pendingId !== undefined}
+                    disabled={isDisabled}
                   />
                 ))
               : null}
