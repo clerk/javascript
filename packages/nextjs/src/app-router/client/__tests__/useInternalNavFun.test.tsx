@@ -194,4 +194,32 @@ describe('useInternalNavFun', () => {
 
     expect(routerNav).not.toHaveBeenCalled();
   });
+
+  it('navigates with the mounted instance when another instance renders but never commits', async () => {
+    const mountedRouterNav = vi.fn();
+    const uncommittedRouterNav = vi.fn();
+    const NeverResolves = React.lazy<React.ComponentType>(() => new Promise(() => {}));
+
+    render(
+      <>
+        <Harness routerNav={mountedRouterNav} />
+        <React.Suspense fallback={null}>
+          <Harness routerNav={uncommittedRouterNav} />
+          <NeverResolves />
+        </React.Suspense>
+      </>,
+    );
+
+    let promise!: Promise<void>;
+    act(() => {
+      promise = navigate('/dashboard');
+    });
+
+    await waitFor(() => {
+      expect(mountedRouterNav).toHaveBeenCalledWith('/dashboard');
+    });
+
+    expect(uncommittedRouterNav).not.toHaveBeenCalled();
+    await expect(promise).resolves.toBeUndefined();
+  });
 });
