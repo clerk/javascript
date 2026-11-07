@@ -23,12 +23,17 @@ type SecurityDirectorySyncSectionProps = {
   onConfigure: () => void;
 };
 
-type DirectorySyncStatus = 'unconfigured' | 'active' | 'inactive';
+type DirectorySyncStatus = 'unconfigured' | 'in_progress' | 'active' | 'inactive';
+type ConfiguredDirectorySyncStatus = Exclude<DirectorySyncStatus, 'unconfigured'>;
 
 const STATUS_BADGES: Record<
-  Exclude<DirectorySyncStatus, 'unconfigured'>,
+  ConfiguredDirectorySyncStatus,
   { colorScheme: 'primary' | 'success' | 'warning'; label: LocalizationKey }
 > = {
+  in_progress: {
+    colorScheme: 'primary',
+    label: localizationKeys('organizationProfile.securityPage.directorySyncSection.badge__inProgress'),
+  },
   active: {
     colorScheme: 'primary',
     label: localizationKeys('organizationProfile.securityPage.directorySyncSection.badge__active'),
@@ -69,7 +74,16 @@ export const SecurityDirectorySyncSection = ({
   const isLoading = isLoadingConnections || (Boolean(connection) && isLoadingDirectory);
   const error = connectionsError ?? directoryError;
 
-  const status: DirectorySyncStatus = directory ? (directory.enabled ? 'active' : 'inactive') : 'unconfigured';
+  // A pull directory (Google Workspace) exists before its credentials do and
+  // cannot be enabled until they are stored, so that outranks the enabled flag,
+  // as in the SSO section. Push providers get `null` here: not applicable.
+  const status: DirectorySyncStatus = !directory
+    ? 'unconfigured'
+    : directory.credentialsConfigured === false
+      ? 'in_progress'
+      : directory.enabled
+        ? 'active'
+        : 'inactive';
 
   return (
     <ProfileSection.Root
@@ -123,7 +137,7 @@ export const SecurityDirectorySyncSection = ({
       ) : (
         <CardStateProvider>
           <ConfiguredContent
-            isActive={status === 'active'}
+            status={status}
             updateEnabled={enabled => updateDirectorySync({ enabled })}
             onDelete={deleteDirectorySync}
             organizationName={organizationName}
@@ -137,7 +151,7 @@ export const SecurityDirectorySyncSection = ({
 };
 
 type ConfiguredContentProps = {
-  isActive: boolean;
+  status: ConfiguredDirectorySyncStatus;
   updateEnabled: (enabled: boolean) => Promise<unknown>;
   onDelete: () => Promise<unknown>;
   organizationName: string;
@@ -146,7 +160,7 @@ type ConfiguredContentProps = {
 };
 
 const ConfiguredContent = ({
-  isActive,
+  status,
   updateEnabled,
   onDelete,
   organizationName,
@@ -173,7 +187,7 @@ const ConfiguredContent = ({
     }
   };
 
-  const badge = STATUS_BADGES[isActive ? 'active' : 'inactive'];
+  const badge = STATUS_BADGES[status];
 
   return (
     <Col gap={4}>
@@ -194,19 +208,30 @@ const ConfiguredContent = ({
               label: localizationKeys('organizationProfile.securityPage.directorySyncSection.menuAction__edit'),
               onClick: onConfigure,
             },
-            isActive
-              ? {
-                  label: localizationKeys(
-                    'organizationProfile.securityPage.directorySyncSection.menuAction__deactivate',
-                  ),
-                  isDisabled: card.isLoading,
-                  onClick: () => void handleUpdateEnabled(false),
-                }
-              : {
-                  label: localizationKeys('organizationProfile.securityPage.directorySyncSection.menuAction__activate'),
-                  isDisabled: card.isLoading,
-                  onClick: () => void handleUpdateEnabled(true),
-                },
+            // Activate is only offered where it can succeed: the server refuses
+            // it for an in-progress directory until the credentials are stored.
+            ...(status === 'active'
+              ? [
+                  {
+                    label: localizationKeys(
+                      'organizationProfile.securityPage.directorySyncSection.menuAction__deactivate',
+                    ),
+                    isDisabled: card.isLoading,
+                    onClick: () => void handleUpdateEnabled(false),
+                  },
+                ]
+              : []),
+            ...(status === 'inactive'
+              ? [
+                  {
+                    label: localizationKeys(
+                      'organizationProfile.securityPage.directorySyncSection.menuAction__activate',
+                    ),
+                    isDisabled: card.isLoading,
+                    onClick: () => void handleUpdateEnabled(true),
+                  },
+                ]
+              : []),
             {
               label: localizationKeys('organizationProfile.securityPage.directorySyncSection.menuAction__remove'),
               isDestructive: true,
@@ -215,6 +240,19 @@ const ConfiguredContent = ({
           ]}
         />
       </Flex>
+
+      {status === 'in_progress' && (
+        <Col sx={{ width: '100%' }}>
+          <ProfileSection.ArrowButton
+            id='directorySync'
+            onClick={onConfigure}
+            localizationKey={localizationKeys(
+              'organizationProfile.securityPage.directorySyncSection.primaryButton__continueConfiguration',
+            )}
+          />
+          <Description sx={t => ({ paddingInlineStart: `calc(${t.space.$2x5} + ${t.sizes.$4} + ${t.space.$2})` })} />
+        </Col>
+      )}
 
       <Card.Alert>{card.error}</Card.Alert>
 
