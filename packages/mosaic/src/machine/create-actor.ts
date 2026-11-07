@@ -326,12 +326,11 @@ function runActor<
         takeTransition(immediate, event);
         return true;
       }
-      const before = context;
-      applyContext(immediate.context);
       effects.push(...immediate.effects);
-      if (context === before) {
+      if (!changes(context, immediate.context)) {
         return false;
       }
+      applyContext(immediate.context);
     }
   }
 
@@ -559,4 +558,13 @@ function isContextFn<TContext>(
 
 function isRouteEvent(event: EventObject): event is RouteEvent {
   return event.type === ROUTE && 'to' in event && typeof event.to === 'string' && event.to.startsWith('#');
+}
+
+function changes<TContext extends object>(context: TContext, patch: Partial<TContext> | undefined): boolean {
+  if (patch === undefined) {
+    return false;
+  }
+  const before = Object.values(context);
+  const after = Object.values({ ...context, ...patch });
+  return after.length !== before.length || after.some((value, index) => !Object.is(value, before[index]));
 }

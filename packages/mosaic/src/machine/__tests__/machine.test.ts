@@ -386,6 +386,28 @@ describe('createActor — always', () => {
     expect(createActor(machine).start().getSnapshot()).toMatchObject({ value: 'done', context: { count: 3 } });
   });
 
+  it('stops checking always once its context result no longer changes context', () => {
+    let checks = 0;
+    const machine = setup<{ count: number }, { type: 'never' }>().createMachine({
+      initial: 'count',
+      context: { count: 0 },
+      states: {
+        count: {
+          always: ({ context }) => {
+            checks += 1;
+            if (checks > 10) {
+              throw new Error('always is still being checked');
+            }
+            return { context: { count: Math.min(context.count + 1, 2) } };
+          },
+        },
+      },
+    });
+
+    expect(createActor(machine).start().getSnapshot()).toMatchObject({ value: 'count', context: { count: 2 } });
+    expect(checks).toBe(3);
+  });
+
   it('notifies once for an event whose always transition follows', () => {
     const machine = setup<{ ready: boolean }, { type: 'READY' }>().createMachine({
       initial: 'check',
