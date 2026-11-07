@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
 import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../../__tests__/async';
 import {
   demandReverificationOnce,
   type FakeFapiSeed,
@@ -26,6 +27,90 @@ import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfileSolanaWalletView } from '../user-profile-solana-wallet.view';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section';
 import { registerWallets, signedInWallets, web3Environment } from './user-profile-web3-wallets.fixtures';
+
+const generic = 'Something went wrong. Please try again.';
+const signatureRejected = 'You have rejected the signature request.';
+
+async function renderWallets(wallets: UserJSON['web3_wallets'] = []) {
+  const fapi = serveFapi(
+    signedInWallets(['web3_metamask_signature', 'web3_solana_signature'], { web3_wallets: wallets }),
+  );
+  return { fapi, ...(await renderWithClerk(<UserProfileWeb3WalletsSection />)) };
+}
+
+function unverifiedWallet(
+  id: string,
+  address: string,
+  strategy: 'web3_metamask_signature' | 'web3_solana_signature' | null,
+) {
+  const wallet = fapiWeb3Wallet({
+    id,
+    web3_wallet: address,
+    verification: fapiVerification(strategy ?? 'web3_metamask_signature', { status: 'unverified' }),
+  });
+  if (strategy === null && wallet.verification) {
+    wallet.verification.strategy = null;
+  }
+  return wallet;
+}
+
+function rowOf(element: HTMLElement) {
+  const row = element.closest<HTMLElement>('.cl-section-row');
+  if (!row) {
+    throw new Error('The element is not inside a section row.');
+  }
+  return row;
+}
+
+function connectRow(provider: string) {
+  return rowOf(screen.getByRole('button', { name: `Connect ${provider}` }));
+}
+
+function addressRow(address: string) {
+  return rowOf(screen.getByTitle(address));
+}
+
+async function expectOnlyError(container: HTMLElement, message: string) {
+  await waitFor(() => expect(within(container).getByRole('alert')).toHaveTextContent(message));
+  const matching = screen.getAllByRole('alert').filter(alert => alert.textContent?.includes(message));
+  expect(matching).toHaveLength(1);
+}
+
+function stubEthereum(accounts: () => Promise<string[]>, signature: () => Promise<string>) {
+  const request = vi.fn(({ method }: { method: string }) => {
+    return method === 'eth_requestAccounts' ? accounts() : signature();
+  });
+  vi.stubGlobal('ethereum', { request });
+  return request;
+}
+
+function signingSolanaWallet(
+  name: string,
+  address: string,
+  signMessage: () => Promise<Array<{ signature: Uint8Array }>>,
+  connect?: () => Promise<{ accounts: unknown[] }>,
+) {
+  const account = {
+    address,
+    publicKey: new Uint8Array([1, 2, 3]),
+    chains: ['solana:mainnet' as const],
+    features: ['solana:signMessage' as const],
+  };
+  return {
+    version: '1.0.0' as const,
+    name,
+    icon: 'data:image/svg+xml;base64,' as const,
+    chains: ['solana:mainnet' as const],
+    accounts: [account],
+    features: {
+      'standard:connect': {
+        version: '1.0.0' as const,
+        connect: connect ?? (() => Promise.resolve({ accounts: [account] })),
+      },
+      'solana:signMessage': { version: '1.0.0' as const, signMessage },
+    },
+  };
+}
 
 describe('Web3 wallets', () => {
   const walletFactors = ['web3_metamask_signature', 'web3_solana_signature'] as const;
@@ -1092,4 +1177,287 @@ describe('Web3 wallets', () => {
   // left wallet_requestPermissions pending. Refresh cleared Clerk's error, but a new connection returned -32002.
   // Clerk cancellation must release the UI and ignore late responses without claiming to cancel the wallet request.
   // The injected MetaMask API exposes no supported method to cancel that request, and clerk_go cannot clear it.
+});
+
+describe('Web3 wallet pending and error placement', () => {
+  describe('connecting an EVM wallet', () => {
+    it('keeps a failure before the account is known on the provider row', async () => {
+      const selection = deferred<string[]>();
+      stubEthereum(
+        () => selection.promise,
+        () => Promise.resolve('signature'),
+      );
+      await renderWallets();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+      expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeDisabled();
+
+      selection.reject(new Error('User rejected the request.'));
+      await expectOnlyError(connectRow('MetaMask'), generic);
+      expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
+    it('moves pending and a signature failure to the wallet it creates', async () => {
+      const signature = deferred<string>();
+      stubEthereum(
+        () => Promise.resolve(['0xabcd']),
+        () => signature.promise,
+      );
+      await renderWallets();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+      await waitFor(() => expect(screen.getByText('Verifying')).toBeInTheDocument());
+      expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
+      expect(rowOf(screen.getByText('Verifying'))).toBe(rowOf(screen.getByRole('button', { name: 'Manage MetaMask' })));
+
+      signature.reject(new Error('Signature rejected'));
+      await expectOnlyError(rowOf(screen.getByRole('button', { name: 'Manage MetaMask' })), generic);
+      expect(screen.getByText('Unverified')).toBeInTheDocument();
+    });
+
+    it('moves pending and a signature failure to the saved wallet the account matches', async () => {
+      const signature = deferred<string>();
+      stubEthereum(
+        () => Promise.resolve(['0xAbCd']),
+        () => signature.promise,
+      );
+      const { fapi } = await renderWallets([unverifiedWallet('saved', '0xabcd', null)]);
+      const creation = holdRequests('post', '/v1/me/web3_wallets');
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+      await waitFor(() => expect(within(addressRow('0xabcd')).getByText('Verifying')).toBeInTheDocument());
+      expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
+
+      signature.reject(new Error('Signature rejected'));
+      await expectOnlyError(addressRow('0xabcd'), generic);
+      expect(within(addressRow('0xabcd')).getByText('Unverified')).toBeInTheDocument();
+      expect(creation.requests).toHaveLength(0);
+      expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['saved']);
+      creation.release();
+    });
+
+    it('shows a failure on the section once its provider row is gone', async () => {
+      const selection = deferred<string[]>();
+      stubEthereum(
+        () => selection.promise,
+        () => Promise.resolve('signature'),
+      );
+      const { clerk, fapi } = await renderWallets();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+      const session = fapi.client.sessions[0];
+      if (!session) {
+        throw new Error('Missing session');
+      }
+      session.user.web3_wallets = [unverifiedWallet('published', '0x1234', 'web3_metamask_signature')];
+      await act(() => clerk.user?.reload());
+      expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
+
+      selection.resolve(['0xabcd']);
+      const message = 'This wallet provider is unavailable.';
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
+      expect(screen.getByRole('alert').closest('.cl-section-row')).toBeNull();
+      expect(screen.getAllByText(message)).toHaveLength(1);
+    });
+  });
+
+  describe('connecting a Solana wallet', () => {
+    it('keeps a failure before the account is known in the picker, then on the provider row once closed', async () => {
+      const unregister = registerWallets(
+        signingSolanaWallet(
+          'Test Solana',
+          'SolanaAbCd',
+          () => Promise.resolve([{ signature: new Uint8Array([4, 5, 6]) }]),
+          () => Promise.reject(new Error('Wallet rejected connection')),
+        ),
+      );
+      try {
+        await renderWallets();
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+        await user.click(await screen.findByRole('button', { name: 'Test Solana' }));
+        await expectOnlyError(screen.getByRole('dialog'), generic);
+        expect(screen.getByRole('button', { name: 'Test Solana' })).toBeEnabled();
+
+        await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' }));
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        await expectOnlyError(connectRow('Solana'), generic);
+      } finally {
+        unregister();
+      }
+    });
+
+    it('refuses to close the picker while the chosen wallet is connecting', async () => {
+      const unregister = registerWallets(
+        signingSolanaWallet('Test Solana', 'SolanaAbCd', () =>
+          Promise.resolve([{ signature: new Uint8Array([4, 5, 6]) }]),
+        ),
+      );
+      try {
+        await renderWallets();
+        const creation = holdRequests('post', '/v1/me/web3_wallets');
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+        await user.click(await screen.findByRole('button', { name: 'Test Solana' }));
+        await waitFor(() => expect(creation.requests).toHaveLength(1));
+        const dialog = screen.getByRole('dialog');
+        expect(within(dialog).getByRole('button', { name: 'Test Solana' })).toHaveAttribute('aria-busy', 'true');
+        expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled();
+        await user.keyboard('{Escape}');
+        expect(dialog).toBeVisible();
+
+        creation.fail('wallet_creation_failed');
+        await expectOnlyError(dialog, 'wallet_creation_failed');
+        expect(within(connectRow('Solana')).queryByRole('alert')).toBeNull();
+      } finally {
+        unregister();
+      }
+    });
+
+    it('closes the picker and moves a signature failure to the wallet it creates', async () => {
+      const signature = deferred<Array<{ signature: Uint8Array }>>();
+      const unregister = registerWallets(signingSolanaWallet('Test Solana', 'SolanaAbCd', () => signature.promise));
+      try {
+        await renderWallets();
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+        await user.click(await screen.findByRole('button', { name: 'Test Solana' }));
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        expect(within(addressRow('SolanaAbCd')).getByText('Verifying')).toBeInTheDocument();
+
+        signature.reject(new Error('User rejected the request.'));
+        await expectOnlyError(addressRow('SolanaAbCd'), signatureRejected);
+        expect(screen.queryByRole('dialog')).toBeNull();
+      } finally {
+        unregister();
+      }
+    });
+
+    it('closes the picker and moves a signature failure to the saved wallet the account matches', async () => {
+      const signature = deferred<Array<{ signature: Uint8Array }>>();
+      const unregister = registerWallets(signingSolanaWallet('Test Solana', 'SolanaAbCd', () => signature.promise));
+      try {
+        const { fapi } = await renderWallets([unverifiedWallet('saved', 'SolanaAbCd', null)]);
+        const creation = holdRequests('post', '/v1/me/web3_wallets');
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+        await user.click(await screen.findByRole('button', { name: 'Test Solana' }));
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        await waitFor(() => expect(within(addressRow('SolanaAbCd')).getByText('Verifying')).toBeInTheDocument());
+
+        signature.reject(new Error('User rejected the request.'));
+        await expectOnlyError(addressRow('SolanaAbCd'), signatureRejected);
+        expect(screen.queryByRole('button', { name: 'Connect Solana' })).toBeNull();
+        expect(creation.requests).toHaveLength(0);
+        expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['saved']);
+        creation.release();
+      } finally {
+        unregister();
+      }
+    });
+  });
+
+  describe('verifying a saved wallet', () => {
+    it('shows pending and a failure on the wallet row without a picker', async () => {
+      const signature = deferred<string>();
+      const request = stubEthereum(
+        () => Promise.resolve(['0xabcd']),
+        () => signature.promise,
+      );
+      await renderWallets([unverifiedWallet('saved', '0xabcd', 'web3_metamask_signature')]);
+      const user = userEvent.setup();
+
+      await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+      await waitFor(() => expect(request).toHaveBeenCalledWith({ method: 'personal_sign', params: expect.any(Array) }));
+      expect(screen.getByText('Verifying')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeDisabled();
+
+      signature.reject(new Error('Signature rejected'));
+      await expectOnlyError(rowOf(screen.getByRole('button', { name: 'Manage MetaMask' })), generic);
+      expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeEnabled();
+    });
+
+    it('holds the picker while verifying, then closes it and shows the failure on the wallet row', async () => {
+      const unregister = registerWallets(
+        signingSolanaWallet('Saved Solana', 'SolanaAbCd', () =>
+          Promise.resolve([{ signature: new Uint8Array([4, 5, 6]) }]),
+        ),
+      );
+      try {
+        await renderWallets([unverifiedWallet('saved', 'SolanaAbCd', 'web3_solana_signature')]);
+        const preparation = holdRequests('post', '/v1/me/web3_wallets/:id/prepare_verification');
+        const user = userEvent.setup();
+
+        await openMenu(user, screen.getByRole('button', { name: 'Manage Solana' }));
+        await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+        await user.click(await screen.findByRole('button', { name: 'Saved Solana' }));
+        await waitFor(() => expect(preparation.requests).toHaveLength(1));
+        const dialog = screen.getByRole('dialog');
+        expect(within(dialog).getByRole('button', { name: 'Saved Solana' })).toHaveAttribute('aria-busy', 'true');
+        expect(screen.getByText('Verifying')).toBeInTheDocument();
+        await user.keyboard('{Escape}');
+        expect(dialog).toBeVisible();
+
+        preparation.fail('verification_failed');
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        await expectOnlyError(rowOf(screen.getByRole('button', { name: 'Manage Solana' })), 'verification_failed');
+      } finally {
+        unregister();
+      }
+    });
+
+    it('closes an idle picker without an error and allows another action', async () => {
+      const unregister = registerWallets(
+        signingSolanaWallet('Saved Solana', 'SolanaAbCd', () =>
+          Promise.resolve([{ signature: new Uint8Array([4, 5, 6]) }]),
+        ),
+      );
+      try {
+        await renderWallets([unverifiedWallet('saved', 'SolanaAbCd', 'web3_solana_signature')]);
+        const user = userEvent.setup();
+
+        await openMenu(user, screen.getByRole('button', { name: 'Manage Solana' }));
+        await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+        await screen.findByRole('button', { name: 'Saved Solana' });
+        await user.keyboard('{Escape}');
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+        expect(screen.queryByRole('alert')).toBeNull();
+        expect(screen.queryByText('Verifying')).toBeNull();
+        expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+      } finally {
+        unregister();
+      }
+    });
+  });
+
+  describe('setting a primary wallet', () => {
+    it('shows a failure on the row it was set from', async () => {
+      await renderWallets([
+        fapiWeb3Wallet({ id: 'first', web3_wallet: '0x1234567890abcdef' }),
+        fapiWeb3Wallet({ id: 'second', web3_wallet: '0xabcdef1234567890' }),
+      ]);
+      const primary = holdRequests('post', '/v1/me');
+      const user = userEvent.setup();
+      const second = () => rowOf(screen.getByTitle('0xabcdef1234567890'));
+
+      await openMenu(user, within(second()).getByRole('button', { name: 'Manage MetaMask' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+      await waitFor(() => expect(primary.requests).toHaveLength(1));
+      primary.fail('primary_update_failed');
+
+      await expectOnlyError(second(), 'primary_update_failed');
+    });
+  });
 });
