@@ -99,10 +99,13 @@ That's the whole flow, as one readable object. Notice there's no way to be in
 A transition is either `{ target: 'state' }` or a function:
 
 ```ts
-(({ context, event, self, actions }, enq) => ({ target?, context? }) | undefined)
+(({ context, event, self, actions }, enq) => ({ target?, context?, reenter? }) | undefined)
 ```
 
 - `target` is the state to enter. Leave it out to stay in the current state.
+  Targeting the current state also stays: no exit or entry runs, and its invoke
+  and `after` timers keep running. Set `reenter: true` to exit and enter it again,
+  which restarts both.
 - `context` is a shallow patch merged into context.
 - Returning `undefined` with nothing queued means the event does not apply here.
   That is how a condition is written: `context.ready ? { target: 'next' } : undefined`.

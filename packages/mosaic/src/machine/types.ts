@@ -59,6 +59,11 @@ export interface TransitionResult<TContext, TStates extends string = string> {
   target?: NoInfer<TStates>;
   /** Shallow context patch applied after the transition. */
   context?: Partial<TContext>;
+  /**
+   * Exit and enter `target` again when it is the current state, restarting its invoke and
+   * `after` timers. Without it, a transition to the current state stays put.
+   */
+  reenter?: boolean;
 }
 
 export type TransitionFn<
@@ -78,7 +83,7 @@ export type Transition<
   TStates extends string = string,
   TActions extends ActionMap = ActionMap,
   TMachineEvent extends EventObject = TEvent,
-> = { target: NoInfer<TStates> } | TransitionFn<TContext, TEvent, TStates, TActions, TMachineEvent>;
+> = { target: NoInfer<TStates>; reenter?: boolean } | TransitionFn<TContext, TEvent, TStates, TActions, TMachineEvent>;
 
 export type EntryExitFn<TContext, TEvent extends EventObject, TActions extends ActionMap = ActionMap> = (
   args: TransitionArgs<TContext, EventObject, TActions, TEvent>,
@@ -208,9 +213,9 @@ export interface StateConfig<
   always?: TransitionFn<TContext, EventObject, TStates, TActions, TEvent>;
   /**
    * Delayed transitions, keyed by delay in milliseconds. The timers start when the state
-   * is entered. Any transition with a `target` clears them, including one back into this
-   * state, which starts them again. `stop()` pauses them and `start()` restarts them from
-   * the full delay.
+   * is entered. Any transition that leaves the state clears them. One back into this state
+   * keeps them running, unless it sets `reenter`, which starts them again. `stop()` pauses
+   * them and `start()` restarts them from the full delay.
    */
   after?: { [delay: number]: Transition<TContext, AfterEvent, TStates, TActions, TEvent> };
   invoke?: Invoke<TContext, TEvent, TStates, TActions, TActors>;

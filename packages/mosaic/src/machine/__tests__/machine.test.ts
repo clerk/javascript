@@ -154,6 +154,116 @@ describe('createActor — transitions', () => {
   });
 });
 
+describe('createActor — transitions to the current state', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function selfMachine() {
+    const log: string[] = [];
+    const signals: AbortSignal[] = [];
+    const fired = vi.fn();
+    const flow = setup<{ n: number }, { type: 'STAY' } | { type: 'RESTART' } | { type: 'RESTART_CONFIG' }>();
+    const machine = flow.createMachine({
+      initial: 'a',
+      context: { n: 0 },
+      states: {
+        a: {
+          entry: (_, enq) => enq(() => log.push('entry')),
+          exit: (_, enq) => enq(() => log.push('exit')),
+          always: ({ context }) => (context.n > 1 ? { target: 'b' } : undefined),
+          invoke: flow.createInvoke({
+            src: (args: AsyncArgs<undefined>) => {
+              signals.push(args.signal);
+              return new Promise<void>(() => {});
+            },
+          }),
+          after: {
+            1000: (_, enq) => {
+              enq(fired);
+              return { target: 'a' };
+            },
+          },
+          on: {
+            STAY: ({ context }) => ({ target: 'a', context: { n: context.n + 1 } }),
+            RESTART: () => ({ target: 'a', reenter: true }),
+            RESTART_CONFIG: { target: 'a', reenter: true },
+          },
+        },
+        b: {},
+      },
+    });
+    return { machine, log, signals, fired };
+  }
+
+  it('stays without running exit or entry, and applies the context', () => {
+    const { machine, log } = selfMachine();
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'STAY' });
+
+    expect(log).toEqual(['entry']);
+    expect(actor.getSnapshot()).toMatchObject({ value: 'a', context: { n: 1 } });
+  });
+
+  it('keeps the invoke running', () => {
+    const { machine, signals } = selfMachine();
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'STAY' });
+
+    expect(signals).toHaveLength(1);
+    expect(signals[0]?.aborted).toBe(false);
+  });
+
+  it('keeps after timers counting from the original entry', () => {
+    const { machine, fired } = selfMachine();
+    const actor = createActor(machine).start();
+
+    vi.advanceTimersByTime(600);
+    actor.send({ type: 'STAY' });
+    vi.advanceTimersByTime(400);
+
+    expect(fired).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not restart an after timer that targets its own state', () => {
+    const { machine, fired } = selfMachine();
+    createActor(machine).start();
+
+    vi.advanceTimersByTime(3000);
+
+    expect(fired).toHaveBeenCalledTimes(1);
+  });
+
+  it('checks always again when the context changes', () => {
+    const { machine } = selfMachine();
+    const actor = createActor(machine).start();
+
+    actor.send({ type: 'STAY' });
+    actor.send({ type: 'STAY' });
+
+    expect(actor.getSnapshot().value).toBe('b');
+  });
+
+  it.each(['RESTART', 'RESTART_CONFIG'] as const)('re-enters, restarting the invoke and timers, on %s', type => {
+    const { machine, log, signals, fired } = selfMachine();
+    const actor = createActor(machine).start();
+
+    vi.advanceTimersByTime(600);
+    actor.send({ type });
+    vi.advanceTimersByTime(400);
+
+    expect(log).toEqual(['entry', 'exit', 'entry']);
+    expect(signals).toHaveLength(2);
+    expect(signals[0]?.aborted).toBe(true);
+    expect(fired).not.toHaveBeenCalled();
+  });
+});
+
 describe('createActor — effects', () => {
   it('runs exit, transition and entry effects in that order', () => {
     const calls: string[] = [];

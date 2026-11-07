@@ -31,9 +31,11 @@ type Effect = () => void;
 type RuntimeTransitionFn<TContext, TStates extends string> = (
   args: TransitionArgs<TContext, EventObject>,
   enq: Enqueue,
-) => { target?: TStates; context?: Partial<TContext> } | undefined | void;
+) => { target?: TStates; context?: Partial<TContext>; reenter?: boolean } | undefined | void;
 
-type RuntimeTransition<TContext, TStates extends string> = { target: TStates } | RuntimeTransitionFn<TContext, TStates>;
+type RuntimeTransition<TContext, TStates extends string> =
+  | { target: TStates; reenter?: boolean }
+  | RuntimeTransitionFn<TContext, TStates>;
 
 interface RuntimeInvoke<TContext, TStates extends string> {
   src?: string;
@@ -73,6 +75,7 @@ interface Taken<TContext, TStates extends string> {
   target: TStates | undefined;
   context: Partial<TContext> | undefined;
   effects: Effect[];
+  reenter?: boolean;
 }
 
 interface At<TContext, TStates extends string> {
@@ -223,7 +226,7 @@ function runActor<
       return undefined;
     }
     if (typeof transition !== 'function') {
-      return { target: transition.target, context: undefined, effects: [] };
+      return { target: transition.target, context: undefined, effects: [], reenter: transition.reenter };
     }
     const queued: Effect[] = [];
     const enq: Enqueue = (fn, ...args) => {
@@ -233,7 +236,7 @@ function runActor<
     if (!result) {
       return queued.length === 0 ? undefined : { target: undefined, context: undefined, effects: queued };
     }
-    return { target: result.target, context: result.context, effects: queued };
+    return { target: result.target, context: result.context, effects: queued, reenter: result.reenter };
   }
 
   function evaluateRoute(event: EventObject, at: { context: TContext }): Taken<TContext, TStates> | undefined {
@@ -250,7 +253,7 @@ function runActor<
       if (!allowed || !isState(target)) {
         return undefined;
       }
-      return { target, context: allowed === true ? undefined : allowed.context, effects: [] };
+      return { target, context: allowed === true ? undefined : allowed.context, effects: [], reenter: true };
     }
     return undefined;
   }
@@ -281,7 +284,8 @@ function runActor<
   }
 
   function takeTransition(taken: Taken<TContext, TStates>, event: EventObject): void {
-    if (taken.target !== undefined) {
+    const target = taken.target === value && !taken.reenter ? undefined : taken.target;
+    if (target !== undefined) {
       runEntryExit(stateOf(value).exit, event);
       invocationToken++;
       invocationAbort?.abort();
@@ -291,8 +295,8 @@ function runActor<
     const before = context;
     applyContext(taken.context);
     effects.push(...taken.effects);
-    if (taken.target !== undefined) {
-      value = resolveChoice(taken.target, event);
+    if (target !== undefined) {
+      value = resolveChoice(target, event);
       enterState(event);
     } else if (context !== before) {
       takeAlways(event);
