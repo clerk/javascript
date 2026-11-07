@@ -6,7 +6,7 @@ import { useForm } from '../../../components/form';
 import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
-import type { ErrorInvokeEvent } from '../../../machine/types';
+import type { TransitionResult } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
@@ -44,28 +44,34 @@ type Event =
   | { type: 'CANCEL' }
   | { type: 'RESEND' };
 
-const { createMachine, assign, fromPromise } = setup<Context, Event>();
+const { createMachine, createInvoke } = setup<Context, Event>();
 
 function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Phone verification is missing'));
 }
 
-const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
-const start = {
-  target: 'sendingFirstCode' as const,
-  actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
-    verifyingId: event.id,
-    phoneNumber: event.phoneNumber,
-    verifier: event.verifier,
-    error: undefined,
-    resendAvailableAt: undefined,
-  })),
-};
+function start<TTarget extends 'preparing' | 'sendingFirstCode'>(
+  event: Extract<Event, { type: 'START' }>,
+  target: TTarget,
+): TransitionResult<Context, TTarget> {
+  return {
+    target,
+    context: {
+      verifyingId: event.id,
+      phoneNumber: event.phoneNumber,
+      verifier: event.verifier,
+      error: undefined,
+      resendAvailableAt: undefined,
+    },
+  };
+}
 
 const sendCode = {
-  invoke: fromPromise((context: Context) => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
-    onDone: { target: 'verify', actions: assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) })) },
-    onError: { target: 'verify', actions: fail },
+  invoke: createInvoke({
+    input: ({ context }) => context.verifier,
+    src: ({ input }) => (input ? input.sendCode() : missingDependency()),
+    onDone: () => ({ target: 'verify', context: { resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) } }),
+    onError: ({ event }) => ({ target: 'verify', context: { error: toFormError(event.error) } }),
   }),
 };
 
@@ -82,33 +88,27 @@ const machine = createMachine({
   states: {
     idle: {
       on: {
-        ADD: {
+        ADD: () => ({
           target: 'phone',
-          actions: assign(() => ({
-            verifyingId: undefined,
-            verifier: undefined,
-            error: undefined,
-            resendAvailableAt: undefined,
-          })),
-        },
-        START: { ...start, target: 'preparing' },
+          context: { verifyingId: undefined, verifier: undefined, error: undefined, resendAvailableAt: undefined },
+        }),
+        START: ({ event }) => start(event, 'preparing'),
       },
     },
     phone: {
-      on: { CANCEL: 'idle', START: start },
+      on: { CANCEL: { target: 'idle' }, START: ({ event }) => start(event, 'sendingFirstCode') },
     },
     preparing: sendCode,
     sendingFirstCode: sendCode,
     sending: sendCode,
     verify: {
       on: {
-        CANCEL: 'idle',
-        VERIFIED: 'idle',
-        RESEND: {
-          target: 'sending',
-          guard: context => isResendUnlocked(context.resendAvailableAt),
-          actions: assign(() => ({ error: undefined })),
-        },
+        CANCEL: { target: 'idle' },
+        VERIFIED: { target: 'idle' },
+        RESEND: ({ context }) =>
+          isResendUnlocked(context.resendAvailableAt)
+            ? { target: 'sending', context: { error: undefined } }
+            : undefined,
       },
     },
   },
@@ -191,7 +191,7 @@ export function useUserProfileAddPhoneController({
       }
     },
     onResend: () => {
-      if (!codeForm.isSubmitting && actor.can({ type: 'RESEND' })) {
+      if (!codeForm.isSubmitting && actor.getSnapshot().can({ type: 'RESEND' })) {
         codeForm.reset();
         send({ type: 'RESEND' });
       }

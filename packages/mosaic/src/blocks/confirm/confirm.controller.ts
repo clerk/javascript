@@ -7,7 +7,6 @@ import type { ReverificationController } from '../../features/reverification';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
-import type { ErrorInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { toLocalizableError } from '../../utils/errors';
 
@@ -19,7 +18,7 @@ export interface ConfirmContext {
 
 export type ConfirmEvent = { type: 'OPEN' } | { type: 'CONFIRM'; run: () => Promise<void> } | { type: 'CANCEL' };
 
-const { createMachine, assign, fromPromise } = setup<ConfirmContext, ConfirmEvent>();
+const { createMachine, createInvoke } = setup<ConfirmContext, ConfirmEvent>();
 
 function notSeated(): Promise<never> {
   return Promise.reject(new Error('confirm run is not seated'));
@@ -36,33 +35,27 @@ export const confirmMachine = createMachine({
   states: {
     idle: {
       on: {
-        OPEN: { target: 'confirming', actions: assign(() => ({ error: undefined, open: true })) },
+        OPEN: () => ({ target: 'confirming', context: { error: undefined, open: true } }),
       },
     },
     confirming: {
       on: {
-        CONFIRM: { target: 'pending', actions: assign((_, event) => ({ run: event.run, error: undefined })) },
-        CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined, open: false })) },
+        CONFIRM: ({ event }) => ({ target: 'pending', context: { run: event.run, error: undefined } }),
+        CANCEL: () => ({ target: 'idle', context: { error: undefined, open: false } }),
       },
     },
     pending: {
       on: {
-        CANCEL: { actions: assign(() => ({ open: false })) },
+        CANCEL: () => ({ context: { open: false } }),
       },
-      invoke: fromPromise(context => context.run(), {
-        onDone: { target: 'idle', actions: assign(() => ({ error: undefined, open: false })) },
-        onError: [
-          {
-            guard: (context: ConfirmContext, event: ErrorInvokeEvent) =>
-              !context.open || isReverificationCancelledError(event.error),
-            target: 'idle',
-            actions: assign(() => ({ open: false })),
-          },
-          {
-            target: 'confirming',
-            actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
-          },
-        ],
+      invoke: createInvoke({
+        input: ({ context }) => context.run,
+        src: ({ input }) => input(),
+        onDone: () => ({ target: 'idle', context: { error: undefined, open: false } }),
+        onError: ({ context, event }) =>
+          !context.open || isReverificationCancelledError(event.error)
+            ? { target: 'idle', context: { open: false } }
+            : { target: 'confirming', context: { error: toLocalizableError(event.error) } },
       }),
     },
   },

@@ -9,7 +9,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred, tick } from '../../__tests__/async';
 import { createActor } from '../create-actor';
-import { setup } from '../setup';
+import { createAsyncLogic, setup } from '../setup';
+
+function routeByStatus(status: string): { target: 'firstFactor' | 'secondFactor' | 'complete' } {
+  if (status === 'needs_first_factor') {
+    return { target: 'firstFactor' };
+  }
+  if (status === 'needs_second_factor') {
+    return { target: 'secondFactor' };
+  }
+  return { target: 'complete' };
+}
 
 // ─── Pattern 1: Multiple competing entry points (replaces useLoadingStatus + useCardState) ──
 
@@ -28,7 +38,7 @@ describe('pattern: multi-button loading (social + email)', () => {
     | { type: 'TYPE_EMAIL'; value: string }
     | { type: 'SUBMIT_EMAIL' };
 
-  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+  const { createMachine, createInvoke } = setup<Ctx, Evt>();
 
   function makeSignInMachine(socialFn: (strategy: Strategy) => Promise<void>, emailFn: () => Promise<void>) {
     return createMachine({
@@ -37,29 +47,19 @@ describe('pattern: multi-button loading (social + email)', () => {
       states: {
         idle: {
           on: {
-            CLICK_SOCIAL: {
-              target: 'submitting',
-              actions: assign((_, e) => ({ activeStrategy: e.strategy })),
-            },
-            SUBMIT_EMAIL: {
-              target: 'submitting',
-              actions: assign(() => ({ activeStrategy: 'email' as const })),
-            },
+            CLICK_SOCIAL: ({ event }) => ({ target: 'submitting', context: { activeStrategy: event.strategy } }),
+            SUBMIT_EMAIL: () => ({ target: 'submitting', context: { activeStrategy: 'email' } }),
           },
         },
         submitting: {
           // All entry points converge here. CLICK_SOCIAL while submitting is a no-op —
           // `idle`'s handlers are inactive, so simultaneous triggers are impossible.
-          invoke: fromPromise(
-            ctx => (ctx.activeStrategy === 'email' ? emailFn() : socialFn(ctx.activeStrategy as Strategy)),
-            {
-              onDone: { target: 'success' },
-              onError: {
-                target: 'idle',
-                actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
-              },
-            },
-          ),
+          invoke: createInvoke({
+            input: ({ context }) => context.activeStrategy,
+            src: ({ input }) => (input === 'email' || input === null ? emailFn() : socialFn(input)),
+            onDone: { target: 'success' },
+            onError: ({ event }) => ({ target: 'idle', context: { error: String(event.error), activeStrategy: null } }),
+          }),
         },
         success: { type: 'final' },
       },
@@ -170,7 +170,7 @@ describe('pattern: resend + cooldown timer', () => {
   type Ctx = { canResend: boolean; error: string | null };
   type Evt = { type: 'SUBMIT' } | { type: 'RESEND' };
 
-  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+  const { createMachine, createInvoke } = setup<Ctx, Evt>();
 
   function makeMachine(resendFn: () => Promise<void>) {
     return createMachine({
@@ -179,29 +179,21 @@ describe('pattern: resend + cooldown timer', () => {
       states: {
         verifying: {
           on: {
-            SUBMIT: 'submitting',
-            RESEND: 'resending',
+            SUBMIT: { target: 'submitting' },
+            RESEND: { target: 'resending' },
           },
         },
         submitting: { type: 'final' },
         resending: {
-          invoke: fromPromise(() => resendFn(), {
-            onDone: {
-              target: 'cooldown',
-              actions: assign(() => ({ canResend: false, error: null })),
-            },
-            onError: {
-              target: 'verifying',
-              actions: assign((_, e) => ({ error: String(e.error) })),
-            },
+          invoke: createInvoke({
+            src: () => resendFn(),
+            onDone: () => ({ target: 'cooldown', context: { canResend: false, error: null } }),
+            onError: ({ event }) => ({ target: 'verifying', context: { error: String(event.error) } }),
           }),
         },
         cooldown: {
           after: {
-            30_000: {
-              target: 'verifying',
-              actions: assign(() => ({ canResend: true })),
-            },
+            30_000: () => ({ target: 'verifying', context: { canResend: true } }),
           },
         },
       },
@@ -267,13 +259,13 @@ describe('pattern: resend + cooldown timer', () => {
 /**
  * An error set by a failed submission should clear as soon as the user types.
  * Old approach: `card.setError(undefined)` in the onChange handler.
- * Machine approach: `assign` inside the `TYPE` handler clears `error`.
+ * Machine approach: the `TYPE` transition returns a context patch that clears `error`.
  */
 describe('pattern: error cleared on new input', () => {
   type Ctx = { value: string; error: string | null };
   type Evt = { type: 'TYPE'; value: string } | { type: 'SUBMIT' };
 
-  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+  const { createMachine, createInvoke } = setup<Ctx, Evt>();
 
   function makeMachine(submitFn: (value: string) => Promise<void>) {
     return createMachine({
@@ -282,19 +274,16 @@ describe('pattern: error cleared on new input', () => {
       states: {
         idle: {
           on: {
-            // assign clears error atomically with updating the value — no extra
-            // `card.setError(undefined)` call required
-            TYPE: { actions: assign((_, e) => ({ value: e.value, error: null })) },
-            SUBMIT: 'submitting',
+            TYPE: ({ event }) => ({ context: { value: event.value, error: null } }),
+            SUBMIT: { target: 'submitting' },
           },
         },
         submitting: {
-          invoke: fromPromise(ctx => submitFn(ctx.value), {
-            onDone: 'success',
-            onError: {
-              target: 'idle',
-              actions: assign((_, e) => ({ error: String(e.error) })),
-            },
+          invoke: createInvoke({
+            input: ({ context }) => context.value,
+            src: ({ input }) => submitFn(input),
+            onDone: { target: 'success' },
+            onError: ({ event }) => ({ target: 'idle', context: { error: String(event.error) } }),
           }),
         },
         success: { type: 'final' },
@@ -321,7 +310,7 @@ describe('pattern: error cleared on new input', () => {
   });
 });
 
-// ─── Pattern 4: Conditional initial state + always routing ───────────────────
+// ─── Pattern 4: Conditional initial state via a choice state ─────────────────
 
 /**
  * A factor verification screen where:
@@ -330,53 +319,48 @@ describe('pattern: error cleared on new input', () => {
  * - Switching strategies routes back through the same logic
  *
  * Old approach: `if (needsPrepare) { prepare() }` in a useEffect.
- * Machine approach: `initial` as a function + `always` transient state.
+ * Machine approach: a `choice` initial state, reused after every strategy switch.
  */
-describe('pattern: conditional initial state + always routing on strategy switch', () => {
+describe('pattern: conditional initial state + choice routing on strategy switch', () => {
   const CODE_STRATEGIES = new Set(['email_code', 'phone_code']);
   const needsPrepare = (strategy: string) => CODE_STRATEGIES.has(strategy);
 
   type Ctx = { strategy: string; value: string; error: string | null };
   type Evt = { type: 'TYPE'; value: string } | { type: 'SUBMIT' } | { type: 'SELECT'; strategy: string };
 
-  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+  const { createMachine, createInvoke } = setup<Ctx, Evt, { strategy: string } | undefined>();
 
   function makeMachine(prepareFn: () => Promise<void>) {
     return createMachine({
-      initial: ctx => (needsPrepare(ctx.strategy) ? 'preparing' : 'verifying'),
-      context: { strategy: 'password', value: '', error: null },
+      initial: 'routing',
+      context: ({ input }) => ({ strategy: input?.strategy ?? 'password', value: '', error: null }),
       states: {
         preparing: {
-          // SELECT is handled here too so the user can switch strategy while
-          // the current prepare is still in-flight. The library cancels the
-          // invoke automatically when the transition fires (invocationToken bump).
           on: {
-            SELECT: {
+            SELECT: ({ event }) => ({
               target: 'routing',
-              actions: assign((_, e) => ({ strategy: e.strategy, value: '', error: null })),
-            },
+              context: { strategy: event.strategy, value: '', error: null },
+            }),
           },
-          invoke: fromPromise(() => prepareFn(), {
-            onDone: 'verifying',
-            onError: {
-              target: 'verifying',
-              actions: assign((_, e) => ({ error: String(e.error) })),
-            },
+          invoke: createInvoke({
+            src: () => prepareFn(),
+            onDone: { target: 'verifying' },
+            onError: ({ event }) => ({ target: 'verifying', context: { error: String(event.error) } }),
           }),
         },
         verifying: {
           on: {
-            TYPE: { actions: assign((_, e) => ({ value: e.value, error: null })) },
-            SUBMIT: 'submitting',
-            SELECT: {
+            TYPE: ({ event }) => ({ context: { value: event.value, error: null } }),
+            SUBMIT: { target: 'submitting' },
+            SELECT: ({ event }) => ({
               target: 'routing',
-              actions: assign((_, e) => ({ strategy: e.strategy, value: '', error: null })),
-            },
+              context: { strategy: event.strategy, value: '', error: null },
+            }),
           },
         },
         routing: {
-          // Transient: immediately routes to preparing or verifying based on new strategy.
-          always: [{ target: 'preparing', guard: ctx => needsPrepare(ctx.strategy) }, { target: 'verifying' }],
+          type: 'choice',
+          choice: ({ context }) => (needsPrepare(context.strategy) ? { target: 'preparing' } : { target: 'verifying' }),
         },
         submitting: { type: 'final' },
       },
@@ -386,9 +370,7 @@ describe('pattern: conditional initial state + always routing on strategy switch
   it('starts in verifying for password strategy', () => {
     const actor = createActor(
       makeMachine(() => Promise.resolve()),
-      {
-        context: { strategy: 'password' },
-      },
+      { input: { strategy: 'password' } },
     );
     actor.start();
     expect(actor.getSnapshot().value).toBe('verifying');
@@ -398,9 +380,7 @@ describe('pattern: conditional initial state + always routing on strategy switch
     const gate = deferred<void>();
     const actor = createActor(
       makeMachine(() => gate.promise),
-      {
-        context: { strategy: 'email_code' },
-      },
+      { input: { strategy: 'email_code' } },
     );
     actor.start();
     expect(actor.getSnapshot().value).toBe('preparing');
@@ -409,9 +389,7 @@ describe('pattern: conditional initial state + always routing on strategy switch
   it('transitions from preparing to verifying once prepare resolves', async () => {
     const actor = createActor(
       makeMachine(() => Promise.resolve()),
-      {
-        context: { strategy: 'email_code' },
-      },
+      { input: { strategy: 'email_code' } },
     );
     actor.start();
     await tick();
@@ -431,9 +409,7 @@ describe('pattern: conditional initial state + always routing on strategy switch
     const gate = deferred<void>();
     const actor = createActor(
       makeMachine(() => gate.promise),
-      {
-        context: { strategy: 'email_code' },
-      },
+      { input: { strategy: 'email_code' } },
     );
     actor.start(); // starts in preparing
     // Simulate switching to password while prepare is in-flight
@@ -442,43 +418,38 @@ describe('pattern: conditional initial state + always routing on strategy switch
   });
 });
 
-// ─── Pattern 5: Post-invoke routing via always transient state ────────────────
+// ─── Pattern 5: Post-invoke routing via a choice state ────────────────────────
 
 /**
  * After an async call resolves, route to one of several states based on the
- * returned status string. The status is stored in context; an `always` transient
- * state fans out immediately.
+ * returned status string. The status is stored in context; a `choice` state
+ * fans out immediately.
  *
  * Old approach: `if (status === 'x') { wizard.goto('x') }` chains in then/catch.
- * Machine approach: `onDone` stores the status; `always` reads it from context.
+ * Machine approach: `onDone` stores the status; the `choice` state reads it from context.
  */
-describe('pattern: post-invoke routing via always transient state', () => {
+describe('pattern: post-invoke routing via a choice state', () => {
   type Ctx = { pendingStatus: string };
   type Evt = { type: 'START' };
 
-  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+  const { createMachine, createInvoke } = setup<Ctx, Evt>();
 
   function makeMachine(asyncFn: () => Promise<{ status: string }>) {
     return createMachine({
       initial: 'idle',
       context: { pendingStatus: '' },
       states: {
-        idle: { on: { START: 'loading' } },
+        idle: { on: { START: { target: 'loading' } } },
         loading: {
-          invoke: fromPromise(() => asyncFn(), {
-            onDone: {
-              target: 'routing',
-              actions: assign((_, e) => ({ pendingStatus: e.output.status })),
-            },
+          invoke: createInvoke({
+            src: () => asyncFn(),
+            onDone: ({ event }) => ({ target: 'routing', context: { pendingStatus: event.output.status } }),
             onError: { target: 'idle' },
           }),
         },
         routing: {
-          always: [
-            { target: 'firstFactor', guard: ctx => ctx.pendingStatus === 'needs_first_factor' },
-            { target: 'secondFactor', guard: ctx => ctx.pendingStatus === 'needs_second_factor' },
-            { target: 'complete' },
-          ],
+          type: 'choice',
+          choice: ({ context }) => routeByStatus(context.pendingStatus),
         },
         firstFactor: {},
         secondFactor: {},
@@ -503,7 +474,7 @@ describe('pattern: post-invoke routing via always transient state', () => {
     expect(actor.getSnapshot().value).toBe('secondFactor');
   });
 
-  it('routes to complete as the fallback when no guard matches', async () => {
+  it('routes to complete as the fallback when no status matches', async () => {
     const actor = createActor(makeMachine(() => Promise.resolve({ status: 'complete' })));
     actor.start();
     actor.send({ type: 'START' });
@@ -513,46 +484,35 @@ describe('pattern: post-invoke routing via always transient state', () => {
   });
 });
 
-// ─── Pattern 6: Typed invoke output via fromPromise ───────────────────────────
+// ─── Pattern 6: Typed invoke output via a named actor ─────────────────────────
 
 /**
- * `fromPromise` carries the resolved type to `onDone.actions`, so the full
- * resource is available without `.status`-extraction workarounds in `src`.
- *
- * Before:
- *   src: async ctx => (await ctx.fetchFn()).status  // only string, full object lost
- * After:
- *   fromPromise(ctx => ctx.fetchFn(), { onDone: { actions: assign((_, e) => ({ status: e.output.status })) } })
- *   // e.output is the full resource — correct type, access any field
+ * A named actor carries its resolved type to `onDone`, so the full resource is
+ * available as `event.output`. `machine.provide` swaps the actor per caller.
  */
-describe('pattern: typed invoke output via fromPromise', () => {
+describe('pattern: typed invoke output via a named actor', () => {
   interface Resource {
     status: string;
     id: string;
   }
 
-  type Ctx = { resource: Resource | null; error: string | null; fetchFn: () => Promise<Resource> };
+  type Ctx = { resource: Resource | null; error: string | null };
   type Evt = { type: 'FETCH' };
 
-  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+  const { createMachine } = setup<Ctx, Evt>();
 
   const machine = createMachine({
     initial: 'idle',
-    context: { resource: null, error: null, fetchFn: async () => ({ status: '', id: '' }) },
+    context: { resource: null, error: null },
+    actors: { fetch: createAsyncLogic(() => Promise.resolve<Resource>({ status: '', id: '' })) },
     states: {
-      idle: { on: { FETCH: 'loading' } },
+      idle: { on: { FETCH: { target: 'loading' } } },
       loading: {
-        invoke: fromPromise(ctx => ctx.fetchFn(), {
-          onDone: {
-            target: 'done',
-            // e.output is Resource — both fields accessible without a cast
-            actions: assign((_, e) => ({ resource: e.output })),
-          },
-          onError: {
-            target: 'idle',
-            actions: assign((_, e) => ({ error: String(e.error) })),
-          },
-        }),
+        invoke: {
+          src: 'fetch',
+          onDone: ({ event }) => ({ target: 'done', context: { resource: event.output } }),
+          onError: ({ event }) => ({ target: 'idle', context: { error: String(event.error) } }),
+        },
       },
       done: { type: 'final' },
     },
@@ -560,7 +520,9 @@ describe('pattern: typed invoke output via fromPromise', () => {
 
   it('stores the full resolved resource in context', async () => {
     const resource: Resource = { status: 'complete', id: 'res_123' };
-    const actor = createActor(machine, { context: { fetchFn: async () => resource } });
+    const actor = createActor(
+      machine.provide({ actors: { fetch: createAsyncLogic(() => Promise.resolve(resource)) } }),
+    );
     actor.start();
     actor.send({ type: 'FETCH' });
     await tick();
@@ -570,7 +532,9 @@ describe('pattern: typed invoke output via fromPromise', () => {
 
   it('stores the full resource including non-status fields', async () => {
     const resource: Resource = { status: 'needs_first_factor', id: 'si_abc' };
-    const actor = createActor(machine, { context: { fetchFn: async () => resource } });
+    const actor = createActor(
+      machine.provide({ actors: { fetch: createAsyncLogic(() => Promise.resolve(resource)) } }),
+    );
     actor.start();
     actor.send({ type: 'FETCH' });
     await tick();
@@ -603,29 +567,25 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
   type Ctx = { ticket: string; pendingStatus: string };
   type Evt = { type: 'CANCEL' };
 
-  const { createMachine, assign, fromPromise } = setup<Ctx, Evt>();
+  const { createMachine, createInvoke } = setup<Ctx, Evt, { ticket: string }>();
 
   function makeMachine(redeemFn: (ticket: string) => Promise<{ status: string }>) {
     return createMachine({
-      initial: 'redeeming', // fires on actor.start() — no useEffect needed
-      context: { ticket: '', pendingStatus: '' },
+      initial: 'redeeming',
+      context: ({ input }) => ({ ticket: input.ticket, pendingStatus: '' }),
       states: {
         redeeming: {
-          invoke: fromPromise(ctx => redeemFn(ctx.ticket), {
-            onDone: {
-              target: 'routing',
-              actions: assign((_, e) => ({ pendingStatus: e.output.status })),
-            },
+          invoke: createInvoke({
+            input: ({ context }) => context.ticket,
+            src: ({ input }) => redeemFn(input),
+            onDone: ({ event }) => ({ target: 'routing', context: { pendingStatus: event.output.status } }),
             onError: { target: 'failed' },
           }),
-          on: { CANCEL: 'cancelled' },
+          on: { CANCEL: { target: 'cancelled' } },
         },
         routing: {
-          always: [
-            { target: 'firstFactor', guard: ctx => ctx.pendingStatus === 'needs_first_factor' },
-            { target: 'secondFactor', guard: ctx => ctx.pendingStatus === 'needs_second_factor' },
-            { target: 'complete' },
-          ],
+          type: 'choice',
+          choice: ({ context }) => routeByStatus(context.pendingStatus),
         },
         firstFactor: {},
         secondFactor: {},
@@ -636,9 +596,9 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
     });
   }
 
-  it('fires the async call immediately on start — no useEffect in the component', async () => {
+  it('fires the async call immediately on start — no useEffect in the component', () => {
     const redeemFn = vi.fn(() => Promise.resolve({ status: 'needs_first_factor' }));
-    const actor = createActor(makeMachine(redeemFn), { context: { ticket: 'org_ticket_123' } });
+    const actor = createActor(makeMachine(redeemFn), { input: { ticket: 'org_ticket_123' } });
     actor.start();
     expect(actor.getSnapshot().value).toBe('redeeming');
     expect(redeemFn).toHaveBeenCalledWith('org_ticket_123');
@@ -647,7 +607,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
   it('routes to firstFactor when the ticket resolves to needs_first_factor', async () => {
     const actor = createActor(
       makeMachine(() => Promise.resolve({ status: 'needs_first_factor' })),
-      { context: { ticket: 'tk' } },
+      { input: { ticket: 'tk' } },
     );
     actor.start();
     await tick();
@@ -657,7 +617,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
   it('routes to secondFactor when the ticket resolves to needs_second_factor', async () => {
     const actor = createActor(
       makeMachine(() => Promise.resolve({ status: 'needs_second_factor' })),
-      { context: { ticket: 'tk' } },
+      { input: { ticket: 'tk' } },
     );
     actor.start();
     await tick();
@@ -667,7 +627,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
   it('routes to complete as the fallback', async () => {
     const actor = createActor(
       makeMachine(() => Promise.resolve({ status: 'complete' })),
-      { context: { ticket: 'tk' } },
+      { input: { ticket: 'tk' } },
     );
     actor.start();
     await tick();
@@ -678,7 +638,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
   it('transitions to failed on error', async () => {
     const actor = createActor(
       makeMachine(() => Promise.reject(new Error('Invalid ticket'))),
-      { context: { ticket: 'bad' } },
+      { input: { ticket: 'bad' } },
     );
     actor.start();
     await tick();
@@ -689,7 +649,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
     const gate = deferred<{ status: string }>();
     const actor = createActor(
       makeMachine(() => gate.promise),
-      { context: { ticket: 'tk' } },
+      { input: { ticket: 'tk' } },
     );
     actor.start();
     actor.send({ type: 'CANCEL' });
@@ -728,7 +688,7 @@ describe('pattern: reactive value auto-switch (replaces useLayoutEffect + hasSwi
   type Ctx = { value: string; fieldType: FieldType; hasAutoSwitched: boolean };
   type Evt = { type: 'TYPE'; value: string } | { type: 'SWITCH_FIELD' } | { type: 'SUBMIT' };
 
-  const { createMachine, assign } = setup<Ctx, Evt>();
+  const { createMachine } = setup<Ctx, Evt>();
 
   function makeMachine(phoneEnabled: boolean) {
     return createMachine({
@@ -737,25 +697,21 @@ describe('pattern: reactive value auto-switch (replaces useLayoutEffect + hasSwi
       states: {
         idle: {
           on: {
-            TYPE: {
-              // All the useLayoutEffect logic lives here — atomically with the value update.
-              actions: assign((ctx, e) => {
-                const shouldSwitch =
-                  phoneEnabled && e.value.startsWith('+') && ctx.fieldType !== 'phone' && !ctx.hasAutoSwitched;
-                if (shouldSwitch) {
-                  return { value: e.value, fieldType: 'phone' as FieldType, hasAutoSwitched: true };
-                }
-                return { value: e.value };
-              }),
+            TYPE: ({ context, event }) => {
+              const shouldSwitch =
+                phoneEnabled &&
+                event.value.startsWith('+') &&
+                context.fieldType !== 'phone' &&
+                !context.hasAutoSwitched;
+              if (shouldSwitch) {
+                return { context: { value: event.value, fieldType: 'phone', hasAutoSwitched: true } };
+              }
+              return { context: { value: event.value } };
             },
-            SWITCH_FIELD: {
-              // Manual switch resets the auto-switch guard so autofill can trigger once more.
-              actions: assign(ctx => ({
-                fieldType: (ctx.fieldType === 'text' ? 'phone' : 'text') as FieldType,
-                hasAutoSwitched: false,
-              })),
-            },
-            SUBMIT: 'submitting',
+            SWITCH_FIELD: ({ context }) => ({
+              context: { fieldType: context.fieldType === 'text' ? 'phone' : 'text', hasAutoSwitched: false },
+            }),
+            SUBMIT: { target: 'submitting' },
           },
         },
         submitting: { type: 'final' },

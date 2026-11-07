@@ -4,8 +4,7 @@ import { useEffect } from 'react';
 import type { FlowDirection } from '../../components/flow';
 import { usePendingAction } from '../../hooks/use-pending-action';
 import { type ErrorDescription, fill, useErrorText, useMessages } from '../../localization';
-import { setup } from '../../machine/setup';
-import type { DoneInvokeEvent } from '../../machine/types';
+import { createAsyncLogic, setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
 import { downloadBackupCodes, printBackupCodes } from '../../utils/backup-codes';
 import { toLocalizableError } from '../../utils/errors';
@@ -51,14 +50,21 @@ type ResolvedFlow = Exclude<TaskFlow, { kind: 'start' }>;
 
 interface TaskContext {
   flow: TaskFlow;
-  initialFlow: ResolvedFlow;
   startsWithAuthenticator: boolean;
   direction: FlowDirection;
   savedSetup?: AuthenticatorSetup;
   pending?: TaskAction;
   resendSeconds: number;
-  prepareAuthenticator: () => Promise<ResolvedFlow>;
   run: () => Promise<ResolvedFlow>;
+}
+
+interface TaskInput {
+  startsWithAuthenticator: boolean;
+}
+
+interface TaskImplementations {
+  initialFlow: ResolvedFlow;
+  prepareAuthenticator: () => Promise<ResolvedFlow>;
 }
 
 type TaskEvent =
@@ -73,11 +79,11 @@ type TaskEvent =
   | { type: 'TICK' }
   | { type: 'RUN'; key: TaskAction; run: () => Promise<ResolvedFlow> };
 
-const { createMachine, assign, fromPromise } = setup<TaskContext, TaskEvent>();
+const { createMachine, createInvoke } = setup<TaskContext, TaskEvent, TaskInput>();
 const REVERIFIABLE_ACTIONS: readonly TaskAction[] = ['sms', 'prepareAuthenticator'];
 
-function resolve(context: TaskContext): ResolvedFlow {
-  return context.flow.kind === 'start' ? context.initialFlow : context.flow;
+function resolve(flow: TaskFlow, initialFlow: ResolvedFlow): ResolvedFlow {
+  return flow.kind === 'start' ? initialFlow : flow;
 }
 
 function smsFlow(phones: readonly { id: string }[]): SmsFlow {
@@ -91,8 +97,7 @@ function smsFlow(phones: readonly { id: string }[]): SmsFlow {
   };
 }
 
-function withSms(context: TaskContext, update: (flow: SmsFlow) => SmsFlow): Partial<TaskContext> {
-  const flow = resolve(context);
+function withSms(flow: ResolvedFlow, update: (flow: SmsFlow) => SmsFlow): Partial<TaskContext> {
   return flow.kind === 'sms' ? { flow: update(flow) } : {};
 }
 
@@ -108,51 +113,61 @@ function settle(context: TaskContext, output: ResolvedFlow): Partial<TaskContext
   };
 }
 
-function fail(context: TaskContext, error: unknown): Partial<TaskContext> {
-  const flow = resolve(context);
+function fail(flow: ResolvedFlow, error: unknown): Partial<TaskContext> {
   if (isReverificationCancelledError(error)) {
     return { flow, pending: undefined };
   }
   return { flow: { ...flow, error: toLocalizableError(error) }, pending: undefined };
 }
 
-const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
+function taskImplementations(implementations: TaskImplementations) {
+  return {
+    actions: { initialFlow: () => implementations.initialFlow },
+    actors: { prepare: createAsyncLogic(() => implementations.prepareAuthenticator()) },
+  };
+}
+
+const placeholder: TaskImplementations = {
+  initialFlow: { kind: 'select' },
+  prepareAuthenticator: () => Promise.resolve({ kind: 'select' }),
+};
 
 const taskSetupMfaMachine = createMachine({
   id: 'taskSetupMfa',
-  initial: context => (context.startsWithAuthenticator ? 'preparing' : 'idle'),
-  context: {
+  initial: 'starting',
+  context: ({ input }) => ({
     flow: { kind: 'start' },
-    initialFlow: { kind: 'select' },
-    startsWithAuthenticator: false,
+    startsWithAuthenticator: input.startsWithAuthenticator,
     direction: 1,
     resendSeconds: 0,
-    prepareAuthenticator: () => Promise.resolve({ kind: 'select' }),
     run: () => Promise.resolve({ kind: 'select' }),
-  },
+  }),
+  ...taskImplementations(placeholder),
   states: {
+    starting: {
+      type: 'choice',
+      choice: ({ context }) => ({ target: context.startsWithAuthenticator ? 'preparing' : 'idle' }),
+    },
     preparing: {
-      invoke: fromPromise(context => context.prepareAuthenticator(), {
-        onDone: {
+      invoke: {
+        src: 'prepare',
+        onDone: ({ context, event }) => ({ target: 'idle', context: settle(context, event.output) }),
+        onError: ({ context, event, actions }) => ({
           target: 'idle',
-          actions: assign<DoneInvokeEvent<ResolvedFlow>>((context, event) => settle(context, event.output)),
-        },
-        onError: { target: 'idle', actions: assign((context, event) => fail(context, event.error)) },
-      }),
+          context: fail(resolve(context.flow, actions.initialFlow()), event.error),
+        }),
+      },
     },
     idle: {
       on: {
-        TICK: tick,
-        SELECT_SMS: { actions: assign((_, event) => ({ flow: event.flow, direction: 1 })) },
-        RESUME_AUTHENTICATOR: {
-          actions: assign((_, event) => ({
-            flow: { kind: 'authenticator', setup: event.setup, code: '' },
-            direction: 1,
-          })),
-        },
-        ADD_PHONE: {
-          actions: assign(context => ({
-            ...withSms(context, flow => ({
+        TICK: ({ context }) => ({ context: { resendSeconds: Math.max(0, context.resendSeconds - 1) } }),
+        SELECT_SMS: ({ event }) => ({ context: { flow: event.flow, direction: 1 } }),
+        RESUME_AUTHENTICATOR: ({ event }) => ({
+          context: { flow: { kind: 'authenticator', setup: event.setup, code: '' }, direction: 1 },
+        }),
+        ADD_PHONE: ({ context, actions }) => ({
+          context: {
+            ...withSms(resolve(context.flow, actions.initialFlow()), flow => ({
               ...flow,
               step: 'phone',
               origin: 'new',
@@ -162,74 +177,76 @@ const taskSetupMfaMachine = createMachine({
               error: undefined,
             })),
             direction: 1,
-          })),
-        },
-        BACK: {
-          actions: assign((context, event) => {
-            const flow = resolve(context);
-            if (flow.kind === 'sms' && flow.step === 'verify') {
-              return {
+          },
+        }),
+        BACK: ({ context, event, actions }) => {
+          const flow = resolve(context.flow, actions.initialFlow());
+          if (flow.kind === 'sms' && flow.step === 'verify') {
+            return {
+              context: {
                 flow: { ...flow, step: flow.origin === 'new' ? 'phone' : 'select', code: '', error: undefined },
                 direction: -1,
-              };
-            }
-            if (flow.kind === 'sms' && flow.step === 'phone' && event.hasPhones) {
-              return {
+              },
+            };
+          }
+          if (flow.kind === 'sms' && flow.step === 'phone' && event.hasPhones) {
+            return {
+              context: {
                 flow: { ...flow, step: 'select', origin: 'existing', phoneId: undefined, error: undefined },
                 direction: -1,
-              };
-            }
-            return { flow: { kind: 'select' }, direction: -1 };
-          }),
+              },
+            };
+          }
+          return { context: { flow: { kind: 'select' }, direction: -1 } };
         },
-        EDIT_PHONE_ID: {
-          actions: assign((context, event) =>
-            withSms(context, flow => ({
-              ...flow,
-              selectedPhoneId: event.value,
-              phoneId: undefined,
-              origin: 'existing',
-            })),
-          ),
+        EDIT_PHONE_ID: ({ context, event, actions }) => ({
+          context: withSms(resolve(context.flow, actions.initialFlow()), flow => ({
+            ...flow,
+            selectedPhoneId: event.value,
+            phoneId: undefined,
+            origin: 'existing',
+          })),
+        }),
+        EDIT_PHONE_NUMBER: ({ context, event, actions }) => ({
+          context: withSms(resolve(context.flow, actions.initialFlow()), flow => ({
+            ...flow,
+            phoneNumber: event.value,
+            phoneId: event.value === flow.phoneNumber ? flow.phoneId : undefined,
+          })),
+        }),
+        EDIT_CODE: ({ context, event, actions }) => {
+          const flow = resolve(context.flow, actions.initialFlow());
+          return {
+            context:
+              flow.kind === 'sms' || flow.kind === 'authenticator' ? { flow: { ...flow, code: event.value } } : {},
+          };
         },
-        EDIT_PHONE_NUMBER: {
-          actions: assign((context, event) =>
-            withSms(context, flow => ({
-              ...flow,
-              phoneNumber: event.value,
-              phoneId: event.value === flow.phoneNumber ? flow.phoneId : undefined,
-            })),
-          ),
+        PRINT_FAILED: ({ context, actions }) => {
+          const flow = resolve(context.flow, actions.initialFlow());
+          return {
+            context: flow.kind === 'success' ? { flow: { ...flow, error: { code: 'mfa_print_unavailable' } } } : {},
+          };
         },
-        EDIT_CODE: {
-          actions: assign((context, event) => {
-            const flow = resolve(context);
-            return flow.kind === 'sms' || flow.kind === 'authenticator' ? { flow: { ...flow, code: event.value } } : {};
-          }),
-        },
-        PRINT_FAILED: {
-          actions: assign(context => {
-            const flow = resolve(context);
-            return flow.kind === 'success' ? { flow: { ...flow, error: { code: 'mfa_print_unavailable' } } } : {};
-          }),
-        },
-        RUN: {
+        RUN: ({ context, event, actions }) => ({
           target: 'busy',
-          actions: assign((context, event) => {
-            const flow = resolve(context);
-            return { flow: { ...flow, error: undefined }, pending: event.key, run: event.run };
-          }),
-        },
+          context: {
+            flow: { ...resolve(context.flow, actions.initialFlow()), error: undefined },
+            pending: event.key,
+            run: event.run,
+          },
+        }),
       },
     },
     busy: {
-      on: { TICK: tick },
-      invoke: fromPromise(context => context.run(), {
-        onDone: {
+      on: { TICK: ({ context }) => ({ context: { resendSeconds: Math.max(0, context.resendSeconds - 1) } }) },
+      invoke: createInvoke({
+        input: ({ context }) => context.run,
+        src: ({ input }) => input(),
+        onDone: ({ context, event }) => ({ target: 'idle', context: settle(context, event.output) }),
+        onError: ({ context, event }) => ({
           target: 'idle',
-          actions: assign<DoneInvokeEvent<ResolvedFlow>>((context, event) => settle(context, event.output)),
-        },
-        onError: { target: 'idle', actions: assign((context, event) => fail(context, event.error)) },
+          context: fail(context.flow.kind === 'start' ? { kind: 'select' } : context.flow, event.error),
+        }),
       }),
     },
   },
@@ -260,16 +277,14 @@ export function useTaskSetupMfaController(model: TaskSetupMfaReadyModel): TaskSe
     const setup = await model.createAuthenticator();
     return { kind: 'authenticator', setup, code: '' };
   };
-  const [{ context, value }, send] = useMachine(taskSetupMfaMachine, {
-    context: {
-      initialFlow: initialFlowFor(model),
-      startsWithAuthenticator: model.methods.length === 1 && model.methods[0] === 'authenticator',
-      prepareAuthenticator,
-    },
-  });
+  const initialFlow = initialFlowFor(model);
+  const [{ context, value }, send] = useMachine(
+    taskSetupMfaMachine.provide(taskImplementations({ initialFlow, prepareAuthenticator })),
+    { input: { startsWithAuthenticator: model.methods.length === 1 && model.methods[0] === 'authenticator' } },
+  );
   const isBusy = value !== 'idle';
   const pending = value === 'preparing' ? 'prepareAuthenticator' : context.pending;
-  const flow = resolve(context);
+  const flow = resolve(context.flow, initialFlow);
   const { resendSeconds } = context;
   const hasPhones = model.phones.length > 0;
   const fileValues = { applicationName: model.applicationName, identifier: model.identifier };

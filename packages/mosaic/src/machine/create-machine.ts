@@ -1,4 +1,4 @@
-import type { EventObject, MachineConfig, StateMachine } from './types';
+import type { ActionMap, ActorMap, EventObject, Implementations, MachineConfig, StateMachine } from './types';
 
 /**
  * Create a state-machine definition from a config object.
@@ -14,26 +14,59 @@ import type { EventObject, MachineConfig, StateMachine } from './types';
  *   initial: 'inactive',
  *   context: { count: 0 },
  *   states: {
- *     inactive: { on: { TOGGLE: 'active' } },
- *     active: { on: { TOGGLE: 'inactive' } },
+ *     inactive: { on: { TOGGLE: { target: 'active' } } },
+ *     active: { on: { TOGGLE: { target: 'inactive' } } },
  *   },
  * });
  * ```
  */
 export function createMachine<
-  TContext extends object = Record<string, never>,
-  TEvent extends EventObject = EventObject,
-  TStates extends string = string,
->(config: MachineConfig<TContext, TEvent, TStates>): StateMachine<TContext, TEvent, TStates> {
+  TContext extends object,
+  TEvent extends EventObject,
+  TStates extends string,
+  TActions extends ActionMap = Record<never, never>,
+  TActors extends ActorMap = Record<never, never>,
+  TInput = undefined,
+>(
+  config: MachineConfig<TContext, TEvent, TStates, TActions, TActors, TInput>,
+): StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput> {
+  return withImplementations(config, {
+    actions: config.actions ?? emptyMap<TActions>(),
+    actors: config.actors ?? emptyMap<TActors>(),
+  });
+}
+
+function withImplementations<
+  TContext extends object,
+  TEvent extends EventObject,
+  TStates extends string,
+  TActions extends ActionMap,
+  TActors extends ActorMap,
+  TInput,
+>(
+  config: MachineConfig<TContext, TEvent, TStates, TActions, TActors, TInput>,
+  implementations: { actions: TActions; actors: TActors },
+): StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput> {
   return {
     id: config.id,
     initial: config.initial,
-    // SAFETY: config.context is optional; when omitted the machine has no context.
-    // The empty object satisfies any TContext at runtime — callers that omit context
-    // also use Record<string, never> as TContext so no fields are accessed.
-    // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
-    context: config.context ?? ({} as TContext),
     states: config.states,
     config,
+    implementations,
+    provide: (next: Implementations<TActions, TActors>) =>
+      withImplementations(config, {
+        actions: { ...implementations.actions, ...next.actions },
+        actors: { ...implementations.actors, ...next.actors },
+      }),
+    resolveState: ({ value, context }) => ({
+      value,
+      context,
+      status: config.states[value].type === 'final' ? 'done' : 'active',
+    }),
   };
+}
+
+function emptyMap<T extends object>(): T {
+  // eslint-disable-next-line typescript/consistent-type-assertions -- A machine without actions or actors gets the default Record<never, never>, which the empty object satisfies.
+  return {} as T;
 }

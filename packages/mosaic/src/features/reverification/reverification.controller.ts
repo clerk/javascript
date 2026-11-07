@@ -1,12 +1,12 @@
 import { isClerkRuntimeError } from '@clerk/shared/error';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import { useResendSeconds } from '../../hooks/use-resend-seconds';
 import type { ErrorDescription } from '../../localization';
 import { isLocalizableError, useErrorText, useMessages } from '../../localization';
-import { setup } from '../../machine/setup';
-import type { DoneInvokeEvent, ErrorInvokeEvent, StateConfig } from '../../machine/types';
+import { createAsyncLogic, setup } from '../../machine/setup';
+import type { DoneInvokeEvent, StateConfig, TransitionResult } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { toLocalizableErrors } from '../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../utils/verification';
@@ -50,8 +50,6 @@ interface ReverificationContext {
   submitRequested: boolean;
   frozenActiveMethodId: string | undefined;
   overlay: readonly Overlay[];
-  supportEmail: string;
-  deps: ReverificationDeps;
 }
 
 type ReverificationEvent =
@@ -65,7 +63,19 @@ type ReverificationEvent =
   | { type: 'BACK' }
   | { type: 'RESEND' };
 
-const { createMachine, assign, fromPromise } = setup<ReverificationContext, ReverificationEvent>();
+const { createMachine } = setup<ReverificationContext, ReverificationEvent>();
+
+type ReverificationState =
+  | 'inactive'
+  | 'starting'
+  | 'preparing'
+  | 'methodPickerPreparing'
+  | 'verifying'
+  | 'submitting'
+  | 'unavailable'
+  | 'failed'
+  | 'finishing'
+  | 'retrying';
 
 function notSeated(): Promise<never> {
   return Promise.reject(new Error('reverification deps are not seated'));
@@ -77,6 +87,45 @@ const unseatedDeps: ReverificationDeps = {
   attempt: notSeated,
   finish: notSeated,
 };
+
+type Seated = ReverificationDeps & Pick<ReverificationActiveModel, 'supportEmail'>;
+
+const unseated: Seated = { ...unseatedDeps, supportEmail: '' };
+
+function latestDeps(seated: { current: ReverificationDeps }): ReverificationDeps {
+  return {
+    start: () => seated.current.start(),
+    prepare: method => seated.current.prepare(method),
+    attempt: (method, value) => seated.current.attempt(method, value),
+    finish: () => seated.current.finish(),
+  };
+}
+
+function reverificationActors(deps: ReverificationDeps) {
+  return {
+    start: createAsyncLogic<undefined, ReverificationResult>(() => deps.start()),
+    prepare: createAsyncLogic<ReverificationMethod | null, void>(({ input }) =>
+      input && needsPrepare(input) ? deps.prepare(input) : Promise.resolve(),
+    ),
+    attempt: createAsyncLogic<{ method: ReverificationMethod | null; value: string }, ReverificationResult>(
+      ({ input }) =>
+        input.method ? deps.attempt(input.method, input.value) : Promise.reject(new Error('No active method')),
+    ),
+    finish: createAsyncLogic<undefined, void>(() => deps.finish()),
+  };
+}
+
+type ReverificationActors = ReturnType<typeof reverificationActors>;
+
+type ReverificationOn = NonNullable<
+  StateConfig<
+    ReverificationContext,
+    ReverificationEvent,
+    ReverificationState,
+    Record<never, never>,
+    ReverificationActors
+  >['on']
+>;
 
 function lockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
   return { resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) };
@@ -100,98 +149,72 @@ function selectMethod(ctx: ReverificationContext, id: string): Partial<Reverific
   };
 }
 
-function prepareActive(ctx: ReverificationContext) {
-  const method = ctx.activeMethod;
-  return method && needsPrepare(method) ? ctx.deps.prepare(method) : Promise.resolve();
+function applyResult(output: ReverificationResult): Partial<ReverificationContext> {
+  return {
+    methods: output.methods,
+    activeMethod: output.startingMethod,
+    inputValue: '',
+    errors: [],
+    ...unlockResend(),
+    direction: 1,
+  };
 }
 
-function submit(ctx: ReverificationContext): Promise<ReverificationResult> {
-  const method = ctx.activeMethod;
-  if (!method) {
-    return Promise.reject(new Error('No active method'));
-  }
-  return ctx.deps.attempt(method, ctx.inputValue);
-}
-
-const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => ({
-  methods: event.output.methods,
-  activeMethod: event.output.startingMethod,
-  inputValue: '',
-  errors: [],
-  ...unlockResend(),
-  direction: 1,
-}));
-const afterResult = [
-  {
-    guard: (_: ReverificationContext, event: DoneInvokeEvent<ReverificationResult>) =>
-      event.output.status === 'complete',
-    target: 'finishing' as const,
+function afterResult({
+  event,
+}: {
+  event: DoneInvokeEvent<ReverificationResult>;
+}): TransitionResult<ReverificationContext, ReverificationState> {
+  const { output } = event;
+  if (output.status === 'complete') {
     // We don't apply the result here as we want to keep the old one visible as we are finishing
-  },
-  {
-    guard: (_: ReverificationContext, event: DoneInvokeEvent<ReverificationResult>) =>
-      event.output.startingMethod === null,
-    target: 'unavailable' as const,
-    actions: applyResult,
-  },
-  {
-    guard: (_: ReverificationContext, event: DoneInvokeEvent<ReverificationResult>) => {
-      const method = event.output.startingMethod;
-      return Boolean(method && needsPrepare(method));
-    },
-    target: 'preparing' as const,
-    actions: [applyResult, assign(() => lockResend())],
-  },
-  { target: 'verifying' as const, actions: applyResult },
-];
+    return { target: 'finishing' };
+  }
+  const method = output.startingMethod;
+  if (method === null) {
+    return { target: 'unavailable', context: applyResult(output) };
+  }
+  if (needsPrepare(method)) {
+    return { target: 'preparing', context: { ...applyResult(output), ...lockResend() } };
+  }
+  return { target: 'verifying', context: applyResult(output) };
+}
 
 function topOverlay(ctx: ReverificationContext): Overlay | undefined {
   return ctx.overlay[ctx.overlay.length - 1];
 }
 
 const factorEvents = {
-  TYPE: {
-    actions: assign((_, event) => ({ inputValue: event.value, errors: [] })),
+  TYPE: ({ event }) => ({ context: { inputValue: event.value, errors: [] } }),
+  SHOW_METHODS: ({ context }) =>
+    context.overlay.length === 0 && context.methods.filter(method => method.id !== context.activeMethod?.id).length > 0
+      ? {
+          context: {
+            overlay: ['method-picker'],
+            direction: 1,
+            submitRequested: false,
+            frozenActiveMethodId: context.activeMethod?.id,
+          },
+        }
+      : undefined,
+  SHOW_HELP: ({ context }) =>
+    topOverlay(context) !== 'help'
+      ? { context: { overlay: [...context.overlay, 'help'], direction: 1, submitRequested: false } }
+      : undefined,
+  BACK: ({ context }) =>
+    context.overlay.length > 0 ? { context: { overlay: context.overlay.slice(0, -1), direction: -1 } } : undefined,
+  SELECT_METHOD: ({ context, event }) => {
+    if (topOverlay(context) !== 'method-picker') {
+      return undefined;
+    }
+    const method = context.methods.find(candidate => candidate.id === event.id);
+    if (method && needsPrepare(method)) {
+      return { target: 'methodPickerPreparing', context: selectMethod(context, event.id) };
+    }
+    return { target: 'verifying', context: { ...selectMethod(context, event.id), overlay: [] } };
   },
-  SHOW_METHODS: {
-    guard: ctx =>
-      ctx.overlay.length === 0 && ctx.methods.filter(method => method.id !== ctx.activeMethod?.id).length > 0,
-    actions: assign(ctx => ({
-      overlay: ['method-picker' as const],
-      direction: 1 as const,
-      submitRequested: false,
-      frozenActiveMethodId: ctx.activeMethod?.id,
-    })),
-  },
-  SHOW_HELP: {
-    guard: ctx => topOverlay(ctx) !== 'help',
-    actions: assign(ctx => ({
-      overlay: [...ctx.overlay, 'help' as const],
-      direction: 1 as const,
-      submitRequested: false,
-    })),
-  },
-  BACK: {
-    guard: ctx => ctx.overlay.length > 0,
-    actions: assign(ctx => ({ overlay: ctx.overlay.slice(0, -1), direction: -1 as const })),
-  },
-  SELECT_METHOD: [
-    {
-      target: 'methodPickerPreparing' as const,
-      guard: (ctx, event) => {
-        const method = ctx.methods.find(candidate => candidate.id === event.id);
-        return topOverlay(ctx) === 'method-picker' && Boolean(method && needsPrepare(method));
-      },
-      actions: assign((ctx, event) => selectMethod(ctx, event.id)),
-    },
-    {
-      target: 'verifying' as const,
-      guard: ctx => topOverlay(ctx) === 'method-picker',
-      actions: assign((ctx, event) => ({ ...selectMethod(ctx, event.id), overlay: [] })),
-    },
-  ],
-  RESET: 'inactive' as const,
-} satisfies NonNullable<StateConfig<ReverificationContext, ReverificationEvent>['on']>;
+  RESET: { target: 'inactive' },
+} satisfies ReverificationOn;
 
 export const reverificationMachine = createMachine({
   id: 'reverification',
@@ -206,27 +229,29 @@ export const reverificationMachine = createMachine({
     submitRequested: false,
     frozenActiveMethodId: undefined,
     overlay: [],
-    supportEmail: '',
-    deps: unseatedDeps,
   },
+  actors: reverificationActors(unseatedDeps),
   states: {
     inactive: {
-      entry: assign(() => ({
-        inputValue: '',
-        errors: [],
-        submitRequested: false,
-        overlay: [],
-        ...unlockResend(),
-      })),
-      on: { START: 'starting' },
+      entry: () => ({
+        context: {
+          inputValue: '',
+          errors: [],
+          submitRequested: false,
+          overlay: [],
+          ...unlockResend(),
+        },
+      }),
+      on: { START: { target: 'starting' } },
     },
 
     starting: {
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(ctx => ctx.deps.start(), {
+      on: { RESET: { target: 'inactive' } },
+      invoke: {
+        src: 'start',
         onDone: afterResult,
-        onError: 'failed',
-      }),
+        onError: { target: 'failed' },
+      },
     },
 
     /*
@@ -238,29 +263,24 @@ export const reverificationMachine = createMachine({
     preparing: {
       on: {
         ...factorEvents,
-        SUBMIT: {
-          guard: ctx => ctx.overlay.length === 0,
-          actions: assign(() => ({ submitRequested: true })),
-        },
+        SUBMIT: ({ context }) => (context.overlay.length === 0 ? { context: { submitRequested: true } } : undefined),
       },
-      invoke: fromPromise(prepareActive, {
-        onDone: [
-          {
-            guard: (ctx: ReverificationContext) => ctx.submitRequested,
-            target: 'submitting' as const,
-            actions: assign(() => ({ submitRequested: false })),
-          },
-          { target: 'verifying' as const },
-        ],
-        onError: {
+      invoke: {
+        src: 'prepare',
+        input: ({ context }) => context.activeMethod,
+        onDone: ({ context }) =>
+          context.submitRequested
+            ? { target: 'submitting', context: { submitRequested: false } }
+            : { target: 'verifying' },
+        onError: ({ event }) => ({
           target: 'verifying',
-          actions: assign((_, event) => ({
+          context: {
             errors: toLocalizableErrors(event.error),
             submitRequested: false,
             ...unlockResend(),
-          })),
-        },
-      }),
+          },
+        }),
+      },
     },
 
     /*
@@ -270,76 +290,79 @@ export const reverificationMachine = createMachine({
       some feedback that does not feel janky. The view handles disabling inputs while preparing.
     */
     methodPickerPreparing: {
-      entry: assign(() => lockResend()),
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(prepareActive, {
-        onDone: { target: 'verifying', actions: assign(() => ({ overlay: [] })) },
-        onError: {
+      entry: () => ({ context: lockResend() }),
+      on: { RESET: { target: 'inactive' } },
+      invoke: {
+        src: 'prepare',
+        input: ({ context }) => context.activeMethod,
+        onDone: (): TransitionResult<ReverificationContext, ReverificationState> => ({
           target: 'verifying',
-          actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error), overlay: [], ...unlockResend() })),
-        },
-      }),
+          context: { overlay: [] },
+        }),
+        onError: ({ event }) => ({
+          target: 'verifying',
+          context: { errors: toLocalizableErrors(event.error), overlay: [], ...unlockResend() },
+        }),
+      },
     },
 
     verifying: {
-      always: [{ guard: ctx => ctx.activeMethod === null, target: 'unavailable' }],
+      always: ({ context }) => (context.activeMethod === null ? { target: 'unavailable' } : undefined),
       on: {
         ...factorEvents,
-        SUBMIT: { target: 'submitting', guard: ctx => ctx.overlay.length === 0 },
-        RESEND: {
-          target: 'preparing',
-          guard: ctx =>
-            ctx.overlay.length === 0 &&
-            Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod)) &&
-            isResendUnlocked(ctx.resendAvailableAt),
-          actions: assign(() => ({
-            ...lockResend(),
-            inputValue: '',
-            errors: [],
-            submitRequested: false,
-          })),
-        },
+        SUBMIT: ({ context }) => (context.overlay.length === 0 ? { target: 'submitting' } : undefined),
+        RESEND: ({ context }) =>
+          context.overlay.length === 0 &&
+          context.activeMethod &&
+          needsPrepare(context.activeMethod) &&
+          isResendUnlocked(context.resendAvailableAt)
+            ? {
+                target: 'preparing',
+                context: {
+                  ...lockResend(),
+                  inputValue: '',
+                  errors: [],
+                  submitRequested: false,
+                },
+              }
+            : undefined,
       },
     },
 
     submitting: {
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(submit, {
+      on: { RESET: { target: 'inactive' } },
+      invoke: {
+        src: 'attempt',
+        input: ({ context }) => ({ method: context.activeMethod, value: context.inputValue }),
         onDone: afterResult,
-        onError: [
-          {
-            guard: (_: ReverificationContext, event: ErrorInvokeEvent) => isPasskeyAbortedError(event.error),
-            target: 'verifying',
-            actions: assign(() => ({ errors: [] })),
-          },
-          {
-            target: 'verifying',
-            actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error) })),
-          },
-        ],
-      }),
+        onError: ({ event }) => ({
+          target: 'verifying',
+          context: { errors: isPasskeyAbortedError(event.error) ? [] : toLocalizableErrors(event.error) },
+        }),
+      },
     },
 
     unavailable: {
-      on: { RESET: 'inactive' },
+      on: { RESET: { target: 'inactive' } },
     },
 
     failed: {
-      on: { RESET: 'inactive' },
+      on: { RESET: { target: 'inactive' } },
     },
 
     finishing: {
-      on: { RESET: 'inactive' },
-      invoke: fromPromise(ctx => ctx.deps.finish(), {
-        onDone: 'retrying',
-        onError: 'failed',
-      }),
+      on: { RESET: { target: 'inactive' } },
+      invoke: {
+        src: 'finish',
+        onDone: { target: 'retrying' },
+        onError: { target: 'failed' },
+      },
     },
 
     // This means we are retrying the action after successful reverification
     // This state is left by the model returning to inactive once the retry has completed
     retrying: {
-      on: { RESET: 'inactive' },
+      on: { RESET: { target: 'inactive' } },
     },
   },
 });
@@ -424,16 +447,15 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
   const errorText = useErrorText();
   const active = model.status === 'active' ? model : null;
 
+  const seated = useRef<Seated>(unseated);
+  useLayoutEffect(() => {
+    if (active) {
+      seated.current = active;
+    }
+  });
   const [snapshot, send] = useMachine(
-    reverificationMachine,
-    active
-      ? {
-          context: {
-            supportEmail: active.supportEmail,
-            deps: active,
-          },
-        }
-      : undefined,
+    // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
+    reverificationMachine.provide({ actors: reverificationActors(latestDeps(seated)) }),
   );
 
   const resendSeconds = useResendSeconds(snapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
@@ -508,8 +530,9 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       onShowHelp: () => send({ type: 'SHOW_HELP' }),
       onBack: () => send({ type: 'BACK' }),
       onEmailSupport: () => {
-        if (context.supportEmail) {
-          window.location.assign(`mailto:${context.supportEmail}`);
+        const supportEmail = seated.current.supportEmail;
+        if (supportEmail) {
+          window.location.assign(`mailto:${supportEmail}`);
         }
       },
       methods,

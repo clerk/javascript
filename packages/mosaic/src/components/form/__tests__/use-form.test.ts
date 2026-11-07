@@ -742,6 +742,52 @@ describe('useForm', () => {
     expect(result.current.values).toEqual({ username: 'given' });
   });
 
+  it('keeps a queued submit when a field is touched while validation is pending', async () => {
+    const check = deferred<FieldFeedback | undefined>();
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { password: '' },
+        fields: { password: { validateAsync: () => check.promise } },
+        onSubmit,
+      }),
+    );
+    act(() => result.current.setValue('password', 'ab'));
+    act(() => result.current.submit());
+    act(() => result.current.touch('password'));
+    expect(result.current.isSubmitting).toBe(true);
+    expect(result.current.fields.password.touched).toBe(true);
+    await act(async () => {
+      check.resolve(undefined);
+      await tick();
+    });
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith({ password: 'ab' });
+  });
+
+  it('drops a queued submit when the form is reset while validation is pending', async () => {
+    const check = deferred<FieldFeedback | undefined>();
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { password: '' },
+        fields: { password: { validateAsync: () => check.promise } },
+        onSubmit,
+      }),
+    );
+    act(() => result.current.setValue('password', 'ab'));
+    act(() => result.current.submit());
+    act(() => result.current.reset({ password: 'next' }));
+    expect(result.current.isSubmitting).toBe(false);
+    expect(result.current.values).toEqual({ password: 'next' });
+    await act(async () => {
+      check.resolve(undefined);
+      await tick();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(result.current.isSubmitting).toBe(false);
+  });
+
   it('ignores changes and reset while submitting', async () => {
     const request = deferred<void>();
     const { result } = renderHook(() =>

@@ -43,10 +43,7 @@ type Event =
   | { type: 'COPY_FAILED' }
   | { type: 'CLOSE' };
 
-const { createMachine, assign } = setup<Context, Event>();
-
-const clearCopyError = assign(() => ({ copyFailed: false }));
-const setCopyError = assign(() => ({ copyFailed: true }));
+const { createMachine } = setup<Context, Event>();
 
 const machine = createMachine({
   id: 'createAPIKey',
@@ -54,29 +51,29 @@ const machine = createMachine({
   context: { secret: null, copyFailed: false },
   states: {
     closed: {
-      on: { OPEN: { target: 'form', actions: assign(() => ({ secret: null, copyFailed: false })) } },
+      on: { OPEN: () => ({ target: 'form', context: { secret: null, copyFailed: false } }) },
     },
     form: {
       on: {
-        CREATED: { target: 'secret', actions: assign((_, event) => ({ secret: event.secret })) },
-        CLOSE: 'closed',
+        CREATED: ({ event }) => ({ target: 'secret', context: { secret: event.secret } }),
+        CLOSE: { target: 'closed' },
       },
     },
     secret: {
-      on: { COPY: 'copying' },
+      on: { COPY: { target: 'copying' } },
     },
     copying: {
       on: {
-        COPIED: { target: 'attempted', actions: clearCopyError },
-        COPY_FAILED: { target: 'attempted', actions: setCopyError },
+        COPIED: () => ({ target: 'attempted', context: { copyFailed: false } }),
+        COPY_FAILED: () => ({ target: 'attempted', context: { copyFailed: true } }),
       },
     },
     attempted: {
       on: {
-        COPY: 'copying',
-        COPIED: { target: 'attempted', actions: clearCopyError },
-        COPY_FAILED: { target: 'attempted', actions: setCopyError },
-        CLOSE: 'closed',
+        COPY: { target: 'copying' },
+        COPIED: () => ({ target: 'attempted', context: { copyFailed: false } }),
+        COPY_FAILED: () => ({ target: 'attempted', context: { copyFailed: true } }),
+        CLOSE: { target: 'closed' },
       },
     },
   },

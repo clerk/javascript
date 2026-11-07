@@ -37,7 +37,7 @@ type SwitcherMachineEvent =
       closeOnSuccess: boolean;
     };
 
-const { createMachine, assign, fromPromise } = setup<SwitcherMachineContext, SwitcherMachineEvent>();
+const { createMachine, createInvoke } = setup<SwitcherMachineContext, SwitcherMachineEvent>();
 
 const settled = { pendingKey: null, frozenModel: null };
 
@@ -54,47 +54,48 @@ const switcherMachine = createMachine({
   states: {
     idle: {
       on: {
-        OPEN: { actions: assign(() => ({ open: true })) },
-        CLOSE: { actions: assign(() => ({ open: false })) },
-        RUN: {
-          target: 'busy',
-          guard: context => context.open,
-          actions: assign((_, event) => ({
-            pendingKey: event.key,
-            frozenModel: event.frozenModel,
-            run: event.run,
-            closeOnSuccess: event.closeOnSuccess,
-          })),
-        },
+        OPEN: () => ({ context: { open: true } }),
+        CLOSE: () => ({ context: { open: false } }),
+        RUN: ({ context, event }) =>
+          context.open
+            ? {
+                target: 'busy',
+                context: {
+                  pendingKey: event.key,
+                  frozenModel: event.frozenModel,
+                  run: event.run,
+                  closeOnSuccess: event.closeOnSuccess,
+                },
+              }
+            : undefined,
       },
     },
     // OPEN/CLOSE have no target so they do not leave this state and abandon the invoke.
     busy: {
       on: {
-        OPEN: { actions: assign(() => ({ open: true })) },
-        CLOSE: { actions: assign(() => ({ open: false })) },
+        OPEN: () => ({ context: { open: true } }),
+        CLOSE: () => ({ context: { open: false } }),
       },
-      invoke: fromPromise(context => context.run(), {
-        onDone: [
-          {
-            target: 'idle',
-            guard: context => context.closeOnSuccess,
-            actions: assign(() => ({ ...settled, open: false })),
-          },
-          { target: 'idle', actions: assign(() => settled) },
-        ],
-        // Leave `open` as the user left it. The error surface is a later change.
-        onError: {
+      invoke: createInvoke({
+        input: ({ context }) => context.run,
+        src: ({ input }) => input(),
+        onDone: ({ context }) => ({
           target: 'idle',
-          actions: [
-            assign(() => settled),
-            (_, event) => console.error('[Clerk] User button action failed', event.error),
-          ],
+          context: context.closeOnSuccess ? { ...settled, open: false } : settled,
+        }),
+        // Leave `open` as the user left it. The error surface is a later change.
+        onError: ({ event }, enq) => {
+          enq(logActionError, event.error);
+          return { target: 'idle', context: settled };
         },
       }),
     },
   },
 });
+
+function logActionError(error: unknown): void {
+  console.error('[Clerk] User button action failed', error);
+}
 
 export type SwitcherControllerOptions = { mode?: SwitcherMode } & SwitcherMenuProps;
 

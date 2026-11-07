@@ -1,8 +1,8 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
 
 import type { LocalizableError } from '../../localization';
-import { setup } from '../../machine/setup';
-import type { TransitionResult } from '../../machine/types';
+import { createAsyncLogic, setup } from '../../machine/setup';
+import type { ActorRef, AsyncArgs, Enqueue, TransitionResult } from '../../machine/types';
 import { keysOf, mapKeys } from '../../primitives/utils/object';
 import { SaveError } from '../../utils/errors';
 import type { FieldFeedback, FormError, FormFieldErrors } from './form-submit-error';
@@ -47,12 +47,19 @@ export interface FormDeps<TValues extends object> {
   errorText: (error: LocalizableError) => string;
 }
 
-export interface FormContext<TValues extends object> extends FormDeps<TValues> {
+export interface FormMachineContext<TValues extends object> {
   values: TValues;
   baseline: TValues | undefined;
   touched: Partial<Record<keyof TValues, true>>;
   async: Partial<Record<keyof TValues, AsyncFieldState>>;
   error: FormError<TValues> | undefined;
+}
+
+export interface FormContext<TValues extends object> extends FormDeps<TValues>, FormMachineContext<TValues> {}
+
+export interface FormImplementations<TValues extends object> {
+  deps: FormDeps<TValues>;
+  focus: (name: keyof TValues) => void;
 }
 
 export type FormEvent<TValues extends object> =
@@ -112,10 +119,16 @@ function isValidating<TValues extends object>(context: FormContext<TValues>): bo
 
 function submitOrStay<TValues extends object>(
   context: FormContext<TValues>,
-  patch: Partial<FormContext<TValues>>,
-): TransitionResult<FormContext<TValues>, FormState> {
+  patch: Partial<FormMachineContext<TValues>>,
+  focus: (name: keyof TValues) => void,
+  enq: Enqueue,
+): TransitionResult<FormMachineContext<TValues>, FormStep> {
   const next = { ...context, ...patch };
   if (!isValid(next)) {
+    const invalid = firstInvalid(next);
+    if (invalid !== undefined) {
+      enq(focus, invalid);
+    }
     return { target: 'editing', context: patch };
   }
   if (isValidating(next)) {
@@ -194,67 +207,87 @@ function asyncStateFor<TValues extends object>(
   return { value, feedback: context.async[name]?.feedback, pending: true };
 }
 
-type FormState = 'editing' | 'queued' | 'submitting';
+type FormStep = 'editing' | 'queued' | 'submitting';
 
-export function createFormMachine<TValues extends object>(deps: FormDeps<TValues>) {
-  const { createMachine, assign, fromPromise } = setup<FormContext<TValues>, FormEvent<TValues>>();
+export function createFormMachine<TValues extends object>(implementations: FormImplementations<TValues>) {
+  const { createMachine } = setup<FormMachineContext<TValues>, FormEvent<TValues>>();
+  const { deps } = implementations;
 
   return createMachine({
     id: 'form',
     initial: 'editing',
     context: {
-      ...deps,
       values: deps.initialValues,
       baseline: undefined,
       touched: {},
       async: {},
       error: undefined,
     },
+    ...formImplementations(implementations),
     states: {
       editing: {
         on: {
-          CHANGE: ({ context, event }) => ({ context: changed(context, event) }),
+          CHANGE: ({ context, event, self, actions }, enq) => ({
+            context: changed({ ...context, ...actions.deps() }, event, self, enq),
+          }),
           TOUCH: ({ context, event }) => ({ context: touched(context, event) }),
           VALIDATED: ({ context, event }) => {
             const async = validated(context, event);
             return async === undefined ? undefined : { context: { async } };
           },
-          SUBMIT: ({ context }) => submitOrStay(context, { touched: mapKeys(context.values, (): true => true) }),
-          RESET: ({ context, event }) => ({ context: resetTo(context, event) }),
+          SUBMIT: ({ context, actions }, enq) =>
+            submitOrStay(
+              { ...context, ...actions.deps() },
+              { touched: mapKeys(context.values, (): true => true) },
+              actions.focus,
+              enq,
+            ),
+          RESET: ({ event, actions }) => ({ context: resetTo(actions.deps(), event) }),
         },
       },
       queued: {
         on: {
-          CHANGE: ({ context, event }) => ({ target: 'editing', context: changed(context, event) }),
+          CHANGE: ({ context, event, self, actions }, enq) => ({
+            target: 'editing',
+            context: changed({ ...context, ...actions.deps() }, event, self, enq),
+          }),
           TOUCH: ({ context, event }) => ({ context: touched(context, event) }),
-          VALIDATED: ({ context, event }) => {
+          VALIDATED: ({ context, event, actions }, enq) => {
             const async = validated(context, event);
-            return async === undefined ? undefined : submitOrStay(context, { async });
+            return async === undefined
+              ? undefined
+              : submitOrStay({ ...context, ...actions.deps() }, { async }, actions.focus, enq);
           },
-          RESET: ({ context, event }) => ({ target: 'editing', context: resetTo(context, event) }),
+          RESET: ({ event, actions }) => ({ target: 'editing', context: resetTo(actions.deps(), event) }),
         },
       },
       submitting: {
-        invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
-          onDone: {
-            target: 'editing',
-            actions: [assign(() => ({ error: undefined })), (_, event) => event.output()],
+        invoke: {
+          src: 'submit',
+          input: ({ context }) => context.values,
+          onDone: ({ event }, enq) => {
+            enq(event.output);
+            return { target: 'editing', context: { error: undefined } };
           },
-          onError: [
-            {
-              guard: (_, e) => Boolean(e.error) && isReverificationCancelledError(e.error),
-              target: 'editing',
-              actions: assign(() => ({ error: undefined })),
-            },
-            {
-              target: 'editing',
-              actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
-            },
-          ],
-        }),
+          onError: ({ context, event, actions }) =>
+            Boolean(event.error) && isReverificationCancelledError(event.error)
+              ? { target: 'editing', context: { error: undefined } }
+              : { target: 'editing', context: { error: toFormError(event.error, { ...context, ...actions.deps() }) } },
+        },
       },
     },
   });
+}
+
+function submitLogic<TValues extends object>(deps: FormDeps<TValues>) {
+  return createAsyncLogic(({ input }: AsyncArgs<TValues>) => deps.onSubmit(input));
+}
+
+export function formImplementations<TValues extends object>(implementations: FormImplementations<TValues>) {
+  return {
+    actions: { deps: (): FormDeps<TValues> => implementations.deps, focus: implementations.focus },
+    actors: { submit: submitLogic(implementations.deps) },
+  };
 }
 
 type EventOf<TValues extends object, TType extends FormEvent<TValues>['type']> = Extract<
@@ -265,25 +298,46 @@ type EventOf<TValues extends object, TType extends FormEvent<TValues>['type']> =
 function changed<TValues extends object>(
   context: FormContext<TValues>,
   event: EventOf<TValues, 'CHANGE'>,
-): Partial<FormContext<TValues>> {
+  self: ActorRef<FormMachineContext<TValues>, FormEvent<TValues>>,
+  enq: Enqueue,
+): Partial<FormMachineContext<TValues>> {
+  const values = { ...context.values, [event.name]: event.value };
+  const asyncState = asyncStateFor(context, event.name, event.value);
+  const validateAsync = fieldConfig(context.fields, event.name)?.validateAsync;
+  if (asyncState !== undefined && validateAsync !== undefined) {
+    enq(startValidation, self, event, validateAsync, values);
+  }
   return {
-    values: { ...context.values, [event.name]: event.value },
-    async: { ...context.async, [event.name]: asyncStateFor(context, event.name, event.value) },
+    values,
+    async: { ...context.async, [event.name]: asyncState },
     error: withoutField(context.error, event.name),
   };
 }
 
+function startValidation<TValues extends object>(
+  self: ActorRef<FormMachineContext<TValues>, FormEvent<TValues>>,
+  event: EventOf<TValues, 'CHANGE'>,
+  validateAsync: AsyncFieldValidator<TValues[keyof TValues], TValues>,
+  values: TValues,
+): void {
+  const settle = (feedback: FieldFeedback | undefined) =>
+    self.send({ type: 'VALIDATED', name: event.name, value: event.value, feedback });
+  void new Promise<FieldFeedback | undefined>(resolve => resolve(validateAsync(event.value, values))).then(settle, () =>
+    settle(undefined),
+  );
+}
+
 function touched<TValues extends object>(
-  context: FormContext<TValues>,
+  context: FormMachineContext<TValues>,
   event: EventOf<TValues, 'TOUCH'>,
-): Partial<FormContext<TValues>> {
+): Partial<FormMachineContext<TValues>> {
   return { touched: { ...context.touched, [event.name]: true } };
 }
 
 function validated<TValues extends object>(
-  context: FormContext<TValues>,
+  context: FormMachineContext<TValues>,
   event: EventOf<TValues, 'VALIDATED'>,
-): FormContext<TValues>['async'] | undefined {
+): FormMachineContext<TValues>['async'] | undefined {
   if (context.async[event.name]?.value !== event.value) {
     return undefined;
   }
@@ -291,11 +345,11 @@ function validated<TValues extends object>(
 }
 
 function resetTo<TValues extends object>(
-  context: FormContext<TValues>,
+  deps: FormDeps<TValues>,
   event: EventOf<TValues, 'RESET'>,
-): Partial<FormContext<TValues>> {
+): Partial<FormMachineContext<TValues>> {
   return {
-    values: event.values ?? context.initialValues,
+    values: event.values ?? deps.initialValues,
     baseline: event.values,
     touched: {},
     async: {},

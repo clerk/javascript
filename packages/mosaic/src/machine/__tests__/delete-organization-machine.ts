@@ -1,6 +1,5 @@
-import { assign } from '../assign';
-import { createMachine } from '../create-machine';
-import type { DoneInvokeEvent, ErrorInvokeEvent, StateMachine } from '../types';
+import { setup } from '../setup';
+import type { StateMachine } from '../types';
 
 /**
  * Shared fixture: the delete-organization flow expressed as an explicit machine.
@@ -34,40 +33,37 @@ export type DeleteOrgEvent =
 /** The async work the `deleting` state invokes. */
 export type DestroyOrg = (context: DeleteOrgContext) => Promise<void>;
 
-export function createDeleteOrgMachine(destroyOrg: DestroyOrg): StateMachine<DeleteOrgContext, DeleteOrgEvent> {
-  return createMachine<DeleteOrgContext, DeleteOrgEvent>({
+export type DeleteOrgState = 'idle' | 'confirming' | 'deleting' | 'deleted';
+
+const deleteOrg = setup<DeleteOrgContext, DeleteOrgEvent>();
+
+export function createDeleteOrgMachine(
+  destroyOrg: DestroyOrg,
+): StateMachine<DeleteOrgContext, DeleteOrgEvent, DeleteOrgState> {
+  return deleteOrg.createMachine({
     id: 'deleteOrg',
     initial: 'idle',
     context: { name: 'Acme Inc', confirmValue: '', error: null },
     states: {
       idle: {
-        on: { OPEN: 'confirming' },
+        on: { OPEN: { target: 'confirming' } },
       },
       confirming: {
         on: {
-          // Internal transition: runs an action, stays in `confirming`.
-          TYPE: {
-            actions: assign<DeleteOrgContext, DeleteOrgEvent>((_, event) =>
-              event.type === 'TYPE' ? { confirmValue: event.value } : {},
-            ),
-          },
-          // Guarded: only proceeds once the typed name matches.
-          CONFIRM: { target: 'deleting', guard: context => context.confirmValue === context.name },
-          CANCEL: {
-            target: 'idle',
-            actions: assign<DeleteOrgContext, DeleteOrgEvent>(() => ({ confirmValue: '', error: null })),
-          },
+          // Internal transition: updates context, stays in `confirming`.
+          TYPE: ({ event }) => ({ context: { confirmValue: event.value } }),
+          // Only proceeds once the typed name matches.
+          CONFIRM: ({ context }) => (context.confirmValue === context.name ? { target: 'deleting' } : undefined),
+          CANCEL: () => ({ target: 'idle', context: { confirmValue: '', error: null } }),
         },
       },
       deleting: {
-        invoke: {
-          src: destroyOrg,
-          onDone: 'deleted',
-          onError: {
-            target: 'confirming',
-            actions: assign<DeleteOrgContext, ErrorInvokeEvent>((_, event) => ({ error: String(event.error) })),
-          },
-        },
+        invoke: deleteOrg.createInvoke({
+          input: ({ context }) => context,
+          src: ({ input }) => destroyOrg(input),
+          onDone: { target: 'deleted' },
+          onError: ({ event }) => ({ target: 'confirming', context: { error: String(event.error) } }),
+        }),
       },
       deleted: { type: 'final' },
     },
@@ -85,27 +81,27 @@ export interface LoaderContext {
 
 export type LoaderEvent = { type: 'FETCH' };
 
-export function createLoaderMachine(fetcher: () => Promise<string>): StateMachine<LoaderContext, LoaderEvent> {
-  return createMachine<LoaderContext, LoaderEvent>({
+export type LoaderState = 'idle' | 'loading' | 'success' | 'failure';
+
+const loader = setup<LoaderContext, LoaderEvent>();
+
+export function createLoaderMachine(
+  fetcher: () => Promise<string>,
+): StateMachine<LoaderContext, LoaderEvent, LoaderState> {
+  return loader.createMachine({
     initial: 'idle',
     context: { data: null, error: null },
     states: {
-      idle: { on: { FETCH: 'loading' } },
+      idle: { on: { FETCH: { target: 'loading' } } },
       loading: {
-        invoke: {
-          src: fetcher,
-          onDone: {
-            target: 'success',
-            actions: assign<LoaderContext, DoneInvokeEvent<string>>((_, event) => ({ data: event.output })),
-          },
-          onError: {
-            target: 'failure',
-            actions: assign<LoaderContext, ErrorInvokeEvent>((_, event) => ({ error: String(event.error) })),
-          },
-        },
+        invoke: loader.createInvoke({
+          src: () => fetcher(),
+          onDone: ({ event }) => ({ target: 'success', context: { data: event.output } }),
+          onError: ({ event }) => ({ target: 'failure', context: { error: String(event.error) } }),
+        }),
       },
       success: { type: 'final' },
-      failure: { on: { FETCH: 'loading' } },
+      failure: { on: { FETCH: { target: 'loading' } } },
     },
   });
 }

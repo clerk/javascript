@@ -1,11 +1,10 @@
 import { useCallback, useId, useRef } from 'react';
 
 import { useErrorText, useMessages } from '../../localization';
-import type { StateMachine } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { keysOf, mapKeys } from '../../primitives/utils/object';
-import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
-import { createFormMachine, fieldConfig, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
+import type { FieldsConfig, FormContext } from './form.machine';
+import { createFormMachine, fieldFeedback, formImplementations, initialOf, isValid } from './form.machine';
 import type { FieldFeedback } from './form-submit-error';
 
 export interface UseFormOptions<TValues extends object, TResult = unknown> {
@@ -109,41 +108,22 @@ export function useForm<TValues extends object, TResult = unknown>(
     fallbackMessage: options.errorFallback ?? m.error,
     errorText,
   };
-  const machineRef = useRef<StateMachine<FormContext<TValues>, FormEvent<TValues>> | null>(null);
+  const implementations = {
+    deps,
+    focus: (name: keyof TValues) => elements.current.get(name)?.focus(),
+  };
+  const machineRef = useRef<ReturnType<typeof createFormMachine<TValues>> | null>(null);
   if (machineRef.current === null) {
-    machineRef.current = createFormMachine(deps);
+    machineRef.current = createFormMachine(implementations);
   }
   // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
-  const [snapshot, send, actor] = useMachine(machineRef.current, { context: deps });
-  const context = { ...snapshot.context, ...deps };
+  const [snapshot, send, actor] = useMachine(machineRef.current.provide(formImplementations(implementations)));
+  const context: FormContext<TValues> = { ...snapshot.context, ...deps };
   const { values } = context;
 
-  const focusFirstInvalid = useCallback(() => {
-    const invalid = firstInvalid(actor.getSnapshot().context);
-    if (invalid !== undefined) {
-      elements.current.get(invalid)?.focus();
-    }
-  }, [actor]);
   const setValue = useCallback(
-    <K extends keyof TValues>(name: K, value: TValues[K]) => {
-      send({ type: 'CHANGE', name, value });
-      const { async, fields, values: next } = actor.getSnapshot().context;
-      const validateAsync = fieldConfig(fields, name)?.validateAsync;
-      if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
-        return;
-      }
-      const settle = (feedback: FieldFeedback | undefined) => {
-        const wasQueued = actor.getSnapshot().value === 'queued';
-        send({ type: 'VALIDATED', name, value, feedback });
-        if (wasQueued) {
-          focusFirstInvalid();
-        }
-      };
-      void new Promise<FieldFeedback | undefined>(resolve => resolve(validateAsync(value, next))).then(settle, () =>
-        settle(undefined),
-      );
-    },
-    [actor, focusFirstInvalid, send],
+    <K extends keyof TValues>(name: K, value: TValues[K]) => send({ type: 'CHANGE', name, value }),
+    [send],
   );
   const touch = useCallback((name: keyof TValues) => send({ type: 'TOUCH', name }), [send]);
   const refFor = useCallback((name: keyof TValues): ElementRef => {
@@ -161,10 +141,7 @@ export function useForm<TValues extends object, TResult = unknown>(
     refs.current.set(name, ref);
     return ref;
   }, []);
-  const submit = useCallback(() => {
-    send({ type: 'SUBMIT' });
-    focusFirstInvalid();
-  }, [focusFirstInvalid, send]);
+  const submit = useCallback(() => send({ type: 'SUBMIT' }), [send]);
   const handleSubmit = useCallback(
     (event: { preventDefault: () => void }) => {
       event.preventDefault();

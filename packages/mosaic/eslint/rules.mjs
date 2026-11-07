@@ -269,34 +269,6 @@ export const forwardRefParts = {
   },
 };
 
-export const noRawInvoke = {
-  meta: {
-    type: 'problem',
-    schema: [],
-    messages: {
-      useFromPromise: 'Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.',
-    },
-  },
-  create(context) {
-    return {
-      Property(node) {
-        if (propertyName(node.key, node.computed) !== 'invoke') {
-          return;
-        }
-        const invoke = unwrapExpression(node.value);
-        if (
-          invoke.type === 'ObjectExpression' &&
-          invoke.properties.some(
-            property => property.type === 'Property' && propertyName(property.key, property.computed) === 'src',
-          )
-        ) {
-          context.report({ node: invoke, messageId: 'useFromPromise' });
-        }
-      },
-    };
-  },
-};
-
 export const noRenderClock = {
   meta: {
     type: 'problem',

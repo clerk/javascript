@@ -1,11 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
-import { assign } from '../assign';
-import { createActor, mockActor } from '../create-actor';
-import { createMachine } from '../create-machine';
+import { createActor, restoreActor } from '../create-actor';
+import { createAsyncLogic, setup } from '../setup';
 import { useActor, useMachine, useSelector } from '../use-machine';
 import { createDeleteOrgMachine } from './delete-organization-machine';
 
@@ -31,7 +29,7 @@ describe('useMachine — drives a flow from a component', () => {
     fireEvent.click(screen.getByText('Open'));
     expect(screen.getByTestId('state')).toHaveTextContent('confirming');
 
-    // Guard blocks confirm until the name is typed.
+    // CONFIRM is unhandled until the name is typed.
     fireEvent.click(screen.getByText('Confirm'));
     expect(screen.getByTestId('state')).toHaveTextContent('confirming');
 
@@ -45,12 +43,12 @@ describe('useMachine — drives a flow from a component', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('deleted');
   });
 
-  it('exposes the actor so components can ask whether a transition is available', () => {
+  it('lets components ask the snapshot whether a transition is available', () => {
     function DeleteOrg() {
-      const [, send, actor] = useMachine(createDeleteOrgMachine(() => Promise.resolve()));
+      const [snapshot, send] = useMachine(createDeleteOrgMachine(() => Promise.resolve()));
       return (
         <div>
-          <output data-testid='can-confirm'>{String(actor.can({ type: 'CONFIRM' }))}</output>
+          <output data-testid='can-confirm'>{String(snapshot.can({ type: 'CONFIRM' }))}</output>
           <button onClick={() => send({ type: 'OPEN' })}>Open</button>
           <button onClick={() => send({ type: 'TYPE', value: 'Acme Inc' })}>Type name</button>
         </div>
@@ -67,17 +65,17 @@ describe('useMachine — drives a flow from a component', () => {
   });
 });
 
-describe('useMachine — context init option', () => {
-  it('passes runtime context through to the actor', () => {
+describe('useMachine — input option', () => {
+  it('builds the initial context from input', () => {
     type Ctx = { label: string };
-    const machine = createMachine<Ctx, { type: never }>({
+    const machine = setup<Ctx, { type: never }, { label: string }>().createMachine({
       initial: 'idle',
-      context: { label: 'default' },
+      context: ({ input }) => ({ label: input.label }),
       states: { idle: {} },
     });
 
     function Comp() {
-      const [snapshot] = useMachine(machine, { context: { label: 'runtime' } });
+      const [snapshot] = useMachine(machine, { input: { label: 'runtime' } });
       return <output>{snapshot.context.label}</output>;
     }
 
@@ -86,15 +84,15 @@ describe('useMachine — context init option', () => {
   });
 });
 
-describe('useActor + mockActor — render a teleported step', () => {
-  it('shows the content for a state reached only by teleport', () => {
-    // `deleting` sits behind a 2s mutation — unreachable by clicking. Teleport in.
-    const actor = mockActor(
-      createDeleteOrgMachine(() => Promise.resolve()),
-      {
+describe('useActor + restoreActor — render a restored step', () => {
+  it('shows the content for a state reached only by restoring it', () => {
+    const machine = createDeleteOrgMachine(() => Promise.resolve());
+    const actor = restoreActor(
+      machine,
+      machine.resolveState({
         value: 'deleting',
-        context: { name: 'Acme Inc', confirmValue: 'Acme Inc' },
-      },
+        context: { name: 'Acme Inc', confirmValue: 'Acme Inc', error: null },
+      }),
     );
 
     function Step() {
@@ -112,14 +110,14 @@ describe('useSelector — re-renders only on the selected slice', () => {
   type Ev = { type: 'INC_A' } | { type: 'INC_B' };
 
   const makeMachine = () =>
-    createMachine<Ctx, Ev>({
+    setup<Ctx, Ev>().createMachine({
       initial: 'active',
       context: { a: 0, b: 0 },
       states: {
         active: {
           on: {
-            INC_A: { actions: assign<Ctx, Ev>(c => ({ a: c.a + 1 })) },
-            INC_B: { actions: assign<Ctx, Ev>(c => ({ b: c.b + 1 })) },
+            INC_A: ({ context }) => ({ context: { a: context.a + 1 } }),
+            INC_B: ({ context }) => ({ context: { b: context.b + 1 } }),
           },
         },
       },
@@ -206,26 +204,28 @@ describe('subscription cleanup', () => {
   });
 });
 
+function makeRunMachine() {
+  return setup<object, { type: 'GO' }>().createMachine({
+    initial: 'idle',
+    context: {},
+    actors: { run: createAsyncLogic(() => Promise.resolve()) },
+    states: {
+      idle: { on: { GO: { target: 'running' } } },
+      running: { invoke: { src: 'run', onDone: { target: 'done' }, onError: { target: 'done' } } },
+      done: { type: 'final' },
+    },
+  });
+}
+
 describe('useMachine — onDone', () => {
   it('calls onDone exactly once when the machine reaches a final state', async () => {
     const gate = deferred<void>();
     const onDone = vi.fn();
 
-    type Ctx = { fn: () => Promise<void> };
-    type Ev = { type: 'GO' };
-    const machine = createMachine<Ctx, Ev>({
-      initial: 'idle',
-      context: { fn: async () => {} },
-      states: {
-        idle: { on: { GO: 'running' } },
-        running: { invoke: { src: (ctx: Ctx) => ctx.fn(), onDone: 'done', onError: 'done' } },
-        done: { type: 'final' },
-      },
-    });
+    const machine = makeRunMachine();
 
     function Comp() {
-      const [snapshot, send] = useMachine(machine, {
-        context: { fn: () => gate.promise },
+      const [snapshot, send] = useMachine(machine.provide({ actors: { run: createAsyncLogic(() => gate.promise) } }), {
         onDone,
       });
       return (
@@ -248,7 +248,7 @@ describe('useMachine — onDone', () => {
 
   it('calls onDone once when the actor restarts in a final state', () => {
     const onDone = vi.fn();
-    const machine = createMachine<object, { type: 'GO' }>({
+    const machine = setup<object, { type: 'GO' }>().createMachine({
       initial: 'done',
       context: {},
       states: { done: { type: 'final' } },
@@ -269,20 +269,12 @@ describe('useMachine — onDone', () => {
     const staleCallback = vi.fn();
     const freshCallback = vi.fn();
 
-    type Ctx = { fn: () => Promise<void> };
-    type Ev = { type: 'GO' };
-    const machine = createMachine<Ctx, Ev>({
-      initial: 'idle',
-      context: { fn: async () => {} },
-      states: {
-        idle: { on: { GO: 'running' } },
-        running: { invoke: { src: (ctx: Ctx) => ctx.fn(), onDone: 'done', onError: 'done' } },
-        done: { type: 'final' },
-      },
-    });
+    const machine = makeRunMachine();
 
     function Comp({ onDone }: { onDone: () => void }) {
-      const [, send] = useMachine(machine, { context: { fn: () => gate.promise }, onDone });
+      const [, send] = useMachine(machine.provide({ actors: { run: createAsyncLogic(() => gate.promise) } }), {
+        onDone,
+      });
       return <button onClick={() => send({ type: 'GO' })}>Go</button>;
     }
 
@@ -297,27 +289,16 @@ describe('useMachine — onDone', () => {
   });
 });
 
-describe('useMachine — live context keeps injected functions current', () => {
-  it('invokes the latest fn from options.context even when the prop changes between renders', async () => {
+describe('useMachine — provided implementations stay current', () => {
+  it('invokes the latest provided actor even when the prop changes between renders', async () => {
     const gate = deferred<void>();
     const staleFn = vi.fn(() => gate.promise);
     const freshFn = vi.fn(() => gate.promise);
 
-    type Ctx = { fn: () => Promise<void> };
-    type Ev = { type: 'GO' };
-    const machine = createMachine<Ctx, Ev>({
-      initial: 'idle',
-      context: { fn: async () => {} },
-      states: {
-        idle: { on: { GO: 'running' } },
-        running: { invoke: { src: (ctx: Ctx) => ctx.fn(), onDone: 'done', onError: 'done' } },
-        done: { type: 'final' },
-      },
-    });
+    const machine = makeRunMachine();
 
     function Runner({ run }: { run: () => Promise<void> }) {
-      // No refs — options.context is synced into the actor on every render.
-      const [snapshot, send] = useMachine(machine, { context: { fn: run } });
+      const [snapshot, send] = useMachine(machine.provide({ actors: { run: createAsyncLogic(run) } }));
       return (
         <div>
           <output data-testid='state'>{snapshot.value}</output>

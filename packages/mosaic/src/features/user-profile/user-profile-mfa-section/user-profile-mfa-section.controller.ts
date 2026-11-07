@@ -3,7 +3,6 @@ import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
-import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { downloadBackupCodes, printBackupCodes } from '../../../utils/backup-codes';
 import { toLocalizableError } from '../../../utils/errors';
@@ -73,7 +72,7 @@ type MfaEvent =
       reject: (error: unknown) => void;
     };
 
-const { createMachine, assign, fromPromise } = setup<MfaContext, MfaEvent>();
+const { createMachine, createInvoke } = setup<MfaContext, MfaEvent>();
 const REVERIFIABLE_ACTIONS: readonly MfaAction[] = ['generate', 'sms', 'prepareAuthenticator'];
 const PENDING_METHODS: Partial<Record<MfaAction, NonNullable<UserProfileMfaSetupViewProps['pendingMethod']>>> = {
   prepareAuthenticator: 'authenticator',
@@ -94,12 +93,10 @@ const mfaMachine = createMachine({
   states: {
     idle: {
       on: {
-        OPEN: { actions: assign(() => ({ flow: { kind: 'select' } })) },
-        CLOSE: {
-          actions: assign(() => ({ flow: { kind: 'closed' }, savedSetup: undefined, resendAvailableAt: undefined })),
-        },
-        SELECT_SMS: {
-          actions: assign((_, event) => ({
+        OPEN: () => ({ context: { flow: { kind: 'select' } } }),
+        CLOSE: () => ({ context: { flow: { kind: 'closed' }, savedSetup: undefined, resendAvailableAt: undefined } }),
+        SELECT_SMS: ({ event }) => ({
+          context: {
             flow: {
               kind: 'sms',
               step: event.hasPhones ? 'select' : 'phone',
@@ -108,13 +105,13 @@ const mfaMachine = createMachine({
               phoneNumber: '',
               code: '',
             },
-          })),
-        },
-        RESUME_AUTHENTICATOR: {
-          actions: assign((_, event) => ({ flow: { kind: 'authenticator', setup: event.setup, code: '' } })),
-        },
-        ADD_PHONE: {
-          actions: assign(context => ({
+          },
+        }),
+        RESUME_AUTHENTICATOR: ({ event }) => ({
+          context: { flow: { kind: 'authenticator', setup: event.setup, code: '' } },
+        }),
+        ADD_PHONE: ({ context }) => ({
+          context: {
             flow:
               context.flow.kind === 'sms'
                 ? {
@@ -127,35 +124,39 @@ const mfaMachine = createMachine({
                     error: undefined,
                   }
                 : context.flow,
-          })),
-        },
-        BACK: {
-          actions: assign((context, event) => {
-            const flow = context.flow;
-            if (flow.kind === 'sms' && flow.step === 'verify') {
-              return {
-                flow: { ...flow, step: flow.origin === 'new' ? 'phone' : 'select', code: '', error: undefined },
-              };
-            }
-            if (flow.kind === 'sms' && flow.step === 'phone' && event.hasPhones) {
-              return { flow: { ...flow, step: 'select', origin: 'existing', phoneId: undefined, error: undefined } };
-            }
+          },
+        }),
+        BACK: ({ context, event }) => {
+          const flow = context.flow;
+          if (flow.kind === 'sms' && flow.step === 'verify') {
             return {
+              context: {
+                flow: { ...flow, step: flow.origin === 'new' ? 'phone' : 'select', code: '', error: undefined },
+              },
+            };
+          }
+          if (flow.kind === 'sms' && flow.step === 'phone' && event.hasPhones) {
+            return {
+              context: { flow: { ...flow, step: 'select', origin: 'existing', phoneId: undefined, error: undefined } },
+            };
+          }
+          return {
+            context: {
               flow: { kind: 'select' },
               savedSetup: flow.kind === 'authenticator' ? flow.setup : context.savedSetup,
-            };
-          }),
+            },
+          };
         },
-        EDIT_PHONE_ID: {
-          actions: assign((context, event) => ({
+        EDIT_PHONE_ID: ({ context, event }) => ({
+          context: {
             flow:
               context.flow.kind === 'sms'
                 ? { ...context.flow, selectedPhoneId: event.value, phoneId: undefined, origin: 'existing' }
                 : context.flow,
-          })),
-        },
-        EDIT_PHONE_NUMBER: {
-          actions: assign((context, event) => ({
+          },
+        }),
+        EDIT_PHONE_NUMBER: ({ context, event }) => ({
+          context: {
             flow:
               context.flow.kind === 'sms'
                 ? {
@@ -164,27 +165,27 @@ const mfaMachine = createMachine({
                     phoneId: event.value === context.flow.phoneNumber ? context.flow.phoneId : undefined,
                   }
                 : context.flow,
-          })),
-        },
-        EDIT_CODE: {
-          actions: assign((context, event) => ({
+          },
+        }),
+        EDIT_CODE: ({ context, event }) => ({
+          context: {
             flow:
               context.flow.kind === 'sms' || context.flow.kind === 'authenticator'
                 ? { ...context.flow, code: event.value }
                 : context.flow,
-          })),
-        },
-        PRINT_FAILED: {
-          actions: assign(context => ({
+          },
+        }),
+        PRINT_FAILED: ({ context }) => ({
+          context: {
             flow:
               context.flow.kind === 'backup'
                 ? { ...context.flow, error: { code: 'mfa_print_unavailable' } }
                 : context.flow,
-          })),
-        },
-        RUN: {
+          },
+        }),
+        RUN: ({ context, event }) => ({
           target: 'busy',
-          actions: assign((context, event) => ({
+          context: {
             flow: { ...context.flow, error: undefined },
             pending: event.key,
             pendingMethods: event.methods,
@@ -192,71 +193,62 @@ const mfaMachine = createMachine({
             run: event.run,
             resolve: event.resolve,
             reject: event.reject,
-          })),
-        },
+          },
+        }),
       },
     },
     busy: {
       on: {
-        OPEN: {
-          actions: assign(() => ({ flow: { kind: 'select' }, dismissed: true })),
-        },
-        CLOSE: {
-          actions: assign(() => ({
+        OPEN: () => ({ context: { flow: { kind: 'select' }, dismissed: true } }),
+        CLOSE: () => ({
+          context: {
             flow: { kind: 'closed' },
             savedSetup: undefined,
             resendAvailableAt: undefined,
             dismissed: true,
-          })),
-        },
+          },
+        }),
       },
-      invoke: fromPromise(context => context.run(), {
-        onDone: {
-          target: 'idle',
-          actions: [
-            context => context.resolve(),
-            assign<DoneInvokeEvent<MfaFlow>>((context, event) => {
-              if (context.dismissed && event.output.kind !== 'backup') {
-                return { pending: undefined, dismissed: false };
-              }
-              return {
-                flow: event.output,
-                savedSetup:
-                  event.output.kind === 'authenticator'
-                    ? event.output.setup
-                    : event.output.kind === 'closed'
-                      ? undefined
-                      : context.savedSetup,
-                pending: undefined,
-                dismissed: false,
-                resendAvailableAt:
-                  context.pending === 'resend' ||
-                  (context.pending === 'sms' && event.output.kind === 'sms' && event.output.step === 'verify')
-                    ? resendUnlockTime(CODE_RESEND_SECONDS)
-                    : context.resendAvailableAt,
-              };
-            }),
-          ],
+      invoke: createInvoke({
+        input: ({ context }) => context.run,
+        src: ({ input }) => input(),
+        onDone: ({ context, event }, enq) => {
+          enq(context.resolve);
+          if (context.dismissed && event.output.kind !== 'backup') {
+            return { target: 'idle', context: { pending: undefined, dismissed: false } };
+          }
+          return {
+            target: 'idle',
+            context: {
+              flow: event.output,
+              savedSetup:
+                event.output.kind === 'authenticator'
+                  ? event.output.setup
+                  : event.output.kind === 'closed'
+                    ? undefined
+                    : context.savedSetup,
+              pending: undefined,
+              dismissed: false,
+              resendAvailableAt:
+                context.pending === 'resend' ||
+                (context.pending === 'sms' && event.output.kind === 'sms' && event.output.step === 'verify')
+                  ? resendUnlockTime(CODE_RESEND_SECONDS)
+                  : context.resendAvailableAt,
+            },
+          };
         },
-        onError: {
-          target: 'idle',
-          actions: [
-            (context, event) => context.reject(event.error),
-            assign((context, event) => {
-              const flow = context.flow;
-              if (context.dismissed) {
-                return { pending: undefined, dismissed: false };
-              }
-              if (isReverificationCancelledError(event.error)) {
-                return { flow: { kind: 'closed' }, pending: undefined };
-              }
-              const error = toLocalizableError(event.error);
-              return {
-                flow: { ...flow, error },
-                pending: undefined,
-              };
-            }),
-          ],
+        onError: ({ context, event }, enq) => {
+          enq(context.reject, event.error);
+          if (context.dismissed) {
+            return { target: 'idle', context: { pending: undefined, dismissed: false } };
+          }
+          if (isReverificationCancelledError(event.error)) {
+            return { target: 'idle', context: { flow: { kind: 'closed' }, pending: undefined } };
+          }
+          return {
+            target: 'idle',
+            context: { flow: { ...context.flow, error: toLocalizableError(event.error) }, pending: undefined },
+          };
         },
       }),
     },

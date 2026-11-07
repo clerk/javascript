@@ -6,7 +6,7 @@ import { useForm } from '../../../components/form';
 import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
-import type { ErrorInvokeEvent } from '../../../machine/types';
+import type { TransitionResult } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
@@ -53,7 +53,7 @@ type Event =
   | { type: 'CONNECT' }
   | { type: 'RESEND' };
 
-const { createMachine, assign, fromPromise } = setup<Context, Event>();
+const { createMachine, createInvoke } = setup<Context, Event>();
 
 function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Email verification is missing'));
@@ -61,36 +61,39 @@ function missingDependency(): Promise<never> {
 
 const LINK_RESEND_SECONDS = 60;
 
-const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
-const resend = {
-  target: 'starting' as const,
-  guard: (context: Context) => isResendUnlocked(context.resendAvailableAt),
-  actions: assign(() => ({ error: undefined })),
-};
-const start = {
-  target: 'starting' as const,
-  actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
-    verifyingId: event.id,
-    emailAddress: event.emailAddress,
-    verifier: event.verifier,
-    verification: undefined,
-    error: undefined,
-    resendAvailableAt: undefined,
-    held: false,
-  })),
-};
+type StartEvent = Extract<Event, { type: 'START' }>;
+
+function resend({ context }: { context: Context }): TransitionResult<Context, 'starting'> | undefined {
+  return isResendUnlocked(context.resendAvailableAt)
+    ? { target: 'starting', context: { error: undefined } }
+    : undefined;
+}
+
+function start(event: StartEvent, held: boolean): TransitionResult<Context, 'starting'> {
+  return {
+    target: 'starting',
+    context: {
+      verifyingId: event.id,
+      emailAddress: event.emailAddress,
+      verifier: event.verifier,
+      verification: undefined,
+      error: undefined,
+      resendAvailableAt: undefined,
+      held,
+    },
+  };
+}
 
 const sendCode = {
-  invoke: fromPromise(
-    (context: Context) => (context.verification?.method === 'code' ? context.verification.sent : missingDependency()),
-    {
-      onDone: {
-        target: 'verify',
-        actions: assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS), held: false })),
-      },
-      onError: { target: 'verify', actions: [fail, assign(() => ({ held: false }))] },
-    },
-  ),
+  invoke: createInvoke({
+    input: ({ context }) => context.verification,
+    src: ({ input }) => (input?.method === 'code' ? input.sent : missingDependency()),
+    onDone: () => ({
+      target: 'verify',
+      context: { resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS), held: false },
+    }),
+    onError: ({ event }) => ({ target: 'verify', context: { error: toFormError(event.error), held: false } }),
+  }),
 };
 
 const machine = createMachine({
@@ -108,27 +111,26 @@ const machine = createMachine({
   states: {
     idle: {
       on: {
-        ADD: {
+        ADD: () => ({
           target: 'email',
-          actions: assign(() => ({
+          context: {
             verifyingId: undefined,
             verifier: undefined,
             verification: undefined,
             error: undefined,
             resendAvailableAt: undefined,
-          })),
-        },
-        START: { ...start, actions: [start.actions, assign(() => ({ held: true }))] },
+          },
+        }),
+        START: ({ event }) => start(event, true),
       },
     },
     email: {
-      on: { CANCEL: 'idle', START: start },
+      on: { CANCEL: { target: 'idle' }, START: ({ event }) => start(event, false) },
     },
     starting: {
-      entry: assign(context => ({
-        verification: context.verifier ? context.verifier.start() : undefined,
-        error: undefined,
-      })),
+      entry: ({ context }) => ({
+        context: { verification: context.verifier ? context.verifier.start() : undefined, error: undefined },
+      }),
       always: ({ context }) => {
         const method = context.verification?.method;
         if (method === 'code') {
@@ -146,29 +148,27 @@ const machine = createMachine({
     preparing: sendCode,
     sending: sendCode,
     waiting: {
-      on: { CANCEL: 'idle', RESEND: resend },
-      invoke: fromPromise(
-        context => (context.verification?.method === 'link' ? context.verification.verified : missingDependency()),
-        {
-          onDone: 'idle',
-          onError: { actions: fail },
-        },
-      ),
+      on: { CANCEL: { target: 'idle' }, RESEND: resend },
+      invoke: createInvoke({
+        input: ({ context }) => context.verification,
+        src: ({ input }) => (input?.method === 'link' ? input.verified : missingDependency()),
+        onDone: { target: 'idle' },
+        onError: ({ event }) => ({ context: { error: toFormError(event.error) } }),
+      }),
     },
     connecting: {
-      on: { CANCEL: 'idle', CONNECT: 'redirecting' },
+      on: { CANCEL: { target: 'idle' }, CONNECT: { target: 'redirecting' } },
     },
     redirecting: {
-      invoke: fromPromise(
-        context => (context.verification?.method === 'sso' ? context.verification.connect() : missingDependency()),
-        {
-          onDone: 'connecting',
-          onError: { target: 'connecting', actions: fail },
-        },
-      ),
+      invoke: createInvoke({
+        input: ({ context }) => context.verification,
+        src: ({ input }) => (input?.method === 'sso' ? input.connect() : missingDependency()),
+        onDone: { target: 'connecting' },
+        onError: ({ event }) => ({ target: 'connecting', context: { error: toFormError(event.error) } }),
+      }),
     },
     verify: {
-      on: { CANCEL: 'idle', RESEND: resend, VERIFIED: 'idle' },
+      on: { CANCEL: { target: 'idle' }, RESEND: resend, VERIFIED: { target: 'idle' } },
     },
   },
 });
@@ -260,7 +260,7 @@ export function useUserProfileAddEmailController({
       }
     },
     onResend: () => {
-      if (!codeForm.isSubmitting && actor.can({ type: 'RESEND' })) {
+      if (!codeForm.isSubmitting && actor.getSnapshot().can({ type: 'RESEND' })) {
         codeForm.reset();
         send({ type: 'RESEND' });
       }
