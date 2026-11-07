@@ -1,5 +1,64 @@
 # @clerk/mosaic
 
+## 0.3.0
+
+### Minor Changes
+
+- **Breaking:** Simplify `Item` to one size and one look. Rows are always bordered and size to their content. TypeScript flags the removed props. ([#10665](https://github.com/clerk/javascript/pull/10665)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                   | After                    |
+  | -------------------------------------------------------- | ------------------------ |
+  | `<Item.Root size='xs' \| 'md' \| 'lg'>`                  | `<Item.Root>`            |
+  | `<Item.Root variant='outline' \| 'default'>`             | `<Item.Root>` (bordered) |
+  | `<Item.Group variant='outline' \| 'default'>`            | `<Item.Group>`           |
+  | `<Item.Separator />`                                     | Removed                  |
+  | `.cl-item[data-size]`, `.cl-item-media[data-size]`       | Removed                  |
+  | `.cl-item[data-variant]`, `.cl-item-group[data-variant]` | Removed                  |
+
+  `Item.Label`'s `variant` is unchanged.
+
+  Find usages with `git grep -nE "Item\.(Root|Group)[^>]*(size|variant)=|Item\.Separator|cl-item(-media|-group)?\[data-(size|variant)"`.
+
+- Configure the profile on `MosaicProvider` with the new `profile` prop, so `UserButton`, `OrganizationSwitcher` and `UserProfile` share one setup. This makes pairings like a user-only `UserButton` beside an `OrganizationSwitcher` with one combined profile possible. ([#10546](https://github.com/clerk/javascript/pull/10546)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  <MosaicProvider profile={{ combined: true, userProfileProps, organizationProfileProps }}>
+    <OrganizationSwitcher />
+    <UserButton combined={false} />
+  </MosaicProvider>
+  ```
+
+  Breaking changes:
+  - `UserButton`: `mode` is replaced by `combined`, which only decides what the menu lists. `mode='user'` becomes `combined={false}`, and to keep the account-only profile too, also set `profile={{ combined: false }}` on `MosaicProvider`.
+  - `UserButton` and `OrganizationSwitcher`: `userProfileProps` and `organizationProfileProps` move to `MosaicProvider`'s `profile`.
+  - `UserButton` and `OrganizationSwitcher`: `userProfileUrl` and `organizationProfileUrl` move to `MosaicProvider`'s `profile`.
+  - `UserButton` and `OrganizationSwitcher`: `userProfileMode` and `organizationProfileMode` are removed. Setting a URL routes there, and leaving it out opens the modal.
+  - `UserButton` and `OrganizationSwitcher`: `appearance` is no longer accepted in `userProfileProps` or `organizationProfileProps`.
+  - `UserButton` and `OrganizationSwitcher`: link items (`href`) are no longer accepted in `customPages`.
+  - `UserButton` and `OrganizationSwitcher`: `afterLeaveOrganizationUrl` moves to `profile.organizationProfileProps`, which also takes `apiKeysProps`.
+  - `UserProfile`: `mode` is replaced by `combined`. When unset it follows `profile.combined`, and it also picks up the provider's profile props, with its own props winning. `OrganizationProfile` picks them up the same way.
+  - With `experimental.newProfiles`, `OrganizationSwitcher` now opens the combined profile by default. Set `profile={{ combined: false }}` for the standalone organization profile.
+  - The `UserProfileMode` type is removed.
+
+### Patch Changes
+
+- `PhoneInput` requires `countryTriggerLabel`, `countryPopupLabel`, and `countrySearchLabel`, which set the accessible names of its country trigger, popup, and search input. The country picker in UserProfile's add phone number and add SMS verification dialogs can now be localized through the `userProfile.phone.addDialog.phone.*` keys. ([#10694](https://github.com/clerk/javascript/pull/10694)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Draw the divider above a card footer that follows a multi-step flow, and match the OAuth consent "Signed in as" text size to the other task footers. ([#10591](https://github.com/clerk/javascript/pull/10591)) by [@kylemac](https://github.com/kylemac)
+
+- Reduce option re-renders in `Combobox`, `Autocomplete` and `Select`. ([#10621](https://github.com/clerk/javascript/pull/10621)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- On touch devices, link buttons no longer show their underline after a tap. With reduced motion turned on, `Drawer` now opens at its resting position instead of starting below it for a frame. ([#10692](https://github.com/clerk/javascript/pull/10692)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the resend countdown in the email, phone and SMS verification dialogs staying locked too long after the device sleeps or the tab is throttled in the background. ([#10619](https://github.com/clerk/javascript/pull/10619)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the organization profile's page order when `OrganizationSwitcher` or `UserButton` opens the legacy profile for a member who can manage the SSO bypass allowlist. The Security page now stays where `pageOrder` puts it instead of moving to the top. ([#10546](https://github.com/clerk/javascript/pull/10546)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `Radio.Card`, a radio laid out as an `Item` row that picks its `value` when clicked anywhere. Fill it with `Radio.Media` and `Radio.Content`, which holds `Radio.Label` and an optional `Radio.Description`. `Radio.Group` takes `layout='stack' | 'grid'`, and `Radio.Section` splits a group into titled sets. ([#10665](https://github.com/clerk/javascript/pull/10665)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.44.2
+
 ## 0.2.2
 
 ### Patch Changes

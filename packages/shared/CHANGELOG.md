@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.44.2
+
+### Patch Changes
+
+- Fix sign-ups failing with "There is no account to transfer" when `handleRedirectCallback()` was called again while an earlier call was still running, for example because `<SignIn />` remounted during the OAuth callback. Calls made while one is running now share its result instead of starting a second transfer. ([#10671](https://github.com/clerk/javascript/pull/10671)) by [@Ephem](https://github.com/Ephem)
+
 ## 4.44.1
 
 ### Patch Changes

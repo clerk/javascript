@@ -1,5 +1,15 @@
 # @clerk/testing
 
+## 2.2.56
+
+### Patch Changes
+
+- Document the `ticket` strategy in the JSDoc for `cy.clerkSignIn()`. The command already accepts it, but its JSDoc listed only `password`, `phone_code`, and `email_code`. ([#10652](https://github.com/clerk/javascript/pull/10652)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.44.2
+  - @clerk/backend@3.27.1
+
 ## 2.2.55
 
 ### Patch Changes
