@@ -2495,6 +2495,23 @@ export const itIT: LocalizationResource = {
           'Gli ambiti richiesti sono stati aggiornati e potresti riscontrare funzionalità limitate. Per favore, ri-autorizza questa applicazione per evitare problemi.',
         title: 'Account collegati',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Elimina account',
         title: 'Terminazione account',

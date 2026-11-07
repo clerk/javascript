@@ -4,6 +4,7 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { localizationKeys } from '../../customizables';
 import {
   AccountConnectedAccounts,
+  AccountConnections,
   AccountEmails,
   AccountEnterpriseAccounts,
   AccountPhone,
@@ -28,6 +29,7 @@ export const AccountPage = withCardStateProvider(() => {
         <AccountEmails />
         <AccountPhone />
         <AccountConnectedAccounts />
+        <AccountConnections />
         <AccountEnterpriseAccounts />
         <AccountWeb3 />
       </ProfileCard.PagePanel>

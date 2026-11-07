@@ -2502,6 +2502,23 @@ export const roRO: LocalizationResource = {
           'Permisiunile necesare au fost actualizate și poți întâmpina funcționalitate limitată. Te rugăm reautorizează aplicația pentru a evita problemele.',
         title: 'Conturi conectate',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Șterge contul',
         title: 'Șterge contul',

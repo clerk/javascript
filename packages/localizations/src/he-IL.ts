@@ -2460,6 +2460,23 @@ export const heIL: LocalizationResource = {
           'ההרשאות הנדרשות עודכנו, ייתכן שאתה חווה פונקציונליות מוגבלת. אנא אשר מחדש את האפליקציה כדי להימנע מבעיות.',
         title: 'חשבונות מחוברים',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'מחק חשבון',
         title: 'מסוכן',

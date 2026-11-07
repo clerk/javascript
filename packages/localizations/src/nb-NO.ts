@@ -2512,6 +2512,23 @@ export const nbNO: LocalizationResource = {
           'De påkrevde tillatelsene har blitt oppdatert, og du kan oppleve begrenset funksjonalitet. Vennligst autoriser denne applikasjonen på nytt for å unngå problemer',
         title: 'Tilkoblede kontoer',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Slett konto',
         title: 'Fare',

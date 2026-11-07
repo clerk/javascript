@@ -2463,6 +2463,23 @@ export const kkKZ: LocalizationResource = {
         subtitle__reauthorize: 'Рұқсаттар өзгерді. Функционалдық шектеулерден аулақ болу үшін қайта рұқсат беріңіз',
         title: 'Қосылған есептік жазбалар',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Есептік жазбаны жою',
         title: 'Есептік жазбаны жою',

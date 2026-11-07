@@ -49,6 +49,7 @@ export type FieldId =
   | 'web3WalletName'
   | 'domain';
 export type ProfileSectionId =
+  | 'connections'
   | 'profile'
   | 'username'
   | 'emailAddresses'

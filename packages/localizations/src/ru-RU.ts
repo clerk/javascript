@@ -2506,6 +2506,23 @@ export const ruRU: LocalizationResource = {
           'Необходимые области доступа были обновлены, и вы можете столкнуться с ограниченной функциональностью. Пожалуйста, повторно авторизуйте приложение, чтобы избежать возможных проблем',
         title: 'Подключенные учетные записи',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Удалить учетную запись',
         title: 'Удаление учетной записи',

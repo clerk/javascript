@@ -2550,6 +2550,23 @@ export const enUS: LocalizationResource = {
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Connected accounts',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: '{{connector}} (another account)',
+        actionLabel__reconnect: 'Reconnect',
+        destructiveActionTitle: 'Disconnect',
+        failedAlert: 'The connection could not be completed. Please try again.',
+        grantedScopes: 'Access: {{scopes}}',
+        loadFailedAlert: 'Your connected services could not be loaded. Please try again later.',
+        primaryButton: 'Connect service',
+        removeResource: {
+          messageLine1: '{{identifier}} will be disconnected from this account.',
+          messageLine2: 'This application will no longer be able to use this service for you.',
+          title: 'Disconnect service',
+        },
+        status__disconnected: 'Disconnected',
+        status__needsAttention: 'Needs attention',
+        title: 'Connected services',
+      },
       dangerSection: {
         deleteAccountButton: 'Delete account',
         title: 'Delete account',

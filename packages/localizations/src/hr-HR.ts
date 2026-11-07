@@ -2514,6 +2514,23 @@ export const hrHR: LocalizationResource = {
           'Potrebna ovlaštenja su ažurirana i možda doživljavate ograničenu funkcionalnost. Molimo vas da ponovno autorizirate ovu aplikaciju kako biste izbjegli probleme',
         title: 'Povezani računi',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Izbriši račun',
         title: 'Izbriši račun',

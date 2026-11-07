@@ -2511,6 +2511,23 @@ export const hiIN: LocalizationResource = {
           'आवश्यक स्कोप अपडेट किए गए हैं, और आप सीमित कार्यक्षमता का अनुभव कर सकते हैं। किसी भी समस्या से बचने के लिए कृपया इस एप्लिकेशन को फिर से अधिकृत करें',
         title: 'कनेक्टेड खाते',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'खाता हटाएं',
         title: 'खाता हटाएं',

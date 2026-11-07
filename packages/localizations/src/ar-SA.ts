@@ -2473,6 +2473,23 @@ export const arSA: LocalizationResource = {
           'تم تحديث النطاقات المطلوبة. هذا التحديث قد يحد من العمليات الوظيفية. يرجى إعادة ترخيص هذا التطبيق لتجنب أي مشاكل',
         title: 'الحسابات المتصلة',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'حذف الحساب',
         title: 'خطر',
