@@ -2,7 +2,8 @@
  * Shared types for the Mosaic state-machine library.
  *
  * A machine is a static config object (so it is introspectable — see {@link StateMachine.states})
- * trimmed to a tiny, dependency-free core: no parallel states, history, SCXML, or spawned actors.
+ * trimmed to a tiny, dependency-free core: flat states only, with no nested or parallel states,
+ * history, or spawned actors.
  */
 
 /** The minimum shape every event must have. */
@@ -198,13 +199,18 @@ export interface StateConfig<
   on?: {
     [K in TEvent['type']]?: Transition<TContext, Extract<TEvent, { type: K }>, TStates, TActions, TEvent>;
   };
-  /** Eventless / immediate transition, evaluated on entry and after each context change in this state. */
+  /**
+   * Eventless transition, checked after the state's entry and again after any transition that
+   * patches context without leaving the state. A result with only `context` is applied and
+   * `always` is checked again, until it targets a state or stops changing context. When it
+   * leaves on entry, this state's invoke and `after` timers never start.
+   */
   always?: TransitionFn<TContext, EventObject, TStates, TActions, TEvent>;
   /**
-   * Delayed transitions — each key is a delay in milliseconds. The matching
-   * transition fires automatically after the delay unless the state is exited
-   * first (by an explicit event, `always`, or `invoke`). Timers are cancelled
-   * on exit and on `stop()`, so they never outlive the state or the actor.
+   * Delayed transitions, keyed by delay in milliseconds. The timers start when the state
+   * is entered. Any transition with a `target` clears them, including one back into this
+   * state, which starts them again. `stop()` pauses them and `start()` restarts them from
+   * the full delay.
    */
   after?: { [delay: number]: Transition<TContext, AfterEvent, TStates, TActions, TEvent> };
   invoke?: Invoke<TContext, TEvent, TStates, TActions, TActors>;
@@ -286,13 +292,17 @@ export type Unsubscribe = () => void;
 
 export interface Actor<TContext, TEvent extends EventObject, TStates extends string = string> {
   /**
-   * Run the initial state's entry, `always` and invoke, then apply the events sent before
-   * this first start, in order. After a `stop()`, resume in the current state instead:
-   * re-arm its `after` timers, then apply the invoke results and events that arrived
-   * while stopped, in arrival order.
+   * Enter the initial state (entry, `always`, invoke and `after` timers), then apply the
+   * events sent before this first start, in order. After a `stop()`, resume in the current
+   * state instead: restart its `after` timers from the full delay, then apply the invoke
+   * results and events that arrived while stopped, in arrival order. An invoke that was
+   * running across the stop is not restarted. Does nothing while already started.
    */
   start: () => Actor<TContext, TEvent, TStates>;
-  /** Stop the actor, pausing its `after` timers and holding in-flight invoke results and sent events for a later `start()`. */
+  /**
+   * Stop the actor, pausing its `after` timers and holding in-flight invoke results and sent
+   * events for a later `start()`. Subscribers get the stopped snapshot once, then all are removed.
+   */
   stop: () => void;
   /** Send an event. Ignored once the actor is `done`; queued until `start()` before the first start and while `stopped`. */
   send: (event: TEvent | RouteEvent) => void;

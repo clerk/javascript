@@ -87,11 +87,11 @@ interface AfterTimer {
 }
 
 /**
- * Wrap a machine definition in a running instance (an "actor").
+ * Wrap a machine definition in an actor, the instance that runs it.
  *
- * Construction is lazy: the snapshot reflects the initial state, but entry,
- * immediate (`always`) transitions, and invokes don't run until
- * {@link Actor.start} is called.
+ * Construction is lazy: the snapshot already holds the initial state (after any
+ * `choice`) and the initial context, but entry, `always`, invoke and `after`
+ * timers wait for {@link Actor.start}.
  *
  * ```ts
  * const actor = createActor(machine);
@@ -115,8 +115,10 @@ export function createActor<
 }
 
 /**
- * Create an actor seated in a snapshot from `machine.resolveState(...)`. Restoring runs
- * no entry, `always` or invoke for that state; `start()` then resumes it.
+ * Create an actor seated in a snapshot from `machine.resolveState(...)`. The seated
+ * state's entry, `always`, invoke and `after` timers never run, even after `start()`;
+ * the actor only reacts to events from there. Use it to render a step that is hard to
+ * reach, such as one waiting on an invoke.
  *
  * ```ts
  * const actor = restoreActor(machine, machine.resolveState({ value: 'deleting', context })).start();

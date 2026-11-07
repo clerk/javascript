@@ -49,7 +49,9 @@ export function setup<TContext extends object, TEvent extends EventObject, TInpu
     ): StateMachine<TContext, TEvent, TStates, TActions, TActors, TInput> => _createMachine(config),
 
     /**
-     * An inline invoke whose resolved type flows into `onDone`.
+     * An inline invoke for a state. `input` maps the state's args to the input, `src`
+     * gets `{ input, signal }`, and its resolved value types `onDone`'s `event.output`.
+     * The signal aborts when the state is left, and a result that settles after that is dropped.
      *
      * ```ts
      * loading: {
@@ -66,7 +68,8 @@ export function setup<TContext extends object, TEvent extends EventObject, TInpu
 }
 
 /**
- * Async logic for a named actor, invoked with `invoke: { src: 'name', input }`.
+ * Async logic for a named actor. Declare it under the machine's `actors` and run it from a
+ * state with `invoke: { src: 'name', input: ({ context }) => … }`. It gets `{ input, signal }`.
  *
  * ```ts
  * actors: { save: createAsyncLogic(({ input }: AsyncArgs<Values>) => api.save(input)) }
