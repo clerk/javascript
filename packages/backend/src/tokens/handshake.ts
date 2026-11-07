@@ -79,7 +79,7 @@ export async function verifyHandshakeToken(
   let key;
 
   if (jwtKey) {
-    key = loadClerkJwkFromPem({ kid, pem: jwtKey });
+    key = data.header.alg === 'EdDSA' ? jwtKey : loadClerkJwkFromPem({ kid, pem: jwtKey });
   } else if (secretKey) {
     // Fetch JWKS from Backend API using the key
     key = await loadClerkJWKFromRemote({ secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });

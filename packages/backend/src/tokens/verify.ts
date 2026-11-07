@@ -135,10 +135,10 @@ export async function verifyToken(
   }
 
   try {
-    let key: JsonWebKey;
+    let key: JsonWebKey | string;
 
     if (options.jwtKey) {
-      key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
+      key = decodedResult.header.alg === 'EdDSA' ? options.jwtKey : loadClerkJwkFromPem({ kid, pem: options.jwtKey });
     } else if (options.secretKey) {
       key = await loadClerkJWKFromRemote({ ...options, kid });
     } else {

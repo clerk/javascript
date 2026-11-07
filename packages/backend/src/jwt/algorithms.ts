@@ -11,9 +11,12 @@ const jwksAlgToCryptoAlg: Record<string, string> = {
   RS512: RSA_ALGORITHM_NAME,
 };
 
-export const algs = Object.keys(algToHash);
+export const algs = [...Object.keys(algToHash), 'EdDSA'];
 
-export function getCryptoAlgorithm(algorithmName: string): RsaHashedImportParams {
+export function getCryptoAlgorithm(algorithmName: string): RsaHashedImportParams | Algorithm {
+  if (algorithmName === 'EdDSA') {
+    return { name: 'Ed25519' };
+  }
   const hash = algToHash[algorithmName];
   const name = jwksAlgToCryptoAlg[algorithmName];
 

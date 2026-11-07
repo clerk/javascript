@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
+import { createBackendApiClient } from '../../api/factory';
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
 import {
   mockExpiredJwt,
@@ -507,6 +508,63 @@ describe('tokens.authenticateRequest(options)', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.clearAllMocks();
+  });
+
+  describe('Poppy account precedence', () => {
+    const endpoint = 'https://example.com/poppy/browser-session';
+    const browserToken = 'a'.repeat(40);
+    const cookie = encodeURIComponent(`${encodeURIComponent(endpoint)}|${browserToken}`);
+    const account = { user_id: mockJwtPayload.sub, session_id: mockJwtPayload.sid, scopes: ['poppy:browser-sign-in'] };
+
+    it.each([
+      { name: 'guest join preserves an independent Clerk login', body: {}, authenticated: true },
+      { name: 'signed-in join accepts its matching Clerk Session', body: { account }, authenticated: true },
+      {
+        name: 'pending join rejects an earlier account',
+        body: { account: { ...account, session_id: 'sess_other' } },
+        authenticated: false,
+      },
+      { name: 'guest rejoin cannot restore an earlier login', body: { replaced_sign_in: true }, authenticated: false },
+      { name: 'authority outage rejects account access', body: {}, status: 503, authenticated: false },
+    ])('$name', async ({ body, status = 200, authenticated }) => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)),
+        http.post('https://clerk.inspired.puma-74.lcl.dev/v1/poppy/browser_sessions/read', () =>
+          HttpResponse.json(body, { status }),
+        ),
+      );
+      const state = await authenticateRequest(
+        mockRequestWithHeaderAuth({ cookie: `__Host-poppy_session=${cookie}` }, 'https://example.com/path'),
+        mockOptions({ apiClient: createBackendApiClient({ publishableKey: PK_TEST }) }),
+      );
+      expect(state.isAuthenticated).toBe(authenticated);
+      if (!authenticated) {
+        expect(state.reason).toBe(AuthErrorReason.PoppyAccountInvalid);
+      }
+    });
+
+    it.each([true, false])('checks a Poppy JWT without its browser cookie; live grant=%s', async active => {
+      const { data: jwt } = await signJwt(
+        { ...mockJwtPayload, agt: { id: 'client', poppy: { session_id: 'poppy-session' } } },
+        signingJwks,
+        {
+          algorithm: 'RS256',
+          header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        },
+      );
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)),
+        http.post('https://clerk.inspired.puma-74.lcl.dev/v1/poppy/browser_sessions/verify', ({ request }) => {
+          expect(request.headers.get('authorization')).toBe(`Bearer ${jwt}`);
+          return HttpResponse.json(active ? account : { errors: [] }, { status: active ? 200 : 401 });
+        }),
+      );
+      const state = await authenticateRequest(
+        mockRequestWithHeaderAuth({ authorization: `Bearer ${jwt}` }),
+        mockOptions({ apiClient: createBackendApiClient({ publishableKey: PK_TEST }) }),
+      );
+      expect(state.isAuthenticated).toBe(active);
+    });
   });
 
   //
