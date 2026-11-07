@@ -764,6 +764,8 @@ export type __internal_LocalizationResource = {
         failedAlert: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
         actionLabel__reconnect: LocalizationValue;
+        actionLabel__additionalAccount: LocalizationValue<'connector'>;
+        grantedScopes: LocalizationValue<'scopes'>;
         status__needsAttention: LocalizationValue;
         status__disconnected: LocalizationValue;
         loadFailedAlert: LocalizationValue;

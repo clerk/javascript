@@ -88,9 +88,8 @@ export const ConnectionsSection = withCardStateProvider(() => {
     connection =>
       connection.status !== 'disconnected' || allConnectors.some(connector => connector.key === connection.connector),
   );
-  const unconnected = allConnectors.filter(
-    connector => !allConnections.some(connection => connection.connector === connector.key),
-  );
+  const hasConnection = (connector: AvailableConnector) =>
+    allConnections.some(connection => connection.connector === connector.key);
 
   if (!loadFailed && allConnectors.length === 0 && allConnections.length === 0) {
     return null;
@@ -123,7 +122,11 @@ export const ConnectionsSection = withCardStateProvider(() => {
 
   const connect = (connector: AvailableConnector) =>
     startFlow(connector.key, () =>
-      clerk.connect.connections.connect({ connector: connector.key, returnUrl: returnUrl() }),
+      clerk.connect.connections.connect({
+        connector: connector.key,
+        returnUrl: returnUrl(),
+        additionalAccount: hasConnection(connector),
+      }),
     );
   const reconnect = (connection: CurrentUserConnection) =>
     startFlow(connection.id, () => clerk.connect.connections.reauthorize(connection.id, { returnUrl: returnUrl() }));
@@ -156,6 +159,7 @@ export const ConnectionsSection = withCardStateProvider(() => {
               key={connection.id}
               connection={connection}
               displayName={allConnectors.find(c => c.key === connection.connector)?.displayName ?? connection.connector}
+              scopeLabels={allConnectors.find(c => c.key === connection.connector)?.scopeLabels ?? {}}
               isLoading={card.isLoading}
               isReconnecting={card.loadingMetadata === connection.id}
               canReconnect={allConnectors.some(c => c.key === connection.connector)}
@@ -165,12 +169,12 @@ export const ConnectionsSection = withCardStateProvider(() => {
           ))}
         </ProfileSection.ItemList>
       </Action.Root>
-      {!loadFailed && unconnected.length > 0 ? (
+      {!loadFailed && allConnectors.length > 0 ? (
         <ProfileSection.ActionMenu
           id='connections'
           triggerLocalizationKey={localizationKeys('userProfile.start.connectionsSection.primaryButton')}
         >
-          {unconnected.map(connector => (
+          {allConnectors.map(connector => (
             <ProfileSection.ActionMenuItem
               key={connector.id}
               id={connector.key}
@@ -180,7 +184,13 @@ export const ConnectionsSection = withCardStateProvider(() => {
               data-connector={connector.key}
               isDisabled={card.isLoading}
               isLoading={card.loadingMetadata === connector.key}
-              localizationKey={connector.displayName}
+              localizationKey={
+                hasConnection(connector)
+                  ? localizationKeys('userProfile.start.connectionsSection.actionLabel__additionalAccount', {
+                      connector: connector.displayName,
+                    })
+                  : connector.displayName
+              }
               onClick={() => void connect(connector)}
               sx={t => ({ justifyContent: 'start', gap: t.space.$2 })}
             />
@@ -230,13 +240,16 @@ const DisconnectScreen = (props: { connectionId: string; displayName: string; on
 const ConnectionItem = (props: {
   connection: CurrentUserConnection;
   displayName: string;
+  scopeLabels: Record<string, string>;
   isLoading: boolean;
   isReconnecting: boolean;
   canReconnect: boolean;
   onReconnect: () => void;
   onDisconnected: () => void;
 }) => {
-  const { connection, displayName, isLoading, isReconnecting, canReconnect, onReconnect, onDisconnected } = props;
+  const { connection, displayName, scopeLabels, isLoading, isReconnecting, canReconnect, onReconnect, onDisconnected } =
+    props;
+  const grantedScopes = connection.scopes.map(scope => scopeLabels[scope] ?? scope).join(', ');
   const isActive = connection.status === 'active';
   const label = connection.providerAccount?.label;
   const removeAction = `disconnect-${connection.id}`;
@@ -274,6 +287,17 @@ const ConnectionItem = (props: {
         </Flex>
         {connection.status === 'disconnected' ? null : <ConnectionMenu removeAction={removeAction} />}
       </ProfileSection.Item>
+      {connection.status === 'disconnected' || !grantedScopes ? null : (
+        <Text
+          colorScheme='secondary'
+          variant='caption'
+          data-connection-scopes
+          sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5}` })}
+          localizationKey={localizationKeys('userProfile.start.connectionsSection.grantedScopes', {
+            scopes: grantedScopes,
+          })}
+        />
+      )}
       {isActive || !canReconnect ? null : (
         <Box sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5}` })}>
           <Button

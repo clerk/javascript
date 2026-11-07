@@ -62,10 +62,9 @@ export type ConnectUserParams = {
 
 export type GetConnectionCredentialParams = {
   userId: string;
-  key: string;
   scopes: string[];
   expiresIn?: number;
-};
+} & ({ key: string; connectionId?: never } | { connectionId: string; key?: never });
 
 export type ListConnectionsParams = {
   userId?: string;

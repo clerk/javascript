@@ -2523,9 +2523,11 @@ export const taIN: LocalizationResource = {
         title: 'இணைக்கப்பட்ட கணக்குகள்',
       },
       connectionsSection: {
+        actionLabel__additionalAccount: undefined,
         actionLabel__reconnect: undefined,
         destructiveActionTitle: undefined,
         failedAlert: undefined,
+        grantedScopes: undefined,
         loadFailedAlert: undefined,
         primaryButton: undefined,
         removeResource: {

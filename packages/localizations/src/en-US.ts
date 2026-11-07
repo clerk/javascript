@@ -2551,9 +2551,11 @@ export const enUS: LocalizationResource = {
         title: 'Connected accounts',
       },
       connectionsSection: {
+        actionLabel__additionalAccount: '{{connector}} (another account)',
         actionLabel__reconnect: 'Reconnect',
         destructiveActionTitle: 'Disconnect',
         failedAlert: 'The connection could not be completed. Please try again.',
+        grantedScopes: 'Access: {{scopes}}',
         loadFailedAlert: 'Your connected services could not be loaded. Please try again later.',
         primaryButton: 'Connect service',
         removeResource: {

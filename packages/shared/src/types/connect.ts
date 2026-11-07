@@ -11,6 +11,7 @@ export interface AvailableConnector {
   displayName: string;
   provider: string | { type: 'custom' };
   scopes: string[];
+  scopeLabels: Record<string, string>;
   logoUrl: string | null;
 }
 
@@ -48,6 +49,10 @@ export type CurrentUserConnectParams = {
   key?: string;
   scopes?: string[];
   returnUrl: string;
+  /**
+   * Connects another account to a connector the user already uses. Clerk picks the key.
+   */
+  additionalAccount?: boolean;
 };
 
 export type CurrentUserReauthorizeParams = {

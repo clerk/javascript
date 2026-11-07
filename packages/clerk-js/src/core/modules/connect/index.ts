@@ -19,6 +19,7 @@ type ConnectorJSON = {
   display_name: string;
   provider: string | { type: 'custom' };
   scopes: string[];
+  scope_labels?: Record<string, string>;
   logo_url: string | null;
 };
 
@@ -48,6 +49,7 @@ const toConnector = (json: ConnectorJSON): AvailableConnector => ({
   displayName: json.display_name,
   provider: json.provider,
   scopes: json.scopes,
+  scopeLabels: json.scope_labels ?? {},
   logoUrl: json.logo_url,
 });
 

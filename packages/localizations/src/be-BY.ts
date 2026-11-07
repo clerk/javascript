@@ -2494,9 +2494,11 @@ export const beBY: LocalizationResource = {
         title: 'Падключаныя ўліковыя запісы',
       },
       connectionsSection: {
+        actionLabel__additionalAccount: undefined,
         actionLabel__reconnect: undefined,
         destructiveActionTitle: undefined,
         failedAlert: undefined,
+        grantedScopes: undefined,
         loadFailedAlert: undefined,
         primaryButton: undefined,
         removeResource: {

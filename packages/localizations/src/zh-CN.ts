@@ -2450,9 +2450,11 @@ export const zhCN: LocalizationResource = {
         title: '已连接的账户',
       },
       connectionsSection: {
+        actionLabel__additionalAccount: undefined,
         actionLabel__reconnect: undefined,
         destructiveActionTitle: undefined,
         failedAlert: undefined,
+        grantedScopes: undefined,
         loadFailedAlert: undefined,
         primaryButton: undefined,
         removeResource: {

@@ -2464,9 +2464,11 @@ export const kkKZ: LocalizationResource = {
         title: 'Қосылған есептік жазбалар',
       },
       connectionsSection: {
+        actionLabel__additionalAccount: undefined,
         actionLabel__reconnect: undefined,
         destructiveActionTitle: undefined,
         failedAlert: undefined,
+        grantedScopes: undefined,
         loadFailedAlert: undefined,
         primaryButton: undefined,
         removeResource: {

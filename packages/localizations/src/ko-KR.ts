@@ -2469,9 +2469,11 @@ export const koKR: LocalizationResource = {
         title: '연결된 계정',
       },
       connectionsSection: {
+        actionLabel__additionalAccount: undefined,
         actionLabel__reconnect: undefined,
         destructiveActionTitle: undefined,
         failedAlert: undefined,
+        grantedScopes: undefined,
         loadFailedAlert: undefined,
         primaryButton: undefined,
         removeResource: {

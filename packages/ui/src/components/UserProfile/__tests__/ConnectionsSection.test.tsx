@@ -12,12 +12,13 @@ const withUser = createFixtures.config(f => {
   f.withUser({});
 });
 
-const connector = { id: 'cnr_1', key: 'acme', displayName: 'Acme Tasks' };
+const connector = { id: 'cnr_1', key: 'acme', displayName: 'Acme Tasks', scopeLabels: { 'tasks.read': 'Read tasks' } };
 const connection = {
   id: 'cnn_1',
   key: 'acme',
   connector: 'acme',
   status: 'active',
+  scopes: ['tasks.read', 'tasks.write'],
   providerAccount: { id: '1', label: 'pat@acme.example' },
 };
 
@@ -94,5 +95,28 @@ describe('ConnectionsSection', () => {
 
     expect(await screen.findByText(/pat@acme\.example/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /reconnect/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the access the user granted, with readable names where known', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    mockConnect(fixtures, { connections: [connection] });
+    render(<ConnectionsSection />, { wrapper });
+
+    expect(await screen.findByText('Access: Read tasks, tasks.write')).toBeInTheDocument();
+  });
+
+  it('offers another account for a service the user already connected', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    const api = mockConnect(fixtures, { connections: [connection] });
+    api.connections.connect.mockResolvedValue({ status: 'complete', connection });
+    const { userEvent } = render(<ConnectionsSection />, { wrapper });
+
+    await userEvent.click(await screen.findByRole('button', { name: /connect service/i }));
+    await userEvent.click(await screen.findByText('Acme Tasks (another account)'));
+    await waitFor(() =>
+      expect(api.connections.connect).toHaveBeenCalledWith(
+        expect.objectContaining({ connector: 'acme', additionalAccount: true }),
+      ),
+    );
   });
 });

@@ -2512,9 +2512,11 @@ export const bnIN: LocalizationResource = {
         title: 'সংযুক্ত অ্যাকাউন্ট',
       },
       connectionsSection: {
+        actionLabel__additionalAccount: undefined,
         actionLabel__reconnect: undefined,
         destructiveActionTitle: undefined,
         failedAlert: undefined,
+        grantedScopes: undefined,
         loadFailedAlert: undefined,
         primaryButton: undefined,
         removeResource: {
