@@ -206,7 +206,8 @@ export interface StateConfig<
   };
   /**
    * Eventless transition, checked after the state's entry and again after any transition that
-   * patches context without leaving the state. A result with only `context` is applied and
+   * stays in the state, whether or not it changes context. An event the state does not handle
+   * skips it. A result with only `context` is applied and
    * `always` is checked again, until it targets a state or stops changing context. When it
    * leaves on entry, this state's invoke and `after` timers never start.
    */

@@ -458,6 +458,41 @@ describe('createActor — always', () => {
     expect(actor.getSnapshot().value).toBe('done');
   });
 
+  it('re-checks always after a handled event that leaves context as it was', () => {
+    const machine = setup<Empty, { type: 'PING' } | { type: 'NOOP' }>().createMachine({
+      initial: 'check',
+      context: {},
+      states: {
+        check: {
+          always: ({ event }) => (event.type === 'PING' || event.type === 'NOOP' ? { target: 'done' } : undefined),
+          on: { PING: (_, enq) => enq(() => {}), NOOP: () => ({}) },
+        },
+        done: {},
+      },
+    });
+
+    for (const type of ['PING', 'NOOP'] as const) {
+      const actor = createActor(machine).start();
+      actor.send({ type });
+      expect(actor.getSnapshot().value).toBe('done');
+    }
+  });
+
+  it('does not check always for an unhandled event', () => {
+    const always = vi.fn(() => undefined);
+    const machine = setup<Empty, { type: 'UNHANDLED' }>().createMachine({
+      initial: 'check',
+      context: {},
+      states: { check: { always } },
+    });
+    const actor = createActor(machine).start();
+    always.mockClear();
+
+    actor.send({ type: 'UNHANDLED' });
+
+    expect(always).not.toHaveBeenCalled();
+  });
+
   it('re-checks always after an invoke settles with only a context change', async () => {
     const ready = setup<{ ready: boolean }, { type: 'never' }>();
     const machine = ready.createMachine({

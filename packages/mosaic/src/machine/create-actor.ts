@@ -292,13 +292,12 @@ function runActor<
       invocationAbort = undefined;
       clearAfterTimers();
     }
-    const before = context;
     applyContext(taken.context);
     effects.push(...taken.effects);
     if (target !== undefined) {
       value = resolveChoice(target, event);
       enterState(event);
-    } else if (context !== before) {
+    } else {
       takeAlways(event);
     }
   }

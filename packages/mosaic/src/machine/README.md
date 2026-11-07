@@ -200,7 +200,8 @@ types `onDone`'s `event.output`.
 You've already seen `states`, `on`, `context`, and `invoke`. The rest:
 
 - **`always`** — an eventless transition, checked when the state is entered
-  and again after any transition that changes context while staying in it.
+  and again after any transition that stays in it, even one that changes
+  nothing. An event the state does not handle skips it.
   A result with only `context` is applied, then `always` is checked again.
   Listeners see one snapshot, after `always` settles. Good for "leave as soon
   as X is true."
