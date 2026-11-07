@@ -88,6 +88,10 @@ const unseatedDeps: ReverificationDeps = {
   finish: notSeated,
 };
 
+type Seated = ReverificationDeps & Pick<ReverificationActiveModel, 'supportEmail'>;
+
+const unseated: Seated = { ...unseatedDeps, supportEmail: '' };
+
 function latestDeps(seated: { current: ReverificationDeps }): ReverificationDeps {
   return {
     start: () => seated.current.start(),
@@ -443,7 +447,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
   const errorText = useErrorText();
   const active = model.status === 'active' ? model : null;
 
-  const seated = useRef<ReverificationDeps>(unseatedDeps);
+  const seated = useRef<Seated>(unseated);
   useLayoutEffect(() => {
     if (active) {
       seated.current = active;
@@ -453,7 +457,6 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
     // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
     reverificationMachine.provide({ actors: reverificationActors(latestDeps(seated)) }),
   );
-  const supportEmail = active?.supportEmail ?? '';
 
   const resendSeconds = useResendSeconds(snapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
 
@@ -527,6 +530,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       onShowHelp: () => send({ type: 'SHOW_HELP' }),
       onBack: () => send({ type: 'BACK' }),
       onEmailSupport: () => {
+        const supportEmail = seated.current.supportEmail;
         if (supportEmail) {
           window.location.assign(`mailto:${supportEmail}`);
         }
@@ -541,5 +545,5 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
     };
 
     return state === 'retrying' ? { status: 'retrying', ...view } : { status: 'ready', onCancel, ...view };
-  }, [inactive, snapshot, onCancel, send, m, errorText, resendSeconds, supportEmail]);
+  }, [inactive, snapshot, onCancel, send, m, errorText, resendSeconds]);
 }

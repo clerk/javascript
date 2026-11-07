@@ -1361,6 +1361,40 @@ describe('Reverification', () => {
         navigations.stop();
       }
     });
+
+    it('emails support while the session is briefly unset during a navigation', async () => {
+      const { clerk, navigate } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor, emailFactor] }),
+        undefined,
+        { supportEmail: 'option@acme.test' },
+      );
+      const navigation = deferred<undefined>();
+      navigate.mockImplementationOnce(() => navigation.promise);
+      const navigations = captureNavigations();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Get help' }));
+        const emailSupport = await screen.findByRole('button', { name: 'Email support' });
+
+        let switching: Promise<void> = Promise.resolve();
+        act(() => {
+          switching = clerk.setActive({ session: 'sess_1', redirectUrl: '/elsewhere' });
+        });
+        await waitFor(() => expect(navigate).toHaveBeenCalledWith('/elsewhere'));
+        expect(clerk.session).toBeUndefined();
+
+        await user.click(emailSupport);
+        await waitFor(() => expect(navigations.urls).toEqual(['mailto:option@acme.test']));
+        navigation.resolve(undefined);
+        await act(() => switching);
+      } finally {
+        navigations.stop();
+      }
+    });
   });
 
   describe('finishing', () => {
