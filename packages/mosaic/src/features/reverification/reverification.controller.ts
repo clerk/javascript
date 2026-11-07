@@ -1,5 +1,5 @@
 import { isClerkRuntimeError } from '@clerk/shared/error';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import { useResendSeconds } from '../../hooks/use-resend-seconds';
@@ -87,6 +87,15 @@ const unseatedDeps: ReverificationDeps = {
   attempt: notSeated,
   finish: notSeated,
 };
+
+function latestDeps(seated: { current: ReverificationDeps }): ReverificationDeps {
+  return {
+    start: () => seated.current.start(),
+    prepare: method => seated.current.prepare(method),
+    attempt: (method, value) => seated.current.attempt(method, value),
+    finish: () => seated.current.finish(),
+  };
+}
 
 function reverificationActors(deps: ReverificationDeps) {
   return {
@@ -434,8 +443,15 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
   const errorText = useErrorText();
   const active = model.status === 'active' ? model : null;
 
+  const seated = useRef<ReverificationDeps>(unseatedDeps);
+  useLayoutEffect(() => {
+    if (active) {
+      seated.current = active;
+    }
+  });
   const [snapshot, send] = useMachine(
-    reverificationMachine.provide({ actors: reverificationActors(active ?? unseatedDeps) }),
+    // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
+    reverificationMachine.provide({ actors: reverificationActors(latestDeps(seated)) }),
   );
   const supportEmail = active?.supportEmail ?? '';
 
