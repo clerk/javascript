@@ -4,6 +4,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "agents-md:sync": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./scripts/sync-agents-md.mjs",
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
     "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs",
     "bundlewatch": "turbo run bundlewatch",
@@ -20,6 +21,7 @@
     "preinstall": "npx only-allow pnpm",
     "integration:secrets": "node ./scripts/1password-keys.mjs",
     "lint": "node ./scripts/lint.mjs",
+    "lint:agents-md": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./scripts/sync-agents-md.mjs --check",
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:dashboard-links": "node ./scripts/check-dashboard-links.mjs",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",

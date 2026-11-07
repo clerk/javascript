@@ -65,6 +65,7 @@ export default defineConfig((overrideOptions: Options) => {
       experimental: 'src/experimental.ts',
       legacy: 'src/legacy.ts',
       types: 'src/types/index.ts',
+      vite: 'src/vite.ts',
     },
     dts: true,
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,

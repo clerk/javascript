@@ -115,6 +115,7 @@ jobs:
           pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-native-components pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-biometrics pack --pack-destination "$SDK_PACK_DIR"
+          pnpm --filter @clerk/shared pack --pack-destination "$SDK_PACK_DIR"
 
       - name: Install fixture dependencies
         if: steps.native-build-cache.outputs.cache-hit != 'true'
@@ -123,6 +124,8 @@ jobs:
           EXPO_SDK: ${{ matrix.expo-sdk }}
         run: |
           cp "package.sdk-$EXPO_SDK.json" package.json
+          SHARED_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-shared-*.tgz)"
+          printf 'overrides:\n  "@clerk/shared": "file:%s"\n' "$SHARED_TARBALL" >> pnpm-workspace.yaml
           pnpm install --no-frozen-lockfile
           # [0-9] keeps this glob off the other clerk-expo-* tarballs.
           SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"

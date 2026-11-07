@@ -85,6 +85,9 @@ jobs:
       - name: Check Dashboard links
         run: pnpm lint:dashboard-links
 
+      - name: Check SDK AGENTS.md
+        run: pnpm lint:agents-md
+
       - name: Verify localizations are generated
         run: |
           pnpm --filter @clerk/localizations generate

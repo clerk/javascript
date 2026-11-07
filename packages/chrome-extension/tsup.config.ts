@@ -16,6 +16,7 @@ export default defineConfig(overrideOptions => {
       './src/legacy.ts',
       './src/react/index.ts',
       './src/types/index.ts',
+      './src/vite.ts',
     ],
     bundle: true,
     clean: true,

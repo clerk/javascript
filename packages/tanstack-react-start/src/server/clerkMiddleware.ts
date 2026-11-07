@@ -6,6 +6,7 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
 import { createMiddleware } from '@tanstack/react-start';
 
+import { writeAgentRulesOnce } from './agentRules';
 import { clerkClient } from './clerkClient';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
@@ -15,6 +16,8 @@ export const clerkMiddleware = (
   options?: ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback,
 ): AnyRequestMiddleware => {
   return createMiddleware().server(async ({ request, next }) => {
+    writeAgentRulesOnce();
+
     const clerkRequest = createClerkRequest(patchRequest(request));
 
     // Resolve options: if function, call it with context object; otherwise use as-is
