@@ -21,6 +21,8 @@ type ConnectorJSON = {
   scopes: string[];
   scope_labels?: Record<string, string>;
   logo_url: string | null;
+  authentication_method?: AvailableConnector['authenticationMethod'];
+  api_key?: { instructions: string | null; help_url: string | null } | null;
 };
 
 type ConnectionJSON = {
@@ -30,6 +32,7 @@ type ConnectionJSON = {
   scopes: string[];
   status: CurrentUserConnection['status'];
   provider_account: { id: string; label: string | null } | null;
+  api_key_hint?: string | null;
   created_at: number;
   updated_at: number;
   disconnected_at: number | null;
@@ -51,6 +54,8 @@ const toConnector = (json: ConnectorJSON): AvailableConnector => ({
   scopes: json.scopes,
   scopeLabels: json.scope_labels ?? {},
   logoUrl: json.logo_url,
+  authenticationMethod: json.authentication_method ?? 'oauth',
+  apiKey: json.api_key ? { instructions: json.api_key.instructions, helpUrl: json.api_key.help_url } : null,
 });
 
 const toConnection = (json: ConnectionJSON): CurrentUserConnection => ({
@@ -60,6 +65,7 @@ const toConnection = (json: ConnectionJSON): CurrentUserConnection => ({
   scopes: json.scopes,
   status: json.status,
   providerAccount: json.provider_account,
+  apiKeyHint: json.api_key_hint ?? null,
   createdAt: new Date(json.created_at),
   updatedAt: new Date(json.updated_at),
   disconnectedAt: json.disconnected_at === null ? null : new Date(json.disconnected_at),

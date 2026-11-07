@@ -109,4 +109,45 @@ describe('ConnectApi', () => {
       action: { type: 'redirect', url: 'https://clerk.test/v1/connect/authorize', expiresAt: 1 },
     });
   });
+
+  it('connects with an API key and reads an API key credential without scopes', async () => {
+    const bodies: unknown[] = [];
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/users/user_1/connections',
+        validateHeaders(async ({ request }) => {
+          bodies.push(await request.json());
+          return HttpResponse.json({
+            status: 'complete',
+            connection: { object: 'connection', id: 'cnn_1', slug: 'openai', api_key_hint: '••••abcd' },
+          });
+        }),
+      ),
+      http.post(
+        'https://api.clerk.test/v1/users/user_1/connection_credentials',
+        validateHeaders(async ({ request }) => {
+          bodies.push(await request.json());
+          return HttpResponse.json({
+            object: 'connection_credential',
+            connection_id: 'cnn_1',
+            type: 'api_key',
+            api_key: 'sk-test-abcd',
+            expires_at: null,
+            granted_scopes: [],
+          });
+        }),
+      ),
+    );
+
+    const result = await apiClient.connect.connections.create({
+      userId: 'user_1',
+      connector: 'openai',
+      apiKey: 'sk-test-abcd',
+    });
+    const credential = await apiClient.connect.connections.getCredential({ userId: 'user_1', slug: 'openai' });
+
+    expect(bodies).toEqual([{ connector: 'openai', api_key: 'sk-test-abcd' }, { slug: 'openai' }]);
+    expect(result.status === 'complete' && result.connection.apiKeyHint).toBe('••••abcd');
+    expect(credential.type === 'api_key' && credential.apiKey).toBe('sk-test-abcd');
+  });
 });

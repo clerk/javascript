@@ -37,7 +37,92 @@ const mockConnect = (fixtures: any, { connectors = [connector], connections = []
   return api;
 };
 
+const apiKeyConnector = {
+  id: 'cnr_2',
+  slug: 'openai',
+  displayName: 'OpenAI',
+  scopeLabels: {},
+  authenticationMethod: 'api_key',
+  apiKey: { instructions: 'Create a key in your OpenAI settings.', helpUrl: 'https://platform.openai.com/api-keys' },
+};
+const apiKeyConnection = {
+  id: 'cnn_3',
+  slug: 'openai',
+  connector: 'openai',
+  status: 'active',
+  scopes: [],
+  providerAccount: null,
+  apiKeyHint: '••••abcd',
+};
+
 describe('ConnectionsSection', () => {
+  it('stores a pasted API key without a redirect', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    const api = mockConnect(fixtures, { connectors: [apiKeyConnector] });
+    api.connections.create.mockResolvedValue({ status: 'complete', connection: apiKeyConnection });
+    const { userEvent } = render(<ConnectionsSection />, { wrapper });
+
+    await userEvent.click(await screen.findByRole('button', { name: /connect service/i }));
+    await userEvent.click(await screen.findByText('OpenAI'));
+    expect(await screen.findByText('Create a key in your OpenAI settings.')).toBeInTheDocument();
+    await userEvent.type(await screen.findByLabelText(/api key/i), '  sk-test-abcd  ');
+    await userEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() =>
+      expect(api.connections.create).toHaveBeenCalledWith({
+        connector: 'openai',
+        apiKey: 'sk-test-abcd',
+        additionalAccount: false,
+      }),
+    );
+  });
+
+  it('reconnects a disconnected API key connection instead of adding another account', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    const api = mockConnect(fixtures, {
+      connectors: [apiKeyConnector],
+      connections: [{ ...apiKeyConnection, status: 'disconnected' }],
+    });
+    api.connections.reauthorize.mockResolvedValue({ status: 'complete', connection: apiKeyConnection });
+    const { userEvent } = render(<ConnectionsSection />, { wrapper });
+
+    await userEvent.click(await screen.findByRole('button', { name: /connect service/i }));
+    await userEvent.click(await waitFor(() => document.querySelector('[data-connector="openai"]') as HTMLElement));
+    await userEvent.type(await screen.findByLabelText(/api key/i), 'sk-again-1234');
+    await userEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(api.connections.reauthorize).toHaveBeenCalledWith('cnn_3', { apiKey: 'sk-again-1234' }));
+    expect(api.connections.create).not.toHaveBeenCalled();
+  });
+
+  it('reconnects a disconnected OAuth connection instead of adding another account', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    const api = mockConnect(fixtures, { connections: [{ ...connection, status: 'disconnected' }] });
+    api.connections.reauthorize.mockResolvedValue({ status: 'complete', connection });
+    const { userEvent } = render(<ConnectionsSection />, { wrapper });
+
+    await userEvent.click(await screen.findByRole('button', { name: /connect service/i }));
+    await userEvent.click(await waitFor(() => document.querySelector('[data-connector="acme"]') as HTMLElement));
+
+    await waitFor(() => expect(api.connections.reauthorize).toHaveBeenCalledWith('cnn_1', expect.any(Object)));
+    expect(api.connections.create).not.toHaveBeenCalled();
+  });
+
+  it('shows the key hint and replaces the key through reauthorize', async () => {
+    const { wrapper, fixtures } = await createFixtures(withUser);
+    const api = mockConnect(fixtures, { connectors: [apiKeyConnector], connections: [apiKeyConnection] });
+    api.connections.reauthorize.mockResolvedValue({ status: 'complete', connection: apiKeyConnection });
+    const { userEvent } = render(<ConnectionsSection />, { wrapper });
+
+    expect(await screen.findByText(/••••abcd/)).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /replace api key/i }));
+    await userEvent.type(await screen.findByLabelText(/api key/i), 'sk-new-wxyz');
+    await userEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(api.connections.reauthorize).toHaveBeenCalledWith('cnn_3', { apiKey: 'sk-new-wxyz' }));
+  });
+
   it('names each service in the connect menu', async () => {
     const { wrapper, fixtures } = await createFixtures(withUser);
     mockConnect(fixtures);

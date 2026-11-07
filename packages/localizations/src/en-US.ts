@@ -2553,6 +2553,14 @@ export const enUS: LocalizationResource = {
       connectionsSection: {
         actionLabel__additionalAccount: '{{connector}} (another account)',
         actionLabel__reconnect: 'Reconnect',
+        actionLabel__replaceApiKey: 'Replace API key',
+        apiKeyForm: {
+          helpLink: 'Where do I find my API key?',
+          label: 'API key',
+          placeholder: 'Paste your API key',
+          title: 'Connect {{connector}}',
+          title__replace: 'Replace {{connector}} API key',
+        },
         destructiveActionTitle: 'Disconnect',
         failedAlert: 'The connection could not be completed. Please try again.',
         grantedScopes: 'Access: {{scopes}}',

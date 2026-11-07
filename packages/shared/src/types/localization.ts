@@ -764,7 +764,15 @@ export type __internal_LocalizationResource = {
         failedAlert: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
         actionLabel__reconnect: LocalizationValue;
+        actionLabel__replaceApiKey: LocalizationValue;
         actionLabel__additionalAccount: LocalizationValue<'connector'>;
+        apiKeyForm: {
+          title: LocalizationValue<'connector'>;
+          title__replace: LocalizationValue<'connector'>;
+          label: LocalizationValue;
+          placeholder: LocalizationValue;
+          helpLink: LocalizationValue;
+        };
         grantedScopes: LocalizationValue<'scopes'>;
         status__needsAttention: LocalizationValue;
         status__disconnected: LocalizationValue;

@@ -3,6 +3,11 @@ import type { ClerkPaginatedResponse } from './pagination';
 export type ConnectionStatus = 'active' | 'needs_attention' | 'disconnected';
 
 /**
+ * How a connector authorizes a user: an OAuth redirect, or an API key the user pastes.
+ */
+export type ConnectAuthenticationMethod = 'oauth' | 'api_key';
+
+/**
  * A connector the current user can connect to. It has no OAuth client settings.
  */
 export interface AvailableConnector {
@@ -13,6 +18,11 @@ export interface AvailableConnector {
   scopes: string[];
   scopeLabels: Record<string, string>;
   logoUrl: string | null;
+  authenticationMethod: ConnectAuthenticationMethod;
+  /**
+   * Help for finding the key, present when `authenticationMethod` is `api_key`.
+   */
+  apiKey: { instructions: string | null; helpUrl: string | null } | null;
 }
 
 /**
@@ -25,6 +35,10 @@ export interface CurrentUserConnection {
   scopes: string[];
   status: ConnectionStatus;
   providerAccount: { id: string; label: string | null } | null;
+  /**
+   * The masked end of the stored API key, such as `••••abcd`, for an API key connection.
+   */
+  apiKeyHint: string | null;
   createdAt: Date;
   updatedAt: Date;
   disconnectedAt: Date | null;
@@ -48,7 +62,14 @@ export type CurrentUserConnectParams = {
   connector: string;
   slug?: string;
   scopes?: string[];
-  returnUrl: string;
+  /**
+   * Where the browser returns after an OAuth redirect. API key connectors do not redirect.
+   */
+  returnUrl?: string;
+  /**
+   * The key the user pastes, for a connector whose `authenticationMethod` is `api_key`.
+   */
+  apiKey?: string;
   /**
    * Connects another account to a connector the user already uses. Clerk picks the slug.
    */
@@ -57,7 +78,11 @@ export type CurrentUserConnectParams = {
 
 export type CurrentUserReauthorizeParams = {
   scopes?: string[];
-  returnUrl: string;
+  returnUrl?: string;
+  /**
+   * A replacement key for an API key connection.
+   */
+  apiKey?: string;
 };
 
 /**

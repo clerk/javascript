@@ -51,10 +51,13 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
 export type {
   ConnectConnector,
   ConnectConnectorConfigurationParams,
+  ConnectApiKeyConfigurationParams,
   CreateConnectorParams,
   UpdateConnectorParams,
   ConnectConnection,
   ConnectConnectionCredential,
+  ConnectOAuthConnectionCredential,
+  ConnectApiKeyConnectionCredential,
   ConnectResult,
   ConnectUserParams,
   GetConnectionCredentialParams,
