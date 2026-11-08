@@ -125,7 +125,7 @@
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "bundlewatch": "^0.4.2",
-    "minimatch": "^10.2.5",
+    "minimatch": "^11.0.0",
     "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
   },
