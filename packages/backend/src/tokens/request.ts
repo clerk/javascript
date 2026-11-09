@@ -784,7 +784,16 @@ export const authenticateRequest: AuthenticateRequest = (async (
       });
     }
 
-    // Handle as a regular session token
+    // Handle as a regular session token. Mirrors the session-only header path.
+    if (hasNonSessionJwtCategory(tokenInHeader)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
     if (errors) {
       return handleSessionTokenError(errors[0], 'header');

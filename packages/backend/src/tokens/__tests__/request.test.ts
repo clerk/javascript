@@ -596,8 +596,10 @@ describe('tokens.authenticateRequest(options)', () => {
       ['unknown', 'cl_some_future_unknown_cat'],
     ];
 
+    const inHeader = (jwt: string) => mockRequestWithHeaderAuth({ authorization: `Bearer ${jwt}` });
+
     describe.each([
-      ['headerToken', (jwt: string) => mockRequestWithHeaderAuth({ authorization: `Bearer ${jwt}` })],
+      ['headerToken', inHeader, {}],
       [
         'cookieToken',
         (jwt: string) =>
@@ -605,27 +607,56 @@ describe('tokens.authenticateRequest(options)', () => {
             {},
             { __clerk_db_jwt: 'deadbeef', __client_uat: `${mockJwtPayload.iat - 10}`, __session: jwt },
           ),
+        {},
       ],
-    ])('%s', (_label, buildRequest) => {
+      ['headerToken, acceptsToken: any', inHeader, { acceptsToken: 'any' as const }],
+      [
+        'headerToken, acceptsToken: [session_token, m2m_token]',
+        inHeader,
+        { acceptsToken: ['session_token', 'm2m_token'] as const },
+      ],
+    ])('%s', (_label, buildRequest, options) => {
       test.each(nonSessionCategories)('returns signed out for a %s presented as a session token', async (_, cat) => {
-        const requestState = await authenticateRequest(buildRequest(await signWithCategory(cat)), mockOptions());
+        const requestState = await authenticateRequest(buildRequest(await signWithCategory(cat)), mockOptions(options));
 
         expect(requestState).toBeSignedOut({ reason: AuthErrorReason.TokenTypeMismatch, message: '' });
         expect(requestState.toAuth()).toBeSignedOutToAuth();
       });
     });
 
-    test.each([
-      ['the session-token category', JWT_CATEGORY_SESSION_TOKEN],
-      ['no category', undefined],
-    ])('headerToken: returns signed in for a token with %s', async (_, cat) => {
-      const requestState = await authenticateRequest(
-        mockRequestWithHeaderAuth({ authorization: `Bearer ${await signWithCategory(cat)}` }),
-        mockOptions(),
-      );
+    describe.each([
+      ['headerToken', {}],
+      ['headerToken, acceptsToken: any', { acceptsToken: 'any' as const }],
+      [
+        'headerToken, acceptsToken: [session_token, m2m_token]',
+        { acceptsToken: ['session_token', 'm2m_token'] as const },
+      ],
+    ])('%s', (_label, options) => {
+      test.each([
+        ['the session-token category', JWT_CATEGORY_SESSION_TOKEN],
+        ['no category', undefined],
+      ])('returns signed in for a token with %s', async (_, cat) => {
+        const requestState = await authenticateRequest(inHeader(await signWithCategory(cat)), mockOptions(options));
 
-      expect(requestState).toBeSignedIn();
+        expect(requestState).toBeSignedIn();
+      });
     });
+
+    test.each([['m2m_token' as const], ['any' as const]])(
+      'still authenticates an M2M JWT with acceptsToken: %s',
+      async acceptsToken => {
+        const { data: m2mJwt } = await signJwt(
+          { ...mockJwtPayload, sub: 'mch_2vYVtestTESTtestTESTtestTESTtest', jti: 'mt_test' },
+          signingJwks,
+          { algorithm: 'RS256', header: { typ: 'JWT', kid: mockRsaJwkKid, cat: JWT_CATEGORY_M2M_TOKEN } },
+        );
+
+        const requestState = await authenticateRequest(inHeader(m2mJwt!), mockOptions({ acceptsToken }));
+
+        expect(requestState.isAuthenticated).toBe(true);
+        expect(requestState.tokenType).toBe('m2m_token');
+      },
+    );
   });
 
   // todo(
