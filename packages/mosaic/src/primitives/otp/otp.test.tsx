@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -349,6 +349,85 @@ describe('Otp', () => {
       await user.paste('1-2-3-4');
 
       expect(inputs().map(i => i.value)).toEqual(['1', '2', '3', '4']);
+    });
+
+    describe('while no slot has focus', () => {
+      function pasteOnPage(text: string) {
+        const data = new DataTransfer();
+        data.setData('text', text);
+        const event = new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true });
+        document.body.dispatchEvent(event);
+        return event;
+      }
+
+      it('fills the whole code, focuses the last slot and completes', async () => {
+        const onComplete = vi.fn();
+        render(
+          <Harness
+            length={4}
+            defaultValue='9'
+            onComplete={onComplete}
+          />,
+        );
+
+        await act(() => pasteOnPage(' 12-34 '));
+
+        expect(inputs().map(i => i.value)).toEqual(['1', '2', '3', '4']);
+        expect(inputs()[3]).toHaveFocus();
+        expect(onComplete).toHaveBeenCalledWith('1234');
+      });
+
+      it('ignores text that is not exactly a code', async () => {
+        render(<Harness length={4} />);
+
+        await act(() => pasteOnPage('Your code is 1234'));
+        await act(() => pasteOnPage('123'));
+        await act(() => pasteOnPage('12345'));
+
+        expect(inputs().map(i => i.value)).toEqual(['', '', '', '']);
+      });
+
+      it('leaves a paste into another field alone', async () => {
+        const user = userEvent.setup();
+        render(
+          <>
+            <input aria-label='Other' />
+            <Harness length={4} />
+          </>,
+        );
+
+        await user.click(screen.getByRole('textbox', { name: 'Other' }));
+        await user.paste('1234');
+
+        expect(screen.getByRole('textbox', { name: 'Other' })).toHaveValue('1234');
+        expect(inputs().map(i => i.value)).toEqual(['', '', '', '']);
+      });
+
+      it('ignores a paste while disabled', async () => {
+        render(
+          <Harness
+            length={4}
+            disabled
+          />,
+        );
+
+        await act(() => pasteOnPage('1234'));
+
+        expect(inputs().map(i => i.value)).toEqual(['', '', '', '']);
+      });
+
+      it('fills only one field when two are mounted', async () => {
+        render(
+          <>
+            <Harness length={4} />
+            <Harness length={4} />
+          </>,
+        );
+
+        await act(() => pasteOnPage('1234'));
+
+        expect(inputs().map(i => i.value)).toEqual(['1', '2', '3', '4', '', '', '', '']);
+      });
     });
   });
 

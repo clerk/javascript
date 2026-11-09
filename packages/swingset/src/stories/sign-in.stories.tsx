@@ -484,6 +484,15 @@ export function EmailCode() {
   return <StepPanel step='email-code' />;
 }
 
+export function EmailCodeInboxLink() {
+  return (
+    <StepPanel
+      step='email-code'
+      identifier='jane@gmail.com'
+    />
+  );
+}
+
 export function Totp() {
   return (
     <StepPanel
