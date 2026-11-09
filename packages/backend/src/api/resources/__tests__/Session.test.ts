@@ -34,6 +34,17 @@ describe('Session', () => {
       expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: '' });
     });
 
+    it.each([
+      ['a number', { sub: 42, type: 'agent', task_id: 'task_1' }],
+      ['missing', { type: 'agent', task_id: 'task_1' }],
+      ['an empty string', { sub: '', type: 'agent', task_id: 'task_1' }],
+    ])('sets agent sub to an empty string when the agent actor sub is %s', (_, actor) => {
+      const session = Session.fromJSON({ ...baseJSON, actor } as unknown as SessionJSON);
+
+      expect(session.actor).toEqual(actor);
+      expect(session.agent).toStrictEqual({ sub: '', type: 'agent', task_id: 'task_1' });
+    });
+
     it('sets actor and a null agent for an impersonation session', () => {
       const actor = { sub: 'user_2' };
       const session = Session.fromJSON({ ...baseJSON, actor } as SessionJSON);

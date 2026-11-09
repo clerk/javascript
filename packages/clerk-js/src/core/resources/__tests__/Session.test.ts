@@ -2713,6 +2713,26 @@ describe('Session', () => {
       expect(session.actor).toEqual(actor);
       expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: '' });
     });
+
+    it.each([
+      ['a number', { sub: 42, type: 'agent', task_id: 'agttsk_1' }],
+      ['missing', { type: 'agent', task_id: 'agttsk_1' }],
+      ['an empty string', { sub: '', type: 'agent', task_id: 'agttsk_1' }],
+    ])('sets agent sub to an empty string when the agent actor sub is %s', (_, actor) => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as unknown as SessionJSON);
+
+      expect(session.actor).toEqual(actor);
+      expect(session.agent).toStrictEqual({ sub: '', type: 'agent', task_id: 'agttsk_1' });
+    });
   });
 
   describe('session-minter monotonic guard', () => {

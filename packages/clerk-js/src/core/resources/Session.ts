@@ -451,7 +451,7 @@ export class Session extends BaseResource implements SessionResource {
     this.agent =
       data.actor?.type === 'agent'
         ? {
-            sub: data.actor.sub,
+            sub: typeof data.actor.sub === 'string' ? data.actor.sub : '',
             type: 'agent',
             task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : '',
           }
