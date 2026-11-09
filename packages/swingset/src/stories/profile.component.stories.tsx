@@ -173,7 +173,7 @@ function Surface({ stub, ...props }: Partial<ProfileRootProps> & { stub?: boolea
             icon={
               <Icon
                 glyph={item.icon}
-                size='sm'
+                size='md'
               />
             }
             badge={item.id === 'security' ? <Badge>2</Badge> : undefined}

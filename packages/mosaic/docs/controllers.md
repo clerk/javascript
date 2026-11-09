@@ -1,95 +1,82 @@
 # Controllers
 
-The controller sits between the view and the outside world. It holds the **local
-state** — what is open, what is in flight, what the view may do next — and wraps
-the model's actions so the surface can report and survive them.
+Read this when you write or change a `*.controller.ts(x)`, a state machine, or how a feature handles pending state, errors, dialogs or focus after a removal. It covers which tool holds the state and how actions are wrapped; the machine runtime itself is in `src/machine/README.md`.
 
-It does **not** touch Clerk. Its effects arrive as injected plain functions:
-from a model (`models.md`) when a wrapper composes the two, or as a prop when a
-leaf view calls its own controller. That keeps the controller independent of
-where its effects come from.
+Worked examples: `src/features/switcher/switcher.controller.tsx` wraps a model; `src/features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts` takes its one effect as a prop.
 
-Worked examples:
+## Rules
 
-- `packages/mosaic/src/features/switcher/switcher.controller.tsx` — wraps a model
-- `packages/mosaic/src/features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`
-  — takes its one effect as a prop
-
-See `packages/mosaic/ARCHITECTURE.md` → "Controllers" for the layer contract.
+- No Clerk imports. Effects arrive as injected plain functions, from a model or as a prop. If a controller needs a Clerk fact, the model supplies it as data.
+- No machine snapshot in the return value. Return the plain props the view reads (`open`, `pendingKey`, `isDeleting`, `errorMessage`), never `snapshot` or `send`.
+- Pass the model's `status` through (`if (model.status !== 'ready') return { status: model.status };`), so the wrapper branches on one value.
+- An absent model callback stays absent, so a capability the instance lacks never reaches the view as a dead affordance.
+- Only the controller decides what closes the surface. `onSelectOrganization` closes on success; a switch that leaves the menu useful does not; a navigation closes before it hands off.
+- Dismissing must not abandon an in-flight effect. Closing may hide the surface, but the busy action keeps running, and only one action runs at a time. A surface that shows the action's error refuses to close once the action can no longer be cancelled; while a reverification challenge can still be cancelled, closing cancels it (`canClose` in `src/blocks/confirm/confirm.controller.ts`).
+- Check [Reuse before you write](../AGENTS.md#reuse-before-you-write) before holding any state by hand.
 
 ## Which one holds the state
-
-A controller is not a machine wrapper. It is the layer that owns the
-interaction, and it holds that state in whichever tool the interaction's
-complexity calls for:
 
 | The interaction…                                                              | Hold it in                                                  |
 | ----------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | Is a boolean or a controlled value, no async, nothing else depends on it      | `useState`                                                  |
-| Has an async lifecycle, or two values that must change together               | A machine, same file                                        |
-| Has a coordinated async core plus some UI-only flags beside it                | Both — machine for the core                                 |
+| Has an async lifecycle, or two values that must change together               | A machine, in the controller file                           |
+| Has a coordinated async core plus some UI-only flags beside it                | Both: a machine for the core                                |
 | Is one async action from a button or a row, needing only pending and an error | `usePendingAction`                                          |
 | Is a form                                                                     | `useForm`                                                   |
 | Is a confirm step before an action                                            | `useConfirmController` with `Confirmation` or `Destructive` |
 
-Check `packages/mosaic/AGENTS.md` → "Reuse before you write" before holding any
-of this by hand. If nothing there fits, ask the user before adding a new pattern.
+The choice is invisible from outside: the controller returns plain props either way, so swapping one for the other later is a change to one file. Do not front-load a machine for a flow that has not earned one, and do not leave a coordinated async flow in flag soup because it started as one boolean. A single open boolean earns nothing; a two-state machine with one event is a boolean spelled long. `src/machine/ADOPTION.md` has the full criteria, including what stays `useState` inside a component that has a machine.
 
-`usePendingAction({ errorFallback })` covers the async actions a button or a
-list row starts: set a default, sign out a device, accept or decline a request,
-connect an account. One hook covers a whole section: every `run(key, action)`
-shares one lock, so a second click anywhere is ignored while one is in flight.
-It owns the error (see "Errors"):
+`useConfirmController` earns a machine because the confirm is async, a failure must land back on the confirming step with a reason, and a cancelled reverification must close without one. `useSwitcherController` earns one because `open` and `pendingKey` constrain each other.
+
+### `usePendingAction`
+
+`usePendingAction({ errorFallback })` covers the async actions a button or row starts: set a default, sign out a device, accept a request, connect an account. Every `run(key, action)` from one hook shares one lock, so one hook covers a whole section and a second click anywhere is ignored while one is in flight. It owns the error (see [Errors](#errors)).
 
 ```ts
 const actions = usePendingAction({ errorFallback: messages.errors.generic });
 
 return {
-  rows: rows.map(row => (actions.errorKey === row.id ? { ...row, error: actions.error } : row)),
-  pendingId: actions.pendingKey,
+  rows: rows.map(row => ({
+    ...row,
+    isPending: actions.pendingKey === row.id,
+    error: actions.errorKey === row.id ? actions.error : undefined,
+  })),
   onRemove: id => void actions.run(id, () => onRemove(id)),
 };
 ```
 
-`run` resolves `true` on success, so the caller can close a dialog or move
-focus. To hold pending through an OAuth redirect, await a delay inside the
-action (`user-profile-connected-accounts-section.controller.ts`). When the user
-cancels a reverification challenge, `run` resolves `false` without showing an
-error and releases the lock. It is not for:
-
-- a form → `useForm`
-- a confirm step → `useConfirmController` with `Confirmation` / `Destructive`
-- an action whose result drives other state → a machine
-- a check that reruns as the user types → `useDebouncedAsync` (`hooks/`), or a
-  form field's `validateAsync`
-
-`useConfirmController` earns a machine: the confirm is async, a failure must land
-back on the confirming step with a reason, and a cancelled reverification must
-close without one. `useSwitcherController` earns one because `open` and
-`pendingKey` constrain each other and dismissing must not abandon an in-flight
-invoke.
-
-`useConfirmController({ onConfirm, reverification, errorFallback })` owns one
-confirm dialog: open, pending, error, and the verify step a reverified action
-swaps in. It is generic over a payload. Create it in the wrapper, pass it to the
-view, and the view hands it to the block as `controller` and opens it from a row
-with `open(payload)`; the copy props read the payload and `onConfirm` receives it.
-A dialog next to its button has no payload and takes the button as `trigger`.
-
-An action Clerk may interrupt for step-up verification goes through
-`useReverificationFlow` in the model, which wraps the raw Clerk call and returns
-the `reverification` controller beside the mapped callback (see
-[Models](models.md)). The controller passes it on, and the block shows the
-verify step inside the same dialog:
+When direct actions and a confirmation must not run together, keep each owner and combine their pending state in the section controller:
 
 ```ts
-// model
-const [removeEmail, reverification] = useReverificationFlow((user: UserResource, id: string) =>
-  byId(user.emailAddresses, id, 'email address').destroy(),
-);
-return { ..., onRemoveEmail: id => saveAsUser(current => removeEmail(current, id)), reverification };
+const actions = usePendingAction();
+const remove = useConfirmController<UserProfileEmail>({
+  onConfirm: contact => removalFocus.remove(contact.id),
+  reverification,
+});
 
-// controller
+return {
+  contacts: contacts.map(contact => ({ ...contact, isPrimaryPending: actions.pendingKey === contact.id })),
+  isDisabled: actions.isPending || remove.isPending,
+  remove,
+};
+```
+
+Pass `isDisabled` to every control that starts one of the actions, including the item that opens the confirmation. `remove.isPending` stays true after the dialog closes during a reverification until the confirmed action settles, and the controller ignores `confirm` until then, so closing the dialog never lets a second action start. Put each row's pending state on the row the controller returns, so views render it without comparing pending keys.
+
+- `run` resolves `true` on success, so the caller can close a dialog or move focus. A cancelled reverification resolves `false`, shows no error and releases the lock.
+- To hold pending through an OAuth redirect, await a delay inside the action (`user-profile-connected-accounts-section.controller.ts`).
+- It is not for a form (`useForm`), a confirm step (`useConfirmController`), an action whose result drives other state (a machine), or a check that reruns as the user types (`useDebouncedAsync`, or a field's `validateAsync`).
+
+For a direct action in `ActionMenu`, opt in with `status: 'idle'` and set it to `'pending'` in the click event while the request runs and no dialog is open yet; the menu closes on the next render unless an action is pending. While pending, the menu reserves room for a spinner, disables its actions and blocks dismissal. It closes when the status returns to `'idle'`. Leave `status` undefined for ordinary actions that close through the menu's own click.
+
+### Confirm steps and step-up verification
+
+`useConfirmController({ onConfirm, reverification, errorFallback })` owns one confirm dialog: open, pending, error, and the verify step a reverified action swaps in. It is generic over a payload. Create it in the wrapper or controller and pass it to the view, which hands it to the block ([Views → Blocks](views.md#blocks)).
+
+An action Clerk may interrupt for verification goes through `useReverificationFlow` in the model ([Models → Step-up verification](models.md#step-up-verification)). The controller passes the returned `reverification` on, and the block shows the verify step inside the same dialog:
+
+```ts
 const removalFocus = useListRemovalFocus({ ids, onRemove: onRemoveEmail, fallback });
 const remove = useConfirmController<UserProfileEmail>({
   onConfirm: email => removalFocus.remove(email.id),
@@ -97,25 +84,11 @@ const remove = useConfirmController<UserProfileEmail>({
 });
 ```
 
-For a direct action without a confirmation step, pass the controller from
-`useReverificationFlow` to `ReverificationDialog` (`blocks/reverification/`) in the view. Keep the direct
-action under `usePendingAction` so its lock and ordinary errors stay with the
-section. The dialog opens once `visible` is true, so it skips the loading card, and offers
-dismissal only while the controller has a cancel callback. Return focus with the hook's
-`lastKey`, which outlives the run, unlike `pendingKey`.
+For a direct action with no confirm step, keep it under `usePendingAction`, so its lock and ordinary errors stay with the section, and pass the `reverification` controller to `ReverificationDialog` in the view. The dialog opens once `visible` is true, so it skips the loading card, and offers dismissal only while the controller has a cancel callback. Return focus with the hook's `lastKey`, which outlives the run, unlike `pendingKey`.
 
-For a direct action in `ActionMenu`, opt in with `status: 'idle'`. Set it to
-`'pending'` while its request runs and no dialog is open yet. Update the status
-in the click event, since the menu closes on the next render unless an action
-is pending. The menu reserves room for a spinner, disables its actions, and
-blocks dismissal while pending. It closes when the status returns to `'idle'`,
-whether a dialog opened or the request settled. Leave `status` undefined for
-ordinary actions that close through the menu's native click behavior. Ordinary
-failures use the section's existing error.
+### `useForm`
 
-A single open boolean earns nothing. A two-state machine with one event is a
-boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
-`useState` and hands the async part to `useForm`:
+`useUserProfileEditUsernameController` holds `isOpen` in `useState` and hands the async part to `useForm`:
 
 ```tsx
 const [isOpen, setIsOpen] = useState(false);
@@ -126,259 +99,103 @@ const form = useForm({
 });
 ```
 
-Keep mutations and required revalidation in `onSubmit`. Put success UI, such as
-closing the dialog or showing a toast, in the optional synchronous
-`onSuccess(result, submittedValues)` callback. The result type comes from
-`onSubmit`. The callback and values belong to the submission that started the
-request. The form machine delivers success only while its actor is mounted.
-Rejection and cancelled reverification skip the callback.
-
-The callback runs during the completion transition, before `isSubmitting` clears.
-Use it to close or display UI, not to reset or resubmit the form. A resolved
-`onSubmit` counts as success even if it returned early. Prevent no-op submissions
-with `canSubmit`, or return a result that lets `onSuccess` distinguish them.
-Unmount suppression does not cancel the underlying request. Identity changes
-must unmount the form, for example through the composing component's React key,
-if they should discard its completion UI.
-
-The choice is invisible from outside — the controller returns plain props either
-way, so the view and its tests are unaffected, and swapping one for the other
-later is a change to one file. Don't front-load a machine for a flow that has
-not earned one; don't leave a coordinated async flow in flag soup because it
-started as one boolean.
-
-`packages/mosaic/src/machine/ADOPTION.md` is the full criteria, including its
-"honest boundary" table of what stays `useState` inside a component that does
-have a machine.
+- Mutations and required revalidation go in `onSubmit`. Success UI, such as closing the dialog or a toast, goes in the synchronous `onSuccess(result, submittedValues)`, whose result type comes from `onSubmit`.
+- `onSuccess` runs during the completion transition, before `isSubmitting` clears, and only while the form is mounted. Use it to close or show UI, not to reset or resubmit. Rejection and a cancelled reverification skip it.
+- A resolved `onSubmit` counts as success even if it returned early. Prevent no-op submissions with `canSubmit`, or return a result that lets `onSuccess` tell them apart.
+- Unmounting does not cancel the request. If an identity change should discard its completion UI, unmount the form, for example through the composing component's React `key`.
 
 ## Machines
 
-A machine is declared in the controller's own file. There is no
-`*.machine.ts` in a feature, and the controller is the only thing that sends to
-it. The runtime is documented next to the code:
-`packages/mosaic/src/machine/README.md` covers the mental model, `setup`,
-`createActor` / `useMachine`, and the API at a glance; the files in `machine/`
-are the full API. Shared async test helpers are in
-`src/__tests__/async.ts`.
+A machine is declared in the controller's own file, and the controller is the only thing that sends to it. `src/machine/README.md` covers the runtime, and shared async test helpers are in `src/__tests__/async.ts`.
 
-A machine never calls Clerk. The effect it runs arrives as a plain function. An
-effect that differs per action rides on the event and is assigned to context.
-From `blocks/confirm/confirm.controller.ts`:
+- A machine never calls Clerk. An effect that differs per action rides on the event and is assigned to context, then runs in `invoke` (`src/blocks/confirm/confirm.controller.ts`). An effect fixed for the controller's lifetime is seated by `useMachine(machine, { context })`, which re-seats context every render (`onRedirect` in `waitlist.controller.ts`).
+- `assign` stays pure. An effect the machine starts runs in `invoke`.
+- The runtime has no spawned actors, parallel states or history states. Effects that run side by side, like `useForm`'s per-field `validateAsync`, run in the hook and report back by event, and the machine drops stale results. Screens that can sit on top of any state, like reverification's method picker and help, may be a stack in context.
+- A phase of an action the user can see (queued, pending, failed) is a named state, not a context field plus a predicate.
+- To keep dismissal from abandoning an effect, model `open` as context and give `OPEN`/`CLOSE` no target in the busy state: `busy: { on: { CLOSE: { actions: assign(() => ({ open: false })) } }, invoke: … }`.
+- A transition shared across states in a `const` needs `target: 'name' as const`, or the target widens to `string` and the machine rejects it.
+- Context holds the `ErrorDescription`, never copy. A machine whose surface shows no error still logs it, so a failure is never silent (`switcher.controller.tsx`).
+
+### Multi-step flows
+
+A flow with several steps on one surface is one machine and one form. No existing flow follows every rule below yet, so each names the closest example.
+
+- **The machine owns the step.** Each step is a state, and the controller derives the step the view shows from the snapshot, so an async state maps to the screen that stays up while it runs (`viewStep` in `reverification.controller.ts`). No `useState` step beside it, and no separate open flag.
+- **Guards live in the machine.** What allows a step to continue is a guard on its event. The controller reads it with `actor.can(event)` rather than writing a `canContinue` that repeats it.
+- **Async work is a named state with `invoke`.** Testing a connection is a `testing` state, not a `pending` field in context and not a call in a transition action. Its result lands in context from `onDone`, beside the state that waited for it, not in a `usePendingAction` flag (`starting` and `submitting` in `reverification.controller.ts`).
+- **One `useForm` holds every step's values.** Its `onSubmit` is the last step's save, and `canSubmit` covers only that save (`create-organization.controller.ts`). Values are not copied into machine context with `TYPE` events.
+- **Navigation is machine events.** Continue and back send `NEXT` and `BACK` with the values the guard needs, and the machine chooses the next step. The controller routes the form's submit by step: a middle step sends `NEXT`, and only the last step runs `form.handleSubmit`, so Enter never saves early.
 
 ```ts
-confirming: {
-  on: {
-    CONFIRM: { target: 'pending', actions: assign((_, event) => ({ run: event.run, error: undefined })) },
+const [snapshot, send, actor] = useMachine(machine, { context: { testConnection: model.onTestConnection } });
+const form = useForm<SsoValues, void>({ initialValues, onSubmit: values => model.onSave(values) });
+const next = { type: 'NEXT', values: form.values } as const;
+
+return {
+  step: viewStep(snapshot.value),
+  form,
+  isTesting: snapshot.value === 'testing',
+  canContinue: actor.can(next),
+  onSubmit: event => {
+    if (snapshot.value === 'review') {
+      form.handleSubmit(event);
+      return;
+    }
+    event.preventDefault();
+    send(next);
   },
-},
-pending: {
-  invoke: fromPromise(context => context.run(), {
-    onDone: { target: 'idle', actions: assign(() => ({ error: undefined, open: false })) },
-    onError: {
-      target: 'confirming',
-      actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
-    },
-  }),
-},
+  onBack: () => send({ type: 'BACK' }),
+};
 ```
 
-An effect fixed for the controller's lifetime is seated by
-`useMachine(machine, { context })`, which re-seats context every render so the
-machine always runs the latest one (`onRedirect` in
-`features/waitlist/waitlist.controller.ts`).
+The view side is in [Views → Moving between screens](views.md#moving-between-screens-on-one-surface).
 
-Context holds the `ErrorDescription`, never copy (see "Errors"). A machine whose
-surface shows no error still logs it, so a failure is never silent
-(`features/switcher/switcher.controller.tsx`).
+## Wrapping actions
 
-## Responsibilities
-
-- **Hold the interaction state.** In React state or a machine — see "Which one
-  holds the state" above.
-- **Pass the model's `status` through.** The wrapper then branches on one value:
-
-  ```tsx
-  if (model.status !== 'ready') {
-    return { status: model.status };
-  }
-  ```
-
-- **Wrap actions to drive pending state.** One helper, so every action is wrapped
-  the same way and only one can be in flight:
-
-  ```tsx
-  const runAction = (keyFor, fn, closeOnSuccess = false) =>
-    fn
-      ? (...args) => send({ type: 'RUN', key: keyFor(...args), run: async () => fn(...args), closeOnSuccess })
-      : undefined;
-  ```
-
-  An absent model callback stays absent, so a capability the instance does not
-  offer never reaches the view as a dead affordance.
-
-- **Decide what closes the surface.** Only the controller knows whether an action
-  ends the interaction. `onSelectOrganization` closes on success; a switch that
-  leaves the menu useful does not; a navigation closes _before_ it hands off.
-- **Hold the surface still while an action runs.** `setActive` swaps the active
-  organization while its promise is still in flight, so the live model would
-  rearrange the popup mid-action. Freeze the model the action started from and
-  render that until it settles:
-
-  ```tsx
-  const resolvedModel = context.frozenModel ?? model;
-  ```
-
-  Freezing also covers the model dropping `ready → loading` during Clerk's
-  transitive state, which would otherwise flash the fallback.
-
-- **Derive view props.** A `pendingKey` run through
-  `useSpinDelay`, a `mode` forced by a capability flag — anything the view would
-  otherwise have to re-derive.
+- **One wrapper for every action**, so each is wrapped the same way and only one is in flight (`runAction` in `switcher.controller.tsx`).
+- **Hold the surface still while an action runs.** `setActive` swaps the active organization while its promise is in flight, so the live model would rearrange the popup mid-action. Freeze the model the action started from and render it until the action settles (`context.frozenModel ?? model`). This also covers the model dropping `ready → loading` during Clerk's transitive state.
+- **Derive view props.** A `pendingKey` run through `useSpinDelay`, a `mode` forced by a capability flag: anything the view would otherwise re-derive.
 
 ## Composition and dialog lifetime
 
-When a wrapper composes the controller above the view, prefer one
-controller-derived contract, forwarding the model's display data through the
-controller when needed. Where practical, mount a
-separate component only once the model is ready, so its controller receives the
-narrowed ready model instead of repeating loading branches. Keep the supported
-injected-effect leaf composition described in `views.md`.
-
-Decide which dialog state survives closing and reopening. Verify that the next
-interaction does not retain an unintended error or draft, and keep reset behavior
-consistent with the pending action's lifetime. Handle rejected dynamic imports
-through an appropriate error owner rather than leaving unhandled rejections.
-
-For a dialog that clears its draft and error on close, test a failed submit,
-close it, and reopen it. Assert that the error is gone and the field has its
-initial value. If the draft is meant to survive, assert the saved draft instead.
-Hold the submit request while dismissing to verify that closing does not unlock
-a second mutation or abandon the first. When a feature uses a dynamic import,
-reject the loader and assert the error UI and recovery behavior it promises.
-
-When introducing lazy loading or Suspense, consider a boundary around dialog
-content that leaves the trigger and parent available. Choose that boundary from
-the feature's loading behavior; it does not require restructuring every dialog.
+- Prefer one controller-derived contract above the view, forwarding the model's display data through the controller when needed.
+- Mount a component once the model is ready, so its controller receives the narrowed model and takes it non-null, instead of repeating loading branches. A model that can drop back to `loading` during an action keeps its controller mounted and freezes the model instead ([Wrapping actions](#wrapping-actions)), since unmounting stops the actor and loses the pending state.
+- Decide which dialog state survives closing and reopening, and keep reset behavior consistent with the pending action's lifetime.
+- Route a rejected dynamic import to an error owner rather than leaving an unhandled rejection. When adding lazy loading or Suspense, consider a boundary around the dialog content that leaves the trigger and parent available.
 
 ## Removing a row takes focus with it
 
-A dialog returns focus to its trigger on close. When the action removes the row
-that trigger sits on — signing a device out, removing an email — the trigger
-unmounts and focus falls to `<body>`. Nothing catches it: the menu item that
-opened the dialog unmounted with the menu, and a dialog mounted at the section
-rather than inside the menu has no floating-tree ancestor to walk back to. A
-keyboard user loses their place mid-list and a screen reader announces nothing.
+A dialog returns focus to its trigger on close. When the action removes the row the trigger sits on, the trigger unmounts and focus falls to `<body>`: the menu item that opened the dialog unmounted with the menu, and a dialog mounted at the section has no floating-tree ancestor to walk back to.
 
-Hand focus to a surviving element with `useListRemovalFocus` (`hooks/`). It sits
-in the controller or wrapper, e.g. between the confirm controller and the model call:
-`remove` records which row went, and `finalFocus` picks the row that took its
-place, the last row when it was the last, or `fallback()` once the list is empty.
-The view receives `registerTrigger` and `finalFocus` as props and passes
-`finalFocus` to the block, which resolves it when the dialog closes, after the
-row has gone:
+Hand focus to a surviving element with `useListRemovalFocus` (`src/hooks/`) in the controller or wrapper, between the confirm controller and the model call. `remove` records which row went, and `finalFocus` picks the row that took its place, the last row when it was the last, or `fallback()` once the list is empty. The view registers each row's trigger with `registerTrigger(id)` and passes `finalFocus` to the block, which resolves it after the row has gone:
 
 ```ts
-const sectionRef = useRef<HTMLDivElement>(null);
 const removalFocus = useListRemovalFocus({
   ids: methods.map(method => method.id),
   onRemove,
   fallback: () => sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
 });
 const remove = useConfirmController<Method>({ onConfirm: method => removalFocus.remove(method.id) });
-
-return { sectionRef, remove, registerTrigger: removalFocus.registerTrigger, finalFocus: removalFocus.finalFocus };
 ```
 
-```tsx
-// each row's trigger
-triggerRef={registerTrigger(method.id)}
-
-// the dialog
-<Confirmation controller={remove} finalFocus={finalFocus} … />
-```
-
-A cancelled or failed removal keeps its own trigger, so `finalFocus` returns
-`null` and the dialog's default (the trigger) applies.
-
-Prefer the row that took the removed one's place, the last row when it was the
-last, and a control that outlives the list once it is empty.
-
-Test the removal, not just the cancel: `toHaveFocus()` on the row that should
-have caught it. A suite that only asserts focus after cancelling passes while
-every successful removal drops focus on the floor.
-
-## Rules
-
-- **No Clerk imports.** If a controller needs a Clerk fact, the model supplies it
-  as data.
-- **No machine snapshot in the return value.** Return the plain props the view
-  reads (`open`, `pendingKey`, `isDeleting`, `errorMessage`), never `snapshot`
-  and `send`.
-- A transition shared across states in a `const` needs `target: 'name' as const`.
-  Without it the target widens to `string` and the machine rejects it.
-- Dismissing must not abandon an in-flight effect. Model `open` as context, and
-  give `OPEN`/`CLOSE` no target in the busy state so they don't leave it:
-
-  ```ts
-  busy: {
-    on: { CLOSE: { actions: assign(() => ({ open: false })) } },
-    invoke: fromPromise(context => context.run(), { /* … */ }),
-  }
-  ```
+A cancelled or failed removal keeps its trigger, so `finalFocus` returns `null` and the dialog's default applies.
 
 ## Errors
 
-One path, so every error a user sees goes through the `errors.*` catalog:
+One path, so every error a user sees goes through the `errors.*` catalog.
 
-- **Owners map, nothing else does.** A failure is owned by one of
-  `usePendingAction` (button and row actions), `useConfirmController` (confirm
-  dialogs), or `useForm` (forms). The first two call
-  `toLocalizableError(cause)` from `utils/errors.ts`. Use one of them instead of
-  catching in a feature. A controller with its own machine maps in the machine's
-  `onError` (`organization-list.controller.ts`).
-- **Machines that display all errors use `toLocalizableErrors(cause)`.** It
-  preserves each error and its parameter name. Reverification stores this array,
-  routes matching parameters to the active field and everything else to the
-  global banner, then localizes each message at render. Single-error owners keep
-  using `toLocalizableError`, including its global-first `SaveError` behavior.
-- **Forms map through `save`.** A model wraps a form's Clerk call in
-  `save(run, fields, params)` from `utils/errors.ts`, which rethrows a Clerk
-  error as a `SaveError` with each error routed to the field it names. The form
-  machine turns a `SaveError` into field and global errors. A controller can also
-  reject a submit with `FormSubmitError` (`components/form`) to set field errors
-  itself. A submit that rejects because the user cancelled a reverification
-  is not an error: the form returns to editing with its values and no message.
-- **Owners hold an `ErrorDescription`.** It is either a `LocalizableError`
-  (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`, the original
-  failure). `toLocalizableError` logs the second as
-  `[Clerk] Could not localize error`. Branch with `isLocalizableError` only
-  when a feature handles the two differently.
-- **Owners resolve copy at render; views get a string.** Owners return
-  `errorMessage` from `useErrorText()`: the
-  catalog entry for `code__paramName`, then `code`, then Clerk's message, then
-  the feature's `errorFallback`, then the generic error. Views never call
-  `useErrorText` on an error they did not create themselves.
-- Not there yet, each with a follow-up: `useForm` resolves when the save fails
-  instead of at render; the profile picture row resolves its controller's error
-  in the view; and the password section maps its own errors
-  (`user-profile-password-errors.ts`). `useForm` takes an `errorFallback` and
-  uses `form.error` when none is given.
-- **`errorFallback` is the feature's copy for faults Clerk cannot describe**
-  (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback,
-  never its cause's `.message`. A failure carrying the Clerk code `network_error`
-  has catalog copy, but network failures may also arrive as raw errors and remain
-  unlocalizable. Preserve the cause and check the unknown-error fallback too.
-- In tests, reject with `clerkApiError(code, message, { paramName })` from
-  `src/__tests__/clerk-errors.ts` to assert catalog copy. Reject with a plain
-  `Error` (silence `console.error`) to assert the fallback.
-  For example, reject with `new Error('socket disconnected')`, assert the
-  feature's fallback is visible, and assert that `socket disconnected` is not
-  rendered. Test `clerkApiError('network_error', 'server detail')` separately
-  to verify catalog copy rather than assuming every network fault has a code.
+- **Owners map, nothing else does.** A failure is owned by `usePendingAction` (button and row actions), `useConfirmController` (confirm dialogs) or `useForm` (forms). Use one instead of catching in a feature. A controller with its own machine maps in the machine's `onError` (`organization-list.controller.ts`).
+- **Single-error owners call `toLocalizableError(cause)`** from `src/utils/errors.ts`, including its global-first `SaveError` behavior. A machine that displays every error uses `toLocalizableErrors(cause)`, which keeps each error and its parameter name; reverification routes matching parameters to the active field and the rest to the banner.
+- **Forms map through `save`.** The model's `save` rethrows a Clerk error as a `SaveError`, and the form machine turns it into field and global errors. A controller can also reject a submit with `FormSubmitError` (`src/components/form/`) to set field errors itself. A submit rejected by a cancelled reverification is not an error: the form returns to editing with its values and no message.
+- **Owners hold an `ErrorDescription`**: a `LocalizableError` (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`). `toLocalizableError` logs the second as `[Clerk] Could not localize error`. Branch with `isLocalizableError` only when a feature handles the two differently.
+- **Owners resolve copy at render; views get a string.** Owners return `errorMessage` from `useErrorText()`, which tries the catalog entry for `code__paramName`, then `code`, then Clerk's message, then the feature's `errorFallback`, then the generic error. Views never call `useErrorText` on an error they did not create.
+- **`errorFallback` is the copy for faults Clerk cannot describe** (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback, never its cause's `.message`. `network_error` has catalog copy, but network failures can also arrive as raw, unlocalizable errors.
+- Known gaps, not precedent: `useForm` resolves copy when the save fails instead of at render (it takes an `errorFallback` and uses `form.error` when none is given), the profile picture row resolves its error in the view, and the password section maps its own errors (`user-profile-password-errors.ts`).
 
 ## Testing
 
-The feature test covers the controller by default. Hold the
-FAPI request an action makes to assert its in-flight state (the spinner, the rows
-stood down), then release or fail it to assert what closes the surface. Timing
-that is awkward to drive through FAPI can get a smaller test. See `testing.md`.
+The feature test covers the controller ([Testing](testing.md)). Hold the FAPI request an action makes to assert its in-flight state, then release or fail it to assert what closes the surface. Timing that is awkward to drive through FAPI can get a smaller test.
+
+- **Errors:** reject with `clerkApiError(code, message, { paramName })` from `src/__tests__/clerk-errors.ts` to assert catalog copy. Reject with a plain `Error` (silence `console.error`), such as `new Error('socket disconnected')`, to assert the fallback shows and the raw message does not. Test `clerkApiError('network_error', …)` separately rather than assuming every network fault has a code.
+- **Dialog lifetime:** for a dialog that clears on close, fail a submit, close, reopen, and assert the error is gone and the field is back to its initial value (or the saved draft, if it is meant to survive). Hold the submit while dismissing to check that closing neither unlocks a second mutation nor abandons the first. For a dynamic import, reject the loader and assert the error UI and recovery.
+- **Removal focus:** test the removal, not just the cancel. Assert `toHaveFocus()` on the row that should catch it; a suite that only checks focus after cancelling passes while every real removal drops focus.

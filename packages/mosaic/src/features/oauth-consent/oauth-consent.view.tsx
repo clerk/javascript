@@ -76,13 +76,9 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
             <Field.Label>{m.organizationLabel}</Field.Label>
             <Select.Root
               items={props.organizations}
-              value={organizationId ?? undefined}
+              value={organizationId}
               alignItemWithTrigger={false}
-              onValueChange={value => {
-                if (typeof value === 'string') {
-                  props.onOrganizationChange(value);
-                }
-              }}
+              onValueChange={props.onOrganizationChange}
             >
               <Select.Trigger />
               <OrganizationPopup organizations={props.organizations} />
@@ -179,7 +175,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
       </Card.Content>
       <Card.Footer xstyle={styles.centered}>
         <Text
-          size='sm'
+          size='xs'
           color='foreground-secondary'
         >
           {fill(m.signedInAs, { identifier: props.identifier })}
@@ -261,7 +257,7 @@ function OrganizationAccess({
 }) {
   const labelId = useId();
   const locale = useLocale();
-  const summarize = (value: string[]) =>
+  const summarize = (value: unknown[]) =>
     value.length === 1
       ? organizations.find(organization => organization.value === value[0])?.label
       : plural(m.organizationCount, value.length, locale);
@@ -279,13 +275,11 @@ function OrganizationAccess({
         aria-labelledby={labelId}
         value={selection.access}
         disabled={disabled}
-        onValueChange={value => {
-          if (value === 'selected') {
-            selection.onAccessChange('selected');
-            return;
+        onValueChange={access => {
+          selection.onAccessChange(access);
+          if (access === 'all') {
+            selection.onSelectedChange([]);
           }
-          selection.onAccessChange('all');
-          selection.onSelectedChange([]);
         }}
       >
         <Field.Root orientation='horizontal'>

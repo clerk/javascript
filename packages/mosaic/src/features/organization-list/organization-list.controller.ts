@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useSpinDelay } from '../../hooks/use-spin-delay';
 import type { ErrorDescription } from '../../localization';
@@ -7,68 +7,72 @@ import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
 import { toLocalizableError } from '../../utils/errors';
 import type { OrganizationListModel } from './organization-list.model';
-import type { OrganizationListData } from './organization-list.types';
 import { organizationListBusyKeys } from './organization-list.types';
 
 export type OrganizationListReadyModel = Extract<OrganizationListModel, { status: 'ready' }>;
 
-interface OrganizationListMachineContext {
+interface OrganizationListMachineContext<M> {
   pendingKey: string | null;
-  frozenModel: OrganizationListReadyModel | null;
+  frozenModel: M | null;
   run: () => Promise<unknown>;
   error: ErrorDescription | undefined;
 }
 
-type OrganizationListMachineEvent =
-  | { type: 'RUN'; key: string; frozenModel: OrganizationListReadyModel; run: () => Promise<unknown> }
+type OrganizationListMachineEvent<M> =
+  | { type: 'RUN'; key: string; frozenModel: M; run: () => Promise<unknown> }
   | { type: 'DISMISS' };
 
-const { createMachine, assign, fromPromise } = setup<OrganizationListMachineContext, OrganizationListMachineEvent>();
+function createOrganizationListMachine<M>() {
+  const { createMachine, assign, fromPromise } = setup<
+    OrganizationListMachineContext<M>,
+    OrganizationListMachineEvent<M>
+  >();
+  const settled = { pendingKey: null, frozenModel: null };
 
-const settled = { pendingKey: null, frozenModel: null };
-
-const organizationListMachine = createMachine({
-  id: 'organizationList',
-  initial: 'idle',
-  context: {
-    pendingKey: null,
-    frozenModel: null,
-    run: () => Promise.resolve(),
-    error: undefined,
-  },
-  states: {
-    idle: {
-      on: {
-        RUN: {
-          target: 'busy',
-          actions: assign((_, event) => ({
-            pendingKey: event.key,
-            frozenModel: event.frozenModel,
-            run: event.run,
-            error: undefined,
-          })),
+  return createMachine({
+    id: 'organizationList',
+    initial: 'idle',
+    context: {
+      pendingKey: null,
+      frozenModel: null,
+      run: () => Promise.resolve(),
+      error: undefined,
+    },
+    states: {
+      idle: {
+        on: {
+          RUN: {
+            target: 'busy',
+            actions: assign((_, event) => ({
+              pendingKey: event.key,
+              frozenModel: event.frozenModel,
+              run: event.run,
+              error: undefined,
+            })),
+          },
+          DISMISS: { actions: assign(() => ({ error: undefined })) },
         },
-        DISMISS: { actions: assign(() => ({ error: undefined })) },
+      },
+      busy: {
+        invoke: fromPromise(context => context.run(), {
+          onDone: { target: 'idle', actions: assign(() => settled) },
+          onError: {
+            target: 'idle',
+            actions: assign((_, event) => ({ ...settled, error: toLocalizableError(event.error) })),
+          },
+        }),
       },
     },
-    busy: {
-      invoke: fromPromise(context => context.run(), {
-        onDone: { target: 'idle', actions: assign(() => settled) },
-        onError: {
-          target: 'idle',
-          actions: assign((_, event) => ({ ...settled, error: toLocalizableError(event.error) })),
-        },
-      }),
-    },
-  },
-});
+  });
+}
 
-export type OrganizationListController =
+type OrganizationListActions = 'onSelectOrganization' | 'onAcceptInvitation' | 'onAcceptSuggestion';
+
+export type OrganizationListController<M extends OrganizationListReadyModel = OrganizationListReadyModel> =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (OrganizationListData & {
+  | (Omit<M, 'status' | OrganizationListActions> & {
       status: 'ready';
-      createOrganization?: OrganizationListReadyModel['createOrganization'];
       pendingKey: string | null;
       error: string | undefined;
       onDismissError: () => void;
@@ -77,12 +81,16 @@ export type OrganizationListController =
       onAcceptSuggestion: (suggestionId: string) => void;
     });
 
-export type OrganizationListReadyController = Extract<OrganizationListController, { status: 'ready' }>;
+export type OrganizationListReadyController<M extends OrganizationListReadyModel = OrganizationListReadyModel> =
+  Extract<OrganizationListController<M>, { status: 'ready' }>;
 
-export function useOrganizationListController(model: OrganizationListModel): OrganizationListController {
+export function useOrganizationListController<M extends OrganizationListReadyModel = OrganizationListReadyModel>(
+  model: M | Exclude<OrganizationListModel, { status: 'ready' }>,
+): OrganizationListController<M> {
   const m = useMessages('organizationList');
   const errorText = useErrorText();
-  const [{ context }, send] = useMachine(organizationListMachine);
+  const machine = useMemo(() => createOrganizationListMachine<M>(), []);
+  const [{ context }, send] = useMachine(machine);
   const pendingKey = useSpinDelay(context.pendingKey, { delay: 0 });
 
   const resolvedModel = context.frozenModel ?? model;
@@ -117,7 +125,10 @@ export interface OrganizationListScreenController {
 }
 
 export function useOrganizationListScreenController(
-  controller: OrganizationListReadyController,
+  controller: Pick<
+    OrganizationListReadyController,
+    'memberships' | 'invitations' | 'suggestions' | 'hidePersonal' | 'createOrganization' | 'onDismissError'
+  >,
 ): OrganizationListScreenController {
   const hasOrganizations =
     controller.memberships.length + controller.invitations.length + controller.suggestions.length > 0;

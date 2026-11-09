@@ -59,7 +59,7 @@ export function OAuthConsentSkeleton({
             <Field.Label>{m.organizationLabel}</Field.Label>
             <Select.Root
               items={organizations}
-              value={defaultOrganizationId ?? undefined}
+              value={defaultOrganizationId}
             >
               <Select.Trigger />
             </Select.Root>
@@ -117,7 +117,7 @@ export function OAuthConsentSkeleton({
       </Card.Content>
       <Card.Footer xstyle={styles.centered}>
         <Text
-          size='sm'
+          size='xs'
           color='foreground-secondary'
         >
           <Skeleton

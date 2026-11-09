@@ -16,7 +16,7 @@ export function UserProfileManagedByLabel({ managedBy, label }: { managedBy: Use
         <Icon
           aria-hidden
           glyph={Lock}
-          size='sm'
+          size='md'
         />
       }
     >

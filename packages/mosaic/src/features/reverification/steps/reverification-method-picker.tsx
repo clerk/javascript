@@ -56,14 +56,13 @@ export function ReverificationMethodPicker({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <Item.Group variant='outline'>
+        <Item.Group>
           {methods.map((method, index) => {
             const isPending = pendingMethodId === method.id;
             return (
               <Item.Root
                 key={method.id}
                 ref={index === 0 ? firstMethodRef : undefined}
-                size='lg'
                 render={
                   <button
                     type='button'

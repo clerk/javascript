@@ -40,7 +40,7 @@ export const styles = stylex.create({
       default: colorVars['--cl-color-positive'],
       ':focus-visible': colorVars['--cl-color-positive'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-positive'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-positive'],
       },
     },
     boxShadow: {

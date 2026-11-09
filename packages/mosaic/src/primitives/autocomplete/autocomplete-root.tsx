@@ -22,7 +22,14 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
-import { AutocompleteContext, type AutocompleteContextValue } from './autocomplete-context';
+import {
+  AutocompleteContext,
+  type AutocompleteContextValue,
+  AutocompleteHighlightContext,
+  type AutocompleteHighlightContextValue,
+  AutocompleteOptionsContext,
+  type AutocompleteOptionsContextValue,
+} from './autocomplete-context';
 
 export interface AutocompleteProps {
   /** Controlled input text. */
@@ -65,14 +72,11 @@ function AutocompleteInner(props: AutocompleteProps) {
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
-  const registerSelectedIndex = useCallback(
-    (index: number, value: string) => {
-      if (value === selectedValue) {
-        setSelectedIndex(index);
-      }
-    },
-    [selectedValue],
-  );
+  const registerSelectedIndex = useCallback((index: number, selected: boolean) => {
+    if (selected) {
+      setSelectedIndex(index);
+    }
+  }, []);
 
   const previousOpenRef = useRef(open);
   useEffect(() => {
@@ -178,7 +182,6 @@ function AutocompleteInner(props: AutocompleteProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       selectedIndex,
       elementsRef,
@@ -189,7 +192,6 @@ function AutocompleteInner(props: AutocompleteProps) {
       setInlineMode,
       handleSelect,
       handleInputChange,
-      registerSelectedIndex,
       mounted,
       transitionProps,
     }),
@@ -203,20 +205,40 @@ function AutocompleteInner(props: AutocompleteProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       selectedIndex,
       handleSelect,
       handleInputChange,
-      registerSelectedIndex,
       mounted,
       transitionProps,
     ],
   );
 
+  const optionsContextValue = useMemo<AutocompleteOptionsContextValue>(
+    () => ({
+      getItemProps,
+      handleSelect,
+      refs,
+      valuesByIndexRef,
+      registerSelectedIndex,
+    }),
+    [getItemProps, handleSelect, refs, registerSelectedIndex],
+  );
+
+  const highlightContextValue = useMemo<AutocompleteHighlightContextValue>(
+    () => ({ activeIndex, selectedValue }),
+    [activeIndex, selectedValue],
+  );
+
   return (
     <FloatingNode id={nodeId}>
-      <AutocompleteContext.Provider value={contextValue}>{children}</AutocompleteContext.Provider>
+      <AutocompleteContext.Provider value={contextValue}>
+        <AutocompleteOptionsContext.Provider value={optionsContextValue}>
+          <AutocompleteHighlightContext.Provider value={highlightContextValue}>
+            {children}
+          </AutocompleteHighlightContext.Provider>
+        </AutocompleteOptionsContext.Provider>
+      </AutocompleteContext.Provider>
     </FloatingNode>
   );
 }

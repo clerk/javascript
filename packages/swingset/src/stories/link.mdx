@@ -1,0 +1,53 @@
+import * as LinkStories from './link.stories';
+
+# Link
+
+A text link, styled like a link-variant `Button` but rendered as a real `<a>`. A link with `target='_blank'` shows a trailing export icon, hidden from assistive tech, that stays on the line with the label's last word.
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={LinkStories}
+/>
+
+## Props
+
+<PropTable
+  meta={LinkStories.meta}
+  extra={[
+    { name: 'href', type: 'string' },
+    { name: 'target', type: 'string' },
+    { name: 'render', type: '(props) => ReactNode' },
+  ]}
+/>
+
+## Usage
+
+<Usage
+  component='Link'
+  module='@clerk/mosaic/components/link'
+  props={{ href: '/docs' }}
+>
+  Learn more
+</Usage>
+
+---
+
+## Examples
+
+### External
+
+<Story
+  name='External'
+  storyModule={LinkStories}
+/>
+
+### Wrapping
+
+Long link text wraps like prose, and the icon stays on the line with the last word. Drag the corner to resize.
+
+<Story
+  name='ExternalWrapping'
+  storyModule={LinkStories}
+/>

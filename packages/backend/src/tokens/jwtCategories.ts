@@ -8,12 +8,13 @@ export const JWT_CATEGORY_M2M_TOKEN = 'cl_B7d4PD333AAA';
 export const JWT_CATEGORY_OIDC_ID_TOKEN = 'cl_B7d4PD444AAA';
 
 /**
- * Whether `cat` marks a JWT as something other than a session token. Handshake tokens are
- * minted with the session-token category too. An absent `cat` is accepted for tokens minted
- * before the category rollout.
+ * Whether `cat` marks a JWT as something other than a session token. An absent `cat` is
+ * non-session: every session token carries one, while OIDC `id_token`s signed by the same
+ * instance key do not (AISEC-21). Handshake tokens are minted with the session-token category
+ * too, but their verifier tolerates an absent one.
  */
 export function isNonSessionJwtCategory(cat?: string): boolean {
-  return cat !== undefined && cat !== JWT_CATEGORY_SESSION_TOKEN;
+  return cat !== JWT_CATEGORY_SESSION_TOKEN;
 }
 
 /** Malformed tokens return `false`; signature verification is left to reject them. */

@@ -1,17 +1,21 @@
-# Documenting Mosaic components
+# Documenting components
 
-`packages/swingset/CLAUDE.md` explains _how the app works_ and `packages/swingset/README.md` covers the _mechanical wiring_ of adding a component (registry, `docModules`, redirect). This file is the **house style** — _what to write_ once the wiring is in place, so every component page reads consistently.
+Read this when you add or change a Swingset page for a Mosaic component, block, hook or style: a `<name>.stories.tsx` or `<name>.mdx` in `packages/swingset/src/stories/`. It covers what to write once the page is wired; how the app works is in `packages/swingset/CLAUDE.md`, and the registry, `docModules` and redirect wiring is in `packages/swingset/README.md`.
 
-A component's docs are two files in `packages/swingset/src/stories/`:
+Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `popover.component.mdx` (A, compound), `accordion.mdx` (B), `user-button.mdx` (C).
 
-- `<name>.stories.tsx` — the live demos (named React exports + a `meta`).
-- `<name>.mdx` — the prose page that embeds those demos via the injected MDX tags (`<Preview>`, `<PropTable>`, `<Usage>`, `<Story>`; see the **MDX** architecture note in `packages/swingset/CLAUDE.md` for the mechanism).
+## Rules
 
-Pick the archetype below by the component's **layer** (its `meta.group`), then follow that archetype's required MDX section order exactly. Same archetype → same headings in the same order, every time. That uniformity is the whole point.
+- A page is a `<name>.stories.tsx` (a `meta`, plus named `export function` stories where the archetype has them; the code footer extracts only function declarations) and a `<name>.mdx`. The archetype decides which stories the file exports and which of `<Preview>`, `<PropTable>`, `<Usage>` and `<Story>` the page uses.
+- Pick the archetype by the entry's layer (`meta.group`) and follow its section order exactly. Same archetype, same headings in the same order: that uniformity is the point.
+- Always set `meta.source`, as a repo-root-relative path to the file that exports the component.
+- Every props table has a **Default** column ([Document the default value](#document-the-default-value)).
+- Prose adds what a demo cannot (behavior, accessibility, when to reach for it) and states the API as it is, without rationale or history ([Writing the prose](#writing-the-prose)).
+- Import the component explicitly, never with `import *`.
 
 ## Layers
 
-`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. Groups in `ALPHABETICAL_GROUPS` (`packages/swingset/src/lib/registry.ts`) sort their entries by `title`; the rest render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
+`meta.group` places an entry in one of these layers; how the sidebar orders groups and `meta.navigation.category` subheadings is in `packages/swingset/src/lib/registry.ts`. Use these exact group strings:
 
 | Group                  | What lives here                                                                                                                      | Archetype   |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
@@ -35,8 +39,6 @@ actually surfaces — an argument table for a style function, a return-value tab
 `Hooks` entry needs only `meta`, with no story exports at all, which is the minimum a section entry
 needs.
 
-Archetype A has two forms, chosen by whether the component exposes a single flat set of variant props: **simple** components (`Button`, `Input`) are knob-driven; **compound** components (`Card`, `Field`, `Menu`, `Popover`) have no flat variant props to knob, so they're documented like a primitive but themed. Both are detailed under Archetype A below.
-
 ## `meta` conventions (all archetypes)
 
 ```ts
@@ -55,12 +57,9 @@ export const meta: StoryMeta = {
 ```
 
 - `title` is the component's export name; it produces the slug and is what readers match against code. Set `label` only when the sidebar should read differently (the slug and page heading still come from `title`).
-- `status` marks the entry's maturity — `'stable'`, `'wip'`, or `'todo'` (planned, not yet implemented; e.g. `Table`) — rendered as a colored dot (green / amber / gray) to the left of the entry in the sidebar, and as a dot-plus-label badge to the right of the page's `# Title` h1. It is explicit: omitting it displays no status anywhere (not every entry carries one, e.g. `Scroll Area`). A todo entry is `meta` alone plus a one-paragraph MDX page; it skips its archetype's required sections (and `source`) until the component exists.
-- `substatus` optionally says _why_ a wip entry is wip — one of the `WipSubstatus` values in `packages/swingset/src/lib/types.ts`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
-- `source` is always a path **relative to the monorepo root**, pointing at the file that exports the documented component. Always set it — it powers the "View source" link.
+- `status` is `'stable'`, `'wip'` or `'todo'` (planned, not yet built), shown as a dot in the sidebar and a badge on the page. Omit it to show no status. A todo entry is `meta` plus a one-paragraph MDX page, and skips its archetype's sections and `source` until the component exists.
+- `substatus` optionally says why a wip entry is wip, as a `WipSubstatus` value (`packages/swingset/src/lib/types.ts`).
 - `styles` declares the component's variant props and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Keep it in sync with the component's real prop union by hand — StyleX compiles its styles away, so nothing derives it for you. Omit it for compound A components, and for B and C.
-
-Always import the component explicitly — never `import *`.
 
 ## Archetype A — styled component (`Components`)
 
@@ -72,7 +71,7 @@ A styled Mosaic component. Which of the two forms below applies is decided by th
 export { default as __source } from './<name>.stories?raw';
 ```
 
-That's all the wiring needed — `StoryEmbed` picks `__source` up automatically and renders a collapsible "View code" footer keyed to each example's story function (see the `<Story>` code-footer architecture note in `packages/swingset/CLAUDE.md`). No MDX change is required; keep authoring `<Story name='…' storyModule={…} />` as before. This applies to both A forms (simple and compound) and to every example a Components page ships.
+`StoryEmbed` picks it up and renders a "View code" footer for each `<Story>`; no MDX change is needed. This applies to both A forms.
 
 ### A · simple — flat variant props (`Button`, `Input`)
 
@@ -128,7 +127,6 @@ import * as ButtonStories from './button.stories';
 - The story file exports a primary demo (rendered by `<Preview>`) plus one named export per variation under **Examples**. Each story takes `props: Record<string, unknown>` and casts through a local `knobsAsProps` helper — knobs are dynamically typed, the component isn't.
 - Use `<PropTable>`'s `extra` for documenting non-variant props; the `xstyle` escape-hatch row is appended for you.
 - Use `<Usage props={{…}}>` to pin static, non-knob props in the generated snippet.
-- `<PropTable>` renders `Prop | Type | Default | Value`: the **Default** column is filled from `meta.styles._defaultVariants`, and the **Value** column is the live knob seeded with that default. No per-row default annotation is needed; see _Document the default value_ under Archetype B.
 
 ### A · compound — parts, no flat variant props (`Card`, `Field`, `Menu`, `Popover`)
 
@@ -202,7 +200,9 @@ No styles, so there's no knob canvas. The single demo renders the primitive **ra
 
 The story is `meta` (no `styles`) plus a single `Default` export that renders the primitive unstyled. Don't add a `<Preview>` or `<PropTable>` — primitives have neither knobs nor a variant surface to drive them.
 
-**Document the default value for every prop in a dedicated Default column.** Every props table — auto and hand-written — has a **Default** column; the `Type` stays a plain union/enum and the default is named in its own column (the convention every component-doc site and TypeDoc's `@default` tag follow), never inlined into the type. The auto `<PropTable>` renders `Prop | Type | Default | Value` and fills Default from `meta.styles._defaultVariants` (the **Value** column is the live knob seeded with that default); hand-written tables render `Prop | Type | Default | Description` and fill it by hand. Name the default member (`'base'`, `'multiple'`, `'bottom-start'`); use `—` when there is no default (a controlled-only or required prop) and append `(required)` for required props; when the default is behavioral rather than a literal, state it in words (`inherits Root`, `falls back to value`).
+### Document the default value
+
+Every props table has a **Default** column, and the `Type` stays a plain union, never with the default inlined. The auto `<PropTable>` fills it from `meta.styles._defaultVariants`; hand-written tables (`Prop | Type | Default | Description`) fill it by hand. Name the default member (`'bottom-start'`), use `—` when there is none and append `(required)` for a required prop, and state a behavioral default in words (`inherits Root`).
 
 ## Archetype C — composed layer (`User Button`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`)
 
@@ -232,12 +232,9 @@ import * as SwitcherStories from './user-button.stories';
 
 ## Writing the prose
 
-- Keep the intro to one short, present-tense paragraph: what the thing is and what it's for. For primitives, say explicitly that it's headless and ships no styles.
-- Prose should add what a demo can't — behavior, accessibility, when to reach for it — not restate prop names already in the table.
-- Describe the API as it is; leave the reasoning that produced it out. No "not a `size`, because…", no rejected alternatives, no history of what a prop used to be — that belongs in the PR description. The docs get the conclusion, stated plainly and briefly.
-- Lead every page with the heading hierarchy its archetype prescribes; don't invent new top-level sections or reorder them. Consistency across pages is the goal.
-
-Every sentence of rationale is one the reader has to skim past to find what the thing does:
+- Keep the intro to one short, present-tense paragraph: what the thing is and what it's for. For primitives, say it is headless and ships no styles.
+- Do not restate prop names already in the table.
+- Leave out the reasoning behind the API: no "not a `size`, because…", no rejected alternatives, no history. That belongs in the PR description.
 
 ```mdx
 <!-- no -->
@@ -262,6 +259,6 @@ Which surface the dialog holds, and the geometry that comes with it.
 - [ ] Story renders.
 - [ ] `Components`-layer story files export `__source` (the `?raw` self-import) so every `<Story>` example gets a "View code" footer.
 - [ ] MDX sections match the archetype's required order exactly.
-- [ ] Every props-table row states its default in the **Default** column (auto `<PropTable>` fills it from `meta.styles._defaultVariants`; `—` / `(required)` when none).
+- [ ] Every props-table row states its default in the **Default** column.
 - [ ] Wiring done per `packages/swingset/README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/(explorer)/page.tsx` redirect if this is now the first component.
 - [ ] `pnpm format --filter @clerk/swingset` is clean.

@@ -74,6 +74,8 @@ export { PhoneInput } from '../components/phone-input';
 export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
+export { Link } from '../components/link';
+export type { LinkProps } from '../components/link';
 export { Menu } from '../components/menu';
 export { TagInput } from '../components/tag-input';
 export type { TagInputProps } from '../components/tag-input';
@@ -183,6 +185,7 @@ export type {
 export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
+export { TaskChooseOrganization } from '../features/task-choose-organization/task-choose-organization';
 export { TaskSetupMFA } from '../features/task-setup-mfa/task-setup-mfa';
 export { UserButton } from '../features/user-button/user-button';
 export { Waitlist } from '../features/waitlist/waitlist';

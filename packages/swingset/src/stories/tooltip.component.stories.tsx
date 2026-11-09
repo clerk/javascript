@@ -26,7 +26,7 @@ export function Default() {
           Tooltip
           <Icon
             glyph={Checkmark}
-            size='sm'
+            size='md'
           />
         </Tooltip.Popup>
       </Tooltip.Root>
