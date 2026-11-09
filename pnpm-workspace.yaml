@@ -2,6 +2,22 @@ packages:
   - packages/*
   - packages/electron-passkeys/npm/*
 
+engineStrict: false
+strictDepBuilds: false
+verifyDepsBeforeRun: false
+
+allowBuilds:
+  '@parcel/watcher': false
+  browser-tabs-lock: false
+  bufferutil: false
+  core-js: false
+  cypress: true
+  electron: false
+  esbuild: false
+  msw: true
+  unrs-resolver: false
+  utf-8-validate: false
+
 catalogs:
   peer-expo:
     expo: '>=54 <59'

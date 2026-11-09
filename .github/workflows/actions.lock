@@ -10,7 +10,7 @@ workflows:
         - 'actions/github-script@v7.1.0'
         - 'actions/upload-artifact@v4.6.2'
         - 'clerk/break-check@v0.6.0'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
         - 'useblacksmith/cache@v5'
         - 'useblacksmith/setup-node@v5.0.4'
     '.github/workflows/ci.yml':
@@ -19,7 +19,7 @@ workflows:
         - 'actions/github-script@v7.1.0'
         - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
         - 'useblacksmith/cache@v5'
         - 'useblacksmith/setup-node@v5.0.4'
     '.github/workflows/e2e-cleanups.yml':
@@ -27,12 +27,12 @@ workflows:
         - 'actions/checkout@v4.4.0'
         - 'actions/github-script@v7.1.0'
         - 'actions/setup-node@v4.4.0'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
     '.github/workflows/e2e-staging.yml':
         - 'actions/checkout@v4.4.0'
         - 'actions/github-script@v7.1.0'
         - 'actions/upload-artifact@v4.6.2'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
         - 'slackapi/slack-github-action@v1.27.1'
         - 'useblacksmith/cache@v5'
         - 'useblacksmith/setup-node@v5.0.4'
@@ -42,7 +42,7 @@ workflows:
         - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
         - 'dtolnay/rust-toolchain@v1'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
         - 'swatinem/rust-cache@v2.9.2'
     '.github/workflows/expo-native-build.yml':
         - 'actions/cache@v4.3.0'
@@ -50,7 +50,7 @@ workflows:
         - 'actions/setup-java@v4.9.1'
         - 'actions/setup-node@v4.4.0'
         - 'gradle/actions@v6.3.0'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
     '.github/workflows/labeler-apply.yml':
         - 'actions/checkout@v4.4.0'
         - 'actions/download-artifact@v4.3.0'
@@ -69,7 +69,7 @@ workflows:
         - 'actions/github-script@v7.1.0'
         - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
         - 'ravsamhq/notify-slack-action@1.10.0'
     '.github/workflows/pr-title-linter.yml':
         - 'actions/checkout@v4.4.0'
@@ -79,7 +79,7 @@ workflows:
         - 'actions/github-script@v7.1.0'
         - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
     '.github/workflows/release.yml':
         - 'actions/cache@v4.3.0'
         - 'actions/checkout@v4.4.0'
@@ -88,7 +88,7 @@ workflows:
         - 'changesets/action@v1.8.0'
         - 'dawidd6/action-download-artifact@v21'
         - 'peter-evans/create-or-update-comment@v3.1.0'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
         - 'slackapi/slack-github-action@v1.27.1'
     '.github/workflows/validate-renovate-config.yml':
         - 'actions/checkout@v4.4.0'
@@ -102,7 +102,7 @@ workflows:
         - 'actions/setup-java@v4.9.1'
         - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
         - 'slackapi/slack-github-action@v1.27.1'
     '.github/workflows/verify-remote.yml':
         - 'actions/checkout@v4.4.0'
@@ -110,7 +110,7 @@ workflows:
         - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
         - 'gradle/actions@v6.3.0'
-        - 'pnpm/action-setup@v4.3.0'
+        - 'pnpm/action-setup@v6.1.0'
 dependencies:
     'actions-cool/check-user-permission@v2.4.0':
         ref: 'v2.4.0'
@@ -220,9 +220,9 @@ dependencies:
         commit: 'sha1-23ff15729ef2fc348714a3bb66d2f655ca9066f2'
         owner_id: 18365890
         repo_id: 223708643
-    'pnpm/action-setup@v4.3.0':
-        ref: 'v4.3.0'
-        commit: 'sha1-b906affcce14559ad1aafd4ab0e942779e9f58b1'
+    'pnpm/action-setup@v6.1.0':
+        ref: 'v6.1.0'
+        commit: 'sha1-ea17c68df8912ef543352723c149a84f56e3d413'
         owner_id: 21320719
         repo_id: 262289747
     'ravsamhq/notify-slack-action@1.10.0':

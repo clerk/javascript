@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: 24
 
-      - uses: pnpm/action-setup@v4.3.0
+      - uses: pnpm/action-setup@v6.1.0
 
       - uses: dtolnay/rust-toolchain@v1
         with:
@@ -84,7 +84,7 @@ jobs:
         with:
           node-version: 24
 
-      - uses: pnpm/action-setup@v4.3.0
+      - uses: pnpm/action-setup@v6.1.0
 
       - name: Install dependencies
         run: pnpm install --filter @clerk/electron-passkeys... --frozen-lockfile --ignore-scripts

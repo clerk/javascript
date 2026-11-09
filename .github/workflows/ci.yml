@@ -367,8 +367,6 @@ jobs:
             echo "Running tests: ${{ matrix.filter-label }}"
             pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
           fi
-        env:
-          NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Run Typedoc tests
         run: |
@@ -376,8 +374,6 @@ jobs:
           if [ "${{ matrix.node-version }}" == "24.15.0" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
             pnpm turbo run //#test:typedoc
           fi
-        env:
-          NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Run verify script tests
         if: matrix.node-version == '24.15.0'
@@ -637,14 +633,12 @@ jobs:
       - name: Publish to local registry
         run: pkglab pub --force
 
-      - name: Edit .npmrc [link-workspace-packages=false]
-        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
-
       - name: Install @clerk/clerk-js in os temp
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
           pnpm init
+          pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
@@ -652,6 +646,7 @@ jobs:
         run: |
           mkdir clerk-ui && cd clerk-ui
           pnpm init
+          pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
           pkglab add @clerk/ui
 
       - name: Copy components @clerk/astro
