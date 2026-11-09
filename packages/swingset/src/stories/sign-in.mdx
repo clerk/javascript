@@ -24,7 +24,7 @@ The example pauses briefly in each pending state. An email containing `new` take
 
 ## Usage
 
-The view renders one step at a time inside a `Card.Root` and reports every interaction through plain callbacks. `combined` switches the start card to the sign-in-or-up copy and hides the sign-up link. The code, backup code, method picker, and help steps are the reverification feature's step views.
+The view renders one step at a time inside a `Card.Root` and reports every interaction through plain callbacks. `combined` switches the start card to the sign-in-or-up copy and hides the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
 
 ```tsx
 import { Card } from '@clerk/mosaic/components/card';

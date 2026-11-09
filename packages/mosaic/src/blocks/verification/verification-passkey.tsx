@@ -1,11 +1,11 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
+import { Button, SubmitButton } from '../../components/button';
+import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
 
-export interface ReverificationPasskeyMessages {
+export interface VerificationPasskeyMessages {
   title: string;
   description: string;
   secondaryActionLabel: string;
@@ -13,8 +13,8 @@ export interface ReverificationPasskeyMessages {
   pendingLabel: string;
 }
 
-export interface ReverificationPasskeyProps {
-  messages: ReverificationPasskeyMessages;
+export interface VerificationPasskeyProps {
+  messages: VerificationPasskeyMessages;
   errorMessage?: string;
   isPending?: boolean;
   onSubmit: () => void;
@@ -22,14 +22,14 @@ export interface ReverificationPasskeyProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function ReverificationPasskey({
+export function VerificationPasskey({
   messages,
   errorMessage,
   isPending = false,
   onSubmit,
   onCancel,
   focusRef,
-}: ReverificationPasskeyProps) {
+}: VerificationPasskeyProps) {
   return (
     <>
       <Card.Header>

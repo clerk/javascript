@@ -1,25 +1,31 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { FormEvent, Ref } from 'react';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { Field } from '../../../components/field';
-import { useFlowAutoFocus } from '../../../components/flow';
-import { Input } from '../../../components/input';
-import { Form } from '../../../primitives/form';
+import { Button, SubmitButton } from '../../components/button';
+import { Card } from '../../components/card';
+import { Field } from '../../components/field';
+import { useFlowAutoFocus } from '../../components/flow';
+import { Icon } from '../../components/icon';
+import { InputGroup } from '../../components/input-group';
+import { Eye } from '../../icons/glyphs/eye';
+import { EyeSlash } from '../../icons/glyphs/eye-slash';
+import { Form } from '../../primitives/form';
 
-export interface ReverificationBackupCodeMessages {
+export interface VerificationPasswordMessages {
   title: string;
   description: string;
   fieldLabel: string;
+  fieldPlaceholder: string;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
   secondaryActionLabel: string;
   primaryActionLabel: string;
   pendingLabel: string;
 }
 
-export interface ReverificationBackupCodeProps {
-  messages: ReverificationBackupCodeMessages;
+export interface VerificationPasswordProps {
+  messages: VerificationPasswordMessages;
   value: string;
   errorMessage?: string;
   globalErrorMessage?: string;
@@ -30,7 +36,7 @@ export interface ReverificationBackupCodeProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function ReverificationBackupCode({
+export function VerificationPassword({
   messages,
   value,
   errorMessage,
@@ -40,8 +46,9 @@ export function ReverificationBackupCode({
   onSubmit,
   onCancel,
   focusRef,
-}: ReverificationBackupCodeProps) {
+}: VerificationPasswordProps) {
   const formId = useId();
+  const [visible, setVisible] = useState(false);
 
   const canSubmit = value !== '';
 
@@ -76,16 +83,26 @@ export function ReverificationBackupCode({
             focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
-            <Input
-              ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
-              name='backupCode'
-              type='text'
-              autoComplete='off'
-              spellCheck={false}
-              data-1p-ignore
-              value={value}
-              onChange={event => onValueChange(event.target.value)}
-            />
+            <InputGroup.Root>
+              <InputGroup.Input
+                ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
+                name='password'
+                type={visible ? 'text' : 'password'}
+                autoComplete='current-password'
+                placeholder={messages.fieldPlaceholder}
+                value={value}
+                onChange={event => onValueChange(event.target.value)}
+              />
+              <InputGroup.End>
+                <Button
+                  type='button'
+                  aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
+                  onClick={() => setVisible(current => !current)}
+                >
+                  <Icon glyph={visible ? EyeSlash : Eye} />
+                </Button>
+              </InputGroup.End>
+            </InputGroup.Root>
             <Field.Message>
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>

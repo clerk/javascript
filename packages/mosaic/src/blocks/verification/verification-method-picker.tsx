@@ -1,26 +1,26 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
-import { Button } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
-import type { IconProps } from '../../../components/icon';
-import { Icon, IconFrame } from '../../../components/icon';
-import { Item } from '../../../components/item';
-import { Spinner } from '../../../components/spinner';
-import { Text } from '../../../components/text';
-import { ChevronRight } from '../../../icons/glyphs/chevron-right';
-import { rtl } from '../../../styles/rtl.styles';
-import { styles } from '../reverification.styles';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
+import type { IconProps } from '../../components/icon';
+import { Icon, IconFrame } from '../../components/icon';
+import { Item } from '../../components/item';
+import { Spinner } from '../../components/spinner';
+import { Text } from '../../components/text';
+import { ChevronRight } from '../../icons/glyphs/chevron-right';
+import { rtl } from '../../styles/rtl.styles';
+import { styles } from './verification.styles';
 
-export interface ReverificationMethod {
+export interface VerificationMethod {
   id: string;
   label: string;
   description?: string;
   icon: IconProps['glyph'];
 }
 
-export interface ReverificationMethodPickerMessages {
+export interface VerificationMethodPickerMessages {
   title: string;
   description: string;
   backButton: string;
@@ -28,9 +28,9 @@ export interface ReverificationMethodPickerMessages {
   helpButton: string;
 }
 
-export interface ReverificationMethodPickerProps {
-  messages: ReverificationMethodPickerMessages;
-  methods: readonly ReverificationMethod[];
+export interface VerificationMethodPickerProps {
+  messages: VerificationMethodPickerMessages;
+  methods: readonly VerificationMethod[];
   pendingMethodId?: string;
   onSelect: (methodId: string) => void;
   onHelp: () => void;
@@ -38,7 +38,7 @@ export interface ReverificationMethodPickerProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function ReverificationMethodPicker({
+export function VerificationMethodPicker({
   messages,
   methods,
   pendingMethodId,
@@ -46,7 +46,7 @@ export function ReverificationMethodPicker({
   onHelp,
   onBack,
   focusRef,
-}: ReverificationMethodPickerProps) {
+}: VerificationMethodPickerProps) {
   const firstMethodRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLDivElement>()]);
 
   return (

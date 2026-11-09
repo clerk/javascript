@@ -1,21 +1,21 @@
-import { Button } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
 
-export interface ReverificationHelpMessages {
+export interface VerificationHelpMessages {
   title: string;
   description: string;
   backButton: string;
   supportButton: string;
 }
 
-export interface ReverificationHelpProps {
-  messages: ReverificationHelpMessages;
+export interface VerificationHelpProps {
+  messages: VerificationHelpMessages;
   onEmailSupport: () => void;
   onBack: () => void;
 }
 
-export function ReverificationHelp({ messages, onEmailSupport, onBack }: ReverificationHelpProps) {
+export function VerificationHelp({ messages, onEmailSupport, onBack }: VerificationHelpProps) {
   return (
     <>
       <Card.Header>

@@ -2,15 +2,15 @@ import { useMergeRefs } from '@floating-ui/react';
 import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { Field } from '../../../components/field';
-import { useFlowAutoFocus } from '../../../components/flow';
-import { Otp } from '../../../components/otp';
-import { Form } from '../../../primitives/form';
-import { CODE_LENGTH } from '../../../utils/verification';
+import { Button, SubmitButton } from '../../components/button';
+import { Card } from '../../components/card';
+import { Field } from '../../components/field';
+import { useFlowAutoFocus } from '../../components/flow';
+import { Otp } from '../../components/otp';
+import { Form } from '../../primitives/form';
+import { CODE_LENGTH } from '../../utils/verification';
 
-export interface ReverificationOtpMessages {
+export interface VerificationCodeMessages {
   title: string;
   description: string;
   fieldLabel: string;
@@ -19,21 +19,21 @@ export interface ReverificationOtpMessages {
   pendingLabel: string;
 }
 
-export interface ReverificationOtpResend {
+export interface VerificationCodeResend {
   text: string;
   label: ReactNode;
   disabled?: boolean;
   onClick: () => void;
 }
 
-export interface ReverificationOTPProps {
-  messages: ReverificationOtpMessages;
+export interface VerificationCodeProps {
+  messages: VerificationCodeMessages;
   value: string;
   length?: number;
   errorMessage?: string;
   globalErrorMessage?: string;
   isPending?: boolean;
-  resend?: ReverificationOtpResend;
+  resend?: VerificationCodeResend;
   onValueChange: (value: string) => void;
   onComplete?: (value: string) => void;
   onSubmit: () => void;
@@ -41,7 +41,7 @@ export interface ReverificationOTPProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function ReverificationOTP({
+export function VerificationCode({
   messages,
   value,
   length = CODE_LENGTH,
@@ -54,7 +54,7 @@ export function ReverificationOTP({
   onSubmit,
   onCancel,
   focusRef,
-}: ReverificationOTPProps) {
+}: VerificationCodeProps) {
   const formId = useId();
 
   const canSubmit = value.length === length;

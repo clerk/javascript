@@ -1,3 +1,11 @@
+import {
+  VerificationBackupCode,
+  VerificationCode,
+  VerificationHelp,
+  VerificationMethodPicker,
+  VerificationPasskey,
+  VerificationPassword,
+} from '@clerk/mosaic/blocks/verification';
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import type { ReverificationMethod, ReverificationStep } from '@clerk/mosaic/features/reverification';
@@ -7,12 +15,6 @@ import {
   ReverificationPending,
   ReverificationView,
 } from '@clerk/mosaic/features/reverification/reverification.view';
-import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/steps/reverification-backup-code';
-import { ReverificationHelp } from '@clerk/mosaic/features/reverification/steps/reverification-help';
-import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/steps/reverification-method-picker';
-import { ReverificationOTP } from '@clerk/mosaic/features/reverification/steps/reverification-otp';
-import { ReverificationPasskey } from '@clerk/mosaic/features/reverification/steps/reverification-passkey';
-import { ReverificationPassword } from '@clerk/mosaic/features/reverification/steps/reverification-password';
 import { SecurityLockSquare } from '@clerk/mosaic/icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '@clerk/mosaic/icons/glyphs/security-passkey';
 import { SecurityPhone } from '@clerk/mosaic/icons/glyphs/security-phone';
@@ -305,7 +307,7 @@ function PasswordPanel({ isPending = false, errorMessage }: { isPending?: boolea
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationPassword
+      <VerificationPassword
         messages={{
           title: 'Verification required',
           description: 'Enter your current password to continue',
@@ -343,7 +345,7 @@ export function PasswordError() {
 function PasskeyPanel({ isPending = false, errorMessage }: { isPending?: boolean; errorMessage?: string }) {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationPasskey
+      <VerificationPasskey
         messages={{
           title: 'Use your passkey',
           description:
@@ -390,7 +392,7 @@ function OTPPanel({
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationOTP
+      <VerificationCode
         messages={{
           title: 'Verification required',
           description,
@@ -465,7 +467,7 @@ function BackupCodePanel({ isPending = false, errorMessage }: { isPending?: bool
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationBackupCode
+      <VerificationBackupCode
         messages={{
           title: 'Enter a backup code',
           description: 'Enter the backup code you received when setting up two-step authentication',
@@ -502,7 +504,7 @@ export function MethodPicker() {
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationMethodPicker
+      <VerificationMethodPicker
         messages={methodPickerMessages}
         methods={[
           { id: 'password', label: 'Continue with your password', icon: SecurityLockSquare },
@@ -522,7 +524,7 @@ export function MethodPicker() {
 export function MethodPickerPending() {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationMethodPicker
+      <VerificationMethodPicker
         messages={methodPickerMessages}
         methods={[
           { id: 'password', label: 'Continue with your password', icon: SecurityLockSquare },
@@ -542,7 +544,7 @@ export function MethodPickerPending() {
 export function Help() {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationHelp
+      <VerificationHelp
         messages={helpMessages}
         onEmailSupport={() => undefined}
         onBack={() => undefined}
