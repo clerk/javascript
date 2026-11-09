@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import { useState } from 'react';
 
 import { AvatarUpload } from '../../blocks/avatar-upload';
+import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
@@ -25,6 +26,7 @@ export interface CreateOrganizationStepsProps {
   invite: InviteMembersForm;
   onFinish: () => void;
   onCancel?: () => void;
+  notice?: string;
 }
 
 export interface CreateOrganizationViewProps extends CreateOrganizationStepsProps {
@@ -62,7 +64,7 @@ export function CreateOrganizationSteps(props: CreateOrganizationStepsProps) {
   );
 }
 
-function CreateStep({ form, slugEnabled, onNameChange, onCancel }: CreateOrganizationStepsProps) {
+function CreateStep({ form, slugEnabled, onNameChange, onCancel, notice }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
   const { ref: nameRef, onChange: _onChange, ...nameControl } = form.register('name');
   const autoFocus = useFlowAutoFocus();
@@ -89,6 +91,11 @@ function CreateStep({ form, slugEnabled, onNameChange, onCancel }: CreateOrganiz
           />
         }
       >
+        {notice ? (
+          <Banner.Root color='warning'>
+            <Banner.Label>{notice}</Banner.Label>
+          </Banner.Root>
+        ) : null}
         <LogoField
           name={form.values.name}
           logo={form.values.logo}

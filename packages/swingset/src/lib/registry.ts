@@ -151,6 +151,12 @@ import {
   meta as itemMeta,
 } from '../stories/item.stories';
 import {
+  External as LinkExternal,
+  ExternalWrapping as LinkExternalWrapping,
+  meta as linkMeta,
+  Primary as LinkPrimary,
+} from '../stories/link.stories';
+import {
   Catalog as LocalizationCatalog,
   CatalogWithOverrides as LocalizationCatalogWithOverrides,
   Fallback as LocalizationFallback,
@@ -348,6 +354,30 @@ import {
   VerifyEmail as SignInVerifyEmail,
 } from '../stories/sign-in.stories';
 import {
+  CustomElement as SignInButtonCustomElement,
+  Default as SignInButtonDefault,
+  meta as signInButtonMeta,
+  Pending as SignInButtonPending,
+} from '../stories/sign-in-button.stories';
+import {
+  CustomElement as SignInWithMetamaskButtonCustomElement,
+  Default as SignInWithMetamaskButtonDefault,
+  meta as signInWithMetamaskButtonMeta,
+  Pending as SignInWithMetamaskButtonPending,
+} from '../stories/sign-in-with-metamask-button.stories';
+import {
+  CustomElement as SignOutButtonCustomElement,
+  Default as SignOutButtonDefault,
+  meta as signOutButtonMeta,
+  Pending as SignOutButtonPending,
+} from '../stories/sign-out-button.stories';
+import {
+  CustomElement as SignUpButtonCustomElement,
+  Default as SignUpButtonDefault,
+  meta as signUpButtonMeta,
+  Pending as SignUpButtonPending,
+} from '../stories/sign-up-button.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -389,6 +419,16 @@ import {
   Validation as TagInputComponentValidation,
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
+import {
+  Default as TaskChooseOrganizationDefault,
+  Empty as TaskChooseOrganizationEmpty,
+  Loading as TaskChooseOrganizationLoading,
+  meta as taskChooseOrganizationMeta,
+  Unavailable as TaskChooseOrganizationUnavailable,
+  WithDefaults as TaskChooseOrganizationWithDefaults,
+  WithError as TaskChooseOrganizationWithError,
+  WithoutCreate as TaskChooseOrganizationWithoutCreate,
+} from '../stories/task-choose-organization.stories';
 import {
   AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
   Default as TaskSetupMfaDefault,
@@ -662,6 +702,13 @@ const skeletonModule: StoryModule = {
   NotShown: SkeletonNotShown,
 };
 
+const linkModule: StoryModule = {
+  meta: linkMeta,
+  Primary: LinkPrimary,
+  External: LinkExternal,
+  ExternalWrapping: LinkExternalWrapping,
+};
+
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
@@ -793,6 +840,34 @@ const waitlistModule: StoryModule = {
   Redirecting: WaitlistRedirecting,
 };
 
+const signInButtonModule: StoryModule = {
+  meta: signInButtonMeta,
+  Default: SignInButtonDefault,
+  CustomElement: SignInButtonCustomElement,
+  Pending: SignInButtonPending,
+};
+
+const signInWithMetamaskButtonModule: StoryModule = {
+  meta: signInWithMetamaskButtonMeta,
+  Default: SignInWithMetamaskButtonDefault,
+  CustomElement: SignInWithMetamaskButtonCustomElement,
+  Pending: SignInWithMetamaskButtonPending,
+};
+
+const signOutButtonModule: StoryModule = {
+  meta: signOutButtonMeta,
+  Default: SignOutButtonDefault,
+  CustomElement: SignOutButtonCustomElement,
+  Pending: SignOutButtonPending,
+};
+
+const signUpButtonModule: StoryModule = {
+  meta: signUpButtonMeta,
+  Default: SignUpButtonDefault,
+  CustomElement: SignUpButtonCustomElement,
+  Pending: SignUpButtonPending,
+};
+
 const userAvatarModule: StoryModule = {
   meta: userAvatarMeta,
   Default: UserAvatarDefault,
@@ -821,6 +896,17 @@ const organizationListModule: StoryModule = {
   Loading: OrganizationListLoading,
   Empty: OrganizationListEmpty,
   WithError: OrganizationListWithError,
+};
+
+const taskChooseOrganizationModule: StoryModule = {
+  meta: taskChooseOrganizationMeta,
+  Default: TaskChooseOrganizationDefault,
+  WithoutCreate: TaskChooseOrganizationWithoutCreate,
+  Empty: TaskChooseOrganizationEmpty,
+  WithDefaults: TaskChooseOrganizationWithDefaults,
+  Unavailable: TaskChooseOrganizationUnavailable,
+  Loading: TaskChooseOrganizationLoading,
+  WithError: TaskChooseOrganizationWithError,
 };
 
 const headingModule: StoryModule = {
@@ -1231,6 +1317,7 @@ export const registry: StoryModule[] = [
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
+  taskChooseOrganizationModule,
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
@@ -1238,6 +1325,10 @@ export const registry: StoryModule[] = [
   reverificationModule,
   waitlistModule,
   taskSetupMfaModule,
+  signInButtonModule,
+  signInWithMetamaskButtonModule,
+  signUpButtonModule,
+  signOutButtonModule,
   // Authentication
   signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
@@ -1250,6 +1341,7 @@ export const registry: StoryModule[] = [
   skeletonModule,
   bannerModule,
   buttonModule,
+  linkModule,
   cardComponentModule,
   checkboxModule,
   comboboxModule,

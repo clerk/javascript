@@ -37,11 +37,32 @@ The choice is invisible from outside: the controller returns plain props either 
 const actions = usePendingAction({ errorFallback: messages.errors.generic });
 
 return {
-  rows: rows.map(row => (actions.errorKey === row.id ? { ...row, error: actions.error } : row)),
-  pendingId: actions.pendingKey,
+  rows: rows.map(row => ({
+    ...row,
+    isPending: actions.pendingKey === row.id,
+    error: actions.errorKey === row.id ? actions.error : undefined,
+  })),
   onRemove: id => void actions.run(id, () => onRemove(id)),
 };
 ```
+
+When direct actions and a confirmation must not run together, keep each owner and combine their pending state in the section controller:
+
+```ts
+const actions = usePendingAction();
+const remove = useConfirmController<UserProfileEmail>({
+  onConfirm: contact => removalFocus.remove(contact.id),
+  reverification,
+});
+
+return {
+  contacts: contacts.map(contact => ({ ...contact, isPrimaryPending: actions.pendingKey === contact.id })),
+  isDisabled: actions.isPending || remove.isPending,
+  remove,
+};
+```
+
+Pass `isDisabled` to every control that starts one of the actions, including the item that opens the confirmation. `remove.isPending` stays true after the dialog closes during a reverification until the confirmed action settles, and the controller ignores `confirm` until then, so closing the dialog never lets a second action start. Put each row's pending state on the row the controller returns, so views render it without comparing pending keys.
 
 - `run` resolves `true` on success, so the caller can close a dialog or move focus. A cancelled reverification resolves `false`, shows no error and releases the lock.
 - To hold pending through an OAuth redirect, await a delay inside the action (`user-profile-connected-accounts-section.controller.ts`).
