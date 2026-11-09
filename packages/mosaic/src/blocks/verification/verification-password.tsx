@@ -12,7 +12,7 @@ import { Eye } from '../../icons/glyphs/eye';
 import { EyeSlash } from '../../icons/glyphs/eye-slash';
 import { Form } from '../../primitives/form';
 
-export interface VerificationPasswordMessages {
+interface VerificationPasswordMessages {
   title: string;
   description: string;
   fieldLabel: string;
@@ -24,7 +24,7 @@ export interface VerificationPasswordMessages {
   pendingLabel: string;
 }
 
-export interface VerificationPasswordProps {
+interface VerificationPasswordProps {
   messages: VerificationPasswordMessages;
   value: string;
   errorMessage?: string;

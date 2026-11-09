@@ -2,14 +2,14 @@ import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 
-export interface VerificationHelpMessages {
+interface VerificationHelpMessages {
   title: string;
   description: string;
   backButton: string;
   supportButton: string;
 }
 
-export interface VerificationHelpProps {
+interface VerificationHelpProps {
   messages: VerificationHelpMessages;
   onEmailSupport: () => void;
   onBack: () => void;

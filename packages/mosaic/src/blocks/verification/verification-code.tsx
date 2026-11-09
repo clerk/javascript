@@ -10,7 +10,7 @@ import { Otp } from '../../components/otp';
 import { Form } from '../../primitives/form';
 import { CODE_LENGTH } from '../../utils/verification';
 
-export interface VerificationCodeMessages {
+interface VerificationCodeMessages {
   title: string;
   description: string;
   fieldLabel: string;
@@ -19,14 +19,14 @@ export interface VerificationCodeMessages {
   pendingLabel: string;
 }
 
-export interface VerificationCodeResend {
+interface VerificationCodeResend {
   text: string;
   label: ReactNode;
   disabled?: boolean;
   onClick: () => void;
 }
 
-export interface VerificationCodeProps {
+interface VerificationCodeProps {
   messages: VerificationCodeMessages;
   value: string;
   length?: number;

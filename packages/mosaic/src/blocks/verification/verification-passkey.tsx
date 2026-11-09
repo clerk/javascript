@@ -5,7 +5,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 
-export interface VerificationPasskeyMessages {
+interface VerificationPasskeyMessages {
   title: string;
   description: string;
   secondaryActionLabel: string;
@@ -13,7 +13,7 @@ export interface VerificationPasskeyMessages {
   pendingLabel: string;
 }
 
-export interface VerificationPasskeyProps {
+interface VerificationPasskeyProps {
   messages: VerificationPasskeyMessages;
   errorMessage?: string;
   isPending?: boolean;

@@ -13,14 +13,14 @@ import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { rtl } from '../../styles/rtl.styles';
 import { styles } from './verification.styles';
 
-export interface VerificationMethod {
+interface VerificationMethod {
   id: string;
   label: string;
   description?: string;
   icon: IconProps['glyph'];
 }
 
-export interface VerificationMethodPickerMessages {
+interface VerificationMethodPickerMessages {
   title: string;
   description: string;
   backButton: string;
@@ -28,7 +28,7 @@ export interface VerificationMethodPickerMessages {
   helpButton: string;
 }
 
-export interface VerificationMethodPickerProps {
+interface VerificationMethodPickerProps {
   messages: VerificationMethodPickerMessages;
   methods: readonly VerificationMethod[];
   pendingMethodId?: string;
