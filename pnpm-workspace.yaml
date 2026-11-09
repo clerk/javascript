@@ -7,8 +7,16 @@ strictDepBuilds: false
 verifyDepsBeforeRun: false
 
 allowBuilds:
+  '@parcel/watcher': false
+  browser-tabs-lock: false
+  bufferutil: false
+  core-js: false
   cypress: true
+  electron: false
+  esbuild: false
   msw: true
+  unrs-resolver: false
+  utf-8-validate: false
 
 catalogs:
   peer-expo:
