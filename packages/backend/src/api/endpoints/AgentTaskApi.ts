@@ -29,7 +29,7 @@ export type CreateAgentTaskParams = {
   /** Whether the session created by the Agent Task is restricted. In a restricted session, the Frontend API allows the agent only to read and to refresh its own session token, and refuses other writes with an `agent_session_forbidden` error. Open the Agent Task URL of a restricted session in a browser that has no other session; otherwise the Frontend API refuses it with the same error. By default, the session is not restricted. */
   sessionRestricted?: boolean;
   /** The ID of the Organization that the session created by the Agent Task starts in. The user must be a member of this Organization. A restricted session can only use this Organization. By default, the session starts in the user's last active Organization if the user is still a member of it, and otherwise in the personal account. There is no way yet to ask for the personal account when the user has a last active Organization. If `sessionRestricted` is `true` and the instance requires an Organization, the request fails when no Organization can be used. */
-  sessionOrganizationId?: string;
+  organizationId?: string;
 };
 
 const basePath = '/agents/tasks';
@@ -41,10 +41,11 @@ export class AgentTaskAPI extends AbstractAPI {
    * @returns The created [`AgentTask`](https://clerk.com/docs/reference/backend/types/backend-agent-task) object.
    */
   public async create(params: CreateAgentTaskParams) {
+    const { organizationId, ...rest } = params;
     return this.request<AgentTask>({
       method: 'POST',
       path: basePath,
-      bodyParams: params,
+      bodyParams: { ...rest, sessionOrganizationId: organizationId },
       options: {
         deepSnakecaseBodyParamKeys: true,
       },

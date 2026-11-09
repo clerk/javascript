@@ -16,7 +16,7 @@ export class AgentTask {
     /** Whether the session created by the Agent Task is restricted. */
     readonly sessionRestricted: boolean = false,
     /** The ID of the Organization that the session created by the Agent Task starts in, or `null` for the user's personal account. A restricted session can only use this Organization or personal account. */
-    readonly sessionOrganizationId: string | null = null,
+    readonly organizationId: string | null = null,
   ) {}
 
   /**

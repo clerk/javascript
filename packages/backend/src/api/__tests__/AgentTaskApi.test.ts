@@ -95,7 +95,7 @@ describe('AgentTaskAPI', () => {
       expect(response.agentTaskId).toBe('agent_task_456');
     });
 
-    it('sends sessionRestricted and sessionOrganizationId and reads them from the response', async () => {
+    it('sends sessionRestricted and organizationId and reads them from the response', async () => {
       server.use(
         http.post(
           'https://api.clerk.test/v1/agents/tasks',
@@ -132,14 +132,14 @@ describe('AgentTaskAPI', () => {
         taskDescription: 'Test task',
         redirectUrl: 'https://example.com/callback',
         sessionRestricted: true,
-        sessionOrganizationId: 'org_123',
+        organizationId: 'org_123',
       });
 
       expect(response.sessionRestricted).toBe(true);
-      expect(response.sessionOrganizationId).toBe('org_123');
+      expect(response.organizationId).toBe('org_123');
     });
 
-    it('defaults sessionRestricted to false and sessionOrganizationId to null when the response omits them', async () => {
+    it('defaults sessionRestricted to false and organizationId to null when the response omits them', async () => {
       server.use(
         http.post(
           'https://api.clerk.test/v1/agents/tasks',
@@ -158,12 +158,12 @@ describe('AgentTaskAPI', () => {
       });
 
       expect(response.sessionRestricted).toBe(false);
-      expect(response.sessionOrganizationId).toBeNull();
+      expect(response.organizationId).toBeNull();
     });
   });
 
   describe('revoke', () => {
-    it('reads sessionRestricted and sessionOrganizationId from the response', async () => {
+    it('reads sessionRestricted and organizationId from the response', async () => {
       server.use(
         http.post(
           'https://api.clerk.test/v1/agents/tasks/agent_task_456/revoke',
@@ -182,7 +182,7 @@ describe('AgentTaskAPI', () => {
 
       expect(response.agentTaskId).toBe('agent_task_456');
       expect(response.sessionRestricted).toBe(true);
-      expect(response.sessionOrganizationId).toBe('org_123');
+      expect(response.organizationId).toBe('org_123');
     });
   });
 });
