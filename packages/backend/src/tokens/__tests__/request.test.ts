@@ -9,6 +9,8 @@ import {
   mockJwt,
   mockJwtPayload,
   mockMalformedJwt,
+  mockRsaJwkKid,
+  signingJwks,
 } from '../../fixtures';
 import {
   mockMachineAuthResponses,
@@ -16,9 +18,16 @@ import {
   mockTokens,
   mockVerificationResults,
 } from '../../fixtures/machine';
+import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
+import {
+  JWT_CATEGORY_JWT_TEMPLATE,
+  JWT_CATEGORY_M2M_TOKEN,
+  JWT_CATEGORY_OIDC_ID_TOKEN,
+  JWT_CATEGORY_SESSION_TOKEN,
+} from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import { type MachineTokenType, TokenType } from '../tokenTypes';
@@ -565,6 +574,58 @@ describe('tokens.authenticateRequest(options)', () => {
 
     expect(requestState).toBeSignedIn();
     expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
+  describe('JWT category (cat) header', () => {
+    async function signWithCategory(cat: string | undefined) {
+      const { data } = await signJwt(mockJwtPayload, signingJwks, {
+        algorithm: 'RS256',
+        header: { typ: 'JWT', kid: mockRsaJwkKid, ...(cat !== undefined ? { cat } : {}) },
+      });
+      return data!;
+    }
+
+    beforeEach(() => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+    });
+
+    const nonSessionCategories = [
+      ['JWT template', JWT_CATEGORY_JWT_TEMPLATE],
+      ['M2M token', JWT_CATEGORY_M2M_TOKEN],
+      ['OIDC ID token', JWT_CATEGORY_OIDC_ID_TOKEN],
+      ['unknown', 'cl_some_future_unknown_cat'],
+    ];
+
+    describe.each([
+      ['headerToken', (jwt: string) => mockRequestWithHeaderAuth({ authorization: `Bearer ${jwt}` })],
+      [
+        'cookieToken',
+        (jwt: string) =>
+          mockRequestWithCookies(
+            {},
+            { __clerk_db_jwt: 'deadbeef', __client_uat: `${mockJwtPayload.iat - 10}`, __session: jwt },
+          ),
+      ],
+    ])('%s', (_label, buildRequest) => {
+      test.each(nonSessionCategories)('returns signed out for a %s presented as a session token', async (_, cat) => {
+        const requestState = await authenticateRequest(buildRequest(await signWithCategory(cat)), mockOptions());
+
+        expect(requestState).toBeSignedOut({ reason: AuthErrorReason.TokenTypeMismatch, message: '' });
+        expect(requestState.toAuth()).toBeSignedOutToAuth();
+      });
+    });
+
+    test.each([
+      ['the session-token category', JWT_CATEGORY_SESSION_TOKEN],
+      ['no category', undefined],
+    ])('headerToken: returns signed in for a token with %s', async (_, cat) => {
+      const requestState = await authenticateRequest(
+        mockRequestWithHeaderAuth({ authorization: `Bearer ${await signWithCategory(cat)}` }),
+        mockOptions(),
+      );
+
+      expect(requestState).toBeSignedIn();
+    });
   });
 
   // todo(
