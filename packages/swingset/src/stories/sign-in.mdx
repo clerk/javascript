@@ -24,22 +24,19 @@ The example pauses briefly in each pending state. An email containing `new` take
 
 ## Usage
 
-The view renders one step at a time inside a `Card.Root` and reports every interaction through plain callbacks. `combined` switches the start card to the sign-in-or-up copy and hides the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
+The view renders its own `Card.Root` and shows one step at a time inside it. `step` says which step and carries that step's data, such as the code channel or the factors to choose from; every other prop is shared across steps and reports interactions through plain callbacks. One step component can draw several steps: the code step covers the email code, the authenticator app code and email verification, with different copy. Leaving out `onShowMethods` hides "Use another method". `combined` switches the start card to the sign-in-or-up copy and hides the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
 
 ```tsx
-import { Card } from '@clerk/mosaic/components/card';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 
-<Card.Root align='center'>
-  <SignInView
-    step={step}
-    combined
-    applicationName='Acme'
-    applicationLogoUrl={logoUrl}
-    socialProviders={providers}
-    {...callbacks}
-  />
-</Card.Root>;
+<SignInView
+  step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }}
+  combined
+  applicationName='Acme'
+  applicationLogoUrl={logoUrl}
+  socialProviders={providers}
+  {...callbacks}
+/>;
 ```
 
 ## Panels

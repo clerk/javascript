@@ -17,7 +17,7 @@ import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignUpDetails } from '../sign-in.types';
 
-export interface SignUpDetailsMessages {
+interface SignUpDetailsMessages {
   title: string;
   description: string;
   firstNameLabel: string;
@@ -36,7 +36,7 @@ export interface SignUpDetailsMessages {
   actionLink: string;
 }
 
-export interface SignUpDetailsProps {
+interface SignUpDetailsProps {
   messages: SignUpDetailsMessages;
   values: SignUpDetails;
   errors?: Partial<Record<keyof SignUpDetails, string>>;

@@ -14,7 +14,7 @@ import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignInSocialProvider } from '../sign-in.types';
 
-export interface SignInStartMessages {
+interface IdentifierStepMessages {
   title: string;
   description: string;
   socialButton: (provider: string) => string;
@@ -27,8 +27,8 @@ export interface SignInStartMessages {
   actionLink: string;
 }
 
-export interface SignInStartProps {
-  messages: SignInStartMessages;
+interface IdentifierStepProps {
+  messages: IdentifierStepMessages;
   logo?: { src: string; alt: string };
   socialProviders: readonly SignInSocialProvider[];
   pendingProviderId?: string;
@@ -42,7 +42,7 @@ export interface SignInStartProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function SignInStart({
+export function IdentifierStep({
   messages,
   logo,
   socialProviders,
@@ -55,7 +55,7 @@ export function SignInStart({
   onSubmit,
   onSignUp,
   focusRef,
-}: SignInStartProps) {
+}: IdentifierStepProps) {
   const formId = useId();
   const busy = isPending || Boolean(pendingProviderId);
 

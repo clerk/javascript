@@ -1,6 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
-import { Card } from '@clerk/mosaic/components/card';
-import type { SignInMethod, SignInSocialProvider, SignInStep, SignUpDetails } from '@clerk/mosaic/features/sign-in';
+import type { SignInFactor, SignInSocialProvider, SignInStep, SignUpDetails } from '@clerk/mosaic/features/sign-in';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 import { useRef, useState } from 'react';
 
@@ -19,6 +18,7 @@ export const meta: StoryMeta = {
 
 const APPLICATION_NAME = 'Acme';
 const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
+const IDENTIFIER = 'jane@acme.com';
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
@@ -27,22 +27,43 @@ const socialProviders: SignInSocialProvider[] = [
   { id: 'oauth_github', name: 'GitHub', iconUrl: 'https://img.clerk.com/static/github.svg' },
 ];
 
-const firstFactors: SignInMethod[] = [
+const firstFactors: SignInFactor[] = [
   { id: 'password', stage: 'first', strategy: 'password' },
   { id: 'email_code', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_1', identifier: 'j***@acme.com' },
 ];
 
-const secondFactors: SignInMethod[] = [
+const secondFactors: SignInFactor[] = [
   { id: 'totp', stage: 'second', strategy: 'totp' },
   { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
 ];
 
 const emptySignUp: SignUpDetails = { firstName: '', lastName: '', emailAddress: '', password: '' };
 
+function stepFor(factor: SignInFactor, identifier: string): SignInStep {
+  switch (factor.strategy) {
+    case 'password':
+    case 'passkey':
+      return { kind: 'secret', secret: 'password', identifier };
+    case 'backup_code':
+      return { kind: 'secret', secret: 'backup-code', identifier };
+    case 'totp':
+      return { kind: 'code', purpose: 'second-factor', channel: 'totp' };
+    case 'email_code':
+      return { kind: 'code', purpose: 'first-factor', channel: 'email', identifier: factor.identifier };
+    case 'phone_code':
+      return {
+        kind: 'code',
+        purpose: factor.stage === 'first' ? 'first-factor' : 'second-factor',
+        channel: 'phone',
+        identifier: factor.identifier,
+      };
+  }
+}
+
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
 
 function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void }) {
-  const [step, setStep] = useState<SignInStep>('start');
+  const [step, setStep] = useState<SignInStep>({ kind: 'identifier' });
   const [direction, setDirection] = useState<-1 | 1>(1);
   const [identifier, setIdentifier] = useState('');
   const [value, setValue] = useState('');
@@ -50,14 +71,14 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isPending, setIsPending] = useState(false);
   const [pendingProviderId, setPendingProviderId] = useState<string>();
-  const [pendingMethodId, setPendingMethodId] = useState<string>();
-  const [methodId, setMethodId] = useState('password');
+  const [pendingFactorId, setPendingFactorId] = useState<string>();
+  const [factorId, setFactorId] = useState('password');
   const [canResend, setCanResend] = useState(true);
   const [signUpDetails, setSignUpDetails] = useState<SignUpDetails>(emptySignUp);
   const [signUpErrors, setSignUpErrors] = useState<Partial<Record<keyof SignUpDetails, string>>>();
   const [supportRequested, setSupportRequested] = useState(false);
   const [stage, setStage] = useState<'first' | 'second'>('first');
-  const pickerReturnRef = useRef<SignInStep>('password');
+  const pickerReturnRef = useRef<SignInStep>({ kind: 'secret', secret: 'password', identifier: '' });
 
   const navigate = (next: SignInStep, nextDirection: -1 | 1) => {
     setDirection(nextDirection);
@@ -81,6 +102,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     await work();
   };
 
+  const startSecondFactor = () => {
+    setStage('second');
+    setFactorId('totp');
+    navigate({ kind: 'code', purpose: 'second-factor', channel: 'totp' }, 1);
+  };
+
   const submitStart = () =>
     run(() => {
       const email = identifier.trim();
@@ -94,12 +121,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       }
       if (email.toLowerCase().includes('new')) {
         setSignUpDetails({ ...emptySignUp, emailAddress: email });
-        navigate('sign-up', 1);
+        navigate({ kind: 'sign-up' }, 1);
         return;
       }
       setStage('first');
-      setMethodId('password');
-      navigate('password', 1);
+      setFactorId('password');
+      navigate({ kind: 'secret', secret: 'password', identifier: email }, 1);
     });
 
   const submitPassword = () =>
@@ -113,9 +140,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         setErrorMessage('Password is incorrect. Try again, or use another method.');
         return;
       }
-      setStage('second');
-      setMethodId('totp');
-      navigate('totp', 1);
+      startSecondFactor();
     });
 
   const submitCode = (onSuccess: () => void) =>
@@ -166,35 +191,28 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       }
       setSignUpErrors(undefined);
-      navigate('verify-email', 1);
+      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: signUpDetails.emailAddress }, 1);
     });
 
   const onSubmit = () => {
-    switch (step) {
-      case 'start':
+    switch (step.kind) {
+      case 'identifier':
         void submitStart();
         return;
-      case 'password':
-        void submitPassword();
+      case 'secret':
+        void (step.secret === 'password' ? submitPassword() : submitBackupCode());
         return;
-      case 'email-code':
-        void submitCode(() => {
-          setStage('second');
-          setMethodId('totp');
-          navigate('totp', 1);
-        });
-        return;
-      case 'totp':
-        void submitCode(() => onComplete({ kind: 'signed-in' }));
-        return;
-      case 'backup-code':
-        void submitBackupCode();
+      case 'code':
+        if (step.purpose === 'first-factor') {
+          void submitCode(startSecondFactor);
+        } else if (step.purpose === 'second-factor') {
+          void submitCode(() => onComplete({ kind: 'signed-in' }));
+        } else {
+          void submitCode(() => onComplete({ kind: 'signed-up' }));
+        }
         return;
       case 'sign-up':
         void submitSignUp();
-        return;
-      case 'verify-email':
-        void submitCode(() => onComplete({ kind: 'signed-up' }));
         return;
       default:
         return;
@@ -210,40 +228,34 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     })();
   };
 
-  const stepFor = (id: string): SignInStep => {
-    if (id === 'email_code') {
-      return 'email-code';
-    }
-    if (id === 'backup_code') {
-      return 'backup-code';
-    }
-    if (id === 'totp') {
-      return 'totp';
-    }
-    return 'password';
-  };
+  const stageFactors = stage === 'first' ? firstFactors : secondFactors;
+  const otherFactors = stageFactors.filter(factor => factor.id !== factorId);
 
-  const onSelectMethod = (id: string) => {
+  const onSelectFactor = (id: string) => {
+    const factor = stageFactors.find(candidate => candidate.id === id);
+    if (!factor) {
+      return;
+    }
     void (async () => {
-      setPendingMethodId(id);
+      setPendingFactorId(id);
       await settleAfter(700);
-      setPendingMethodId(undefined);
-      setMethodId(id);
-      navigate(stepFor(id), 1);
+      setPendingFactorId(undefined);
+      setFactorId(id);
+      navigate(stepFor(factor, identifier), 1);
     })();
   };
 
   const onShowMethods = () => {
     pickerReturnRef.current = step;
-    navigate('method-picker', 1);
+    navigate({ kind: 'choice', purpose: 'methods', options: otherFactors }, 1);
   };
 
   const onBack = () => {
-    if (step === 'help') {
-      navigate('method-picker', -1);
+    if (step.kind === 'notice') {
+      navigate({ kind: 'choice', purpose: 'methods', options: otherFactors }, -1);
       return;
     }
-    if (step === 'method-picker') {
+    if (step.kind === 'choice') {
       navigate(pickerReturnRef.current, -1);
     }
   };
@@ -262,54 +274,47 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     })();
   };
 
-  const stageMethods = stage === 'first' ? firstFactors : secondFactors;
-  const otpChannel = step === 'email-code' || step === 'verify-email' ? 'email' : step === 'totp' ? 'totp' : undefined;
-
   return (
     <>
-      <Card.Root align='center'>
-        <SignInView
-          step={step}
-          direction={direction}
-          applicationName={APPLICATION_NAME}
-          applicationLogoUrl={APPLICATION_LOGO_URL}
-          combined
-          socialProviders={socialProviders}
-          pendingProviderId={pendingProviderId}
-          onSelectProvider={onSelectProvider}
-          identifier={identifier}
-          onIdentifierChange={next => {
-            setIdentifier(next);
-            setErrorMessage(undefined);
-          }}
-          onEditIdentifier={() => {
-            setStage('first');
-            navigate('start', -1);
-          }}
-          value={value}
-          onValueChange={onValueChange}
-          errorMessage={errorMessage}
-          isPending={isPending}
-          onSubmit={onSubmit}
-          onForgotPassword={onShowMethods}
-          onShowMethods={onShowMethods}
-          onShowHelp={() => navigate('help', 1)}
-          onBack={onBack}
-          onEmailSupport={() => setSupportRequested(true)}
-          methods={stageMethods.filter(method => method.id !== methodId)}
-          pendingMethodId={pendingMethodId}
-          onSelectMethod={onSelectMethod}
-          otpChannel={otpChannel}
-          onResend={onResend}
-          canResend={canResend}
-          signUpDetails={signUpDetails}
-          signUpErrors={signUpErrors}
-          onSignUpDetailChange={(field, next) => {
-            setSignUpDetails(current => ({ ...current, [field]: next }));
-            setSignUpErrors(current => (current ? { ...current, [field]: undefined } : current));
-          }}
-        />
-      </Card.Root>
+      <SignInView
+        step={step}
+        direction={direction}
+        applicationName={APPLICATION_NAME}
+        applicationLogoUrl={APPLICATION_LOGO_URL}
+        combined
+        socialProviders={socialProviders}
+        pendingProviderId={pendingProviderId}
+        onSelectProvider={onSelectProvider}
+        identifier={identifier}
+        onIdentifierChange={next => {
+          setIdentifier(next);
+          setErrorMessage(undefined);
+        }}
+        onEditIdentifier={() => {
+          setStage('first');
+          navigate({ kind: 'identifier' }, -1);
+        }}
+        value={value}
+        onValueChange={onValueChange}
+        errorMessage={errorMessage}
+        isPending={isPending}
+        onSubmit={onSubmit}
+        onForgotPassword={onShowMethods}
+        onShowMethods={otherFactors.length > 0 ? onShowMethods : undefined}
+        onShowHelp={() => navigate({ kind: 'notice', purpose: 'help' }, 1)}
+        onBack={onBack}
+        onEmailSupport={() => setSupportRequested(true)}
+        pendingFactorId={pendingFactorId}
+        onSelectFactor={onSelectFactor}
+        onResend={onResend}
+        canResend={canResend}
+        signUpDetails={signUpDetails}
+        signUpErrors={signUpErrors}
+        onSignUpDetailChange={(field, next) => {
+          setSignUpDetails(current => ({ ...current, [field]: next }));
+          setSignUpErrors(current => (current ? { ...current, [field]: undefined } : current));
+        }}
+      />
       {supportRequested ? <p>Email support requested.</p> : null}
     </>
   );
@@ -358,70 +363,61 @@ export function Default() {
 function StepPanel({
   step,
   combined = true,
-  identifier = 'jane@acme.com',
   errorMessage,
   isPending = false,
   pendingProviderId,
   providers = socialProviders,
-  stage = 'first',
 }: {
   step: SignInStep;
   combined?: boolean;
-  identifier?: string;
   errorMessage?: string;
   isPending?: boolean;
   pendingProviderId?: string;
   providers?: SignInSocialProvider[];
-  stage?: 'first' | 'second';
 }) {
-  const [value, setValue] = useState(errorMessage && step !== 'start' ? 'incorrect' : '');
+  const [value, setValue] = useState(errorMessage && step.kind !== 'identifier' ? 'incorrect' : '');
   const [details, setDetails] = useState<SignUpDetails>({ ...emptySignUp, emailAddress: 'new@acme.com' });
-  const methods = stage === 'first' ? firstFactors.slice(1) : secondFactors.slice(1);
 
   return (
-    <Card.Root align='center'>
-      <SignInView
-        step={step}
-        applicationName={APPLICATION_NAME}
-        applicationLogoUrl={APPLICATION_LOGO_URL}
-        combined={combined}
-        socialProviders={providers}
-        pendingProviderId={pendingProviderId}
-        onSelectProvider={() => undefined}
-        identifier={step === 'start' ? value : identifier}
-        onIdentifierChange={setValue}
-        onEditIdentifier={() => undefined}
-        onSignUp={() => undefined}
-        value={value}
-        onValueChange={setValue}
-        errorMessage={errorMessage}
-        isPending={isPending}
-        onSubmit={() => undefined}
-        onForgotPassword={() => undefined}
-        onShowMethods={() => undefined}
-        onShowHelp={() => undefined}
-        onBack={() => undefined}
-        onEmailSupport={() => undefined}
-        methods={methods}
-        onSelectMethod={() => undefined}
-        otpChannel={step === 'email-code' || step === 'verify-email' ? 'email' : step === 'totp' ? 'totp' : undefined}
-        onResend={() => undefined}
-        canResend
-        signUpDetails={details}
-        onSignUpDetailChange={(field, next) => setDetails(current => ({ ...current, [field]: next }))}
-      />
-    </Card.Root>
+    <SignInView
+      step={step}
+      applicationName={APPLICATION_NAME}
+      applicationLogoUrl={APPLICATION_LOGO_URL}
+      combined={combined}
+      socialProviders={providers}
+      pendingProviderId={pendingProviderId}
+      onSelectProvider={() => undefined}
+      identifier={step.kind === 'identifier' ? value : IDENTIFIER}
+      onIdentifierChange={setValue}
+      onEditIdentifier={() => undefined}
+      onSignUp={() => undefined}
+      value={value}
+      onValueChange={setValue}
+      errorMessage={errorMessage}
+      isPending={isPending}
+      onSubmit={() => undefined}
+      onForgotPassword={() => undefined}
+      onShowMethods={() => undefined}
+      onShowHelp={() => undefined}
+      onBack={() => undefined}
+      onEmailSupport={() => undefined}
+      onSelectFactor={() => undefined}
+      onResend={() => undefined}
+      canResend
+      signUpDetails={details}
+      onSignUpDetailChange={(field, next) => setDetails(current => ({ ...current, [field]: next }))}
+    />
   );
 }
 
 export function Start() {
-  return <StepPanel step='start' />;
+  return <StepPanel step={{ kind: 'identifier' }} />;
 }
 
 export function StartSignInOnly() {
   return (
     <StepPanel
-      step='start'
+      step={{ kind: 'identifier' }}
       combined={false}
     />
   );
@@ -430,7 +426,7 @@ export function StartSignInOnly() {
 export function StartManyProviders() {
   return (
     <StepPanel
-      step='start'
+      step={{ kind: 'identifier' }}
       providers={[
         ...socialProviders,
         { id: 'oauth_apple', name: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
@@ -443,7 +439,7 @@ export function StartManyProviders() {
 export function StartProviderPending() {
   return (
     <StepPanel
-      step='start'
+      step={{ kind: 'identifier' }}
       pendingProviderId='oauth_google'
     />
   );
@@ -452,20 +448,22 @@ export function StartProviderPending() {
 export function StartError() {
   return (
     <StepPanel
-      step='start'
+      step={{ kind: 'identifier' }}
       errorMessage='Enter a valid email address.'
     />
   );
 }
 
+const passwordStep: SignInStep = { kind: 'secret', secret: 'password', identifier: IDENTIFIER };
+
 export function Password() {
-  return <StepPanel step='password' />;
+  return <StepPanel step={passwordStep} />;
 }
 
 export function PasswordPending() {
   return (
     <StepPanel
-      step='password'
+      step={passwordStep}
       isPending
     />
   );
@@ -474,42 +472,32 @@ export function PasswordPending() {
 export function PasswordError() {
   return (
     <StepPanel
-      step='password'
+      step={passwordStep}
       errorMessage='Password is incorrect. Try again, or use another method.'
     />
   );
 }
 
 export function EmailCode() {
-  return <StepPanel step='email-code' />;
+  return <StepPanel step={{ kind: 'code', purpose: 'first-factor', channel: 'email', identifier: IDENTIFIER }} />;
 }
 
 export function Totp() {
-  return (
-    <StepPanel
-      step='totp'
-      stage='second'
-    />
-  );
+  return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }} />;
 }
 
 export function BackupCode() {
-  return (
-    <StepPanel
-      step='backup-code'
-      stage='second'
-    />
-  );
+  return <StepPanel step={{ kind: 'secret', secret: 'backup-code', identifier: IDENTIFIER }} />;
 }
 
 export function MethodPicker() {
-  return <StepPanel step='method-picker' />;
+  return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
 }
 
 export function SignUp() {
-  return <StepPanel step='sign-up' />;
+  return <StepPanel step={{ kind: 'sign-up' }} />;
 }
 
 export function VerifyEmail() {
-  return <StepPanel step='verify-email' />;
+  return <StepPanel step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }} />;
 }

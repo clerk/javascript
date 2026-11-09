@@ -28,7 +28,7 @@ export interface SignInPasswordMessages {
   pendingLabel: string;
 }
 
-export interface SignInPasswordProps {
+interface SignInPasswordProps {
   messages: SignInPasswordMessages;
   identifier: string;
   onEditIdentifier?: () => void;

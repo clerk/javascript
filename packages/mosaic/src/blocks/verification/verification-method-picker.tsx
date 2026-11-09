@@ -20,7 +20,7 @@ interface VerificationMethod {
   icon: IconProps['glyph'];
 }
 
-interface VerificationMethodPickerMessages {
+export interface VerificationMethodPickerMessages {
   title: string;
   description: string;
   backButton: string;
