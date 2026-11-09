@@ -62,28 +62,28 @@ export function useUserProfileWeb3WalletsController({
       panelTitle(),
   });
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
-    onConfirm: wallet => removalFocus.remove(wallet.id),
+    onConfirm: async wallet => {
+      await removalFocus.remove(wallet.id);
+      if (errorId === wallet.id) {
+        action.reset();
+      }
+    },
     reverification: removeReverification,
   });
 
   const runConnection = (provider: UserProfileWeb3Provider, walletName?: string) =>
-    action.run(provider.id, async signal => {
+    action.run(provider.id, async () => {
       setOwner({ kind: 'connect', providerId: provider.id, target: null });
       if (walletName) {
         setPicker({ open: true, kind: 'connect', provider, walletName });
       }
       try {
-        await connect(
-          provider.id,
-          walletName,
-          target => {
-            setOwner({ kind: 'connect', providerId: provider.id, target });
-            if (provider.walletPicker === 'solana' && target.kind === 'wallet') {
-              setPicker({ open: false });
-            }
-          },
-          signal,
-        );
+        await connect(provider.id, walletName, target => {
+          setOwner({ kind: 'connect', providerId: provider.id, target });
+          if (provider.walletPicker === 'solana' && target.kind === 'wallet') {
+            setPicker({ open: false });
+          }
+        });
         setPicker({ open: false });
       } finally {
         setPicker(current =>
@@ -93,13 +93,13 @@ export function useUserProfileWeb3WalletsController({
     });
 
   const runVerification = (walletId: string, walletName?: string) =>
-    action.run(walletId, async signal => {
+    action.run(walletId, async () => {
       setOwner({ kind: 'verify', walletId });
       if (walletName) {
         setPicker({ open: true, kind: 'verify', walletId, walletName });
       }
       try {
-        await verify(walletId, walletName, signal);
+        await verify(walletId, walletName);
       } finally {
         setPicker({ open: false });
       }

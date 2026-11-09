@@ -109,10 +109,10 @@ function walletUnavailable() {
 function rethrowProviderError(cause: unknown): never {
   if (typeof cause === 'object' && cause !== null && 'code' in cause) {
     if (cause.code === 4001) {
-      throw new ClerkRuntimeError('Wallet connection was cancelled.', { code: 'web3_connection_cancelled' });
+      throw new ClerkRuntimeError('The wallet request was cancelled.', { code: 'web3_connection_cancelled' });
     }
     if (cause.code === -32002) {
-      throw new ClerkRuntimeError('A wallet request is already pending.', { code: 'web3_request_pending' });
+      throw new ClerkRuntimeError('An earlier wallet request is still pending.', { code: 'web3_request_pending' });
     }
   }
   throw cause;
@@ -132,11 +132,8 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   const [setPrimaryWallet, setPrimaryReverification] = useReverificationFlow(
     (current: UserResource, walletId: string) => current.update({ primaryWeb3WalletId: walletId }),
   );
-  const [createWallet, createReverification] = useReverificationFlow(
-    (current: UserResource, web3Wallet: string, signal?: AbortSignal) => {
-      signal?.throwIfAborted();
-      return current.createWeb3Wallet({ web3Wallet });
-    },
+  const [createWallet, createReverification] = useReverificationFlow((current: UserResource, web3Wallet: string) =>
+    current.createWeb3Wallet({ web3Wallet }),
   );
 
   if (!isLoaded || !environment) {
@@ -170,18 +167,14 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
     identifier,
     walletName,
     web3,
-    signal,
   }: {
     wallet: Web3WalletResource;
     provider: (typeof WEB3_PROVIDERS)[number];
     identifier: string;
     walletName?: string;
     web3: ReturnType<typeof createWeb3>;
-    signal?: AbortSignal;
   }) => {
-    signal?.throwIfAborted();
     const prepared = await wallet.prepareVerification({ strategy: provider.strategy });
-    signal?.throwIfAborted();
     requireCurrentUser();
     const nonce = prepared.verification.message;
     if (!nonce) {
@@ -192,7 +185,6 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
     const signature = await web3
       .generateWeb3Signature({ identifier, nonce, provider: provider.provider, walletName })
       .catch(rethrowProviderError);
-    signal?.throwIfAborted();
     requireCurrentUser();
     if (!signature) {
       throw new ClerkRuntimeError('The wallet signature is unavailable.', { code: 'web3_signature_unavailable' });
@@ -202,8 +194,7 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   return {
     ...projection,
     userId,
-    connect: async (strategy, walletName, onTarget, signal) => {
-      signal?.throwIfAborted();
+    connect: async (strategy, walletName, onTarget) => {
       requireCurrentUser();
       const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === strategy);
       const available = projection.availableProviders.some(candidate => candidate.id === strategy);
@@ -215,7 +206,6 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
       const identifier = await web3
         .getWeb3Identifier({ provider: provider.provider, walletName })
         .catch(rethrowProviderError);
-      signal?.throwIfAborted();
       if (!identifier) {
         throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
       }
@@ -239,17 +229,15 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         throw walletUnavailable();
       }
       onTarget?.(existing ? { kind: 'wallet', id: existing.id } : { kind: 'address', address: normalizedIdentifier });
-      const wallet = existing ?? (await createWallet(current, identifier, signal));
-      signal?.throwIfAborted();
+      const wallet = existing ?? (await createWallet(current, identifier));
       requireCurrentUser();
       if (!wallet) {
         throw new ClerkRuntimeError('The wallet could not be created.', { code: 'web3_wallet_creation_failed' });
       }
       onTarget?.({ kind: 'wallet', id: wallet.id });
-      await attemptVerification({ wallet, provider, identifier, walletName, web3, signal });
+      await attemptVerification({ wallet, provider, identifier, walletName, web3 });
     },
-    verify: async (walletId, walletName, signal) => {
-      signal?.throwIfAborted();
+    verify: async (walletId, walletName) => {
       const current = requireCurrentUser();
       const wallet = current.web3Wallets.find(candidate => candidate.id === walletId);
       const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === wallet?.verification.strategy);
@@ -266,7 +254,6 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
       const identifier = await web3
         .getWeb3Identifier({ provider: provider.provider, walletName })
         .catch(rethrowProviderError);
-      signal?.throwIfAborted();
       if (!identifier) {
         throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
       }
@@ -285,7 +272,7 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
           code: 'web3_wallet_account_mismatch',
         });
       }
-      await attemptVerification({ wallet: latest, provider, identifier, walletName, web3, signal });
+      await attemptVerification({ wallet: latest, provider, identifier, walletName, web3 });
     },
     setPrimary: async walletId => {
       const current = requireCurrentUser();

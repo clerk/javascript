@@ -2,4 +2,4 @@
 "@clerk/mosaic": patch
 ---
 
-Show a clear cancellation message for rejected wallet requests in UserProfile, and explain when a request is still pending in the wallet. Ignore late wallet responses after closing the profile so reopening starts a fresh connection flow.
+Show a clear message in UserProfile when a wallet request is rejected, or when an earlier request is still waiting in the wallet, and release the wallet buttons so the user can try again. Removing a wallet now also clears that wallet's error.
