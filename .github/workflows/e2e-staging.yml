@@ -227,10 +227,6 @@ jobs:
         if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
         run: pkglab pub --force
 
-      - name: Edit .npmrc [link-workspace-packages=false]
-        if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
-        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
-
       - name: Install @clerk/clerk-js from local registry
         if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
         working-directory: ${{ runner.temp }}
