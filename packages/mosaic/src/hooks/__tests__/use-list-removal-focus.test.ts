@@ -16,7 +16,7 @@ function setup(
   for (const [id, button] of buttons) {
     hook.result.current.registerTrigger(id)(button);
   }
-  const remove = (id: string) => act(() => hook.result.current.remove(id));
+  const remove = async (id: string) => act(() => hook.result.current.remove(id));
   return { ...hook, buttons, fallback, remove };
 }
 
