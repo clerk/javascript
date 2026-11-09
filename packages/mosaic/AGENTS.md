@@ -25,7 +25,7 @@ The docs describe the Mosaic we are building toward. Code that differs from them
 
 Read every line that matches your task. Paths below are relative to this package.
 
-- Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If the repo's `packages/ui` has a legacy version, [Migration](docs/migration.md) first
+- Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If `packages/ui` or `packages/react` has a legacy version, [Migration](docs/migration.md) first, even for a headless port
 - Write or change a model, or add a Clerk read, mutation or permission check → [Models](docs/models.md)
 - Build a feature from a design before Clerk's API can back it → [Models → Before the API exists](docs/models.md#before-the-api-exists)
 - Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
@@ -41,7 +41,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Write, move or review a test → [Testing](docs/testing.md)
 - Fix or silence a lint error → [Lint](docs/lint.md)
 - Move a legacy component's logic or styles into Mosaic → [Migration](docs/migration.md)
-- Check that a migration kept every legacy behavior → [Parity audit](docs/parity-audit.md)
+- Implement or review a migration, or check that it kept every legacy behavior → [Parity audit](docs/parity-audit.md)
 - Add or change a component's Swingset page → [Documenting components](docs/documenting-components.md)
 - Prove a change in a browser → [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)
 - Remove or rename a public export, prop, `--cl-*` token or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)
@@ -57,18 +57,6 @@ Before you change a file that matches a pattern below, read its guide, even for 
 - `src/**/*.controller.ts(x)` → [Controllers](docs/controllers.md)
 - `src/**/*.view.tsx` → [Views](docs/views.md)
 - `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` → [Testing](docs/testing.md)
-
-## Ports of legacy components are migrations
-
-For a current task that implements or reviews a Mosaic migration, or changes its migrated behavior, search `packages/react/src/components/` and `packages/ui/src/components/` for the counterpart. A headless port framed as a new feature is a [migration](docs/migration.md) too. Unrelated work does not acquire this workflow merely because the branch already contains Mosaic changes.
-
-1. Read the counterpart, shared prop types, and relevant helper/runtime calls. Write the Phase 1 inventory to `tmp/mosaic-parity/<feature>.md` before the model. Record the task scope, exact revisions, accepted differences, and exclusions alongside the legacy path and `## Inventory` section.
-2. Before you call the work done, review it, or open a PR, run the [parity audit](docs/parity-audit.md) in a read-only subagent and put its table under `## Parity audit` in the same file. Reading the doc is not running the audit.
-3. Use the audit's classifications to separate parity gaps, intentional differences needing disclosure, missing verification, and optional improvements. List intentional differences and approved deferrals in the PR description. Do not require inherited improvements or refactors as parity fixes.
-4. Listing a difference does not make it acceptable. Cite any conflicting rule in this file or `docs/`, and fix the gap or raise it with the user. Do not infer intentional behavior from the implementation. Preserve decisions the user already made, and leave unresolved product choices open.
-5. Inspect the actual results of focused type and behavior checks. For relevant async actions, include a representative failure through the existing fake FAPI or supported browser setup. A populated note is process bookkeeping, not proof of parity.
-
-`tmp/` is ignored by git, so the file stays out of the PR. The hooks in `.claude/settings.json` and `.codex/hooks.json` (`scripts/mosaic-parity-gate.mjs`) give conditional guidance for the feature paths in the current edit. They do not inspect branch history or notes, deny edits, or block completion. For a read-only parity review, run the explicit scoped command in [Parity audit](docs/parity-audit.md). These reminders do not run the audit or verify its evidence.
 
 ## Layers in one paragraph
 
