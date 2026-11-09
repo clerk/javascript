@@ -98,7 +98,7 @@
     "@types/proper-lockfile": "^4.1.4",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-react": "6.2.1",
     "@vitest/browser-playwright": "5.0.0",
     "@vitest/coverage-v8": "5.0.0",
     "chalk": "4.1.2",

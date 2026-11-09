@@ -62,7 +62,6 @@ jobs:
         run: |
           build_hash="$(
             git ls-files -s -- \
-              .npmrc \
               package.json \
               pnpm-lock.yaml \
               pnpm-workspace.yaml \
