@@ -125,6 +125,10 @@ runs:
       run: pnpm install --frozen-lockfile
       shell: bash
 
+    - name: Export Node version
+      shell: bash
+      run: node -p '"NODE_VERSION=" + process.versions.node' >> "$GITHUB_ENV"
+
     - name: Add node_modules/.bin to PATH
       run: echo "${{ github.workspace }}/node_modules/.bin" >> $GITHUB_PATH
       shell: bash
