@@ -10,8 +10,8 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const popupRadius = radiusVars['--cl-radius-lg'];
-const listInset = space['1'];
+const popupRadius = radiusVars['--cl-radius-xl'];
+const listInset = space['1.5'];
 const optionRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
 
 export const styles = stylex.create({
@@ -31,7 +31,7 @@ export const styles = stylex.create({
     justifyContent: 'center',
     outlineOffset: { default: null, ':focus-visible': 0 },
     paddingInlineEnd: 0,
-    paddingInlineStart: space['1.5'],
+    paddingInlineStart: space['2'],
     userSelect: 'none',
     height: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
   },
@@ -44,7 +44,7 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
-    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontSize: '1rem',
     justifyContent: 'center',
     lineHeight: 1,
     height: space['4'],
@@ -75,7 +75,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-foreground'],
   },
   countrySearchRow: {
-    gap: space['1'],
+    gap: space['1.5'],
     alignItems: 'center',
     borderBlockEndColor: colorVars['--cl-color-border-subtle'],
     borderBlockEndStyle: 'solid',
@@ -83,16 +83,16 @@ export const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     paddingInlineEnd: space['2'],
-    paddingInlineStart: space['2'],
-    height: space['8'],
+    paddingInlineStart: space['3'],
+    height: space['9'],
   },
   countrySearchIcon: {
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    height: space['5'],
-    width: space['5'],
+    height: space['4'],
+    width: space['4'],
   },
   countrySearchInput: {
     borderRadius: 0,
@@ -126,7 +126,7 @@ export const styles = stylex.create({
   },
   option: {
     borderRadius: optionRadius,
-    gap: space['1'],
+    gap: space['2'],
     outline: {
       default: 'none',
       '@media (forced-colors: active)': {
@@ -155,7 +155,7 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     paddingInlineEnd: space['1.5'],
-    paddingInlineStart: space['1'],
+    paddingInlineStart: space['1.5'],
     height: space['8'],
   },
   empty: {
@@ -171,11 +171,10 @@ export const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    height: space['5'],
-    width: space['5'],
+    height: space['4'],
+    width: space['4'],
   },
   optionName: {
-    padding: space['0.5'],
     overflow: 'hidden',
     flexGrow: 1,
     textOverflow: 'ellipsis',

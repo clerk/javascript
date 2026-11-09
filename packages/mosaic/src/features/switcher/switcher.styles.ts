@@ -31,7 +31,7 @@ export const styles = stylex.create({
 
   triggerLabelled: {
     padding: space['1.5'],
-    borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['1']})`,
+    borderRadius: radiusVars['--cl-radius-xl'],
     gap: space['1.5'],
     backgroundColor: {
       default: 'transparent',
