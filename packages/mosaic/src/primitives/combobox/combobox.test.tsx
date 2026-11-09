@@ -211,6 +211,30 @@ describe('Combobox', () => {
     expect(input).toHaveFocus();
   });
 
+  it('opens on an input click only when asked to', async () => {
+    const user = userEvent.setup();
+    function Fixture({ openOnInputClick }: { openOnInputClick?: boolean }) {
+      return (
+        <Combobox.Root openOnInputClick={openOnInputClick}>
+          <Combobox.Input aria-label='Fruit' />
+          <Combobox.Positioner>
+            <Combobox.Popup>
+              <Combobox.Option value='apple'>Apple</Combobox.Option>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Root>
+      );
+    }
+    const { rerender } = render(<Fixture />);
+
+    await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+
+    rerender(<Fixture openOnInputClick />);
+    await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
   it('holds options during exit and shows updated options when reopened', () => {
     function Fixture({ open, label }: { open: boolean; label: string }) {
       return (

@@ -24,6 +24,8 @@ const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 // popup's 1px border, the viewport's 5px padding, and its own 6px padding, on both the text and
 // the icon's edge, at the same 32px height.
 
+const hoverBorderColor = 'light-dark(#bebebe, #525252)';
+
 export const trigger = stylex.create({
   base: {
     '--_cl-icon-color': {
@@ -32,6 +34,18 @@ export const trigger = stylex.create({
         default: null,
         ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
       },
+    },
+    borderColor: {
+      default: colorVars['--cl-color-border'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': hoverBorderColor,
+      },
+    },
+    backgroundColor: {
+      default: 'transparent',
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
     },
     paddingInlineEnd: `calc(${space['3']} - 1px)`,
     paddingInlineStart: `calc(${space['3']} - 1px)`,

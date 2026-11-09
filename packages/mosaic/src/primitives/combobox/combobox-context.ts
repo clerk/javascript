@@ -11,6 +11,7 @@ import type { TransitionProps } from '../hooks/use-transition';
 
 export interface ComboboxContextValue {
   open: boolean;
+  clear: () => void;
   inputValue: string;
   filterQuery: string;
   selectedValue: string | null;

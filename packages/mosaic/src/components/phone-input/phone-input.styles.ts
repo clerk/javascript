@@ -16,13 +16,21 @@ const optionRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
 
 export const styles = stylex.create({
   triggerStart: {
-    paddingInlineStart: 'var(--_cl-input-group-inset)',
+    paddingInlineStart: 0,
   },
   trigger: {
-    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    borderRadius: 'max(0px, calc(var(--_cl-input-group-radius) - var(--_cl-input-group-inset)))',
+    '--_cl-icon-color': {
+      default: colorVars['--cl-color-input-placeholder'],
+      ':not([data-disabled])[aria-expanded="true"]': colorVars['--cl-color-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
+      },
+    },
+    borderRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
     borderWidth: 0,
     alignItems: 'center',
+    alignSelf: 'stretch',
     appearance: 'none',
     backgroundColor: 'transparent',
     cursor: 'pointer',
@@ -31,9 +39,8 @@ export const styles = stylex.create({
     justifyContent: 'center',
     outlineOffset: { default: null, ':focus-visible': 0 },
     paddingInlineEnd: 0,
-    paddingInlineStart: space['2'],
+    paddingInlineStart: `calc(${space['2']} + var(--_cl-input-group-inset))`,
     userSelect: 'none',
-    height: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
   },
   triggerContent: {
     gap: space['0.5'],

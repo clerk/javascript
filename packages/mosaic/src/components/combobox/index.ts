@@ -1,5 +1,6 @@
 export {
   Combobox,
+  ComboboxClear,
   ComboboxCollection,
   ComboboxEmpty,
   ComboboxInput,
@@ -11,6 +12,7 @@ export {
   ComboboxTrigger,
 } from './combobox';
 export type {
+  ComboboxClearProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
   ComboboxListProps,
