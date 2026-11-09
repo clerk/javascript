@@ -34,6 +34,12 @@ const styles = stylex.create({
   },
 });
 
+const labels = {
+  countryTriggerLabel: 'Country, {country}',
+  countryPopupLabel: 'Choose a country',
+  countrySearchLabel: 'Search countries',
+};
+
 function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as PhoneInputProps;
 }
@@ -43,6 +49,7 @@ export function Default(props: Record<string, unknown>) {
     <Field.Root xstyle={styles.stack}>
       <Field.Label>Phone number</Field.Label>
       <PhoneInput
+        {...labels}
         {...knobsAsProps(props)}
         name='phoneNumber'
         placeholder='202 555 0123'
@@ -56,16 +63,19 @@ export function Sizes() {
   return (
     <div style={{ display: 'grid', gap: 12, width: 320 }}>
       <PhoneInput
+        {...labels}
         size='sm'
         aria-label='Small phone number'
         placeholder='Small'
       />
       <PhoneInput
+        {...labels}
         size='md'
         aria-label='Medium phone number'
         placeholder='Medium'
       />
       <PhoneInput
+        {...labels}
         size='lg'
         aria-label='Large phone number'
         placeholder='Large'
@@ -78,7 +88,10 @@ export function Prefilled() {
   return (
     <Field.Root xstyle={styles.stack}>
       <Field.Label>Phone number</Field.Label>
-      <PhoneInput defaultValue='+306901234567' />
+      <PhoneInput
+        {...labels}
+        defaultValue='+306901234567'
+      />
       <Field.Description>Paste an international number to update the detected country.</Field.Description>
     </Field.Root>
   );
@@ -91,7 +104,10 @@ export function Disabled() {
       xstyle={styles.stack}
     >
       <Field.Label>Phone number</Field.Label>
-      <PhoneInput defaultValue='+12025550123' />
+      <PhoneInput
+        {...labels}
+        defaultValue='+12025550123'
+      />
     </Field.Root>
   );
 }
@@ -103,7 +119,10 @@ export function Invalid() {
       xstyle={styles.stack}
     >
       <Field.Label>Phone number</Field.Label>
-      <PhoneInput defaultValue='+1202' />
+      <PhoneInput
+        {...labels}
+        defaultValue='+1202'
+      />
       <Field.Error>Enter a valid phone number.</Field.Error>
     </Field.Root>
   );

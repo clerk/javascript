@@ -8,6 +8,7 @@ import React from 'react';
 
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { fill } from '../../localization/messages';
 import { Button } from '../../primitives/button';
 import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useFormattedInput } from '../../primitives/hooks';
@@ -62,6 +63,10 @@ export interface PhoneInputProps extends Omit<
   defaultCountry?: CountryIso;
   onCountryChange?: (country: CountryIso) => void;
   size?: 'sm' | 'md' | 'lg';
+  /** The country trigger's accessible name, with `{country}` filled in. */
+  countryTriggerLabel: string;
+  countryPopupLabel: string;
+  countrySearchLabel: string;
   countrySearchPlaceholder?: string;
   noResultsMessage?: string;
 }
@@ -75,6 +80,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     defaultCountry,
     onCountryChange,
     size = 'md',
+    countryTriggerLabel,
+    countryPopupLabel,
+    countrySearchLabel,
     countrySearchPlaceholder = 'Search',
     noResultsMessage = 'No countries found',
     disabled: disabledProp,
@@ -222,7 +230,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               }
               type='button'
               disabled={disabled}
-              aria-label={`Country, ${country.name}`}
+              aria-label={fill(countryTriggerLabel, { country: country.name })}
             >
               <span {...stylex.props(reset.base, styles.triggerContent)}>
                 <span
@@ -240,7 +248,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           </InputGroup.Start>
           <Popover.Popup
             anchor={anchor}
-            aria-label='Choose a country'
+            aria-label={countryPopupLabel}
             size='anchor'
             {...themeProps('phone-input-popup')}
             xstyle={[reset.base, styles.popup]}
@@ -271,7 +279,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                     />
                   </span>
                   <HeadlessCombobox.Input
-                    aria-label='Search countries'
+                    aria-label={countrySearchLabel}
                     placeholder={countrySearchPlaceholder}
                     spellCheck={false}
                     {...mergeStyleProps(
