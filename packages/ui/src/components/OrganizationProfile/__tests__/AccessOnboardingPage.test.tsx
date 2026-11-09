@@ -6,6 +6,7 @@ import { render, screen, waitFor } from '@/test/utils';
 
 import { OrganizationProfile } from '..';
 import { AccessOnboardingPage } from '../AccessOnboarding/AccessOnboardingPage';
+import type { ScenarioKey } from '../AccessOnboarding/prototypeState';
 import { useAccessPrototype } from '../AccessOnboarding/prototypeState';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
@@ -114,5 +115,66 @@ describe('AccessOnboardingPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Remove it-admin@acmedev.org' }));
     await waitFor(() => expect(screen.queryByText('it-admin@acmedev.org')).not.toBeInTheDocument());
+  });
+
+  const renderScenario = async (key: ScenarioKey, queryParams: Record<string, string> = {}) => {
+    const { createFixtures: createViewFixtures } = bindCreateFixtures('OrganizationProfile', {
+      router: { queryParams },
+    });
+    const { wrapper } = await createViewFixtures(withPageFixtures);
+    const View = () => {
+      const { scenario, setScenario } = useAccessPrototype();
+      if (scenario !== key) {
+        setScenario(key);
+        return null;
+      }
+      return <AccessOnboardingPage />;
+    };
+    return render(<View />, { wrapper });
+  };
+
+  it('claims an owned domain after reviewing who joins', async () => {
+    await renderScenario('configured', { policy: 'pol_acmedev_org' });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Claim domain' }));
+    expect(await screen.findByText('Claim acmedev.org')).toBeInTheDocument();
+    expect(screen.getByText('sam.ortiz@acmedev.org')).toBeInTheDocument();
+    expect(screen.getByText('They join when Okta Directory syncs them.')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start notice period' }));
+    expect(await screen.findByText('Notice period')).toBeInTheDocument();
+  });
+
+  it('asks for ownership before claiming, and hides claiming when the app does not allow it', async () => {
+    const draft = await renderScenario('configured', { policy: 'pol_example_com' });
+    expect(await screen.findByText('Prove ownership to claim this domain')).toBeInTheDocument();
+    draft.unmount();
+
+    await renderScenario('claims_off', { policy: 'pol_acmedev_org' });
+    expect(await screen.findByText('Manage policy')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Claim domain' })).not.toBeInTheDocument();
+  });
+
+  it('shows a parent its sub-organizations, policy scope and routing', async () => {
+    const list = await renderScenario('parent');
+    expect(await screen.findByText('Parent organization')).toBeInTheDocument();
+    expect(screen.getByText('Houston Clinic, El Paso Clinic')).toBeInTheDocument();
+    list.unmount();
+
+    const tab = await renderScenario('parent', { tab: 'sub-organizations' });
+    expect(await screen.findByText('How people join a sub-organization')).toBeInTheDocument();
+    expect(screen.getByText('Austin Clinic')).toBeInTheDocument();
+    tab.unmount();
+
+    await renderScenario('parent', { policy: 'pol_meridianvet' });
+    expect(await screen.findByText('Nobody joins Meridian Vet Group by domain.')).toBeInTheDocument();
+    expect(screen.getByText('Skip for people who sign in with SSO')).toBeInTheDocument();
+    expect(screen.getByText('All sub-organizations')).toBeInTheDocument();
+  });
+
+  it('shows a sub-organization the rules it inherits', async () => {
+    await renderScenario('child');
+    expect(await screen.findByText('From Meridian Vet Group')).toBeInTheDocument();
+    expect(screen.getByText('Required, skipped after SSO')).toBeInTheDocument();
   });
 });

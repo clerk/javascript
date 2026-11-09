@@ -24,6 +24,7 @@ export const DomainEntry = ({
   canManage,
   onVerified,
   onRemove,
+  claim,
 }: {
   domain: string;
   proof: ProtoProof;
@@ -33,6 +34,8 @@ export const DomainEntry = ({
   canManage: boolean;
   onVerified: () => void;
   onRemove: () => void;
+  /** The domain's claim line, under its proof. */
+  claim?: React.ReactNode;
 }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const owned = proof.ownership === 'verified';
@@ -73,12 +76,13 @@ export const DomainEntry = ({
             <ProofLine
               ok={owned}
               label={`Domain ownership ${owned ? 'verified' : 'unverified'}`}
-              info='Single sign-on and directory sync need a DNS record that proves you own this domain.'
+              info='Single sign-on, directory sync and claiming the domain need a DNS record that proves you own it.'
               action={!owned && canManage ? <VerifyButton onClick={() => setIsVerifying(true)} /> : null}
             />
           ) : null}
         </>
       )}
+      {claim}
       {isVerifying ? (
         <DnsDialog
           domain={domain}

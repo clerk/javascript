@@ -3,7 +3,7 @@ import { useRouter } from '../../../router';
 /*
  * The Access page is one route; query params pick the view so every page
  * shares the session-backed store:
- *   (none) | tab=connections      the Policies / Connections tabs
+ *   (none) | tab=connections|sub-organizations   the list tabs
  *   policy=<id>|new               Add policy, Manage policy, Manage default
  *   setup=sso|directory&policy=…  the setup wizards, returning to that policy
  *   connection=<id>               Manage SSO connection / Directory Sync
@@ -17,6 +17,7 @@ export const useAccessNavigation = () => {
     queryParams,
     toPolicies: () => go({}),
     toConnections: () => go({ tab: 'connections' }),
+    toSubOrganizations: () => go({ tab: 'sub-organizations' }),
     toPolicy: (policyId: string) => go({ policy: policyId }),
     toSetup: (kind: 'sso' | 'directory', policyId: string) => go({ setup: kind, policy: policyId }),
     toConnection: (connectionId: string, fromPolicy?: string) =>

@@ -36,6 +36,7 @@ import {
   useAccessPrototype,
 } from './prototypeState';
 import { ProviderMark } from './ProviderMark';
+import { ParentRules, SubOrganizationsPanel } from './SubOrganizations';
 
 /*
  * Prototype: the Access page in <OrganizationProfile />, built to the Oct
@@ -75,7 +76,9 @@ export const AccessOnboardingPage = ({ contentRef }: { contentRef?: React.RefObj
 const AccessListPage = () => {
   const store = useAccessPrototype();
   const nav = useAccessNavigation();
-  const tabIndex = nav.queryParams.tab === 'connections' ? 1 : 0;
+  const isParent = store.hierarchy?.role === 'parent';
+  const tabs = ['policies', 'connections', ...(isParent ? ['sub-organizations'] : [])];
+  const tabIndex = Math.max(0, tabs.indexOf(nav.queryParams.tab ?? 'policies'));
 
   return (
     <ProfileCard.Page>
@@ -88,12 +91,22 @@ const AccessListPage = () => {
           align='start'
           gap={4}
         >
-          <Header.Root>
-            <Header.Title
-              localizationKey={protoKey('Access')}
-              textVariant='h2'
-            />
-          </Header.Root>
+          <Flex
+            align='center'
+            gap={2}
+          >
+            <Header.Root>
+              <Header.Title
+                localizationKey={protoKey('Access')}
+                textVariant='h2'
+              />
+            </Header.Root>
+            {store.hierarchy ? (
+              <Badge colorScheme='primary'>
+                {isParent ? 'Parent organization' : `Part of ${store.hierarchy.parentName}`}
+              </Badge>
+            ) : null}
+          </Flex>
           {/* Prototype-only: jump between the states on the design board. */}
           <Select
             elementId='role'
@@ -121,11 +134,14 @@ const AccessListPage = () => {
 
         <Tabs
           value={tabIndex}
-          onChange={index => (index === 1 ? nav.toConnections() : nav.toPolicies())}
+          onChange={index =>
+            index === 1 ? nav.toConnections() : index === 2 ? nav.toSubOrganizations() : nav.toPolicies()
+          }
         >
           <TabsList sx={t => ({ gap: t.space.$2 })}>
             <Tab localizationKey={protoKey('Policies')} />
             <Tab localizationKey={protoKey('Connections')} />
+            {isParent ? <Tab localizationKey={protoKey('Sub-organizations')} /> : null}
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
@@ -134,6 +150,11 @@ const AccessListPage = () => {
             <TabPanel sx={{ width: '100%' }}>
               <ConnectionsPanel />
             </TabPanel>
+            {isParent ? (
+              <TabPanel sx={{ width: '100%' }}>
+                <SubOrganizationsPanel />
+              </TabPanel>
+            ) : null}
           </TabPanels>
         </Tabs>
       </Col>
@@ -144,7 +165,7 @@ const AccessListPage = () => {
 /* ------------------------------------------------------------- policies */
 
 const PoliciesPanel = () => {
-  const { policies, access } = useAccessPrototype();
+  const { policies, access, hierarchy } = useAccessPrototype();
   const nav = useAccessNavigation();
   const active = policies.filter(policy => !policy.isCatchAll && policy.status === 'active');
   const catchAll = policies.filter(policy => policy.isCatchAll);
@@ -152,6 +173,7 @@ const PoliciesPanel = () => {
 
   return (
     <Col sx={t => ({ gap: t.space.$6, width: '100%', paddingTop: t.space.$4 })}>
+      {hierarchy?.role === 'child' ? <ParentRules /> : null}
       <Col sx={t => ({ gap: t.space.$3 })}>
         <Flex
           justify='between'
@@ -164,7 +186,11 @@ const PoliciesPanel = () => {
               colorScheme='secondary'
               sx={smallSx}
             >
-              Control access for your organization, including SSO and Directory Sync.
+              {hierarchy?.role === 'parent'
+                ? 'Sign-in applies to everyone at these domains. Other rules apply to members of your sub-organizations.'
+                : hierarchy?.role === 'child'
+                  ? `Add rules on top of ${hierarchy.parentName}’s. They can be stricter, not looser.`
+                  : 'Control access for your organization, including SSO and Directory Sync.'}
             </Text>
           </Col>
           {access.canManage ? (
@@ -191,7 +217,8 @@ const PoliciesPanel = () => {
 };
 
 const PolicyTable = ({ policies }: { policies: ProtoPolicy[] }) => {
-  const { access } = useAccessPrototype();
+  const { access, hierarchy } = useAccessPrototype();
+  const isParent = hierarchy?.role === 'parent';
   return (
     <Box sx={t => ({ ...borderSx(t), overflowX: 'auto', width: '100%' })}>
       <Table sx={{ tableLayout: 'fixed' }}>
@@ -199,12 +226,19 @@ const PolicyTable = ({ policies }: { policies: ProtoPolicy[] }) => {
           <Tr>
             <Th
               localizationKey={protoKey('Target')}
-              sx={{ width: '31%' }}
+              sx={{ width: isParent ? '26%' : '31%' }}
             />
-            <Th
-              localizationKey={protoKey('Enrollment')}
-              sx={{ width: '31%' }}
-            />
+            {isParent ? (
+              <Th
+                localizationKey={protoKey('Sub-organizations')}
+                sx={{ width: '26%' }}
+              />
+            ) : (
+              <Th
+                localizationKey={protoKey('Enrollment')}
+                sx={{ width: '31%' }}
+              />
+            )}
             <Th localizationKey={protoKey('Authentication')} />
             {access.canManage ? (
               <Th
@@ -228,7 +262,7 @@ const PolicyTable = ({ policies }: { policies: ProtoPolicy[] }) => {
 };
 
 const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
-  const { policies, connections, access, updatePolicy, removePolicy } = useAccessPrototype();
+  const { policies, connections, access, hierarchy, updatePolicy, removePolicy } = useAccessPrototype();
   const nav = useAccessNavigation();
   const open = () => nav.toPolicy(policy.id);
   const directory = connectionById(policy.directoryId, connections);
@@ -279,16 +313,34 @@ const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
           ) : null}
         </Flex>
       </Td>
-      <Td>
-        {policy.enrollment === 'directory_sync' && directory ? (
-          <ProviderMark
-            provider={directory.provider}
-            name={directory.name}
-          />
-        ) : (
-          <Text sx={smallSx}>{ENROLLMENT_LABELS[policy.enrollment].label}</Text>
-        )}
-      </Td>
+      {hierarchy?.role === 'parent' ? (
+        <Td>
+          <Text
+            sx={smallSx}
+            truncate
+          >
+            {policy.isCatchAll
+              ? 'Parent members only'
+              : !policy.subOrganizationIds
+                ? 'All'
+                : hierarchy.subOrganizations
+                    .filter(organization => policy.subOrganizationIds?.includes(organization.id))
+                    .map(organization => organization.name)
+                    .join(', ') || 'None'}
+          </Text>
+        </Td>
+      ) : (
+        <Td>
+          {policy.enrollment === 'directory_sync' && directory ? (
+            <ProviderMark
+              provider={directory.provider}
+              name={directory.name}
+            />
+          ) : (
+            <Text sx={smallSx}>{ENROLLMENT_LABELS[policy.enrollment].label}</Text>
+          )}
+        </Td>
+      )}
       <Td>
         {policy.signIn === 'sso' && ssoConnections.length > 0 ? (
           <Flex

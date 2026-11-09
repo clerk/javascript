@@ -6,6 +6,7 @@ import { Switch } from '@/ui/elements/Switch';
 
 import { Button, Col, descriptors, Flex, Icon, Text } from '../../../customizables';
 import { Cog, Plus, Trash } from '../../../icons';
+import { ClaimLine } from './DomainClaim';
 import { DomainEntry } from './DomainProof';
 import { useAccessNavigation } from './navigation';
 import {
@@ -38,9 +39,11 @@ import {
   needsOwnership,
   newDraft,
   NON_DIRECTORY_FALLBACK_LABELS,
+  PARENT_DOMAINS,
   proofFor,
   protoKey,
   REVERIFICATION_OPTIONS,
+  ROUTING_LABELS,
   simulateRequest,
   useAccessPrototype,
 } from './prototypeState';
@@ -95,11 +98,17 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
   const blocker = activationBlocker(draft, false);
   const isDirty = !saved || JSON.stringify(draftFromPolicy(saved)) !== JSON.stringify(draft);
   const ownershipNeeded = needsOwnership(draft);
+  const claimsShown = access.claimsAllowed && store.hierarchy?.role !== 'child';
+  const hierarchy = store.hierarchy;
 
   const addDomain = () => {
     const domain = domainInput.trim().toLowerCase();
     if (!DOMAIN_PATTERN.test(domain)) {
       setDomainError('Enter a domain like example.com');
+      return;
+    }
+    if (hierarchy?.role === 'child' && PARENT_DOMAINS.includes(domain)) {
+      setDomainError(`${hierarchy.parentName} manages this domain`);
       return;
     }
     const taken = policies.some(entry => entry.id !== draft.policyId && entry.domains.includes(domain));
@@ -193,15 +202,24 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                 key={domain}
                 domain={domain}
                 proof={proof}
-                ownershipNeeded={ownershipNeeded}
+                ownershipNeeded={ownershipNeeded || claimsShown}
+                claim={
+                  <ClaimLine
+                    domain={domain}
+                    owned={proof.ownership === 'verified'}
+                    canManage={canManage}
+                    context={draft}
+                  />
+                }
                 compact={saved?.status === 'active' && isProven(draft, domain)}
                 canManage={canManage}
-                onVerified={() =>
+                onVerified={() => {
                   store.setDraft(previous => ({
                     ...previous,
                     proofs: { ...previous.proofs, [domain]: { association: true, ownership: 'verified' } },
-                  }))
-                }
+                  }));
+                  store.restoreClaim(domain);
+                }}
                 onRemove={() =>
                   set({
                     domains: draft.domains.filter(entry => entry !== domain),
@@ -213,12 +231,74 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
           })}
         </SettingRow>
 
+        {hierarchy?.role === 'parent' ? (
+          <SettingRow
+            label='Sub-organizations'
+            info='Who follows this policy’s multi-factor and re-verification rules. Everyone at these domains still signs in the same way.'
+          >
+            <RadioOption
+              name='sub-organizations'
+              checked={!draft.subOrganizationIds}
+              onSelect={() => set({ subOrganizationIds: undefined })}
+              isDisabled={!canManage}
+              label='All sub-organizations'
+              description='Includes any added later'
+            />
+            <RadioOption
+              name='sub-organizations'
+              checked={Boolean(draft.subOrganizationIds)}
+              onSelect={() => set({ subOrganizationIds: draft.subOrganizationIds ?? [] })}
+              isDisabled={!canManage}
+              label='Only the ones I choose'
+            >
+              <Col sx={t => ({ gap: t.space.$2 })}>
+                {hierarchy.subOrganizations.map(organization => {
+                  const chosen = draft.subOrganizationIds ?? [];
+                  return (
+                    <Switch
+                      key={organization.id}
+                      isChecked={chosen.includes(organization.id)}
+                      isDisabled={!canManage}
+                      onChange={checked =>
+                        set({
+                          subOrganizationIds: checked
+                            ? [...chosen, organization.id]
+                            : chosen.filter(id => id !== organization.id),
+                        })
+                      }
+                      label={protoKey(organization.name)}
+                    />
+                  );
+                })}
+              </Col>
+            </RadioOption>
+          </SettingRow>
+        ) : null}
+
         <SettingRow label='Multi-factor authentication'>
           <MfaControl
             value={draft.mfa}
             onChange={mfa => set({ mfa })}
             isDisabled={!canManage}
           />
+          {draft.mfa !== 'off' && draft.signIn === 'sso' ? (
+            <Col sx={t => ({ gap: t.space.$1, paddingInlineStart: t.space.$6 })}>
+              <Switch
+                isChecked={draft.skipMfaForSso}
+                isDisabled={!canManage}
+                onChange={skipMfaForSso => set({ skipMfaForSso })}
+                label={protoKey('Skip for people who sign in with SSO')}
+              />
+              <Text
+                colorScheme='secondary'
+                sx={xsSx}
+              >
+                {hierarchy?.role === 'parent'
+                  ? 'Your identity provider handles the second factor. Applies inside your sub-organizations only.'
+                  : 'Your identity provider handles the second factor. Applies inside this organization only.'}
+              </Text>
+            </Col>
+          ) : null}
         </SettingRow>
 
         <SettingRow label='Authentication'>
@@ -263,52 +343,64 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
           />
         </SettingRow>
 
-        <SettingRow label='Enrollment'>
-          {(Object.keys(ENROLLMENT_LABELS) as ProtoEnrollment[])
-            .filter(mode => mode !== 'directory_sync' || access.ssoAllowed)
-            .map(mode => (
-              <RadioOption
-                key={mode}
-                name='enrollment'
-                checked={draft.enrollment === mode}
-                onSelect={() => set({ enrollment: mode })}
-                isDisabled={!canManage}
-                label={ENROLLMENT_LABELS[mode].label}
-                description={ENROLLMENT_LABELS[mode].description}
-              >
-                {mode === 'directory_sync' ? (
-                  <Col sx={t => ({ gap: t.space.$4 })}>
-                    <ConnectionList
-                      label='Directory'
-                      chosen={draft.directoryId ? [draft.directoryId] : []}
-                      options={directories}
-                      canManage={canManage}
-                      addLabel='Add directory'
-                      onChange={([directoryId]) => set({ directoryId })}
-                      onCreate={() => nav.toSetup('directory', draft.policyId)}
-                      onConfigure={id => nav.toConnection(id, draft.policyId)}
-                    />
-                    <Col sx={t => ({ gap: t.space.$3 })}>
-                      <Text sx={smallSx}>
-                        {`Users with ${draft.domains[0] ? `an @${draft.domains[0]}` : 'a matching'} email who aren’t in the directory:`}
-                      </Text>
-                      {(Object.keys(NON_DIRECTORY_FALLBACK_LABELS) as ProtoNonDirectoryFallback[]).map(value => (
-                        <RadioOption
-                          key={value}
-                          name='nonDirectoryFallback'
-                          checked={draft.nonDirectoryFallback === value}
-                          onSelect={() => set({ nonDirectoryFallback: value })}
-                          isDisabled={!canManage}
-                          label={NON_DIRECTORY_FALLBACK_LABELS[value].label}
-                          description={NON_DIRECTORY_FALLBACK_LABELS[value].description}
-                        />
-                      ))}
+        {hierarchy?.role === 'parent' ? (
+          <SettingRow label='Enrollment'>
+            <Text sx={smallSx}>{`Nobody joins ${hierarchy.parentName} by domain.`}</Text>
+            <Text
+              colorScheme='secondary'
+              sx={smallSx}
+            >
+              {`People reach sub-organizations this way: ${ROUTING_LABELS[hierarchy.routing].label.toLowerCase()}. Change it on the Sub-organizations tab.`}
+            </Text>
+          </SettingRow>
+        ) : (
+          <SettingRow label='Enrollment'>
+            {(Object.keys(ENROLLMENT_LABELS) as ProtoEnrollment[])
+              .filter(mode => mode !== 'directory_sync' || access.ssoAllowed)
+              .map(mode => (
+                <RadioOption
+                  key={mode}
+                  name='enrollment'
+                  checked={draft.enrollment === mode}
+                  onSelect={() => set({ enrollment: mode })}
+                  isDisabled={!canManage}
+                  label={ENROLLMENT_LABELS[mode].label}
+                  description={ENROLLMENT_LABELS[mode].description}
+                >
+                  {mode === 'directory_sync' ? (
+                    <Col sx={t => ({ gap: t.space.$4 })}>
+                      <ConnectionList
+                        label='Directory'
+                        chosen={draft.directoryId ? [draft.directoryId] : []}
+                        options={directories}
+                        canManage={canManage}
+                        addLabel='Add directory'
+                        onChange={([directoryId]) => set({ directoryId })}
+                        onCreate={() => nav.toSetup('directory', draft.policyId)}
+                        onConfigure={id => nav.toConnection(id, draft.policyId)}
+                      />
+                      <Col sx={t => ({ gap: t.space.$3 })}>
+                        <Text sx={smallSx}>
+                          {`Users with ${draft.domains[0] ? `an @${draft.domains[0]}` : 'a matching'} email who aren’t in the directory:`}
+                        </Text>
+                        {(Object.keys(NON_DIRECTORY_FALLBACK_LABELS) as ProtoNonDirectoryFallback[]).map(value => (
+                          <RadioOption
+                            key={value}
+                            name='nonDirectoryFallback'
+                            checked={draft.nonDirectoryFallback === value}
+                            onSelect={() => set({ nonDirectoryFallback: value })}
+                            isDisabled={!canManage}
+                            label={NON_DIRECTORY_FALLBACK_LABELS[value].label}
+                            description={NON_DIRECTORY_FALLBACK_LABELS[value].description}
+                          />
+                        ))}
+                      </Col>
                     </Col>
-                  </Col>
-                ) : null}
-              </RadioOption>
-            ))}
-        </SettingRow>
+                  ) : null}
+                </RadioOption>
+              ))}
+          </SettingRow>
+        )}
       </Col>
 
       {canManage ? (
