@@ -21,7 +21,7 @@ import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
-import { JWT_CATEGORY_JWT_TEMPLATE } from '../jwtCategories';
+import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_OIDC_ID_TOKEN } from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import { type MachineTokenType, TokenType } from '../tokenTypes';
@@ -1328,15 +1328,18 @@ describe('tokens.authenticateRequest(options)', () => {
       templateInHeader,
       { acceptsToken: ['session_token', 'm2m_token'] as const },
     ],
-  ])('%s: JWT-template token presented as a session token (SEC-340)', (_label, buildRequest, options) => {
-    test('returns signed out', async () => {
+  ])('%s: non-session token presented as a session token (SEC-340)', (_label, buildRequest, options) => {
+    test.each([
+      ['a JWT-template token', JWT_CATEGORY_JWT_TEMPLATE],
+      ['an OIDC ID token', JWT_CATEGORY_OIDC_ID_TOKEN],
+    ])('returns signed out for %s', async (_kind, cat) => {
       const { sid: _sid, ...payloadWithoutSid } = mockJwtPayload;
-      const { data: templateJwt } = await signJwt(payloadWithoutSid, signingJwks, {
+      const { data: nonSessionJwt } = await signJwt(payloadWithoutSid, signingJwks, {
         algorithm: 'RS256',
-        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_JWT_TEMPLATE },
+        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat },
       });
 
-      const requestState = await authenticateRequest(buildRequest(templateJwt!), mockOptions(options));
+      const requestState = await authenticateRequest(buildRequest(nonSessionJwt!), mockOptions(options));
 
       expect(requestState).toBeSignedOut({
         reason: AuthErrorReason.TokenTypeMismatch,

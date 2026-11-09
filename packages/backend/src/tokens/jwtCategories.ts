@@ -5,6 +5,7 @@ import { decodeJwt } from '../jwt/verifyJwt';
 export const JWT_CATEGORY_SESSION_TOKEN = 'cl_B7d4PD111AAA';
 export const JWT_CATEGORY_JWT_TEMPLATE = 'cl_B7d4PD222AAA';
 export const JWT_CATEGORY_M2M_TOKEN = 'cl_B7d4PD333AAA';
+export const JWT_CATEGORY_OIDC_ID_TOKEN = 'cl_B7d4PD444AAA';
 
 /**
  * Whether `cat` marks a JWT as something other than a session token. Handshake tokens are
