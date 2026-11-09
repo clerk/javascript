@@ -126,7 +126,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           HUSKY: "0"
-          NPM_CONFIG_PROVENANCE: true
+          PNPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
@@ -388,7 +388,7 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         run: pnpm release:canary
         env:
-          NPM_CONFIG_PROVENANCE: true
+          PNPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
         if: steps.publish.outcome == 'success'
@@ -608,7 +608,7 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         run: pnpm release:snapshot
         env:
-          NPM_CONFIG_PROVENANCE: true
+          PNPM_CONFIG_PROVENANCE: true
 
       - name: Package info
         if: steps.version-packages.outputs.success == '1'

@@ -110,7 +110,7 @@ runs:
       run: echo $TURBO_ARGS
 
     - name: Install PNPM
-      uses: pnpm/action-setup@v4.3.0
+      uses: pnpm/action-setup@v6.1.0
 
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v4.4.0

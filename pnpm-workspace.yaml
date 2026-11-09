@@ -2,6 +2,14 @@ packages:
   - packages/*
   - packages/electron-passkeys/npm/*
 
+engineStrict: false
+strictDepBuilds: false
+verifyDepsBeforeRun: false
+
+allowBuilds:
+  cypress: true
+  msw: true
+
 catalogs:
   peer-expo:
     expo: '>=54 <59'

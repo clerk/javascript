@@ -95,7 +95,7 @@ jobs:
           key: expo-native-build-v1-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ steps.native-build-key.outputs.hash }}
 
       - if: steps.native-build-cache.outputs.cache-hit != 'true'
-        uses: pnpm/action-setup@v4.3.0
+        uses: pnpm/action-setup@v6.1.0
       - if: steps.native-build-cache.outputs.cache-hit != 'true'
         uses: actions/setup-node@v4.4.0
         with:
