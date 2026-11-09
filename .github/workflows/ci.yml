@@ -642,6 +642,7 @@ jobs:
         run: |
           mkdir clerk-js && cd clerk-js
           pnpm init
+          pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
@@ -649,6 +650,7 @@ jobs:
         run: |
           mkdir clerk-ui && cd clerk-ui
           pnpm init
+          pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
           pkglab add @clerk/ui
 
       - name: Copy components @clerk/astro
