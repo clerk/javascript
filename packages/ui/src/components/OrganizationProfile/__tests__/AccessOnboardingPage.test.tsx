@@ -1,4 +1,5 @@
 import { fireEvent } from '@testing-library/react';
+import { useEffect, useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -123,12 +124,14 @@ describe('AccessOnboardingPage', () => {
     });
     const { wrapper } = await createViewFixtures(withPageFixtures);
     const View = () => {
-      const { scenario, setScenario } = useAccessPrototype();
-      if (scenario !== key) {
+      const { setScenario } = useAccessPrototype();
+      const [ready, setReady] = useState(false);
+      useEffect(() => {
         setScenario(key);
-        return null;
-      }
-      return <AccessOnboardingPage />;
+        setReady(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+      return ready ? <AccessOnboardingPage /> : null;
     };
     return render(<View />, { wrapper });
   };
@@ -176,5 +179,55 @@ describe('AccessOnboardingPage', () => {
     await renderScenario('child');
     expect(await screen.findByText('From Meridian Vet Group')).toBeInTheDocument();
     expect(screen.getByText('Required, skipped after SSO')).toBeInTheDocument();
+  });
+
+  it('offers a parent when a domain another organization owns is added', async () => {
+    await renderScenario('configured', { policy: 'new' });
+
+    fireEvent.change(await screen.findByLabelText('Domain'), { target: { value: 'acmelabs.io' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    expect(await screen.findByText('Acme Labs already owns acmelabs.io.')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create parent' }));
+    expect(await screen.findByText('Create parent organization')).toBeInTheDocument();
+    expect(screen.getByText('acmelabs.io · proof moves up')).toBeInTheDocument();
+    expect(screen.getByText('acmedev.org · owner must agree')).toBeInTheDocument();
+  });
+
+  it('creates a parent from the Access page and lands on it', async () => {
+    await renderScenario('configured');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Create parent organization' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Create parent' }));
+
+    expect(await screen.findByText('Parent organization')).toBeInTheDocument();
+    expect(screen.getByText(/Proof for acmedev.org, exampledev.net moved to Acme Group/)).toBeInTheDocument();
+  });
+
+  it('prompts for a parent under a proven domain that other organizations share', async () => {
+    await renderScenario('configured', { policy: 'pol_acmedev_org' });
+    expect(
+      await screen.findByText('Acme Research and Acme Design also use acmedev.org. Manage them together?'),
+    ).toBeInTheDocument();
+  });
+
+  it('lets the policy choose what happens to people outside the directory', async () => {
+    await renderScenario('configured', { policy: 'pol_acmedev_org' });
+
+    expect(await screen.findByText('Let them create their own organization')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Show an error'));
+    expect(await screen.findByLabelText('Contact email')).toBeInTheDocument();
+  });
+
+  it('gives a sub-organization member a way into the parent', async () => {
+    await renderScenario('child');
+    fireEvent.click(await screen.findByRole('button', { name: 'Go to Meridian Vet Group' }));
+    expect(await screen.findByText('Parent organization')).toBeInTheDocument();
+  });
+
+  it('keeps parent members out of sub-organizations unless the setting is on', async () => {
+    await renderScenario('parent', { tab: 'sub-organizations' });
+    expect(await screen.findByText('Parent members can open every sub-organization')).toBeInTheDocument();
+    expect(screen.getByText('One sub-organization per directory group')).toBeInTheDocument();
   });
 });

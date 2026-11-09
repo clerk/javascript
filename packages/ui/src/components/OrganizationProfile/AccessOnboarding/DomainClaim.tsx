@@ -200,7 +200,7 @@ const LinkText = ({ children, onClick }: { children: string; onClick: () => void
 
 /* ---------------------------------------------------------------- dialogs */
 
-const OverlayDialog = ({
+export const OverlayDialog = ({
   onClose,
   width = '30rem',
   children,
@@ -246,7 +246,7 @@ const OverlayDialog = ({
   );
 };
 
-const DialogHeader = ({ title, description }: { title: string; description: string }) => (
+export const DialogHeader = ({ title, description }: { title: string; description: string }) => (
   <Col sx={t => ({ gap: t.space.$1 })}>
     <Text variant='subtitle'>{title}</Text>
     <Text

@@ -6,6 +6,7 @@ import { Switch } from '@/ui/elements/Switch';
 
 import { Button, Col, descriptors, Flex, Icon, Text } from '../../../customizables';
 import { Cog, Plus, Trash } from '../../../icons';
+import { DomainConflict, SharedDomainPrompt } from './CreateParent';
 import { ClaimLine } from './DomainClaim';
 import { DomainEntry } from './DomainProof';
 import { useAccessNavigation } from './navigation';
@@ -84,6 +85,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
   const saved = policies.find(entry => entry.id === draft.policyId);
   const [domainInput, setDomainInput] = useState('');
   const [domainError, setDomainError] = useState<string | null>(null);
+  const [conflict, setConflict] = useState<string | null>(null);
   const [saving, setSaving] = useState<ProtoPolicyStatus | null>(null);
   const canManage = access.canManage;
 
@@ -109,6 +111,11 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
     }
     if (hierarchy?.role === 'child' && PARENT_DOMAINS.includes(domain)) {
       setDomainError(`${hierarchy.parentName} manages this domain`);
+      return;
+    }
+    const owner = store.relatedOrganizations.find(entry => entry.domain === domain && entry.ownsDomain);
+    if (owner) {
+      setConflict(owner.id);
       return;
     }
     const taken = policies.some(entry => entry.id !== draft.policyId && entry.domains.includes(domain));
@@ -173,6 +180,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                     onChange={value => {
                       setDomainInput(value);
                       setDomainError(null);
+                      setConflict(null);
                     }}
                     onEnter={addDomain}
                   />
@@ -193,6 +201,12 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                   {domainError}
                 </Text>
               ) : null}
+              {conflict
+                ? (() => {
+                    const owner = store.relatedOrganizations.find(entry => entry.id === conflict);
+                    return owner ? <DomainConflict organization={owner} /> : null;
+                  })()
+                : null}
             </Col>
           ) : null}
           {draft.domains.map(domain => {
@@ -204,12 +218,15 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                 proof={proof}
                 ownershipNeeded={ownershipNeeded || claimsShown}
                 claim={
-                  <ClaimLine
-                    domain={domain}
-                    owned={proof.ownership === 'verified'}
-                    canManage={canManage}
-                    context={draft}
-                  />
+                  <>
+                    <ClaimLine
+                      domain={domain}
+                      owned={proof.ownership === 'verified'}
+                      canManage={canManage}
+                      context={draft}
+                    />
+                    {proof.ownership === 'verified' ? <SharedDomainPrompt domain={domain} /> : null}
+                  </>
                 }
                 compact={saved?.status === 'active' && isProven(draft, domain)}
                 canManage={canManage}
@@ -350,6 +367,12 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
               colorScheme='secondary'
               sx={smallSx}
             >
+              People join the parent by invitation. Whoever created it is its first member.
+            </Text>
+            <Text
+              colorScheme='secondary'
+              sx={smallSx}
+            >
               {`People reach sub-organizations this way: ${ROUTING_LABELS[hierarchy.routing].label.toLowerCase()}. Change it on the Sub-organizations tab.`}
             </Text>
           </SettingRow>
@@ -392,8 +415,25 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                             isDisabled={!canManage}
                             label={NON_DIRECTORY_FALLBACK_LABELS[value].label}
                             description={NON_DIRECTORY_FALLBACK_LABELS[value].description}
-                          />
+                          >
+                            {value === 'error' ? (
+                              <TextInput
+                                ariaLabel='Contact email'
+                                value={draft.contactEmail}
+                                placeholder='it@example.com'
+                                onChange={contactEmail => set({ contactEmail })}
+                              />
+                            ) : null}
+                          </RadioOption>
                         ))}
+                        {draft.signIn === 'sso' ? (
+                          <Text
+                            colorScheme='secondary'
+                            sx={xsSx}
+                          >
+                            Only reaches people your identity provider lets sign in.
+                          </Text>
+                        ) : null}
                       </Col>
                     </Col>
                   ) : null}

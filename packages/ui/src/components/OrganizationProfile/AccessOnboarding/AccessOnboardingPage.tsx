@@ -21,6 +21,7 @@ import {
 import { Header } from '../../../elements/Header';
 import type { PropsOfComponent } from '../../../styledSystem';
 import { ManageConnectionPage, SetupWizard } from './ConnectionPages';
+import { CreateParentButton } from './CreateParent';
 import { useAccessNavigation } from './navigation';
 import { borderSx, ContentRefContext, InfoTooltip, smallSx } from './parts';
 import { PolicyPage } from './PolicyPage';
@@ -106,6 +107,16 @@ const AccessListPage = () => {
                 {isParent ? 'Parent organization' : `Part of ${store.hierarchy.parentName}`}
               </Badge>
             ) : null}
+            {store.hierarchy?.role === 'child' && store.hierarchy.isParentMember ? (
+              <Button
+                variant='outline'
+                size='xs'
+                textVariant='buttonSmall'
+                block={false}
+                onClick={() => store.setScenario('parent')}
+                localizationKey={protoKey(`Go to ${store.hierarchy.parentName}`)}
+              />
+            ) : null}
           </Flex>
           {/* Prototype-only: jump between the states on the design board. */}
           <Select
@@ -131,6 +142,25 @@ const AccessListPage = () => {
             <SelectOptionList />
           </Select>
         </Flex>
+
+        {store.notice ? (
+          <Flex
+            justify='between'
+            align='center'
+            gap={3}
+            sx={t => ({ ...borderSx(t), padding: t.space.$3 })}
+          >
+            <Text sx={smallSx}>{store.notice}</Text>
+            <Button
+              variant='outline'
+              size='xs'
+              textVariant='buttonSmall'
+              block={false}
+              onClick={store.dismissNotice}
+              localizationKey={protoKey('Dismiss')}
+            />
+          </Flex>
+        ) : null}
 
         <Tabs
           value={tabIndex}
@@ -165,7 +195,7 @@ const AccessListPage = () => {
 /* ------------------------------------------------------------- policies */
 
 const PoliciesPanel = () => {
-  const { policies, access, hierarchy } = useAccessPrototype();
+  const { policies, access, hierarchy, relatedOrganizations } = useAccessPrototype();
   const nav = useAccessNavigation();
   const active = policies.filter(policy => !policy.isCatchAll && policy.status === 'active');
   const catchAll = policies.filter(policy => policy.isCatchAll);
@@ -194,13 +224,19 @@ const PoliciesPanel = () => {
             </Text>
           </Col>
           {access.canManage ? (
-            <Button
-              size='sm'
-              textVariant='buttonSmall'
-              block={false}
-              onClick={() => nav.toPolicy('new')}
-              localizationKey={protoKey('Add policy')}
-            />
+            <Flex
+              align='center'
+              gap={2}
+            >
+              {relatedOrganizations.length > 0 ? <CreateParentButton /> : null}
+              <Button
+                size='sm'
+                textVariant='buttonSmall'
+                block={false}
+                onClick={() => nav.toPolicy('new')}
+                localizationKey={protoKey('Add policy')}
+              />
+            </Flex>
           ) : null}
         </Flex>
         <PolicyTable policies={[...active, ...catchAll]} />

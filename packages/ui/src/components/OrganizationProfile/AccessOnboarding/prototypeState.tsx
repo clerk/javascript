@@ -20,7 +20,8 @@ export type ProtoSignIn = 'default' | 'sso';
 export type ProtoMfa = 'off' | 'optional' | 'required';
 export type ProtoPolicyStatus = 'active' | 'draft' | 'inactive';
 export type ProtoProvider = 'saml_okta' | 'saml_microsoft' | 'saml_google' | 'saml_custom' | 'oidc';
-export type ProtoNonDirectoryFallback = 'block' | 'request_access';
+/** People at the domain who aren't provisioned by the directory. */
+export type ProtoNonDirectoryFallback = 'join' | 'create_own' | 'error';
 export type ProtoOwnership = 'unverified' | 'verified';
 export type ProtoConnectionStatus = 'pending' | 'active' | 'broken';
 export type ProtoConnectionKind = 'sso' | 'directory';
@@ -49,6 +50,8 @@ export type ProtoPolicy = {
   /** The directory when enrollment is directory_sync. */
   directoryId?: string;
   nonDirectoryFallback: ProtoNonDirectoryFallback;
+  /** Shown in the error when nonDirectoryFallback is 'error'. */
+  contactEmail: string;
   proofs: Record<string, ProtoProof>;
   /** MFA is skipped for people who signed in with one of the policy's SSO connections. */
   skipMfaForSso: boolean;
@@ -137,7 +140,7 @@ export const formatDate = (iso: string) =>
 export type ProtoSubOrganization = { id: string; name: string; membersCount: number };
 
 /** How someone who signs in at a parent's domain ends up in a sub-organization. */
-export type ProtoRouting = 'application' | 'org_rules' | 'directory_groups';
+export type ProtoRouting = 'application' | 'org_rules' | 'directory_groups' | 'group_per_organization';
 
 export const ROUTING_LABELS: Record<ProtoRouting, { label: string; description: string }> = {
   application: {
@@ -150,7 +153,11 @@ export const ROUTING_LABELS: Record<ProtoRouting, { label: string; description: 
   },
   directory_groups: {
     label: 'Directory groups',
-    description: 'Map groups from your identity provider to sub-organizations.',
+    description: 'Map groups from your identity provider to existing sub-organizations.',
+  },
+  group_per_organization: {
+    label: 'One sub-organization per directory group',
+    description: 'Each group becomes a sub-organization, and its members stay in sync with the group.',
   },
 };
 
@@ -168,6 +175,22 @@ export type ProtoHierarchy = {
   subOrganizations: ProtoSubOrganization[];
   routing: ProtoRouting;
   groupMappings: ProtoGroupMapping[];
+  /** The member on screen is also a member of the parent, so the switcher offers a way in. */
+  isParentMember: boolean;
+  /** Optional: parent members can open every sub-organization. Off by default. */
+  parentMembersSeeAll: boolean;
+};
+
+/** Another organization in the application that shares a domain with this one. */
+export type ProtoRelatedOrganization = {
+  id: string;
+  name: string;
+  membersCount: number;
+  domain: string;
+  /** It proved the domain itself. */
+  ownsDomain: boolean;
+  /** The member on screen is an admin there. */
+  isAdmin: boolean;
 };
 
 /** What the application owner allows this organization's members to do. */
@@ -198,6 +221,7 @@ export type PolicyDraft = {
   enrollment: ProtoEnrollment;
   directoryId?: string;
   nonDirectoryFallback: ProtoNonDirectoryFallback;
+  contactEmail: string;
   skipMfaForSso: boolean;
   subOrganizationIds?: string[];
 };
@@ -216,6 +240,9 @@ export type ProtoState = {
   /** Keyed by domain. */
   claims: Record<string, ProtoClaim>;
   hierarchy: ProtoHierarchy | null;
+  relatedOrganizations: ProtoRelatedOrganization[];
+  /** A one-off message on the Access page, e.g. after creating a parent. */
+  notice: string | null;
 };
 
 /* ----------------------------------------------------------------- labels */
@@ -232,8 +259,15 @@ export const ENROLLMENT_LABELS: Record<ProtoEnrollment, { label: string; descrip
 
 export const NON_DIRECTORY_FALLBACK_LABELS: Record<ProtoNonDirectoryFallback, { label: string; description: string }> =
   {
-    block: { label: 'Block access', description: 'Only directory members can join' },
-    request_access: { label: 'Allow access requests', description: 'Members can request access from an admin' },
+    create_own: {
+      label: 'Let them create their own organization',
+      description: 'They can sign in and start a separate organization',
+    },
+    join: {
+      label: 'Add them to this organization',
+      description: 'They join even though the directory doesn’t list them',
+    },
+    error: { label: 'Show an error', description: 'They can’t continue and see who to contact' },
   };
 
 export const PROVIDER_LABELS: Record<ProtoProvider, { label: string; iconId: string; kind: 'saml' | 'oidc' }> = {
@@ -333,7 +367,8 @@ const policy = (domain: string, overrides: Partial<ProtoPolicy> = {}): ProtoPoli
   connectionIds: [],
   reverificationHours: null,
   enrollment: 'invitation_only',
-  nonDirectoryFallback: 'block',
+  nonDirectoryFallback: 'create_own',
+  contactEmail: '',
   proofs: { [domain]: emptyProof() },
   skipMfaForSso: false,
   createdAt: new Date().toISOString(),
@@ -360,6 +395,7 @@ export const draftFromPolicy = (source: ProtoPolicy): PolicyDraft => ({
   enrollment: source.enrollment,
   directoryId: source.directoryId,
   nonDirectoryFallback: source.nonDirectoryFallback,
+  contactEmail: source.contactEmail,
   skipMfaForSso: source.skipMfaForSso,
   subOrganizationIds: source.subOrganizationIds,
 });
@@ -379,7 +415,8 @@ export const newDraft = (state: Pick<ProtoState, 'userEmail' | 'policies'>): Pol
     connectionIds: [],
     reverificationHours: null,
     enrollment: 'invitation_only',
-    nonDirectoryFallback: 'block',
+    nonDirectoryFallback: 'create_own',
+    contactEmail: '',
     skipMfaForSso: false,
   };
 };
@@ -450,7 +487,29 @@ const MERIDIAN_HIERARCHY: ProtoHierarchy = {
     { group: 'El Paso staff', subOrganizationId: 'org_sub_el_paso' },
     { group: 'Regional managers', subOrganizationId: null },
   ],
+  isParentMember: true,
+  parentMembersSeeAll: false,
 };
+
+const ACME_RELATED: ProtoRelatedOrganization[] = [
+  {
+    id: 'org_acme_research',
+    name: 'Acme Research',
+    membersCount: 12,
+    domain: 'acmedev.org',
+    ownsDomain: false,
+    isAdmin: true,
+  },
+  {
+    id: 'org_acme_design',
+    name: 'Acme Design',
+    membersCount: 7,
+    domain: 'acmedev.org',
+    ownsDomain: false,
+    isAdmin: false,
+  },
+  { id: 'org_acme_labs', name: 'Acme Labs', membersCount: 19, domain: 'acmelabs.io', ownsDomain: true, isAdmin: true },
+];
 
 /** The parent's rules, as a sub-organization sees them. */
 export const PARENT_RULES = [
@@ -500,6 +559,8 @@ const scenario = (key: ScenarioKey): ProtoState => {
         outsidePeople: OUTSIDE_PEOPLE,
         claims: {},
         hierarchy: null,
+        relatedOrganizations: ACME_RELATED,
+        notice: null,
       };
     case 'claims_off':
       return {
@@ -511,8 +572,9 @@ const scenario = (key: ScenarioKey): ProtoState => {
       return {
         ...scenario('work'),
         scenario: key,
-        userEmail: 'tomas@meridianvet.com',
+        userEmail: 'dana@meridianvet.com',
         organizationName: 'Austin Clinic',
+        relatedOrganizations: [],
         hierarchy: { ...MERIDIAN_HIERARCHY, role: 'child' },
       };
     case 'parent':
@@ -568,6 +630,8 @@ const scenario = (key: ScenarioKey): ProtoState => {
           'meridianpets.com': { status: 'claimed', startsAt: '2026-10-20T09:00:00.000Z', includeOrganizations: false },
         },
         hierarchy: MERIDIAN_HIERARCHY,
+        relatedOrganizations: [],
+        notice: null,
       };
     case 'configured':
       return {
@@ -598,7 +662,8 @@ const scenario = (key: ScenarioKey): ProtoState => {
             connectionIds: ['con_okta_marketing'],
             enrollment: 'directory_sync',
             directoryId: 'dir_okta',
-            nonDirectoryFallback: 'request_access',
+            nonDirectoryFallback: 'error',
+            contactEmail: 'it@exampledev.net',
             proofs: { 'exampledev.net': { association: true, ownership: 'verified' } },
             createdAt: '2026-09-20T10:00:00.000Z',
           }),
@@ -640,13 +705,15 @@ const scenario = (key: ScenarioKey): ProtoState => {
           'exampledev.net': { status: 'notice', startsAt: '2026-11-18T09:00:00.000Z', includeOrganizations: true },
         },
         hierarchy: null,
+        relatedOrganizations: ACME_RELATED,
+        notice: null,
       };
   }
 };
 
 /* ------------------------------------------------------------------ store */
 
-const STORAGE_KEY = 'clerk-access-prototype-v3';
+const STORAGE_KEY = 'clerk-access-prototype-v4';
 const SERVER_STATE = scenario('work');
 
 let state: ProtoState | null = null;
@@ -857,8 +924,57 @@ export const useAccessPrototype = () => {
     [update],
   );
 
+  /**
+   * Puts a parent on top of this organization and the chosen others. They keep
+   * their IDs and data; domain proof moves up so nobody verifies again.
+   * Organizations the member doesn't administer join once their owner agrees.
+   */
+  const createParent = useCallback(
+    (name: string, organizationIds: string[]) =>
+      update(previous => {
+        const chosen = previous.relatedOrganizations.filter(entry => organizationIds.includes(entry.id));
+        const joined = chosen.filter(entry => entry.isAdmin);
+        const pending = chosen.filter(entry => !entry.isAdmin);
+        const proven = previous.policies.flatMap(policy =>
+          policy.domains.filter(domain => policy.proofs[domain]?.ownership === 'verified'),
+        );
+        const moved = [...new Set([...proven, ...joined.filter(entry => entry.ownsDomain).map(entry => entry.domain)])];
+        return {
+          ...previous,
+          organizationName: name,
+          hierarchy: {
+            role: 'parent',
+            parentName: name,
+            subOrganizations: [
+              { id: 'org_current', name: previous.organizationName, membersCount: 24 },
+              ...joined.map(entry => ({ id: entry.id, name: entry.name, membersCount: entry.membersCount })),
+            ],
+            routing: 'application',
+            groupMappings: [],
+            isParentMember: true,
+            parentMembersSeeAll: false,
+          },
+          relatedOrganizations: previous.relatedOrganizations.filter(entry => !joined.includes(entry)),
+          notice: [
+            `${name} now manages ${joined.length + 1} organization${joined.length ? 's' : ''}. You’re its first member; others join by invitation.`,
+            moved.length ? `Proof for ${moved.join(', ')} moved to ${name}, so nobody needs to verify again.` : null,
+            pending.length
+              ? `${pending.map(entry => entry.name).join(', ')} ${pending.length === 1 ? 'joins' : 'join'} once ${pending.length === 1 ? 'its owner agrees' : 'their owners agree'}.`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' '),
+        };
+      }),
+    [update],
+  );
+
+  const dismissNotice = useCallback(() => update(previous => ({ ...previous, notice: null })), [update]);
+
   return {
     ...current,
+    createParent,
+    dismissNotice,
     startClaim,
     startClaimNow,
     endClaim,

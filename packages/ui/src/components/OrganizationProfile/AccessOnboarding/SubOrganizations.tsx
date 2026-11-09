@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
+import { Switch } from '@/ui/elements/Switch';
 
 import { Badge, Box, Button, Col, Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../../customizables';
 import { borderSx, RadioOption, smallSx, WarningLine } from './parts';
@@ -19,12 +20,17 @@ export const SubOrganizationsPanel = () => {
   const hierarchy = store.hierarchy;
   const [routing, setRouting] = useState<ProtoRouting>(hierarchy?.routing ?? 'application');
   const [mappings, setMappings] = useState<ProtoGroupMapping[]>(hierarchy?.groupMappings ?? []);
+  const [seeAll, setSeeAll] = useState(hierarchy?.parentMembersSeeAll ?? false);
   const [isSaving, setIsSaving] = useState(false);
   if (!hierarchy) {
     return null;
   }
   const directory = store.connections.find(connection => connection.kind === 'directory');
-  const isDirty = routing !== hierarchy.routing || JSON.stringify(mappings) !== JSON.stringify(hierarchy.groupMappings);
+  const isDirty =
+    routing !== hierarchy.routing ||
+    seeAll !== hierarchy.parentMembersSeeAll ||
+    JSON.stringify(mappings) !== JSON.stringify(hierarchy.groupMappings);
+  const needsDirectory = (value: ProtoRouting) => value === 'directory_groups' || value === 'group_per_organization';
   const coveredBy = (id: string) =>
     store.policies.filter(
       policy => !policy.isCatchAll && (!policy.subOrganizationIds || policy.subOrganizationIds.includes(id)),
@@ -33,7 +39,7 @@ export const SubOrganizationsPanel = () => {
   const save = () => {
     setIsSaving(true);
     void simulateRequest().then(() => {
-      store.updateHierarchy({ routing, groupMappings: mappings });
+      store.updateHierarchy({ routing, groupMappings: mappings, parentMembersSeeAll: seeAll });
       setIsSaving(false);
     });
   };
@@ -108,15 +114,23 @@ export const SubOrganizationsPanel = () => {
             name='routing'
             checked={routing === value}
             onSelect={() => setRouting(value)}
-            isDisabled={!store.access.canManage || (value === 'directory_groups' && !directory)}
+            isDisabled={!store.access.canManage || (needsDirectory(value) && !directory)}
             label={ROUTING_LABELS[value].label}
             description={
-              value === 'directory_groups' && !directory
+              needsDirectory(value) && !directory
                 ? 'Add a directory on a policy first.'
                 : ROUTING_LABELS[value].description
             }
-            badge={value === 'directory_groups' ? <Badge colorScheme='primary'>Later</Badge> : undefined}
+            badge={needsDirectory(value) ? <Badge colorScheme='primary'>Later</Badge> : undefined}
           >
+            {value === 'group_per_organization' && directory ? (
+              <Text
+                colorScheme='secondary'
+                sx={smallSx}
+              >
+                {`${mappings.length} groups in ${directory.name} would become ${mappings.length} sub-organizations.`}
+              </Text>
+            ) : null}
             {value === 'directory_groups' && directory ? (
               <GroupMappingTable
                 directoryName={directory.name}
@@ -126,6 +140,30 @@ export const SubOrganizationsPanel = () => {
             ) : null}
           </RadioOption>
         ))}
+      </Col>
+
+      <Col sx={t => ({ gap: t.space.$3 })}>
+        <Col sx={t => ({ gap: t.space.$0x5 })}>
+          <Flex
+            align='center'
+            gap={2}
+          >
+            <Text variant='subtitle'>Parent members</Text>
+            <Badge colorScheme='primary'>Optional</Badge>
+          </Flex>
+          <Text
+            colorScheme='secondary'
+            sx={smallSx}
+          >
+            {`People in ${hierarchy.parentName} manage it, and aren’t members of its sub-organizations.`}
+          </Text>
+        </Col>
+        <Switch
+          isChecked={seeAll}
+          isDisabled={!store.access.canManage}
+          onChange={setSeeAll}
+          label={protoKey('Parent members can open every sub-organization')}
+        />
         {store.access.canManage ? (
           <Flex justify='end'>
             <Button
