@@ -773,6 +773,16 @@ export type __internal_LocalizationResource = {
         subtitle__disconnected: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
       };
+      agentConnectionsSection: {
+        title: LocalizationValue;
+        domainUnknown: LocalizationValue;
+        scopes: LocalizationValue<'scopes'>;
+        noScopes: LocalizationValue;
+        lastUsed: LocalizationValue<'date'>;
+        lastUsedUnknown: LocalizationValue;
+        loadError: LocalizationValue;
+        retry: LocalizationValue;
+      };
       enterpriseAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;

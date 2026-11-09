@@ -2540,6 +2540,16 @@ export const enUS: LocalizationResource = {
         destructiveAction: 'Sign out of device',
         title: 'Active devices',
       },
+      agentConnectionsSection: {
+        domainUnknown: 'Domain unavailable',
+        lastUsed: 'Last used: {{date}}',
+        lastUsedUnknown: 'Last used: Unknown',
+        loadError: 'Agent connections could not be loaded.',
+        noScopes: 'None',
+        retry: 'Try again',
+        scopes: 'Scopes: {{scopes}}',
+        title: 'Personal agents',
+      },
       connectedAccountsSection: {
         actionLabel__connectionFailed: 'Reconnect',
         actionLabel__reauthorize: 'Authorize now',

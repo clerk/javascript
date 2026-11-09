@@ -1,3 +1,4 @@
+import type { AgentConnectionResource, GetAgentConnectionsParams } from './agentConnection';
 import type { BackupCodeResource } from './backupCode';
 import type { BillingPayerMethods } from './billing';
 import type {
@@ -280,6 +281,9 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   createExternalAccount: (params: CreateExternalAccountParams) => Promise<ExternalAccountResource>;
   getOrganizationMemberships: GetOrganizationMemberships;
+  __experimental_getAgentConnections: (
+    params?: GetAgentConnectionsParams,
+  ) => Promise<ClerkPaginatedResponse<AgentConnectionResource>>;
   /**
    * Gets a list of Organization invitations for the user.
    * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`UserOrganizationInvitation`](https://clerk.com/docs/reference/types/user-organization-invitation) objects.

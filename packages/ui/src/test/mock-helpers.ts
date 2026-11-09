@@ -62,7 +62,12 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
         },
       });
       if (sessionAny.user) {
-        mockMethodsOf(sessionAny.user);
+        mockMethodsOf(sessionAny.user, {
+          exclude: [],
+          mocks: {
+            __experimental_getAgentConnections: vi.fn(() => Promise.resolve({ data: [], total_count: 0 })),
+          },
+        });
         sessionAny.user.emailAddresses?.forEach((m: any) => mockMethodsOf(m));
         sessionAny.user.phoneNumbers?.forEach((m: any) => mockMethodsOf(m));
         sessionAny.user.externalAccounts?.forEach((m: any) => mockMethodsOf(m));
