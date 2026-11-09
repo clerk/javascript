@@ -292,32 +292,6 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
           </SettingRow>
         ) : null}
 
-        <SettingRow label='Multi-factor authentication'>
-          <MfaControl
-            value={draft.mfa}
-            onChange={mfa => set({ mfa })}
-            isDisabled={!canManage}
-          />
-          {draft.mfa !== 'off' && draft.signIn === 'sso' ? (
-            <Col sx={t => ({ gap: t.space.$1, paddingInlineStart: t.space.$6 })}>
-              <Switch
-                isChecked={draft.skipMfaForSso}
-                isDisabled={!canManage}
-                onChange={skipMfaForSso => set({ skipMfaForSso })}
-                label={protoKey('Skip for people who sign in with SSO')}
-              />
-              <Text
-                colorScheme='secondary'
-                sx={xsSx}
-              >
-                {hierarchy?.role === 'parent'
-                  ? 'Your identity provider handles the second factor. Applies inside your sub-organizations only.'
-                  : 'Your identity provider handles the second factor. Applies inside this organization only.'}
-              </Text>
-            </Col>
-          ) : null}
-        </SettingRow>
-
         <SettingRow label='Authentication'>
           <RadioOption
             name='authentication'
@@ -351,6 +325,32 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
               onConfigure={id => nav.toConnection(id, draft.policyId)}
             />
           </RadioOption>
+        </SettingRow>
+
+        <SettingRow label='Multi-factor authentication'>
+          <MfaControl
+            value={draft.mfa}
+            onChange={mfa => set({ mfa })}
+            isDisabled={!canManage}
+          />
+          {draft.signIn === 'sso' ? (
+            <Col sx={t => ({ gap: t.space.$1, paddingInlineStart: t.space.$6 })}>
+              <Switch
+                isChecked={draft.skipMfaForSso}
+                isDisabled={!canManage}
+                onChange={skipMfaForSso => set({ skipMfaForSso })}
+                label={protoKey('Skip for people who sign in with SSO')}
+              />
+              <Text
+                colorScheme='secondary'
+                sx={xsSx}
+              >
+                {hierarchy?.role === 'parent'
+                  ? 'Your identity provider handles the second factor. Applies inside your sub-organizations only.'
+                  : 'Your identity provider handles the second factor. Applies inside this organization only.'}
+              </Text>
+            </Col>
+          ) : null}
         </SettingRow>
 
         <SettingRow label='Re-verification'>
@@ -495,32 +495,22 @@ const MfaControl = ({
   isDisabled: boolean;
 }) => (
   <Col sx={t => ({ gap: t.space.$3 })}>
-    <Switch
-      isChecked={value !== 'off'}
+    <RadioOption
+      name='mfa'
+      checked={value !== 'required'}
+      onSelect={() => onChange('optional')}
       isDisabled={isDisabled}
-      onChange={checked => onChange(checked ? 'required' : 'off')}
-      label={protoKey('Enabled')}
+      label='Optional'
+      description='Members can choose to set up MFA'
     />
-    {value !== 'off' ? (
-      <Col sx={t => ({ gap: t.space.$3, paddingInlineStart: t.space.$6 })}>
-        <RadioOption
-          name='mfa'
-          checked={value === 'optional'}
-          onSelect={() => onChange('optional')}
-          isDisabled={isDisabled}
-          label='Optional'
-          description='Members can choose to set up MFA'
-        />
-        <RadioOption
-          name='mfa'
-          checked={value === 'required'}
-          onSelect={() => onChange('required')}
-          isDisabled={isDisabled}
-          label='Required'
-          description='All members must set up MFA'
-        />
-      </Col>
-    ) : null}
+    <RadioOption
+      name='mfa'
+      checked={value === 'required'}
+      onSelect={() => onChange('required')}
+      isDisabled={isDisabled}
+      label='Required'
+      description='All members must set up MFA'
+    />
   </Col>
 );
 

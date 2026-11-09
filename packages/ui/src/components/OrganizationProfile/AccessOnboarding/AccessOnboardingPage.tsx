@@ -21,7 +21,6 @@ import {
 import { Header } from '../../../elements/Header';
 import type { PropsOfComponent } from '../../../styledSystem';
 import { ManageConnectionPage, SetupWizard } from './ConnectionPages';
-import { CreateParentButton } from './CreateParent';
 import { useAccessNavigation } from './navigation';
 import { borderSx, ContentRefContext, InfoTooltip, smallSx } from './parts';
 import { PolicyPage } from './PolicyPage';
@@ -195,7 +194,7 @@ const AccessListPage = () => {
 /* ------------------------------------------------------------- policies */
 
 const PoliciesPanel = () => {
-  const { policies, access, hierarchy, relatedOrganizations } = useAccessPrototype();
+  const { policies, access, hierarchy } = useAccessPrototype();
   const nav = useAccessNavigation();
   const active = policies.filter(policy => !policy.isCatchAll && policy.status === 'active');
   const catchAll = policies.filter(policy => policy.isCatchAll);
@@ -224,19 +223,13 @@ const PoliciesPanel = () => {
             </Text>
           </Col>
           {access.canManage ? (
-            <Flex
-              align='center'
-              gap={2}
-            >
-              {relatedOrganizations.length > 0 ? <CreateParentButton /> : null}
-              <Button
-                size='sm'
-                textVariant='buttonSmall'
-                block={false}
-                onClick={() => nav.toPolicy('new')}
-                localizationKey={protoKey('Add policy')}
-              />
-            </Flex>
+            <Button
+              size='sm'
+              textVariant='buttonSmall'
+              block={false}
+              onClick={() => nav.toPolicy('new')}
+              localizationKey={protoKey('Add policy')}
+            />
           ) : null}
         </Flex>
         <PolicyTable policies={[...active, ...catchAll]} />

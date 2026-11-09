@@ -188,27 +188,27 @@ describe('AccessOnboardingPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add' }));
     expect(await screen.findByText('Acme Labs already owns acmelabs.io.')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Create parent' }));
-    expect(await screen.findByText('Create parent organization')).toBeInTheDocument();
-    expect(screen.getByText('acmelabs.io · proof moves up')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Create parent organization' }));
+    expect(await screen.findByText('acmelabs.io · proof moves up')).toBeInTheDocument();
     expect(screen.getByText('acmedev.org · owner must agree')).toBeInTheDocument();
   });
 
-  it('creates a parent from the Access page and lands on it', async () => {
-    await renderScenario('configured');
+  it('creates a parent from a shared, proven domain on the policy form', async () => {
+    await renderScenario('configured', { policy: 'pol_acmedev_org' });
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Create parent organization' }));
+    expect(await screen.findByText('Acme Research and Acme Design also use acmedev.org.')).toBeInTheDocument();
+    expect(screen.queryByText('Parent organization')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Create parent organization' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Create parent' }));
 
-    expect(await screen.findByText('Parent organization')).toBeInTheDocument();
-    expect(screen.getByText(/Proof for acmedev.org, exampledev.net moved to Acme Group/)).toBeInTheDocument();
+    expect(await screen.findByText('All sub-organizations')).toBeInTheDocument();
+    expect(screen.queryByText('Acme Research and Acme Design also use acmedev.org.')).not.toBeInTheDocument();
   });
 
-  it('prompts for a parent under a proven domain that other organizations share', async () => {
-    await renderScenario('configured', { policy: 'pol_acmedev_org' });
-    expect(
-      await screen.findByText('Acme Research and Acme Design also use acmedev.org. Manage them together?'),
-    ).toBeInTheDocument();
+  it('keeps parent creation off the policies list', async () => {
+    await renderScenario('configured');
+    expect(await screen.findByRole('button', { name: 'Add policy' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Create parent organization' })).not.toBeInTheDocument();
   });
 
   it('lets the policy choose what happens to people outside the directory', async () => {

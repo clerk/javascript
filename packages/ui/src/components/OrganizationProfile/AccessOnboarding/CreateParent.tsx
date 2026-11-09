@@ -15,33 +15,22 @@ const useCanCreateParent = () => {
 };
 
 /*
- * Entry points for creating a parent. Each one appears where the shared
- * domain shows up: after proving ownership, when a domain is already owned by
- * another organization, and from the Access page (standing in for the
- * organization switcher and Create organization).
+ * Entry points for creating a parent, on the policy form where a shared
+ * domain shows up: under a proven domain other organizations use, and when an
+ * added domain is already owned by another organization.
  */
-export const CreateParentButton = ({
-  label = 'Create parent organization',
-  variant = 'outline',
-  preselect = [],
-}: {
-  label?: string;
-  variant?: 'outline' | 'ghost';
-  preselect?: string[];
-}) => {
+const CreateParentLink = ({ preselect }: { preselect: string[] }) => {
   const [isOpen, setIsOpen] = useState(false);
-  if (!useCanCreateParent()) {
-    return null;
-  }
   return (
     <>
       <Button
-        variant={variant}
-        size='xs'
+        variant='link'
+        colorScheme='primary'
         textVariant='buttonSmall'
         block={false}
         onClick={() => setIsOpen(true)}
-        localizationKey={protoKey(label)}
+        localizationKey={protoKey('Create parent organization')}
+        sx={{ alignSelf: 'flex-start', padding: 0, minHeight: 0 }}
       />
       {isOpen ? (
         <CreateParentDialog
@@ -62,22 +51,15 @@ export const SharedDomainPrompt = ({ domain }: { domain: string }) => {
     return null;
   }
   return (
-    <Flex
-      justify='between'
-      align='center'
-      gap={2}
-    >
+    <Col sx={t => ({ gap: t.space.$0x5 })}>
       <Text
         colorScheme='secondary'
         sx={xsSx}
       >
-        {`${listNames(others)} also ${others.length === 1 ? 'uses' : 'use'} ${domain}. Manage them together?`}
+        {`${listNames(others)} also ${others.length === 1 ? 'uses' : 'use'} ${domain}.`}
       </Text>
-      <CreateParentButton
-        label='Create parent'
-        preselect={others.filter(entry => entry.isAdmin).map(entry => entry.id)}
-      />
-    </Flex>
+      <CreateParentLink preselect={others.filter(entry => entry.isAdmin).map(entry => entry.id)} />
+    </Col>
   );
 };
 
@@ -85,7 +67,7 @@ export const SharedDomainPrompt = ({ domain }: { domain: string }) => {
 export const DomainConflict = ({ organization }: { organization: ProtoRelatedOrganization }) => {
   const canCreate = useCanCreateParent();
   return (
-    <Col sx={t => ({ gap: t.space.$1x5 })}>
+    <Col sx={t => ({ gap: t.space.$0x5 })}>
       <Text
         colorScheme='danger'
         sx={xsSx}
@@ -93,24 +75,17 @@ export const DomainConflict = ({ organization }: { organization: ProtoRelatedOrg
         {`${organization.name} already owns ${organization.domain}.`}
       </Text>
       {canCreate ? (
-        <Flex
-          justify='between'
-          align='center'
-          gap={2}
-        >
+        <>
           <Text
             colorScheme='secondary'
             sx={xsSx}
           >
             {organization.isAdmin
-              ? 'Put a parent over both to manage the domain from one place. Its proof moves up with it.'
-              : `Put a parent over both. ${organization.name}’s owner has to agree before it joins.`}
+              ? 'Put a parent over both to manage the domain from one place.'
+              : `Put a parent over both. ${organization.name}’s owner has to agree first.`}
           </Text>
-          <CreateParentButton
-            label='Create parent'
-            preselect={[organization.id]}
-          />
-        </Flex>
+          <CreateParentLink preselect={[organization.id]} />
+        </>
       ) : null}
     </Col>
   );

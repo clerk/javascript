@@ -362,7 +362,7 @@ const policy = (domain: string, overrides: Partial<ProtoPolicy> = {}): ProtoPoli
   id: nextId('pol'),
   domains: [domain],
   status: 'active',
-  mfa: 'off',
+  mfa: 'optional',
   signIn: 'default',
   connectionIds: [],
   reverificationHours: null,
@@ -410,7 +410,7 @@ export const newDraft = (state: Pick<ProtoState, 'userEmail' | 'policies'>): Pol
     domains,
     proofs: Object.fromEntries(domains.map(domain => [domain, proofFor(domain, state.userEmail)])),
     status: 'draft',
-    mfa: 'required',
+    mfa: 'optional',
     signIn: 'default',
     connectionIds: [],
     reverificationHours: null,
@@ -713,7 +713,7 @@ const scenario = (key: ScenarioKey): ProtoState => {
 
 /* ------------------------------------------------------------------ store */
 
-const STORAGE_KEY = 'clerk-access-prototype-v4';
+const STORAGE_KEY = 'clerk-access-prototype-v5';
 const SERVER_STATE = scenario('work');
 
 let state: ProtoState | null = null;
