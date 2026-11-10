@@ -2,17 +2,15 @@ import type { Ref } from 'react';
 
 import type { VerificationHelpMessages } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
-import type { UseFormResult } from '../../../components/form';
-import type { SignInStep, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import type { SignInStep } from '../sign-in.types';
 import { SignInForgotPassword } from './sign-in-forgot-password';
 
 interface NoticeStepProps {
   step: Extract<SignInStep, { kind: 'notice' }>;
   messages: VerificationHelpMessages;
-  form: UseFormResult<SignInValues>;
   globalErrorMessage?: string;
   isPending: boolean;
-  onSubmit: (event: SignInSubmitEvent) => void;
+  onSubmit: () => void;
   onEmailSupport: () => void;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -21,7 +19,6 @@ interface NoticeStepProps {
 export function NoticeStep({
   step,
   messages,
-  form,
   globalErrorMessage,
   isPending,
   onSubmit,
@@ -43,7 +40,6 @@ export function NoticeStep({
         <SignInForgotPassword
           focusRef={focusRef}
           identifier={step.identifier}
-          form={form}
           globalErrorMessage={globalErrorMessage}
           isPending={isPending}
           onSubmit={onSubmit}

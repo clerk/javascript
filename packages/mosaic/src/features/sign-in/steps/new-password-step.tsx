@@ -86,29 +86,27 @@ export function NewPasswordStep({
             <Field.Label>{m.newPassword.signOutOfOtherSessions}</Field.Label>
           </Field.Root>
         </div>
-        <div {...stylex.props(styles.actions)}>
-          <SubmitButton
-            form={form.id}
-            fullWidth
-            isPending={isPending}
-            pendingLabel={m.newPassword.pending}
-            disabled={!form.canSubmit}
-            focusableWhenDisabled
-          >
-            {m.newPassword.submit}
-          </SubmitButton>
-          <Button
-            type='button'
-            variant='ghost'
-            color='neutral'
-            fullWidth
-            disabled={isPending}
-            onClick={onBack}
-          >
-            {m.forgotPassword.back}
-          </Button>
-        </div>
       </Card.Content>
+      <Card.Footer>
+        <Button
+          type='button'
+          variant='outline'
+          color='neutral'
+          disabled={isPending}
+          onClick={onBack}
+        >
+          {m.forgotPassword.back}
+        </Button>
+        <SubmitButton
+          form={form.id}
+          isPending={isPending}
+          pendingLabel={m.newPassword.pending}
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
+        >
+          {m.newPassword.submit}
+        </SubmitButton>
+      </Card.Footer>
     </>
   );
 }

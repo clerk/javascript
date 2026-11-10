@@ -268,10 +268,9 @@ export function SignInView({
                     backButton: m.back,
                     supportButton: m.alternativeMethods.getHelp.emailSupport,
                   }}
-                  form={form}
                   globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
-                  onSubmit={onSubmit}
+                  onSubmit={() => onSubmit()}
                   onEmailSupport={onEmailSupport}
                   onBack={onBack}
                 />

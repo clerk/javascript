@@ -48,10 +48,6 @@ export const styles = stylex.create({
     alignSelf: 'start',
     justifySelf: 'start',
   },
-  actions: {
-    gap: space['1'],
-    display: 'grid',
-  },
   footerText: {
     textAlign: 'center',
   },
