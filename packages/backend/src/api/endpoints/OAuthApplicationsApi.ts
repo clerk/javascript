@@ -1,5 +1,6 @@
 import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
+import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type { DeletedObject } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
@@ -36,6 +37,108 @@ export type RevokeOAuthApplicationTokenParams = {
   /** The opaque OAuth access token or refresh token to revoke. */
   token: string;
 };
+
+/**
+ * A token type identifier as defined in [RFC 8693 section 3](https://www.rfc-editor.org/rfc/rfc8693#section-3).
+ */
+export type OAuthTokenTypeIdentifier =
+  | 'urn:ietf:params:oauth:token-type:access_token'
+  | 'urn:ietf:params:oauth:token-type:refresh_token'
+  | 'urn:ietf:params:oauth:token-type:id_token'
+  | 'urn:ietf:params:oauth:token-type:jwt'
+  | (string & {});
+
+/**
+ * The parameters for performing an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an OAuth application.
+ */
+export type ExchangeOAuthApplicationTokenParams = {
+  /** The ID of the OAuth application performing the exchange. */
+  oauthApplicationId: string;
+  /** The client secret of the OAuth application, used to authenticate with the token endpoint. */
+  clientSecret: string;
+  /** The token that represents the identity of the party on behalf of whom the request is being made. */
+  subjectToken: string;
+  /** The type of `subjectToken`. */
+  subjectTokenType: OAuthTokenTypeIdentifier;
+  /** The token that represents the identity of the acting party, for delegation. */
+  actorToken?: string;
+  /** The type of `actorToken`. Required when `actorToken` is provided. */
+  actorTokenType?: OAuthTokenTypeIdentifier;
+  /** The type of token being requested. */
+  requestedTokenType?: OAuthTokenTypeIdentifier;
+  /** The logical name or names of the target service where the issued token will be used. */
+  audience?: string | string[];
+  /** The URI or URIs of the target service or resource where the issued token will be used. */
+  resource?: string | string[];
+  /** The scopes requested for the issued token. */
+  scope?: string[];
+};
+
+/**
+ * The result of a successful [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693#section-2.2.1).
+ */
+export type ExchangeOAuthApplicationTokenResult = {
+  /** The issued security token. */
+  accessToken: string;
+  /** The type of the issued token. */
+  issuedTokenType: OAuthTokenTypeIdentifier;
+  /** How the issued token is used, for example `Bearer`. */
+  tokenType: string;
+  /** The lifetime of the issued token in seconds, if provided by the authorization server. */
+  expiresIn?: number;
+  /** The scopes of the issued token, if provided by the authorization server. */
+  scope?: string[];
+  /** A refresh token, if issued by the authorization server. */
+  refreshToken?: string;
+};
+
+const TOKEN_EXCHANGE_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:token-exchange';
+
+const formUrlEncode = (value: string) => new URLSearchParams({ v: value }).toString().slice(2);
+
+const appendAll = (body: URLSearchParams, key: string, value: string | string[] | undefined) => {
+  if (value === undefined) {
+    return;
+  }
+  for (const v of Array.isArray(value) ? value : [value]) {
+    body.append(key, v);
+  }
+};
+
+const buildTokenExchangeBody = (params: ExchangeOAuthApplicationTokenParams) => {
+  const body = new URLSearchParams({
+    grant_type: TOKEN_EXCHANGE_GRANT_TYPE,
+    subject_token: params.subjectToken,
+    subject_token_type: params.subjectTokenType,
+  });
+  appendAll(body, 'actor_token', params.actorToken);
+  appendAll(body, 'actor_token_type', params.actorTokenType);
+  appendAll(body, 'requested_token_type', params.requestedTokenType);
+  appendAll(body, 'audience', params.audience);
+  appendAll(body, 'resource', params.resource);
+  if (params.scope?.length) {
+    body.set('scope', params.scope.join(' '));
+  }
+  return body;
+};
+
+type TokenExchangeResponseJSON = {
+  access_token: string;
+  issued_token_type: string;
+  token_type: string;
+  expires_in?: number;
+  scope?: string;
+  refresh_token?: string;
+};
+
+const toTokenExchangeResult = (json: TokenExchangeResponseJSON): ExchangeOAuthApplicationTokenResult => ({
+  accessToken: json.access_token,
+  issuedTokenType: json.issued_token_type,
+  tokenType: json.token_type,
+  expiresIn: json.expires_in,
+  scope: json.scope ? json.scope.split(' ') : undefined,
+  refreshToken: json.refresh_token,
+});
 
 /** @generateWithEmptyComment */
 export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
@@ -148,5 +251,48 @@ export class OAuthApplicationsApi extends AbstractAPI {
       path: joinPaths(basePath, oauthApplicationId, 'revoke_token'),
       bodyParams,
     });
+  }
+
+  /**
+   * @experimental This is an experimental API for OAuth 2.0 Token Exchange and is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version to avoid breaking changes.
+   *
+   * Performs an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application), exchanging a subject token for a new token issued by the application's token endpoint.
+   *
+   * @param params - The parameters for the token exchange.
+   * @returns The issued token and its metadata.
+   *
+   * @example
+   * ```ts
+   * const { accessToken } = await clerkClient.oauthApplications.__experimental_exchangeToken({
+   *   oauthApplicationId: 'oauthapp_123',
+   *   clientSecret: process.env.OAUTH_CLIENT_SECRET,
+   *   subjectToken,
+   *   subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+   *   audience: 'https://api.example.com',
+   * });
+   * ```
+   */
+  public async __experimental_exchangeToken(
+    params: ExchangeOAuthApplicationTokenParams,
+  ): Promise<ExchangeOAuthApplicationTokenResult> {
+    const application = await this.get(params.oauthApplicationId);
+
+    const credentials = `${formUrlEncode(application.clientId)}:${formUrlEncode(params.clientSecret)}`;
+
+    const response = await runtime.fetch(application.tokenFetchUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Basic ${btoa(credentials)}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: buildTokenExchangeBody(params),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OAuth token exchange failed with status ${response.status}.`);
+    }
+
+    return toTokenExchangeResult((await response.json()) as TokenExchangeResponseJSON);
   }
 }
