@@ -28,6 +28,7 @@ export type SignInNextStepInput = {
 };
 
 export type SignUpNextStepInput = {
+  id?: string | undefined;
   status: string | null;
   protectCheck: ProtectCheckResource | null;
   isTransferable: boolean;
@@ -81,7 +82,7 @@ export function getSignInNextStep(signIn: SignInNextStepInput): NextStep {
  * @internal
  */
 export function getSignUpNextStep(signUp: SignUpNextStepInput): NextStep {
-  if (signUp.status === null) {
+  if (!signUp.id || signUp.status === null) {
     return { type: 'start' };
   }
   if (signUp.status === 'complete') {

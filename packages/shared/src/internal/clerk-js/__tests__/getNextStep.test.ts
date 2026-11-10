@@ -20,6 +20,7 @@ function signIn(overrides: Partial<SignInNextStepInput>): SignInNextStepInput {
 
 function signUp(overrides: Partial<SignUpNextStepInput>): SignUpNextStepInput {
   return {
+    id: 'sua_1',
     status: 'missing_requirements',
     protectCheck: null,
     isTransferable: false,
@@ -112,6 +113,21 @@ describe('getSignInNextStep', () => {
 describe('getSignUpNextStep', () => {
   it('returns start before the sign-up is created', () => {
     expect(getSignUpNextStep(signUp({ status: null }))).toEqual({ type: 'start' });
+  });
+
+  it('returns start for a sign-up future that has not been created', () => {
+    const signUpFuture: SignUpNextStepInput = {
+      status: 'missing_requirements',
+      protectCheck: null,
+      isTransferable: false,
+      missingFields: [],
+      unverifiedFields: [],
+      emailAddress: null,
+      phoneNumber: null,
+      verifications: { emailAddress: { nextAction: '' }, phoneNumber: { nextAction: '' } },
+      createdSessionId: null,
+    };
+    expect(getSignUpNextStep(signUpFuture)).toEqual({ type: 'start' });
   });
 
   it('returns complete with the created session', () => {
