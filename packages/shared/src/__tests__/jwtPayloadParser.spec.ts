@@ -49,7 +49,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
     });
 
-    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
     expect(actor).toBeUndefined();
   });
 
@@ -59,7 +59,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
     } as any);
 
-    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
     expect(actor).toBeUndefined();
   });
 
@@ -72,22 +72,47 @@ describe('JWTPayloadToAuthObjectProperties', () => {
     } as any);
 
     expect(actor).toEqual({ sub: 'impersonator' });
-    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
+  });
+
+  test('sets restricted to true when the agt claim has rst true', () => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com', rst: true },
+    });
+
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: true });
   });
 
   test.each([
-    ['an empty object', {}, { sub: '', type: 'agent', task_id: '' }],
-    ['a missing tsk', { id: 'agent_123' }, { sub: 'agent_123', type: 'agent', task_id: '' }],
-    ['a missing id', { tsk: 'agttsk_456' }, { sub: '', type: 'agent', task_id: 'agttsk_456' }],
-    ['empty strings', { id: '', tsk: '' }, { sub: '', type: 'agent', task_id: '' }],
-    ['non-string fields', { id: 1, tsk: 2 }, { sub: '', type: 'agent', task_id: '' }],
-    ['a string', 'x', { sub: '', type: 'agent', task_id: '' }],
-    ['a number', 1, { sub: '', type: 'agent', task_id: '' }],
-    ['an array', [], { sub: '', type: 'agent', task_id: '' }],
-    ['true', true, { sub: '', type: 'agent', task_id: '' }],
-    ['false', false, { sub: '', type: 'agent', task_id: '' }],
-    ['zero', 0, { sub: '', type: 'agent', task_id: '' }],
-    ['an empty string', '', { sub: '', type: 'agent', task_id: '' }],
+    ['absent', undefined],
+    ['false', false],
+    ['the string "true"', 'true'],
+    ['1', 1],
+  ])('sets restricted to false when the agt claim rst is %s', (_name, rst) => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com', rst },
+    } as any);
+
+    expect(agent?.restricted).toBe(false);
+  });
+
+  test.each([
+    ['an empty object', {}, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['a missing tsk', { id: 'agent_123' }, { sub: 'agent_123', type: 'agent', task_id: '', restricted: false }],
+    ['a missing id', { tsk: 'agttsk_456' }, { sub: '', type: 'agent', task_id: 'agttsk_456', restricted: false }],
+    ['empty strings', { id: '', tsk: '' }, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['non-string fields', { id: 1, tsk: 2 }, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['a string', 'x', { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['a number', 1, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['an array', [], { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['true', true, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['false', false, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['zero', 0, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['an empty string', '', { sub: '', type: 'agent', task_id: '', restricted: false }],
   ])('agent is still non-null for a malformed agt claim: %s', (_name, agt, expected) => {
     expect(JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2, agt } as any).agent).toEqual(expected);
   });

@@ -38,9 +38,9 @@ describe('createClientFromJwt', () => {
 
   it('sets the actor and agent on the stub session to the agent when the JWT has an agt claim', () => {
     const client = createClientFromJwt(
-      jwtWithClaims({ agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'r', restricted: true } }),
+      jwtWithClaims({ agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'r', rst: true } }),
     );
-    const agent = { sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' };
+    const agent = { sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: true };
 
     expect(client.signedInSessions[0]?.actor).toStrictEqual(agent);
     expect(client.signedInSessions[0]?.agent).toStrictEqual(agent);

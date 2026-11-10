@@ -18,12 +18,12 @@ const baseJSON = {
 
 describe('Session', () => {
   describe('fromJSON', () => {
-    it('sets agent to only sub, type and task_id and keeps the full actor when the actor has type "agent"', () => {
+    it('sets agent to only sub, type, task_id and restricted and keeps the full actor when the actor has type "agent"', () => {
       const actor = { sub: 'agent_1', type: 'agent', task_id: 'task_1', restricted: true };
       const session = Session.fromJSON({ ...baseJSON, actor } as SessionJSON);
 
       expect(session.actor).toEqual(actor);
-      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: 'task_1' });
+      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: 'task_1', restricted: true });
     });
 
     it('sets agent task_id to an empty string when an agent actor has no task_id', () => {
@@ -31,7 +31,7 @@ describe('Session', () => {
       const session = Session.fromJSON({ ...baseJSON, actor } as SessionJSON);
 
       expect(session.actor).toEqual(actor);
-      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: '' });
+      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: '', restricted: false });
     });
 
     it.each([
@@ -42,7 +42,7 @@ describe('Session', () => {
       const session = Session.fromJSON({ ...baseJSON, actor } as unknown as SessionJSON);
 
       expect(session.actor).toEqual(actor);
-      expect(session.agent).toStrictEqual({ sub: '', type: 'agent', task_id: 'task_1' });
+      expect(session.agent).toStrictEqual({ sub: '', type: 'agent', task_id: 'task_1', restricted: false });
     });
 
     it('sets actor and a null agent for an impersonation session', () => {

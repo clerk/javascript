@@ -78,6 +78,7 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
             sub: typeof data.actor.sub === 'string' ? data.actor.sub : '',
             type: 'agent',
             task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : '',
+            restricted: data.actor.restricted === true,
           }
         : null;
     return this;

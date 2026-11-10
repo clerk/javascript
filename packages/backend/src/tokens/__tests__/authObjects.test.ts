@@ -41,6 +41,7 @@ describe('makeAuthObjectSerializable', () => {
       sub: 'agent_123',
       type: 'agent',
       task_id: 'agttsk_456',
+      restricted: false,
     });
   });
 });
@@ -70,8 +71,19 @@ describe('signedInAuthObject', () => {
       agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
     } as unknown as JwtPayload);
 
-    expect(authObject.agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' });
+    expect(authObject.agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
     expect(authObject.actor).toBeUndefined();
+  });
+
+  it('exposes a restricted agent task session on the auth object', () => {
+    const authObject = signedInAuthObject({} as AuthenticateContext, 'token', {
+      v: 2,
+      sid: 'sessionId',
+      sub: 'userId',
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com', rst: true },
+    } as unknown as JwtPayload);
+
+    expect(authObject.agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: true });
   });
 
   it('agent is null for sessions without the agt claim', () => {

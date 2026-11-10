@@ -103,8 +103,13 @@ const parseAgentClaim = (agt: unknown): AgentActClaim | null => {
   if (agt === null || agt === undefined) {
     return null;
   }
-  const { id, tsk } = (typeof agt === 'object' ? agt : {}) as { id?: unknown; tsk?: unknown };
-  return { sub: typeof id === 'string' ? id : '', type: 'agent', task_id: typeof tsk === 'string' ? tsk : '' };
+  const { id, tsk, rst } = (typeof agt === 'object' ? agt : {}) as { id?: unknown; tsk?: unknown; rst?: unknown };
+  return {
+    sub: typeof id === 'string' ? id : '',
+    type: 'agent',
+    task_id: typeof tsk === 'string' ? tsk : '',
+    restricted: rst === true,
+  };
 };
 
 /**

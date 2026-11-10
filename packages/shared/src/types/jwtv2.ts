@@ -233,6 +233,10 @@ export interface AgentTaskClaim {
    * The registry that issued the agent.
    */
   reg: string;
+  /**
+   * Present and `true` when the agent task that created the session is restricted.
+   */
+  rst?: boolean;
 }
 
 /**
@@ -246,6 +250,10 @@ export type AgentActClaim = ActClaim & {
    * The ID of the agent task that was used to create the session.
    */
   task_id?: string;
+  /**
+   * Whether the agent task that created the session is restricted. In a restricted session, Clerk's Frontend API refuses the agent's writes. `false` when the session does not say so. Until Clerk adds the flag to the session token, it reads `false` on the server and during server rendering. Clerk enforces the restriction; to refuse agent sessions, check the agent itself, not this field.
+   */
+  restricted?: boolean;
 };
 
 /**
