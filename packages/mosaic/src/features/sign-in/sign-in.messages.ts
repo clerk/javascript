@@ -43,7 +43,7 @@ export const signInMessages = {
   },
   passwordCompromised: {
     title: 'Password compromised',
-    description: 'This password has been found as part of a breach and can not be used, please reset your password.',
+    message: 'This password has been found as part of a breach and can not be used, please reset your password.',
     resetPassword: 'Reset your password',
   },
   emailLink: {

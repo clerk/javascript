@@ -89,6 +89,7 @@ export function NoticeStep({
         <SignInPasswordCompromised
           focusRef={focusRef}
           globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
           onForgotPassword={onForgotPassword}
           onCancel={onCancel}
         />
@@ -100,6 +101,7 @@ export function NoticeStep({
           identifier={step.identifier}
           onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
           resend={resend}
           onCancel={onCancel}
         />

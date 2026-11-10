@@ -12,6 +12,7 @@ interface SignInEmailLinkProps {
   identifier: string;
   onEditIdentifier?: () => void;
   globalErrorMessage?: string;
+  isPending: boolean;
   resend?: VerificationCodeResend;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -21,6 +22,7 @@ export function SignInEmailLink({
   identifier,
   onEditIdentifier,
   globalErrorMessage,
+  isPending,
   resend,
   onCancel,
   focusRef,
@@ -36,6 +38,7 @@ export function SignInEmailLink({
         <SignInIdentityPreview
           identifier={identifier}
           editLabel={m.password.editIdentifier}
+          disabled={isPending}
           onEdit={onEditIdentifier}
         />
         {resend ? (
@@ -47,7 +50,7 @@ export function SignInEmailLink({
               size='sm'
               color='neutral'
               variant='link'
-              disabled={resend.disabled}
+              disabled={resend.disabled || isPending}
               onClick={resend.onClick}
             >
               {resend.label}
@@ -68,6 +71,7 @@ export function SignInEmailLink({
             type='button'
             variant='outline'
             color='neutral'
+            disabled={isPending}
             onClick={onCancel}
           >
             {m.useAnotherMethod}

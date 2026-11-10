@@ -662,6 +662,15 @@ export function NoticePasswordCompromised() {
   return <StepPanel step={{ kind: 'notice', purpose: 'password-compromised' }} />;
 }
 
+export function NoticePasswordCompromisedPending() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'password-compromised' }}
+      isPending
+    />
+  );
+}
+
 export function NoticeEmailLinkSent() {
   return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER }} />;
 }

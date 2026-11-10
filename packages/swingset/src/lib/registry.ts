@@ -371,6 +371,7 @@ import {
   NoticeLocked as SignInNoticeLocked,
   NoticeNoMethods as SignInNoticeNoMethods,
   NoticePasswordCompromised as SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
   SignUpDetails as SignInSignUpDetails,
 } from '../stories/sign-in.stories';
 import {
@@ -1301,6 +1302,7 @@ const signInModule: StoryModule = {
   NoticeNoMethods: SignInNoticeNoMethods,
   NoticeActionBlocked: SignInNoticeActionBlocked,
   NoticePasswordCompromised: SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending: SignInNoticePasswordCompromisedPending,
   NoticeEmailLinkSent: SignInNoticeEmailLinkSent,
   NewPasswordReset: SignInNewPasswordReset,
   SignUpDetails: SignInSignUpDetails,

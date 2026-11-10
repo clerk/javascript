@@ -1,13 +1,14 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
-import { Button } from '../../../components/button';
+import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { useMessages } from '../../../localization';
 
 interface SignInPasswordCompromisedProps {
   globalErrorMessage?: string;
+  isPending: boolean;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -15,6 +16,7 @@ interface SignInPasswordCompromisedProps {
 
 export function SignInPasswordCompromised({
   globalErrorMessage,
+  isPending,
   onForgotPassword,
   onCancel,
   focusRef,
@@ -26,13 +28,12 @@ export function SignInPasswordCompromised({
     <>
       <Card.Header>
         <Card.Title>{m.passwordCompromised.title}</Card.Title>
-        <Card.Description>{m.passwordCompromised.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
         color='negative'
       >
-        {globalErrorMessage}
+        {globalErrorMessage ?? m.passwordCompromised.message}
       </Card.Banner>
       <Card.Footer>
         {onCancel ? (
@@ -41,19 +42,22 @@ export function SignInPasswordCompromised({
             type='button'
             variant='outline'
             color='neutral'
+            disabled={isPending}
             onClick={onCancel}
           >
             {m.useAnotherMethod}
           </Button>
         ) : null}
         {onForgotPassword ? (
-          <Button
+          <SubmitButton
             ref={ref}
             type='button'
+            isPending={isPending}
+            pendingLabel={m.forgotPassword.pending}
             onClick={onForgotPassword}
           >
             {m.passwordCompromised.resetPassword}
-          </Button>
+          </SubmitButton>
         ) : null}
       </Card.Footer>
     </>
