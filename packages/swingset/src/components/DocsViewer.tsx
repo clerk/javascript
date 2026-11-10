@@ -74,6 +74,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
   },
   blocks: {
+    'change-password': dynamic(() => import('../stories/change-password.mdx')),
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },

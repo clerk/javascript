@@ -111,6 +111,7 @@ A block is a view fragment that owns one piece of state nothing outside it can u
 
 - `blocks/destructive` (`Destructive`) holds the half-typed confirmation phrase and compares it.
 - `blocks/confirmation` (`Confirmation`) is a confirm step with no typed phrase.
+- `blocks/change-password` (`ChangePassword`) holds whether the new password field has focus, so a hint about the password turns into an error once the user leaves it. The caller renders the title, banner and actions around it.
 - `blocks/avatar-upload` (`AvatarUpload`) is an avatar or logo picker. Its parts share the file input, so the caller places them in its own layout.
 - `blocks/verification` holds the steps that verify a factor, such as `VerificationCode`. Each renders the inside of a card and takes its copy as `messages`, so reverification and sign-in show them with their own strings.
 

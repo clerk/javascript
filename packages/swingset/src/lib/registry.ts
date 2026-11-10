@@ -50,6 +50,7 @@ import {
   meta as comboboxMeta,
   Scrolling as ComboboxScrolling,
 } from '../stories/combobox.stories';
+import { Default as ChangePasswordDefault, meta as changePasswordMeta } from '../stories/change-password.stories';
 import {
   Default as ConfirmationDefault,
   meta as confirmationMeta,
@@ -1210,6 +1211,11 @@ const userProfileDangerSectionModule: StoryModule = {
   WithError: UserProfileDangerSectionWithError,
 };
 
+const changePasswordModule: StoryModule = {
+  meta: changePasswordMeta,
+  Default: ChangePasswordDefault,
+};
+
 const confirmationModule: StoryModule = {
   meta: confirmationMeta,
   Default: ConfirmationDefault,
@@ -1348,6 +1354,7 @@ export const registry: StoryModule[] = [
   // Authentication
   signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
+  changePasswordModule,
   confirmationModule,
   destructiveModule,
   // Components

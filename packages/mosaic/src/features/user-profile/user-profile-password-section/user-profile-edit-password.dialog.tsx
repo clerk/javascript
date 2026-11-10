@@ -1,10 +1,10 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { RefObject } from 'react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
+import { ChangePassword } from '../../../blocks/change-password';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { Checkbox } from '../../../components/checkbox';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
@@ -15,10 +15,7 @@ import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
-import type {
-  UserProfileEditPasswordField,
-  UserProfileEditPasswordValues,
-} from './user-profile-password-section.types';
+import type { UserProfileEditPasswordValues } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordDialogProps {
   passwordFeedback?: FieldFeedback;
@@ -68,49 +65,31 @@ export function UserProfileEditPasswordDialog({
           />
         }
       >
-        <input
-          readOnly
-          hidden
-          name='identifier'
-          autoComplete='username'
-          value={identifier}
-        />
         {showCurrentPassword ? (
-          <PasswordField
-            autoComplete='current-password'
+          <CurrentPasswordField
             form={form}
             inputRef={initialFocusRef}
-            label={m.currentPasswordLabel}
-            name='currentPassword'
           />
         ) : null}
-        <PasswordField
-          autoComplete='new-password'
-          form={form}
-          inputRef={showCurrentPassword ? undefined : initialFocusRef}
-          label={m.newPasswordLabel}
-          name='newPassword'
-          advisoryFeedback={passwordFeedback}
-        />
-        <PasswordField
-          autoComplete='new-password'
-          form={form}
-          label={m.confirmPasswordLabel}
-          name='confirmPassword'
-        />
-        <Field.Root
-          orientation='horizontal'
+        <ChangePassword
+          messages={{
+            newPasswordLabel: m.newPasswordLabel,
+            confirmPasswordLabel: m.confirmPasswordLabel,
+            signOutOfOtherSessionsLabel: m.signOutOfOtherSessionsLabel,
+            signOutOfOtherSessionsDescription: m.signOutOfOtherSessionsDescription,
+            showPasswordLabel: m.showPassword,
+            hidePasswordLabel: m.hidePassword,
+          }}
+          identifier={identifier}
+          newPassword={form.register('newPassword')}
+          confirmPassword={form.register('confirmPassword')}
+          fields={form.fields}
+          signOutOfOtherSessions={form.values.signOutOfOtherSessions}
+          onSignOutOfOtherSessionsChange={checked => form.setValue('signOutOfOtherSessions', checked)}
+          passwordFeedback={passwordFeedback}
           disabled={form.isSubmitting}
-        >
-          <Checkbox
-            checked={form.values.signOutOfOtherSessions}
-            onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
-          />
-          <Field.Content>
-            <Field.Label>{m.signOutOfOtherSessionsLabel}</Field.Label>
-            <Field.Description>{m.signOutOfOtherSessionsDescription}</Field.Description>
-          </Field.Content>
-        </Field.Root>
+          focusRef={showCurrentPassword ? undefined : initialFocusRef}
+        />
       </Card.Content>
       <Card.Footer>
         <Dialog.Close
@@ -178,51 +157,34 @@ export function UserProfileEditPasswordDialog({
   );
 }
 
-function PasswordField({
-  label,
-  autoComplete,
+function CurrentPasswordField({
   form,
   inputRef,
-  name,
-  advisoryFeedback,
 }: {
-  label: string;
-  autoComplete: 'current-password' | 'new-password';
   form: UseFormResult<UserProfileEditPasswordValues>;
-  inputRef?: RefObject<HTMLInputElement>;
-  name: UserProfileEditPasswordField;
-  advisoryFeedback?: FieldFeedback;
+  inputRef: RefObject<HTMLInputElement>;
 }) {
   const m = useMessages('userProfile').password;
-  const [focused, setFocused] = useState(false);
-  const { feedback } = form.fields[name];
-  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
-  const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
-  const { ref, ...control } = form.register(name);
+  const { feedback } = form.fields.currentPassword;
+  const { ref, ...control } = form.register('currentPassword');
   const mergedRef = useMergeRefs([ref, inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
-  // TODO: Discuss enforcing the configured minimum length on the new password input or keeping the hint advisory and letting the server validate. https://github.com/clerk/javascript/pull/9930#discussion_r4151734254
   return (
     <Field.Root
       disabled={form.isSubmitting}
       focusableWhenDisabled
-      invalid={feedbackType === 'error'}
+      invalid={feedback?.type === 'error'}
       required
     >
-      <Field.Label>{label}</Field.Label>
+      <Field.Label>{m.currentPasswordLabel}</Field.Label>
       <PasswordInput
         ref={mergedRef}
-        autoComplete={autoComplete}
+        autoComplete='current-password'
         {...control}
-        onFocus={() => setFocused(true)}
-        onBlur={() => {
-          setFocused(false);
-          control.onBlur();
-        }}
         showPasswordLabel={m.showPassword}
         hidePasswordLabel={m.hidePassword}
       />
-      <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
+      <Field.Feedback feedback={feedback?.type === 'error' ? feedback : undefined} />
     </Field.Root>
   );
 }
