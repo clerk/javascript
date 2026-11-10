@@ -150,7 +150,7 @@ return {
 
 The view side is in [Views → Moving between screens](views.md#moving-between-screens-on-one-surface).
 
-**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The controller derives the screen from `getSignInNextStep` or `getSignUpNextStep`, and keeps what the step can't say in the route, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#how-the-route-and-the-step-fit-together)).
+**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The controller derives the screen from `getSignInNextStep` or `getSignUpNextStep`, and keeps what the step can't say in the route, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#pick-the-screen)).
 
 ## Wrapping actions
 
