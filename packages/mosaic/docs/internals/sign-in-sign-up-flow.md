@@ -73,6 +73,12 @@ const screen = editing ? 'fields' : step.type;
 - **A step can span screens, or share one.** `enterprise_sso` is a chooser in one client and a redirect in another.
 - **The step says where, the resource says what.** A factor screen lists other methods from `signIn.supportedFirstFactors`, as `ui` does (`SignInFactorOne.tsx:84`). The step doesn't copy them.
 
+### Entry actions
+
+Some URLs carry an action to run before the user does anything: a `__clerk_ticket` from an invitation, or the return from an email link. The model exposes it as data and a callback (`hasTicket`, `redeemTicket: () => signUp.ticket()`; `ticket()` reads the param itself, `clerk-js/src/core/resources/SignUp.ts:1281-1283`). The controller runs it on the `start` or `identifier` screen, then routes by the new step.
+
+A ticket is single-use, so the guard is "not redeemed yet", not "first mount". A bare mount effect runs twice under React StrictMode and again on remount. Mosaic has no shared helper for this yet; the first feature that needs one adds it to `src/hooks/`.
+
 ### Transfer moves to FAPI
 
 A sign-in created with `intent: 'sign_in_or_up'` whose identifier has no account comes back as a sign-up, with the sign-up's next step. Without the intent, behaviour is unchanged.
