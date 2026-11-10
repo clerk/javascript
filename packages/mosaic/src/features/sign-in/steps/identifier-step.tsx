@@ -26,6 +26,7 @@ interface IdentifierStepProps {
   errorMessage?: string;
   globalErrorMessage?: string;
   isPending: boolean;
+  isDisabled: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   onSignUp?: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -42,12 +43,12 @@ export function IdentifierStep({
   errorMessage,
   globalErrorMessage,
   isPending,
+  isDisabled,
   onSubmit,
   onSignUp,
   focusRef,
 }: IdentifierStepProps) {
   const m = useMessages('signIn');
-  const busy = isPending || Boolean(pendingProviderId);
   const { ref: identifierFieldRef, ...identifier } = form.register('identifier');
   const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
   const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
@@ -76,7 +77,7 @@ export function IdentifierStep({
       <Card.Content>
         {socialProviders.length > 0 ? (
           <>
-            <ProviderButtonGroup disabled={busy}>
+            <ProviderButtonGroup disabled={isDisabled}>
               {socialProviders.map(provider => (
                 <ProviderButton
                   key={provider.id}
@@ -117,7 +118,7 @@ export function IdentifierStep({
           <Field.Root
             required
             invalid={feedback?.type === 'error'}
-            disabled={busy}
+            disabled={isDisabled}
             focusableWhenDisabled
           >
             <Field.Label>{m.start.emailLabel}</Field.Label>
@@ -142,7 +143,7 @@ export function IdentifierStep({
               type='button'
               size='sm'
               variant='link'
-              disabled={busy}
+              disabled={isDisabled}
               onClick={onSignUp}
             >
               {m.start.signUpLink}

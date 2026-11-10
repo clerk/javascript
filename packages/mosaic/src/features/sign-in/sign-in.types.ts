@@ -66,19 +66,20 @@ export interface SignInViewProps {
   onSubmit: (event?: SignInSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
   isPending: boolean;
+  isDisabled: boolean;
   errorMessage?: string;
   globalErrorMessage?: string;
   newPasswordFeedback?: FieldFeedback;
   onEditIdentifier: () => void;
   onSignUp?: () => void;
   onForgotPassword?: () => void;
-  onShowMethods?: () => void;
+  onCancel?: () => void;
   onShowHelp: () => void;
   onBack: () => void;
   onEmailSupport: () => void;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
-  onResend: () => void;
+  onResend?: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;
 }

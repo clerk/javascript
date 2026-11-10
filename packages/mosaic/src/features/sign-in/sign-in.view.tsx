@@ -51,15 +51,12 @@ function choiceCopy(
     : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
 }
 
-function resendCopy(step: CodeStepData, m: Messages): ResendCopy | undefined {
+function resendCopy(step: CodeStepData, m: Messages): ResendCopy {
   if (step.purpose === 'reset-password') {
     return m.resetPasswordCode;
   }
   if (step.purpose === 'verify-email') {
     return m.verifyEmail;
-  }
-  if (step.channel === 'totp') {
-    return undefined;
   }
   if (step.channel === 'phone') {
     return step.purpose === 'second-factor' ? m.phoneCodeMfa : m.phoneCode;
@@ -115,13 +112,14 @@ export function SignInView({
   onSubmit,
   onCodeComplete,
   isPending,
+  isDisabled,
   errorMessage,
   globalErrorMessage,
   newPasswordFeedback,
   onEditIdentifier,
   onSignUp,
   onForgotPassword,
-  onShowMethods,
+  onCancel,
   onShowHelp,
   onBack,
   onEmailSupport,
@@ -139,8 +137,8 @@ export function SignInView({
     primaryActionLabel: m.continue,
     pendingLabel: m.verifying,
   };
-  const resendFor = (copy: ResendCopy | undefined): VerificationCodeResend | undefined =>
-    copy && {
+  const resendFor = (copy: ResendCopy): VerificationCodeResend | undefined =>
+    onResend && {
       text: copy.resendText,
       label: resendRemainingSeconds ? (
         <span>
@@ -153,8 +151,7 @@ export function SignInView({
       ) : (
         copy.resend
       ),
-      // TODO: Take this flag from the controller instead of deriving it from canResend and isPending.
-      disabled: !canResend || isPending,
+      disabled: !canResend,
       onClick: onResend,
     };
 
@@ -180,9 +177,9 @@ export function SignInView({
                 errorMessage={errorMessage}
                 globalErrorMessage={globalErrorMessage}
                 isPending={isPending}
+                isDisabled={isDisabled}
                 onSubmit={onSubmit}
-                // TODO: Have the controller omit onSignUp in the combined flow instead of the view dropping it.
-                onSignUp={combined ? undefined : onSignUp}
+                onSignUp={onSignUp}
               />
             </Flow.Step>
 
@@ -204,7 +201,7 @@ export function SignInView({
                   onSubmit={onSubmit}
                   onEditIdentifier={onEditIdentifier}
                   onForgotPassword={onForgotPassword}
-                  onShowMethods={onShowMethods}
+                  onCancel={onCancel}
                 />
               ) : null}
             </Flow.Step>
@@ -213,7 +210,6 @@ export function SignInView({
               {current.kind === 'code' ? (
                 <CodeStep
                   focusRef={focusRef}
-                  step={current}
                   messages={{
                     ...codeCopy(current, m),
                     ...actions,
@@ -231,8 +227,7 @@ export function SignInView({
                   isPending={isPending}
                   onSubmit={onSubmit}
                   onCodeComplete={onCodeComplete}
-                  onShowMethods={onShowMethods}
-                  onBack={onBack}
+                  onCancel={onCancel}
                 />
               ) : null}
             </Flow.Step>

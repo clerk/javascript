@@ -16,7 +16,7 @@ interface SecretStepProps {
   onSubmit: (event?: SignInSubmitEvent) => void;
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
-  onShowMethods?: () => void;
+  onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -30,7 +30,7 @@ export function SecretStep({
   onSubmit,
   onEditIdentifier,
   onForgotPassword,
-  onShowMethods,
+  onCancel,
   focusRef,
 }: SecretStepProps) {
   if (step.secret === 'password') {
@@ -45,7 +45,7 @@ export function SecretStep({
         isPending={isPending}
         onSubmit={onSubmit}
         onForgotPassword={onForgotPassword}
-        onCancel={onShowMethods}
+        onCancel={onCancel}
       />
     );
   }
@@ -62,7 +62,7 @@ export function SecretStep({
       isPending={isPending}
       onValueChange={onValueChange}
       onSubmit={() => onSubmit()}
-      onCancel={onShowMethods}
+      onCancel={onCancel}
     />
   );
 }

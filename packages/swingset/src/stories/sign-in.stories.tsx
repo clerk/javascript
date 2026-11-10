@@ -100,6 +100,10 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
   }
 }
 
+function offersResend(step: SignInStep): boolean {
+  return step.kind === 'code' && step.channel !== 'totp';
+}
+
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
 
 function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void }) {
@@ -330,6 +334,16 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     }
   };
 
+  const cancelFor = (current: SignInStep) => {
+    if (current.kind === 'code' && current.purpose === 'reset-password') {
+      return onBack;
+    }
+    if (current.kind === 'code' && current.purpose === 'verify-email') {
+      return undefined;
+    }
+    return otherFactors.length > 0 ? onShowMethods : undefined;
+  };
+
   const onResend = () => {
     if (!canResend || isPending) {
       return;
@@ -362,6 +376,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           void submitCode(code);
         }}
         isPending={isPending || form.isSubmitting}
+        isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId)}
         errorMessage={errorMessage}
         globalErrorMessage={globalErrorMessage}
         newPasswordFeedback={
@@ -376,14 +391,14 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           navigate({ kind: 'identifier' }, -1);
         }}
         onForgotPassword={() => navigate({ kind: 'notice', purpose: 'forgot-password', identifier }, 1)}
-        onShowMethods={otherFactors.length > 0 ? onShowMethods : undefined}
+        onCancel={cancelFor(step)}
         onShowHelp={() => navigate({ kind: 'notice', purpose: 'help' }, 1)}
         onBack={onBack}
         onEmailSupport={() => setSupportRequested(true)}
         pendingFactorId={pendingFactorId}
         onSelectFactor={onSelectFactor}
-        onResend={onResend}
-        canResend={canResend}
+        onResend={offersResend(step) ? onResend : undefined}
+        canResend={canResend && !isPending}
       />
       {supportRequested ? <p>Email support requested.</p> : null}
     </>
@@ -471,17 +486,18 @@ function StepPanel({
       onSubmit={event => event?.preventDefault()}
       onCodeComplete={code => form.setValue('code', code)}
       isPending={isPending}
+      isDisabled={isPending || Boolean(pendingProviderId)}
       errorMessage={errorMessage}
       globalErrorMessage={globalErrorMessage}
       onEditIdentifier={() => undefined}
-      onSignUp={() => undefined}
+      onSignUp={combined ? undefined : () => undefined}
       onForgotPassword={() => undefined}
-      onShowMethods={() => undefined}
+      onCancel={step.kind === 'code' && step.purpose === 'verify-email' ? undefined : () => undefined}
       onShowHelp={() => undefined}
       onBack={() => undefined}
       onEmailSupport={() => undefined}
       onSelectFactor={() => undefined}
-      onResend={() => undefined}
+      onResend={offersResend(step) ? () => undefined : undefined}
       canResend
     />
   );
