@@ -92,7 +92,7 @@ What the bridge can't compute, so FAPI must send:
 
 - **The sign-up order.** Today it is client code.
 - **`target` for sign-in.** Nothing says which email or phone a code went to. `ui` keeps the chosen factor in component state (`ui/src/components/SignIn/SignInFactorOne.tsx:89-91`, `:168`), so a reload loses it.
-- **`sent` per target for sign-in.** FAPI sends `first_factor_verification` only after a prepare, and it stays `unverified` until it is verified, fails or expires, so the bridge reads `sent` from it. It has no identification, so after a code to one email, a second email with the same strategy also reads as sent.
+- **`sent` per target for sign-in.** FAPI sends `first_factor_verification` only after a prepare, and it stays `unverified` until it is verified, fails or expires, so the bridge reads `sent` from it. It has no identification, so after a code to one email, a second email with the same strategy also reads as sent. `ui` has the same bug today: switching to a second phone or email with the same strategy sends no code (`ui/src/components/SignIn/SignInFactorOneCodeForm.tsx:52-57`).
 
 ## Phases
 
