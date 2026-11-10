@@ -75,4 +75,166 @@ describe('OAuthApplications', () => {
       ).rejects.toThrow('A valid resource ID is required.');
     });
   });
+
+  describe('__experimental_exchangeToken', () => {
+    const tokenFetchUrl = 'https://clerk.example.test/oauth/token';
+    const clientId = 'client id:with+reserved';
+    const clientSecret = 'secret value:+/=';
+
+    const mockOAuthApplication = {
+      object: 'oauth_application',
+      id: oauthApplicationId,
+      instance_id: 'ins_xxxxx',
+      name: 'Example',
+      client_id: clientId,
+      client_uri: null,
+      client_image_url: null,
+      dynamically_registered: false,
+      consent_screen_enabled: true,
+      pkce_required: false,
+      public: false,
+      scopes: 'profile email',
+      redirect_uris: [],
+      authorize_url: 'https://clerk.example.test/oauth/authorize',
+      token_fetch_url: tokenFetchUrl,
+      user_info_url: 'https://clerk.example.test/oauth/userinfo',
+      discovery_url: 'https://clerk.example.test/.well-known/openid-configuration',
+      token_introspection_url: 'https://clerk.example.test/oauth/token_info',
+      created_at: 1,
+      updated_at: 1,
+    };
+
+    const createClient = () =>
+      createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+    const useApplication = () =>
+      server.use(
+        http.get(
+          `https://api.clerk.test/v1/oauth_applications/${oauthApplicationId}`,
+          validateHeaders(() => HttpResponse.json(mockOAuthApplication)),
+        ),
+      );
+
+    it('exchanges a subject token at the application token endpoint', async () => {
+      useApplication();
+
+      let captured: { headers: Headers; body: URLSearchParams } | undefined;
+      server.use(
+        http.post(tokenFetchUrl, async ({ request }) => {
+          captured = { headers: request.headers, body: new URLSearchParams(await request.text()) };
+          return HttpResponse.json({
+            access_token: 'exchanged_token',
+            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+            token_type: 'Bearer',
+            expires_in: 3600,
+            scope: 'invoices:read invoices:write',
+          });
+        }),
+      );
+
+      const result = await createClient().oauthApplications.__experimental_exchangeToken({
+        oauthApplicationId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        actorToken: 'actor_token',
+        actorTokenType: 'urn:ietf:params:oauth:token-type:jwt',
+        requestedTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        audience: ['https://a.example.test', 'https://b.example.test'],
+        resource: 'https://r.example.test',
+        scope: ['invoices:read', 'invoices:write'],
+      });
+
+      expect(result).toEqual({
+        accessToken: 'exchanged_token',
+        issuedTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        tokenType: 'Bearer',
+        expiresIn: 3600,
+        scope: ['invoices:read', 'invoices:write'],
+        refreshToken: undefined,
+      });
+
+      expect(captured?.headers.get('Content-Type')).toBe('application/x-www-form-urlencoded');
+      expect(captured?.headers.get('Accept')).toBe('application/json');
+
+      const body = captured?.body;
+      expect(body?.get('grant_type')).toBe('urn:ietf:params:oauth:grant-type:token-exchange');
+      expect(body?.get('subject_token')).toBe('subject_token');
+      expect(body?.get('subject_token_type')).toBe('urn:ietf:params:oauth:token-type:access_token');
+      expect(body?.get('actor_token')).toBe('actor_token');
+      expect(body?.get('actor_token_type')).toBe('urn:ietf:params:oauth:token-type:jwt');
+      expect(body?.get('requested_token_type')).toBe('urn:ietf:params:oauth:token-type:access_token');
+      expect(body?.getAll('audience')).toEqual(['https://a.example.test', 'https://b.example.test']);
+      expect(body?.getAll('resource')).toEqual(['https://r.example.test']);
+      expect(body?.get('scope')).toBe('invoices:read invoices:write');
+      expect(body?.has('client_id')).toBe(false);
+    });
+
+    it('authenticates with form-urlencoded client credentials over HTTP Basic', async () => {
+      useApplication();
+
+      let authorization: string | null = null;
+      server.use(
+        http.post(tokenFetchUrl, ({ request }) => {
+          authorization = request.headers.get('Authorization');
+          return HttpResponse.json({
+            access_token: 'exchanged_token',
+            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+            token_type: 'Bearer',
+          });
+        }),
+      );
+
+      await createClient().oauthApplications.__experimental_exchangeToken({
+        oauthApplicationId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+      });
+
+      expect(authorization).toBe(`Basic ${btoa('client+id%3Awith%2Breserved:secret+value%3A%2B%2F%3D')}`);
+    });
+
+    it('omits optional parameters that are not provided', async () => {
+      useApplication();
+
+      let body: URLSearchParams | undefined;
+      server.use(
+        http.post(tokenFetchUrl, async ({ request }) => {
+          body = new URLSearchParams(await request.text());
+          return HttpResponse.json({
+            access_token: 'exchanged_token',
+            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+            token_type: 'N_A',
+            refresh_token: 'refresh',
+          });
+        }),
+      );
+
+      const result = await createClient().oauthApplications.__experimental_exchangeToken({
+        oauthApplicationId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+      });
+
+      expect([...(body?.keys() ?? [])]).toEqual(['grant_type', 'subject_token', 'subject_token_type']);
+      expect(result.scope).toBeUndefined();
+      expect(result.refreshToken).toBe('refresh');
+    });
+
+    it('throws when the OAuth application ID is missing', async () => {
+      await expect(
+        createClient().oauthApplications.__experimental_exchangeToken({
+          oauthApplicationId: '',
+          clientSecret,
+          subjectToken: 'subject_token',
+          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        }),
+      ).rejects.toThrow('A valid resource ID is required.');
+    });
+  });
 });
