@@ -69,7 +69,7 @@ const screen = editing ? 'fields' : step.type;
 ```
 
 - **The URL shows, the server decides.** Back, forward and a link to the start render that page. FAPI's step only changes after the user submits there. A route redirects only when FAPI's state makes it impossible, as `ui` does today (`ui/src/components/SignIn/SignInFactorTwo.tsx:47`). In Mosaic the component that owns the sign-in routes (`useRouterScope`, #10602) does that redirect, and is the only one that does.
-- **No step machine.** A machine whose states copy the step is a second source of truth. Busy and errors come from `useForm` or `usePendingAction`. The only local state is a back move, like `editing` above. [Controllers → Multi-step flows](../controllers.md#multi-step-flows) lists this as the exception to "the machine owns the step".
+- **No step machine.** A machine whose states copy the step is a second source of truth. Busy and errors come from `useForm` or `usePendingAction`. Local state holds only what the step can't: a back move, like `editing` above, or the factor the user picked when two share a strategy (see [Bridge](#bridge)). [Controllers → Multi-step flows](../controllers.md#multi-step-flows) lists this as the exception to "the machine owns the step".
 - **A step can span screens, or share one.** `enterprise_sso` is a chooser in one client and a redirect in another.
 - **The step says where, the resource says what.** A factor screen lists other methods from `signIn.supportedFirstFactors`, as `ui` does (`SignInFactorOne.tsx:84`). The step doesn't copy them.
 
