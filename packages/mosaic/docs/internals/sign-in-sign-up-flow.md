@@ -1,7 +1,7 @@
 # Sign-in and sign-up flow
 
 > [!NOTE]
-> Proposal, not decided. Agent-drafted. Paths are relative to `packages/`.
+> Decided for clients: the bridge and D2, D4–D6. The FAPI side (D1, D3, phases 2–3) is a proposal to the FAPI team. Paths are relative to `packages/`.
 
 ## Goal
 
@@ -67,7 +67,7 @@ const step = getSignUpNextStep(signUp);
 const screen = editing ? 'fields' : step.type;
 ```
 
-- **The URL shows, the server decides.** Back, forward and a link to the start render that page. FAPI's step only changes after the user submits there. A route redirects only when FAPI's state makes it impossible, as `ui` does today (`ui/src/components/SignIn/SignInFactorTwo.tsx:47`).
+- **The URL shows, the server decides.** Back, forward and a link to the start render that page. FAPI's step only changes after the user submits there. A route redirects only when FAPI's state makes it impossible, as `ui` does today (`ui/src/components/SignIn/SignInFactorTwo.tsx:47`). In Mosaic the component that owns the sign-in routes (`useRouterScope`, #10602) does that redirect, and is the only one that does.
 - **No step machine.** A machine whose states copy the step is a second source of truth. Busy and errors come from `useForm` or `usePendingAction`. The only local state is a back move, like `editing` above. This is an exception to "the machine owns the step" in [Controllers](../controllers.md#multi-step-flows), for flows whose step FAPI owns.
 - **A step can span screens, or share one.** `enterprise_sso` is a chooser in one client and a redirect in another.
 - **The step says where, the resource says what.** A factor screen lists other methods from `signIn.supportedFirstFactors`, as `ui` does (`SignInFactorOne.tsx:84`). The step doesn't copy them.
@@ -80,7 +80,7 @@ This removes the 3 client transfer copies. A transfer never asks the user anythi
 
 ### Version skew
 
-clerk-js sends `__clerk_api_version` on every request (`clerk-js/src/core/fapiClient.ts:151`). FAPI sends a step type only to API versions that know it. A client that still meets an unknown type renders a "Start over" fallback, never a spinner. How FAPI gates responses by version today is unverified.
+clerk-js sends `__clerk_api_version` on every request (`clerk-js/src/core/fapiClient.ts:151`). FAPI sends a step type only to API versions that know it. FAPI already does this for sign-in: before `2024-10-01`, an enterprise SSO sign-in reads `needs_identifier`. A client that still meets an unknown type renders a "Start over" fallback, never a spinner.
 
 ### Bridge
 
