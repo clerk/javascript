@@ -50,5 +50,3 @@ export const MARK_PIECES = [
   leg(20),
   leg(40),
 ].map(roundedPath);
-export const MARK_FILLETS: string[] = [];
-export const MARK_PATHS = [...MARK_PIECES, ...MARK_FILLETS];

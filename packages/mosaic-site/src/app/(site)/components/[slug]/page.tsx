@@ -9,7 +9,7 @@ type Params = {
 };
 export const dynamicParams = false;
 export function generateStaticParams(): Params[] {
-  return COMPONENT_META.map(item => ({ slug: item.slug }));
+  return COMPONENT_META.filter(item => !item.comingSoon).map(item => ({ slug: item.slug }));
 }
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
@@ -19,14 +19,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function Page({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const meta = getComponentMeta(slug);
-  if (!meta) {
+  if (!meta || meta.comingSoon) {
     notFound();
   }
   return (
-    <DocsShell
-      title={`Components / ${meta.title}`}
-      overlay
-    >
+    <DocsShell title={`Components / ${meta.title}`}>
       <ComponentDetail slug={slug} />
     </DocsShell>
   );

@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 import { useQueryParam } from '@/components/gallery/touch-mode';
-import { parseRemix, REMIX_CSS, REMIX_MESSAGE, type RemixId } from '@/lib/components/remix';
+import { parseRemix, REMIX_MESSAGE, type RemixId } from '@/lib/components/remix';
 
 const subscribeRemix = (listener: () => void) => {
   const observer = new MutationObserver(listener);
@@ -15,9 +15,6 @@ export function useRemixValue(): RemixId {
     () => parseRemix(document.documentElement.dataset.remix),
     () => 'default',
   );
-}
-export function RemixStyles() {
-  return <style>{REMIX_CSS}</style>;
 }
 export function useApplyRemix(remix: RemixId) {
   React.useEffect(() => {
@@ -47,5 +44,5 @@ export function RemixReceiver() {
     return () => window.removeEventListener('message', onMessage);
   }, []);
   useApplyRemix(remix);
-  return <RemixStyles />;
+  return null;
 }
