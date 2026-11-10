@@ -5,6 +5,7 @@ import { EyeSlash } from '../../icons/glyphs/eye-slash';
 import type { MosaicElementProps } from '../../props';
 import { themeProps } from '../../props';
 import { Button } from '../button';
+import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
 
@@ -33,20 +34,36 @@ export interface PasswordInputProps extends Omit<MosaicElementProps<'input'>, 't
  * ```
  */
 export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(function MosaicPasswordInput(
-  { size = 'md', showPasswordLabel, hidePasswordLabel, xstyle, ...inputProps },
+  {
+    size = 'md',
+    showPasswordLabel,
+    hidePasswordLabel,
+    xstyle,
+    disabled: disabledProp,
+    'aria-invalid': ariaInvalidProp,
+    ...inputProps
+  },
   ref,
 ) {
+  const field = useOptionalFieldContext();
+  const disabled = disabledProp ?? field?.disabled ?? false;
+  const ariaInvalid = ariaInvalidProp ?? (field?.invalid ? true : undefined);
+  const invalid = ariaInvalid === true || ariaInvalid === 'true';
   const [visible, setVisible] = useState(false);
 
   return (
     <InputGroup.Root
       size={size}
-      {...themeProps('password-input', { size, visible })}
+      disabled={disabled}
+      invalid={invalid}
+      {...themeProps('password-input', { size, disabled, invalid, visible })}
       xstyle={xstyle}
     >
       <InputGroup.Input
         ref={ref}
         {...inputProps}
+        disabled={disabledProp}
+        aria-invalid={ariaInvalidProp}
         type={visible ? 'text' : 'password'}
       />
       <InputGroup.End>
