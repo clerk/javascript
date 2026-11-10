@@ -857,6 +857,7 @@ export class SignIn extends BaseResource implements SignInResource {
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
       timezone: this.timezone,
+      client_trust_state: this.clientTrustState,
       protect_check: this.protectCheck
         ? {
             status: this.protectCheck.status,

@@ -1460,6 +1460,18 @@ describe('SignIn', () => {
 
         expect(signIn.__internal_future.clientTrustState).toBeUndefined();
       });
+
+      it('survives a snapshot round trip', () => {
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_second_factor',
+          client_trust_state: 'new',
+        } as any);
+
+        const restored = new SignIn(signIn.__internal_toSnapshot());
+
+        expect(restored.__internal_future.clientTrustState).toBe('new');
+      });
     });
 
     describe('password', () => {
