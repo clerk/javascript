@@ -227,6 +227,34 @@ describe('OAuthApplications', () => {
       expect(result.refreshToken).toBe('refresh');
     });
 
+    it('sends client_id in the body and no Authorization header for public clients', async () => {
+      useApplication();
+
+      let captured: { authorization: string | null; body: URLSearchParams } | undefined;
+      server.use(
+        http.post(tokenFetchUrl, async ({ request }) => {
+          captured = {
+            authorization: request.headers.get('Authorization'),
+            body: new URLSearchParams(await request.text()),
+          };
+          return HttpResponse.json({
+            access_token: 'exchanged_token',
+            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+            token_type: 'Bearer',
+          });
+        }),
+      );
+
+      await createClient().oauthApplications.__experimental_exchangeToken({
+        oauthApplicationId,
+        subjectToken: 'subject_token',
+        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+      });
+
+      expect(captured?.authorization).toBeNull();
+      expect(captured?.body.get('client_id')).toBe(clientId);
+    });
+
     it.each([
       ['unsupported_grant_type', 'The authorization grant type is not supported.'],
       ['invalid_grant', undefined],
