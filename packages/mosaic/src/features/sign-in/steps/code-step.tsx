@@ -29,6 +29,7 @@ export function CodeStep({
   onShowMethods,
   focusRef,
 }: CodeStepProps) {
+  // TODO: Have the controller pass the one callback each code step offers, and omit resend for the authenticator app, so the view stops choosing by purpose and channel.
   return (
     <VerificationCode
       focusRef={focusRef}
@@ -38,6 +39,7 @@ export function CodeStep({
       isPending={isPending}
       resend={step.channel === 'totp' ? undefined : resend}
       onValueChange={onValueChange}
+      // TODO: Pass the completed code to onSubmit. A controller that reads its value state in onSubmit sees the value from before onValueChange.
       onComplete={code => {
         onValueChange(code);
         onSubmit();
