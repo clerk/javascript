@@ -15,7 +15,7 @@ There is no step machine and no local copy of the step. Each step has one route,
 The route and the step can disagree: the user went back, opened an old link, or the sign-in reset. The screen is the route when the step allows it, otherwise the step's route, and "Start over" when the step is `unknown`.
 
 ```tsx
-const step = getSignInNextStep(signIn);
+const { step } = model;
 const { route } = useRouterScope(signInRoutes, { routing, path, root: 'start' });
 const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step) ? route : routeFor(step);
 ```
@@ -23,13 +23,15 @@ const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step)
 - `routeFor(step)` returns the step's route, from the lists below.
 - `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field.
 - The component that owns the route table computes `screen` during render, with no effect.
+- Until Clerk loads, the model is `loading` and the scope gets `ready: false`, so an entry like `factor-one` isn't reset to `start`. Once Clerk is loaded there is always a step.
 
 ## Move on after a submit
 
-A screen calls the method, shows `error` if there is one, then calls `next(getSignInNextStep(signIn))`. The step is current after `await`, because the resource updates before the promise resolves.
+The model makes the Clerk call and returns the next step, read from the resource after the call. The controller passes it to `next(step)`.
 
 - `complete`: `finalize()`, then leave the flow.
-- `transfer`: `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step.
+- `transfer`: `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
+- `unknown`: nothing. The screen already shows "Start over".
 - Anything else: `go(routeFor(step))`.
 - An error from `finalize()` or the transfer stays on the current screen.
 
@@ -50,7 +52,7 @@ Sign-up:
 
 - `start` → `start`
 - `protect` → `protectCheck`
-- `enterprise_sso` → `enterpriseConnections`, or straight to the IdP
+- `enterprise_sso` → `enterpriseConnections`, which goes straight to the IdP unless there are several connections to pick from
 - `fields` (`fields`) → `continue`
 - `verify_email` (`target`, `sent`) → `verifyEmail`
 - `verify_phone` (`target`, `sent`) → `verifyPhone`
@@ -59,7 +61,7 @@ Sign-up:
 
 ## Back, forward and reload
 
-- FAPI's state changes only on submit. A route redirects only when the step doesn't allow it.
+- FAPI's state changes only on submit. A route the step doesn't allow shows the step's screen instead.
 - Back to `start` shows the identifier form; submitting it creates a new sign-in. Forward to `factorOne` still works.
 - Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`).
 - Virtual routing has no history: a remount starts at `start`, and FAPI's state is kept.
