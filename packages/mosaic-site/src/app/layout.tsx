@@ -2,6 +2,7 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import Script from 'next/script';
 import type React from 'react';
 
 import { ThemeProvider } from '@/components/theme-provider';
@@ -21,6 +22,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={cn('font-sans antialiased', heading.variable, sans.variable, mono.variable)}
     >
+      <head>
+        {process.env.NODE_ENV === 'development' && (
+          <Script
+            src='//unpkg.com/react-grab/dist/index.global.js'
+            crossOrigin='anonymous'
+            strategy='beforeInteractive'
+          />
+        )}
+      </head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
