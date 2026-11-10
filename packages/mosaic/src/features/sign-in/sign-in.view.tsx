@@ -274,6 +274,7 @@ export function SignInView({
                   onSubmit={() => onSubmit()}
                   onEmailSupport={onEmailSupport}
                   onBack={onBack}
+                  onEditIdentifier={onEditIdentifier}
                   onForgotPassword={onForgotPassword}
                   onCancel={onCancel}
                 />

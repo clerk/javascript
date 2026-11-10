@@ -48,7 +48,7 @@ export const signInMessages = {
   },
   emailLink: {
     title: 'Check your email',
-    description: 'Use the verification link sent to {identifier}',
+    description: 'Use the verification link sent to your email',
     resendText: 'Didn’t receive a link?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',

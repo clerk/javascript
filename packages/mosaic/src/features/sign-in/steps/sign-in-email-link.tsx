@@ -5,17 +5,26 @@ import type { VerificationCodeResend } from '../../../blocks/verification';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
-import { fill, useMessages } from '../../../localization';
+import { useMessages } from '../../../localization';
+import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface SignInEmailLinkProps {
   identifier: string;
+  onEditIdentifier?: () => void;
   globalErrorMessage?: string;
   resend?: VerificationCodeResend;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
-export function SignInEmailLink({ identifier, globalErrorMessage, resend, onCancel, focusRef }: SignInEmailLinkProps) {
+export function SignInEmailLink({
+  identifier,
+  onEditIdentifier,
+  globalErrorMessage,
+  resend,
+  onCancel,
+  focusRef,
+}: SignInEmailLinkProps) {
   const m = useMessages('signIn');
   const ref = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
 
@@ -23,7 +32,12 @@ export function SignInEmailLink({ identifier, globalErrorMessage, resend, onCanc
     <>
       <Card.Header>
         <Card.Title>{m.emailLink.title}</Card.Title>
-        <Card.Description>{fill(m.emailLink.description, { identifier })}</Card.Description>
+        <Card.Description>{m.emailLink.description}</Card.Description>
+        <SignInIdentityPreview
+          identifier={identifier}
+          editLabel={m.password.editIdentifier}
+          onEdit={onEditIdentifier}
+        />
         {resend ? (
           <Card.Description>
             {resend.text}{' '}

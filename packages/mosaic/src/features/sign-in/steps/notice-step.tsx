@@ -17,6 +17,7 @@ interface NoticeStepProps {
   onSubmit: () => void;
   onEmailSupport: () => void;
   onBack: () => void;
+  onEditIdentifier: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -30,6 +31,7 @@ export function NoticeStep({
   onSubmit,
   onEmailSupport,
   onBack,
+  onEditIdentifier,
   onForgotPassword,
   onCancel,
   focusRef,
@@ -96,6 +98,7 @@ export function NoticeStep({
         <SignInEmailLink
           focusRef={focusRef}
           identifier={step.identifier}
+          onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}
           resend={resend}
           onCancel={onCancel}
