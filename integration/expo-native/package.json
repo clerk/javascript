@@ -7,7 +7,7 @@
     "typecheck": "tsc -p ."
   },
   "devDependencies": {
-    "@clerk/internal-mobile-e2e": "github:clerk/internal-mobile-e2e#7aa9db994b61aba09b378103d92fb5ed12d231ad",
+    "@clerk/internal-mobile-e2e": "github:clerk/internal-mobile-e2e#137bb50aebfa07b03356e88b63bc57601ae0cd04",
     "@types/node": "24.19.1",
     "typescript": "7.0.2"
   },
