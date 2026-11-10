@@ -41,7 +41,7 @@ import { SignInView } from '@clerk/mosaic/features/sign-in';
 
 ## Steps
 
-Each section is one component in `features/sign-in/steps/`, and each example under it is one `SignInStep` value it draws.
+Each section is one component in `features/sign-in/steps/`, and each example under it is one `SignInStep` value it draws. A red "not found" box marks a view that legacy sign-in has and Mosaic doesn't yet; it turns into the example once its story exists.
 
 ### Identifier step
 
@@ -66,6 +66,38 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Error
 
 <Story name='IdentifierError' storyModule={Stories} />
+
+#### Phone
+
+<Story name='IdentifierPhone' storyModule={Stories} />
+
+#### Username
+
+<Story name='IdentifierUsername' storyModule={Stories} />
+
+#### Passkey
+
+<Story name='IdentifierPasskey' storyModule={Stories} />
+
+#### Web3 wallets
+
+<Story name='IdentifierWeb3' storyModule={Stories} />
+
+#### Alternative phone channel
+
+<Story name='IdentifierAlternativePhoneChannel' storyModule={Stories} />
+
+#### Last used
+
+<Story name='IdentifierLastUsed' storyModule={Stories} />
+
+#### Captcha
+
+<Story name='IdentifierCaptcha' storyModule={Stories} />
+
+#### Join waitlist
+
+<Story name='IdentifierWaitlist' storyModule={Stories} />
 
 ### Secret step
 
@@ -99,9 +131,41 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='CodeAuthenticatorApp' storyModule={Stories} />
 
+#### Phone code
+
+<Story name='CodePhone' storyModule={Stories} />
+
+#### Alternative phone channel
+
+<Story name='CodeAlternativePhoneChannel' storyModule={Stories} />
+
+#### Second factor phone code
+
+<Story name='CodeSecondFactorPhone' storyModule={Stories} />
+
+#### Second factor email code
+
+<Story name='CodeSecondFactorEmail' storyModule={Stories} />
+
+#### New device
+
+<Story name='CodeClientTrust' storyModule={Stories} />
+
+#### Reset password
+
+<Story name='CodeResetPassword' storyModule={Stories} />
+
+#### SSO bypass
+
+<Story name='CodeSsoBypass' storyModule={Stories} />
+
 #### Verify email
 
 <Story name='CodeVerifyEmail' storyModule={Stories} />
+
+#### Verify phone
+
+<Story name='CodeVerifyPhone' storyModule={Stories} />
 
 ### Choice step
 
@@ -111,6 +175,22 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='ChoiceMethods' storyModule={Stories} />
 
+#### Methods with passkey and providers
+
+<Story name='ChoiceMethodsWithProviders' storyModule={Stories} />
+
+#### Enterprise connections
+
+<Story name='ChoiceEnterpriseConnections' storyModule={Stories} />
+
+#### Accounts
+
+<Story name='ChoiceAccounts' storyModule={Stories} />
+
+#### Wallets
+
+<Story name='ChoiceWallets' storyModule={Stories} />
+
 ### Notice step
 
 `notice-step.tsx` draws `{ kind: 'notice' }`: help, with `VerificationHelp`.
@@ -119,6 +199,50 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticeHelp' storyModule={Stories} />
 
+#### Forgot password
+
+<Story name='NoticeForgotPassword' storyModule={Stories} />
+
+#### Password changed
+
+<Story name='NoticePasswordChanged' storyModule={Stories} />
+
+#### Account locked
+
+<Story name='NoticeLocked' storyModule={Stories} />
+
+#### No available methods
+
+<Story name='NoticeNoMethods' storyModule={Stories} />
+
+#### Action blocked
+
+<Story name='NoticeActionBlocked' storyModule={Stories} />
+
+#### Password compromised
+
+<Story name='NoticePasswordCompromised' storyModule={Stories} />
+
+#### Email link sent
+
+<Story name='NoticeEmailLinkSent' storyModule={Stories} />
+
+#### Passkey
+
+<Story name='NoticePasskey' storyModule={Stories} />
+
+### New password step
+
+`new-password-step.tsx` will draw `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices.
+
+#### Set new password
+
+<Story name='NewPasswordReset' storyModule={Stories} />
+
+#### Required reset
+
+<Story name='NewPasswordRequired' storyModule={Stories} />
+
 ### Sign-up step
 
 `sign-up-details.tsx` draws `{ kind: 'sign-up' }` in the combined flow.
@@ -126,3 +250,15 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Details
 
 <Story name='SignUpDetails' storyModule={Stories} />
+
+#### Fields from instance settings
+
+<Story name='SignUpSettingsFields' storyModule={Stories} />
+
+#### Password requirements
+
+<Story name='SignUpPasswordRequirements' storyModule={Stories} />
+
+#### Verify by email link
+
+<Story name='SignUpVerifyEmailLink' storyModule={Stories} />
