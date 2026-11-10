@@ -33,4 +33,38 @@ describe('Mosaic PasswordInput', () => {
     await user.click(screen.getByRole('button', { name: 'Hide password' }));
     expect(input).toHaveAttribute('type', 'password');
   });
+
+  it('disables the toggle when disabled outside a field', async () => {
+    render(
+      <PasswordInput
+        aria-label='Password'
+        disabled
+        showPasswordLabel='Show password'
+        hidePasswordLabel='Hide password'
+      />,
+    );
+    const user = userEvent.setup();
+    const input = screen.getByLabelText('Password');
+
+    expect(input).toBeDisabled();
+    expect(input.closest('.cl-password-input')).toHaveAttribute('data-disabled');
+
+    await user.click(screen.getByRole('button', { name: 'Show password' }));
+    expect(input).toHaveAttribute('type', 'password');
+  });
+
+  it('marks the group invalid when aria-invalid is set outside a field', () => {
+    render(
+      <PasswordInput
+        aria-label='Password'
+        aria-invalid
+        showPasswordLabel='Show password'
+        hidePasswordLabel='Hide password'
+      />,
+    );
+    const input = screen.getByLabelText('Password');
+
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input.closest('.cl-password-input')).toHaveAttribute('data-invalid');
+  });
 });
