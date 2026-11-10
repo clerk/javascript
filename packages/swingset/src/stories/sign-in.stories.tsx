@@ -410,11 +410,13 @@ function StepPanel({
   );
 }
 
-export function Start() {
+const passwordStep: SignInStep = { kind: 'secret', secret: 'password', identifier: IDENTIFIER };
+
+export function IdentifierDefault() {
   return <StepPanel step={{ kind: 'identifier' }} />;
 }
 
-export function StartSignInOnly() {
+export function IdentifierSignInOnly() {
   return (
     <StepPanel
       step={{ kind: 'identifier' }}
@@ -423,7 +425,7 @@ export function StartSignInOnly() {
   );
 }
 
-export function StartManyProviders() {
+export function IdentifierManyProviders() {
   return (
     <StepPanel
       step={{ kind: 'identifier' }}
@@ -436,7 +438,7 @@ export function StartManyProviders() {
   );
 }
 
-export function StartProviderPending() {
+export function IdentifierProviderPending() {
   return (
     <StepPanel
       step={{ kind: 'identifier' }}
@@ -445,7 +447,7 @@ export function StartProviderPending() {
   );
 }
 
-export function StartError() {
+export function IdentifierError() {
   return (
     <StepPanel
       step={{ kind: 'identifier' }}
@@ -454,13 +456,11 @@ export function StartError() {
   );
 }
 
-const passwordStep: SignInStep = { kind: 'secret', secret: 'password', identifier: IDENTIFIER };
-
-export function Password() {
+export function SecretPassword() {
   return <StepPanel step={passwordStep} />;
 }
 
-export function PasswordPending() {
+export function SecretPasswordPending() {
   return (
     <StepPanel
       step={passwordStep}
@@ -469,7 +469,7 @@ export function PasswordPending() {
   );
 }
 
-export function PasswordError() {
+export function SecretPasswordError() {
   return (
     <StepPanel
       step={passwordStep}
@@ -478,26 +478,30 @@ export function PasswordError() {
   );
 }
 
-export function EmailCode() {
-  return <StepPanel step={{ kind: 'code', purpose: 'first-factor', channel: 'email', identifier: IDENTIFIER }} />;
-}
-
-export function Totp() {
-  return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }} />;
-}
-
-export function BackupCode() {
+export function SecretBackupCode() {
   return <StepPanel step={{ kind: 'secret', secret: 'backup-code', identifier: IDENTIFIER }} />;
 }
 
-export function MethodPicker() {
+export function CodeEmail() {
+  return <StepPanel step={{ kind: 'code', purpose: 'first-factor', channel: 'email', identifier: IDENTIFIER }} />;
+}
+
+export function CodeAuthenticatorApp() {
+  return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }} />;
+}
+
+export function CodeVerifyEmail() {
+  return <StepPanel step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }} />;
+}
+
+export function ChoiceMethods() {
   return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
 }
 
-export function SignUp() {
-  return <StepPanel step={{ kind: 'sign-up' }} />;
+export function NoticeHelp() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'help' }} />;
 }
 
-export function VerifyEmail() {
-  return <StepPanel step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }} />;
+export function SignUpDetails() {
+  return <StepPanel step={{ kind: 'sign-up' }} />;
 }
