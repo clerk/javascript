@@ -55,8 +55,8 @@ export type OAuthTokenTypeIdentifier =
 export type ExchangeOAuthApplicationTokenParams = {
   /** The ID of the OAuth application performing the exchange. */
   oauthApplicationId: string;
-  /** The client secret of the OAuth application, used to authenticate with the token endpoint. */
-  clientSecret: string;
+  /** The client secret of the OAuth application, used to authenticate with the token endpoint. Omit it for public OAuth applications, which have no client secret. */
+  clientSecret?: string;
   /** The token that represents the identity of the party on behalf of whom the request is being made. */
   subjectToken: string;
   /** The type of `subjectToken`. */
@@ -302,17 +302,20 @@ export class OAuthApplicationsApi extends AbstractAPI {
 
     const application = await this.get(params.oauthApplicationId);
 
-    const credentials = `${formUrlEncode(application.clientId)}:${formUrlEncode(params.clientSecret)}`;
+    const body = buildTokenExchangeBody(params);
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
 
-    const response = await runtime.fetch(application.tokenFetchUrl, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Basic ${btoa(credentials)}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: buildTokenExchangeBody(params),
-    });
+    if (params.clientSecret) {
+      const credentials = `${formUrlEncode(application.clientId)}:${formUrlEncode(params.clientSecret)}`;
+      headers.Authorization = `Basic ${btoa(credentials)}`;
+    } else {
+      body.set('client_id', application.clientId);
+    }
+
+    const response = await runtime.fetch(application.tokenFetchUrl, { method: 'POST', headers, body });
 
     const json = await response.json().catch(() => undefined);
 
