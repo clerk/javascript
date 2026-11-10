@@ -53,6 +53,13 @@ export function NewPasswordStep({
           />
         }
       >
+        <input
+          readOnly
+          hidden
+          name='identifier'
+          autoComplete='username'
+          value={form.values.identifier}
+        />
         <div {...stylex.props(styles.fieldStack)}>
           <PasswordField
             form={form}
