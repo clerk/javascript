@@ -218,7 +218,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Notice step
 
-`notice-step.tsx` draws `{ kind: 'notice' }`: help (`VerificationHelp`) and forgot password.
+`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password and a sent email link.
 
 #### Help
 
@@ -251,6 +251,42 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Email link sent
 
 <Story name='NoticeEmailLinkSent' storyModule={Stories} />
+
+#### Signed in on other tab
+
+<Story name='NoticeEmailLinkSignedInOtherTab' storyModule={Stories} />
+
+#### Email verified
+
+<Story name='NoticeEmailLinkVerified' storyModule={Stories} />
+
+#### Signing in from email link
+
+<Story name='NoticeEmailLinkSigningIn' storyModule={Stories} />
+
+#### Signed in from email link
+
+<Story name='NoticeEmailLinkSignedIn' storyModule={Stories} />
+
+#### Email link expired
+
+<Story name='NoticeEmailLinkExpired' storyModule={Stories} />
+
+#### Email link invalid
+
+<Story name='NoticeEmailLinkInvalid' storyModule={Stories} />
+
+#### Email link for another device
+
+<Story name='NoticeEmailLinkClientMismatch' storyModule={Stories} />
+
+#### Close this tab
+
+<Story name='NoticeEmailLinkCloseTab' storyModule={Stories} />
+
+#### Start over
+
+<Story name='NoticeStartOver' storyModule={Stories} />
 
 ### New password step
 
