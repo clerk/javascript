@@ -19,7 +19,7 @@ import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
-type ResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
+type ResendCopy = Pick<Messages['emailCode'] | Messages['emailLink'], 'resendText' | 'resend' | 'resendCountdown'>;
 
 function factorLabel(factor: SignInFactor, m: Messages): string {
   switch (factor.strategy) {
@@ -252,22 +252,30 @@ export function SignInView({
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['notice:help', 'notice:forgot-password']}>
+            <Flow.Step
+              ids={[
+                'notice:help',
+                'notice:forgot-password',
+                'notice:locked',
+                'notice:no-methods',
+                'notice:action-blocked',
+                'notice:password-compromised',
+                'notice:email-link',
+                'notice:passkey',
+              ]}
+            >
               {current.kind === 'notice' ? (
                 <NoticeStep
                   focusRef={focusRef}
                   step={current}
-                  messages={{
-                    title: m.alternativeMethods.getHelp.title,
-                    description: m.alternativeMethods.getHelp.description,
-                    backButton: m.back,
-                    supportButton: m.alternativeMethods.getHelp.emailSupport,
-                  }}
                   globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
+                  resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}
                   onSubmit={() => onSubmit()}
                   onEmailSupport={onEmailSupport}
                   onBack={onBack}
+                  onForgotPassword={onForgotPassword}
+                  onCancel={onCancel}
                 />
               ) : null}
             </Flow.Step>

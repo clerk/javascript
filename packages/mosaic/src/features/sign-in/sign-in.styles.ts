@@ -48,6 +48,9 @@ export const styles = stylex.create({
     alignSelf: 'start',
     justifySelf: 'start',
   },
+  traceId: {
+    userSelect: 'all',
+  },
   footerText: {
     textAlign: 'center',
   },

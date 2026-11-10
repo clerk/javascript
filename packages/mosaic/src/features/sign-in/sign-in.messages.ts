@@ -25,6 +25,36 @@ export const signInMessages = {
     pending: 'Sending code',
     back: 'Back to sign in',
   },
+  locked: {
+    title: 'Account locked',
+    description:
+      'Your account is locked after too many failed sign-in attempts. Try again later, or email support for help.',
+  },
+  noAvailableMethods: {
+    title: 'Cannot sign in',
+    description: 'Cannot proceed with sign in. There’s no available authentication factor.',
+  },
+  actionBlocked: {
+    title: 'We couldn’t complete this request',
+    description: 'For your security, this request could not be completed.',
+    traceIdLabel: 'Reference',
+  },
+  passwordCompromised: {
+    title: 'Password compromised',
+    description: 'This password has been found as part of a breach and can not be used, please reset your password.',
+    resetPassword: 'Reset your password',
+  },
+  emailLink: {
+    title: 'Check your email',
+    description: 'Use the verification link sent to {identifier}',
+    resendText: 'Didn’t receive a link?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  passkey: {
+    title: 'Use your passkey',
+    description: 'Using your passkey confirms it’s you. Your device may ask for your fingerprint, face or screen lock.',
+  },
   resetMethods: {
     title: 'Forgot password?',
     description: 'Choose where to send a code to reset your password.',

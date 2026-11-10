@@ -101,7 +101,7 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
 }
 
 function offersResend(step: SignInStep): boolean {
-  return step.kind === 'code' && step.channel !== 'totp';
+  return (step.kind === 'code' && step.channel !== 'totp') || (step.kind === 'notice' && step.purpose === 'email-link');
 }
 
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
@@ -631,6 +631,38 @@ export function NoticeForgotPasswordPending() {
       isPending
     />
   );
+}
+
+export function NoticeLocked() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'locked' }} />;
+}
+
+export function NoticeNoMethods() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'no-methods' }} />;
+}
+
+export function NoticeActionBlocked() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'notice',
+        purpose: 'action-blocked',
+        details: { linkUrl: 'https://acme.com/support', linkText: 'Contact support', traceId: 'trc_2x7Hq9LmP4' },
+      }}
+    />
+  );
+}
+
+export function NoticePasswordCompromised() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'password-compromised' }} />;
+}
+
+export function NoticeEmailLinkSent() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER }} />;
+}
+
+export function NoticePasskey() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'passkey' }} />;
 }
 
 export function NewPasswordReset() {

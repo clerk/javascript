@@ -28,8 +28,19 @@ export type SignInStep =
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
+  | { kind: 'notice'; purpose: 'locked' | 'no-methods' | 'password-compromised' | 'passkey' }
+  | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
+  | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' }
   | { kind: 'sign-up' };
+
+export interface SignInActionBlockedDetails {
+  title?: string;
+  description?: string;
+  linkUrl?: string;
+  linkText?: string;
+  traceId?: string;
+}
 
 export interface SignInSocialProvider {
   id: string;

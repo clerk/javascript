@@ -20,6 +20,9 @@ describe('stepKey', () => {
         'code:reset-password',
       ],
       [{ kind: 'notice', purpose: 'forgot-password', identifier: 'jane@acme.com' }, 'notice:forgot-password'],
+      [{ kind: 'notice', purpose: 'locked' }, 'notice:locked'],
+      [{ kind: 'notice', purpose: 'action-blocked' }, 'notice:action-blocked'],
+      [{ kind: 'notice', purpose: 'email-link', identifier: 'jane@acme.com' }, 'notice:email-link'],
       [{ kind: 'new-password', reason: 'forgot' }, 'new-password:forgot'],
       [{ kind: 'sign-up' }, 'sign-up'],
     ];
