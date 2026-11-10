@@ -5,9 +5,7 @@ import type { VerificationCodeResend } from '../../../blocks/verification';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
-import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
-import { styles } from '../sign-in.styles';
 
 interface SignInEmailLinkProps {
   identifier: string;
@@ -26,19 +24,8 @@ export function SignInEmailLink({ identifier, globalErrorMessage, resend, onCanc
       <Card.Header>
         <Card.Title>{m.emailLink.title}</Card.Title>
         <Card.Description>{fill(m.emailLink.description, { identifier })}</Card.Description>
-      </Card.Header>
-      <Card.Banner
-        role='alert'
-        color='negative'
-      >
-        {globalErrorMessage}
-      </Card.Banner>
-      {resend ? (
-        <Card.Content>
-          <Text
-            size='xs'
-            xstyle={styles.footerText}
-          >
+        {resend ? (
+          <Card.Description>
             {resend.text}{' '}
             <Button
               ref={ref}
@@ -51,9 +38,15 @@ export function SignInEmailLink({ identifier, globalErrorMessage, resend, onCanc
             >
               {resend.label}
             </Button>
-          </Text>
-        </Card.Content>
-      ) : null}
+          </Card.Description>
+        ) : null}
+      </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       {onCancel ? (
         <Card.Footer>
           <Button
