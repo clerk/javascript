@@ -1,18 +1,15 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { FormEvent, Ref } from 'react';
-import { useId, useState } from 'react';
+import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
-import { Icon } from '../../../components/icon';
 import { Input } from '../../../components/input';
-import { InputGroup } from '../../../components/input-group';
+import { PasswordInput } from '../../../components/password-input';
 import { Text } from '../../../components/text';
-import { Eye } from '../../../icons/glyphs/eye';
-import { EyeSlash } from '../../../icons/glyphs/eye-slash';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
@@ -39,7 +36,6 @@ export function SignUpDetailsStep({
 }: SignUpDetailsProps) {
   const m = useMessages('signIn');
   const formId = useId();
-  const [visible, setVisible] = useState(false);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -125,25 +121,15 @@ export function SignUpDetailsStep({
               focusableWhenDisabled
             >
               <Field.Label>{m.signUp.passwordLabel}</Field.Label>
-              <InputGroup.Root>
-                <InputGroup.Input
-                  name='password'
-                  type={visible ? 'text' : 'password'}
-                  autoComplete='new-password'
-                  placeholder={m.signUp.passwordPlaceholder}
-                  value={values.password}
-                  onChange={event => onValueChange('password', event.target.value)}
-                />
-                <InputGroup.End>
-                  <Button
-                    type='button'
-                    aria-label={visible ? m.hidePassword : m.showPassword}
-                    onClick={() => setVisible(current => !current)}
-                  >
-                    <Icon glyph={visible ? EyeSlash : Eye} />
-                  </Button>
-                </InputGroup.End>
-              </InputGroup.Root>
+              <PasswordInput
+                name='password'
+                autoComplete='new-password'
+                placeholder={m.signUp.passwordPlaceholder}
+                value={values.password}
+                onChange={event => onValueChange('password', event.target.value)}
+                showPasswordLabel={m.showPassword}
+                hidePasswordLabel={m.hidePassword}
+              />
               <Field.Message>
                 <Field.Error>{errors.password}</Field.Error>
               </Field.Message>
