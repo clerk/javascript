@@ -72,14 +72,12 @@ export function UserProfileEditPasswordDialog({
           />
         ) : null}
         <ChangePassword
-          messages={{
-            newPasswordLabel: m.newPasswordLabel,
-            confirmPasswordLabel: m.confirmPasswordLabel,
-            signOutOfOtherSessionsLabel: m.signOutOfOtherSessionsLabel,
-            signOutOfOtherSessionsDescription: m.signOutOfOtherSessionsDescription,
-            showPasswordLabel: m.showPassword,
-            hidePasswordLabel: m.hidePassword,
-          }}
+          newPasswordLabel={m.newPasswordLabel}
+          confirmPasswordLabel={m.confirmPasswordLabel}
+          signOutOfOtherSessionsLabel={m.signOutOfOtherSessionsLabel}
+          signOutOfOtherSessionsDescription={m.signOutOfOtherSessionsDescription}
+          showPasswordLabel={m.showPassword}
+          hidePasswordLabel={m.hidePassword}
           identifier={identifier}
           newPassword={form.register('newPassword')}
           confirmPassword={form.register('confirmPassword')}

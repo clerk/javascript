@@ -30,15 +30,12 @@ export function Default() {
     <Card.Root>
       <Card.Content>
         <ChangePassword
-          messages={{
-            newPasswordLabel: 'New password',
-            confirmPasswordLabel: 'Confirm password',
-            signOutOfOtherSessionsLabel: 'Sign out of all other devices',
-            signOutOfOtherSessionsDescription:
-              'It is recommended to sign out of all other devices which may have used your old password.',
-            showPasswordLabel: 'Show password',
-            hidePasswordLabel: 'Hide password',
-          }}
+          newPasswordLabel='New password'
+          confirmPasswordLabel='Confirm password'
+          signOutOfOtherSessionsLabel='Sign out of all other devices'
+          signOutOfOtherSessionsDescription='It is recommended to sign out of all other devices which may have used your old password.'
+          showPasswordLabel='Show password'
+          hidePasswordLabel='Hide password'
           identifier='jane@acme.com'
           newPassword={form.register('newPassword')}
           confirmPassword={form.register('confirmPassword')}

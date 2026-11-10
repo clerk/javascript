@@ -16,17 +16,13 @@ interface PasswordControl {
   ref: (element: HTMLElement | null) => void;
 }
 
-export interface ChangePasswordMessages {
+interface ChangePasswordProps {
   newPasswordLabel: string;
   confirmPasswordLabel: string;
   signOutOfOtherSessionsLabel: string;
   signOutOfOtherSessionsDescription?: string;
   showPasswordLabel: string;
   hidePasswordLabel: string;
-}
-
-interface ChangePasswordProps {
-  messages: ChangePasswordMessages;
   identifier: string;
   newPassword: PasswordControl;
   confirmPassword: PasswordControl;
@@ -39,7 +35,12 @@ interface ChangePasswordProps {
 }
 
 export function ChangePassword({
-  messages,
+  newPasswordLabel,
+  confirmPasswordLabel,
+  signOutOfOtherSessionsLabel,
+  signOutOfOtherSessionsDescription,
+  showPasswordLabel,
+  hidePasswordLabel,
   identifier,
   newPassword,
   confirmPassword,
@@ -62,8 +63,9 @@ export function ChangePassword({
       <PasswordField
         control={newPassword}
         field={fields.newPassword}
-        label={messages.newPasswordLabel}
-        messages={messages}
+        label={newPasswordLabel}
+        showPasswordLabel={showPasswordLabel}
+        hidePasswordLabel={hidePasswordLabel}
         disabled={disabled}
         focusRef={focusRef}
         advisoryFeedback={passwordFeedback}
@@ -71,8 +73,9 @@ export function ChangePassword({
       <PasswordField
         control={confirmPassword}
         field={fields.confirmPassword}
-        label={messages.confirmPasswordLabel}
-        messages={messages}
+        label={confirmPasswordLabel}
+        showPasswordLabel={showPasswordLabel}
+        hidePasswordLabel={hidePasswordLabel}
         disabled={disabled}
       />
       <Field.Root
@@ -83,13 +86,13 @@ export function ChangePassword({
           checked={signOutOfOtherSessions}
           onChange={event => onSignOutOfOtherSessionsChange(event.target.checked)}
         />
-        {messages.signOutOfOtherSessionsDescription ? (
+        {signOutOfOtherSessionsDescription ? (
           <Field.Content>
-            <Field.Label>{messages.signOutOfOtherSessionsLabel}</Field.Label>
-            <Field.Description>{messages.signOutOfOtherSessionsDescription}</Field.Description>
+            <Field.Label>{signOutOfOtherSessionsLabel}</Field.Label>
+            <Field.Description>{signOutOfOtherSessionsDescription}</Field.Description>
           </Field.Content>
         ) : (
-          <Field.Label>{messages.signOutOfOtherSessionsLabel}</Field.Label>
+          <Field.Label>{signOutOfOtherSessionsLabel}</Field.Label>
         )}
       </Field.Root>
     </>
@@ -100,7 +103,8 @@ function PasswordField({
   control: { ref, ...control },
   field,
   label,
-  messages,
+  showPasswordLabel,
+  hidePasswordLabel,
   disabled,
   focusRef,
   advisoryFeedback,
@@ -108,7 +112,8 @@ function PasswordField({
   control: PasswordControl;
   field: FormField;
   label: string;
-  messages: ChangePasswordMessages;
+  showPasswordLabel: string;
+  hidePasswordLabel: string;
   disabled: boolean;
   focusRef?: Ref<HTMLElement>;
   advisoryFeedback?: FieldFeedback;
@@ -136,8 +141,8 @@ function PasswordField({
           setFocused(false);
           control.onBlur();
         }}
-        showPasswordLabel={messages.showPasswordLabel}
-        hidePasswordLabel={messages.hidePasswordLabel}
+        showPasswordLabel={showPasswordLabel}
+        hidePasswordLabel={hidePasswordLabel}
       />
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>
