@@ -69,6 +69,16 @@ export function Disabled(props: Record<string, unknown>) {
   );
 }
 
+export function ReadOnly(props: Record<string, unknown>) {
+  return (
+    <Input
+      {...knobsAsProps(props)}
+      readOnly
+      defaultValue='trc_2x7Hq9LmP4'
+    />
+  );
+}
+
 export function Invalid(props: Record<string, unknown>) {
   return (
     <Input

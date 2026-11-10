@@ -50,7 +50,7 @@ export function SignInPassword({
         <Card.Description>{m.password.description}</Card.Description>
         <SignInIdentityPreview
           identifier={identifier}
-          editLabel={m.password.editIdentifier}
+          editLabel={m.editIdentifier}
           disabled={isPending}
           onEdit={onEditIdentifier}
         />

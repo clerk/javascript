@@ -14,7 +14,6 @@ export const signInMessages = {
   password: {
     title: 'Enter your password',
     description: 'Enter the password associated with your account',
-    editIdentifier: 'Edit email address',
     label: 'Password',
     placeholder: 'Enter your password',
     forgotPassword: 'Forgot password?',
@@ -24,6 +23,34 @@ export const signInMessages = {
     description: 'We’ll send a one-time code to {identifier}',
     pending: 'Sending code',
     back: 'Back to sign in',
+  },
+  noAvailableMethods: {
+    title: 'Cannot sign in',
+    description: 'Cannot proceed with sign in. There’s no available authentication factor.',
+  },
+  actionBlocked: {
+    title: 'We couldn’t complete this request',
+    description: 'For your security, this request could not be completed.',
+    traceIdLabel: 'Reference',
+    copyTraceId: 'Copy reference',
+    traceIdCopied: 'Copied',
+  },
+  passwordCompromised: {
+    title: 'Password compromised',
+    message: 'This password has been found as part of a breach and can not be used, please reset your password.',
+    resetPassword: 'Reset your password',
+    pending: 'Resetting password',
+  },
+  emailLink: {
+    title: 'Check your email',
+    description: 'Use the verification link sent to your email',
+    resendText: 'Didn’t receive a link?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  passkey: {
+    title: 'Use your passkey',
+    description: 'Using your passkey confirms it’s you. Your device may ask for your fingerprint, face or screen lock.',
   },
   resetMethods: {
     title: 'Forgot password?',
@@ -123,6 +150,7 @@ export const signInMessages = {
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
   },
+  editIdentifier: 'Edit email address',
   continue: 'Continue',
   verifying: 'Verifying',
   back: 'Back',

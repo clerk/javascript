@@ -78,10 +78,11 @@ const newPasswordFields: FieldsConfig<SignInValues> = {
 function stepFor(factor: SignInFactor, identifier: string): SignInStep {
   switch (factor.strategy) {
     case 'password':
+      return { kind: 'credential', credential: 'password', identifier };
     case 'passkey':
-      return { kind: 'secret', secret: 'password', identifier };
+      return { kind: 'credential', credential: 'passkey', identifier };
     case 'backup_code':
-      return { kind: 'secret', secret: 'backup-code', identifier };
+      return { kind: 'credential', credential: 'backup-code', identifier };
     case 'totp':
       return { kind: 'code', purpose: 'second-factor', channel: 'totp' };
     case 'email_code':
@@ -101,7 +102,7 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
 }
 
 function offersResend(step: SignInStep): boolean {
-  return step.kind === 'code' && step.channel !== 'totp';
+  return (step.kind === 'code' && step.channel !== 'totp') || (step.kind === 'notice' && step.purpose === 'email-link');
 }
 
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
@@ -118,7 +119,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const [canResend, setCanResend] = useState(true);
   const [supportRequested, setSupportRequested] = useState(false);
   const [stage, setStage] = useState<'first' | 'second'>('first');
-  const pickerReturnRef = useRef<SignInStep>({ kind: 'secret', secret: 'password', identifier: '' });
+  const pickerReturnRef = useRef<SignInStep>({ kind: 'credential', credential: 'password', identifier: '' });
   const form = useForm<SignInValues>({
     initialValues: emptyValues,
     fields: newPasswordFields,
@@ -169,7 +170,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       }
       setStage('first');
       setFactorId('password');
-      navigate({ kind: 'secret', secret: 'password', identifier }, 1);
+      navigate({ kind: 'credential', credential: 'password', identifier }, 1);
     });
 
   const submitPassword = () =>
@@ -183,7 +184,8 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       }
       if (values.password.toLowerCase() === 'locked') {
-        setGlobalErrorMessage('Too many failed attempts. Try again later, or use another method.');
+        navigate({ kind: 'identifier' }, -1);
+        setGlobalErrorMessage('Your account is locked. You will be able to try again in 30 minutes.');
         return;
       }
       startSecondFactor();
@@ -263,8 +265,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       case 'identifier':
         void submitStart();
         return;
-      case 'secret':
-        void (step.secret === 'password' ? submitPassword() : submitBackupCode());
+      case 'credential':
+        if (step.credential === 'passkey') {
+          void run(() => startSecondFactor());
+          return;
+        }
+        void (step.credential === 'password' ? submitPassword() : submitBackupCode());
         return;
       case 'code':
         void submitCode(values.code);
@@ -318,11 +324,11 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
 
   const onBack = () => {
     if (step.kind === 'notice' && step.purpose === 'forgot-password') {
-      navigate({ kind: 'secret', secret: 'password', identifier: step.identifier }, -1);
+      navigate({ kind: 'credential', credential: 'password', identifier: step.identifier }, -1);
       return;
     }
     if (step.kind === 'new-password' || (step.kind === 'code' && step.purpose === 'reset-password')) {
-      navigate({ kind: 'secret', secret: 'password', identifier }, -1);
+      navigate({ kind: 'credential', credential: 'password', identifier }, -1);
       return;
     }
     if (step.kind === 'notice') {
@@ -453,6 +459,7 @@ function StepPanel({
   isPending = false,
   pendingProviderId,
   providers = socialProviders,
+  identifier,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -461,12 +468,14 @@ function StepPanel({
   isPending?: boolean;
   pendingProviderId?: string;
   providers?: SignInSocialProvider[];
+  identifier?: string;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
     initialValues: {
       ...emptyValues,
-      identifier: step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER,
+      identifier:
+        identifier ?? (step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER),
       password: attempted,
       backupCode: attempted,
     },
@@ -503,7 +512,7 @@ function StepPanel({
   );
 }
 
-const passwordStep: SignInStep = { kind: 'secret', secret: 'password', identifier: IDENTIFIER };
+const passwordStep: SignInStep = { kind: 'credential', credential: 'password', identifier: IDENTIFIER };
 
 export function IdentifierDefault() {
   return <StepPanel step={{ kind: 'identifier' }} />;
@@ -549,6 +558,17 @@ export function IdentifierError() {
   );
 }
 
+export function IdentifierLocked() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier' }}
+      combined={false}
+      identifier={IDENTIFIER}
+      globalErrorMessage='Your account is locked. You will be able to try again in 30 minutes. For more information, please contact support.'
+    />
+  );
+}
+
 export function IdentifierBannerError() {
   return (
     <StepPanel
@@ -558,11 +578,11 @@ export function IdentifierBannerError() {
   );
 }
 
-export function SecretPassword() {
+export function CredentialPassword() {
   return <StepPanel step={passwordStep} />;
 }
 
-export function SecretPasswordPending() {
+export function CredentialPasswordPending() {
   return (
     <StepPanel
       step={passwordStep}
@@ -571,7 +591,7 @@ export function SecretPasswordPending() {
   );
 }
 
-export function SecretPasswordError() {
+export function CredentialPasswordError() {
   return (
     <StepPanel
       step={passwordStep}
@@ -580,8 +600,8 @@ export function SecretPasswordError() {
   );
 }
 
-export function SecretBackupCode() {
-  return <StepPanel step={{ kind: 'secret', secret: 'backup-code', identifier: IDENTIFIER }} />;
+export function CredentialBackupCode() {
+  return <StepPanel step={{ kind: 'credential', credential: 'backup-code', identifier: IDENTIFIER }} />;
 }
 
 export function CodeEmail() {
@@ -631,6 +651,43 @@ export function NoticeForgotPasswordPending() {
       isPending
     />
   );
+}
+
+export function NoticeNoMethods() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'no-methods' }} />;
+}
+
+export function NoticeActionBlocked() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'notice',
+        purpose: 'action-blocked',
+        details: { linkUrl: 'https://acme.com/support', linkText: 'Contact support', traceId: 'trc_2x7Hq9LmP4' },
+      }}
+    />
+  );
+}
+
+export function NoticePasswordCompromised() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'password-compromised' }} />;
+}
+
+export function NoticePasswordCompromisedPending() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'password-compromised' }}
+      isPending
+    />
+  );
+}
+
+export function NoticeEmailLinkSent() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER }} />;
+}
+
+export function CredentialPasskey() {
+  return <StepPanel step={{ kind: 'credential', credential: 'passkey', identifier: IDENTIFIER }} />;
 }
 
 export function NewPasswordReset() {

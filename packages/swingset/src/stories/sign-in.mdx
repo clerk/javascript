@@ -2,7 +2,7 @@ import * as Stories from './sign-in.stories';
 
 # SignIn
 
-The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error under the field. Enter `locked` as the password to render one in the banner.
+The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error under the field. Enter `locked` as the password to return to the start with the lockout in the banner.
 
 ## Example
 
@@ -76,6 +76,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='IdentifierBannerError' storyModule={Stories} />
 
+#### Locked
+
+<Story name='IdentifierLocked' storyModule={Stories} />
+
 #### Phone
 
 <Story name='IdentifierPhone' storyModule={Stories} />
@@ -108,25 +112,29 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='IdentifierWaitlist' storyModule={Stories} />
 
-### Secret step
+### Credential step
 
-`secret-step.tsx` draws `{ kind: 'secret' }`: the password (with identity preview and forgot password) or a backup code (`VerificationBackupCode`).
+`credential-step.tsx` draws `{ kind: 'credential' }`: the password (with identity preview and forgot password), a passkey prompt (with identity preview) or a backup code (`VerificationBackupCode`).
 
 #### Password
 
-<Story name='SecretPassword' storyModule={Stories} />
+<Story name='CredentialPassword' storyModule={Stories} />
 
 #### Password pending
 
-<Story name='SecretPasswordPending' storyModule={Stories} />
+<Story name='CredentialPasswordPending' storyModule={Stories} />
 
 #### Password error
 
-<Story name='SecretPasswordError' storyModule={Stories} />
+<Story name='CredentialPasswordError' storyModule={Stories} />
 
 #### Backup code
 
-<Story name='SecretBackupCode' storyModule={Stories} />
+<Story name='CredentialBackupCode' storyModule={Stories} />
+
+#### Passkey
+
+<Story name='CredentialPasskey' storyModule={Stories} />
 
 ### Code step
 
@@ -210,7 +218,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Notice step
 
-`notice-step.tsx` draws `{ kind: 'notice' }`: help (`VerificationHelp`) and forgot password.
+`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password and a sent email link.
 
 #### Help
 
@@ -224,10 +232,6 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticeForgotPasswordPending' storyModule={Stories} />
 
-#### Account locked
-
-<Story name='NoticeLocked' storyModule={Stories} />
-
 #### No available methods
 
 <Story name='NoticeNoMethods' storyModule={Stories} />
@@ -240,13 +244,49 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticePasswordCompromised' storyModule={Stories} />
 
+#### Password compromised pending
+
+<Story name='NoticePasswordCompromisedPending' storyModule={Stories} />
+
 #### Email link sent
 
 <Story name='NoticeEmailLinkSent' storyModule={Stories} />
 
-#### Passkey
+#### Signed in on other tab
 
-<Story name='NoticePasskey' storyModule={Stories} />
+<Story name='NoticeEmailLinkSignedInOtherTab' storyModule={Stories} />
+
+#### Email verified
+
+<Story name='NoticeEmailLinkVerified' storyModule={Stories} />
+
+#### Signing in from email link
+
+<Story name='NoticeEmailLinkSigningIn' storyModule={Stories} />
+
+#### Signed in from email link
+
+<Story name='NoticeEmailLinkSignedIn' storyModule={Stories} />
+
+#### Email link expired
+
+<Story name='NoticeEmailLinkExpired' storyModule={Stories} />
+
+#### Email link invalid
+
+<Story name='NoticeEmailLinkInvalid' storyModule={Stories} />
+
+#### Email link for another device
+
+<Story name='NoticeEmailLinkClientMismatch' storyModule={Stories} />
+
+#### Close this tab
+
+<Story name='NoticeEmailLinkCloseTab' storyModule={Stories} />
+
+#### Start over
+
+<Story name='NoticeStartOver' storyModule={Stories} />
 
 ### New password step
 

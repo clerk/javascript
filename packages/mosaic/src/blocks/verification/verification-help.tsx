@@ -24,7 +24,6 @@ export function VerificationHelp({ messages, onEmailSupport, onBack }: Verificat
       </Card.Header>
       <Card.Footer>
         <Button
-          ref={useFlowAutoFocus<HTMLButtonElement>()}
           type='button'
           variant='outline'
           color='neutral'
@@ -33,6 +32,7 @@ export function VerificationHelp({ messages, onEmailSupport, onBack }: Verificat
           {messages.backButton}
         </Button>
         <Button
+          ref={useFlowAutoFocus<HTMLButtonElement>()}
           type='button'
           onClick={onEmailSupport}
         >

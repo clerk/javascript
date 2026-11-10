@@ -1,4 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
+import { CopyButton } from '@clerk/mosaic/components/copy-button';
 import { Field } from '@clerk/mosaic/components/field';
 import { Icon } from '@clerk/mosaic/components/icon';
 import type { InputGroupRootProps } from '@clerk/mosaic/components/input-group';
@@ -116,6 +117,26 @@ export function Disabled(props: Record<string, unknown>) {
       <InputGroup.Root {...knobsAsProps(props)}>
         <InputGroup.Input defaultValue='austin' />
         <InputGroup.End>@acme.com</InputGroup.End>
+      </InputGroup.Root>
+    </Field.Root>
+  );
+}
+
+export function ReadOnly(props: Record<string, unknown>) {
+  return (
+    <Field.Root xstyle={styles.fieldWidth}>
+      <Field.Label>Reference</Field.Label>
+      <InputGroup.Root {...knobsAsProps(props)}>
+        <InputGroup.Input
+          value='trc_2x7Hq9LmP4'
+          readOnly
+        />
+        <InputGroup.End>
+          <CopyButton
+            value='trc_2x7Hq9LmP4'
+            label='Copy reference'
+          />
+        </InputGroup.End>
       </InputGroup.Root>
     </Field.Root>
   );

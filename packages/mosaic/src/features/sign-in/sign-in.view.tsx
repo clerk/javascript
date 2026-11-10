@@ -11,15 +11,15 @@ import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types'
 import { stepKey } from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CodeStep } from './steps/code-step';
+import { CredentialStep } from './steps/credential-step';
 import { IdentifierStep } from './steps/identifier-step';
 import { NewPasswordStep } from './steps/new-password-step';
 import { NoticeStep } from './steps/notice-step';
-import { SecretStep } from './steps/secret-step';
 import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
-type ResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
+type ResendCopy = Pick<Messages['emailCode'] | Messages['emailLink'], 'resendText' | 'resend' | 'resendCountdown'>;
 
 function factorLabel(factor: SignInFactor, m: Messages): string {
   switch (factor.strategy) {
@@ -183,9 +183,9 @@ export function SignInView({
               />
             </Flow.Step>
 
-            <Flow.Step ids={['secret:password', 'secret:backup-code']}>
-              {current.kind === 'secret' ? (
-                <SecretStep
+            <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
+              {current.kind === 'credential' ? (
+                <CredentialStep
                   focusRef={focusRef}
                   step={current}
                   messages={{
@@ -202,6 +202,7 @@ export function SignInView({
                   onEditIdentifier={onEditIdentifier}
                   onForgotPassword={onForgotPassword}
                   onCancel={onCancel}
+                  onShowHelp={onShowHelp}
                 />
               ) : null}
             </Flow.Step>
@@ -252,22 +253,29 @@ export function SignInView({
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['notice:help', 'notice:forgot-password']}>
+            <Flow.Step
+              ids={[
+                'notice:help',
+                'notice:forgot-password',
+                'notice:no-methods',
+                'notice:action-blocked',
+                'notice:password-compromised',
+                'notice:email-link',
+              ]}
+            >
               {current.kind === 'notice' ? (
                 <NoticeStep
                   focusRef={focusRef}
                   step={current}
-                  messages={{
-                    title: m.alternativeMethods.getHelp.title,
-                    description: m.alternativeMethods.getHelp.description,
-                    backButton: m.back,
-                    supportButton: m.alternativeMethods.getHelp.emailSupport,
-                  }}
                   globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
+                  resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}
                   onSubmit={() => onSubmit()}
                   onEmailSupport={onEmailSupport}
                   onBack={onBack}
+                  onEditIdentifier={onEditIdentifier}
+                  onForgotPassword={onForgotPassword}
+                  onCancel={onCancel}
                 />
               ) : null}
             </Flow.Step>
