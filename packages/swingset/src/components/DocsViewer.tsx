@@ -94,6 +94,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
     pagination: dynamic(() => import('../stories/pagination.mdx')),
+    'password-input': dynamic(() => import('../stories/password-input.mdx')),
     'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
     stepper: dynamic(() => import('../stories/stepper.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
