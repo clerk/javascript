@@ -23,6 +23,7 @@ export type SignInFactorOneCodeCard = Pick<
 > & {
   factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
+  isInitialFactor: boolean;
   onFactorPrepare: () => void;
 };
 
@@ -50,6 +51,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const normalizedVerificationChannel =
     signIn.firstFactorVerification.channel === 'sms' ? undefined : signIn.firstFactorVerification.channel;
   const hasPendingFactorVerification =
+    (props.factorAlreadyPrepared || props.isInitialFactor) &&
     signIn.firstFactorVerification.status === 'unverified' &&
     signIn.firstFactorVerification.strategy === props.factor.strategy &&
     normalizedFactorChannel === normalizedVerificationChannel;

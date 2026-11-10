@@ -1,11 +1,12 @@
 import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, mockWebAuthn, render, screen } from '@/test/utils';
 
+import { clearFetchCache } from '../../../hooks';
 import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
 import { SignInFactorOne } from '../SignInFactorOne';
 
@@ -1042,6 +1043,74 @@ describe('SignInFactorOne', () => {
       await screen.findByText(/code to \+/);
       await userEvent.click(screen.getByText(/code to \+/));
       await screen.findByText('Check your phone');
+    });
+
+    describe('switching between two phone numbers through another method', () => {
+      beforeEach(() => {
+        clearFetchCache();
+      });
+
+      const secondPhoneFactor = {
+        strategy: 'phone_code' as const,
+        phoneNumberId: 'idn_B',
+        safeIdentifier: '+15555550199',
+      };
+
+      const createTwoPhoneFixtures = async () => {
+        const result = await createFixtures(f => {
+          f.withPhoneNumber();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.withPassword();
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+        });
+        result.fixtures.signIn.supportedFirstFactors = [
+          ...(result.fixtures.signIn.supportedFirstFactors ?? []),
+          secondPhoneFactor,
+        ];
+        result.fixtures.signIn.prepareFirstFactor.mockImplementation(() => {
+          result.fixtures.signIn.firstFactorVerification.status = 'unverified';
+          result.fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+          result.fixtures.signIn.firstFactorVerification.channel = 'sms';
+          return Promise.resolve({} as SignInResource);
+        });
+        return result;
+      };
+
+      it('sends a code to the second phone number after a code was sent to the first', async () => {
+        const { wrapper, fixtures } = await createTwoPhoneFixtures();
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1));
+
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(await screen.findByText('Use another method'));
+        await userEvent.click(screen.getByText('Send SMS code to +1 (555) 555-0199'));
+        await screen.findByText('Check your phone');
+
+        expect(fixtures.signIn.prepareFirstFactor).toHaveBeenLastCalledWith(
+          expect.objectContaining({ phoneNumberId: 'idn_B' }),
+        );
+      });
+
+      it('does not resend on mount when a code is pending, but sends one after switching to the second phone number', async () => {
+        const { wrapper, fixtures } = await createTwoPhoneFixtures();
+        fixtures.signIn.firstFactorVerification.status = 'unverified';
+        fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+        fixtures.signIn.firstFactorVerification.channel = 'sms';
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await screen.findByText('Check your phone');
+        expect(fixtures.signIn.prepareFirstFactor).not.toHaveBeenCalled();
+
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(await screen.findByText('Use another method'));
+        await userEvent.click(screen.getByText('Send SMS code to +1 (555) 555-0199'));
+        await screen.findByText('Check your phone');
+
+        expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledWith(
+          expect.objectContaining({ phoneNumberId: 'idn_B' }),
+        );
+      });
     });
 
     describe('Get Help', () => {
