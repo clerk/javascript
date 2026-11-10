@@ -19,7 +19,6 @@ import { SignUpDetailsStep } from './steps/sign-up-details';
 type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
 
-// TODO: Move factorLabel, choiceCopy and codeCopy to sign-in.utils.ts and test them there.
 function factorLabel(factor: SignInFactor, m: Messages): string {
   switch (factor.strategy) {
     case 'password':
