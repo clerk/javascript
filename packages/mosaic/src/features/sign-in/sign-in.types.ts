@@ -1,20 +1,26 @@
 import type { FlowDirection } from '../../components/flow';
-import type { ReverificationMethod, ReverificationOtpChannel } from '../reverification';
+
+export type SignInFactor =
+  | { id: string; stage: 'first'; strategy: 'password' }
+  | { id: string; stage: 'first' | 'second'; strategy: 'passkey' }
+  | { id: string; stage: 'first'; strategy: 'email_code'; emailAddressId: string; identifier: string }
+  | { id: string; stage: 'first' | 'second'; strategy: 'phone_code'; phoneNumberId: string; identifier: string }
+  | { id: string; stage: 'second'; strategy: 'totp' | 'backup_code' };
+
+type SignInCodeChannel = 'email' | 'phone' | 'totp';
 
 export type SignInStep =
-  | 'start'
-  | 'password'
-  | 'email-code'
-  | 'totp'
-  | 'backup-code'
-  | 'method-picker'
-  | 'help'
-  | 'sign-up'
-  | 'verify-email';
-
-export type SignInMethod = ReverificationMethod;
-
-export type SignInOtpChannel = ReverificationOtpChannel;
+  | { kind: 'identifier' }
+  | { kind: 'secret'; secret: 'password' | 'backup-code'; identifier: string }
+  | {
+      kind: 'code';
+      purpose: 'first-factor' | 'second-factor' | 'verify-email';
+      channel: SignInCodeChannel;
+      identifier?: string;
+    }
+  | { kind: 'choice'; purpose: 'methods'; options: readonly SignInFactor[] }
+  | { kind: 'notice'; purpose: 'help' }
+  | { kind: 'sign-up' };
 
 export interface SignInSocialProvider {
   id: string;
@@ -48,14 +54,12 @@ export interface SignInViewProps {
   isPending: boolean;
   onSubmit: () => void;
   onForgotPassword?: () => void;
-  onShowMethods: () => void;
+  onShowMethods?: () => void;
   onShowHelp: () => void;
   onBack: () => void;
   onEmailSupport: () => void;
-  methods: readonly SignInMethod[];
-  pendingMethodId?: string;
-  onSelectMethod: (id: string) => void;
-  otpChannel?: SignInOtpChannel;
+  pendingFactorId?: string;
+  onSelectFactor: (id: string) => void;
   onResend: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;

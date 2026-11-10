@@ -9,7 +9,7 @@ import { useFlowAutoFocus } from '../../components/flow';
 import { Input } from '../../components/input';
 import { Form } from '../../primitives/form';
 
-interface VerificationBackupCodeMessages {
+export interface VerificationBackupCodeMessages {
   title: string;
   description: string;
   fieldLabel: string;

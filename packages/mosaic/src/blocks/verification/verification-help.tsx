@@ -2,7 +2,7 @@ import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 
-interface VerificationHelpMessages {
+export interface VerificationHelpMessages {
   title: string;
   description: string;
   backButton: string;
