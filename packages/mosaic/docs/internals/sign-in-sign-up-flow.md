@@ -68,7 +68,9 @@ Sign-up:
 - `verify_email` (`target`, `sent`) → `verifyEmail`
 - `verify_phone` (`target`, `sent`) → `verifyPhone`
 
-`identifier` and `start` are what Mosaic shows before the resource exists; a sign-in with no status and a sign-up not yet created both return them. `sent` means a code or link is out, so a reload doesn't send another.
+`identifier` and `start` are what Mosaic shows before the resource exists; a sign-in with no status and a sign-up not yet created both return them. `sent` means a code or link is out, so a reload on the same `:factor` doesn't send another. Picking a different factor always sends, because `sent` can't tell two targets with the same strategy apart (see [Bridge](#bridge)).
+
+With no `:factor`, `factorOne` starts on the factor `ui`'s `determineStartingSignInFactor` picks (`ui/src/components/SignIn/utils.ts:76`). That rule moves to `shared` so both use one copy.
 
 ## Back, forward and reload
 
@@ -83,7 +85,7 @@ The controller calls these model callbacks on `start`, then `next(step)`.
 
 - Ticket (`__clerk_ticket`): `__clerk_status=sign_up` redeems it with `signUp.ticket({ unsafeMetadata })`; any other status with `signIn.ticket()`, as `ui/src/components/SignIn/SignInStart.tsx` does. A ticket works only once, so redeem it once: keep the "already started" flag in a component that doesn't remount, so a remount or StrictMode can't redeem it twice. A failed redemption shows its error on `start`.
 - Email-link return (`__clerk_status`): `verified` with a `__clerk_created_session` this client has activates that session (`clerk-js/src/core/clerk.ts:2620-2636`); any other `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
-- A step that is already `complete` on mount, such as a reload before the session was set active: `next(step)` finalizes it.
+- A step that is already `complete` or `transfer` on mount, such as a reload before it ran: `next(step)` runs it once, with the same guard as a ticket. The email-link return is handled first.
 
 ## Bridge
 
