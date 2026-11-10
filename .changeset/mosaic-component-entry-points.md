@@ -2,4 +2,4 @@
 '@clerk/mosaic': patch
 ---
 
-Export `Avatar`, `Badge`, `DataList` and `Entity` from `@clerk/mosaic/components/avatar`, `@clerk/mosaic/components/badge`, `@clerk/mosaic/components/data-list` and `@clerk/mosaic/components/entity`, the import paths Swingset documents. Style them with `@clerk/mosaic/styles.css`.
+Export `Avatar`, `Badge`, `Banner`, `Button`, `DataList`, `Entity`, `Icon` and `Text` from `@clerk/mosaic/components/<name>`, and the `External` glyph from `@clerk/mosaic/icons/glyphs/external`, the import paths Swingset documents. Style them with `@clerk/mosaic/styles.css`.

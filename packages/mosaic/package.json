@@ -41,6 +41,16 @@
       "import": "./dist/components/badge.js",
       "default": "./dist/components/badge.js"
     },
+    "./components/banner": {
+      "types": "./dist/components/banner.d.ts",
+      "import": "./dist/components/banner.js",
+      "default": "./dist/components/banner.js"
+    },
+    "./components/button": {
+      "types": "./dist/components/button.d.ts",
+      "import": "./dist/components/button.js",
+      "default": "./dist/components/button.js"
+    },
     "./components/data-list": {
       "types": "./dist/components/data-list.d.ts",
       "import": "./dist/components/data-list.js",
@@ -50,6 +60,21 @@
       "types": "./dist/components/entity.d.ts",
       "import": "./dist/components/entity.js",
       "default": "./dist/components/entity.js"
+    },
+    "./components/icon": {
+      "types": "./dist/components/icon.d.ts",
+      "import": "./dist/components/icon.js",
+      "default": "./dist/components/icon.js"
+    },
+    "./components/text": {
+      "types": "./dist/components/text.d.ts",
+      "import": "./dist/components/text.js",
+      "default": "./dist/components/text.js"
+    },
+    "./icons/glyphs/external": {
+      "types": "./dist/icons/glyphs/external.d.ts",
+      "import": "./dist/icons/glyphs/external.js",
+      "default": "./dist/icons/glyphs/external.js"
     },
     "./styles.css": {
       "types": "./styles.css.d.ts",
