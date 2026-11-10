@@ -406,11 +406,11 @@ export interface SignInFutureResource {
   /**
    * The [Device Trust](https://clerk.com/docs/guides/protect/device-trust) state of the device the user is signing in from.
    * <ul>
-   *  <li>`'new'` - The user hasn't signed in on this device before, or Clerk can't confirm that they have.</li>
+   *  <li>`'new'` - The user hasn't signed in on this device before, or Clerk can't confirm that they have. This is always the value while `status` is `'needs_client_trust'`.</li>
    *  <li>`'known'` - The user has signed in on this device before.</li>
    *  <li>`'pending'` - Clerk can't tell yet, for example because the sign-in has no identifier.</li>
    * </ul>
-   * `undefined` when Device Trust is off, or when the instance reports Device Trust through the `'needs_client_trust'` status instead.
+   * `undefined` when Device Trust is off. When the instance reports Device Trust through the `'needs_client_trust'` status, it's also `undefined` at every other status.
    */
   readonly clientTrustState?: ClientTrustState;
 

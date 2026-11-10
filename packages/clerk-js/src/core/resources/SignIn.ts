@@ -1005,8 +1005,8 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.secondFactorVerification;
   }
 
-  get clientTrustState() {
-    return this.#resource.clientTrustState;
+  get clientTrustState(): ClientTrustState | undefined {
+    return this.#resource.clientTrustState ?? (this.#resource.status === 'needs_client_trust' ? 'new' : undefined);
   }
 
   get protectCheck() {
