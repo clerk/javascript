@@ -10,6 +10,6 @@
 | `<UserButton combined={false} />`                                                                               | `<UserButton />` or `<Switcher mode='user' />` |
 | `<UserButton triggerVariant='condensed' />`                                                                     | `<Switcher triggerVariant='condensed' />`      |
 | Organization props on `UserButton` (`hidePersonal`, `afterSelectOrganizationUrl`, `createOrganizationUrl`, ...) | The same props on `Switcher`                   |
-| `UserButtonMenuProps`                                                                                           | `CombinedSwitcherProps`                        |
+| `UserButtonProps` (combined menu)                                                                               | `CombinedSwitcherProps`                        |
 
 Find usages with `git grep -n "UserButton"`.

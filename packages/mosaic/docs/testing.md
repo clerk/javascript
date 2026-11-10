@@ -64,7 +64,7 @@ it('makes the selected organization active and closes', async () => {
     client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: 'org_1' })]),
     memberships: [fapiMembership(acme), fapiMembership(other)],
   });
-  await renderWithClerk(<UserButton />);
+  await renderWithClerk(<Switcher />);
   const user = userEvent.setup();
 
   await user.click(screen.getByRole('button', { name: /Open account menu/ }));
