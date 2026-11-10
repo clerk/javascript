@@ -1,10 +1,4 @@
-export type ComponentGroup = 'Primitives' | 'Subcomponents' | 'Features';
-export const GROUP_LABELS: Record<ComponentGroup, string> = {
-  Features: 'All-in-one',
-  Subcomponents: 'Subcomponents',
-  Primitives: 'Primitives',
-};
-export const GROUP_ORDER: ComponentGroup[] = ['Features', 'Subcomponents', 'Primitives'];
+export type ComponentGroup = 'Features';
 export type ComponentMeta = {
   slug: string;
   title: string;
@@ -16,74 +10,9 @@ export type ComponentMeta = {
   snippet: string;
   modal?: boolean;
   frame?: boolean;
+  comingSoon?: boolean;
 };
 export const COMPONENT_META: ComponentMeta[] = [
-  {
-    slug: 'button',
-    title: 'Button',
-    group: 'Primitives',
-    tags: ['Actions', 'Forms'],
-    description: 'Filled, outline, ghost and link buttons in four sizes and three colors.',
-    thumbWidth: 420,
-    center: true,
-    snippet: `import { Button } from '@clerk/mosaic/components/button';
-
-<Button>Click me</Button>`,
-  },
-  {
-    slug: 'badge',
-    title: 'Badge',
-    group: 'Primitives',
-    tags: ['Display', 'Status'],
-    description: 'A compact status label in primary, neutral, warning, negative or positive.',
-    thumbWidth: 420,
-    center: true,
-    snippet: `import { Badge } from '@clerk/mosaic/components/badge';
-
-<Badge color='positive'>Active</Badge>`,
-  },
-  {
-    slug: 'banner',
-    title: 'Banner',
-    group: 'Primitives',
-    tags: ['Feedback', 'Status'],
-    description: 'An inline message with a label and description, colored by intent.',
-    thumbWidth: 520,
-    center: true,
-    snippet: `import { Banner } from '@clerk/mosaic/components/banner';
-
-<Banner.Root color='warning'>
-  <Banner.Label>Warning banner</Banner.Label>
-  <Banner.Description>Your payment could not be processed.</Banner.Description>
-</Banner.Root>`,
-  },
-  {
-    slug: 'avatar',
-    title: 'Avatar',
-    group: 'Primitives',
-    tags: ['Identity', 'Display'],
-    description: 'An image with a fallback for when the image is missing or still loading.',
-    thumbWidth: 320,
-    center: true,
-    snippet: `import { Avatar } from '@clerk/mosaic/components/avatar';
-
-<Avatar.Root>
-  <Avatar.Image src='/avatar.png' alt='@clerk' />
-  <Avatar.Fallback>CL</Avatar.Fallback>
-</Avatar.Root>`,
-  },
-  {
-    slug: 'switch',
-    title: 'Switch',
-    group: 'Primitives',
-    tags: ['Forms', 'Settings'],
-    description: 'A toggle for settings that take effect immediately.',
-    thumbWidth: 320,
-    center: true,
-    snippet: `import { Switch } from '@clerk/mosaic/components/switch';
-
-<Switch aria-label='Notifications' defaultChecked />`,
-  },
   {
     slug: 'user-button',
     title: '<UserButton />',
@@ -120,21 +49,65 @@ export const COMPONENT_META: ComponentMeta[] = [
     thumbWidth: 1100,
     center: false,
     modal: true,
+    comingSoon: true,
     snippet: `import { OrganizationProfileView } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 
 <OrganizationProfileView activePage={activePage} pages={pages} onPageChange={setActivePage} />`,
   },
   {
-    slug: 'api-keys-table',
-    title: '<APIKeysTable />',
-    group: 'Subcomponents',
-    tags: ['Authentication', 'Developers'],
-    description: 'List, create and revoke API keys for a user or an organization.',
-    thumbWidth: 900,
+    slug: 'organization-switcher',
+    title: '<OrganizationSwitcher />',
+    group: 'Features',
+    tags: ['Multi-tenancy', 'Navigation'],
+    description:
+      'The active organization and the menu behind it: switch organization, join one, create one, open its settings.',
+    thumbWidth: 520,
     center: true,
-    snippet: `import { APIKeysTableView } from '@clerk/mosaic/features/api-keys/api-keys-table.view';
+    frame: false,
+    snippet: `import { OrganizationSwitcher } from '@clerk/mosaic';
 
-<APIKeysTableView {...props} />`,
+<OrganizationSwitcher />`,
+  },
+  {
+    slug: 'organization-list',
+    title: '<OrganizationList />',
+    group: 'Features',
+    comingSoon: true,
+    tags: ['Multi-tenancy', 'Onboarding'],
+    description: 'Choose an organization to continue with, accept an invitation or suggestion, or create a new one.',
+    thumbWidth: 520,
+    center: true,
+    frame: false,
+    snippet: `import { OrganizationList } from '@clerk/mosaic/features/organization-list/organization-list';
+
+<OrganizationList />`,
+  },
+  {
+    slug: 'create-organization',
+    title: '<CreateOrganization />',
+    group: 'Features',
+    tags: ['Multi-tenancy', 'Onboarding'],
+    description: 'Name a new organization, choose its slug, and invite the first members.',
+    thumbWidth: 520,
+    center: true,
+    frame: false,
+    snippet: `import { CreateOrganization } from '@clerk/mosaic/features/create-organization/create-organization';
+
+<CreateOrganization />`,
+  },
+  {
+    slug: 'waitlist',
+    title: '<Waitlist />',
+    group: 'Features',
+    comingSoon: true,
+    tags: ['Authentication', 'Onboarding'],
+    description: "Collect an email address for the application's waitlist, then thank the user.",
+    thumbWidth: 520,
+    center: true,
+    frame: false,
+    snippet: `import { Waitlist } from '@clerk/mosaic/features/waitlist/waitlist';
+
+<Waitlist />`,
   },
 ];
 export const getComponentMeta = (slug: string) => COMPONENT_META.find(item => item.slug === slug);

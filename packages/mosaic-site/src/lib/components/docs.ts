@@ -10,7 +10,8 @@ export type DocBlock =
   | { type: 'code'; code: string }
   | { type: 'props'; rows: PropRow[] }
   | { type: 'table'; head: string[]; rows: string[][] }
-  | { type: 'example'; id: string; title?: string; caption?: string };
+  | { type: 'example'; id: string; title?: string; caption?: string }
+  | { type: 'prompt'; text: string };
 export type DocSection = {
   title: string;
   level?: 2 | 3;
@@ -18,490 +19,6 @@ export type DocSection = {
 };
 const colors = (...values: string[]) => values.map(value => `'${value}'`).join(' | ');
 export const DOCS: Record<string, DocSection[]> = {
-  button: [
-    {
-      title: 'Overview',
-      blocks: [
-        {
-          type: 'p',
-          text: '`Button` is the base interactive control. `color` picks the palette and `variant` decides how much of it to show, so the two are independent: every combination is the same two props.',
-        },
-        {
-          type: 'p',
-          text: '`SubmitButton` is a `Button` that defaults `type` to `submit` and adds a pending state. Use it for the button that commits a form, and plain `Button` everywhere else.',
-        },
-      ],
-    },
-    {
-      title: 'Usage',
-      blocks: [
-        {
-          type: 'code',
-          code: `import { Button } from '@clerk/mosaic/components/button';
-
-<Button color='primary' variant='filled' size='md'>
-  Click me
-</Button>`,
-        },
-      ],
-    },
-    {
-      title: 'Props',
-      blocks: [
-        {
-          type: 'props',
-          rows: [
-            {
-              name: 'color',
-              type: colors('primary', 'neutral', 'negative'),
-              default: "'primary'",
-              description: 'The palette.',
-            },
-            {
-              name: 'variant',
-              type: colors('filled', 'outline', 'ghost', 'link'),
-              default: "'filled'",
-              description: 'How much of the palette shows. `link` reads as text, not a control.',
-            },
-            { name: 'size', type: colors('xs', 'sm', 'md', 'lg'), default: "'md'", description: 'Sets the height.' },
-            {
-              name: 'shape',
-              type: colors('default', 'square', 'circle'),
-              default: "'default'",
-              description: 'Square and circle are for icon-only buttons.',
-            },
-            {
-              name: 'fullWidth',
-              type: 'boolean',
-              default: 'false',
-              description: 'Stretch to the width of the container.',
-            },
-            {
-              name: 'touchTarget',
-              type: 'boolean',
-              default: 'true',
-              description: 'Floor the hit area at 44px under a coarse pointer.',
-            },
-            { name: 'disabled', type: 'boolean', default: 'false' },
-            {
-              name: 'focusableWhenDisabled',
-              type: 'boolean',
-              default: 'false',
-              description: 'Keep a disabled button in the tab order.',
-            },
-          ],
-        },
-        {
-          type: 'p',
-          text: '`SubmitButton` takes every prop above, plus:',
-        },
-        {
-          type: 'props',
-          rows: [
-            {
-              name: 'isPending',
-              type: 'boolean',
-              default: 'false',
-              description: 'Fades the label and shows a spinner.',
-            },
-            {
-              name: 'spinDelay',
-              type: '{ delay?: number }',
-              default: '300ms',
-              description: 'How long to wait before the spinner draws. It stays up at least 200ms once it does.',
-            },
-            {
-              name: 'pendingLabel',
-              type: 'string',
-              default: "'pending'",
-              description: 'The accessible name of the spinner.',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Examples',
-      blocks: [],
-    },
-    {
-      title: 'Variants',
-      level: 3,
-      blocks: [{ type: 'example', id: 'variants' }],
-    },
-    {
-      title: 'Sizes',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: '`size` sets the height. Under a coarse pointer every size floors at 44px instead, because a fingertip is the same width whatever density the surrounding UI runs at. `link` opts out: it reads as text.',
-        },
-        { type: 'example', id: 'sizes' },
-      ],
-    },
-    {
-      title: 'Colors',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: 'Hover a cell, or tab through it, to see the states. `filled` shifts its fill and `link` underlines. `outline` and `ghost` share the same neutral hover fill, except under `negative`, where both tint by color.',
-        },
-        { type: 'example', id: 'colors' },
-      ],
-    },
-    {
-      title: 'Shapes',
-      level: 3,
-      blocks: [{ type: 'example', id: 'shapes' }],
-    },
-    {
-      title: 'Icons',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: 'An icon is a child, not a prop. Give it a `placement` and the button tightens the padding on that edge, so you can pass icons on either side, or both, with nothing to declare on the button itself.',
-        },
-        { type: 'example', id: 'icons' },
-        {
-          type: 'code',
-          code: `<Button>
-  <Icon glyph={Checkmark} placement='inline-start' />
-  Approve
-</Button>`,
-        },
-      ],
-    },
-    {
-      title: 'Disabled',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: 'A disabled button keeps its resting fill and dims, so which color and variant it is stays legible. Hover and press are suppressed by the styles, not by `pointer-events`, which keeps the button hit-testable so a wrapping tooltip can explain why it is disabled.',
-        },
-        { type: 'example', id: 'disabled' },
-        {
-          type: 'p',
-          text: 'Disabling a button that is currently focused drops focus to the body, which costs a screen reader user their place. `focusableWhenDisabled` keeps it in the tab order for the case where a button disables itself in response to being pressed:',
-        },
-        {
-          type: 'code',
-          code: `<Button type='submit' disabled={submitting} focusableWhenDisabled>
-  Save
-</Button>`,
-        },
-      ],
-    },
-    {
-      title: 'Submitting',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: 'Press the button to run a stand-in action. While `isPending`, the label fades to zero opacity and a spinner centers over it. The label stays mounted, so the button holds its width and nothing around it reflows.',
-        },
-        { type: 'example', id: 'submit' },
-        {
-          type: 'p',
-          text: 'The button goes inert the instant `isPending` flips, but the spinner waits 300ms before it draws. Plenty of actions resolve faster than a spinner takes to read, and one that appears and vanishes reads as a glitch. An action already known to be slow can skip the wait:',
-        },
-        {
-          type: 'code',
-          code: `<SubmitButton isPending={isSubmitting} spinDelay={{ delay: 0 }}>
-  Save changes
-</SubmitButton>`,
-        },
-      ],
-    },
-  ],
-  badge: [
-    {
-      title: 'Overview',
-      blocks: [
-        {
-          type: 'p',
-          text: '`Badge` is a compact status label. It takes a `color` and any content, including a leading icon.',
-        },
-      ],
-    },
-    {
-      title: 'Usage',
-      blocks: [
-        {
-          type: 'code',
-          code: `import { Badge } from '@clerk/mosaic/components/badge';
-
-<Badge color='positive'>Active</Badge>`,
-        },
-      ],
-    },
-    {
-      title: 'Props',
-      blocks: [
-        {
-          type: 'props',
-          rows: [
-            {
-              name: 'color',
-              type: colors('primary', 'neutral', 'warning', 'negative', 'positive'),
-              default: "'primary'",
-              description: 'The palette.',
-            },
-            { name: 'render', type: '(props) => ReactNode', description: 'Compose the badge onto another element.' },
-          ],
-        },
-      ],
-    },
-    { title: 'Examples', blocks: [] },
-    { title: 'Colors', level: 3, blocks: [{ type: 'example', id: 'colors' }] },
-    {
-      title: 'With an icon',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: 'Put an icon before the label. Give it `flexShrink: 0` so a long label never squeezes it.',
-        },
-        { type: 'example', id: 'icon' },
-      ],
-    },
-  ],
-  banner: [
-    {
-      title: 'Overview',
-      blocks: [
-        {
-          type: 'p',
-          text: '`Banner` is an inline message with a label and an optional description, colored by intent. `color` lives on `Banner.Root` only; `Banner.Label` and `Banner.Description` read it from context, so they never need it passed again.',
-        },
-      ],
-    },
-    {
-      title: 'Usage',
-      blocks: [
-        {
-          type: 'code',
-          code: `import { Banner } from '@clerk/mosaic/components/banner';
-
-<Banner.Root color='negative'>
-  <Banner.Label>Error banner</Banner.Label>
-  <Banner.Description>Renew now to avoid service interruption.</Banner.Description>
-</Banner.Root>`,
-        },
-      ],
-    },
-    {
-      title: 'Props',
-      blocks: [
-        {
-          type: 'props',
-          rows: [
-            {
-              name: 'color',
-              type: colors('neutral', 'warning', 'negative', 'positive'),
-              default: "'neutral'",
-              description: 'Set on `Banner.Root`. Chooses the surface and the icon.',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Parts',
-      blocks: [
-        {
-          type: 'table',
-          head: ['Part', 'Slot class', 'Description'],
-          rows: [
-            ['`Banner.Root`', '`.cl-banner-root`', 'Tinted surface. Owns `color` and renders the icon for it.'],
-            ['`Banner.Label`', '`.cl-banner-label`', 'The headline, in the foreground color at medium weight.'],
-            [
-              '`Banner.Description`',
-              '`.cl-banner-description`',
-              'Supporting text beneath the label, in the secondary color.',
-            ],
-          ],
-        },
-        {
-          type: 'p',
-          text: 'Every part accepts `render` for polymorphism and forwards its ref.',
-        },
-      ],
-    },
-    {
-      title: 'Styling',
-      blocks: [
-        {
-          type: 'p',
-          text: 'Each part carries its stable slot class and reflects the active color as `data-color`. Override a `.cl-banner-*` class from a CSS layer that wins over the Mosaic styles:',
-        },
-        {
-          type: 'code',
-          code: `@import '@clerk/mosaic/styles.css' layer(components);
-
-@layer overrides {
-  .cl-banner-root[data-color='negative'] {
-    border-radius: 0;
-  }
-}`,
-        },
-        {
-          type: 'p',
-          text: "Warning, negative and positive paint the color's `-subtle` surface inside its `-border` hairline and use the saturated token for the icon. Retheme one by overriding `--cl-color-negative-subtle`, `--cl-color-negative-border` and `--cl-color-negative`.",
-        },
-      ],
-    },
-    { title: 'Examples', blocks: [] },
-    { title: 'Colors', level: 3, blocks: [{ type: 'example', id: 'colors' }] },
-    {
-      title: 'Label only',
-      level: 3,
-      blocks: [
-        { type: 'p', text: 'The description is optional. A banner with just a label renders as a single line.' },
-        { type: 'example', id: 'labelOnly' },
-      ],
-    },
-  ],
-  avatar: [
-    {
-      title: 'Overview',
-      blocks: [
-        {
-          type: 'p',
-          text: '`Avatar` represents a user or entity as an image, falling back to a blank placeholder when the image is missing or fails to load. It is a compound component: `Avatar.Root` positions and sizes the box, `Avatar.Image` renders the picture once it loads, and `Avatar.Fallback` holds the space until then.',
-        },
-        {
-          type: 'p',
-          text: 'The fallback still takes children, such as initials, but never paints them, so an entity without a picture reads as an absent image rather than as two letters. They stay in the DOM in a hidden slot, out of the page, the accessibility tree and the tab order together.',
-        },
-      ],
-    },
-    {
-      title: 'Usage',
-      blocks: [
-        {
-          type: 'code',
-          code: `import { Avatar } from '@clerk/mosaic/components/avatar';
-
-<Avatar.Root>
-  <Avatar.Image src='https://github.com/clerk.png' alt='@clerk' />
-  <Avatar.Fallback>CL</Avatar.Fallback>
-</Avatar.Root>`,
-        },
-      ],
-    },
-    {
-      title: 'Props',
-      blocks: [
-        {
-          type: 'p',
-          text: '`bordered`, `shape` and `size` live on `Avatar.Root`. `bordered` draws a 1px inset outline so the avatar keeps an edge against a matching background.',
-        },
-        {
-          type: 'props',
-          rows: [
-            { name: 'size', type: colors('xs', 'sm', 'md', 'lg'), default: "'md'" },
-            { name: 'shape', type: colors('circle', 'square'), default: "'circle'" },
-            { name: 'bordered', type: 'boolean', default: 'true' },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Parts',
-      blocks: [
-        {
-          type: 'table',
-          head: ['Part', 'Slot class', 'Description'],
-          rows: [
-            ['`Avatar.Root`', '`.cl-avatar`', 'Owns `shape` and `size`, positioning, and polymorphic rendering.'],
-            ['`Avatar.Image`', '`.cl-avatar-image`', 'Renders an `img` once the source loads, and nothing until then.'],
-            [
-              '`Avatar.Fallback`',
-              '`.cl-avatar-fallback`',
-              'Shown while the image is pending or has failed. Carries `data-pending` while an image is resolving.',
-            ],
-            ['`Avatar.Icon`', '`.cl-avatar-icon`', 'An optional icon surface over the avatar corner.'],
-          ],
-        },
-      ],
-    },
-    { title: 'Examples', blocks: [] },
-    { title: 'Sizes', level: 3, blocks: [{ type: 'example', id: 'sizes' }] },
-    { title: 'Shapes', level: 3, blocks: [{ type: 'example', id: 'shapes' }] },
-    {
-      title: 'Pending',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: 'While an image is still resolving, the fallback carries `data-pending` and shimmers. Once the image fails, the shimmer stops and the fallback settles into a plain fill, because nothing is on its way for an entity that has no picture.',
-        },
-      ],
-    },
-  ],
-  switch: [
-    {
-      title: 'Overview',
-      blocks: [
-        {
-          type: 'p',
-          text: '`Switch` is a styled native `input type="checkbox" role="switch"` for a setting that is on or off. It forwards its ref and every input prop to the input, so it works controlled (`checked` and `onChange`) or uncontrolled (`defaultChecked`) exactly like the native element, and submits with a form like a checkbox.',
-        },
-      ],
-    },
-    {
-      title: 'Usage',
-      blocks: [
-        {
-          type: 'code',
-          code: `import { Switch } from '@clerk/mosaic/components/switch';
-
-<Switch
-  aria-label='Email notifications'
-  checked={enabled}
-  onChange={event => setEnabled(event.target.checked)}
-/>`,
-        },
-        {
-          type: 'p',
-          text: 'For a switch with a visible label or description, place it in a `Field` with `orientation="horizontal"`.',
-        },
-      ],
-    },
-    {
-      title: 'Props',
-      blocks: [
-        {
-          type: 'props',
-          rows: [
-            { name: 'size', type: colors('sm', 'md'), default: "'md'" },
-            { name: 'disabled', type: 'boolean', default: 'false' },
-            { name: 'checked', type: 'boolean', description: 'Controlled state.' },
-            { name: 'defaultChecked', type: 'boolean', description: 'Uncontrolled initial state.' },
-            { name: 'onChange', type: '(event) => void' },
-          ],
-        },
-      ],
-    },
-    { title: 'Examples', blocks: [] },
-    { title: 'States', level: 3, blocks: [{ type: 'example', id: 'states' }] },
-    { title: 'Sizes', level: 3, blocks: [{ type: 'example', id: 'sizes' }] },
-    {
-      title: 'With Field',
-      level: 3,
-      blocks: [
-        {
-          type: 'p',
-          text: 'A `Field` adds the label and description, and passes its `disabled` state down to the switch.',
-        },
-        { type: 'example', id: 'withField' },
-      ],
-    },
-  ],
   'user-profile': [
     {
       title: 'Overview',
@@ -519,6 +36,10 @@ export const DOCS: Record<string, DocSection[]> = {
     {
       title: 'Usage',
       blocks: [
+        {
+          type: 'prompt',
+          text: "Set up Clerk in this project if it is not already installed: add @clerk/nextjs or the Clerk SDK that matches the framework, wrap the app in the Clerk provider and configure the publishable key and secret key from the Clerk Dashboard. Then add the Mosaic UserProfileView from '@clerk/mosaic/features/user-profile/user-profile.view' to a page of the app, rendered with activePage, pages and onPageChange wired to local state and elevation set to 'flush'.",
+        },
         {
           type: 'code',
           code: `import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
@@ -657,6 +178,10 @@ export const DOCS: Record<string, DocSection[]> = {
       title: 'Usage',
       blocks: [
         {
+          type: 'prompt',
+          text: "Set up Clerk in this project if it is not already installed: add @clerk/nextjs or the Clerk SDK that matches the framework, wrap the app in the Clerk provider and configure the publishable key and secret key from the Clerk Dashboard. Then add the Mosaic OrganizationProfileView from '@clerk/mosaic/features/organization-profile/organization-profile.view' to a page of the app, rendered with activePage, pages and onPageChange wired to local state and elevation set to 'flush'.",
+        },
+        {
           type: 'code',
           code: `import { OrganizationProfileView } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 
@@ -755,21 +280,17 @@ export const DOCS: Record<string, DocSection[]> = {
       ],
     },
   ],
-  'api-keys-table': [
+  'organization-switcher': [
     {
       title: 'Overview',
       blocks: [
         {
           type: 'p',
-          text: 'A table of the API keys that belong to a user or an organization, with search, page navigation, creation, and revocation confirmed by typing the key name.',
+          text: "`OrganizationSwitcher` is the active organization's avatar and the menu behind it: switch organization or back to the personal account, join a suggested or invited organization, create one, invite members, and open the organization's settings.",
         },
         {
           type: 'p',
-          text: '`APIKeysTable` takes the `subject` whose keys it lists and reads them from Clerk. It offers creation and revocation only when the signed-in user may manage them. The user and organization profile API keys panels render it under their own title.',
-        },
-        {
-          type: 'p',
-          text: 'After a key is created, its secret is shown once. The secret dialog stays open on Escape and outside clicks until the secret has been copied, or a copy has failed.',
+          text: 'It reads the active session and organization from Clerk, so it takes no data. It renders nothing when nobody is signed in or the instance has organizations turned off.',
         },
       ],
     },
@@ -777,10 +298,14 @@ export const DOCS: Record<string, DocSection[]> = {
       title: 'Usage',
       blocks: [
         {
+          type: 'prompt',
+          text: "Set up Clerk in this project if it is not already installed: add @clerk/nextjs or the Clerk SDK that matches the framework, wrap the app in the Clerk provider and configure the publishable key and secret key from the Clerk Dashboard. Then add the Mosaic OrganizationSwitcher from '@clerk/mosaic' to the app header and render it as <OrganizationSwitcher />. Enable Organizations in the Clerk Dashboard first.",
+        },
+        {
           type: 'code',
-          code: `import { APIKeysTable } from '@clerk/mosaic/features/api-keys/api-keys-table';
+          code: `import { OrganizationSwitcher } from '@clerk/mosaic';
 
-<APIKeysTable subject={{ kind: 'organization' }} perPage={10} showDescription />`,
+<OrganizationSwitcher />`,
         },
       ],
     },
@@ -790,48 +315,216 @@ export const DOCS: Record<string, DocSection[]> = {
         {
           type: 'props',
           rows: [
-            { name: 'subject', type: "{ kind: 'user' | 'organization' }", description: 'Whose keys the table lists.' },
-            { name: 'perPage', type: 'number', default: '10', description: 'How many keys a page lists.' },
             {
-              name: 'showDescription',
+              name: 'hidePersonal',
               type: 'boolean',
               default: 'false',
-              description: 'Adds an optional Description field to the create dialog.',
+              description: 'Leaves the personal account out of the list, so only organizations can be picked.',
             },
-            { name: 'messages', type: 'APIKeysTableMessages', description: "Replaces any of the table's strings." },
+            {
+              name: 'organizationProfileUrl',
+              type: 'string',
+              description: 'Routes Manage organization to a page of your own.',
+            },
+            {
+              name: 'createOrganizationUrl',
+              type: 'string',
+              description: 'Routes Create organization to a page of your own.',
+            },
+            {
+              name: 'afterSelectOrganizationUrl',
+              type: 'string | ((organization) => string)',
+              description:
+                'Where switching organization lands. Takes a `:param` template, a plain path, or a function.',
+            },
+            {
+              name: 'afterSelectPersonalUrl',
+              type: 'string',
+              description: 'Where switching to the personal account lands.',
+            },
+            {
+              name: 'fallback',
+              type: 'ReactNode',
+              description: 'Rendered while Clerk is still answering.',
+            },
           ],
         },
       ],
     },
-    { title: 'Examples', blocks: [] },
+  ],
+  'organization-list': [
     {
-      title: 'Organization',
-      level: 3,
-      blocks: [
-        { type: 'p', text: 'An organization subject explains organization keys in its empty state.' },
-        { type: 'example', id: 'organization' },
-      ],
-    },
-    {
-      title: 'Description',
-      level: 3,
+      title: 'Overview',
       blocks: [
         {
           type: 'p',
-          text: '`showDescription` adds an optional Description field to the create dialog. The description is saved with the key.',
+          text: '`OrganizationList` is a card listing the accounts the signed-in user can continue as: their personal account, the organizations they belong to, and the organizations they are invited to or may request to join. Selecting one makes it active.',
         },
-        { type: 'example', id: 'description' },
+        {
+          type: 'p',
+          text: 'Where the user may create organizations, a button opens the create-organization flow in place of the list.',
+        },
       ],
     },
     {
-      title: 'Loading',
-      level: 3,
+      title: 'Usage',
+      blocks: [
+        {
+          type: 'prompt',
+          text: "Set up Clerk in this project if it is not already installed: add @clerk/nextjs or the Clerk SDK that matches the framework, wrap the app in the Clerk provider and configure the publishable key and secret key from the Clerk Dashboard. Then add the Mosaic OrganizationList from '@clerk/mosaic/features/organization-list/organization-list' to a page of the app and render it as <OrganizationList />. Enable Organizations in the Clerk Dashboard first.",
+        },
+        {
+          type: 'code',
+          code: `import { OrganizationList } from '@clerk/mosaic/features/organization-list/organization-list';
+
+<OrganizationList />`,
+        },
+      ],
+    },
+    {
+      title: 'Props',
+      blocks: [
+        {
+          type: 'props',
+          rows: [
+            {
+              name: 'hidePersonal',
+              type: 'boolean',
+              default: 'false',
+              description: 'Leaves the personal account out of the list.',
+            },
+            {
+              name: 'skipInvitationScreen',
+              type: 'boolean',
+              default: 'false',
+              description: 'Skips the invite step after creating an organization.',
+            },
+            {
+              name: 'afterCreateOrganizationUrl',
+              type: 'string',
+              description: 'Where a newly created organization lands.',
+            },
+            {
+              name: 'afterSelectOrganizationUrl',
+              type: 'string | ((organization) => string)',
+              description: 'Where selecting an organization lands.',
+            },
+            {
+              name: 'afterSelectPersonalUrl',
+              type: 'string',
+              description: 'Where selecting the personal account lands.',
+            },
+            {
+              name: 'fallback',
+              type: 'ReactNode',
+              description: 'Rendered while Clerk is still answering.',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  'create-organization': [
+    {
+      title: 'Overview',
       blocks: [
         {
           type: 'p',
-          text: '`APIKeysTableSkeleton` stands in for the table until its first page arrives. The search, the Create button and the column headers stay real, with the controls disabled, and only the rows are bones.',
+          text: '`CreateOrganization` is a form that creates an organization: a logo, a name and, where the instance uses them, a slug. The new organization becomes the active one.',
         },
-        { type: 'example', id: 'loading' },
+        {
+          type: 'p',
+          text: 'Unless `skipInvitationScreen` is set, or the organization can hold only one member, the next step invites members to it.',
+        },
+      ],
+    },
+    {
+      title: 'Usage',
+      blocks: [
+        {
+          type: 'prompt',
+          text: "Set up Clerk in this project if it is not already installed: add @clerk/nextjs or the Clerk SDK that matches the framework, wrap the app in the Clerk provider and configure the publishable key and secret key from the Clerk Dashboard. Then add the Mosaic CreateOrganization from '@clerk/mosaic/features/create-organization/create-organization' to a page of the app and render it as <CreateOrganization />. Enable Organizations in the Clerk Dashboard first.",
+        },
+        {
+          type: 'code',
+          code: `import { CreateOrganization } from '@clerk/mosaic/features/create-organization/create-organization';
+
+<CreateOrganization />`,
+        },
+      ],
+    },
+    {
+      title: 'Props',
+      blocks: [
+        {
+          type: 'props',
+          rows: [
+            {
+              name: 'skipInvitationScreen',
+              type: 'boolean',
+              default: 'false',
+              description: 'Skips the invite step after the organization is created.',
+            },
+            {
+              name: 'afterCreateOrganizationUrl',
+              type: 'string',
+              description: 'Where the new organization lands.',
+            },
+            {
+              name: 'fallback',
+              type: 'ReactNode',
+              description: 'Rendered while Clerk is still answering.',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  waitlist: [
+    {
+      title: 'Overview',
+      blocks: [
+        {
+          type: 'p',
+          text: "`Waitlist` is a card that collects an email address and adds it to the application's waitlist, then thanks the user. It reads the application from Clerk, so it takes no data.",
+        },
+        { type: 'p', text: 'An `email_address` query parameter fills in the field.' },
+      ],
+    },
+    {
+      title: 'Usage',
+      blocks: [
+        {
+          type: 'code',
+          code: `import { Waitlist } from '@clerk/mosaic/features/waitlist/waitlist';
+
+<Waitlist />`,
+        },
+      ],
+    },
+    {
+      title: 'Props',
+      blocks: [
+        {
+          type: 'props',
+          rows: [
+            {
+              name: 'afterJoinWaitlistUrl',
+              type: 'string',
+              description: 'Sends the user on two seconds after they join.',
+            },
+            {
+              name: 'signInUrl',
+              type: 'string',
+              description: "Where the Sign in link goes. Defaults to the application's sign-in URL.",
+            },
+            {
+              name: 'fallback',
+              type: 'ReactNode',
+              description: 'Rendered while Clerk is still answering.',
+            },
+          ],
+        },
       ],
     },
   ],
@@ -856,6 +549,10 @@ export const DOCS: Record<string, DocSection[]> = {
     {
       title: 'Usage',
       blocks: [
+        {
+          type: 'prompt',
+          text: "Set up Clerk in this project if it is not already installed: add @clerk/nextjs or the Clerk SDK that matches the framework, wrap the app in the Clerk provider and configure the publishable key and secret key from the Clerk Dashboard. Then add the Mosaic UserButton from '@clerk/mosaic' to the app header and render it as <UserButton />.",
+        },
         {
           type: 'code',
           code: `import { UserButton } from '@clerk/mosaic';

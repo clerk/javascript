@@ -5,12 +5,10 @@ import * as React from 'react';
 
 import { AppWireframe, Header, PageSkeleton, Rail, WIREFRAME_WIDTH } from '@/components/gallery/app-wireframe';
 import { DEMOS } from '@/components/gallery/demos';
-import { EdgeGrid } from '@/components/gallery/edge-grid';
 import { ScaledFrame } from '@/components/gallery/scaled-frame';
-import { Chip, LabShell, PanelLabel, SliderField, TextField } from '@/components/marketing/lab-ui';
 import { MosaicLoader } from '@/components/marketing/mosaic-loader';
-import { DEFAULT_FRAME, FRAME_SLIDERS, type FrameConfig } from '@/lib/components/frame';
-import { COMPONENT_META, getComponentMeta } from '@/lib/components/meta';
+import { type FrameConfig } from '@/lib/components/frame';
+import { getComponentMeta } from '@/lib/components/meta';
 import { cn } from '@/lib/utils';
 export function ToolbarIcon({ path, className }: { path: string; className?: string }) {
   return (
@@ -91,12 +89,28 @@ export function BrowserFrame({
           <div className='relative'>
             <MosaicLoader visible={!ready} />
             {embed ? (
-              <iframe
-                src={embed.src}
-                title={embed.title}
-                onLoad={() => setReady(true)}
-                className='aspect-[16/10] w-full border-0'
-              />
+              <ScaledFrame
+                width={WIREFRAME_WIDTH / config.zoom}
+                center={false}
+                interactive
+                className='aspect-[16/10] w-full'
+              >
+                <iframe
+                  ref={frame => {
+                    if (
+                      frame?.contentDocument?.readyState === 'complete' &&
+                      frame.contentDocument.body?.childElementCount
+                    ) {
+                      setReady(true);
+                    }
+                  }}
+                  src={embed.src}
+                  title={embed.title}
+                  onLoad={() => setReady(true)}
+                  className='border-0'
+                  style={{ width: WIREFRAME_WIDTH / config.zoom, height: (WIREFRAME_WIDTH / config.zoom) * 0.625 }}
+                />
+              </ScaledFrame>
             ) : (
               <ScaledFrame
                 width={
@@ -108,7 +122,7 @@ export function BrowserFrame({
               >
                 {config.mode === 'fullscreen' && meta.modal ? (
                   <div
-                    className='overflow-y-auto bg-[var(--cl-color-page,#fff)] [scrollbar-width:thin]'
+                    className='overflow-y-auto bg-[var(--cl-color-page,#fff)] [scrollbar-gutter:stable] [scrollbar-width:thin]'
                     style={{ width: WIREFRAME_WIDTH / config.zoom, height: (WIREFRAME_WIDTH / config.zoom) * 0.625 }}
                   >
                     {closed ? (
@@ -161,106 +175,5 @@ export function BrowserFrame({
         </div>
       </div>
     </MosaicProvider>
-  );
-}
-export function BrowserFrameTool() {
-  const [config, setConfig] = React.useState<FrameConfig>(DEFAULT_FRAME);
-  const [copied, setCopied] = React.useState(false);
-  const patch = <K extends keyof FrameConfig>(key: K, value: FrameConfig[K]) =>
-    setConfig(current => ({ ...current, [key]: value }));
-  const copy = () => {
-    void navigator.clipboard.writeText(JSON.stringify(config, null, 2)).then(() => {
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    });
-  };
-  return (
-    <LabShell
-      title='Browser frame'
-      stage={
-        <div className='relative isolate flex min-h-0 flex-1 items-center justify-center overflow-hidden px-4 pb-6'>
-          <EdgeGrid className='absolute inset-0 -z-10' />
-          <BrowserFrame
-            config={config}
-            interactive
-            className='w-[min(100%,calc((100svh-11rem)*1.6))]'
-          />
-        </div>
-      }
-      panel={
-        <>
-          <p className='text-sm leading-5 text-neutral-600 dark:text-neutral-400'>
-            A minimal browser window around a component: a light bezel, a plain toolbar and a text address.
-          </p>
-          <div className='flex flex-col gap-3'>
-            <PanelLabel>Component</PanelLabel>
-            <select
-              aria-label='Component'
-              value={config.slug}
-              onChange={event => patch('slug', event.target.value)}
-              className='border-foreground/15 text-foreground bg-background rounded-lg border px-3 py-2 text-sm outline-none'
-            >
-              {COMPONENT_META.map(meta => (
-                <option
-                  key={meta.slug}
-                  value={meta.slug}
-                >
-                  {meta.title}
-                </option>
-              ))}
-            </select>
-          </div>
-          <TextField
-            label='Address'
-            value={config.url}
-            onChange={value => patch('url', value)}
-          />
-          {FRAME_SLIDERS.map(slider => (
-            <SliderField
-              key={slider.key}
-              label={slider.label}
-              min={slider.min}
-              max={slider.max}
-              step={slider.step}
-              value={config[slider.key]}
-              onChange={value => patch(slider.key, value)}
-            />
-          ))}
-          <div className='flex flex-col gap-3'>
-            <PanelLabel>Mode</PanelLabel>
-            <div className='flex gap-2'>
-              <Chip
-                active={config.mode === 'flush'}
-                onClick={() => patch('mode', 'flush')}
-              >
-                Flush
-              </Chip>
-              <Chip
-                active={config.mode === 'modal'}
-                onClick={() => patch('mode', 'modal')}
-              >
-                Modal
-              </Chip>
-            </div>
-          </div>
-          <div className='mt-auto flex gap-2'>
-            <button
-              type='button'
-              onClick={copy}
-              className='bg-foreground text-background flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-transform hover:scale-[1.02]'
-            >
-              {copied ? 'Copied' : 'Copy settings'}
-            </button>
-            <button
-              type='button'
-              onClick={() => setConfig(DEFAULT_FRAME)}
-              className='border-foreground/15 hover:border-foreground/40 rounded-lg border px-4 py-2.5 text-sm text-neutral-600 dark:text-neutral-300'
-            >
-              Reset
-            </button>
-          </div>
-        </>
-      }
-    />
   );
 }

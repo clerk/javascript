@@ -67,9 +67,9 @@ export function PropertiesMenu({
         aria-expanded={mounted}
         onClick={() => (mounted ? close() : open())}
         className={cn(
-          'hover:bg-foreground/[0.07] flex h-9 items-center gap-2 rounded-full text-sm transition-colors',
+          'dark:hover:bg-gray-850 flex h-9 items-center gap-2 rounded-full text-sm font-medium transition-colors hover:bg-gray-100',
           embedded ? 'w-9 justify-center text-neutral-600 dark:text-neutral-400' : 'px-3.5',
-          embedded && mounted && 'bg-foreground/[0.1] text-foreground',
+          embedded && mounted && 'text-foreground dark:bg-gray-850 bg-gray-100',
         )}
       >
         <svg

@@ -6,11 +6,12 @@ import { Skeleton } from '@/components/gallery/app-wireframe';
 import { DEMOS } from '@/components/gallery/demos';
 import { ComponentDocs } from '@/components/gallery/docs';
 import { EdgeGrid } from '@/components/gallery/edge-grid';
+import { OptionPicker, RemixIcon, ThemeIcon } from '@/components/gallery/option-picker';
 import { PropertiesMenu, type Property } from '@/components/gallery/properties-menu';
-import { RemixStyles, useApplyRemix } from '@/components/gallery/remix';
-import { RemixPicker } from '@/components/gallery/remix-picker';
+import { useApplyRemix } from '@/components/gallery/remix';
 import { useEmbedScrollReceiver } from '@/components/gallery/scroll-bridge';
 import { SegmentedControl } from '@/components/gallery/segmented-control';
+import { ThemeStyles, useApplyTheme } from '@/components/gallery/theme';
 import {
   BUTTON_CONFIG_MESSAGE,
   userButtonProperties,
@@ -19,11 +20,13 @@ import {
   type UserButtonType,
 } from '@/components/gallery/user-button-stage';
 import { ViewSwitcher } from '@/components/gallery/view-switcher';
+import { XrayLegend, XrayOverlay } from '@/components/gallery/xray';
 import { BrowserFrame } from '@/components/marketing/browser-frame';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { DEFAULT_FRAME, frameUrlFor } from '@/lib/components/frame';
 import { COMPONENT_META } from '@/lib/components/meta';
-import { REMIX_MESSAGE, type RemixId } from '@/lib/components/remix';
+import { REMIX_MESSAGE, REMIXES_BY_SLUG, type RemixId } from '@/lib/components/remix';
+import { THEME_MESSAGE, type ThemeId, THEMES } from '@/lib/components/theme';
 import { cn } from '@/lib/utils';
 const viewports = [
   {
@@ -63,12 +66,10 @@ function Fade({ active, className, children }: { active: boolean; className?: st
   );
 }
 function Stage({
-  compact = false,
   fill = false,
   tall = false,
   children,
 }: {
-  compact?: boolean;
   fill?: boolean;
   tall?: boolean;
   children: React.ReactNode;
@@ -80,11 +81,7 @@ function Stage({
         'relative flex w-full flex-col items-center overflow-hidden transition-[min-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
         tall ? 'justify-start' : 'justify-center',
         fill ? 'px-0 py-0' : tall ? 'px-4 pb-6 pt-2 md:px-8' : 'px-4 py-12 md:px-8',
-        tall
-          ? 'min-h-[min(calc(100svh-3.5rem+4rem),896px)]'
-          : compact
-            ? 'min-h-[420px]'
-            : 'min-h-[calc(100svh-3.5rem)]',
+        tall ? 'min-h-[min(calc(100svh+4rem),896px)]' : 'min-h-svh',
       )}
     >
       <EdgeGrid className='absolute inset-0' />
@@ -285,10 +282,11 @@ function PhoneFrame({
               title={`${frame.label} on a phone`}
               onLoad={event => {
                 setLoaded(current => ({ ...current, [frame.url]: true }));
-                if (latest.current) {
-                  const target = event.currentTarget.contentWindow;
-                  [latest.current].flat().forEach(item => target?.postMessage(item, window.location.origin));
-                }
+                const target = event.currentTarget.contentWindow;
+                const send = () =>
+                  [latest.current].flat().forEach(item => item && target?.postMessage(item, window.location.origin));
+                send();
+                [300, 1000, 2500].forEach(delay => window.setTimeout(send, delay));
               }}
               className={cn(
                 'absolute inset-x-0 top-14 h-[calc(100%-3.5rem)] w-full border-0 transition-opacity duration-300 motion-reduce:transition-none',
@@ -304,7 +302,15 @@ function PhoneFrame({
     </div>
   );
 }
-function PageTitle({ title, description, tags }: { title: string; description: string; tags: string[] }) {
+function PageTitle({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children?: React.ReactNode;
+}) {
   return (
     <div className='flex w-full max-w-[780px] flex-col items-center gap-3 px-4 pb-10 pt-14 text-center md:px-0'>
       <h1
@@ -314,16 +320,7 @@ function PageTitle({ title, description, tags }: { title: string; description: s
         {title}
       </h1>
       <p className='text-[19px] leading-8 text-neutral-600 dark:text-neutral-400'>{description}</p>
-      <ul className='mt-1 flex flex-wrap justify-center gap-2'>
-        {tags.map(tag => (
-          <li
-            key={tag}
-            className='border-foreground/10 bg-foreground/[0.03] rounded-full border px-3 py-1 text-[13px] text-neutral-600 dark:text-neutral-400'
-          >
-            {tag}
-          </li>
-        ))}
-      </ul>
+      {children ? <div className='mt-2'>{children}</div> : null}
     </div>
   );
 }
@@ -333,7 +330,7 @@ const VIEW_OPTIONS = [
   { id: 'fullscreen' as const, label: 'full screen' },
 ];
 const pill =
-  'border-foreground/10 bg-background/80 flex items-center gap-1 rounded-full border p-1 shadow-lg backdrop-blur';
+  'flex items-center gap-1 rounded-full bg-white p-1 shadow-[0_0_0_1px_--theme(--color-gray-950/0.06),0_8px_24px_-8px_--theme(--color-gray-950/0.18)] dark:bg-gray-900 dark:shadow-[0_0_0_1px_--theme(--color-white/0.08),0_8px_24px_-8px_--theme(--color-black/0.6)]';
 export function ComponentDetail({ slug }: { slug: string }) {
   const index = COMPONENT_META.findIndex(item => item.slug === slug);
   const meta = COMPONENT_META[index];
@@ -343,20 +340,40 @@ export function ComponentDetail({ slug }: { slug: string }) {
   const narrow = useNarrow();
   const viewport = narrow ? 'mobile' : chosenViewport;
   const [warm, setWarm] = React.useState(false);
-  const [stageInView, setStageInView] = React.useState(true);
-  const [buttonType, setButtonType] = React.useState<UserButtonType>('combined');
+  const stageSlug = slug === 'user-button' || slug === 'organization-switcher';
+  const [buttonType, setButtonType] = React.useState<UserButtonType>(
+    slug === 'organization-switcher' ? 'org' : 'combined',
+  );
   const [buttonSize, setButtonSize] = React.useState<UserButtonSize>('full');
   const [initialButton, setInitialButton] = React.useState<{ type: string; size: string }>({
     type: 'combined',
     size: 'full',
   });
-  const [mode, setMode] = React.useState<'flush' | 'modal' | 'fullscreen'>('flush');
+  const [chosenMode, setMode] = React.useState<'flush' | 'modal' | 'fullscreen'>('flush');
+  const [theme, setTheme] = React.useState<ThemeId>('default');
   const [remix, setRemix] = React.useState<RemixId>('default');
-  const remixable = Boolean(meta.modal) || meta.group !== 'Primitives';
-  useApplyRemix(remixable ? remix : 'default');
+  const [source, setSource] = React.useState<'component' | 'blocks'>('component');
+  const [xray, setXray] = React.useState(false);
+  const [flushTarget, setFlushTarget] = React.useState<HTMLElement | null>(null);
+  const remixOptions = REMIXES_BY_SLUG[slug];
+  const blocks = Boolean(remixOptions) && source === 'blocks';
+  const themable = !blocks;
+  const mode = blocks ? 'flush' : chosenMode;
+  const activeTheme = themable ? theme : 'default';
+  const activeRemix = blocks ? remix : 'default';
+  useApplyTheme(activeTheme);
+  useApplyRemix(activeRemix);
+  const appearanceMessages: Record<string, string>[] = themable
+    ? [
+        { type: THEME_MESSAGE, theme: activeTheme },
+        { type: REMIX_MESSAGE, remix: activeRemix },
+      ]
+    : [];
   const showModal = Boolean(meta.modal) && mode === 'modal';
+  const xrayAvailable = slug === 'user-profile' && viewport === 'desktop' && mode === 'flush';
+  const xrayActive = xray && xrayAvailable;
   const properties: Property[] = [
-    ...(meta.modal
+    ...(meta.modal && !blocks
       ? [
           {
             id: 'view',
@@ -367,41 +384,44 @@ export function ComponentDetail({ slug }: { slug: string }) {
           },
         ]
       : []),
-    ...(slug === 'user-button'
-      ? userButtonProperties({ type: buttonType, size: buttonSize, onType: setButtonType, onSize: setButtonSize })
+    ...(stageSlug
+      ? userButtonProperties({
+          type: buttonType,
+          size: buttonSize,
+          onType: setButtonType,
+          onSize: setButtonSize,
+          ...(slug === 'organization-switcher' ? { types: [] } : {}),
+        })
       : []),
   ];
+  const sourceToggle = remixOptions ? (
+    <div className={pill}>
+      <SegmentedControl
+        label='Source'
+        value={source}
+        cellWidth={96}
+        options={[
+          { id: 'component', label: 'Component' },
+          { id: 'blocks', label: 'Blocks' },
+        ]}
+        onChange={id => {
+          setSource(id);
+          if (id === 'blocks' && remix === 'default') {
+            setRemix(remixOptions.find(option => option.id !== 'default')?.id ?? 'default');
+          }
+        }}
+      />
+    </div>
+  ) : null;
   const frameUrl = frameUrlFor(slug);
-  const heroText = slug === 'user-button' && viewport !== 'mobile';
+  const heroText = stageSlug && viewport !== 'mobile';
   React.useEffect(() => {
     const timer = window.setTimeout(() => setWarm(true), 150);
     return () => window.clearTimeout(timer);
   }, []);
-  React.useEffect(() => {
-    const visible = new Map<Element, boolean>();
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry =>
-          visible.set(
-            entry.target,
-            entry.intersectionRatio >= 0.1 || (entry.isIntersecting && entry.intersectionRect.height >= 120),
-          ),
-        );
-        setStageInView([...visible.values()].some(Boolean));
-      },
-      { threshold: [0, 0.1, 0.25, 0.5, 1] },
-    );
-    const timer = window.setTimeout(() => {
-      document.querySelectorAll('[data-preview-stage]').forEach(element => observer.observe(element));
-    }, 0);
-    return () => {
-      window.clearTimeout(timer);
-      observer.disconnect();
-    };
-  }, [viewport, slug]);
   return (
     <MosaicProvider>
-      <RemixStyles />
+      <ThemeStyles />
       <div className='flex flex-col items-center pb-28'>
         {meta.modal ? (
           <div className='relative flex w-full flex-col items-center'>
@@ -412,8 +432,9 @@ export function ComponentDetail({ slug }: { slug: string }) {
             <PageTitle
               title={meta.title}
               description={meta.description}
-              tags={meta.tags}
-            />
+            >
+              {sourceToggle}
+            </PageTitle>
             <ViewSwitcher
               viewport={viewport}
               mountMobile={warm}
@@ -423,11 +444,18 @@ export function ComponentDetail({ slug }: { slug: string }) {
                     active={mode === 'flush'}
                     className='flex items-center justify-center px-4 md:px-8'
                   >
-                    <div className='relative w-[min(100%,1170px)] max-w-full'>
+                    <div
+                      ref={setFlushTarget}
+                      className='relative w-[min(100%,1170px)] max-w-full'
+                    >
                       <BrowserFrame
                         config={{ ...DEFAULT_FRAME, slug, url: frameUrl }}
                         interactive
                         className='w-full'
+                      />
+                      <XrayOverlay
+                        target={flushTarget}
+                        active={xrayActive}
                       />
                     </div>
                   </Fade>
@@ -451,7 +479,7 @@ export function ComponentDetail({ slug }: { slug: string }) {
                       <BrowserFrame
                         config={{ ...DEFAULT_FRAME, slug, url: frameUrl }}
                         embed={{
-                          src: `/embed/${slug}/modal?remix=${remix}`,
+                          src: `/embed/${slug}/modal?theme=${activeTheme}&remix=${activeRemix}`,
                           title: `${meta.title} in a dialog`,
                         }}
                         className='w-full'
@@ -466,6 +494,7 @@ export function ComponentDetail({ slug }: { slug: string }) {
                     <PhoneFrame
                       src={`/embed/${slug}`}
                       modalSrc={`/embed/${slug}/modal`}
+                      message={appearanceMessages.length > 0 ? appearanceMessages : undefined}
                       showModal={showModal}
                       title={meta.title}
                     />
@@ -480,35 +509,29 @@ export function ComponentDetail({ slug }: { slug: string }) {
               <PageTitle
                 title={meta.title}
                 description={meta.description}
-                tags={meta.tags}
-              />
+              >
+                {sourceToggle}
+              </PageTitle>
             )}
             <Stage
-              compact={viewport !== 'mobile'}
               fill={heroText}
-              tall={slug === 'user-button'}
+              tall={stageSlug}
             >
               {heroText ? (
                 <PageTitle
                   title={meta.title}
                   description={meta.description}
-                  tags={meta.tags}
-                />
+                >
+                  {sourceToggle}
+                </PageTitle>
               ) : null}
               <ViewSwitcher
                 viewport={viewport}
                 mountMobile={warm}
                 desktop={
-                  <div
-                    className={cn('w-full', slug === 'user-button' ? 'flex h-[820px] items-center' : 'max-w-[1100px]')}
-                  >
-                    <div
-                      className={cn(
-                        'w-full',
-                        slug !== 'user-button' && meta.center && 'flex items-center justify-center',
-                      )}
-                    >
-                      {slug === 'user-button' ? (
+                  <div className={cn('w-full', stageSlug ? 'flex h-[820px] items-center' : 'max-w-[1100px]')}>
+                    <div className={cn('w-full', !stageSlug && meta.center && 'flex items-center justify-center')}>
+                      {stageSlug ? (
                         <UserButtonStage
                           type={buttonType}
                           size={buttonSize}
@@ -520,23 +543,20 @@ export function ComponentDetail({ slug }: { slug: string }) {
                   </div>
                 }
                 mobile={
-                  slug === 'user-button' ? (
+                  stageSlug ? (
                     <div className='flex h-[820px] w-full items-center justify-center'>
                       <FitWidth width={410}>
                         <PhoneFrame
                           src={
-                            slug === 'user-button'
+                            stageSlug
                               ? `/embed/${slug}?type=${initialButton.type}&size=${initialButton.size}`
                               : `/embed/${slug}`
                           }
                           message={
-                            slug === 'user-button'
-                              ? [
-                                  { type: BUTTON_CONFIG_MESSAGE, buttonType, size: buttonSize },
-                                  { type: REMIX_MESSAGE, remix },
-                                ]
-                              : remixable
-                                ? { type: REMIX_MESSAGE, remix }
+                            stageSlug
+                              ? [{ type: BUTTON_CONFIG_MESSAGE, buttonType, size: buttonSize }, ...appearanceMessages]
+                              : appearanceMessages.length > 0
+                                ? appearanceMessages
                                 : undefined
                           }
                           showModal={false}
@@ -547,18 +567,15 @@ export function ComponentDetail({ slug }: { slug: string }) {
                   ) : (
                     <PhoneFrame
                       src={
-                        slug === 'user-button'
+                        stageSlug
                           ? `/embed/${slug}?type=${initialButton.type}&size=${initialButton.size}`
                           : `/embed/${slug}`
                       }
                       message={
-                        slug === 'user-button'
-                          ? [
-                              { type: BUTTON_CONFIG_MESSAGE, buttonType, size: buttonSize },
-                              { type: REMIX_MESSAGE, remix },
-                            ]
-                          : remixable
-                            ? { type: REMIX_MESSAGE, remix }
+                        stageSlug
+                          ? [{ type: BUTTON_CONFIG_MESSAGE, buttonType, size: buttonSize }, ...appearanceMessages]
+                          : appearanceMessages.length > 0
+                            ? appearanceMessages
                             : undefined
                       }
                       showModal={false}
@@ -570,52 +587,82 @@ export function ComponentDetail({ slug }: { slug: string }) {
             </Stage>
           </>
         )}
+        <div className='pointer-events-none sticky bottom-5 z-20 mt-6 flex w-full justify-center'>
+          <div className='pointer-events-auto flex flex-wrap items-center justify-center gap-2'>
+            {xrayAvailable ? (
+              <div className={pill}>
+                <button
+                  type='button'
+                  aria-pressed={xray}
+                  onClick={() => setXray(value => !value)}
+                  className={cn(
+                    'flex h-8 items-center gap-2 rounded-full px-3 text-sm transition-colors',
+                    xray ? 'bg-foreground text-background' : 'hover:bg-foreground/[0.06]',
+                  )}
+                >
+                  X-ray
+                </button>
+                {xrayActive ? <XrayLegend /> : null}
+              </div>
+            ) : null}
+            <div className={pill}>
+              {narrow ? null : (
+                <SegmentedControl
+                  label='Preview size'
+                  value={viewport}
+                  options={viewports.map(item => ({
+                    id: item.id,
+                    label: item.label,
+                    icon: <Icon path={item.path} />,
+                  }))}
+                  onChange={id => {
+                    setViewport(id);
+                    if (id === 'mobile') {
+                      setInitialButton({ type: buttonType, size: buttonSize });
+                    }
+                  }}
+                />
+              )}
+              <ThemeToggle className='border-0' />
+              {properties.length > 0 ? (
+                <PropertiesMenu
+                  properties={properties}
+                  pillClass={pill}
+                  embedded
+                />
+              ) : null}
+            </div>
+            {themable ? (
+              <OptionPicker
+                label='Theme'
+                slug={slug}
+                options={THEMES}
+                value={theme}
+                onChange={value => setTheme(value as ThemeId)}
+                previewQuery={id => `theme=${id}&remix=default`}
+                icon={() => <ThemeIcon />}
+                pillClass={pill}
+              />
+            ) : null}
+            {blocks && remixOptions ? (
+              <OptionPicker
+                label='Remix'
+                slug={slug}
+                options={remixOptions.filter(option => option.id !== 'default')}
+                value={remix}
+                onChange={value => setRemix(value as RemixId)}
+                previewQuery={id => `remix=${id}&theme=default`}
+                icon={active => <RemixIcon active={active} />}
+                pillClass={pill}
+              />
+            ) : null}
+          </div>
+        </div>
         <div className='flex w-full flex-col items-center px-4 md:px-8'>
           <ComponentDocs
             slug={slug}
             fallback={meta.snippet}
           />
-        </div>
-      </div>
-
-      <div
-        className={cn(
-          'pointer-events-none fixed inset-x-0 bottom-5 z-20 flex justify-center transition-[opacity,translate] duration-[500ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
-          stageInView ? 'translate-y-0 opacity-100' : 'translate-y-[calc(100%+2.5rem)] opacity-0',
-        )}
-      >
-        <div className={cn('flex flex-wrap items-center justify-center gap-2', stageInView && 'pointer-events-auto')}>
-          <div className={pill}>
-            {narrow ? null : (
-              <SegmentedControl
-                label='Preview size'
-                value={viewport}
-                options={viewports.map(item => ({ id: item.id, label: item.label, icon: <Icon path={item.path} /> }))}
-                onChange={id => {
-                  setViewport(id);
-                  if (id === 'mobile') {
-                    setInitialButton({ type: buttonType, size: buttonSize });
-                  }
-                }}
-              />
-            )}
-            <ThemeToggle className='border-0' />
-            {properties.length > 0 ? (
-              <PropertiesMenu
-                properties={properties}
-                pillClass={pill}
-                embedded
-              />
-            ) : null}
-          </div>
-          {remixable ? (
-            <RemixPicker
-              slug={slug}
-              value={remix}
-              onChange={setRemix}
-              pillClass={pill}
-            />
-          ) : null}
         </div>
       </div>
     </MosaicProvider>
