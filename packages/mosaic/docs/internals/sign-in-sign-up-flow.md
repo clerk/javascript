@@ -68,7 +68,7 @@ Sign-up:
 
 The controller runs these on `start`, then calls `next(step)`.
 
-- Ticket (`__clerk_ticket`): the model exposes `redeemTicket: () => signUp.ticket({ unsafeMetadata })`. A ticket is single-use, so guard on "not started yet", kept above the component that remounts. A failed redemption shows its error on `start`.
+- Ticket (`__clerk_ticket`): the model exposes `redeemTicket: () => signUp.ticket({ unsafeMetadata })`. A ticket works only once, so redeem it once: keep the "already started" flag in a component that doesn't remount, so a remount or StrictMode can't redeem it twice. A failed redemption shows its error on `start`.
 - Email-link return (`__clerk_status`): only `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
 
 ## Bridge
