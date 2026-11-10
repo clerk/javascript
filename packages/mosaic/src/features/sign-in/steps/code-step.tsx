@@ -2,50 +2,49 @@ import type { Ref } from 'react';
 
 import type { VerificationCodeMessages, VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationCode } from '../../../blocks/verification';
-import type { SignInStep } from '../sign-in.types';
+import type { UseFormResult } from '../../../components/form';
+import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface CodeStepProps {
-  step: Extract<SignInStep, { kind: 'code' }>;
   messages: VerificationCodeMessages;
   resend?: VerificationCodeResend;
-  value: string;
+  form: UseFormResult<SignInValues>;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
-  onValueChange: (value: string) => void;
-  onSubmit: () => void;
-  onShowMethods?: () => void;
+  onSubmit: (event?: SignInSubmitEvent) => void;
+  onCodeComplete: (code: string) => void;
+  onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
 export function CodeStep({
-  step,
   messages,
   resend,
-  value,
+  form,
   errorMessage,
+  globalErrorMessage,
   isPending,
-  onValueChange,
   onSubmit,
-  onShowMethods,
+  onCodeComplete,
+  onCancel,
   focusRef,
 }: CodeStepProps) {
-  // TODO: Have the controller pass the one callback each code step offers, and omit resend for the authenticator app, so the view stops choosing by purpose and channel.
+  const { value, onValueChange } = form.registerValue('code');
+
   return (
     <VerificationCode
       focusRef={focusRef}
       messages={messages}
       value={value}
       errorMessage={errorMessage}
+      globalErrorMessage={globalErrorMessage}
       isPending={isPending}
-      resend={step.channel === 'totp' ? undefined : resend}
+      resend={resend}
       onValueChange={onValueChange}
-      // TODO: Pass the completed code to onSubmit. A controller that reads its value state in onSubmit sees the value from before onValueChange.
-      onComplete={code => {
-        onValueChange(code);
-        onSubmit();
-      }}
-      onSubmit={onSubmit}
-      onCancel={step.purpose === 'verify-email' ? undefined : onShowMethods}
+      onComplete={onCodeComplete}
+      onSubmit={() => onSubmit()}
+      onCancel={onCancel}
     />
   );
 }

@@ -2,34 +2,35 @@ import type { Ref } from 'react';
 
 import type { VerificationBackupCodeMessages } from '../../../blocks/verification';
 import { VerificationBackupCode } from '../../../blocks/verification';
-import type { SignInStep } from '../sign-in.types';
+import type { UseFormResult } from '../../../components/form';
+import type { SignInStep, SignInSubmitEvent, SignInValues } from '../sign-in.types';
 import { SignInPassword } from './sign-in-password';
 
 interface SecretStepProps {
   step: Extract<SignInStep, { kind: 'secret' }>;
   messages: VerificationBackupCodeMessages;
-  value: string;
+  form: UseFormResult<SignInValues>;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
-  onValueChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (event?: SignInSubmitEvent) => void;
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
-  onShowMethods?: () => void;
+  onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
 export function SecretStep({
   step,
   messages,
-  value,
+  form,
   errorMessage,
+  globalErrorMessage,
   isPending,
-  onValueChange,
   onSubmit,
   onEditIdentifier,
   onForgotPassword,
-  onShowMethods,
+  onCancel,
   focusRef,
 }: SecretStepProps) {
   if (step.secret === 'password') {
@@ -38,16 +39,18 @@ export function SecretStep({
         focusRef={focusRef}
         identifier={step.identifier}
         onEditIdentifier={onEditIdentifier}
-        value={value}
+        form={form}
         errorMessage={errorMessage}
+        globalErrorMessage={globalErrorMessage}
         isPending={isPending}
-        onValueChange={onValueChange}
         onSubmit={onSubmit}
         onForgotPassword={onForgotPassword}
-        onCancel={onShowMethods}
+        onCancel={onCancel}
       />
     );
   }
+
+  const { value, onValueChange } = form.registerValue('backupCode');
 
   return (
     <VerificationBackupCode
@@ -55,10 +58,11 @@ export function SecretStep({
       messages={messages}
       value={value}
       errorMessage={errorMessage}
+      globalErrorMessage={globalErrorMessage}
       isPending={isPending}
       onValueChange={onValueChange}
-      onSubmit={onSubmit}
-      onCancel={onShowMethods}
+      onSubmit={() => onSubmit()}
+      onCancel={onCancel}
     />
   );
 }
