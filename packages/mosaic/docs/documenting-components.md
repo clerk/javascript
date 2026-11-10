@@ -23,6 +23,7 @@ Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `p
 | `User Profile`         | Composed flow UI (e.g. `UserProfileProfilePanel`)                                                                                    | C           |
 | `Organization Profile` | Composed flow UI (e.g. `OrganizationProfileGeneralPanel`)                                                                            | C           |
 | `Misc`                 | Standalone composed components (e.g. `OrganizationSwitcher`, `Waitlist`)                                                             | C           |
+| `Authentication`       | Flow views built from steps (e.g. `SignIn`)                                                                                          | C · flow    |
 | `Blocks`               | Flows assembled from components, wired by the caller's machine (e.g. `Confirmation`, `Destructive`)                                  | C           |
 | `Components`           | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A           |
 | `Primitives`           | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`)                                                           | B           |
@@ -204,7 +205,7 @@ The story is `meta` (no `styles`) plus a single `Default` export that renders th
 
 Every props table has a **Default** column, and the `Type` stays a plain union, never with the default inlined. The auto `<PropTable>` fills it from `meta.styles._defaultVariants`; hand-written tables (`Prop | Type | Default | Description`) fill it by hand. Name the default member (`'bottom-start'`), use `—` when there is none and append `(required)` for a required prop, and state a behavioral default in words (`inherits Root`).
 
-## Archetype C — composed layer (`User Button`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`)
+## Archetype C — composed layer (`User Button`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`, `Authentication`)
 
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
@@ -229,6 +230,49 @@ import * as SwitcherStories from './user-button.stories';
 
 - The `composition` array names each lower-layer component this one builds on, with a link to that component's page and its `layer`. List every direct dependency so the layering is navigable.
 - The story is `meta` plus a single `Default` export that renders the composed UI with no knobs.
+
+### C · flow — a view built from steps (`Authentication`)
+
+A flow view shows one step at a time, so a single `Default` cannot show every screen. The page adds `Usage` and one section per step component after the composition. Required MDX section order:
+
+```mdx
+import * as Stories from './sign-in.stories';
+
+# SignIn
+
+<!-- One paragraph: what the working example does and which inputs reach which branches. -->
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]}
+/>
+
+## Usage
+
+<!-- What the view owns, how `step` picks the screen, and a code fence rendering the view. -->
+
+## Steps
+
+<!-- One sentence on how the sections map to step components, and that a red box marks a planned view. -->
+
+### Identifier step
+
+<!-- One line naming the step file and the step values it draws. -->
+
+#### Default
+
+<Story
+  name='IdentifierDefault'
+  storyModule={Stories}
+/>
+```
+
+- `Default` is a working example: plain props driven by a stand-in for the controller, so the whole flow can be clicked through.
+- Under `## Steps`, each `###` is one component in the feature's `steps/` folder, and each `####` is one step value it draws. Each example is one story export, named for the step and the example (`IdentifierDefault`, `SecretPasswordError`).
+- A view the legacy component has and Mosaic does not yet gets its `####` and a `<Story>` naming the export it will have. Swingset renders a red "not found" box for a story the file does not export, which marks the gap on the page. Exporting the story turns the box into the example, with no MDX change.
 
 ## Writing the prose
 
