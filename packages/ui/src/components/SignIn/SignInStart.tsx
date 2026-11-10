@@ -534,7 +534,6 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
-          case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
           case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
           case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
           case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
@@ -549,6 +548,13 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.USER_BANNED:
           case ERROR_CODES.USER_DEACTIVATED:
             card.setError(error);
+            break;
+          case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
+            if (ctx.transferable) {
+              defaultErrorHandler();
+            } else {
+              card.setError(error);
+            }
             break;
           default:
             defaultErrorHandler();
