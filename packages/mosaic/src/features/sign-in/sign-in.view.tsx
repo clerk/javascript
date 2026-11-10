@@ -94,15 +94,14 @@ export function SignInView({
   socialProviders,
   pendingProviderId,
   onSelectProvider,
-  identifier,
-  onIdentifierChange,
+  form,
+  onSubmit,
+  onCodeComplete,
+  isPending,
+  errorMessage,
+  newPasswordFeedback,
   onEditIdentifier,
   onSignUp,
-  value,
-  onValueChange,
-  errorMessage,
-  isPending,
-  onSubmit,
   onForgotPassword,
   onShowMethods,
   onShowHelp,
@@ -113,11 +112,6 @@ export function SignInView({
   onResend,
   canResend,
   resendRemainingSeconds,
-  signUpDetails,
-  signUpErrors,
-  onSignUpDetailChange,
-  newPasswordForm,
-  newPasswordFeedback,
   focusRef,
 }: SignInViewProps & { focusRef?: Ref<HTMLElement> }) {
   const m = useMessages('signIn');
@@ -163,10 +157,9 @@ export function SignInView({
                 socialProviders={socialProviders}
                 pendingProviderId={pendingProviderId}
                 onSelectProvider={onSelectProvider}
-                value={identifier}
+                form={form}
                 errorMessage={errorMessage}
                 isPending={isPending}
-                onValueChange={onIdentifierChange}
                 onSubmit={onSubmit}
                 // TODO: Have the controller omit onSignUp in the combined flow instead of the view dropping it.
                 onSignUp={combined ? undefined : onSignUp}
@@ -184,10 +177,9 @@ export function SignInView({
                     fieldLabel: m.backupCodeMfa.label,
                     ...actions,
                   }}
-                  value={value}
+                  form={form}
                   errorMessage={errorMessage}
                   isPending={isPending}
-                  onValueChange={onValueChange}
                   onSubmit={onSubmit}
                   onEditIdentifier={onEditIdentifier}
                   onForgotPassword={onForgotPassword}
@@ -212,11 +204,11 @@ export function SignInView({
                       : {}),
                   }}
                   resend={resend}
-                  value={value}
+                  form={form}
                   errorMessage={errorMessage}
                   isPending={isPending}
-                  onValueChange={onValueChange}
                   onSubmit={onSubmit}
+                  onCodeComplete={onCodeComplete}
                   onShowMethods={onShowMethods}
                   onBack={onBack}
                 />
@@ -254,6 +246,7 @@ export function SignInView({
                     backButton: m.back,
                     supportButton: m.alternativeMethods.getHelp.emailSupport,
                   }}
+                  form={form}
                   isPending={isPending}
                   onSubmit={onSubmit}
                   onEmailSupport={onEmailSupport}
@@ -265,7 +258,10 @@ export function SignInView({
             <Flow.Step ids={['new-password:forgot']}>
               <NewPasswordStep
                 focusRef={focusRef}
-                form={newPasswordForm}
+                form={form}
+                errorMessage={errorMessage}
+                isPending={isPending}
+                onSubmit={onSubmit}
                 passwordFeedback={newPasswordFeedback}
                 onBack={onBack}
               />
@@ -274,10 +270,9 @@ export function SignInView({
             <Flow.Step ids={['sign-up']}>
               <SignUpDetailsStep
                 focusRef={focusRef}
-                values={signUpDetails}
-                errors={signUpErrors}
+                form={form}
+                errorMessage={errorMessage}
                 isPending={isPending}
-                onValueChange={onSignUpDetailChange}
                 onSubmit={onSubmit}
                 onSignIn={onEditIdentifier}
               />

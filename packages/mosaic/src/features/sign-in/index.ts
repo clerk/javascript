@@ -1,2 +1,9 @@
 export { SignInView } from './sign-in.view';
-export type { NewPasswordValues, SignInFactor, SignInSocialProvider, SignInStep, SignUpDetails } from './sign-in.types';
+export type {
+  SignInFactor,
+  SignInSocialProvider,
+  SignInStep,
+  SignInSubmitEvent,
+  SignInValues,
+  SignInViewProps,
+} from './sign-in.types';

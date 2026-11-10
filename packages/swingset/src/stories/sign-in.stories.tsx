@@ -2,11 +2,11 @@ import { Button } from '@clerk/mosaic/components/button';
 import type { FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
-  NewPasswordValues,
   SignInFactor,
   SignInSocialProvider,
   SignInStep,
-  SignUpDetails,
+  SignInSubmitEvent,
+  SignInValues,
 } from '@clerk/mosaic/features/sign-in';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 import { useRef, useState } from 'react';
@@ -50,18 +50,28 @@ const resetFactors: SignInFactor[] = [
   { id: 'reset_phone', stage: 'first', strategy: 'reset_password_phone_code', identifier: '+1 ••• ••• 0123' },
 ];
 
-const emptySignUp: SignUpDetails = { firstName: '', lastName: '', emailAddress: '', password: '' };
+const emptyValues: SignInValues = {
+  identifier: '',
+  password: '',
+  code: '',
+  backupCode: '',
+  firstName: '',
+  lastName: '',
+  newPassword: '',
+  confirmPassword: '',
+  signOutOfOtherSessions: true,
+};
 
-const emptyNewPassword: NewPasswordValues = { password: '', confirmPassword: '', signOutOfOtherSessions: true };
-
-const newPasswordFields: FieldsConfig<NewPasswordValues> = {
-  password: {
-    validate: password =>
-      password.length < 8 ? { type: 'error', message: 'Your password must contain 8 or more characters.' } : undefined,
+const newPasswordFields: FieldsConfig<SignInValues> = {
+  newPassword: {
+    validate: newPassword =>
+      newPassword.length < 8
+        ? { type: 'error', message: 'Your password must contain 8 or more characters.' }
+        : undefined,
   },
   confirmPassword: {
     validate: (confirmPassword, values) =>
-      confirmPassword !== values.password ? { type: 'error', message: 'Passwords don’t match.' } : undefined,
+      confirmPassword !== values.newPassword ? { type: 'error', message: 'Passwords don’t match.' } : undefined,
   },
 };
 
@@ -95,40 +105,31 @@ type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect
 function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void }) {
   const [step, setStep] = useState<SignInStep>({ kind: 'identifier' });
   const [direction, setDirection] = useState<-1 | 1>(1);
-  const [identifier, setIdentifier] = useState('');
-  const [value, setValue] = useState('');
-  const valueRef = useRef(value);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [isPending, setIsPending] = useState(false);
   const [pendingProviderId, setPendingProviderId] = useState<string>();
   const [pendingFactorId, setPendingFactorId] = useState<string>();
   const [factorId, setFactorId] = useState('password');
   const [canResend, setCanResend] = useState(true);
-  const [signUpDetails, setSignUpDetails] = useState<SignUpDetails>(emptySignUp);
-  const [signUpErrors, setSignUpErrors] = useState<Partial<Record<keyof SignUpDetails, string>>>();
-  const newPasswordForm = useForm<NewPasswordValues>({
-    initialValues: emptyNewPassword,
+  const [supportRequested, setSupportRequested] = useState(false);
+  const [stage, setStage] = useState<'first' | 'second'>('first');
+  const pickerReturnRef = useRef<SignInStep>({ kind: 'secret', secret: 'password', identifier: '' });
+  const form = useForm<SignInValues>({
+    initialValues: emptyValues,
     fields: newPasswordFields,
     onSubmit: () => settleAfter(1_500),
     onSuccess: () => onComplete({ kind: 'signed-in' }),
   });
-  const [supportRequested, setSupportRequested] = useState(false);
-  const [stage, setStage] = useState<'first' | 'second'>('first');
-  const pickerReturnRef = useRef<SignInStep>({ kind: 'secret', secret: 'password', identifier: '' });
+  const { values } = form;
+  const identifier = values.identifier.trim();
 
   const navigate = (next: SignInStep, nextDirection: -1 | 1) => {
     setDirection(nextDirection);
     setStep(next);
-    valueRef.current = '';
-    setValue('');
+    form.setValue('code', '');
+    form.setValue('backupCode', '');
     setErrorMessage(undefined);
     setCanResend(true);
-  };
-
-  const onValueChange = (nextValue: string) => {
-    valueRef.current = nextValue;
-    setValue(nextValue);
-    setErrorMessage(undefined);
   };
 
   const run = async (work: () => void | Promise<void>) => {
@@ -146,42 +147,38 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
 
   const submitStart = () =>
     run(() => {
-      const email = identifier.trim();
-      if (!email) {
+      if (!identifier) {
         setErrorMessage('Enter your email address.');
         return;
       }
-      if (!email.includes('@')) {
+      if (!identifier.includes('@')) {
         setErrorMessage('Enter a valid email address.');
         return;
       }
-      if (email.toLowerCase().includes('new')) {
-        setSignUpDetails({ ...emptySignUp, emailAddress: email });
+      if (identifier.toLowerCase().includes('new')) {
         navigate({ kind: 'sign-up' }, 1);
         return;
       }
       setStage('first');
       setFactorId('password');
-      navigate({ kind: 'secret', secret: 'password', identifier: email }, 1);
+      navigate({ kind: 'secret', secret: 'password', identifier }, 1);
     });
 
   const submitPassword = () =>
     run(() => {
-      const password = valueRef.current;
-      if (!password) {
+      if (!values.password) {
         setErrorMessage('Enter your password.');
         return;
       }
-      if (password.toLowerCase() === 'error') {
+      if (values.password.toLowerCase() === 'error') {
         setErrorMessage('Password is incorrect. Try again, or use another method.');
         return;
       }
       startSecondFactor();
     });
 
-  const submitCode = (onSuccess: () => void) =>
+  const submitCode = (code: string) =>
     run(() => {
-      const code = valueRef.current;
       if (code.length !== 6) {
         setErrorMessage('Enter the complete verification code.');
         return;
@@ -190,17 +187,34 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         setErrorMessage('Incorrect code. Try again.');
         return;
       }
-      onSuccess();
+      if (step.kind !== 'code') {
+        return;
+      }
+      switch (step.purpose) {
+        case 'reset-password':
+          form.setValue('newPassword', '');
+          form.setValue('confirmPassword', '');
+          navigate({ kind: 'new-password', reason: 'forgot' }, 1);
+          return;
+        case 'first-factor':
+          startSecondFactor();
+          return;
+        case 'second-factor':
+          onComplete({ kind: 'signed-in' });
+          return;
+        case 'verify-email':
+          onComplete({ kind: 'signed-up' });
+          return;
+      }
     });
 
   const submitBackupCode = () =>
     run(() => {
-      const code = valueRef.current;
-      if (!code.trim()) {
+      if (!values.backupCode.trim()) {
         setErrorMessage('Enter a backup code.');
         return;
       }
-      if (code.toLowerCase() === 'error') {
+      if (values.backupCode.toLowerCase() === 'error') {
         setErrorMessage('Incorrect backup code. Try again.');
         return;
       }
@@ -209,28 +223,30 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
 
   const submitSignUp = () =>
     run(() => {
-      const errors: Partial<Record<keyof SignUpDetails, string>> = {};
-      if (!signUpDetails.firstName.trim()) {
-        errors.firstName = 'Enter your first name.';
-      }
-      if (!signUpDetails.lastName.trim()) {
-        errors.lastName = 'Enter your last name.';
-      }
-      if (!signUpDetails.emailAddress.includes('@')) {
-        errors.emailAddress = 'Enter a valid email address.';
-      }
-      if (signUpDetails.password.length < 8) {
-        errors.password = 'Your password must contain 8 or more characters.';
-      }
-      if (Object.keys(errors).length > 0) {
-        setSignUpErrors(errors);
+      if (!values.firstName.trim() || !values.lastName.trim()) {
+        setErrorMessage('Enter your first and last name.');
         return;
       }
-      setSignUpErrors(undefined);
-      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: signUpDetails.emailAddress }, 1);
+      if (!identifier.includes('@')) {
+        setErrorMessage('Enter a valid email address.');
+        return;
+      }
+      if (values.password.length < 8) {
+        setErrorMessage('Your password must contain 8 or more characters.');
+        return;
+      }
+      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier }, 1);
     });
 
-  const onSubmit = () => {
+  const onSubmit = (event?: SignInSubmitEvent) => {
+    if (step.kind === 'new-password') {
+      form.handleSubmit(event ?? { preventDefault: () => undefined });
+      return;
+    }
+    event?.preventDefault();
+    if (isPending) {
+      return;
+    }
     switch (step.kind) {
       case 'identifier':
         void submitStart();
@@ -239,18 +255,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         void (step.secret === 'password' ? submitPassword() : submitBackupCode());
         return;
       case 'code':
-        if (step.purpose === 'reset-password') {
-          void submitCode(() => {
-            newPasswordForm.reset();
-            navigate({ kind: 'new-password', reason: 'forgot' }, 1);
-          });
-        } else if (step.purpose === 'first-factor') {
-          void submitCode(startSecondFactor);
-        } else if (step.purpose === 'second-factor') {
-          void submitCode(() => onComplete({ kind: 'signed-in' }));
-        } else {
-          void submitCode(() => onComplete({ kind: 'signed-up' }));
-        }
+        void submitCode(values.code);
         return;
       case 'sign-up':
         void submitSignUp();
@@ -304,11 +309,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       navigate({ kind: 'secret', secret: 'password', identifier: step.identifier }, -1);
       return;
     }
-    if (step.kind === 'new-password') {
-      navigate({ kind: 'secret', secret: 'password', identifier }, -1);
-      return;
-    }
-    if (step.kind === 'code' && step.purpose === 'reset-password') {
+    if (step.kind === 'new-password' || (step.kind === 'code' && step.purpose === 'reset-password')) {
       navigate({ kind: 'secret', secret: 'password', identifier }, -1);
       return;
     }
@@ -346,20 +347,25 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         socialProviders={socialProviders}
         pendingProviderId={pendingProviderId}
         onSelectProvider={onSelectProvider}
-        identifier={identifier}
-        onIdentifierChange={next => {
-          setIdentifier(next);
-          setErrorMessage(undefined);
+        form={form}
+        onSubmit={onSubmit}
+        onCodeComplete={code => {
+          form.setValue('code', code);
+          void submitCode(code);
         }}
+        isPending={isPending || form.isSubmitting}
+        errorMessage={errorMessage}
+        newPasswordFeedback={
+          values.newPassword === ''
+            ? undefined
+            : values.newPassword.length < 8
+              ? { type: 'info', message: 'Your password must contain 8 or more characters.' }
+              : { type: 'success', message: 'Your password meets all the necessary requirements.' }
+        }
         onEditIdentifier={() => {
           setStage('first');
           navigate({ kind: 'identifier' }, -1);
         }}
-        value={value}
-        onValueChange={onValueChange}
-        errorMessage={errorMessage}
-        isPending={isPending}
-        onSubmit={onSubmit}
         onForgotPassword={() => navigate({ kind: 'notice', purpose: 'forgot-password', identifier }, 1)}
         onShowMethods={otherFactors.length > 0 ? onShowMethods : undefined}
         onShowHelp={() => navigate({ kind: 'notice', purpose: 'help' }, 1)}
@@ -369,20 +375,6 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         onSelectFactor={onSelectFactor}
         onResend={onResend}
         canResend={canResend}
-        signUpDetails={signUpDetails}
-        signUpErrors={signUpErrors}
-        onSignUpDetailChange={(field, next) => {
-          setSignUpDetails(current => ({ ...current, [field]: next }));
-          setSignUpErrors(current => (current ? { ...current, [field]: undefined } : current));
-        }}
-        newPasswordForm={newPasswordForm}
-        newPasswordFeedback={
-          newPasswordForm.values.password === ''
-            ? undefined
-            : newPasswordForm.values.password.length < 8
-              ? { type: 'info', message: 'Your password must contain 8 or more characters.' }
-              : { type: 'success', message: 'Your password meets all the necessary requirements.' }
-        }
       />
       {supportRequested ? <p>Email support requested.</p> : null}
     </>
@@ -444,10 +436,14 @@ function StepPanel({
   pendingProviderId?: string;
   providers?: SignInSocialProvider[];
 }) {
-  const [value, setValue] = useState(errorMessage && step.kind !== 'identifier' ? 'incorrect' : '');
-  const [details, setDetails] = useState<SignUpDetails>({ ...emptySignUp, emailAddress: 'new@acme.com' });
-  const newPasswordForm = useForm<NewPasswordValues>({
-    initialValues: emptyNewPassword,
+  const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
+  const form = useForm<SignInValues>({
+    initialValues: {
+      ...emptyValues,
+      identifier: step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER,
+      password: attempted,
+      backupCode: attempted,
+    },
     onSubmit: () => Promise.resolve(),
   });
 
@@ -460,15 +456,13 @@ function StepPanel({
       socialProviders={providers}
       pendingProviderId={pendingProviderId}
       onSelectProvider={() => undefined}
-      identifier={step.kind === 'identifier' ? value : IDENTIFIER}
-      onIdentifierChange={setValue}
+      form={form}
+      onSubmit={event => event?.preventDefault()}
+      onCodeComplete={code => form.setValue('code', code)}
+      isPending={isPending}
+      errorMessage={errorMessage}
       onEditIdentifier={() => undefined}
       onSignUp={() => undefined}
-      value={value}
-      onValueChange={setValue}
-      errorMessage={errorMessage}
-      isPending={isPending}
-      onSubmit={() => undefined}
       onForgotPassword={() => undefined}
       onShowMethods={() => undefined}
       onShowHelp={() => undefined}
@@ -477,9 +471,6 @@ function StepPanel({
       onSelectFactor={() => undefined}
       onResend={() => undefined}
       canResend
-      signUpDetails={details}
-      onSignUpDetailChange={(field, next) => setDetails(current => ({ ...current, [field]: next }))}
-      newPasswordForm={newPasswordForm}
     />
   );
 }

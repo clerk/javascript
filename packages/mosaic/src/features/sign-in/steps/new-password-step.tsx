@@ -12,20 +12,31 @@ import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { NewPasswordValues } from '../sign-in.types';
+import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface NewPasswordStepProps {
-  form: UseFormResult<NewPasswordValues>;
+  form: UseFormResult<SignInValues>;
+  errorMessage?: string;
+  isPending: boolean;
+  onSubmit: (event: SignInSubmitEvent) => void;
   passwordFeedback?: FieldFeedback;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
-export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: NewPasswordStepProps) {
+export function NewPasswordStep({
+  form,
+  errorMessage,
+  isPending,
+  onSubmit,
+  passwordFeedback,
+  onBack,
+  focusRef,
+}: NewPasswordStepProps) {
   const m = useMessages('signIn');
-  const { ref: passwordFieldRef, ...password } = form.register('password');
+  const { ref: passwordFieldRef, ...password } = form.register('newPassword');
   const passwordRef = useMergeRefs<HTMLElement>([passwordFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
-  const passwordError = form.fields.password.feedback;
+  const passwordError = form.fields.newPassword.feedback;
   const confirmPasswordFeedback = form.fields.confirmPassword.feedback;
 
   return (
@@ -37,13 +48,13 @@ export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: Ne
         role='alert'
         color='negative'
       >
-        {form.error}
+        {errorMessage ?? form.error}
       </Card.Banner>
       <Card.Content
         render={
           <Form
             id={form.id}
-            onSubmit={form.handleSubmit}
+            onSubmit={onSubmit}
           />
         }
       >
@@ -51,7 +62,7 @@ export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: Ne
           <Field.Root
             required
             invalid={passwordError?.type === 'error'}
-            disabled={form.isSubmitting}
+            disabled={isPending}
             focusableWhenDisabled
           >
             <Field.Label>{m.newPassword.passwordLabel}</Field.Label>
@@ -67,7 +78,7 @@ export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: Ne
           <Field.Root
             required
             invalid={confirmPasswordFeedback?.type === 'error'}
-            disabled={form.isSubmitting}
+            disabled={isPending}
             focusableWhenDisabled
           >
             <Field.Label>{m.newPassword.confirmPasswordLabel}</Field.Label>
@@ -81,7 +92,7 @@ export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: Ne
           </Field.Root>
           <Field.Root
             orientation='horizontal'
-            disabled={form.isSubmitting}
+            disabled={isPending}
           >
             <Checkbox
               checked={form.values.signOutOfOtherSessions}
@@ -94,7 +105,7 @@ export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: Ne
           <SubmitButton
             form={form.id}
             fullWidth
-            isPending={form.isSubmitting}
+            isPending={isPending}
             pendingLabel={m.newPassword.pending}
             disabled={!form.canSubmit}
             focusableWhenDisabled
@@ -106,7 +117,7 @@ export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: Ne
             variant='ghost'
             color='neutral'
             fullWidth
-            disabled={form.isSubmitting}
+            disabled={isPending}
             onClick={onBack}
           >
             {m.forgotPassword.back}

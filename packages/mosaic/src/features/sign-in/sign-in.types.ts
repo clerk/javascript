@@ -37,17 +37,20 @@ export interface SignInSocialProvider {
   iconUrl: string;
 }
 
-export interface SignUpDetails {
+export interface SignInValues {
+  identifier: string;
+  password: string;
+  code: string;
+  backupCode: string;
   firstName: string;
   lastName: string;
-  emailAddress: string;
-  password: string;
-}
-
-export interface NewPasswordValues {
-  password: string;
+  newPassword: string;
   confirmPassword: string;
   signOutOfOtherSessions: boolean;
+}
+
+export interface SignInSubmitEvent {
+  preventDefault: () => void;
 }
 
 export interface SignInViewProps {
@@ -59,15 +62,14 @@ export interface SignInViewProps {
   socialProviders: readonly SignInSocialProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
-  identifier: string;
-  onIdentifierChange: (value: string) => void;
+  form: UseFormResult<SignInValues>;
+  onSubmit: (event?: SignInSubmitEvent) => void;
+  onCodeComplete: (code: string) => void;
+  isPending: boolean;
+  errorMessage?: string;
+  newPasswordFeedback?: FieldFeedback;
   onEditIdentifier: () => void;
   onSignUp?: () => void;
-  value: string;
-  onValueChange: (value: string) => void;
-  errorMessage?: string;
-  isPending: boolean;
-  onSubmit: () => void;
   onForgotPassword?: () => void;
   onShowMethods?: () => void;
   onShowHelp: () => void;
@@ -78,9 +80,4 @@ export interface SignInViewProps {
   onResend: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;
-  signUpDetails: SignUpDetails;
-  signUpErrors?: Partial<Record<keyof SignUpDetails, string>>;
-  onSignUpDetailChange: (field: keyof SignUpDetails, value: string) => void;
-  newPasswordForm: UseFormResult<NewPasswordValues>;
-  newPasswordFeedback?: FieldFeedback;
 }

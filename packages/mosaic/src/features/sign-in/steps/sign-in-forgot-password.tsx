@@ -5,21 +5,25 @@ import type { Ref } from 'react';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
+import type { UseFormResult } from '../../../components/form';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
+import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface SignInForgotPasswordProps {
   identifier: string;
-  isPending?: boolean;
-  onSubmit: () => void;
+  form: UseFormResult<SignInValues>;
+  isPending: boolean;
+  onSubmit: (event: SignInSubmitEvent) => void;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
 export function SignInForgotPassword({
   identifier,
-  isPending = false,
+  form,
+  isPending,
   onSubmit,
   onBack,
   focusRef,
@@ -36,16 +40,15 @@ export function SignInForgotPassword({
       <Card.Content
         render={
           <Form
-            onSubmit={event => {
-              event.preventDefault();
-              onSubmit();
-            }}
+            id={form.id}
+            onSubmit={onSubmit}
           />
         }
       >
         <div {...stylex.props(styles.actions)}>
           <SubmitButton
             ref={ref}
+            form={form.id}
             fullWidth
             isPending={isPending}
             pendingLabel={m.forgotPassword.pending}

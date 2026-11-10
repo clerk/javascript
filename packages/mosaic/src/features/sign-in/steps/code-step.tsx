@@ -2,7 +2,8 @@ import type { Ref } from 'react';
 
 import type { VerificationCodeMessages, VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationCode } from '../../../blocks/verification';
-import type { SignInStep } from '../sign-in.types';
+import type { UseFormResult } from '../../../components/form';
+import type { SignInStep, SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 // TODO: Have the controller pass the one callback each code step offers, and omit resend for the authenticator app, so the view stops choosing by purpose and channel.
 function secondaryAction(
@@ -25,11 +26,11 @@ interface CodeStepProps {
   step: Extract<SignInStep, { kind: 'code' }>;
   messages: VerificationCodeMessages;
   resend?: VerificationCodeResend;
-  value: string;
+  form: UseFormResult<SignInValues>;
   errorMessage?: string;
   isPending: boolean;
-  onValueChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (event?: SignInSubmitEvent) => void;
+  onCodeComplete: (code: string) => void;
   onShowMethods?: () => void;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -39,15 +40,17 @@ export function CodeStep({
   step,
   messages,
   resend,
-  value,
+  form,
   errorMessage,
   isPending,
-  onValueChange,
   onSubmit,
+  onCodeComplete,
   onShowMethods,
   onBack,
   focusRef,
 }: CodeStepProps) {
+  const { value, onValueChange } = form.registerValue('code');
+
   return (
     <VerificationCode
       focusRef={focusRef}
@@ -57,12 +60,8 @@ export function CodeStep({
       isPending={isPending}
       resend={step.channel === 'totp' ? undefined : resend}
       onValueChange={onValueChange}
-      // TODO: Pass the completed code to onSubmit. A controller that reads its value state in onSubmit sees the value from before onValueChange.
-      onComplete={code => {
-        onValueChange(code);
-        onSubmit();
-      }}
-      onSubmit={onSubmit}
+      onComplete={onCodeComplete}
+      onSubmit={() => onSubmit()}
       onCancel={secondaryAction(step, onShowMethods, onBack)}
     />
   );

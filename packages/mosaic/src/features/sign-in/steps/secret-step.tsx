@@ -2,17 +2,17 @@ import type { Ref } from 'react';
 
 import type { VerificationBackupCodeMessages } from '../../../blocks/verification';
 import { VerificationBackupCode } from '../../../blocks/verification';
-import type { SignInStep } from '../sign-in.types';
+import type { UseFormResult } from '../../../components/form';
+import type { SignInStep, SignInSubmitEvent, SignInValues } from '../sign-in.types';
 import { SignInPassword } from './sign-in-password';
 
 interface SecretStepProps {
   step: Extract<SignInStep, { kind: 'secret' }>;
   messages: VerificationBackupCodeMessages;
-  value: string;
+  form: UseFormResult<SignInValues>;
   errorMessage?: string;
   isPending: boolean;
-  onValueChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (event?: SignInSubmitEvent) => void;
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
   onShowMethods?: () => void;
@@ -22,10 +22,9 @@ interface SecretStepProps {
 export function SecretStep({
   step,
   messages,
-  value,
+  form,
   errorMessage,
   isPending,
-  onValueChange,
   onSubmit,
   onEditIdentifier,
   onForgotPassword,
@@ -38,16 +37,17 @@ export function SecretStep({
         focusRef={focusRef}
         identifier={step.identifier}
         onEditIdentifier={onEditIdentifier}
-        value={value}
+        form={form}
         errorMessage={errorMessage}
         isPending={isPending}
-        onValueChange={onValueChange}
         onSubmit={onSubmit}
         onForgotPassword={onForgotPassword}
         onCancel={onShowMethods}
       />
     );
   }
+
+  const { value, onValueChange } = form.registerValue('backupCode');
 
   return (
     <VerificationBackupCode
@@ -57,7 +57,7 @@ export function SecretStep({
       errorMessage={errorMessage}
       isPending={isPending}
       onValueChange={onValueChange}
-      onSubmit={onSubmit}
+      onSubmit={() => onSubmit()}
       onCancel={onShowMethods}
     />
   );
