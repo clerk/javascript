@@ -11,14 +11,16 @@ import * as React from 'react';
 import { Header, MobileShell, PageSkeleton, Rail, Skeleton } from '@/components/gallery/app-wireframe';
 import { RemixReceiver } from '@/components/gallery/remix';
 import { EmbedScrollBridge } from '@/components/gallery/scroll-bridge';
+import { ThemeReceiver } from '@/components/gallery/theme';
 import { TouchMode, useTouchParam } from '@/components/gallery/touch-mode';
 import { frameUrlFor } from '@/lib/components/frame';
+import { withoutOrganizationComingSoon, withoutUserComingSoon } from '@/lib/components/pages';
 export function UserProfileModal() {
   const { activePage, setActivePage, pages } = useUserProfileFixture();
   return (
     <UserProfileView
       activePage={activePage}
-      pages={pages}
+      pages={withoutUserComingSoon(pages)}
       onPageChange={setActivePage}
     />
   );
@@ -28,7 +30,7 @@ export function OrganizationProfileModal() {
   return (
     <OrganizationProfileView
       activePage={activePage}
-      pages={pages}
+      pages={withoutOrganizationComingSoon(pages)}
       onPageChange={setActivePage}
     />
   );
@@ -49,6 +51,7 @@ export function EmbedModal({ slug }: { slug: string }) {
     <MosaicProvider>
       <EmbedScrollBridge />
       <RemixReceiver />
+      <ThemeReceiver />
       <TouchMode />
       {touch ? (
         <MobileShell url={frameUrlFor(slug)}>

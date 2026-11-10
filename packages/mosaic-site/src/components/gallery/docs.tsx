@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import { EXAMPLES } from '@/components/gallery/examples';
+import { PromptBar } from '@/components/prompt-bar/prompt-bar';
 import { type DocBlock, DOCS, type DocSection, type PropRow } from '@/lib/components/docs';
 import { cn } from '@/lib/utils';
 const copy = 'text-[17px] leading-[1.7] text-neutral-600 dark:text-neutral-400';
@@ -65,7 +66,7 @@ function CopyButton({ text }: { text: string }) {
     </button>
   );
 }
-function CodeBlock({ code }: { code: string }) {
+export function CodeBlock({ code }: { code: string }) {
   return (
     <div className={cn(card, 'relative mt-5')}>
       <pre className='text-foreground overflow-x-auto p-5 pr-14 font-mono text-[14px] leading-[1.7]'>{code}</pre>
@@ -206,6 +207,12 @@ function Block({ slug, block }: { slug: string; block: DocBlock }) {
           slug={slug}
           id={block.id}
         />
+      );
+    case 'prompt':
+      return (
+        <div className='mt-6'>
+          <PromptBar command={block.text} />
+        </div>
       );
   }
 }

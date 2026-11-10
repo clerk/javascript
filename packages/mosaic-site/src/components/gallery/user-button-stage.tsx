@@ -3,6 +3,7 @@ import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 import { Building } from '@clerk/mosaic/icons/glyphs/building';
 import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 import { Users } from '@clerk/mosaic/icons/glyphs/users';
+import { PortalProvider } from '@clerk/mosaic/primitives/portal';
 import { usePrototype } from '@swingset/stories/fixtures/switcher';
 import * as React from 'react';
 
@@ -15,8 +16,8 @@ export type UserButtonSize = 'full' | 'condensed' | 'avatar';
 export const TYPE_OPTIONS: { id: UserButtonType; label: string }[] = [
   { id: 'combined', label: 'combined' },
   { id: 'user', label: 'user' },
-  { id: 'org', label: 'organization' },
 ];
+const ALL_TYPES: { id: UserButtonType; label: string }[] = [...TYPE_OPTIONS, { id: 'org', label: 'organization' }];
 export const SIZE_OPTIONS: { id: UserButtonSize; label: string }[] = [
   { id: 'full', label: 'full' },
   { id: 'condensed', label: 'condensed' },
@@ -31,7 +32,7 @@ const placementFor = (type: UserButtonType, size: UserButtonSize): Placement => 
   if (size === 'avatar') {
     return 'left';
   }
-  return type === 'combined' ? 'bottom' : 'top';
+  return 'top';
 };
 const HERO = 840;
 const WINDOW = { y: 40, height: 800, maxWidth: 1280, margin: 48, minWidth: 720 };
@@ -66,15 +67,22 @@ export function Switcher({
   defaultOpen?: boolean;
 }) {
   const prototype = usePrototype({ hidePersonal: true });
-  const { onOpenChange, open } = prototype;
+  const { onOpenChange } = prototype;
+  const outsidePress = React.useRef(false);
   React.useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const close = () => onOpenChange?.(false);
-    window.addEventListener('scroll', close, { passive: true });
-    return () => window.removeEventListener('scroll', close);
-  }, [open, onOpenChange]);
+    const onPointerDown = (event: PointerEvent) => {
+      outsidePress.current = !(event.target as Element | null)?.closest('[data-stage]');
+    };
+    const onKeyDown = () => {
+      outsidePress.current = false;
+    };
+    document.addEventListener('pointerdown', onPointerDown, true);
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown, true);
+      document.removeEventListener('keydown', onKeyDown, true);
+    };
+  }, []);
   React.useEffect(() => {
     if (!defaultOpen) {
       return;
@@ -85,11 +93,17 @@ export function Switcher({
   return (
     <SwitcherView
       {...prototype}
+      onOpenChange={(next: boolean) => {
+        if (!next && outsidePress.current) {
+          return;
+        }
+        onOpenChange?.(next);
+      }}
       onSwitchSession={sessionId => {
         prototype.onSwitchSession?.(sessionId);
         setTimeout(() => onOpenChange?.(false), SWITCH_CLOSE_DELAY);
       }}
-      mode={type === 'user' ? 'user' : type === 'org' ? 'organization' : 'combined'}
+      mode={type === 'user' ? 'user' : type === 'combined' ? 'combined' : 'organization'}
       placement={menuSide[placement]}
       triggerVariant={size === 'condensed' ? 'condensed' : 'full'}
       {...(size === 'avatar' ? { showTriggerLabel: false } : {})}
@@ -296,187 +310,99 @@ export function UserButtonStage({ type, size }: { type: UserButtonType; size: Us
   return (
     <div
       ref={stageRef}
+      data-stage=''
       className='relative w-full overflow-hidden'
       style={{ height: HERO }}
     >
-      <div
-        className={cn('absolute transition-[transform,top] duration-700 motion-reduce:transition-none', ease)}
-        style={{
-          left: '50%',
-          top: windowTop,
-          width: `min(${WINDOW.maxWidth}px, calc(100% - ${WINDOW.margin * 2}px))`,
-          minWidth: WINDOW.minWidth,
-          height: windowHeight,
-          transform: `translateX(calc(-50% + ${centerShift}px))`,
-        }}
-      >
-        <div
-          aria-hidden='true'
-          className='absolute inset-0 bg-[color-mix(in_srgb,var(--background)_93%,var(--foreground))] shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_15%,transparent),inset_0_1px_0_rgba(255,255,255,0.12)]'
-          style={{ padding: BEZEL, borderRadius: 24, ...clipStyle }}
-        >
-          <div className='bg-background flex h-full flex-col overflow-hidden rounded-2xl'>
-            <div
-              className='border-foreground/10 flex shrink-0 items-center gap-5 border-b px-5 text-neutral-500'
-              style={{ height: TOOLBAR }}
-            >
-              <ToolbarIcon path='M3 5h18v14H3zM9 5v14' />
-              <ToolbarIcon path='M15 18l-6-6 6-6' />
-              <ToolbarIcon
-                path='M9 18l6-6-6-6'
-                className='opacity-40'
-              />
-              <ToolbarIcon path='M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5' />
-              <Address url='app.acme.com/dashboard' />
-            </div>
-            <div className='min-h-0 flex-1'>
-              <AppChrome
-                placement={placement}
-                rail={rail}
-                item={item}
-              />
-            </div>
-          </div>
-        </div>
-        {veils.map(veil => (
-          <div
-            key={veil.key}
-            aria-hidden='true'
-            className='pointer-events-none absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none'
-            style={{ backgroundImage: veil.image, opacity: veil.on ? 1 : 0, borderRadius: 24, ...clipStyle }}
-          />
-        ))}
-        <div
-          aria-hidden='true'
-          className='pointer-events-none absolute inset-0'
-          style={focusStyle}
-        />
+      <PortalProvider container={stageRef}>
         <div
           className={cn(
-            'absolute left-0 top-0 motion-reduce:transition-none',
-            settled && cn('transition-[translate] duration-500', ease),
+            'absolute transition-[transform,top,opacity] duration-700 motion-reduce:transition-none',
+            ease,
+            !settled && 'opacity-0',
           )}
-          style={{ translate: `${inWindow.x}px ${inWindow.y}px` }}
+          style={{
+            left: '50%',
+            top: windowTop,
+            width: `min(${WINDOW.maxWidth}px, calc(100% - ${WINDOW.margin * 2}px))`,
+            minWidth: WINDOW.minWidth,
+            height: windowHeight,
+            transform: `translateX(calc(-50% + ${centerShift}px))`,
+          }}
         >
           <div
-            className={cn('overflow-clip transition-[max-width] duration-500 motion-reduce:transition-none', ease)}
-            style={{ maxWidth: clipWidth, overflowClipMargin: 6 }}
+            aria-hidden='true'
+            className='absolute inset-0 bg-[color-mix(in_srgb,var(--background)_93%,var(--foreground))] shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_15%,transparent),inset_0_1px_0_rgba(255,255,255,0.12)]'
+            style={{ padding: BEZEL, borderRadius: 24, ...clipStyle }}
+          >
+            <div className='bg-background flex h-full flex-col overflow-hidden rounded-2xl'>
+              <div
+                className='border-foreground/10 flex shrink-0 items-center gap-5 border-b px-5 text-neutral-500'
+                style={{ height: TOOLBAR }}
+              >
+                <ToolbarIcon path='M3 5h18v14H3zM9 5v14' />
+                <ToolbarIcon path='M15 18l-6-6 6-6' />
+                <ToolbarIcon
+                  path='M9 18l6-6-6-6'
+                  className='opacity-40'
+                />
+                <ToolbarIcon path='M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5' />
+                <Address url='app.acme.com/dashboard' />
+              </div>
+              <div className='min-h-0 flex-1'>
+                <AppChrome
+                  placement={placement}
+                  rail={rail}
+                  item={item}
+                />
+              </div>
+            </div>
+          </div>
+          {veils.map(veil => (
+            <div
+              key={veil.key}
+              aria-hidden='true'
+              className='pointer-events-none absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none'
+              style={{ backgroundImage: veil.image, opacity: veil.on ? 1 : 0, borderRadius: 24, ...clipStyle }}
+            />
+          ))}
+          <div
+            aria-hidden='true'
+            className='pointer-events-none absolute inset-0'
+            style={focusStyle}
+          />
+          <div
+            className={cn(
+              'absolute left-0 top-0 motion-reduce:transition-none',
+              settled && cn('transition-[translate] duration-500', ease),
+            )}
+            style={{ translate: `${inWindow.x}px ${inWindow.y}px` }}
           >
             <div
-              ref={buttonRef}
-              className={cn('flex', buttonFills ? FILL_CLASS : 'w-max')}
-              style={buttonFills ? { width: FILL_WIDTH } : undefined}
+              className={cn('overflow-clip transition-[max-width] duration-500 motion-reduce:transition-none', ease)}
+              style={{ maxWidth: clipWidth, overflowClipMargin: 6 }}
             >
-              <PopIn
-                key={size}
-                instant={intro}
+              <div
+                ref={buttonRef}
+                className={cn('flex', buttonFills ? FILL_CLASS : 'w-max')}
+                style={buttonFills ? { width: FILL_WIDTH } : undefined}
               >
-                <Switcher
-                  type={type}
-                  size={size}
-                  placement={placement}
-                  defaultOpen={intro}
-                />
-              </PopIn>
+                <PopIn
+                  key={size}
+                  instant={intro}
+                >
+                  <Switcher
+                    type={type}
+                    size={size}
+                    placement={placement}
+                    defaultOpen={intro}
+                  />
+                </PopIn>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-export function PreviewSelect<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  options: { id: T; label: string; preview?: React.ReactNode }[];
-  onChange: (value: T) => void;
-}) {
-  const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const onPointerDown = (event: PointerEvent) => {
-      if (!ref.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
-  const current = options.find(item => item.id === value) ?? options[0];
-  return (
-    <div
-      ref={ref}
-      className='relative'
-    >
-      <button
-        type='button'
-        aria-label={label}
-        aria-haspopup='listbox'
-        aria-expanded={open}
-        onClick={() => setOpen(previous => !previous)}
-        className='hover:bg-foreground/[0.07] flex h-9 items-center gap-2.5 rounded-full pl-2 pr-3.5 text-sm transition-colors'
-      >
-        {current.preview}
-        <span className={cn('font-mono text-[13px]', !current.preview && 'pl-1.5')}>
-          <span className='text-neutral-500'>{label}</span> {current.label}
-        </span>
-        <svg
-          viewBox='0 0 24 24'
-          className='size-3.5 text-neutral-500'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          aria-hidden='true'
-        >
-          <path d='m6 15 6-6 6 6' />
-        </svg>
-      </button>
-      {open ? (
-        <div
-          role='listbox'
-          aria-label={label}
-          className='border-foreground/10 bg-background absolute bottom-full left-0 mb-3 flex w-max min-w-[132px] flex-col gap-0.5 rounded-2xl border p-1.5 shadow-xl'
-        >
-          {options.map(item => (
-            <button
-              key={item.id}
-              type='button'
-              role='option'
-              aria-selected={item.id === value}
-              onClick={() => {
-                onChange(item.id);
-                setOpen(false);
-              }}
-              className={cn(
-                'hover:bg-foreground/[0.07] flex w-full items-center gap-3 rounded-[10px] p-2 text-left text-sm transition-colors',
-                item.id === value && 'bg-foreground/[0.07]',
-              )}
-            >
-              {item.preview}
-              <span className={cn('font-mono text-[13px]', !item.preview && 'px-1')}>{item.label}</span>
-            </button>
-          ))}
-        </div>
-      ) : null}
+      </PortalProvider>
     </div>
   );
 }
@@ -485,36 +411,73 @@ export function userButtonProperties({
   size,
   onType,
   onSize,
+  types = TYPE_OPTIONS,
 }: {
+  types?: { id: UserButtonType; label: string }[];
   type: UserButtonType;
   size: UserButtonSize;
   onType: (value: UserButtonType) => void;
   onSize: (value: UserButtonSize) => void;
 }): Property[] {
+  const sizeProperty: Property = {
+    id: 'triggerVariant',
+    label: 'triggerVariant',
+    value: size,
+    options: SIZE_OPTIONS,
+    onChange: value => onSize(value as UserButtonSize),
+  };
+  if (types.length === 0) {
+    return [sizeProperty];
+  }
   return [
     {
       id: 'mode',
       label: 'mode',
       value: type,
-      options: TYPE_OPTIONS.map(item => {
+      options: types.map(item => {
         const Glyph = TYPE_GLYPHS[item.id];
         return { ...item, icon: <Glyph className='size-4 shrink-0' /> };
       }),
       onChange: value => onType(value as UserButtonType),
     },
-    {
-      id: 'triggerVariant',
-      label: 'triggerVariant',
-      value: size,
-      options: SIZE_OPTIONS,
-      onChange: value => onSize(value as UserButtonSize),
-    },
+    sizeProperty,
   ];
 }
 export const BUTTON_CONFIG_MESSAGE = 'mosaic-user-button-config';
-const parseType = (value: string | null): UserButtonType =>
-  TYPE_OPTIONS.find(item => item.id === value)?.id ?? 'combined';
+const parseType = (value: string | null): UserButtonType => ALL_TYPES.find(item => item.id === value)?.id ?? 'combined';
 const parseSize = (value: string | null): UserButtonSize => SIZE_OPTIONS.find(item => item.id === value)?.id ?? 'full';
+export function StagePreview({ type }: { type: UserButtonType }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const rail = FILL_WIDTH + INSET * 2;
+  return (
+    <div
+      ref={ref}
+      data-stage=''
+      className='bg-background text-foreground relative h-svh w-full overflow-hidden'
+    >
+      <PortalProvider container={ref}>
+        <div className='absolute inset-0'>
+          <AppChrome
+            placement='top'
+            rail={rail}
+            item={{ width: FILL_WIDTH, height: 46 }}
+          />
+        </div>
+        <div
+          className={cn('absolute', FILL_CLASS)}
+          style={{ left: INSET, top: INSET, width: FILL_WIDTH }}
+        >
+          <Switcher
+            type={type}
+            size='full'
+            placement='top'
+            defaultOpen
+          />
+        </div>
+      </PortalProvider>
+    </div>
+  );
+}
 export function MobileUserButton({ type, size, url }: { type: string | null; size: string | null; url: string }) {
   const [config, setConfig] = React.useState({ type: parseType(type), size: parseSize(size) });
   React.useEffect(() => {

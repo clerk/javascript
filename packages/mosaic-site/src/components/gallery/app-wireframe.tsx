@@ -81,7 +81,9 @@ export function AppWireframe({
         <div
           className={cn(
             'min-h-0 flex-1',
-            scroll ? 'overflow-y-auto [scrollbar-width:thin]' : 'overflow-hidden [scrollbar-width:none]',
+            scroll
+              ? 'overflow-y-auto [scrollbar-gutter:stable] [scrollbar-width:thin]'
+              : 'overflow-hidden [scrollbar-width:none]',
             '[&_.cl-profile-nav]:sticky! [&_.cl-profile-nav]:top-6! [&_.cl-profile-nav]:self-start!',
           )}
         >
@@ -94,7 +96,7 @@ export function AppWireframe({
           <div
             className={cn(
               'ring-foreground/10 absolute left-1/2 top-1/2 h-[84%] w-[68%] -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-[var(--cl-color-page,#fff)] shadow-2xl ring-1',
-              scroll ? 'overflow-y-auto [scrollbar-width:thin]' : 'overflow-hidden',
+              scroll ? 'overflow-y-auto [scrollbar-gutter:stable] [scrollbar-width:thin]' : 'overflow-hidden',
             )}
           >
             {children}

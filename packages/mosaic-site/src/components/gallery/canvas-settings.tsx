@@ -67,7 +67,10 @@ export function CanvasSettings() {
     mfa: <UserProfileMfaSectionView {...mfa.section} />,
   };
   return (
-    <div className='flex w-full max-w-[760px] flex-col gap-10'>
+    <div
+      data-xray='canvas-settings'
+      className='flex w-full flex-col gap-10 px-10 pb-10 pt-6'
+    >
       <div className='flex flex-col gap-2'>
         <h3 className='text-[2rem] font-bold leading-10 tracking-[-0.02em]'>Account</h3>
         <p className='text-base text-neutral-600 dark:text-neutral-400'>
@@ -98,17 +101,6 @@ export function CanvasSettings() {
                 </Field.Root>
               </div>
             </div>
-            <p className='pb-4 text-sm'>
-              <a
-                href='https://clerk.com'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-[#2383e2]'
-              >
-                Create a custom self-portrait
-              </a>{' '}
-              with Clerk Faces
-            </p>
           </Section.Body>
         </Section.Group>
       </Section.Root>
