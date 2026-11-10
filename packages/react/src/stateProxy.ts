@@ -183,6 +183,9 @@ export class StateProxy implements State {
             },
           });
         },
+        get clientTrustState() {
+          return gateProperty(target, 'clientTrustState', undefined);
+        },
         get identifier() {
           return gateProperty(target, 'identifier', null);
         },

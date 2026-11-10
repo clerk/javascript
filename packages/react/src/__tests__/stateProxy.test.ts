@@ -25,6 +25,23 @@ describe('StateProxy', () => {
     },
   );
 
+  it('exposes signIn clientTrustState after loading and follows the active attempt', () => {
+    const clientAttempt = { clientTrustState: 'known' };
+    let stateAttempt: { clientTrustState: string } | null = { clientTrustState: 'new' };
+    const isomorphicClerk = {
+      loaded: false,
+      client: { signIn: { __internal_future: clientAttempt } },
+      __internal_state: { signInSignal: () => ({ signIn: stateAttempt }) },
+    };
+    const signIn = new StateProxy(isomorphicClerk as any).signInSignal().signIn as SignInFutureResource;
+
+    expect(signIn.clientTrustState).toBeUndefined();
+    isomorphicClerk.loaded = true;
+    expect(signIn.clientTrustState).toBe('new');
+    stateAttempt = null;
+    expect(signIn.clientTrustState).toBe('known');
+  });
+
   it('preserves a completed sign-in across chained calls when the client clears its sign-in attempt', async () => {
     const emptySignIn = {
       status: 'needs_identifier',

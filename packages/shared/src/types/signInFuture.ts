@@ -1,5 +1,6 @@
 import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
+import type { ClientTrustState } from './json';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { ProtectCheckResource } from './signUpCommon';
@@ -401,6 +402,17 @@ export interface SignInFutureResource {
    * The state of the verification process for the selected second factor. Initially, this property contains an empty verification object, since there is no second factor selected.
    */
   readonly secondFactorVerification: VerificationResource;
+
+  /**
+   * The [Device Trust](https://clerk.com/docs/guides/protect/device-trust) state of the device the user is signing in from.
+   * <ul>
+   *  <li>`'new'` - The user hasn't signed in on this device before, or Clerk can't confirm that they have.</li>
+   *  <li>`'known'` - The user has signed in on this device before.</li>
+   *  <li>`'pending'` - Clerk can't tell yet, for example because the sign-in has no identifier.</li>
+   * </ul>
+   * `undefined` when Device Trust is off, or when the instance reports Device Trust through the `'needs_client_trust'` status instead.
+   */
+  readonly clientTrustState?: ClientTrustState;
 
   /**
    * The authentication identifier value for the current sign-in. `null` if the `strategy` is `'oauth_<provider>'` or `'enterprise_sso'`.
