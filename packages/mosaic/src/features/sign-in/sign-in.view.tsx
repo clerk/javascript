@@ -19,20 +19,21 @@ import { SignUpDetailsStep } from './steps/sign-up-details';
 type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
 
+// TODO: Move factorLabel, choiceCopy and codeCopy to sign-in.utils.ts and test them there.
 function factorLabel(factor: SignInFactor, m: Messages): string {
   switch (factor.strategy) {
     case 'password':
-      return m.alternativeMethods.blockButtonPassword;
+      return m.alternativeMethods.password;
     case 'passkey':
-      return m.alternativeMethods.blockButtonPasskey;
+      return m.alternativeMethods.passkey;
     case 'email_code':
-      return fill(m.alternativeMethods.blockButtonEmailCode, { identifier: factor.identifier });
+      return fill(m.alternativeMethods.emailCode, { identifier: factor.identifier });
     case 'phone_code':
-      return fill(m.alternativeMethods.blockButtonPhoneCode, { identifier: factor.identifier });
+      return fill(m.alternativeMethods.phoneCode, { identifier: factor.identifier });
     case 'totp':
-      return m.alternativeMethods.blockButtonTotp;
+      return m.alternativeMethods.totp;
     case 'backup_code':
-      return m.alternativeMethods.blockButtonBackupCode;
+      return m.alternativeMethods.backupCode;
   }
 }
 
@@ -44,21 +45,21 @@ function codeCopy(
   if (step.purpose === 'verify-email') {
     return {
       title: m.verifyEmail.title,
-      description: fill(m.verifyEmail.subtitle, { identifier }),
-      fieldLabel: m.verifyEmail.formTitle,
+      description: fill(m.verifyEmail.description, { identifier }),
+      fieldLabel: m.verifyEmail.label,
     };
   }
   if (step.channel === 'totp') {
-    return { title: m.totpMfa.title, description: m.totpMfa.subtitle, fieldLabel: m.totpMfa.formTitle };
+    return { title: m.totpMfa.title, description: m.totpMfa.description, fieldLabel: m.totpMfa.label };
   }
   if (step.channel === 'phone') {
     const copy = step.purpose === 'second-factor' ? m.phoneCodeMfa : m.phoneCode;
-    return { title: copy.title, description: fill(copy.subtitle, { identifier }), fieldLabel: copy.formTitle };
+    return { title: copy.title, description: fill(copy.description, { identifier }), fieldLabel: copy.label };
   }
   return {
     title: m.emailCode.title,
-    description: fill(m.emailCode.subtitle, { identifier }),
-    fieldLabel: m.emailCode.formTitle,
+    description: fill(m.emailCode.description, { identifier }),
+    fieldLabel: m.emailCode.label,
   };
 }
 
@@ -98,12 +99,12 @@ export function SignInView({
   const m = useMessages('signIn');
 
   const actions = {
-    secondaryActionLabel: m.footerActionLinkUseAnotherMethod,
-    primaryActionLabel: m.formButtonPrimary,
+    secondaryActionLabel: m.useAnotherMethod,
+    primaryActionLabel: m.continue,
     pendingLabel: m.verifying,
   };
   const resend = {
-    text: m.emailCode.resendText,
+    text: m.emailCode.resendPrompt,
     label: resendRemainingSeconds ? (
       <span>
         {rich(m.emailCode.resendCountdown, {
@@ -115,6 +116,7 @@ export function SignInView({
     ) : (
       m.emailCode.resend
     ),
+    // TODO: Take this flag from the controller instead of deriving it from canResend and isPending.
     disabled: !canResend || isPending,
     onClick: onResend,
   };
@@ -134,15 +136,15 @@ export function SignInView({
                 logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
                 messages={{
                   title: fill(combined ? m.start.titleCombined : m.start.title, { applicationName }),
-                  description: combined ? m.start.subtitleCombined : m.start.subtitle,
-                  socialButton: provider => fill(m.socialButton, { provider }),
-                  dividerText: m.dividerText,
-                  fieldLabel: m.formFieldLabelEmailAddress,
-                  fieldPlaceholder: m.formFieldInputPlaceholderEmailAddress,
-                  primaryActionLabel: m.formButtonPrimary,
+                  description: combined ? m.start.descriptionCombined : m.start.description,
+                  socialButton: provider => fill(m.start.socialButton, { provider }),
+                  dividerText: m.start.divider,
+                  fieldLabel: m.start.emailLabel,
+                  fieldPlaceholder: m.start.emailPlaceholder,
+                  primaryActionLabel: m.continue,
                   pendingLabel: m.verifying,
-                  actionText: m.start.actionText,
-                  actionLink: m.start.actionLink,
+                  actionText: m.start.signUpPrompt,
+                  actionLink: m.start.signUpLink,
                 }}
                 socialProviders={socialProviders}
                 pendingProviderId={pendingProviderId}
@@ -152,6 +154,7 @@ export function SignInView({
                 isPending={isPending}
                 onValueChange={onIdentifierChange}
                 onSubmit={onSubmit}
+                // TODO: Have the controller omit onSignUp in the combined flow instead of the view dropping it.
                 onSignUp={combined ? undefined : onSignUp}
               />
             </Flow.Step>
@@ -164,19 +167,19 @@ export function SignInView({
                   messages={{
                     password: {
                       title: m.password.title,
-                      description: m.password.subtitle,
-                      identityEditLabel: m.identityPreviewEditButton,
-                      fieldLabel: m.formFieldLabelPassword,
-                      fieldPlaceholder: m.formFieldInputPlaceholderPassword,
-                      showPasswordLabel: m.formFieldActionShowPassword,
-                      hidePasswordLabel: m.formFieldActionHidePassword,
-                      forgotPasswordLabel: m.password.actionLink,
+                      description: m.password.description,
+                      identityEditLabel: m.password.editIdentifier,
+                      fieldLabel: m.password.label,
+                      fieldPlaceholder: m.password.placeholder,
+                      showPasswordLabel: m.showPassword,
+                      hidePasswordLabel: m.hidePassword,
+                      forgotPasswordLabel: m.password.forgotPassword,
                       ...actions,
                     },
                     backupCode: {
                       title: m.backupCodeMfa.title,
-                      description: m.backupCodeMfa.subtitle,
-                      fieldLabel: m.formFieldLabelBackupCode,
+                      description: m.backupCodeMfa.description,
+                      fieldLabel: m.backupCodeMfa.label,
                       ...actions,
                     },
                   }}
@@ -216,10 +219,10 @@ export function SignInView({
                   step={current}
                   messages={{
                     title: m.alternativeMethods.title,
-                    description: m.alternativeMethods.subtitle,
-                    backButton: m.backButton,
-                    helpText: m.alternativeMethods.actionText,
-                    helpButton: m.alternativeMethods.actionLink,
+                    description: m.alternativeMethods.description,
+                    backButton: m.back,
+                    helpText: m.alternativeMethods.helpPrompt,
+                    helpButton: m.alternativeMethods.helpLink,
                   }}
                   factorLabel={factor => factorLabel(factor, m)}
                   pendingFactorId={pendingFactorId}
@@ -237,9 +240,9 @@ export function SignInView({
                   messages={{
                     help: {
                       title: m.alternativeMethods.getHelp.title,
-                      description: m.alternativeMethods.getHelp.content,
-                      backButton: m.backButton,
-                      supportButton: m.alternativeMethods.getHelp.blockButtonEmailSupport,
+                      description: m.alternativeMethods.getHelp.description,
+                      backButton: m.back,
+                      supportButton: m.alternativeMethods.getHelp.emailSupport,
                     },
                   }}
                   onEmailSupport={onEmailSupport}
@@ -253,21 +256,21 @@ export function SignInView({
                 focusRef={focusRef}
                 messages={{
                   title: m.signUp.title,
-                  description: m.signUp.subtitle,
-                  firstNameLabel: m.formFieldLabelFirstName,
-                  firstNamePlaceholder: m.formFieldInputPlaceholderFirstName,
-                  lastNameLabel: m.formFieldLabelLastName,
-                  lastNamePlaceholder: m.formFieldInputPlaceholderLastName,
-                  emailLabel: m.formFieldLabelEmailAddress,
-                  emailPlaceholder: m.formFieldInputPlaceholderEmailAddress,
-                  passwordLabel: m.formFieldLabelPassword,
-                  passwordPlaceholder: m.formFieldInputPlaceholderPassword,
-                  showPasswordLabel: m.formFieldActionShowPassword,
-                  hidePasswordLabel: m.formFieldActionHidePassword,
-                  primaryActionLabel: m.formButtonPrimary,
+                  description: m.signUp.description,
+                  firstNameLabel: m.signUp.firstNameLabel,
+                  firstNamePlaceholder: m.signUp.firstNamePlaceholder,
+                  lastNameLabel: m.signUp.lastNameLabel,
+                  lastNamePlaceholder: m.signUp.lastNamePlaceholder,
+                  emailLabel: m.signUp.emailLabel,
+                  emailPlaceholder: m.signUp.emailPlaceholder,
+                  passwordLabel: m.signUp.passwordLabel,
+                  passwordPlaceholder: m.signUp.passwordPlaceholder,
+                  showPasswordLabel: m.showPassword,
+                  hidePasswordLabel: m.hidePassword,
+                  primaryActionLabel: m.continue,
                   pendingLabel: m.verifying,
-                  actionText: m.signUp.actionText,
-                  actionLink: m.signUp.actionLink,
+                  actionText: m.signUp.signInPrompt,
+                  actionLink: m.signUp.signInLink,
                 }}
                 values={signUpDetails}
                 errors={signUpErrors}
