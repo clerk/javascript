@@ -3,12 +3,11 @@ import type { Ref } from 'react';
 import type { VerificationBackupCodeMessages } from '../../../blocks/verification';
 import { VerificationBackupCode } from '../../../blocks/verification';
 import type { SignInStep } from '../sign-in.types';
-import type { SignInPasswordMessages } from './sign-in-password';
 import { SignInPassword } from './sign-in-password';
 
 interface SecretStepProps {
   step: Extract<SignInStep, { kind: 'secret' }>;
-  messages: { password: SignInPasswordMessages; backupCode: VerificationBackupCodeMessages };
+  messages: VerificationBackupCodeMessages;
   value: string;
   errorMessage?: string;
   isPending: boolean;
@@ -37,7 +36,6 @@ export function SecretStep({
     return (
       <SignInPassword
         focusRef={focusRef}
-        messages={messages.password}
         identifier={step.identifier}
         onEditIdentifier={onEditIdentifier}
         value={value}
@@ -54,7 +52,7 @@ export function SecretStep({
   return (
     <VerificationBackupCode
       focusRef={focusRef}
-      messages={messages.backupCode}
+      messages={messages}
       value={value}
       errorMessage={errorMessage}
       isPending={isPending}

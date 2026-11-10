@@ -134,18 +134,8 @@ export function SignInView({
               <IdentifierStep
                 focusRef={focusRef}
                 logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
-                messages={{
-                  title: fill(combined ? m.start.titleCombined : m.start.title, { applicationName }),
-                  description: combined ? m.start.descriptionCombined : m.start.description,
-                  socialButton: provider => fill(m.start.socialButton, { provider }),
-                  dividerText: m.start.divider,
-                  fieldLabel: m.start.emailLabel,
-                  fieldPlaceholder: m.start.emailPlaceholder,
-                  primaryActionLabel: m.continue,
-                  pendingLabel: m.verifying,
-                  actionText: m.start.signUpPrompt,
-                  actionLink: m.start.signUpLink,
-                }}
+                applicationName={applicationName}
+                combined={combined}
                 socialProviders={socialProviders}
                 pendingProviderId={pendingProviderId}
                 onSelectProvider={onSelectProvider}
@@ -165,23 +155,10 @@ export function SignInView({
                   focusRef={focusRef}
                   step={current}
                   messages={{
-                    password: {
-                      title: m.password.title,
-                      description: m.password.description,
-                      identityEditLabel: m.password.editIdentifier,
-                      fieldLabel: m.password.label,
-                      fieldPlaceholder: m.password.placeholder,
-                      showPasswordLabel: m.showPassword,
-                      hidePasswordLabel: m.hidePassword,
-                      forgotPasswordLabel: m.password.forgotPassword,
-                      ...actions,
-                    },
-                    backupCode: {
-                      title: m.backupCodeMfa.title,
-                      description: m.backupCodeMfa.description,
-                      fieldLabel: m.backupCodeMfa.label,
-                      ...actions,
-                    },
+                    title: m.backupCodeMfa.title,
+                    description: m.backupCodeMfa.description,
+                    fieldLabel: m.backupCodeMfa.label,
+                    ...actions,
                   }}
                   value={value}
                   errorMessage={errorMessage}
@@ -254,24 +231,6 @@ export function SignInView({
             <Flow.Step ids={['sign-up']}>
               <SignUpDetailsStep
                 focusRef={focusRef}
-                messages={{
-                  title: m.signUp.title,
-                  description: m.signUp.description,
-                  firstNameLabel: m.signUp.firstNameLabel,
-                  firstNamePlaceholder: m.signUp.firstNamePlaceholder,
-                  lastNameLabel: m.signUp.lastNameLabel,
-                  lastNamePlaceholder: m.signUp.lastNamePlaceholder,
-                  emailLabel: m.signUp.emailLabel,
-                  emailPlaceholder: m.signUp.emailPlaceholder,
-                  passwordLabel: m.signUp.passwordLabel,
-                  passwordPlaceholder: m.signUp.passwordPlaceholder,
-                  showPasswordLabel: m.showPassword,
-                  hidePasswordLabel: m.hidePassword,
-                  primaryActionLabel: m.continue,
-                  pendingLabel: m.verifying,
-                  actionText: m.signUp.signInPrompt,
-                  actionLink: m.signUp.signInLink,
-                }}
                 values={signUpDetails}
                 errors={signUpErrors}
                 isPending={isPending}
