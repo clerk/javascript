@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import type { VerificationCodeMessages } from '../../blocks/verification';
+import type { VerificationCodeMessages, VerificationCodeResend } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import type { MosaicMessages } from '../../localization';
@@ -19,6 +19,7 @@ import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
+type ResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
 
 function factorLabel(factor: SignInFactor, m: Messages): string {
   switch (factor.strategy) {
@@ -48,6 +49,22 @@ function choiceCopy(
   return step.purpose === 'reset-methods'
     ? { title: m.resetMethods.title, description: m.resetMethods.description }
     : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
+}
+
+function resendCopy(step: CodeStepData, m: Messages): ResendCopy | undefined {
+  if (step.purpose === 'reset-password') {
+    return m.resetPasswordCode;
+  }
+  if (step.purpose === 'verify-email') {
+    return m.verifyEmail;
+  }
+  if (step.channel === 'totp') {
+    return undefined;
+  }
+  if (step.channel === 'phone') {
+    return step.purpose === 'second-factor' ? m.phoneCodeMfa : m.phoneCode;
+  }
+  return m.emailCode;
 }
 
 function codeCopy(
@@ -122,23 +139,24 @@ export function SignInView({
     primaryActionLabel: m.continue,
     pendingLabel: m.verifying,
   };
-  const resend = {
-    text: m.emailCode.resendPrompt,
-    label: resendRemainingSeconds ? (
-      <span>
-        {rich(m.emailCode.resendCountdown, {
-          values: {
-            seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
-          },
-        })}
-      </span>
-    ) : (
-      m.emailCode.resend
-    ),
-    // TODO: Take this flag from the controller instead of deriving it from canResend and isPending.
-    disabled: !canResend || isPending,
-    onClick: onResend,
-  };
+  const resendFor = (copy: ResendCopy | undefined): VerificationCodeResend | undefined =>
+    copy && {
+      text: copy.resendText,
+      label: resendRemainingSeconds ? (
+        <span>
+          {rich(copy.resendCountdown, {
+            values: {
+              seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
+            },
+          })}
+        </span>
+      ) : (
+        copy.resend
+      ),
+      // TODO: Take this flag from the controller instead of deriving it from canResend and isPending.
+      disabled: !canResend || isPending,
+      onClick: onResend,
+    };
 
   return (
     <Card.Root align='center'>
@@ -206,7 +224,7 @@ export function SignInView({
                         }
                       : {}),
                   }}
-                  resend={resend}
+                  resend={resendFor(resendCopy(current, m))}
                   form={form}
                   errorMessage={errorMessage}
                   globalErrorMessage={globalErrorMessage}
