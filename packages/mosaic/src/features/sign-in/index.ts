@@ -1,9 +1,10 @@
 export { SignInView } from './sign-in.view';
 export type {
-  SignInMethod,
-  SignInOtpChannel,
+  SignInActionBlockedDetails,
+  SignInFactor,
   SignInSocialProvider,
   SignInStep,
+  SignInSubmitEvent,
+  SignInValues,
   SignInViewProps,
-  SignUpDetails,
 } from './sign-in.types';

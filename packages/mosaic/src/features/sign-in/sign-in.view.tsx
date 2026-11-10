@@ -1,54 +1,102 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import {
-  VerificationBackupCode,
-  VerificationCode,
-  VerificationHelp,
-  VerificationMethodPicker,
-} from '../../blocks/verification';
+import type { VerificationCodeMessages, VerificationCodeResend } from '../../blocks/verification';
+import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
-import type { IconComponent } from '../../icons/glyph';
-import { Envelope } from '../../icons/glyphs/envelope';
-import { Key } from '../../icons/glyphs/key';
-import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
-import { SecurityPasskey } from '../../icons/glyphs/security-passkey';
-import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
-import type { SignInMethod, SignInViewProps } from './sign-in.types';
-import { SignInPassword } from './steps/sign-in-password';
-import { SignInStart } from './steps/sign-in-start';
+import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
+import { stepKey } from './sign-in.utils';
+import { ChoiceStep } from './steps/choice-step';
+import { CodeStep } from './steps/code-step';
+import { CredentialStep } from './steps/credential-step';
+import { IdentifierStep } from './steps/identifier-step';
+import { NewPasswordStep } from './steps/new-password-step';
+import { NoticeStep } from './steps/notice-step';
 import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];
+type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
+type ResendCopy = Pick<Messages['emailCode'] | Messages['emailLink'], 'resendText' | 'resend' | 'resendCountdown'>;
 
-const methodIcon = {
-  password: SecurityLockSquare,
-  passkey: SecurityPasskey,
-  email_code: Envelope,
-  phone_code: SecurityPhone,
-  totp: SecurityLockSquare,
-  backup_code: Key,
-} as const satisfies Record<SignInMethod['strategy'], IconComponent>;
-
-function methodLabel(method: SignInMethod, m: Messages): string {
-  const identifier = 'identifier' in method ? method.identifier : '';
-  switch (method.strategy) {
+function factorLabel(factor: SignInFactor, m: Messages): string {
+  switch (factor.strategy) {
     case 'password':
-      return m.alternativeMethods.blockButtonPassword;
+      return m.alternativeMethods.password;
     case 'passkey':
-      return m.alternativeMethods.blockButtonPasskey;
+      return m.alternativeMethods.passkey;
     case 'email_code':
-      return fill(m.alternativeMethods.blockButtonEmailCode, { identifier });
+      return fill(m.alternativeMethods.emailCode, { identifier: factor.identifier });
     case 'phone_code':
-      return fill(m.alternativeMethods.blockButtonPhoneCode, { identifier });
+      return fill(m.alternativeMethods.phoneCode, { identifier: factor.identifier });
     case 'totp':
-      return m.alternativeMethods.blockButtonTotp;
+      return m.alternativeMethods.totp;
     case 'backup_code':
-      return m.alternativeMethods.blockButtonBackupCode;
+      return m.alternativeMethods.backupCode;
+    case 'reset_password_email_code':
+      return fill(m.resetMethods.emailCode, { identifier: factor.identifier });
+    case 'reset_password_phone_code':
+      return fill(m.resetMethods.phoneCode, { identifier: factor.identifier });
   }
+}
+
+function choiceCopy(
+  step: Extract<SignInStep, { kind: 'choice' }>,
+  m: Messages,
+): { title: string; description: string } {
+  return step.purpose === 'reset-methods'
+    ? { title: m.resetMethods.title, description: m.resetMethods.description }
+    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
+}
+
+function resendCopy(step: CodeStepData, m: Messages): ResendCopy {
+  if (step.purpose === 'reset-password') {
+    return m.resetPasswordCode;
+  }
+  if (step.purpose === 'verify-email') {
+    return m.verifyEmail;
+  }
+  if (step.channel === 'phone') {
+    return step.purpose === 'second-factor' ? m.phoneCodeMfa : m.phoneCode;
+  }
+  return m.emailCode;
+}
+
+function codeCopy(
+  step: CodeStepData,
+  m: Messages,
+): Pick<VerificationCodeMessages, 'title' | 'description' | 'fieldLabel'> {
+  const identifier = step.identifier ?? '';
+  if (step.purpose === 'reset-password') {
+    const description =
+      step.channel === 'phone' ? m.resetPasswordCode.descriptionPhone : m.resetPasswordCode.descriptionEmail;
+    return {
+      title: m.resetPasswordCode.title,
+      description: fill(description, { identifier }),
+      fieldLabel: m.resetPasswordCode.label,
+    };
+  }
+  if (step.purpose === 'verify-email') {
+    return {
+      title: m.verifyEmail.title,
+      description: fill(m.verifyEmail.description, { identifier }),
+      fieldLabel: m.verifyEmail.label,
+    };
+  }
+  if (step.channel === 'totp') {
+    return { title: m.totpMfa.title, description: m.totpMfa.description, fieldLabel: m.totpMfa.label };
+  }
+  if (step.channel === 'phone') {
+    const copy = step.purpose === 'second-factor' ? m.phoneCodeMfa : m.phoneCode;
+    return { title: copy.title, description: fill(copy.description, { identifier }), fieldLabel: copy.label };
+  }
+  return {
+    title: m.emailCode.title,
+    description: fill(m.emailCode.description, { identifier }),
+    fieldLabel: m.emailCode.label,
+  };
 }
 
 export function SignInView({
@@ -60,268 +108,202 @@ export function SignInView({
   socialProviders,
   pendingProviderId,
   onSelectProvider,
-  identifier,
-  onIdentifierChange,
+  form,
+  onSubmit,
+  onCodeComplete,
+  isPending,
+  isDisabled,
+  errorMessage,
+  globalErrorMessage,
+  newPasswordFeedback,
   onEditIdentifier,
   onSignUp,
-  value,
-  onValueChange,
-  errorMessage,
-  isPending,
-  onSubmit,
   onForgotPassword,
-  onShowMethods,
+  onCancel,
   onShowHelp,
   onBack,
   onEmailSupport,
-  methods,
-  pendingMethodId,
-  onSelectMethod,
-  otpChannel,
+  pendingFactorId,
+  onSelectFactor,
   onResend,
   canResend,
   resendRemainingSeconds,
-  signUpDetails,
-  signUpErrors,
-  onSignUpDetailChange,
   focusRef,
 }: SignInViewProps & { focusRef?: Ref<HTMLElement> }) {
   const m = useMessages('signIn');
 
   const actions = {
-    secondaryActionLabel: m.footerActionLinkUseAnotherMethod,
-    primaryActionLabel: m.formButtonPrimary,
+    secondaryActionLabel: m.useAnotherMethod,
+    primaryActionLabel: m.continue,
     pendingLabel: m.verifying,
   };
-  const hasAlternatives = methods.length > 0;
-  const resend =
-    otpChannel === 'email' || otpChannel === 'phone'
-      ? {
-          text: m.emailCode.resendText,
-          label: resendRemainingSeconds ? (
-            <span>
-              {rich(m.emailCode.resendCountdown, {
-                values: {
-                  seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
-                },
-              })}
-            </span>
-          ) : (
-            m.emailCode.resend
-          ),
-          disabled: !canResend || isPending,
-          onClick: onResend,
-        }
-      : undefined;
-  const otpSubmit = (code: string) => {
-    onValueChange(code);
-    onSubmit();
-  };
+  const resendFor = (copy: ResendCopy): VerificationCodeResend | undefined =>
+    onResend && {
+      text: copy.resendText,
+      label: resendRemainingSeconds ? (
+        <span>
+          {rich(copy.resendCountdown, {
+            values: {
+              seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
+            },
+          })}
+        </span>
+      ) : (
+        copy.resend
+      ),
+      disabled: !canResend,
+      onClick: onResend,
+    };
 
   return (
-    <Flow.Root
-      value={step}
-      direction={direction}
-      state={step}
-    >
-      {() => (
-        <>
-          <Flow.Step ids={['start']}>
-            <SignInStart
-              focusRef={focusRef}
-              logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
-              messages={{
-                title: fill(combined ? m.start.titleCombined : m.start.title, { applicationName }),
-                description: combined ? m.start.subtitleCombined : m.start.subtitle,
-                socialButton: provider => fill(m.socialButton, { provider }),
-                dividerText: m.dividerText,
-                fieldLabel: m.formFieldLabelEmailAddress,
-                fieldPlaceholder: m.formFieldInputPlaceholderEmailAddress,
-                primaryActionLabel: m.formButtonPrimary,
-                pendingLabel: m.verifying,
-                actionText: m.start.actionText,
-                actionLink: m.start.actionLink,
-              }}
-              socialProviders={socialProviders}
-              pendingProviderId={pendingProviderId}
-              onSelectProvider={onSelectProvider}
-              value={identifier}
-              errorMessage={errorMessage}
-              isPending={isPending}
-              onValueChange={onIdentifierChange}
-              onSubmit={onSubmit}
-              onSignUp={combined ? undefined : onSignUp}
-            />
-          </Flow.Step>
+    <Card.Root align='center'>
+      <Flow.Root
+        value={stepKey(step)}
+        direction={direction}
+        state={step}
+      >
+        {current => (
+          <>
+            <Flow.Step ids={['identifier']}>
+              <IdentifierStep
+                focusRef={focusRef}
+                logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                applicationName={applicationName}
+                combined={combined}
+                socialProviders={socialProviders}
+                pendingProviderId={pendingProviderId}
+                onSelectProvider={onSelectProvider}
+                form={form}
+                errorMessage={errorMessage}
+                globalErrorMessage={globalErrorMessage}
+                isPending={isPending}
+                isDisabled={isDisabled}
+                onSubmit={onSubmit}
+                onSignUp={onSignUp}
+              />
+            </Flow.Step>
 
-          <Flow.Step ids={['password']}>
-            <SignInPassword
-              focusRef={focusRef}
-              messages={{
-                title: m.password.title,
-                description: m.password.subtitle,
-                identityEditLabel: m.identityPreviewEditButton,
-                fieldLabel: m.formFieldLabelPassword,
-                fieldPlaceholder: m.formFieldInputPlaceholderPassword,
-                showPasswordLabel: m.formFieldActionShowPassword,
-                hidePasswordLabel: m.formFieldActionHidePassword,
-                forgotPasswordLabel: m.password.actionLink,
-                ...actions,
-              }}
-              identifier={identifier}
-              onEditIdentifier={onEditIdentifier}
-              value={value}
-              errorMessage={errorMessage}
-              isPending={isPending}
-              onValueChange={onValueChange}
-              onSubmit={onSubmit}
-              onForgotPassword={onForgotPassword}
-              onCancel={hasAlternatives ? onShowMethods : undefined}
-            />
-          </Flow.Step>
+            <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
+              {current.kind === 'credential' ? (
+                <CredentialStep
+                  focusRef={focusRef}
+                  step={current}
+                  messages={{
+                    title: m.backupCodeMfa.title,
+                    description: m.backupCodeMfa.description,
+                    fieldLabel: m.backupCodeMfa.label,
+                    ...actions,
+                  }}
+                  form={form}
+                  errorMessage={errorMessage}
+                  globalErrorMessage={globalErrorMessage}
+                  isPending={isPending}
+                  onSubmit={onSubmit}
+                  onEditIdentifier={onEditIdentifier}
+                  onForgotPassword={onForgotPassword}
+                  onCancel={onCancel}
+                  onShowHelp={onShowHelp}
+                />
+              ) : null}
+            </Flow.Step>
 
-          <Flow.Step ids={['email-code']}>
-            <VerificationCode
-              focusRef={focusRef}
-              messages={{
-                title: m.emailCode.title,
-                description: fill(m.emailCode.subtitle, { identifier }),
-                fieldLabel: m.emailCode.formTitle,
-                ...actions,
-              }}
-              value={value}
-              errorMessage={errorMessage}
-              isPending={isPending}
-              resend={resend}
-              onValueChange={onValueChange}
-              onComplete={otpSubmit}
-              onSubmit={onSubmit}
-              onCancel={hasAlternatives ? onShowMethods : undefined}
-            />
-          </Flow.Step>
+            <Flow.Step ids={['code:first-factor', 'code:second-factor', 'code:reset-password', 'code:verify-email']}>
+              {current.kind === 'code' ? (
+                <CodeStep
+                  focusRef={focusRef}
+                  messages={{
+                    ...codeCopy(current, m),
+                    ...actions,
+                    ...(current.purpose === 'reset-password'
+                      ? {
+                          primaryActionLabel: m.resetPasswordCode.verify,
+                          secondaryActionLabel: m.forgotPassword.back,
+                        }
+                      : {}),
+                  }}
+                  resend={resendFor(resendCopy(current, m))}
+                  form={form}
+                  errorMessage={errorMessage}
+                  globalErrorMessage={globalErrorMessage}
+                  isPending={isPending}
+                  onSubmit={onSubmit}
+                  onCodeComplete={onCodeComplete}
+                  onCancel={onCancel}
+                />
+              ) : null}
+            </Flow.Step>
 
-          <Flow.Step ids={['totp']}>
-            <VerificationCode
-              focusRef={focusRef}
-              messages={{
-                title: m.totpMfa.title,
-                description: m.totpMfa.subtitle,
-                fieldLabel: m.totpMfa.formTitle,
-                ...actions,
-              }}
-              value={value}
-              errorMessage={errorMessage}
-              isPending={isPending}
-              onValueChange={onValueChange}
-              onComplete={otpSubmit}
-              onSubmit={onSubmit}
-              onCancel={hasAlternatives ? onShowMethods : undefined}
-            />
-          </Flow.Step>
+            <Flow.Step ids={['choice:methods', 'choice:reset-methods']}>
+              {current.kind === 'choice' ? (
+                <ChoiceStep
+                  focusRef={focusRef}
+                  step={current}
+                  messages={{
+                    ...choiceCopy(current, m),
+                    backButton: m.back,
+                    helpText: m.alternativeMethods.helpPrompt,
+                    helpButton: m.alternativeMethods.helpLink,
+                  }}
+                  factorLabel={factor => factorLabel(factor, m)}
+                  pendingFactorId={pendingFactorId}
+                  onSelectFactor={onSelectFactor}
+                  onShowHelp={onShowHelp}
+                  onBack={onBack}
+                />
+              ) : null}
+            </Flow.Step>
 
-          <Flow.Step ids={['backup-code']}>
-            <VerificationBackupCode
-              focusRef={focusRef}
-              messages={{
-                title: m.backupCodeMfa.title,
-                description: m.backupCodeMfa.subtitle,
-                fieldLabel: m.formFieldLabelBackupCode,
-                ...actions,
-              }}
-              value={value}
-              errorMessage={errorMessage}
-              isPending={isPending}
-              onValueChange={onValueChange}
-              onSubmit={onSubmit}
-              onCancel={hasAlternatives ? onShowMethods : undefined}
-            />
-          </Flow.Step>
+            <Flow.Step
+              ids={[
+                'notice:help',
+                'notice:forgot-password',
+                'notice:no-methods',
+                'notice:action-blocked',
+                'notice:password-compromised',
+                'notice:email-link',
+              ]}
+            >
+              {current.kind === 'notice' ? (
+                <NoticeStep
+                  focusRef={focusRef}
+                  step={current}
+                  globalErrorMessage={globalErrorMessage}
+                  isPending={isPending}
+                  resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}
+                  onSubmit={() => onSubmit()}
+                  onEmailSupport={onEmailSupport}
+                  onBack={onBack}
+                  onEditIdentifier={onEditIdentifier}
+                  onForgotPassword={onForgotPassword}
+                  onCancel={onCancel}
+                />
+              ) : null}
+            </Flow.Step>
 
-          <Flow.Step ids={['method-picker']}>
-            <VerificationMethodPicker
-              focusRef={focusRef}
-              messages={{
-                title: m.alternativeMethods.title,
-                description: m.alternativeMethods.subtitle,
-                backButton: m.backButton,
-                helpText: m.alternativeMethods.actionText,
-                helpButton: m.alternativeMethods.actionLink,
-              }}
-              methods={methods.map(method => ({
-                id: method.id,
-                label: methodLabel(method, m),
-                icon: methodIcon[method.strategy],
-              }))}
-              pendingMethodId={pendingMethodId}
-              onSelect={onSelectMethod}
-              onHelp={onShowHelp}
-              onBack={onBack}
-            />
-          </Flow.Step>
+            <Flow.Step ids={['new-password:forgot']}>
+              <NewPasswordStep
+                focusRef={focusRef}
+                form={form}
+                isPending={isPending}
+                onSubmit={onSubmit}
+                passwordFeedback={newPasswordFeedback}
+                onBack={onBack}
+              />
+            </Flow.Step>
 
-          <Flow.Step ids={['help']}>
-            <VerificationHelp
-              messages={{
-                title: m.alternativeMethods.getHelp.title,
-                description: m.alternativeMethods.getHelp.content,
-                backButton: m.backButton,
-                supportButton: m.alternativeMethods.getHelp.blockButtonEmailSupport,
-              }}
-              onEmailSupport={onEmailSupport}
-              onBack={onBack}
-            />
-          </Flow.Step>
-
-          <Flow.Step ids={['sign-up']}>
-            <SignUpDetailsStep
-              focusRef={focusRef}
-              messages={{
-                title: m.signUp.title,
-                description: m.signUp.subtitle,
-                firstNameLabel: m.formFieldLabelFirstName,
-                firstNamePlaceholder: m.formFieldInputPlaceholderFirstName,
-                lastNameLabel: m.formFieldLabelLastName,
-                lastNamePlaceholder: m.formFieldInputPlaceholderLastName,
-                emailLabel: m.formFieldLabelEmailAddress,
-                emailPlaceholder: m.formFieldInputPlaceholderEmailAddress,
-                passwordLabel: m.formFieldLabelPassword,
-                passwordPlaceholder: m.formFieldInputPlaceholderPassword,
-                showPasswordLabel: m.formFieldActionShowPassword,
-                hidePasswordLabel: m.formFieldActionHidePassword,
-                primaryActionLabel: m.formButtonPrimary,
-                pendingLabel: m.verifying,
-                actionText: m.signUp.actionText,
-                actionLink: m.signUp.actionLink,
-              }}
-              values={signUpDetails}
-              errors={signUpErrors}
-              isPending={isPending}
-              onValueChange={onSignUpDetailChange}
-              onSubmit={onSubmit}
-              onSignIn={onEditIdentifier}
-            />
-          </Flow.Step>
-
-          <Flow.Step ids={['verify-email']}>
-            <VerificationCode
-              focusRef={focusRef}
-              messages={{
-                title: m.verifyEmail.title,
-                description: fill(m.verifyEmail.subtitle, { identifier: signUpDetails.emailAddress }),
-                fieldLabel: m.verifyEmail.formTitle,
-                ...actions,
-              }}
-              value={value}
-              errorMessage={errorMessage}
-              isPending={isPending}
-              resend={resend}
-              onValueChange={onValueChange}
-              onComplete={otpSubmit}
-              onSubmit={onSubmit}
-            />
-          </Flow.Step>
-        </>
-      )}
-    </Flow.Root>
+            <Flow.Step ids={['sign-up']}>
+              <SignUpDetailsStep
+                focusRef={focusRef}
+                form={form}
+                globalErrorMessage={globalErrorMessage}
+                isPending={isPending}
+                onSubmit={onSubmit}
+                onSignIn={onEditIdentifier}
+              />
+            </Flow.Step>
+          </>
+        )}
+      </Flow.Root>
+    </Card.Root>
   );
 }

@@ -1,171 +1,126 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { FormEvent, Ref } from 'react';
-import { useId, useState } from 'react';
+import type { Ref } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
-import { Icon } from '../../../components/icon';
+import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
-import { InputGroup } from '../../../components/input-group';
+import { PasswordInput } from '../../../components/password-input';
 import { Text } from '../../../components/text';
-import { Eye } from '../../../icons/glyphs/eye';
-import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { SignUpDetails } from '../sign-in.types';
+import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
-export interface SignUpDetailsMessages {
-  title: string;
-  description: string;
-  firstNameLabel: string;
-  firstNamePlaceholder: string;
-  lastNameLabel: string;
-  lastNamePlaceholder: string;
-  emailLabel: string;
-  emailPlaceholder: string;
-  passwordLabel: string;
-  passwordPlaceholder: string;
-  showPasswordLabel: string;
-  hidePasswordLabel: string;
-  primaryActionLabel: string;
-  pendingLabel: string;
-  actionText: string;
-  actionLink: string;
-}
-
-export interface SignUpDetailsProps {
-  messages: SignUpDetailsMessages;
-  values: SignUpDetails;
-  errors?: Partial<Record<keyof SignUpDetails, string>>;
-  isPending?: boolean;
-  onValueChange: (field: keyof SignUpDetails, value: string) => void;
-  onSubmit: () => void;
+interface SignUpDetailsProps {
+  form: UseFormResult<SignInValues>;
+  globalErrorMessage?: string;
+  isPending: boolean;
+  onSubmit: (event: SignInSubmitEvent) => void;
   onSignIn?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
 export function SignUpDetailsStep({
-  messages,
-  values,
-  errors = {},
-  isPending = false,
-  onValueChange,
+  form,
+  globalErrorMessage,
+  isPending,
   onSubmit,
   onSignIn,
   focusRef,
 }: SignUpDetailsProps) {
-  const formId = useId();
-  const [visible, setVisible] = useState(false);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!isPending) {
-      onSubmit();
-    }
-  };
+  const m = useMessages('signIn');
+  const { ref: firstNameFieldRef, ...firstName } = form.register('firstName');
+  const firstNameRef = useMergeRefs<HTMLElement>([firstNameFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
+  const {
+    firstName: firstNameField,
+    lastName: lastNameField,
+    identifier: emailField,
+    password: passwordField,
+  } = form.fields;
 
   return (
     <>
       <Card.Header>
-        <Card.Title>{messages.title}</Card.Title>
-        <Card.Description>{messages.description}</Card.Description>
+        <Card.Title>{m.signUp.title}</Card.Title>
+        <Card.Description>{m.signUp.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         <Form
-          id={formId}
-          onSubmit={handleSubmit}
+          id={form.id}
+          onSubmit={onSubmit}
         >
           <div {...stylex.props(styles.fieldStack)}>
             <div {...stylex.props(styles.nameRow)}>
               <Field.Root
                 required
-                invalid={Boolean(errors.firstName)}
+                invalid={firstNameField.feedback?.type === 'error'}
                 disabled={isPending}
                 focusableWhenDisabled
               >
-                <Field.Label>{messages.firstNameLabel}</Field.Label>
+                <Field.Label>{m.signUp.firstNameLabel}</Field.Label>
                 <Input
-                  ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
-                  name='firstName'
+                  ref={firstNameRef}
                   autoComplete='given-name'
-                  placeholder={messages.firstNamePlaceholder}
-                  value={values.firstName}
-                  onChange={event => onValueChange('firstName', event.target.value)}
+                  placeholder={m.signUp.firstNamePlaceholder}
+                  {...firstName}
                 />
-                <Field.Message>
-                  <Field.Error>{errors.firstName}</Field.Error>
-                </Field.Message>
+                <Field.Feedback feedback={firstNameField.feedback} />
               </Field.Root>
               <Field.Root
                 required
-                invalid={Boolean(errors.lastName)}
+                invalid={lastNameField.feedback?.type === 'error'}
                 disabled={isPending}
                 focusableWhenDisabled
               >
-                <Field.Label>{messages.lastNameLabel}</Field.Label>
+                <Field.Label>{m.signUp.lastNameLabel}</Field.Label>
                 <Input
-                  name='lastName'
                   autoComplete='family-name'
-                  placeholder={messages.lastNamePlaceholder}
-                  value={values.lastName}
-                  onChange={event => onValueChange('lastName', event.target.value)}
+                  placeholder={m.signUp.lastNamePlaceholder}
+                  {...form.register('lastName')}
                 />
-                <Field.Message>
-                  <Field.Error>{errors.lastName}</Field.Error>
-                </Field.Message>
+                <Field.Feedback feedback={lastNameField.feedback} />
               </Field.Root>
             </div>
             <Field.Root
               required
-              invalid={Boolean(errors.emailAddress)}
+              invalid={emailField.feedback?.type === 'error'}
               disabled={isPending}
               focusableWhenDisabled
             >
-              <Field.Label>{messages.emailLabel}</Field.Label>
+              <Field.Label>{m.signUp.emailLabel}</Field.Label>
               <Input
-                name='emailAddress'
                 type='email'
                 autoComplete='email'
-                placeholder={messages.emailPlaceholder}
-                value={values.emailAddress}
-                onChange={event => onValueChange('emailAddress', event.target.value)}
+                placeholder={m.signUp.emailPlaceholder}
+                {...form.register('identifier')}
               />
-              <Field.Message>
-                <Field.Error>{errors.emailAddress}</Field.Error>
-              </Field.Message>
+              <Field.Feedback feedback={emailField.feedback} />
             </Field.Root>
             <Field.Root
               required
-              invalid={Boolean(errors.password)}
+              invalid={passwordField.feedback?.type === 'error'}
               disabled={isPending}
               focusableWhenDisabled
             >
-              <Field.Label>{messages.passwordLabel}</Field.Label>
-              <InputGroup.Root>
-                <InputGroup.Input
-                  name='password'
-                  type={visible ? 'text' : 'password'}
-                  autoComplete='new-password'
-                  placeholder={messages.passwordPlaceholder}
-                  value={values.password}
-                  onChange={event => onValueChange('password', event.target.value)}
-                />
-                <InputGroup.End>
-                  <Button
-                    type='button'
-                    aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
-                    onClick={() => setVisible(current => !current)}
-                  >
-                    <Icon glyph={visible ? EyeSlash : Eye} />
-                  </Button>
-                </InputGroup.End>
-              </InputGroup.Root>
-              <Field.Message>
-                <Field.Error>{errors.password}</Field.Error>
-              </Field.Message>
+              <Field.Label>{m.signUp.passwordLabel}</Field.Label>
+              <PasswordInput
+                autoComplete='new-password'
+                placeholder={m.signUp.passwordPlaceholder}
+                {...form.register('password')}
+                showPasswordLabel={m.showPassword}
+                hidePasswordLabel={m.hidePassword}
+              />
+              <Field.Feedback feedback={passwordField.feedback} />
             </Field.Root>
           </div>
         </Form>
@@ -175,7 +130,7 @@ export function SignUpDetailsStep({
             color='foreground-secondary'
             xstyle={styles.footerText}
           >
-            {messages.actionText}{' '}
+            {m.signUp.signInPrompt}{' '}
             <Button
               type='button'
               size='sm'
@@ -183,19 +138,19 @@ export function SignUpDetailsStep({
               disabled={isPending}
               onClick={onSignIn}
             >
-              {messages.actionLink}
+              {m.signUp.signInLink}
             </Button>
           </Text>
         ) : null}
       </Card.Content>
       <Card.Footer>
         <SubmitButton
-          form={formId}
+          form={form.id}
           fullWidth
           isPending={isPending}
-          pendingLabel={messages.pendingLabel}
+          pendingLabel={m.verifying}
         >
-          {messages.primaryActionLabel}
+          {m.continue}
         </SubmitButton>
       </Card.Footer>
     </>

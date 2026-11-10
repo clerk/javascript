@@ -71,6 +71,8 @@ export { InputGroup } from '../components/input-group';
 export type { InputGroupAddonProps, InputGroupRootProps } from '../components/input-group';
 export { Pagination } from '../components/pagination';
 export type { PaginationProps } from '../components/pagination';
+export { PasswordInput } from '../components/password-input';
+export type { PasswordInputProps } from '../components/password-input';
 export { PhoneInput } from '../components/phone-input';
 export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
