@@ -104,7 +104,14 @@ export const styles = stylex.create({
     },
     paddingInlineEnd: space['1.5'],
     paddingInlineStart: space['1.5'],
+    position: 'relative',
     height: space['8'],
+    '::before': {
+      insetBlock: `calc(-1 * ${space['0.5']})`,
+      insetInline: `calc(-1 * ${space['0.5']})`,
+      content: '""',
+      position: 'absolute',
+    },
   },
   empty: {
     paddingBlock: space['6'],
