@@ -1,11 +1,12 @@
 import type { ModalContentProps } from '../../modals/modal.types';
-import type { UserProfileProps } from './user-profile';
+import type { CombinedProfileProps } from '../profile/profile';
 import type { UserProfileViewProps } from './user-profile.view';
 
 export interface UserProfileModalOptions extends Pick<
-  UserProfileProps,
-  'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'combined' | 'organizationProfileProps'
+  CombinedProfileProps,
+  'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'organizationProfileProps'
 > {
+  combined?: boolean;
   page?: UserProfileViewProps['activePage'];
 }
 

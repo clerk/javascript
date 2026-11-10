@@ -83,7 +83,7 @@ export type UserProfileEnterpriseAccountsModel =
     };
 
 export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAccountsModel {
-  const { mode } = useUserProfileOptions();
+  const { mode, combined } = useUserProfileOptions();
   const clerk = useClerk();
   const router = useMosaicRouter();
   const [createAccount, connectReverification] = useReverificationFlow(
@@ -137,7 +137,7 @@ export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAc
       if (!projection.connections.some(connection => connection.id === connectionId)) {
         throw unavailable();
       }
-      const redirectUrl = withUserProfileModalReturn(window.location.href, mode);
+      const redirectUrl = withUserProfileModalReturn(window.location.href, { mode, combined });
       const account = await createAccount(current, { enterpriseConnectionId: connectionId, redirectUrl });
       currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;

@@ -1,8 +1,8 @@
 import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
+import { UserProfileSurface } from '../profile/profile';
 import { useMosaicProfile, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
-import { UserProfileSurface } from './user-profile';
 import type { UserProfileModalContentProps, UserProfileModalOptions } from './user-profile.modal.types';
 
 export default function UserProfileModalContent({
@@ -22,11 +22,12 @@ export default function UserProfileModalContent({
 
   // An opening the routing state caused on its own, a deep link or a return, carries no options;
   // it gets the provider's, the same ones every handle-driven open spreads in.
-  const provided: UserProfileModalOptions = userProfileModalOptions(profile);
-  const { page: _page, ...props } = options ?? provided;
+  const resolved: UserProfileModalOptions = options ?? userProfileModalOptions(profile);
+  const { page: _page, combined = true, ...props } = resolved;
   return (
     <UserProfileSurface
       {...props}
+      combined={combined}
       presentation='modal'
       path={path}
     />

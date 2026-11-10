@@ -227,7 +227,7 @@ function unavailable() {
 }
 
 export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
-  const { additionalOAuthScopes, mode } = useUserProfileOptions();
+  const { additionalOAuthScopes, mode, combined } = useUserProfileOptions();
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
@@ -283,7 +283,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   };
 
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
-  const withModalState = (url: string) => withUserProfileModalReturn(url, mode);
+  const withModalState = (url: string) => withUserProfileModalReturn(url, { mode, combined });
 
   const completeVerification = async (response: ExternalAccountResource): Promise<ConnectedAccountActionResult> => {
     const url = response.verification?.externalVerificationRedirectURL;
