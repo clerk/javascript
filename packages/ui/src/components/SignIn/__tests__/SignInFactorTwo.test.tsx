@@ -94,6 +94,24 @@ describe('SignInFactorTwo', () => {
     });
   });
 
+  describe('New device notice with a second factor attribute', () => {
+    it.each([
+      ['with client_trust_state', 'new'],
+      ['without client_trust_state', undefined],
+    ] as const)('does not render the notice %s', async (_, clientTrustState) => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber({ used_for_second_factor: true, second_factors: ['phone_code'] });
+        f.startSignInFactorTwo({ supportPhoneCode: true, clientTrustState });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockResolvedValueOnce({} as SignInResource);
+      render(<SignInFactorTwo />, { wrapper });
+
+      expect(screen.getAllByTestId('otp-input-segment')).toHaveLength(6);
+      expect(screen.queryByText(/You're signing in from a new device/i)).not.toBeInTheDocument();
+    });
+  });
+
   describe('Selected Second Factor Method', () => {
     describe('Phone Code', () => {
       it('renders the correct screen with the text "Check your phone"', async () => {
