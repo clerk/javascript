@@ -50,9 +50,7 @@ export function IdentifierStep({
   const busy = isPending || Boolean(pendingProviderId);
   const { ref: identifierFieldRef, ...identifier } = form.register('identifier');
   const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
-  const feedback: FieldFeedback | undefined = errorMessage
-    ? { type: 'error', message: errorMessage }
-    : form.fields.identifier.feedback;
+  const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
 
   return (
     <>

@@ -41,9 +41,7 @@ export function SignInPassword({
   const m = useMessages('signIn');
   const { ref: passwordFieldRef, ...password } = form.register('password');
   const passwordRef = useMergeRefs<HTMLElement>([passwordFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
-  const feedback: FieldFeedback | undefined = errorMessage
-    ? { type: 'error', message: errorMessage }
-    : form.fields.password.feedback;
+  const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
 
   return (
     <>
