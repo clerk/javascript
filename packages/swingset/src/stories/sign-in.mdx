@@ -15,6 +15,7 @@ The example pauses briefly in each pending state. An email containing `new` take
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
     { name: 'PasswordInput', href: '/components/password-input', layer: 'Components' },
+    { name: 'Checkbox', href: '/components/checkbox', layer: 'Components' },
     { name: 'OTP', href: '/components/otp', layer: 'Components' },
     { name: 'Item', href: '/components/item', layer: 'Components' },
     { name: 'Button', href: '/components/button', layer: 'Components' },
@@ -155,6 +156,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='CodeResetPassword' storyModule={Stories} />
 
+#### Reset password by phone
+
+<Story name='CodeResetPasswordPhone' storyModule={Stories} />
+
 #### SSO bypass
 
 <Story name='CodeSsoBypass' storyModule={Stories} />
@@ -169,11 +174,15 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Choice step
 
-`choice-step.tsx` draws `{ kind: 'choice' }` with `VerificationMethodPicker`.
+`choice-step.tsx` draws `{ kind: 'choice' }` with `VerificationMethodPicker`: other sign-in methods, or where to send a password reset code.
 
 #### Methods
 
 <Story name='ChoiceMethods' storyModule={Stories} />
+
+#### Reset methods
+
+<Story name='ChoiceResetMethods' storyModule={Stories} />
 
 #### Methods with passkey and providers
 
@@ -193,7 +202,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Notice step
 
-`notice-step.tsx` draws `{ kind: 'notice' }`: help, with `VerificationHelp`.
+`notice-step.tsx` draws `{ kind: 'notice' }`: help (`VerificationHelp`) and forgot password.
 
 #### Help
 
@@ -203,9 +212,9 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticeForgotPassword' storyModule={Stories} />
 
-#### Password changed
+#### Forgot password pending
 
-<Story name='NoticePasswordChanged' storyModule={Stories} />
+<Story name='NoticeForgotPasswordPending' storyModule={Stories} />
 
 #### Account locked
 
@@ -233,7 +242,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### New password step
 
-`new-password-step.tsx` will draw `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices.
+`new-password-step.tsx` draws `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices.
 
 #### Set new password
 

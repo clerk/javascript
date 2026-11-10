@@ -343,8 +343,11 @@ import {
 } from '../stories/separator.stories';
 import {
   ChoiceMethods as SignInChoiceMethods,
+  ChoiceResetMethods as SignInChoiceResetMethods,
   CodeAuthenticatorApp as SignInCodeAuthenticatorApp,
   CodeEmail as SignInCodeEmail,
+  CodeResetPassword as SignInCodeResetPassword,
+  CodeResetPasswordPhone as SignInCodeResetPasswordPhone,
   CodeVerifyEmail as SignInCodeVerifyEmail,
   Default as SignInDefault,
   IdentifierDefault as SignInIdentifierDefault,
@@ -353,6 +356,9 @@ import {
   IdentifierProviderPending as SignInIdentifierProviderPending,
   IdentifierSignInOnly as SignInIdentifierSignInOnly,
   meta as signInMeta,
+  NewPasswordReset as SignInNewPasswordReset,
+  NoticeForgotPassword as SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending as SignInNoticeForgotPasswordPending,
   NoticeHelp as SignInNoticeHelp,
   SecretBackupCode as SignInSecretBackupCode,
   SecretPassword as SignInSecretPassword,
@@ -1274,9 +1280,15 @@ const signInModule: StoryModule = {
   SecretBackupCode: SignInSecretBackupCode,
   CodeEmail: SignInCodeEmail,
   CodeAuthenticatorApp: SignInCodeAuthenticatorApp,
+  CodeResetPassword: SignInCodeResetPassword,
+  CodeResetPasswordPhone: SignInCodeResetPasswordPhone,
   CodeVerifyEmail: SignInCodeVerifyEmail,
   ChoiceMethods: SignInChoiceMethods,
+  ChoiceResetMethods: SignInChoiceResetMethods,
   NoticeHelp: SignInNoticeHelp,
+  NoticeForgotPassword: SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending: SignInNoticeForgotPasswordPending,
+  NewPasswordReset: SignInNewPasswordReset,
   SignUpDetails: SignInSignUpDetails,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {

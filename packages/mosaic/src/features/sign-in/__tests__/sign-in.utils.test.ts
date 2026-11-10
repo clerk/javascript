@@ -13,7 +13,14 @@ describe('stepKey', () => {
       [{ kind: 'code', purpose: 'second-factor', channel: 'totp' }, 'code:second-factor'],
       [{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }, 'code:verify-email'],
       [{ kind: 'choice', purpose: 'methods', options: [] }, 'choice:methods'],
+      [{ kind: 'choice', purpose: 'reset-methods', options: [] }, 'choice:reset-methods'],
       [{ kind: 'notice', purpose: 'help' }, 'notice:help'],
+      [
+        { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' },
+        'code:reset-password',
+      ],
+      [{ kind: 'notice', purpose: 'forgot-password', identifier: 'jane@acme.com' }, 'notice:forgot-password'],
+      [{ kind: 'new-password', reason: 'forgot' }, 'new-password:forgot'],
       [{ kind: 'sign-up' }, 'sign-up'],
     ];
 

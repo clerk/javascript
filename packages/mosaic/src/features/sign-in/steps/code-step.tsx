@@ -4,6 +4,23 @@ import type { VerificationCodeMessages, VerificationCodeResend } from '../../../
 import { VerificationCode } from '../../../blocks/verification';
 import type { SignInStep } from '../sign-in.types';
 
+// TODO: Have the controller pass the one callback each code step offers, and omit resend for the authenticator app, so the view stops choosing by purpose and channel.
+function secondaryAction(
+  step: Extract<SignInStep, { kind: 'code' }>,
+  onShowMethods: (() => void) | undefined,
+  onBack: () => void,
+): (() => void) | undefined {
+  switch (step.purpose) {
+    case 'verify-email':
+      return undefined;
+    case 'reset-password':
+      return onBack;
+    case 'first-factor':
+    case 'second-factor':
+      return onShowMethods;
+  }
+}
+
 interface CodeStepProps {
   step: Extract<SignInStep, { kind: 'code' }>;
   messages: VerificationCodeMessages;
@@ -14,6 +31,7 @@ interface CodeStepProps {
   onValueChange: (value: string) => void;
   onSubmit: () => void;
   onShowMethods?: () => void;
+  onBack: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -27,9 +45,9 @@ export function CodeStep({
   onValueChange,
   onSubmit,
   onShowMethods,
+  onBack,
   focusRef,
 }: CodeStepProps) {
-  // TODO: Have the controller pass the one callback each code step offers, and omit resend for the authenticator app, so the view stops choosing by purpose and channel.
   return (
     <VerificationCode
       focusRef={focusRef}
@@ -45,7 +63,7 @@ export function CodeStep({
         onSubmit();
       }}
       onSubmit={onSubmit}
-      onCancel={step.purpose === 'verify-email' ? undefined : onShowMethods}
+      onCancel={secondaryAction(step, onShowMethods, onBack)}
     />
   );
 }

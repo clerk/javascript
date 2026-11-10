@@ -1,5 +1,13 @@
 import { Button } from '@clerk/mosaic/components/button';
-import type { SignInFactor, SignInSocialProvider, SignInStep, SignUpDetails } from '@clerk/mosaic/features/sign-in';
+import type { FieldsConfig } from '@clerk/mosaic/components/form';
+import { useForm } from '@clerk/mosaic/components/form';
+import type {
+  NewPasswordValues,
+  SignInFactor,
+  SignInSocialProvider,
+  SignInStep,
+  SignUpDetails,
+} from '@clerk/mosaic/features/sign-in';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 import { useRef, useState } from 'react';
 
@@ -37,7 +45,25 @@ const secondFactors: SignInFactor[] = [
   { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
 ];
 
+const resetFactors: SignInFactor[] = [
+  { id: 'reset_email', stage: 'first', strategy: 'reset_password_email_code', identifier: 'j***@acme.com' },
+  { id: 'reset_phone', stage: 'first', strategy: 'reset_password_phone_code', identifier: '+1 ••• ••• 0123' },
+];
+
 const emptySignUp: SignUpDetails = { firstName: '', lastName: '', emailAddress: '', password: '' };
+
+const emptyNewPassword: NewPasswordValues = { password: '', confirmPassword: '', signOutOfOtherSessions: true };
+
+const newPasswordFields: FieldsConfig<NewPasswordValues> = {
+  password: {
+    validate: password =>
+      password.length < 8 ? { type: 'error', message: 'Your password must contain 8 or more characters.' } : undefined,
+  },
+  confirmPassword: {
+    validate: (confirmPassword, values) =>
+      confirmPassword !== values.password ? { type: 'error', message: 'Passwords don’t match.' } : undefined,
+  },
+};
 
 function stepFor(factor: SignInFactor, identifier: string): SignInStep {
   switch (factor.strategy) {
@@ -57,6 +83,10 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
         channel: 'phone',
         identifier: factor.identifier,
       };
+    case 'reset_password_email_code':
+      return { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: factor.identifier };
+    case 'reset_password_phone_code':
+      return { kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: factor.identifier };
   }
 }
 
@@ -76,6 +106,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const [canResend, setCanResend] = useState(true);
   const [signUpDetails, setSignUpDetails] = useState<SignUpDetails>(emptySignUp);
   const [signUpErrors, setSignUpErrors] = useState<Partial<Record<keyof SignUpDetails, string>>>();
+  const newPasswordForm = useForm<NewPasswordValues>({
+    initialValues: emptyNewPassword,
+    fields: newPasswordFields,
+    onSubmit: () => settleAfter(1_500),
+    onSuccess: () => onComplete({ kind: 'signed-in' }),
+  });
   const [supportRequested, setSupportRequested] = useState(false);
   const [stage, setStage] = useState<'first' | 'second'>('first');
   const pickerReturnRef = useRef<SignInStep>({ kind: 'secret', secret: 'password', identifier: '' });
@@ -203,7 +239,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         void (step.secret === 'password' ? submitPassword() : submitBackupCode());
         return;
       case 'code':
-        if (step.purpose === 'first-factor') {
+        if (step.purpose === 'reset-password') {
+          void submitCode(() => {
+            newPasswordForm.reset();
+            navigate({ kind: 'new-password', reason: 'forgot' }, 1);
+          });
+        } else if (step.purpose === 'first-factor') {
           void submitCode(startSecondFactor);
         } else if (step.purpose === 'second-factor') {
           void submitCode(() => onComplete({ kind: 'signed-in' }));
@@ -213,6 +254,14 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       case 'sign-up':
         void submitSignUp();
+        return;
+      case 'notice':
+        if (step.purpose === 'forgot-password') {
+          const identifierForCode = step.identifier;
+          void run(() =>
+            navigate({ kind: 'code', purpose: 'reset-password', channel: 'email', identifier: identifierForCode }, 1),
+          );
+        }
         return;
       default:
         return;
@@ -251,6 +300,18 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   };
 
   const onBack = () => {
+    if (step.kind === 'notice' && step.purpose === 'forgot-password') {
+      navigate({ kind: 'secret', secret: 'password', identifier: step.identifier }, -1);
+      return;
+    }
+    if (step.kind === 'new-password') {
+      navigate({ kind: 'secret', secret: 'password', identifier }, -1);
+      return;
+    }
+    if (step.kind === 'code' && step.purpose === 'reset-password') {
+      navigate({ kind: 'secret', secret: 'password', identifier }, -1);
+      return;
+    }
     if (step.kind === 'notice') {
       navigate({ kind: 'choice', purpose: 'methods', options: otherFactors }, -1);
       return;
@@ -299,7 +360,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         errorMessage={errorMessage}
         isPending={isPending}
         onSubmit={onSubmit}
-        onForgotPassword={onShowMethods}
+        onForgotPassword={() => navigate({ kind: 'notice', purpose: 'forgot-password', identifier }, 1)}
         onShowMethods={otherFactors.length > 0 ? onShowMethods : undefined}
         onShowHelp={() => navigate({ kind: 'notice', purpose: 'help' }, 1)}
         onBack={onBack}
@@ -314,6 +375,14 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           setSignUpDetails(current => ({ ...current, [field]: next }));
           setSignUpErrors(current => (current ? { ...current, [field]: undefined } : current));
         }}
+        newPasswordForm={newPasswordForm}
+        newPasswordFeedback={
+          newPasswordForm.values.password === ''
+            ? undefined
+            : newPasswordForm.values.password.length < 8
+              ? { type: 'info', message: 'Your password must contain 8 or more characters.' }
+              : { type: 'success', message: 'Your password meets all the necessary requirements.' }
+        }
       />
       {supportRequested ? <p>Email support requested.</p> : null}
     </>
@@ -377,6 +446,10 @@ function StepPanel({
 }) {
   const [value, setValue] = useState(errorMessage && step.kind !== 'identifier' ? 'incorrect' : '');
   const [details, setDetails] = useState<SignUpDetails>({ ...emptySignUp, emailAddress: 'new@acme.com' });
+  const newPasswordForm = useForm<NewPasswordValues>({
+    initialValues: emptyNewPassword,
+    onSubmit: () => Promise.resolve(),
+  });
 
   return (
     <SignInView
@@ -406,6 +479,7 @@ function StepPanel({
       canResend
       signUpDetails={details}
       onSignUpDetailChange={(field, next) => setDetails(current => ({ ...current, [field]: next }))}
+      newPasswordForm={newPasswordForm}
     />
   );
 }
@@ -490,6 +564,16 @@ export function CodeAuthenticatorApp() {
   return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }} />;
 }
 
+export function CodeResetPassword() {
+  return <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'email', identifier: IDENTIFIER }} />;
+}
+
+export function CodeResetPasswordPhone() {
+  return (
+    <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: '+1 ••• ••• 0123' }} />
+  );
+}
+
 export function CodeVerifyEmail() {
   return <StepPanel step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }} />;
 }
@@ -498,8 +582,31 @@ export function ChoiceMethods() {
   return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
 }
 
+export function ChoiceResetMethods() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'reset-methods', options: resetFactors }} />;
+}
+
 export function NoticeHelp() {
   return <StepPanel step={{ kind: 'notice', purpose: 'help' }} />;
+}
+
+const forgotPasswordStep: SignInStep = { kind: 'notice', purpose: 'forgot-password', identifier: IDENTIFIER };
+
+export function NoticeForgotPassword() {
+  return <StepPanel step={forgotPasswordStep} />;
+}
+
+export function NoticeForgotPasswordPending() {
+  return (
+    <StepPanel
+      step={forgotPasswordStep}
+      isPending
+    />
+  );
+}
+
+export function NewPasswordReset() {
+  return <StepPanel step={{ kind: 'new-password', reason: 'forgot' }} />;
 }
 
 export function SignUpDetails() {

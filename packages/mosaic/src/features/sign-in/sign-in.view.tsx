@@ -12,6 +12,7 @@ import { stepKey } from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CodeStep } from './steps/code-step';
 import { IdentifierStep } from './steps/identifier-step';
+import { NewPasswordStep } from './steps/new-password-step';
 import { NoticeStep } from './steps/notice-step';
 import { SecretStep } from './steps/secret-step';
 import { SignUpDetailsStep } from './steps/sign-up-details';
@@ -33,7 +34,20 @@ function factorLabel(factor: SignInFactor, m: Messages): string {
       return m.alternativeMethods.totp;
     case 'backup_code':
       return m.alternativeMethods.backupCode;
+    case 'reset_password_email_code':
+      return fill(m.resetMethods.emailCode, { identifier: factor.identifier });
+    case 'reset_password_phone_code':
+      return fill(m.resetMethods.phoneCode, { identifier: factor.identifier });
   }
+}
+
+function choiceCopy(
+  step: Extract<SignInStep, { kind: 'choice' }>,
+  m: Messages,
+): { title: string; description: string } {
+  return step.purpose === 'reset-methods'
+    ? { title: m.resetMethods.title, description: m.resetMethods.description }
+    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
 }
 
 function codeCopy(
@@ -41,6 +55,15 @@ function codeCopy(
   m: Messages,
 ): Pick<VerificationCodeMessages, 'title' | 'description' | 'fieldLabel'> {
   const identifier = step.identifier ?? '';
+  if (step.purpose === 'reset-password') {
+    const description =
+      step.channel === 'phone' ? m.resetPasswordCode.descriptionPhone : m.resetPasswordCode.descriptionEmail;
+    return {
+      title: m.resetPasswordCode.title,
+      description: fill(description, { identifier }),
+      fieldLabel: m.resetPasswordCode.label,
+    };
+  }
   if (step.purpose === 'verify-email') {
     return {
       title: m.verifyEmail.title,
@@ -93,6 +116,8 @@ export function SignInView({
   signUpDetails,
   signUpErrors,
   onSignUpDetailChange,
+  newPasswordForm,
+  newPasswordFeedback,
   focusRef,
 }: SignInViewProps & { focusRef?: Ref<HTMLElement> }) {
   const m = useMessages('signIn');
@@ -171,12 +196,21 @@ export function SignInView({
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['code:first-factor', 'code:second-factor', 'code:verify-email']}>
+            <Flow.Step ids={['code:first-factor', 'code:second-factor', 'code:reset-password', 'code:verify-email']}>
               {current.kind === 'code' ? (
                 <CodeStep
                   focusRef={focusRef}
                   step={current}
-                  messages={{ ...codeCopy(current, m), ...actions }}
+                  messages={{
+                    ...codeCopy(current, m),
+                    ...actions,
+                    ...(current.purpose === 'reset-password'
+                      ? {
+                          primaryActionLabel: m.resetPasswordCode.verify,
+                          secondaryActionLabel: m.forgotPassword.back,
+                        }
+                      : {}),
+                  }}
                   resend={resend}
                   value={value}
                   errorMessage={errorMessage}
@@ -184,18 +218,18 @@ export function SignInView({
                   onValueChange={onValueChange}
                   onSubmit={onSubmit}
                   onShowMethods={onShowMethods}
+                  onBack={onBack}
                 />
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['choice:methods']}>
+            <Flow.Step ids={['choice:methods', 'choice:reset-methods']}>
               {current.kind === 'choice' ? (
                 <ChoiceStep
                   focusRef={focusRef}
                   step={current}
                   messages={{
-                    title: m.alternativeMethods.title,
-                    description: m.alternativeMethods.description,
+                    ...choiceCopy(current, m),
                     backButton: m.back,
                     helpText: m.alternativeMethods.helpPrompt,
                     helpButton: m.alternativeMethods.helpLink,
@@ -209,9 +243,10 @@ export function SignInView({
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['notice:help']}>
+            <Flow.Step ids={['notice:help', 'notice:forgot-password']}>
               {current.kind === 'notice' ? (
                 <NoticeStep
+                  focusRef={focusRef}
                   step={current}
                   messages={{
                     help: {
@@ -220,11 +255,42 @@ export function SignInView({
                       backButton: m.back,
                       supportButton: m.alternativeMethods.getHelp.emailSupport,
                     },
+                    forgotPassword: {
+                      title: m.forgotPassword.title,
+                      description: fill(m.forgotPassword.description, {
+                        identifier: current.purpose === 'forgot-password' ? current.identifier : '',
+                      }),
+                      primaryActionLabel: m.continue,
+                      pendingLabel: m.forgotPassword.pending,
+                      backLabel: m.forgotPassword.back,
+                    },
                   }}
+                  isPending={isPending}
+                  onSubmit={onSubmit}
                   onEmailSupport={onEmailSupport}
                   onBack={onBack}
                 />
               ) : null}
+            </Flow.Step>
+
+            <Flow.Step ids={['new-password:forgot']}>
+              <NewPasswordStep
+                focusRef={focusRef}
+                messages={{
+                  title: m.newPassword.title,
+                  passwordLabel: m.newPassword.passwordLabel,
+                  confirmPasswordLabel: m.newPassword.confirmPasswordLabel,
+                  showPasswordLabel: m.showPassword,
+                  hidePasswordLabel: m.hidePassword,
+                  signOutOfOtherSessionsLabel: m.newPassword.signOutOfOtherSessions,
+                  primaryActionLabel: m.newPassword.submit,
+                  pendingLabel: m.newPassword.pending,
+                  backLabel: m.forgotPassword.back,
+                }}
+                form={newPasswordForm}
+                passwordFeedback={newPasswordFeedback}
+                onBack={onBack}
+              />
             </Flow.Step>
 
             <Flow.Step ids={['sign-up']}>

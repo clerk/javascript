@@ -19,6 +19,33 @@ export const signInMessages = {
     placeholder: 'Enter your password',
     forgotPassword: 'Forgot password?',
   },
+  forgotPassword: {
+    title: 'Forgot password',
+    description: 'We’ll send a one-time code to {identifier}',
+    pending: 'Sending code',
+    back: 'Back to sign in',
+  },
+  resetMethods: {
+    title: 'Forgot password?',
+    description: 'Choose where to send a code to reset your password.',
+    emailCode: 'Email a code to {identifier}',
+    phoneCode: 'Text a code to {identifier}',
+  },
+  resetPasswordCode: {
+    title: 'Reset password',
+    descriptionEmail: 'First, enter the code sent to your email address {identifier}',
+    descriptionPhone: 'First, enter the code sent to your phone {identifier}',
+    label: 'Verification code',
+    verify: 'Verify',
+  },
+  newPassword: {
+    title: 'Set new password',
+    passwordLabel: 'New password',
+    confirmPasswordLabel: 'Confirm password',
+    signOutOfOtherSessions: 'Sign out of all other devices',
+    submit: 'Reset password',
+    pending: 'Resetting password',
+  },
   emailCode: {
     title: 'Check your email',
     description: 'Enter the verification code sent to {identifier}',
