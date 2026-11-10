@@ -9,8 +9,8 @@ import { PlaygroundProvider } from './PlaygroundContext';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
-  'user-button': {
-    'user-button': dynamic(() => import('../stories/user-button.mdx')),
+  switcher: {
+    switcher: dynamic(() => import('../stories/switcher.mdx')),
   },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
@@ -53,6 +53,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   misc: {
     'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
+    'user-button': dynamic(() => import('../stories/user-button.mdx')),
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
     'organization-list': dynamic(() => import('../stories/organization-list.mdx')),

@@ -13,7 +13,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserButton } from '../user-button';
+import { Switcher } from '../switcher';
 
 const GAP = 4;
 
@@ -27,7 +27,7 @@ const alice = fapiUser({
   organization_memberships: memberships,
 });
 
-describe('UserButton badged avatar customization', () => {
+describe('Switcher badged avatar customization', () => {
   it('keeps the gap around a resized badge in the trigger', async () => {
     customize(`.cl-user-button-avatar { --cl-avatar-badge-size: 24px; --cl-avatar-badge-gap: ${GAP}px; }`);
     await renderSignedIn();
@@ -74,7 +74,7 @@ async function renderSignedIn() {
     client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: acme.id })]),
     memberships,
   });
-  await renderWithClerk(<UserButton />);
+  await renderWithClerk(<Switcher />);
 }
 
 async function triggerAvatar(): Promise<HTMLElement> {

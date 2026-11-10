@@ -2,11 +2,16 @@
 
 export type { OAuthConsentProps } from './features/oauth-consent/oauth-consent';
 export { OAuthConsent } from './features/oauth-consent/oauth-consent';
-export type { UserButtonProps } from './features/user-button/user-button';
+export type {
+  CombinedSwitcherProps,
+  OrganizationSwitcherProps,
+  SwitcherProps,
+  UserButtonProps,
+} from './features/switcher/switcher';
+export { Switcher } from './features/switcher/switcher';
 export { UserButton } from './features/user-button/user-button';
 export type { UserAvatarProps } from './features/user-avatar/user-avatar';
 export { UserAvatar } from './features/user-avatar/user-avatar';
-export type { OrganizationSwitcherProps } from './features/organization-switcher/organization-switcher';
 export { OrganizationSwitcher } from './features/organization-switcher/organization-switcher';
 export type { OrganizationProfileProps } from './features/organization-profile/organization-profile';
 export { OrganizationProfile } from './features/organization-profile/organization-profile';

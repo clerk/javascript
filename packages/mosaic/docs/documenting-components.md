@@ -2,7 +2,7 @@
 
 Read this when you add or change a Swingset page for a Mosaic component, block, hook or style: a `<name>.stories.tsx` or `<name>.mdx` in `packages/swingset/src/stories/`. It covers what to write once the page is wired; how the app works is in `packages/swingset/CLAUDE.md`, and the registry, `docModules` and redirect wiring is in `packages/swingset/README.md`.
 
-Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `popover.component.mdx` (A, compound), `accordion.mdx` (B), `user-button.mdx` (C).
+Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `popover.component.mdx` (A, compound), `accordion.mdx` (B), `switcher.mdx` (C).
 
 ## Rules
 
@@ -19,7 +19,7 @@ Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `p
 
 | Group                  | What lives here                                                                                                                      | Archetype   |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| `User Button`          | Composed flow UI (e.g. `UserButton`)                                                                                                 | C           |
+| `Switcher`             | Composed flow UI (e.g. `Switcher`)                                                                                                   | C           |
 | `User Profile`         | Composed flow UI (e.g. `UserProfileProfilePanel`)                                                                                    | C           |
 | `Organization Profile` | Composed flow UI (e.g. `OrganizationProfileGeneralPanel`)                                                                            | C           |
 | `Misc`                 | Standalone composed components (e.g. `OrganizationSwitcher`, `Waitlist`)                                                             | C           |
@@ -31,7 +31,7 @@ Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `p
 | `Hooks`                | Headless hooks (`useForm`)                                                                                                           | B (adapted) |
 | `Localization`         | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers                                    | B (adapted) |
 
-`User Button` / `User Profile` / `Organization Profile` / `Misc` / `Blocks` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
+`Switcher` / `User Profile` / `Organization Profile` / `Misc` / `Blocks` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
 
 `Styles` and `Hooks` are the non-component layers: there is no element to knob, so they follow
 archetype B's shape (Example → Usage → Parts → Styling) with `Props` replaced by whatever the export
@@ -205,14 +205,14 @@ The story is `meta` (no `styles`) plus a single `Default` export that renders th
 
 Every props table has a **Default** column, and the `Type` stays a plain union, never with the default inlined. The auto `<PropTable>` fills it from `meta.styles._defaultVariants`; hand-written tables (`Prop | Type | Default | Description`) fill it by hand. Name the default member (`'bottom-start'`), use `—` when there is none and append `(required)` for a required prop, and state a behavioral default in words (`inherits Root`).
 
-## Archetype C — composed layer (`User Button`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`, `Authentication`)
+## Archetype C — composed layer (`Switcher`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`, `Authentication`)
 
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
 ```mdx
-import * as SwitcherStories from './user-button.stories';
+import * as SwitcherStories from './switcher.stories';
 
-# UserButton
+# Switcher
 
 <!-- One paragraph: what state this owns and which lower-layer pieces it wires together. -->
 

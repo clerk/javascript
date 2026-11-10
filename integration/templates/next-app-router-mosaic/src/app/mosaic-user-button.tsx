@@ -1,11 +1,11 @@
 'use client';
 
-import { MosaicProvider, UserButton } from '@clerk/mosaic';
+import { Switcher, MosaicProvider } from '@clerk/mosaic';
 
 export function MosaicUserButton() {
   return (
     <MosaicProvider experimental={{ newProfiles: true }}>
-      <UserButton />
+      <Switcher />
     </MosaicProvider>
   );
 }
