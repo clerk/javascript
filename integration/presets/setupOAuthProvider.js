@@ -3,6 +3,8 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 
 import { resolveInstanceKeys } from './envs';
 
+const providerSlug = 'e2e_oauth_provider';
+
 export async function setupOAuthProvider(
   { applicationName, publishableKey, patchConfig },
   { consentScreenEnabled = true } = {},
@@ -19,7 +21,10 @@ export async function setupOAuthProvider(
     secretKey: providerKeys.sk,
   }).oauthApplications.create({
     name: applicationName,
-    redirectUris: [`https://${parsedPublishableKey.frontendApi}/v1/oauth_callback`],
+    redirectUris: [
+      `https://${parsedPublishableKey.frontendApi}/v1/oauth_callback`,
+      `https://${parsedPublishableKey.frontendApi}/v1/sso/oauth_custom_${providerSlug}/callback`,
+    ],
     scopes: 'profile email',
     public: false,
     consentScreenEnabled,
@@ -31,7 +36,7 @@ export async function setupOAuthProvider(
 
   await patchConfig({
     connections_oauth_custom: {
-      e2e_oauth_provider: {
+      [providerSlug]: {
         auth_url: `${oauthProviderUrl}/oauth/authorize`,
         authenticatable: true,
         base_scopes: [],
