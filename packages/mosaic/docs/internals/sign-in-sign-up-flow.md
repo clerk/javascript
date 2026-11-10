@@ -21,7 +21,7 @@ const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step)
 ```
 
 - `routeFor(step)` returns the step's route, from the lists below.
-- `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field.
+- `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field. `complete` and `transfer` have no route, so they allow any route: the current screen stays up while `next` runs, and shows the error if it fails.
 - The component that owns the route table computes `screen` during render, with no effect.
 - This runs once the model is `ready`, and after Clerk loads there is always a step. Until then the scope gets `ready: false`, so a starting route like `factor-one` isn't reset to `start`.
 
@@ -40,7 +40,8 @@ submitPassword: async (password: string) => {
 ```
 
 - `complete`: the model's `finalize()`, then leave the flow.
-- `transfer`: the model's `transfer()`, which calls `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
+- `transfer` from sign-in: the model's `transfer()` calls `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
+- `transfer` from sign-up, when the identifier already has an account: the model's `transfer()` calls `signIn.create({ transfer: true })`, then `next` with the sign-in's step.
 - `unknown`: nothing. The screen already shows "Start over".
 - Anything else: `go(routeFor(step))`.
 - An error from `finalize()` or the transfer stays on the current screen.
@@ -80,8 +81,9 @@ Sign-up:
 
 The controller calls these model callbacks on `start`, then `next(step)`.
 
-- Ticket (`__clerk_ticket`): the model exposes `redeemTicket: () => signUp.ticket({ unsafeMetadata })`. A ticket works only once, so redeem it once: keep the "already started" flag in a component that doesn't remount, so a remount or StrictMode can't redeem it twice. A failed redemption shows its error on `start`.
-- Email-link return (`__clerk_status`): only `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
+- Ticket (`__clerk_ticket`): `__clerk_status=sign_up` redeems it with `signUp.ticket({ unsafeMetadata })`; any other status with `signIn.ticket()`, as `ui/src/components/SignIn/SignInStart.tsx` does. A ticket works only once, so redeem it once: keep the "already started" flag in a component that doesn't remount, so a remount or StrictMode can't redeem it twice. A failed redemption shows its error on `start`.
+- Email-link return (`__clerk_status`): `verified` with a `__clerk_created_session` this client has activates that session (`clerk-js/src/core/clerk.ts:2620-2636`); any other `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
+- A step that is already `complete` on mount, such as a reload before the session was set active: `next(step)` finalizes it.
 
 ## Bridge
 
