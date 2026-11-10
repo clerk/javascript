@@ -13,31 +13,12 @@ import { InputGroup } from '../../../components/input-group';
 import { Text } from '../../../components/text';
 import { Eye } from '../../../icons/glyphs/eye';
 import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignUpDetails } from '../sign-in.types';
 
-interface SignUpDetailsMessages {
-  title: string;
-  description: string;
-  firstNameLabel: string;
-  firstNamePlaceholder: string;
-  lastNameLabel: string;
-  lastNamePlaceholder: string;
-  emailLabel: string;
-  emailPlaceholder: string;
-  passwordLabel: string;
-  passwordPlaceholder: string;
-  showPasswordLabel: string;
-  hidePasswordLabel: string;
-  primaryActionLabel: string;
-  pendingLabel: string;
-  actionText: string;
-  actionLink: string;
-}
-
 interface SignUpDetailsProps {
-  messages: SignUpDetailsMessages;
   values: SignUpDetails;
   errors?: Partial<Record<keyof SignUpDetails, string>>;
   isPending?: boolean;
@@ -48,7 +29,6 @@ interface SignUpDetailsProps {
 }
 
 export function SignUpDetailsStep({
-  messages,
   values,
   errors = {},
   isPending = false,
@@ -57,6 +37,7 @@ export function SignUpDetailsStep({
   onSignIn,
   focusRef,
 }: SignUpDetailsProps) {
+  const m = useMessages('signIn');
   const formId = useId();
   const [visible, setVisible] = useState(false);
 
@@ -70,8 +51,8 @@ export function SignUpDetailsStep({
   return (
     <>
       <Card.Header>
-        <Card.Title>{messages.title}</Card.Title>
-        <Card.Description>{messages.description}</Card.Description>
+        <Card.Title>{m.signUp.title}</Card.Title>
+        <Card.Description>{m.signUp.description}</Card.Description>
       </Card.Header>
       <Card.Content>
         <Form
@@ -86,12 +67,12 @@ export function SignUpDetailsStep({
                 disabled={isPending}
                 focusableWhenDisabled
               >
-                <Field.Label>{messages.firstNameLabel}</Field.Label>
+                <Field.Label>{m.signUp.firstNameLabel}</Field.Label>
                 <Input
                   ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
                   name='firstName'
                   autoComplete='given-name'
-                  placeholder={messages.firstNamePlaceholder}
+                  placeholder={m.signUp.firstNamePlaceholder}
                   value={values.firstName}
                   onChange={event => onValueChange('firstName', event.target.value)}
                 />
@@ -105,11 +86,11 @@ export function SignUpDetailsStep({
                 disabled={isPending}
                 focusableWhenDisabled
               >
-                <Field.Label>{messages.lastNameLabel}</Field.Label>
+                <Field.Label>{m.signUp.lastNameLabel}</Field.Label>
                 <Input
                   name='lastName'
                   autoComplete='family-name'
-                  placeholder={messages.lastNamePlaceholder}
+                  placeholder={m.signUp.lastNamePlaceholder}
                   value={values.lastName}
                   onChange={event => onValueChange('lastName', event.target.value)}
                 />
@@ -124,12 +105,12 @@ export function SignUpDetailsStep({
               disabled={isPending}
               focusableWhenDisabled
             >
-              <Field.Label>{messages.emailLabel}</Field.Label>
+              <Field.Label>{m.signUp.emailLabel}</Field.Label>
               <Input
                 name='emailAddress'
                 type='email'
                 autoComplete='email'
-                placeholder={messages.emailPlaceholder}
+                placeholder={m.signUp.emailPlaceholder}
                 value={values.emailAddress}
                 onChange={event => onValueChange('emailAddress', event.target.value)}
               />
@@ -143,20 +124,20 @@ export function SignUpDetailsStep({
               disabled={isPending}
               focusableWhenDisabled
             >
-              <Field.Label>{messages.passwordLabel}</Field.Label>
+              <Field.Label>{m.signUp.passwordLabel}</Field.Label>
               <InputGroup.Root>
                 <InputGroup.Input
                   name='password'
                   type={visible ? 'text' : 'password'}
                   autoComplete='new-password'
-                  placeholder={messages.passwordPlaceholder}
+                  placeholder={m.signUp.passwordPlaceholder}
                   value={values.password}
                   onChange={event => onValueChange('password', event.target.value)}
                 />
                 <InputGroup.End>
                   <Button
                     type='button'
-                    aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
+                    aria-label={visible ? m.hidePassword : m.showPassword}
                     onClick={() => setVisible(current => !current)}
                   >
                     <Icon glyph={visible ? EyeSlash : Eye} />
@@ -175,7 +156,7 @@ export function SignUpDetailsStep({
             color='foreground-secondary'
             xstyle={styles.footerText}
           >
-            {messages.actionText}{' '}
+            {m.signUp.signInPrompt}{' '}
             <Button
               type='button'
               size='sm'
@@ -183,7 +164,7 @@ export function SignUpDetailsStep({
               disabled={isPending}
               onClick={onSignIn}
             >
-              {messages.actionLink}
+              {m.signUp.signInLink}
             </Button>
           </Text>
         ) : null}
@@ -193,9 +174,9 @@ export function SignUpDetailsStep({
           form={formId}
           fullWidth
           isPending={isPending}
-          pendingLabel={messages.pendingLabel}
+          pendingLabel={m.verifying}
         >
-          {messages.primaryActionLabel}
+          {m.continue}
         </SubmitButton>
       </Card.Footer>
     </>

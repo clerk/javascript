@@ -10,26 +10,12 @@ import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Eye } from '../../../icons/glyphs/eye';
 import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
-export interface SignInPasswordMessages {
-  title: string;
-  description: string;
-  identityEditLabel: string;
-  fieldLabel: string;
-  fieldPlaceholder: string;
-  showPasswordLabel: string;
-  hidePasswordLabel: string;
-  forgotPasswordLabel: string;
-  secondaryActionLabel: string;
-  primaryActionLabel: string;
-  pendingLabel: string;
-}
-
 interface SignInPasswordProps {
-  messages: SignInPasswordMessages;
   identifier: string;
   onEditIdentifier?: () => void;
   value: string;
@@ -43,7 +29,6 @@ interface SignInPasswordProps {
 }
 
 export function SignInPassword({
-  messages,
   identifier,
   onEditIdentifier,
   value,
@@ -55,6 +40,7 @@ export function SignInPassword({
   onCancel,
   focusRef,
 }: SignInPasswordProps) {
+  const m = useMessages('signIn');
   const formId = useId();
   const [visible, setVisible] = useState(false);
 
@@ -68,11 +54,11 @@ export function SignInPassword({
   return (
     <>
       <Card.Header>
-        <Card.Title>{messages.title}</Card.Title>
-        <Card.Description>{messages.description}</Card.Description>
+        <Card.Title>{m.password.title}</Card.Title>
+        <Card.Description>{m.password.description}</Card.Description>
         <SignInIdentityPreview
           identifier={identifier}
-          editLabel={messages.identityEditLabel}
+          editLabel={m.password.editIdentifier}
           disabled={isPending}
           onEdit={onEditIdentifier}
         />
@@ -88,21 +74,21 @@ export function SignInPassword({
             disabled={isPending}
             focusableWhenDisabled
           >
-            <Field.Label>{messages.fieldLabel}</Field.Label>
+            <Field.Label>{m.password.label}</Field.Label>
             <InputGroup.Root>
               <InputGroup.Input
                 ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
                 name='password'
                 type={visible ? 'text' : 'password'}
                 autoComplete='current-password'
-                placeholder={messages.fieldPlaceholder}
+                placeholder={m.password.placeholder}
                 value={value}
                 onChange={event => onValueChange(event.target.value)}
               />
               <InputGroup.End>
                 <Button
                   type='button'
-                  aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
+                  aria-label={visible ? m.hidePassword : m.showPassword}
                   onClick={() => setVisible(current => !current)}
                 >
                   <Icon glyph={visible ? EyeSlash : Eye} />
@@ -121,7 +107,7 @@ export function SignInPassword({
                 onClick={onForgotPassword}
                 xstyle={styles.forgotPassword}
               >
-                {messages.forgotPasswordLabel}
+                {m.password.forgotPassword}
               </Button>
             ) : null}
           </Field.Root>
@@ -137,16 +123,16 @@ export function SignInPassword({
             disabled={isPending}
             onClick={onCancel}
           >
-            {messages.secondaryActionLabel}
+            {m.useAnotherMethod}
           </Button>
         ) : null}
         <SubmitButton
           form={formId}
           fullWidth
           isPending={isPending}
-          pendingLabel={messages.pendingLabel}
+          pendingLabel={m.verifying}
         >
-          {messages.primaryActionLabel}
+          {m.continue}
         </SubmitButton>
       </Card.Footer>
     </>
