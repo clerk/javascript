@@ -1,6 +1,6 @@
 export type ComponentGroup = 'Primitives' | 'Subcomponents' | 'Features';
 export const GROUP_LABELS: Record<ComponentGroup, string> = {
-  Features: 'All-in-one',
+  Features: 'Bundled',
   Subcomponents: 'Subcomponents',
   Primitives: 'Primitives',
 };
