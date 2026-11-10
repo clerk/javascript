@@ -11,7 +11,7 @@ import type {
 } from './switcher.model';
 import { useSwitcherModel } from './switcher.model';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './switcher.pages';
-import type { SwitcherMenuProps } from './switcher.types';
+import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
 import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';
 import { SwitcherView } from './switcher.view';
 
@@ -47,13 +47,14 @@ export type OrganizationSwitcherProps = SwitcherBaseProps & OrganizationSwitcher
 /**
  * What the menu lists, and the options that apply to it. `combined` lists accounts and organizations,
  * `user` lists accounts alone and never an organization, even when one is active, and `organization`
- * lists organizations and the personal account. The profile's shape is set by `MosaicProvider`'s
- * `profile`.
+ * lists organizations and the personal account. A mode chosen at runtime takes only the props every
+ * mode shares. The profile's shape is set by `MosaicProvider`'s `profile`.
  */
 export type SwitcherProps =
   | ({ mode?: 'combined' } & CombinedSwitcherProps)
-  | ({ mode: 'user' } & UserButtonProps)
-  | ({ mode: 'organization' } & OrganizationSwitcherProps);
+  | ({ mode: 'user'; triggerVariant?: never } & UserButtonProps)
+  | ({ mode: 'organization'; triggerVariant?: never } & OrganizationSwitcherProps)
+  | ({ mode: SwitcherMode } & SwitcherBaseProps & { [K in keyof SwitcherModelOptions | 'triggerVariant']?: never });
 
 /**
  * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an account,
@@ -123,13 +124,13 @@ export function Switcher(props: SwitcherProps = {}): ReactElement | null {
     showTriggerLabel,
     triggerBadge,
     mode = 'combined',
+    triggerVariant: requestedTriggerVariant,
     customMenuItems,
     menuItemOrder,
     fallback,
     ...options
   } = props;
-  const triggerVariant =
-    props.mode === 'user' || props.mode === 'organization' ? 'condensed' : (props.triggerVariant ?? 'full');
+  const triggerVariant = mode === 'combined' ? (requestedTriggerVariant ?? 'full') : 'condensed';
   const profile = useMosaicProfile();
   const { userProfileProps, organizationProfileProps } = profile;
   // The portals must outlive the popover, so custom pages are bridged here rather than inside it.
