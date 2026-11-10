@@ -8,6 +8,7 @@ export type NextStep =
   | { type: 'new_password' }
   | { type: 'protect' }
   | { type: 'transfer' }
+  | { type: 'start' }
   | { type: 'enterprise_sso' }
   | { type: 'fields'; fields: SignUpField[] }
   | { type: 'verify_email'; target: string | null; sent: boolean }
@@ -80,6 +81,9 @@ export function getSignInNextStep(signIn: SignInNextStepInput): NextStep {
  * @internal
  */
 export function getSignUpNextStep(signUp: SignUpNextStepInput): NextStep {
+  if (signUp.status === null) {
+    return { type: 'start' };
+  }
   if (signUp.status === 'complete') {
     return { type: 'complete', createdSessionId: signUp.createdSessionId };
   }

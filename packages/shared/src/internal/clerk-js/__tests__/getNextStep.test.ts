@@ -110,6 +110,10 @@ describe('getSignInNextStep', () => {
 });
 
 describe('getSignUpNextStep', () => {
+  it('returns start before the sign-up is created', () => {
+    expect(getSignUpNextStep(signUp({ status: null }))).toEqual({ type: 'start' });
+  });
+
   it('returns complete with the created session', () => {
     expect(getSignUpNextStep(signUp({ status: 'complete', createdSessionId: 'sess_1' }))).toEqual({
       type: 'complete',

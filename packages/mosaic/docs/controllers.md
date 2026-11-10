@@ -150,6 +150,8 @@ return {
 
 The view side is in [Views → Moving between screens](views.md#moving-between-screens-on-one-surface).
 
+**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The controller derives the screen from `getSignInNextStep` or `getSignUpNextStep`, and keeps only back moves such as `editing` locally ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#screens-and-navigation)).
+
 ## Wrapping actions
 
 - **One wrapper for every action**, so each is wrapped the same way and only one is in flight (`runAction` in `switcher.controller.tsx`).

@@ -32,7 +32,8 @@ Adding one step, the protect check (#8329), touched about 15 source files in `ui
 ## Proposal
 
 ```ts
-await signUp.update({ username });
+const { error } = await signUp.update({ username });
+if (error) return showError(error);
 
 switch (signUp.nextStep.type) {
   case 'fields': // { fields }
@@ -48,10 +49,10 @@ Each step is a step of the auth flow, not a screen. Sign-in steps match today's 
 | Flow    | Steps, in order                                                                                      |
 | ------- | ---------------------------------------------------------------------------------------------------- |
 | Sign-in | `protect`, `transfer`, `identifier`, `first_factor`, `second_factor`, `client_trust`, `new_password` |
-| Sign-up | `protect`, `transfer`, `enterprise_sso`, `fields`, `verify_email`, `verify_phone`                    |
+| Sign-up | `start`, `protect`, `transfer`, `enterprise_sso`, `fields`, `verify_email`, `verify_phone`           |
 | Both    | `complete` (`createdSessionId`), `unknown`                                                           |
 
-Verify steps carry `strategy` or `target`, and `sent`: whether a code or link is already out, so a reload doesn't send another.
+`start` and sign-in's `identifier` are what clients show before the resource exists, so FAPI never sends them. Verify steps carry `strategy` or `target`, and `sent`: whether a code or link is already out, so a reload doesn't send another.
 
 - **Nothing new to call.** `nextStep` is a field. Every method stays and returns `{ error }` as today. Read `signIn.nextStep` after `await`: the resource is updated before the promise resolves (`clerk-js/src/core/resources/Base.ts:140`, `:235`).
 - **Nothing acts on its own.** FAPI reports the step and never sends a code or redirects. A custom screen before a verify step is just not sending the code yet.
@@ -68,7 +69,7 @@ const screen = editing ? 'fields' : step.type;
 ```
 
 - **The URL shows, the server decides.** Back, forward and a link to the start render that page. FAPI's step only changes after the user submits there. A route redirects only when FAPI's state makes it impossible, as `ui` does today (`ui/src/components/SignIn/SignInFactorTwo.tsx:47`). In Mosaic the component that owns the sign-in routes (`useRouterScope`, #10602) does that redirect, and is the only one that does.
-- **No step machine.** A machine whose states copy the step is a second source of truth. Busy and errors come from `useForm` or `usePendingAction`. The only local state is a back move, like `editing` above. This is an exception to "the machine owns the step" in [Controllers](../controllers.md#multi-step-flows), for flows whose step FAPI owns.
+- **No step machine.** A machine whose states copy the step is a second source of truth. Busy and errors come from `useForm` or `usePendingAction`. The only local state is a back move, like `editing` above. [Controllers → Multi-step flows](../controllers.md#multi-step-flows) lists this as the exception to "the machine owns the step".
 - **A step can span screens, or share one.** `enterprise_sso` is a chooser in one client and a redirect in another.
 - **The step says where, the resource says what.** A factor screen lists other methods from `signIn.supportedFirstFactors`, as `ui` does (`SignInFactorOne.tsx:84`). The step doesn't copy them.
 
@@ -86,7 +87,12 @@ clerk-js sends `__clerk_api_version` on every request (`clerk-js/src/core/fapiCl
 
 `getSignInNextStep` and `getSignUpNextStep` (`shared/src/internal/clerk-js/getNextStep.ts`) compute the step from today's fields. Mosaic uses them from day one, so it works against any FAPI. Once FAPI sends `next_step`, they will return it, and once the minimum supported API version has it, the computing half is deleted.
 
-Against the same fixtures, `getSignUpNextStep` matches `navigateToNextStepSignUp` except for transfer, which `ui` handles before routing. It disagrees with `completeSignUpFlow` when fields and email are both missing (fields first, D2).
+Against the same fixtures, `getSignUpNextStep` differs from `ui`'s routers (`shared/src/internal/clerk-js/navigateToNextStepSignUp.ts`, `completeSignUpFlow.ts`) in four cases:
+
+- **Transfer.** `ui` transfers before routing; the bridge returns `transfer`.
+- **Fields and email both missing.** `completeSignUpFlow` verifies first; the bridge collects first (D2).
+- **`enterprise_sso`.** `navigateToNextStepSignUp` goes to `/continue` when it has no connections URL, and `completeSignUpFlow` redirects to the IdP; the bridge returns `enterprise_sso` and the client picks.
+- **Nothing it can place.** With nothing missing, or only `web3_wallet` unverified, `ui` goes to `/continue`; the bridge returns `unknown` (D4).
 
 What the bridge can't compute, so FAPI must send:
 
