@@ -2,7 +2,7 @@ import * as Stories from './sign-in.stories';
 
 # SignIn
 
-The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error under the field. Enter `locked` as the password to render one in the banner.
+The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error under the field. Enter `locked` as the password to return to the start with the lockout in the banner.
 
 ## Example
 
@@ -75,6 +75,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Banner error
 
 <Story name='IdentifierBannerError' storyModule={Stories} />
+
+#### Locked
+
+<Story name='IdentifierLocked' storyModule={Stories} />
 
 #### Phone
 
@@ -227,10 +231,6 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Forgot password pending
 
 <Story name='NoticeForgotPasswordPending' storyModule={Stories} />
-
-#### Account locked
-
-<Story name='NoticeLocked' storyModule={Stories} />
 
 #### No available methods
 

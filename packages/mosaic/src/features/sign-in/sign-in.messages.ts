@@ -25,11 +25,6 @@ export const signInMessages = {
     pending: 'Sending code',
     back: 'Back to sign in',
   },
-  locked: {
-    title: 'Account locked',
-    description:
-      'Your account is locked after too many failed sign-in attempts. Try again later, or email support for help.',
-  },
   noAvailableMethods: {
     title: 'Cannot sign in',
     description: 'Cannot proceed with sign in. There’s no available authentication factor.',

@@ -184,7 +184,8 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       }
       if (values.password.toLowerCase() === 'locked') {
-        setGlobalErrorMessage('Too many failed attempts. Try again later, or use another method.');
+        navigate({ kind: 'identifier' }, -1);
+        setGlobalErrorMessage('Your account is locked. You will be able to try again in 30 minutes.');
         return;
       }
       startSecondFactor();
@@ -554,6 +555,15 @@ export function IdentifierError() {
   );
 }
 
+export function IdentifierLocked() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier' }}
+      globalErrorMessage='Your account is locked. You will be able to try again in 30 minutes. For more information, please contact support.'
+    />
+  );
+}
+
 export function IdentifierBannerError() {
   return (
     <StepPanel
@@ -636,10 +646,6 @@ export function NoticeForgotPasswordPending() {
       isPending
     />
   );
-}
-
-export function NoticeLocked() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'locked' }} />;
 }
 
 export function NoticeNoMethods() {

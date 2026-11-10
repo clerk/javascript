@@ -28,7 +28,7 @@ export type SignInStep =
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'locked' | 'no-methods' | 'password-compromised' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' }

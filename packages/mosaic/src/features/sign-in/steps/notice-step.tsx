@@ -55,14 +55,6 @@ export function NoticeStep({
           onBack={onBack}
         />
       );
-    case 'locked':
-      return (
-        <VerificationHelp
-          messages={{ ...m.locked, ...help, backButton: m.forgotPassword.back }}
-          onEmailSupport={onEmailSupport}
-          onBack={onBack}
-        />
-      );
     case 'no-methods':
       return (
         <VerificationHelp

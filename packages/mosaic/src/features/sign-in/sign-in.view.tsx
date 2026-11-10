@@ -257,7 +257,6 @@ export function SignInView({
               ids={[
                 'notice:help',
                 'notice:forgot-password',
-                'notice:locked',
                 'notice:no-methods',
                 'notice:action-blocked',
                 'notice:password-compromised',
