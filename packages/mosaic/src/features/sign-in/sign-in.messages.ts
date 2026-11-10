@@ -38,6 +38,8 @@ export const signInMessages = {
     title: 'We couldn’t complete this request',
     description: 'For your security, this request could not be completed.',
     traceIdLabel: 'Reference',
+    copyTraceId: 'Copy reference',
+    traceIdCopied: 'Copied',
   },
   passwordCompromised: {
     title: 'Password compromised',

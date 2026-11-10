@@ -1,9 +1,10 @@
 import { Card } from '../../../components/card';
+import { CopyButton } from '../../../components/copy-button';
+import { Field } from '../../../components/field';
+import { InputGroup } from '../../../components/input-group';
 import { Link } from '../../../components/link';
-import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
 import type { SignInActionBlockedDetails } from '../sign-in.types';
-import { styles } from '../sign-in.styles';
 
 interface SignInActionBlockedProps {
   details?: SignInActionBlockedDetails;
@@ -18,34 +19,37 @@ export function SignInActionBlocked({ details }: SignInActionBlockedProps) {
       <Card.Header>
         <Card.Title>{details?.title ?? m.title}</Card.Title>
         <Card.Description>{details?.description ?? m.description}</Card.Description>
-      </Card.Header>
-      {href || details?.traceId ? (
-        <Card.Content xstyle={[styles.fieldStack, styles.footerText]}>
-          {href ? (
+        {href ? (
+          <Card.Description>
             <Link
               href={href}
               target='_blank'
               rel='noopener noreferrer'
-              size='xs'
+              size='sm'
             >
               {details?.linkText ?? href}
             </Link>
-          ) : null}
-          {details?.traceId ? (
-            <Text
-              size='xs'
-              color='foreground-secondary'
-            >
-              {m.traceIdLabel}{' '}
-              <Text
-                render={<span />}
-                size='xs'
-                xstyle={styles.traceId}
-              >
-                {details.traceId}
-              </Text>
-            </Text>
-          ) : null}
+          </Card.Description>
+        ) : null}
+      </Card.Header>
+      {details?.traceId ? (
+        <Card.Content>
+          <Field.Root>
+            <Field.Label>{m.traceIdLabel}</Field.Label>
+            <InputGroup.Root>
+              <InputGroup.Input
+                value={details.traceId}
+                readOnly
+              />
+              <InputGroup.End>
+                <CopyButton
+                  value={details.traceId}
+                  label={m.copyTraceId}
+                  copiedLabel={m.traceIdCopied}
+                />
+              </InputGroup.End>
+            </InputGroup.Root>
+          </Field.Root>
         </Card.Content>
       ) : null}
     </>
