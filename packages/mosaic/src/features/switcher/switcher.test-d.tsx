@@ -31,24 +31,24 @@ describe('Switcher props', () => {
         signInUrl='/sign-in'
       />
     );
-    // @ts-expect-error the trigger variant only applies to the combined menu
     void (
       <Switcher
         mode='user'
+        // @ts-expect-error -- the trigger variant only applies to the combined menu
         triggerVariant='full'
       />
     );
-    // @ts-expect-error a user menu lists no organizations
     void (
       <Switcher
         mode='user'
+        // @ts-expect-error -- a user menu lists no organizations
         hidePersonal
       />
     );
-    // @ts-expect-error a user menu lists no organizations
     void (
       <Switcher
         mode='user'
+        // @ts-expect-error -- a user menu lists no organizations
         createOrganizationUrl='/orgs/new'
       />
     );
@@ -62,17 +62,17 @@ describe('Switcher props', () => {
         createOrganizationUrl='/orgs/new'
       />
     );
-    // @ts-expect-error the trigger variant only applies to the combined menu
     void (
       <Switcher
         mode='organization'
+        // @ts-expect-error -- the trigger variant only applies to the combined menu
         triggerVariant='full'
       />
     );
-    // @ts-expect-error an organization menu lists no accounts
     void (
       <Switcher
         mode='organization'
+        // @ts-expect-error -- an organization menu lists no accounts
         afterSwitchSessionUrl='/dashboard'
       />
     );
