@@ -40,13 +40,13 @@ Turn the hits into a behavior inventory, one row per effect, guard, error path, 
 Include shared prop types and mode-dependent options, defaults, callback order and error delivery; the full list is in [Parity audit → Rules](parity-audit.md#rules). Write the inventory to `tmp/mosaic-parity/<feature>.md`:
 
 ```md
-# sign-out-button parity
+# checkout-button parity
 
-Legacy: packages/react/src/components/SignOutButton.tsx
+Legacy: packages/react/src/components/CheckoutButton.tsx
 
 ## Inventory
 
-- `redirectUrl` defaults to `/`
+- `for="organization"` throws without an active organization
 - …
 ```
 

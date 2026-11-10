@@ -14,6 +14,7 @@ Worked example: [What it catches](#what-it-catches).
 - A Deferred item tracked only by a `// TODO` is a regression at risk of shipping. Surface it as a tracked item.
 - A defect the legacy component already had is not a parity row. List it below the table as an optional improvement.
 - A difference that breaks a rule in [AGENTS.md](../AGENTS.md) or `docs/` is fixed or raised with the user, not shipped as intentional.
+- An error the legacy component let reach the app, by a throw, a rejection or the console, stays observable. Losing it is a gap to fix, not a decision to ask about. Check that whatever owns the error still renders after the action fails: a failed sign-out can unmount its own button.
 - For each async action in scope, check success, pending and a representative rejection through the feature's fake FAPI harness ([Testing](testing.md)). A mock of the Clerk method cannot prove that method's runtime effect.
 - Run it as a read-only subagent that returns a conclusion, not file dumps. Put its table under `## Parity audit` in `tmp/mosaic-parity/<feature>.md`, beside the [Phase 1 inventory](migration.md#phase-1-inventory-the-legacy-behavior). `tmp/` is ignored by git, so nothing is committed.
 - A filled table is not proof. Read the results of the checks it cites before you claim parity.
