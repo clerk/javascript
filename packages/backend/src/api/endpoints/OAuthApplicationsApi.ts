@@ -1,5 +1,6 @@
 import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
+import { OAuthTokenExchangeError } from '../../errors';
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type { DeletedObject } from '../resources';
@@ -140,6 +141,25 @@ const toTokenExchangeResult = (json: TokenExchangeResponseJSON): ExchangeOAuthAp
   refreshToken: json.refresh_token,
 });
 
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+
+const isTokenExchangeResponse = (value: unknown): value is TokenExchangeResponseJSON =>
+  isRecord(value) &&
+  typeof value.access_token === 'string' &&
+  typeof value.issued_token_type === 'string' &&
+  typeof value.token_type === 'string';
+
+const toTokenExchangeError = (json: unknown, status: number) => {
+  if (!isRecord(json) || typeof json.error !== 'string') {
+    return new OAuthTokenExchangeError({ error: 'invalid_response', status });
+  }
+  return new OAuthTokenExchangeError({
+    error: json.error,
+    errorDescription: typeof json.error_description === 'string' ? json.error_description : undefined,
+    status,
+  });
+};
+
 /** @generateWithEmptyComment */
 export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
   /**
@@ -260,6 +280,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
    *
    * @param params - The parameters for the token exchange.
    * @returns The issued token and its metadata.
+   * @throws `OAuthTokenExchangeError` if the token endpoint rejects the exchange or returns an invalid response.
    *
    * @example
    * ```ts
@@ -275,6 +296,10 @@ export class OAuthApplicationsApi extends AbstractAPI {
   public async __experimental_exchangeToken(
     params: ExchangeOAuthApplicationTokenParams,
   ): Promise<ExchangeOAuthApplicationTokenResult> {
+    if (params.actorTokenType && !params.actorToken) {
+      throw new Error('`actorTokenType` requires `actorToken`.');
+    }
+
     const application = await this.get(params.oauthApplicationId);
 
     const credentials = `${formUrlEncode(application.clientId)}:${formUrlEncode(params.clientSecret)}`;
@@ -289,10 +314,16 @@ export class OAuthApplicationsApi extends AbstractAPI {
       body: buildTokenExchangeBody(params),
     });
 
+    const json = await response.json().catch(() => undefined);
+
     if (!response.ok) {
-      throw new Error(`OAuth token exchange failed with status ${response.status}.`);
+      throw toTokenExchangeError(json, response.status);
     }
 
-    return toTokenExchangeResult((await response.json()) as TokenExchangeResponseJSON);
+    if (!isTokenExchangeResponse(json)) {
+      throw new OAuthTokenExchangeError({ error: 'invalid_response', status: response.status });
+    }
+
+    return toTokenExchangeResult(json);
   }
 }

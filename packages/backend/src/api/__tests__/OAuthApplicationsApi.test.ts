@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
+import { OAuthTokenExchangeError } from '../../errors';
 import { server, validateHeaders } from '../../mock-server';
 import { createBackendApiClient } from '../factory';
 
@@ -224,6 +225,81 @@ describe('OAuthApplications', () => {
       expect([...(body?.keys() ?? [])]).toEqual(['grant_type', 'subject_token', 'subject_token_type']);
       expect(result.scope).toBeUndefined();
       expect(result.refreshToken).toBe('refresh');
+    });
+
+    it.each([
+      ['unsupported_grant_type', 'The authorization grant type is not supported.'],
+      ['invalid_grant', undefined],
+      ['invalid_target', 'Unknown audience.'],
+    ])('throws OAuthTokenExchangeError for a %s error response', async (error, errorDescription) => {
+      useApplication();
+      server.use(
+        http.post(tokenFetchUrl, () =>
+          HttpResponse.json(
+            { error, ...(errorDescription && { error_description: errorDescription }) },
+            { status: 400 },
+          ),
+        ),
+      );
+
+      const promise = createClient().oauthApplications.__experimental_exchangeToken({
+        oauthApplicationId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+      });
+
+      await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
+      await expect(promise).rejects.toMatchObject({ error, errorDescription, status: 400 });
+    });
+
+    it('throws an invalid_response error when the error body is not JSON', async () => {
+      useApplication();
+      server.use(http.post(tokenFetchUrl, () => new HttpResponse('Bad Gateway', { status: 502 })));
+
+      await expect(
+        createClient().oauthApplications.__experimental_exchangeToken({
+          oauthApplicationId,
+          clientSecret,
+          subjectToken: 'subject_token',
+          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        }),
+      ).rejects.toMatchObject({ error: 'invalid_response', errorDescription: undefined, status: 502 });
+    });
+
+    it('throws an invalid_response error when a successful response is malformed', async () => {
+      useApplication();
+      server.use(http.post(tokenFetchUrl, () => HttpResponse.json({ token_type: 'Bearer' })));
+
+      await expect(
+        createClient().oauthApplications.__experimental_exchangeToken({
+          oauthApplicationId,
+          clientSecret,
+          subjectToken: 'subject_token',
+          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        }),
+      ).rejects.toMatchObject({ error: 'invalid_response', status: 200 });
+    });
+
+    it('rejects actorTokenType without actorToken before making any request', async () => {
+      let requested = false;
+      server.use(
+        http.all('*', () => {
+          requested = true;
+          return HttpResponse.json({});
+        }),
+      );
+
+      await expect(
+        createClient().oauthApplications.__experimental_exchangeToken({
+          oauthApplicationId,
+          clientSecret,
+          subjectToken: 'subject_token',
+          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+          actorTokenType: 'urn:ietf:params:oauth:token-type:jwt',
+        }),
+      ).rejects.toThrow('`actorTokenType` requires `actorToken`.');
+      expect(requested).toBe(false);
     });
 
     it('throws when the OAuth application ID is missing', async () => {
