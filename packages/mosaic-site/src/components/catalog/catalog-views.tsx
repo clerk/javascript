@@ -4,6 +4,7 @@ import { inertProps } from '@clerk/shared/inert';
 import Link from 'next/link';
 
 import { StoryGallery } from '@/components/catalog/story-gallery';
+import { StoryThumb } from '@/components/catalog/story-thumb';
 import { DEMOS } from '@/components/gallery/demos';
 import { ScaledFrame } from '@/components/gallery/scaled-frame';
 import {
@@ -71,6 +72,10 @@ function Thumb({ kind, item }: { kind: Kind; item: CatalogItem }) {
         </ScaledFrame>
       </MosaicProvider>
     );
+  }
+  const file = item.soon ? undefined : storyFileFor(item.slug);
+  if (file) {
+    return <StoryThumb file={file} />;
   }
   return (
     <div className='bg-foreground/[0.03] flex aspect-[16/10] w-full items-center justify-center'>

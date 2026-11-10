@@ -1,14 +1,17 @@
 'use client';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { StoryThumb } from '@/components/catalog/story-thumb';
 import { DEMOS } from '@/components/gallery/demos';
 import { ScaledFrame } from '@/components/gallery/scaled-frame';
+import { SegmentedControl } from '@/components/gallery/segmented-control';
 import { TopNav } from '@/components/marketing/top-nav';
 import { CATALOG, type CatalogItem, type Kind } from '@/lib/components/catalog';
 import { getComponentMeta } from '@/lib/components/meta';
+import { storyFileFor } from '@/lib/components/stories';
 import { cn } from '@/lib/utils';
 const SIDEBAR_WIDTH = 256;
 const PREVIEW_WIDTH = 340;
@@ -19,6 +22,7 @@ const gettingStarted: NavLink[] = [
   { href: '/installation', label: 'Installation' },
   { href: '/colors', label: 'Colors' },
 ];
+const VIEW_KEY = 'mosaic-docs-view';
 const itemHref = (kind: Kind, slug: string) => `/${kind}/${slug}`;
 function NavItem({
   link,
@@ -71,13 +75,6 @@ function SoonBadge() {
 }
 const HEADER_CLASS =
   'flex h-8 items-center gap-2 px-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-neutral-500';
-function CountBadge({ count }: { count: number }) {
-  return (
-    <span className='bg-foreground/[0.06] rounded-full px-2 py-0.5 text-[11px] font-medium normal-case tracking-normal text-neutral-500'>
-      {count}
-    </span>
-  );
-}
 function Chevron({ open }: { open: boolean }) {
   return (
     <svg
@@ -97,7 +94,17 @@ function Chevron({ open }: { open: boolean }) {
     </svg>
   );
 }
-function Collapsible({ open, id, children }: { open: boolean; id: string; children: React.ReactNode }) {
+function Collapsible({
+  open,
+  id,
+  rail = true,
+  children,
+}: {
+  open: boolean;
+  id: string;
+  rail?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div
       id={id}
@@ -108,7 +115,7 @@ function Collapsible({ open, id, children }: { open: boolean; id: string; childr
       {...(open ? {} : { inert: true })}
     >
       <div className='overflow-hidden'>
-        <div className='border-foreground/10 ml-3 flex flex-col border-l pl-2'>{children}</div>
+        <div className={cn('flex flex-col', rail ? 'border-foreground/10 ml-3 border-l pl-2' : 'pl-4')}>{children}</div>
       </div>
     </div>
   );
@@ -205,8 +212,120 @@ function ComponentRow({ item, pathname, showPreview, setHover }: RowProps & { it
     </div>
   );
 }
-const flowItems = CATALOG.blocks.flatMap(category => category.groups.flatMap(group => group.items));
+const blockItems = CATALOG.blocks.flatMap(category => category.groups.flatMap(group => group.items));
 const pieceItems = CATALOG.components.flatMap(category => category.groups.flatMap(group => group.items));
+function CategoryGroup({
+  label,
+  href,
+  kind,
+  items,
+  pathname,
+  showPreview,
+  setHover,
+  hideHeader = false,
+}: RowProps & { label: string; href: string; kind: Kind; items: CatalogItem[]; hideHeader?: boolean }) {
+  return (
+    <div className='flex flex-col'>
+      {hideHeader ? null : (
+        <Link
+          href={href}
+          aria-current={pathname === href ? 'page' : undefined}
+          className={cn(
+            'text-foreground focus-visible:ring-foreground/60 flex h-8 items-center gap-2 rounded-md px-2.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset',
+            pathname === href ? 'bg-foreground/[0.06]' : 'hover:bg-foreground/[0.03]',
+          )}
+        >
+          {label}
+          <span className='bg-foreground/[0.06] inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-medium leading-none text-neutral-500'>
+            {items.length}
+          </span>
+        </Link>
+      )}
+      {items.map(item =>
+        kind === 'blocks' ? (
+          <ComponentRow
+            key={item.slug}
+            item={item}
+            pathname={pathname}
+            showPreview={showPreview}
+            setHover={setHover}
+          />
+        ) : (
+          <NavItem
+            key={item.slug}
+            link={{
+              href: itemHref('components', item.slug),
+              slug: item.slug,
+              label: item.title,
+              comingSoon: item.soon,
+              hideBadge: true,
+            }}
+            pathname={pathname}
+            showPreview={showPreview}
+            setHover={setHover}
+          />
+        ),
+      )}
+    </div>
+  );
+}
+function AllRow({ kind, count, pathname }: { kind: Kind; count: number; pathname: string }) {
+  const href = `/${kind}`;
+  const active = pathname === href;
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'focus-visible:ring-foreground/60 flex h-8 items-center gap-2 rounded-md px-2.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset',
+        active ? 'bg-foreground/[0.06] text-foreground font-medium' : 'hover:text-foreground text-neutral-500',
+      )}
+    >
+      <svg
+        viewBox='0 0 16 16'
+        className='size-4 shrink-0'
+        fill='none'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinejoin='round'
+        aria-hidden='true'
+      >
+        <rect
+          x='2'
+          y='2'
+          width='5'
+          height='5'
+          rx='1'
+        />
+        <rect
+          x='9'
+          y='2'
+          width='5'
+          height='5'
+          rx='1'
+        />
+        <rect
+          x='2'
+          y='9'
+          width='5'
+          height='5'
+          rx='1'
+        />
+        <rect
+          x='9'
+          y='9'
+          width='5'
+          height='5'
+          rx='1'
+        />
+      </svg>
+      All {kind}
+      <span className='bg-foreground/[0.06] ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-medium leading-none text-neutral-500'>
+        {count}
+      </span>
+    </Link>
+  );
+}
 function SidebarIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -284,6 +403,21 @@ function HoverPreview({
       </div>
     );
   }
+  const file = storyFileFor(slug);
+  if ((!meta || !Demo) && file) {
+    return (
+      <div
+        aria-hidden='true'
+        style={position}
+        className='pointer-events-none fixed z-40 hidden transition-[top] duration-200 ease-out [animation:sidebar-preview-in_160ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:[animation:none] lg:block'
+      >
+        <StoryThumb
+          file={file}
+          className='ring-foreground/10 overflow-hidden rounded-2xl shadow-2xl ring-1'
+        />
+      </div>
+    );
+  }
   if (!meta || !Demo) {
     return null;
   }
@@ -315,6 +449,36 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
     });
     return () => cancelAnimationFrame(frame);
   }, [pathname]);
+  const pathKind: Kind | null = pathname.startsWith('/components')
+    ? 'components'
+    : pathname.startsWith('/blocks')
+      ? 'blocks'
+      : null;
+  const [view, setView] = React.useState<Kind>(pathKind ?? 'blocks');
+  const [seenPath, setSeenPath] = React.useState(pathname);
+  if (seenPath !== pathname) {
+    setSeenPath(pathname);
+    if (pathKind && pathKind !== view) {
+      setView(pathKind);
+    }
+  }
+  const loaded = React.useRef(false);
+  React.useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const stored = window.localStorage.getItem(VIEW_KEY);
+      if (!pathKind && (stored === 'blocks' || stored === 'components')) {
+        setView(stored);
+      }
+      loaded.current = true;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pathKind]);
+  React.useEffect(() => {
+    if (loaded.current) {
+      window.localStorage.setItem(VIEW_KEY, view);
+    }
+  }, [view]);
+  const router = useRouter();
   const [hover, setHoverState] = React.useState<{ slug: string; top: number; comingSoon?: boolean } | null>(null);
   const timers = React.useRef({ show: 0, hide: 0 });
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -374,6 +538,21 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
             className='relative flex flex-col'
             onMouseLeave={() => setHover(null)}
           >
+            <SegmentedControl
+              label='Browse'
+              value={view}
+              options={[
+                { id: 'blocks', label: 'Blocks' },
+                { id: 'components', label: 'Components' },
+              ]}
+              onChange={next => {
+                setView(next);
+                router.push(`/${next}`);
+              }}
+              fill
+              dense
+              className='mb-6'
+            />
             <div className='flex flex-col'>
               <div className={HEADER_CLASS}>Getting started</div>
               {gettingStarted.map(link => (
@@ -386,63 +565,38 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
                 />
               ))}
             </div>
-            <div className='mt-6 flex flex-col'>
-              <Link
-                href='/blocks'
-                className={cn(HEADER_CLASS, 'hover:text-foreground transition-colors')}
-              >
-                Blocks
-                <CountBadge count={flowItems.length} />
-              </Link>
-              {CATALOG.blocks.map(category => (
-                <div
-                  key={category.id}
-                  className='flex flex-col'
-                >
-                  <div className='text-foreground/50 mt-4 px-2 pb-1 text-[12px] font-medium first:mt-1'>
-                    {category.label}
-                  </div>
-                  {category.groups
-                    .flatMap(group => group.items)
-                    .map(item => (
-                      <ComponentRow
-                        key={item.slug}
-                        item={item}
-                        pathname={pathname}
-                        showPreview={showPreview}
-                        setHover={setHover}
-                      />
-                    ))}
-                </div>
-              ))}
-            </div>
-            <div className='mt-6 flex flex-col'>
-              <Link
-                href='/components'
-                className={cn(HEADER_CLASS, 'hover:text-foreground transition-colors')}
-              >
-                Components
-                <CountBadge count={pieceItems.length} />
-                {pieceItems.every(item => item.soon) ? (
-                  <span className='bg-foreground/[0.06] rounded-full px-2 py-0.5 text-[11px] font-medium normal-case tracking-normal text-neutral-500'>
-                    Soon
-                  </span>
-                ) : null}
-              </Link>
-              {pieceItems.map(item => (
-                <NavItem
-                  key={item.slug}
-                  link={{
-                    href: itemHref('components', item.slug),
-                    label: item.title,
-                    comingSoon: item.soon,
-                    hideBadge: true,
-                  }}
+            <div className='mt-6 flex flex-col gap-5'>
+              <AllRow
+                kind={view}
+                count={view === 'blocks' ? blockItems.length : pieceItems.length}
+                pathname={pathname}
+              />
+              {view === 'blocks' &&
+                CATALOG.blocks.map(category => (
+                  <CategoryGroup
+                    key={category.id}
+                    hideHeader
+                    label={category.label}
+                    href={`/blocks/category/${category.id}`}
+                    kind='blocks'
+                    items={category.groups.flatMap(group => group.items)}
+                    pathname={pathname}
+                    showPreview={showPreview}
+                    setHover={setHover}
+                  />
+                ))}
+              {view === 'components' && (
+                <CategoryGroup
+                  hideHeader
+                  label='Components'
+                  href='/components'
+                  kind='components'
+                  items={pieceItems}
                   pathname={pathname}
                   showPreview={showPreview}
                   setHover={setHover}
                 />
-              ))}
+              )}
             </div>
           </nav>
         </div>

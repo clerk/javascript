@@ -29,6 +29,7 @@ interface SegmentedControlProps<T extends string> {
   onChange: (id: T) => void;
   cellWidth?: number;
   fill?: boolean;
+  dense?: boolean;
 }
 
 const FAST_SPRING = { type: 'spring', stiffness: 70 * 7, damping: 14 * Math.sqrt(7), mass: 1 } as const;
@@ -63,6 +64,7 @@ const FILL = clsx(
 );
 const LIT = clsx('pointer-events-none absolute inset-0 z-10');
 const LIT_OPTION = clsx('relative gap-1 text-xs/4 font-medium lg:text-sm');
+const LIT_OPTION_DENSE = clsx('relative gap-1 text-xs/4 font-medium');
 const TRACK = clsx('relative isolate', NAV_CHROME_FILL);
 const TRACK_FOCUS =
   'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-gray-950/45 dark:has-[:focus-visible]:outline-white/50';
@@ -110,6 +112,7 @@ export function SegmentedControl<T extends string>({
   onChange,
   cellWidth = 32,
   fill = false,
+  dense = false,
 }: SegmentedControlProps<T>) {
   const name = useId();
   const [keyboard, setKeyboard] = useState(false);
@@ -296,7 +299,11 @@ export function SegmentedControl<T extends string>({
           {options.map((option, i) => (
             <motion.div
               key={option.id}
-              className={clsx(LIT_OPTION, !option.icon && 'px-4', fill && 'flex-1')}
+              className={clsx(
+                dense ? LIT_OPTION_DENSE : LIT_OPTION,
+                !option.icon && (dense ? 'px-2' : 'px-4'),
+                fill && 'flex-1',
+              )}
               style={!fill && cellWidth && option.icon ? { width: cellWidth } : undefined}
               animate={{
                 x: i === active || (option.icon && !fill) ? 0 : 12 * (active - i),
@@ -321,11 +328,12 @@ export function SegmentedControl<T extends string>({
             labelRefs.current[i] = el;
           }}
           className={clsx(
-            'group relative flex h-8 cursor-pointer items-center gap-1 whitespace-nowrap rounded-full text-xs/4 font-medium lg:text-sm',
+            'group relative flex h-8 cursor-pointer items-center gap-1 whitespace-nowrap rounded-full text-xs/4 font-medium',
+            !dense && 'lg:text-sm',
             'transition-colors',
             'after:absolute after:inset-y-0 after:-left-1 after:-right-1 first-of-type:after:left-0 last-of-type:after:right-0',
-            option.icon ? 'justify-center' : 'px-4',
-            fill && 'flex-1',
+            option.icon ? 'justify-center' : dense ? 'px-2' : 'px-4',
+            fill && 'flex-1 justify-center',
             i === active
               ? 'text-gray-950 dark:text-white'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
@@ -361,7 +369,12 @@ export function SegmentedControl<T extends string>({
               <span className={clsx(FILL, 'inset-0')} />
               <span className={clsx(LIT, '[clip-path:inset(0_round_9999px)]')}>
                 <span
-                  className={clsx(LIT_OPTION, 'block', !option.icon && 'px-4', fill && 'w-full')}
+                  className={clsx(
+                    dense ? LIT_OPTION_DENSE : LIT_OPTION,
+                    'block',
+                    !option.icon && (dense ? 'px-2' : 'px-4'),
+                    fill && 'w-full',
+                  )}
                   style={!fill && cellWidth && option.icon ? { width: cellWidth } : undefined}
                 >
                   <LitFace
