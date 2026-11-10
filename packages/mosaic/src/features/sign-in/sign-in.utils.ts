@@ -5,8 +5,8 @@ export function stepKey(step: SignInStep): string {
     case 'identifier':
     case 'sign-up':
       return step.kind;
-    case 'secret':
-      return `secret:${step.secret}`;
+    case 'credential':
+      return `credential:${step.credential}`;
     case 'new-password':
       return `new-password:${step.reason}`;
     case 'code':

@@ -78,10 +78,11 @@ const newPasswordFields: FieldsConfig<SignInValues> = {
 function stepFor(factor: SignInFactor, identifier: string): SignInStep {
   switch (factor.strategy) {
     case 'password':
+      return { kind: 'credential', credential: 'password', identifier };
     case 'passkey':
-      return { kind: 'secret', secret: 'password', identifier };
+      return { kind: 'credential', credential: 'passkey', identifier };
     case 'backup_code':
-      return { kind: 'secret', secret: 'backup-code', identifier };
+      return { kind: 'credential', credential: 'backup-code', identifier };
     case 'totp':
       return { kind: 'code', purpose: 'second-factor', channel: 'totp' };
     case 'email_code':
@@ -118,7 +119,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const [canResend, setCanResend] = useState(true);
   const [supportRequested, setSupportRequested] = useState(false);
   const [stage, setStage] = useState<'first' | 'second'>('first');
-  const pickerReturnRef = useRef<SignInStep>({ kind: 'secret', secret: 'password', identifier: '' });
+  const pickerReturnRef = useRef<SignInStep>({ kind: 'credential', credential: 'password', identifier: '' });
   const form = useForm<SignInValues>({
     initialValues: emptyValues,
     fields: newPasswordFields,
@@ -169,7 +170,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       }
       setStage('first');
       setFactorId('password');
-      navigate({ kind: 'secret', secret: 'password', identifier }, 1);
+      navigate({ kind: 'credential', credential: 'password', identifier }, 1);
     });
 
   const submitPassword = () =>
@@ -263,8 +264,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       case 'identifier':
         void submitStart();
         return;
-      case 'secret':
-        void (step.secret === 'password' ? submitPassword() : submitBackupCode());
+      case 'credential':
+        if (step.credential === 'passkey') {
+          void run(() => startSecondFactor());
+          return;
+        }
+        void (step.credential === 'password' ? submitPassword() : submitBackupCode());
         return;
       case 'code':
         void submitCode(values.code);
@@ -318,11 +323,11 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
 
   const onBack = () => {
     if (step.kind === 'notice' && step.purpose === 'forgot-password') {
-      navigate({ kind: 'secret', secret: 'password', identifier: step.identifier }, -1);
+      navigate({ kind: 'credential', credential: 'password', identifier: step.identifier }, -1);
       return;
     }
     if (step.kind === 'new-password' || (step.kind === 'code' && step.purpose === 'reset-password')) {
-      navigate({ kind: 'secret', secret: 'password', identifier }, -1);
+      navigate({ kind: 'credential', credential: 'password', identifier }, -1);
       return;
     }
     if (step.kind === 'notice') {
@@ -503,7 +508,7 @@ function StepPanel({
   );
 }
 
-const passwordStep: SignInStep = { kind: 'secret', secret: 'password', identifier: IDENTIFIER };
+const passwordStep: SignInStep = { kind: 'credential', credential: 'password', identifier: IDENTIFIER };
 
 export function IdentifierDefault() {
   return <StepPanel step={{ kind: 'identifier' }} />;
@@ -558,11 +563,11 @@ export function IdentifierBannerError() {
   );
 }
 
-export function SecretPassword() {
+export function CredentialPassword() {
   return <StepPanel step={passwordStep} />;
 }
 
-export function SecretPasswordPending() {
+export function CredentialPasswordPending() {
   return (
     <StepPanel
       step={passwordStep}
@@ -571,7 +576,7 @@ export function SecretPasswordPending() {
   );
 }
 
-export function SecretPasswordError() {
+export function CredentialPasswordError() {
   return (
     <StepPanel
       step={passwordStep}
@@ -580,8 +585,8 @@ export function SecretPasswordError() {
   );
 }
 
-export function SecretBackupCode() {
-  return <StepPanel step={{ kind: 'secret', secret: 'backup-code', identifier: IDENTIFIER }} />;
+export function CredentialBackupCode() {
+  return <StepPanel step={{ kind: 'credential', credential: 'backup-code', identifier: IDENTIFIER }} />;
 }
 
 export function CodeEmail() {
@@ -661,8 +666,8 @@ export function NoticeEmailLinkSent() {
   return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER }} />;
 }
 
-export function NoticePasskey() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'passkey' }} />;
+export function CredentialPasskey() {
+  return <StepPanel step={{ kind: 'credential', credential: 'passkey', identifier: IDENTIFIER }} />;
 }
 
 export function NewPasswordReset() {

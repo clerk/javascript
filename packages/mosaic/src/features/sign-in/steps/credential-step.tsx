@@ -4,10 +4,11 @@ import type { VerificationBackupCodeMessages } from '../../../blocks/verificatio
 import { VerificationBackupCode } from '../../../blocks/verification';
 import type { UseFormResult } from '../../../components/form';
 import type { SignInStep, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import { SignInPasskey } from './sign-in-passkey';
 import { SignInPassword } from './sign-in-password';
 
-interface SecretStepProps {
-  step: Extract<SignInStep, { kind: 'secret' }>;
+interface CredentialStepProps {
+  step: Extract<SignInStep, { kind: 'credential' }>;
   messages: VerificationBackupCodeMessages;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
@@ -17,10 +18,11 @@ interface SecretStepProps {
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
+  onShowHelp: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
-export function SecretStep({
+export function CredentialStep({
   step,
   messages,
   form,
@@ -31,9 +33,10 @@ export function SecretStep({
   onEditIdentifier,
   onForgotPassword,
   onCancel,
+  onShowHelp,
   focusRef,
-}: SecretStepProps) {
-  if (step.secret === 'password') {
+}: CredentialStepProps) {
+  if (step.credential === 'password') {
     return (
       <SignInPassword
         focusRef={focusRef}
@@ -46,6 +49,21 @@ export function SecretStep({
         onSubmit={onSubmit}
         onForgotPassword={onForgotPassword}
         onCancel={onCancel}
+      />
+    );
+  }
+
+  if (step.credential === 'passkey') {
+    return (
+      <SignInPasskey
+        focusRef={focusRef}
+        identifier={step.identifier}
+        onEditIdentifier={onEditIdentifier}
+        globalErrorMessage={globalErrorMessage}
+        isPending={isPending}
+        onSubmit={() => onSubmit()}
+        onCancel={onCancel}
+        onShowHelp={onShowHelp}
       />
     );
   }

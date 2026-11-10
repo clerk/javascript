@@ -1,7 +1,7 @@
 import type { Ref } from 'react';
 
 import type { VerificationCodeResend } from '../../../blocks/verification';
-import { VerificationHelp, VerificationPasskey } from '../../../blocks/verification';
+import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
 import type { SignInStep } from '../sign-in.types';
 import { SignInActionBlocked } from './sign-in-action-blocked';
@@ -98,22 +98,6 @@ export function NoticeStep({
           identifier={step.identifier}
           globalErrorMessage={globalErrorMessage}
           resend={resend}
-          onCancel={onCancel}
-        />
-      );
-    case 'passkey':
-      return (
-        <VerificationPasskey
-          focusRef={focusRef}
-          messages={{
-            ...m.passkey,
-            secondaryActionLabel: m.useAnotherMethod,
-            primaryActionLabel: m.continue,
-            pendingLabel: m.verifying,
-          }}
-          errorMessage={globalErrorMessage}
-          isPending={isPending}
-          onSubmit={onSubmit}
           onCancel={onCancel}
         />
       );

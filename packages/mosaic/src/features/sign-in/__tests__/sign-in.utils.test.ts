@@ -7,8 +7,9 @@ describe('stepKey', () => {
   it('keys each step by its kind and the variant that changes its copy', () => {
     const steps: [SignInStep, string][] = [
       [{ kind: 'identifier' }, 'identifier'],
-      [{ kind: 'secret', secret: 'password', identifier: 'jane@acme.com' }, 'secret:password'],
-      [{ kind: 'secret', secret: 'backup-code', identifier: 'jane@acme.com' }, 'secret:backup-code'],
+      [{ kind: 'credential', credential: 'password', identifier: 'jane@acme.com' }, 'credential:password'],
+      [{ kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' }, 'credential:backup-code'],
+      [{ kind: 'credential', credential: 'passkey', identifier: 'jane@acme.com' }, 'credential:passkey'],
       [{ kind: 'code', purpose: 'first-factor', channel: 'email', identifier: 'jane@acme.com' }, 'code:first-factor'],
       [{ kind: 'code', purpose: 'second-factor', channel: 'totp' }, 'code:second-factor'],
       [{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }, 'code:verify-email'],

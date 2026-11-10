@@ -271,7 +271,7 @@ import * as Stories from './sign-in.stories';
 ```
 
 - `Default` is a working example: plain props driven by a stand-in for the controller, so the whole flow can be clicked through.
-- Under `## Steps`, each `###` is one component in the feature's `steps/` folder, and each `####` is one step value it draws. Each example is one story export, named for the step and the example (`IdentifierDefault`, `SecretPasswordError`).
+- Under `## Steps`, each `###` is one component in the feature's `steps/` folder, and each `####` is one step value it draws. Each example is one story export, named for the step and the example (`IdentifierDefault`, `CredentialPasswordError`).
 - A view the legacy component has and Mosaic does not yet gets its `####` and a `<Story>` naming the export it will have. Swingset renders a red "not found" box for a story the file does not export, which marks the gap on the page. Exporting the story turns the box into the example, with no MDX change.
 
 ## Writing the prose

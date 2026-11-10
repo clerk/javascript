@@ -14,7 +14,7 @@ import { CodeStep } from './steps/code-step';
 import { IdentifierStep } from './steps/identifier-step';
 import { NewPasswordStep } from './steps/new-password-step';
 import { NoticeStep } from './steps/notice-step';
-import { SecretStep } from './steps/secret-step';
+import { CredentialStep } from './steps/credential-step';
 import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];
@@ -183,9 +183,9 @@ export function SignInView({
               />
             </Flow.Step>
 
-            <Flow.Step ids={['secret:password', 'secret:backup-code']}>
-              {current.kind === 'secret' ? (
-                <SecretStep
+            <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
+              {current.kind === 'credential' ? (
+                <CredentialStep
                   focusRef={focusRef}
                   step={current}
                   messages={{
@@ -202,6 +202,7 @@ export function SignInView({
                   onEditIdentifier={onEditIdentifier}
                   onForgotPassword={onForgotPassword}
                   onCancel={onCancel}
+                  onShowHelp={onShowHelp}
                 />
               ) : null}
             </Flow.Step>
@@ -261,7 +262,6 @@ export function SignInView({
                 'notice:action-blocked',
                 'notice:password-compromised',
                 'notice:email-link',
-                'notice:passkey',
               ]}
             >
               {current.kind === 'notice' ? (

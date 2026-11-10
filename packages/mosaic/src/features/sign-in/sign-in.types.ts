@@ -18,7 +18,7 @@ type SignInCodeChannel = 'email' | 'phone' | 'totp';
 
 export type SignInStep =
   | { kind: 'identifier' }
-  | { kind: 'secret'; secret: 'password' | 'backup-code'; identifier: string }
+  | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
       purpose: 'first-factor' | 'second-factor' | 'reset-password' | 'verify-email';
@@ -28,7 +28,7 @@ export type SignInStep =
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'locked' | 'no-methods' | 'password-compromised' | 'passkey' }
+  | { kind: 'notice'; purpose: 'locked' | 'no-methods' | 'password-compromised' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' }
