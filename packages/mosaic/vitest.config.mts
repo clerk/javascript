@@ -1,7 +1,8 @@
-import stylex from '@stylexjs/unplugin/vite';
-import { playwright } from '@vitest/browser-playwright';
-import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
+
+import stylex from '@stylexjs/unplugin/vite';
+import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
 import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
@@ -63,15 +64,7 @@ export default defineConfig({
         test: {
           name: 'mosaic',
           include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
-          exclude: [
-            'src/primitives/**',
-            // temporarily disable the import-guards test until we can refactor them to not take up so much time
-            'eslint/import-guards.test.mjs',
-            featureTests,
-            webkitTests,
-            browserTests,
-            visualTests,
-          ],
+          exclude: ['src/primitives/**', featureTests, webkitTests, browserTests, visualTests],
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
         },
       },
