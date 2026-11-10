@@ -39,62 +39,90 @@ import { SignInView } from '@clerk/mosaic/features/sign-in';
 />;
 ```
 
-## Panels
+## Steps
 
-These examples isolate each step and its visual states.
+Each section is one component in `features/sign-in/steps/`, and each example under it is one `SignInStep` value it draws.
 
-### Start
+### Identifier step
 
-<Story name='Start' storyModule={Stories} />
+`identifier-step.tsx` draws `{ kind: 'identifier' }`: social providers, the email field and, outside the combined flow, the sign-up link.
+
+#### Default
+
+<Story name='IdentifierDefault' storyModule={Stories} />
 
 #### Sign in only
 
-<Story name='StartSignInOnly' storyModule={Stories} />
+<Story name='IdentifierSignInOnly' storyModule={Stories} />
 
 #### Many providers
 
-<Story name='StartManyProviders' storyModule={Stories} />
+<Story name='IdentifierManyProviders' storyModule={Stories} />
 
 #### Provider pending
 
-<Story name='StartProviderPending' storyModule={Stories} />
+<Story name='IdentifierProviderPending' storyModule={Stories} />
 
 #### Error
 
-<Story name='StartError' storyModule={Stories} />
+<Story name='IdentifierError' storyModule={Stories} />
 
-### Password
+### Secret step
 
-<Story name='Password' storyModule={Stories} />
+`secret-step.tsx` draws `{ kind: 'secret' }`: the password (with identity preview and forgot password) or a backup code (`VerificationBackupCode`).
 
-#### Pending
+#### Password
 
-<Story name='PasswordPending' storyModule={Stories} />
+<Story name='SecretPassword' storyModule={Stories} />
 
-#### Error
+#### Password pending
 
-<Story name='PasswordError' storyModule={Stories} />
+<Story name='SecretPasswordPending' storyModule={Stories} />
 
-### Email code
+#### Password error
 
-<Story name='EmailCode' storyModule={Stories} />
+<Story name='SecretPasswordError' storyModule={Stories} />
 
-### Authenticator app
+#### Backup code
 
-<Story name='Totp' storyModule={Stories} />
+<Story name='SecretBackupCode' storyModule={Stories} />
 
-### Backup code
+### Code step
 
-<Story name='BackupCode' storyModule={Stories} />
+`code-step.tsx` draws every `{ kind: 'code' }` with `VerificationCode`. The purpose sets the copy and the second button; the channel decides whether Resend shows.
 
-### Method picker
+#### Email code
 
-<Story name='MethodPicker' storyModule={Stories} />
+<Story name='CodeEmail' storyModule={Stories} />
 
-### Sign up
+#### Authenticator app
 
-<Story name='SignUp' storyModule={Stories} />
+<Story name='CodeAuthenticatorApp' storyModule={Stories} />
 
-### Verify email
+#### Verify email
 
-<Story name='VerifyEmail' storyModule={Stories} />
+<Story name='CodeVerifyEmail' storyModule={Stories} />
+
+### Choice step
+
+`choice-step.tsx` draws `{ kind: 'choice' }` with `VerificationMethodPicker`.
+
+#### Methods
+
+<Story name='ChoiceMethods' storyModule={Stories} />
+
+### Notice step
+
+`notice-step.tsx` draws `{ kind: 'notice' }`: help, with `VerificationHelp`.
+
+#### Help
+
+<Story name='NoticeHelp' storyModule={Stories} />
+
+### Sign-up step
+
+`sign-up-details.tsx` draws `{ kind: 'sign-up' }` in the combined flow.
+
+#### Details
+
+<Story name='SignUpDetails' storyModule={Stories} />
