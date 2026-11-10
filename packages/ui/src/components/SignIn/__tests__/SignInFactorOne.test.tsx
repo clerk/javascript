@@ -1113,6 +1113,73 @@ describe('SignInFactorOne', () => {
       });
     });
 
+    describe('switching between two email addresses through another method', () => {
+      beforeEach(() => {
+        clearFetchCache();
+      });
+
+      const secondEmailFactor = {
+        strategy: 'email_code' as const,
+        emailAddressId: 'idn_EB',
+        safeIdentifier: 'second@clerk.com',
+      };
+
+      const createTwoEmailFixtures = async () => {
+        const result = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.withPassword();
+          f.startSignInWithEmailAddress({ supportEmailCode: true });
+        });
+        result.fixtures.signIn.supportedFirstFactors = [
+          ...(result.fixtures.signIn.supportedFirstFactors ?? []),
+          secondEmailFactor,
+        ];
+        result.fixtures.signIn.prepareFirstFactor.mockImplementation(() => {
+          result.fixtures.signIn.firstFactorVerification.status = 'unverified';
+          result.fixtures.signIn.firstFactorVerification.strategy = 'email_code';
+          result.fixtures.signIn.firstFactorVerification.channel = undefined;
+          return Promise.resolve({} as SignInResource);
+        });
+        return result;
+      };
+
+      it('sends a code to the second email address after a code was sent to the first', async () => {
+        const { wrapper, fixtures } = await createTwoEmailFixtures();
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1));
+
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(await screen.findByText('Use another method'));
+        await userEvent.click(screen.getByText('Email code to second@clerk.com'));
+        await screen.findByText('Check your email');
+
+        expect(fixtures.signIn.prepareFirstFactor).toHaveBeenLastCalledWith(
+          expect.objectContaining({ emailAddressId: 'idn_EB' }),
+        );
+      });
+
+      it('does not resend on mount when a code is pending, but sends one after switching to the second email address', async () => {
+        const { wrapper, fixtures } = await createTwoEmailFixtures();
+        fixtures.signIn.firstFactorVerification.status = 'unverified';
+        fixtures.signIn.firstFactorVerification.strategy = 'email_code';
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await screen.findByText('Check your email');
+        expect(fixtures.signIn.prepareFirstFactor).not.toHaveBeenCalled();
+
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(await screen.findByText('Use another method'));
+        await userEvent.click(screen.getByText('Email code to second@clerk.com'));
+        await screen.findByText('Check your email');
+
+        expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledWith(
+          expect.objectContaining({ emailAddressId: 'idn_EB' }),
+        );
+      });
+    });
+
     describe('Get Help', () => {
       it('should render the get help component when clicking the "Get Help" button', async () => {
         const { wrapper } = await createFixtures(f => {
