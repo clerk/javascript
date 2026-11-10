@@ -1,6 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
+import { useState } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -32,10 +33,6 @@ export function NewPasswordStep({
   focusRef,
 }: NewPasswordStepProps) {
   const m = useMessages('signIn');
-  const { ref: passwordFieldRef, ...password } = form.register('newPassword');
-  const passwordRef = useMergeRefs<HTMLElement>([passwordFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
-  const passwordError = form.fields.newPassword.feedback;
-  const confirmPasswordFeedback = form.fields.confirmPassword.feedback;
 
   return (
     <>
@@ -57,37 +54,20 @@ export function NewPasswordStep({
         }
       >
         <div {...stylex.props(styles.fieldStack)}>
-          <Field.Root
-            required
-            invalid={passwordError?.type === 'error'}
+          <PasswordField
+            form={form}
+            name='newPassword'
+            label={m.newPassword.passwordLabel}
             disabled={isPending}
-            focusableWhenDisabled
-          >
-            <Field.Label>{m.newPassword.passwordLabel}</Field.Label>
-            <PasswordInput
-              ref={passwordRef}
-              autoComplete='new-password'
-              {...password}
-              showPasswordLabel={m.showPassword}
-              hidePasswordLabel={m.hidePassword}
-            />
-            <Field.Feedback feedback={passwordError?.type === 'error' ? passwordError : passwordFeedback} />
-          </Field.Root>
-          <Field.Root
-            required
-            invalid={confirmPasswordFeedback?.type === 'error'}
+            inputRef={focusRef}
+            advisoryFeedback={passwordFeedback}
+          />
+          <PasswordField
+            form={form}
+            name='confirmPassword'
+            label={m.newPassword.confirmPasswordLabel}
             disabled={isPending}
-            focusableWhenDisabled
-          >
-            <Field.Label>{m.newPassword.confirmPasswordLabel}</Field.Label>
-            <PasswordInput
-              autoComplete='new-password'
-              {...form.register('confirmPassword')}
-              showPasswordLabel={m.showPassword}
-              hidePasswordLabel={m.hidePassword}
-            />
-            <Field.Feedback feedback={confirmPasswordFeedback} />
-          </Field.Root>
+          />
           <Field.Root
             orientation='horizontal'
             disabled={isPending}
@@ -123,5 +103,53 @@ export function NewPasswordStep({
         </div>
       </Card.Content>
     </>
+  );
+}
+
+function PasswordField({
+  form,
+  name,
+  label,
+  disabled,
+  inputRef,
+  advisoryFeedback,
+}: {
+  form: UseFormResult<SignInValues>;
+  name: 'newPassword' | 'confirmPassword';
+  label: string;
+  disabled: boolean;
+  inputRef?: Ref<HTMLElement>;
+  advisoryFeedback?: FieldFeedback;
+}) {
+  const m = useMessages('signIn');
+  const [focused, setFocused] = useState(false);
+  const { feedback } = form.fields[name];
+  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
+  const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
+  const { ref, ...control } = form.register(name);
+  const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, useFlowAutoFocus<HTMLInputElement>()]);
+
+  return (
+    <Field.Root
+      required
+      invalid={feedbackType === 'error'}
+      disabled={disabled}
+      focusableWhenDisabled
+    >
+      <Field.Label>{label}</Field.Label>
+      <PasswordInput
+        ref={mergedRef}
+        autoComplete='new-password'
+        {...control}
+        onFocus={() => setFocused(true)}
+        onBlur={() => {
+          setFocused(false);
+          control.onBlur();
+        }}
+        showPasswordLabel={m.showPassword}
+        hidePasswordLabel={m.hidePassword}
+      />
+      <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
+    </Field.Root>
   );
 }
