@@ -28,6 +28,7 @@ interface CodeStepProps {
   resend?: VerificationCodeResend;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: (event?: SignInSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
@@ -42,6 +43,7 @@ export function CodeStep({
   resend,
   form,
   errorMessage,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onCodeComplete,
@@ -57,6 +59,7 @@ export function CodeStep({
       messages={messages}
       value={value}
       errorMessage={errorMessage}
+      globalErrorMessage={globalErrorMessage}
       isPending={isPending}
       resend={step.channel === 'totp' ? undefined : resend}
       onValueChange={onValueChange}

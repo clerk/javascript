@@ -67,6 +67,7 @@ export interface SignInViewProps {
   onCodeComplete: (code: string) => void;
   isPending: boolean;
   errorMessage?: string;
+  globalErrorMessage?: string;
   newPasswordFeedback?: FieldFeedback;
   onEditIdentifier: () => void;
   onSignUp?: () => void;

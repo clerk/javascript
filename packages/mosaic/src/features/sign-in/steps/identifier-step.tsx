@@ -24,6 +24,7 @@ interface IdentifierStepProps {
   onSelectProvider: (id: string) => void;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   onSignUp?: () => void;
@@ -39,6 +40,7 @@ export function IdentifierStep({
   onSelectProvider,
   form,
   errorMessage,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onSignUp,
@@ -67,6 +69,12 @@ export function IdentifierStep({
         <Card.Title>{fill(combined ? m.start.titleCombined : m.start.title, { applicationName })}</Card.Title>
         <Card.Description>{combined ? m.start.descriptionCombined : m.start.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         {socialProviders.length > 0 ? (
           <>

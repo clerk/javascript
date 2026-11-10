@@ -18,6 +18,7 @@ interface SignInPasswordProps {
   onEditIdentifier?: () => void;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   onForgotPassword?: () => void;
@@ -30,6 +31,7 @@ export function SignInPassword({
   onEditIdentifier,
   form,
   errorMessage,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onForgotPassword,
@@ -55,6 +57,12 @@ export function SignInPassword({
           onEdit={onEditIdentifier}
         />
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         <Form
           id={form.id}

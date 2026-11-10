@@ -16,7 +16,6 @@ import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface NewPasswordStepProps {
   form: UseFormResult<SignInValues>;
-  errorMessage?: string;
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   passwordFeedback?: FieldFeedback;
@@ -26,7 +25,6 @@ interface NewPasswordStepProps {
 
 export function NewPasswordStep({
   form,
-  errorMessage,
   isPending,
   onSubmit,
   passwordFeedback,
@@ -48,7 +46,7 @@ export function NewPasswordStep({
         role='alert'
         color='negative'
       >
-        {errorMessage ?? form.error}
+        {form.error}
       </Card.Banner>
       <Card.Content
         render={

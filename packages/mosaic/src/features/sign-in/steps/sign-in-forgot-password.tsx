@@ -14,6 +14,7 @@ import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 interface SignInForgotPasswordProps {
   identifier: string;
   form: UseFormResult<SignInValues>;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   onBack: () => void;
@@ -23,6 +24,7 @@ interface SignInForgotPasswordProps {
 export function SignInForgotPassword({
   identifier,
   form,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onBack,
@@ -37,6 +39,12 @@ export function SignInForgotPassword({
         <Card.Title>{m.forgotPassword.title}</Card.Title>
         <Card.Description>{fill(m.forgotPassword.description, { identifier })}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content
         render={
           <Form

@@ -17,14 +17,21 @@ import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface SignUpDetailsProps {
   form: UseFormResult<SignInValues>;
-  errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   onSignIn?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
-export function SignUpDetailsStep({ form, errorMessage, isPending, onSubmit, onSignIn, focusRef }: SignUpDetailsProps) {
+export function SignUpDetailsStep({
+  form,
+  globalErrorMessage,
+  isPending,
+  onSubmit,
+  onSignIn,
+  focusRef,
+}: SignUpDetailsProps) {
   const m = useMessages('signIn');
   const { ref: firstNameFieldRef, ...firstName } = form.register('firstName');
   const firstNameRef = useMergeRefs<HTMLElement>([firstNameFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
@@ -45,7 +52,7 @@ export function SignUpDetailsStep({ form, errorMessage, isPending, onSubmit, onS
         role='alert'
         color='negative'
       >
-        {errorMessage ?? form.error}
+        {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
         <Form

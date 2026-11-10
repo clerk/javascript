@@ -10,6 +10,7 @@ interface NoticeStepProps {
   step: Extract<SignInStep, { kind: 'notice' }>;
   messages: VerificationHelpMessages;
   form: UseFormResult<SignInValues>;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   onEmailSupport: () => void;
@@ -21,6 +22,7 @@ export function NoticeStep({
   step,
   messages,
   form,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onEmailSupport,
@@ -42,6 +44,7 @@ export function NoticeStep({
           focusRef={focusRef}
           identifier={step.identifier}
           form={form}
+          globalErrorMessage={globalErrorMessage}
           isPending={isPending}
           onSubmit={onSubmit}
           onBack={onBack}

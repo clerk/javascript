@@ -11,6 +11,7 @@ interface SecretStepProps {
   messages: VerificationBackupCodeMessages;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending: boolean;
   onSubmit: (event?: SignInSubmitEvent) => void;
   onEditIdentifier: () => void;
@@ -24,6 +25,7 @@ export function SecretStep({
   messages,
   form,
   errorMessage,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onEditIdentifier,
@@ -39,6 +41,7 @@ export function SecretStep({
         onEditIdentifier={onEditIdentifier}
         form={form}
         errorMessage={errorMessage}
+        globalErrorMessage={globalErrorMessage}
         isPending={isPending}
         onSubmit={onSubmit}
         onForgotPassword={onForgotPassword}
@@ -55,6 +58,7 @@ export function SecretStep({
       messages={messages}
       value={value}
       errorMessage={errorMessage}
+      globalErrorMessage={globalErrorMessage}
       isPending={isPending}
       onValueChange={onValueChange}
       onSubmit={() => onSubmit()}

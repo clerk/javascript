@@ -99,6 +99,7 @@ export function SignInView({
   onCodeComplete,
   isPending,
   errorMessage,
+  globalErrorMessage,
   newPasswordFeedback,
   onEditIdentifier,
   onSignUp,
@@ -159,6 +160,7 @@ export function SignInView({
                 onSelectProvider={onSelectProvider}
                 form={form}
                 errorMessage={errorMessage}
+                globalErrorMessage={globalErrorMessage}
                 isPending={isPending}
                 onSubmit={onSubmit}
                 // TODO: Have the controller omit onSignUp in the combined flow instead of the view dropping it.
@@ -179,6 +181,7 @@ export function SignInView({
                   }}
                   form={form}
                   errorMessage={errorMessage}
+                  globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
                   onSubmit={onSubmit}
                   onEditIdentifier={onEditIdentifier}
@@ -206,6 +209,7 @@ export function SignInView({
                   resend={resend}
                   form={form}
                   errorMessage={errorMessage}
+                  globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
                   onSubmit={onSubmit}
                   onCodeComplete={onCodeComplete}
@@ -247,6 +251,7 @@ export function SignInView({
                     supportButton: m.alternativeMethods.getHelp.emailSupport,
                   }}
                   form={form}
+                  globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
                   onSubmit={onSubmit}
                   onEmailSupport={onEmailSupport}
@@ -259,7 +264,6 @@ export function SignInView({
               <NewPasswordStep
                 focusRef={focusRef}
                 form={form}
-                errorMessage={errorMessage}
                 isPending={isPending}
                 onSubmit={onSubmit}
                 passwordFeedback={newPasswordFeedback}
@@ -271,7 +275,7 @@ export function SignInView({
               <SignUpDetailsStep
                 focusRef={focusRef}
                 form={form}
-                errorMessage={errorMessage}
+                globalErrorMessage={globalErrorMessage}
                 isPending={isPending}
                 onSubmit={onSubmit}
                 onSignIn={onEditIdentifier}

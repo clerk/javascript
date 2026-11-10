@@ -106,6 +106,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const [step, setStep] = useState<SignInStep>({ kind: 'identifier' });
   const [direction, setDirection] = useState<-1 | 1>(1);
   const [errorMessage, setErrorMessage] = useState<string>();
+  const [globalErrorMessage, setGlobalErrorMessage] = useState<string>();
   const [isPending, setIsPending] = useState(false);
   const [pendingProviderId, setPendingProviderId] = useState<string>();
   const [pendingFactorId, setPendingFactorId] = useState<string>();
@@ -129,10 +130,13 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     form.setValue('code', '');
     form.setValue('backupCode', '');
     setErrorMessage(undefined);
+    setGlobalErrorMessage(undefined);
     setCanResend(true);
   };
 
   const run = async (work: () => void | Promise<void>) => {
+    setErrorMessage(undefined);
+    setGlobalErrorMessage(undefined);
     setIsPending(true);
     await settleAfter(700);
     setIsPending(false);
@@ -172,6 +176,10 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       }
       if (values.password.toLowerCase() === 'error') {
         setErrorMessage('Password is incorrect. Try again, or use another method.');
+        return;
+      }
+      if (values.password.toLowerCase() === 'locked') {
+        setGlobalErrorMessage('Too many failed attempts. Try again later, or use another method.');
         return;
       }
       startSecondFactor();
@@ -224,15 +232,15 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const submitSignUp = () =>
     run(() => {
       if (!values.firstName.trim() || !values.lastName.trim()) {
-        setErrorMessage('Enter your first and last name.');
+        setGlobalErrorMessage('Enter your first and last name.');
         return;
       }
       if (!identifier.includes('@')) {
-        setErrorMessage('Enter a valid email address.');
+        setGlobalErrorMessage('Enter a valid email address.');
         return;
       }
       if (values.password.length < 8) {
-        setErrorMessage('Your password must contain 8 or more characters.');
+        setGlobalErrorMessage('Your password must contain 8 or more characters.');
         return;
       }
       navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier }, 1);
@@ -355,6 +363,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         }}
         isPending={isPending || form.isSubmitting}
         errorMessage={errorMessage}
+        globalErrorMessage={globalErrorMessage}
         newPasswordFeedback={
           values.newPassword === ''
             ? undefined
@@ -425,6 +434,7 @@ function StepPanel({
   step,
   combined = true,
   errorMessage,
+  globalErrorMessage,
   isPending = false,
   pendingProviderId,
   providers = socialProviders,
@@ -432,6 +442,7 @@ function StepPanel({
   step: SignInStep;
   combined?: boolean;
   errorMessage?: string;
+  globalErrorMessage?: string;
   isPending?: boolean;
   pendingProviderId?: string;
   providers?: SignInSocialProvider[];
@@ -461,6 +472,7 @@ function StepPanel({
       onCodeComplete={code => form.setValue('code', code)}
       isPending={isPending}
       errorMessage={errorMessage}
+      globalErrorMessage={globalErrorMessage}
       onEditIdentifier={() => undefined}
       onSignUp={() => undefined}
       onForgotPassword={() => undefined}
@@ -517,6 +529,15 @@ export function IdentifierError() {
     <StepPanel
       step={{ kind: 'identifier' }}
       errorMessage='Enter a valid email address.'
+    />
+  );
+}
+
+export function IdentifierBannerError() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier' }}
+      globalErrorMessage='Too many requests. Try again in a few minutes.'
     />
   );
 }
