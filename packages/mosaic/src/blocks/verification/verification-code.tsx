@@ -1,15 +1,16 @@
 import { useMergeRefs } from '@floating-ui/react';
-import type { FormEvent, Ref } from 'react';
+import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { Field } from '../../../components/field';
-import { useFlowAutoFocus } from '../../../components/flow';
-import { Input } from '../../../components/input';
-import { Form } from '../../../primitives/form';
+import { Button, SubmitButton } from '../../components/button';
+import { Card } from '../../components/card';
+import { Field } from '../../components/field';
+import { useFlowAutoFocus } from '../../components/flow';
+import { Otp } from '../../components/otp';
+import { Form } from '../../primitives/form';
+import { CODE_LENGTH } from '../../utils/verification';
 
-export interface ReverificationBackupCodeMessages {
+interface VerificationCodeMessages {
   title: string;
   description: string;
   fieldLabel: string;
@@ -18,32 +19,45 @@ export interface ReverificationBackupCodeMessages {
   pendingLabel: string;
 }
 
-export interface ReverificationBackupCodeProps {
-  messages: ReverificationBackupCodeMessages;
+interface VerificationCodeResend {
+  text: string;
+  label: ReactNode;
+  disabled?: boolean;
+  onClick: () => void;
+}
+
+interface VerificationCodeProps {
+  messages: VerificationCodeMessages;
   value: string;
+  length?: number;
   errorMessage?: string;
   globalErrorMessage?: string;
   isPending?: boolean;
+  resend?: VerificationCodeResend;
   onValueChange: (value: string) => void;
+  onComplete?: (value: string) => void;
   onSubmit: () => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
-export function ReverificationBackupCode({
+export function VerificationCode({
   messages,
   value,
+  length = CODE_LENGTH,
   errorMessage,
   globalErrorMessage,
   isPending = false,
+  resend,
   onValueChange,
+  onComplete,
   onSubmit,
   onCancel,
   focusRef,
-}: ReverificationBackupCodeProps) {
+}: VerificationCodeProps) {
   const formId = useId();
 
-  const canSubmit = value !== '';
+  const canSubmit = value.length === length;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -76,19 +90,36 @@ export function ReverificationBackupCode({
             focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
-            <Input
+            <Otp
               ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
-              name='backupCode'
-              type='text'
-              autoComplete='off'
-              spellCheck={false}
-              data-1p-ignore
+              name='code'
+              length={length}
               value={value}
-              onChange={event => onValueChange(event.target.value)}
+              onValueChange={onValueChange}
+              onComplete={code => {
+                if (!isPending) {
+                  onComplete?.(code);
+                }
+              }}
             />
             <Field.Message>
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
+            {resend ? (
+              <Field.Description>
+                {resend.text}{' '}
+                <Button
+                  type='button'
+                  size='sm'
+                  color='neutral'
+                  variant='link'
+                  disabled={resend.disabled || isPending}
+                  onClick={resend.onClick}
+                >
+                  {resend.label}
+                </Button>
+              </Field.Description>
+            ) : null}
           </Field.Root>
         </Form>
       </Card.Content>

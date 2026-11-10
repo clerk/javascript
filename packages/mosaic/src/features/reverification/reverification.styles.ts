@@ -6,9 +6,6 @@ const stackedFooter = '@container card (max-width: 20rem)' as const;
 const half = `calc(50% - ${space['1']})`;
 
 export const styles = stylex.create({
-  helpText: {
-    textAlign: 'center',
-  },
   pending: {
     paddingBlock: space['12'],
     alignItems: 'center',
