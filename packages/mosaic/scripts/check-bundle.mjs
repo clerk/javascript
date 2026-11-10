@@ -2,12 +2,17 @@ import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const distDir = resolve(import.meta.dirname, '../dist');
-const jsFiles = (await readdir(distDir)).filter(file => file.endsWith('.js'));
+const jsFiles = (await readdir(distDir, { recursive: true })).filter(file => file.endsWith('.js'));
 const sources = await Promise.all(jsFiles.map(file => readFile(resolve(distDir, file), 'utf8')));
-const entry = await readFile(resolve(distDir, 'index.js'), 'utf8');
+const componentEntries = (await readdir(resolve(distDir, 'components')))
+  .filter(file => file.endsWith('.js'))
+  .map(file => `components/${file}`);
 
-if (!entry.startsWith("'use client';") && !entry.startsWith('"use client";')) {
-  throw new Error("Published Mosaic JS is missing a top-level 'use client' boundary.");
+for (const entryFile of ['index.js', ...componentEntries]) {
+  const entry = await readFile(resolve(distDir, entryFile), 'utf8');
+  if (!entry.startsWith("'use client';") && !entry.startsWith('"use client";')) {
+    throw new Error(`Published Mosaic JS entry ${entryFile} is missing a top-level 'use client' boundary.`);
+  }
 }
 
 const forbidden = [

@@ -31,6 +31,26 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./components/avatar": {
+      "types": "./dist/components/avatar.d.ts",
+      "import": "./dist/components/avatar.js",
+      "default": "./dist/components/avatar.js"
+    },
+    "./components/badge": {
+      "types": "./dist/components/badge.d.ts",
+      "import": "./dist/components/badge.js",
+      "default": "./dist/components/badge.js"
+    },
+    "./components/data-list": {
+      "types": "./dist/components/data-list.d.ts",
+      "import": "./dist/components/data-list.js",
+      "default": "./dist/components/data-list.js"
+    },
+    "./components/entity": {
+      "types": "./dist/components/entity.d.ts",
+      "import": "./dist/components/entity.js",
+      "default": "./dist/components/entity.js"
+    },
     "./styles.css": {
       "types": "./styles.css.d.ts",
       "default": "./dist/styles.css"

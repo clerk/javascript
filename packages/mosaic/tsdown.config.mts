@@ -13,7 +13,13 @@ const { default: getTypeScriptExecutablePath } = await import(
 );
 
 export default defineConfig({
-  entry: ['./src/index.ts'],
+  entry: {
+    index: './src/index.ts',
+    'components/avatar': './src/components/avatar/index.ts',
+    'components/badge': './src/components/badge/index.ts',
+    'components/data-list': './src/components/data-list/index.ts',
+    'components/entity': './src/components/entity/index.ts',
+  },
   outDir: './dist',
   format: ['esm'],
   dts: {
