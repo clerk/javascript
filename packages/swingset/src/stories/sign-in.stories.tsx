@@ -459,6 +459,7 @@ function StepPanel({
   isPending = false,
   pendingProviderId,
   providers = socialProviders,
+  identifier,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -467,12 +468,14 @@ function StepPanel({
   isPending?: boolean;
   pendingProviderId?: string;
   providers?: SignInSocialProvider[];
+  identifier?: string;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
     initialValues: {
       ...emptyValues,
-      identifier: step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER,
+      identifier:
+        identifier ?? (step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER),
       password: attempted,
       backupCode: attempted,
     },
@@ -559,6 +562,8 @@ export function IdentifierLocked() {
   return (
     <StepPanel
       step={{ kind: 'identifier' }}
+      combined={false}
+      identifier={IDENTIFIER}
       globalErrorMessage='Your account is locked. You will be able to try again in 30 minutes. For more information, please contact support.'
     />
   );
