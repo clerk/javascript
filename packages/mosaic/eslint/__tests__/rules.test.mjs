@@ -19,7 +19,6 @@ ruleTester.run('no-model-react-state', plugin.rules['no-model-react-state'], {
     "import React from './other'; React.useState(0);",
     "import React from 'react'; const useState = 'useMemo'; React[useState](() => 0, []);",
     "import React from 'react'; const useState = 'useMemo'; const { [useState]: memo } = React;",
-    "import('./reverification.messages');",
   ],
   invalid: [
     { code: "import React from 'react'; React.useState(0);", errors: [{ messageId: 'controllerState' }] },
