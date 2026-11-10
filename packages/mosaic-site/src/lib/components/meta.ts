@@ -15,7 +15,7 @@ export type ComponentMeta = {
 export const COMPONENT_META: ComponentMeta[] = [
   {
     slug: 'user-button',
-    title: '<UserButton />',
+    title: 'Switcher',
     group: 'Features',
     tags: ['Authentication', 'Multi-tenancy'],
     description:
@@ -29,7 +29,7 @@ export const COMPONENT_META: ComponentMeta[] = [
   },
   {
     slug: 'user-profile',
-    title: '<UserProfile />',
+    title: 'Profile',
     group: 'Features',
     tags: ['Authentication', 'Billing', 'Security'],
     description: 'Profile, security and billing for the signed-in user, in one navigable view.',
@@ -41,8 +41,22 @@ export const COMPONENT_META: ComponentMeta[] = [
 <UserProfileView activePage={activePage} pages={pages} onPageChange={setActivePage} />`,
   },
   {
+    slug: 'combined-profile',
+    title: 'Profile',
+    group: 'Features',
+    tags: ['Authentication', 'Multi-tenancy'],
+    description: 'Profile, security and billing for the signed-in user, with the organization alongside.',
+    thumbWidth: 1100,
+    center: false,
+    modal: true,
+    comingSoon: true,
+    snippet: `import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
+
+<UserProfileView activePage={activePage} pages={pages} organization={{ pages: organizationPages }} onPageChange={setActivePage} />`,
+  },
+  {
     slug: 'organization-profile',
-    title: '<OrganizationProfile />',
+    title: 'Organization profile',
     group: 'Features',
     tags: ['Multi-tenancy', 'Billing', 'Roles'],
     description: 'Members, invitations, API keys and settings for an organization.',
@@ -56,7 +70,7 @@ export const COMPONENT_META: ComponentMeta[] = [
   },
   {
     slug: 'organization-switcher',
-    title: '<OrganizationSwitcher />',
+    title: 'Organization switcher',
     group: 'Features',
     tags: ['Multi-tenancy', 'Navigation'],
     description:
@@ -70,7 +84,7 @@ export const COMPONENT_META: ComponentMeta[] = [
   },
   {
     slug: 'organization-list',
-    title: '<OrganizationList />',
+    title: 'Organization list',
     group: 'Features',
     comingSoon: true,
     tags: ['Multi-tenancy', 'Onboarding'],
@@ -84,11 +98,11 @@ export const COMPONENT_META: ComponentMeta[] = [
   },
   {
     slug: 'create-organization',
-    title: '<CreateOrganization />',
+    title: 'Create organization',
     group: 'Features',
     tags: ['Multi-tenancy', 'Onboarding'],
     description: 'Name a new organization, choose its slug, and invite the first members.',
-    thumbWidth: 520,
+    thumbWidth: 700,
     center: true,
     frame: false,
     snippet: `import { CreateOrganization } from '@clerk/mosaic/features/create-organization/create-organization';
@@ -97,7 +111,7 @@ export const COMPONENT_META: ComponentMeta[] = [
   },
   {
     slug: 'waitlist',
-    title: '<Waitlist />',
+    title: 'Waitlist',
     group: 'Features',
     comingSoon: true,
     tags: ['Authentication', 'Onboarding'],

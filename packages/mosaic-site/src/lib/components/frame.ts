@@ -8,7 +8,7 @@ export type FrameConfig = {
 export const DEFAULT_FRAME: FrameConfig = {
   slug: 'user-profile',
   url: 'app.acme.com/account',
-  zoom: 1,
+  zoom: 1.08,
   radius: 16,
   mode: 'flush',
 };

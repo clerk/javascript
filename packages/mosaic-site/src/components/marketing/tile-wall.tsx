@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import * as React from 'react';
 
 import { BLOOM, CRAZE, MOTTLE, SPECKS } from '@/components/marketing/glaze-textures';
-import { PALETTE } from '@/lib/brand/tile-palettes';
+import { usePalette, useTileTune } from '@/components/marketing/tile-settings';
 
 const GAP = 0.012;
 const POP = [0.22, 1, 0.36, 1] as const;
@@ -29,10 +29,6 @@ const staggerDelay = (column: number, row: number, seed: number, columns: number
   }
 };
 
-const BEVEL_MATTE_BOTTOM =
-  'inset 0 -1px 0 rgba(255,255,255,0.28), inset 0 2px 3px rgba(40,25,90,0.2), inset 0 0 0 1px rgba(40,25,90,0.12)';
-const BEVEL_MATTE =
-  'inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -2px 3px rgba(40,25,90,0.2), inset 0 0 0 1px rgba(40,25,90,0.12)';
 const BEVEL_BOTTOM =
   'inset 0 -1.5px 0 rgba(255,255,255,0.75), inset 0 2.5px 3px rgba(40,25,90,0.3), inset 1.5px 0 0 rgba(255,255,255,0.2), inset -2px 0 3px rgba(40,25,90,0.14), inset 0 0 0 1px rgba(40,25,90,0.16)';
 
@@ -47,6 +43,7 @@ export function TileWall({
   built,
   fromOpener,
   run,
+  seedOrigin,
   stagger = DEFAULT_STAGGER,
   appear = 'scatter',
   lightFrom = 'top',
@@ -58,6 +55,7 @@ export function TileWall({
   built: boolean;
   fromOpener: boolean;
   run: number;
+  seedOrigin?: { column: number; row: number };
   stagger?: Stagger;
   appear?: 'scatter' | 'fade' | 'static';
   lightFrom?: 'top' | 'bottom';
@@ -65,15 +63,21 @@ export function TileWall({
   render: (column: number, row: number) => React.ReactNode;
 }) {
   const id = React.useId().replace(/:/g, '');
-  const palette = PALETTE;
+  const palette = usePalette();
+  const tune = useTileTune();
+  const matteBevel = `inset 0 ${lightFrom === 'bottom' ? '-1px' : '1px'} 0 rgba(255,255,255,${tune.bevelHighlight}), inset 0 ${lightFrom === 'bottom' ? '2px' : '-2px'} 3px rgba(40,25,90,${tune.bevelShadow}), inset 0 0 0 1px rgba(40,25,90,${tune.bevelEdge})`;
   const tiles = React.useMemo(
     () =>
       Array.from({ length: columns * rows }, (_, index) => {
         const column = index % columns;
         const row = Math.floor(index / columns);
-        return { column, row, seed: unit(column * 13.7 + row * 5.3 + run) };
+        return {
+          column,
+          row,
+          seed: unit((column + (seedOrigin?.column ?? 0)) * 13.7 + (row + (seedOrigin?.row ?? 0)) * 5.3 + run),
+        };
       }),
-    [columns, rows, run],
+    [columns, rows, run, seedOrigin?.column, seedOrigin?.row],
   );
   return (
     <div
@@ -97,7 +101,7 @@ export function TileWall({
         >
           <feTurbulence
             type='fractalNoise'
-            baseFrequency={matte ? '0.03' : '0.022'}
+            baseFrequency={matte ? tune.warpScale : 0.022}
             numOctaves='2'
             seed='5'
             result='noise'
@@ -105,7 +109,7 @@ export function TileWall({
           <feDisplacementMap
             in='SourceGraphic'
             in2='noise'
-            scale={matte ? '2.8' : '1.8'}
+            scale={matte ? tune.warp : 1.8}
             xChannelSelector='R'
             yChannelSelector='G'
           />
@@ -120,19 +124,19 @@ export function TileWall({
               : {
                   opacity: 0,
                   scale: 0.4,
-                  x: (tile.seed - 0.5) * 300,
-                  y: (unit(tile.seed * 91) - 0.5) * 300,
+                  x: (tile.seed - 0.5) * (matte ? tune.scatter : 300),
+                  y: (unit(tile.seed * 91) - 0.5) * (matte ? tune.scatter : 300),
                   rotate: (tile.seed - 0.5) * 90,
                 };
         const tone = unit(tile.seed * 53 + 7);
         return (
           <motion.div
             key={`${tile.column},${tile.row}`}
-            style={{ padding: `${GAP * 100}%`, background: palette.grout }}
+            style={{ padding: `${(matte ? tune.gap : GAP) * 100}%`, background: matte ? tune.grout : palette.grout }}
             initial={away}
             animate={built ? { opacity: 1, scale: 1, x: 0, y: 0, rotate: 0 } : away}
             transition={{
-              duration: appear === 'fade' ? 0.8 : fromOpener ? 1.1 : 0.8,
+              duration: appear === 'fade' ? 0.8 : fromOpener ? (matte ? tune.tileDuration : 1.1) : 0.8,
               delay: built
                 ? appear === 'fade'
                   ? 0
@@ -143,7 +147,10 @@ export function TileWall({
               ease: POP,
             }}
           >
-            <div className='relative size-full overflow-hidden rounded-[2.5%]'>
+            <div
+              className='relative size-full overflow-hidden'
+              style={{ borderRadius: `${matte ? tune.radius : 2.5}%` }}
+            >
               <div
                 className='size-full'
                 style={{ filter: `url("#${id}-glaze")` }}
@@ -154,7 +161,7 @@ export function TileWall({
                 aria-hidden='true'
                 className='pointer-events-none absolute inset-0 mix-blend-multiply'
                 style={{
-                  opacity: matte ? 0.28 : 0.14,
+                  opacity: matte ? tune.mottle : 0.14,
                   backgroundImage: MOTTLE,
                   backgroundSize: '300px 300px',
                   backgroundPosition: `${tile.seed * 300}px ${tone * 300}px`,
@@ -164,7 +171,7 @@ export function TileWall({
                 aria-hidden='true'
                 className='pointer-events-none absolute inset-0 mix-blend-soft-light'
                 style={{
-                  opacity: matte ? 0.55 : 0.45,
+                  opacity: matte ? tune.bloom : 0.45,
                   backgroundImage: BLOOM,
                   backgroundSize: '260px 260px',
                   backgroundPosition: `${tone * 260}px ${tile.seed * 260}px`,
@@ -174,7 +181,7 @@ export function TileWall({
                 aria-hidden='true'
                 className='pointer-events-none absolute inset-0 mix-blend-multiply'
                 style={{
-                  opacity: matte ? 0.4 : 0.2,
+                  opacity: matte ? tune.specks : 0.2,
                   backgroundImage: SPECKS,
                   backgroundSize: '200px 200px',
                   backgroundPosition: `${tone * 200}px ${tile.seed * 200}px`,
@@ -184,7 +191,7 @@ export function TileWall({
                 aria-hidden='true'
                 className='pointer-events-none absolute inset-0 mix-blend-multiply'
                 style={{
-                  opacity: matte ? 0.12 : 0.07,
+                  opacity: matte ? tune.craze : 0.07,
                   backgroundImage: CRAZE,
                   backgroundSize: '360px 360px',
                   backgroundPosition: `${tile.seed * 360}px ${tone * 360}px`,
@@ -196,15 +203,9 @@ export function TileWall({
                 style={{
                   background:
                     lightFrom === 'bottom'
-                      ? `linear-gradient(to top, rgba(255,255,255,${matte ? palette.gloss * 0.25 : palette.gloss}) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,${0.1 + tone * 0.1}) 100%)`
-                      : `linear-gradient(135deg, rgba(255,255,255,${matte ? palette.gloss * 0.25 : palette.gloss}) 0%, rgba(255,255,255,0) 38%, rgba(0,0,0,${0.1 + tone * 0.1}) 100%)`,
-                  boxShadow: matte
-                    ? lightFrom === 'bottom'
-                      ? BEVEL_MATTE_BOTTOM
-                      : BEVEL_MATTE
-                    : lightFrom === 'bottom'
-                      ? BEVEL_BOTTOM
-                      : BEVEL,
+                      ? `linear-gradient(to top, rgba(255,255,255,${matte ? tune.gloss : palette.gloss}) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,${matte ? tune.shadeBase + tone * tune.shadeRange : 0.1 + tone * 0.1}) 100%)`
+                      : `linear-gradient(135deg, rgba(255,255,255,${matte ? tune.gloss : palette.gloss}) 0%, rgba(255,255,255,0) 38%, rgba(0,0,0,${matte ? tune.shadeBase + tone * tune.shadeRange : 0.1 + tone * 0.1}) 100%)`,
+                  boxShadow: matte ? matteBevel : lightFrom === 'bottom' ? BEVEL_BOTTOM : BEVEL,
                 }}
               />
             </div>

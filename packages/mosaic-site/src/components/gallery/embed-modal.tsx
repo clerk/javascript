@@ -25,6 +25,18 @@ export function UserProfileModal() {
     />
   );
 }
+export function CombinedProfileModal() {
+  const { activePage, setActivePage, pages } = useUserProfileFixture();
+  const organization = useOrganizationProfileFixture();
+  return (
+    <UserProfileView
+      activePage={activePage}
+      pages={withoutUserComingSoon(pages)}
+      organization={{ pages: withoutOrganizationComingSoon(organization.pages) }}
+      onPageChange={setActivePage}
+    />
+  );
+}
 export function OrganizationProfileModal() {
   const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
   return (
@@ -37,10 +49,12 @@ export function OrganizationProfileModal() {
 }
 const TRIGGER_LABELS: Record<string, string> = {
   'user-profile': 'Manage account',
+  'combined-profile': 'Manage account',
   'organization-profile': 'Manage organization',
 };
 const MODALS: Record<string, () => React.ReactElement> = {
   'user-profile': UserProfileModal,
+  'combined-profile': CombinedProfileModal,
   'organization-profile': OrganizationProfileModal,
 };
 export function EmbedModal({ slug }: { slug: string }) {

@@ -19,7 +19,7 @@ import { TabsProfile } from '@/components/gallery/tabs-profile';
 import { withoutOrganizationComingSoon, withoutUserComingSoon } from '@/lib/components/pages';
 
 function UserButtonDemo() {
-  const prototype = usePrototype({ hidePersonal: true });
+  const prototype = usePrototype();
   return (
     <SwitcherView
       {...prototype}
@@ -46,6 +46,19 @@ function UserProfileDemo() {
     />
   );
 }
+function CombinedProfileDemo() {
+  const { activePage, setActivePage, pages } = useUserProfileFixture();
+  const organization = useOrganizationProfileFixture();
+  return (
+    <UserProfileView
+      activePage={activePage}
+      pages={withoutUserComingSoon(pages)}
+      organization={{ pages: withoutOrganizationComingSoon(organization.pages) }}
+      onPageChange={setActivePage}
+      elevation='flush'
+    />
+  );
+}
 function OrganizationProfileDemo() {
   const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
   return (
@@ -60,6 +73,7 @@ function OrganizationProfileDemo() {
 export const DEMOS: Record<string, () => React.ReactElement> = {
   'user-button': UserButtonDemo,
   'user-profile': UserProfileDemo,
+  'combined-profile': CombinedProfileDemo,
   'organization-profile': OrganizationProfileDemo,
   'organization-switcher': OrganizationSwitcherDemo,
   'organization-list': OrganizationListDemo,

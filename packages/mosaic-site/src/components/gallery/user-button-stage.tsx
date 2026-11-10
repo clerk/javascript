@@ -60,13 +60,15 @@ export function Switcher({
   size,
   placement,
   defaultOpen,
+  closeOnOutsidePress = false,
 }: {
   type: UserButtonType;
   size: UserButtonSize;
   placement: Placement;
   defaultOpen?: boolean;
+  closeOnOutsidePress?: boolean;
 }) {
-  const prototype = usePrototype({ hidePersonal: true });
+  const prototype = usePrototype({ hidePersonal: type === 'org' });
   const { onOpenChange } = prototype;
   const outsidePress = React.useRef(false);
   React.useEffect(() => {
@@ -94,7 +96,7 @@ export function Switcher({
     <SwitcherView
       {...prototype}
       onOpenChange={(next: boolean) => {
-        if (!next && outsidePress.current) {
+        if (!next && outsidePress.current && !closeOnOutsidePress) {
           return;
         }
         onOpenChange?.(next);
@@ -173,7 +175,7 @@ function AppChrome({
         style={{
           width: slim ? RAIL_SLIM : rail,
           gap: ITEM_GAP,
-          paddingTop: placement === 'top' || slim ? INSET + item.height + ITEM_GAP * 2 : INSET,
+          paddingTop: placement === 'bottom' ? INSET : INSET + item.height + ITEM_GAP * 2,
         }}
       >
         <NavRows
@@ -250,7 +252,7 @@ export function UserButtonStage({ type, size }: { type: UserButtonType; size: Us
   const buttonFills = filled && size !== 'avatar';
   const item =
     placement === 'right'
-      ? { width: RAIL - INSET * 2, height: 40 }
+      ? { width: RAIL - INSET * 2, height: 46 }
       : { width: filled ? FILL_WIDTH : button.width || 250, height: filled ? 46 : button.height || 46 };
   const windowWidth = Math.max(WINDOW.minWidth, Math.min(WINDOW.maxWidth, stage.width - WINDOW.margin * 2));
   const windowHeight = WINDOW.height;
@@ -499,6 +501,7 @@ export function MobileUserButton({ type, size, url }: { type: string | null; siz
         type={buttonType}
         size={buttonSize}
         placement={right ? 'right' : 'top'}
+        closeOnOutsidePress
       />
     </div>
   );

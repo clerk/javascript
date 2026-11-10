@@ -14,7 +14,7 @@ export function ToolbarIcon({ path, className }: { path: string; className?: str
   return (
     <svg
       viewBox='0 0 24 24'
-      className={cn('size-[18px]', className)}
+      className={cn('size-4', className)}
       fill='none'
       stroke='currentColor'
       strokeWidth='1.75'
@@ -32,10 +32,48 @@ export function Address({ url, className }: { url: string; className?: string })
   const host = slash === -1 ? bare : bare.slice(0, slash);
   const path = slash === -1 ? '' : bare.slice(slash + 1);
   return (
-    <span className={cn('truncate text-[15px] text-neutral-500', className)}>
+    <span className={cn('truncate text-[13px] text-neutral-500', className)}>
       http://<span className='text-foreground'>{host}</span>
       {path ? ` / ${path}` : ''}
     </span>
+  );
+}
+export function BrowserChrome({
+  url,
+  radius = 16,
+  className,
+  children,
+}: {
+  url: string;
+  radius?: number;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        'bg-foreground/[0.07] ring-foreground/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] ring-1 backdrop-blur-xl',
+        className,
+      )}
+      style={{ borderRadius: radius + 6 }}
+    >
+      <div
+        className='bg-background flex flex-col overflow-hidden'
+        style={{ borderRadius: radius }}
+      >
+        <div className='border-foreground/10 flex h-10 shrink-0 items-center gap-4 border-b px-4 text-neutral-500'>
+          <ToolbarIcon path='M3 5h18v14H3zM9 5v14' />
+          <ToolbarIcon path='M15 18l-6-6 6-6' />
+          <ToolbarIcon
+            path='M9 18l6-6-6-6'
+            className='opacity-40'
+          />
+          <ToolbarIcon path='M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5' />
+          <Address url={url} />
+        </div>
+        {children}
+      </div>
+    </div>
   );
 }
 export function BrowserFrame({
@@ -65,115 +103,98 @@ export function BrowserFrame({
   }
   return (
     <MosaicProvider>
-      <div
-        className={cn(
-          'bg-foreground/[0.07] ring-foreground/15 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] ring-1 backdrop-blur-xl',
-          className,
-        )}
-        style={{ borderRadius: config.radius + 6 }}
+      <BrowserChrome
+        url={config.url}
+        radius={config.radius}
+        className={className}
       >
-        <div
-          className='bg-background flex flex-col overflow-hidden'
-          style={{ borderRadius: config.radius }}
-        >
-          <div className='border-foreground/10 flex h-12 shrink-0 items-center gap-5 border-b px-5 text-neutral-500'>
-            <ToolbarIcon path='M3 5h18v14H3zM9 5v14' />
-            <ToolbarIcon path='M15 18l-6-6 6-6' />
-            <ToolbarIcon
-              path='M9 18l6-6-6-6'
-              className='opacity-40'
-            />
-            <ToolbarIcon path='M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5' />
-            <Address url={config.url} />
-          </div>
-          <div className='relative'>
-            <MosaicLoader visible={!ready} />
-            {embed ? (
-              <ScaledFrame
-                width={WIREFRAME_WIDTH / config.zoom}
-                center={false}
-                interactive
-                className='aspect-[16/10] w-full'
-              >
-                <iframe
-                  ref={frame => {
-                    if (
-                      frame?.contentDocument?.readyState === 'complete' &&
-                      frame.contentDocument.body?.childElementCount
-                    ) {
-                      setReady(true);
-                    }
-                  }}
-                  src={embed.src}
-                  title={embed.title}
-                  onLoad={() => setReady(true)}
-                  className='border-0'
+        <div className='relative'>
+          <MosaicLoader visible={!ready} />
+          {embed ? (
+            <ScaledFrame
+              width={WIREFRAME_WIDTH / config.zoom}
+              center={false}
+              interactive
+              className='aspect-[16/10] w-full'
+            >
+              <iframe
+                ref={frame => {
+                  if (
+                    frame?.contentDocument?.readyState === 'complete' &&
+                    frame.contentDocument.body?.childElementCount
+                  ) {
+                    setReady(true);
+                  }
+                }}
+                src={embed.src}
+                title={embed.title}
+                onLoad={() => setReady(true)}
+                className='border-0'
+                style={{ width: WIREFRAME_WIDTH / config.zoom, height: (WIREFRAME_WIDTH / config.zoom) * 0.625 }}
+              />
+            </ScaledFrame>
+          ) : (
+            <ScaledFrame
+              width={
+                (meta.group === 'Features' && meta.frame !== false ? WIREFRAME_WIDTH : meta.thumbWidth) / config.zoom
+              }
+              center={meta.center}
+              interactive={interactive}
+              className='aspect-[16/10] w-full bg-[var(--cl-color-page,#fff)]'
+            >
+              {config.mode === 'fullscreen' && meta.modal ? (
+                <div
+                  className='overflow-y-auto bg-[var(--cl-color-page,#fff)] [scrollbar-gutter:stable] [scrollbar-width:thin]'
                   style={{ width: WIREFRAME_WIDTH / config.zoom, height: (WIREFRAME_WIDTH / config.zoom) * 0.625 }}
-                />
-              </ScaledFrame>
-            ) : (
-              <ScaledFrame
-                width={
-                  (meta.group === 'Features' && meta.frame !== false ? WIREFRAME_WIDTH : meta.thumbWidth) / config.zoom
-                }
-                center={meta.center}
-                interactive={interactive}
-                className='aspect-[16/10] w-full bg-[var(--cl-color-page,#fff)]'
-              >
-                {config.mode === 'fullscreen' && meta.modal ? (
-                  <div
-                    className='overflow-y-auto bg-[var(--cl-color-page,#fff)] [scrollbar-gutter:stable] [scrollbar-width:thin]'
-                    style={{ width: WIREFRAME_WIDTH / config.zoom, height: (WIREFRAME_WIDTH / config.zoom) * 0.625 }}
-                  >
-                    {closed ? (
-                      <div className='flex h-full'>
-                        <Rail />
-                        <div className='flex min-w-0 flex-1 flex-col'>
-                          <Header
-                            action={
-                              <Button onClick={() => setClosed(false)}>
-                                {config.slug === 'organization-profile' ? 'Manage organization' : 'Manage account'}
-                              </Button>
-                            }
-                          />
-                          <PageSkeleton />
-                        </div>
+                >
+                  {closed ? (
+                    <div className='flex h-full'>
+                      <Rail />
+                      <div className='flex min-w-0 flex-1 flex-col'>
+                        <Header
+                          action={
+                            <Button onClick={() => setClosed(false)}>
+                              {config.slug === 'organization-profile' ? 'Manage organization' : 'Manage account'}
+                            </Button>
+                          }
+                        />
+                        <PageSkeleton />
                       </div>
-                    ) : (
-                      <div className='[&_.cl-profile-layout]:m-0! [&_.cl-profile-layout]:w-full! [&_.cl-profile-layout]:max-w-none! [&_.cl-profile-layout]:justify-between! px-10 pb-8 pt-6'>
-                        <button
-                          type='button'
-                          onClick={() => setClosed(true)}
-                          className='text-foreground hover:bg-foreground/[0.07] mb-6 flex items-center gap-1.5 rounded-lg py-1.5 pl-1.5 pr-3 text-sm transition-colors'
-                        >
-                          <ToolbarIcon
-                            path='M15 18l-6-6 6-6'
-                            className='size-4'
-                          />
-                          Back to app
-                        </button>
-                        <Demo />
-                      </div>
-                    )}
-                  </div>
-                ) : meta.group === 'Features' && meta.frame !== false ? (
-                  <AppWireframe
-                    width={WIREFRAME_WIDTH / config.zoom}
-                    modal={config.mode === 'modal' && Boolean(meta.modal)}
-                    scroll={interactive}
-                  >
-                    <Demo />
-                  </AppWireframe>
-                ) : (
-                  <div className='px-8 pt-6'>
-                    <Demo />
-                  </div>
-                )}
-              </ScaledFrame>
-            )}
-          </div>
+                    </div>
+                  ) : (
+                    <div className='[&_.cl-profile-layout]:m-0! [&_.cl-profile-layout]:w-full! [&_.cl-profile-layout]:max-w-none! [&_.cl-profile-layout]:justify-between! px-10 pb-8 pt-6'>
+                      <button
+                        type='button'
+                        onClick={() => setClosed(true)}
+                        className='text-foreground hover:bg-foreground/[0.07] mb-6 flex items-center gap-1.5 rounded-lg py-1.5 pl-1.5 pr-3 text-sm transition-colors'
+                      >
+                        <ToolbarIcon
+                          path='M15 18l-6-6 6-6'
+                          className='size-4'
+                        />
+                        Back to app
+                      </button>
+                      <Demo />
+                    </div>
+                  )}
+                </div>
+              ) : meta.group === 'Features' && meta.frame !== false ? (
+                <AppWireframe
+                  width={WIREFRAME_WIDTH / config.zoom}
+                  modal={config.mode === 'modal' && Boolean(meta.modal)}
+                  scroll={interactive}
+                >
+                  <Demo />
+                </AppWireframe>
+              ) : (
+                <div className='px-8 pt-6'>
+                  <Demo />
+                </div>
+              )}
+            </ScaledFrame>
+          )}
         </div>
-      </div>
+      </BrowserChrome>
     </MosaicProvider>
   );
 }

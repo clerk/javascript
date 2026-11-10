@@ -8,7 +8,7 @@ import * as React from 'react';
 import { OrganizationProfileModal, UserProfileModal } from '@/components/gallery/embed-modal';
 type Example = () => React.ReactElement;
 function UserButtonCondensed() {
-  const prototype = usePrototype({ hidePersonal: true });
+  const prototype = usePrototype();
   return (
     <SwitcherView
       {...prototype}
@@ -18,7 +18,7 @@ function UserButtonCondensed() {
   );
 }
 function UserButtonIconOnly() {
-  const prototype = usePrototype({ hidePersonal: true });
+  const prototype = usePrototype();
   return (
     <SwitcherView
       {...prototype}
@@ -37,7 +37,7 @@ function UserButtonUserOnly() {
   );
 }
 function UserButtonSingleSession() {
-  const prototype = usePrototype({ singleSession: true, hidePersonal: true });
+  const prototype = usePrototype({ singleSession: true });
   return (
     <SwitcherView
       {...prototype}

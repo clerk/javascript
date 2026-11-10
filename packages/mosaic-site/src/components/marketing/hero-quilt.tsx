@@ -2,17 +2,39 @@
 import { motion, useReducedMotion } from 'motion/react';
 import * as React from 'react';
 
-import { BigTileGrid, QUILT } from '@/components/marketing/big-tile-wall';
-import { TileStage } from '@/components/marketing/tile-stage';
+import { QUILT } from '@/components/marketing/big-tile-wall';
+import { TileQuilt } from '@/components/marketing/tile-quilt';
 import { PromptBar } from '@/components/prompt-bar/prompt-bar';
 import { AGENT_PROMPT } from '@/lib/agent-prompt';
+import { TILE_DEFAULTS } from '@/lib/tile-settings';
 
-const { designs: START, bigColumns: COLUMNS } = QUILT;
+const { designs: START } = QUILT;
 const EASE = [0.22, 1, 0.36, 1] as const;
-const TILE_START = 0.4;
-const COLUMN_STEP = 0.07;
 const LINE_COLOR = 'color-mix(in srgb, currentColor 11%, transparent)';
-const PITCH = 'calc(clamp(22rem, 58vw, 50rem) / 6)';
+const PITCH = 'var(--pitch, calc(clamp(22rem, 58vw, 50rem) / 6))';
+const COLUMNS_WIDE = 6;
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+
+function useAlignedPitch(ref: React.RefObject<HTMLElement | null>) {
+  const [pitch, setPitch] = React.useState<number | null>(null);
+  useIsomorphicLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) {
+      return;
+    }
+    const measure = () => {
+      const width = element.clientWidth;
+      const wanted = Math.min(Math.max(352, window.innerWidth * 0.58), 800) / COLUMNS_WIDE;
+      const extra = Math.max(0, Math.round((width / wanted - COLUMNS_WIDE) / 2));
+      setPitch(width / (COLUMNS_WIDE + 2 * extra));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+  return pitch;
+}
 
 const GRID_MASK = 'radial-gradient(ellipse 72vw 61vh at 50% 50%, black 20%, transparent 100%)';
 
@@ -24,9 +46,13 @@ function Grid() {
       className='pointer-events-none absolute'
       initial={{ opacity: 0, transform: reduced ? 'scale(1)' : 'scale(0.94)' }}
       animate={{ opacity: 1, transform: 'scale(1)' }}
-      transition={{ duration: reduced ? 0.3 : 1.2, delay: 0.1, ease: EASE }}
+      transition={{
+        duration: reduced ? 0.3 : 1.2,
+        delay: TILE_DEFAULTS.startDelay + TILE_DEFAULTS.columnSpan + TILE_DEFAULTS.tileDuration * 0.7,
+        ease: EASE,
+      }}
       style={{
-        left: `calc(${PITCH} * -24)`,
+        left: `calc(${PITCH} * -24 - 1px)`,
         right: `calc(${PITCH} * -24)`,
         top: `calc(${PITCH} * -14)`,
         bottom: `calc(${PITCH} * -14)`,
@@ -53,47 +79,20 @@ const useRise = () => {
 };
 
 export function HeroQuilt() {
-  const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [failed, setFailed] = React.useState(false);
-  const onFail = React.useCallback(() => setFailed(true), []);
+  const sectionRef = React.useRef<HTMLElement>(null);
+  const pitch = useAlignedPitch(sectionRef);
   const rise = useRise();
-  const lightAt = TILE_START + COLUMN_STEP * COLUMNS + 0.7;
+  const lightAt = TILE_DEFAULTS.startDelay + TILE_DEFAULTS.columnSpan * 0.5;
   return (
-    <section className='bg-background text-foreground relative isolate flex min-h-[calc(100svh-8rem)] flex-col items-center justify-center overflow-hidden px-6 pb-16 pt-10 text-center'>
-      <div
-        ref={anchorRef}
-        className='relative aspect-[3/1] w-[clamp(22rem,58vw,50rem)]'
-      >
+    <section
+      ref={sectionRef}
+      style={pitch ? ({ '--pitch': `${pitch}px` } as React.CSSProperties) : undefined}
+      className='bg-background text-foreground relative isolate flex min-h-[calc(100svh-8rem)] flex-col items-center justify-center overflow-hidden px-6 pb-16 pt-10 text-center'
+    >
+      <div className='relative aspect-[3/1] w-[calc(var(--pitch,calc(clamp(22rem,58vw,50rem)/6))*6)]'>
         <Grid />
-        {failed ? (
-          <div className='relative grid grid-cols-6'>
-            {START.map((design, index) => (
-              <div
-                key={`${design}-${index}`}
-                className='relative aspect-square'
-              >
-                <BigTileGrid
-                  designs={[design]}
-                  bigColumns={1}
-                  built
-                  fromOpener={false}
-                  run={0}
-                  appear='static'
-                  lightFrom='bottom'
-                  matte
-                />
-              </div>
-            ))}
-          </div>
-        ) : null}
+        <TileQuilt designs={START} />
       </div>
-      {failed ? null : (
-        <TileStage
-          anchorRef={anchorRef}
-          designs={START}
-          onFail={onFail}
-        />
-      )}
       <motion.p
         {...rise(lightAt)}
         className='mt-12 bg-gradient-to-r from-[#6c47ff] via-[#8f74ff] to-[#c4b5fd] bg-clip-text text-sm font-medium uppercase tracking-[0.22em] text-transparent'

@@ -26,8 +26,7 @@
     "react-aria": "3.44.0",
     "react-aria-components": "1.13.0",
     "react-dom": "catalog:react",
-    "tailwind-merge": "^3.6.0",
-    "three": "^0.187.0"
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@babel/plugin-syntax-jsx": "^7.29.7",
@@ -38,7 +37,6 @@
     "@tailwindcss/postcss": "^4.0.0",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@types/three": "^0.187.0",
     "tailwindcss": "^4.0.0",
     "typescript": "catalog:repo"
   }

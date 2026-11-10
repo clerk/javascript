@@ -11,7 +11,7 @@ const heading = Geist({ subsets: ['latin'], variable: '--font-heading' });
 const sans = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' });
 export const metadata: Metadata = {
-  title: 'Mosaic Components',
+  title: 'Clerk UI',
   description:
     'Sign-in, profiles, consent and agent experiences. Composable components made to be rearranged, restyled and replaced.',
 };

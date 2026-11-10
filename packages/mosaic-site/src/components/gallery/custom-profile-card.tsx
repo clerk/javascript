@@ -37,10 +37,7 @@ export function CustomProfileCard({
     setEditing(false);
   };
   return (
-    <div
-      data-xray='custom-profile-card'
-      className='flex w-full flex-col gap-8'
-    >
+    <div className='flex w-full flex-col gap-8'>
       <div className='flex flex-col items-center gap-3 pt-2'>
         <Avatar.Root size='lg'>
           <Avatar.Image

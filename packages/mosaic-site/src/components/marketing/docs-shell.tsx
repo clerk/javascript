@@ -6,37 +6,20 @@ import * as React from 'react';
 
 import { DEMOS } from '@/components/gallery/demos';
 import { ScaledFrame } from '@/components/gallery/scaled-frame';
-import { GLASS_EDGES, GLASS_SCHEME, glassStyle } from '@/components/glass';
-import { ClerkComponentsLogo } from '@/components/marketing/clerk-logo';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { TopNav } from '@/components/marketing/top-nav';
+import { CATALOG, type CatalogItem, type Kind } from '@/lib/components/catalog';
 import { getComponentMeta } from '@/lib/components/meta';
-import { NAV_SECTIONS } from '@/lib/components/nav';
-import { ROADMAP } from '@/lib/components/roadmap';
 import { cn } from '@/lib/utils';
-const SIDEBAR_WIDTH = 232;
+const SIDEBAR_WIDTH = 256;
 const PREVIEW_WIDTH = 340;
-type NavLink = { href: string; label: string; slug?: string; comingSoon?: boolean };
+const PREVIEW_DELAY = 500;
+const PREVIEW_GRACE = 250;
+type NavLink = { href: string; label: string; slug?: string; comingSoon?: boolean; hideBadge?: boolean };
 const gettingStarted: NavLink[] = [
-  { href: '/', label: 'Overview' },
   { href: '/installation', label: 'Installation' },
   { href: '/colors', label: 'Colors' },
 ];
-const sections = NAV_SECTIONS.map(section => ({
-  label: section.label,
-  groups: section.groups.map(group => ({
-    label: group.label,
-    links: group.slugs
-      .map(slug => ROADMAP.find(item => item.slug === slug))
-      .filter(item => item !== undefined)
-      .map(item => ({
-        href: `/components/${item.slug}`,
-        label: item.title,
-        slug: item.slug,
-        comingSoon: item.status === 'soon',
-      }))
-      .sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon)),
-  })),
-}));
+const itemHref = (kind: Kind, slug: string) => `/${kind}/${slug}`;
 function NavItem({
   link,
   pathname,
@@ -53,9 +36,11 @@ function NavItem({
       <span
         aria-disabled='true'
         onMouseEnter={event => showPreview(link, event.currentTarget)}
-        className='flex h-7 cursor-not-allowed items-center rounded-md px-2.5 text-[13px] text-neutral-400 dark:text-neutral-600'
+        onMouseLeave={() => setHover(null)}
+        className='flex h-8 cursor-not-allowed items-center gap-2 rounded-md px-2.5 text-sm text-neutral-400 dark:text-neutral-600'
       >
         <span className='truncate'>{link.label}</span>
+        {link.hideBadge ? null : <SoonBadge />}
       </span>
     );
   }
@@ -65,98 +50,163 @@ function NavItem({
       href={link.href}
       aria-current={active ? 'page' : undefined}
       onMouseEnter={event => showPreview(link, event.currentTarget)}
+      onMouseLeave={() => setHover(null)}
       onFocus={event => showPreview(link, event.currentTarget)}
       onBlur={() => setHover(null)}
       className={cn(
-        'flex h-7 items-center rounded-md px-2.5 text-[13px] transition-colors',
-        active ? 'bg-foreground/[0.07] text-foreground' : 'hover:text-foreground text-neutral-500',
+        'focus-visible:ring-foreground/60 flex h-8 items-center rounded-md px-2.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset',
+        active ? 'bg-foreground/[0.06] text-foreground font-medium' : 'hover:text-foreground text-neutral-500',
       )}
     >
       {link.label}
     </Link>
   );
 }
-function NavSectionGroup({
-  section,
-  pathname,
-  showPreview,
-  setHover,
-}: {
-  section: (typeof sections)[number];
-  pathname: string;
-  showPreview: (link: NavLink, element: HTMLElement) => void;
-  setHover: (value: null) => void;
-}) {
-  const containsActive = section.groups.some(group => group.links.some(link => link.href === pathname));
-  const [expanded, setExpanded] = React.useState(containsActive || section.label === 'Authentication');
-  const panelId = React.useId();
-  const comingSoon = section.groups.every(group => group.links.every(link => link.comingSoon));
+function SoonBadge() {
   return (
-    <div className='mt-3 flex flex-col'>
-      <button
-        type='button'
-        aria-expanded={expanded}
-        aria-controls={panelId}
-        onClick={() => setExpanded(value => !value)}
-        className='text-foreground hover:bg-foreground/[0.04] flex h-8 items-center justify-between rounded-md px-2.5 text-[13px] font-medium transition-colors'
-      >
-        <span className='flex items-center gap-2'>
-          {section.label}
-          {comingSoon ? (
-            <span className='bg-foreground/[0.06] rounded-full px-2 py-0.5 text-[11px] font-medium text-neutral-500'>
-              Coming soon
-            </span>
-          ) : null}
-        </span>
-        <svg
-          viewBox='0 0 16 16'
-          className={cn(
-            'size-4 text-neutral-400 transition-transform duration-300 motion-reduce:transition-none',
-            expanded && 'rotate-180',
-          )}
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='1.5'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          aria-hidden='true'
-        >
-          <path d='m4 6 4 4 4-4' />
-        </svg>
-      </button>
-      <div
-        id={panelId}
-        className={cn(
-          'grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
-          expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
-        )}
-        {...(expanded ? {} : { inert: true })}
-      >
-        <div className='overflow-hidden'>
-          {section.groups.map(group => (
-            <div
-              key={group.label}
-              className='mt-2 flex flex-col first:mt-1'
-            >
-              <div className='flex h-6 items-center px-2.5 text-[11px] font-medium text-neutral-400 dark:text-neutral-500'>
-                {group.label}
-              </div>
-              {group.links.map(link => (
-                <NavItem
-                  key={link.href}
-                  link={link}
-                  pathname={pathname}
-                  showPreview={showPreview}
-                  setHover={setHover}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+    <span className='bg-foreground/[0.06] ml-auto shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium text-neutral-500'>
+      Soon
+    </span>
+  );
+}
+const HEADER_CLASS =
+  'flex h-8 items-center gap-2 px-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-neutral-500';
+function CountBadge({ count }: { count: number }) {
+  return (
+    <span className='bg-foreground/[0.06] rounded-full px-2 py-0.5 text-[11px] font-medium normal-case tracking-normal text-neutral-500'>
+      {count}
+    </span>
+  );
+}
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox='0 0 16 16'
+      className={cn(
+        'size-4 text-neutral-400 transition-transform duration-300 motion-reduce:transition-none',
+        !open && '-rotate-90',
+      )}
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      aria-hidden='true'
+    >
+      <path d='m4 6 4 4 4-4' />
+    </svg>
+  );
+}
+function Collapsible({ open, id, children }: { open: boolean; id: string; children: React.ReactNode }) {
+  return (
+    <div
+      id={id}
+      className={cn(
+        'grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none',
+        open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+      )}
+      {...(open ? {} : { inert: true })}
+    >
+      <div className='overflow-hidden'>
+        <div className='border-foreground/10 ml-3 flex flex-col border-l pl-2'>{children}</div>
       </div>
     </div>
   );
 }
+type RowProps = {
+  pathname: string;
+  showPreview: (link: NavLink, element: HTMLElement) => void;
+  setHover: (value: null) => void;
+};
+function ComponentRow({ item, pathname, showPreview, setHover }: RowProps & { item: CatalogItem }) {
+  const href = itemHref('blocks', item.slug);
+  const parts = item.children ?? [];
+  const containsActive = pathname === href || parts.some(part => itemHref('blocks', part.slug) === pathname);
+  const [open, setOpen] = React.useState(containsActive);
+  const [seen, setSeen] = React.useState(pathname);
+  if (seen !== pathname) {
+    setSeen(pathname);
+    if (containsActive) {
+      setOpen(true);
+    }
+  }
+  const panelId = React.useId();
+  const link: NavLink = { href, label: item.title, slug: item.slug, comingSoon: item.soon };
+  if (parts.length === 0) {
+    return (
+      <NavItem
+        link={link}
+        pathname={pathname}
+        showPreview={showPreview}
+        setHover={setHover}
+      />
+    );
+  }
+  const current = pathname === href;
+  return (
+    <div className='flex flex-col'>
+      <div
+        className={cn(
+          'has-[:focus-visible]:ring-foreground/60 flex items-center rounded-md transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-inset',
+          current ? 'bg-foreground/[0.06]' : 'hover:bg-foreground/[0.03]',
+        )}
+      >
+        {item.soon ? (
+          <span
+            aria-disabled='true'
+            onMouseEnter={event => showPreview(link, event.currentTarget)}
+            onMouseLeave={() => setHover(null)}
+            className='flex h-8 min-w-0 flex-1 cursor-not-allowed items-center gap-2 px-2.5 text-sm text-neutral-400 dark:text-neutral-600'
+          >
+            <span className='truncate'>{item.title}</span>
+            <SoonBadge />
+          </span>
+        ) : (
+          <Link
+            href={href}
+            aria-current={current ? 'page' : undefined}
+            onMouseEnter={event => showPreview(link, event.currentTarget)}
+            onMouseLeave={() => setHover(null)}
+            onFocus={event => showPreview(link, event.currentTarget)}
+            onBlur={() => setHover(null)}
+            className={cn(
+              'flex h-8 min-w-0 flex-1 items-center px-2.5 text-sm outline-none transition-colors',
+              current ? 'text-foreground font-medium' : 'hover:text-foreground text-neutral-500',
+            )}
+          >
+            {item.title}
+          </Link>
+        )}
+        <button
+          type='button'
+          aria-expanded={open}
+          aria-controls={panelId}
+          aria-label={`${open ? 'Collapse' : 'Expand'} ${item.title}`}
+          onClick={() => setOpen(value => !value)}
+          className='flex size-8 shrink-0 items-center justify-center outline-none'
+        >
+          <Chevron open={open} />
+        </button>
+      </div>
+      <Collapsible
+        open={open}
+        id={panelId}
+      >
+        {parts.map(part => (
+          <NavItem
+            key={part.slug}
+            link={{ href: itemHref('blocks', part.slug), label: part.title, comingSoon: part.soon }}
+            pathname={pathname}
+            showPreview={showPreview}
+            setHover={setHover}
+          />
+        ))}
+      </Collapsible>
+    </div>
+  );
+}
+const flowItems = CATALOG.blocks.flatMap(category => category.groups.flatMap(group => group.items));
+const pieceItems = CATALOG.components.flatMap(category => category.groups.flatMap(group => group.items));
 function SidebarIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -203,7 +253,7 @@ function HoverPreview({
       <div
         aria-hidden='true'
         style={position}
-        className='pointer-events-none fixed z-40 hidden lg:block'
+        className='pointer-events-none fixed z-40 hidden transition-[top] duration-200 ease-out [animation:sidebar-preview-in_160ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:[animation:none] lg:block'
       >
         <div className='ring-foreground/10 bg-background flex aspect-[16/10] flex-col items-center justify-center gap-3 rounded-2xl shadow-2xl ring-1'>
           <span className='bg-foreground/[0.06] ring-foreground/10 flex size-11 items-center justify-center rounded-full ring-1'>
@@ -241,7 +291,7 @@ function HoverPreview({
     <div
       aria-hidden='true'
       style={position}
-      className='pointer-events-none fixed z-40 hidden lg:block'
+      className='pointer-events-none fixed z-40 hidden transition-[top] duration-200 ease-out [animation:sidebar-preview-in_160ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:[animation:none] lg:block'
     >
       <MosaicProvider>
         <ScaledFrame
@@ -257,19 +307,49 @@ function HoverPreview({
 }
 export function DocsShell({ children }: { title?: string; children: React.ReactNode }) {
   const pathname = usePathname();
+  const home = pathname === '/';
   const [mobileOpen, setMobileOpen] = React.useState(false);
   React.useEffect(() => {
-    const frame = requestAnimationFrame(() => setMobileOpen(false));
+    const frame = requestAnimationFrame(() => {
+      setMobileOpen(false);
+    });
     return () => cancelAnimationFrame(frame);
   }, [pathname]);
-  const [hover, setHover] = React.useState<{ slug: string; top: number; comingSoon?: boolean } | null>(null);
-  const showPreview = (link: NavLink, element: HTMLElement) => {
-    if (link.slug) {
-      setHover({ slug: link.slug, top: element.getBoundingClientRect().top, comingSoon: link.comingSoon });
-    }
+  const [hover, setHoverState] = React.useState<{ slug: string; top: number; comingSoon?: boolean } | null>(null);
+  const timers = React.useRef({ show: 0, hide: 0 });
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const setHover = (value: null) => {
+    window.clearTimeout(timers.current.show);
+    window.clearTimeout(timers.current.hide);
+    timers.current.hide = window.setTimeout(() => setHoverState(value), PREVIEW_GRACE);
   };
+  const showPreview = (link: NavLink, element: HTMLElement) => {
+    window.clearTimeout(timers.current.show);
+    window.clearTimeout(timers.current.hide);
+    if (!link.slug) {
+      setHover(null);
+      return;
+    }
+    const next = { slug: link.slug, top: element.getBoundingClientRect().top, comingSoon: link.comingSoon };
+    if (hover) {
+      setHoverState(next);
+      return;
+    }
+    timers.current.show = window.setTimeout(() => setHoverState(next), PREVIEW_DELAY);
+  };
+  React.useEffect(() => {
+    const pending = timers.current;
+    return () => {
+      window.clearTimeout(pending.show);
+      window.clearTimeout(pending.hide);
+    };
+  }, []);
+  React.useEffect(() => {
+    scrollRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'nearest' });
+  }, [pathname]);
   return (
     <div className='bg-background text-foreground min-h-svh'>
+      <TopNav />
       <button
         type='button'
         tabIndex={-1}
@@ -279,37 +359,23 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
       />
       <aside
         aria-label='Site'
-        style={
-          {
-            width: SIDEBAR_WIDTH,
-            '--glass-r': '1.5rem',
-            ...glassStyle({ light: 'white', dark: 'gray-850' }),
-          } as React.CSSProperties
-        }
+        style={{ width: SIDEBAR_WIDTH }}
         className={cn(
-          GLASS_SCHEME,
-          GLASS_EDGES,
-          'fixed bottom-3 left-3 top-3 isolate z-30 flex-col rounded-3xl transition-[opacity,translate] duration-700 lg:flex',
-          mobileOpen ? 'flex' : 'hidden',
+          'bg-background border-foreground/10 fixed bottom-0 left-0 top-14 z-30 flex-col border-r transition-[opacity,translate] duration-700 lg:flex',
+          mobileOpen ? 'flex shadow-2xl' : 'hidden',
+          home && '!hidden',
         )}
       >
-        <div className='bg-(--glass-fill) absolute inset-0 -z-20 rounded-[inherit] backdrop-blur-md [box-shadow:var(--glass-shadow)]' />
-        <div className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 pt-4 [scrollbar-width:none]'>
-          <Link
-            href='/'
-            aria-label='Clerk components home'
-            className='px-2.5'
-          >
-            <ClerkComponentsLogo className='h-4' />
-          </Link>
+        <div
+          ref={scrollRef}
+          className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-4 pt-5 [scrollbar-width:none]'
+        >
           <nav
             className='relative flex flex-col'
             onMouseLeave={() => setHover(null)}
           >
             <div className='flex flex-col'>
-              <div className='text-foreground flex h-7 items-center px-2.5 text-[13px] font-medium'>
-                Getting started
-              </div>
+              <div className={HEADER_CLASS}>Getting started</div>
               {gettingStarted.map(link => (
                 <NavItem
                   key={link.href}
@@ -320,31 +386,76 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
                 />
               ))}
             </div>
-            {sections.map(section => (
-              <NavSectionGroup
-                key={section.label}
-                section={section}
-                pathname={pathname}
-                showPreview={showPreview}
-                setHover={setHover}
-              />
-            ))}
+            <div className='mt-6 flex flex-col'>
+              <Link
+                href='/blocks'
+                className={cn(HEADER_CLASS, 'hover:text-foreground transition-colors')}
+              >
+                Blocks
+                <CountBadge count={flowItems.length} />
+              </Link>
+              {CATALOG.blocks.map(category => (
+                <div
+                  key={category.id}
+                  className='flex flex-col'
+                >
+                  <div className='text-foreground/50 mt-4 px-2 pb-1 text-[12px] font-medium first:mt-1'>
+                    {category.label}
+                  </div>
+                  {category.groups
+                    .flatMap(group => group.items)
+                    .map(item => (
+                      <ComponentRow
+                        key={item.slug}
+                        item={item}
+                        pathname={pathname}
+                        showPreview={showPreview}
+                        setHover={setHover}
+                      />
+                    ))}
+                </div>
+              ))}
+            </div>
+            <div className='mt-6 flex flex-col'>
+              <Link
+                href='/components'
+                className={cn(HEADER_CLASS, 'hover:text-foreground transition-colors')}
+              >
+                Components
+                <CountBadge count={pieceItems.length} />
+                {pieceItems.every(item => item.soon) ? (
+                  <span className='bg-foreground/[0.06] rounded-full px-2 py-0.5 text-[11px] font-medium normal-case tracking-normal text-neutral-500'>
+                    Soon
+                  </span>
+                ) : null}
+              </Link>
+              {pieceItems.map(item => (
+                <NavItem
+                  key={item.slug}
+                  link={{
+                    href: itemHref('components', item.slug),
+                    label: item.title,
+                    comingSoon: item.soon,
+                    hideBadge: true,
+                  }}
+                  pathname={pathname}
+                  showPreview={showPreview}
+                  setHover={setHover}
+                />
+              ))}
+            </div>
           </nav>
-        </div>
-        <div className='flex shrink-0 items-center px-3 py-3 max-lg:hidden'>
-          <ThemeToggle />
         </div>
       </aside>
       {hover ? (
         <HoverPreview
-          left={SIDEBAR_WIDTH + 24}
+          left={SIDEBAR_WIDTH + 12}
           slug={hover.slug}
           top={hover.top}
           comingSoon={hover.comingSoon}
         />
       ) : null}
-      <div className='fixed bottom-4 left-4 z-40 flex items-center gap-2 lg:hidden'>
-        <ThemeToggle className='lg:hidden' />
+      <div className={cn('fixed bottom-4 left-4 z-40 flex items-center gap-2 lg:hidden', home && 'hidden')}>
         <button
           type='button'
           aria-expanded={mobileOpen}
@@ -355,7 +466,7 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
           <SidebarIcon className='size-[18px]' />
         </button>
       </div>
-      <div className='lg:pl-64'>{children}</div>
+      <div className={cn(!home && 'lg:pl-64')}>{children}</div>
     </div>
   );
 }

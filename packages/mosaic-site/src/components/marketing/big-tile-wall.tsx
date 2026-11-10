@@ -1,10 +1,10 @@
 'use client';
 import * as React from 'react';
 
+import { usePalette } from '@/components/marketing/tile-settings';
 import { type Stagger, TileWall } from '@/components/marketing/tile-wall';
 import { MARK_PIECES, MARK_VIEWBOX } from '@/lib/brand/mark';
 import { type GlyphId, GLYPHS } from '@/lib/brand/product-glyphs';
-import { PALETTE } from '@/lib/brand/tile-palettes';
 import { LOGO_PARTS, LOGO_SIZE } from '@/lib/mosaic-logo/clerk-logo';
 
 const SIZE = 200;
@@ -43,7 +43,7 @@ const FRAME_CORNERS = [
 ];
 
 function Frame() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {FRAME_CORNERS.map(([x, y]) => (
@@ -67,7 +67,7 @@ function Frame() {
 }
 
 function ClerkMark() {
-  const p = PALETTE;
+  const p = usePalette();
   const offset = 100 - (LOGO_SIZE * MARK_SCALE) / 2;
   return (
     <>
@@ -93,7 +93,7 @@ function ClerkMark() {
 }
 
 function MosaicMark() {
-  const p = PALETTE;
+  const p = usePalette();
   const [, , width, height] = MARK_VIEWBOX.split(' ').map(Number);
   const scale = 118 / width;
   return (
@@ -129,7 +129,7 @@ function MosaicMark() {
 }
 
 function Keyhole() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       <Frame />
@@ -157,7 +157,7 @@ function Keyhole() {
 }
 
 function Shield() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       <Frame />
@@ -180,7 +180,7 @@ function Shield() {
 }
 
 function Glyph({ glyph }: { glyph: GlyphId }) {
-  const p = PALETTE;
+  const p = usePalette();
   const { size, parts } = GLYPHS[glyph];
   const scale = (glyph === 'organizations' ? 112 : 100) / Math.max(size[0], size[1]);
   const x = 100 - (size[0] * scale) / 2;
@@ -219,7 +219,7 @@ function Glyph({ glyph }: { glyph: GlyphId }) {
 }
 
 function UserBadge({ id }: { id: string }) {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       <Frame />
@@ -255,7 +255,7 @@ function UserBadge({ id }: { id: string }) {
 }
 
 function Diamonds() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {[
@@ -290,7 +290,7 @@ function Diamonds() {
 }
 
 function Pinwheel() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       <path
@@ -315,7 +315,7 @@ function Pinwheel() {
 }
 
 function Petals() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {CELLS.map(cell => {
@@ -339,7 +339,7 @@ function Petals() {
 }
 
 function Rings({ id }: { id: string }) {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       <defs>
@@ -397,7 +397,7 @@ function Rings({ id }: { id: string }) {
 const range = (count: number) => Array.from({ length: count }, (_, index) => index);
 
 function Scales() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {range(7).map(row =>
@@ -432,7 +432,7 @@ function Scales() {
 }
 
 function Chevrons() {
-  const p = PALETTE;
+  const p = usePalette();
   const fills = [p.brand, p.paper, p.soft, p.paper, p.deep, p.ring];
   return (
     <>
@@ -459,7 +459,7 @@ function Chevrons() {
 }
 
 function Checker() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {range(8).map(row =>
@@ -488,7 +488,7 @@ function Checker() {
 }
 
 function Stars() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {[
@@ -543,46 +543,8 @@ function Stars() {
   );
 }
 
-function Arches() {
-  const p = PALETTE;
-  return (
-    <>
-      {[100, 200].map((base, row) =>
-        range(4).map(column => {
-          const x = column * 50;
-          return (
-            <g key={`${row}-${column}`}>
-              <path
-                d={`M${x + 2} ${base}V${base - 35}A23 23 0 0 1 ${x + 48} ${base - 35}V${base}Z`}
-                fill={(column + row) % 2 ? p.soft : p.brand}
-              />
-              <path
-                d={`M${x + 11} ${base}V${base - 35}A14 14 0 0 1 ${x + 39} ${base - 35}V${base}Z`}
-                fill={p.paper}
-              />
-              <circle
-                cx={x + 25}
-                cy={base - 40}
-                r={5}
-                fill={p.deep}
-              />
-            </g>
-          );
-        }),
-      )}
-      {range(4).map(column => (
-        <polygon
-          key={column}
-          points={diamond(column * 50 + 25, 20, 9)}
-          fill={p.ring}
-        />
-      ))}
-    </>
-  );
-}
-
 function Quatrefoil() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {[
@@ -629,7 +591,7 @@ function Quatrefoil() {
 }
 
 function Bands() {
-  const p = PALETTE;
+  const p = usePalette();
   const fills = [p.ring, p.brand, p.paper, p.soft, p.paper, p.deep, p.paper];
   return (
     <>
@@ -645,7 +607,7 @@ function Bands() {
 }
 
 function Dots() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {range(4).map(row =>
@@ -680,7 +642,7 @@ function Dots() {
 }
 
 function Triangles() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {range(4).map(row =>
@@ -713,7 +675,7 @@ function Triangles() {
 }
 
 function Lattice() {
-  const p = PALETTE;
+  const p = usePalette();
   return (
     <>
       {range(7).map(row =>
@@ -769,8 +731,6 @@ export function BigTileArt({ design, id }: { design: string; id: string }) {
       return <Checker />;
     case 'stars':
       return <Stars />;
-    case 'arches':
-      return <Arches />;
     case 'quatrefoil':
       return <Quatrefoil />;
     case 'bands':
@@ -796,6 +756,7 @@ export function BigTileGrid({
   built,
   fromOpener,
   run,
+  seedOrigin,
   stagger,
   appear,
   lightFrom,
@@ -810,9 +771,10 @@ export function BigTileGrid({
   appear?: 'scatter' | 'fade' | 'static';
   lightFrom?: 'top' | 'bottom';
   matte?: boolean;
+  seedOrigin?: { column: number; row: number };
 }) {
   const id = React.useId().replace(/:/g, '');
-  const p = PALETTE;
+  const p = usePalette();
   const bigRows = Math.ceil(designs.length / bigColumns);
   return (
     <TileWall
@@ -821,6 +783,7 @@ export function BigTileGrid({
       built={built}
       fromOpener={fromOpener}
       run={run}
+      seedOrigin={seedOrigin}
       stagger={stagger}
       appear={appear}
       lightFrom={lightFrom}
@@ -853,17 +816,17 @@ export function BigTileGrid({
 export const QUILT = {
   designs: [
     'petals',
-    'clerk',
+    'scales',
     'diamonds',
-    'shield',
+    'chevrons',
     'rings',
-    'organizations',
-    'billing',
+    'stars',
+    'quatrefoil',
     'pinwheel',
-    'mosaic',
-    'authentication',
-    'diamonds',
-    'petals',
+    'checker',
+    'triangles',
+    'lattice',
+    'dots',
   ],
   bigColumns: 6,
 };

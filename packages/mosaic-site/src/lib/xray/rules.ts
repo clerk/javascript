@@ -2,8 +2,8 @@ export type XrayLayer = 'all-in-one' | 'blocks' | 'custom';
 export type XrayMeta = { layer: XrayLayer; name: string; hooks: string[] };
 export type XrayRule = { selector: string; resolve: (element: Element) => XrayMeta | null };
 export const XRAY_LAYERS: Record<XrayLayer, { label: string; color: string }> = {
-  'all-in-one': { label: 'All-in-one', color: '#8b5cf6' },
-  blocks: { label: 'Blocks', color: '#06b6d4' },
+  'all-in-one': { label: 'Block', color: '#8b5cf6' },
+  blocks: { label: 'Components', color: '#06b6d4' },
   custom: { label: 'Custom', color: '#f59e0b' },
 };
 const REVERIFY = 'useReverificationFlow';

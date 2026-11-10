@@ -10,6 +10,7 @@
     "moduleDetection": "force",
     "lib": ["ES2023", "DOM"],
     "paths": {
+      "@/lib/types": ["../swingset/src/lib/types"],
       "@/lib/chaos": ["../swingset/src/lib/chaos"],
       "@/components/ChaosProvider": ["../swingset/src/components/ChaosProvider"],
       "@/*": ["./src/*"],

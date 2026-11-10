@@ -6,8 +6,8 @@ import { Skeleton } from '@/components/gallery/app-wireframe';
 import { DEMOS } from '@/components/gallery/demos';
 import { ComponentDocs } from '@/components/gallery/docs';
 import { EdgeGrid } from '@/components/gallery/edge-grid';
-import { OptionPicker, RemixIcon, ThemeIcon } from '@/components/gallery/option-picker';
-import { PropertiesMenu, type Property } from '@/components/gallery/properties-menu';
+import { OptionPicker, RemixIcon } from '@/components/gallery/option-picker';
+import { PropertiesIcon, type Property, PropertyGroups } from '@/components/gallery/properties-menu';
 import { useApplyRemix } from '@/components/gallery/remix';
 import { useEmbedScrollReceiver } from '@/components/gallery/scroll-bridge';
 import { SegmentedControl } from '@/components/gallery/segmented-control';
@@ -20,13 +20,12 @@ import {
   type UserButtonType,
 } from '@/components/gallery/user-button-stage';
 import { ViewSwitcher } from '@/components/gallery/view-switcher';
-import { XrayLegend, XrayOverlay } from '@/components/gallery/xray';
-import { BrowserFrame } from '@/components/marketing/browser-frame';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { BrowserChrome, BrowserFrame } from '@/components/marketing/browser-frame';
+import { useMosaicTheme } from '@/components/use-mosaic-theme';
 import { DEFAULT_FRAME, frameUrlFor } from '@/lib/components/frame';
 import { COMPONENT_META } from '@/lib/components/meta';
 import { REMIX_MESSAGE, REMIXES_BY_SLUG, type RemixId } from '@/lib/components/remix';
-import { THEME_MESSAGE, type ThemeId, THEMES } from '@/lib/components/theme';
+import { THEME_MESSAGE } from '@/lib/components/theme';
 import { cn } from '@/lib/utils';
 const viewports = [
   {
@@ -331,16 +330,39 @@ const VIEW_OPTIONS = [
 ];
 const pill =
   'flex items-center gap-1 rounded-full bg-white p-1 shadow-[0_0_0_1px_--theme(--color-gray-950/0.06),0_8px_24px_-8px_--theme(--color-gray-950/0.18)] dark:bg-gray-900 dark:shadow-[0_0_0_1px_--theme(--color-white/0.08),0_8px_24px_-8px_--theme(--color-black/0.6)]';
+const GROUPED = 'flex items-center';
+function ToolbarDivider() {
+  return (
+    <span
+      aria-hidden='true'
+      className='bg-foreground/10 mx-1 h-5 w-px shrink-0'
+    />
+  );
+}
+type ModeId = 'user' | 'organization' | 'combined';
+const MODE_OPTIONS: { id: ModeId; label: string }[] = [
+  { id: 'user', label: 'User' },
+  { id: 'organization', label: 'Organization' },
+  { id: 'combined', label: 'Both' },
+];
+const PROFILE_PREVIEW: Record<ModeId, string> = {
+  user: 'user-profile',
+  organization: 'organization-profile',
+  combined: 'combined-profile',
+};
 export function ComponentDetail({ slug }: { slug: string }) {
   const index = COMPONENT_META.findIndex(item => item.slug === slug);
   const meta = COMPONENT_META[index];
-  const Demo = DEMOS[slug];
   useEmbedScrollReceiver();
   const [chosenViewport, setViewport] = React.useState<(typeof viewports)[number]['id']>('desktop');
   const narrow = useNarrow();
   const viewport = narrow ? 'mobile' : chosenViewport;
   const [warm, setWarm] = React.useState(false);
   const stageSlug = slug === 'user-button' || slug === 'organization-switcher';
+  const profileSlug = slug === 'user-profile';
+  const [profileMode, setProfileMode] = React.useState<ModeId>('user');
+  const previewSlug = profileSlug ? PROFILE_PREVIEW[profileMode] : slug;
+  const Demo = DEMOS[previewSlug];
   const [buttonType, setButtonType] = React.useState<UserButtonType>(
     slug === 'organization-switcher' ? 'org' : 'combined',
   );
@@ -350,11 +372,9 @@ export function ComponentDetail({ slug }: { slug: string }) {
     size: 'full',
   });
   const [chosenMode, setMode] = React.useState<'flush' | 'modal' | 'fullscreen'>('flush');
-  const [theme, setTheme] = React.useState<ThemeId>('default');
+  const [theme] = useMosaicTheme();
   const [remix, setRemix] = React.useState<RemixId>('default');
-  const [source, setSource] = React.useState<'component' | 'blocks'>('component');
-  const [xray, setXray] = React.useState(false);
-  const [flushTarget, setFlushTarget] = React.useState<HTMLElement | null>(null);
+  const [source] = React.useState<'component' | 'blocks'>('component');
   const remixOptions = REMIXES_BY_SLUG[slug];
   const blocks = Boolean(remixOptions) && source === 'blocks';
   const themable = !blocks;
@@ -370,8 +390,6 @@ export function ComponentDetail({ slug }: { slug: string }) {
       ]
     : [];
   const showModal = Boolean(meta.modal) && mode === 'modal';
-  const xrayAvailable = slug === 'user-profile' && viewport === 'desktop' && mode === 'flush';
-  const xrayActive = xray && xrayAvailable;
   const properties: Property[] = [
     ...(meta.modal && !blocks
       ? [
@@ -390,30 +408,31 @@ export function ComponentDetail({ slug }: { slug: string }) {
           size: buttonSize,
           onType: setButtonType,
           onSize: setButtonSize,
-          ...(slug === 'organization-switcher' ? { types: [] } : {}),
+          types: [],
         })
       : []),
   ];
-  const sourceToggle = remixOptions ? (
-    <div className={pill}>
-      <SegmentedControl
-        label='Source'
-        value={source}
-        cellWidth={96}
-        options={[
-          { id: 'component', label: 'Component' },
-          { id: 'blocks', label: 'Blocks' },
-        ]}
-        onChange={id => {
-          setSource(id);
-          if (id === 'blocks' && remix === 'default') {
-            setRemix(remixOptions.find(option => option.id !== 'default')?.id ?? 'default');
-          }
-        }}
-      />
-    </div>
-  ) : null;
-  const frameUrl = frameUrlFor(slug);
+  const switcherMode: ModeId = buttonType === 'org' ? 'organization' : buttonType === 'user' ? 'user' : 'combined';
+  const modeValue = profileSlug ? profileMode : switcherMode;
+  const modeToggle =
+    profileSlug || slug === 'user-button' ? (
+      <div className={pill}>
+        <SegmentedControl
+          label='Mode'
+          value={modeValue}
+          cellWidth={112}
+          options={MODE_OPTIONS}
+          onChange={id => {
+            if (profileSlug) {
+              setProfileMode(id);
+              return;
+            }
+            setButtonType(id === 'organization' ? 'org' : id === 'user' ? 'user' : 'combined');
+          }}
+        />
+      </div>
+    ) : null;
+  const frameUrl = frameUrlFor(previewSlug);
   const heroText = stageSlug && viewport !== 'mobile';
   React.useEffect(() => {
     const timer = window.setTimeout(() => setWarm(true), 150);
@@ -433,7 +452,7 @@ export function ComponentDetail({ slug }: { slug: string }) {
               title={meta.title}
               description={meta.description}
             >
-              {sourceToggle}
+              {modeToggle}
             </PageTitle>
             <ViewSwitcher
               viewport={viewport}
@@ -442,30 +461,23 @@ export function ComponentDetail({ slug }: { slug: string }) {
                 <div className='relative h-[820px] w-full overflow-hidden'>
                   <Fade
                     active={mode === 'flush'}
-                    className='flex items-center justify-center px-4 md:px-8'
+                    className='flex items-start justify-center px-4 md:px-8'
                   >
-                    <div
-                      ref={setFlushTarget}
-                      className='relative w-[min(100%,1170px)] max-w-full'
-                    >
+                    <div className='relative w-[min(100%,1170px)] max-w-full'>
                       <BrowserFrame
-                        config={{ ...DEFAULT_FRAME, slug, url: frameUrl }}
+                        config={{ ...DEFAULT_FRAME, slug: previewSlug, url: frameUrl }}
                         interactive
                         className='w-full'
-                      />
-                      <XrayOverlay
-                        target={flushTarget}
-                        active={xrayActive}
                       />
                     </div>
                   </Fade>
                   <Fade
                     active={mode === 'fullscreen'}
-                    className='flex items-center justify-center px-4 md:px-8'
+                    className='flex items-start justify-center px-4 md:px-8'
                   >
                     <div className='relative w-[min(100%,1170px)] max-w-full'>
                       <BrowserFrame
-                        config={{ ...DEFAULT_FRAME, slug, url: frameUrl, mode: 'fullscreen' }}
+                        config={{ ...DEFAULT_FRAME, slug: previewSlug, url: frameUrl, mode: 'fullscreen' }}
                         interactive
                         className='w-full'
                       />
@@ -477,9 +489,9 @@ export function ComponentDetail({ slug }: { slug: string }) {
                   >
                     <div className='relative w-[min(100%,1170px)] max-w-full'>
                       <BrowserFrame
-                        config={{ ...DEFAULT_FRAME, slug, url: frameUrl }}
+                        config={{ ...DEFAULT_FRAME, slug: previewSlug, url: frameUrl }}
                         embed={{
-                          src: `/embed/${slug}/modal?theme=${activeTheme}&remix=${activeRemix}`,
+                          src: `/embed/${previewSlug}/modal?theme=${activeTheme}&remix=${activeRemix}`,
                           title: `${meta.title} in a dialog`,
                         }}
                         className='w-full'
@@ -492,8 +504,8 @@ export function ComponentDetail({ slug }: { slug: string }) {
                 <div className='flex min-h-[820px] w-full items-center justify-center'>
                   <FitWidth width={410}>
                     <PhoneFrame
-                      src={`/embed/${slug}`}
-                      modalSrc={`/embed/${slug}/modal`}
+                      src={`/embed/${previewSlug}`}
+                      modalSrc={`/embed/${previewSlug}/modal`}
                       message={appearanceMessages.length > 0 ? appearanceMessages : undefined}
                       showModal={showModal}
                       title={meta.title}
@@ -510,7 +522,7 @@ export function ComponentDetail({ slug }: { slug: string }) {
                 title={meta.title}
                 description={meta.description}
               >
-                {sourceToggle}
+                {modeToggle}
               </PageTitle>
             )}
             <Stage
@@ -522,7 +534,7 @@ export function ComponentDetail({ slug }: { slug: string }) {
                   title={meta.title}
                   description={meta.description}
                 >
-                  {sourceToggle}
+                  {modeToggle}
                 </PageTitle>
               ) : null}
               <ViewSwitcher
@@ -537,7 +549,14 @@ export function ComponentDetail({ slug }: { slug: string }) {
                           size={buttonSize}
                         />
                       ) : (
-                        <Demo />
+                        <BrowserChrome
+                          url={frameUrl}
+                          className='w-full'
+                        >
+                          <div className='flex justify-center bg-[var(--cl-color-page,#fff)] px-8 py-14'>
+                            <Demo />
+                          </div>
+                        </BrowserChrome>
                       )}
                     </div>
                   </div>
@@ -549,8 +568,8 @@ export function ComponentDetail({ slug }: { slug: string }) {
                         <PhoneFrame
                           src={
                             stageSlug
-                              ? `/embed/${slug}?type=${initialButton.type}&size=${initialButton.size}`
-                              : `/embed/${slug}`
+                              ? `/embed/${previewSlug}?type=${initialButton.type}&size=${initialButton.size}`
+                              : `/embed/${previewSlug}`
                           }
                           message={
                             stageSlug
@@ -568,8 +587,8 @@ export function ComponentDetail({ slug }: { slug: string }) {
                     <PhoneFrame
                       src={
                         stageSlug
-                          ? `/embed/${slug}?type=${initialButton.type}&size=${initialButton.size}`
-                          : `/embed/${slug}`
+                          ? `/embed/${previewSlug}?type=${initialButton.type}&size=${initialButton.size}`
+                          : `/embed/${previewSlug}`
                       }
                       message={
                         stageSlug
@@ -588,25 +607,12 @@ export function ComponentDetail({ slug }: { slug: string }) {
           </>
         )}
         <div className='pointer-events-none sticky bottom-5 z-20 mt-6 flex w-full justify-center'>
-          <div className='pointer-events-auto flex flex-wrap items-center justify-center gap-2'>
-            {xrayAvailable ? (
-              <div className={pill}>
-                <button
-                  type='button'
-                  aria-pressed={xray}
-                  onClick={() => setXray(value => !value)}
-                  className={cn(
-                    'flex h-8 items-center gap-2 rounded-full px-3 text-sm transition-colors',
-                    xray ? 'bg-foreground text-background' : 'hover:bg-foreground/[0.06]',
-                  )}
-                >
-                  X-ray
-                </button>
-                {xrayActive ? <XrayLegend /> : null}
-              </div>
-            ) : null}
-            <div className={pill}>
-              {narrow ? null : (
+          <div
+            data-toolbar=''
+            className={cn(pill, 'pointer-events-auto')}
+          >
+            {narrow ? null : (
+              <>
                 <SegmentedControl
                   label='Preview size'
                   value={viewport}
@@ -622,26 +628,20 @@ export function ComponentDetail({ slug }: { slug: string }) {
                     }
                   }}
                 />
-              )}
-              <ThemeToggle className='border-0' />
-              {properties.length > 0 ? (
-                <PropertiesMenu
-                  properties={properties}
-                  pillClass={pill}
-                  embedded
-                />
-              ) : null}
-            </div>
-            {themable ? (
+                <ToolbarDivider />
+              </>
+            )}
+            {properties.length > 0 ? (
               <OptionPicker
-                label='Theme'
+                label='Customize'
                 slug={slug}
-                options={THEMES}
-                value={theme}
-                onChange={value => setTheme(value as ThemeId)}
-                previewQuery={id => `theme=${id}&remix=default`}
-                icon={() => <ThemeIcon />}
-                pillClass={pill}
+                options={[]}
+                value=''
+                onChange={() => {}}
+                previewQuery={() => ''}
+                icon={() => <PropertiesIcon />}
+                pillClass={GROUPED}
+                header={<PropertyGroups properties={properties} />}
               />
             ) : null}
             {blocks && remixOptions ? (
@@ -653,7 +653,7 @@ export function ComponentDetail({ slug }: { slug: string }) {
                 onChange={value => setRemix(value as RemixId)}
                 previewQuery={id => `remix=${id}&theme=default`}
                 icon={active => <RemixIcon active={active} />}
-                pillClass={pill}
+                pillClass={GROUPED}
               />
             ) : null}
           </div>

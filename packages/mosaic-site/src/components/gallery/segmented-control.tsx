@@ -28,6 +28,7 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (id: T) => void;
   cellWidth?: number;
+  fill?: boolean;
 }
 
 const FAST_SPRING = { type: 'spring', stiffness: 70 * 7, damping: 14 * Math.sqrt(7), mass: 1 } as const;
@@ -64,13 +65,23 @@ const LIT = clsx('pointer-events-none absolute inset-0 z-10');
 const LIT_OPTION = clsx('relative gap-1 text-xs/4 font-medium lg:text-sm');
 const TRACK = clsx('relative isolate', NAV_CHROME_FILL);
 const TRACK_FOCUS =
-  'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-gray-950 dark:has-[:focus-visible]:outline-white';
+  'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-gray-950/45 dark:has-[:focus-visible]:outline-white/50';
 const TRACK_SHADOW = clsx(
   '[box-shadow:0_0_0_0.5px_rgba(0_0_0/0.12),inset_2px_3px_4px_-3px_rgba(0_0_0/0.08),inset_2px_4px_15px_-8px_rgba(0_0_0/0.03)]',
   'dark:[box-shadow:0_0_0_0.5px_rgba(255_255_255/0.1),inset_2px_3px_4px_-3px_rgba(0_0_0/0.3)]',
 );
 
-function LitFace({ option, active, instant }: { option: SegmentedOption<string>; active: boolean; instant?: boolean }) {
+function LitFace({
+  option,
+  active,
+  instant,
+  showLabel,
+}: {
+  option: SegmentedOption<string>;
+  active: boolean;
+  instant?: boolean;
+  showLabel?: boolean;
+}) {
   return (
     <span
       className={clsx(
@@ -86,7 +97,7 @@ function LitFace({ option, active, instant }: { option: SegmentedOption<string>;
           instant={instant}
         />
       )}
-      {!option.icon && option.label}
+      {(!option.icon || showLabel) && option.label}
     </span>
   );
 }
@@ -98,6 +109,7 @@ export function SegmentedControl<T extends string>({
   value,
   onChange,
   cellWidth = 32,
+  fill = false,
 }: SegmentedControlProps<T>) {
   const name = useId();
   const [keyboard, setKeyboard] = useState(false);
@@ -249,7 +261,8 @@ export function SegmentedControl<T extends string>({
         TRACK,
         TRACK_SHADOW,
         keyboard && TRACK_FOCUS,
-        'inline-flex gap-0.5 rounded-full p-0.5',
+        fill ? 'flex w-full' : 'inline-flex',
+        'gap-0.5 rounded-full p-0.5',
         className,
       )}
     >
@@ -261,13 +274,13 @@ export function SegmentedControl<T extends string>({
           right: rightFinal,
           opacity: overlayOpacity,
         }}
-        className={clsx(PILL, 'inset-y-0')}
+        className={clsx(PILL, 'inset-y-0.5')}
       />
       <motion.div
         {...inertProps(true)}
         aria-hidden
         style={{ left: leftFinal, right: rightFinal, opacity: overlayOpacity }}
-        className={clsx(FILL, 'inset-y-0')}
+        className={clsx(FILL, 'inset-y-0.5')}
       />
 
       <motion.div
@@ -283,16 +296,17 @@ export function SegmentedControl<T extends string>({
           {options.map((option, i) => (
             <motion.div
               key={option.id}
-              className={clsx(LIT_OPTION, !option.icon && 'px-4')}
-              style={cellWidth && option.icon ? { width: cellWidth } : undefined}
+              className={clsx(LIT_OPTION, !option.icon && 'px-4', fill && 'flex-1')}
+              style={!fill && cellWidth && option.icon ? { width: cellWidth } : undefined}
               animate={{
-                x: i === active ? 0 : 12 * (active - i),
+                x: i === active || (option.icon && !fill) ? 0 : 12 * (active - i),
               }}
               transition={reduceMotion ? { duration: 0 } : X_SLOW_SPRING}
             >
               <LitFace
                 option={option}
                 active={i === active}
+                showLabel={fill}
               />
             </motion.div>
           ))}
@@ -301,7 +315,7 @@ export function SegmentedControl<T extends string>({
       {options.map((option, i) => (
         <label
           key={option.id}
-          style={cellWidth && option.icon ? { width: cellWidth } : undefined}
+          style={!fill && cellWidth && option.icon ? { width: cellWidth } : undefined}
           aria-label={option.icon ? option.label : undefined}
           ref={el => {
             labelRefs.current[i] = el;
@@ -311,6 +325,7 @@ export function SegmentedControl<T extends string>({
             'transition-colors',
             'after:absolute after:inset-y-0 after:-left-1 after:-right-1 first-of-type:after:left-0 last-of-type:after:right-0',
             option.icon ? 'justify-center' : 'px-4',
+            fill && 'flex-1',
             i === active
               ? 'text-gray-950 dark:text-white'
               : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
@@ -334,7 +349,7 @@ export function SegmentedControl<T extends string>({
               className='mr-0.5'
             />
           )}
-          {!option.icon && option.label}
+          {(!option.icon || fill) && option.label}
           {standIn && i === active && (
             <motion.span
               {...inertProps(true)}
@@ -346,12 +361,13 @@ export function SegmentedControl<T extends string>({
               <span className={clsx(FILL, 'inset-0')} />
               <span className={clsx(LIT, '[clip-path:inset(0_round_9999px)]')}>
                 <span
-                  className={clsx(LIT_OPTION, 'block', !option.icon && 'px-4')}
-                  style={cellWidth && option.icon ? { width: cellWidth } : undefined}
+                  className={clsx(LIT_OPTION, 'block', !option.icon && 'px-4', fill && 'w-full')}
+                  style={!fill && cellWidth && option.icon ? { width: cellWidth } : undefined}
                 >
                   <LitFace
                     option={option}
                     active
+                    showLabel={fill}
                   />
                 </span>
               </span>

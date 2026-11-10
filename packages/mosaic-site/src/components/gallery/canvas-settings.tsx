@@ -41,8 +41,9 @@ function ManageDialog({ row, children }: { row: CanvasRow; children: React.React
         <Card.Root
           elevation='overlay'
           renderBranding={false}
+          align='center'
         >
-          <Card.Header align='center'>
+          <Card.Header>
             <Card.Media>
               <RowIcon className='size-8' />
             </Card.Media>
@@ -67,10 +68,7 @@ export function CanvasSettings() {
     mfa: <UserProfileMfaSectionView {...mfa.section} />,
   };
   return (
-    <div
-      data-xray='canvas-settings'
-      className='flex w-full flex-col gap-10 px-10 pb-10 pt-6'
-    >
+    <div className='flex w-full flex-col gap-10 px-10 pb-10 pt-6'>
       <div className='flex flex-col gap-2'>
         <h3 className='text-[2rem] font-bold leading-10 tracking-[-0.02em]'>Account</h3>
         <p className='text-base text-neutral-600 dark:text-neutral-400'>

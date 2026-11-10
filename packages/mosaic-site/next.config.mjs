@@ -12,6 +12,29 @@ const swingsetSrc = resolve(__dirname, '../swingset/src');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack(config) {
+    const excludeRawQuery = rules => {
+      for (const rule of rules) {
+        if (!rule || typeof rule !== 'object') {
+          continue;
+        }
+        if (Array.isArray(rule.oneOf)) {
+          excludeRawQuery(rule.oneOf);
+        }
+        if (Array.isArray(rule.rules)) {
+          excludeRawQuery(rule.rules);
+        }
+        if (rule.oneOf || rule.rules || rule.type === 'asset/source') {
+          continue;
+        }
+        if (!rule.resourceQuery) {
+          rule.resourceQuery = { not: [/raw/] };
+        } else if (rule.resourceQuery.not) {
+          rule.resourceQuery.not.push(/raw/);
+        }
+      }
+    };
+    excludeRawQuery(config.module.rules);
+    config.module.rules.push({ resourceQuery: /raw/, type: 'asset/source' });
     const isDev = process.env.NODE_ENV !== 'production';
     config.plugins.push(
       stylexPlugin({

@@ -22,7 +22,7 @@ export const button = cva(
         ],
         navigation: [
           'label-3 rounded-md shadow-[0_2px_3px_-1px_--theme(--color-black/0.08),0_0_0_0.5px_--theme(--color-gray-950/0.18),0_1px_0_0_--theme(--color-white/0.10)_inset]',
-          '[background:linear-gradient(180deg,rgba(19,19,22,0)_45%,rgba(19,19,22,0.03)_55%),#fff] dark:[background:linear-gradient(180deg,rgba(255,255,255,0.04)_45%,rgba(255,255,255,0)_55%),#42434d]',
+          '[background:linear-gradient(180deg,rgba(19,19,22,0)_45%,rgba(19,19,22,0.03)_55%),#fff] dark:[background:linear-gradient(180deg,rgba(255,255,255,0.04)_45%,rgba(255,255,255,0)_55%),#333333]',
           'dark:shadow-[0_2px_3px_-1px_--theme(--color-black/0.08),0_0_0_0.5px_rgba(247,247,248,0.10),0_1px_0_0_rgba(255,255,255,0.10)_inset]',
         ],
         secondary: ['text-gray-950'],
