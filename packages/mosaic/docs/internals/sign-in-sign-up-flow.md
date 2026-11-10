@@ -27,7 +27,17 @@ const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step)
 
 ## Move on after a submit
 
-The model makes the Clerk call and returns the next step, read from the resource after the call. The controller passes it to `next(step)`.
+The model makes the Clerk call and returns the next step, read from the resource after the call. The controller passes it to `next(step)`. A sign-in or sign-up method returns `{ error }` instead of rejecting; the model throws that `error`, which is the Clerk error the call failed with, so `save` and the controller's error owners handle it like any other Clerk call.
+
+```ts
+submitPassword: async (password: string) => {
+  await save(async () => {
+    const { error } = await signIn.password({ password });
+    if (error) throw error;
+  }, ['password']);
+  return getSignInNextStep(signIn);
+},
+```
 
 - `complete`: `finalize()`, then leave the flow.
 - `transfer`: `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
