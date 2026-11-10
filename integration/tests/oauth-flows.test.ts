@@ -8,13 +8,14 @@ import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { withRetry } from '../testUtils/retryableClerkClient';
+import { isOAuthCallbackPath } from '../testUtils/setupTestingTokens';
 import { createUserService } from '../testUtils/usersService';
 
 const grantOAuthConsent = async (page: Page) => {
   const allowAccessButton = page.getByRole('button', { name: 'Allow' });
   await expect(allowAccessButton).toBeVisible();
   const [callback] = await Promise.all([
-    page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+    page.waitForRequest(request => isOAuthCallbackPath(new URL(request.url()).pathname)),
     allowAccessButton.click(),
   ]);
   expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
