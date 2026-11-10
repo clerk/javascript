@@ -13,6 +13,8 @@ export { UserAvatar } from './features/user-avatar/user-avatar';
 export { OrganizationSwitcher } from './features/organization-switcher/organization-switcher';
 export type { OrganizationProfileProps } from './features/organization-profile/organization-profile';
 export { OrganizationProfile } from './features/organization-profile/organization-profile';
+export type { CombinedProfileProps, ProfileMode, ProfileProps } from './features/profile/profile';
+export { Profile } from './features/profile/profile';
 export type { UserProfileProps } from './features/user-profile/user-profile';
 export { UserProfile } from './features/user-profile/user-profile';
 export type { MosaicProfile } from './features/profile-pages/use-mosaic-profile';

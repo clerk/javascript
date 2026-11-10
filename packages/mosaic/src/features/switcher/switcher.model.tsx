@@ -92,7 +92,10 @@ export interface SwitcherProfileContext {
     userProfile: CustomPage[] | undefined;
     organizationProfile: CustomPage[] | undefined;
   };
-  /** Which switchers the opening menu carries. Only a menu with both has one Settings row for two targets. */
+  /**
+   * Which switchers the opening menu carries. Only a menu with both has one Settings row for two
+   * targets, and only it can open a combined profile.
+   */
   menuMode: SwitcherMode;
 }
 
@@ -143,6 +146,10 @@ function toMembership(organization: OrganizationResource): SwitcherMembership {
   };
 }
 
+function opensCombinedProfile(menuMode: SwitcherMode, { combined = true }: MosaicProfile): boolean {
+  return menuMode === 'combined' && combined;
+}
+
 function toSession(sessionId: string, user: UserResource): SwitcherSession {
   return {
     sessionId,
@@ -173,13 +180,7 @@ export function useSwitcherModel(
   const userProfile = useModal(userProfileModal);
   const organizationProfile = useModal(organizationProfileModal);
   const { newProfiles } = useMosaicExperimental();
-  const {
-    combined = true,
-    userProfileProps,
-    organizationProfileProps,
-    userProfileUrl,
-    organizationProfileUrl,
-  } = profile;
+  const { userProfileProps, organizationProfileProps, userProfileUrl, organizationProfileUrl } = profile;
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -191,7 +192,8 @@ export function useSwitcherModel(
     enabled: Boolean(environment?.organizationSettings.enabled),
   });
 
-  const mosaicUserProfile = userProfileModalOptions(profile);
+  const profileCombined = opensCombinedProfile(menuMode, profile);
+  const mosaicUserProfile = userProfileModalOptions({ ...profile, combined: profileCombined });
 
   const manageAccount = openOrNavigate({
     url: userProfileUrl,
@@ -218,7 +220,7 @@ export function useSwitcherModel(
           afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
           apiKeysProps: organizationProfileProps?.apiKeysProps,
         });
-      } else if (combined) {
+      } else if (profileCombined) {
         userProfile.open(
           {
             ...mosaicUserProfile,
@@ -234,8 +236,7 @@ export function useSwitcherModel(
     navigate: router.navigate,
   });
 
-  const managesBothInOneProfile =
-    newProfiles && menuMode === 'combined' && combined && !userProfileUrl && !organizationProfileUrl;
+  const managesBothInOneProfile = newProfiles && profileCombined && !userProfileUrl && !organizationProfileUrl;
 
   const createOrganization = openOrNavigate({
     url: options.createOrganizationUrl,

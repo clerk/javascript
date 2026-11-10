@@ -80,6 +80,15 @@ describe('OrganizationProfile', () => {
     expect(screen.queryByText('Loading profile')).toBeNull();
   });
 
+  it("adds the provider's organization pages", async () => {
+    serve();
+    await renderWithClerk(<OrganizationProfile />, undefined, undefined, undefined, {
+      userProfileProps: { customPages: [{ path: 'usage', label: 'Usage', content: <p>Usage</p> }] },
+      organizationProfileProps: { customPages: [{ path: 'audit', label: 'Audit log', content: <p>Audit</p> }] },
+    });
+    expect(tabNames()).toEqual(['General', 'Members', 'Audit log']);
+  });
+
   it('renders nothing when signed out', async () => {
     const fapi = serve();
     fapi.client = fapiClient();

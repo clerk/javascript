@@ -175,9 +175,9 @@ describe('UserProfile modal return', () => {
       });
     }
 
-    async function tabsAfterReturning(profile: MosaicProfile) {
+    async function tabsAfterReturning(profile: MosaicProfile, param = 'user-profile%2Faccount') {
       serveInOrganization();
-      visit('?__clerk_mosaic_modal=user-profile%2Faccount');
+      visit(`?__clerk_mosaic_modal=${param}`);
 
       await renderWithClerk(<p>Page</p>, undefined, undefined, undefined, profile);
 
@@ -196,10 +196,18 @@ describe('UserProfile modal return', () => {
       expect(tabs).toContain('Terms');
     });
 
-    it('stays account-only when the provider turns combined off', async () => {
-      const tabs = await tabsAfterReturning({ combined: false });
+    it.each([
+      { name: 'a user profile', param: 'user-profile%2Faccount', profile: {}, expected: ['Account', 'Security'] },
+      {
+        name: 'a combined profile',
+        param: 'profile%2Faccount',
+        profile: { combined: false },
+        expected: ['Account', 'Security', 'General'],
+      },
+    ])('reopens $name whatever the provider says', async ({ param, profile, expected }) => {
+      const tabs = await tabsAfterReturning(profile, param);
 
-      expect(tabs).not.toContain('General');
+      expect(tabs).toEqual(expected);
     });
   });
 

@@ -15,6 +15,7 @@ export interface CompositionPiece {
 // Matches the sidebar group names.
 const LAYER_ORDER = [
   'Switcher',
+  'Profile',
   'User Profile',
   'Organization Profile',
   'Misc',

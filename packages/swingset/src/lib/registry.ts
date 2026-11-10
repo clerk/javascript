@@ -269,6 +269,7 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
+import { Default as ProfileFeatureDefault, meta as profileFeatureMeta } from '../stories/profile.stories';
 import {
   Default as ProviderButtonDefault,
   Many as ProviderButtonMany,
@@ -1121,6 +1122,11 @@ const userProfileApiKeysPanelModule: StoryModule = {
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
+const profileFeatureModule: StoryModule = {
+  meta: profileFeatureMeta,
+  Default: ProfileFeatureDefault,
+};
+
 const userProfileModule: StoryModule = {
   meta: userProfileMeta,
   Default: UserProfileDefault,
@@ -1350,6 +1356,8 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // Switcher
   switcherModule,
+  // Profile
+  profileFeatureModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels

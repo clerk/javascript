@@ -7,8 +7,10 @@ import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-
 
 export interface MosaicProfile {
   /**
-   * Whether one profile carries the account's pages and the active organization's. `false` keeps them
-   * in separate profiles. It decides the profile's shape, not what `UserButton`'s menu lists.
+   * Whether a menu that carries both the account and the organization opens one profile with both
+   * groups of pages. `false` opens them as separate profiles. A menu that carries only one of them
+   * always opens that one's profile. It is also the mode of a `<Profile />` without a `mode`:
+   * `false` shows the account's pages alone.
    *
    * @default true
    */

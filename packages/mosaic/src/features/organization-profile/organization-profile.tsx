@@ -3,18 +3,9 @@
 import type { ReactNode } from 'react';
 
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
-import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
-import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
-import { organizationProfilePageIds } from './organization-profile.layout';
-import { useOrganizationProfileModel } from './organization-profile.model';
+import { Profile } from '../profile/profile';
 import type { OrganizationProfileOptions } from './organization-profile.provider';
-import { OrganizationProfileProvider } from './organization-profile.provider';
-import type { OrganizationProfilePageId, OrganizationProfilePages } from './organization-profile.types';
 import type { OrganizationProfileViewProps } from './organization-profile.view';
-import { OrganizationProfileView } from './organization-profile.view';
-import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
-import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
-import { OrganizationProfileMembersPanel } from './organization-profile-members-panel/organization-profile-members-panel';
 
 /** Everything `<OrganizationProfile />` takes: your own pages and their order, the page it opens on, and where leaving the organization lands. */
 export interface OrganizationProfileProps
@@ -40,7 +31,7 @@ export interface OrganizationProfileProps
 }
 
 /**
- * The active organization's profile: General, Members when the user may read or manage
+ * The active organization's profile, the same as `<Profile mode='organization' />`: General, Members when the user may read or manage
  * memberships, and API keys when the instance enables them and the user may use them, with your own
  * pages alongside. It reads the organization from Clerk, so it takes no data. It renders `fallback`
  * until Clerk answers, and nothing at all when there is no active organization or nobody is signed in.
@@ -72,56 +63,11 @@ export interface OrganizationProfileProps
  * <OrganizationProfile afterLeaveOrganizationUrl='/organizations' />
  * ```
  */
-export function OrganizationProfile(props: OrganizationProfileProps) {
-  const { organizationProfileProps } = useMosaicProfile();
-  const {
-    customPages = organizationProfileProps?.customPages,
-    pageOrder = organizationProfileProps?.pageOrder,
-    path = organizationProfileProps?.path ?? '/organization',
-    afterLeaveOrganizationUrl = organizationProfileProps?.afterLeaveOrganizationUrl,
-    fallback,
-    apiKeysProps = organizationProfileProps?.apiKeysProps,
-  } = props;
-  const model = useOrganizationProfileModel();
-  const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
-  const { activePage, onPageChange } = useProfilePagesController(
-    pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
-    { routing: 'virtual', path },
-  );
-
-  if (model.status === 'loading') {
-    return fallback ?? null;
-  }
-  if (!pages || activePage === undefined) {
-    return null;
-  }
-
+export function OrganizationProfile(props: OrganizationProfileProps): ReactNode {
   return (
-    <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
-      <OrganizationProfileView
-        elevation='flush'
-        activePage={activePage}
-        onPageChange={onPageChange}
-        customPages={customPages}
-        pageOrder={pageOrder}
-        pages={pages}
-      />
-    </OrganizationProfileProvider>
+    <Profile
+      {...props}
+      mode='organization'
+    />
   );
-}
-
-/**
- * The organization's built-in panels, for the pages the instance has turned on. `apiKeysProps.hide`
- * leaves the API keys panel out; the rest of `apiKeysProps` goes to it.
- */
-export function organizationProfilePanels(
-  available: readonly OrganizationProfilePageId[],
-  { hide: hideAPIKeys = false, ...apiKeysProps }: APIKeysPageProps = {},
-): OrganizationProfilePages {
-  return {
-    general: <OrganizationProfileGeneralPanel />,
-    members: available.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
-    apiKeys:
-      available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
-  };
 }
