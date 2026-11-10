@@ -19,8 +19,8 @@ import { renderWithClerk } from '../../../__tests__/feature/render';
 import { PortalProvider } from '../../../primitives/portal';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import { signedIn as withConnectedAccounts } from '../../user-profile/user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
-import type { UserButtonProps } from '../user-button';
-import { UserButton } from '../user-button';
+import type { SwitcherProps } from '../switcher';
+import { Switcher } from '../switcher';
 
 beforeAll(async () => {
   await import('../../user-profile/user-profile.modal-content');
@@ -62,10 +62,10 @@ function signedIn(overrides: FakeFapiSeed = {}): FakeFapiSeed {
   };
 }
 
-function tree(props: UserButtonProps = {}) {
+function tree(props: SwitcherProps = {}) {
   return (
     <div data-testid='host'>
-      <UserButton {...props} />
+      <Switcher {...props} />
     </div>
   );
 }
@@ -96,11 +96,11 @@ function requiredPopup() {
 }
 
 const terms = { label: 'Terms', path: 'terms', content: <p>Terms body</p> };
-describe('UserButton with experimental.newProfiles', () => {
+describe('Switcher with experimental.newProfiles', () => {
   const newProfiles = { newProfiles: true };
 
   async function renderWithNewProfiles(
-    props: UserButtonProps = {},
+    props: SwitcherProps = {},
     seed: FakeFapiSeed = signedIn(),
     profile?: MosaicProfile,
   ) {
@@ -200,7 +200,7 @@ describe('UserButton with experimental.newProfiles', () => {
   });
 
   it("leaves the organization's pages out of a separate profile", async () => {
-    await renderWithNewProfiles({ combined: false }, undefined, { combined: false });
+    await renderWithNewProfiles({ mode: 'user' }, undefined, { combined: false });
     const user = await open();
 
     await user.click(screen.getByRole('button', { name: 'Settings' }));

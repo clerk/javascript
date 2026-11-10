@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 import { LiveSidebar } from './live-sidebar';
-import { LiveUserButton } from './live-user-button';
+import { LiveSwitcher } from './live-switcher';
 
 function LiveChrome({ children, userButton }: { children: ReactNode; userButton?: ReactNode }) {
   return (
@@ -70,7 +70,7 @@ export default function ClerkLayout({ children }: { children: ReactNode }) {
       signUpFallbackRedirectUrl='/live'
       afterSignOutUrl='/live'
     >
-      <LiveChrome userButton={<LiveUserButton />}>{children}</LiveChrome>
+      <LiveChrome userButton={<LiveSwitcher />}>{children}</LiveChrome>
     </ClerkProvider>
   );
 }

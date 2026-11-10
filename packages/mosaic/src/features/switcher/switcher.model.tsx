@@ -70,8 +70,9 @@ type CreateOrganizationMode =
       createOrganizationMode?: 'modal';
     };
 
-export type SwitcherModelOptions = OrganizationSwitcherModelOptions &
-  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
+export type SwitcherModelOptions = OrganizationSwitcherModelOptions & UserSwitcherModelOptions;
+
+export type UserSwitcherModelOptions = Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
 
 export type OrganizationSwitcherModelOptions = CreateOrganizationMode &
   Pick<
