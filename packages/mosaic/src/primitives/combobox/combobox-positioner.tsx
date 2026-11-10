@@ -64,6 +64,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
       <FloatingFocusManager
         context={floatingContext}
         initialFocus={-1}
+        returnFocus={false}
         visuallyHiddenDismiss
         modal={false}
       >

@@ -111,7 +111,7 @@
     "@rspack/plugin-react-refresh": "catalog:rspack",
     "@types/cloudflare-turnstile": "^0.2.2",
     "bundlewatch": "^0.4.2",
-    "jsdom": "26.1.0",
+    "jsdom": "27.0.0",
     "minimatch": "^10.2.6",
     "webpack-merge": "^5.10.0"
   },

@@ -15,6 +15,10 @@ import { organizationProfileProfileSectionMessages } from '../features/organizat
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { signInMessages } from '../features/sign-in/sign-in.messages';
+import { signInButtonMessages } from '../features/sign-in-button/sign-in-button.messages';
+import { signInWithMetamaskButtonMessages } from '../features/sign-in-with-metamask-button/sign-in-with-metamask-button.messages';
+import { signOutButtonMessages } from '../features/sign-out-button/sign-out-button.messages';
+import { signUpButtonMessages } from '../features/sign-up-button/sign-up-button.messages';
 import { taskChooseOrganizationMessages } from '../features/task-choose-organization/task-choose-organization.messages';
 import { taskSetupMfaMessages } from '../features/task-setup-mfa/task-setup-mfa.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
@@ -90,6 +94,10 @@ export const mosaicMessages = {
   waitlist: waitlistMessages,
   signIn: signInMessages,
   taskSetupMfa: taskSetupMfaMessages,
+  signInButton: signInButtonMessages,
+  signInWithMetamaskButton: signInWithMetamaskButtonMessages,
+  signUpButton: signUpButtonMessages,
+  signOutButton: signOutButtonMessages,
 };
 
 export type MosaicMessages = typeof mosaicMessages;

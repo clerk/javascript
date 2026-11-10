@@ -9,6 +9,7 @@ import {
   offset,
   type Placement,
   size,
+  useClick,
   useDismiss,
   useFloating,
   useFloatingNodeId,
@@ -48,6 +49,8 @@ export interface ComboboxProps {
   children: ReactNode;
   /** Separate search input inside another surface. Bind open to that surface. */
   inline?: boolean;
+  /** Opens the popup when the input is clicked. Has no effect with `inline`. */
+  openOnInputClick?: boolean;
 }
 
 function ComboboxInner(props: ComboboxProps) {
@@ -204,7 +207,8 @@ function ComboboxInner(props: ComboboxProps) {
     scrollItemIntoView: true,
   });
 
-  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav]);
+  const click = useClick(floatingContext, { enabled: Boolean(props.openOnInputClick) && !props.inline, toggle: false });
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav, click]);
   const referenceProps = getReferenceProps();
   const popupId = typeof referenceProps['aria-controls'] === 'string' ? referenceProps['aria-controls'] : undefined;
 
@@ -246,9 +250,19 @@ function ComboboxInner(props: ComboboxProps) {
     [props.inline, setInputValue, setOpenState, setSelectedValue],
   );
 
+  const clear = useCallback(() => {
+    setQueryChanged(false);
+    setInputValue('');
+    setSelectedValue(null);
+    setSelectedIndex(null);
+    setActiveIndex(null);
+    focusInput();
+  }, [focusInput, setInputValue, setSelectedValue]);
+
   const contextValue = useMemo<ComboboxContextValue>(
     () => ({
       open,
+      clear,
       inputValue,
       filterQuery,
       selectedValue,
@@ -277,6 +291,7 @@ function ComboboxInner(props: ComboboxProps) {
     }),
     [
       open,
+      clear,
       inputValue,
       filterQuery,
       selectedValue,

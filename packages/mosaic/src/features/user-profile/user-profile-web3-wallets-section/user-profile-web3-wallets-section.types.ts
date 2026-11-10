@@ -13,6 +13,7 @@ export interface UserProfileWeb3Provider {
   iconUrl?: string;
   monochromeIcon?: boolean;
   connectError?: string;
+  isPending?: boolean;
 }
 
 export interface UserProfileWeb3Wallet {
@@ -30,13 +31,15 @@ export interface UserProfileWeb3Wallet {
   canRemove?: boolean;
   primaryError?: string;
   verifyError?: string;
+  isPending?: boolean;
+  isPrimaryPending?: boolean;
 }
 
 export interface UserProfileWeb3WalletsSectionViewProps {
   wallets: UserProfileWeb3Wallet[];
   sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileWeb3Provider[];
-  pendingId?: string;
+  isDisabled?: boolean;
   error?: string;
   onConnect?: (id: string) => void;
   onVerify?: (id: string) => void;

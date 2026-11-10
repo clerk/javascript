@@ -11,7 +11,6 @@ import { PlaygroundProvider } from './PlaygroundContext';
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
-    'profile-permutations': dynamic(() => import('../stories/profile-permutations.mdx')),
   },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
@@ -65,6 +64,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
     'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),
+    'sign-in-button': dynamic(() => import('../stories/sign-in-button.mdx')),
+    'sign-in-with-metamask-button': dynamic(() => import('../stories/sign-in-with-metamask-button.mdx')),
+    'sign-up-button': dynamic(() => import('../stories/sign-up-button.mdx')),
+    'sign-out-button': dynamic(() => import('../stories/sign-out-button.mdx')),
   },
   authentication: {
     'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
@@ -77,6 +80,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'action-bar': dynamic(() => import('../stories/action-bar.mdx')),
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
+    link: dynamic(() => import('../stories/link.mdx')),
     skeleton: dynamic(() => import('../stories/skeleton.mdx')),
     banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),

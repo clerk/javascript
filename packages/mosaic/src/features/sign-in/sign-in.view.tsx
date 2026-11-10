@@ -1,6 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
+import {
+  VerificationBackupCode,
+  VerificationCode,
+  VerificationHelp,
+  VerificationMethodPicker,
+} from '../../blocks/verification';
 import { Flow } from '../../components/flow';
 import type { IconComponent } from '../../icons/glyph';
 import { Envelope } from '../../icons/glyphs/envelope';
@@ -11,10 +17,6 @@ import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
-import { ReverificationBackupCode } from '../reverification/steps/reverification-backup-code';
-import { ReverificationHelp } from '../reverification/steps/reverification-help';
-import { ReverificationMethodPicker } from '../reverification/steps/reverification-method-picker';
-import { ReverificationOTP } from '../reverification/steps/reverification-otp';
 import type { SignInMethod, SignInViewProps } from './sign-in.types';
 import { SignInPassword } from './steps/sign-in-password';
 import { SignInStart } from './steps/sign-in-start';
@@ -179,7 +181,7 @@ export function SignInView({
           </Flow.Step>
 
           <Flow.Step ids={['email-code']}>
-            <ReverificationOTP
+            <VerificationCode
               focusRef={focusRef}
               messages={{
                 title: m.emailCode.title,
@@ -199,7 +201,7 @@ export function SignInView({
           </Flow.Step>
 
           <Flow.Step ids={['totp']}>
-            <ReverificationOTP
+            <VerificationCode
               focusRef={focusRef}
               messages={{
                 title: m.totpMfa.title,
@@ -218,7 +220,7 @@ export function SignInView({
           </Flow.Step>
 
           <Flow.Step ids={['backup-code']}>
-            <ReverificationBackupCode
+            <VerificationBackupCode
               focusRef={focusRef}
               messages={{
                 title: m.backupCodeMfa.title,
@@ -236,7 +238,7 @@ export function SignInView({
           </Flow.Step>
 
           <Flow.Step ids={['method-picker']}>
-            <ReverificationMethodPicker
+            <VerificationMethodPicker
               focusRef={focusRef}
               messages={{
                 title: m.alternativeMethods.title,
@@ -258,7 +260,7 @@ export function SignInView({
           </Flow.Step>
 
           <Flow.Step ids={['help']}>
-            <ReverificationHelp
+            <VerificationHelp
               messages={{
                 title: m.alternativeMethods.getHelp.title,
                 description: m.alternativeMethods.getHelp.content,
@@ -301,7 +303,7 @@ export function SignInView({
           </Flow.Step>
 
           <Flow.Step ids={['verify-email']}>
-            <ReverificationOTP
+            <VerificationCode
               focusRef={focusRef}
               messages={{
                 title: m.verifyEmail.title,

@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 import type { JSX, Ref } from 'react';
 
+import {
+  VerificationBackupCode,
+  VerificationCode,
+  VerificationHelp,
+  VerificationMethodPicker,
+  VerificationPasskey,
+  VerificationPassword,
+} from '../../blocks/verification';
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
@@ -20,12 +28,6 @@ import type {
   ReverificationOtpChannel,
   ReverificationViewProps,
 } from './reverification.types';
-import { ReverificationBackupCode } from './steps/reverification-backup-code';
-import { ReverificationHelp } from './steps/reverification-help';
-import { ReverificationMethodPicker } from './steps/reverification-method-picker';
-import { ReverificationOTP } from './steps/reverification-otp';
-import { ReverificationPasskey } from './steps/reverification-passkey';
-import { ReverificationPassword } from './steps/reverification-password';
 
 type Messages = MosaicMessages['reverification'];
 
@@ -183,7 +185,7 @@ export function ReverificationView({
       {() => (
         <>
           <Flow.Step ids={['password']}>
-            <ReverificationPassword
+            <VerificationPassword
               focusRef={focusRef}
               messages={{
                 title: m.password.title,
@@ -205,7 +207,7 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['passkey']}>
-            <ReverificationPasskey
+            <VerificationPasskey
               focusRef={focusRef}
               messages={{
                 title: m.passkey.title,
@@ -220,7 +222,7 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['otp']}>
-            <ReverificationOTP
+            <VerificationCode
               focusRef={focusRef}
               messages={{
                 title: otp.title,
@@ -244,7 +246,7 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['backup-code']}>
-            <ReverificationBackupCode
+            <VerificationBackupCode
               focusRef={focusRef}
               messages={{
                 title: m.backupCode.title,
@@ -263,7 +265,7 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['method-picker']}>
-            <ReverificationMethodPicker
+            <VerificationMethodPicker
               focusRef={focusRef}
               messages={{
                 title: m.methods.title,
@@ -285,7 +287,7 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['help']}>
-            <ReverificationHelp
+            <VerificationHelp
               messages={{
                 title: m.help.title,
                 description: m.help.description,

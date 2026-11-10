@@ -74,6 +74,8 @@ export { PhoneInput } from '../components/phone-input';
 export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
+export { Link } from '../components/link';
+export type { LinkProps } from '../components/link';
 export { Menu } from '../components/menu';
 export { TagInput } from '../components/tag-input';
 export type { TagInputProps } from '../components/tag-input';

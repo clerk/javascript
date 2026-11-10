@@ -580,6 +580,19 @@ describe('the manifest', () => {
     assert.deepEqual(parseManifest(JSON.stringify(WITH_BEFORE)), WITH_BEFORE);
   });
 
+  it('accepts null as the before of a screenshot of a new screen, and refuses it for a video or for every file', () => {
+    const [wasVideo] = WITH_BEFORE.before.files;
+    const newScreen = { ...WITH_BEFORE, before: { ...WITH_BEFORE.before, files: [wasVideo, null] } };
+    assert.deepEqual(parseManifest(JSON.stringify(newScreen)), newScreen);
+    const withFiles = files => () =>
+      parseManifest(JSON.stringify({ ...WITH_BEFORE, before: { ...WITH_BEFORE.before, files } }));
+    assert.throws(
+      withFiles([null, WITH_BEFORE.before.files[1]]),
+      /before must have one file for each file, of the same kind, or null for a screenshot of a new screen/,
+    );
+    assert.throws(withFiles([null, null]), /the files of before must be a list of 1 to 50/);
+  });
+
   const before = change => parse({ before: { ...WITH_BEFORE.before, ...change } });
   const [wasVideo, wasShot] = WITH_BEFORE.before.files;
   const refusedBefore = [
@@ -1506,6 +1519,34 @@ describe('the step that edits the description', () => {
     assert.equal(await published(CLIP), laidOut(SAID, '', '| `video` |', '| :---: |', `| ${asset(1)} |`));
   });
 
+  it('lays out a new screen in the Before and After table of the screens that exist, with New screen as its before', async () => {
+    const media = [
+      ['start.png', PNG],
+      ['update.png', PNG],
+      ['security.png', PNG],
+    ];
+    const was = [
+      ['before-start.png', WAS_PNG],
+      ['before-security.png', WAS_PNG],
+    ];
+    const wasFiles = beforeFor(was).files;
+    const manifest = manifestFor(media, { before: beforeFor([], { files: [wasFiles[0], null, wasFiles[1]] }) });
+    const fake = fakeGh({ ...PULL, body: '' });
+    assert.equal(publish(await fetched(manifest, [...media, ...was]), fake).outcome, 'published');
+    assert.equal(
+      fake.state.pull.body,
+      laidOut(
+        `${SAID}${WAS}`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| <img src="${asset(4)}" width="280" alt="Before: start"> | <img src="${asset(1)}" width="280" alt="After: start"> |`,
+        `| New screen | <img src="${asset(2)}" width="280" alt="After: update"> |`,
+        `| <img src="${asset(5)}" width="280" alt="Before: security"> | <img src="${asset(3)}" width="280" alt="After: security"> |`,
+      ),
+    );
+  });
+
   it('lays out a hand-off that holds both kinds with a before as one Before and After table, in the order of the manifest', async () => {
     assert.equal(
       await published([...CLIP, ...SHOT], [...WAS_CLIP, ...WAS_SHOT]),
@@ -1524,7 +1565,7 @@ describe('the step that edits the description', () => {
   const ADDRESS = 'https://github\\.com/user-attachments/assets/[0-9a-f-]{36}';
   const LABEL = '[A-Za-z0-9._-]+';
   const COUNTS = '\\d+ of \\d+ passed(, \\d+ flaky \\(passed only on a retry\\))?';
-  const CELL = `(${ADDRESS}|<img src="${ADDRESS}" width="280" alt="((Before|After): )?${LABEL}">)`;
+  const CELL = `(${ADDRESS}|<img src="${ADDRESS}" width="280" alt="((Before|After): )?${LABEL}">|New screen)`;
   const TEMPLATE = [
     /^$/,
     /^<!-- \/?verify-evidence:ios -->$/,
