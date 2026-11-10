@@ -115,7 +115,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     organizations: new OrganizationAPI(request),
     organizationPermissions: new OrganizationPermissionAPI(request),
     organizationRoles: new OrganizationRoleAPI(request),
-    __experimental_poppy: new PoppyAPI(poppyBrowserRequest, request, frontendApi),
+    __experimental_poppy: new PoppyAPI(poppyBrowserRequest, request),
     phoneNumbers: new PhoneNumberAPI(request),
     proxyChecks: new ProxyCheckAPI(request),
     redirectUrls: new RedirectUrlAPI(request),

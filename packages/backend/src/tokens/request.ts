@@ -3,7 +3,6 @@ import { logger } from '@clerk/shared/logger';
 import type { JwtPayload } from '@clerk/shared/types';
 
 import type { PoppyBrowserSession, PoppyCredential } from '../api/endpoints/PoppyApi';
-import { poppyCookies } from '../api/endpoints/PoppyApi';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { MachineTokenVerificationError, TokenVerificationError, TokenVerificationErrorReason } from '../errors';
@@ -950,74 +949,6 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
   };
 
-  const browserToken = clerkRequest.cookies.get(poppyCookies.browser);
-  let joined: PoppyBrowserSession | null = null;
-  if (browserToken && options.__experimental_poppy) {
-    const endpoint = options.__experimental_poppy.browserSessionEndpoint;
-    if (new URL(endpoint).origin !== clerkRequest.clerkUrl.origin) {
-      throw new Error('The Poppy browser Session endpoint must use the Company origin.');
-    }
-    joined = await resolvePoppy({ type: 'browser', endpoint, token: browserToken });
-    authenticateContext.poppySession = joined;
-    state.poppy = joined;
-  }
-
-  if (state.status === 'handshake') {
-    const sessionToken = authenticateContext.sessionTokenInCookie;
-    if (
-      joined &&
-      !joined.account &&
-      sessionToken &&
-      !isMachineJwt(sessionToken) &&
-      !hasNonSessionJwtCategory(sessionToken)
-    ) {
-      const { data, errors } = await verifyToken(sessionToken, authenticateContext);
-      let claims = data;
-      if (errors) {
-        const error: unknown = errors[0];
-        if (!(error instanceof TokenVerificationError)) {
-          throw error instanceof Error ? error : new Error('Native Clerk Session verification failed.');
-        }
-        switch (error.reason) {
-          case TokenVerificationErrorReason.TokenExpired:
-            claims = decodeJwt(sessionToken).data?.payload;
-            break;
-          case TokenVerificationErrorReason.TokenInvalid:
-          case TokenVerificationErrorReason.TokenInvalidAlgorithm:
-          case TokenVerificationErrorReason.TokenInvalidAuthorizedParties:
-          case TokenVerificationErrorReason.TokenInvalidIssuer:
-          case TokenVerificationErrorReason.TokenInvalidSignature:
-          case TokenVerificationErrorReason.TokenNotActiveYet:
-          case TokenVerificationErrorReason.TokenIatInTheFuture:
-            return state;
-          default:
-            throw error;
-        }
-      }
-      const agent: unknown = claims?.agt;
-      if (typeof claims?.sid === 'string' && typeof agent === 'object' && agent !== null && 'poppy' in agent) {
-        return rejectPoppyAccount();
-      }
-    }
-    if (
-      state.reason === AuthErrorReason.DevBrowserMissing &&
-      joined &&
-      !joined.account &&
-      !authenticateContext.sessionToken &&
-      !authenticateContext.clientUat &&
-      !authenticateContext.refreshTokenInCookie
-    ) {
-      const guest = signedOut({
-        tokenType: TokenType.SessionToken,
-        authenticateContext,
-        reason: AuthErrorReason.SessionTokenAndUATMissing,
-      });
-      guest.poppy = joined;
-      return guest;
-    }
-    return state;
-  }
-
   if (!state.isAuthenticated) {
     return state;
   }
@@ -1025,23 +956,17 @@ export const authenticateRequest: AuthenticateRequest = (async (
   if (auth.tokenType !== TokenType.SessionToken) {
     return state;
   }
-  if (joined?.account && (joined.account.session_id !== auth.sessionId || joined.account.user_id !== auth.userId)) {
-    return rejectPoppyAccount();
-  }
   const agent: unknown = auth.sessionClaims.agt;
   const isPoppySession = typeof agent === 'object' && agent !== null && 'poppy' in agent;
   if (!isPoppySession) {
     return state;
   }
-  const current =
-    browserToken && options.__experimental_poppy ? joined : await resolvePoppy({ type: 'session', token: state.token });
+  const current = await resolvePoppy({ type: 'session', token: state.token });
   if (!current?.account || current.account.session_id !== auth.sessionId || current.account.user_id !== auth.userId) {
     return rejectPoppyAccount();
   }
-  if (!joined) {
-    authenticateContext.poppySession = current;
-    state.poppy = current;
-  }
+  authenticateContext.poppySession = current;
+  state.poppy = current;
   return state;
 }) as AuthenticateRequest;
 

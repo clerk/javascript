@@ -2,7 +2,6 @@ import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
-import type { PoppyOptions } from '../api/endpoints/PoppyApi';
 import type {
   AuthenticatedMachineObject,
   AuthObject,
@@ -19,11 +18,11 @@ import type { VerifyTokenOptions } from './verify';
  */
 export type AuthenticateRequestOptions = {
   /**
-   * Clerk's experimental configuration for Poppy browser sessions. Enables live account-authority
-   * checks for the joined browser; in `clerkMiddleware()`, also serves discovery and join requests.
-   * These SDK options may change while Poppy is a draft.
+   * Clerk's preview flag for publishing Poppy discovery through `clerkMiddleware()`.
+   * The Backend API supplies Clerk's hosted browser Session endpoint. No application join or callback route is needed.
+   * This option may change while Poppy is a draft.
    */
-  __experimental_poppy?: PoppyOptions;
+  __experimental_poppy?: boolean;
   /**
    * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */

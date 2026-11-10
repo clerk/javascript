@@ -52,7 +52,6 @@ export type { ClerkMiddlewareAuth, ClerkMiddlewareSessionAuthObject, ClerkMiddle
 export type {
   OrganizationMembershipRole,
   PoppyBrowserSession,
-  PoppyOptions,
   // Resources
   AllowlistIdentifier,
   Client,
@@ -87,5 +86,3 @@ export {
   type FrontendApiProxyOptions,
   type NextFrontendApiProxyOptions,
 } from './proxy';
-
-export { PoppyCallbackPage } from './PoppyCallbackPage';

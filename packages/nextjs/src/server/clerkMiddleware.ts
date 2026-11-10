@@ -1,5 +1,4 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
-import { createPoppyBrowserSessionHandler, poppyCookies } from '@clerk/backend';
 import type {
   AuthenticatedState,
   AuthenticateRequestOptions,
@@ -63,7 +62,6 @@ import type {
 import {
   assertKey,
   decorateRequest,
-  encryptClerkRequestData,
   handleMultiDomainAndProxy,
   redirectAdapter,
   setRequestHeadersOnNextResponse,
@@ -210,75 +208,29 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const resolvedClerkClient = await clerkClient();
 
       if (options.__experimental_poppy) {
-        const proxyPoppy = createPoppyBrowserSessionHandler({
-          ...options.__experimental_poppy,
-          clerkClient: resolvedClerkClient,
-        });
-        const endpoint = new URL(options.__experimental_poppy.browserSessionEndpoint);
         const poppyRequestUrl = createClerkRequest(request).clerkUrl;
-        if (poppyRequestUrl.origin === endpoint.origin) {
-          if (
-            poppyRequestUrl.pathname === '/.well-known/poppy.json' ||
-            poppyRequestUrl.pathname === '/.well-known/oauth-protected-resource'
-          ) {
-            if (request.method !== 'GET') {
-              return new Response(null, { status: 405, headers: { Allow: 'GET' } });
-            }
-            const metadata = await resolvedClerkClient.__experimental_poppy.getMetadata();
-            if (endpoint.origin !== `https://${metadata.organization.domain}`) {
-              throw new Error('The browser Session endpoint must use the configured Company origin.');
-            }
-            return Response.json(
-              poppyRequestUrl.pathname === '/.well-known/poppy.json'
-                ? { ...metadata, web: { browser_session_endpoint: endpoint.href, unscoped: true } }
-                : {
-                    resource: endpoint.origin,
-                    authorization_servers: [metadata.auth.issuer],
-                    scopes_supported: Object.keys(metadata.auth.scopes),
-                    bearer_methods_supported: ['header'],
-                  },
-              { headers: { 'Cache-Control': 'no-store' } },
-            );
+        if (
+          poppyRequestUrl.pathname === '/.well-known/poppy.json' ||
+          poppyRequestUrl.pathname === '/.well-known/oauth-protected-resource'
+        ) {
+          if (request.method !== 'GET') {
+            return new Response(null, { status: 405, headers: { Allow: 'GET' } });
           }
-          if (
-            (poppyRequestUrl.pathname === endpoint.pathname &&
-              (request.method === 'GET' || request.method === 'POST')) ||
-            (poppyRequestUrl.pathname === endpoint.pathname + '/authorize' && request.method === 'POST')
-          ) {
-            return proxyPoppy(request);
+          const metadata = await resolvedClerkClient.__experimental_poppy.getMetadata();
+          if (poppyRequestUrl.origin !== `https://${metadata.organization.domain}`) {
+            throw new Error('Poppy discovery must use the configured Company origin.');
           }
-          if (poppyRequestUrl.pathname === endpoint.pathname + '/callback' && request.method === 'GET') {
-            const response = NextResponse.next();
-            if (options.contentSecurityPolicy) {
-              const { headers } = createContentSecurityPolicyHeaders(
-                (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
-                options.contentSecurityPolicy,
-              );
-              const cspRequestHeaders: Record<string, string> = {};
-              headers.forEach(([key, value]) => {
-                setHeader(response, key, value);
-                cspRequestHeaders[key] = value;
-              });
-              setRequestHeadersOnNextResponse(response, request, cspRequestHeaders);
-            }
-            response.headers.set('Cache-Control', 'no-store');
-            response.headers.set('Referrer-Policy', 'no-referrer');
-            response.headers.set('X-Frame-Options', 'DENY');
-            response.headers.append(
-              'Set-Cookie',
-              `${poppyCookies.ticket}=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Strict`,
-            );
-            setRequestHeadersOnNextResponse(response, request, {
-              [constants.Headers.AuthStatus]: AuthStatus.SignedOut,
-              [constants.Headers.AuthToken]: '',
-              [constants.Headers.AuthSignature]: '',
-              [constants.Headers.AuthReason]: '',
-              [constants.Headers.AuthMessage]: '',
-              [constants.Headers.ClerkUrl]: poppyRequestUrl.href,
-              [constants.Headers.ClerkRequestData]: encryptClerkRequestData(resolvedParams, {}, null) ?? '',
-            });
-            return response;
-          }
+          return Response.json(
+            poppyRequestUrl.pathname === '/.well-known/poppy.json'
+              ? metadata
+              : {
+                  resource: poppyRequestUrl.origin,
+                  authorization_servers: [metadata.auth.issuer],
+                  scopes_supported: Object.keys(metadata.auth.scopes),
+                  bearer_methods_supported: ['header'],
+                },
+            { headers: { 'Cache-Control': 'no-store' } },
+          );
         }
       }
 
