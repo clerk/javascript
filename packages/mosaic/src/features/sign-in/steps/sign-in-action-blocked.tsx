@@ -5,6 +5,7 @@ import { InputGroup } from '../../../components/input-group';
 import { Link } from '../../../components/link';
 import { useMessages } from '../../../localization';
 import type { SignInActionBlockedDetails } from '../sign-in.types';
+import { httpsUrl } from '../sign-in.utils';
 
 interface SignInActionBlockedProps {
   details?: SignInActionBlockedDetails;
@@ -12,7 +13,7 @@ interface SignInActionBlockedProps {
 
 export function SignInActionBlocked({ details }: SignInActionBlockedProps) {
   const m = useMessages('signIn').actionBlocked;
-  const href = details?.linkUrl;
+  const href = httpsUrl(details?.linkUrl);
 
   return (
     <>
