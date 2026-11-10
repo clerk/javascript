@@ -277,7 +277,12 @@ describe('JSX guards', () => {
     .find(override => override.files.includes('src/**/*') && override.rules['eslint-compat/no-restricted-syntax'])
     .rules['eslint-compat/no-restricted-syntax'].slice(1);
   ruleTester.run('no-restricted-syntax', syntaxPlugin.rules['no-restricted-syntax'], {
-    valid: [].map(testCase => ({ ...testCase, options })),
+    valid: [
+      'export const Sample = ({ visible }) => <div>{visible ? <Part /> : null}</div>;',
+      'export const Sample = () => <div className="x" style={{ color: "red" }} />;',
+      'export const Sample = () => <div {...stylex.props(styles.root)} />;',
+      'export const Sample = () => <Form><Part xstyle={styles.root} /><Card.Root xstyle={styles.root} /></Form>;',
+    ].map(code => ({ code, filename: 'src/components/sample.tsx', options })),
     invalid: [
       {
         name: 'keeps JSX restrictions: export const Sample = () => <form />;',
@@ -292,11 +297,29 @@ describe('JSX guards', () => {
         errors: [/Mosaic parts take `xstyle`/],
       },
       {
-        name: 'preserves eslint-compat/no-restricted-syntax',
+        name: 'rejects native forms in views',
         filename: 'src/features/reverification/sample.view.tsx',
         code: 'export function View() { return <form />; }',
-        errors: [/./],
+        errors: [/Use `Form` from mosaic\/primitives\/form/],
       },
+      {
+        name: 'rejects logical AND in conditional JSX',
+        filename: 'src/components/sample.tsx',
+        code: 'export const Sample = ({ count }) => <div>{count && <Part />}</div>;',
+        errors: [/Use a ternary/],
+      },
+      ...['className="x"', 'style={{ color: "red" }}'].map(attribute => ({
+        name: `rejects ${attribute} on member components`,
+        filename: 'src/components/sample.tsx',
+        code: `export const Sample = () => <Card.Root ${attribute} />;`,
+        errors: [/Mosaic parts take `xstyle`/],
+      })),
+      ...['Part', 'Card.Root'].map(component => ({
+        name: `rejects stylex.props spreads on ${component}`,
+        filename: 'src/components/sample.tsx',
+        code: `export const Sample = () => <${component} {...stylex.props(styles.root)} />;`,
+        errors: [/Mosaic parts take the atoms as `xstyle`/],
+      })),
     ].map(testCase => ({ ...testCase, options })),
   });
 });
