@@ -3,15 +3,11 @@ import type { Ref } from 'react';
 import type { VerificationHelpMessages } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import type { SignInStep } from '../sign-in.types';
-import type { SignInForgotPasswordMessages } from './sign-in-forgot-password';
 import { SignInForgotPassword } from './sign-in-forgot-password';
 
 interface NoticeStepProps {
   step: Extract<SignInStep, { kind: 'notice' }>;
-  messages: {
-    help: VerificationHelpMessages;
-    forgotPassword: SignInForgotPasswordMessages;
-  };
+  messages: VerificationHelpMessages;
   isPending: boolean;
   onSubmit: () => void;
   onEmailSupport: () => void;
@@ -24,7 +20,7 @@ export function NoticeStep({ step, messages, isPending, onSubmit, onEmailSupport
     case 'help':
       return (
         <VerificationHelp
-          messages={messages.help}
+          messages={messages}
           onEmailSupport={onEmailSupport}
           onBack={onBack}
         />
@@ -33,7 +29,7 @@ export function NoticeStep({ step, messages, isPending, onSubmit, onEmailSupport
       return (
         <SignInForgotPassword
           focusRef={focusRef}
-          messages={messages.forgotPassword}
+          identifier={step.identifier}
           isPending={isPending}
           onSubmit={onSubmit}
           onBack={onBack}

@@ -5,19 +5,12 @@ import type { Ref } from 'react';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
+import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 
-export interface SignInForgotPasswordMessages {
-  title: string;
-  description: string;
-  primaryActionLabel: string;
-  pendingLabel: string;
-  backLabel: string;
-}
-
 interface SignInForgotPasswordProps {
-  messages: SignInForgotPasswordMessages;
+  identifier: string;
   isPending?: boolean;
   onSubmit: () => void;
   onBack: () => void;
@@ -25,19 +18,20 @@ interface SignInForgotPasswordProps {
 }
 
 export function SignInForgotPassword({
-  messages,
+  identifier,
   isPending = false,
   onSubmit,
   onBack,
   focusRef,
 }: SignInForgotPasswordProps) {
+  const m = useMessages('signIn');
   const ref = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
 
   return (
     <>
       <Card.Header>
-        <Card.Title>{messages.title}</Card.Title>
-        <Card.Description>{messages.description}</Card.Description>
+        <Card.Title>{m.forgotPassword.title}</Card.Title>
+        <Card.Description>{fill(m.forgotPassword.description, { identifier })}</Card.Description>
       </Card.Header>
       <Card.Content
         render={
@@ -54,9 +48,9 @@ export function SignInForgotPassword({
             ref={ref}
             fullWidth
             isPending={isPending}
-            pendingLabel={messages.pendingLabel}
+            pendingLabel={m.forgotPassword.pending}
           >
-            {messages.primaryActionLabel}
+            {m.continue}
           </SubmitButton>
           <Button
             type='button'
@@ -66,7 +60,7 @@ export function SignInForgotPassword({
             disabled={isPending}
             onClick={onBack}
           >
-            {messages.backLabel}
+            {m.forgotPassword.back}
           </Button>
         </div>
       </Card.Content>

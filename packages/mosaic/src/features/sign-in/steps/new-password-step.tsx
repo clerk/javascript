@@ -9,31 +9,20 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
+import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { NewPasswordValues } from '../sign-in.types';
 
-export interface NewPasswordStepMessages {
-  title: string;
-  passwordLabel: string;
-  confirmPasswordLabel: string;
-  showPasswordLabel: string;
-  hidePasswordLabel: string;
-  signOutOfOtherSessionsLabel: string;
-  primaryActionLabel: string;
-  pendingLabel: string;
-  backLabel: string;
-}
-
 interface NewPasswordStepProps {
-  messages: NewPasswordStepMessages;
   form: UseFormResult<NewPasswordValues>;
   passwordFeedback?: FieldFeedback;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
-export function NewPasswordStep({ messages, form, passwordFeedback, onBack, focusRef }: NewPasswordStepProps) {
+export function NewPasswordStep({ form, passwordFeedback, onBack, focusRef }: NewPasswordStepProps) {
+  const m = useMessages('signIn');
   const { ref: passwordFieldRef, ...password } = form.register('password');
   const passwordRef = useMergeRefs<HTMLElement>([passwordFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
   const passwordError = form.fields.password.feedback;
@@ -42,7 +31,7 @@ export function NewPasswordStep({ messages, form, passwordFeedback, onBack, focu
   return (
     <>
       <Card.Header>
-        <Card.Title>{messages.title}</Card.Title>
+        <Card.Title>{m.newPassword.title}</Card.Title>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -65,13 +54,13 @@ export function NewPasswordStep({ messages, form, passwordFeedback, onBack, focu
             disabled={form.isSubmitting}
             focusableWhenDisabled
           >
-            <Field.Label>{messages.passwordLabel}</Field.Label>
+            <Field.Label>{m.newPassword.passwordLabel}</Field.Label>
             <PasswordInput
               ref={passwordRef}
               autoComplete='new-password'
               {...password}
-              showPasswordLabel={messages.showPasswordLabel}
-              hidePasswordLabel={messages.hidePasswordLabel}
+              showPasswordLabel={m.showPassword}
+              hidePasswordLabel={m.hidePassword}
             />
             <Field.Feedback feedback={passwordError?.type === 'error' ? passwordError : passwordFeedback} />
           </Field.Root>
@@ -81,12 +70,12 @@ export function NewPasswordStep({ messages, form, passwordFeedback, onBack, focu
             disabled={form.isSubmitting}
             focusableWhenDisabled
           >
-            <Field.Label>{messages.confirmPasswordLabel}</Field.Label>
+            <Field.Label>{m.newPassword.confirmPasswordLabel}</Field.Label>
             <PasswordInput
               autoComplete='new-password'
               {...form.register('confirmPassword')}
-              showPasswordLabel={messages.showPasswordLabel}
-              hidePasswordLabel={messages.hidePasswordLabel}
+              showPasswordLabel={m.showPassword}
+              hidePasswordLabel={m.hidePassword}
             />
             <Field.Feedback feedback={confirmPasswordFeedback} />
           </Field.Root>
@@ -98,7 +87,7 @@ export function NewPasswordStep({ messages, form, passwordFeedback, onBack, focu
               checked={form.values.signOutOfOtherSessions}
               onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
             />
-            <Field.Label>{messages.signOutOfOtherSessionsLabel}</Field.Label>
+            <Field.Label>{m.newPassword.signOutOfOtherSessions}</Field.Label>
           </Field.Root>
         </div>
         <div {...stylex.props(styles.actions)}>
@@ -106,11 +95,11 @@ export function NewPasswordStep({ messages, form, passwordFeedback, onBack, focu
             form={form.id}
             fullWidth
             isPending={form.isSubmitting}
-            pendingLabel={messages.pendingLabel}
+            pendingLabel={m.newPassword.pending}
             disabled={!form.canSubmit}
             focusableWhenDisabled
           >
-            {messages.primaryActionLabel}
+            {m.newPassword.submit}
           </SubmitButton>
           <Button
             type='button'
@@ -120,7 +109,7 @@ export function NewPasswordStep({ messages, form, passwordFeedback, onBack, focu
             disabled={form.isSubmitting}
             onClick={onBack}
           >
-            {messages.backLabel}
+            {m.forgotPassword.back}
           </Button>
         </div>
       </Card.Content>

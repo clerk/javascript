@@ -249,21 +249,10 @@ export function SignInView({
                   focusRef={focusRef}
                   step={current}
                   messages={{
-                    help: {
-                      title: m.alternativeMethods.getHelp.title,
-                      description: m.alternativeMethods.getHelp.description,
-                      backButton: m.back,
-                      supportButton: m.alternativeMethods.getHelp.emailSupport,
-                    },
-                    forgotPassword: {
-                      title: m.forgotPassword.title,
-                      description: fill(m.forgotPassword.description, {
-                        identifier: current.purpose === 'forgot-password' ? current.identifier : '',
-                      }),
-                      primaryActionLabel: m.continue,
-                      pendingLabel: m.forgotPassword.pending,
-                      backLabel: m.forgotPassword.back,
-                    },
+                    title: m.alternativeMethods.getHelp.title,
+                    description: m.alternativeMethods.getHelp.description,
+                    backButton: m.back,
+                    supportButton: m.alternativeMethods.getHelp.emailSupport,
                   }}
                   isPending={isPending}
                   onSubmit={onSubmit}
@@ -276,17 +265,6 @@ export function SignInView({
             <Flow.Step ids={['new-password:forgot']}>
               <NewPasswordStep
                 focusRef={focusRef}
-                messages={{
-                  title: m.newPassword.title,
-                  passwordLabel: m.newPassword.passwordLabel,
-                  confirmPasswordLabel: m.newPassword.confirmPasswordLabel,
-                  showPasswordLabel: m.showPassword,
-                  hidePasswordLabel: m.hidePassword,
-                  signOutOfOtherSessionsLabel: m.newPassword.signOutOfOtherSessions,
-                  primaryActionLabel: m.newPassword.submit,
-                  pendingLabel: m.newPassword.pending,
-                  backLabel: m.forgotPassword.back,
-                }}
                 form={newPasswordForm}
                 passwordFeedback={newPasswordFeedback}
                 onBack={onBack}
