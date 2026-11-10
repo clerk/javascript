@@ -4,11 +4,11 @@ How sign-in and sign-up decide which screen to show, from the step FAPI says com
 
 ## The model
 
-A step is a step of the auth flow, not a screen. FAPI owns the step, the order of steps, and whether a code is already sent. Mosaic owns the routes, the layout and copy, and when to send a code. FAPI never names a screen or a route.
+A step is a step of the auth flow, not a screen. FAPI owns the step, the order of steps, and whether a code is already sent. Mosaic owns the routes, the layout and copy, and when to send a code.
 
 Today FAPI sends `status`, `missing_fields` and `unverified_fields`, not a step. Until it sends `nextStep`, `getSignInNextStep` and `getSignUpNextStep` in `shared` compute it from those fields (see [Bridge](#bridge)).
 
-There is no step machine and no local copy of the step. Each step has one route, and what the step can't say lives in the route, such as the factor the user picked in `factorOne`'s `:factor` param.
+There is no step machine and no local copy of the step. What the step can't say lives in the route, such as the factor the user picked in `factorOne`'s `:factor` param.
 
 ## Pick the screen
 
@@ -23,11 +23,11 @@ const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step)
 - `routeFor(step)` returns the step's route, from the lists below.
 - `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field.
 - The component that owns the route table computes `screen` during render, with no effect.
-- Until Clerk loads, the model is `loading` and the scope gets `ready: false`, so an entry like `factor-one` isn't reset to `start`. Once Clerk is loaded there is always a step.
+- This runs once the model is `ready`, and after Clerk loads there is always a step. Until then the scope gets `ready: false`, so a starting route like `factor-one` isn't reset to `start`.
 
 ## Move on after a submit
 
-The model makes the Clerk call and returns the next step, read from the resource after the call. The controller passes it to `next(step)`. A sign-in or sign-up method returns `{ error }` instead of rejecting; the model throws that `error`, which is the Clerk error the call failed with, so `save` and the controller's error owners handle it like any other Clerk call.
+The model makes the Clerk call and returns the next step. The methods return `{ error }` instead of rejecting, so the model throws it for `save` and the controller's error owners. The controller passes the step to `next(step)`.
 
 ```ts
 submitPassword: async (password: string) => {
@@ -39,8 +39,8 @@ submitPassword: async (password: string) => {
 },
 ```
 
-- `complete`: `finalize()`, then leave the flow.
-- `transfer`: `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
+- `complete`: the model's `finalize()`, then leave the flow.
+- `transfer`: the model's `transfer()`, which calls `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
 - `unknown`: nothing. The screen already shows "Start over".
 - Anything else: `go(routeFor(step))`.
 - An error from `finalize()` or the transfer stays on the current screen.
@@ -78,7 +78,7 @@ Sign-up:
 
 ## Entry actions
 
-The controller runs these on `start`, then calls `next(step)`.
+The controller calls these model callbacks on `start`, then `next(step)`.
 
 - Ticket (`__clerk_ticket`): the model exposes `redeemTicket: () => signUp.ticket({ unsafeMetadata })`. A ticket works only once, so redeem it once: keep the "already started" flag in a component that doesn't remount, so a remount or StrictMode can't redeem it twice. A failed redemption shows its error on `start`.
 - Email-link return (`__clerk_status`): only `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
