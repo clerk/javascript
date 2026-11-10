@@ -239,6 +239,13 @@ import {
 } from '../stories/pagination.stories';
 import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
 import {
+  Default as PasswordInputDefault,
+  Disabled as PasswordInputDisabled,
+  Invalid as PasswordInputInvalid,
+  meta as passwordInputMeta,
+  Sizes as PasswordInputSizes,
+} from '../stories/password-input.stories';
+import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
   Invalid as PhoneInputInvalid,
@@ -759,6 +766,13 @@ const stepperModule: StoryModule = {
   Clickable: StepperClickable,
 };
 
+const passwordInputModule: StoryModule = {
+  meta: passwordInputMeta,
+  Default: PasswordInputDefault,
+  Sizes: PasswordInputSizes,
+  Disabled: PasswordInputDisabled,
+  Invalid: PasswordInputInvalid,
+};
 const phoneInputModule: StoryModule = {
   meta: phoneInputMeta,
   Default: PhoneInputDefault,
@@ -1350,6 +1364,7 @@ export const registry: StoryModule[] = [
   flowComponentModule,
   inputModule,
   inputGroupModule,
+  passwordInputModule,
   phoneInputModule,
   dataListModule,
   itemModule,
