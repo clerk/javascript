@@ -20,26 +20,26 @@ export function SignInActionBlocked({ details }: SignInActionBlockedProps) {
         <Card.Description>{details?.description ?? m.description}</Card.Description>
       </Card.Header>
       {href || details?.traceId ? (
-        <Card.Content xstyle={styles.fieldStack}>
+        <Card.Content xstyle={[styles.fieldStack, styles.footerText]}>
           {href ? (
             <Link
               href={href}
               target='_blank'
               rel='noopener noreferrer'
-              size='sm'
+              size='xs'
             >
               {details?.linkText ?? href}
             </Link>
           ) : null}
           {details?.traceId ? (
             <Text
-              size='sm'
+              size='xs'
               color='foreground-secondary'
             >
               {m.traceIdLabel}{' '}
               <Text
                 render={<span />}
-                size='sm'
+                size='xs'
                 xstyle={styles.traceId}
               >
                 {details.traceId}

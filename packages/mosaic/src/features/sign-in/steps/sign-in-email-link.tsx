@@ -7,6 +7,7 @@ import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
+import { styles } from '../sign-in.styles';
 
 interface SignInEmailLinkProps {
   identifier: string;
@@ -35,8 +36,8 @@ export function SignInEmailLink({ identifier, globalErrorMessage, resend, onCanc
       {resend ? (
         <Card.Content>
           <Text
-            size='sm'
-            color='foreground-secondary'
+            size='xs'
+            xstyle={styles.footerText}
           >
             {resend.text}{' '}
             <Button
