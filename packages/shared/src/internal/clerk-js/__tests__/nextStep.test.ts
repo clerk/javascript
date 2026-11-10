@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { SignInNextStepInput, SignUpNextStepInput } from '../getNextStep';
-import { getSignInNextStep, getSignUpNextStep } from '../getNextStep';
+import type { SignInNextStepInput, SignUpNextStepInput } from '../nextStep';
+import { getSignInNextStep, getSignUpNextStep } from '../nextStep';
 
 const notStarted = { status: null, strategy: null };
 const protectCheck = { status: 'pending' as const, token: 'token', sdkUrl: 'https://protect.example/sdk.js' };
