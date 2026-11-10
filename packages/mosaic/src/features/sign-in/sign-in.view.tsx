@@ -11,10 +11,10 @@ import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types'
 import { stepKey } from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CodeStep } from './steps/code-step';
+import { CredentialStep } from './steps/credential-step';
 import { IdentifierStep } from './steps/identifier-step';
 import { NewPasswordStep } from './steps/new-password-step';
 import { NoticeStep } from './steps/notice-step';
-import { CredentialStep } from './steps/credential-step';
 import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];

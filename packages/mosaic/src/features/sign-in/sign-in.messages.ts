@@ -14,7 +14,6 @@ export const signInMessages = {
   password: {
     title: 'Enter your password',
     description: 'Enter the password associated with your account',
-    editIdentifier: 'Edit email address',
     label: 'Password',
     placeholder: 'Enter your password',
     forgotPassword: 'Forgot password?',
@@ -40,6 +39,7 @@ export const signInMessages = {
     title: 'Password compromised',
     message: 'This password has been found as part of a breach and can not be used, please reset your password.',
     resetPassword: 'Reset your password',
+    pending: 'Resetting password',
   },
   emailLink: {
     title: 'Check your email',
@@ -150,6 +150,7 @@ export const signInMessages = {
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
   },
+  editIdentifier: 'Edit email address',
   continue: 'Continue',
   verifying: 'Verifying',
   back: 'Back',

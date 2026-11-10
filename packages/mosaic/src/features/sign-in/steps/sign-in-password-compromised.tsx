@@ -53,7 +53,7 @@ export function SignInPasswordCompromised({
             ref={ref}
             type='button'
             isPending={isPending}
-            pendingLabel={m.forgotPassword.pending}
+            pendingLabel={m.passwordCompromised.pending}
             onClick={onForgotPassword}
           >
             {m.passwordCompromised.resetPassword}

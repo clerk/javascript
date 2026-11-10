@@ -37,7 +37,7 @@ export function SignInEmailLink({
         <Card.Description>{m.emailLink.description}</Card.Description>
         <SignInIdentityPreview
           identifier={identifier}
-          editLabel={m.password.editIdentifier}
+          editLabel={m.editIdentifier}
           disabled={isPending}
           onEdit={onEditIdentifier}
         />
