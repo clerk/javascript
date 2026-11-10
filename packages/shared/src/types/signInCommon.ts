@@ -221,6 +221,10 @@ export type AuthenticateWithPasskeyParams = {
    * `passkey` among its supported second factors.
    */
   flow?: 'autofill' | 'discoverable';
+  /**
+   * Only offer passkeys already available on this device. When none are, the request fails with `passkey_registration_cancelled` instead of showing the system's "use a passkey from another device" sheet. Supported by the native Expo passkeys module on iOS 16+ and Android, and ignored in the browser. Defaults to `false`.
+   */
+  preferImmediatelyAvailableCredentials?: boolean;
 };
 
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {

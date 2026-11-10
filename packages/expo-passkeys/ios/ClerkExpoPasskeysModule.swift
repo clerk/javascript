@@ -11,8 +11,8 @@ public class ClerkExpoPasskeysModule: Module {
             self.credentialManager.createPasskey(challengeBase64: challenge, rpId:rpId, displayName:displayName, userIdBase64: userId, excludeCredentialIdsBase64: excludeCredentialIds, promise: promise)
         }
         
-        AsyncFunction("get") { (challenge: String, rpId:String, promise: Promise) in
-            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, promise: promise)
+        AsyncFunction("get") { (challenge: String, rpId:String, preferImmediatelyAvailableCredentials: Bool, promise: Promise) in
+            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, preferImmediatelyAvailableCredentials: preferImmediatelyAvailableCredentials, promise: promise)
         }
         
         AsyncFunction("autofill") { (challenge: String, rpId:String, promise: Promise) in

@@ -665,7 +665,7 @@ export class SignIn extends BaseResource implements SignInResource {
    * @returns The updated `SignIn` resource.
    */
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
-    const { flow } = params || {};
+    const { flow, preferImmediatelyAvailableCredentials } = params || {};
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -699,6 +699,7 @@ export class SignIn extends BaseResource implements SignInResource {
       const { publicKeyCredential, error } = await webAuthnGetCredential({
         publicKeyOptions: secondFactorPublicKeyOptions,
         conditionalUI: false,
+        preferImmediatelyAvailableCredentials,
       });
       if (!publicKeyCredential) {
         throw error;
@@ -748,6 +749,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { publicKeyCredential, error } = await webAuthnGetCredential({
       publicKeyOptions,
       conditionalUI: canUseConditionalUI,
+      preferImmediatelyAvailableCredentials,
     });
 
     if (!publicKeyCredential) {
@@ -1578,7 +1580,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: ClerkError | null }> {
-    const { flow } = params || {};
+    const { flow, preferImmediatelyAvailableCredentials } = params || {};
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -1633,6 +1635,7 @@ class SignInFuture implements SignInFutureResource {
       const { publicKeyCredential, error } = await webAuthnGetCredential({
         publicKeyOptions,
         conditionalUI: canUseConditionalUI,
+        preferImmediatelyAvailableCredentials,
       });
 
       if (!publicKeyCredential) {

@@ -115,8 +115,10 @@ const makeSerializedGetResponse = (
 
 export async function get({
   publicKeyOptions,
+  preferImmediatelyAvailableCredentials = false,
 }: {
   publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+  preferImmediatelyAvailableCredentials?: boolean;
 }): Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>> {
   if (!publicKeyOptions) {
     throw new Error('publicKeyCredential has not been provided');
@@ -129,8 +131,14 @@ export async function get({
   };
 
   const getPasskeyModule = Platform.select({
-    android: async () => ClerkExpoPasskeys.get(JSON.stringify(serializedPublicCredential)),
-    ios: async () => ClerkExpoPasskeys.get(serializedPublicCredential.challenge, serializedPublicCredential.rpId),
+    android: async () =>
+      ClerkExpoPasskeys.get(JSON.stringify(serializedPublicCredential), preferImmediatelyAvailableCredentials),
+    ios: async () =>
+      ClerkExpoPasskeys.get(
+        serializedPublicCredential.challenge,
+        serializedPublicCredential.rpId,
+        preferImmediatelyAvailableCredentials,
+      ),
     default: null,
   });
 
