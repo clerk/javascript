@@ -43,29 +43,29 @@ const signUpRoutes = {
 } as const;
 ```
 
-| Sign-in step    | Carries            | Route                |
-| --------------- | ------------------ | -------------------- |
-| `identifier`    |                    | `start`              |
-| `protect`       |                    | `protectCheck`       |
-| `first_factor`  | `strategy`, `sent` | `factorOne`          |
-| `second_factor` | `strategy`, `sent` | `factorTwo`          |
-| `client_trust`  |                    | `clientTrust`        |
-| `new_password`  |                    | `resetPassword`      |
-| `transfer`      |                    | the sign-up's routes |
-| `complete`      | `createdSessionId` | leaves the flow      |
+| Sign-in step    | Carries            | Route                                       |
+| --------------- | ------------------ | ------------------------------------------- |
+| `identifier`    |                    | `start`                                     |
+| `protect`       |                    | `protectCheck`                              |
+| `first_factor`  | `strategy`, `sent` | `factorOne`                                 |
+| `second_factor` | `strategy`, `sent` | `factorTwo`                                 |
+| `client_trust`  |                    | `clientTrust`                               |
+| `new_password`  |                    | `resetPassword`                             |
+| `transfer`      |                    | runs the transfer, then the sign-up's route |
+| `complete`      | `createdSessionId` | `finalize()`, then leaves                   |
 
-| Sign-up step     | Carries            | Route                                       |
-| ---------------- | ------------------ | ------------------------------------------- |
-| `start`          |                    | `start`                                     |
-| `protect`        |                    | `protectCheck`                              |
-| `enterprise_sso` |                    | `enterpriseConnections`, or straight to IdP |
-| `fields`         | `fields`           | `continue`                                  |
-| `verify_email`   | `target`, `sent`   | `verifyEmail`                               |
-| `verify_phone`   | `target`, `sent`   | `verifyPhone`                               |
-| `transfer`       |                    | the route of the step after the transfer    |
-| `complete`       | `createdSessionId` | leaves the flow                             |
+| Sign-up step     | Carries            | Route                                         |
+| ---------------- | ------------------ | --------------------------------------------- |
+| `start`          |                    | `start`                                       |
+| `protect`        |                    | `protectCheck`                                |
+| `enterprise_sso` |                    | `enterpriseConnections`, or straight to IdP   |
+| `fields`         | `fields`           | `continue`                                    |
+| `verify_email`   | `target`, `sent`   | `verifyEmail`                                 |
+| `verify_phone`   | `target`, `sent`   | `verifyPhone`                                 |
+| `transfer`       |                    | runs the transfer, then the next step's route |
+| `complete`       | `createdSessionId` | `finalize()`, then leaves                     |
 
-`identifier` and `start` are what Mosaic shows before the resource exists, so FAPI never sends them. `sent` means a code or link is already out, so a reload doesn't send another. `unknown` shows a "Start over" screen (D4).
+`identifier` and `start` are what Mosaic shows before the resource exists, so FAPI never sends them. `sent` means a code or link is already out, so a reload doesn't send another. `unknown` shows a "Start over" screen on every route (D4).
 
 ## How the route and the step fit together
 
@@ -79,7 +79,7 @@ The component that owns the route table resolves the route during render, with n
 ```tsx
 const step = getSignInNextStep(signIn);
 const { route, go } = useRouterScope(signInRoutes, { routing, path, root: 'start' });
-const shown = allowedRoute(route, step) ? route : routeFor(step);
+const shown = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step) ? route : routeFor(step);
 ```
 
 It renders the screen for `shown`. A screen moves on in its submit handler:
@@ -87,8 +87,16 @@ It renders the screen for `shown`. A screen moves on in its submit handler:
 ```ts
 const { error } = await signIn.password({ password });
 if (error) return showError(error);
-go(routeFor(getSignInNextStep(signIn)));
+await next(getSignInNextStep(signIn));
 ```
+
+`next(step)` turns the step into a move:
+
+- `complete`: `signIn.finalize()` sets the session active (`clerk-js/src/core/resources/SignIn.ts:1781`), then the flow is left.
+- `transfer`: until FAPI transfers (phase 3), `signUp.create({ transfer: true, unsafeMetadata })`, as `ui` does (`ui/src/components/SignIn/handleSignUpIfMissingTransfer.ts:40-43`), then the sign-up's next step.
+- Anything else: `go(routeFor(step))`.
+
+An error from `finalize()` or the transfer stays on the current screen.
 
 Methods stay as they are and return `{ error }`. The resource is updated before the promise resolves, so the step is current after `await` (`clerk-js/src/core/resources/Base.ts:140`, `:235`).
 
@@ -124,9 +132,12 @@ The alternatives were to always show FAPI's step, which breaks back and links, o
 
 ## Entry actions
 
-Some URLs carry an action to run before the user does anything: a `__clerk_ticket` from an invitation, or the return from an email link. The model exposes it as data and a callback (`hasTicket`, `redeemTicket: () => signUp.ticket()`; `ticket()` reads the param itself, `clerk-js/src/core/resources/SignUp.ts:1281-1283`). The controller runs it on `start`, then goes to `routeFor(step)`.
+Some URLs carry an action to run before the user does anything. The controller runs it on `start`, then calls `next(step)`.
 
-A ticket is single-use, so the guard is "not redeemed yet", not "first mount". A bare mount effect runs twice under React StrictMode and again on remount. Mosaic has no shared helper for this yet; the first feature that needs one adds it to `src/hooks/`.
+- An invitation's `__clerk_ticket`: the model exposes `redeemTicket: () => signUp.ticket({ unsafeMetadata })`. `ticket()` reads the param itself (`clerk-js/src/core/resources/SignUp.ts:1281-1283`), and `unsafeMetadata` goes along as in `ui` (`ui/src/components/SignUp/SignUpStart.tsx:153`).
+- The return from an email link: `__clerk_status` says how it went (`shared/src/internal/clerk-js/queryParams.ts:29-32`). Only `verified` continues by step. `transferable` and the error statuses (expired, failed, client mismatch) show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does, because no step says them.
+
+A ticket is single-use, so the guard is "not started yet", kept above the component that remounts. "First mount" fails because a mount effect runs twice under React StrictMode, and "not redeemed" fails because a remount during the request would start a second one. A failed redemption shows its error on `start`. Mosaic has no shared helper for this yet; the first feature that needs one adds it to `src/hooks/`.
 
 ## Transfer moves to FAPI
 
