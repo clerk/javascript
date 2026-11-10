@@ -404,13 +404,13 @@ export interface SignInFutureResource {
   readonly secondFactorVerification: VerificationResource;
 
   /**
-   * The [Device Trust](https://clerk.com/docs/guides/protect/device-trust) state of the device the user is signing in from.
+   * The [Device Trust](https://clerk.com/docs/guides/protect/device-trust) state of the device the user is signing in from, as of the latest response.
    * <ul>
-   *  <li>`'new'` - The user hasn't signed in on this device before, or Clerk can't confirm that they have. This is always the value while `status` is `'needs_client_trust'`.</li>
-   *  <li>`'known'` - The user has signed in on this device before.</li>
+   *  <li>`'new'` - Clerk doesn't trust this device for the user yet, or can't confirm that it does. While `status` is `'needs_client_trust'`, this is `'new'` unless Clerk reports otherwise.</li>
+   *  <li>`'known'` - Clerk trusts this device for the user. Completing a sign-in makes the device trusted in most cases, so a `'complete'` sign-in usually reads `'known'`.</li>
    *  <li>`'pending'` - Clerk can't tell yet, for example because the sign-in has no identifier.</li>
    * </ul>
-   * `undefined` when Device Trust is off. When the instance reports Device Trust through the `'needs_client_trust'` status, it's also `undefined` at every other status.
+   * To record whether the device was trusted before this sign-in, read the value before the sign-in completes, for example after `create({ identifier })` and before `password()`. `undefined` when Device Trust is off, or before a sign-in attempt exists.
    */
   readonly clientTrustState?: ClientTrustState;
 
