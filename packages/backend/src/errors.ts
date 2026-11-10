@@ -117,3 +117,18 @@ export class MachineTokenVerificationError extends ClerkError {
     return `${this.message} (code=${this.code}, status=${this.status || 'n/a'})`;
   }
 }
+
+export class OAuthTokenExchangeError extends Error {
+  readonly error: string;
+  readonly errorDescription?: string;
+  readonly status?: number;
+
+  constructor({ error, errorDescription, status }: { error: string; errorDescription?: string; status?: number }) {
+    super(errorDescription ? `${error}: ${errorDescription}` : error);
+    Object.setPrototypeOf(this, OAuthTokenExchangeError.prototype);
+    this.name = 'OAuthTokenExchangeError';
+    this.error = error;
+    this.errorDescription = errorDescription;
+    this.status = status;
+  }
+}
