@@ -11,7 +11,6 @@ import { PlaygroundProvider } from './PlaygroundContext';
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
-    'profile-permutations': dynamic(() => import('../stories/profile-permutations.mdx')),
   },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
