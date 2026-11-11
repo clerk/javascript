@@ -1,0 +1,6 @@
+/.expo/
+/.env*
+/android/
+/ios/
+/node_modules/
+/pnpm-lock.yaml
