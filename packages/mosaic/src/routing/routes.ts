@@ -97,7 +97,7 @@ function minLengthOf(parts: readonly PatternPart[]): number {
   return minLength;
 }
 
-function isRouteName<Routes extends RouteTable>(routes: Routes, name: string): name is RouteName<Routes> {
+export function isRouteName<Routes extends RouteTable>(routes: Routes, name: string): name is RouteName<Routes> {
   return Object.prototype.hasOwnProperty.call(routes, name);
 }
 
@@ -156,22 +156,30 @@ export function routeParts(
   name: string,
   params: Record<string, string | undefined> = {},
 ): string[] {
-  const pattern = routes[name];
+  const pattern = isRouteName(routes, name) ? routes[name] : undefined;
   return pattern === undefined ? [] : buildParts(compilePattern(pattern), params);
 }
 
 // compiled 'billing/plans/:planId?' + { planId: 'pro' } -> ['billing', 'plans', 'pro']    + {} -> ['billing', 'plans']
+// A param after an omitted optional one has no place to go: it would take the omitted one's
+// position and read back under its name, so it is a caller error rather than a shorter segment.
 export function buildParts(parts: readonly PatternPart[], params: Record<string, string | undefined>): string[] {
   const built: string[] = [];
+  let omitted: string | undefined;
   for (const part of parts) {
     if (!part.param) {
       built.push(part.value);
       continue;
     }
     const value = params[part.name];
-    if (value !== undefined) {
-      built.push(value);
+    if (value === undefined) {
+      omitted ??= part.name;
+      continue;
     }
+    if (omitted !== undefined) {
+      throw new Error(`[clerk] Route param "${part.name}" was given without "${omitted}" before it.`);
+    }
+    built.push(value);
   }
   return built;
 }

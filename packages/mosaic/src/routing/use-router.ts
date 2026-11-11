@@ -4,7 +4,7 @@ import type { MosaicLocation, SegmentParts } from './location';
 import type { Route, Router } from './router';
 import { createRouter } from './router';
 import type { RouteName, RouteTable } from './routes';
-import { routeParts } from './routes';
+import { isRouteName, routeParts } from './routes';
 import type { RoutingScope } from './routing-scope';
 import { createRoutingScope, useInheritedScope } from './routing-scope';
 import type { MosaicLocationOptions } from './use-mosaic-location';
@@ -157,7 +157,7 @@ export function useRouterScope<const Routes extends RouteTable>(
       return undefined;
     }
     const name = notFound?.(parts);
-    return name !== undefined && name in table ? name : root;
+    return name !== undefined && isRouteName(table, name) ? name : root;
   }, [ready, matched, notFound, parts, table, root]);
   const current = useMemo<Route<Routes> | undefined>(() => {
     if (!ready) {

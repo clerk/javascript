@@ -116,12 +116,26 @@ describe('buildParts', () => {
   });
 });
 
+describe('buildParts with a gap', () => {
+  it('rejects a param given after an omitted optional one', () => {
+    const [route] = compileRoutes({ r: 'a/:b?/:c?' });
+    expect(buildParts(route.parts, { b: 'x', c: 'y' })).toEqual(['a', 'x', 'y']);
+    expect(buildParts(route.parts, { b: 'x' })).toEqual(['a', 'x']);
+    expect(() => buildParts(route.parts, { c: 'y' })).toThrow('without "b" before it');
+  });
+});
+
 describe('routeParts', () => {
   const table = { account: 'account', apiKeys: 'api-keys', statement: 'billing/statement/:statementId' };
 
   it('builds the parts for a route name', () => {
     expect(routeParts(table, 'apiKeys')).toEqual(['api-keys']);
     expect(routeParts(table, 'statement', { statementId: 'st_1' })).toEqual(['billing', 'statement', 'st_1']);
+  });
+
+  it('builds no parts for an inherited name', () => {
+    expect(routeParts({ account: 'account' }, 'toString')).toEqual([]);
+    expect(routeParts({ account: 'account' }, 'constructor')).toEqual([]);
   });
 
   it('builds no parts for an unknown name', () => {

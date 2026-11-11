@@ -94,7 +94,10 @@ export function ModalSurfaceHost<Options>({
         }));
         location.write(surface.initialParts?.(options) ?? []);
       },
-      close: () => location.clear(),
+      close: () => {
+        location.clear();
+        setState(previous => (previous.openRequested ? { ...previous, openRequested: false } : previous));
+      },
       preload,
       isOpen,
     };
