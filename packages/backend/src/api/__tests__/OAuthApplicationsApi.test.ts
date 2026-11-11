@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { OAuthTokenExchangeError } from '../../errors';
 import { server, validateHeaders } from '../../mock-server';
+import type { ExchangeOAuthApplicationTokenParams } from '../endpoints/OAuthApplicationsApi';
 import { createBackendApiClient } from '../factory';
 
 describe('OAuthApplications', () => {
@@ -228,6 +229,29 @@ describe('OAuthApplications', () => {
       expect(result.refreshToken).toBe('refresh');
     });
 
+    it('ignores empty entries in a returned scope', async () => {
+      useApplication();
+      server.use(
+        http.post(tokenFetchUrl, () =>
+          HttpResponse.json({
+            access_token: 'exchanged_token',
+            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+            token_type: 'Bearer',
+            scope: ' invoices:read  invoices:write ',
+          }),
+        ),
+      );
+
+      const result = await createClient().oauthApplications.__experimental_exchangeToken({
+        oauthApplicationId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+      });
+
+      expect(result.scope).toEqual(['invoices:read', 'invoices:write']);
+    });
+
     it('sends client_id in the body and no Authorization header for public clients', async () => {
       useApplication();
 
@@ -319,26 +343,29 @@ describe('OAuthApplications', () => {
       ).rejects.toMatchObject({ error: 'invalid_response', status: 200 });
     });
 
-    it('rejects actorTokenType without actorToken before making any request', async () => {
-      let requested = false;
-      server.use(
-        http.all('*', () => {
-          requested = true;
-          return HttpResponse.json({});
-        }),
-      );
+    it.each([{ actorTokenType: 'urn:ietf:params:oauth:token-type:jwt' }, { actorToken: 'actor_token' }])(
+      'rejects an unpaired actor parameter before making any request: %o',
+      async actor => {
+        let requested = false;
+        server.use(
+          http.all('*', () => {
+            requested = true;
+            return HttpResponse.json({});
+          }),
+        );
 
-      await expect(
-        createClient().oauthApplications.__experimental_exchangeToken({
-          oauthApplicationId,
-          clientSecret,
-          subjectToken: 'subject_token',
-          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
-          actorTokenType: 'urn:ietf:params:oauth:token-type:jwt',
-        }),
-      ).rejects.toThrow('`actorTokenType` requires `actorToken`.');
-      expect(requested).toBe(false);
-    });
+        await expect(
+          createClient().oauthApplications.__experimental_exchangeToken({
+            oauthApplicationId,
+            clientSecret,
+            subjectToken: 'subject_token',
+            subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+            ...actor,
+          } as unknown as ExchangeOAuthApplicationTokenParams),
+        ).rejects.toThrow('`actorToken` and `actorTokenType` must be provided together.');
+        expect(requested).toBe(false);
+      },
+    );
 
     it('throws when the OAuth application ID is missing', async () => {
       await expect(
