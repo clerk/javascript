@@ -32,15 +32,11 @@ import {
   type ComboboxOptionsContextValue,
 } from './combobox-context';
 
-export interface ComboboxProps {
+interface ComboboxBaseProps {
   /** Controlled input text. */
   inputValue?: string;
   defaultInputValue?: string;
   onInputValueChange?: (value: string) => void;
-  /** Controlled selected value. */
-  value?: string | null;
-  defaultValue?: string | null;
-  onValueChange?: (value: string | null) => void;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -53,8 +49,37 @@ export interface ComboboxProps {
   openOnInputClick?: boolean;
 }
 
+export interface ComboboxSingleProps extends ComboboxBaseProps {
+  multiple?: false;
+  /** Controlled selected value. */
+  value?: string | null;
+  defaultValue?: string | null;
+  onValueChange?: (value: string | null) => void;
+}
+
+export interface ComboboxMultipleProps extends ComboboxBaseProps {
+  /** Lets several options be selected. Picking an option toggles it, clears the query and keeps the popup open. */
+  multiple: true;
+  /** Controlled selected values, in the order they were picked. */
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+}
+
+export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps;
+
+function toValues(value: string | null | undefined): string[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  return value === null ? [] : [value];
+}
+
 function ComboboxInner(props: ComboboxProps) {
   const { placement: placementProp = 'bottom-start', sideOffset = 4, children } = props;
+  const multiple = props.multiple === true;
+  const onSingleValueChange = props.multiple ? undefined : props.onValueChange;
+  const onMultipleValueChange = props.multiple ? props.onValueChange : undefined;
 
   const nodeId = useFloatingNodeId();
 
@@ -66,17 +91,27 @@ function ComboboxInner(props: ComboboxProps) {
     props.onInputValueChange,
   );
 
-  const [selectedValue, setSelectedValue] = useControllableState<string | null>(
-    props.value,
-    props.defaultValue ?? null,
-    props.onValueChange,
+  const onSelectedValuesChange = useCallback(
+    (values: string[]) => {
+      onMultipleValueChange?.(values);
+      onSingleValueChange?.(values[0] ?? null);
+    },
+    [onSingleValueChange, onMultipleValueChange],
   );
+  const singleValue = props.multiple ? undefined : props.value;
+  const controlledSingleValues = useMemo(() => toValues(singleValue), [singleValue]);
+  const [selectedValues, setSelectedValues] = useControllableState<string[]>(
+    props.multiple ? props.value : controlledSingleValues,
+    (props.multiple ? props.defaultValue : toValues(props.defaultValue)) ?? [],
+    onSelectedValuesChange,
+  );
+  const selectedValue = multiple ? null : (selectedValues[0] ?? null);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [inlineMode, setInlineMode] = useState(false);
   const [queryChanged, setQueryChanged] = useState(false);
-  const initialValue = props.value ?? props.defaultValue;
+  const initialValue = props.multiple ? undefined : (props.value ?? props.defaultValue);
   const labelsByValueRef = useRef(
     new Map<string, string>(
       initialValue != null && props.defaultInputValue !== undefined ? [[initialValue, props.defaultInputValue]] : [],
@@ -84,6 +119,7 @@ function ComboboxInner(props: ComboboxProps) {
   );
 
   const highlightFirstRef = useRef(false);
+  const highlightValueRef = useRef<string | null>(null);
 
   const setOpen = useCallback(
     (nextOpen: boolean) => {
@@ -120,6 +156,7 @@ function ComboboxInner(props: ComboboxProps) {
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const chipsRef = useRef<HTMLDivElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
   const registerOption = useCallback((index: number) => {
     if (index === 0 && highlightFirstRef.current) {
@@ -129,6 +166,10 @@ function ComboboxInner(props: ComboboxProps) {
   }, []);
   const registerSelectedIndex = useCallback((index: number, value: string, label: string, selected: boolean) => {
     labelsByValueRef.current.set(value, label);
+    if (highlightValueRef.current === value) {
+      highlightValueRef.current = null;
+      setActiveIndex(index);
+    }
     if (!selected) {
       return undefined;
     }
@@ -189,7 +230,7 @@ function ComboboxInner(props: ComboboxProps) {
         return false;
       }
       const target = event.target;
-      return !(target instanceof Node && triggerRef.current?.contains(target));
+      return !(target instanceof Node && (triggerRef.current?.contains(target) || chipsRef.current?.contains(target)));
     },
     bubbles: {
       escapeKey: inlineMode,
@@ -222,21 +263,46 @@ function ComboboxInner(props: ComboboxProps) {
   const handleSelect = useCallback(
     (value: string, index: number, label: string) => {
       labelsByValueRef.current.set(value, label);
-      setSelectedValue(value);
+      if (multiple) {
+        const next = selectedValues.includes(value)
+          ? selectedValues.filter(selected => selected !== value)
+          : [...selectedValues, value];
+        setSelectedValues(next);
+        if (next.length === 0) {
+          setSelectedIndex(null);
+        }
+        if (inputValue !== '') {
+          highlightValueRef.current = value;
+          setInputValue('');
+        }
+        return;
+      }
+      setSelectedValues([value]);
       setSelectedIndex(index);
       setInputValue(props.inline ? '' : label);
       setActiveIndex(null);
       setOpen(false);
     },
-    [props.inline, setSelectedValue, setInputValue, setOpen],
+    [multiple, selectedValues, inputValue, props.inline, setSelectedValues, setInputValue, setOpen],
+  );
+
+  const removeValue = useCallback(
+    (value: string) => {
+      const next = selectedValues.filter(selected => selected !== value);
+      setSelectedValues(next);
+      if (next.length === 0) {
+        setSelectedIndex(null);
+      }
+    },
+    [selectedValues, setSelectedValues],
   );
 
   const handleInputChange = useCallback(
     (value: string) => {
       setQueryChanged(true);
       setInputValue(value);
-      if (value === '' && !props.inline) {
-        setSelectedValue(null);
+      if (value === '' && !props.inline && !multiple) {
+        setSelectedValues([]);
         setSelectedIndex(null);
       }
       setOpenState(true);
@@ -247,17 +313,17 @@ function ComboboxInner(props: ComboboxProps) {
         setActiveIndex(null);
       }
     },
-    [props.inline, setInputValue, setOpenState, setSelectedValue],
+    [props.inline, multiple, setInputValue, setOpenState, setSelectedValues],
   );
 
   const clear = useCallback(() => {
     setQueryChanged(false);
     setInputValue('');
-    setSelectedValue(null);
+    setSelectedValues([]);
     setSelectedIndex(null);
     setActiveIndex(null);
     focusInput();
-  }, [focusInput, setInputValue, setSelectedValue]);
+  }, [focusInput, setInputValue, setSelectedValues]);
 
   const contextValue = useMemo<ComboboxContextValue>(
     () => ({
@@ -265,7 +331,10 @@ function ComboboxInner(props: ComboboxProps) {
       clear,
       inputValue,
       filterQuery,
-      selectedValue,
+      multiple,
+      selectedValues,
+      labelsByValueRef,
+      removeValue,
       floatingContext,
       refs,
       floatingStyles,
@@ -278,6 +347,7 @@ function ComboboxInner(props: ComboboxProps) {
       labelsRef,
       popupRef,
       triggerRef,
+      chipsRef,
       arrowRef,
       valuesByIndexRef,
       setInlineMode,
@@ -294,7 +364,9 @@ function ComboboxInner(props: ComboboxProps) {
       clear,
       inputValue,
       filterQuery,
-      selectedValue,
+      multiple,
+      selectedValues,
+      removeValue,
       floatingContext,
       refs,
       floatingStyles,
@@ -326,8 +398,8 @@ function ComboboxInner(props: ComboboxProps) {
   );
 
   const highlightContextValue = useMemo<ComboboxHighlightContextValue>(
-    () => ({ activeIndex, selectedValue }),
-    [activeIndex, selectedValue],
+    () => ({ activeIndex, selectedValues }),
+    [activeIndex, selectedValues],
   );
 
   return (

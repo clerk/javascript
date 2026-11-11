@@ -14,7 +14,10 @@ export interface ComboboxContextValue {
   clear: () => void;
   inputValue: string;
   filterQuery: string;
-  selectedValue: string | null;
+  multiple: boolean;
+  selectedValues: string[];
+  labelsByValueRef: React.MutableRefObject<Map<string, string>>;
+  removeValue: (value: string) => void;
   floatingContext: FloatingContext;
   refs: ExtendedRefs<ReferenceType>;
   floatingStyles: CSSProperties;
@@ -27,6 +30,7 @@ export interface ComboboxContextValue {
   labelsRef: React.MutableRefObject<Array<string | null>>;
   popupRef: React.RefObject<HTMLDivElement | null>;
   triggerRef: React.MutableRefObject<HTMLButtonElement | null>;
+  chipsRef: React.MutableRefObject<HTMLDivElement | null>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   setInlineMode: React.Dispatch<React.SetStateAction<boolean>>;
@@ -60,7 +64,7 @@ export interface ComboboxOptionsContextValue {
 
 export interface ComboboxHighlightContextValue {
   activeIndex: number | null;
-  selectedValue: string | null;
+  selectedValues: string[];
 }
 export const ComboboxHighlightContext = createContext<ComboboxHighlightContextValue | null>(null);
 

@@ -15,8 +15,18 @@ export interface ComboboxPositionerProps extends ComponentProps<'div'> {
 export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPositionerProps>(
   function ComboboxPositioner(props, ref) {
     const { anchor, render, ...otherProps } = props;
-    const { mounted, floatingContext, refs, floatingStyles, placement, getFloatingProps, elementsRef, labelsRef } =
-      useComboboxContext();
+    const {
+      mounted,
+      multiple,
+      floatingContext,
+      refs,
+      floatingStyles,
+      placement,
+      getFloatingProps,
+      elementsRef,
+      labelsRef,
+      chipsRef,
+    } = useComboboxContext();
 
     const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
 
@@ -35,6 +45,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
 
     const ownProps = {
       'data-side': side,
+      'aria-multiselectable': multiple || undefined,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 
@@ -67,6 +78,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
         returnFocus={false}
         visuallyHiddenDismiss
         modal={false}
+        getInsideElements={() => (chipsRef.current ? [chipsRef.current] : [])}
       >
         <FloatingList
           elementsRef={elementsRef}

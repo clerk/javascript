@@ -10,7 +10,7 @@ export type ComboboxClearProps = ComponentProps<'button'>;
 export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearProps>(
   function ComboboxClear(props, ref) {
     const { render, ...otherProps } = props;
-    const { inputValue, selectedValue, clear } = useComboboxContext();
+    const { inputValue, selectedValues, clear } = useComboboxContext();
 
     const defaultProps = {
       type: 'button',
@@ -31,6 +31,6 @@ export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearPr
       props: mergeProps<'button'>(defaultProps, otherProps),
     });
 
-    return inputValue !== '' || selectedValue !== null ? element : null;
+    return inputValue !== '' || selectedValues.length > 0 ? element : null;
   },
 );

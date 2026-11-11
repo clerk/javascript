@@ -1,5 +1,6 @@
 'use client';
 
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -11,8 +12,12 @@ import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { chipStyles } from '../../styles/chip.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { inputStyles } from '../../styles/input.styles';
 import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
+import { useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
@@ -24,11 +29,15 @@ export type ComboboxSize = 'sm' | 'md' | 'lg';
 export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
 export type ComboboxClearProps = MosaicComponentProps<'button'>;
 export const ComboboxCollection = HeadlessCombobox.Collection;
+export const ComboboxValue = HeadlessCombobox.Value;
+export type ComboboxValueProps = React.ComponentProps<typeof HeadlessCombobox.Value>;
 
 const ComboboxAnchorContext = React.createContext<{
   anchor: HTMLElement | null;
   setAnchor: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
 } | null>(null);
+
+const ComboboxInChipsContext = React.createContext(false);
 
 export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
@@ -112,12 +121,27 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
   const inputGroup = useOptionalInputGroupContext();
   const variant = variantProp ?? (inputGroup ? 'ghost' : 'default');
   const setAnchor = React.useContext(ComboboxAnchorContext)?.setAnchor;
+  const inChips = React.useContext(ComboboxInChipsContext);
   const groupElement = inputGroup?.element;
   React.useLayoutEffect(() => {
+    if (inChips) {
+      return;
+    }
     setAnchor?.(groupElement ?? null);
     return () => setAnchor?.(null);
-  }, [groupElement, setAnchor]);
+  }, [groupElement, setAnchor, inChips]);
   const size = inputGroup?.size ?? sizeProp ?? 'md';
+
+  if (inChips) {
+    return (
+      <ChipsInput
+        ref={ref}
+        render={render}
+        xstyle={xstyle}
+        {...rest}
+      />
+    );
+  }
 
   return (
     <HeadlessCombobox.Input
@@ -132,6 +156,106 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
       }
       {...mergeStyleProps(themeProps('combobox-input', { size, variant }), stylex.props(xstyle), rest)}
     />
+  );
+});
+
+const ChipsInput = React.forwardRef<HTMLInputElement, MosaicComponentProps<'input'>>(function MosaicComboboxChipsInput(
+  {
+    id,
+    disabled: disabledProp,
+    required: requiredProp,
+    'aria-invalid': ariaInvalid,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    xstyle,
+    ...rest
+  },
+  ref,
+) {
+  const fieldProps = useOptionalFieldControlProps({
+    id,
+    disabled: disabledProp,
+    required: requiredProp,
+    ariaInvalid,
+    ariaLabelledBy,
+    ariaDescribedBy,
+  });
+
+  return (
+    <HeadlessCombobox.Input
+      ref={ref}
+      id={fieldProps?.id ?? id}
+      disabled={fieldProps?.disabled ?? disabledProp}
+      required={fieldProps?.required ?? requiredProp}
+      aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
+      aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
+      aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
+      {...mergeStyleProps(themeProps('combobox-input'), stylex.props(reset.base, chipStyles.input, xstyle), rest)}
+    />
+  );
+});
+
+export type ComboboxChipsProps = MosaicComponentProps<'div'>;
+
+/** The field for a `multiple` combobox. Holds the chips and the input, and anchors the popup. */
+export const ComboboxChips = React.forwardRef<HTMLDivElement, ComboboxChipsProps>(function MosaicComboboxChips(
+  { xstyle, ...rest },
+  ref,
+) {
+  const setAnchor = React.useContext(ComboboxAnchorContext)?.setAnchor;
+  const [element, setElement] = React.useState<HTMLDivElement | null>(null);
+  const mergedRef = useMergeRefs([setElement, ref]);
+  React.useLayoutEffect(() => {
+    setAnchor?.(element);
+    return () => setAnchor?.(null);
+  }, [element, setAnchor]);
+
+  return (
+    <ComboboxInChipsContext.Provider value>
+      <HeadlessCombobox.Chips
+        ref={mergedRef}
+        {...mergeStyleProps(
+          themeProps('combobox-chips'),
+          stylex.props(reset.base, inputStyles.group, chipStyles.field, styles.chips, xstyle),
+          rest,
+        )}
+      />
+    </ComboboxInChipsContext.Provider>
+  );
+});
+
+export interface ComboboxChipProps extends MosaicComponentProps<'div'> {
+  value: string;
+  /** Accessible name of the chip's remove button. */
+  removeLabel: string;
+}
+
+export const ComboboxChip = React.forwardRef<HTMLDivElement, ComboboxChipProps>(function MosaicComboboxChip(
+  { removeLabel, children, xstyle, ...rest },
+  ref,
+) {
+  return (
+    <HeadlessCombobox.Chip
+      ref={ref}
+      {...mergeStyleProps(
+        themeProps('combobox-chip'),
+        stylex.props(reset.base, focusOutline.visible, chipStyles.chip, xstyle),
+        rest,
+      )}
+    >
+      <span {...mergeStyleProps(themeProps('combobox-chip-label'), stylex.props(reset.base, chipStyles.label))}>
+        {children}
+      </span>
+      <HeadlessCombobox.ChipRemove
+        aria-label={removeLabel}
+        {...mergeStyleProps(themeProps('combobox-chip-remove'), stylex.props(reset.base, chipStyles.remove))}
+      >
+        <Icon
+          glyph={X}
+          size='md'
+        />
+      </HeadlessCombobox.ChipRemove>
+    </HeadlessCombobox.Chip>
   );
 });
 
@@ -252,6 +376,9 @@ export const ComboboxEmpty = React.forwardRef<HTMLParagraphElement, ComboboxEmpt
 export const Combobox = {
   Root: ComboboxRoot,
   Collection: ComboboxCollection,
+  Value: ComboboxValue,
+  Chips: ComboboxChips,
+  Chip: ComboboxChip,
   Input: ComboboxInput,
   Trigger: ComboboxTrigger,
   Clear: ComboboxClear,

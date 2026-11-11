@@ -36,6 +36,8 @@ export type {
 } from '../components/empty-state';
 export { Combobox } from '../components/combobox';
 export type {
+  ComboboxChipProps,
+  ComboboxChipsProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
   ComboboxListProps,
@@ -43,6 +45,7 @@ export type {
   ComboboxPopupProps,
   ComboboxRootProps,
   ComboboxSize,
+  ComboboxValueProps,
 } from '../components/combobox';
 export { DataList } from '../components/data-list';
 export type { DataListProps } from '../components/data-list';

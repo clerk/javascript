@@ -10,7 +10,7 @@ export type ComboboxListProps = ComponentProps<'div'>;
 
 export const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxListProps>(function ComboboxList(props, ref) {
   const { render, ...otherProps } = props;
-  const { elementsRef, labelsRef, refs, getFloatingProps, setInlineMode } = useComboboxContext();
+  const { multiple, elementsRef, labelsRef, refs, getFloatingProps, setInlineMode } = useComboboxContext();
 
   useEffect(() => {
     setInlineMode(true);
@@ -20,7 +20,7 @@ export const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxListProps>(
   const floatingProps = getFloatingProps();
   const wiredId = floatingProps['id'];
 
-  const ownProps = {} satisfies DefaultProps<'div'>;
+  const ownProps = { 'aria-multiselectable': multiple || undefined } satisfies DefaultProps<'div'>;
 
   const defaultProps = { ...ownProps, ...floatingProps };
 

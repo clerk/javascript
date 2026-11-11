@@ -57,6 +57,96 @@ export function Default() {
   );
 }
 
+export function Multiple() {
+  const options = ['Apple', 'Apricot', 'Banana', 'Blackberry', 'Cherry', 'Fig', 'Grape', 'Pear', 'Plum'];
+  const labelOf = (value: string) => options.find(option => option.toLowerCase() === value) ?? value;
+
+  return (
+    <Combobox.Root
+      multiple
+      defaultValue={['banana', 'fig']}
+    >
+      <Field.Root xstyle={styles.fieldWidth}>
+        <Field.Label>Fruits</Field.Label>
+        <Combobox.Chips>
+          <Combobox.Value>
+            {values =>
+              values.map(value => (
+                <Combobox.Chip
+                  key={value}
+                  value={value}
+                  removeLabel={`Remove ${labelOf(value)}`}
+                >
+                  {labelOf(value)}
+                </Combobox.Chip>
+              ))
+            }
+          </Combobox.Value>
+          <Combobox.Input placeholder='Search fruit…' />
+        </Combobox.Chips>
+      </Field.Root>
+      <Combobox.Popup>
+        <Combobox.Collection
+          items={options}
+          itemToStringLabel={option => option}
+          empty={<Combobox.Empty>No fruit found</Combobox.Empty>}
+        >
+          {option => (
+            <Combobox.Option
+              key={option}
+              value={option.toLowerCase()}
+              label={option}
+            >
+              {option}
+              <Combobox.OptionIndicator />
+            </Combobox.Option>
+          )}
+        </Combobox.Collection>
+      </Combobox.Popup>
+    </Combobox.Root>
+  );
+}
+
+export function MultipleCount() {
+  const options = ['Apple', 'Apricot', 'Banana', 'Blackberry', 'Cherry', 'Fig', 'Grape', 'Pear', 'Plum'];
+
+  return (
+    <Combobox.Root
+      multiple
+      defaultValue={['apple', 'cherry']}
+    >
+      <Field.Root xstyle={styles.fieldWidth}>
+        <Field.Label>Fruits</Field.Label>
+        <InputGroup.Root>
+          <Combobox.Input placeholder='Search fruit…' />
+          <InputGroup.End>
+            <Combobox.Value>{value => (value.length > 0 ? `${value.length} selected` : null)}</Combobox.Value>
+            <Combobox.Trigger aria-label='Toggle fruit options' />
+          </InputGroup.End>
+        </InputGroup.Root>
+      </Field.Root>
+      <Combobox.Popup>
+        <Combobox.Collection
+          items={options}
+          itemToStringLabel={option => option}
+          empty={<Combobox.Empty>No fruit found</Combobox.Empty>}
+        >
+          {option => (
+            <Combobox.Option
+              key={option}
+              value={option.toLowerCase()}
+              label={option}
+            >
+              {option}
+              <Combobox.OptionIndicator />
+            </Combobox.Option>
+          )}
+        </Combobox.Collection>
+      </Combobox.Popup>
+    </Combobox.Root>
+  );
+}
+
 export function Scrolling() {
   const options = Array.from({ length: 40 }, (_, index) => `Fruit ${index + 1}`);
 

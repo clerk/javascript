@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { ComboboxChipsContext } from './combobox-chips-context';
 import { useComboboxContext } from './combobox-context';
 
 export type ComboboxInputProps = ComponentProps<'input'>;
@@ -19,7 +21,11 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
     handleSelect,
     labelsRef,
     valuesByIndexRef,
+    selectedValues,
+    removeValue,
   } = useComboboxContext();
+  const chips = useContext(ComboboxChipsContext);
+  const { previousKey } = readingDirectionKeys(useDirection());
 
   const state = { open };
 
@@ -31,6 +37,20 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
         handleInputChange(event.target.value);
       },
       onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+        const last = selectedValues.at(-1);
+        const { selectionStart, selectionEnd } = event.currentTarget;
+        if (chips && last !== undefined && selectionStart === 0 && selectionEnd === 0) {
+          if (event.key === 'Backspace') {
+            event.preventDefault();
+            removeValue(last);
+            return;
+          }
+          if (event.key === previousKey) {
+            event.preventDefault();
+            chips.focusLastChip();
+            return;
+          }
+        }
         if (event.key === 'Enter' && activeIndex != null) {
           const value = valuesByIndexRef.current.get(activeIndex);
           const label = labelsRef.current[activeIndex];
