@@ -1,4 +1,5 @@
 import { ClerkError } from '@clerk/shared/error';
+import { buildPublishableKey } from '@clerk/shared/keys';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
@@ -83,46 +84,18 @@ describe('OAuthApplications', () => {
     const clientId = 'client id:with+reserved';
     const clientSecret = 'secret value:+/=';
 
-    const mockOAuthApplication = {
-      object: 'oauth_application',
-      id: oauthApplicationId,
-      instance_id: 'ins_xxxxx',
-      name: 'Example',
-      client_id: clientId,
-      client_uri: null,
-      client_image_url: null,
-      dynamically_registered: false,
-      consent_screen_enabled: true,
-      pkce_required: false,
-      public: false,
-      scopes: 'profile email',
-      redirect_uris: [],
-      authorize_url: 'https://clerk.example.test/oauth/authorize',
-      token_fetch_url: tokenFetchUrl,
-      user_info_url: 'https://clerk.example.test/oauth/userinfo',
-      discovery_url: 'https://clerk.example.test/.well-known/openid-configuration',
-      token_introspection_url: 'https://clerk.example.test/oauth/token_info',
-      created_at: 1,
-      updated_at: 1,
-    };
+    const publishableKey = buildPublishableKey('clerk.example.test');
 
-    const createClient = () =>
-      createBackendApiClient({
-        apiUrl: 'https://api.clerk.test',
-        secretKey: 'sk_xxxxx',
+    const createClient = () => createBackendApiClient({ apiUrl: 'https://api.clerk.test' });
+
+    const tokenResponse = () =>
+      HttpResponse.json({
+        access_token: 'exchanged_token',
+        issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+        token_type: 'Bearer',
       });
 
-    const useApplication = () =>
-      server.use(
-        http.get(
-          `https://api.clerk.test/v1/oauth_applications/${oauthApplicationId}`,
-          validateHeaders(() => HttpResponse.json(mockOAuthApplication)),
-        ),
-      );
-
     it('exchanges a subject token at the application token endpoint', async () => {
-      useApplication();
-
       let captured: { headers: Headers; body: URLSearchParams } | undefined;
       server.use(
         http.post(tokenFetchUrl, async ({ request }) => {
@@ -138,7 +111,8 @@ describe('OAuthApplications', () => {
       );
 
       const result = await createClient().oauthApplications.__experimental_exchangeToken({
-        oauthApplicationId,
+        publishableKey,
+        clientId,
         clientSecret,
         subjectToken: 'subject_token',
         resource: 'https://r.example.test',
@@ -167,22 +141,17 @@ describe('OAuthApplications', () => {
     });
 
     it('authenticates with form-urlencoded client credentials over HTTP Basic', async () => {
-      useApplication();
-
       let authorization: string | null = null;
       server.use(
         http.post(tokenFetchUrl, ({ request }) => {
           authorization = request.headers.get('Authorization');
-          return HttpResponse.json({
-            access_token: 'exchanged_token',
-            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
-            token_type: 'Bearer',
-          });
+          return tokenResponse();
         }),
       );
 
       await createClient().oauthApplications.__experimental_exchangeToken({
-        oauthApplicationId,
+        publishableKey,
+        clientId,
         clientSecret,
         subjectToken: 'subject_token',
         resource: 'https://r.example.test',
@@ -192,8 +161,6 @@ describe('OAuthApplications', () => {
     });
 
     it('omits optional parameters that are not provided', async () => {
-      useApplication();
-
       let body: URLSearchParams | undefined;
       server.use(
         http.post(tokenFetchUrl, async ({ request }) => {
@@ -208,7 +175,8 @@ describe('OAuthApplications', () => {
       );
 
       const result = await createClient().oauthApplications.__experimental_exchangeToken({
-        oauthApplicationId,
+        publishableKey,
+        clientId,
         clientSecret,
         subjectToken: 'subject_token',
         resource: 'https://r.example.test',
@@ -220,7 +188,6 @@ describe('OAuthApplications', () => {
     });
 
     it('ignores empty entries in a returned scope', async () => {
-      useApplication();
       server.use(
         http.post(tokenFetchUrl, () =>
           HttpResponse.json({
@@ -233,7 +200,8 @@ describe('OAuthApplications', () => {
       );
 
       const result = await createClient().oauthApplications.__experimental_exchangeToken({
-        oauthApplicationId,
+        publishableKey,
+        clientId,
         clientSecret,
         subjectToken: 'subject_token',
         resource: 'https://r.example.test',
@@ -247,7 +215,6 @@ describe('OAuthApplications', () => {
       ['invalid_grant', undefined],
       ['invalid_target', 'Unknown audience.'],
     ])('throws OAuthTokenExchangeError for a %s error response', async (error, errorDescription) => {
-      useApplication();
       server.use(
         http.post(tokenFetchUrl, () =>
           HttpResponse.json(
@@ -258,7 +225,8 @@ describe('OAuthApplications', () => {
       );
 
       const promise = createClient().oauthApplications.__experimental_exchangeToken({
-        oauthApplicationId,
+        publishableKey,
+        clientId,
         clientSecret,
         subjectToken: 'subject_token',
         resource: 'https://r.example.test',
@@ -278,12 +246,12 @@ describe('OAuthApplications', () => {
     });
 
     it('throws an invalid_response error when the error body is not JSON', async () => {
-      useApplication();
       server.use(http.post(tokenFetchUrl, () => new HttpResponse('Bad Gateway', { status: 502 })));
 
       await expect(
         createClient().oauthApplications.__experimental_exchangeToken({
-          oauthApplicationId,
+          publishableKey,
+          clientId,
           clientSecret,
           subjectToken: 'subject_token',
           resource: 'https://r.example.test',
@@ -292,12 +260,12 @@ describe('OAuthApplications', () => {
     });
 
     it('throws an invalid_response error when a successful response is malformed', async () => {
-      useApplication();
       server.use(http.post(tokenFetchUrl, () => HttpResponse.json({ token_type: 'Bearer' })));
 
       await expect(
         createClient().oauthApplications.__experimental_exchangeToken({
-          oauthApplicationId,
+          publishableKey,
+          clientId,
           clientSecret,
           subjectToken: 'subject_token',
           resource: 'https://r.example.test',
@@ -305,15 +273,62 @@ describe('OAuthApplications', () => {
       ).rejects.toMatchObject({ error: 'invalid_response', status: 200 });
     });
 
-    it('throws when the OAuth application ID is missing', async () => {
+    it('sends the exchange to the proxy URL when one is configured', async () => {
+      let requested = false;
+      server.use(
+        http.post('https://example.test/__clerk/oauth/token', () => {
+          requested = true;
+          return tokenResponse();
+        }),
+      );
+
+      await createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        proxyUrl: 'https://example.test/__clerk/',
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource: 'https://r.example.test',
+      });
+
+      expect(requested).toBe(true);
+    });
+
+    it.each([
+      ['the publishable key is missing', { publishableKey: '' }, 'Publishable key is missing.'],
+      ['the publishable key is invalid', { publishableKey: 'pk_invalid' }, 'Publishable key not valid'],
+      ['the proxy URL is relative', { publishableKey, proxyUrl: '/__clerk' }, '`proxyUrl` must be an absolute URL'],
+    ])('throws before making any request when %s', async (_, endpointParams, message) => {
+      let requested = false;
+      server.use(
+        http.all('*', () => {
+          requested = true;
+          return tokenResponse();
+        }),
+      );
+
       await expect(
         createClient().oauthApplications.__experimental_exchangeToken({
-          oauthApplicationId: '',
+          ...endpointParams,
+          clientId,
           clientSecret,
           subjectToken: 'subject_token',
           resource: 'https://r.example.test',
         }),
-      ).rejects.toThrow('A valid resource ID is required.');
+      ).rejects.toThrow(message);
+      expect(requested).toBe(false);
+    });
+
+    it('throws when the client ID is missing', async () => {
+      await expect(
+        createClient().oauthApplications.__experimental_exchangeToken({
+          publishableKey,
+          clientId: '',
+          clientSecret,
+          subjectToken: 'subject_token',
+          resource: 'https://r.example.test',
+        }),
+      ).rejects.toThrow('A valid client ID is required.');
     });
   });
 });
