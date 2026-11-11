@@ -17,7 +17,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { useVirtualEntries } from '../../../routing/virtual-store';
+import { useVirtualEntries, useVirtualWrite } from '../../../routing/virtual-store';
 import { OrganizationProfile } from '../../organization-profile/organization-profile';
 import { OrganizationSwitcher } from '../../organization-switcher/organization-switcher';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
@@ -328,6 +328,22 @@ describe('a mounted OrganizationProfile under a provider profile', () => {
 function Entry({ base }: { base: string }) {
   return <output data-testid='entry'>{JSON.stringify(useVirtualEntries().get(base) ?? null)}</output>;
 }
+
+function OpenByRouting({ base }: { base: string }) {
+  const write = useVirtualWrite();
+  return <button onClick={() => write(base, [])}>Open by routing</button>;
+}
+
+describe('a user profile modal opened by the routing state', () => {
+  it("renders with the provider's options", async () => {
+    await renderWithProfile(<OpenByRouting base='/modal/user' />, { userProfileProps: { customPages: [terms] } });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Open by routing' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'Terms' })).toBeInTheDocument();
+  });
+});
 
 describe('a mounted UserProfile under a provider profile', () => {
   it("routes its pages under the provider's path", async () => {
