@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
+import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
@@ -34,6 +35,8 @@ interface VerificationCodeProps {
   globalErrorMessage?: string;
   isPending?: boolean;
   resend?: VerificationCodeResend;
+  identityPreview?: ReactNode;
+  notice?: string;
   onValueChange: (value: string) => void;
   onComplete?: (value: string) => void;
   onSubmit: () => void;
@@ -49,6 +52,8 @@ export function VerificationCode({
   globalErrorMessage,
   isPending = false,
   resend,
+  identityPreview,
+  notice,
   onValueChange,
   onComplete,
   onSubmit,
@@ -71,6 +76,7 @@ export function VerificationCode({
       <Card.Header>
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
+        {identityPreview}
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -122,6 +128,11 @@ export function VerificationCode({
             ) : null}
           </Field.Root>
         </Form>
+        {notice ? (
+          <Banner.Root color='warning'>
+            <Banner.Label>{notice}</Banner.Label>
+          </Banner.Root>
+        ) : null}
       </Card.Content>
       <Card.Footer>
         {onCancel ? (
