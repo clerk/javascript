@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest } from '@clerk/shared/types';
+import type { Autocomplete, ClerkPaginationRequest } from '@clerk/shared/types';
 
 import { OAuthTokenExchangeError } from '../../errors';
 import { runtime } from '../../runtime';
@@ -42,12 +42,12 @@ export type RevokeOAuthApplicationTokenParams = {
 /**
  * A token type identifier as defined in [RFC 8693 section 3](https://www.rfc-editor.org/rfc/rfc8693#section-3).
  */
-export type OAuthTokenTypeIdentifier =
+export type OAuthTokenTypeIdentifier = Autocomplete<
   | 'urn:ietf:params:oauth:token-type:access_token'
   | 'urn:ietf:params:oauth:token-type:refresh_token'
   | 'urn:ietf:params:oauth:token-type:id_token'
   | 'urn:ietf:params:oauth:token-type:jwt'
-  | (string & {});
+>;
 
 /**
  * The parameters for performing an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an OAuth application.
@@ -93,22 +93,45 @@ export type ExchangeOAuthApplicationTokenResult = {
   refreshToken?: string;
 };
 
-const TOKEN_EXCHANGE_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:token-exchange';
+/** @generateWithEmptyComment */
+export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
+  /**
+   * Filters by a case-insensitive substring of the application name or an exact client ID.
+   */
+  nameQuery?: string;
+  /**
+   * Returns OAuth applications in a particular order. Prefix a value with `+` to sort in ascending order, or `-` to sort in descending order. Defaults to `-created_at`.
+   */
+  orderBy?: WithSign<'name' | 'created_at'>;
+}>;
 
-const formUrlEncode = (value: string) => new URLSearchParams({ v: value }).toString().slice(2);
+type TokenExchangeResponseJSON = {
+  access_token: string;
+  issued_token_type: string;
+  token_type: string;
+  expires_in?: number;
+  scope?: string;
+  refresh_token?: string;
+};
 
-const appendAll = (body: URLSearchParams, key: string, value: string | string[] | undefined) => {
+const tokenExchangeGrantType = 'urn:ietf:params:oauth:grant-type:token-exchange';
+
+function formUrlEncode(value: string) {
+  return new URLSearchParams({ v: value }).toString().slice(2);
+}
+
+function appendAll(body: URLSearchParams, key: string, value: string | string[] | undefined) {
   if (value === undefined) {
     return;
   }
   for (const v of Array.isArray(value) ? value : [value]) {
     body.append(key, v);
   }
-};
+}
 
-const buildTokenExchangeBody = (params: ExchangeOAuthApplicationTokenParams) => {
+function tokenExchangeBody(params: ExchangeOAuthApplicationTokenParams) {
   const body = new URLSearchParams({
-    grant_type: TOKEN_EXCHANGE_GRANT_TYPE,
+    grant_type: tokenExchangeGrantType,
     subject_token: params.subjectToken,
     subject_token_type: params.subjectTokenType,
   });
@@ -121,35 +144,33 @@ const buildTokenExchangeBody = (params: ExchangeOAuthApplicationTokenParams) => 
     body.set('scope', params.scope.join(' '));
   }
   return body;
-};
+}
 
-type TokenExchangeResponseJSON = {
-  access_token: string;
-  issued_token_type: string;
-  token_type: string;
-  expires_in?: number;
-  scope?: string;
-  refresh_token?: string;
-};
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
 
-const toTokenExchangeResult = (json: TokenExchangeResponseJSON): ExchangeOAuthApplicationTokenResult => ({
-  accessToken: json.access_token,
-  issuedTokenType: json.issued_token_type,
-  tokenType: json.token_type,
-  expiresIn: json.expires_in,
-  scope: json.scope ? json.scope.split(' ') : undefined,
-  refreshToken: json.refresh_token,
-});
+function isTokenExchangeResponse(value: unknown): value is TokenExchangeResponseJSON {
+  return (
+    isRecord(value) &&
+    typeof value.access_token === 'string' &&
+    typeof value.issued_token_type === 'string' &&
+    typeof value.token_type === 'string'
+  );
+}
 
-const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+function tokenExchangeResult(json: TokenExchangeResponseJSON): ExchangeOAuthApplicationTokenResult {
+  return {
+    accessToken: json.access_token,
+    issuedTokenType: json.issued_token_type,
+    tokenType: json.token_type,
+    expiresIn: json.expires_in,
+    scope: json.scope ? json.scope.split(' ') : undefined,
+    refreshToken: json.refresh_token,
+  };
+}
 
-const isTokenExchangeResponse = (value: unknown): value is TokenExchangeResponseJSON =>
-  isRecord(value) &&
-  typeof value.access_token === 'string' &&
-  typeof value.issued_token_type === 'string' &&
-  typeof value.token_type === 'string';
-
-const toTokenExchangeError = (json: unknown, status: number) => {
+function tokenExchangeError(json: unknown, status: number) {
   if (!isRecord(json) || typeof json.error !== 'string') {
     return new OAuthTokenExchangeError({ error: 'invalid_response', status });
   }
@@ -158,19 +179,7 @@ const toTokenExchangeError = (json: unknown, status: number) => {
     errorDescription: typeof json.error_description === 'string' ? json.error_description : undefined,
     status,
   });
-};
-
-/** @generateWithEmptyComment */
-export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
-  /**
-   * Filters by a case-insensitive substring of the application name or an exact client ID.
-   */
-  nameQuery?: string;
-  /**
-   * Returns OAuth applications in a particular order. Prefix a value with `+` to sort in ascending order, or `-` to sort in descending order. Defaults to `-created_at`.
-   */
-  orderBy?: WithSign<'name' | 'created_at'>;
-}>;
+}
 
 /** @generateWithEmptyComment */
 export class OAuthApplicationsApi extends AbstractAPI {
@@ -302,7 +311,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
 
     const application = await this.get(params.oauthApplicationId);
 
-    const body = buildTokenExchangeBody(params);
+    const body = tokenExchangeBody(params);
     const headers: Record<string, string> = {
       Accept: 'application/json',
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -320,13 +329,13 @@ export class OAuthApplicationsApi extends AbstractAPI {
     const json = await response.json().catch(() => undefined);
 
     if (!response.ok) {
-      throw toTokenExchangeError(json, response.status);
+      throw tokenExchangeError(json, response.status);
     }
 
     if (!isTokenExchangeResponse(json)) {
       throw new OAuthTokenExchangeError({ error: 'invalid_response', status: response.status });
     }
 
-    return toTokenExchangeResult(json);
+    return tokenExchangeResult(json);
   }
 }
