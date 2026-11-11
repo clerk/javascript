@@ -5,4 +5,4 @@
 '@clerk/shared': minor
 ---
 
-Add a `preferImmediatelyAvailableCredentials` option to `signIn.authenticateWithPasskey()` and `signIn.passkey()`. In Expo apps on iOS and Android, it limits passkey sign-in to passkeys already on the device. When there are none, the request fails with `passkey_registration_cancelled` and the system's "use a passkey from another device" sheet doesn't appear, so an app can prompt for a passkey automatically on sign-in. Browsers ignore it.
+Add a `preferImmediatelyAvailableCredentials` option to `signIn.authenticateWithPasskey()` and `signIn.passkey()`. With `@clerk/expo-passkeys` on iOS 16+ and Android, it limits sign-in to passkeys already on the device, and the request fails without showing the "use a passkey from another device" sheet when there are none. This lets an app prompt for a passkey automatically when its sign-in screen opens. Browsers ignore it.

@@ -330,7 +330,7 @@ export interface SignInFuturePasskeyParams {
    */
   flow?: 'autofill' | 'discoverable';
   /**
-   * Only offer passkeys already available on this device. When none are, the request fails with `passkey_registration_cancelled` instead of showing the system's "use a passkey from another device" sheet. Supported by the native Expo passkeys module on iOS 16+ and Android, and ignored in the browser. Defaults to `false`.
+   * Only offer passkeys that are already on the device. When there are none, the request fails without showing the system's "use a passkey from another device" sheet. Supported by `@clerk/expo-passkeys` on iOS 16+ and Android. Browsers ignore it. Defaults to `false`.
    */
   preferImmediatelyAvailableCredentials?: boolean;
 }
