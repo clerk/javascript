@@ -22,13 +22,11 @@ export interface OrganizationProfileProps
     Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder'>,
     Pick<OrganizationProfileOptions, 'afterLeaveOrganizationUrl'> {
   /**
-   * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
-   * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
-   * the first page instead.
+   * The base the profile's pages are nested under. Two profiles on one page need different bases.
    *
-   * @default the first page in the navigation
+   * @default '/organization'
    */
-  defaultPage?: OrganizationProfileViewProps['activePage'];
+  path?: string;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that there is no active
    * organization.
@@ -60,12 +58,6 @@ export interface OrganizationProfileProps
  * ```
  *
  * @example
- * `defaultPage` picks the page the profile opens on without moving it in the navigation.
- * ```tsx
- * <OrganizationProfile defaultPage='members' />
- * ```
- *
- * @example
  * `customPages` adds your own pages; `pageOrder` places them among the built-in ones.
  * ```tsx
  * <OrganizationProfile
@@ -85,22 +77,22 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
   const {
     customPages = organizationProfileProps?.customPages,
     pageOrder = organizationProfileProps?.pageOrder,
-    defaultPage,
+    path = organizationProfileProps?.path ?? '/organization',
     afterLeaveOrganizationUrl = organizationProfileProps?.afterLeaveOrganizationUrl,
     fallback,
     apiKeysProps = organizationProfileProps?.apiKeysProps,
   } = props;
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
-  const navigation = useProfilePagesController(
-    defaultPage ?? pageOrder?.[0] ?? 'general',
+  const { activePage, onPageChange } = useProfilePagesController(
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
+    { routing: 'virtual', path },
   );
 
   if (model.status === 'loading') {
     return fallback ?? null;
   }
-  if (!pages) {
+  if (!pages || activePage === undefined) {
     return null;
   }
 
@@ -108,7 +100,8 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <OrganizationProfileView
         elevation='flush'
-        {...navigation}
+        activePage={activePage}
+        onPageChange={onPageChange}
         customPages={customPages}
         pageOrder={pageOrder}
         pages={pages}

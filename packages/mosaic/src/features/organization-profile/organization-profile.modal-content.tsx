@@ -7,6 +7,7 @@ import type { OrganizationProfileModalContentProps } from './organization-profil
 export default function OrganizationProfileModalContent({
   options,
   close,
+  path,
 }: OrganizationProfileModalContentProps): React.ReactElement {
   const { isLoaded, organization } = useOrganization();
   const inactive = isLoaded && !organization;
@@ -17,11 +18,11 @@ export default function OrganizationProfileModalContent({
     }
   }, [inactive, close]);
 
-  const { page, ...props } = options ?? {};
+  const { page: _page, ...props } = options ?? {};
   return (
     <OrganizationProfile
       {...props}
-      defaultPage={page}
+      path={path}
     />
   );
 }
