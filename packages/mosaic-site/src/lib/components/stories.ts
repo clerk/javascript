@@ -43,8 +43,15 @@ export const STORY_COMPONENTS: Record<string, string> = {
   pagination: 'pagination',
   section: 'section',
   panel: 'panel.component',
-  confirm: 'confirmation',
-  'destructive-action': 'destructive',
+  confirmation: 'confirmation',
+  destructive: 'destructive',
+  entity: 'entity',
+  flow: 'flow.component',
+  icon: 'icon',
+  'icon-frame': 'icon-frame',
+  profile: 'profile.component',
+  reveal: 'reveal.component',
+  'visually-hidden': 'visually-hidden',
   reverification: 'reverification',
 };
 export const STORY_BLOCKS: Record<string, string> = {
@@ -54,6 +61,17 @@ export const STORY_BLOCKS: Record<string, string> = {
   'task-choose-organization': 'task-choose-organization',
   waitlist: 'waitlist',
   'organization-list': 'organization-list',
-  'api-keys': 'api-keys-table',
+};
+export const STORY_PARTS: Record<string, string> = {
+  'profile-panel': 'user-profile-profile-panel',
+  'security-panel': 'user-profile-security-panel',
+  'billing-panel': 'user-profile-billing-panel',
+  'api-keys': 'user-profile-api-keys-panel',
+  'enterprise-accounts': 'user-profile-enterprise-accounts-section',
+  'web3-wallets': 'user-profile-web3-wallets-section',
+  'danger-zone': 'user-profile-danger-section',
+  subscription: 'user-profile-subscription-section',
+  'payment-methods': 'user-profile-payment-methods-section',
+  'billing-history': 'user-profile-billing-history-section',
 };
 export const storyFileFor = (slug: string) => STORY_BLOCKS[slug] ?? STORY_COMPONENTS[slug];

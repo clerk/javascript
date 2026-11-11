@@ -3,20 +3,23 @@ import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import Link from 'next/link';
 import * as React from 'react';
 
+import { StoryGallery } from '@/components/catalog/story-gallery';
 import { PART_DEMOS } from '@/components/gallery/part-demos';
 import { SegmentedControl } from '@/components/gallery/segmented-control';
 import { findPart } from '@/lib/components/catalog';
+import { STORY_PARTS } from '@/lib/components/stories';
 
 export function PartDetail({ slug }: { slug: string }) {
   const found = findPart(slug);
   const entry = PART_DEMOS[slug];
   const [modeId, setModeId] = React.useState(entry?.modes?.[0]?.id);
-  if (!found || !entry) {
+  const file = STORY_PARTS[slug];
+  if (!found || (!entry && !file)) {
     return null;
   }
   const { parent, item } = found;
-  const mode = entry.modes?.find(candidate => candidate.id === modeId) ?? entry.modes?.[0];
-  const { Demo, snippet } = mode ?? entry;
+  const mode = entry?.modes?.find(candidate => candidate.id === modeId) ?? entry?.modes?.[0];
+  const shown = mode ?? entry;
   return (
     <main className='mx-auto w-full max-w-[880px] px-6 pb-24 pt-14 md:px-10'>
       <nav
@@ -51,7 +54,7 @@ export function PartDetail({ slug }: { slug: string }) {
         </Link>
         . Use it on its own to build a custom account page.
       </p>
-      {entry.modes ? (
+      {entry?.modes ? (
         <div className='mt-8'>
           <SegmentedControl
             label='Mode'
@@ -61,17 +64,23 @@ export function PartDetail({ slug }: { slug: string }) {
           />
         </div>
       ) : null}
-      <div className='ring-foreground/10 mt-10 overflow-hidden rounded-2xl bg-[var(--cl-color-page,#fff)] p-6 ring-1 md:p-10'>
-        <MosaicProvider>
-          <div className='mx-auto w-full max-w-[640px]'>
-            <Demo />
+      {shown ? (
+        <>
+          <div className='ring-foreground/10 mt-10 overflow-hidden rounded-2xl bg-[var(--cl-color-page,#fff)] p-6 ring-1 md:p-10'>
+            <MosaicProvider>
+              <div className='mx-auto w-full max-w-[640px]'>
+                <shown.Demo />
+              </div>
+            </MosaicProvider>
           </div>
-        </MosaicProvider>
-      </div>
-      <h2 className='text-foreground mt-12 text-xl font-semibold tracking-tight'>Usage</h2>
-      <pre className='bg-foreground/[0.04] ring-foreground/10 mt-4 overflow-x-auto rounded-xl p-5 text-[13px] leading-6 ring-1'>
-        <code>{snippet}</code>
-      </pre>
+          <h2 className='text-foreground mt-12 text-xl font-semibold tracking-tight'>Usage</h2>
+          <pre className='bg-foreground/[0.04] ring-foreground/10 mt-4 overflow-x-auto rounded-xl p-5 text-[13px] leading-6 ring-1'>
+            <code>{shown.snippet}</code>
+          </pre>
+        </>
+      ) : (
+        <StoryGallery file={file} />
+      )}
     </main>
   );
 }

@@ -11,6 +11,7 @@ import { SegmentedControl } from '@/components/gallery/segmented-control';
 import { TopNav } from '@/components/marketing/top-nav';
 import { CATALOG, type CatalogItem, type Kind } from '@/lib/components/catalog';
 import { getComponentMeta } from '@/lib/components/meta';
+import { NAV_SECTIONS } from '@/lib/components/nav';
 import { storyFileFor } from '@/lib/components/stories';
 import { cn } from '@/lib/utils';
 const SIDEBAR_WIDTH = 256;
@@ -212,6 +213,21 @@ function ComponentRow({ item, pathname, showPreview, setHover }: RowProps & { it
     </div>
   );
 }
+const blockBySlug = new Map(
+  CATALOG.blocks.flatMap(category => category.groups.flatMap(group => group.items)).map(item => [item.slug, item]),
+);
+const blockSections = NAV_SECTIONS.map(section => ({
+  label: section.label,
+  groups: section.groups
+    .map(group => ({
+      label: group.label,
+      items: group.slugs
+        .map(slug => blockBySlug.get(slug))
+        .filter(item => item !== undefined)
+        .sort((a, b) => Number(a.soon) - Number(b.soon)),
+    }))
+    .filter(group => group.items.length > 0),
+})).filter(section => section.groups.length > 0);
 const blockItems = CATALOG.blocks.flatMap(category => category.groups.flatMap(group => group.items));
 const pieceItems = CATALOG.components.flatMap(category => category.groups.flatMap(group => group.items));
 function CategoryGroup({
@@ -324,6 +340,39 @@ function AllRow({ kind, count, pathname }: { kind: Kind; count: number; pathname
         {count}
       </span>
     </Link>
+  );
+}
+function BlockSection({
+  section,
+  pathname,
+  showPreview,
+  setHover,
+}: RowProps & { section: (typeof blockSections)[number] }) {
+  return (
+    <div className='flex flex-col'>
+      <div className={HEADER_CLASS}>{section.label}</div>
+      {section.groups.map(group => (
+        <div
+          key={group.label}
+          className='mt-1 flex flex-col'
+        >
+          {group.label ? (
+            <div className='flex h-6 items-center px-2.5 text-[11px] font-medium text-neutral-400 dark:text-neutral-500'>
+              {group.label}
+            </div>
+          ) : null}
+          {group.items.map(item => (
+            <ComponentRow
+              key={item.slug}
+              item={item}
+              pathname={pathname}
+              showPreview={showPreview}
+              setHover={setHover}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 function SidebarIcon({ className }: { className?: string }) {
@@ -538,6 +587,18 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
             className='relative flex flex-col'
             onMouseLeave={() => setHover(null)}
           >
+            <div className='flex flex-col'>
+              <div className={HEADER_CLASS}>Getting started</div>
+              {gettingStarted.map(link => (
+                <NavItem
+                  key={link.href}
+                  link={link}
+                  pathname={pathname}
+                  showPreview={showPreview}
+                  setHover={setHover}
+                />
+              ))}
+            </div>
             <SegmentedControl
               label='Browse'
               value={view}
@@ -551,35 +612,19 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
               }}
               fill
               dense
-              className='mb-6'
+              className='mt-6'
             />
-            <div className='flex flex-col'>
-              <div className={HEADER_CLASS}>Getting started</div>
-              {gettingStarted.map(link => (
-                <NavItem
-                  key={link.href}
-                  link={link}
-                  pathname={pathname}
-                  showPreview={showPreview}
-                  setHover={setHover}
-                />
-              ))}
-            </div>
-            <div className='mt-6 flex flex-col gap-5'>
+            <div className='mt-4 flex flex-col gap-5'>
               <AllRow
                 kind={view}
                 count={view === 'blocks' ? blockItems.length : pieceItems.length}
                 pathname={pathname}
               />
               {view === 'blocks' &&
-                CATALOG.blocks.map(category => (
-                  <CategoryGroup
-                    key={category.id}
-                    hideHeader
-                    label={category.label}
-                    href={`/blocks/category/${category.id}`}
-                    kind='blocks'
-                    items={category.groups.flatMap(group => group.items)}
+                blockSections.map(section => (
+                  <BlockSection
+                    key={section.label}
+                    section={section}
                     pathname={pathname}
                     showPreview={showPreview}
                     setHover={setHover}

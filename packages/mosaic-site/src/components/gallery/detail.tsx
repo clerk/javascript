@@ -343,7 +343,7 @@ type ModeId = 'user' | 'organization' | 'combined';
 const MODE_OPTIONS: { id: ModeId; label: string }[] = [
   { id: 'user', label: 'User' },
   { id: 'organization', label: 'Organization' },
-  { id: 'combined', label: 'Both' },
+  { id: 'combined', label: 'Combined' },
 ];
 const PROFILE_PREVIEW: Record<ModeId, string> = {
   user: 'user-profile',

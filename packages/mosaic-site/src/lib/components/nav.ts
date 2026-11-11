@@ -5,13 +5,15 @@ export type NavSection = {
 
 export const NAV_SECTIONS: NavSection[] = [
   {
+    label: 'Account',
+    groups: [{ label: '', slugs: ['user-button', 'user-profile', 'user-avatar', 'api-keys'] }],
+  },
+  {
     label: 'Authentication',
     groups: [
-      { label: 'Account', slugs: ['user-button', 'user-profile', 'user-avatar', 'api-keys'] },
-      { label: 'Sign in', slugs: ['sign-in', 'sign-up', 'google-one-tap', 'waitlist'] },
       {
-        label: 'Tasks',
-        slugs: ['task-reset-password', 'task-setup-mfa'],
+        label: '',
+        slugs: ['sign-in', 'sign-up', 'google-one-tap', 'waitlist', 'task-reset-password', 'task-setup-mfa'],
       },
     ],
   },
@@ -19,24 +21,23 @@ export const NAV_SECTIONS: NavSection[] = [
     label: 'Multi-tenancy',
     groups: [
       {
-        label: 'Organizations',
-        slugs: ['organization-switcher', 'organization-list', 'create-organization', 'organization-profile'],
+        label: '',
+        slugs: [
+          'organization-switcher',
+          'organization-list',
+          'create-organization',
+          'organization-profile',
+          'task-choose-organization',
+        ],
       },
-      { label: 'Tasks', slugs: ['task-choose-organization'] },
     ],
   },
   {
     label: 'Billing',
-    groups: [
-      { label: 'Plans', slugs: ['pricing-table', 'plan-details'] },
-      { label: 'Payments', slugs: ['checkout', 'subscription-details'] },
-    ],
+    groups: [{ label: '', slugs: ['pricing-table', 'plan-details', 'checkout', 'subscription-details'] }],
   },
   {
     label: 'AI',
-    groups: [
-      { label: 'OAuth consent', slugs: ['oauth-consent'] },
-      { label: 'Agent approvals', slugs: ['agent-approval'] },
-    ],
+    groups: [{ label: '', slugs: ['oauth-consent', 'agent-approval'] }],
   },
 ];

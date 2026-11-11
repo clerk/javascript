@@ -68,21 +68,27 @@ const part = (slug: string, title: string, description: string, soon = false): C
   soon,
 });
 
-const planned = (title: string): CatalogItem => part(slugify(title), title, '', true);
-
 const PARTS: Record<string, CatalogItem[]> = {
   'user-profile': [
+    part('profile-panel', 'Profile panel', 'The Profile page of the user profile.'),
+    part('security-panel', 'Security panel', 'The Security page of the user profile.'),
+    part('billing-panel', 'Billing panel', 'The Billing page of the user profile.'),
+    part('api-keys', 'API keys panel', 'The API keys page of the user profile.'),
     part('avatar-upload', 'Avatar upload', 'Picker, drop target and remove menu for a profile picture.'),
-    part('profile-details', 'Profile details', 'Name and username, each edited in a dialog.'),
-    part('email-addresses', 'Email addresses', 'Add, verify, set primary and remove email addresses.'),
-    part('phone-numbers', 'Phone numbers', 'Add and verify phone numbers, and choose a primary.'),
-    part('connected-accounts', 'Connected accounts', 'Link and unlink social sign-in providers.'),
+    part('profile-details', 'Profile', 'Name and username, each edited in a dialog.'),
+    part('email-addresses', 'Email', 'Add, verify, set primary and remove email addresses.'),
+    part('phone-numbers', 'Phone', 'Add and verify phone numbers, and choose a primary.'),
     part('password', 'Password', 'Set or change the password, with live strength feedback.'),
     part('passkeys', 'Passkeys', 'Create, rename and remove passkeys.'),
-    part('two-step-verification', 'Two-step verification', 'Authenticator app, text message and backup codes.'),
+    part('two-step-verification', '2-step verification', 'Authenticator app, text message and backup codes.'),
     part('active-devices', 'Active devices', 'See signed-in devices and sign out of one or all.'),
-    part('api-keys', 'API keys', 'Create, copy and revoke API keys.'),
-    ...['Members', 'Invitations', 'Roles'].map(planned),
+    part('connected-accounts', 'Connected accounts', 'Link and unlink social sign-in providers.'),
+    part('enterprise-accounts', 'Enterprise accounts', 'Enterprise connections on the user profile.'),
+    part('web3-wallets', 'Web3 wallets', 'Web3 wallets on the user profile.'),
+    part('danger-zone', 'Danger zone', 'Destructive account actions on the user profile.'),
+    part('subscription', 'Subscription', 'The subscription section of the user profile.'),
+    part('payment-methods', 'Payment methods', 'The payment methods section of the user profile.'),
+    part('billing-history', 'Billing history', 'The billing history section of the user profile.'),
   ],
 };
 
@@ -113,9 +119,7 @@ const blockGroups: CatalogCategory[] = [
     [
       'Button',
       'Action bar',
-      'Action menu',
       'Copy button',
-      'Link',
       'Provider button',
       'Sign in button',
       'Sign up button',
@@ -156,16 +160,20 @@ const blockGroups: CatalogCategory[] = [
       'Text',
       'Separator',
       'Skeleton',
-      'Spinner',
       'Empty state',
+      'Entity',
+      'Icon',
+      'Icon frame',
+      'Profile',
+      'Visually hidden',
     ],
     'Content the user reads and scans.',
   ),
   simple('Overlays', ['Dialog', 'Drawer', 'Popover', 'Menu', 'Tooltip', 'Toast'], 'A layer that sits above the page.'),
-  simple('Navigation', ['Tabs', 'Pagination', 'Section', 'Panel', 'Stepper'], 'Moves the user through a view.'),
+  simple('Navigation', ['Tabs', 'Pagination', 'Section', 'Panel', 'Flow', 'Reveal'], 'Moves the user through a view.'),
   simple(
     'Patterns',
-    ['Confirm', 'Destructive action', 'Reverification'],
+    ['Confirmation', 'Destructive', 'Reverification'],
     'A step that checks the user before it goes on.',
   ),
 ];
