@@ -93,3 +93,47 @@ export function Scrolling() {
     </Combobox.Root>
   );
 }
+
+export function OptionParts() {
+  const currencies = [
+    { code: 'USD', name: 'US Dollar', symbol: '$' },
+    { code: 'EUR', name: 'Euro', symbol: '€' },
+    { code: 'GBP', name: 'British Pound', symbol: '£' },
+    { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+    { code: 'CHF', name: 'Swiss Franc with a long name that truncates', symbol: '₣' },
+  ];
+
+  return (
+    <Combobox.Root>
+      <Field.Root xstyle={styles.fieldWidth}>
+        <Field.Label>Currency</Field.Label>
+        <InputGroup.Root>
+          <Combobox.Input placeholder='Search currencies…' />
+          <InputGroup.End>
+            <Combobox.Trigger aria-label='Toggle currency options' />
+          </InputGroup.End>
+        </InputGroup.Root>
+      </Field.Root>
+      <Combobox.Popup>
+        <Combobox.Collection
+          items={currencies}
+          itemToStringLabel={currency => currency.name}
+          empty={<Combobox.Empty>No currency found</Combobox.Empty>}
+        >
+          {currency => (
+            <Combobox.Option
+              key={currency.code}
+              value={currency.code}
+              label={currency.name}
+            >
+              <Combobox.Media aria-hidden='true'>{currency.symbol}</Combobox.Media>
+              <Combobox.Label>{currency.name}</Combobox.Label>
+              <Combobox.Detail>{currency.code}</Combobox.Detail>
+              <Combobox.OptionIndicator />
+            </Combobox.Option>
+          )}
+        </Combobox.Collection>
+      </Combobox.Popup>
+    </Combobox.Root>
+  );
+}

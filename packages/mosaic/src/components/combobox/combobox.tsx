@@ -12,6 +12,7 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
@@ -213,6 +214,56 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
   );
 });
 
+/** `span`, not `div`: the option's children are phrasing content. */
+export type ComboboxMediaProps = MosaicComponentProps<'span'>;
+
+/** Square leading column that centers an icon, flag or avatar, so every option's label starts on one line. */
+export const ComboboxMedia = React.forwardRef<HTMLSpanElement, ComboboxMediaProps>(function MosaicComboboxMedia(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('combobox-option-media'), stylex.props(reset.base, styles.media, xstyle), rest),
+  });
+});
+
+export type ComboboxLabelProps = MosaicComponentProps<'span'>;
+
+/** The option's name. Takes the space between the media and whatever trails it, truncating to one line. */
+export const ComboboxLabel = React.forwardRef<HTMLSpanElement, ComboboxLabelProps>(function MosaicComboboxLabel(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: mergeStyleProps(
+      themeProps('combobox-option-label'),
+      stylex.props(reset.base, styles.label, truncationStyles.singleLine, xstyle),
+      rest,
+    ),
+  });
+});
+
+export type ComboboxDetailProps = MosaicComponentProps<'span'>;
+
+/** Secondary trailing text, such as a code or count. Stays whole while the label truncates. */
+export const ComboboxDetail = React.forwardRef<HTMLSpanElement, ComboboxDetailProps>(function MosaicComboboxDetail(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('combobox-option-detail'), stylex.props(reset.base, styles.detail, xstyle), rest),
+  });
+});
+
 export type ComboboxEmptyProps = MosaicComponentProps<'p'>;
 
 export type ComboboxOptionIndicatorProps = MosaicComponentProps<'span'>;
@@ -258,6 +309,9 @@ export const Combobox = {
   Popup: ComboboxPopup,
   List: ComboboxList,
   Option: ComboboxOption,
+  Media: ComboboxMedia,
+  Label: ComboboxLabel,
+  Detail: ComboboxDetail,
   OptionIndicator: ComboboxOptionIndicator,
   Empty: ComboboxEmpty,
 };

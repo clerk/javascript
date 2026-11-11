@@ -368,6 +368,25 @@ describe('Mosaic PhoneInput', () => {
     expect(popup).toContainElement(list);
   });
 
+  it('builds each country option from the combobox option parts', async () => {
+    const user = userEvent.setup();
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+    await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Algeria');
+
+    const option = await screen.findByRole('option', { name: /Algeria/ });
+    expect(option).toHaveClass('cl-combobox-option', 'cl-phone-input-country-option');
+    expect(option.querySelector('.cl-combobox-option-media')).toHaveTextContent('🇩🇿');
+    expect(option.querySelector('.cl-combobox-option-label')).toHaveTextContent('Algeria');
+    expect(option.querySelector('.cl-combobox-option-detail')).toHaveTextContent('+213');
+  });
+
   it('keeps the country search in its own Field scope', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const user = userEvent.setup();

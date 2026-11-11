@@ -114,6 +114,24 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     textAlign: 'center',
   },
+  media: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['4'],
+  },
+  label: {
+    flexGrow: 1,
+    minWidth: 0,
+  },
+  detail: {
+    color: colorVars['--cl-color-foreground-secondary'],
+    flexShrink: 0,
+    fontVariantNumeric: 'tabular-nums',
+    whiteSpace: 'nowrap',
+  },
   indicator: {
     alignItems: 'center',
     display: 'inline-flex',
