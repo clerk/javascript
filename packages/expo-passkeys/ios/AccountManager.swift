@@ -68,7 +68,7 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
         let authController = ASAuthorizationController(authorizationRequests: [ assertionRequest ] )
         authController.delegate = self
         authController.presentationContextProvider = self
-        if preferImmediatelyAvailableCredentials {
+        if preferImmediatelyAvailableCredentials, #available(iOS 16.0, *) {
             authController.performRequests(options: .preferImmediatelyAvailableCredentials)
         } else {
             authController.performRequests()
