@@ -61,10 +61,6 @@ export type ExchangeOAuthApplicationTokenParams = {
   subjectToken: string;
   /** The type of `subjectToken`. */
   subjectTokenType: OAuthTokenTypeIdentifier;
-  /** The token that represents the identity of the acting party, for delegation. */
-  actorToken?: string;
-  /** The type of `actorToken`. Required when `actorToken` is provided. */
-  actorTokenType?: OAuthTokenTypeIdentifier;
   /** The type of token being requested. */
   requestedTokenType?: OAuthTokenTypeIdentifier;
   /** The logical name or names of the target service where the issued token will be used. */
@@ -73,7 +69,15 @@ export type ExchangeOAuthApplicationTokenParams = {
   resource?: string | string[];
   /** The scopes requested for the issued token. */
   scope?: string[];
-};
+} & (
+  | {
+      /** The token that represents the identity of the acting party, for delegation. */
+      actorToken: string;
+      /** The type of `actorToken`. */
+      actorTokenType: OAuthTokenTypeIdentifier;
+    }
+  | { actorToken?: never; actorTokenType?: never }
+);
 
 /**
  * The result of a successful [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693#section-2.2.1).
@@ -165,7 +169,7 @@ function tokenExchangeResult(json: TokenExchangeResponseJSON): ExchangeOAuthAppl
     issuedTokenType: json.issued_token_type,
     tokenType: json.token_type,
     expiresIn: json.expires_in,
-    scope: json.scope ? json.scope.split(' ') : undefined,
+    scope: json.scope ? json.scope.split(' ').filter(Boolean) : undefined,
     refreshToken: json.refresh_token,
   };
 }
@@ -290,12 +294,13 @@ export class OAuthApplicationsApi extends AbstractAPI {
    * @param params - The parameters for the token exchange.
    * @returns The issued token and its metadata.
    * @throws `OAuthTokenExchangeError` if the token endpoint rejects the exchange or returns an invalid response.
+   * @throws `Error` if only one of `actorToken` and `actorTokenType` is provided.
    *
    * @example
    * ```ts
    * const { accessToken } = await clerkClient.oauthApplications.__experimental_exchangeToken({
    *   oauthApplicationId: 'oauthapp_123',
-   *   clientSecret: process.env.OAUTH_CLIENT_SECRET,
+   *   clientSecret: process.env.OAUTH_CLIENT_SECRET!,
    *   subjectToken,
    *   subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
    *   audience: 'https://api.example.com',
@@ -305,8 +310,8 @@ export class OAuthApplicationsApi extends AbstractAPI {
   public async __experimental_exchangeToken(
     params: ExchangeOAuthApplicationTokenParams,
   ): Promise<ExchangeOAuthApplicationTokenResult> {
-    if (params.actorTokenType && !params.actorToken) {
-      throw new Error('`actorTokenType` requires `actorToken`.');
+    if (!params.actorToken !== !params.actorTokenType) {
+      throw new Error('`actorToken` and `actorTokenType` must be provided together.');
     }
 
     const application = await this.get(params.oauthApplicationId);
