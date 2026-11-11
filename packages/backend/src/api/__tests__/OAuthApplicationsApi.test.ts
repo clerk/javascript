@@ -1,3 +1,4 @@
+import { ClerkError } from '@clerk/shared/error';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
@@ -278,7 +279,16 @@ describe('OAuthApplications', () => {
       });
 
       await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
-      await expect(promise).rejects.toMatchObject({ error, errorDescription, status: 400 });
+      await expect(promise).rejects.toBeInstanceOf(ClerkError);
+      await expect(promise).rejects.toMatchObject({
+        code: error,
+        error,
+        errorDescription,
+        status: 400,
+        clerkError: true,
+        name: 'OAuthTokenExchangeError',
+        message: errorDescription ? `${error}: ${errorDescription}` : error,
+      });
     });
 
     it('throws an invalid_response error when the error body is not JSON', async () => {

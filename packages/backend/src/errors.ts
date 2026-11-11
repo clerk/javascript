@@ -118,17 +118,23 @@ export class MachineTokenVerificationError extends ClerkError {
   }
 }
 
-export class OAuthTokenExchangeError extends Error {
-  readonly error: string;
+export class OAuthTokenExchangeError extends ClerkError {
+  static kind = 'OAuthTokenExchangeError';
   readonly errorDescription?: string;
   readonly status?: number;
 
   constructor({ error, errorDescription, status }: { error: string; errorDescription?: string; status?: number }) {
-    super(errorDescription ? `${error}: ${errorDescription}` : error);
+    super({ message: errorDescription ? `${error}: ${errorDescription}` : error, code: error });
     Object.setPrototypeOf(this, OAuthTokenExchangeError.prototype);
-    this.name = 'OAuthTokenExchangeError';
-    this.error = error;
     this.errorDescription = errorDescription;
     this.status = status;
+  }
+
+  get error() {
+    return this.code;
+  }
+
+  protected static override formatMessage(_name: string, msg: string, _code: string, _docsUrl: string | undefined) {
+    return msg;
   }
 }
