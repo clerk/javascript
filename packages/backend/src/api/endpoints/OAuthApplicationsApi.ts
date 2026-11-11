@@ -117,6 +117,41 @@ function formUrlEncode(value: string) {
   return new URLSearchParams({ v: value }).toString().slice(2);
 }
 
+function invalidTokenExchangeRequest(errorDescription: string) {
+  return new OAuthTokenExchangeError({ error: 'invalid_request', errorDescription });
+}
+
+const loopbackHostnames = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+function parseAbsoluteUrl(value: string) {
+  try {
+    return new URL(value);
+  } catch {
+    return undefined;
+  }
+}
+
+function isAllowedResourceUrl({ protocol, hostname }: URL) {
+  return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(hostname));
+}
+
+function assertValidTokenExchangeResource(resource: string) {
+  if (resource.includes('#')) {
+    throw invalidTokenExchangeRequest('`resource` must not contain a fragment.');
+  }
+  const url = parseAbsoluteUrl(resource);
+  if (!url) {
+    throw invalidTokenExchangeRequest('`resource` must be an absolute URI.');
+  }
+  if (!isAllowedResourceUrl(url)) {
+    throw invalidTokenExchangeRequest('`resource` must use https, or http on a loopback host.');
+  }
+}
+
+function assertValidTokenExchangeParams(params: ExchangeOAuthApplicationTokenParams) {
+  assertValidTokenExchangeResource(params.resource);
+}
+
 function tokenExchangeBody(params: ExchangeOAuthApplicationTokenParams) {
   const body = new URLSearchParams({
     grant_type: tokenExchangeGrantType,
@@ -316,6 +351,8 @@ export class OAuthApplicationsApi extends AbstractAPI {
   public async __experimental_exchangeToken(
     params: ExchangeOAuthApplicationTokenParams,
   ): Promise<ExchangeOAuthApplicationTokenResult> {
+    assertValidTokenExchangeParams(params);
+
     if (!params.clientId) {
       throw new Error('A valid client ID is required.');
     }

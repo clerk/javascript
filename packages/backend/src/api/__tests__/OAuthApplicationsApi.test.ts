@@ -412,6 +412,69 @@ describe('OAuthApplications', () => {
       expect(requested).toBe(false);
     });
 
+    it.each([
+      ['has a fragment', 'https://r.example.test/api#section'],
+      ['has a bare trailing fragment delimiter', 'https://r.example.test/api#'],
+      ['is relative', '/api'],
+      ['is unparsable', 'https://'],
+      ['is empty', ''],
+      ['uses plain http for a non-loopback host', 'http://r.example.test/api'],
+      ['uses plain http for a loopback-looking host name', 'http://localhost.example.test'],
+      ['uses a non-http scheme', 'urn:example:resource'],
+      ['uses a websocket scheme', 'wss://r.example.test/api'],
+    ])('rejects a resource that %s before making any request', async (_, resource) => {
+      const requested: string[] = [];
+      server.use(
+        http.all('*', ({ request }) => {
+          requested.push(`${request.method} ${request.url}`);
+          return tokenResponse();
+        }),
+      );
+
+      const promise = createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource,
+      });
+
+      await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
+      await expect(promise).rejects.toMatchObject({
+        code: 'invalid_request',
+        error: 'invalid_request',
+        errorDescription: expect.stringContaining('resource'),
+        status: undefined,
+      });
+      expect(requested).toEqual([]);
+    });
+
+    it.each([
+      ['an https resource with a query', 'https://r.example.test/api?tenant=a&b=1'],
+      ['an https resource as written, without normalization', 'HTTPS://R.Example.test'],
+      ['an http resource on localhost', 'http://localhost:3000'],
+      ['an http resource on 127.0.0.1', 'http://127.0.0.1:8080/api'],
+      ['an http resource on [::1]', 'http://[::1]:8080'],
+    ])('sends %s', async (_, resource) => {
+      let sent: string[] | undefined;
+      server.use(
+        http.post(tokenFetchUrl, async ({ request }) => {
+          sent = new URLSearchParams(await request.text()).getAll('resource');
+          return tokenResponse();
+        }),
+      );
+
+      await createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource,
+      });
+
+      expect(sent).toEqual([resource]);
+    });
+
     it('throws when the client ID is missing', async () => {
       await expect(
         createClient().oauthApplications.__experimental_exchangeToken({
