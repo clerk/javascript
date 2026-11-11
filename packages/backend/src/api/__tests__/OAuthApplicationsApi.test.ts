@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { OAuthTokenExchangeError } from '../../errors';
 import { server, validateHeaders } from '../../mock-server';
+import type { ExchangeOAuthApplicationTokenParams } from '../endpoints';
 import { createBackendApiClient } from '../factory';
 
 describe('OAuthApplications', () => {
@@ -94,6 +95,27 @@ describe('OAuthApplications', () => {
         issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
         token_type: 'Bearer',
       });
+
+    const exchange = (overrides: Partial<ExchangeOAuthApplicationTokenParams> = {}) =>
+      createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource: 'https://r.example.test',
+        ...overrides,
+      });
+
+    const recordRequests = () => {
+      const requested: string[] = [];
+      server.use(
+        http.all('*', ({ request }) => {
+          requested.push(`${request.method} ${request.url}`);
+          return tokenResponse();
+        }),
+      );
+      return requested;
+    };
 
     it('exchanges a subject token at the application token endpoint', async () => {
       let captured: { headers: Headers; body: URLSearchParams } | undefined;
@@ -289,13 +311,7 @@ describe('OAuthApplications', () => {
         ),
       );
 
-      const promise = createClient().oauthApplications.__experimental_exchangeToken({
-        publishableKey,
-        clientId,
-        clientSecret,
-        subjectToken: 'subject_token',
-        resource: 'https://r.example.test',
-      });
+      const promise = exchange();
 
       await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
       await expect(promise).rejects.toMatchObject({ error: 'invalid_response', status });
@@ -322,13 +338,7 @@ describe('OAuthApplications', () => {
         ),
       );
 
-      const promise = createClient().oauthApplications.__experimental_exchangeToken({
-        publishableKey,
-        clientId,
-        clientSecret,
-        subjectToken: 'subject_token',
-        resource: 'https://r.example.test',
-      });
+      const promise = exchange();
 
       await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
       await expect(promise).rejects.toMatchObject({ error: 'invalid_response', status: 200 });
@@ -348,13 +358,7 @@ describe('OAuthApplications', () => {
         ),
       );
 
-      const result = await createClient().oauthApplications.__experimental_exchangeToken({
-        publishableKey,
-        clientId,
-        clientSecret,
-        subjectToken: 'subject_token',
-        resource: 'https://r.example.test',
-      });
+      const result = await exchange();
 
       expect(result).toEqual({
         accessToken: 'exchanged_token',
@@ -422,22 +426,20 @@ describe('OAuthApplications', () => {
       ['uses plain http for a loopback-looking host name', 'http://localhost.example.test'],
       ['uses a non-http scheme', 'urn:example:resource'],
       ['uses a websocket scheme', 'wss://r.example.test/api'],
+      ['has surrounding spaces', ' https://a.example '],
+      ['has a tab', 'https://a.ex\tample/'],
+      ['uses backslashes', 'https:\\\\a.example\\p'],
+      ['has a space', 'https://a.example/a b'],
+      ['has a non-ASCII character', 'https://a.example/é'],
+      ['has a newline', 'https://a.example/a\nb'],
+      ['has an invalid percent-encoding', 'https://a.example/%zz'],
+      ['has a leading control character', '\u0000https://a.example'],
+      ['has no authority', 'https:a.example'],
+      ['hides a host behind a backslash', 'http://localhost\\@evil.example/'],
     ])('rejects a resource that %s before making any request', async (_, resource) => {
-      const requested: string[] = [];
-      server.use(
-        http.all('*', ({ request }) => {
-          requested.push(`${request.method} ${request.url}`);
-          return tokenResponse();
-        }),
-      );
+      const requested = recordRequests();
 
-      const promise = createClient().oauthApplications.__experimental_exchangeToken({
-        publishableKey,
-        clientId,
-        clientSecret,
-        subjectToken: 'subject_token',
-        resource,
-      });
+      const promise = exchange({ resource });
 
       await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
       await expect(promise).rejects.toMatchObject({
@@ -464,13 +466,7 @@ describe('OAuthApplications', () => {
         }),
       );
 
-      await createClient().oauthApplications.__experimental_exchangeToken({
-        publishableKey,
-        clientId,
-        clientSecret,
-        subjectToken: 'subject_token',
-        resource,
-      });
+      await exchange({ resource });
 
       expect(sent).toEqual([resource]);
     });
@@ -484,22 +480,9 @@ describe('OAuthApplications', () => {
       ['an element with a control character', ['a\tb']],
       ['an element with DEL', ['a\u007fb']],
     ])('rejects a scope with %s before making any request', async (_, scope) => {
-      const requested: string[] = [];
-      server.use(
-        http.all('*', ({ request }) => {
-          requested.push(`${request.method} ${request.url}`);
-          return tokenResponse();
-        }),
-      );
+      const requested = recordRequests();
 
-      const promise = createClient().oauthApplications.__experimental_exchangeToken({
-        publishableKey,
-        clientId,
-        clientSecret,
-        subjectToken: 'subject_token',
-        resource: 'https://r.example.test',
-        scope,
-      });
+      const promise = exchange({ scope });
 
       await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
       await expect(promise).rejects.toMatchObject({
@@ -523,14 +506,7 @@ describe('OAuthApplications', () => {
         }),
       );
 
-      await createClient().oauthApplications.__experimental_exchangeToken({
-        publishableKey,
-        clientId,
-        clientSecret,
-        subjectToken: 'subject_token',
-        resource: 'https://r.example.test',
-        scope,
-      });
+      await exchange({ scope });
 
       expect(body?.get('scope')).toBe(expected);
     });

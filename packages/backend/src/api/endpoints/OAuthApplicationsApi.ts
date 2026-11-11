@@ -117,8 +117,12 @@ function formUrlEncode(value: string) {
   return new URLSearchParams({ v: value }).toString().slice(2);
 }
 
-function invalidTokenExchangeRequest(errorDescription: string) {
+function tokenExchangeRequestError(errorDescription: string) {
   return new OAuthTokenExchangeError({ error: 'invalid_request', errorDescription });
+}
+
+function tokenExchangeResponseError(status: number) {
+  return new OAuthTokenExchangeError({ error: 'invalid_response', status });
 }
 
 const loopbackHostnames = new Set(['localhost', '127.0.0.1', '[::1]']);
@@ -135,25 +139,27 @@ function isAllowedResourceUrl({ protocol, hostname }: URL) {
   return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(hostname));
 }
 
+const rfc3986AbsoluteUriPattern =
+  /^[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[A-Za-z0-9\-._~:/?@!$&'()*+,;=[\]]|%[0-9A-Fa-f]{2})*$/;
+
 function assertValidTokenExchangeResource(resource: string) {
   if (resource.includes('#')) {
-    throw invalidTokenExchangeRequest('`resource` must not contain a fragment.');
+    throw tokenExchangeRequestError('`resource` must not contain a fragment.');
   }
-  const url = parseAbsoluteUrl(resource);
+  const url = rfc3986AbsoluteUriPattern.test(resource) ? parseAbsoluteUrl(resource) : undefined;
   if (!url) {
-    throw invalidTokenExchangeRequest('`resource` must be an absolute URI.');
+    throw tokenExchangeRequestError('`resource` must be an absolute URI.');
   }
   if (!isAllowedResourceUrl(url)) {
-    throw invalidTokenExchangeRequest('`resource` must use https, or http on a loopback host.');
+    throw tokenExchangeRequestError('`resource` must use https, or http on a loopback host.');
   }
 }
 
-// RFC 6749 §3.3: scope-token = 1*( %x21 / %x23-5B / %x5D-7E )
 const scopeTokenPattern = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
 
 function assertValidTokenExchangeScope(scope: string[] | undefined) {
   if (scope?.some(token => !scopeTokenPattern.test(token))) {
-    throw invalidTokenExchangeRequest(
+    throw tokenExchangeRequestError(
       'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
     );
   }
@@ -190,7 +196,7 @@ function isString(value: unknown): value is string {
 }
 
 function isNonNegativeInteger(value: unknown): value is number {
-  return Number.isSafeInteger(value) && (value as number) >= 0;
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
 function isTokenExchangeResponse(value: unknown): value is TokenExchangeResponseJSON {
@@ -217,12 +223,12 @@ function tokenExchangeResult(json: TokenExchangeResponseJSON): ExchangeOAuthAppl
 }
 
 function tokenExchangeError(json: unknown, status: number) {
-  if (!isRecord(json) || typeof json.error !== 'string') {
-    return new OAuthTokenExchangeError({ error: 'invalid_response', status });
+  if (!isRecord(json) || !isString(json.error)) {
+    return tokenExchangeResponseError(status);
   }
   return new OAuthTokenExchangeError({
     error: json.error,
-    errorDescription: typeof json.error_description === 'string' ? json.error_description : undefined,
+    errorDescription: isString(json.error_description) ? json.error_description : undefined,
     status,
   });
 }
@@ -390,7 +396,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
     }
 
     if (response.status !== 200 || !isTokenExchangeResponse(json)) {
-      throw new OAuthTokenExchangeError({ error: 'invalid_response', status: response.status });
+      throw tokenExchangeResponseError(response.status);
     }
 
     return tokenExchangeResult(json);
