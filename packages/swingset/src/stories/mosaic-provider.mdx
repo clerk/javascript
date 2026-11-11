@@ -58,8 +58,9 @@ The button you pick (`Switcher`, `UserButton` or `OrganizationSwitcher`) decides
 which profile it opens. `combined` on `MosaicProvider` decides whether a combined `Switcher` opens one
 profile or two, and what a `<Profile />` without a `mode` shows.
 
-`profile.combined` takes effect only with `experimental.newProfiles`. Without it, `Switcher`, `UserButton` and
-`OrganizationSwitcher` open Clerk's modals.
+For `Switcher`, `UserButton` and `OrganizationSwitcher`, `profile.combined` takes effect only with
+`experimental.newProfiles`. Without it, they open Clerk's modals. A `<Profile />` without a `mode` follows
+`profile.combined` either way.
 
 | Option                     | Type                       | Default | Description                                                                       |
 | -------------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------- |
