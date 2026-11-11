@@ -109,6 +109,11 @@ export const signInMessages = {
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
   },
+  enterpriseSso: {
+    continue: 'Continue with SSO',
+    pending: 'Redirecting to SSO',
+    bypass: 'Can’t use SSO?',
+  },
   ssoBypass: {
     notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
   },
@@ -160,6 +165,16 @@ export const signInMessages = {
   verifyEmail: {
     title: 'Verify your email',
     description: 'Enter the verification code sent to {identifier}',
+    label: 'Verification code',
+    resendText: 'Didn’t receive a code?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  verifyPhone: {
+    title: 'Verify your phone',
+    titleProvider: 'Verify your {provider}',
+    description: 'Enter the verification code sent to your phone',
+    descriptionProvider: 'Enter the verification code sent to your {provider}',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',

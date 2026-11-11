@@ -51,6 +51,16 @@ export function codeCopy(step: CodeStepData, m: Messages): { title: string; desc
       fieldLabel: m.verifyEmail.label,
     };
   }
+  if (step.purpose === 'verify-phone') {
+    const provider = step.provider;
+    return provider
+      ? {
+          title: fill(m.verifyPhone.titleProvider, { provider }),
+          description: fill(m.verifyPhone.descriptionProvider, { provider }),
+          fieldLabel: m.verifyPhone.label,
+        }
+      : { title: m.verifyPhone.title, description: m.verifyPhone.description, fieldLabel: m.verifyPhone.label };
+  }
   if (step.channel === 'totp') {
     return { title: m.totpMfa.title, description: m.totpMfa.description, fieldLabel: m.totpMfa.label };
   }
@@ -76,6 +86,9 @@ export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy 
   if (step.purpose === 'verify-email') {
     return m.verifyEmail;
   }
+  if (step.purpose === 'verify-phone') {
+    return m.verifyPhone;
+  }
   if (step.channel === 'phone' && step.provider) {
     return m.alternativePhoneCode;
   }
@@ -94,7 +107,7 @@ export function codeIdentity(
   return {
     identifier: describesIdentifier ? undefined : step.identifier,
     editLabel: step.channel === 'phone' ? m.editPhoneNumber : m.editIdentifier,
-    editable: step.purpose === 'first-factor' || step.purpose === 'sso-bypass',
+    editable: step.purpose === 'first-factor' || step.purpose === 'sso-bypass' || step.purpose === 'verify-phone',
     notice:
       step.purpose === 'client-trust'
         ? m.clientTrust.notice
@@ -114,6 +127,9 @@ export function codeSecondaryAction(
   }
   if (step.channel === 'phone' && step.provider) {
     return { label: m.alternativePhoneCode.useSms, onClick: onCancel };
+  }
+  if (step.purpose === 'verify-phone') {
+    return { label: m.useAnotherMethod, onClick: undefined };
   }
   if ((step.purpose === 'second-factor' || step.purpose === 'client-trust') && !onCancel) {
     return { label: m.back, onClick: onBack };

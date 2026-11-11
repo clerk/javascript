@@ -166,6 +166,7 @@ export function SignInView({
                 'code:sso-bypass',
                 'code:reset-password',
                 'code:verify-email',
+                'code:verify-phone',
               ]}
             >
               {current.kind === 'code' ? (
@@ -218,6 +219,7 @@ export function SignInView({
                 'notice:no-methods',
                 'notice:action-blocked',
                 'notice:password-compromised',
+                'notice:enterprise-sso',
                 'notice:email-link',
               ]}
             >
@@ -225,6 +227,8 @@ export function SignInView({
                 <NoticeStep
                   focusRef={focusRef}
                   step={current}
+                  applicationName={applicationName}
+                  logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
                   globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
                   resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}

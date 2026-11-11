@@ -646,6 +646,21 @@ export function CodeSsoBypass() {
   return <StepPanel step={{ kind: 'code', purpose: 'sso-bypass', channel: 'email', identifier: IDENTIFIER }} />;
 }
 
+export function CodeVerifyPhone() {
+  return (
+    <StepPanel step={{ kind: 'code', purpose: 'verify-phone', channel: 'phone', identifier: '+1 555 555 0123' }} />
+  );
+}
+
+export function NoticeEnterpriseSso() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'enterprise-sso' }}
+      combined={false}
+    />
+  );
+}
+
 export function CodeClientTrust() {
   return <StepPanel step={{ kind: 'code', purpose: 'client-trust', channel: 'email', identifier: IDENTIFIER }} />;
 }

@@ -21,7 +21,14 @@ export type SignInStep =
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
-      purpose: 'first-factor' | 'second-factor' | 'client-trust' | 'sso-bypass' | 'reset-password' | 'verify-email';
+      purpose:
+        | 'first-factor'
+        | 'second-factor'
+        | 'client-trust'
+        | 'sso-bypass'
+        | 'reset-password'
+        | 'verify-email'
+        | 'verify-phone';
       channel: SignInCodeChannel;
       identifier?: string;
       provider?: string;
@@ -29,7 +36,7 @@ export type SignInStep =
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' }

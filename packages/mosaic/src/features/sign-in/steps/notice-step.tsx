@@ -6,11 +6,14 @@ import { useMessages } from '../../../localization';
 import type { SignInStep } from '../sign-in.types';
 import { SignInActionBlocked } from './sign-in-action-blocked';
 import { SignInEmailLink } from './sign-in-email-link';
+import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
 
 interface NoticeStepProps {
   step: Extract<SignInStep, { kind: 'notice' }>;
+  applicationName: string;
+  logo?: { src: string; alt: string };
   globalErrorMessage?: string;
   isPending: boolean;
   resend?: VerificationCodeResend;
@@ -25,6 +28,8 @@ interface NoticeStepProps {
 
 export function NoticeStep({
   step,
+  applicationName,
+  logo,
   globalErrorMessage,
   isPending,
   resend,
@@ -83,6 +88,18 @@ export function NoticeStep({
           globalErrorMessage={globalErrorMessage}
           isPending={isPending}
           onForgotPassword={onForgotPassword}
+          onCancel={onCancel}
+        />
+      );
+    case 'enterprise-sso':
+      return (
+        <SignInEnterpriseSso
+          focusRef={focusRef}
+          applicationName={applicationName}
+          logo={logo}
+          globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
+          onSubmit={onSubmit}
           onCancel={onCancel}
         />
       );

@@ -84,6 +84,16 @@ describe('code step copy', () => {
     expect(codeIdentity({ kind: 'code', purpose: 'first-factor', channel: 'email' }, m).notice).toBeUndefined();
   });
 
+  it('lets a phone being verified be edited and offers no other method', () => {
+    const step = { kind: 'code', purpose: 'verify-phone', channel: 'phone', identifier: '+1 555 555 0123' } as const;
+
+    expect(codeCopy(step, m).title).toBe('Verify your phone');
+    expect(codeIdentity(step, m)).toMatchObject({ identifier: '+1 555 555 0123', editable: true });
+    expect(
+      codeSecondaryAction(step, m, { onCancel: () => undefined, onBack: () => undefined }).onClick,
+    ).toBeUndefined();
+  });
+
   it('goes back from a second factor when there is no other method', () => {
     const onBack = () => undefined;
     const onCancel = () => undefined;
