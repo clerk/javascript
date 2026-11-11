@@ -17,6 +17,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useVirtualEntries } from '../../../routing/virtual-store';
 import { OrganizationProfile } from '../../organization-profile/organization-profile';
 import { OrganizationSwitcher } from '../../organization-switcher/organization-switcher';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
@@ -324,7 +325,24 @@ describe('a mounted OrganizationProfile under a provider profile', () => {
   });
 });
 
+function Entry({ base }: { base: string }) {
+  return <output data-testid='entry'>{JSON.stringify(useVirtualEntries().get(base) ?? null)}</output>;
+}
+
 describe('a mounted UserProfile under a provider profile', () => {
+  it("routes its pages under the provider's path", async () => {
+    await renderWithProfile(
+      <>
+        <UserProfile />
+        <Entry base='/account' />
+      </>,
+      { userProfileProps: { path: '/account' } },
+    );
+
+    await userEvent.setup().click(await screen.findByRole('tab', { name: 'Security' }));
+    expect(JSON.parse(screen.getByTestId('entry').textContent ?? 'null')).toEqual(['security']);
+  });
+
   it('fills in what its own organizationProfileProps leave out from the provider', async () => {
     await renderWithProfile(<UserProfile organizationProfileProps={{ pageOrder: ['members'] }} />, {
       organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }], pageOrder: ['general'] },

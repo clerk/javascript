@@ -77,7 +77,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
   const {
     customPages = organizationProfileProps?.customPages,
     pageOrder = organizationProfileProps?.pageOrder,
-    path = '/organization',
+    path = organizationProfileProps?.path ?? '/organization',
     afterLeaveOrganizationUrl = organizationProfileProps?.afterLeaveOrganizationUrl,
     fallback,
     apiKeysProps = organizationProfileProps?.apiKeysProps,

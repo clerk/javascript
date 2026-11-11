@@ -113,6 +113,7 @@ export function UserProfile(props: UserProfileProps) {
     pageOrder = userProfileProps?.pageOrder,
     additionalOAuthScopes = userProfileProps?.additionalOAuthScopes,
     apiKeysProps = userProfileProps?.apiKeysProps,
+    path = userProfileProps?.path,
     organizationProfileProps: {
       customPages: organizationCustomPages = providerOrganization?.customPages,
       pageOrder: organizationPageOrder = providerOrganization?.pageOrder,
@@ -130,6 +131,7 @@ export function UserProfile(props: UserProfileProps) {
       pageOrder={pageOrder}
       additionalOAuthScopes={additionalOAuthScopes}
       apiKeysProps={apiKeysProps}
+      path={path}
       organizationProfileProps={{
         customPages: organizationCustomPages,
         pageOrder: organizationPageOrder,
