@@ -65,9 +65,9 @@ export type ExchangeOAuthApplicationTokenParams = {
   clientSecret: string;
   /** The OAuth access token that represents the user on whose behalf the request is being made. */
   subjectToken: string;
-  /** The URI of the target resource where the issued token will be used. */
+  /** The absolute URI of the target resource where the issued token will be used. It must use `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`, and must not contain a fragment. It is sent exactly as given. */
   resource: string;
-  /** The scopes requested for the issued token. */
+  /** The scopes requested for the issued token. Each element must be a single, non-empty [scope token](https://www.rfc-editor.org/rfc/rfc6749#section-3.3): printable ASCII without spaces, `"` or `\`. */
   scope?: string[];
 };
 
@@ -79,7 +79,7 @@ export type ExchangeOAuthApplicationTokenResult = {
   accessToken: string;
   /** The type of the issued token. */
   issuedTokenType: OAuthTokenTypeIdentifier;
-  /** How the issued token is used, for example `Bearer`. */
+  /** How the issued token is used, for example `Bearer`, as returned by the authorization server. Compare it case-insensitively ([RFC 6749 section 5.1](https://www.rfc-editor.org/rfc/rfc6749#section-5.1)), and only use the token if your code supports this type ([RFC 6749 section 7.1](https://www.rfc-editor.org/rfc/rfc6749#section-7.1)). */
   tokenType: string;
   /** The lifetime of the issued token in seconds, if provided by the authorization server. */
   expiresIn?: number;
@@ -346,8 +346,11 @@ export class OAuthApplicationsApi extends AbstractAPI {
    *
    * @param params - The parameters for the token exchange.
    * @returns The issued token and its metadata.
-   * @throws `OAuthTokenExchangeError` if the token endpoint rejects the exchange or returns an invalid response.
+   * @throws `OAuthTokenExchangeError` with code `invalid_request` and no `status` if `resource` or `scope` is invalid. No request is made.
+   * @throws `OAuthTokenExchangeError` with the OAuth error code, `errorDescription` and HTTP `status` if the token endpoint rejects the exchange ([RFC 6749 section 5.2](https://www.rfc-editor.org/rfc/rfc6749#section-5.2)).
+   * @throws `OAuthTokenExchangeError` with code `invalid_response` and the HTTP `status` if the token endpoint returns a non-200 success status, an error without an OAuth error code, or a malformed token response.
    * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute URL.
+   * @throws Network failures from `fetch`, unwrapped and unchanged.
    *
    * @example
    * ```ts
