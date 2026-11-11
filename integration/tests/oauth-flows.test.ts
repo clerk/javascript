@@ -635,5 +635,51 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
         await u.services.users.deleteIfExists({ email: newUser.email });
       }
     });
+
+    test('keeps the transfer error on the start screen when the sign-up transfer is blocked', async ({
+      page,
+      context,
+    }) => {
+      const providerKeys = await resolveInstanceKeys('oauth-provider');
+      const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
+      const users = createUserService(withRetry(providerClient));
+      const newUser = users.createFakeUser(test, { withUsername: true });
+      await users.createBapiUser(newUser);
+
+      const u = await createTestUtils({ app, page, context });
+
+      await page.route('**/v1/client/sign_ups*', route => {
+        const request = route.request();
+        const isTransfer =
+          request.method() === 'POST' &&
+          (new URL(request.url()).searchParams.get('transfer') === 'true' ||
+            request.postData()?.includes('transfer=true'));
+        if (!isTransfer) {
+          return route.continue();
+        }
+        return route.fulfill({ status: 429, contentType: 'text/html', body: '<html><body>Blocked</body></html>' });
+      });
+
+      try {
+        await u.po.signIn.goTo();
+        await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+        await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+        await u.po.signIn.setIdentifier(newUser.email);
+        await u.po.signIn.continue();
+        await u.po.signIn.enterTestOtpCode();
+
+        const genericError = u.page.getByText(/Unable to complete action at this time/);
+        await genericError.waitFor();
+        await u.page.waitForURL(url => url.pathname === '/sign-in');
+        await u.po.signIn.waitForMounted();
+
+        await expect(genericError).toBeVisible();
+        await expect(u.page.getByText(/The External Account was not found/)).toBeHidden();
+      } finally {
+        await newUser.deleteIfExists();
+        await u.services.users.deleteIfExists({ email: newUser.email });
+      }
+    });
   },
 );
