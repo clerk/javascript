@@ -1113,6 +1113,26 @@ describe('Combobox multiple', () => {
     expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
   });
 
+  it('updates a count from Value when Clear empties the selection', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root
+        multiple
+        defaultValue={['apple', 'cherry']}
+      >
+        <Combobox.Input aria-label='Fruits' />
+        <span data-testid='count'>
+          <Combobox.Value>{value => (value.length > 0 ? `${value.length} selected` : 'None')}</Combobox.Value>
+        </span>
+        <Combobox.Clear />
+      </Combobox.Root>,
+    );
+    expect(screen.getByTestId('count')).toHaveTextContent('2 selected');
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(screen.getByTestId('count')).toHaveTextContent('None');
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
+  });
+
   it('keeps the controlled selection when the parent rejects a change', async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();

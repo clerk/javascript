@@ -121,6 +121,7 @@ export function MultipleCount() {
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Value>{value => (value.length > 0 ? `${value.length} selected` : null)}</Combobox.Value>
+            <Combobox.Clear aria-label='Clear fruits' />
             <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
         </InputGroup.Root>
