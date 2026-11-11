@@ -123,6 +123,39 @@ describe('SignIn SSO callback when the sign-up transfer fails', () => {
     SSO_CALLBACK_BOUNCE_DELAY + 6000,
   );
 
+  it(
+    'shows the blocked screen after bouncing back when Protect blocks the sign-up transfer',
+    async () => {
+      const { wrapper, fixtures } = await setup();
+      vi.mocked(fixtures.clerk.handleRedirectCallback).mockRejectedValue(
+        new ClerkAPIResponseError('Error', {
+          data: [
+            {
+              code: 'action_blocked',
+              message: 'Action blocked',
+              long_message: 'This sign-up was blocked.',
+              meta: {
+                trace_id: '4Hn2rT9q',
+                title: 'Sign-up blocked',
+                description: 'We could not create your account right now.',
+              },
+            },
+          ],
+          status: 403,
+        }),
+      );
+
+      renderAt('/sign-in/sso-callback', wrapper);
+
+      await waitForBounce();
+      expect(await screen.findByText('Sign-up blocked')).toBeInTheDocument();
+      expect(screen.getByText('We could not create your account right now.')).toBeInTheDocument();
+      expect(screen.getByText('4Hn2rT9q')).toBeInTheDocument();
+      expect(screen.queryByText(ACCOUNT_NOT_FOUND)).not.toBeInTheDocument();
+    },
+    SSO_CALLBACK_BOUNCE_DELAY + 6000,
+  );
+
   it('still tells the user their account was not found when they land on the start screen with a transferable sign-in', async () => {
     const { wrapper, fixtures } = await setup();
 
