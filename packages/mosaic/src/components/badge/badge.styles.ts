@@ -12,6 +12,7 @@ export const styles = stylex.create({
     paddingInline: space['2'],
     alignItems: 'center',
     display: 'inline-flex',
+    flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],

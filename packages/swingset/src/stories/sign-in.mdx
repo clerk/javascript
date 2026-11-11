@@ -2,7 +2,7 @@ import * as Stories from './sign-in.stories';
 
 # SignIn
 
-The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error.
+The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error under the field. Enter `locked` as the password to return to the start with the lockout in the banner.
 
 ## Example
 
@@ -14,7 +14,8 @@ The example pauses briefly in each pending state. An email containing `new` take
     { name: 'Flow', href: '/components/flow', layer: 'Components' },
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
-    { name: 'Input Group', href: '/components/input-group', layer: 'Components' },
+    { name: 'PasswordInput', href: '/components/password-input', layer: 'Components' },
+    { name: 'Checkbox', href: '/components/checkbox', layer: 'Components' },
     { name: 'OTP', href: '/components/otp', layer: 'Components' },
     { name: 'Item', href: '/components/item', layer: 'Components' },
     { name: 'Button', href: '/components/button', layer: 'Components' },
@@ -24,7 +25,7 @@ The example pauses briefly in each pending state. An email containing `new` take
 
 ## Usage
 
-The view renders its own `Card.Root` and shows one step at a time inside it. `step` says which step and carries that step's data, such as the code channel or the factors to choose from; every other prop is shared across steps and reports interactions through plain callbacks. One step component can draw several steps: the code step covers the email code, the authenticator app code and email verification, with different copy. Leaving out `onShowMethods` hides "Use another method". `combined` switches the start card to the sign-in-or-up copy and hides the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
+The view renders its own `Card.Root` and shows one step at a time inside it. `step` says which step and carries that step's data, such as the code channel or the factors to choose from; every other prop is shared across steps. `form` is one `useForm` holding every step's fields (`SignInValues`), and each step's form submits through `onSubmit`; a completed code goes to `onCodeComplete` with the code. `isPending` describes the current step's attempt, and `isDisabled` locks every control that would start another action, including while a social provider is pending. `errorMessage` is an error about the step's field and shows under it; `globalErrorMessage` is an error about the whole step and shows in the card's banner. The new-password step is the last save, so its errors come from `form` instead. Everything else reports interactions through plain callbacks. One step component can draw several steps: the code step covers the email code, the authenticator app code and email verification, with different copy. `onCancel` is the step's secondary action, "Use another method" or "Back to sign in", and leaving it out hides the button. Leaving out `onResend` hides the resend link, as on the authenticator app step, and `canResend` is false while a resend is waiting or another action runs. `combined` switches the start card to the sign-in-or-up copy; leave out `onSignUp` there to hide the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
 
 ```tsx
 import { SignInView } from '@clerk/mosaic/features/sign-in';
@@ -35,6 +36,10 @@ import { SignInView } from '@clerk/mosaic/features/sign-in';
   applicationName='Acme'
   applicationLogoUrl={logoUrl}
   socialProviders={providers}
+  form={form}
+  onSubmit={onSubmit}
+  onCodeComplete={onCodeComplete}
+  isPending={isPending}
   {...callbacks}
 />;
 ```
@@ -66,6 +71,14 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Error
 
 <Story name='IdentifierError' storyModule={Stories} />
+
+#### Banner error
+
+<Story name='IdentifierBannerError' storyModule={Stories} />
+
+#### Locked
+
+<Story name='IdentifierLocked' storyModule={Stories} />
 
 #### Phone
 
@@ -99,25 +112,29 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='IdentifierWaitlist' storyModule={Stories} />
 
-### Secret step
+### Credential step
 
-`secret-step.tsx` draws `{ kind: 'secret' }`: the password (with identity preview and forgot password) or a backup code (`VerificationBackupCode`).
+`credential-step.tsx` draws `{ kind: 'credential' }`: the password (with identity preview and forgot password), a passkey prompt (with identity preview) or a backup code (`VerificationBackupCode`).
 
 #### Password
 
-<Story name='SecretPassword' storyModule={Stories} />
+<Story name='CredentialPassword' storyModule={Stories} />
 
 #### Password pending
 
-<Story name='SecretPasswordPending' storyModule={Stories} />
+<Story name='CredentialPasswordPending' storyModule={Stories} />
 
 #### Password error
 
-<Story name='SecretPasswordError' storyModule={Stories} />
+<Story name='CredentialPasswordError' storyModule={Stories} />
 
 #### Backup code
 
-<Story name='SecretBackupCode' storyModule={Stories} />
+<Story name='CredentialBackupCode' storyModule={Stories} />
+
+#### Passkey
+
+<Story name='CredentialPasskey' storyModule={Stories} />
 
 ### Code step
 
@@ -155,6 +172,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='CodeResetPassword' storyModule={Stories} />
 
+#### Reset password by phone
+
+<Story name='CodeResetPasswordPhone' storyModule={Stories} />
+
 #### SSO bypass
 
 <Story name='CodeSsoBypass' storyModule={Stories} />
@@ -169,11 +190,15 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Choice step
 
-`choice-step.tsx` draws `{ kind: 'choice' }` with `VerificationMethodPicker`.
+`choice-step.tsx` draws `{ kind: 'choice' }` with `VerificationMethodPicker`: other sign-in methods, or where to send a password reset code.
 
 #### Methods
 
 <Story name='ChoiceMethods' storyModule={Stories} />
+
+#### Reset methods
+
+<Story name='ChoiceResetMethods' storyModule={Stories} />
 
 #### Methods with passkey and providers
 
@@ -193,7 +218,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Notice step
 
-`notice-step.tsx` draws `{ kind: 'notice' }`: help, with `VerificationHelp`.
+`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password and a sent email link.
 
 #### Help
 
@@ -203,13 +228,9 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticeForgotPassword' storyModule={Stories} />
 
-#### Password changed
+#### Forgot password pending
 
-<Story name='NoticePasswordChanged' storyModule={Stories} />
-
-#### Account locked
-
-<Story name='NoticeLocked' storyModule={Stories} />
+<Story name='NoticeForgotPasswordPending' storyModule={Stories} />
 
 #### No available methods
 
@@ -223,17 +244,53 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticePasswordCompromised' storyModule={Stories} />
 
+#### Password compromised pending
+
+<Story name='NoticePasswordCompromisedPending' storyModule={Stories} />
+
 #### Email link sent
 
 <Story name='NoticeEmailLinkSent' storyModule={Stories} />
 
-#### Passkey
+#### Signed in on other tab
 
-<Story name='NoticePasskey' storyModule={Stories} />
+<Story name='NoticeEmailLinkSignedInOtherTab' storyModule={Stories} />
+
+#### Email verified
+
+<Story name='NoticeEmailLinkVerified' storyModule={Stories} />
+
+#### Signing in from email link
+
+<Story name='NoticeEmailLinkSigningIn' storyModule={Stories} />
+
+#### Signed in from email link
+
+<Story name='NoticeEmailLinkSignedIn' storyModule={Stories} />
+
+#### Email link expired
+
+<Story name='NoticeEmailLinkExpired' storyModule={Stories} />
+
+#### Email link invalid
+
+<Story name='NoticeEmailLinkInvalid' storyModule={Stories} />
+
+#### Email link for another device
+
+<Story name='NoticeEmailLinkClientMismatch' storyModule={Stories} />
+
+#### Close this tab
+
+<Story name='NoticeEmailLinkCloseTab' storyModule={Stories} />
+
+#### Start over
+
+<Story name='NoticeStartOver' storyModule={Stories} />
 
 ### New password step
 
-`new-password-step.tsx` will draw `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices.
+`new-password-step.tsx` draws `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices.
 
 #### Set new password
 

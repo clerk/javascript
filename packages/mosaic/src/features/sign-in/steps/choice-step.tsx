@@ -17,6 +17,8 @@ const factorIcon = {
   phone_code: SecurityPhone,
   totp: SecurityLockSquare,
   backup_code: Key,
+  reset_password_email_code: Envelope,
+  reset_password_phone_code: SecurityPhone,
 } as const satisfies Record<SignInFactor['strategy'], IconComponent>;
 
 interface ChoiceStepProps {
