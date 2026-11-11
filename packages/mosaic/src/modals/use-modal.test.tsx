@@ -647,6 +647,45 @@ describe('a modal surface that routes', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
+  it('does not reuse the options or container of an earlier open for an opening written from outside', async () => {
+    const container = document.body.appendChild(document.createElement('div'));
+    onTestFinished(() => container.remove());
+    const surface = routedSurface();
+    const ref: { handle: ModalHandle<StubOptions> | undefined; write: ReturnType<typeof useVirtualWrite> | undefined } =
+      {
+        handle: undefined,
+        write: undefined,
+      };
+    function Outside({ onWrite }: { onWrite: (write: ReturnType<typeof useVirtualWrite>) => void }) {
+      onWrite(useVirtualWrite());
+      return null;
+    }
+    renderWithModals(
+      [surface],
+      <>
+        <Caller
+          surface={surface}
+          onHandle={h => (ref.handle = h)}
+        />
+        <Outside onWrite={w => (ref.write = w)} />
+      </>,
+    );
+
+    act(() => ref.handle?.open({ label: 'first' }, container));
+    await flush();
+    expect(readOptions()).toEqual({ label: 'first' });
+    expect(container).toContainElement(screen.getByLabelText('Stub'));
+
+    act(() => ref.handle?.close());
+    await flush();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    act(() => ref.write?.('/modal/stub', []));
+    await flush();
+    expect(readOptions()).toBeNull();
+    expect(container).not.toContainElement(screen.getByLabelText('Stub'));
+  });
+
   it('hands its base to the content', async () => {
     const surface = defineModalSurface<StubOptions>({
       id: 'based',
