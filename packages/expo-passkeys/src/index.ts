@@ -115,7 +115,7 @@ const makeSerializedGetResponse = (
 
 export async function get({
   publicKeyOptions,
-  preferImmediatelyAvailableCredentials = false,
+  preferImmediatelyAvailableCredentials,
 }: {
   publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
   preferImmediatelyAvailableCredentials?: boolean;
@@ -130,14 +130,15 @@ export async function get({
     challenge: arrayBufferToBase64Url(publicKeyOptions.challenge),
   };
 
+  const immediateCredentialsArgs = preferImmediatelyAvailableCredentials ? [true] : [];
+
   const getPasskeyModule = Platform.select({
-    android: async () =>
-      ClerkExpoPasskeys.get(JSON.stringify(serializedPublicCredential), preferImmediatelyAvailableCredentials),
+    android: async () => ClerkExpoPasskeys.get(JSON.stringify(serializedPublicCredential), ...immediateCredentialsArgs),
     ios: async () =>
       ClerkExpoPasskeys.get(
         serializedPublicCredential.challenge,
         serializedPublicCredential.rpId,
-        preferImmediatelyAvailableCredentials,
+        ...immediateCredentialsArgs,
       ),
     default: null,
   });

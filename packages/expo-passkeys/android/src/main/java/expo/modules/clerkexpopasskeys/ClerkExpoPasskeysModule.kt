@@ -29,11 +29,11 @@ class ClerkExpoPasskeysModule : Module() {
 
         }
 
-        AsyncFunction("get") { request: String, preferImmediatelyAvailableCredentials: Boolean, promise: Promise ->
+        AsyncFunction("get") { request: String, preferImmediatelyAvailableCredentials: Boolean?, promise: Promise ->
 
             mCoroutine.launch {
                 try {
-                    val response = getPasskey(request, preferImmediatelyAvailableCredentials, appContext)
+                    val response = getPasskey(request, preferImmediatelyAvailableCredentials ?: false, appContext)
                     promise.resolve(response)
                 } catch (e: GetCredentialException) {
                     handleGetFailure(e, promise)
