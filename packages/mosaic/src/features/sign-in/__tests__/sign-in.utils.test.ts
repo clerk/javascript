@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { signInMessages } from '../sign-in.messages';
 import type { SignInStep } from '../sign-in.types';
-import { httpsUrl, stepKey } from '../sign-in.utils';
+import { codeCopy, codeIdentity, codeSecondaryAction, httpsUrl, stepKey } from '../sign-in.utils';
 
 describe('stepKey', () => {
   it('keys each step by its kind and the variant that changes its copy', () => {
@@ -39,5 +40,59 @@ describe('httpsUrl', () => {
     expect(httpsUrl('data:text/html,hi')).toBeUndefined();
     expect(httpsUrl('/support')).toBeUndefined();
     expect(httpsUrl(undefined)).toBeUndefined();
+  });
+});
+
+describe('code step copy', () => {
+  const m = signInMessages;
+
+  it('names the alternative phone channel in the title and offers SMS instead', () => {
+    const step = { kind: 'code', purpose: 'first-factor', channel: 'phone', provider: 'WhatsApp' } as const;
+
+    expect(codeCopy(step, m).title).toBe('Check your WhatsApp');
+    expect(codeSecondaryAction(step, m, { onCancel: () => undefined, onBack: () => undefined }).label).toBe(
+      'Send code via SMS instead',
+    );
+  });
+
+  it('shows the identifier on its own line, editable only before the second factor', () => {
+    const first = codeIdentity(
+      { kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: '+1******0123' },
+      m,
+    );
+    const second = codeIdentity(
+      { kind: 'code', purpose: 'second-factor', channel: 'email', identifier: 'jane@acme.com' },
+      m,
+    );
+
+    expect(first).toMatchObject({ identifier: '+1******0123', editable: true, editLabel: 'Edit phone number' });
+    expect(second).toMatchObject({ identifier: 'jane@acme.com', editable: false });
+  });
+
+  it('keeps the identifier in the description where the copy already names it', () => {
+    const step = { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' } as const;
+
+    expect(codeIdentity(step, m).identifier).toBeUndefined();
+    expect(codeCopy(step, m).description).toContain('jane@acme.com');
+  });
+
+  it('warns on a new device and on an SSO bypass', () => {
+    expect(codeIdentity({ kind: 'code', purpose: 'client-trust', channel: 'email' }, m).notice).toBe(
+      m.clientTrust.notice,
+    );
+    expect(codeIdentity({ kind: 'code', purpose: 'sso-bypass', channel: 'email' }, m).notice).toBe(m.ssoBypass.notice);
+    expect(codeIdentity({ kind: 'code', purpose: 'first-factor', channel: 'email' }, m).notice).toBeUndefined();
+  });
+
+  it('goes back from a second factor when there is no other method', () => {
+    const onBack = () => undefined;
+    const onCancel = () => undefined;
+    const step = { kind: 'code', purpose: 'second-factor', channel: 'phone' } as const;
+
+    expect(codeSecondaryAction(step, m, { onBack })).toEqual({ label: 'Back', onClick: onBack });
+    expect(codeSecondaryAction(step, m, { onCancel, onBack })).toEqual({
+      label: 'Use another method',
+      onClick: onCancel,
+    });
   });
 });

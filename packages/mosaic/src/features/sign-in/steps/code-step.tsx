@@ -3,16 +3,14 @@ import type { Ref } from 'react';
 import type { VerificationCodeMessages, VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationCode } from '../../../blocks/verification';
 import type { UseFormResult } from '../../../components/form';
-import { useMessages } from '../../../localization';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface CodeStepProps {
   messages: VerificationCodeMessages;
   resend?: VerificationCodeResend;
-  identifier?: string;
-  notice?: string;
-  onEditIdentifier?: () => void;
+  identity: { identifier?: string; editLabel: string; editable: boolean; notice?: string };
+  onEditIdentifier: () => void;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
@@ -26,8 +24,7 @@ interface CodeStepProps {
 export function CodeStep({
   messages,
   resend,
-  identifier,
-  notice,
+  identity,
   onEditIdentifier,
   form,
   errorMessage,
@@ -38,7 +35,6 @@ export function CodeStep({
   onCancel,
   focusRef,
 }: CodeStepProps) {
-  const m = useMessages('signIn');
   const { value, onValueChange } = form.registerValue('code');
 
   return (
@@ -51,16 +47,16 @@ export function CodeStep({
       isPending={isPending}
       resend={resend}
       identityPreview={
-        identifier ? (
+        identity.identifier ? (
           <SignInIdentityPreview
-            identifier={identifier}
-            editLabel={m.editIdentifier}
+            identifier={identity.identifier}
+            editLabel={identity.editLabel}
             disabled={isPending}
-            onEdit={onEditIdentifier}
+            onEdit={identity.editable ? onEditIdentifier : undefined}
           />
         ) : undefined
       }
-      notice={notice}
+      notice={identity.notice}
       onValueChange={onValueChange}
       onComplete={onCodeComplete}
       onSubmit={() => onSubmit()}

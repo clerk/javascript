@@ -1,14 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import type { VerificationCodeMessages, VerificationCodeResend } from '../../blocks/verification';
+import type { VerificationCodeResend } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
-import { stepKey } from './sign-in.utils';
+import { codeCopy, codeIdentity, codeResendCopy, codeSecondaryAction, stepKey } from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CodeStep } from './steps/code-step';
 import { CredentialStep } from './steps/credential-step';
@@ -18,7 +18,6 @@ import { NoticeStep } from './steps/notice-step';
 import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];
-type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
 type ResendCopy = Pick<Messages['emailCode'] | Messages['emailLink'], 'resendText' | 'resend' | 'resendCountdown'>;
 
 function factorLabel(factor: SignInFactor, m: Messages): string {
@@ -49,68 +48,6 @@ function choiceCopy(
   return step.purpose === 'reset-methods'
     ? { title: m.resetMethods.title, description: m.resetMethods.description }
     : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
-}
-
-function resendCopy(step: CodeStepData, m: Messages): ResendCopy {
-  if (step.purpose === 'reset-password') {
-    return m.resetPasswordCode;
-  }
-  if (step.purpose === 'verify-email') {
-    return m.verifyEmail;
-  }
-  if (step.channel === 'phone') {
-    return step.purpose === 'first-factor' ? m.phoneCode : m.phoneCodeMfa;
-  }
-  return m.emailCode;
-}
-
-function codeCopy(
-  step: CodeStepData,
-  m: Messages,
-): Pick<VerificationCodeMessages, 'title' | 'description' | 'fieldLabel'> {
-  const identifier = step.identifier ?? '';
-  if (step.purpose === 'reset-password') {
-    const description =
-      step.channel === 'phone' ? m.resetPasswordCode.descriptionPhone : m.resetPasswordCode.descriptionEmail;
-    return {
-      title: m.resetPasswordCode.title,
-      description: fill(description, { identifier }),
-      fieldLabel: m.resetPasswordCode.label,
-    };
-  }
-  if (step.purpose === 'verify-email') {
-    return {
-      title: m.verifyEmail.title,
-      description: fill(m.verifyEmail.description, { identifier }),
-      fieldLabel: m.verifyEmail.label,
-    };
-  }
-  if (step.channel === 'totp') {
-    return { title: m.totpMfa.title, description: m.totpMfa.description, fieldLabel: m.totpMfa.label };
-  }
-  if (step.channel === 'phone') {
-    const copy = step.purpose === 'first-factor' ? m.phoneCode : m.phoneCodeMfa;
-    return { title: copy.title, description: fill(copy.description, { identifier }), fieldLabel: copy.label };
-  }
-  return {
-    title: m.emailCode.title,
-    description: m.emailCode.description,
-    fieldLabel: m.emailCode.label,
-  };
-}
-
-function codeExtras(
-  step: CodeStepData,
-  m: Messages,
-  onEditIdentifier: () => void,
-): { identifier?: string; notice?: string; onEditIdentifier?: () => void } {
-  const showsIdentifier =
-    step.channel === 'email' && (step.purpose === 'first-factor' || step.purpose === 'client-trust');
-  return {
-    identifier: showsIdentifier ? step.identifier : undefined,
-    notice: step.purpose === 'client-trust' ? m.clientTrust.notice : undefined,
-    onEditIdentifier: step.purpose === 'first-factor' ? onEditIdentifier : undefined,
-  };
 }
 
 export function SignInView({
@@ -226,6 +163,7 @@ export function SignInView({
                 'code:first-factor',
                 'code:second-factor',
                 'code:client-trust',
+                'code:sso-bypass',
                 'code:reset-password',
                 'code:verify-email',
               ]}
@@ -236,22 +174,19 @@ export function SignInView({
                   messages={{
                     ...codeCopy(current, m),
                     ...actions,
-                    ...(current.purpose === 'reset-password'
-                      ? {
-                          primaryActionLabel: m.resetPasswordCode.verify,
-                          secondaryActionLabel: m.forgotPassword.back,
-                        }
-                      : {}),
+                    secondaryActionLabel: codeSecondaryAction(current, m, { onCancel, onBack }).label,
+                    ...(current.purpose === 'reset-password' ? { primaryActionLabel: m.resetPasswordCode.verify } : {}),
                   }}
-                  resend={resendFor(resendCopy(current, m))}
-                  {...codeExtras(current, m, onEditIdentifier)}
+                  resend={resendFor(codeResendCopy(current, m))}
+                  identity={codeIdentity(current, m)}
                   form={form}
                   errorMessage={errorMessage}
                   globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
                   onSubmit={onSubmit}
                   onCodeComplete={onCodeComplete}
-                  onCancel={onCancel}
+                  onEditIdentifier={onEditIdentifier}
+                  onCancel={codeSecondaryAction(current, m, { onCancel, onBack }).onClick}
                 />
               ) : null}
             </Flow.Step>

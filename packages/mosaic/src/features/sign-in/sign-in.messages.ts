@@ -86,7 +86,7 @@ export const signInMessages = {
   },
   phoneCode: {
     title: 'Check your phone',
-    description: 'Enter the verification code sent to {identifier}',
+    description: 'Enter the verification code sent to your phone',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
@@ -94,11 +94,23 @@ export const signInMessages = {
   },
   phoneCodeMfa: {
     title: 'Check your phone',
-    description: 'To continue, enter the verification code sent to {identifier}',
+    description: 'To continue, enter the verification code sent to your phone',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
+  },
+  alternativePhoneCode: {
+    title: 'Check your {provider}',
+    description: 'Enter the verification code sent to your {provider}',
+    label: 'Verification code',
+    useSms: 'Send code via SMS instead',
+    resendText: 'Didn’t receive a code?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  ssoBypass: {
+    notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
   },
   clientTrust: {
     notice: 'You’re signing in from a new device. We’re asking for verification to keep your account secure.',
@@ -154,6 +166,7 @@ export const signInMessages = {
     resendCountdown: 'Resend ({seconds})',
   },
   editIdentifier: 'Edit email address',
+  editPhoneNumber: 'Edit phone number',
   continue: 'Continue',
   verifying: 'Verifying',
   back: 'Back',

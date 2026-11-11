@@ -27,6 +27,7 @@ export const meta: StoryMeta = {
 const APPLICATION_NAME = 'Acme';
 const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 const IDENTIFIER = 'jane@acme.com';
+const PHONE = '+1******0123';
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
@@ -460,6 +461,7 @@ function StepPanel({
   pendingProviderId,
   providers = socialProviders,
   identifier,
+  otherMethods = true,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -469,6 +471,7 @@ function StepPanel({
   pendingProviderId?: string;
   providers?: SignInSocialProvider[];
   identifier?: string;
+  otherMethods?: boolean;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -501,7 +504,9 @@ function StepPanel({
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
       onForgotPassword={() => undefined}
-      onCancel={step.kind === 'code' && step.purpose === 'verify-email' ? undefined : () => undefined}
+      onCancel={
+        !otherMethods || (step.kind === 'code' && step.purpose === 'verify-email') ? undefined : () => undefined
+      }
       onShowHelp={() => undefined}
       onBack={() => undefined}
       onEmailSupport={() => undefined}
@@ -610,6 +615,35 @@ export function CodeEmail() {
 
 export function CodeAuthenticatorApp() {
   return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }} />;
+}
+
+export function CodePhone() {
+  return <StepPanel step={{ kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: PHONE }} />;
+}
+
+export function CodeAlternativePhoneChannel() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: PHONE, provider: 'WhatsApp' }}
+    />
+  );
+}
+
+export function CodeSecondFactorPhone() {
+  return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'phone', identifier: PHONE }} />;
+}
+
+export function CodeSecondFactorEmail() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'second-factor', channel: 'email', identifier: IDENTIFIER }}
+      otherMethods={false}
+    />
+  );
+}
+
+export function CodeSsoBypass() {
+  return <StepPanel step={{ kind: 'code', purpose: 'sso-bypass', channel: 'email', identifier: IDENTIFIER }} />;
 }
 
 export function CodeClientTrust() {
