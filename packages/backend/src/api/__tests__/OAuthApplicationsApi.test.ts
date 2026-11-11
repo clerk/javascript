@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest';
 
 import { OAuthTokenExchangeError } from '../../errors';
 import { server, validateHeaders } from '../../mock-server';
-import type { ExchangeOAuthApplicationTokenParams } from '../endpoints/OAuthApplicationsApi';
 import { createBackendApiClient } from '../factory';
 
 describe('OAuthApplications', () => {
@@ -142,11 +141,6 @@ describe('OAuthApplications', () => {
         oauthApplicationId,
         clientSecret,
         subjectToken: 'subject_token',
-        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
-        actorToken: 'actor_token',
-        actorTokenType: 'urn:ietf:params:oauth:token-type:jwt',
-        requestedTokenType: 'urn:ietf:params:oauth:token-type:access_token',
-        audience: ['https://a.example.test', 'https://b.example.test'],
         resource: 'https://r.example.test',
         scope: ['invoices:read', 'invoices:write'],
       });
@@ -167,10 +161,6 @@ describe('OAuthApplications', () => {
       expect(body?.get('grant_type')).toBe('urn:ietf:params:oauth:grant-type:token-exchange');
       expect(body?.get('subject_token')).toBe('subject_token');
       expect(body?.get('subject_token_type')).toBe('urn:ietf:params:oauth:token-type:access_token');
-      expect(body?.get('actor_token')).toBe('actor_token');
-      expect(body?.get('actor_token_type')).toBe('urn:ietf:params:oauth:token-type:jwt');
-      expect(body?.get('requested_token_type')).toBe('urn:ietf:params:oauth:token-type:access_token');
-      expect(body?.getAll('audience')).toEqual(['https://a.example.test', 'https://b.example.test']);
       expect(body?.getAll('resource')).toEqual(['https://r.example.test']);
       expect(body?.get('scope')).toBe('invoices:read invoices:write');
       expect(body?.has('client_id')).toBe(false);
@@ -195,7 +185,7 @@ describe('OAuthApplications', () => {
         oauthApplicationId,
         clientSecret,
         subjectToken: 'subject_token',
-        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        resource: 'https://r.example.test',
       });
 
       expect(authorization).toBe(`Basic ${btoa('client+id%3Awith%2Breserved:secret+value%3A%2B%2F%3D')}`);
@@ -221,10 +211,10 @@ describe('OAuthApplications', () => {
         oauthApplicationId,
         clientSecret,
         subjectToken: 'subject_token',
-        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        resource: 'https://r.example.test',
       });
 
-      expect([...(body?.keys() ?? [])]).toEqual(['grant_type', 'subject_token', 'subject_token_type']);
+      expect([...(body?.keys() ?? [])]).toEqual(['grant_type', 'subject_token', 'subject_token_type', 'resource']);
       expect(result.scope).toBeUndefined();
       expect(result.refreshToken).toBe('refresh');
     });
@@ -246,7 +236,7 @@ describe('OAuthApplications', () => {
         oauthApplicationId,
         clientSecret,
         subjectToken: 'subject_token',
-        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        resource: 'https://r.example.test',
       });
 
       expect(result.scope).toEqual(['invoices:read', 'invoices:write']);
@@ -273,7 +263,7 @@ describe('OAuthApplications', () => {
       await createClient().oauthApplications.__experimental_exchangeToken({
         oauthApplicationId,
         subjectToken: 'subject_token',
-        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        resource: 'https://r.example.test',
       });
 
       expect(captured?.authorization).toBeNull();
@@ -299,7 +289,7 @@ describe('OAuthApplications', () => {
         oauthApplicationId,
         clientSecret,
         subjectToken: 'subject_token',
-        subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        resource: 'https://r.example.test',
       });
 
       await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
@@ -324,7 +314,7 @@ describe('OAuthApplications', () => {
           oauthApplicationId,
           clientSecret,
           subjectToken: 'subject_token',
-          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+          resource: 'https://r.example.test',
         }),
       ).rejects.toMatchObject({ error: 'invalid_response', errorDescription: undefined, status: 502 });
     });
@@ -338,34 +328,10 @@ describe('OAuthApplications', () => {
           oauthApplicationId,
           clientSecret,
           subjectToken: 'subject_token',
-          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+          resource: 'https://r.example.test',
         }),
       ).rejects.toMatchObject({ error: 'invalid_response', status: 200 });
     });
-
-    it.each([{ actorTokenType: 'urn:ietf:params:oauth:token-type:jwt' }, { actorToken: 'actor_token' }])(
-      'rejects an unpaired actor parameter before making any request: %o',
-      async actor => {
-        let requested = false;
-        server.use(
-          http.all('*', () => {
-            requested = true;
-            return HttpResponse.json({});
-          }),
-        );
-
-        await expect(
-          createClient().oauthApplications.__experimental_exchangeToken({
-            oauthApplicationId,
-            clientSecret,
-            subjectToken: 'subject_token',
-            subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
-            ...actor,
-          } as unknown as ExchangeOAuthApplicationTokenParams),
-        ).rejects.toThrow('`actorToken` and `actorTokenType` must be provided together.');
-        expect(requested).toBe(false);
-      },
-    );
 
     it('throws when the OAuth application ID is missing', async () => {
       await expect(
@@ -373,7 +339,7 @@ describe('OAuthApplications', () => {
           oauthApplicationId: '',
           clientSecret,
           subjectToken: 'subject_token',
-          subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+          resource: 'https://r.example.test',
         }),
       ).rejects.toThrow('A valid resource ID is required.');
     });

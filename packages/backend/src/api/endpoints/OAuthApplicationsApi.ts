@@ -57,27 +57,13 @@ export type ExchangeOAuthApplicationTokenParams = {
   oauthApplicationId: string;
   /** The client secret of the OAuth application, used to authenticate with the token endpoint. Omit it for public OAuth applications, which have no client secret. */
   clientSecret?: string;
-  /** The token that represents the identity of the party on behalf of whom the request is being made. */
+  /** The OAuth access token that represents the user on whose behalf the request is being made. */
   subjectToken: string;
-  /** The type of `subjectToken`. */
-  subjectTokenType: OAuthTokenTypeIdentifier;
-  /** The type of token being requested. */
-  requestedTokenType?: OAuthTokenTypeIdentifier;
-  /** The logical name or names of the target service where the issued token will be used. */
-  audience?: string | string[];
-  /** The URI or URIs of the target service or resource where the issued token will be used. */
-  resource?: string | string[];
+  /** The URI of the target resource where the issued token will be used. */
+  resource: string;
   /** The scopes requested for the issued token. */
   scope?: string[];
-} & (
-  | {
-      /** The token that represents the identity of the acting party, for delegation. */
-      actorToken: string;
-      /** The type of `actorToken`. */
-      actorTokenType: OAuthTokenTypeIdentifier;
-    }
-  | { actorToken?: never; actorTokenType?: never }
-);
+};
 
 /**
  * The result of a successful [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693#section-2.2.1).
@@ -119,31 +105,19 @@ type TokenExchangeResponseJSON = {
 };
 
 const tokenExchangeGrantType = 'urn:ietf:params:oauth:grant-type:token-exchange';
+const accessTokenType = 'urn:ietf:params:oauth:token-type:access_token';
 
 function formUrlEncode(value: string) {
   return new URLSearchParams({ v: value }).toString().slice(2);
-}
-
-function appendAll(body: URLSearchParams, key: string, value: string | string[] | undefined) {
-  if (value === undefined) {
-    return;
-  }
-  for (const v of Array.isArray(value) ? value : [value]) {
-    body.append(key, v);
-  }
 }
 
 function tokenExchangeBody(params: ExchangeOAuthApplicationTokenParams) {
   const body = new URLSearchParams({
     grant_type: tokenExchangeGrantType,
     subject_token: params.subjectToken,
-    subject_token_type: params.subjectTokenType,
+    subject_token_type: accessTokenType,
+    resource: params.resource,
   });
-  appendAll(body, 'actor_token', params.actorToken);
-  appendAll(body, 'actor_token_type', params.actorTokenType);
-  appendAll(body, 'requested_token_type', params.requestedTokenType);
-  appendAll(body, 'audience', params.audience);
-  appendAll(body, 'resource', params.resource);
   if (params.scope?.length) {
     body.set('scope', params.scope.join(' '));
   }
@@ -289,12 +263,11 @@ export class OAuthApplicationsApi extends AbstractAPI {
   /**
    * @experimental This is an experimental API for OAuth 2.0 Token Exchange and is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version to avoid breaking changes.
    *
-   * Performs an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application), exchanging a subject token for a new token issued by the application's token endpoint.
+   * Performs an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application), exchanging a user's OAuth access token for a new access token for the target resource, issued by the application's token endpoint.
    *
    * @param params - The parameters for the token exchange.
    * @returns The issued token and its metadata.
    * @throws `OAuthTokenExchangeError` if the token endpoint rejects the exchange or returns an invalid response.
-   * @throws `Error` if only one of `actorToken` and `actorTokenType` is provided.
    *
    * @example
    * ```ts
@@ -302,18 +275,13 @@ export class OAuthApplicationsApi extends AbstractAPI {
    *   oauthApplicationId: 'oauthapp_123',
    *   clientSecret: process.env.OAUTH_CLIENT_SECRET!,
    *   subjectToken,
-   *   subjectTokenType: 'urn:ietf:params:oauth:token-type:access_token',
-   *   audience: 'https://api.example.com',
+   *   resource: 'https://api.example.com',
    * });
    * ```
    */
   public async __experimental_exchangeToken(
     params: ExchangeOAuthApplicationTokenParams,
   ): Promise<ExchangeOAuthApplicationTokenResult> {
-    if (!params.actorToken !== !params.actorTokenType) {
-      throw new Error('`actorToken` and `actorTokenType` must be provided together.');
-    }
-
     const application = await this.get(params.oauthApplicationId);
 
     const body = tokenExchangeBody(params);
