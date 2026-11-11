@@ -475,6 +475,66 @@ describe('OAuthApplications', () => {
       expect(sent).toEqual([resource]);
     });
 
+    it.each([
+      ['an empty element', ['read', '']],
+      ['an element with a space', ['a b']],
+      ['an element with a double quote', ['a"b']],
+      ['an element with a backslash', ['a\\b']],
+      ['an element with a non-ASCII character', ['café']],
+      ['an element with a control character', ['a\tb']],
+      ['an element with DEL', ['a\u007fb']],
+    ])('rejects a scope with %s before making any request', async (_, scope) => {
+      const requested: string[] = [];
+      server.use(
+        http.all('*', ({ request }) => {
+          requested.push(`${request.method} ${request.url}`);
+          return tokenResponse();
+        }),
+      );
+
+      const promise = createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource: 'https://r.example.test',
+        scope,
+      });
+
+      await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
+      await expect(promise).rejects.toMatchObject({
+        code: 'invalid_request',
+        error: 'invalid_request',
+        errorDescription: expect.stringContaining('scope'),
+        status: undefined,
+      });
+      expect(requested).toEqual([]);
+    });
+
+    it.each([
+      ['no scope parameter for an empty scope list', [], null],
+      ['scope tokens at the edges of the allowed character ranges', ['!', '#', '[', ']', '~'], '! # [ ] ~'],
+    ])('sends %s', async (_, scope, expected) => {
+      let body: URLSearchParams | undefined;
+      server.use(
+        http.post(tokenFetchUrl, async ({ request }) => {
+          body = new URLSearchParams(await request.text());
+          return tokenResponse();
+        }),
+      );
+
+      await createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource: 'https://r.example.test',
+        scope,
+      });
+
+      expect(body?.get('scope')).toBe(expected);
+    });
+
     it('throws when the client ID is missing', async () => {
       await expect(
         createClient().oauthApplications.__experimental_exchangeToken({

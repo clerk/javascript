@@ -148,8 +148,20 @@ function assertValidTokenExchangeResource(resource: string) {
   }
 }
 
+// RFC 6749 §3.3: scope-token = 1*( %x21 / %x23-5B / %x5D-7E )
+const scopeTokenPattern = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
+
+function assertValidTokenExchangeScope(scope: string[] | undefined) {
+  if (scope?.some(token => !scopeTokenPattern.test(token))) {
+    throw invalidTokenExchangeRequest(
+      'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
+    );
+  }
+}
+
 function assertValidTokenExchangeParams(params: ExchangeOAuthApplicationTokenParams) {
   assertValidTokenExchangeResource(params.resource);
+  assertValidTokenExchangeScope(params.scope);
 }
 
 function tokenExchangeBody(params: ExchangeOAuthApplicationTokenParams) {
