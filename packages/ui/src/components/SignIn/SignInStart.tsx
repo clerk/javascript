@@ -527,31 +527,33 @@ function SignInStartInternal(): JSX.Element {
 
       const error = signIn?.firstFactorVerification?.error;
       if (error) {
-        switch (error.code) {
-          case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
-          case ERROR_CODES.OAUTH_ACCESS_DENIED:
-          case ERROR_CODES.NOT_ALLOWED_ACCESS:
-          case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
-          case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
-          case ERROR_CODES.USER_LOCKED:
-          case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
-          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
-          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
-          case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
-          case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
-          case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
-          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
-          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
-          case ERROR_CODES.CAPTCHA_INVALID:
-          case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
-          case ERROR_CODES.FRAUD_ACTION_BLOCKED:
-          case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
-          case ERROR_CODES.USER_BANNED:
-          case ERROR_CODES.USER_DEACTIVATED:
-            card.setError(error);
-            break;
-          default:
-            defaultErrorHandler();
+        if (!card.error) {
+          switch (error.code) {
+            case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+            case ERROR_CODES.OAUTH_ACCESS_DENIED:
+            case ERROR_CODES.NOT_ALLOWED_ACCESS:
+            case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
+            case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+            case ERROR_CODES.USER_LOCKED:
+            case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
+            case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
+            case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
+            case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+            case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+            case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+            case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+            case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+            case ERROR_CODES.CAPTCHA_INVALID:
+            case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
+            case ERROR_CODES.FRAUD_ACTION_BLOCKED:
+            case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
+            case ERROR_CODES.USER_BANNED:
+            case ERROR_CODES.USER_DEACTIVATED:
+              card.setError(error);
+              break;
+            default:
+              defaultErrorHandler();
+          }
         }
 
         // TODO: This is a workaround in order to reset the sign in attempt
