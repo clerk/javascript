@@ -7,6 +7,7 @@ import type { AuthenticateContext } from './authenticateContext';
 import type { SignedInState, SignedOutState } from './authStatus';
 import { AuthErrorReason, signedIn, signedOut } from './authStatus';
 import { getCookieName, getCookieValue } from './cookie';
+import { isNonSessionJwtCategory } from './jwtCategories';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import type { OrganizationMatcher } from './organizationMatcher';
 import { TokenType } from './tokenTypes';
@@ -27,6 +28,16 @@ async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Pro
 
   assertHeaderType(typ);
   assertHeaderAlgorithm(alg);
+
+  // Handshake tokens are minted with the session-token category. A JWT template can carry an
+  // author-controlled top-level `handshake[]` claim that resolveHandshake emits verbatim as Set-Cookie.
+  if (isNonSessionJwtCategory(header.cat)) {
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenInvalid,
+      message: 'Invalid handshake token category.',
+    });
+  }
 
   const { data: signatureValid, errors: signatureErrors } = await hasValidSignature(decoded, key);
   if (signatureErrors) {
