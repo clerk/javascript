@@ -636,50 +636,71 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       }
     });
 
-    test('keeps the transfer error on the start screen when the sign-up transfer is blocked', async ({
-      page,
-      context,
-    }) => {
-      const providerKeys = await resolveInstanceKeys('oauth-provider');
-      const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
-      const users = createUserService(withRetry(providerClient));
-      const newUser = users.createFakeUser(test, { withUsername: true });
-      await users.createBapiUser(newUser);
+    const blockedTransferResponses = [
+      {
+        name: 'a non-Clerk HTML response',
+        response: { status: 429, contentType: 'text/html', body: '<html><body>Blocked</body></html>' },
+        error: /Unable to complete action at this time/,
+      },
+      {
+        name: 'a Clerk-shaped WAF response',
+        response: {
+          status: 429,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            errors: [{ code: 'too_many_requests', message: 'Too many requests. Please try again in a bit.' }],
+          }),
+        },
+        error: /Too many requests\. Please try again in a bit\./,
+      },
+    ];
 
-      const u = await createTestUtils({ app, page, context });
+    for (const { name, response, error } of blockedTransferResponses) {
+      test(`keeps the transfer error on the start screen when the sign-up transfer is blocked by ${name}`, async ({
+        page,
+        context,
+      }) => {
+        const providerKeys = await resolveInstanceKeys('oauth-provider');
+        const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
+        const users = createUserService(withRetry(providerClient));
+        const newUser = users.createFakeUser(test, { withUsername: true });
+        await users.createBapiUser(newUser);
 
-      await page.route('**/v1/client/sign_ups*', route => {
-        const request = route.request();
-        const isTransfer =
-          request.method() === 'POST' &&
-          (new URL(request.url()).searchParams.get('transfer') === 'true' ||
-            request.postData()?.includes('transfer=true'));
-        if (!isTransfer) {
-          return route.continue();
+        const u = await createTestUtils({ app, page, context });
+
+        await page.route('**/v1/client/sign_ups*', route => {
+          const request = route.request();
+          const isTransfer =
+            request.method() === 'POST' &&
+            (new URL(request.url()).searchParams.get('transfer') === 'true' ||
+              request.postData()?.includes('transfer=true'));
+          if (!isTransfer) {
+            return route.continue();
+          }
+          return route.fulfill(response);
+        });
+
+        try {
+          await u.po.signIn.goTo();
+          await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+          await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+          await u.po.signIn.setIdentifier(newUser.email);
+          await u.po.signIn.continue();
+          await u.po.signIn.enterTestOtpCode();
+
+          const transferError = u.page.getByText(error);
+          await transferError.waitFor();
+          await u.page.waitForURL(url => url.pathname === '/sign-in');
+          await u.po.signIn.waitForMounted();
+
+          await expect(transferError).toBeVisible();
+          await expect(u.page.getByText(/The External Account was not found/)).toBeHidden();
+        } finally {
+          await newUser.deleteIfExists();
+          await u.services.users.deleteIfExists({ email: newUser.email });
         }
-        return route.fulfill({ status: 429, contentType: 'text/html', body: '<html><body>Blocked</body></html>' });
       });
-
-      try {
-        await u.po.signIn.goTo();
-        await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-        await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
-
-        await u.po.signIn.setIdentifier(newUser.email);
-        await u.po.signIn.continue();
-        await u.po.signIn.enterTestOtpCode();
-
-        const genericError = u.page.getByText(/Unable to complete action at this time/);
-        await genericError.waitFor();
-        await u.page.waitForURL(url => url.pathname === '/sign-in');
-        await u.po.signIn.waitForMounted();
-
-        await expect(genericError).toBeVisible();
-        await expect(u.page.getByText(/The External Account was not found/)).toBeHidden();
-      } finally {
-        await newUser.deleteIfExists();
-        await u.services.users.deleteIfExists({ email: newUser.email });
-      }
-    });
+    }
   },
 );

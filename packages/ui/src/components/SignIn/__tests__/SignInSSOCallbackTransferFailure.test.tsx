@@ -23,15 +23,13 @@ const setup = async () => {
     f.withSocialProvider({ provider: 'google' });
   });
 
-  fixtures.signIn.firstFactorVerification = {
-    status: 'transferable',
-    strategy: 'oauth_google',
-    error: {
-      code: 'external_account_not_found',
-      message: 'Invalid external account',
-      longMessage: 'The External Account was not found.',
-    },
-  } as any;
+  fixtures.signIn.firstFactorVerification.status = 'transferable';
+  fixtures.signIn.firstFactorVerification.strategy = 'oauth_google';
+  fixtures.signIn.firstFactorVerification.error = {
+    code: 'external_account_not_found',
+    message: 'Invalid external account',
+    longMessage: 'The External Account was not found.',
+  };
   vi.mocked(fixtures.clerk.navigate).mockImplementation((to: string) => {
     const url = new URL(to, window.location.href);
     if (url.origin === window.location.origin) {
