@@ -273,6 +273,99 @@ describe('OAuthApplications', () => {
       ).rejects.toMatchObject({ error: 'invalid_response', status: 200 });
     });
 
+    it.each([201, 202, 204])('throws an invalid_response error for a %i response', async status => {
+      server.use(
+        http.post(tokenFetchUrl, () =>
+          status === 204
+            ? new HttpResponse(null, { status })
+            : HttpResponse.json(
+                {
+                  access_token: 'exchanged_token',
+                  issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+                  token_type: 'Bearer',
+                },
+                { status },
+              ),
+        ),
+      );
+
+      const promise = createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource: 'https://r.example.test',
+      });
+
+      await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
+      await expect(promise).rejects.toMatchObject({ error: 'invalid_response', status });
+    });
+
+    it.each([
+      ['a numeric scope', { scope: 42 }],
+      ['a null scope', { scope: null }],
+      ['a string expires_in', { expires_in: '3600' }],
+      ['a negative expires_in', { expires_in: -1 }],
+      ['a fractional expires_in', { expires_in: 1.5 }],
+      ['a null expires_in', { expires_in: null }],
+      ['a numeric refresh_token', { refresh_token: 7 }],
+      ['a null refresh_token', { refresh_token: null }],
+    ])('throws an invalid_response error for a successful response with %s', async (_, member) => {
+      server.use(
+        http.post(tokenFetchUrl, () =>
+          HttpResponse.json({
+            access_token: 'exchanged_token',
+            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+            token_type: 'Bearer',
+            ...member,
+          }),
+        ),
+      );
+
+      const promise = createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource: 'https://r.example.test',
+      });
+
+      await expect(promise).rejects.toBeInstanceOf(OAuthTokenExchangeError);
+      await expect(promise).rejects.toMatchObject({ error: 'invalid_response', status: 200 });
+    });
+
+    it('ignores unrecognized members in a successful response', async () => {
+      server.use(
+        http.post(tokenFetchUrl, () =>
+          HttpResponse.json({
+            access_token: 'exchanged_token',
+            issued_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+            token_type: 'Bearer',
+            expires_in: 0,
+            refresh_token: 'refresh',
+            custom_member: { nested: true },
+          }),
+        ),
+      );
+
+      const result = await createClient().oauthApplications.__experimental_exchangeToken({
+        publishableKey,
+        clientId,
+        clientSecret,
+        subjectToken: 'subject_token',
+        resource: 'https://r.example.test',
+      });
+
+      expect(result).toEqual({
+        accessToken: 'exchanged_token',
+        issuedTokenType: 'urn:ietf:params:oauth:token-type:access_token',
+        tokenType: 'Bearer',
+        expiresIn: 0,
+        scope: undefined,
+        refreshToken: 'refresh',
+      });
+    });
+
     it('sends the exchange to the proxy URL when one is configured', async () => {
       let requested = false;
       server.use(

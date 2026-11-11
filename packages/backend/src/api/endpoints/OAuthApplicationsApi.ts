@@ -134,12 +134,27 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
+function isAbsentOr(value: Record<string, unknown>, key: string, check: (member: unknown) => boolean) {
+  return !(key in value) || check(value[key]);
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return Number.isSafeInteger(value) && (value as number) >= 0;
+}
+
 function isTokenExchangeResponse(value: unknown): value is TokenExchangeResponseJSON {
   return (
     isRecord(value) &&
-    typeof value.access_token === 'string' &&
-    typeof value.issued_token_type === 'string' &&
-    typeof value.token_type === 'string'
+    isString(value.access_token) &&
+    isString(value.issued_token_type) &&
+    isString(value.token_type) &&
+    isAbsentOr(value, 'scope', isString) &&
+    isAbsentOr(value, 'expires_in', isNonNegativeInteger) &&
+    isAbsentOr(value, 'refresh_token', isString)
   );
 }
 
@@ -322,7 +337,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
       throw tokenExchangeError(json, response.status);
     }
 
-    if (!isTokenExchangeResponse(json)) {
+    if (response.status !== 200 || !isTokenExchangeResponse(json)) {
       throw new OAuthTokenExchangeError({ error: 'invalid_response', status: response.status });
     }
 
