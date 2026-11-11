@@ -612,6 +612,10 @@ export function CodeAuthenticatorApp() {
   return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }} />;
 }
 
+export function CodeClientTrust() {
+  return <StepPanel step={{ kind: 'code', purpose: 'client-trust', channel: 'email', identifier: IDENTIFIER }} />;
+}
+
 export function CodeResetPassword() {
   return <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'email', identifier: IDENTIFIER }} />;
 }

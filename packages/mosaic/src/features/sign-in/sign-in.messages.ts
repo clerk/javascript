@@ -78,7 +78,7 @@ export const signInMessages = {
   },
   emailCode: {
     title: 'Check your email',
-    description: 'Enter the verification code sent to {identifier}',
+    description: 'Enter the verification code sent to your email',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
@@ -99,6 +99,9 @@ export const signInMessages = {
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
+  },
+  clientTrust: {
+    notice: 'You’re signing in from a new device. We’re asking for verification to keep your account secure.',
   },
   totpMfa: {
     title: 'Two-step verification',

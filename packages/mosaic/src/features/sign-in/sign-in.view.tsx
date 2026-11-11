@@ -59,7 +59,7 @@ function resendCopy(step: CodeStepData, m: Messages): ResendCopy {
     return m.verifyEmail;
   }
   if (step.channel === 'phone') {
-    return step.purpose === 'second-factor' ? m.phoneCodeMfa : m.phoneCode;
+    return step.purpose === 'first-factor' ? m.phoneCode : m.phoneCodeMfa;
   }
   return m.emailCode;
 }
@@ -89,13 +89,27 @@ function codeCopy(
     return { title: m.totpMfa.title, description: m.totpMfa.description, fieldLabel: m.totpMfa.label };
   }
   if (step.channel === 'phone') {
-    const copy = step.purpose === 'second-factor' ? m.phoneCodeMfa : m.phoneCode;
+    const copy = step.purpose === 'first-factor' ? m.phoneCode : m.phoneCodeMfa;
     return { title: copy.title, description: fill(copy.description, { identifier }), fieldLabel: copy.label };
   }
   return {
     title: m.emailCode.title,
-    description: fill(m.emailCode.description, { identifier }),
+    description: m.emailCode.description,
     fieldLabel: m.emailCode.label,
+  };
+}
+
+function codeExtras(
+  step: CodeStepData,
+  m: Messages,
+  onEditIdentifier: () => void,
+): { identifier?: string; notice?: string; onEditIdentifier?: () => void } {
+  const showsIdentifier =
+    step.channel === 'email' && (step.purpose === 'first-factor' || step.purpose === 'client-trust');
+  return {
+    identifier: showsIdentifier ? step.identifier : undefined,
+    notice: step.purpose === 'client-trust' ? m.clientTrust.notice : undefined,
+    onEditIdentifier: step.purpose === 'first-factor' ? onEditIdentifier : undefined,
   };
 }
 
@@ -207,7 +221,15 @@ export function SignInView({
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['code:first-factor', 'code:second-factor', 'code:reset-password', 'code:verify-email']}>
+            <Flow.Step
+              ids={[
+                'code:first-factor',
+                'code:second-factor',
+                'code:client-trust',
+                'code:reset-password',
+                'code:verify-email',
+              ]}
+            >
               {current.kind === 'code' ? (
                 <CodeStep
                   focusRef={focusRef}
@@ -222,6 +244,7 @@ export function SignInView({
                       : {}),
                   }}
                   resend={resendFor(resendCopy(current, m))}
+                  {...codeExtras(current, m, onEditIdentifier)}
                   form={form}
                   errorMessage={errorMessage}
                   globalErrorMessage={globalErrorMessage}

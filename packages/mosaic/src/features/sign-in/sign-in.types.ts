@@ -21,7 +21,7 @@ export type SignInStep =
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
-      purpose: 'first-factor' | 'second-factor' | 'reset-password' | 'verify-email';
+      purpose: 'first-factor' | 'second-factor' | 'client-trust' | 'reset-password' | 'verify-email';
       channel: SignInCodeChannel;
       identifier?: string;
     }
