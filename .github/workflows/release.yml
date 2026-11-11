@@ -41,11 +41,6 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init
-        with:
-          playwright-enabled: true # Must be present to enable caching on branched workflows
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
