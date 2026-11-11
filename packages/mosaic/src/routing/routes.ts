@@ -71,7 +71,11 @@ export function compilePattern(pattern: string): PatternPart[] {
       return { param: false, value: part };
     }
     const optional = part.endsWith('?');
-    return { param: true, name: part.slice(1, optional ? -1 : undefined), optional };
+    const name = part.slice(1, optional ? -1 : undefined);
+    if (name === '') {
+      throw new Error(`[clerk] Route pattern "${pattern}" has a param without a name.`);
+    }
+    return { param: true, name, optional };
   });
   const firstOptional = parts.findIndex(part => part.param && part.optional);
   if (firstOptional !== -1 && parts.slice(firstOptional).some(part => !part.param || !part.optional)) {

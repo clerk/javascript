@@ -71,6 +71,11 @@ describe('compilePattern', () => {
     expect(() => compilePattern('api%20keys')).toThrow('written decoded');
   });
 
+  it('rejects a param without a name', () => {
+    expect(() => compilePattern('billing/:')).toThrow('without a name');
+    expect(() => compilePattern('billing/:?')).toThrow('without a name');
+  });
+
   it('rejects a required part after an optional one', () => {
     expect(() => compilePattern('a/:b?/c')).toThrow('optional parts come last');
     expect(() => compilePattern('a/:b?/:c')).toThrow('optional parts come last');
