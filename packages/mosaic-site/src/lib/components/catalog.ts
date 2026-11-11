@@ -1,4 +1,4 @@
-import { ROADMAP } from '@/lib/components/roadmap';
+import { NAV_SECTIONS } from '@/lib/components/nav';
 import { STORY_COMPONENTS } from '@/lib/components/stories';
 
 export type Kind = 'components' | 'blocks';
@@ -41,26 +41,6 @@ const simple = (label: string, names: string[], description: string): CatalogCat
   ],
 });
 
-const FLOW_GROUPS: { id: string; label: string; slugs: string[] }[] = [
-  { id: 'account', label: 'Account', slugs: ['user-profile', 'user-button'] },
-  {
-    id: 'authentication',
-    label: 'Authentication',
-    slugs: ['sign-in', 'sign-up', 'google-one-tap', 'waitlist', 'task-reset-password', 'task-setup-mfa'],
-  },
-  {
-    id: 'organizations',
-    label: 'Organizations',
-    slugs: ['organization-list', 'create-organization', 'task-choose-organization'],
-  },
-  {
-    id: 'billing',
-    label: 'Billing',
-    slugs: ['pricing-table', 'plan-details', 'checkout', 'subscription-details'],
-  },
-  { id: 'ai', label: 'AI', slugs: ['oauth-consent', 'agent-approval'] },
-];
-
 const part = (slug: string, title: string, description: string, soon = false): CatalogItem => ({
   slug,
   title,
@@ -70,11 +50,6 @@ const part = (slug: string, title: string, description: string, soon = false): C
 
 const PARTS: Record<string, CatalogItem[]> = {
   'user-profile': [
-    part('profile-panel', 'Profile panel', 'The Profile page of the user profile.'),
-    part('security-panel', 'Security panel', 'The Security page of the user profile.'),
-    part('billing-panel', 'Billing panel', 'The Billing page of the user profile.'),
-    part('api-keys', 'API keys panel', 'The API keys page of the user profile.'),
-    part('avatar-upload', 'Avatar upload', 'Picker, drop target and remove menu for a profile picture.'),
     part('profile-details', 'Profile', 'Name and username, each edited in a dialog.'),
     part('email-addresses', 'Email', 'Add, verify, set primary and remove email addresses.'),
     part('phone-numbers', 'Phone', 'Add and verify phone numbers, and choose a primary.'),
@@ -89,26 +64,47 @@ const PARTS: Record<string, CatalogItem[]> = {
     part('subscription', 'Subscription', 'The subscription section of the user profile.'),
     part('payment-methods', 'Payment methods', 'The payment methods section of the user profile.'),
     part('billing-history', 'Billing history', 'The billing history section of the user profile.'),
+    part('api-keys-table', 'API keys table', 'List, create and revoke API keys.'),
+  ],
+  'organization-profile': [
+    part('organization-details', 'Organization details', 'Logo, name and slug of the organization.'),
+    part('organization-danger-zone', 'Danger zone', 'Destructive organization actions.'),
   ],
 };
 
-const flows: CatalogCategory[] = FLOW_GROUPS.map(group => ({
-  id: group.id,
-  label: group.label,
+const BLOCK_ITEMS: Record<string, { title: string; description: string }> = {
+  'user-button': { title: 'Switcher', description: 'The signed-in avatar and the menu behind it.' },
+  'user-profile': { title: 'Profile', description: 'Profile, security and billing for the signed-in user.' },
+  'user-avatar': { title: 'User avatar', description: 'The signed-in user’s avatar.' },
+  'sign-in': { title: 'Sign in', description: 'The sign-in flow.' },
+  waitlist: { title: 'Waitlist', description: 'Join the waitlist with an email address.' },
+  'task-setup-mfa': { title: 'Setup MFA', description: 'The set up MFA session task.' },
+  'organization-switcher': { title: 'Organization switcher', description: 'Switch the active organization.' },
+  'organization-list': { title: 'Organization list', description: 'Choose, join or create an organization.' },
+  'create-organization': { title: 'Create organization', description: 'Create an organization.' },
+  'organization-profile': { title: 'Organization profile', description: 'General, members and API keys.' },
+  'invite-members-button': { title: 'Invite members button', description: 'Invite people to an organization.' },
+  'task-choose-organization': {
+    title: 'Task: choose organization',
+    description: 'The choose organization session task.',
+  },
+  'oauth-consent': { title: 'OAuth consent', description: 'Approve or deny an OAuth request.' },
+};
+
+const flows: CatalogCategory[] = NAV_SECTIONS.map(section => ({
+  id: slugify(section.label),
+  label: section.label,
   groups: [
     {
       label: '',
-      items: group.slugs
-        .map(slug => ROADMAP.find(item => item.slug === slug))
-        .filter(item => item !== undefined)
-        .map(item => ({
-          slug: item.slug,
-          title: item.title,
-          description: '',
-          soon: item.status === 'soon',
-          ...(PARTS[item.slug] ? { children: PARTS[item.slug] } : {}),
-        }))
-        .sort((a, b) => Number(a.soon) - Number(b.soon)),
+      items: section.groups
+        .flatMap(group => group.slugs)
+        .map(slug => ({
+          slug,
+          ...BLOCK_ITEMS[slug],
+          soon: false,
+          ...(PARTS[slug] ? { children: PARTS[slug] } : {}),
+        })),
     },
   ],
 }));

@@ -11,7 +11,6 @@ import { SegmentedControl } from '@/components/gallery/segmented-control';
 import { TopNav } from '@/components/marketing/top-nav';
 import { CATALOG, type CatalogItem, type Kind } from '@/lib/components/catalog';
 import { getComponentMeta } from '@/lib/components/meta';
-import { NAV_SECTIONS } from '@/lib/components/nav';
 import { storyFileFor } from '@/lib/components/stories';
 import { cn } from '@/lib/utils';
 const SIDEBAR_WIDTH = 256;
@@ -213,21 +212,6 @@ function ComponentRow({ item, pathname, showPreview, setHover }: RowProps & { it
     </div>
   );
 }
-const blockBySlug = new Map(
-  CATALOG.blocks.flatMap(category => category.groups.flatMap(group => group.items)).map(item => [item.slug, item]),
-);
-const blockSections = NAV_SECTIONS.map(section => ({
-  label: section.label,
-  groups: section.groups
-    .map(group => ({
-      label: group.label,
-      items: group.slugs
-        .map(slug => blockBySlug.get(slug))
-        .filter(item => item !== undefined)
-        .sort((a, b) => Number(a.soon) - Number(b.soon)),
-    }))
-    .filter(group => group.items.length > 0),
-})).filter(section => section.groups.length > 0);
 const blockItems = CATALOG.blocks.flatMap(category => category.groups.flatMap(group => group.items));
 const pieceItems = CATALOG.components.flatMap(category => category.groups.flatMap(group => group.items));
 function CategoryGroup({
@@ -347,7 +331,7 @@ function BlockSection({
   pathname,
   showPreview,
   setHover,
-}: RowProps & { section: (typeof blockSections)[number] }) {
+}: RowProps & { section: (typeof CATALOG.blocks)[number] }) {
   return (
     <div className='flex flex-col'>
       <div className={HEADER_CLASS}>{section.label}</div>
@@ -621,7 +605,7 @@ export function DocsShell({ children }: { title?: string; children: React.ReactN
                 pathname={pathname}
               />
               {view === 'blocks' &&
-                blockSections.map(section => (
+                CATALOG.blocks.map(section => (
                   <BlockSection
                     key={section.label}
                     section={section}

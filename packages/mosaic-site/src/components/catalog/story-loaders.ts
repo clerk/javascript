@@ -2,6 +2,7 @@ import type { StoryModule } from '@swingset/lib/types';
 
 export const STORY_LOADERS: Record<string, () => Promise<StoryModule>> = {
   'action-bar': () => import('@swingset/stories/action-bar.stories'),
+  'api-keys-table': () => import('@swingset/stories/api-keys-table.stories'),
   avatar: () => import('@swingset/stories/avatar.stories'),
   badge: () => import('@swingset/stories/badge.stories'),
   banner: () => import('@swingset/stories/banner.stories'),
@@ -24,11 +25,16 @@ export const STORY_LOADERS: Record<string, () => Promise<StoryModule>> = {
   'icon-frame': () => import('@swingset/stories/icon-frame.stories'),
   input: () => import('@swingset/stories/input.stories'),
   'input-group': () => import('@swingset/stories/input-group.stories'),
+  'invite-members-button': () => import('@swingset/stories/invite-members-button.stories'),
   item: () => import('@swingset/stories/item.stories'),
   link: () => import('@swingset/stories/link.stories'),
   'menu.component': () => import('@swingset/stories/menu.component.stories'),
   'oauth-consent': () => import('@swingset/stories/oauth-consent.stories'),
   'organization-list': () => import('@swingset/stories/organization-list.stories'),
+  'organization-profile': () => import('@swingset/stories/organization-profile.stories'),
+  'organization-profile-danger-section': () => import('@swingset/stories/organization-profile-danger-section.stories'),
+  'organization-profile-profile-section': () =>
+    import('@swingset/stories/organization-profile-profile-section.stories'),
   'otp.component': () => import('@swingset/stories/otp.component.stories'),
   pagination: () => import('@swingset/stories/pagination.stories'),
   'panel.component': () => import('@swingset/stories/panel.component.stories'),
@@ -59,17 +65,14 @@ export const STORY_LOADERS: Record<string, () => Promise<StoryModule>> = {
   text: () => import('@swingset/stories/text.stories'),
   toast: () => import('@swingset/stories/toast.stories'),
   'tooltip.component': () => import('@swingset/stories/tooltip.component.stories'),
-  'user-profile-api-keys-panel': () => import('@swingset/stories/user-profile-api-keys-panel.stories'),
+  'user-avatar': () => import('@swingset/stories/user-avatar.stories'),
   'user-profile-billing-history-section': () =>
     import('@swingset/stories/user-profile-billing-history-section.stories'),
-  'user-profile-billing-panel': () => import('@swingset/stories/user-profile-billing-panel.stories'),
   'user-profile-danger-section': () => import('@swingset/stories/user-profile-danger-section.stories'),
   'user-profile-enterprise-accounts-section': () =>
     import('@swingset/stories/user-profile-enterprise-accounts-section.stories'),
   'user-profile-payment-methods-section': () =>
     import('@swingset/stories/user-profile-payment-methods-section.stories'),
-  'user-profile-profile-panel': () => import('@swingset/stories/user-profile-profile-panel.stories'),
-  'user-profile-security-panel': () => import('@swingset/stories/user-profile-security-panel.stories'),
   'user-profile-subscription-section': () => import('@swingset/stories/user-profile-subscription-section.stories'),
   'user-profile-web3-wallets-section': () => import('@swingset/stories/user-profile-web3-wallets-section.stories'),
   'visually-hidden': () => import('@swingset/stories/visually-hidden.stories'),

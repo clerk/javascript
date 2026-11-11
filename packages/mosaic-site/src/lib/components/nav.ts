@@ -6,16 +6,11 @@ export type NavSection = {
 export const NAV_SECTIONS: NavSection[] = [
   {
     label: 'Account',
-    groups: [{ label: '', slugs: ['user-button', 'user-profile', 'user-avatar', 'api-keys'] }],
+    groups: [{ label: '', slugs: ['user-button', 'user-profile', 'user-avatar'] }],
   },
   {
     label: 'Authentication',
-    groups: [
-      {
-        label: '',
-        slugs: ['sign-in', 'sign-up', 'google-one-tap', 'waitlist', 'task-reset-password', 'task-setup-mfa'],
-      },
-    ],
+    groups: [{ label: '', slugs: ['sign-in', 'waitlist', 'task-setup-mfa'] }],
   },
   {
     label: 'Multi-tenancy',
@@ -27,17 +22,14 @@ export const NAV_SECTIONS: NavSection[] = [
           'organization-list',
           'create-organization',
           'organization-profile',
+          'invite-members-button',
           'task-choose-organization',
         ],
       },
     ],
   },
   {
-    label: 'Billing',
-    groups: [{ label: '', slugs: ['pricing-table', 'plan-details', 'checkout', 'subscription-details'] }],
-  },
-  {
     label: 'AI',
-    groups: [{ label: '', slugs: ['oauth-consent', 'agent-approval'] }],
+    groups: [{ label: '', slugs: ['oauth-consent'] }],
   },
 ];

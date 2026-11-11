@@ -1,6 +1,4 @@
 'use client';
-import { Section } from '@clerk/mosaic/components/section';
-import { OrganizationProfileLogoRowView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-logo-row.view';
 import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { UserProfileEmailSectionView } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.view';
@@ -8,9 +6,7 @@ import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/u
 import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.view';
-import { UserProfilePictureRowView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-picture-row.view';
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
-import { useOrganizationProfileFixture } from '@swingset/stories/fixtures/organization-profile';
 import { useUserProfileActiveDevicesFixture } from '@swingset/stories/fixtures/user-profile-active-devices';
 import { useConnectedAccountsFixture } from '@swingset/stories/fixtures/user-profile-connected-accounts';
 import { useUserProfileEditPasswordFixture } from '@swingset/stories/fixtures/user-profile-edit-password';
@@ -22,41 +18,6 @@ import { useUserProfileProfileFixture } from '@swingset/stories/fixtures/user-pr
 
 const PATH = '@clerk/mosaic/features/user-profile';
 
-function AvatarUploadDemo() {
-  const profile = useUserProfileProfileFixture();
-  return (
-    <Section.Root>
-      <Section.Group>
-        <Section.Body>
-          <UserProfilePictureRowView
-            {...profile.picture}
-            name={profile.name}
-            imageUrl={profile.imageUrl}
-            hasImage={profile.hasImage}
-          />
-        </Section.Body>
-      </Section.Group>
-    </Section.Root>
-  );
-}
-function OrganizationAvatarUploadDemo() {
-  const { profile } = useOrganizationProfileFixture();
-  return (
-    <Section.Root>
-      <Section.Group>
-        <Section.Body>
-          <OrganizationProfileLogoRowView
-            name={profile.name}
-            imageUrl={profile.imageUrl}
-            hasImage={profile.hasImage}
-            onChange={profile.onLogoChange}
-            onRemove={profile.onRemoveLogo}
-          />
-        </Section.Body>
-      </Section.Group>
-    </Section.Root>
-  );
-}
 function ProfileDetailsDemo() {
   return <UserProfileProfileSectionView {...useUserProfileProfileFixture()} />;
 }
@@ -85,26 +46,7 @@ function ActiveDevicesDemo() {
 const usage = (view: string, dir: string, props: string) =>
   `import { ${view} } from '${PATH}/${dir}/${dir}.view';\n\n<${view} ${props} />`;
 
-export type PartMode = { id: string; label: string; Demo: () => React.ReactElement; snippet: string };
-export const PART_DEMOS: Record<string, { Demo: () => React.ReactElement; snippet: string; modes?: PartMode[] }> = {
-  'avatar-upload': {
-    Demo: AvatarUploadDemo,
-    snippet: `import { UserProfilePictureRowView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-picture-row.view';\n\n<UserProfilePictureRowView {...picture} name={name} imageUrl={imageUrl} hasImage />`,
-    modes: [
-      {
-        id: 'user',
-        label: 'User',
-        Demo: AvatarUploadDemo,
-        snippet: `import { UserProfilePictureRowView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-picture-row.view';\n\n<UserProfilePictureRowView {...picture} name={name} imageUrl={imageUrl} hasImage />`,
-      },
-      {
-        id: 'organization',
-        label: 'Organization',
-        Demo: OrganizationAvatarUploadDemo,
-        snippet: `import { OrganizationProfileLogoRowView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-logo-row.view';\n\n<OrganizationProfileLogoRowView name={name} imageUrl={imageUrl} hasImage onChange={onChange} onRemove={onRemove} />`,
-      },
-    ],
-  },
+export const PART_DEMOS: Record<string, { Demo: () => React.ReactElement; snippet: string }> = {
   'profile-details': {
     Demo: ProfileDetailsDemo,
     snippet: usage('UserProfileProfileSectionView', 'user-profile-profile-section', '{...profile}'),

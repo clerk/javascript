@@ -45,6 +45,7 @@ export const STORY_COMPONENTS: Record<string, string> = {
   panel: 'panel.component',
   confirmation: 'confirmation',
   destructive: 'destructive',
+  reverification: 'reverification',
   entity: 'entity',
   flow: 'flow.component',
   icon: 'icon',
@@ -52,7 +53,6 @@ export const STORY_COMPONENTS: Record<string, string> = {
   profile: 'profile.component',
   reveal: 'reveal.component',
   'visually-hidden': 'visually-hidden',
-  reverification: 'reverification',
 };
 export const STORY_BLOCKS: Record<string, string> = {
   'sign-in': 'sign-in',
@@ -61,17 +61,19 @@ export const STORY_BLOCKS: Record<string, string> = {
   'task-choose-organization': 'task-choose-organization',
   waitlist: 'waitlist',
   'organization-list': 'organization-list',
+  'user-avatar': 'user-avatar',
+  'organization-profile': 'organization-profile',
+  'invite-members-button': 'invite-members-button',
 };
 export const STORY_PARTS: Record<string, string> = {
-  'profile-panel': 'user-profile-profile-panel',
-  'security-panel': 'user-profile-security-panel',
-  'billing-panel': 'user-profile-billing-panel',
-  'api-keys': 'user-profile-api-keys-panel',
+  'api-keys-table': 'api-keys-table',
   'enterprise-accounts': 'user-profile-enterprise-accounts-section',
   'web3-wallets': 'user-profile-web3-wallets-section',
   'danger-zone': 'user-profile-danger-section',
   subscription: 'user-profile-subscription-section',
   'payment-methods': 'user-profile-payment-methods-section',
   'billing-history': 'user-profile-billing-history-section',
+  'organization-details': 'organization-profile-profile-section',
+  'organization-danger-zone': 'organization-profile-danger-section',
 };
 export const storyFileFor = (slug: string) => STORY_BLOCKS[slug] ?? STORY_COMPONENTS[slug];
