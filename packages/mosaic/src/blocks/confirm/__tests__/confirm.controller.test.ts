@@ -38,18 +38,41 @@ describe('confirmMachine', () => {
     expect(actor.getSnapshot().status).toBe('active');
   });
 
-  it('abandons the run when cancelled while pending, ignoring how it settles', async () => {
+  it('closes when cancelled while pending, and stays pending until the run settles', async () => {
     const run = deferred<void>();
     const actor = start();
     actor.send({ type: 'CONFIRM', run: () => run.promise });
 
     actor.send({ type: 'CANCEL' });
-    expect(actor.getSnapshot().value).toBe('idle');
+    expect(actor.getSnapshot().value).toBe('pending');
+    expect(actor.getSnapshot().context.open).toBe(false);
+
+    run.resolve();
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('idle'));
+  });
+
+  it('ends idle without a reason when a cancelled run fails', async () => {
+    const run = deferred<void>();
+    const actor = start();
+    actor.send({ type: 'CONFIRM', run: () => run.promise });
+    actor.send({ type: 'CANCEL' });
 
     run.reject(blocked);
-    await run.promise.catch(() => undefined);
-    expect(actor.getSnapshot().value).toBe('idle');
+
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('idle'));
     expect(actor.getSnapshot().context.error).toBeUndefined();
+  });
+
+  it('stays closed when reopened while a cancelled run is still pending', () => {
+    const run = deferred<void>();
+    const actor = start();
+    actor.send({ type: 'CONFIRM', run: () => run.promise });
+    actor.send({ type: 'CANCEL' });
+
+    actor.send({ type: 'OPEN' });
+
+    expect(actor.getSnapshot().value).toBe('pending');
+    expect(actor.getSnapshot().context.open).toBe(false);
   });
 
   it('lands back on confirming with the reason when the action fails', async () => {
@@ -121,4 +144,69 @@ describe('useConfirmController', () => {
     });
     await waitFor(() => expect(result.current.isOpen).toBe(false));
   });
+
+  it('closes on a cancelled reverification but reports pending until the action settles', async () => {
+    const pending = deferred<void>();
+    const onCancel = vi.fn();
+    const { result } = renderHook(() =>
+      useConfirmController({
+        onConfirm: () => pending.promise,
+        reverification: { status: 'loading', onCancel, visible: false },
+      }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.confirm());
+
+    act(() => result.current.onOpenChange(false));
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(result.current.isOpen).toBe(false);
+    expect(result.current.isPending).toBe(true);
+
+    await act(async () => {
+      pending.reject(cancelled);
+      await pending.promise.catch(() => undefined);
+    });
+    await waitFor(() => expect(result.current.isPending).toBe(false));
+    expect(result.current.isOpen).toBe(false);
+  });
+  it.each(['resolve', 'reject'] as const)(
+    'stays pending after the dialog is cancelled until the run can %s, without a second run',
+    async outcome => {
+      const run = deferred<void>();
+      const onConfirm = vi.fn(() => run.promise);
+      const reverification = { status: 'loading' as const, onCancel: vi.fn(), visible: false };
+      const { result } = renderHook(() => useConfirmController({ onConfirm, reverification }));
+
+      act(() => result.current.onOpenChange(true));
+      act(() => result.current.confirm());
+      act(() => result.current.onOpenChange(false));
+
+      expect(reverification.onCancel).toHaveBeenCalledOnce();
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.isPending).toBe(true);
+
+      act(() => result.current.onOpenChange(true));
+      act(() => result.current.confirm());
+
+      expect(onConfirm).toHaveBeenCalledOnce();
+      expect(result.current.isOpen).toBe(false);
+
+      await act(async () => {
+        if (outcome === 'resolve') {
+          run.resolve();
+        } else {
+          run.reject(blocked);
+        }
+        await run.promise.catch(() => undefined);
+      });
+
+      expect(result.current.isPending).toBe(false);
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.errorMessage).toBeUndefined();
+
+      act(() => result.current.onOpenChange(true));
+      expect(result.current.isOpen).toBe(true);
+    },
+  );
 });

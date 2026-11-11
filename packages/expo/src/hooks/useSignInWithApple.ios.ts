@@ -1,5 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/react/legacy';
-import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
@@ -132,6 +132,20 @@ export function useSignInWithApple() {
           // A transferable sign-in means the user doesn't exist; surface the original restriction error.
           if (signIn.firstFactorVerification.status === 'transferable') {
             throw signUpError;
+          }
+
+          const verificationError = signIn.firstFactorVerification.error;
+          if (verificationError) {
+            throw new ClerkAPIResponseError(verificationError.longMessage || verificationError.message, {
+              data: [
+                {
+                  code: verificationError.code,
+                  message: verificationError.message,
+                  long_message: verificationError.longMessage,
+                },
+              ],
+              status: 422,
+            });
           }
 
           return {

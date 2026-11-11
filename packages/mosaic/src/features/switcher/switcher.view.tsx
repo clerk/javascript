@@ -273,7 +273,7 @@ function SwitcherRow({
         <SwitcherItemTrailing>
           <Icon
             glyph={Checkmark}
-            size='sm'
+            size='md'
           />
         </SwitcherItemTrailing>
       ) : null}
@@ -578,7 +578,7 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
         <Menu.Media>
           <Icon
             glyph={Checkmark}
-            size='sm'
+            size='md'
           />
         </Menu.Media>
       ) : null}
@@ -618,7 +618,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
           ) : (
             <Icon
               glyph={icon}
-              size='sm'
+              size='md'
             />
           )}
         </SwitcherItemMedia>
@@ -629,7 +629,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
           <Icon
             glyph={ChevronRight}
             xstyle={rtl.mirror}
-            size='sm'
+            size='md'
           />
         </SwitcherItemTrailing>
       </Menu.Trigger>
@@ -681,7 +681,7 @@ function SwitchAccountRow() {
           <Menu.Media>
             <Icon
               glyph={Plus}
-              size='sm'
+              size='md'
             />
           </Menu.Media>
           <Menu.Label>{m.accounts.add}</Menu.Label>
@@ -697,7 +697,7 @@ function SwitchAccountRow() {
             <Menu.Media>
               <Icon
                 glyph={SignOut}
-                size='sm'
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Menu.Media>
@@ -733,7 +733,9 @@ function OrganizationSection() {
   const { showOrganizations } = data.layout;
 
   const actions: ReactNode[] = [];
+  // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
   for (const action of data.layout.actions.organizationsFooter) {
+    // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
     if (action === 'createOrganization' && data.onCreateOrganization) {
       actions.push(
         <ActionRow
@@ -741,10 +743,11 @@ function OrganizationSection() {
           icon={
             <Icon
               glyph={Plus}
-              size='sm'
+              size='md'
             />
           }
           label={m.manage.createOrganization}
+          // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
           onClick={data.onCreateOrganization}
         />,
       );
@@ -766,6 +769,7 @@ function OrganizationSection() {
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
         {showOrganizations ? (
+          // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
           data.organizationsLoading ? (
             <OrganizationListLoadingRow />
           ) : (
@@ -773,6 +777,7 @@ function OrganizationSection() {
               <PersonalRow />
               <MembershipRows />
               <PendingRows />
+              {/* eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data. */}
               {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
             </>
           )
@@ -802,7 +807,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
         icon={
           <Icon
             glyph={Cog6Teeth}
-            size='sm'
+            size='md'
           />
         }
         label={m.manage.settings}
@@ -825,7 +830,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
           <Menu.Media>
             <Icon
               glyph={target.icon}
-              size='sm'
+              size='md'
             />
           </Menu.Media>
           <Menu.Label>{target.label}</Menu.Label>
@@ -872,7 +877,7 @@ function ManageSection() {
             icon={
               <Icon
                 glyph={UsersAddRight}
-                size='sm'
+                size='md'
               />
             }
             label={m.manage.invite}
@@ -932,7 +937,7 @@ function Footer() {
           icon={
             <Icon
               glyph={Plus}
-              size='sm'
+              size='md'
             />
           }
           label={m.accounts.add}
@@ -947,7 +952,7 @@ function Footer() {
           icon={
             <Icon
               glyph={SignOut}
-              size='sm'
+              size='md'
             />
           }
           label={m.accounts.signOut}
@@ -1088,7 +1093,7 @@ export function SwitcherTrigger({
           ) : null}
           <Icon
             glyph={ChevronDown}
-            size='sm'
+            size='md'
             xstyle={styles.triggerCaret}
           />
         </>

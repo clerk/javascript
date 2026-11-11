@@ -3,7 +3,7 @@
 import React, { useCallback } from 'react';
 
 import { readingDirectionKeys, useDirection } from '../direction-provider';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useOtpContext } from './otp-context';
 import { inputModeForPattern, removeAt, replaceAt, sanitize } from './otp-utils';
 
@@ -51,7 +51,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
 
   const state = { active: activeIndex === index, filled: char !== '', disabled };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     id: getInputId(index),
     ...labelProps,
     value: char,
@@ -116,6 +116,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
       setValue(next);
       queueFocus(Math.min(index + inserted.length, length - 1), next);
     },
+    // eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (disabled) {
         return;
@@ -202,7 +203,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
       setValue(next);
       queueFocus(Math.min(index + inserted.length, length - 1), next);
     },
-  };
+  } satisfies DefaultProps<'input'>;
 
   return useRender({
     defaultTagName: 'input',

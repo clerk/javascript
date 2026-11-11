@@ -123,6 +123,11 @@ export const styles = stylex.create({
       default: `0 max(calc(${SNAP} + ${SWIPE}), calc(-1 * ${BLEED}))`,
       ':where([data-ending-style])': '0 100%',
       ':where([data-starting-style])': `0 calc(100% - ${BLEED} - ${SHEET_ENTER_PEEK})`,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: `0 max(calc(${SNAP} + ${SWIPE}), calc(-1 * ${BLEED}))`,
+        ':where([data-ending-style])': '0 100%',
+        ':where([data-starting-style])': `0 max(calc(${SNAP} + ${SWIPE}), calc(-1 * ${BLEED}))`,
+      },
     },
     // A mouse drag that crosses text would otherwise select it, and the engine will not start a
     // drag while a selection stands inside the sheet — every pull after that would feel dead until
@@ -140,8 +145,8 @@ export const styles = stylex.create({
     // the pointer is captured on it, so `:active` survives the drag. A press elsewhere in the sheet
     // is not a press on the handle, and leaves it alone.
     '--_cl-grip-color': {
-      default: colorVars['--cl-color-border'],
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-border']}, ${colorVars['--cl-color-foreground-secondary']} 35%)`,
+      default: colorVars['--cl-color-border-subtle'],
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-border-subtle']}, ${colorVars['--cl-color-foreground-secondary']} 35%)`,
     },
     '--_cl-grip-duration': {
       default: durationVars['--cl-duration-base'],

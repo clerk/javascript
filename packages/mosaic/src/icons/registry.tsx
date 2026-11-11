@@ -49,7 +49,7 @@ import { EllipsisVertical } from './glyphs/ellipsis-vertical';
 import { EnterpriseConnections } from './glyphs/enterprise-connections';
 import { Envelope } from './glyphs/envelope';
 import { ExclamationCircle } from './glyphs/exclamation-circle';
-import { Export } from './glyphs/export';
+import { External } from './glyphs/external';
 import { Eye } from './glyphs/eye';
 import { EyeSlash } from './glyphs/eye-slash';
 import { FaceScan } from './glyphs/face-scan';
@@ -147,7 +147,7 @@ export const iconRegistry = {
   'enterprise-connections': EnterpriseConnections,
   envelope: Envelope,
   'exclamation-circle': ExclamationCircle,
-  export: Export,
+  external: External,
   eye: Eye,
   'eye-slash': EyeSlash,
   'face-scan': FaceScan,

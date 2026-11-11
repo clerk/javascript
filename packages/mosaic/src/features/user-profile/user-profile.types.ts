@@ -35,22 +35,7 @@ export interface CustomProfilePage {
   label: string;
   /** Where the page lives, relative to the profile root. Absolute URLs are rejected. */
   path: string;
-  href?: never;
   icon?: ReactNode;
   /** Rendered as the page itself. */
   content: ReactNode;
 }
-
-/** A row in the profile's navigation that leaves for somewhere else. */
-export interface CustomProfileLink {
-  /** Names the row in the profile's navigation. */
-  label: string;
-  /** Identifies the row, for ordering. */
-  path: string;
-  /** Where the row goes. */
-  href: string;
-  icon?: ReactNode;
-  content?: never;
-}
-
-export type CustomProfileItem = CustomProfilePage | CustomProfileLink;

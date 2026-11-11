@@ -44,7 +44,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/action-setup@v4.3.0
+      - uses: pnpm/action-setup@v6.1.0
 
       - uses: actions/setup-node@v4.4.0
         with:
@@ -138,7 +138,7 @@ jobs:
       - name: Build the fixture and boot a device
         timeout-minutes: 30
         env:
-          CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+          MOBILE_VERIFICATION_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
           VERIFY_SIMSLIM: ${{ matrix.platform == 'ios' && '1' || '' }}
           SIMSLIM_BOOT_TIMEOUT: 15m
           SIMSLIM_SPAWN_TIMEOUT: 5m
@@ -182,7 +182,7 @@ jobs:
       - name: Run the end-to-end tests
         timeout-minutes: 30
         env:
-          CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+          MOBILE_VERIFICATION_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           "$CLI" run --all --platform "$PLATFORM" --backend local --retries 1 --max-failures 5 --github-report
@@ -190,7 +190,7 @@ jobs:
       - name: Release the device and delete the Clerk application
         if: always() && steps.install.outcome == 'success'
         env:
-          CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+          MOBILE_VERIFICATION_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
         run: |
           "$CLI" down
 

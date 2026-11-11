@@ -32,6 +32,7 @@ export function AppSidebar({
   const [isMac, setIsMac] = React.useState(false);
 
   React.useEffect(() => {
+    // eslint-disable-next-line react/set-state-in-effect -- Read the client platform only after hydration
     setIsMac(navigator.platform.toLowerCase().includes('mac'));
   }, []);
 

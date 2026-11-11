@@ -19,7 +19,6 @@ export interface AutocompleteContextValue {
   placement: Placement;
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
-  getItemProps: UseInteractionsReturn['getItemProps'];
   activeIndex: number | null;
   selectedIndex: number | null;
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
@@ -30,7 +29,6 @@ export interface AutocompleteContextValue {
   setInlineMode: React.Dispatch<React.SetStateAction<boolean>>;
   handleSelect: (value: string, index: number, label: string) => void;
   handleInputChange: (value: string) => void;
-  registerSelectedIndex: (index: number, value: string) => void;
   mounted: boolean;
   transitionProps: TransitionProps;
 }
@@ -41,6 +39,38 @@ export function useAutocompleteContext() {
   const ctx = useContext(AutocompleteContext);
   if (!ctx) {
     throw new Error('Autocomplete compound components must be used within <Autocomplete>');
+  }
+  return ctx;
+}
+
+export interface AutocompleteHighlightContextValue {
+  activeIndex: number | null;
+  selectedValue: string | undefined;
+}
+export const AutocompleteHighlightContext = createContext<AutocompleteHighlightContextValue | null>(null);
+
+export function useAutocompleteHighlightContext() {
+  const ctx = useContext(AutocompleteHighlightContext);
+  if (!ctx) {
+    throw new Error('Autocomplete.Option must be used within <Autocomplete>');
+  }
+  return ctx;
+}
+
+export interface AutocompleteOptionsContextValue {
+  getItemProps: UseInteractionsReturn['getItemProps'];
+  handleSelect: (value: string, index: number, label: string) => void;
+  refs: ExtendedRefs<ReferenceType>;
+  valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
+  registerSelectedIndex: (index: number, selected: boolean) => void;
+}
+
+export const AutocompleteOptionsContext = createContext<AutocompleteOptionsContextValue | null>(null);
+
+export function useAutocompleteOptionsContext() {
+  const ctx = useContext(AutocompleteOptionsContext);
+  if (!ctx) {
+    throw new Error('Autocomplete.Option must be used within <Autocomplete>');
   }
   return ctx;
 }

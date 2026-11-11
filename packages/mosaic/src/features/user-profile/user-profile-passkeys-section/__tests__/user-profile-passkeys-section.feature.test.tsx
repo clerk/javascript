@@ -395,7 +395,8 @@ describe('Renaming a passkey', () => {
     const rename = holdRequests('post', '/v1/me/passkeys/pk_1');
     await user.click(save);
     await waitFor(() => expect(rename.requests).toHaveLength(1));
-    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('aria-disabled', 'true');
+    expect(input).toHaveAttribute('readonly');
     expect(save).toHaveAttribute('aria-busy', 'true');
     await user.keyboard('{Escape}');
     expect(dialog).toBeVisible();
@@ -562,8 +563,4 @@ describe('Satellite passkeys', () => {
 describe('Passkey reverification', () => {
   it.todo('completes reverification before creating, renaming, or removing a passkey');
   it.todo('cancels reverification without changing passkeys and permits retry');
-});
-
-describe('Passkey follow-ups', () => {
-  it.todo('rerenders passkey eligibility when a replaced or fetched environment changes policy');
 });

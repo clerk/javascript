@@ -4,9 +4,7 @@ import * as ItemStories from './item.stories';
 
 Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Root`, `Item.Media`, `Item.Content`, `Item.Label`, …). `Item.Root` renders as a `<div>` by default; pass it a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
 
-Set `variant='outline'` on a row to border it, or once on `Item.Group` to border every row inside it — the group then spaces them apart rather than seating them on one surface.
-
-Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's height and gap, and `Item.Media` picks the matching column width up from context rather than taking a size of its own.
+Every row is bordered, so it reads as its own card. Rows have no fixed height: they size to their content with even padding.
 
 ## Example
 
@@ -22,66 +20,14 @@ Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's 
   storyModule={ItemStories}
 />
 
-### Sizes
-
-<Story
-  name='Sizes'
-  storyModule={ItemStories}
-/>
-
 ### Group
+
+`Item.Group` stacks rows 8px apart. It's layout only; the rows carry their own semantics.
 
 <Story
   name='Group'
   storyModule={ItemStories}
 />
-
-### Outline
-
-`variant='outline'` borders a row so it reads as its own card.
-
-<Story
-  name='Outline'
-  storyModule={ItemStories}
-/>
-
-### Outline group
-
-Set the same `variant` on `Item.Group` to border a whole set at once: the group drops its own gutter
-and spaces the rows 8px apart instead. Rows pick it up from the group through context, so only a row
-that disagrees needs a `variant` of its own.
-
-<Story
-  name='OutlineGroup'
-  storyModule={ItemStories}
-/>
-
-### Scrolling
-
-`Item.Group` is the canonical scroll surface in Mosaic: cap its height, spread the scroll-area atoms
-onto it, and it fades its content at whichever edge still has something to reveal.
-
-<Story
-  name='Scrolling'
-  storyModule={ItemStories}
-/>
-
-```tsx
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
-import * as stylex from '@stylexjs/stylex';
-
-<div
-  {...stylex.props(scrollAreaRoot)}
-  style={{ height: 260 }}
->
-  <Item.Group xstyle={scrollAreaViewport()}>{organizations}</Item.Group>
-</div>;
-```
-
-The atoms aren't specific to `Item` — they go on anything that scrolls, and they carry the edge
-fades, the scrollbar, the gutter, and the theming tokens with them. See
-[Scroll Area](/styles/scroll-area) for the full surface: the gutter argument, what happens when
-there is nothing to scroll, the token table, and how to replace the fade entirely.
 
 ## Usage
 
@@ -111,9 +57,9 @@ import { Item } from '@clerk/mosaic/components/item';
 Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. A row whose text _is_ the row, rather than naming a subject, uses `Item.Label` with `variant='interactive'`:
 
 ```tsx
-<Item.Root size='xs' render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
+<Item.Root render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
   <Item.Media>
-    <Icon glyph={LogOut} size='sm' />
+    <Icon glyph={LogOut} size='md' />
   </Item.Media>
   <Item.Content>
     <Item.Label variant='interactive'>Sign out of all accounts</Item.Label>
@@ -123,16 +69,15 @@ Media sizes itself from the row, so give it a child that fills its column — an
 
 ## Parts
 
-| Part               | Class                 | Description                                                                |
-| ------------------ | --------------------- | -------------------------------------------------------------------------- |
-| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.             |
-| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar. Sized by the root's `size`. |
-| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions.       |
-| `Item.Label`       | `cl-item-label`       | The row's label. Truncates to a single line.                               |
-| `Item.Description` | `cl-item-description` | Secondary text beneath the label. Truncates to a single line.              |
-| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                       |
-| `Item.Group`       | `cl-item-group`       | Vertical wrapper around a set of rows. Sets the `variant` its rows take.   |
-| `Item.Separator`   | `cl-item-separator`   | Thin divider (`<hr>`) between rows.                                        |
+| Part               | Class                 | Description                                                          |
+| ------------------ | --------------------- | -------------------------------------------------------------------- |
+| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.       |
+| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar.                       |
+| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions. |
+| `Item.Label`       | `cl-item-label`       | The row's label. Truncates to a single line.                         |
+| `Item.Description` | `cl-item-description` | Secondary text beneath the label. Truncates to a single line.        |
+| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                 |
+| `Item.Group`       | `cl-item-group`       | Vertical stack of rows, spaced apart.                                |
 
 Every part accepts a `render` prop for element polymorphism and forwards a ref.
 
@@ -146,33 +91,17 @@ The row carries the text color and, through `--_cl-icon-color`, the strength of 
 | --------- | -------------- | -------------------------- | --------- |
 | `variant` | `data-variant` | `default` \| `interactive` | `default` |
 
-`variant` decides whether a row is bordered. It sits on both `Item.Root` and `Item.Group`: set it on
-the group and every row inside it takes it through context, with the group dropping its gutter and
-spacing the rows by 8px. A row that sets its own wins over its group, in either direction — so one
-row can opt out of an outlined group with `variant='default'`.
-
 The root reflects its state as `data-*` attributes on `.cl-item`, so consumers can scope overrides without touching StyleX's hashed atoms:
 
-| Prop      | Attribute          | Values                              | Default     |
-| --------- | ------------------ | ----------------------------------- | ----------- |
-| `size`    | `data-size`        | `xs` \| `md` \| `lg`                | `md`        |
-| `variant` | `data-variant`     | `default` \| `outline`              | its group's |
-| `render`  | `data-interactive` | present when a `render` is provided | —           |
-
-`Item.Group` reflects its own `variant` as `data-variant` on `.cl-item-group`.
-
-`size` fixes the row's height and gap. `Item.Media` reflects the same value as `data-size` and takes its width from it, so the two stay in step without being set twice:
+| Prop     | Attribute          | Values                              | Default |
+| -------- | ------------------ | ----------------------------------- | ------- |
+| `render` | `data-interactive` | present when a `render` is provided | —       |
 
 ```css
 /* Re-theme interactive rows */
 .cl-item[data-interactive] {
   background-color: var(--cl-color-surface);
 }
-
-/* Widen the media column on compact rows */
-.cl-item-media[data-size='xs'] {
-  width: 1.5rem;
-}
 ```
 
-`Item.Media` is a square that centers its child. Because the column is sized by the row, give it a child that fills it — an `Avatar.Root` with `size='fit'`, or an `Icon` — rather than a fixed pixel size that won't track `size`. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).
+`Item.Media` is a square that centers its child. Give it a child that fills it — an `Avatar.Root` with `size='fit'`, or an `Icon` — rather than a fixed pixel size. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).

@@ -4,14 +4,6 @@ import React from 'react';
 import { reset } from '../styles/reset.styles';
 import { truncationStyles } from '../styles/typography.styles';
 
-// The ellipsis comes from `truncationStyles.singleLine`; this releases the flex-item min-width
-// floor, without which the box never shrinks enough to clip.
-const styles = stylex.create({
-  label: {
-    minWidth: 0,
-  },
-});
-
 // Wrap the text children so they have a box of their own to truncate against — a bare text
 // child is laid out in an anonymous flex item that no selector can reach. A whole run of
 // adjacent text shares one box, or `Delete {name}` would split into two flex items with the
@@ -28,7 +20,7 @@ export function withTruncatableLabel(children: React.ReactNode): React.ReactNode
     result.push(
       <span
         key={`label-${result.length}`}
-        {...stylex.props(reset.base, truncationStyles.singleLine, styles.label)}
+        {...stylex.props(reset.base, truncationStyles.singleLine)}
       >
         {run}
       </span>,

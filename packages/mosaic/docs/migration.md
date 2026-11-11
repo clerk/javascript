@@ -1,30 +1,21 @@
-# Migrating a component into Mosaic
+# Migration
 
-Migrating a legacy component means taking logic that was fused into one file and
-pulling it apart into the model / controller / view layers (see the skill
-overview and `packages/mosaic/ARCHITECTURE.md` → "Flow and data architecture").
-`packages/mosaic/src/features/reverification/` is a compact worked example of the
-finished shape: model, controller, view, types, messages, wrapper, and a feature test.
+Read this when you move a legacy component (usually under `packages/ui/src/components/<Feature>/`) into Mosaic, whether its flow logic or only its styles. It covers the five phases from inventory to ship; the finished shape is in [Features](features.md), and the parity check is in [Parity audit](parity-audit.md).
 
-**The core risk this workflow exists to manage:** a legacy component fuses
-rendering, data-fetching, and flow logic into one blob. Splitting it three ways
-silently drops behavior that was only ever _implicit_ — a per-field error map, a
-step-up reverification, an empty-state gate, a derived callout. None of it
-surfaces as a failing test or a type error. It only surfaces when someone diffs
-old against new. So the spine of this workflow is **treat the legacy component
-as the spec, and prove the new layers cover every line of it.**
+Worked example: `src/features/reverification/`.
 
-Do not write the new layers first and then ask "did I get everything?" — that
-means proving a negative. Invert it: enumerate the legacy behavior first, then
-make each layer account for a specific row.
+## Rules
 
----
+- The legacy component is the spec. A legacy file fuses rendering, data fetching and flow logic, and splitting it three ways drops behavior that was only implicit (a per-field error map, a step-up reverification, an empty-state gate, a derived callout) without failing a test or a type check.
+- Inventory the legacy behavior first, then make each layer account for a row. Do not write the layers first and ask what you missed.
+- Every inventory row lands in exactly one layer, and later in exactly one parity bucket. A row with no home is a behavior you are about to drop.
+- A deferred behavior gets a tracked ticket, never a buried `// TODO`.
+- Share a business-rule helper when legacy and Mosaic must behave the same. Do not extract similar presentation code only to remove duplication, since the designs may diverge.
+- A component with no data or flow logic only needs its styles moved ([Styles](#styles)).
 
-## Phase 1 — Inventory the legacy behavior (the spec)
+## Phase 1: inventory the legacy behavior
 
-Locate the legacy files (usually under `packages/ui/src/components/<Feature>/`).
-Then grep them for the primitives that carry hidden logic. Every
-hit is a row you must consciously place or drop later:
+Grep the legacy files for the primitives that carry hidden logic. Every hit is a row you must place or consciously drop:
 
 | Primitive                         | The behavior it usually hides                      |
 | --------------------------------- | -------------------------------------------------- |
@@ -33,95 +24,61 @@ hit is a row you must consciously place or drop later:
 | `useReverification`               | step-up reverification before a mutation           |
 | `revalidate` / `.reload()`        | cache invalidation timing after a mutation         |
 | `<Protect` / `checkAuthorization` | permission gating and section visibility           |
-| `useCalloutLabel`                 | derived, computed labels / counts                  |
-| `useFetch` / `useOrganization`    | data loading, pagination, loading/empty states     |
-| `useInView`                       | infinite-scroll / intersection triggers            |
-
-Use `packages/mosaic/AGENTS.md` → "Reuse before you write" for shared helpers
-such as `save` and `useReverificationFlow`. The table does not cover every
-legacy behavior. Place revalidation and loading rules in the model, and inspect
-existing features for pagination and derived callouts before choosing their
-implementation in Phase 2.
+| `useCalloutLabel`                 | derived, computed labels or counts                 |
+| `useFetch` / `useOrganization`    | data loading, pagination, loading and empty states |
+| `useInView`                       | infinite-scroll or intersection triggers           |
 
 ```bash
-rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useInView' \
+rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useOrganization|\.reload\(|useInView' \
   packages/ui/src/components/<Feature>/
 ```
 
-Turn the hits into a **behavior inventory** — one row per: effect, guard, error
-path, empty/loading state, permission gate, revalidate, reset-on-close, derived
-label. This list is finite and is the contract the migration must satisfy.
+Turn the hits into a behavior inventory, one row per effect, guard, error path, empty or loading state, permission gate, revalidate, reset-on-close and derived label. The table does not cover every behavior; read the files too. For shared answers (`save`, `useReverificationFlow`), use [Reuse before you write](../AGENTS.md#reuse-before-you-write).
 
-## Phase 2 — Design the split (map every row to a layer)
+## Phase 2: map every row to a layer
 
-Assign each inventory row to exactly one layer. A row with no home is a behavior
-you are about to drop.
+- Clerk reads, mutations, permission gates, revalidate timing, first-load empty states and capability flags go in the **model** ([Models](models.md)).
+- What is open, what is in flight, what closes the surface and the flow rules behind it go in the **controller** ([Controllers](controllers.md)). Whether it holds them in `useState` or a machine is a Phase 3 decision; the rows are the same either way.
+- Rendering and labels go in the **view** ([Views](views.md)).
 
-- Clerk reads, mutations, permission gating, revalidate timing, first-page-load
-  empty-state, capability flags → **model** (`models.md`).
-- Interaction state: what is open, what is in flight, what closes the surface,
-  and the flow rules behind it → **controller** (`controllers.md`). Whether it
-  holds that in `useState` or a machine is a Phase 3 decision, not a Phase 2 one
-  — the inventory rows are the same either way.
-- Rendering and labels → **view** (`views.md`).
+Two rows have no obvious home:
 
-Two rows deserve extra care because they have no obvious home:
+- A capability the instance lacks goes in the model, by omitting the callback, not as a `disabled` prop the view interprets.
+- Pure derivation (slot layout, ordering a consumer's list) goes in `*.layout.ts` or `*.utils.ts` beside the view, with its own test.
 
-- **A capability the instance lacks** belongs in the model, expressed by omitting
-  the callback — not as a `disabled` prop the view has to interpret.
-- **Pure derivation** (slot layout, ordering a consumer's list) belongs in
-  `*.layout.ts` / `*.utils.ts` beside the view, where it gets its own test.
+For pagination and derived callouts, read an existing feature that has them before choosing an implementation.
 
-Share business-rule helpers when legacy and Mosaic must keep the same behavior.
-Do not extract similar presentation code solely to remove duplication when the
-designs may diverge. Inspect the existing helper and its callers before deciding
-where shared logic belongs.
+## Phase 3: implement and test
 
-## Phase 3 — Implement and test
+Lay the files out as in [Features → File shape](features.md#file-shape). Now decide how the controller holds its state, using what the inventory says about async lifecycles and values that constrain each other ([Controllers → Which one holds the state](controllers.md#which-one-holds-the-state)).
 
-File shape: `<feature>.model.ts(x)` · `<feature>.controller.ts(x)` ·
-`<feature>.view.tsx` · `<feature>.tsx` (composition wrapper), plus
-`<feature>.types.ts` for the data contract the model and view share, and
-`<feature>.messages.ts` for the strings. `*.styles.ts` and `*.dialog.tsx` are
-common extras. See `packages/mosaic/ARCHITECTURE.md` → "File shape".
+Test with one `*.feature.test.tsx` that uses the feature the way a user would ([Testing](testing.md)). Turn each inventory row into a test there by default. The model is the highest-risk layer, so its rows (revalidation, permission gates, empty states) each get one.
 
-Only now decide how the controller holds its state: the inventory tells you
-whether the interaction has the async lifecycle and mutually-constraining values
-that earn a machine, or whether it is `useState` (`controllers.md` → "Which one
-holds the state").
+## Phase 4: verify parity
 
-Test the feature with one `*.feature.test.tsx` that uses it the way a user
-would, against a real Clerk with FAPI faked (`testing.md`). Turn each inventory
-row into a test there by default, and reach for a smaller test only where
-`testing.md` says it is the better tool. The **model** is the
-highest-risk layer, so make sure its rows (revalidation, permission gates,
-empty states) each have one.
+Tests cover only the branches you remembered. Run the [Parity audit](parity-audit.md) against the legacy files and the new layers, and place every Phase 1 row as Migrated, Deliberately changed (such as infinite scroll becoming a "Load more" button) or Deferred.
 
-## Phase 4 — Verify parity (the confidence step)
+## Phase 5: ship
 
-Tests only cover branches you remembered to write. To catch the
-ones you didn't, run an automated diff of legacy against new.
+Tests green, then a changeset and a conventional commit with scope `mosaic` (the `clerk-monorepo` skill has the dev loop and changeset rules). If the migration removes or changes legacy code in `packages/ui`, keep its public surface backwards compatible: non-major `packages/ui` releases load into older SDKs in the wild.
 
-Launch an **Explore subagent** with the prompt in `parity-audit.md`. Give it the
-legacy file paths and the new model/controller/view paths. It returns a table
-classifying every legacy behavior as:
+## Styles
 
-- **Migrated** — points at a specific state / transition / context field.
-- **Deliberately changed** — names the new behavior and why (e.g. infinite
-  scroll → "Load more" button).
-- **Deferred** — a real tracked ticket, **not** a `// TODO` buried in a
-  controller or model. A buried TODO is invisible at review time; that is exactly
-  how an earlier domains-section migration shipped three regressions (see
-  `parity-audit.md`).
+Nothing in the styling layer is shared between the two systems:
 
-Every inventory row from Phase 1 must land in exactly one bucket. The table is
-**ephemeral**: it drives the work and the PR discussion, then is discarded. It is
-not committed.
+| Concern          | Legacy (`@clerk/ui`)                         | Mosaic                                     |
+| ---------------- | -------------------------------------------- | ------------------------------------------ |
+| Engine           | Emotion, runtime CSS-in-JS                   | StyleX, static CSS                         |
+| Tokens           | `InternalTheme`                              | `--cl-*` custom properties                 |
+| Variants         | `createVariants`                             | `stylex.create` with `themeProps`          |
+| Styling contract | `customizables` / `APPEARANCE_KEYS` registry | `.cl-<slot>` class and `data-<axis>` attrs |
 
-## Phase 5 — Ship
+To move a component's styles from the old system to Mosaic:
 
-Tests green, then a changeset and a conventional commit. See the `clerk-monorepo`
-skill for the dev loop and the hard rules, including which changeset to write.
-The commit scope is `mosaic`. If the migration removes or changes legacy code in
-`packages/ui`, remember non-major `packages/ui` changes load into older SDKs in
-the wild, so keep its public surface backwards compatible.
+1. Replace `createVariants` with `stylex.create`: one style key per variant value, selected by the prop at render time instead of merged by a runtime engine.
+2. Replace `applyVariants(props)` with `mergeStyleProps(themeProps(slot, variants), stylex.props(..., xstyle), rest)` and spread the result onto the element. Drop any `className` or `style` props the legacy component took; callers pass `xstyle`.
+3. Move stateful styling (disabled, hover, focus, invalid) into StyleX conditions: a key inside the property's value object beside `default`, with an attribute on the element itself wrapped in `:where(...)`: `cursor: { default: 'pointer', ':where([data-disabled])': 'not-allowed' }`.
+4. Update token references, such as `theme.colors.$primary500` to `colorVars['--cl-color-brand']`.
+5. Export the component from `src/styles/index.ts` and run `pnpm build` in `packages/mosaic`.
+
+The rules behind these steps are in [StyleX](stylex.md) and [Theming](theming.md).

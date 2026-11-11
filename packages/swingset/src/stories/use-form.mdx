@@ -53,7 +53,12 @@ Wire the form element with `id` and `handleSubmit`, a text control with `registe
     </Field.Message>
   </Field.Root>
 
-  <PhoneInput {...form.registerValue('phoneNumber')} />
+  <PhoneInput
+    {...form.registerValue('phoneNumber')}
+    countryTriggerLabel='Country, {country}'
+    countryPopupLabel='Choose a country'
+    countrySearchLabel='Search countries'
+  />
 
   <SubmitButton isPending={form.isSubmitting} disabled={!form.canSubmit || !form.isDirty}>
     Save

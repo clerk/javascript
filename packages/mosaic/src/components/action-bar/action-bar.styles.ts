@@ -11,7 +11,6 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const reduceMotion = '@media (prefers-reduced-motion: reduce)';
 const barRadius = radiusVars['--cl-radius-lg'];
 const inset = space['1'];
 
@@ -48,11 +47,11 @@ export const styles = stylex.create({
     },
     transform: {
       default: 'translateY(0)',
-      [reduceMotion]: {
+      ':where([data-starting-style], [data-ending-style])': 'translateY(0.25rem)',
+      '@media (prefers-reduced-motion: reduce)': {
         default: 'translateY(0)',
         ':where([data-starting-style], [data-ending-style])': 'translateY(0)',
       },
-      ':where([data-starting-style], [data-ending-style])': 'translateY(0.25rem)',
     },
     transitionDuration: {
       default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
@@ -60,7 +59,7 @@ export const styles = stylex.create({
     },
     transitionProperty: {
       default: 'opacity, transform',
-      [reduceMotion]: 'opacity',
+      '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     transitionTimingFunction: {
       default: easingVars['--cl-ease-enter'],
@@ -79,7 +78,7 @@ export const styles = stylex.create({
     marginBlock: space['1'],
     marginInline: space['0.5'],
     alignSelf: 'stretch',
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     width: '1px',
   },
 });

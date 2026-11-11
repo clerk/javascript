@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { type FirstInputLabel, OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
 import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
 
@@ -59,7 +59,7 @@ const visuallyHiddenInputStyle: CSSProperties = {
   padding: 0,
   margin: -1,
   overflow: 'hidden',
-  clip: 'rect(0, 0, 0, 0)',
+  clipPath: 'inset(50%)',
   whiteSpace: 'nowrap',
   border: 0,
 };
@@ -79,6 +79,8 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
     focusableWhenDisabled = false,
     required = false,
     id: idProp,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     children,
     ...otherProps
   } = props;
@@ -90,8 +92,6 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
   // The first slot is what a `<label>` targets and where focus lands, so it takes the field's
   // name instead of its positional one; otherwise its accessible name would contradict the
   // visible label. With no name here the slot is left to a native `<label>`.
-  const ariaLabel = otherProps['aria-label'];
-  const ariaLabelledBy = otherProps['aria-labelledby'];
   const firstInputLabel = useMemo<FirstInputLabel | undefined>(() => {
     if (ariaLabelledBy) {
       return { 'aria-labelledby': ariaLabelledBy };
@@ -222,8 +222,10 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
 
   const state = { disabled, complete, empty: value.length === 0 };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     role: 'group',
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     children: (
       <>
         {children}
@@ -243,7 +245,7 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
         ) : null}
       </>
     ),
-  };
+  } satisfies DefaultProps<'div'>;
 
   return (
     <OtpContext.Provider value={contextValue}>

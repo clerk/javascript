@@ -1,45 +1,32 @@
 import { useMergeRefs } from '@floating-ui/react';
-import * as stylex from '@stylexjs/stylex';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
-import { Avatar } from '../../components/avatar';
+import { AvatarUpload } from '../../blocks/avatar-upload';
+import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
 import { Flow, useFlowAutoFocus } from '../../components/flow';
 import type { UseFormResult } from '../../components/form';
 import { Input } from '../../components/input';
-import { Text } from '../../components/text';
 import type { LocalizableError } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
-import type { FileRejectionReason } from '../../primitives/file-upload';
 import { FileUpload } from '../../primitives/file-upload';
 import { Form } from '../../primitives/form';
-import {
-  canSendInvitations,
-  InviteMembersFields,
-} from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.fields';
-import type { CreateOrganizationInviteController } from './create-organization.controller';
-import { styles } from './create-organization.styles';
+import { AVATAR_REJECTION_ERRORS } from '../../utils/avatar-upload';
+import type { InviteMembersForm } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
+import { InviteMembersFields } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.fields';
 import type { CreateOrganizationStep, CreateOrganizationValues } from './create-organization.types';
-
-const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-const LOGO_MAX_BYTES = 10 * 1000 * 1000;
-
-const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
-  accept: { code: 'avatar_file_type_invalid' },
-  size: { code: 'avatar_file_size_exceeded' },
-  overflow: { code: 'avatar_file_count_exceeded' },
-};
 
 export interface CreateOrganizationStepsProps {
   step: CreateOrganizationStep;
   form: UseFormResult<CreateOrganizationValues>;
   slugEnabled: boolean;
   onNameChange: (name: string) => void;
-  invite: CreateOrganizationInviteController;
+  invite: InviteMembersForm;
   onFinish: () => void;
   onCancel?: () => void;
+  notice?: string;
 }
 
 export interface CreateOrganizationViewProps extends CreateOrganizationStepsProps {
@@ -77,7 +64,7 @@ export function CreateOrganizationSteps(props: CreateOrganizationStepsProps) {
   );
 }
 
-function CreateStep({ form, slugEnabled, onNameChange, onCancel }: CreateOrganizationStepsProps) {
+function CreateStep({ form, slugEnabled, onNameChange, onCancel, notice }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
   const { ref: nameRef, onChange: _onChange, ...nameControl } = form.register('name');
   const autoFocus = useFlowAutoFocus();
@@ -104,6 +91,11 @@ function CreateStep({ form, slugEnabled, onNameChange, onCancel }: CreateOrganiz
           />
         }
       >
+        {notice ? (
+          <Banner.Root color='warning'>
+            <Banner.Label>{notice}</Banner.Label>
+          </Banner.Root>
+        ) : null}
         <LogoField
           name={form.values.name}
           logo={form.values.logo}
@@ -181,91 +173,48 @@ function LogoField({
   const errorText = useErrorText();
   const [rejection, setRejection] = useState<LocalizableError>();
   const previewUrl = FileUpload.useObjectUrl(logo ?? undefined);
-  const labelId = useId();
-  const initials = name
-    .split(/\s+/)
-    .map(part => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
 
   return (
-    <FileUpload.Root
+    <Field.Root
       disabled={disabled}
-      accept={LOGO_MIME_TYPES}
-      maxSize={LOGO_MAX_BYTES}
-      aria-labelledby={labelId}
-      onReject={rejections => {
-        const rejected = rejections[0];
-        setRejection(rejected ? REJECTION_ERRORS[rejected.reason] : undefined);
-      }}
-      onValueChange={files => {
-        const file = files[0];
-        if (file) {
+      invalid={Boolean(rejection)}
+    >
+      <AvatarUpload.Root
+        name={name}
+        imageUrl={previewUrl}
+        hasImage={Boolean(logo)}
+        onChange={file => {
           setRejection(undefined);
           onChange(file);
-        }
-      }}
-    >
-      <div {...stylex.props(styles.logo)}>
-        <Avatar.Root
-          shape='square'
-          size='lg'
-        >
-          <Avatar.Image
-            alt=''
-            src={previewUrl}
+        }}
+        onReject={rejections => {
+          const rejected = rejections[0];
+          setRejection(rejected ? AVATAR_REJECTION_ERRORS[rejected.reason] : undefined);
+        }}
+        onRemove={() => {
+          setRejection(undefined);
+          onChange(null);
+        }}
+      >
+        <AvatarUpload.Dropzone>
+          <AvatarUpload.Image
+            shape='square'
+            size='lg'
           />
-          <Avatar.Fallback>{initials}</Avatar.Fallback>
-        </Avatar.Root>
-        <div {...stylex.props(styles.logoContent)}>
-          <Text
-            id={labelId}
-            render={<span />}
-          >
-            {m.create.logoLabel}
-          </Text>
-          <Text
-            size='xs'
-            color={rejection ? 'negative' : 'foreground-secondary'}
-            role={rejection ? 'alert' : undefined}
-          >
-            {rejection ? errorText(rejection) : m.create.logoDescription}
-          </Text>
-        </div>
-        <div {...stylex.props(styles.logoActions)}>
-          {logo ? (
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='sm'
-              disabled={disabled}
-              onClick={() => onChange(null)}
-            >
-              {m.create.removeLogo}
-            </Button>
-          ) : null}
-          <FileUpload.Trigger
-            render={
-              <Button
-                variant='outline'
-                color='neutral'
-                size='sm'
-              />
-            }
-          >
-            {m.create.uploadLogo}
-          </FileUpload.Trigger>
-        </div>
-      </div>
-    </FileUpload.Root>
+          <Field.Content>
+            <Field.Label>{m.create.logo.label}</Field.Label>
+            <Field.Description>{m.create.logo.description}</Field.Description>
+          </Field.Content>
+          <AvatarUpload.Actions labels={m.create.logo} />
+        </AvatarUpload.Dropzone>
+      </AvatarUpload.Root>
+      <Field.Feedback feedback={rejection ? { type: 'error', message: errorText(rejection) } : undefined} />
+    </Field.Root>
   );
 }
 
 function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
   const m = useMessages('createOrganization');
-  const formId = useId();
-  const canSubmit = canSendInvitations(invite);
   const emailInput = useFlowAutoFocus();
 
   return (
@@ -282,19 +231,14 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
       <Card.Content
         render={
           <Form
-            id={formId}
-            onSubmit={event => {
-              event.preventDefault();
-              if (canSubmit && !invite.isPending) {
-                invite.onSubmit();
-              }
-            }}
+            id={invite.formId}
+            onSubmit={invite.onSubmit}
           />
         }
       >
         <InviteMembersFields
           emailInputRef={emailInput}
-          {...invite}
+          invite={invite}
         />
       </Card.Content>
       <Card.Footer>
@@ -307,9 +251,9 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
           {m.invite.skip}
         </Button>
         <SubmitButton
-          form={formId}
+          form={invite.formId}
           isPending={invite.isPending}
-          disabled={!canSubmit}
+          disabled={!invite.canSubmit}
           focusableWhenDisabled
         >
           {m.invite.submit}

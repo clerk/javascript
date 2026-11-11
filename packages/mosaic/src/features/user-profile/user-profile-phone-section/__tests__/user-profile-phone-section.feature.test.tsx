@@ -1,14 +1,17 @@
 import type { EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   demandReverificationOnce,
   type FakeFapiSeed,
+  fapiUrl,
   holdRequests,
   serveFapi,
   VERIFICATION_CODE,
+  worker,
 } from '../../../../__tests__/feature/fake-fapi';
 import type { FapiAttributeOverrides } from '../../../../__tests__/feature/fapi';
 import {
@@ -23,6 +26,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePhoneSection } from '../user-profile-phone-section';
 
 const HOME = fapiPhoneNumber({
@@ -92,6 +96,35 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile phone section', () => {
+  it('holds the menu and row order while setting a number as primary', async () => {
+    const { actor } = await renderSection(signedIn([HOME, WORK]));
+    const primary = holdRequests('post', '/v1/me');
+    try {
+      await manage(actor, WORK_LABEL, 'Set as primary');
+      await waitFor(() => expect(primary.requests).toHaveLength(1));
+      const menu = screen.getByRole('menu');
+      const item = within(menu).getByRole('menuitem', { name: 'Set as primary' });
+      expect(item).toHaveAttribute('aria-busy', 'true');
+      const manageWork = screen.getByRole('button', { name: `Manage ${WORK_LABEL}` });
+      expect(manageWork).toHaveAttribute('aria-disabled', 'true');
+      expect(within(menu).getByRole('menuitem', { name: 'Remove phone number' })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Add phone number' })).toBeDisabled();
+      expect(await within(item).findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
+    } finally {
+      primary.release();
+      await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
+    }
+    expect(screen.getByRole('button', { name: `Manage ${WORK_LABEL}` })).not.toHaveAttribute('aria-disabled', 'true');
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
+    expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
+  });
+
   it('lists the primary number first and marks it', async () => {
     await renderSection(signedIn([HOME, WORK]));
 
@@ -125,6 +158,97 @@ describe('the user profile phone section', () => {
     expect(screen.getByText('+49')).toBeInTheDocument();
   });
 
+  it('uses the localization of its provider for the country picker', async () => {
+    serveFapi(signedIn([], { country: 'de' }));
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{
+          overrides: {
+            'userProfile.phone.addDialog.phone.selectedCountry': 'Land: {country}',
+            'userProfile.phone.addDialog.phone.chooseCountry': 'Land wählen',
+            'userProfile.phone.addDialog.phone.searchCountries': 'Länder durchsuchen',
+            'userProfile.phone.addDialog.phone.countrySearchPlaceholder': 'Suchen',
+            'userProfile.phone.addDialog.phone.noCountries': 'Keine Länder gefunden',
+          },
+        }}
+      >
+        <UserProfilePhoneSection />
+      </MosaicProvider>,
+    );
+    const actor = userEvent.setup();
+
+    await actor.click(screen.getByRole('button', { name: 'Add phone number' }));
+    await actor.click(await screen.findByRole('button', { name: 'Land: Germany' }));
+
+    const picker = await screen.findByRole('dialog', { name: 'Land wählen' });
+    const search = within(picker).getByRole('combobox', { name: 'Länder durchsuchen' });
+    expect(search).toHaveAttribute('placeholder', 'Suchen');
+    await actor.type(search, 'zzzz');
+    await waitFor(() => expect(picker).toHaveTextContent('Keine Länder gefunden'));
+  });
+
+  it('says something went wrong when sending the code fails without details', async () => {
+    const { actor } = await renderSection();
+    worker.use(
+      http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), () =>
+        HttpResponse.json({ errors: [] }, { status: 500 }),
+      ),
+    );
+
+    await addPhone(actor, '8015550100');
+
+    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+  });
+
+  it('holds the phone entry step until the first code is sent', async () => {
+    const { actor, fapi } = await renderSection();
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      expect(screen.getByRole('textbox', { name: 'Phone' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Send code' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('button', { name: 'Send code' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Verification code' })).toBeNull();
+      await actor.keyboard('{Escape}{Enter}');
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      expect(prepare.requests).toHaveLength(1);
+      expect(fapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+    } finally {
+      prepare.release();
+    }
+
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
+  it('recovers from a failed first code without creating the phone again', async () => {
+    const { actor, fapi } = await renderSection();
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeVisible();
+      prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    } finally {
+      prepare.release();
+    }
+
+    expect(await screen.findByText('Unable to send a code.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    const retryFapi = serveFapi(fapi);
+    await actor.click(screen.getByRole('button', { name: 'Resend' }));
+    expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(retryFapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
   it('keeps the dialog open and says the code was wrong', async () => {
     const { actor } = await renderSection();
 
@@ -141,6 +265,56 @@ describe('the user profile phone section', () => {
     await addPhone(actor, '8015550100');
 
     expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+  });
+
+  it('disables Cancel while verifying a phone code and allows cancellation after an error', async () => {
+    const { actor } = await renderSection();
+    await addPhone(actor, '8015550100');
+    const attempt = holdRequests('post', '/v1/me/phone_numbers/:id/attempt_verification');
+
+    try {
+      await enterCode(actor, '000000');
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(screen.getByRole('dialog', { name: 'Verify your phone number' })).toBeVisible();
+    } finally {
+      attempt.release();
+    }
+
+    expect(await screen.findByText('Incorrect code')).toBeVisible();
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    expect(cancel).toBeEnabled();
+    await actor.click(cancel);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('disables Cancel while resending a phone code and allows cancellation once sent', async ({ onTestFinished }) => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    onTestFinished(() => vi.useRealTimers());
+    await renderSection();
+    const actor = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await addPhone(actor, '8015550100');
+    await screen.findByRole('textbox', { name: 'Verification code' });
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      for (let second = 0; second < 30; second++) {
+        await act(() => vi.advanceTimersByTimeAsync(1000));
+      }
+      const resend = screen.getByRole('button', { name: /Resend/ });
+      await waitFor(() => expect(resend).toBeEnabled());
+      await actor.click(resend);
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(screen.getByRole('dialog', { name: 'Verify your phone number' })).toBeVisible();
+    } finally {
+      prepare.release();
+    }
+
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    await waitFor(() => expect(cancel).toBeEnabled());
+    await actor.click(cancel);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('verifies a number that was left unverified', async () => {
@@ -183,8 +357,8 @@ describe('the user profile phone section', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
 
-    await waitFor(() => expect(listed()).toEqual([WORK_LABEL, HOME_LABEL]));
-    expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary');
+    await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
+    expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
   });
 
   it('removes a number once the removal is confirmed', async () => {
@@ -458,6 +632,7 @@ describe('phone reverification', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu', { hidden: true })).toBeNull());
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await actor.keyboard('hunter2{Enter}');
 
@@ -482,6 +657,7 @@ describe('phone reverification', () => {
     expect(within(row()).queryByRole('alert')).toBeNull();
     expect(within(row()).getByRole('button', { name: `Manage ${WORK_LABEL}` })).toHaveFocus();
 
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
     await manage(actor, WORK_LABEL, 'Set as primary');
     await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_work'));
   });

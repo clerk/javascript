@@ -104,6 +104,13 @@ async function expectGapAroundBadge(avatar: HTMLElement) {
   if (!badge) {
     throw new Error('No badge');
   }
+  await expect
+    .poll(() => sampleAroundBadge(badge))
+    .toEqual({ badge: 'dark', innerGap: 'light', outerGap: 'light', lead: 'dark' });
+}
+
+async function sampleAroundBadge(badge: HTMLElement) {
+  const pixels = await sampleViewport();
   const box = badge.getBoundingClientRect();
   const radius = box.width / 2;
   const towardLead = document.documentElement.dir === 'rtl' ? 1 : -1;
@@ -113,14 +120,12 @@ async function expectGapAroundBadge(avatar: HTMLElement) {
     y: center.y - distance / Math.SQRT2,
   });
 
-  const pixels = await sampleViewport();
-
-  expect({
+  return {
     badge: pixels(along(radius - 2)),
     innerGap: pixels(along(radius + GAP / 2)),
     outerGap: pixels(along(radius + GAP - 1)),
     lead: pixels(along(radius + GAP + 2)),
-  }).toEqual({ badge: 'dark', innerGap: 'light', outerGap: 'light', lead: 'dark' });
+  };
 }
 
 async function sampleViewport(): Promise<(point: { x: number; y: number }) => 'dark' | 'light'> {

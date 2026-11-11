@@ -8,9 +8,9 @@ import { organizationProfilePanels } from '../organization-profile/organization-
 import { useOrganizationProfileModel } from '../organization-profile/organization-profile.model';
 import { OrganizationProfileProvider } from '../organization-profile/organization-profile.provider';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
+import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useUserProfilePages } from '../switcher/switcher.pages';
-import type { SwitcherMode } from '../switcher/switcher.types';
-import { userProfilePageIds } from './user-profile.layout';
+import { ORGANIZATION_PAGE_PREFIX, userProfilePageIds } from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
 import type { UserProfileViewProps } from './user-profile.view';
@@ -20,23 +20,15 @@ import { UserProfileProfilePanel } from './user-profile-profile-panel';
 import { UserProfileSecurityPanel } from './user-profile-security-panel';
 import { useUserProfileUserModel } from './user-profile-user.model';
 
-/**
- * Which profiles the surface carries. `combined` adds the active organization's pages after the
- * account's; `user` shows the account's alone, even when an organization is active.
- */
-export type UserProfileMode = Exclude<SwitcherMode, 'organization'>;
-
 /** Everything `<UserProfile />` takes: your own pages and their order, the page it opens on, and the OAuth scopes it asks for. */
 export interface UserProfileProps
   extends Pick<UserProfileViewProps, 'customPages' | 'pageOrder'>, Pick<UserProfileOptions, 'additionalOAuthScopes'> {
   /**
-   * The page the profile opens on: a built-in page's id, or a custom page's `path`. Unlike
-   * `pageOrder`, it leaves the navigation order alone. A page the navigation does not list opens
-   * the first page instead.
+   * The base the profile's pages are nested under. Two profiles on one page need different bases.
    *
-   * @default the first page in the navigation
+   * @default '/user'
    */
-  defaultPage?: UserProfileViewProps['activePage'];
+  path?: string;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that nobody is signed in.
    */
@@ -47,14 +39,14 @@ export interface UserProfileProps
    */
   apiKeysProps?: APIKeysPageProps;
   /**
-   * Which profiles the surface carries: the account's and the active organization's, or the
-   * account's alone.
+   * Whether the surface adds the active organization's pages after the account's. `false` shows the
+   * account's alone, even when an organization is active.
    *
-   * @default 'combined'
+   * @default `MosaicProvider`'s `profile.combined`, which is `true` unless set
    */
-  mode?: UserProfileMode;
+  combined?: boolean;
   /**
-   * Options for the organization's pages in `combined` mode: your own pages and their order, the API
+   * Options for the organization's pages when `combined`: your own pages and their order, the API
    * keys page, and where leaving the organization lands. `pageOrder` names the organization's pages
    * without the `organization/` prefix, as in `['members', 'general']`.
    */
@@ -82,16 +74,9 @@ export interface UserProfileProps
  * ```
  *
  * @example
- * `defaultPage` picks the page the profile opens on without moving it in the navigation. An
- * organization page's id is prefixed with `organization/`.
+ * `combined={false}` leaves the active organization's pages out.
  * ```tsx
- * <UserProfile defaultPage='security' />
- * ```
- *
- * @example
- * `mode='user'` leaves the active organization's pages out.
- * ```tsx
- * <UserProfile mode='user' />
+ * <UserProfile combined={false} />
  * ```
  *
  * @example
@@ -121,9 +106,38 @@ export interface UserProfileProps
  * ```
  */
 export function UserProfile(props: UserProfileProps) {
+  const { combined, userProfileProps, organizationProfileProps: providerOrganization } = useMosaicProfile();
+  const {
+    combined: ownCombined = combined,
+    customPages = userProfileProps?.customPages,
+    pageOrder = userProfileProps?.pageOrder,
+    additionalOAuthScopes = userProfileProps?.additionalOAuthScopes,
+    apiKeysProps = userProfileProps?.apiKeysProps,
+    path = userProfileProps?.path,
+    organizationProfileProps: {
+      customPages: organizationCustomPages = providerOrganization?.customPages,
+      pageOrder: organizationPageOrder = providerOrganization?.pageOrder,
+      apiKeysProps: organizationApiKeysProps = providerOrganization?.apiKeysProps,
+      afterLeaveOrganizationUrl = providerOrganization?.afterLeaveOrganizationUrl,
+    } = {},
+    ...rest
+  } = props;
+
   return (
     <UserProfileSurface
-      {...props}
+      {...rest}
+      combined={ownCombined}
+      customPages={customPages}
+      pageOrder={pageOrder}
+      additionalOAuthScopes={additionalOAuthScopes}
+      apiKeysProps={apiKeysProps}
+      path={path}
+      organizationProfileProps={{
+        customPages: organizationCustomPages,
+        pageOrder: organizationPageOrder,
+        apiKeysProps: organizationApiKeysProps,
+        afterLeaveOrganizationUrl,
+      }}
       presentation='mounted'
     />
   );
@@ -131,11 +145,11 @@ export function UserProfile(props: UserProfileProps) {
 
 export function UserProfileSurface({
   presentation,
-  mode = 'combined',
+  combined = true,
   organizationProfileProps,
   customPages,
   pageOrder,
-  defaultPage,
+  path = '/user',
   additionalOAuthScopes,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
@@ -152,7 +166,7 @@ export function UserProfileSurface({
 
   const viewProps: AccountViewProps = {
     elevation: 'flush',
-    initialPage: defaultPage ?? pageOrder?.[0] ?? 'account',
+    path,
     customPages,
     pageOrder,
     pages: {
@@ -168,53 +182,73 @@ export function UserProfileSurface({
       additionalOAuthScopes={additionalOAuthScopes}
       mode={presentation}
     >
-      {mode === 'user' ? (
-        <AccountUserProfileView {...viewProps} />
-      ) : (
+      {combined ? (
         <CombinedUserProfileView
           {...viewProps}
           organizationProfileProps={organizationProfileProps}
+          fallback={fallback}
         />
+      ) : (
+        <AccountUserProfileView {...viewProps} />
       )}
     </UserProfileProvider>
   );
 }
 
 type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
-  initialPage: UserProfileViewProps['activePage'];
+  path: string;
 };
 
-function AccountUserProfileView({ initialPage, ...viewProps }: AccountViewProps) {
-  const navigation = useProfilePagesController(initialPage, userProfilePageIds(viewProps));
+function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
+  const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds(viewProps), {
+    routing: 'virtual',
+    path,
+  });
+
+  if (activePage === undefined) {
+    return null;
+  }
 
   return (
     <UserProfileView
       {...viewProps}
-      {...navigation}
+      activePage={activePage}
+      onPageChange={onPageChange}
     />
   );
 }
 
 function CombinedUserProfileView({
-  initialPage,
+  path,
+  fallback,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
-}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps'>) {
+}: AccountViewProps & Pick<UserProfileProps, 'organizationProfileProps' | 'fallback'>) {
   const model = useOrganizationProfileModel();
   const organization =
     model.status === 'ready'
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
-  const navigation = useProfilePagesController(
-    initialPage,
-    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
-  );
+  const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
+  const { activePage, onPageChange } = useProfilePagesController(pageIds, {
+    routing: 'virtual',
+    path,
+    notFound: parts =>
+      `${parts[0]}/` === ORGANIZATION_PAGE_PREFIX
+        ? pageIds?.find(id => id.startsWith(ORGANIZATION_PAGE_PREFIX))
+        : undefined,
+  });
+
+  if (activePage === undefined) {
+    return fallback ?? null;
+  }
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
       <UserProfileView
         {...viewProps}
-        {...navigation}
+        activePage={activePage}
+        onPageChange={onPageChange}
         organization={organization}
       />
     </OrganizationProfileProvider>

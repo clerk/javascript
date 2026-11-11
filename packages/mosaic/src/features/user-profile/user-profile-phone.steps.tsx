@@ -68,6 +68,11 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
             value={props.phoneNumber}
             onValueChange={props.onPhoneNumberChange}
             defaultCountry={props.defaultCountry}
+            countryTriggerLabel={m.phone.selectedCountry}
+            countryPopupLabel={m.phone.chooseCountry}
+            countrySearchLabel={m.phone.searchCountries}
+            countrySearchPlaceholder={m.phone.countrySearchPlaceholder}
+            noResultsMessage={m.phone.noCountries}
           />
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
@@ -183,6 +188,7 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
       <Card.Footer>
         {props.secondaryAction ?? (
           <Dialog.Close
+            disabled={props.isPending || props.isResending}
             render={
               <Button
                 variant='outline'

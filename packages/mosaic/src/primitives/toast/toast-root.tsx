@@ -30,7 +30,7 @@ const visuallyHidden: CSSProperties = {
   padding: 0,
   margin: -1,
   overflow: 'hidden',
-  clip: 'rect(0, 0, 0, 0)',
+  clipPath: 'inset(50%)',
   whiteSpace: 'nowrap',
   border: 0,
 };
@@ -110,6 +110,7 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
     if (repeatCount === 0) {
       return;
     }
+    // eslint-disable-next-line react/set-state-in-effect -- Reset the repeat indicator when the toast changes.
     setRepeated(false);
     const frame = requestAnimationFrame(() => setRepeated(true));
     return () => cancelAnimationFrame(frame);

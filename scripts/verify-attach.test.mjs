@@ -580,6 +580,19 @@ describe('the manifest', () => {
     assert.deepEqual(parseManifest(JSON.stringify(WITH_BEFORE)), WITH_BEFORE);
   });
 
+  it('accepts null as the before of a screenshot of a new screen, and refuses it for a video or for every file', () => {
+    const [wasVideo] = WITH_BEFORE.before.files;
+    const newScreen = { ...WITH_BEFORE, before: { ...WITH_BEFORE.before, files: [wasVideo, null] } };
+    assert.deepEqual(parseManifest(JSON.stringify(newScreen)), newScreen);
+    const withFiles = files => () =>
+      parseManifest(JSON.stringify({ ...WITH_BEFORE, before: { ...WITH_BEFORE.before, files } }));
+    assert.throws(
+      withFiles([null, WITH_BEFORE.before.files[1]]),
+      /before must have one file for each file, of the same kind, or null for a screenshot of a new screen/,
+    );
+    assert.throws(withFiles([null, null]), /the files of before must be a list of 1 to 50/);
+  });
+
   const before = change => parse({ before: { ...WITH_BEFORE.before, ...change } });
   const [wasVideo, wasShot] = WITH_BEFORE.before.files;
   const refusedBefore = [
@@ -1305,14 +1318,14 @@ describe('the step that edits the description', () => {
         'api repos/clerk/clerk-ios/pulls/669',
         'api repos/clerk/clerk-ios/pulls/669/commits?per_page=100&page=1',
         'api repos/clerk/clerk-ios/pulls/669',
-        'pr edit',
+        'issue edit',
         'api repos/clerk/clerk-ios/pulls/669',
-        'pr edit',
+        'issue edit',
       ],
     );
     const edit = fake.state.calls[3];
     assert.deepEqual(edit.args, [
-      'pr',
+      'issue',
       'edit',
       '669',
       '--repo',
@@ -1336,6 +1349,22 @@ describe('the step that edits the description', () => {
     assert.deepEqual(said, [
       'notice: Put verify run r20261008-052713-253e in the description of pull request #669: 2 files.',
     ]);
+  });
+
+  it('publishes when a team is requested as a reviewer, which gh pr edit cannot read with the evidence token', async () => {
+    const env = await fetched();
+    const fake = fakeGh();
+    const teamRequested = {
+      gh: (args, options) =>
+        args[0] === 'pr'
+          ? {
+              status: 1,
+              stderr:
+                'GraphQL: Resource not accessible by personal access token (repository.pullRequest.reviewRequests.nodes.0.requestedReviewer)\n',
+            }
+          : fake.gh(args, options),
+    };
+    assert.equal(publish(env, teamRequested).outcome, 'published');
   });
 
   it('replaces the block of an earlier run and keeps the text around it', async () => {
@@ -1392,7 +1421,7 @@ describe('the step that edits the description', () => {
     assert.equal(outcome, 'dry run');
     assert.deepEqual(fake.state.calls, []);
     assert.deepEqual(said, [
-      `plain: would run, in ${path.join(env.WORK, 'files')}:\ngh pr edit 669 --repo clerk/clerk-ios --body-file ${path.join(env.WORK, 'body.md')} --attach ./evidence-n0nce-1.mp4 --attach ./evidence-n0nce-2.png`,
+      `plain: would run, in ${path.join(env.WORK, 'files')}:\ngh issue edit 669 --repo clerk/clerk-ios --body-file ${path.join(env.WORK, 'body.md')} --attach ./evidence-n0nce-1.mp4 --attach ./evidence-n0nce-2.png`,
     ]);
     assert.equal(
       fs.readFileSync(path.join(env.WORK, 'body.md'), 'utf8'),
@@ -1413,7 +1442,7 @@ describe('the step that edits the description', () => {
       return lines.map(line => line.replace(/-[0-9a-f]{16}-/g, '-<nonce>-').replaceAll(env.WORK, '<work>'));
     };
     assert.deepEqual(await dry('ahead'), [
-      'would run, in <work>/files:\ngh pr edit 669 --repo clerk/clerk-ios --body-file <work>/body.md --attach ./evidence-<nonce>-1.mp4 --attach ./evidence-<nonce>-2.png',
+      'would run, in <work>/files:\ngh issue edit 669 --repo clerk/clerk-ios --body-file <work>/body.md --attach ./evidence-<nonce>-1.mp4 --attach ./evidence-<nonce>-2.png',
     ]);
     assert.deepEqual(await dry('diverged'), [
       '::notice title=verify-attach::Pull request #669 is not the pull request of run 37731397352 (the commit the session started on is not one of its commits or a commit of its base branch), so nothing is published.',
@@ -1490,6 +1519,34 @@ describe('the step that edits the description', () => {
     assert.equal(await published(CLIP), laidOut(SAID, '', '| `video` |', '| :---: |', `| ${asset(1)} |`));
   });
 
+  it('lays out a new screen in the Before and After table of the screens that exist, with New screen as its before', async () => {
+    const media = [
+      ['start.png', PNG],
+      ['update.png', PNG],
+      ['security.png', PNG],
+    ];
+    const was = [
+      ['before-start.png', WAS_PNG],
+      ['before-security.png', WAS_PNG],
+    ];
+    const wasFiles = beforeFor(was).files;
+    const manifest = manifestFor(media, { before: beforeFor([], { files: [wasFiles[0], null, wasFiles[1]] }) });
+    const fake = fakeGh({ ...PULL, body: '' });
+    assert.equal(publish(await fetched(manifest, [...media, ...was]), fake).outcome, 'published');
+    assert.equal(
+      fake.state.pull.body,
+      laidOut(
+        `${SAID}${WAS}`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| <img src="${asset(4)}" width="280" alt="Before: start"> | <img src="${asset(1)}" width="280" alt="After: start"> |`,
+        `| New screen | <img src="${asset(2)}" width="280" alt="After: update"> |`,
+        `| <img src="${asset(5)}" width="280" alt="Before: security"> | <img src="${asset(3)}" width="280" alt="After: security"> |`,
+      ),
+    );
+  });
+
   it('lays out a hand-off that holds both kinds with a before as one Before and After table, in the order of the manifest', async () => {
     assert.equal(
       await published([...CLIP, ...SHOT], [...WAS_CLIP, ...WAS_SHOT]),
@@ -1508,7 +1565,7 @@ describe('the step that edits the description', () => {
   const ADDRESS = 'https://github\\.com/user-attachments/assets/[0-9a-f-]{36}';
   const LABEL = '[A-Za-z0-9._-]+';
   const COUNTS = '\\d+ of \\d+ passed(, \\d+ flaky \\(passed only on a retry\\))?';
-  const CELL = `(${ADDRESS}|<img src="${ADDRESS}" width="280" alt="((Before|After): )?${LABEL}">)`;
+  const CELL = `(${ADDRESS}|<img src="${ADDRESS}" width="280" alt="((Before|After): )?${LABEL}">|New screen)`;
   const TEMPLATE = [
     /^$/,
     /^<!-- \/?verify-evidence:ios -->$/,
@@ -1639,7 +1696,7 @@ describe('the step that edits the description', () => {
       const { outcome, said } = publish(await fetched(), fake);
       assert.equal(outcome, 'listed');
       assert.equal(fake.state.laidOutBody, null);
-      assert.equal(fake.state.calls.filter(call => call.args[0] === 'pr').length, 1);
+      assert.equal(fake.state.calls.filter(call => call.args[0] === 'issue').length, 1);
       assert.deepEqual(said, [
         'notice: Put verify run r20261008-052713-253e in the description of pull request #669 as a list of 2 files. The pull request changed before they could be laid out. A rerun of this job uploads them again and lays them out.',
       ]);
@@ -1682,11 +1739,13 @@ describe('the step that edits the description', () => {
     const fake = fakeGh();
     const failing = {
       gh: (args, options) =>
-        args[0] === 'pr' && !args.includes('--attach') ? { status: 1, stderr: 'HTTP 502\n' } : fake.gh(args, options),
+        args[0] === 'issue' && !args.includes('--attach')
+          ? { status: 1, stderr: 'HTTP 502\n' }
+          : fake.gh(args, options),
     };
     assert.throws(
       () => publish(env, failing),
-      error => error.message === 'gh pr edit failed to lay out the files in pull request #669\ngh: HTTP 502',
+      error => error.message === 'gh issue edit failed to lay out the files in pull request #669\ngh: HTTP 502',
     );
   });
 
@@ -1970,7 +2029,7 @@ describe('the step that edits the description', () => {
       const { outcome, said } = publish(await fetched(), fake);
       assert.equal(outcome, 'refused');
       assert.equal(
-        fake.state.calls.some(call => call.args[0] === 'pr'),
+        fake.state.calls.some(call => call.args[0] === 'issue'),
         false,
       );
       assert.deepEqual(said, [
@@ -2005,7 +2064,7 @@ describe('the step that edits the description', () => {
     const rerun = fakeGh({ ...PULL, body: list });
     assert.equal(publish(await fetched(), rerun).outcome, 'published');
     assert.deepEqual(
-      rerun.state.calls.filter(call => call.args[0] === 'pr').map(call => call.args.includes('--attach')),
+      rerun.state.calls.filter(call => call.args[0] === 'issue').map(call => call.args.includes('--attach')),
       [true, false],
     );
     assert.equal(rerun.state.pull.body, `${PULL.body}\r\n${laidOut(SAID, ...AFTER_ONLY).replaceAll('\n', '\r\n')}`);
@@ -2079,7 +2138,7 @@ describe('the step that edits the description', () => {
     const fake = fakeGh();
     const failing = {
       gh: (args, options) =>
-        args[0] === 'pr'
+        args[0] === 'issue'
           ? { status: 1, stderr: '::error::from gh\nunsupported authentication type\n' }
           : fake.gh(args, options),
     };
@@ -2087,7 +2146,7 @@ describe('the step that edits the description', () => {
       () => publish(env, failing),
       error =>
         error.message ===
-        'gh pr edit failed for pull request #669\ngh: ::error::from gh\ngh: unsupported authentication type',
+        'gh issue edit failed for pull request #669\ngh: ::error::from gh\ngh: unsupported authentication type',
     );
   });
 });
@@ -2095,8 +2154,8 @@ describe('the step that edits the description', () => {
 describe('what the workflow can be told by the script', () => {
   it('writes each message as one workflow command, whatever the text holds', () => {
     assert.equal(
-      workflowCommand('error', 'gh pr edit failed\ngh: ::add-mask::x\r\n100%'),
-      '::error title=verify-attach::gh pr edit failed%0Agh: ::add-mask::x%0D%0A100%25',
+      workflowCommand('error', 'gh issue edit failed\ngh: ::add-mask::x\r\n100%'),
+      '::error title=verify-attach::gh issue edit failed%0Agh: ::add-mask::x%0D%0A100%25',
     );
   });
 

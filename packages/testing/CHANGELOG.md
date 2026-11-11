@@ -1,5 +1,23 @@
 # @clerk/testing
 
+## 2.2.55
+
+### Patch Changes
+
+- Make the unstable API keys page object's `selectExpiration` wait for the expiration dropdown to open and close, instead of force-clicking the option while the list is still animating. ([#10647](https://github.com/clerk/javascript/pull/10647)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`11d5dfb`](https://github.com/clerk/javascript/commit/11d5dfb1bec6f3e5f61db0b078e87fc3b8ecd8e2), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/backend@3.27.0
+  - @clerk/shared@4.44.1
+
+## 2.2.54
+
+### Patch Changes
+
+- Updated dependencies [[`ed3fe79`](https://github.com/clerk/javascript/commit/ed3fe791dca5af8ace0d05592728c06da2cf5e4d), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/backend@3.26.6
+  - @clerk/shared@4.44.0
+
 ## 2.2.53
 
 ### Patch Changes

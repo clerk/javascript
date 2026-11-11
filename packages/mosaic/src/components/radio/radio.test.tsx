@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -185,6 +185,43 @@ describe('Mosaic Radio', () => {
       expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('name', 'access');
     });
 
+    it('submits its value with a form when it has a name', () => {
+      const { container } = render(
+        <form>
+          <Group
+            name='access'
+            defaultValue='all'
+          />
+        </form>,
+      );
+      expect(formEntries(container)).toEqual([['access', 'all']]);
+    });
+
+    it('submits a non-string value as its JSON', () => {
+      const { container } = render(
+        <form>
+          <Radio.Group
+            name='size'
+            defaultValue={10}
+          >
+            <Radio.Item value={10} />
+            <Radio.Item value={{ id: 20 }} />
+          </Radio.Group>
+        </form>,
+      );
+      expect(formEntries(container)).toEqual([['size', '10']]);
+      expect(screen.getAllByRole('radio')[1]).toHaveAttribute('value', '{"id":20}');
+    });
+
+    it('submits nothing with a form when it has no name', () => {
+      const { container } = render(
+        <form>
+          <Group defaultValue='all' />
+        </form>,
+      );
+      expect(formEntries(container)).toEqual([]);
+    });
+
     it('disables every item', () => {
       render(<Group disabled />);
       for (const radio of screen.getAllByRole('radio')) {
@@ -203,5 +240,159 @@ describe('Mosaic Radio', () => {
       );
       expect(screen.getByRole('radio', { name: 'All organizations' })).toHaveAttribute('value', 'all');
     });
+
+    it('reflects its layout for theming', () => {
+      render(<Group layout='grid' />);
+      expect(screen.getByRole('radiogroup')).toHaveAttribute('data-layout', 'grid');
+    });
+  });
+
+  describe('Card', () => {
+    function Card({ value, label, description, disabled }: CardProps) {
+      return (
+        <Radio.Card
+          value={value}
+          disabled={disabled}
+        >
+          <Radio.Content>
+            <Radio.Label>{label}</Radio.Label>
+            {description ? <Radio.Description>{description}</Radio.Description> : null}
+          </Radio.Content>
+        </Radio.Card>
+      );
+    }
+
+    function Picker(props: Partial<React.ComponentProps<typeof Radio.Group>> & { oktaDisabled?: boolean }) {
+      const { oktaDisabled, ...groupProps } = props;
+      return (
+        <Radio.Group
+          aria-label='Identity provider'
+          {...groupProps}
+        >
+          <Card
+            value='okta'
+            label='Okta workforce'
+            description='Sign in with Okta.'
+            disabled={oktaDisabled}
+          />
+          <Card
+            value='google'
+            label='Google Workspace'
+          />
+        </Radio.Group>
+      );
+    }
+
+    it('names the radio from its label and describes it with its description', () => {
+      render(<Picker />);
+      const radio = screen.getByRole('radio', { name: 'Okta workforce' });
+      expect(radio).toHaveAccessibleDescription('Sign in with Okta.');
+    });
+
+    it('picks its value when the user clicks anywhere on the card', async () => {
+      const onValueChange = vi.fn();
+      render(<Picker onValueChange={onValueChange} />);
+
+      await userEvent.click(screen.getByText('Sign in with Okta.'));
+
+      expect(onValueChange).toHaveBeenCalledWith('okta');
+      expect(screen.getByRole('radio', { name: 'Okta workforce' })).toBeChecked();
+    });
+
+    it('reflects whether it is checked for theming', async () => {
+      render(<Picker defaultValue='google' />);
+      const okta = screen.getByText('Okta workforce').closest('.cl-radio-card');
+      const google = screen.getByText('Google Workspace').closest('.cl-radio-card');
+      expect(okta).not.toHaveAttribute('data-checked');
+      expect(google).toHaveAttribute('data-checked');
+
+      await userEvent.click(screen.getByText('Okta workforce'));
+
+      expect(okta).toHaveAttribute('data-checked');
+      expect(google).not.toHaveAttribute('data-checked');
+    });
+
+    it('cannot be picked when it is disabled', async () => {
+      const onValueChange = vi.fn();
+      render(
+        <Picker
+          oktaDisabled
+          onValueChange={onValueChange}
+        />,
+      );
+      const radio = screen.getByRole('radio', { name: 'Okta workforce' });
+      expect(radio).toBeDisabled();
+      expect(screen.getByText('Okta workforce').closest('.cl-radio-card')).toHaveAttribute('data-disabled');
+
+      await userEvent.click(screen.getByText('Okta workforce'));
+
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('cannot be picked when its group is disabled', () => {
+      render(<Picker disabled />);
+      for (const radio of screen.getAllByRole('radio')) {
+        expect(radio).toBeDisabled();
+      }
+    });
+  });
+
+  describe('Section', () => {
+    it('groups its radios under its label and shares the group name across sections', () => {
+      render(
+        <Radio.Group aria-label='Identity provider'>
+          <Radio.Section label='SAML'>
+            <Radio.Item
+              aria-label='Okta workforce'
+              value='okta'
+            />
+          </Radio.Section>
+          <Radio.Section label='OpenID Connect (OIDC)'>
+            <Radio.Item
+              aria-label='OIDC Provider'
+              value='oidc'
+            />
+          </Radio.Section>
+        </Radio.Group>,
+      );
+      const saml = screen.getByRole('group', { name: 'SAML' });
+      const oidc = screen.getByRole('group', { name: 'OpenID Connect (OIDC)' });
+      const okta = within(saml).getByRole('radio', { name: 'Okta workforce' });
+      const oidcRadio = within(oidc).getByRole('radio', { name: 'OIDC Provider' });
+      expect(okta.getAttribute('name')).toBeTruthy();
+      expect(oidcRadio).toHaveAttribute('name', okta.getAttribute('name') ?? '');
+    });
+
+    it('reflects its layout for theming', () => {
+      render(
+        <Radio.Group aria-label='Identity provider'>
+          <Radio.Section
+            label='SAML'
+            layout='grid'
+          >
+            <Radio.Item
+              aria-label='Okta workforce'
+              value='okta'
+            />
+          </Radio.Section>
+        </Radio.Group>,
+      );
+      expect(screen.getByRole('group', { name: 'SAML' })).toHaveAttribute('data-layout', 'grid');
+    });
   });
 });
+
+interface CardProps {
+  value: string;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+}
+
+function formEntries(container: HTMLElement) {
+  const form = container.querySelector('form');
+  if (!form) {
+    throw new Error('Expected a form');
+  }
+  return [...new FormData(form).entries()];
+}

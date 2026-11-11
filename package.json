@@ -29,7 +29,7 @@
     "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
     "pub": "pkglab pub",
-    "release": "changeset publish && git push --follow-tags && node scripts/wait-for-packages-on-npm.mjs",
+    "release": "changeset publish && git push origin --tags && node scripts/wait-for-packages-on-npm.mjs",
     "release:canary": "changeset publish --tag canary --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
     "release:canary-core3": "changeset publish --tag canary-core3 --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
@@ -98,7 +98,7 @@
     "@types/proper-lockfile": "^4.1.4",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-react": "6.2.1",
     "@vitest/browser-playwright": "5.0.0",
     "@vitest/coverage-v8": "5.0.0",
     "chalk": "4.1.2",
@@ -132,6 +132,8 @@
     "json5": "2.2.3",
     "jsonwebtoken": "9.0.3",
     "lint-staged": "^14.0.1",
+    "oxlint": "1.90.0",
+    "oxlint-tsgolint": "7.0.2005",
     "pkglab": "0.17.1",
     "prettier": "3.8.3",
     "prettier-plugin-astro": "^0.14.1",
@@ -158,15 +160,9 @@
     "vitest": "5.0.0",
     "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@10.34.5+sha512.a4ee05f2f73658255bd6a89859c065a45c28a57daefae2c893a168ee2b73168c37b91e83e57ea67654ad03f03031746430e8bce38e362e042605fb8abc80192e",
+  "packageManager": "pnpm@12.18.0+sha512.9d7882d5dc82147ecfc4e062aa34834e0ad0296710a1837a1115ae012127d36b7109e321ac1598a1dd0a65597681b1e99917e12ed0d749eae91187943363beb3",
   "engines": {
     "node": ">=24.15.0",
-    "pnpm": ">=10.34.5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "cypress",
-      "msw"
-    ]
+    "pnpm": ">=12.18.0"
   }
 }

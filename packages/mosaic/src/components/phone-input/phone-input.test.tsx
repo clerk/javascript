@@ -6,10 +6,21 @@ import { describe, expect, it, vi } from 'vitest';
 import { Field } from '../field';
 import { PhoneInput } from './phone-input';
 
+const labels = {
+  countryTriggerLabel: 'Country, {country}',
+  countryPopupLabel: 'Choose a country',
+  countrySearchLabel: 'Search countries',
+};
+
 describe('Mosaic PhoneInput', () => {
   it('opens the country picker from the keyboard and restores focus when dismissed', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
     const trigger = screen.getByRole('button', { name: 'Country, United States' });
 
     await user.tab();
@@ -25,7 +36,12 @@ describe('Mosaic PhoneInput', () => {
 
   it('focuses the country search when opened with a pointer', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
 
@@ -34,17 +50,44 @@ describe('Mosaic PhoneInput', () => {
 
   it('shows Search as the default country search placeholder', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
 
+    expect(screen.getByRole('dialog', { name: 'Choose a country' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('placeholder', 'Search');
+  });
+
+  it('uses custom accessible names for the country trigger, popup, and search', async () => {
+    const user = userEvent.setup();
+    render(
+      <PhoneInput
+        aria-label='Phone number'
+        countryTriggerLabel='{country} selected'
+        countryPopupLabel='Pick a region'
+        countrySearchLabel='Filter regions'
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'United States selected' }));
+
+    expect(screen.getByRole('dialog', { name: 'Pick a region' })).toBeInTheDocument();
+    await user.type(screen.getByRole('combobox', { name: 'Filter regions' }), 'Greece');
+    await user.keyboard('{ArrowDown}{Enter}');
+
+    expect(screen.getByRole('button', { name: 'Greece selected' })).toBeInTheDocument();
   });
 
   it('uses a custom country search placeholder', async () => {
     const user = userEvent.setup();
     render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         countrySearchPlaceholder='Find a country'
       />,
@@ -59,6 +102,7 @@ describe('Mosaic PhoneInput', () => {
     const ref = React.createRef<HTMLInputElement>();
     const { unmount } = render(
       <PhoneInput
+        {...labels}
         ref={ref}
         aria-label='Phone number'
       />,
@@ -72,6 +116,7 @@ describe('Mosaic PhoneInput', () => {
     const ref = vi.fn();
     const { unmount } = render(
       <PhoneInput
+        {...labels}
         ref={ref}
         aria-label='Phone number'
       />,
@@ -87,6 +132,7 @@ describe('Mosaic PhoneInput', () => {
       const user = userEvent.setup();
       render(
         <PhoneInput
+          {...labels}
           size={size}
           aria-label='Phone number'
         />,
@@ -104,7 +150,12 @@ describe('Mosaic PhoneInput', () => {
     },
   );
   it('renders a telephone input with the default country and calling code', () => {
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     const input = screen.getByRole('textbox', { name: 'Phone number' });
     expect(input).toHaveAttribute('type', 'tel');
@@ -121,6 +172,7 @@ describe('Mosaic PhoneInput', () => {
     const onValueChange = vi.fn();
     render(
       <PhoneInput
+        {...labels}
         defaultCountry='de'
         aria-label='Phone number'
         onValueChange={onValueChange}
@@ -138,6 +190,7 @@ describe('Mosaic PhoneInput', () => {
   it('prefers the number it is given over the default country', () => {
     render(
       <PhoneInput
+        {...labels}
         defaultCountry='de'
         defaultValue='+18015550100'
         aria-label='Phone number'
@@ -152,6 +205,7 @@ describe('Mosaic PhoneInput', () => {
     const onValueChange = vi.fn();
     render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         onValueChange={onValueChange}
       />,
@@ -169,6 +223,7 @@ describe('Mosaic PhoneInput', () => {
     const onCountryChange = vi.fn();
     render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         defaultValue='+12025550123'
         onValueChange={onValueChange}
@@ -191,7 +246,12 @@ describe('Mosaic PhoneInput', () => {
 
   it('links the country search to its list and active option through selection', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
     const searchInput = screen.getByRole('combobox', { name: 'Search countries' });
@@ -211,7 +271,12 @@ describe('Mosaic PhoneInput', () => {
 
   it('clears the country search when the popup is dismissed', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
     await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Greece');
@@ -224,7 +289,12 @@ describe('Mosaic PhoneInput', () => {
 
   it('focuses the search when clicking its row after dismissing and reopening', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
     await user.keyboard('{Escape}');
@@ -244,7 +314,12 @@ describe('Mosaic PhoneInput', () => {
 
   it('focuses the phone input when clicking its group after the search is dismissed', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
     const phoneInput = screen.getByRole('textbox', { name: 'Phone number' });
     const phoneGroup = phoneInput.closest('.cl-phone-input');
     if (!phoneGroup) {
@@ -261,7 +336,12 @@ describe('Mosaic PhoneInput', () => {
 
   it('clears the country search after a country is chosen', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
     await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Greece');
@@ -273,7 +353,12 @@ describe('Mosaic PhoneInput', () => {
 
   it('renders the country list inside the popup', async () => {
     const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
+    render(
+      <PhoneInput
+        {...labels}
+        aria-label='Phone number'
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
 
@@ -289,7 +374,7 @@ describe('Mosaic PhoneInput', () => {
     render(
       <Field.Root>
         <Field.Label>Phone number</Field.Label>
-        <PhoneInput />
+        <PhoneInput {...labels} />
       </Field.Root>,
     );
 
@@ -304,6 +389,7 @@ describe('Mosaic PhoneInput', () => {
     const onValueChange = vi.fn();
     render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         onValueChange={onValueChange}
       />,
@@ -322,6 +408,7 @@ describe('Mosaic PhoneInput', () => {
     const user = userEvent.setup();
     render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         defaultValue='+1202555012'
       />,
@@ -341,6 +428,7 @@ describe('Mosaic PhoneInput', () => {
     const onValueChange = vi.fn();
     render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         onValueChange={onValueChange}
       />,
@@ -358,6 +446,7 @@ describe('Mosaic PhoneInput', () => {
     const onValueChange = vi.fn();
     render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         defaultCountry='af'
         onValueChange={onValueChange}
@@ -377,6 +466,7 @@ describe('Mosaic PhoneInput', () => {
       const [value, setValue] = React.useState('');
       return (
         <PhoneInput
+          {...labels}
           aria-label='Phone number'
           defaultCountry='ca'
           value={value}
@@ -394,6 +484,7 @@ describe('Mosaic PhoneInput', () => {
   it('follows an outside value from another calling code', () => {
     const { rerender } = render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         value='+12025550123'
       />,
@@ -401,6 +492,7 @@ describe('Mosaic PhoneInput', () => {
 
     rerender(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         value='+306901234567'
       />,
@@ -413,6 +505,7 @@ describe('Mosaic PhoneInput', () => {
   it('follows an outside value from another country with the same calling code', () => {
     const { rerender } = render(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         value='+12025550123'
       />,
@@ -420,6 +513,7 @@ describe('Mosaic PhoneInput', () => {
 
     rerender(
       <PhoneInput
+        {...labels}
         aria-label='Phone number'
         value='+16045551234'
       />,
@@ -435,6 +529,7 @@ describe('Mosaic PhoneInput', () => {
       return (
         <>
           <PhoneInput
+            {...labels}
             aria-label='Phone number'
             value={value}
             onValueChange={setValue}
@@ -469,6 +564,7 @@ describe('Mosaic PhoneInput', () => {
     render(
       <form data-testid='form'>
         <PhoneInput
+          {...labels}
           name='phoneNumber'
           aria-label='Phone number'
         />
@@ -492,7 +588,7 @@ describe('Mosaic PhoneInput', () => {
         invalid
       >
         <Field.Label>Phone number</Field.Label>
-        <PhoneInput />
+        <PhoneInput {...labels} />
         <Field.Error>Enter a valid phone number</Field.Error>
       </Field.Root>,
     );
@@ -510,6 +606,7 @@ describe('Mosaic PhoneInput', () => {
     const onValueChange = vi.fn();
     render(
       <PhoneInput
+        {...labels}
         value='+12025550123'
         onValueChange={onValueChange}
         aria-label='Phone number'

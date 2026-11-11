@@ -1,5 +1,33 @@
 # Change Log
 
+## 6.42.3
+
+### Patch Changes
+
+- Fix `getToken()` and React Native startup hanging when a Frontend API request never gets a response. In React Native, session token requests now time out after 10 seconds and are retried. In React Native apps that use `__experimental_resourceCache`, startup requests time out after 7 seconds and Clerk loads from the cached resources. Token requests in browsers are unchanged. ([#10646](https://github.com/clerk/javascript/pull/10646)) by [@mikepitre](https://github.com/mikepitre)
+
+- Prevent Chrome extensions from loading Device Intelligence scripts from remote URLs. ([#10565](https://github.com/clerk/javascript/pull/10565)) by [@mwickett](https://github.com/mwickett)
+
+  Initialize production Chrome extension authentication without requiring a previously stored client token.
+
+- Fix users occasionally being signed out right after completing sign-up. `setActive({ session })` now rejects with a network error instead of signing the user out when it cannot confirm a newly created session. ([#10654](https://github.com/clerk/javascript/pull/10654)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+
+## 6.42.2
+
+### Patch Changes
+
+- In `@clerk/expo` apps on iOS and Android, Clerk now finishes loading once its requests succeed again after a failed load, such as while Clerk rejects an outdated app version. Previously it stayed failed until the app restarted. ([#10461](https://github.com/clerk/javascript/pull/10461)) by [@seanperez29](https://github.com/seanperez29)
+
+- Fix sign-ins and sign-ups being blocked by Device Intelligence checks when the same origin served more than one Clerk instance, such as an app moving from development to production keys. The Device Intelligence token is now stored per instance, so a token acquired for one instance is no longer sent to another. ([#10536](https://github.com/clerk/javascript/pull/10536)) by [@mwickett](https://github.com/mwickett)
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
 ## 6.42.1
 
 ### Patch Changes

@@ -68,6 +68,7 @@ export function OrganizationProfileEditSlugDialog({
           >
             <Field.Root
               disabled={form.isSubmitting}
+              focusableWhenDisabled
               invalid={feedback?.type === 'error'}
             >
               <Field.Label visuallyHidden>{m.slug.fieldLabel}</Field.Label>

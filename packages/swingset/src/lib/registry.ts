@@ -149,8 +149,13 @@ import {
   Group as ItemGroup,
   Interactive as ItemInteractive,
   meta as itemMeta,
-  Scrolling as ItemScrolling,
 } from '../stories/item.stories';
+import {
+  External as LinkExternal,
+  ExternalWrapping as LinkExternalWrapping,
+  meta as linkMeta,
+  Primary as LinkPrimary,
+} from '../stories/link.stories';
 import {
   Catalog as LocalizationCatalog,
   CatalogWithOverrides as LocalizationCatalogWithOverrides,
@@ -168,6 +173,15 @@ import {
 } from '../stories/logs-table.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
+import {
+  Default as OAuthConsentDefault,
+  ManyScopes as OAuthConsentManyScopes,
+  meta as oauthConsentMeta,
+  MultipleOrganizations as OAuthConsentMultipleOrganizations,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
 import {
   Default as OrganizationListDefault,
   Empty as OrganizationListEmpty,
@@ -234,6 +248,13 @@ import {
   SinglePage as PaginationSinglePage,
 } from '../stories/pagination.stories';
 import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
+import {
+  Default as PasswordInputDefault,
+  Disabled as PasswordInputDisabled,
+  Invalid as PasswordInputInvalid,
+  meta as passwordInputMeta,
+  Sizes as PasswordInputSizes,
+} from '../stories/password-input.stories';
 import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
@@ -326,6 +347,68 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
+import {
+  ChoiceMethods as SignInChoiceMethods,
+  ChoiceResetMethods as SignInChoiceResetMethods,
+  CodeAuthenticatorApp as SignInCodeAuthenticatorApp,
+  CodeEmail as SignInCodeEmail,
+  CodeResetPassword as SignInCodeResetPassword,
+  CodeResetPasswordPhone as SignInCodeResetPasswordPhone,
+  CodeVerifyEmail as SignInCodeVerifyEmail,
+  CredentialBackupCode as SignInCredentialBackupCode,
+  CredentialPasskey as SignInCredentialPasskey,
+  CredentialPassword as SignInCredentialPassword,
+  CredentialPasswordError as SignInCredentialPasswordError,
+  CredentialPasswordPending as SignInCredentialPasswordPending,
+  Default as SignInDefault,
+  IdentifierBannerError as SignInIdentifierBannerError,
+  IdentifierDefault as SignInIdentifierDefault,
+  IdentifierError as SignInIdentifierError,
+  IdentifierLocked as SignInIdentifierLocked,
+  IdentifierManyProviders as SignInIdentifierManyProviders,
+  IdentifierProviderPending as SignInIdentifierProviderPending,
+  IdentifierSignInOnly as SignInIdentifierSignInOnly,
+  meta as signInMeta,
+  NewPasswordReset as SignInNewPasswordReset,
+  NoticeActionBlocked as SignInNoticeActionBlocked,
+  NoticeEmailLinkSent as SignInNoticeEmailLinkSent,
+  NoticeForgotPassword as SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending as SignInNoticeForgotPasswordPending,
+  NoticeHelp as SignInNoticeHelp,
+  NoticeNoMethods as SignInNoticeNoMethods,
+  NoticePasswordCompromised as SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
+  SignUpDetails as SignInSignUpDetails,
+} from '../stories/sign-in.stories';
+import {
+  CustomElement as SignInButtonCustomElement,
+  Default as SignInButtonDefault,
+  meta as signInButtonMeta,
+  Pending as SignInButtonPending,
+} from '../stories/sign-in-button.stories';
+import {
+  CustomElement as SignInWithMetamaskButtonCustomElement,
+  Default as SignInWithMetamaskButtonDefault,
+  meta as signInWithMetamaskButtonMeta,
+  Pending as SignInWithMetamaskButtonPending,
+} from '../stories/sign-in-with-metamask-button.stories';
+import {
+  CustomElement as SignOutButtonCustomElement,
+  Default as SignOutButtonDefault,
+  meta as signOutButtonMeta,
+  Pending as SignOutButtonPending,
+} from '../stories/sign-out-button.stories';
+import {
+  CustomElement as SignUpButtonCustomElement,
+  Default as SignUpButtonDefault,
+  meta as signUpButtonMeta,
+  Pending as SignUpButtonPending,
+} from '../stories/sign-up-button.stories';
+import {
   Elements as SkeletonElements,
   HoldSpace as SkeletonHoldSpace,
   meta as skeletonMeta,
@@ -334,6 +417,12 @@ import {
   Shapes as SkeletonShapes,
   TextContent as SkeletonTextContent,
 } from '../stories/skeleton.stories';
+import {
+  Clickable as StepperClickable,
+  meta as stepperMeta,
+  Primary as StepperPrimary,
+  Progress as StepperProgress,
+} from '../stories/stepper.stories';
 import {
   Default as SwitchDefault,
   meta as switchMeta,
@@ -361,6 +450,23 @@ import {
   Validation as TagInputComponentValidation,
 } from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
+import {
+  Default as TaskChooseOrganizationDefault,
+  Empty as TaskChooseOrganizationEmpty,
+  Loading as TaskChooseOrganizationLoading,
+  meta as taskChooseOrganizationMeta,
+  Unavailable as TaskChooseOrganizationUnavailable,
+  WithDefaults as TaskChooseOrganizationWithDefaults,
+  WithError as TaskChooseOrganizationWithError,
+  WithoutCreate as TaskChooseOrganizationWithoutCreate,
+} from '../stories/task-choose-organization.stories';
+import {
+  AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
+  Default as TaskSetupMfaDefault,
+  meta as taskSetupMfaMeta,
+  NewPhone as TaskSetupMfaNewPhone,
+  SmsOnly as TaskSetupMfaSmsOnly,
+} from '../stories/task-setup-mfa.stories';
 import {
   Colors as TextColors,
   Default as TextDefault,
@@ -627,6 +733,13 @@ const skeletonModule: StoryModule = {
   NotShown: SkeletonNotShown,
 };
 
+const linkModule: StoryModule = {
+  meta: linkMeta,
+  Primary: LinkPrimary,
+  External: LinkExternal,
+  ExternalWrapping: LinkExternalWrapping,
+};
+
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
@@ -670,6 +783,20 @@ const paginationModule: StoryModule = {
   Disabled: PaginationDisabled,
 };
 
+const stepperModule: StoryModule = {
+  meta: stepperMeta,
+  Primary: StepperPrimary,
+  Progress: StepperProgress,
+  Clickable: StepperClickable,
+};
+
+const passwordInputModule: StoryModule = {
+  meta: passwordInputMeta,
+  Default: PasswordInputDefault,
+  Sizes: PasswordInputSizes,
+  Disabled: PasswordInputDisabled,
+  Invalid: PasswordInputInvalid,
+};
 const phoneInputModule: StoryModule = {
   meta: phoneInputMeta,
   Default: PhoneInputDefault,
@@ -721,13 +848,20 @@ const itemModule: StoryModule = {
   Default: ItemDefault,
   Interactive: ItemInteractive,
   Group: ItemGroup,
-  Scrolling: ItemScrolling,
 };
 
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
   Combined: UserButtonCombined,
   User: UserButtonUser,
+};
+
+const taskSetupMfaModule: StoryModule = {
+  meta: taskSetupMfaMeta,
+  Default: TaskSetupMfaDefault,
+  SmsOnly: TaskSetupMfaSmsOnly,
+  AuthenticatorOnly: TaskSetupMfaAuthenticatorOnly,
+  NewPhone: TaskSetupMfaNewPhone,
 };
 
 const inviteMembersButtonModule: StoryModule = {
@@ -742,6 +876,34 @@ const waitlistModule: StoryModule = {
   Default: WaitlistDefault,
   Joined: WaitlistJoined,
   Redirecting: WaitlistRedirecting,
+};
+
+const signInButtonModule: StoryModule = {
+  meta: signInButtonMeta,
+  Default: SignInButtonDefault,
+  CustomElement: SignInButtonCustomElement,
+  Pending: SignInButtonPending,
+};
+
+const signInWithMetamaskButtonModule: StoryModule = {
+  meta: signInWithMetamaskButtonMeta,
+  Default: SignInWithMetamaskButtonDefault,
+  CustomElement: SignInWithMetamaskButtonCustomElement,
+  Pending: SignInWithMetamaskButtonPending,
+};
+
+const signOutButtonModule: StoryModule = {
+  meta: signOutButtonMeta,
+  Default: SignOutButtonDefault,
+  CustomElement: SignOutButtonCustomElement,
+  Pending: SignOutButtonPending,
+};
+
+const signUpButtonModule: StoryModule = {
+  meta: signUpButtonMeta,
+  Default: SignUpButtonDefault,
+  CustomElement: SignUpButtonCustomElement,
+  Pending: SignUpButtonPending,
 };
 
 const userAvatarModule: StoryModule = {
@@ -772,6 +934,17 @@ const organizationListModule: StoryModule = {
   Loading: OrganizationListLoading,
   Empty: OrganizationListEmpty,
   WithError: OrganizationListWithError,
+};
+
+const taskChooseOrganizationModule: StoryModule = {
+  meta: taskChooseOrganizationMeta,
+  Default: TaskChooseOrganizationDefault,
+  WithoutCreate: TaskChooseOrganizationWithoutCreate,
+  Empty: TaskChooseOrganizationEmpty,
+  WithDefaults: TaskChooseOrganizationWithDefaults,
+  Unavailable: TaskChooseOrganizationUnavailable,
+  Loading: TaskChooseOrganizationLoading,
+  WithError: TaskChooseOrganizationWithError,
 };
 
 const headingModule: StoryModule = {
@@ -911,6 +1084,12 @@ const segmentedControlModule: StoryModule = {
   meta: segmentedControlMeta,
   Default: SegmentedControlDefault,
   Disabled: SegmentedControlDisabled,
+};
+
+const separatorModule: StoryModule = {
+  meta: separatorMeta,
+  Default: SeparatorDefault,
+  Labelled: SeparatorLabelled,
 };
 
 const switchModule: StoryModule = {
@@ -1074,6 +1253,15 @@ const apiKeysTableModule: StoryModule = {
   Empty: APIKeysTableEmpty,
 };
 
+const oauthConsentModule: StoryModule = {
+  meta: oauthConsentMeta,
+  Default: OAuthConsentDefault,
+  ScopeList: OAuthConsentScopeList,
+  ManyScopes: OAuthConsentManyScopes,
+  MultipleOrganizations: OAuthConsentMultipleOrganizations,
+  OfflineAccess: OAuthConsentOfflineAccess,
+};
+
 const reverificationModule: StoryModule = {
   meta: reverificationMeta,
   Default: ReverificationDefault,
@@ -1094,6 +1282,40 @@ const reverificationModule: StoryModule = {
   MethodPicker: ReverificationMethodPicker,
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
+};
+
+const signInModule: StoryModule = {
+  meta: signInMeta,
+  Default: SignInDefault,
+  IdentifierDefault: SignInIdentifierDefault,
+  IdentifierSignInOnly: SignInIdentifierSignInOnly,
+  IdentifierManyProviders: SignInIdentifierManyProviders,
+  IdentifierProviderPending: SignInIdentifierProviderPending,
+  IdentifierError: SignInIdentifierError,
+  IdentifierBannerError: SignInIdentifierBannerError,
+  IdentifierLocked: SignInIdentifierLocked,
+  CredentialPassword: SignInCredentialPassword,
+  CredentialPasswordPending: SignInCredentialPasswordPending,
+  CredentialPasswordError: SignInCredentialPasswordError,
+  CredentialBackupCode: SignInCredentialBackupCode,
+  CredentialPasskey: SignInCredentialPasskey,
+  CodeEmail: SignInCodeEmail,
+  CodeAuthenticatorApp: SignInCodeAuthenticatorApp,
+  CodeResetPassword: SignInCodeResetPassword,
+  CodeResetPasswordPhone: SignInCodeResetPasswordPhone,
+  CodeVerifyEmail: SignInCodeVerifyEmail,
+  ChoiceMethods: SignInChoiceMethods,
+  ChoiceResetMethods: SignInChoiceResetMethods,
+  NoticeHelp: SignInNoticeHelp,
+  NoticeForgotPassword: SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending: SignInNoticeForgotPasswordPending,
+  NoticeNoMethods: SignInNoticeNoMethods,
+  NoticeActionBlocked: SignInNoticeActionBlocked,
+  NoticePasswordCompromised: SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending: SignInNoticePasswordCompromisedPending,
+  NoticeEmailLinkSent: SignInNoticeEmailLinkSent,
+  NewPasswordReset: SignInNewPasswordReset,
+  SignUpDetails: SignInSignUpDetails,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
@@ -1156,15 +1378,25 @@ export const registry: StoryModule[] = [
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
   // Misc
+  { meta: mosaicProviderMeta },
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
+  taskChooseOrganizationModule,
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
   logsTableModule,
+  oauthConsentModule,
   reverificationModule,
   waitlistModule,
+  taskSetupMfaModule,
+  signInButtonModule,
+  signInWithMetamaskButtonModule,
+  signUpButtonModule,
+  signOutButtonModule,
+  // Authentication
+  signInModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
@@ -1175,6 +1407,7 @@ export const registry: StoryModule[] = [
   skeletonModule,
   bannerModule,
   buttonModule,
+  linkModule,
   cardComponentModule,
   checkboxModule,
   comboboxModule,
@@ -1183,6 +1416,7 @@ export const registry: StoryModule[] = [
   flowComponentModule,
   inputModule,
   inputGroupModule,
+  passwordInputModule,
   phoneInputModule,
   dataListModule,
   itemModule,
@@ -1203,6 +1437,8 @@ export const registry: StoryModule[] = [
   revealModule,
   sectionModule,
   segmentedControlModule,
+  separatorModule,
+  stepperModule,
   selectComponentModule,
   switchModule,
   tableModule,

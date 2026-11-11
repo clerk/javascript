@@ -6,7 +6,7 @@ import { Key } from '../../icons/glyphs/key';
 import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
 import { Users } from '../../icons/glyphs/users';
 import { applyOrder } from '../../utils/apply-order';
-import { withUniquePaths } from '../profile-pages/profile-pages.layout';
+import { withRoutablePaths, withUniquePaths } from '../profile-pages/profile-pages.layout';
 import type {
   CustomOrganizationProfilePage,
   OrganizationProfilePageId,
@@ -48,7 +48,7 @@ export function resolveOrganizationProfilePages(
   customPages: readonly CustomOrganizationProfilePage[] = [],
   order?: readonly string[],
 ): OrganizationProfileNavEntry[] {
-  const uniqueCustomPages = withUniquePaths(customPages);
+  const uniqueCustomPages = withUniquePaths(withRoutablePaths(customPages, ORGANIZATION_PROFILE_PAGE_IDS));
   const customById = new Map(uniqueCustomPages.map(page => [page.path, page]));
   const builtInIds = new Set<string>(builtIn);
   const entries: OrganizationProfileNavEntry[] = [

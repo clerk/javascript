@@ -10,6 +10,7 @@ import type {
 import { Platform } from 'react-native';
 
 import packageJson from '../../../package.json';
+import { createAppVersionRequestHooks } from '../../app-version/appVersionRequestHooks';
 import {
   ClientResourceCache,
   DUMMY_CLERK_CLIENT_RESOURCE,
@@ -140,10 +141,18 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           : tokenCache.saveToken(CLERK_CLIENT_JWT_KEY, token);
       };
       const requestTokens = new WeakMap<FapiRequestInit, string | null>();
+      const appVersionRequestHooks = isNative() ? createAppVersionRequestHooks() : null;
 
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
       const clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
       __internal_clerk = clerk;
+      appVersionRequestHooks?.checkOnForeground({
+        reload: () => clerk.__internal_reloadInitialResources(),
+        // `GET /v1/` only passes Clerk's app version check, and never reads or creates a client.
+        check: () =>
+          // @ts-expect-error - This is an internal API
+          clerk.getFapiClient().request({ method: 'GET', path: '/' }, { allowEmptyBody: true, fetchMaxTries: 1 }),
+      });
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
@@ -314,6 +323,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         if (isNative()) {
           (requestInit.headers as Headers).set('x-mobile', '1');
           (requestInit.headers as Headers).set('x-expo-sdk-version', packageJson.version);
+          appVersionRequestHooks?.beforeRequest(requestInit);
         }
       });
 
@@ -324,6 +334,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         if (authHeader) {
           await saveClientToken(authHeader, requestTokens.get(requestInit) ?? null);
         }
+
+        appVersionRequestHooks?.afterResponse(requestInit, response);
 
         if (__DEV__ && !nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
           console.error(

@@ -101,6 +101,18 @@ test.describe('OAuth testing tokens @nextjs', () => {
     expect((await context.cookies(providerOrigin)).map(cookie => cookie.name).sort()).toEqual(['consent', 'provider']);
   });
 
+  test('delivers the token on the provider-specific callback', async ({ page }) => {
+    const callback = new URL('/v1/sso/oauth_custom_e2e_oauth_provider/callback?code=auth-code', appOrigin);
+    await consent(page, callback);
+
+    const received = JSON.parse((await page.locator('body').textContent()) || '{}');
+    expect(new URL(received.url, appOrigin).pathname).toBe(callback.pathname);
+    expect(Object.fromEntries(new URL(received.url, appOrigin).searchParams)).toEqual({
+      code: 'auth-code',
+      __clerk_testing_token: 'app-testing-token',
+    });
+  });
+
   test('delivers the token on the callback when the provider skips the consent screen', async ({ page, context }) => {
     await setupTestingTokens({ context, frontendApiOrigin: providerOrigin, token: 'provider-testing-token' });
     const callback = new URL('/v1/oauth_callback?code=auth-code&state=a%2Bb%2F%3D', appOrigin);
@@ -121,6 +133,10 @@ test.describe('OAuth testing tokens @nextjs', () => {
     ['another origin', () => new URL('/v1/oauth_callback?code=auth-code', providerOrigin)],
     ['another path', () => new URL('/sso-callback?code=auth-code', appOrigin)],
     ['a callback subpath', () => new URL('/v1/oauth_callback/other?code=auth-code', appOrigin)],
+    [
+      'a provider callback subpath',
+      () => new URL('/v1/sso/oauth_custom_e2e_oauth_provider/callback/other?code=auth-code', appOrigin),
+    ],
   ] as const) {
     test(`does not send the token to ${name}`, async ({ page }) => {
       const callback = getCallback();

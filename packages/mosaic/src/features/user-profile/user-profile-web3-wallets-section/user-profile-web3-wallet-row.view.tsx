@@ -14,10 +14,10 @@ import { UserProfileProviderMedia } from '../user-profile-provider-media';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.types';
 
+// eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
 export function UserProfileWeb3WalletRowView({
   wallet,
   triggerRef,
-  isPending = false,
   isDisabled = false,
   onConnect,
   onVerify,
@@ -26,7 +26,6 @@ export function UserProfileWeb3WalletRowView({
 }: {
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
   triggerRef?: Ref<HTMLButtonElement>;
-  isPending?: boolean;
   isDisabled?: boolean;
   onConnect?: (id: string) => void;
   onVerify?: (id: string) => void;
@@ -35,6 +34,7 @@ export function UserProfileWeb3WalletRowView({
 }) {
   const m = useMessages('userProfile').web3Wallets;
   const linkedWallet = 'address' in wallet ? wallet : undefined;
+  const isPending = wallet.isPending ?? false;
   const address = linkedWallet?.address;
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
   const actions: ActionMenuAction[] = [];
@@ -43,7 +43,11 @@ export function UserProfileWeb3WalletRowView({
     actions.push({ label: m.verify, onClick: () => onVerify(wallet.id) });
   }
   if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
-    actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
+    actions.push({
+      label: m.setPrimary,
+      onClick: () => onSetPrimary(wallet.id),
+      status: linkedWallet.isPrimaryPending ? 'pending' : 'idle',
+    });
   }
   if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(linkedWallet) });
@@ -99,7 +103,7 @@ export function UserProfileWeb3WalletRowView({
                 <Icon
                   glyph={ArrowUpRight}
                   placement='inline-end'
-                  size='sm'
+                  size='md'
                 />
               </SubmitButton>
             ) : null}

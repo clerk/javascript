@@ -12,8 +12,8 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
-const popupRadius = radiusVars['--cl-radius-lg'];
-const inset = space['0.5'];
+const popupRadius = radiusVars['--cl-radius-xl'];
+const inset = space['1.5'];
 const itemRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 
 // Positioning is applied inline by the headless positioner; this only clears the
@@ -88,22 +88,21 @@ export const item = stylex.create({
   base: {
     borderRadius: itemRadius,
     borderStyle: 'none',
-    gap: space['0.5'],
+    gap: space['1'],
     outline: 'none',
-    paddingInline: space['1.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
       default: colorVars['--cl-color-foreground-secondary'],
       ':is([data-active])': colorVars['--cl-color-foreground'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-foreground'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
@@ -117,6 +116,8 @@ export const item = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
     outlineOffset: 0,
+    paddingInlineEnd: space['1.5'],
+    paddingInlineStart: space['1.5'],
     position: 'relative',
     textAlign: 'start',
     height: space['8'],
@@ -134,7 +135,7 @@ export const item = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-negative-alpha-200'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-negative-alpha-200'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -180,7 +181,7 @@ export const separator = stylex.create({
     // Full-bleed across the popup: cancel the viewport's inline padding.
     marginBlock: space['0.5'],
     marginInline: `calc(-1 * ${inset})`,
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     blockSize: '1px',
     flexShrink: 0,
   },

@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 import type { EnhancedPage } from './app';
 import { common } from './common';
 
@@ -51,8 +53,11 @@ export const createAPIKeysComponentPageObject = (testArgs: { page: EnhancedPage 
       return page.getByLabel(/Description/i).fill(value);
     },
     selectExpiration: async (value?: keyof typeof expirationOptions) => {
-      await page.getByRole('button', { name: /Select date/i }).click();
-      return page.getByText(expirationOptions[value ?? 'never'], { exact: true }).click({ force: true });
+      const trigger = page.locator('.cl-selectButton__apiKeyExpiration');
+      await trigger.click();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      await page.getByRole('option', { name: expirationOptions[value ?? 'never'], exact: true }).click();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     },
     clickSaveButton: () => {
       return page.getByText(/Create key/i).click();

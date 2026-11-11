@@ -298,7 +298,7 @@ function MemberRow({
           <Select.Root
             items={roles}
             value={member.role}
-            onValueChange={value => value && onChangeRole(member.id, value)}
+            onValueChange={role => onChangeRole(member.id, role)}
           >
             <Select.Trigger
               variant='ghost'

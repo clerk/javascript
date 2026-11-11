@@ -83,7 +83,6 @@ const PLATFORM_NATIVE_INPUTS: Readonly<Record<Platform, readonly string[]>> = {
 };
 
 const BUNDLE_INPUTS = [
-  '.npmrc',
   'package.json',
   'pnpm-lock.yaml',
   'pnpm-workspace.yaml',

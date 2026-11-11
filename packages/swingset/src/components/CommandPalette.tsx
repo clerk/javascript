@@ -73,11 +73,13 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
   const results = q ? entries.filter(entry => entry.search.includes(q)) : entries;
 
   React.useEffect(() => {
+    // eslint-disable-next-line react/set-state-in-effect -- Reset the selected result after the search query changes
     setActiveIndex(0);
   }, [q]);
 
   React.useEffect(() => {
     if (!open) {
+      // eslint-disable-next-line react/set-state-in-effect -- Clear the search state when the controlled palette closes
       setQuery('');
       setActiveIndex(0);
     }

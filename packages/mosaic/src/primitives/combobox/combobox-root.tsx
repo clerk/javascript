@@ -9,6 +9,7 @@ import {
   offset,
   type Placement,
   size,
+  useClick,
   useDismiss,
   useFloating,
   useFloatingNodeId,
@@ -22,7 +23,14 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
-import { ComboboxContext, type ComboboxContextValue } from './combobox-context';
+import {
+  ComboboxContext,
+  type ComboboxContextValue,
+  ComboboxHighlightContext,
+  type ComboboxHighlightContextValue,
+  ComboboxOptionsContext,
+  type ComboboxOptionsContextValue,
+} from './combobox-context';
 
 export interface ComboboxProps {
   /** Controlled input text. */
@@ -41,6 +49,8 @@ export interface ComboboxProps {
   children: ReactNode;
   /** Separate search input inside another surface. Bind open to that surface. */
   inline?: boolean;
+  /** Opens the popup when the input is clicked. Has no effect with `inline`. */
+  openOnInputClick?: boolean;
 }
 
 function ComboboxInner(props: ComboboxProps) {
@@ -87,6 +97,7 @@ function ComboboxInner(props: ComboboxProps) {
 
   useEffect(() => {
     if (!open) {
+      // eslint-disable-next-line react/set-state-in-effect -- Reset the query flag when the controlled selection changes.
       setQueryChanged(false);
       highlightFirstRef.current = false;
     }
@@ -100,6 +111,7 @@ function ComboboxInner(props: ComboboxProps) {
     }
   }, [open, props.inline, selectedValue, selectedIndex, inputValue, setInputValue]);
 
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const selectedLabel = selectedValue === null ? '' : (labelsByValueRef.current.get(selectedValue) ?? selectedValue);
   const filterQuery = !queryChanged && inputValue === selectedLabel ? '' : inputValue;
 
@@ -115,16 +127,14 @@ function ComboboxInner(props: ComboboxProps) {
       setActiveIndex(0);
     }
   }, []);
-  const registerSelectedIndex = useCallback(
-    (index: number, value: string, label: string) => {
-      labelsByValueRef.current.set(value, label);
-      if (value === selectedValue) {
-        setSelectedIndex(index);
-        return () => setSelectedIndex(current => (current === index ? null : current));
-      }
-    },
-    [selectedValue],
-  );
+  const registerSelectedIndex = useCallback((index: number, value: string, label: string, selected: boolean) => {
+    labelsByValueRef.current.set(value, label);
+    if (!selected) {
+      return undefined;
+    }
+    setSelectedIndex(index);
+    return () => setSelectedIndex(current => (current === index ? null : current));
+  }, []);
 
   const previousOpenRef = useRef(open);
   useEffect(() => {
@@ -160,6 +170,7 @@ function ComboboxInner(props: ComboboxProps) {
         },
         padding: 5,
       }),
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       arrow({ element: arrowRef }),
       cssVars({ sideOffset }),
     ],
@@ -196,7 +207,8 @@ function ComboboxInner(props: ComboboxProps) {
     scrollItemIntoView: true,
   });
 
-  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav]);
+  const click = useClick(floatingContext, { enabled: Boolean(props.openOnInputClick) && !props.inline, toggle: false });
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav, click]);
   const referenceProps = getReferenceProps();
   const popupId = typeof referenceProps['aria-controls'] === 'string' ? referenceProps['aria-controls'] : undefined;
 
@@ -238,9 +250,19 @@ function ComboboxInner(props: ComboboxProps) {
     [props.inline, setInputValue, setOpenState, setSelectedValue],
   );
 
+  const clear = useCallback(() => {
+    setQueryChanged(false);
+    setInputValue('');
+    setSelectedValue(null);
+    setSelectedIndex(null);
+    setActiveIndex(null);
+    focusInput();
+  }, [focusInput, setInputValue, setSelectedValue]);
+
   const contextValue = useMemo<ComboboxContextValue>(
     () => ({
       open,
+      clear,
       inputValue,
       filterQuery,
       selectedValue,
@@ -250,7 +272,6 @@ function ComboboxInner(props: ComboboxProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       selectedIndex,
       elementsRef,
@@ -265,13 +286,12 @@ function ComboboxInner(props: ComboboxProps) {
       setOpen,
       focusInput,
       popupId,
-      registerSelectedIndex,
-      registerOption,
       mounted,
       transitionProps,
     }),
     [
       open,
+      clear,
       inputValue,
       filterQuery,
       selectedValue,
@@ -281,7 +301,6 @@ function ComboboxInner(props: ComboboxProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       selectedIndex,
       handleSelect,
@@ -289,16 +308,37 @@ function ComboboxInner(props: ComboboxProps) {
       setOpen,
       focusInput,
       popupId,
-      registerSelectedIndex,
-      registerOption,
       mounted,
       transitionProps,
     ],
   );
 
+  const optionsContextValue = useMemo<ComboboxOptionsContextValue>(
+    () => ({
+      getItemProps,
+      handleSelect,
+      refs,
+      valuesByIndexRef,
+      registerSelectedIndex,
+      registerOption,
+    }),
+    [getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+  );
+
+  const highlightContextValue = useMemo<ComboboxHighlightContextValue>(
+    () => ({ activeIndex, selectedValue }),
+    [activeIndex, selectedValue],
+  );
+
   return (
     <FloatingNode id={nodeId}>
-      <ComboboxContext.Provider value={contextValue}>{children}</ComboboxContext.Provider>
+      <ComboboxContext.Provider value={contextValue}>
+        <ComboboxOptionsContext.Provider value={optionsContextValue}>
+          <ComboboxHighlightContext.Provider value={highlightContextValue}>
+            {children}
+          </ComboboxHighlightContext.Provider>
+        </ComboboxOptionsContext.Provider>
+      </ComboboxContext.Provider>
     </FloatingNode>
   );
 }

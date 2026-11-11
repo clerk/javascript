@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { type CSSProperties } from 'react';
 
 import { usePanelSize } from '../hooks/use-panel-size';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useAccordionItemContext } from './accordion-context';
 
 export type AccordionPanelProps = ComponentProps<'div'>;
@@ -17,16 +17,18 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
 
     const state = { open };
 
-    const defaultProps: Record<string, unknown> = {
+    const style: CSSProperties & Record<`--${string}`, string | undefined> = {
+      '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
+      ...transitionProps.style,
+    };
+
+    const defaultProps = {
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
       ...transitionProps,
-      style: {
-        '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
-        ...transitionProps.style,
-      },
-    };
+      style,
+    } satisfies DefaultProps<'div'>;
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not
