@@ -1,8 +1,10 @@
+import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { Autocomplete, ClerkPaginationRequest } from '@clerk/shared/types';
 
 import { OAuthTokenExchangeError } from '../../errors';
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
+import { parsePublishableKey } from '../../util/shared';
 import type { DeletedObject } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { OAuthApplication } from '../resources/OAuthApplication';
@@ -53,8 +55,12 @@ export type OAuthTokenTypeIdentifier = Autocomplete<
  * The parameters for performing an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an OAuth application.
  */
 export type ExchangeOAuthApplicationTokenParams = {
-  /** The ID of the OAuth application performing the exchange. */
-  oauthApplicationId: string;
+  /** The publishable key of the instance, used to derive its token endpoint. */
+  publishableKey: string;
+  /** The absolute URL of your Frontend API proxy. When set, the exchange is sent through the proxy instead of the Frontend API host in `publishableKey`. */
+  proxyUrl?: string;
+  /** The client ID of the OAuth application performing the exchange. */
+  clientId: string;
   /** The client secret of the OAuth application, used to authenticate with the token endpoint. */
   clientSecret: string;
   /** The OAuth access token that represents the user on whose behalf the request is being made. */
@@ -157,6 +163,17 @@ function tokenExchangeError(json: unknown, status: number) {
     errorDescription: typeof json.error_description === 'string' ? json.error_description : undefined,
     status,
   });
+}
+
+function oauthTokenEndpoint({ publishableKey, proxyUrl }: ExchangeOAuthApplicationTokenParams) {
+  if (proxyUrl) {
+    if (!isHttpOrHttps(proxyUrl)) {
+      throw new Error('`proxyUrl` must be an absolute URL to perform an OAuth token exchange.');
+    }
+    return `${proxyUrl.replace(/\/+$/, '')}/oauth/token`;
+  }
+  const { frontendApi } = parsePublishableKey(publishableKey, { fatal: true });
+  return `https://${frontendApi}/oauth/token`;
 }
 
 /** @generateWithEmptyComment */
@@ -263,16 +280,18 @@ export class OAuthApplicationsApi extends AbstractAPI {
   /**
    * @experimental This is an experimental API for OAuth 2.0 Token Exchange and is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version to avoid breaking changes.
    *
-   * Performs an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application), exchanging a user's OAuth access token for a new access token for the target resource, issued by the application's token endpoint.
+   * Performs an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application), exchanging a user's OAuth access token for a new access token for the target resource. The request is sent to the instance's token endpoint, derived from `publishableKey`, or from `proxyUrl` when set, and authenticates with the application's client ID and client secret. The instance secret key is not required.
    *
    * @param params - The parameters for the token exchange.
    * @returns The issued token and its metadata.
    * @throws `OAuthTokenExchangeError` if the token endpoint rejects the exchange or returns an invalid response.
+   * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute URL.
    *
    * @example
    * ```ts
    * const { accessToken } = await clerkClient.oauthApplications.__experimental_exchangeToken({
-   *   oauthApplicationId: 'oauthapp_123',
+   *   publishableKey: process.env.CLERK_PUBLISHABLE_KEY!,
+   *   clientId: process.env.OAUTH_CLIENT_ID!,
    *   clientSecret: process.env.OAUTH_CLIENT_SECRET!,
    *   subjectToken,
    *   resource: 'https://api.example.com',
@@ -282,9 +301,12 @@ export class OAuthApplicationsApi extends AbstractAPI {
   public async __experimental_exchangeToken(
     params: ExchangeOAuthApplicationTokenParams,
   ): Promise<ExchangeOAuthApplicationTokenResult> {
-    const application = await this.get(params.oauthApplicationId);
+    if (!params.clientId) {
+      throw new Error('A valid client ID is required.');
+    }
 
-    const credentials = `${formUrlEncode(application.clientId)}:${formUrlEncode(params.clientSecret)}`;
+    const tokenEndpoint = oauthTokenEndpoint(params);
+    const credentials = `${formUrlEncode(params.clientId)}:${formUrlEncode(params.clientSecret)}`;
     const body = tokenExchangeBody(params);
     const headers = {
       Accept: 'application/json',
@@ -292,7 +314,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
 
-    const response = await runtime.fetch(application.tokenFetchUrl, { method: 'POST', headers, body });
+    const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body });
 
     const json = await response.json().catch(() => undefined);
 
