@@ -695,7 +695,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
           await u.po.signIn.waitForMounted();
 
           await expect(transferError).toBeVisible();
-          await expect(u.page.getByText(/The External Account was not found/)).toBeHidden();
+          await expect(
+            u.page.getByText(/Account not found\. Please sign up or try signing in to a different account\./),
+          ).toBeHidden();
         } finally {
           await newUser.deleteIfExists();
           await u.services.users.deleteIfExists({ email: newUser.email });

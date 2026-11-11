@@ -2083,6 +2083,7 @@ export const koKR: LocalizationResource = {
       '보안 검증에 실패해 회원가입을 완료할 수 없어요. 페이지를 새로고침한 뒤 다시 시도하거나 지원팀에 문의해 주세요.',
     captcha_unavailable:
       '봇 검증에 실패해 회원가입을 완료할 수 없어요. 페이지를 새로고침한 뒤 다시 시도하거나 지원팀에 문의해 주세요.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       '임시 이메일 서비스는 지원되지 않아요. 계정을 만들려면 일반 이메일 주소를 사용해 주세요.',
@@ -2158,9 +2159,11 @@ export const koKR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '이미 로그인 중이에요.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 지갑 확장 프로그램을 찾을 수 없어요. 계속하려면 설치해 주세요.',
     web3_signature_request_rejected: '서명 요청을 거부했어요. 계속하려면 다시 시도해 주세요.',

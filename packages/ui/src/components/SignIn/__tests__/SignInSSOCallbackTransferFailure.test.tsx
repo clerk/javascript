@@ -13,7 +13,7 @@ const { createFixtures } = bindCreateFixtures('SignIn');
 
 const SSO_CALLBACK_BOUNCE_DELAY = 4000;
 
-const ACCOUNT_NOT_FOUND = /The External Account was not found/i;
+const ACCOUNT_NOT_FOUND = /Account not found\. Please sign up or try signing in to a different account\./i;
 const GENERIC_ERROR = /Unable to complete action at this time/i;
 const RATE_LIMITED = /Too many requests\. Please try again in a bit\./i;
 
