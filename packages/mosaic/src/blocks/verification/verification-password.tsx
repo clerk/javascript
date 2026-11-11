@@ -1,15 +1,12 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { FormEvent, Ref } from 'react';
-import { useId, useState } from 'react';
+import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
 import { useFlowAutoFocus } from '../../components/flow';
-import { Icon } from '../../components/icon';
-import { InputGroup } from '../../components/input-group';
-import { Eye } from '../../icons/glyphs/eye';
-import { EyeSlash } from '../../icons/glyphs/eye-slash';
+import { PasswordInput } from '../../components/password-input';
 import { Form } from '../../primitives/form';
 
 interface VerificationPasswordMessages {
@@ -48,7 +45,6 @@ export function VerificationPassword({
   focusRef,
 }: VerificationPasswordProps) {
   const formId = useId();
-  const [visible, setVisible] = useState(false);
 
   const canSubmit = value !== '';
 
@@ -83,26 +79,16 @@ export function VerificationPassword({
             focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
-            <InputGroup.Root>
-              <InputGroup.Input
-                ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
-                name='password'
-                type={visible ? 'text' : 'password'}
-                autoComplete='current-password'
-                placeholder={messages.fieldPlaceholder}
-                value={value}
-                onChange={event => onValueChange(event.target.value)}
-              />
-              <InputGroup.End>
-                <Button
-                  type='button'
-                  aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
-                  onClick={() => setVisible(current => !current)}
-                >
-                  <Icon glyph={visible ? EyeSlash : Eye} />
-                </Button>
-              </InputGroup.End>
-            </InputGroup.Root>
+            <PasswordInput
+              ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
+              name='password'
+              autoComplete='current-password'
+              placeholder={messages.fieldPlaceholder}
+              value={value}
+              onChange={event => onValueChange(event.target.value)}
+              showPasswordLabel={messages.showPasswordLabel}
+              hidePasswordLabel={messages.hidePasswordLabel}
+            />
             <Field.Message>
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>

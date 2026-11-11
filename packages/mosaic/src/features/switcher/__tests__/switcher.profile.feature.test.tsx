@@ -17,6 +17,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useVirtualEntries, useVirtualWrite } from '../../../routing/virtual-store';
 import { OrganizationProfile } from '../../organization-profile/organization-profile';
 import { OrganizationSwitcher } from '../../organization-switcher/organization-switcher';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
@@ -324,7 +325,40 @@ describe('a mounted OrganizationProfile under a provider profile', () => {
   });
 });
 
+function Entry({ base }: { base: string }) {
+  return <output data-testid='entry'>{JSON.stringify(useVirtualEntries().get(base) ?? null)}</output>;
+}
+
+function OpenByRouting({ base }: { base: string }) {
+  const write = useVirtualWrite();
+  return <button onClick={() => write(base, [])}>Open by routing</button>;
+}
+
+describe('a user profile modal opened by the routing state', () => {
+  it("renders with the provider's options", async () => {
+    await renderWithProfile(<OpenByRouting base='/modal/user' />, { userProfileProps: { customPages: [terms] } });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Open by routing' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'Terms' })).toBeInTheDocument();
+  });
+});
+
 describe('a mounted UserProfile under a provider profile', () => {
+  it("routes its pages under the provider's path", async () => {
+    await renderWithProfile(
+      <>
+        <UserProfile />
+        <Entry base='/account' />
+      </>,
+      { userProfileProps: { path: '/account' } },
+    );
+
+    await userEvent.setup().click(await screen.findByRole('tab', { name: 'Security' }));
+    expect(JSON.parse(screen.getByTestId('entry').textContent ?? 'null')).toEqual(['security']);
+  });
+
   it('fills in what its own organizationProfileProps leave out from the provider', async () => {
     await renderWithProfile(<UserProfile organizationProfileProps={{ pageOrder: ['members'] }} />, {
       organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }], pageOrder: ['general'] },
@@ -334,9 +368,10 @@ describe('a mounted UserProfile under a provider profile', () => {
   });
 
   it('lands where the provider says after leaving the organization', async () => {
-    const { navigate } = await renderWithProfile(<UserProfile defaultPage='organization/general' />, {
+    const { navigate } = await renderWithProfile(<UserProfile />, {
       organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
     });
+    await userEvent.setup().click(await screen.findByRole('tab', { name: 'General', description: 'Organization' }));
     await leaveOrganization();
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/left'));

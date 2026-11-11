@@ -50,13 +50,13 @@ export interface ProfilePages<PageId extends string> {
 
 /** Options for the underlying `<UserProfile />` component. */
 export interface ProfileUserProps
-  extends ProfilePages<UserProfilePageId>, Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps'> {}
+  extends ProfilePages<UserProfilePageId>, Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps' | 'path'> {}
 
 /** Options for the underlying `<OrganizationProfile />` component. */
 export interface ProfileOrganizationProps
   extends
     ProfilePages<OrganizationProfilePageId>,
-    Pick<OrganizationProfileProps, 'afterLeaveOrganizationUrl' | 'apiKeysProps'> {}
+    Pick<OrganizationProfileProps, 'afterLeaveOrganizationUrl' | 'apiKeysProps' | 'path'> {}
 
 const MosaicProfileContext = createContext<MosaicProfile>({});
 

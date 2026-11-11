@@ -1,70 +1,57 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { FormEvent, Ref } from 'react';
-import { useId } from 'react';
+import type { Ref } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
+import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
+import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { SignInSocialProvider } from '../sign-in.types';
+import type { SignInSocialProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
-export interface SignInStartMessages {
-  title: string;
-  description: string;
-  socialButton: (provider: string) => string;
-  dividerText: string;
-  fieldLabel: string;
-  fieldPlaceholder: string;
-  primaryActionLabel: string;
-  pendingLabel: string;
-  actionText: string;
-  actionLink: string;
-}
-
-export interface SignInStartProps {
-  messages: SignInStartMessages;
+interface IdentifierStepProps {
+  applicationName: string;
+  combined: boolean;
   logo?: { src: string; alt: string };
   socialProviders: readonly SignInSocialProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
-  value: string;
+  form: UseFormResult<SignInValues>;
   errorMessage?: string;
-  isPending?: boolean;
-  onValueChange: (value: string) => void;
-  onSubmit: () => void;
+  globalErrorMessage?: string;
+  isPending: boolean;
+  isDisabled: boolean;
+  onSubmit: (event: SignInSubmitEvent) => void;
   onSignUp?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
-export function SignInStart({
-  messages,
+export function IdentifierStep({
+  applicationName,
+  combined,
   logo,
   socialProviders,
   pendingProviderId,
   onSelectProvider,
-  value,
+  form,
   errorMessage,
-  isPending = false,
-  onValueChange,
+  globalErrorMessage,
+  isPending,
+  isDisabled,
   onSubmit,
   onSignUp,
   focusRef,
-}: SignInStartProps) {
-  const formId = useId();
-  const busy = isPending || Boolean(pendingProviderId);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!busy) {
-      onSubmit();
-    }
-  };
+}: IdentifierStepProps) {
+  const m = useMessages('signIn');
+  const { ref: identifierFieldRef, ...identifier } = form.register('identifier');
+  const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
+  const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
 
   return (
     <>
@@ -78,13 +65,19 @@ export function SignInStart({
             />
           </Card.Media>
         ) : null}
-        <Card.Title>{messages.title}</Card.Title>
-        <Card.Description>{messages.description}</Card.Description>
+        <Card.Title>{fill(combined ? m.start.titleCombined : m.start.title, { applicationName })}</Card.Title>
+        <Card.Description>{combined ? m.start.descriptionCombined : m.start.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         {socialProviders.length > 0 ? (
           <>
-            <ProviderButtonGroup disabled={busy}>
+            <ProviderButtonGroup disabled={isDisabled}>
               {socialProviders.map(provider => (
                 <ProviderButton
                   key={provider.id}
@@ -95,10 +88,10 @@ export function SignInStart({
                       {...stylex.props(styles.providerIcon)}
                     />
                   }
-                  longLabel={messages.socialButton(provider.name)}
+                  longLabel={fill(m.start.socialButton, { provider: provider.name })}
                   shortLabel={provider.name}
                   isPending={pendingProviderId === provider.id}
-                  pendingLabel={messages.pendingLabel}
+                  pendingLabel={m.verifying}
                   onClick={() => onSelectProvider(provider.id)}
                 />
               ))}
@@ -112,35 +105,31 @@ export function SignInStart({
                 size='sm'
                 color='foreground-secondary'
               >
-                {messages.dividerText}
+                {m.start.divider}
               </Text>
               <span {...stylex.props(styles.dividerLine)} />
             </div>
           </>
         ) : null}
         <Form
-          id={formId}
-          onSubmit={handleSubmit}
+          id={form.id}
+          onSubmit={onSubmit}
         >
           <Field.Root
             required
-            invalid={Boolean(errorMessage)}
-            disabled={busy}
+            invalid={feedback?.type === 'error'}
+            disabled={isDisabled}
             focusableWhenDisabled
           >
-            <Field.Label>{messages.fieldLabel}</Field.Label>
+            <Field.Label>{m.start.emailLabel}</Field.Label>
             <Input
-              ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
-              name='identifier'
+              ref={identifierRef}
               type='email'
               autoComplete='email webauthn'
-              placeholder={messages.fieldPlaceholder}
-              value={value}
-              onChange={event => onValueChange(event.target.value)}
+              placeholder={m.start.emailPlaceholder}
+              {...identifier}
             />
-            <Field.Message>
-              <Field.Error>{errorMessage}</Field.Error>
-            </Field.Message>
+            <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>
         {onSignUp ? (
@@ -149,28 +138,28 @@ export function SignInStart({
             color='foreground-secondary'
             xstyle={styles.footerText}
           >
-            {messages.actionText}{' '}
+            {m.start.signUpPrompt}{' '}
             <Button
               type='button'
               size='sm'
               variant='link'
-              disabled={busy}
+              disabled={isDisabled}
               onClick={onSignUp}
             >
-              {messages.actionLink}
+              {m.start.signUpLink}
             </Button>
           </Text>
         ) : null}
       </Card.Content>
       <Card.Footer>
         <SubmitButton
-          form={formId}
+          form={form.id}
           fullWidth
           disabled={Boolean(pendingProviderId)}
           isPending={isPending}
-          pendingLabel={messages.pendingLabel}
+          pendingLabel={m.verifying}
         >
-          {messages.primaryActionLabel}
+          {m.continue}
         </SubmitButton>
       </Card.Footer>
     </>
