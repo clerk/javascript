@@ -202,6 +202,16 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       code: "import { setup } from '../machine/setup';",
     },
     {
+      name: "src/modals/sample.ts may import down or across: import { useMosaicLocation } from '../routing/use-mosaic-location';",
+      filename: 'src/modals/sample.ts',
+      code: "import { useMosaicLocation } from '../routing/use-mosaic-location';",
+    },
+    {
+      name: "src/features/reverification/sample.controller.ts may import down or across: import { useRouterScope } from '../../routing/use-router';",
+      filename: 'src/features/reverification/sample.controller.ts',
+      code: "import { useRouterScope } from '../../routing/use-router';",
+    },
+    {
       name: "src/blocks/sample.tsx may import down or across: import { Reverification } from '../features/reverification';",
       filename: 'src/blocks/sample.tsx',
       code: "import { Reverification } from '../features/reverification';",
@@ -423,6 +433,18 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       name: "src/queries/sample.ts cannot import up: import { Button } from '../components/button';",
       filename: 'src/queries/sample.ts',
       code: "import { Button } from '../components/button';",
+      errors: [/down/],
+    },
+    {
+      name: "src/routing/sample.ts cannot import up: import { ModalHost } from '../modals/modal-host';",
+      filename: 'src/routing/sample.ts',
+      code: "import { ModalHost } from '../modals/modal-host';",
+      errors: [/down/],
+    },
+    {
+      name: "src/components/sample.tsx cannot import up: import { useRouter } from '../routing/use-router';",
+      filename: 'src/components/sample.tsx',
+      code: "import { useRouter } from '../routing/use-router';",
       errors: [/down/],
     },
   ].map(testCase => ({ ...testCase, options, settings: config.settings })),

@@ -334,9 +334,10 @@ describe('a mounted UserProfile under a provider profile', () => {
   });
 
   it('lands where the provider says after leaving the organization', async () => {
-    const { navigate } = await renderWithProfile(<UserProfile defaultPage='organization/general' />, {
+    const { navigate } = await renderWithProfile(<UserProfile />, {
       organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
     });
+    await userEvent.setup().click(await screen.findByRole('tab', { name: 'General', description: 'Organization' }));
     await leaveOrganization();
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/left'));
