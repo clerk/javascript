@@ -227,10 +227,15 @@ function CombinedUserProfileView({
     model.status === 'ready'
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
-  const { activePage, onPageChange } = useProfilePagesController(
-    model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization }),
-    { routing: 'virtual', path },
-  );
+  const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
+  const { activePage, onPageChange } = useProfilePagesController(pageIds, {
+    routing: 'virtual',
+    path,
+    notFound: parts =>
+      `${parts[0]}/` === ORGANIZATION_PAGE_PREFIX
+        ? pageIds?.find(id => id.startsWith(ORGANIZATION_PAGE_PREFIX))
+        : undefined,
+  });
 
   if (activePage === undefined) {
     return fallback ?? null;

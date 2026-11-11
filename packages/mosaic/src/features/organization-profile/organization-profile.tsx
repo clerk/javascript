@@ -19,8 +19,8 @@ import { OrganizationProfileMembersPanel } from './organization-profile-members-
 /** Everything `<OrganizationProfile />` takes: your own pages and their order, the page it opens on, and where leaving the organization lands. */
 export interface OrganizationProfileProps
   extends
-  Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder'>,
-  Pick<OrganizationProfileOptions, 'afterLeaveOrganizationUrl'> {
+    Pick<OrganizationProfileViewProps, 'customPages' | 'pageOrder'>,
+    Pick<OrganizationProfileOptions, 'afterLeaveOrganizationUrl'> {
   /**
    * The base the profile's pages are nested under. Two profiles on one page need different bases.
    *

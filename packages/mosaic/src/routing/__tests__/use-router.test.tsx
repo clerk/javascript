@@ -216,6 +216,29 @@ describe('useRouterScope', () => {
     expect(result.current.segment).toEqual(['security']);
   });
 
+  it('asks notFound where an unknown segment goes', () => {
+    const notFound = vi.fn((parts: readonly string[]) => (parts[0] === 'billing' ? ('statement' as const) : undefined));
+    const statementRoutes = { account: 'account', security: 'security', statement: 'billing/statement' } as const;
+    const { result } = renderHook(
+      () => ({
+        router: useRouterScope(statementRoutes, { routing: 'virtual', path: '/user', root: 'account', notFound }),
+        segment: useUserSegment(),
+        write: useVirtualWrite(),
+      }),
+      { wrapper: wrapperWith({ '/user': ['billing', 'nowhere'] }) },
+    );
+    expect(result.current.router.route).toBe('statement');
+    expect(result.current.segment).toEqual(['billing', 'statement']);
+    expect(notFound).toHaveBeenLastCalledWith(['billing', 'nowhere']);
+
+    act(() => {
+      result.current.write('/user', ['nowhere']);
+    });
+    expect(notFound).toHaveBeenLastCalledWith(['nowhere']);
+    expect(result.current.router.route).toBe('account');
+    expect(result.current.segment).toEqual([]);
+  });
+
   it('keeps the same result object between unrelated renders', () => {
     const { result, rerender } = renderHook(() => useRouterScope(routes, userScope), {
       wrapper: wrapperWith({ '/user': ['security'] }),

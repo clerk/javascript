@@ -4,6 +4,7 @@ import type { MosaicLocation, SegmentParts } from './location';
 import type { Route, Router } from './router';
 import { createRouter } from './router';
 import type { RouteName, RouteTable } from './routes';
+import { routeParts } from './routes';
 import type { RoutingScope } from './routing-scope';
 import { createRoutingScope, useInheritedScope } from './routing-scope';
 import type { MosaicLocationOptions } from './use-mosaic-location';
@@ -119,6 +120,10 @@ export interface RouterScopeOptions<Routes extends RouteTable> {
   // entry the table cannot match yet is kept until it can. Pass it when the routes depend on data
   // that has not arrived, and handle the undefined route that comes with it.
   ready?: boolean;
+  // Where a segment nothing matches goes instead of the root, asked with the segment; a profile
+  // sends an unknown page in the organization group to that group's first page. Returning nothing,
+  // or a name that is not a route, means the root.
+  notFound?: (parts: SegmentParts) => RouteName<Routes> | undefined;
 }
 
 export interface RouterScope<Routes extends RouteTable, Name = RouteName<Routes>> {
@@ -140,24 +145,32 @@ export function useRouterScope<const Routes extends RouteTable>(
 ): RouterScope<Routes>;
 export function useRouterScope<const Routes extends RouteTable>(
   routes: Routes,
-  { routing, path, root, ready = true }: RouterScopeOptions<Routes>,
+  { routing, path, root, ready = true, notFound }: RouterScopeOptions<Routes>,
 ): RouterScope<Routes, RouteName<Routes> | undefined> {
   const scope = useMemo(() => createRoutingScope({ routing, path }), [routing, path]);
   const rooted: Routes = Object.assign({}, routes, { [root]: '' });
-  const { location, router, entry } = useRouting(rooted, { routing, path });
+  const { location, table, router, entry } = useRouting(rooted, { routing, path });
   const held = useOwnedSegment(location, entry, routing === 'virtual');
   const { parts, matched } = useMatch(router, held);
-  const current = useMemo<Route<Routes> | undefined>(
-    () => (ready ? (matched ?? { name: root, params: EMPTY_PARAMS }) : undefined),
-    [ready, matched, root],
-  );
-
-  const unmatched = ready && matched === undefined;
-  useEffect(() => {
-    if (unmatched) {
-      location.write(EMPTY_PARTS, { replace: true });
+  const fallback = useMemo<RouteName<Routes> | undefined>(() => {
+    if (!ready || matched !== undefined) {
+      return undefined;
     }
-  }, [parts, unmatched, location]);
+    const name = notFound?.(parts);
+    return name !== undefined && name in table ? name : root;
+  }, [ready, matched, notFound, parts, table, root]);
+  const current = useMemo<Route<Routes> | undefined>(() => {
+    if (!ready) {
+      return undefined;
+    }
+    return matched ?? { name: fallback ?? root, params: EMPTY_PARAMS };
+  }, [ready, matched, fallback, root]);
+
+  useEffect(() => {
+    if (fallback !== undefined) {
+      location.write(routeParts(table, fallback), { replace: true });
+    }
+  }, [parts, fallback, location, table]);
 
   return useMemo(
     () => ({ route: current?.name, params: current?.params ?? EMPTY_PARAMS, go: router.go, scope }),

@@ -370,6 +370,20 @@ describe('UserProfile with an active organization', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeVisible();
   });
 
+  it('opens as a modal on the first organization page when the requested organization page is unavailable', async () => {
+    serveWithOrganization({ permissions: [] });
+    await renderWithClerk(<OpenProfile page='organization/members' />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Open profile' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'General', description: 'Organization' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
   it('opens the organization page that shares an account page name', async () => {
     serveWithOrganization();
     await renderWithClerk(
@@ -415,7 +429,7 @@ describe('UserProfile with an active organization', () => {
     expect(tabsDescribedBy('Organization')).toEqual(['Audit log', 'General', 'Members']);
   });
 
-  it('keeps the shown page after the open organization page leaves the navigation', async () => {
+  it('stays in the organization group after the open organization page leaves the navigation', async () => {
     const globex = fapiOrganization({ id: 'org_2', name: 'Globex' });
     const memberships = [
       fapiMembership(acme, { permissions: ['org:sys_memberships:read'] }),
@@ -435,7 +449,7 @@ describe('UserProfile with an active organization', () => {
     await act(() => clerk.setActive({ organization: acme.id }));
     await waitFor(() => expect(tabsDescribedBy('Organization')).toEqual(['General', 'Members']));
 
-    expect(screen.getByRole('tab', { name: 'Account', description: 'Account' })).toHaveAttribute(
+    expect(screen.getByRole('tab', { name: 'General', description: 'Organization' })).toHaveAttribute(
       'aria-selected',
       'true',
     );
