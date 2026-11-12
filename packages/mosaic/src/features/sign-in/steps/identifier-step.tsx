@@ -13,13 +13,13 @@ import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { SignInSocialProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import type { SignInProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface IdentifierStepProps {
   applicationName: string;
   combined: boolean;
   logo?: { src: string; alt: string };
-  socialProviders: readonly SignInSocialProvider[];
+  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   form: UseFormResult<SignInValues>;

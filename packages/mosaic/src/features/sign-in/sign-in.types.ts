@@ -34,7 +34,7 @@ export type SignInStep =
       provider?: string;
     }
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
-  | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInSocialProvider[] }
+  | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
   | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
@@ -51,7 +51,7 @@ export interface SignInActionBlockedDetails {
   traceId?: string;
 }
 
-export interface SignInSocialProvider {
+export interface SignInProvider {
   id: string;
   name: string;
   iconUrl: string;
@@ -79,7 +79,7 @@ export interface SignInViewProps {
   applicationName: string;
   applicationLogoUrl?: string;
   combined: boolean;
-  socialProviders: readonly SignInSocialProvider[];
+  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   form: UseFormResult<SignInValues>;

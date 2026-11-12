@@ -9,13 +9,13 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
 import { styles } from '../sign-in.styles';
-import type { SignInSocialProvider } from '../sign-in.types';
+import type { SignInProvider } from '../sign-in.types';
 
 interface SignInEnterpriseConnectionsProps {
   title: string;
   description: string;
   logo?: { src: string; alt: string };
-  connections: readonly SignInSocialProvider[];
+  connections: readonly SignInProvider[];
   globalErrorMessage?: string;
   pendingConnectionId?: string;
   onSelectConnection: (id: string) => void;

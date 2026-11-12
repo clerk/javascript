@@ -3,7 +3,7 @@ import type { FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
   SignInFactor,
-  SignInSocialProvider,
+  SignInProvider,
   SignInStep,
   SignInSubmitEvent,
   SignInValues,
@@ -31,7 +31,7 @@ const PHONE = '+1******0123';
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
-const socialProviders: SignInSocialProvider[] = [
+const socialProviders: SignInProvider[] = [
   { id: 'oauth_google', name: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
   { id: 'oauth_github', name: 'GitHub', iconUrl: 'https://img.clerk.com/static/github.svg' },
 ];
@@ -469,7 +469,7 @@ function StepPanel({
   globalErrorMessage?: string;
   isPending?: boolean;
   pendingProviderId?: string;
-  providers?: SignInSocialProvider[];
+  providers?: SignInProvider[];
   identifier?: string;
   otherMethods?: boolean;
 }) {
