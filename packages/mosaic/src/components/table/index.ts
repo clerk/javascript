@@ -1,3 +1,5 @@
+'use client';
+
 export { Table } from './table';
 export type {
   TableAlign,

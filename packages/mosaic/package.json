@@ -91,6 +91,11 @@
       "import": "./dist/components/skeleton.js",
       "default": "./dist/components/skeleton.js"
     },
+    "./components/table": {
+      "types": "./dist/components/table.d.ts",
+      "import": "./dist/components/table.js",
+      "default": "./dist/components/table.js"
+    },
     "./components/text": {
       "types": "./dist/components/text.d.ts",
       "import": "./dist/components/text.js",
