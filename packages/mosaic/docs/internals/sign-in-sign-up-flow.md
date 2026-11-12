@@ -12,7 +12,7 @@ There is no step machine and no local copy of the step. What the step can't say 
 
 ## Pick the screen
 
-The route and the step can disagree: the user went back, opened an old link, or the sign-in reset. The screen is the route when the step allows it, otherwise the step's route, and "Start over" when the step is `unknown`.
+The route and the step can disagree: the user went back, opened an old link, or the sign-in reset. A route the step allows stays. Any other route is replaced with the step's route, so the screen and the route never drift. `unknown` shows "Start over" on whatever route it's on.
 
 ```tsx
 const { step } = model;
@@ -39,7 +39,7 @@ submitPassword: async (password: string) => {
 },
 ```
 
-- `complete`: the model's `finalize()`, then leave the flow.
+- `complete`: the model's `finalize()`, then leave the flow. In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
 - `transfer` from sign-in: the model's `transfer()` calls `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
 - `transfer` from sign-up, when the identifier already has an account: the model's `transfer()` calls `signIn.create({ transfer: true })`, then `next` with the sign-in's step.
 - `unknown`: nothing. The screen already shows "Start over".
@@ -74,7 +74,7 @@ With no `:factor`, `factorOne` starts on the factor `ui`'s `determineStartingSig
 
 ## Back, forward and reload
 
-- FAPI's state changes only on submit. A route the step doesn't allow shows the step's screen instead.
+- FAPI's state changes only on submit. A route the step doesn't allow is replaced with the step's route.
 - Back to `start` shows the identifier form; submitting it creates a new sign-in. Forward to `factorOne` still works.
 - Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`).
 - Virtual routing has no history: a remount starts at `start`, and FAPI's state is kept.
@@ -85,6 +85,7 @@ The controller calls these model callbacks on `start`, then `next(step)`.
 
 - Ticket (`__clerk_ticket`): `__clerk_status=sign_up` redeems it with `signUp.ticket({ unsafeMetadata })`; any other status with `signIn.ticket()`, as `ui/src/components/SignIn/SignInStart.tsx` does. A ticket works only once, so redeem it once: keep the "already started" flag in a component that doesn't remount, so a remount or StrictMode can't redeem it twice. A failed redemption shows its error on `start`.
 - Email-link return (`__clerk_status`): `verified` with a `__clerk_created_session` this client has activates that session (`clerk-js/src/core/clerk.ts:2620-2636`); any other `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
+- Redirect URLs for email links and OAuth/SAML returns come from the router (the planned `useReturnUrl(name, params)`), never hand-built. That part waits for the routing follow-up.
 - A step that is already `complete` or `transfer` on mount, such as a reload before it ran: `next(step)` runs it once, with the same guard as a ticket. The email-link return is handled first.
 
 ## Bridge
