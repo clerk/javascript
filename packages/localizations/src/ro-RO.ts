@@ -1755,8 +1755,8 @@ export const roRO: LocalizationResource = {
         titleNewTab: 'Autentificat în altă filă',
       },
       verifiedTransferable: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Revino în fila inițială pentru a continua',
+        title: 'Email verificat',
       },
     },
     emailLinkMfa: {
@@ -1770,7 +1770,7 @@ export const roRO: LocalizationResource = {
       title: undefined,
     },
     enterpriseSSO: {
-      formButtonPrimary: undefined,
+      formButtonPrimary: 'Continuă cu SSO',
     },
     forgotPassword: {
       formTitle: 'Cod pentru resetarea parolei',
@@ -1807,13 +1807,13 @@ export const roRO: LocalizationResource = {
       title: 'Introdu parola',
     },
     passwordCompromised: {
-      title: undefined,
+      title: 'Parola este compromisă',
     },
     passwordPwned: {
       title: 'Parola este compromisă',
     },
     passwordUntrusted: {
-      title: undefined,
+      title: 'Parola nu este de încredere',
     },
     phoneCode: {
       formTitle: 'Cod de verificare',
@@ -1828,10 +1828,10 @@ export const roRO: LocalizationResource = {
       title: 'Verifică-ți telefonul',
     },
     protectCheck: {
-      loading: undefined,
-      retryButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      loading: 'Se încarcă…',
+      retryButton: 'Încearcă din nou',
+      subtitle: 'Te rugăm să aștepți cât timp îți verificăm solicitarea.',
+      title: 'Se verifică solicitarea',
     },
     resetPassword: {
       formButtonPrimary: 'Resetează parola',
@@ -1843,13 +1843,13 @@ export const roRO: LocalizationResource = {
       detailsLabel: 'Trebuie să îți verificăm identitatea înainte de a reseta parola.',
     },
     ssoBypass: {
-      actionLink: undefined,
+      actionLink: 'Nu poți folosi SSO?',
       code: {
-        resendButton: undefined,
-        subtitle: undefined,
-        title: undefined,
+        resendButton: 'Nu ai primit un cod? Retrimite',
+        subtitle: 'pentru a continua la {{applicationName}}',
+        title: 'Verifică-ți emailul',
       },
-      notice: undefined,
+      notice: 'Organizația ta impune autentificarea unică (SSO). Dacă continui fără ea, acest lucru va fi înregistrat.',
     },
     start: {
       actionLink: 'Înregistrează-te',
@@ -1949,10 +1949,10 @@ export const roRO: LocalizationResource = {
       title: 'Verifică-ți telefonul',
     },
     protectCheck: {
-      loading: undefined,
-      retryButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      loading: 'Se încarcă…',
+      retryButton: 'Încearcă din nou',
+      subtitle: 'Te rugăm să aștepți cât timp îți verificăm solicitarea.',
+      title: 'Se verifică solicitarea',
     },
     restrictedAccess: {
       actionLink: 'Autentifică-te',
