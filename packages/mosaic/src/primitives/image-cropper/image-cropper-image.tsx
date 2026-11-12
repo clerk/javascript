@@ -12,6 +12,14 @@ export const ImageCropperImage = React.forwardRef<HTMLImageElement, ImageCropper
   function ImageCropperImage(props, ref) {
     const { render, ...otherProps } = props;
     const { src, crop, size, setSize } = useImageCropperContext();
+    const readLoaded = React.useCallback(
+      (image: HTMLImageElement | null) => {
+        if (image?.complete && image.naturalWidth > 0) {
+          setSize({ width: image.naturalWidth, height: image.naturalHeight });
+        }
+      },
+      [setSize],
+    );
 
     const defaultProps = {
       src,
@@ -26,7 +34,7 @@ export const ImageCropperImage = React.forwardRef<HTMLImageElement, ImageCropper
 
     return useRender({
       defaultTagName: 'img',
-      ref,
+      ref: [ref, readLoaded],
       render,
       state: { loaded: size !== undefined },
       stateAttributesMapping: {

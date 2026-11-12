@@ -6,7 +6,10 @@ import { axe } from '../../test-utils/axe';
 import type { Crop } from '../crop';
 import { ImageCropper, type ImageCropperRootProps } from '../index';
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 function Harness(props: Partial<ImageCropperRootProps>) {
   return (
@@ -52,6 +55,17 @@ describe('ImageCropper', () => {
 
     expect(screen.getByRole('slider', { name: 'Zoom' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Rotate' })).toBeEnabled();
+  });
+
+  it('takes the size of an image that finished loading before it mounted', () => {
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(200);
+    vi.spyOn(HTMLImageElement.prototype, 'naturalHeight', 'get').mockReturnValue(100);
+
+    render(<Harness />);
+
+    expect(screen.getByRole('slider', { name: 'Zoom' })).toBeEnabled();
+    expect(document.querySelector('img')?.style.width).toBe('200%');
   });
 
   it('sizes the image to cover the frame', () => {
