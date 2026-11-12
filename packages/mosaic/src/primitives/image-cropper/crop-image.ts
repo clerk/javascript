@@ -1,4 +1,4 @@
-import { type Crop, pixelCrop, turned } from './crop';
+import { clampCrop, type Crop, pixelCrop, turned } from './crop';
 
 export interface CropImageOptions {
   /** Width and height of the output, in pixels. */
@@ -19,7 +19,7 @@ export async function cropImage(src: string, crop: Crop, { size, type }: CropIma
   await image.decode();
 
   const natural = { width: image.naturalWidth, height: image.naturalHeight };
-  const area = pixelCrop(crop, natural);
+  const area = pixelCrop(clampCrop(crop, natural, Number.POSITIVE_INFINITY), natural);
   const upright = turned(natural, crop.rotation);
 
   const canvas = document.createElement('canvas');

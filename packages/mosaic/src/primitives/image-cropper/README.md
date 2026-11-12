@@ -14,6 +14,8 @@ controls through `data-*` attributes.
 ## Usage
 
 ```tsx
+import { useState } from 'react';
+
 import { type Crop, cropImage, ImageCropper, INITIAL_CROP } from '../../primitives/image-cropper';
 
 function Cropper({ src, onSave }: { src: string; onSave: (blob: Blob) => void }) {

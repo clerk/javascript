@@ -22,6 +22,8 @@ result from `cropImage`.
 ## Usage
 
 ```tsx
+import { useState } from 'react';
+
 import { type Crop, cropImage, ImageCropper, INITIAL_CROP } from '@clerk/mosaic/primitives/image-cropper';
 
 const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
@@ -114,7 +116,7 @@ On a focused `Viewport`:
 ## Styling
 
 The primitive sets only the `Image` placement (absolute, centred, scaled and rotated by the crop) and
-`touch-action: none` on the `Viewport`. Give the `Viewport` a size, `position: relative` and
+`touch-action: none` on the `Viewport` once the image has loaded. Give the `Viewport` a size, `position: relative` and
 `overflow: hidden`.
 
 | Attribute       | Applies To                                     | Description                         |

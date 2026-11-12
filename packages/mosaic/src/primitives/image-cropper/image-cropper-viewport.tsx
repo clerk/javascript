@@ -16,6 +16,7 @@ interface Point {
 const KEY_PAN = 0.02;
 const KEY_PAN_LARGE = 0.1;
 const WHEEL_ZOOM = 0.002;
+const WHEEL_LINE = 16;
 
 export const ImageCropperViewport = React.forwardRef<HTMLDivElement, ImageCropperViewportProps>(
   function ImageCropperViewport(props, ref) {
@@ -25,18 +26,20 @@ export const ImageCropperViewport = React.forwardRef<HTMLDivElement, ImageCroppe
     const pointers = useRef(new Map<number, Point>());
     const [dragging, setDragging] = useState(false);
 
+    const ready = size !== undefined && !disabled;
+
     useEffect(() => {
       const element = elementRef.current;
-      if (!element) {
+      if (!element || !ready) {
         return;
       }
       const onWheel = (event: WheelEvent) => {
         event.preventDefault();
-        zoomBy(Math.exp(-event.deltaY * WHEEL_ZOOM));
+        zoomBy(Math.exp(-wheelPixels(event, element.clientHeight) * WHEEL_ZOOM));
       };
       element.addEventListener('wheel', onWheel, { passive: false });
       return () => element.removeEventListener('wheel', onWheel);
-    }, [zoomBy]);
+    }, [ready, zoomBy]);
 
     const release = (pointerId: number) => {
       pointers.current.delete(pointerId);
@@ -45,12 +48,10 @@ export const ImageCropperViewport = React.forwardRef<HTMLDivElement, ImageCroppe
       }
     };
 
-    const ready = size !== undefined && !disabled;
-
     const defaultProps = {
       role: 'application',
       tabIndex: ready ? 0 : -1,
-      style: { touchAction: 'none' },
+      style: ready ? { touchAction: 'none' } : undefined,
       onPointerDown: event => {
         if (!ready || event.button !== 0) {
           return;
@@ -76,15 +77,16 @@ export const ImageCropperViewport = React.forwardRef<HTMLDivElement, ImageCroppe
         pan((to.x - from.x) / frame, (to.y - from.y) / frame);
         const [a, b] = before;
         const [c, d] = after;
-        if (a && b && c && d) {
-          zoomBy(distance(c, d) / distance(a, b));
+        const start = a && b ? distance(a, b) : 0;
+        if (c && d && start > 0) {
+          zoomBy(distance(c, d) / start);
         }
       },
       onPointerUp: event => release(event.pointerId),
       onPointerCancel: event => release(event.pointerId),
       onLostPointerCapture: event => release(event.pointerId),
       onKeyDown: event => {
-        if (!ready) {
+        if (!ready || event.target !== event.currentTarget) {
           return;
         }
         const step = event.shiftKey ? KEY_PAN_LARGE : KEY_PAN;
@@ -141,6 +143,16 @@ function keyAction(key: string, step: number): KeyAction | undefined {
     default:
       return undefined;
   }
+}
+
+function wheelPixels(event: WheelEvent, page: number): number {
+  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+    return event.deltaY * WHEEL_LINE;
+  }
+  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+    return event.deltaY * page;
+  }
+  return event.deltaY;
 }
 
 function midpoint(points: Point[]): Point {

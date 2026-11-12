@@ -245,6 +245,73 @@ describe('ImageCropper', () => {
     expect(lastCrop(onValueChange)?.zoom).toBe(2);
   });
 
+  it('keeps a pinch that starts with both fingers on one point from breaking the crop', () => {
+    const onValueChange = vi.fn<(crop: Crop) => void>();
+    render(<Harness onValueChange={onValueChange} />);
+    load(100, 100);
+    const viewport = screen.getByRole('application', { name: 'Crop' });
+    vi.spyOn(viewport, 'getBoundingClientRect').mockReturnValue(DOMRect.fromRect({ width: 200, height: 200 }));
+
+    fireEvent.pointerDown(viewport, { pointerId: 1, clientX: 100, clientY: 100, button: 0 });
+    fireEvent.pointerDown(viewport, { pointerId: 2, clientX: 100, clientY: 100, button: 0 });
+    fireEvent.pointerMove(viewport, { pointerId: 2, clientX: 200, clientY: 100 });
+
+    expect(lastCrop(onValueChange)?.zoom).toBe(1);
+  });
+
+  it('zooms the same amount whether the wheel reports pixels or lines', () => {
+    const onValueChange = vi.fn<(crop: Crop) => void>();
+    render(<Harness onValueChange={onValueChange} />);
+    load(100, 100);
+    const viewport = screen.getByRole('application', { name: 'Crop' });
+
+    fireEvent.wheel(viewport, { deltaY: -48, deltaMode: WheelEvent.DOM_DELTA_PIXEL });
+    const byPixels = lastCrop(onValueChange)?.zoom;
+    fireEvent.keyDown(viewport, { key: '0' });
+    fireEvent.wheel(viewport, { deltaY: -3, deltaMode: WheelEvent.DOM_DELTA_LINE });
+
+    expect(lastCrop(onValueChange)?.zoom).toBeCloseTo(byPixels ?? Number.NaN);
+  });
+
+  it('leaves the wheel and touch to the page until the image has loaded', () => {
+    render(<Harness />);
+    const viewport = screen.getByRole('application', { name: 'Crop' });
+
+    expect(fireEvent.wheel(viewport, { deltaY: -48 })).toBe(true);
+    expect(viewport.style.touchAction).toBe('');
+
+    load(100, 100);
+
+    expect(fireEvent.wheel(viewport, { deltaY: -48 })).toBe(false);
+    expect(viewport.style.touchAction).toBe('none');
+  });
+
+  it('leaves arrow keys to a slider placed inside the frame', () => {
+    const onValueChange = vi.fn<(crop: Crop) => void>();
+    render(
+      <ImageCropper.Root
+        src='photo.png'
+        onValueChange={onValueChange}
+      >
+        <ImageCropper.Viewport aria-label='Crop'>
+          <ImageCropper.Image alt='' />
+          <ImageCropper.Zoom aria-label='Zoom' />
+        </ImageCropper.Viewport>
+      </ImageCropper.Root>,
+    );
+    load(100, 100);
+
+    expect(fireEvent.keyDown(screen.getByRole('slider', { name: 'Zoom' }), { key: 'ArrowLeft' })).toBe(true);
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('clamps a crop passed in, so the image still covers the frame', () => {
+    render(<Harness value={{ x: 0.5, y: 0, zoom: 1, rotation: 0 }} />);
+    const image = load(100, 100);
+
+    expect(image.style.left).toBe('50%');
+  });
+
   it('ignores every gesture while disabled', async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn<(crop: Crop) => void>();

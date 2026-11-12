@@ -59,4 +59,12 @@ describe('cropImage', () => {
     expect(image.at(32, 8)).toEqual(RED);
     expect(image.at(32, 56)).toEqual(BLUE);
   });
+
+  it('clamps a crop that would leave part of the square outside the image', async () => {
+    const blob = await cropImage(halves(100, 100), { ...INITIAL_CROP, x: 0.5 }, { size: 64, type: 'image/png' });
+    const image = await pixels(blob);
+
+    expect(image.at(8, 32)).toEqual(RED);
+    expect(image.at(56, 32)).toEqual(BLUE);
+  });
 });

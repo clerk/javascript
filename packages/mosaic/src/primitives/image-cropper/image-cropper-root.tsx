@@ -31,8 +31,9 @@ export function ImageCropperRoot({
   disabled = false,
   children,
 }: ImageCropperRootProps) {
-  const [crop, setCrop] = useControllableState(value, defaultValue, onValueChange);
+  const [stored, setCrop] = useControllableState(value, defaultValue, onValueChange);
   const [size, setSize] = useState<Size>();
+  const crop = useMemo(() => (size ? clampCrop(stored, size, maxZoom) : stored), [stored, size, maxZoom]);
   const area = useRef<HTMLDivElement | null>(null);
   const latest = useRef(crop);
   // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
