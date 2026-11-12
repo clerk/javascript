@@ -209,4 +209,32 @@ describe('UserAPI', () => {
       await expect(apiClient.users.removePassword('')).rejects.toThrow('A valid resource ID is required.');
     });
   });
+
+  describe('mergeUser', () => {
+    it('calls POST /users/{id}/merge and returns both users', async () => {
+      const postHandler = vi.fn(async ({ request }: { request: Request }) => {
+        expect(await request.json()).toEqual({ from_user_id: 'user_456', dry_run: true });
+        return HttpResponse.json({
+          user: { ...mockUserResponse, first_name: 'Remaining' },
+          deleted_user: { ...mockUserResponse, id: 'user_456', first_name: 'Deleted' },
+        });
+      });
+
+      server.use(http.post('https://api.clerk.test/v1/users/user_123/merge', validateHeaders(postHandler)));
+
+      const response = await apiClient.users.mergeUser('user_123', { fromUserId: 'user_456', dryRun: true });
+
+      expect(postHandler).toHaveBeenCalledTimes(1);
+      expect(response.user.id).toBe('user_123');
+      expect(response.user.firstName).toBe('Remaining');
+      expect(response.deletedUser.id).toBe('user_456');
+      expect(response.deletedUser.firstName).toBe('Deleted');
+    });
+
+    it('requires a user ID', async () => {
+      await expect(apiClient.users.mergeUser('', { fromUserId: 'user_456' })).rejects.toThrow(
+        'A valid resource ID is required.',
+      );
+    });
+  });
 });
