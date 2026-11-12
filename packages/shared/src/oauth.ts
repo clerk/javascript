@@ -122,6 +122,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     docsUrl: 'https://clerk.com/docs/authentication/social-connections/coinbase',
   },
   {
+    provider: 'link',
+    strategy: 'oauth_link',
+    name: 'Stripe Link',
+    docsUrl: 'https://clerk.com/docs/guides/configure/auth-strategies/social-connections/link',
+  },
+  {
     provider: 'spotify',
     strategy: 'oauth_spotify',
     name: 'Spotify',
