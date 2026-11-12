@@ -82,7 +82,7 @@ export function getSignInNextStep(signIn: SignInNextStepInput): NextStep {
  * @internal
  */
 export function getSignUpNextStep(signUp: SignUpNextStepInput): NextStep {
-  if (!signUp.id || signUp.status === null) {
+  if (!signUp.id) {
     return { type: 'start' };
   }
   if (signUp.status === 'complete') {

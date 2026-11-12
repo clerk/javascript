@@ -112,7 +112,11 @@ describe('getSignInNextStep', () => {
 
 describe('getSignUpNextStep', () => {
   it('returns start before the sign-up is created', () => {
-    expect(getSignUpNextStep(signUp({ status: null }))).toEqual({ type: 'start' });
+    expect(getSignUpNextStep(signUp({ id: undefined, status: null }))).toEqual({ type: 'start' });
+  });
+
+  it('returns unknown for a created sign-up with no status', () => {
+    expect(getSignUpNextStep(signUp({ status: null }))).toEqual({ type: 'unknown' });
   });
 
   it('returns start for a sign-up future that has not been created', () => {
