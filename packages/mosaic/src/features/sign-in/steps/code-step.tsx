@@ -48,7 +48,7 @@ export function CodeStep({
       globalErrorMessage={globalErrorMessage}
       isPending={isPending}
       resend={resend}
-      identityPreview={
+      identity={
         identity.identifier ? (
           <SignInIdentityPreview
             identifier={identity.identifier}

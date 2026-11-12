@@ -35,7 +35,7 @@ interface VerificationCodeProps {
   globalErrorMessage?: string;
   isPending?: boolean;
   resend?: VerificationCodeResend;
-  identityPreview?: ReactNode;
+  identity?: ReactNode;
   notice?: string;
   onValueChange: (value: string) => void;
   onComplete?: (value: string) => void;
@@ -52,7 +52,7 @@ export function VerificationCode({
   globalErrorMessage,
   isPending = false,
   resend,
-  identityPreview,
+  identity,
   notice,
   onValueChange,
   onComplete,
@@ -76,7 +76,7 @@ export function VerificationCode({
       <Card.Header>
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
-        {identityPreview}
+        {identity}
       </Card.Header>
       <Card.Banner
         role='alert'
