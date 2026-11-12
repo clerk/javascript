@@ -39,3 +39,18 @@ scenario.setScenario(scenario.UserButtonLoggedIn);
 ```
 
 Like `setProps`, this command will persist the active scenario to the URL.
+
+You can also pick a scenario from the **Scenario** folder in the Controls pane. Choosing **None (live API)** turns mocking off.
+
+### Protect scenarios
+
+These scenarios mock the responses the Clerk API returns when Clerk Protect blocks or challenges a sign-in or sign-up, so you can see what `<SignIn />` and `<SignUp />` render. Open `/sign-in` or `/sign-up`, activate one, and submit the form with any email address.
+
+| Scenario                        | What the mocked API does                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------- |
+| `ProtectBlockedGeneric`         | Blocks the first submit with the default message.                                           |
+| `ProtectBlockedOutdatedClerkJS` | Blocks the first submit with the outdated ClerkJS message and link.                         |
+| `ProtectBlockedNetwork`         | Blocks the first sign-up submit with the network message.                                   |
+| `ProtectBlockedAtVerification`  | Accepts the first submit, then blocks the password or email code submit.                    |
+| `ProtectChallenge`              | Requires a challenge after the first submit. A stand-in challenge lets you pass or fail it. |
+| `ProtectChallengeThenBlocked`   | Requires a challenge after the first submit, then blocks once it is solved.                 |

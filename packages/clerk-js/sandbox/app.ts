@@ -253,6 +253,7 @@ async function initControls() {
   PARAMS.localization = sessionStorage.getItem('localization') ?? OTHER_DEFAULTS.localization;
   PARAMS.elevation = sessionStorage.getItem('elevation') ?? OTHER_DEFAULTS.elevation;
   PARAMS.devWarnings = sessionStorage.getItem('devWarnings') !== 'off';
+  PARAMS.scenario = localStorage.getItem(`${COMPONENT_PROPS_NAMESPACE}-scenario`) ?? '';
 
   const pane = new Pane({ title: 'Controls', expanded: false });
 
@@ -370,6 +371,16 @@ async function initControls() {
     applyLocalization();
     applyAppearanceOptions();
   });
+
+  const scenarioFolder = pane.addFolder({ title: 'Scenario', expanded: true });
+  scenarioFolder
+    .addBinding(PARAMS, 'scenario', {
+      label: 'Mocked API',
+      options: { 'None (live API)': '', ...Object.fromEntries(AVAILABLE_SCENARIOS.map(name => [name, name])) },
+    })
+    .on('change', (ev: any) => {
+      setScenario((ev.value as AvailableScenario) || null);
+    });
 
   // Page folder
   const pageFolder = pane.addFolder({ title: 'Page', expanded: false });
