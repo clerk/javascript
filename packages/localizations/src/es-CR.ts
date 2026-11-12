@@ -2097,6 +2097,7 @@ export const esCR: LocalizationResource = {
       'El registro falló debido a fallos en la validación de seguridad. Por favor, recarga la página o contáctanos para obtener más asistencia.',
     captcha_unavailable:
       'El registro falló debido a fallos en la validación de robot. Por favor, recarga la página o contáctanos para obtener más asistencia.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Código incorrecto.',
     form_email_address_blocked:
       'Los servicios de correo electrónico temporal no están soportados. Por favor, use su dirección de correo electrónico regular para crear una cuenta.',
@@ -2173,9 +2174,11 @@ export const esCR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'No se puede encontrar la extension de la billetera Web3. Instala una para continuar',
     web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',

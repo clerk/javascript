@@ -2143,6 +2143,7 @@ export const enUS: LocalizationResource = {
     captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+    external_account_not_found: 'Account not found. Please sign up or try signing in to a different account.',
     form_code_incorrect: undefined,
     form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
@@ -2224,11 +2225,13 @@ export const enUS: LocalizationResource = {
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    signup_rate_limit_exceeded: 'Too many requests. Please try again in a bit.',
     sso_bypass_domain_not_served:
       'This member could not be added because their email address is not served by a connection.',
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',
+    too_many_requests: 'Too many requests. Please try again in a bit.',
     too_many_unverified_identifications:
       'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',

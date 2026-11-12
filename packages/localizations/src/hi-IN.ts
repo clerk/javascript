@@ -2106,6 +2106,7 @@ export const hiIN: LocalizationResource = {
       'असफल सुरक्षा सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     captcha_unavailable:
       'असफल बॉट सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'अस्थायी ईमेल सेवाएं समर्थित नहीं हैं। कृपया खाता बनाने के लिए अपना नियमित ईमेल पता उपयोग करें।',
@@ -2187,9 +2188,11 @@ export const hiIN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 वॉलेट एक्सटेंशन नहीं मिल सका। जारी रखने के लिए कृपया एक इंस्टॉल करें।',
     web3_signature_request_rejected:

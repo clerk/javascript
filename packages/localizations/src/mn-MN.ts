@@ -2089,6 +2089,7 @@ export const mnMN: LocalizationResource = {
       'Аюулгүй байдлын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Маягтын код буруу байна',
     form_email_address_blocked:
       'Түр зуурын имэйл үйлчилгээг дэмжихгүй. Данс үүсгэхийн тулд ердийн имэйл хаягаа ашиглана уу.',
@@ -2163,9 +2164,11 @@ export const mnMN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:

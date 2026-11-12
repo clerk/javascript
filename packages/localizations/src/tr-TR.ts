@@ -2090,6 +2090,7 @@ export const trTR: LocalizationResource = {
       'Güvenlik doğrulamalarındaki hatalar nedeniyle kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     captcha_unavailable:
       'Bot doğrulaması başarısız olduğu için kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Hatalı kod.',
     form_email_address_blocked:
       'Geçici e-posta hizmetleri desteklenmemektedir. Lütfen hesap oluşturmak için normal e-posta adresinizi kullanın.',
@@ -2165,9 +2166,11 @@ export const trTR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Zaten giriş yapmışsınız.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',

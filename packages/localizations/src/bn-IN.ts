@@ -2106,6 +2106,7 @@ export const bnIN: LocalizationResource = {
       'নিরাপত্তা যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     captcha_unavailable:
       'বট যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'অস্থায়ী ইমেইল পরিষেবাগুলি সমর্থিত নয়। অনুগ্রহ করে অ্যাকাউন্ট তৈরি করতে আপনার নিয়মিত ইমেইল ঠিকানা ব্যবহার করুন।',
@@ -2186,9 +2187,11 @@ export const bnIN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'একটি Web3 ওয়ালেট এক্সটেনশন পাওয়া যায়নি। চালিয়ে যেতে দয়া করে একটি ইনস্টল করুন।',
     web3_signature_request_rejected:
