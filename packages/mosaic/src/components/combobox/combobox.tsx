@@ -17,7 +17,7 @@ import { focusOutline } from '../../styles/focus-outline.styles';
 import { inputStyles } from '../../styles/input.styles';
 import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
-import { useOptionalFieldControlProps } from '../field/field.context';
+import { useOptionalFieldContext, useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
@@ -40,6 +40,7 @@ const ComboboxAnchorContext = React.createContext<{
 const ComboboxInChipsContext = React.createContext(false);
 
 export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
+  const fieldDisabled = useOptionalFieldContext()?.disabled;
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
   const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
   return (
@@ -48,6 +49,7 @@ export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props
         sideOffset={sideOffset}
         openOnInputClick={openOnInputClick}
         {...props}
+        disabled={props.disabled ?? fieldDisabled}
       />
     </ComboboxAnchorContext.Provider>
   );

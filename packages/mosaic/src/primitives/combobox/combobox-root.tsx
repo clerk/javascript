@@ -47,6 +47,8 @@ interface ComboboxBaseProps {
   inline?: boolean;
   /** Opens the popup when the input is clicked. Has no effect with `inline`. */
   openOnInputClick?: boolean;
+  /** Disables the input, the options, the chips and the buttons, so the selection can't change. */
+  disabled?: boolean;
 }
 
 export interface ComboboxSingleProps extends ComboboxBaseProps {
@@ -78,6 +80,7 @@ function toValues(value: string | null | undefined): string[] | undefined {
 function ComboboxInner(props: ComboboxProps) {
   const { placement: placementProp = 'bottom-start', sideOffset = 4, children } = props;
   const multiple = props.multiple === true;
+  const disabled = props.disabled === true;
   const onSingleValueChange = props.multiple ? undefined : props.onValueChange;
   const onMultipleValueChange = props.multiple ? props.onValueChange : undefined;
 
@@ -262,6 +265,9 @@ function ComboboxInner(props: ComboboxProps) {
 
   const handleSelect = useCallback(
     (value: string, index: number, label: string) => {
+      if (disabled) {
+        return;
+      }
       labelsByValueRef.current.set(value, label);
       if (multiple) {
         const next = selectedValues.includes(value)
@@ -283,18 +289,21 @@ function ComboboxInner(props: ComboboxProps) {
       setActiveIndex(null);
       setOpen(false);
     },
-    [multiple, selectedValues, inputValue, props.inline, setSelectedValues, setInputValue, setOpen],
+    [disabled, multiple, selectedValues, inputValue, props.inline, setSelectedValues, setInputValue, setOpen],
   );
 
   const removeValue = useCallback(
     (value: string) => {
+      if (disabled) {
+        return;
+      }
       const next = selectedValues.filter(selected => selected !== value);
       setSelectedValues(next);
       if (next.length === 0) {
         setSelectedIndex(null);
       }
     },
-    [selectedValues, setSelectedValues],
+    [disabled, selectedValues, setSelectedValues],
   );
 
   const handleInputChange = useCallback(
@@ -317,13 +326,16 @@ function ComboboxInner(props: ComboboxProps) {
   );
 
   const clear = useCallback(() => {
+    if (disabled) {
+      return;
+    }
     setQueryChanged(false);
     setInputValue('');
     setSelectedValues([]);
     setSelectedIndex(null);
     setActiveIndex(null);
     focusInput();
-  }, [focusInput, setInputValue, setSelectedValues]);
+  }, [disabled, focusInput, setInputValue, setSelectedValues]);
 
   const contextValue = useMemo<ComboboxContextValue>(
     () => ({
@@ -332,6 +344,7 @@ function ComboboxInner(props: ComboboxProps) {
       inputValue,
       filterQuery,
       multiple,
+      disabled,
       selectedValues,
       labelsByValueRef,
       removeValue,
@@ -365,6 +378,7 @@ function ComboboxInner(props: ComboboxProps) {
       inputValue,
       filterQuery,
       multiple,
+      disabled,
       selectedValues,
       removeValue,
       floatingContext,
@@ -393,8 +407,9 @@ function ComboboxInner(props: ComboboxProps) {
       valuesByIndexRef,
       registerSelectedIndex,
       registerOption,
+      disabled,
     }),
-    [getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+    [getItemProps, handleSelect, refs, registerSelectedIndex, registerOption, disabled],
   );
 
   const highlightContextValue = useMemo<ComboboxHighlightContextValue>(

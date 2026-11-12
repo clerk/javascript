@@ -23,6 +23,7 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
     valuesByIndexRef,
     selectedValues,
     removeValue,
+    disabled,
   } = useComboboxContext();
   const chips = useContext(ComboboxChipsContext);
   const { previousKey } = readingDirectionKeys(useDirection());
@@ -32,6 +33,7 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
   const defaultProps = {
     ...getReferenceProps({
       value: inputValue,
+      disabled,
       'aria-autocomplete': 'list' as const,
       onChange(event: React.ChangeEvent<HTMLInputElement>) {
         handleInputChange(event.target.value);

@@ -42,9 +42,17 @@ interface ComboboxOptionBodyProps extends ComboboxOptionProps {
 
 const ComboboxOptionBody = React.memo(function ComboboxOptionBody(bodyProps: ComboboxOptionBodyProps) {
   const { forwardedRef: ref, listItemRef: itemRef, index, isActive, isSelected, isAnchor, ...props } = bodyProps;
-  const { render, value, label, disabled, ...otherProps } = props;
-  const { getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, registerOption, refs } =
-    useComboboxOptionsContext();
+  const { render, value, label, disabled: disabledProp, ...otherProps } = props;
+  const {
+    getItemProps,
+    handleSelect,
+    valuesByIndexRef,
+    registerSelectedIndex,
+    registerOption,
+    refs,
+    disabled: rootDisabled,
+  } = useComboboxOptionsContext();
+  const disabled = disabledProp === true || rootDisabled;
 
   const id = useId();
   const displayLabel = label ?? value;
@@ -65,7 +73,7 @@ const ComboboxOptionBody = React.memo(function ComboboxOptionBody(bodyProps: Com
   const state = {
     selected: isSelected,
     active: isActive,
-    disabled: !!disabled,
+    disabled,
   };
 
   const ownProps = {

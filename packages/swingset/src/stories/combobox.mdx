@@ -16,7 +16,8 @@ import * as ComboboxStories from './combobox.stories';
 Set `multiple` to let several options be picked. `value` is then an array in pick order. Picking an
 option toggles it, clears the search and keeps the popup open. `Combobox.Value` passes the selected
 values to its children, so each one can render as a `Chip`. Backspace in an empty input removes the
-last chip, and the left arrow moves from the input to the chips.
+last chip, and the left arrow moves from the input to the chips. Set `disabled` on the root, or on an
+enclosing `Field.Root`, to lock the input, the options, the chips and the buttons.
 
 <Story
   name='Multiple'

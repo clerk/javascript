@@ -15,6 +15,7 @@ export interface ComboboxContextValue {
   inputValue: string;
   filterQuery: string;
   multiple: boolean;
+  disabled: boolean;
   selectedValues: string[];
   labelsByValueRef: React.MutableRefObject<Map<string, string>>;
   removeValue: (value: string) => void;
@@ -60,6 +61,7 @@ export interface ComboboxOptionsContextValue {
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   registerSelectedIndex: (index: number, value: string, label: string, selected: boolean) => (() => void) | undefined;
   registerOption: (index: number) => void;
+  disabled: boolean;
 }
 
 export interface ComboboxHighlightContextValue {

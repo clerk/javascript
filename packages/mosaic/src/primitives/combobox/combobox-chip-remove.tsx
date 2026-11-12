@@ -11,12 +11,13 @@ export type ComboboxChipRemoveProps = ComponentProps<'button'>;
 export const ComboboxChipRemove = React.forwardRef<HTMLButtonElement, ComboboxChipRemoveProps>(
   function ComboboxChipRemove(props, ref) {
     const { render, ...otherProps } = props;
-    const { removeValue, focusInput } = useComboboxContext();
+    const { removeValue, focusInput, disabled } = useComboboxContext();
     const value = useComboboxChipValue();
 
     const defaultProps = {
       type: 'button',
       tabIndex: -1,
+      disabled,
       onPointerDown(event: React.PointerEvent<HTMLButtonElement>) {
         event.preventDefault();
       },
@@ -30,6 +31,10 @@ export const ComboboxChipRemove = React.forwardRef<HTMLButtonElement, ComboboxCh
       defaultTagName: 'button',
       render,
       ref,
+      state: { disabled },
+      stateAttributesMapping: {
+        disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
+      },
       props: mergeProps<'button'>(defaultProps, otherProps),
     });
   },

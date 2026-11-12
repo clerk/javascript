@@ -10,12 +10,13 @@ export type ComboboxClearProps = ComponentProps<'button'>;
 export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearProps>(
   function ComboboxClear(props, ref) {
     const { render, ...otherProps } = props;
-    const { inputValue, selectedValues, clear } = useComboboxContext();
+    const { inputValue, selectedValues, clear, disabled } = useComboboxContext();
 
     const defaultProps = {
       type: 'button',
       tabIndex: -1,
       'aria-label': 'Clear',
+      disabled,
       onPointerDown(event: React.PointerEvent<HTMLButtonElement>) {
         event.preventDefault();
       },
@@ -28,6 +29,10 @@ export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearPr
       defaultTagName: 'button',
       render,
       ref,
+      state: { disabled },
+      stateAttributesMapping: {
+        disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
+      },
       props: mergeProps<'button'>(defaultProps, otherProps),
     });
 

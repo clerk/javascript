@@ -10,12 +10,13 @@ export type ComboboxTriggerProps = ComponentProps<'button'>;
 export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
   function ComboboxTrigger(props, ref) {
     const { render, ...otherProps } = props;
-    const { open, setOpen, focusInput, popupId, triggerRef } = useComboboxContext();
-    const state = { open };
+    const { open, setOpen, focusInput, popupId, triggerRef, disabled } = useComboboxContext();
+    const state = { open, disabled };
 
     const defaultProps = {
       type: 'button',
       tabIndex: -1,
+      disabled,
       'aria-controls': popupId,
       'aria-expanded': open,
       'aria-haspopup': 'listbox',
@@ -35,6 +36,7 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
       state,
       stateAttributesMapping: {
         open: (value: boolean): Record<string, string> | null => (value ? { 'data-open': '' } : { 'data-closed': '' }),
+        disabled: (value: boolean) => (value ? { 'data-disabled': '' } : null),
       },
       props: mergeProps<'button'>(defaultProps, otherProps),
     });

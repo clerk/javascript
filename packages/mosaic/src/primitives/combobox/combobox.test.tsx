@@ -896,6 +896,8 @@ describe('Combobox multiple', () => {
     defaultValue?: string[];
     onValueChange?: (value: string[]) => void;
     chips?: boolean;
+    disabled?: boolean;
+    open?: boolean;
   }) {
     const { chips = true, ...rootProps } = props;
     return (
@@ -1131,6 +1133,63 @@ describe('Combobox multiple', () => {
     await user.click(screen.getByRole('button', { name: 'Clear' }));
     expect(screen.getByTestId('count')).toHaveTextContent('None');
     expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
+  });
+
+  describe('disabled', () => {
+    it('disables the input, the chip removers, the trigger and Clear', () => {
+      render(
+        <Multiple
+          defaultValue={['apple']}
+          disabled
+        />,
+      );
+      expect(screen.getByRole('combobox')).toBeDisabled();
+      for (const name of ['Remove Apple', 'Show fruits', 'Clear']) {
+        const button = screen.getByRole('button', { name });
+        expect(button).toBeDisabled();
+        expect(button).toHaveAttribute('data-disabled');
+      }
+      expect(screen.getByTestId('chip')).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('ignores Backspace, Delete and ArrowDown on a focused chip', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      render(
+        <Multiple
+          defaultValue={['apple', 'banana']}
+          onValueChange={onValueChange}
+          disabled
+        />,
+      );
+      const [apple, banana] = screen.getAllByTestId('chip');
+      apple?.focus();
+      await user.keyboard('{Backspace}');
+      banana?.focus();
+      await user.keyboard('{Delete}');
+      await user.keyboard('{ArrowDown}');
+      expect(chipNames()).toEqual(['Apple', 'Banana']);
+      expect(onValueChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('keeps the selection when an option is clicked', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      render(
+        <Multiple
+          defaultValue={['apple']}
+          onValueChange={onValueChange}
+          open
+          disabled
+        />,
+      );
+      const cherry = screen.getByRole('option', { name: 'Cherry' });
+      expect(cherry).toHaveAttribute('aria-disabled', 'true');
+      await user.click(cherry);
+      expect(chipNames()).toEqual(['Apple']);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
   });
 
   it('keeps the controlled selection when the parent rejects a change', async () => {

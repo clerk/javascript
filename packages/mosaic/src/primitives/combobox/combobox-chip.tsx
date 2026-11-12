@@ -13,7 +13,7 @@ export interface ComboboxChipProps extends ComponentProps<'div'> {
 export const ComboboxChip = React.forwardRef<HTMLDivElement, ComboboxChipProps>(function ComboboxChip(props, ref) {
   const { render, value, ...otherProps } = props;
   const { registerChip, navigate, removeChip } = useComboboxChipsContext();
-  const { setOpen, focusInput } = useComboboxContext();
+  const { setOpen, focusInput, disabled } = useComboboxContext();
 
   const registerRef = useCallback(
     (element: HTMLDivElement | null) => registerChip(value, element),
@@ -22,17 +22,24 @@ export const ComboboxChip = React.forwardRef<HTMLDivElement, ComboboxChipProps>(
 
   const defaultProps = {
     tabIndex: -1,
+    'aria-disabled': disabled || undefined,
     onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
       if (event.target !== event.currentTarget) {
         return;
       }
       if (event.key === 'Backspace' || event.key === 'Delete') {
         event.preventDefault();
+        if (disabled) {
+          return;
+        }
         removeChip(value, event.key === 'Backspace' ? 'previous' : 'next');
         return;
       }
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault();
+        if (disabled) {
+          return;
+        }
         setOpen(true);
         focusInput();
         return;
@@ -49,6 +56,10 @@ export const ComboboxChip = React.forwardRef<HTMLDivElement, ComboboxChipProps>(
     defaultTagName: 'div',
     render,
     ref: [registerRef, ref],
+    state: { disabled },
+    stateAttributesMapping: {
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
+    },
     props: mergeProps<'div'>(defaultProps, otherProps),
   });
 
