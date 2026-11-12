@@ -11,6 +11,52 @@ import * as ComboboxStories from './combobox.stories';
 
 `value` is the selected option; `inputValue` is the search text. Clearing the input clears the selection.
 
+## Multiple
+
+Set `multiple` to let several options be picked. `value` is then an array in pick order. Picking an
+option toggles it, clears the search and keeps the popup open. `Combobox.Value` passes the selected
+values to its children, so each one can render as a `Chip`. Backspace in an empty input removes the
+last chip, and the left arrow moves from the input to the chips. Set `disabled` on the root, or on an
+enclosing `Field.Root`, to lock the input, the options, the chips and the buttons.
+
+<Story
+  name='Multiple'
+  storyModule={ComboboxStories}
+/>
+
+Chips are optional. Like `Select.Value`, `Combobox.Value` takes a function of the selected values,
+so a plain input can show a count instead.
+
+<Story
+  name='MultipleCount'
+  storyModule={ComboboxStories}
+/>
+
+```tsx
+<Combobox.Root multiple defaultValue={['apple', 'cherry']}>
+  <InputGroup.Root>
+    <Combobox.Input placeholder='Search fruit…' />
+    <InputGroup.End>
+      <Combobox.Value>{value => (value.length > 0 ? `${value.length} selected` : null)}</Combobox.Value>
+      <Combobox.Clear aria-label='Clear fruits' />
+      <Combobox.Trigger aria-label='Toggle fruit options' />
+    </InputGroup.End>
+  </InputGroup.Root>
+  {/* popup */}
+</Combobox.Root>
+```
+
+## Always open
+
+For a picker that sits in the page, set `inline` and `open` and render `List` in place of `Popup`.
+Picking keeps the list open. To hide picked options, as below, control `value` and filter them out of
+`items`.
+
+<Story
+  name='AlwaysOpen'
+  storyModule={ComboboxStories}
+/>
+
 ## Inline lists
 
 Use `List` inside an existing popover. Set `inline` and bind the root's open state to that popover
@@ -45,14 +91,17 @@ so closing resets the search, not the selection.
 
 ## Parts
 
-| Part                  | Description                                                                 |
-| --------------------- | --------------------------------------------------------------------------- |
-| `Combobox.Root`       | Owns input, selection, open state, and keyboard navigation.                 |
-| `Combobox.Input`      | Search input; renders Mosaic `Input` unless composed through another input. |
-| `Combobox.Trigger`    | Opens and closes the option list while keeping focus on the input.          |
-| `Combobox.Clear`      | Empties the input and selection; shown only while there is a value.         |
-| `Combobox.Popup`      | Portals, positions, surfaces, and scrolls a floating option list.           |
-| `Combobox.List`       | Scrollable inline listbox.                                                  |
-| `Combobox.Collection` | Filters items and renders each option, with an optional empty state.        |
-| `Combobox.Option`     | Selectable option with active, selected, and disabled states.               |
-| `Combobox.Empty`      | Empty result message.                                                       |
+| Part                  | Description                                                                  |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `Combobox.Root`       | Owns input, selection, open state, and keyboard navigation.                  |
+| `Combobox.Chips`      | Field for `multiple`; holds the chips and the input, and anchors the popup.  |
+| `Combobox.Value`      | Selected labels, or a function of the selected values.                       |
+| `Combobox.Chip`       | One selected value with a remove button; removable with Backspace or Delete. |
+| `Combobox.Input`      | Search input; renders Mosaic `Input` unless composed through another input.  |
+| `Combobox.Trigger`    | Opens and closes the option list while keeping focus on the input.           |
+| `Combobox.Clear`      | Empties the input and selection; shown only while there is a value.          |
+| `Combobox.Popup`      | Portals, positions, surfaces, and scrolls a floating option list.            |
+| `Combobox.List`       | Scrollable inline listbox.                                                   |
+| `Combobox.Collection` | Filters items and renders each option, with an optional empty state.         |
+| `Combobox.Option`     | Selectable option with active, selected, and disabled states.                |
+| `Combobox.Empty`      | Empty result message.                                                        |

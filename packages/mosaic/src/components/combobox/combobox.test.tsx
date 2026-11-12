@@ -425,4 +425,50 @@ describe('Mosaic Combobox', () => {
     await user.click(trigger);
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
+
+  it('locks a multiple combobox inside a disabled Field', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Field.Root disabled>
+        <Field.Label>Fruits</Field.Label>
+        <Combobox.Root
+          multiple
+          inline
+          open
+          defaultValue={['apple']}
+          onValueChange={onValueChange}
+        >
+          <Combobox.Chips>
+            <Combobox.Value>
+              {values =>
+                values.map(value => (
+                  <Combobox.Chip
+                    key={value}
+                    value={value}
+                    removeLabel={`Remove ${value}`}
+                  >
+                    {value}
+                  </Combobox.Chip>
+                ))
+              }
+            </Combobox.Value>
+            <Combobox.Input />
+          </Combobox.Chips>
+          <Combobox.List>
+            <Combobox.Option
+              value='banana'
+              label='Banana'
+            >
+              Banana
+            </Combobox.Option>
+          </Combobox.List>
+        </Combobox.Root>
+      </Field.Root>,
+    );
+    expect(screen.getByRole('combobox', { name: 'Fruits' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Remove apple' })).toBeDisabled();
+    await user.click(screen.getByRole('option', { name: 'Banana' }));
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
 });

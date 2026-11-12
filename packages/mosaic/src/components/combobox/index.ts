@@ -1,5 +1,7 @@
 export {
   Combobox,
+  ComboboxChip,
+  ComboboxChips,
   ComboboxClear,
   ComboboxCollection,
   ComboboxEmpty,
@@ -10,8 +12,11 @@ export {
   ComboboxPopup,
   ComboboxRoot,
   ComboboxTrigger,
+  ComboboxValue,
 } from './combobox';
 export type {
+  ComboboxChipProps,
+  ComboboxChipsProps,
   ComboboxClearProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
@@ -22,4 +27,5 @@ export type {
   ComboboxRootProps,
   ComboboxSize,
   ComboboxTriggerProps,
+  ComboboxValueProps,
 } from './combobox';

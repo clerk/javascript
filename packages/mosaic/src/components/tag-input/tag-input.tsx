@@ -12,6 +12,7 @@ import type {
 import { TagInput as Primitive } from '../../primitives/tag-input';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { chipStyles } from '../../styles/chip.styles';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { inputStyles } from '../../styles/input.styles';
 import { reset } from '../../styles/reset.styles';
@@ -55,15 +56,15 @@ function Tags({ removeLabel, itemProps }: { removeLabel: (value: string) => stri
       {...itemProps}
       {...mergeStyleProps(
         themeProps('tag-input-tag', { invalid: tag.invalid, disabled }),
-        stylex.props(reset.base, focusOutline.visible, styles.tag, tag.invalid && styles.tagInvalid),
+        stylex.props(reset.base, focusOutline.visible, chipStyles.chip, tag.invalid && styles.tagInvalid),
       )}
     >
-      <span {...mergeStyleProps(themeProps('tag-input-tag-label'), stylex.props(reset.base, styles.tagLabel))}>
+      <span {...mergeStyleProps(themeProps('tag-input-tag-label'), stylex.props(reset.base, chipStyles.label))}>
         {tag.value}
       </span>
       <Primitive.TagRemove
         aria-label={removeLabel(tag.value)}
-        {...mergeStyleProps(themeProps('tag-input-tag-remove'), stylex.props(reset.base, styles.tagRemove))}
+        {...mergeStyleProps(themeProps('tag-input-tag-remove'), stylex.props(reset.base, chipStyles.remove))}
       >
         <Icon
           glyph={X}
@@ -88,7 +89,7 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(function Mo
       required={required && value.length === 0}
       aria-required={required || undefined}
       {...itemProps}
-      {...mergeStyleProps(themeProps('tag-input-input'), stylex.props(reset.base, styles.input), rest)}
+      {...mergeStyleProps(themeProps('tag-input-input'), stylex.props(reset.base, chipStyles.input), rest)}
     />
   );
 });
@@ -154,7 +155,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
       focusableWhenDisabled={fieldProps?.focusableWhenDisabled}
       {...mergeStyleProps(
         themeProps('tag-input', { disabled, invalid }),
-        stylex.props(reset.base, inputStyles.group, styles.root, disabled && styles.disabled, xstyle),
+        stylex.props(reset.base, inputStyles.group, chipStyles.field, disabled && styles.disabled, xstyle),
       )}
     >
       <Primitive.List {...mergeStyleProps(themeProps('tag-input-list'), stylex.props(reset.base, styles.list))}>

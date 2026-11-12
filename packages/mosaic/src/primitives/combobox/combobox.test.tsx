@@ -885,3 +885,327 @@ describe('Combobox selection in a transition', () => {
     expect(screen.getByRole('option', { name: 'Banana' })).not.toHaveAttribute('data-active');
   });
 });
+
+describe('Combobox multiple', () => {
+  function labelOf(value: string) {
+    return fruits.find(fruit => fruit.value === value)?.label ?? value;
+  }
+
+  function Multiple(props: {
+    value?: string[];
+    defaultValue?: string[];
+    onValueChange?: (value: string[]) => void;
+    chips?: boolean;
+    disabled?: boolean;
+    open?: boolean;
+  }) {
+    const { chips = true, ...rootProps } = props;
+    return (
+      <Combobox.Root
+        multiple
+        {...rootProps}
+      >
+        {chips ? (
+          <Combobox.Chips aria-label='Selected fruits'>
+            <Combobox.Value>
+              {values =>
+                values.map(value => (
+                  <Combobox.Chip
+                    key={value}
+                    value={value}
+                    aria-label={labelOf(value)}
+                    data-testid='chip'
+                  >
+                    {labelOf(value)}
+                    <Combobox.ChipRemove aria-label={`Remove ${labelOf(value)}`} />
+                  </Combobox.Chip>
+                ))
+              }
+            </Combobox.Value>
+            <Combobox.Input aria-label='Fruits' />
+          </Combobox.Chips>
+        ) : (
+          <>
+            <span data-testid='value'>
+              <Combobox.Value placeholder='No fruits' />
+            </span>
+            <Combobox.Input aria-label='Fruits' />
+          </>
+        )}
+        <Combobox.Trigger aria-label='Show fruits' />
+        <Combobox.Clear />
+        <Combobox.Positioner>
+          <Combobox.Popup>
+            <Combobox.Collection
+              items={fruits}
+              itemToStringLabel={fruit => fruit.label}
+            >
+              {fruit => (
+                <Combobox.Option
+                  key={fruit.value}
+                  value={fruit.value}
+                  label={fruit.label}
+                >
+                  {fruit.label}
+                </Combobox.Option>
+              )}
+            </Combobox.Collection>
+          </Combobox.Popup>
+        </Combobox.Positioner>
+        <button type='button'>Outside</button>
+      </Combobox.Root>
+    );
+  }
+
+  function chipNames() {
+    return Array.from(screen.queryAllByTestId('chip'), chip => chip.getAttribute('aria-label'));
+  }
+
+  it('toggles options in pick order and keeps the popup open', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Multiple onValueChange={onValueChange} />);
+    await user.click(screen.getByRole('button', { name: 'Show fruits' }));
+    expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
+
+    await user.click(screen.getByRole('option', { name: 'Cherry' }));
+    await user.click(screen.getByRole('option', { name: 'Apple' }));
+    expect(onValueChange).toHaveBeenLastCalledWith(['cherry', 'apple']);
+    expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('combobox')).toHaveFocus();
+    expect(chipNames()).toEqual(['Cherry', 'Apple']);
+
+    await user.click(screen.getByRole('option', { name: 'Cherry' }));
+    expect(onValueChange).toHaveBeenLastCalledWith(['apple']);
+    expect(chipNames()).toEqual(['Apple']);
+  });
+
+  it('clears the query after a pick from a filtered list and keeps that option highlighted', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Multiple onValueChange={onValueChange} />);
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'ch');
+    expect(screen.getAllByRole('option')).toHaveLength(1);
+    await user.keyboard('{Enter}');
+
+    expect(onValueChange).toHaveBeenLastCalledWith(['cherry']);
+    expect(input).toHaveValue('');
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getAllByRole('option')).toHaveLength(fruits.length);
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('data-active'));
+  });
+
+  it('never shows a label in the input and drops the query on close', async () => {
+    const user = userEvent.setup();
+    render(<Multiple defaultValue={['banana']} />);
+    const input = screen.getByRole('combobox');
+    const outside = screen.getByRole('button', { name: 'Outside' });
+    expect(input).toHaveValue('');
+    await user.type(input, 'zz');
+    await user.click(outside);
+    await waitFor(() => expect(input).toHaveValue(''));
+    expect(chipNames()).toEqual(['Banana']);
+  });
+
+  it('shows the placeholder, then the selected labels joined with commas', async () => {
+    const user = userEvent.setup();
+    render(<Multiple chips={false} />);
+    expect(screen.getByTestId('value')).toHaveTextContent('No fruits');
+    await user.click(screen.getByRole('button', { name: 'Show fruits' }));
+    await user.click(screen.getByRole('option', { name: 'Banana' }));
+    await user.click(screen.getByRole('option', { name: 'Apple' }));
+    expect(screen.getByTestId('value')).toHaveTextContent('Banana, Apple');
+  });
+
+  it('removes the last chip with Backspace in an empty input only', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Multiple
+        defaultValue={['apple', 'banana']}
+        onValueChange={onValueChange}
+      />,
+    );
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'x');
+    await user.keyboard('{Backspace}');
+    expect(onValueChange).not.toHaveBeenCalled();
+    await user.keyboard('{Backspace}');
+    expect(onValueChange).toHaveBeenLastCalledWith(['apple']);
+    expect(chipNames()).toEqual(['Apple']);
+    expect(input).toHaveFocus();
+  });
+
+  it('moves between the chips and the input with the arrow keys', async () => {
+    const user = userEvent.setup();
+    render(<Multiple defaultValue={['apple', 'banana']} />);
+    const input = screen.getByRole('combobox');
+    await user.type(input, 'a');
+    await user.keyboard('{ArrowLeft}');
+    expect(input).toHaveFocus();
+    await user.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toHaveAttribute('aria-label', 'Banana');
+    await user.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toHaveAttribute('aria-label', 'Apple');
+    await user.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toHaveAttribute('aria-label', 'Apple');
+    await user.keyboard('{ArrowRight}{ArrowRight}');
+    expect(input).toHaveFocus();
+  });
+
+  it('removes a focused chip and moves focus to its neighbour', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Multiple
+        defaultValue={['apple', 'banana', 'cherry']}
+        onValueChange={onValueChange}
+      />,
+    );
+    const input = screen.getByRole('combobox');
+    await user.click(input);
+    await user.keyboard('{Escape}{ArrowLeft}{ArrowLeft}');
+    expect(document.activeElement).toHaveAttribute('aria-label', 'Banana');
+
+    await user.keyboard('{Backspace}');
+    expect(onValueChange).toHaveBeenLastCalledWith(['apple', 'cherry']);
+    expect(document.activeElement).toHaveAttribute('aria-label', 'Apple');
+
+    await user.keyboard('{Delete}');
+    expect(onValueChange).toHaveBeenLastCalledWith(['cherry']);
+    expect(document.activeElement).toHaveAttribute('aria-label', 'Cherry');
+
+    await user.keyboard('{Delete}');
+    expect(onValueChange).toHaveBeenLastCalledWith([]);
+    expect(input).toHaveFocus();
+  });
+
+  it('removes a chip from its remove button without opening the popup', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Multiple
+        defaultValue={['apple', 'banana']}
+        onValueChange={onValueChange}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: 'Remove Apple' }));
+    expect(onValueChange).toHaveBeenLastCalledWith(['banana']);
+    expect(chipNames()).toEqual(['Banana']);
+    expect(screen.getByRole('combobox')).toHaveFocus();
+    expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('clears every selected value', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Multiple
+        defaultValue={['apple', 'banana']}
+        onValueChange={onValueChange}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(onValueChange).toHaveBeenLastCalledWith([]);
+    expect(chipNames()).toEqual([]);
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
+  });
+
+  it('updates a count from Value when Clear empties the selection', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root
+        multiple
+        defaultValue={['apple', 'cherry']}
+      >
+        <Combobox.Input aria-label='Fruits' />
+        <span data-testid='count'>
+          <Combobox.Value>{value => (value.length > 0 ? `${value.length} selected` : 'None')}</Combobox.Value>
+        </span>
+        <Combobox.Clear />
+      </Combobox.Root>,
+    );
+    expect(screen.getByTestId('count')).toHaveTextContent('2 selected');
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+    expect(screen.getByTestId('count')).toHaveTextContent('None');
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull();
+  });
+
+  describe('disabled', () => {
+    it('disables the input, the chip removers, the trigger and Clear', () => {
+      render(
+        <Multiple
+          defaultValue={['apple']}
+          disabled
+        />,
+      );
+      expect(screen.getByRole('combobox')).toBeDisabled();
+      for (const name of ['Remove Apple', 'Show fruits', 'Clear']) {
+        const button = screen.getByRole('button', { name });
+        expect(button).toBeDisabled();
+        expect(button).toHaveAttribute('data-disabled');
+      }
+      expect(screen.getByTestId('chip')).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('ignores Backspace, Delete and ArrowDown on a focused chip', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      render(
+        <Multiple
+          defaultValue={['apple', 'banana']}
+          onValueChange={onValueChange}
+          disabled
+        />,
+      );
+      const [apple, banana] = screen.getAllByTestId('chip');
+      apple?.focus();
+      await user.keyboard('{Backspace}');
+      banana?.focus();
+      await user.keyboard('{Delete}');
+      await user.keyboard('{ArrowDown}');
+      expect(chipNames()).toEqual(['Apple', 'Banana']);
+      expect(onValueChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('keeps the selection when an option is clicked', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      render(
+        <Multiple
+          defaultValue={['apple']}
+          onValueChange={onValueChange}
+          open
+          disabled
+        />,
+      );
+      const cherry = screen.getByRole('option', { name: 'Cherry' });
+      expect(cherry).toHaveAttribute('aria-disabled', 'true');
+      await user.click(cherry);
+      expect(chipNames()).toEqual(['Apple']);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+  });
+
+  it('keeps the controlled selection when the parent rejects a change', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Multiple
+        value={['apple']}
+        onValueChange={onValueChange}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: 'Show fruits' }));
+    await user.click(screen.getByRole('option', { name: 'Banana' }));
+    await user.click(screen.getByRole('button', { name: 'Remove Apple' }));
+    expect(onValueChange.mock.calls).toEqual([[['apple', 'banana']], [[]]]);
+    expect(chipNames()).toEqual(['Apple']);
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+  });
+});

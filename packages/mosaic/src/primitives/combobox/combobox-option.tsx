@@ -15,7 +15,7 @@ export interface ComboboxOptionProps extends ComponentProps<'div'> {
 
 export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionProps>(
   function ComboboxOption(props, ref) {
-    const { activeIndex, selectedValue } = useComboboxHighlightContext();
+    const { activeIndex, selectedValues } = useComboboxHighlightContext();
     const { ref: itemRef, index } = useListItem({ label: props.label ?? props.value });
     return (
       <ComboboxOptionBody
@@ -24,7 +24,8 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
         listItemRef={itemRef}
         index={index}
         isActive={activeIndex === index}
-        isSelected={selectedValue === props.value}
+        isSelected={selectedValues.includes(props.value)}
+        isAnchor={selectedValues.at(-1) === props.value}
       />
     );
   },
@@ -36,13 +37,22 @@ interface ComboboxOptionBodyProps extends ComboboxOptionProps {
   index: number;
   isActive: boolean;
   isSelected: boolean;
+  isAnchor: boolean;
 }
 
 const ComboboxOptionBody = React.memo(function ComboboxOptionBody(bodyProps: ComboboxOptionBodyProps) {
-  const { forwardedRef: ref, listItemRef: itemRef, index, isActive, isSelected, ...props } = bodyProps;
-  const { render, value, label, disabled, ...otherProps } = props;
-  const { getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, registerOption, refs } =
-    useComboboxOptionsContext();
+  const { forwardedRef: ref, listItemRef: itemRef, index, isActive, isSelected, isAnchor, ...props } = bodyProps;
+  const { render, value, label, disabled: disabledProp, ...otherProps } = props;
+  const {
+    getItemProps,
+    handleSelect,
+    valuesByIndexRef,
+    registerSelectedIndex,
+    registerOption,
+    refs,
+    disabled: rootDisabled,
+  } = useComboboxOptionsContext();
+  const disabled = disabledProp === true || rootDisabled;
 
   const id = useId();
   const displayLabel = label ?? value;
@@ -52,18 +62,18 @@ const ComboboxOptionBody = React.memo(function ComboboxOptionBody(bodyProps: Com
     if (!disabled) {
       map.set(index, value);
     }
-    const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel, isSelected);
+    const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel, isAnchor);
     registerOption(index);
     return () => {
       map.delete(index);
       unregisterSelectedIndex?.();
     };
-  }, [index, value, displayLabel, disabled, isSelected, valuesByIndexRef, registerSelectedIndex, registerOption]);
+  }, [index, value, displayLabel, disabled, isAnchor, valuesByIndexRef, registerSelectedIndex, registerOption]);
 
   const state = {
     selected: isSelected,
     active: isActive,
-    disabled: !!disabled,
+    disabled,
   };
 
   const ownProps = {

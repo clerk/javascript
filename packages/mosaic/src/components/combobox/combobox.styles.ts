@@ -18,6 +18,11 @@ const inset = space['1.5'];
 const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 
 export const styles = stylex.create({
+  chips: {
+    padding: `calc(${space['1']} - 1px)`,
+    gap: space['1'],
+    minHeight: space['8'],
+  },
   positioner: {
     outline: 'none',
   },

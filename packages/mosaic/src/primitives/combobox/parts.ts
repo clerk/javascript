@@ -1,4 +1,13 @@
-export { type ComboboxProps, ComboboxRoot as Root } from './combobox-root';
+export {
+  type ComboboxMultipleProps,
+  type ComboboxProps,
+  type ComboboxSingleProps,
+  ComboboxRoot as Root,
+} from './combobox-root';
+export { type ComboboxValueProps, ComboboxValue as Value } from './combobox-value';
+export { type ComboboxChipsProps, ComboboxChips as Chips } from './combobox-chips';
+export { type ComboboxChipProps, ComboboxChip as Chip } from './combobox-chip';
+export { type ComboboxChipRemoveProps, ComboboxChipRemove as ChipRemove } from './combobox-chip-remove';
 export { type ComboboxCollectionProps, ComboboxCollection as Collection } from './combobox-collection';
 export { type ComboboxInputProps, ComboboxInput as Input } from './combobox-input';
 export { type ComboboxClearProps, ComboboxClear as Clear } from './combobox-clear';
