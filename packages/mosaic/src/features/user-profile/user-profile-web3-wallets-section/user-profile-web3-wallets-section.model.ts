@@ -106,6 +106,18 @@ function walletUnavailable() {
   return new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
 }
 
+function rethrowProviderError(cause: unknown): never {
+  if (typeof cause === 'object' && cause !== null && 'code' in cause) {
+    if (cause.code === 4001) {
+      throw new ClerkRuntimeError('The wallet request was cancelled.', { code: 'web3_connection_cancelled' });
+    }
+    if (cause.code === -32002) {
+      throw new ClerkRuntimeError('An earlier wallet request is still pending.', { code: 'web3_request_pending' });
+    }
+  }
+  throw cause;
+}
+
 export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
@@ -170,7 +182,9 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         code: 'web3_verification_message_unavailable',
       });
     }
-    const signature = await web3.generateWeb3Signature({ identifier, nonce, provider: provider.provider, walletName });
+    const signature = await web3
+      .generateWeb3Signature({ identifier, nonce, provider: provider.provider, walletName })
+      .catch(rethrowProviderError);
     requireCurrentUser();
     if (!signature) {
       throw new ClerkRuntimeError('The wallet signature is unavailable.', { code: 'web3_signature_unavailable' });
@@ -189,7 +203,9 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
       }
       const web3 = createWeb3(manager);
-      const identifier = await web3.getWeb3Identifier({ provider: provider.provider, walletName });
+      const identifier = await web3
+        .getWeb3Identifier({ provider: provider.provider, walletName })
+        .catch(rethrowProviderError);
       if (!identifier) {
         throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
       }
@@ -235,7 +251,9 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         throw walletUnavailable();
       }
       const web3 = createWeb3(manager);
-      const identifier = await web3.getWeb3Identifier({ provider: provider.provider, walletName });
+      const identifier = await web3
+        .getWeb3Identifier({ provider: provider.provider, walletName })
+        .catch(rethrowProviderError);
       if (!identifier) {
         throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
       }

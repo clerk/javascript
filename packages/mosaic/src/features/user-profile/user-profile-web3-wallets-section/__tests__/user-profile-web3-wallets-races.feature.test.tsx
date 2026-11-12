@@ -206,6 +206,7 @@ describe('Web3 wallet selection races', () => {
       await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
       await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['other_wallet']);
+      expect(screen.queryByText('Something went wrong. Please try again.')).toBeNull();
     },
   );
 
