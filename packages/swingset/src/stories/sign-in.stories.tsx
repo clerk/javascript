@@ -598,6 +598,7 @@ function SwitchingIdentifier({ fields }: { fields: readonly SignInIdentifierFiel
   const next = fields.length > 1 ? fields[(index + 1) % fields.length] : undefined;
   return (
     <StepPanel
+      combined={false}
       step={{ kind: 'identifier', field: fields[index], nextField: next }}
       onSwitchField={() => setIndex(current => (current + 1) % fields.length)}
     />
@@ -615,6 +616,7 @@ export function IdentifierUsername() {
 export function IdentifierPasskey() {
   return (
     <StepPanel
+      combined={false}
       step={{ kind: 'identifier', field: 'email' }}
       onPasskey={() => undefined}
     />
@@ -631,6 +633,7 @@ export function IdentifierAlternativePhoneChannel() {
   const [step, setStep] = useState<SignInStep>({ kind: 'identifier', field: 'phone', channel: whatsApp });
   return (
     <StepPanel
+      combined={false}
       step={step}
       providers={[...socialProviders, whatsApp]}
       onSelectProvider={id => {
@@ -646,6 +649,7 @@ export function IdentifierAlternativePhoneChannel() {
 export function IdentifierLastUsed() {
   return (
     <StepPanel
+      combined={false}
       step={{ kind: 'identifier', field: 'email' }}
       providers={[...socialProviders, { id: 'oauth_x', name: 'X', iconUrl: 'https://img.clerk.com/static/x.svg' }]}
       lastUsedProviderId='oauth_github'
@@ -654,7 +658,12 @@ export function IdentifierLastUsed() {
 }
 
 export function IdentifierLastUsedField() {
-  return <StepPanel step={{ kind: 'identifier', field: 'email', lastUsed: true }} />;
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email', lastUsed: true }}
+    />
+  );
 }
 
 export function IdentifierCaptcha() {
@@ -662,7 +671,10 @@ export function IdentifierCaptcha() {
   useTestTurnstile(() => ref.current?.querySelector<HTMLElement>('.cl-captcha'));
   return (
     <div ref={ref}>
-      <StepPanel step={{ kind: 'identifier', field: 'email' }} />
+      <StepPanel
+        combined={false}
+        step={{ kind: 'identifier', field: 'email' }}
+      />
     </div>
   );
 }
