@@ -68,24 +68,25 @@ describe('ProviderIcon', () => {
       expect(styles.backgroundImage).not.toContain(iconUrl);
     });
 
-    it('applies background-image styles for non-mask-image providers', async () => {
+    it.each(['google', 'world_id'] as const)('preserves the original colors for provider %s', async id => {
       const { wrapper } = await createFixtures();
+      const iconUrl = `https://example.com/${id}-icon.svg`;
 
       render(
         <ProviderIcon
-          id='google'
-          iconUrl='https://example.com/google-icon.svg'
-          name='Google'
+          id={id}
+          iconUrl={iconUrl}
+          name={id}
         />,
         { wrapper },
       );
 
-      const icon = screen.getByLabelText('Google icon');
+      const icon = screen.getByLabelText(`${id} icon`);
       expect(icon).toBeInTheDocument();
 
       const styles = window.getComputedStyle(icon);
-      expect(styles.backgroundImage).toContain('https://example.com/google-icon.svg');
-      expect(styles.maskImage).not.toContain('https://example.com/google-icon.svg');
+      expect(styles.backgroundImage).toContain(iconUrl);
+      expect(styles.maskImage).not.toContain(iconUrl);
     });
   });
 
