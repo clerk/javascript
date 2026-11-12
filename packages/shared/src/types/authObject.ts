@@ -23,7 +23,7 @@ export type SharedSignedInAuthObjectProperties = {
   actor: ActClaim | undefined;
   /**
    * The agent and agent task that created the session, from the `agt` claim. `null` for other sessions.
-   * `sub` and `task_id` can be `''` if the claim is malformed, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session.
+   * `sub` can be `''` if the claim is malformed, and `task_id` is `undefined` for a Poppy session or when the claim has no readable task ID, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session. `poppy` is set for a Poppy session (experimental).
    * `actor` is `undefined` for agent sessions, because the session token carries the `agt` claim instead of `act`.
    */
   agent: AgentActClaim | null;

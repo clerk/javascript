@@ -52,7 +52,7 @@ export type UseAuthReturn =
       actor: undefined;
       /**
        * The agent and agent task that created the session. `null` for other sessions, and `undefined` before Clerk has loaded.
-       * `sub` and `task_id` can be `''` if the claim is malformed, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session.
+       * `sub` can be `''` if the claim is malformed, and `task_id` is `undefined` for a Poppy session or when the claim has no readable task ID, so use a truthiness check (`if (agent)`), not its fields, to detect an agent session. `poppy` is set for a Poppy session (experimental).
        */
       agent: undefined;
       /**

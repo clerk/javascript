@@ -4,6 +4,7 @@ import type {
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  PoppyClaim,
   SharedSignedInAuthObjectProperties,
 } from './types';
 
@@ -99,16 +100,39 @@ function buildOrgPermissions({
   return orgPermissions;
 }
 
+// Any non-null `poppy` value marks a Poppy session, even a malformed one; its unreadable fields are left empty.
+const parsePoppyClaim = (poppy: unknown): PoppyClaim | undefined => {
+  if (poppy === null || poppy === undefined) {
+    return undefined;
+  }
+  const { session_id, client_id, user_id, agent_id } = (typeof poppy === 'object' ? poppy : {}) as Record<
+    string,
+    unknown
+  >;
+  return {
+    session_id: typeof session_id === 'string' ? session_id : '',
+    client_id: typeof client_id === 'string' ? client_id : '',
+    user_id: typeof user_id === 'string' ? user_id : '',
+    agent_id: typeof agent_id === 'string' ? agent_id : undefined,
+  };
+};
+
 const parseAgentClaim = (agt: unknown): AgentActClaim | null => {
   if (agt === null || agt === undefined) {
     return null;
   }
-  const { id, tsk, rst } = (typeof agt === 'object' ? agt : {}) as { id?: unknown; tsk?: unknown; rst?: unknown };
+  const { id, tsk, rst, poppy } = (typeof agt === 'object' ? agt : {}) as {
+    id?: unknown;
+    tsk?: unknown;
+    rst?: unknown;
+    poppy?: unknown;
+  };
   return {
     sub: typeof id === 'string' ? id : '',
     type: 'agent',
-    task_id: typeof tsk === 'string' ? tsk : '',
+    task_id: typeof tsk === 'string' ? tsk : undefined,
     restricted: rst === true,
+    poppy: parsePoppyClaim(poppy),
   };
 };
 

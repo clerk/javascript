@@ -75,6 +75,72 @@ describe('JWTPayloadToAuthObjectProperties', () => {
     expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
   });
 
+  test('exposes a Poppy session from the agt claim, with no task_id', () => {
+    const clientId = 'https://agent.example.com/client.json';
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: {
+        id: clientId,
+        reg: clientId,
+        poppy: { session_id: 'ps_123', client_id: clientId, user_id: 'pu_123', agent_id: 'agent-7' },
+        rst: true,
+      },
+    } as any);
+    expect(agent).toStrictEqual({
+      sub: clientId,
+      type: 'agent',
+      task_id: undefined,
+      restricted: true,
+      poppy: { session_id: 'ps_123', client_id: clientId, user_id: 'pu_123', agent_id: 'agent-7' },
+    });
+    expect(actor).toBeUndefined();
+  });
+
+  test('leaves agent_id undefined for a Poppy session without one', () => {
+    const clientId = 'https://agent.example.com/client.json';
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: {
+        id: clientId,
+        reg: clientId,
+        poppy: { session_id: 'ps_123', client_id: clientId, user_id: 'pu_123' },
+        rst: true,
+      },
+    } as any);
+    expect(agent?.poppy).toStrictEqual({
+      session_id: 'ps_123',
+      client_id: clientId,
+      user_id: 'pu_123',
+      agent_id: undefined,
+    });
+    expect(agent?.task_id).toBeUndefined();
+  });
+
+  test('leaves poppy undefined for an agent task session', () => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com', poppy: null },
+    } as any);
+    expect(agent?.poppy).toBeUndefined();
+    expect(agent?.task_id).toBe('agttsk_456');
+  });
+
+  test.each([
+    ['a string', 'ps_123'],
+    ['an empty object', {}],
+    ['non-string fields', { session_id: 1, client_id: [], user_id: {}, agent_id: 2 }],
+  ])('poppy is still set for a malformed poppy value: %s', (_name, poppy) => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', reg: 'https://clerk.com', poppy },
+    } as any);
+    expect(agent?.poppy).toStrictEqual({ session_id: '', client_id: '', user_id: '', agent_id: undefined });
+  });
+
   test('sets restricted to true when the agt claim has rst true', () => {
     const { agent } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,
@@ -101,18 +167,18 @@ describe('JWTPayloadToAuthObjectProperties', () => {
   });
 
   test.each([
-    ['an empty object', {}, { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['a missing tsk', { id: 'agent_123' }, { sub: 'agent_123', type: 'agent', task_id: '', restricted: false }],
+    ['an empty object', {}, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['a missing tsk', { id: 'agent_123' }, { sub: 'agent_123', type: 'agent', task_id: undefined, restricted: false }],
     ['a missing id', { tsk: 'agttsk_456' }, { sub: '', type: 'agent', task_id: 'agttsk_456', restricted: false }],
     ['empty strings', { id: '', tsk: '' }, { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['non-string fields', { id: 1, tsk: 2 }, { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['a string', 'x', { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['a number', 1, { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['an array', [], { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['true', true, { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['false', false, { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['zero', 0, { sub: '', type: 'agent', task_id: '', restricted: false }],
-    ['an empty string', '', { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['non-string fields', { id: 1, tsk: 2 }, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['a string', 'x', { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['a number', 1, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['an array', [], { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['true', true, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['false', false, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['zero', 0, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['an empty string', '', { sub: '', type: 'agent', task_id: undefined, restricted: false }],
   ])('agent is still non-null for a malformed agt claim: %s', (_name, agt, expected) => {
     expect(JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2, agt } as any).agent).toEqual(expected);
   });

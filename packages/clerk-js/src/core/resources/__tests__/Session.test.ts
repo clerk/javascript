@@ -2697,7 +2697,7 @@ describe('Session', () => {
       expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: 'agttsk_1', restricted: true });
     });
 
-    it('sets agent task_id to an empty string when an agent actor has no task_id', () => {
+    it('leaves agent task_id undefined when an agent actor has no task_id', () => {
       const actor = { sub: 'agent_1', type: 'agent' as const };
       const session = new Session({
         status: 'active',
@@ -2711,7 +2711,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       expect(session.actor).toEqual(actor);
-      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: '', restricted: false });
+      expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: undefined, restricted: false });
     });
 
     it.each([

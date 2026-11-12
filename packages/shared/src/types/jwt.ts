@@ -1,4 +1,4 @@
-import type { ActClaim, AgentTaskClaim, JwtHeader, JwtPayload } from './jwtv2';
+import type { ActClaim, AgentClaim, JwtHeader, JwtPayload } from './jwtv2';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 
 export interface JWT {
@@ -83,9 +83,9 @@ export interface ClerkJWTClaims {
   act?: ActClaim;
 
   /**
-   * Agent task claim (agt). Present on sessions created from an agent task. These sessions do not carry an `act` claim.
+   * Agent claim (agt). Present on agent sessions. These sessions do not carry an `act` claim.
    */
-  agt?: AgentTaskClaim;
+  agt?: AgentClaim;
 
   /**
    * Active Organization ID.

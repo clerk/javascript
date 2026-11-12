@@ -90,7 +90,7 @@ export class Session {
         ? {
             sub: typeof data.actor.sub === 'string' ? data.actor.sub : '',
             type: 'agent',
-            task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : '',
+            task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : undefined,
             restricted: data.actor.restricted === true,
           }
         : null,
