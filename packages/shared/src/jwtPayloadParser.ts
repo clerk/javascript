@@ -100,7 +100,6 @@ function buildOrgPermissions({
   return orgPermissions;
 }
 
-// Any non-null `poppy` value marks a Poppy session, even a malformed one; its unreadable fields are left empty.
 const parsePoppyClaim = (poppy: unknown): PoppyClaim | undefined => {
   if (poppy === null || poppy === undefined) {
     return undefined;
@@ -127,12 +126,13 @@ const parseAgentClaim = (agt: unknown): AgentActClaim | null => {
     rst?: unknown;
     poppy?: unknown;
   };
+  const poppyClaim = parsePoppyClaim(poppy);
   return {
     sub: typeof id === 'string' ? id : '',
     type: 'agent',
     task_id: typeof tsk === 'string' ? tsk : undefined,
     restricted: rst === true,
-    poppy: parsePoppyClaim(poppy),
+    ...(poppyClaim && { poppy: poppyClaim }),
   };
 };
 

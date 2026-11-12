@@ -246,11 +246,11 @@ export interface SessionResource extends ClerkResource {
   lastActiveAt: Date;
   /**
    * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
-   * For agent task sessions, `actor` also holds the agent today. This will change in a future major version; use `agent` to detect an agent session.
+   * For agent sessions, `actor` also holds the agent today. This will change in a future major version; use `agent` to detect an agent session.
    */
   actor: ActClaim | null;
   /**
-   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and [Agent Task](https://clerk.com/docs/reference/types/agent-task) that was used to create the session.
+   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and, for an agent task session, the [Agent Task](https://clerk.com/docs/reference/types/agent-task) that was used to create the session. `task_id` is `undefined` for a Poppy session.
    */
   agent: AgentActClaim | null;
   /**
@@ -392,11 +392,11 @@ export interface SessionWithActivitiesResource extends ClerkResource {
   latestActivity: SessionActivity;
   /**
    * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
-   * For agent task sessions, `actor` also holds the agent today. This will change in a future major version; use `agent` to detect an agent session.
+   * For agent sessions, `actor` also holds the agent today. This will change in a future major version; use `agent` to detect an agent session.
    */
   actor: ActClaim | null;
   /**
-   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and [Agent Task](https://clerk.com/docs/reference/types/agent-task) that was used to create the session.
+   * When the session's actor claim has `type: 'agent'`, this property exposes information about the agent and, for an agent task session, the [Agent Task](https://clerk.com/docs/reference/types/agent-task) that was used to create the session. `task_id` is `undefined` for a Poppy session.
    */
   agent: AgentActClaim | null;
 

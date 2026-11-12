@@ -36,6 +36,26 @@ describe('SessionWithActivities', () => {
     expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: undefined, restricted: false });
   });
 
+  it('does not map the Poppy fields of a Poppy actor into agent', () => {
+    const actor = {
+      sub: 'https://agent.example.com/client.json',
+      type: 'agent',
+      restricted: true,
+      source: 'poppy',
+      source_id: 'ps_1',
+      external_user_id: 'pu_1',
+    };
+    const session = build(actor as SessionWithActivitiesJSON['actor']);
+
+    expect(session.actor).toEqual(actor);
+    expect(session.agent).toStrictEqual({
+      sub: 'https://agent.example.com/client.json',
+      type: 'agent',
+      task_id: undefined,
+      restricted: true,
+    });
+  });
+
   it.each([
     ['a number', { sub: 42, type: 'agent', task_id: 'task_1' }],
     ['missing', { type: 'agent', task_id: 'task_1' }],
