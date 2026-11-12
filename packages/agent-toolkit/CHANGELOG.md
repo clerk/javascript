@@ -1,5 +1,11 @@
 # @clerk/agent-toolkit
 
+## 0.2.38
+
+### Patch Changes
+
+- Publish `@clerk/elements` and `@clerk/agent-toolkit` as deprecated on npm. Both are no longer supported; `@clerk/elements` was dropped in [Core 3](https://clerk.com/changelog/2026-03-03-core-3). ([#10310](https://github.com/clerk/javascript/pull/10310)) by [@manovotny](https://github.com/manovotny)
+
 ## 0.2.37
 
 ### Patch Changes
