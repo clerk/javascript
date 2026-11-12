@@ -55,6 +55,7 @@ const resetFactors: SignInFactor[] = [
 
 const emptyValues: SignInValues = {
   identifier: '',
+  phoneNumber: '',
   password: '',
   code: '',
   backupCode: '',

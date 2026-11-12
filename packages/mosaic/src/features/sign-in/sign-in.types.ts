@@ -62,6 +62,7 @@ export interface SignInProvider {
 
 export interface SignInValues {
   identifier: string;
+  phoneNumber: string;
   password: string;
   code: string;
   backupCode: string;

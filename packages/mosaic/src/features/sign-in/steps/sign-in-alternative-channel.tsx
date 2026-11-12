@@ -42,7 +42,7 @@ export function SignInAlternativeChannel({
   focusRef,
 }: SignInAlternativeChannelProps) {
   const m = useMessages('signIn');
-  const { ref: phoneFieldRef, ...phone } = form.registerValue('identifier');
+  const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
   const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
   const provider = channel.name;

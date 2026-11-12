@@ -111,7 +111,7 @@ function IdentifierStart({
 }: IdentifierStartProps) {
   const m = useMessages('signIn');
   const { ref: identifierFieldRef, ...identifier } = form.register('identifier');
-  const { ref: phoneFieldRef, ...phone } = form.registerValue('identifier');
+  const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const autoFocusRef = useFlowAutoFocus<HTMLInputElement>();
   const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, autoFocusRef]);
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, autoFocusRef]);
