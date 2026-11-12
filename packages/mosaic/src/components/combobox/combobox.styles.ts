@@ -125,6 +125,10 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-foreground-secondary'],
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
+    position: {
+      default: null,
+      ':empty': 'absolute',
+    },
     textAlign: 'center',
   },
   media: {
