@@ -2481,6 +2481,23 @@ export const srRS: LocalizationResource = {
           'Potrebna ovlašćenja su ažurirana, i možda doživljavaš ograničenu funkcionalnost. Molimo re-autorizuj ovu aplikaciju da izbegneš bilo kakve probleme',
         title: 'Povezani nalozi',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Obriši nalog',
         title: 'Obriši nalog',

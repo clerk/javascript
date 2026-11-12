@@ -758,6 +758,23 @@ export type __internal_LocalizationResource = {
         detailsAction__unverified: LocalizationValue;
         destructiveAction: LocalizationValue;
       };
+      connectionsSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+        failedAlert: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        actionLabel__reconnect: LocalizationValue;
+        actionLabel__additionalAccount: LocalizationValue<'connector'>;
+        grantedScopes: LocalizationValue<'scopes'>;
+        status__needsAttention: LocalizationValue;
+        status__disconnected: LocalizationValue;
+        loadFailedAlert: LocalizationValue;
+        removeResource: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue<'identifier'>;
+          messageLine2: LocalizationValue;
+        };
+      };
       connectedAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;

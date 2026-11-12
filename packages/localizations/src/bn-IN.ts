@@ -2511,6 +2511,23 @@ export const bnIN: LocalizationResource = {
           'প্রয়োজনীয় স্কোপগুলি আপডেট করা হয়েছে, এবং আপনি সীমিত কার্যকারিতা অনুভব করতে পারেন। কোনো সমস্যা এড়াতে দয়া করে এই অ্যাপ্লিকেশনকে পুনরায় অনুমোদন করুন',
         title: 'সংযুক্ত অ্যাকাউন্ট',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'অ্যাকাউন্ট মুছুন',
         title: 'অ্যাকাউন্ট মুছুন',

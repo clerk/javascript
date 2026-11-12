@@ -48,6 +48,18 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
 /**
  * General Types
  */
+export type {
+  ConnectConnector,
+  ConnectConnectorConfigurationParams,
+  CreateConnectorParams,
+  UpdateConnectorParams,
+  ConnectConnection,
+  ConnectConnectionCredential,
+  ConnectResult,
+  ConnectUserParams,
+  GetConnectionCredentialParams,
+  ListConnectionsParams,
+} from './api/endpoints/ConnectApi';
 export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
 /**

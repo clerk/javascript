@@ -2493,6 +2493,23 @@ export const plPL: LocalizationResource = {
           'Wymagane zakresy zostały zaktualizowane i funkcjonalność aplikacji może być ograniczona. Aby uniknąć problemów, należy ponownie autoryzować aplikację',
         title: 'Połączone konta',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Usuń konto',
         title: 'Niebezpieczeństwo',

@@ -2498,6 +2498,23 @@ export const esCR: LocalizationResource = {
           'Los permisos requeridos han sido actualizados, y podrías experimentar limitaciones. Por favor, autoriza de nuevo esta aplicación para evitar cualquier problema',
         title: 'Cuentas conectadas',
       },
+      connectionsSection: {
+        actionLabel__additionalAccount: undefined,
+        actionLabel__reconnect: undefined,
+        destructiveActionTitle: undefined,
+        failedAlert: undefined,
+        grantedScopes: undefined,
+        loadFailedAlert: undefined,
+        primaryButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          title: undefined,
+        },
+        status__disconnected: undefined,
+        status__needsAttention: undefined,
+        title: undefined,
+      },
       dangerSection: {
         deleteAccountButton: 'Eliminar cuenta',
         title: 'Eliminar cuenta',

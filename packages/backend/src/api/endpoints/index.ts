@@ -4,6 +4,7 @@ export * from './AccountlessApplicationsAPI';
 export * from './AbstractApi';
 export * from './AllowlistIdentifierApi';
 export * from './APIKeysApi';
+export * from './ConnectApi';
 export * from './BetaFeaturesApi';
 export * from './BlocklistIdentifierApi';
 export * from './ClientApi';
