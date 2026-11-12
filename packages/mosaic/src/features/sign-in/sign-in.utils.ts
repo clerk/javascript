@@ -1,6 +1,6 @@
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
-import type { SignInIdentifierField, SignInStep } from './sign-in.types';
+import type { SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
 
 export function stepKey(step: SignInStep): string {
   switch (step.kind) {
@@ -178,4 +178,25 @@ export function identifierFieldCopy(field: SignInIdentifierField, m: Messages): 
     case 'phone':
       return { label: m.start.phoneLabel, placeholder: m.start.phonePlaceholder, switchLabel: m.start.usePhone };
   }
+}
+
+export function startPrompt(
+  m: Messages,
+  { onSignUp, onJoinWaitlist }: { onSignUp?: () => void; onJoinWaitlist?: () => void },
+): { text: string; link: string; onClick: () => void } | undefined {
+  if (onJoinWaitlist) {
+    return { text: m.start.waitlistPrompt, link: m.start.waitlistLink, onClick: onJoinWaitlist };
+  }
+  if (onSignUp) {
+    return { text: m.start.signUpPrompt, link: m.start.signUpLink, onClick: onSignUp };
+  }
+  return undefined;
+}
+
+export function splitLastUsedProvider(
+  providers: readonly SignInProvider[],
+  lastUsedProviderId: string | undefined,
+): { lastUsed?: SignInProvider; others: readonly SignInProvider[] } {
+  const lastUsed = providers.find(provider => provider.id === lastUsedProviderId);
+  return { lastUsed, others: lastUsed ? providers.filter(provider => provider !== lastUsed) : providers };
 }

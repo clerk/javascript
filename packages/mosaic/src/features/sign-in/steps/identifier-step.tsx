@@ -24,7 +24,7 @@ import type {
   SignInSubmitEvent,
   SignInValues,
 } from '../sign-in.types';
-import { identifierFieldCopy } from '../sign-in.utils';
+import { identifierFieldCopy, splitLastUsedProvider, startPrompt } from '../sign-in.utils';
 import { SignInAlternativeChannel } from './sign-in-alternative-channel';
 
 type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
@@ -260,8 +260,7 @@ function SignInProviders({
   if (providers.length === 0) {
     return null;
   }
-  const lastUsedProvider = providers.find(provider => provider.id === lastUsedProviderId);
-  const otherProviders = providers.filter(provider => provider !== lastUsedProvider);
+  const { lastUsed: lastUsedProvider, others: otherProviders } = splitLastUsedProvider(providers, lastUsedProviderId);
   const providerButton = (provider: SignInProvider, badge?: string) => (
     <ProviderButton
       key={provider.id}
@@ -314,11 +313,7 @@ interface StartPromptProps {
 
 function StartPrompt({ onSignUp, onJoinWaitlist, isDisabled }: StartPromptProps) {
   const m = useMessages('signIn');
-  const prompt = onJoinWaitlist
-    ? { text: m.start.waitlistPrompt, link: m.start.waitlistLink, onClick: onJoinWaitlist }
-    : onSignUp
-      ? { text: m.start.signUpPrompt, link: m.start.signUpLink, onClick: onSignUp }
-      : undefined;
+  const prompt = startPrompt(m, { onSignUp, onJoinWaitlist });
   if (!prompt) {
     return null;
   }

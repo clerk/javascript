@@ -9,6 +9,8 @@ import {
   codeSecondaryAction,
   httpsUrl,
   identifierFieldCopy,
+  splitLastUsedProvider,
+  startPrompt,
   stepKey,
 } from '../sign-in.utils';
 
@@ -143,6 +145,48 @@ describe('identifierFieldCopy', () => {
       label: 'Phone number',
       placeholder: 'Enter your phone number',
       switchLabel: 'Use phone',
+    });
+  });
+});
+
+describe('startPrompt', () => {
+  it('offers the waitlist over sign-up, and nothing without either', () => {
+    const onSignUp = () => undefined;
+    const onJoinWaitlist = () => undefined;
+    expect(startPrompt(signInMessages, { onSignUp })).toEqual({
+      text: 'Don’t have an account?',
+      link: 'Sign up',
+      onClick: onSignUp,
+    });
+    expect(startPrompt(signInMessages, { onSignUp, onJoinWaitlist })).toEqual({
+      text: 'Want early access?',
+      link: 'Join waitlist',
+      onClick: onJoinWaitlist,
+    });
+    expect(startPrompt(signInMessages, {})).toBeUndefined();
+  });
+});
+
+describe('splitLastUsedProvider', () => {
+  const google = { id: 'oauth_google', name: 'Google', iconUrl: 'google.svg' };
+  const github = { id: 'oauth_github', name: 'GitHub', iconUrl: 'github.svg' };
+  const x = { id: 'oauth_x', name: 'X', iconUrl: 'x.svg' };
+
+  it('takes the last used provider out of the others, keeping their order', () => {
+    expect(splitLastUsedProvider([google, github, x], 'oauth_github')).toEqual({
+      lastUsed: github,
+      others: [google, x],
+    });
+  });
+
+  it('leaves every provider in the others when none was used last or it is not offered', () => {
+    expect(splitLastUsedProvider([google, github], undefined)).toEqual({
+      lastUsed: undefined,
+      others: [google, github],
+    });
+    expect(splitLastUsedProvider([google, github], 'oauth_apple')).toEqual({
+      lastUsed: undefined,
+      others: [google, github],
     });
   });
 });
