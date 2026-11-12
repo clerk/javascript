@@ -264,16 +264,16 @@ describe('Mosaic Combobox', () => {
   it('keeps the selected label while reopening the unfiltered collection', async () => {
     const user = userEvent.setup();
     render(
-      <Combobox.Root>
+      <Combobox.Root
+        items={['Apple', 'Banana']}
+        itemToStringLabel={item => item}
+      >
         <Combobox.Input aria-label='Fruit' />
         <Combobox.Trigger aria-label='Show fruits' />
         <Combobox.Popup>
-          <Combobox.Collection
-            items={['Apple', 'Banana']}
-            itemToStringLabel={item => item}
-            empty={<Combobox.Empty>No matches</Combobox.Empty>}
-          >
-            {item => (
+          <Combobox.Empty>No matches</Combobox.Empty>
+          <Combobox.Collection>
+            {(item: string) => (
               <Combobox.Option
                 key={item}
                 value={item}
@@ -376,10 +376,21 @@ describe('Mosaic Combobox', () => {
     expect(option).toContainElement(screen.getByText('+213', { selector: '.cl-combobox-option-detail' }));
   });
 
-  it('renders a reusable empty state', () => {
-    render(<Combobox.Empty>No matches</Combobox.Empty>);
+  it('renders the empty state as a styled status region', () => {
+    render(
+      <Combobox.Root
+        inline
+        open
+        items={[]}
+        itemToStringLabel={item => item}
+      >
+        <Combobox.Input aria-label='Fruit' />
+        <Combobox.Empty>No matches</Combobox.Empty>
+      </Combobox.Root>,
+    );
 
-    expect(screen.getByText('No matches')).toHaveClass('cl-combobox-empty');
+    expect(screen.getByRole('status')).toHaveClass('cl-combobox-empty');
+    expect(screen.getByRole('status')).toHaveTextContent('No matches');
   });
 
   function ClearableCombobox(props?: { onValueChange?: (value: string | null) => void }) {

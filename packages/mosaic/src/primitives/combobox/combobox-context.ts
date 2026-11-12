@@ -13,7 +13,7 @@ export interface ComboboxContextValue {
   open: boolean;
   clear: () => void;
   inputValue: string;
-  filterQuery: string;
+  filteredItems: readonly unknown[];
   selectedValue: string | null;
   floatingContext: FloatingContext;
   refs: ExtendedRefs<ReferenceType>;

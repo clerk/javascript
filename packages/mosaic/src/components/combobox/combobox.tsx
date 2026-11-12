@@ -20,7 +20,7 @@ import { useOptionalInputGroupContext } from '../input-group/input-group.context
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { styles, trigger } from './combobox.styles';
 
-export type ComboboxRootProps = ComboboxProps;
+export type ComboboxRootProps<Item = unknown> = ComboboxProps<Item>;
 export type ComboboxSize = 'sm' | 'md' | 'lg';
 export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
 export type ComboboxClearProps = MosaicComponentProps<'button'>;
@@ -31,7 +31,7 @@ const ComboboxAnchorContext = React.createContext<{
   setAnchor: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
 } | null>(null);
 
-export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
+export function ComboboxRoot<Item>({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps<Item>) {
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
   const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
   return (
@@ -264,7 +264,7 @@ export const ComboboxDetail = React.forwardRef<HTMLSpanElement, ComboboxDetailPr
   });
 });
 
-export type ComboboxEmptyProps = MosaicComponentProps<'p'>;
+export type ComboboxEmptyProps = MosaicComponentProps<'div'>;
 
 export type ComboboxOptionIndicatorProps = MosaicComponentProps<'span'>;
 
@@ -286,18 +286,16 @@ export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, Combobo
   },
 );
 
-export const ComboboxEmpty = React.forwardRef<HTMLParagraphElement, ComboboxEmptyProps>(function MosaicComboboxEmpty(
-  { render, xstyle, ...rest },
+export const ComboboxEmpty = React.forwardRef<HTMLDivElement, ComboboxEmptyProps>(function MosaicComboboxEmpty(
+  { xstyle, ...rest },
   ref,
 ) {
-  return useRender({
-    defaultTagName: 'p',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty, xstyle), rest),
-    },
-  });
+  return (
+    <HeadlessCombobox.Empty
+      ref={ref}
+      {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty, xstyle), rest)}
+    />
+  );
 });
 
 export const Combobox = {
