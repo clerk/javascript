@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { Suspense } from 'react';
 
 import { routingDemos } from '@/components/routing-demo/demos';
 import { buttonVariants } from '@/components/ui/button';
@@ -29,7 +30,7 @@ export default function RoutingLayout({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
-      {children}
+      <Suspense fallback={null}>{children}</Suspense>
     </div>
   );
 }
