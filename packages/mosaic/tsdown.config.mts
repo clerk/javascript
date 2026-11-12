@@ -26,6 +26,7 @@ export default defineConfig({
     'components/icon': './src/components/icon/index.ts',
     'components/input': './src/components/input/index.ts',
     'components/item': './src/components/item/index.ts',
+    'components/skeleton': './src/components/skeleton/index.ts',
     'components/text': './src/components/text/index.ts',
     'icons/glyphs/external': './src/icons/glyphs/external.tsx',
   },

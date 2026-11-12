@@ -86,6 +86,11 @@
       "import": "./dist/components/item.js",
       "default": "./dist/components/item.js"
     },
+    "./components/skeleton": {
+      "types": "./dist/components/skeleton.d.ts",
+      "import": "./dist/components/skeleton.js",
+      "default": "./dist/components/skeleton.js"
+    },
     "./components/text": {
       "types": "./dist/components/text.d.ts",
       "import": "./dist/components/text.js",
