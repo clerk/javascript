@@ -27,6 +27,7 @@ interface IdentifierStepProps {
   socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
+  onPasskey?: () => void;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
@@ -47,6 +48,7 @@ export function IdentifierStep({
   socialProviders,
   pendingProviderId,
   onSelectProvider,
+  onPasskey,
   form,
   errorMessage,
   globalErrorMessage,
@@ -169,6 +171,18 @@ export function IdentifierStep({
             <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>
+        {onPasskey ? (
+          <Button
+            type='button'
+            size='sm'
+            variant='link'
+            disabled={isDisabled}
+            onClick={onPasskey}
+            xstyle={styles.passkeyAction}
+          >
+            {m.start.usePasskey}
+          </Button>
+        ) : null}
         {onSignUp ? (
           <Text
             size='sm'

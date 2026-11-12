@@ -21,6 +21,7 @@ export const signInMessages = {
     selectedCountry: 'Country, {country}',
     chooseCountry: 'Choose a country',
     searchCountries: 'Search countries',
+    usePasskey: 'Use passkey instead',
     signUpPrompt: 'Don’t have an account?',
     signUpLink: 'Sign up',
   },

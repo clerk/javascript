@@ -464,6 +464,7 @@ function StepPanel({
   identifier,
   otherMethods = true,
   onSwitchField,
+  onPasskey,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -475,6 +476,7 @@ function StepPanel({
   identifier?: string;
   otherMethods?: boolean;
   onSwitchField?: () => void;
+  onPasskey?: () => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -498,6 +500,7 @@ function StepPanel({
       pendingProviderId={pendingProviderId}
       onSelectProvider={() => undefined}
       onSwitchField={onSwitchField}
+      onPasskey={onPasskey}
       form={form}
       onSubmit={event => event?.preventDefault()}
       onCodeComplete={code => form.setValue('code', code)}
@@ -595,6 +598,15 @@ export function IdentifierPhone() {
 
 export function IdentifierUsername() {
   return <SwitchingIdentifier fields={['username']} />;
+}
+
+export function IdentifierPasskey() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier', field: 'email' }}
+      onPasskey={() => undefined}
+    />
+  );
 }
 
 export function IdentifierEmailOrUsername() {

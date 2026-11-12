@@ -59,6 +59,7 @@ export function SignInView({
   socialProviders,
   pendingProviderId,
   onSelectProvider,
+  onPasskey,
   form,
   onSubmit,
   onCodeComplete,
@@ -133,6 +134,7 @@ export function SignInView({
                     socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
                     onSelectProvider={onSelectProvider}
+                    onPasskey={onPasskey}
                     form={form}
                     errorMessage={errorMessage}
                     globalErrorMessage={globalErrorMessage}

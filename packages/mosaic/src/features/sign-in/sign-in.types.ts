@@ -84,6 +84,7 @@ export interface SignInViewProps {
   socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
+  onPasskey?: () => void;
   form: UseFormResult<SignInValues>;
   onSubmit: (event?: SignInSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
