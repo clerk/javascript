@@ -19,11 +19,16 @@ export interface FakeVerificationState {
   firstFactors: SignInFirstFactorJSON[];
   secondFactors: SignInSecondFactorJSON[];
   secrets: Partial<Record<VerificationSecretStrategy, string>>;
+  codesByIdentification: Partial<Record<string, string>>;
+  firstFactorCode: string | null;
+  secondFactorCode: string | null;
   firstFactorVerification: VerificationJSON | null;
   secondFactorVerification: VerificationJSON | null;
 }
 
-export type FakeVerificationSeed = Partial<Pick<FakeVerificationState, 'firstFactors' | 'secondFactors' | 'secrets'>>;
+export type FakeVerificationSeed = Partial<
+  Pick<FakeVerificationState, 'firstFactors' | 'secondFactors' | 'secrets' | 'codesByIdentification'>
+>;
 
 export interface VerificationHost {
   client: ClientJSON;
@@ -37,6 +42,9 @@ export function createVerificationState(seed: FakeVerificationSeed = {}): FakeVe
     firstFactors: [{ strategy: 'password' }],
     secondFactors: [],
     secrets: {},
+    codesByIdentification: {},
+    firstFactorCode: null,
+    secondFactorCode: null,
     firstFactorVerification: null,
     secondFactorVerification: null,
     ...seed,
@@ -195,7 +203,18 @@ export function verificationHandlers(state: VerificationHost, url: (path: string
           return verificationErrors.missingResource(idParam);
         }
       }
-      setStageVerification(state, stage, fapiVerification(strategy));
+      if (strategy === 'email_code' || strategy === 'phone_code') {
+        const identification = body.get(strategy === 'email_code' ? 'email_address_id' : 'phone_number_id');
+        const code =
+          (identification ? state.verification.codesByIdentification[identification] : undefined) ??
+          state.verification.secrets[strategy] ??
+          null;
+        state.verification =
+          stage === 'first'
+            ? { ...state.verification, firstFactorCode: code }
+            : { ...state.verification, secondFactorCode: code };
+      }
+      setStageVerification(state, stage, fapiVerification(strategy, { expire_at: Date.now() + 600_000 }));
       return verificationReply(state, session);
     };
 
@@ -214,15 +233,33 @@ export function verificationHandlers(state: VerificationHost, url: (path: string
       if (PREPARABLE_STRATEGIES.includes(strategy) && prepared?.strategy !== strategy) {
         return verificationErrors.notSent();
       }
-      if (strategy !== 'passkey' && state.verification.secrets[strategy as VerificationSecretStrategy] === undefined) {
+      if (
+        PREPARABLE_STRATEGIES.includes(strategy) &&
+        prepared &&
+        prepared.expire_at !== null &&
+        prepared.expire_at <= Date.now()
+      ) {
+        return apiError(422, 'verification_expired', 'This code has expired.');
+      }
+      const secret =
+        strategy === 'email_code' || strategy === 'phone_code'
+          ? stage === 'first'
+            ? state.verification.firstFactorCode
+            : state.verification.secondFactorCode
+          : strategy === 'password' || strategy === 'totp' || strategy === 'backup_code'
+            ? state.verification.secrets[strategy]
+            : undefined;
+      if (strategy !== 'passkey' && secret === undefined) {
         throw new Error(`fake FAPI: no secret seeded for strategy "${strategy}"`);
       }
       if (strategy === 'password') {
+        setStageVerification(state, stage, fapiVerification('password'));
+        state.verification.firstFactorCode = null;
         if (body.get('password') !== state.verification.secrets.password) {
           return verificationErrors.passwordIncorrect();
         }
       } else if (strategy !== 'passkey') {
-        if (body.get('code') !== state.verification.secrets[strategy as VerificationSecretStrategy]) {
+        if (body.get('code') !== secret) {
           return verificationErrors.codeIncorrect();
         }
       }
@@ -253,6 +290,8 @@ export function verificationHandlers(state: VerificationHost, url: (path: string
         status: level === 'second_factor' ? 'needs_second_factor' : 'needs_first_factor',
         firstFactorVerification: null,
         secondFactorVerification: null,
+        firstFactorCode: null,
+        secondFactorCode: null,
       };
       return verificationReply(state, session);
     }),
