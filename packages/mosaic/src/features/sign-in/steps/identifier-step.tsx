@@ -5,7 +5,6 @@ import React, { type Ref } from 'react';
 
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
-import { Captcha } from '../../../components/captcha';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -26,6 +25,7 @@ import type {
 } from '../sign-in.types';
 import { identifierFieldCopy, splitLastUsedProvider, startPrompt } from '../sign-in.utils';
 import { SignInAlternativeChannel } from './sign-in-alternative-channel';
+import { SignInCaptcha } from './sign-in-captcha';
 
 type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
 
@@ -212,10 +212,7 @@ function IdentifierStart({
             </Field.Root>
           </Form>
         </div>
-        <Captcha
-          xstyle={styles.captcha}
-          onInteractiveChange={setIsChallengeShown}
-        />
+        <SignInCaptcha onInteractiveChange={setIsChallengeShown} />
         {onPasskey ? (
           <Button
             type='button'

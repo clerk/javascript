@@ -121,33 +121,37 @@ export function SignInView({
       >
         {current => {
           const secondary = current.kind === 'code' ? codeSecondaryAction(current, m, { onCancel, onBack }) : undefined;
+          const identifierStep =
+            current.kind === 'identifier' ? (
+              <IdentifierStep
+                step={current}
+                onCancel={onCancel}
+                onSwitchField={onSwitchField}
+                focusRef={focusRef}
+                logo={logo}
+                applicationName={applicationName}
+                combined={combined}
+                socialProviders={socialProviders}
+                pendingProviderId={pendingProviderId}
+                lastUsedProviderId={lastUsedProviderId}
+                onSelectProvider={onSelectProvider}
+                onPasskey={onPasskey}
+                form={form}
+                errorMessage={errorMessage}
+                globalErrorMessage={globalErrorMessage}
+                isPending={isPending}
+                isDisabled={isDisabled}
+                onSubmit={onSubmit}
+                onSignUp={onSignUp}
+                onJoinWaitlist={onJoinWaitlist}
+              />
+            ) : null;
           return (
             <>
-              <Flow.Step ids={['identifier', 'identifier:channel']}>
-                {current.kind === 'identifier' ? (
-                  <IdentifierStep
-                    step={current}
-                    onCancel={onCancel}
-                    onSwitchField={onSwitchField}
-                    focusRef={focusRef}
-                    logo={logo}
-                    applicationName={applicationName}
-                    combined={combined}
-                    socialProviders={socialProviders}
-                    pendingProviderId={pendingProviderId}
-                    lastUsedProviderId={lastUsedProviderId}
-                    onSelectProvider={onSelectProvider}
-                    onPasskey={onPasskey}
-                    form={form}
-                    errorMessage={errorMessage}
-                    globalErrorMessage={globalErrorMessage}
-                    isPending={isPending}
-                    isDisabled={isDisabled}
-                    onSubmit={onSubmit}
-                    onSignUp={onSignUp}
-                    onJoinWaitlist={onJoinWaitlist}
-                  />
-                ) : null}
+              <Flow.Step ids={['identifier']}>{stepKey(current) === 'identifier' ? identifierStep : null}</Flow.Step>
+
+              <Flow.Step ids={['identifier:channel']}>
+                {stepKey(current) === 'identifier:channel' ? identifierStep : null}
               </Flow.Step>
 
               <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>

@@ -3,7 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
-import { Captcha } from '../../../components/captcha';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -13,6 +12,7 @@ import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import { SignInCaptcha } from './sign-in-captcha';
 
 interface SignInAlternativeChannelProps {
   channel: SignInProvider;
@@ -92,7 +92,7 @@ export function SignInAlternativeChannel({
             <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>
-        <Captcha xstyle={styles.captcha} />
+        <SignInCaptcha />
       </Card.Content>
       <Card.Footer>
         {onCancel ? (
