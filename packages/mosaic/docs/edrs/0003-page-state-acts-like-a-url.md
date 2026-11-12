@@ -4,7 +4,7 @@ title: 'Hold routing state above the components and make it behave like a URL'
 summary: "The page's routing state is a map from base to parts in MosaicProvider. An entry lives while its base has a mounted owner. A modal is open exactly while its entry exists. Components hold no routing state in any mode."
 status: accepted
 implementation: shipped
-implementation_note: 'src/routing/virtual-store.tsx, src/modals/modal-host.tsx. Only the virtual carrier exists; URL carriers project the same map later.'
+implementation_note: 'src/routing/virtual-store.tsx, src/modals/modal-host.tsx. The URL modes keep the same contract without the map; see MEDR-0008.'
 date: 2026-11-06
 authors:
   - 'Fredrik Höglund <fredrik@clerk.dev>'
@@ -32,10 +32,10 @@ Routing state is a map above the components. An entry lives while its base has a
 - Leave and return starts fresh; a parked owner resumes where it was; an owner replaced mid-exit keeps its page; StrictMode changes nothing.
 - A parked modal does not resume, since its content is inside a closed dialog; legacy closes modals on navigation too.
 - The parked case is a todo in the contract suite until a React 19 test project exists, since React 18 cannot produce the cycle. The outside-clear case is in the suite, because it is the one a park that also ran on navigation got wrong.
-- Back closes a modal and a URL with the segment opens one, once a URL mode exists. The return after a redirect can become an entry seeded on load.
+- Back closes a modal and a URL with the segment opens one in the URL modes. The return after a redirect can become an entry seeded on load.
 - Ownership arrives one commit after mount, so an owner's first redirect runs on its second commit.
 - `useSegmentParts` returns `undefined` for a base with no entry; a scope reads that as the root, a modal as closed.
-- A URL carrier must project the map rather than let each location write the URL on its own, or two writes in one tick clobber each other.
+- A URL carrier was expected to project the map so two writes in one tick could not clobber each other. [MEDR-0008](./0008-url-carriers.md) decided otherwise: a URL location reads and writes the URL directly, and the clobber is accepted.
 
 ## References
 
@@ -47,3 +47,4 @@ Routing state is a map above the components. An entry lives while its base has a
 
 - **2026-11-06**: Accepted.
 - **2026-11-06**: Amended after review: render from the parked entry while hidden, park tied to its location, compare-and-delete in the sweep, content loaded on any entry.
+- **2026-11-11**: Amended when the URL modes shipped: the projection consequence points at MEDR-0008.

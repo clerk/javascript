@@ -87,7 +87,7 @@ This is mostly based on the above constraints, but also some research.
   - Our own navigation is just one more source of change
   - Because the router keeps no state of its own, there is nothing to sync after a navigation. That is why navigations no longer need to be awaited
 - The only stateful piece is where the segment lives
-  - For `path` and `hash` that is the framework adapter's/browser's URL
+  - For `path`, `hash` and `query` that is the framework adapter's/browser's URL
   - For `virtual` this is a value in memory
 - Use framework adapter state over `window` if it exists
   - So our segment and the host page change in the same commit
@@ -96,7 +96,7 @@ This is mostly based on the above constraints, but also some research.
 - Automatic navigations replace; only a user action pushes
   - Otherwise every bounce and redirect leaves a history entry, which is the source of legacy's back-button traps
 - Change notifications
-  - Delivered in a microtask, never synchronously - Frameworks can trigger these from lifecycles where triggering state changes/rerenders are not safe, like in insertion effects (Next.js)
+  - Delivered synchronously after the write. Mosaic writes only from handlers and effects, never from a lifecycle where a state change is unsafe; an adapter's own hooks notify whenever the host does
   - Carry no payload. Readers re-read the live location. - Payload can be stale by the time it's read if multiple writes are coalesced
 - Exits are not part of the router. They are a single call into `clerk-js` with a full URL, and the router cannot express one
 - Guards belongs to machines/components, not routes
@@ -112,17 +112,17 @@ The decisions are recorded in [the routing EDRs](../edrs/README.md) and the usag
 
 - The router is three parts: a location, one implementation per mode and per framework adapter; a route table per component, typed, that parses and builds a segment; and the router that derives a route from the two and hands the component `route`, `params` and `go`
 - Names are the API, patterns are the codec. `go()` takes a name and params, never a URL, which is what enforces the step/exit split
-- The seam is `useSegmentParts()`, `write()`, `clear()` and `own()`. Each location implements how React learns about its changes: with a framework adapter that is `usePathname`/`useLocation`, so the host's transitions apply; `virtual` is plain React state; only the `window` fallback and `hash` need `useSyncExternalStore`, since their source is outside React
+- The seam is `useSegmentParts()`, `write()`, `clear()` and `own()`. Each location implements how React learns about its changes: with a framework adapter that is `usePathname`/`useLocation`, so the host's transitions apply; `virtual` is plain React state; only the `window` fallback needs `useSyncExternalStore`, since its source is outside React
 - Two hooks: `useRouterScope` for the segment's owner, `useRouter` for everything inside it. The owner renders the `scope` it gets back around its children; nested routers read mode and base from it. The owner names its `root`, the route that lives at the base: an unknown segment shows the root and is replaced with the base, so owners of one base always agree and cannot loop. An owner whose table depends on data that has not arrived passes `ready` and reports no route, writing nothing, until it has. The scope is where nesting lands later: a sub-surface's base is the parent's base plus its current segment
-- The page's routing state is a map from base to parts, held above the components. An entry lives while its base has an owner, and a parked component keeps its segment in its own state so it resumes where it was; a modal is open while its entry exists. Virtual holds the map as state in `MosaicProvider`; a real carrier projects it, several entries into the hash or the query string, exactly one into the pathname. A second pathname owner on a page is a configuration error
+- The page's routing state is a map from base to parts, held above the components. An entry lives while its base has an owner, and a parked component keeps its segment in its own state so it resumes where it was; a modal is open while its entry exists. Virtual holds the map as state in `MosaicProvider`. A URL mode holds nothing of its own: it reads its entry from the URL and writes the URL back at once ([MEDR-0008](../edrs/0008-url-carriers.md)); several entries fit in the hash or the query string, exactly one in the pathname. A second pathname owner on a page is a configuration error
 - The profiles use legacy's segments with the first page as the root, and there is no `defaultPage`. The modal `page` option is the host writing the entry before the content mounts
 - No `<Route>` component. Legacy's `<Route>` tree did matching, rendering, `canActivate` guards and nesting with relative paths. The table does the matching, the view switches on `route`, guards live in the component or machine, and a nested surface is a nested scope with its own table
 - Framework adapters
   - For now, they are passed into `<MosaicProvider>`, as copy-paste objects rather than entry points. No adapter means the `window` fallback, which stays a supported mode
   - Later when `<ClerkProvider>` starts rendering `<MosaicProvider>` it comes in that way via the framework SDKs instead. Same adapter, different supplier
   - These are also what would provide the server URL
-- SSR status: `virtual` renders the same on server and client. `path` with an adapter reads the request URL through the host's hooks; `hash` and the `window` fallback render the root on the server and correct once after hydration
-- A `query` mode is a candidate: the map projected into one reserved query param. Hash's zero-config deployment but sent to the server, and modal state that survives refresh and redirects
+- SSR status: `virtual` renders the same on server and client. `path` with an adapter reads the request URL through the host's hooks; `hash`, `query` and the `window` fallback render the root on the server and correct once after hydration
+- `query` mode is one param per base, `p.user=security`, not one reserved param: two components keep apart and a modal's param can be dropped on its own. It is sent to the server, so it is the candidate for modal state that survives a refresh or a redirect
 
 ## Security
 
@@ -165,7 +165,7 @@ The URL is attacker-controlled input: anyone can send a user a link. That covers
 
 - **Embedded router**: Mosaic's router. It owns one segment of the location and never the page; the host, or the window when there is no host router, owns the rest.
 - **Location**: where a segment lives and how it is read and written. One implementation per mode. Its seam is `useSegmentParts()`, `write()`, `clear()` and `own()`.
-- **Mode**: which location a component uses. `path` (the URL under a base), `hash` (`#/…`), `virtual` (the page's in-memory map). Chosen per component through the `routing` prop; `virtual` is also what modals use.
+- **Mode**: which location a component uses. `path` (the pathname under a base), `hash` and `query` (one param per base), `virtual` (the page's in-memory map). Chosen per component through the `routing` prop, and fixed for the component's lifetime; `virtual` is also what modals use by default.
 - **Base** (base path): the part of the location a component sits under, `/user` for the profile. Set with the `path` prop, defaulted per component. One owner per base per page.
 - **Segment**: the part of the location a component owns, everything after its base. `security` or `billing/statement/st_1`.
 - **Parts**: the segment as decoded parts, as `useSegmentParts()` returns it. `undefined` when the base has no entry.
@@ -179,6 +179,6 @@ The URL is attacker-controlled input: anyone can send a user a link. That covers
 - **Step**: a navigation whose destination is inside the component's segment. Made with `go(name, params)`.
 - **Exit**: a navigation whose destination is outside the segment. A full URL handed to `clerk-js`, which decides soft or hard, decoration and the transitive state.
 - **Scope**: the mode and base a surface was mounted with, shared with everything nested inside it through `MosaicRoutingScope`. Configuration, not state. Returned by `useRouterScope` as an opaque value.
-- **Framework adapter**: the host-router integration a `path` or `hash` location reads and writes through, `usePathname` and `pushState` in Next. Supplied at the top, by `MosaicProvider` now and `ClerkProvider` later.
-- **Window fallback**: the `path` or `hash` location used when there is no framework adapter. Reads `window.location`, listens to `popstate`, and is the one place `useSyncExternalStore` is still needed.
+- **Framework adapter**: the host-router integration a URL-mode location reads and writes through, `usePathname` and a raw query string in Next. A plain object of optional members supplied at the top, by `MosaicProvider` now and `ClerkProvider` later ([MEDR-0009](../edrs/0009-router-adapter.md)).
+- **Window fallback**: what a URL-mode location reads and writes for each adapter member that is missing. Reads `window.location`, listens to `popstate` and `hashchange`, writes without Next's history marker, and is the one place `useSyncExternalStore` is still needed.
 - **Page** vs **step**: a profile's navigation entries are pages; a flow's states are steps. Both are routes; the words only say which kind of surface owns them.

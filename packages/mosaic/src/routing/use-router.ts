@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { MosaicLocation, SegmentParts } from './location';
@@ -8,7 +9,7 @@ import { isRouteName, routeParts } from './routes';
 import type { RoutingScope } from './routing-scope';
 import { createRoutingScope, useInheritedScope } from './routing-scope';
 import type { MosaicLocationOptions } from './use-mosaic-location';
-import { useMosaicLocation } from './use-mosaic-location';
+import { useFixedRoutingMode, useMosaicLocation } from './use-mosaic-location';
 
 const EMPTY_PARAMS: Record<string, string> = Object.freeze({});
 const EMPTY_PARTS: SegmentParts = Object.freeze([]);
@@ -37,9 +38,10 @@ function useStableTable<Routes extends RouteTable>(routes: Routes): Routes {
 // without unmounting it (Activity), and then the component's state survives. In virtual mode the
 // cleanup therefore parks the entry in state, the scope keeps rendering from the parked entry while
 // it is hidden, so the page's subtree keeps its state, and the effects that run on resume write it
-// back, unless something else wrote the base in between. The ownership effect's dependencies never
-// change on a navigation, so its cleanup only runs on hide, unmount or a change of location; it
-// reads the entry to park from a ref that is written in an effect and read nowhere else. A park
+// back, unless something else wrote the base in between. In virtual mode the ownership effect's
+// dependencies never change on a navigation, so its cleanup only runs on hide, unmount or a change
+// of location; it reads the entry to park from a ref that is written in an effect and read nowhere
+// else. A park
 // is tied to the location it was taken from, so a scope that moves to another base does not carry
 // its page along. The parked value is consumed during render as soon as an entry is present again,
 // so a mounted scope never falls back to it, and an entry cleared from outside shows the root. A
@@ -82,7 +84,7 @@ function useOwnedSegment(
 }
 
 function missingScope(): never {
-  throw new Error('[clerk] useRouter needs a <MosaicRoutingScope> above it; the segment owner calls useRouterScope.');
+  throw new Error('[Clerk] useRouter needs a <MosaicRoutingScope> above it; the segment owner calls useRouterScope.');
 }
 
 interface Routing<Routes extends RouteTable> {
@@ -122,7 +124,7 @@ export interface RouterScopeOptions<Routes extends RouteTable> {
   ready?: boolean;
   // Where a segment nothing matches goes instead of the root, asked with the segment; a profile
   // sends an unknown page in the organization group to that group's first page. Returning nothing,
-  // or a name that is not a route, means the root.
+  // a name that is not a route, or a route that needs params means the root.
   notFound?: (parts: SegmentParts) => RouteName<Routes> | undefined;
 }
 
@@ -145,10 +147,11 @@ export function useRouterScope<const Routes extends RouteTable>(
 ): RouterScope<Routes>;
 export function useRouterScope<const Routes extends RouteTable>(
   routes: Routes,
-  { routing, path, root, ready = true, notFound }: RouterScopeOptions<Routes>,
+  { routing: requested, path, root, ready = true, notFound }: RouterScopeOptions<Routes>,
 ): RouterScope<Routes, RouteName<Routes> | undefined> {
+  const routing = useFixedRoutingMode(requested);
   const scope = useMemo(() => createRoutingScope({ routing, path }), [routing, path]);
-  const rooted: Routes = Object.assign({}, routes, { [root]: '' });
+  const rooted: Routes = { ...routes, [root]: '' };
   const { location, table, router, entry } = useRouting(rooted, { routing, path });
   const held = useOwnedSegment(location, entry, routing === 'virtual');
   const { parts, matched } = useMatch(router, held);
@@ -157,8 +160,15 @@ export function useRouterScope<const Routes extends RouteTable>(
       return undefined;
     }
     const name = notFound?.(parts);
-    return name !== undefined && isRouteName(table, name) ? name : root;
-  }, [ready, matched, notFound, parts, table, root]);
+    if (name === undefined || !isRouteName(table, name)) {
+      return root;
+    }
+    if (router.parse(routeParts(table, name))?.name !== name) {
+      logger.warnOnce(`[Clerk] notFound returned "${name}", which needs params, so the root is shown instead.`);
+      return root;
+    }
+    return name;
+  }, [ready, matched, notFound, parts, table, router, root]);
   const current = useMemo<Route<Routes> | undefined>(() => {
     if (!ready) {
       return undefined;

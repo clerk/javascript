@@ -110,7 +110,7 @@ export function VirtualStoreProvider({ initial, children }: VirtualStoreProvider
 }
 
 function missingProvider(): never {
-  throw new Error('[clerk] Virtual routing must be used within a <MosaicProvider>.');
+  throw new Error('[Clerk] Virtual routing must be used within a <MosaicProvider>.');
 }
 
 export function useVirtualEntries(): VirtualEntries {

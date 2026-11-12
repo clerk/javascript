@@ -12,5 +12,7 @@ export type { UserProfileProps } from './features/user-profile/user-profile';
 export { UserProfile } from './features/user-profile/user-profile';
 export type { MosaicProfile } from './features/profile-pages/use-mosaic-profile';
 export { MosaicProvider } from './mosaic-provider';
+export type { MosaicRouting, RouterAdapter } from './routing/router-adapter';
+export type { MosaicRoutingMode } from './routing/use-mosaic-location';
 export type { PortalContainer, PortalProviderProps } from './primitives/portal';
 export { PortalProvider } from './primitives/portal';

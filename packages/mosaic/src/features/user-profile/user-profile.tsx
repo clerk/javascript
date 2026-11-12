@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import { organizationProfilePanels } from '../organization-profile/organization-profile';
@@ -29,6 +30,15 @@ export interface UserProfileProps
    * @default '/user'
    */
   path?: string;
+  /**
+   * Where the profile keeps the page that is open. `virtual` keeps it in memory, so the URL does not
+   * change. `path` puts it in the URL's pathname under `path`, `query` and `hash` in a param of the
+   * query string or the hash named after `path`, so the page survives a reload and Back returns to
+   * the previous one.
+   *
+   * @default 'virtual'
+   */
+  routing?: MosaicRoutingMode;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that nobody is signed in.
    */
@@ -114,6 +124,7 @@ export function UserProfile(props: UserProfileProps) {
     additionalOAuthScopes = userProfileProps?.additionalOAuthScopes,
     apiKeysProps = userProfileProps?.apiKeysProps,
     path = userProfileProps?.path,
+    routing = userProfileProps?.routing,
     organizationProfileProps: {
       customPages: organizationCustomPages = providerOrganization?.customPages,
       pageOrder: organizationPageOrder = providerOrganization?.pageOrder,
@@ -132,6 +143,7 @@ export function UserProfile(props: UserProfileProps) {
       additionalOAuthScopes={additionalOAuthScopes}
       apiKeysProps={apiKeysProps}
       path={path}
+      routing={routing}
       organizationProfileProps={{
         customPages: organizationCustomPages,
         pageOrder: organizationPageOrder,
@@ -150,6 +162,7 @@ export function UserProfileSurface({
   customPages,
   pageOrder,
   path = '/user',
+  routing = 'virtual',
   additionalOAuthScopes,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
@@ -167,6 +180,7 @@ export function UserProfileSurface({
   const viewProps: AccountViewProps = {
     elevation: 'flush',
     path,
+    routing,
     customPages,
     pageOrder,
     pages: {
@@ -184,12 +198,16 @@ export function UserProfileSurface({
     >
       {combined ? (
         <CombinedUserProfileView
+          key={routing}
           {...viewProps}
           organizationProfileProps={organizationProfileProps}
           fallback={fallback}
         />
       ) : (
-        <AccountUserProfileView {...viewProps} />
+        <AccountUserProfileView
+          key={routing}
+          {...viewProps}
+        />
       )}
     </UserProfileProvider>
   );
@@ -197,11 +215,12 @@ export function UserProfileSurface({
 
 type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
   path: string;
+  routing: MosaicRoutingMode;
 };
 
-function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
+function AccountUserProfileView({ path, routing, ...viewProps }: AccountViewProps) {
   const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds(viewProps), {
-    routing: 'virtual',
+    routing,
     path,
   });
 
@@ -220,6 +239,7 @@ function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
 
 function CombinedUserProfileView({
   path,
+  routing,
   fallback,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
@@ -231,7 +251,7 @@ function CombinedUserProfileView({
       : undefined;
   const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
   const { activePage, onPageChange } = useProfilePagesController(pageIds, {
-    routing: 'virtual',
+    routing,
     path,
     notFound: parts =>
       `${parts[0]}/` === ORGANIZATION_PAGE_PREFIX

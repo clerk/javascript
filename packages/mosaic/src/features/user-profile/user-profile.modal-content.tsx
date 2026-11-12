@@ -9,6 +9,7 @@ export default function UserProfileModalContent({
   options,
   close,
   path,
+  routing,
 }: UserProfileModalContentProps): React.ReactElement {
   const { isLoaded, user } = useUser();
   const profile = useMosaicProfile();
@@ -29,6 +30,7 @@ export default function UserProfileModalContent({
       {...props}
       presentation='modal'
       path={path}
+      routing={routing}
     />
   );
 }

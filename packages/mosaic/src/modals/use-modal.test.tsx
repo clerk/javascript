@@ -1,7 +1,7 @@
 import { logger } from '@clerk/shared/logger';
 import { act, cleanup, configure, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { MosaicProviderProps } from '../mosaic-provider';
 import { MosaicProvider } from '../mosaic-provider';
@@ -159,6 +159,59 @@ describe('useModal', () => {
     expect(stubHandle?.isOpen).toBe(false);
     expect(screen.getByText('Other modal')).toBeInTheDocument();
     expect(screen.queryByText('Stub modal')).not.toBeInTheDocument();
+  });
+
+  it('lets only the modal on top take a dismissal', async () => {
+    function OtherContent() {
+      return <h2>Other modal</h2>;
+    }
+    const stub = stubSurface();
+    const other = defineModalSurface<StubOptions>({
+      id: 'other',
+      variant: 'card',
+      load: () => Promise.resolve({ default: OtherContent }),
+    });
+    let stubHandle: ModalHandle<StubOptions> | undefined;
+    let otherHandle: ModalHandle<StubOptions> | undefined;
+    renderWithModals(
+      [stub, other],
+      <>
+        <Caller
+          surface={stub}
+          onHandle={h => (stubHandle = h)}
+        />
+        <Caller
+          surface={other}
+          onHandle={h => (otherHandle = h)}
+        />
+      </>,
+    );
+    await flush();
+    act(() => stubHandle?.open());
+    await flush();
+    act(() => otherHandle?.open());
+    await flush();
+    expect(screen.getAllByRole('dialog')).toHaveLength(2);
+
+    act(() => {
+      screen.getByText('Other modal').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+    await flush();
+    expect(stubHandle?.isOpen).toBe(true);
+    expect(otherHandle?.isOpen).toBe(true);
+
+    act(() => {
+      screen.getByText('Other modal').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    await flush();
+    expect(otherHandle?.isOpen).toBe(false);
+    expect(stubHandle?.isOpen).toBe(true);
+
+    act(() => {
+      screen.getByText('Stub modal').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    await flush();
+    expect(stubHandle?.isOpen).toBe(false);
   });
 
   it('loads the content once across preloads and opens', async () => {
@@ -739,5 +792,185 @@ describe('a modal surface that routes', () => {
     await flush();
 
     expect(screen.getByTestId('base').textContent).toBe('/modal/based');
+  });
+});
+
+describe('a modal surface in path mode', () => {
+  const pages = { account: 'account', security: 'security' } as const;
+
+  function PathContent({ path, routing }: ModalContentProps<StubOptions>) {
+    const { route, go } = useRouterScope(pages, { routing, path, root: 'account' });
+    return (
+      <>
+        <output data-testid='route'>{route}</output>
+        <button
+          type='button'
+          onClick={() => go('security')}
+        >
+          Go to security
+        </button>
+      </>
+    );
+  }
+
+  function pathSurface() {
+    return defineModalSurface<StubOptions>({
+      id: 'pathed',
+      variant: 'card',
+      load: () => Promise.resolve({ default: PathContent }),
+      path: '/modal/stub',
+      initialParts: options => (options?.page ? [options.page] : []),
+    });
+  }
+
+  const providerProps = { routing: { modals: { routing: 'path', path: '/page' } } } as const;
+
+  beforeEach(() => window.history.replaceState(null, '', '/page?q=1'));
+
+  it('lives under the page it opens from and closes back to it', async () => {
+    const { ref } = renderCaller(pathSurface(), providerProps);
+    const length = window.history.length;
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByTestId('route').textContent).toBe('security');
+    expect(window.location.pathname + window.location.search).toBe('/page/modal/stub/security?q=1');
+    expect(window.history.length).toBe(length + 1);
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.pathname + window.location.search).toBe('/page?q=1');
+    expect(window.history.length).toBe(length + 1);
+  });
+
+  it('routes its content in the pathname', async () => {
+    const { ref } = renderCaller(pathSurface(), providerProps);
+
+    act(() => ref.handle?.open());
+    await flush();
+    expect(window.location.pathname).toBe('/page/modal/stub');
+    expect(screen.getByTestId('route').textContent).toBe('account');
+
+    act(() => screen.getByRole('button', { name: 'Go to security' }).click());
+    expect(window.location.pathname + window.location.search).toBe('/page/modal/stub/security?q=1');
+    expect(screen.getByTestId('route').textContent).toBe('security');
+  });
+
+  it('composes its base from a page and a path written without their slashes', async () => {
+    const surface = defineModalSurface<StubOptions>({
+      id: 'unslashed',
+      variant: 'card',
+      load: () => Promise.resolve({ default: PathContent }),
+      path: 'modal/stub/',
+      initialParts: options => (options?.page ? [options.page] : []),
+    });
+    const { ref } = renderCaller(surface, { routing: { modals: { routing: 'path', path: 'page/' } } });
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(window.location.pathname).toBe('/page/modal/stub/security');
+    expect(screen.getByTestId('route').textContent).toBe('security');
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.pathname + window.location.search).toBe('/page?q=1');
+  });
+
+  it('opens from the URL and closes when the browser goes back', async () => {
+    window.history.replaceState(null, '', '/page');
+    window.history.pushState(null, '', '/page/modal/stub/security');
+    const { ref } = renderCaller(pathSurface(), providerProps);
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByTestId('route').textContent).toBe('security');
+
+    act(() => {
+      window.history.replaceState(null, '', '/page');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+  });
+});
+
+describe('a modal surface in query mode', () => {
+  const pages = { account: 'account', security: 'security' } as const;
+
+  function QueryContent({ path, routing }: ModalContentProps<StubOptions>) {
+    const { route, go } = useRouterScope(pages, { routing, path, root: 'account' });
+    return (
+      <>
+        <output data-testid='route'>{route}</output>
+        <button
+          type='button'
+          onClick={() => go('security')}
+        >
+          Go to security
+        </button>
+      </>
+    );
+  }
+
+  function querySurface() {
+    return defineModalSurface<StubOptions>({
+      id: 'queried',
+      variant: 'card',
+      load: () => Promise.resolve({ default: QueryContent }),
+      path: '/modal/stub',
+      routing: 'query',
+      initialParts: options => (options?.page ? [options.page] : []),
+    });
+  }
+
+  beforeEach(() => window.history.replaceState(null, '', '/page?q=1'));
+
+  it('opens with a push to its param and closes by replacing it away', async () => {
+    const { ref } = renderCaller(querySurface());
+    const length = window.history.length;
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByTestId('route').textContent).toBe('security');
+    expect(window.location.search).toBe('?q=1&p.modal.stub=security');
+    expect(window.history.length).toBe(length + 1);
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.search).toBe('?q=1');
+    expect(window.history.length).toBe(length + 1);
+  });
+
+  it('routes its content in the query string', async () => {
+    const { ref } = renderCaller(querySurface());
+
+    act(() => ref.handle?.open());
+    await flush();
+    expect(window.location.search).toBe('?q=1&p.modal.stub=');
+    expect(screen.getByTestId('route').textContent).toBe('account');
+
+    act(() => screen.getByRole('button', { name: 'Go to security' }).click());
+    expect(window.location.search).toBe('?q=1&p.modal.stub=security');
+    expect(screen.getByTestId('route').textContent).toBe('security');
+  });
+
+  it('opens from the URL and closes when the browser goes back', async () => {
+    window.history.replaceState(null, '', '/page?q=1&p.modal.stub=security');
+    const { ref } = renderCaller(querySurface());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByTestId('route').textContent).toBe('security');
+
+    act(() => {
+      window.history.replaceState(null, '', '/page?q=1');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 });

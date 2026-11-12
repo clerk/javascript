@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
@@ -27,6 +28,15 @@ export interface OrganizationProfileProps
    * @default '/organization'
    */
   path?: string;
+  /**
+   * Where the profile keeps the page that is open. `virtual` keeps it in memory, so the URL does not
+   * change. `path` puts it in the URL's pathname under `path`, `query` and `hash` in a param of the
+   * query string or the hash named after `path`, so the page survives a reload and Back returns to
+   * the previous one.
+   *
+   * @default 'virtual'
+   */
+  routing?: MosaicRoutingMode;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that there is no active
    * organization.
@@ -78,15 +88,40 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
     customPages = organizationProfileProps?.customPages,
     pageOrder = organizationProfileProps?.pageOrder,
     path = organizationProfileProps?.path ?? '/organization',
+    routing = organizationProfileProps?.routing ?? 'virtual',
     afterLeaveOrganizationUrl = organizationProfileProps?.afterLeaveOrganizationUrl,
     fallback,
     apiKeysProps = organizationProfileProps?.apiKeysProps,
   } = props;
+
+  return (
+    <OrganizationProfileSurface
+      key={routing}
+      customPages={customPages}
+      pageOrder={pageOrder}
+      path={path}
+      routing={routing}
+      afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}
+      fallback={fallback}
+      apiKeysProps={apiKeysProps}
+    />
+  );
+}
+
+function OrganizationProfileSurface({
+  customPages,
+  pageOrder,
+  path,
+  routing,
+  afterLeaveOrganizationUrl,
+  fallback,
+  apiKeysProps,
+}: OrganizationProfileProps & Required<Pick<OrganizationProfileProps, 'path' | 'routing'>>) {
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
   const { activePage, onPageChange } = useProfilePagesController(
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
-    { routing: 'virtual', path },
+    { routing, path },
   );
 
   if (model.status === 'loading') {
