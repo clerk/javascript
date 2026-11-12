@@ -1,0 +1,143 @@
+import * as ImageCropperStories from './image-cropper.stories';
+
+# Image Cropper
+
+Crops an image to a square. The user pans by dragging or with the arrow keys, zooms with the wheel, a
+pinch, the keyboard, a slider or step buttons, turns it a quarter at a time, and resets it.
+`cropImage` then draws the chosen square into a new image. It is a **headless** primitive: it ships
+**no styles**. You size the frame, draw any mask over it, and style the controls through the `data-*`
+attributes each part emits.
+
+## Example
+
+The demo is intentionally unstyled. The only inline styles give the frame a size and clip the image,
+which the primitive leaves to you. Drag, zoom or rotate the image, then press Crop to see the 128px
+result from `cropImage`.
+
+<Story
+  name='Default'
+  storyModule={ImageCropperStories}
+/>
+
+## Usage
+
+```tsx
+import { useState } from 'react';
+
+import { type Crop, cropImage, ImageCropper, INITIAL_CROP } from '@clerk/mosaic/primitives/image-cropper';
+
+const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
+
+<ImageCropper.Root
+  src={src}
+  value={crop}
+  onValueChange={setCrop}
+>
+  <ImageCropper.Viewport aria-label='Crop. Drag or use the arrow keys to move, plus and minus to zoom.'>
+    <ImageCropper.Image />
+  </ImageCropper.Viewport>
+  <ImageCropper.ZoomOut aria-label='Zoom out'>−</ImageCropper.ZoomOut>
+  <ImageCropper.Zoom aria-label='Zoom' />
+  <ImageCropper.ZoomIn aria-label='Zoom in'>+</ImageCropper.ZoomIn>
+  <ImageCropper.Rotate>Rotate</ImageCropper.Rotate>
+  <ImageCropper.Reset>Reset</ImageCropper.Reset>
+</ImageCropper.Root>;
+
+const blob = await cropImage(src, crop, { size: 512, type: 'image/png' });
+```
+
+### A crop area inside a larger frame
+
+Without `Area`, the whole `Viewport` is the crop. Wrap the image in `Area` to make the crop a smaller
+square, and the `Viewport` around it shows the rest of the image for context. Drags are measured
+against the `Area`, so the image follows the pointer either way.
+
+```tsx
+<ImageCropper.Viewport aria-label='Crop'>
+  <ImageCropper.Area>
+    <ImageCropper.Image />
+  </ImageCropper.Area>
+</ImageCropper.Viewport>
+```
+
+## Parts
+
+| Part                    | Default Element        | Description                                                            |
+| ----------------------- | ---------------------- | ---------------------------------------------------------------------- |
+| `ImageCropper.Root`     | none                   | Owns the crop and the image size, provides context                     |
+| `ImageCropper.Viewport` | `<div>`                | The frame: pans on drag and arrow keys, zooms on wheel, pinch and keys |
+| `ImageCropper.Area`     | `<div>`                | The square that is cropped, when it is smaller than the frame          |
+| `ImageCropper.Image`    | `<img>`                | The image, placed by the crop. Reports its size on load                |
+| `ImageCropper.Zoom`     | `<input type="range">` | Sets the zoom, from 1 to `maxZoom`                                     |
+| `ImageCropper.ZoomIn`   | `<button>`             | Zooms in one step. Disabled at `maxZoom`                               |
+| `ImageCropper.ZoomOut`  | `<button>`             | Zooms out one step. Disabled at 1                                      |
+| `ImageCropper.Rotate`   | `<button>`             | Turns the image a quarter clockwise                                    |
+| `ImageCropper.Reset`    | `<button>`             | Returns to `INITIAL_CROP`                                              |
+
+All parts except `Root` accept a `render` prop and standard HTML attributes for their default
+element. Every control stays disabled until the image has loaded, because the crop limits depend on
+its size.
+
+## Props
+
+### `ImageCropper.Root`
+
+| Prop                       | Type                              | Default                   | Description                                     |
+| -------------------------- | --------------------------------- | ------------------------- | ----------------------------------------------- |
+| <code>src</code>           | <code>string</code>               | — (required)              | The image to crop, such as an object URL        |
+| <code>value</code>         | <code>Crop</code>                 | —                         | Controlled crop                                 |
+| <code>defaultValue</code>  | <code>Crop</code>                 | <code>INITIAL_CROP</code> | Initial crop (uncontrolled)                     |
+| <code>onValueChange</code> | <code>(crop: Crop) => void</code> | —                         | Called on every pan, zoom, turn and reset       |
+| <code>maxZoom</code>       | <code>number</code>               | <code>4</code>            | Largest zoom, as a multiple of the cover scale  |
+| <code>disabled</code>      | <code>boolean</code>              | <code>false</code>        | Ignores every gesture and disables the controls |
+
+A `Crop` is `{ x, y, zoom, rotation }`. `x` and `y` move the image centre from the frame centre, as a
+fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame. `rotation` is `0`,
+`90`, `180` or `270`. The crop is always clamped so the image covers the frame.
+
+Other parts take no additional props beyond standard HTML attributes for their default element.
+
+### `cropImage(src, crop, { size, type })`
+
+Returns a `Promise<Blob>` holding the square the crop shows, `size` pixels wide, encoded as `type`. It
+draws to a canvas, so an animated image keeps only its first frame.
+
+### Keyboard
+
+On a focused `Viewport`:
+
+| Key        | Action                   |
+| ---------- | ------------------------ |
+| Arrow keys | Pan. Hold Shift for more |
+| `+` / `=`  | Zoom in one step         |
+| `-` / `_`  | Zoom out one step        |
+| `0`        | Reset                    |
+
+## Styling
+
+The primitive sets only the `Image` placement (absolute, centred, scaled and rotated by the crop) and
+`touch-action: none` on the `Viewport` once the image has loaded. Give the `Viewport` a size, `position: relative` and
+`overflow: hidden`.
+
+| Attribute       | Applies To                                     | Description                         |
+| --------------- | ---------------------------------------------- | ----------------------------------- |
+| `data-dragging` | Viewport                                       | Present while a pointer is dragging |
+| `data-loaded`   | Image                                          | Present once the image has loaded   |
+| `data-disabled` | Viewport, Zoom, ZoomIn, ZoomOut, Rotate, Reset | Present when the part is disabled   |
+
+```css
+.cropper-viewport {
+  position: relative;
+  overflow: hidden;
+  width: 240px;
+  height: 240px;
+  cursor: grab;
+}
+.cropper-viewport[data-dragging] {
+  cursor: grabbing;
+}
+```
+
+`Viewport` has `role="application"` so screen readers pass the arrow keys through; give it an
+`aria-label` that names the keys. It leaves the tab order until the image has loaded. `Image` has an
+empty `alt`, because the `Viewport` label describes it. Give icon-only buttons an `aria-label`.
