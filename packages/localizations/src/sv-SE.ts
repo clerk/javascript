@@ -1639,6 +1639,14 @@ export const svSE: LocalizationResource = {
       subtitle: 'Ange lösenordet som är kopplat till ditt konto',
       title: 'Ange ditt lösenord',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifieringskod',
       resendButton: 'Fick du ingen kod? Skicka igen',
@@ -1650,6 +1658,22 @@ export const svSE: LocalizationResource = {
       resendButton: 'Fick du ingen kod? Skicka igen',
       subtitle: 'För att fortsätta, vänligen ange verifieringskoden som skickats till din telefon',
       title: 'Kontrollera din telefon',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verifieringskod',
