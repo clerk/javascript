@@ -2,12 +2,20 @@ import { describe, expect, it } from 'vitest';
 
 import { signInMessages } from '../sign-in.messages';
 import type { SignInStep } from '../sign-in.types';
-import { codeCopy, codeIdentity, codeNotice, codeSecondaryAction, httpsUrl, stepKey } from '../sign-in.utils';
+import {
+  codeCopy,
+  codeIdentity,
+  codeNotice,
+  codeSecondaryAction,
+  httpsUrl,
+  identifierFieldCopy,
+  stepKey,
+} from '../sign-in.utils';
 
 describe('stepKey', () => {
   it('keys each step by its kind and the variant that changes its copy', () => {
     const steps: [SignInStep, string][] = [
-      [{ kind: 'identifier' }, 'identifier'],
+      [{ kind: 'identifier', field: 'email' }, 'identifier'],
       [{ kind: 'credential', credential: 'password', identifier: 'jane@acme.com' }, 'credential:password'],
       [{ kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' }, 'credential:backup-code'],
       [{ kind: 'credential', credential: 'passkey', identifier: 'jane@acme.com' }, 'credential:passkey'],
@@ -101,6 +109,32 @@ describe('code step copy', () => {
     expect(codeSecondaryAction(step, m, { onCancel, onBack })).toEqual({
       label: 'Use another method',
       onClick: onCancel,
+    });
+  });
+});
+
+describe('identifierFieldCopy', () => {
+  it('labels each identifier field and the link that switches to it', () => {
+    const m = signInMessages;
+    expect(identifierFieldCopy('email', m)).toEqual({
+      label: 'Email address',
+      placeholder: 'Enter your email address',
+      switchLabel: 'Use email',
+    });
+    expect(identifierFieldCopy('email-or-username', m)).toEqual({
+      label: 'Email address or username',
+      placeholder: 'Enter email or username',
+      switchLabel: 'Use email or username',
+    });
+    expect(identifierFieldCopy('username', m)).toEqual({
+      label: 'Username',
+      placeholder: 'Enter your username',
+      switchLabel: 'Use username',
+    });
+    expect(identifierFieldCopy('phone', m)).toEqual({
+      label: 'Phone number',
+      placeholder: 'Enter your phone number',
+      switchLabel: 'Use phone',
     });
   });
 });

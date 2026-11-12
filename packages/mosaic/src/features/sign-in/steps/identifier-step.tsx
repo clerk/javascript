@@ -8,14 +8,19 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
+import { PhoneInput } from '../../../components/phone-input';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { SignInProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import type { SignInIdentifierField, SignInProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import { identifierFieldCopy } from '../sign-in.utils';
 
 interface IdentifierStepProps {
+  field: SignInIdentifierField;
+  nextField?: SignInIdentifierField;
+  onSwitchField?: () => void;
   applicationName: string;
   combined: boolean;
   logo?: { src: string; alt: string };
@@ -33,6 +38,9 @@ interface IdentifierStepProps {
 }
 
 export function IdentifierStep({
+  field,
+  nextField,
+  onSwitchField,
   applicationName,
   combined,
   logo,
@@ -50,7 +58,11 @@ export function IdentifierStep({
 }: IdentifierStepProps) {
   const m = useMessages('signIn');
   const { ref: identifierFieldRef, ...identifier } = form.register('identifier');
-  const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
+  const { ref: phoneFieldRef, ...phone } = form.registerValue('identifier');
+  const autoFocusRef = useFlowAutoFocus<HTMLInputElement>();
+  const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, autoFocusRef]);
+  const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, autoFocusRef]);
+  const copy = identifierFieldCopy(field, m);
   const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
 
   return (
@@ -121,14 +133,39 @@ export function IdentifierStep({
             disabled={isDisabled}
             focusableWhenDisabled
           >
-            <Field.Label>{m.start.emailLabel}</Field.Label>
-            <Input
-              ref={identifierRef}
-              type='email'
-              autoComplete='email webauthn'
-              placeholder={m.start.emailPlaceholder}
-              {...identifier}
-            />
+            <Field.Header>
+              <Field.Label>{copy.label}</Field.Label>
+              {nextField && onSwitchField ? (
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='link'
+                  disabled={isDisabled}
+                  onClick={onSwitchField}
+                >
+                  {identifierFieldCopy(nextField, m).switchLabel}
+                </Button>
+              ) : null}
+            </Field.Header>
+            {field === 'phone' ? (
+              <PhoneInput
+                ref={phoneRef}
+                autoComplete='tel webauthn'
+                placeholder={copy.placeholder}
+                countryTriggerLabel={m.start.selectedCountry}
+                countryPopupLabel={m.start.chooseCountry}
+                countrySearchLabel={m.start.searchCountries}
+                {...phone}
+              />
+            ) : (
+              <Input
+                ref={identifierRef}
+                type={field === 'email' ? 'email' : 'text'}
+                autoComplete={field === 'email' ? 'email webauthn' : 'username webauthn'}
+                placeholder={copy.placeholder}
+                {...identifier}
+              />
+            )}
             <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>

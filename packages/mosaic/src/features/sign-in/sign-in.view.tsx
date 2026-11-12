@@ -68,6 +68,7 @@ export function SignInView({
   globalErrorMessage,
   newPasswordFeedback,
   onEditIdentifier,
+  onSwitchField,
   onSignUp,
   onForgotPassword,
   onCancel,
@@ -106,6 +107,8 @@ export function SignInView({
       onClick: onResend,
     };
 
+  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+
   return (
     <Card.Root align='center'>
       <Flow.Root
@@ -118,22 +121,27 @@ export function SignInView({
           return (
             <>
               <Flow.Step ids={['identifier']}>
-                <IdentifierStep
-                  focusRef={focusRef}
-                  logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
-                  applicationName={applicationName}
-                  combined={combined}
-                  socialProviders={socialProviders}
-                  pendingProviderId={pendingProviderId}
-                  onSelectProvider={onSelectProvider}
-                  form={form}
-                  errorMessage={errorMessage}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  isDisabled={isDisabled}
-                  onSubmit={onSubmit}
-                  onSignUp={onSignUp}
-                />
+                {current.kind === 'identifier' ? (
+                  <IdentifierStep
+                    field={current.field}
+                    nextField={current.nextField}
+                    onSwitchField={onSwitchField}
+                    focusRef={focusRef}
+                    logo={logo}
+                    applicationName={applicationName}
+                    combined={combined}
+                    socialProviders={socialProviders}
+                    pendingProviderId={pendingProviderId}
+                    onSelectProvider={onSelectProvider}
+                    form={form}
+                    errorMessage={errorMessage}
+                    globalErrorMessage={globalErrorMessage}
+                    isPending={isPending}
+                    isDisabled={isDisabled}
+                    onSubmit={onSubmit}
+                    onSignUp={onSignUp}
+                  />
+                ) : null}
               </Flow.Step>
 
               <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
@@ -213,7 +221,7 @@ export function SignInView({
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}
                     onBack={onBack}
-                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     pendingProviderId={pendingProviderId}
                     onSelectProvider={onSelectProvider}
@@ -238,7 +246,7 @@ export function SignInView({
                     focusRef={focusRef}
                     step={current}
                     applicationName={applicationName}
-                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     isPending={isPending}
                     resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}

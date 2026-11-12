@@ -1,6 +1,6 @@
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
-import type { SignInStep } from './sign-in.types';
+import type { SignInIdentifierField, SignInStep } from './sign-in.types';
 
 export function stepKey(step: SignInStep): string {
   switch (step.kind) {
@@ -150,4 +150,31 @@ export function codeSecondaryAction(
     return { label: m.back, onClick: onBack };
   }
   return { label: m.useAnotherMethod, onClick: onCancel };
+}
+
+interface IdentifierFieldCopy {
+  label: string;
+  placeholder: string;
+  switchLabel: string;
+}
+
+export function identifierFieldCopy(field: SignInIdentifierField, m: Messages): IdentifierFieldCopy {
+  switch (field) {
+    case 'email':
+      return { label: m.start.emailLabel, placeholder: m.start.emailPlaceholder, switchLabel: m.start.useEmail };
+    case 'email-or-username':
+      return {
+        label: m.start.emailOrUsernameLabel,
+        placeholder: m.start.emailOrUsernamePlaceholder,
+        switchLabel: m.start.useEmailOrUsername,
+      };
+    case 'username':
+      return {
+        label: m.start.usernameLabel,
+        placeholder: m.start.usernamePlaceholder,
+        switchLabel: m.start.useUsername,
+      };
+    case 'phone':
+      return { label: m.start.phoneLabel, placeholder: m.start.phonePlaceholder, switchLabel: m.start.usePhone };
+  }
 }

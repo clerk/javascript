@@ -16,8 +16,10 @@ export type SignInFactor =
 
 type SignInCodeChannel = 'email' | 'phone' | 'totp';
 
+export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
+
 export type SignInStep =
-  | { kind: 'identifier' }
+  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField }
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
@@ -91,6 +93,7 @@ export interface SignInViewProps {
   globalErrorMessage?: string;
   newPasswordFeedback?: FieldFeedback;
   onEditIdentifier: () => void;
+  onSwitchField?: () => void;
   onSignUp?: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
