@@ -76,6 +76,18 @@ describe('code step copy', () => {
     expect(codeCopy(step, m, 'Acme').description).toContain('jane@acme.com');
   });
 
+  it('formats a phone number named in the description', () => {
+    const step = { kind: 'code', purpose: 'second-factor', channel: 'phone', identifier: '+15555550123' } as const;
+
+    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the verification code sent to +1 (555) 555-0123');
+  });
+
+  it('leaves a masked phone number as FAPI sent it', () => {
+    const step = { kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: '+1******0123' } as const;
+
+    expect(codeCopy(step, m, 'Acme').description).toBe('First, enter the code sent to your phone +1******0123');
+  });
+
   it('warns on a new device and on an SSO bypass', () => {
     expect(codeNotice({ kind: 'code', purpose: 'client-trust', channel: 'email' }, m)).toBe(m.clientTrust.notice);
     expect(codeNotice({ kind: 'code', purpose: 'sso-bypass', channel: 'email' }, m)).toBe(m.ssoBypass.notice);
@@ -86,7 +98,7 @@ describe('code step copy', () => {
     const step = { kind: 'code', purpose: 'verify-phone', channel: 'phone', identifier: '+1 555 555 0123' } as const;
 
     expect(codeCopy(step, m, 'Acme').title).toBe('Verify your phone');
-    expect(codeIdentity(step, m).identifier).toBe('+1 555 555 0123');
+    expect(codeIdentity(step, m).identifier).toBe('+1 (555) 555-0123');
     expect(
       codeSecondaryAction(step, m, { onCancel: () => undefined, onBack: () => undefined }).onClick,
     ).toBeUndefined();

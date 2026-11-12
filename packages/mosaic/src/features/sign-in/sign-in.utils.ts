@@ -1,3 +1,5 @@
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
+
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
 import type { SignInStep } from './sign-in.types';
@@ -38,7 +40,7 @@ export function codeCopy(
   m: Messages,
   applicationName: string,
 ): { title: string; description: string; fieldLabel: string } {
-  const identifier = step.identifier ?? '';
+  const identifier = displayIdentifier(step) ?? '';
   if (step.purpose === 'reset-password') {
     const description =
       step.channel === 'phone' ? m.resetPasswordCode.descriptionPhone : m.resetPasswordCode.descriptionEmail;
@@ -110,9 +112,17 @@ function sentToIdentifier(step: CodeStepData): boolean {
   return Boolean(step.identifier) && !identifierEditable(step);
 }
 
+function displayIdentifier(step: CodeStepData): string | undefined {
+  const { identifier } = step;
+  if (step.channel !== 'phone' || !identifier || identifier.includes('*')) {
+    return identifier;
+  }
+  return stringToFormattedPhoneString(identifier);
+}
+
 export function codeIdentity(step: CodeStepData, m: Messages): { identifier?: string; editLabel: string } {
   return {
-    identifier: step.channel !== 'totp' && identifierEditable(step) ? step.identifier : undefined,
+    identifier: step.channel !== 'totp' && identifierEditable(step) ? displayIdentifier(step) : undefined,
     editLabel: step.channel === 'phone' ? m.editPhoneNumber : m.editIdentifier,
   };
 }
