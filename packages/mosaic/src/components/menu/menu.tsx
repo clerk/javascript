@@ -134,7 +134,7 @@ export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(funct
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('menu-media', { size }),
+        themeProps('menu-item-media', { size }),
         stylex.props(reset.base, slots.media.base, slots.media[size], xstyle),
         rest,
       ),
@@ -160,7 +160,7 @@ export const MenuLabel = React.forwardRef<HTMLSpanElement, MenuLabelProps>(funct
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('menu-label'),
+        themeProps('menu-item-label'),
         stylex.props(reset.base, slots.label.base, truncationStyles.singleLine, xstyle),
         rest,
       ),
@@ -179,7 +179,11 @@ export const MenuIndicator = React.forwardRef<HTMLSpanElement, MenuIndicatorProp
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('menu-indicator'), stylex.props(reset.base, slots.indicator.base, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('menu-item-indicator'),
+        stylex.props(reset.base, slots.indicator.base, xstyle),
+        rest,
+      ),
     },
   });
 });
