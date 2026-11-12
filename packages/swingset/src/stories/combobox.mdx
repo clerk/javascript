@@ -45,6 +45,17 @@ so a plain input can show a count instead.
 </Combobox.Root>
 ```
 
+## Always open
+
+For a picker that sits in the page, set `inline` and `open` and render `List` in place of `Popup`.
+Picking keeps the list open. To hide picked options, as below, control `value` and filter them out of
+`items`.
+
+<Story
+  name='AlwaysOpen'
+  storyModule={ComboboxStories}
+/>
+
 ## Inline lists
 
 Use `List` inside an existing popover. Set `inline` and bind the root's open state to that popover

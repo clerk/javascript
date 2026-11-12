@@ -4,6 +4,7 @@ import { Combobox } from '@clerk/mosaic/components/combobox';
 import { Field } from '@clerk/mosaic/components/field';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
 import * as stylex from '@stylexjs/stylex';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -144,6 +145,67 @@ export function MultipleCount() {
           )}
         </Combobox.Collection>
       </Combobox.Popup>
+    </Combobox.Root>
+  );
+}
+
+export function AlwaysOpen() {
+  const projects = [
+    'storybook',
+    'clerk',
+    'internal-compliance-portal',
+    'clark-agent',
+    'swingset',
+    'clerk-js-sandbox',
+    'roadmap-admin',
+    'roadmap-portal',
+  ];
+  const [value, setValue] = useState<string[]>([]);
+
+  return (
+    <Combobox.Root
+      multiple
+      inline
+      open
+      value={value}
+      onValueChange={setValue}
+    >
+      <Field.Root xstyle={styles.fieldWidth}>
+        <Field.Label>Projects</Field.Label>
+        <Combobox.Chips>
+          <Combobox.Value>
+            {values =>
+              values.map(project => (
+                <Combobox.Chip
+                  key={project}
+                  value={project}
+                  removeLabel={`Remove ${project}`}
+                >
+                  {project}
+                </Combobox.Chip>
+              ))
+            }
+          </Combobox.Value>
+          <Combobox.Input placeholder='Search projects' />
+        </Combobox.Chips>
+        <Combobox.List aria-label='Projects'>
+          <Combobox.Collection
+            items={projects.filter(project => !value.includes(project))}
+            itemToStringLabel={project => project}
+            empty={<Combobox.Empty>No projects found</Combobox.Empty>}
+          >
+            {project => (
+              <Combobox.Option
+                key={project}
+                value={project}
+                label={project}
+              >
+                {project}
+              </Combobox.Option>
+            )}
+          </Combobox.Collection>
+        </Combobox.List>
+      </Field.Root>
     </Combobox.Root>
   );
 }
