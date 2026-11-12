@@ -113,8 +113,19 @@ function IdentifierStart({
   const { ref: identifierFieldRef, ...identifier } = form.register('identifier');
   const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const autoFocusRef = useFlowAutoFocus<HTMLInputElement>();
-  const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, autoFocusRef]);
-  const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, autoFocusRef]);
+  const switchedRef = React.useRef(false);
+  const focusAfterSwitch = React.useCallback((element: HTMLElement | null) => {
+    if (element && switchedRef.current) {
+      switchedRef.current = false;
+      element.focus();
+    }
+  }, []);
+  const switchField = () => {
+    switchedRef.current = true;
+    onSwitchField?.();
+  };
+  const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, autoFocusRef, focusAfterSwitch]);
+  const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, autoFocusRef, focusAfterSwitch]);
   const copy = identifierFieldCopy(field, m);
   const [isChallengeShown, setIsChallengeShown] = React.useState(false);
   const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
@@ -170,7 +181,7 @@ function IdentifierStart({
                     size='sm'
                     variant='link'
                     disabled={isDisabled}
-                    onClick={onSwitchField}
+                    onClick={switchField}
                   >
                     {identifierFieldCopy(nextField, m).switchLabel}
                   </Button>
