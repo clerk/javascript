@@ -49,31 +49,31 @@ describe('code step copy', () => {
   it('names the alternative phone channel in the title and offers SMS instead', () => {
     const step = { kind: 'code', purpose: 'first-factor', channel: 'phone', provider: 'WhatsApp' } as const;
 
-    expect(codeCopy(step, m).title).toBe('Check your WhatsApp');
+    expect(codeCopy(step, m, 'Acme').title).toBe('Check your WhatsApp');
     expect(codeSecondaryAction(step, m, { onCancel: () => undefined, onBack: () => undefined }).label).toBe(
       'Send code via SMS instead',
     );
   });
 
-  it('shows the identifier on its own line, editable only before the second factor', () => {
-    const first = codeIdentity(
-      { kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: '+1******0123' },
-      m,
-    );
-    const second = codeIdentity(
-      { kind: 'code', purpose: 'second-factor', channel: 'email', identifier: 'jane@acme.com' },
-      m,
-    );
+  it('shows an editable identifier on its own line before the second factor', () => {
+    const step = { kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: '+1******0123' } as const;
 
-    expect(first).toMatchObject({ identifier: '+1******0123', editable: true, editLabel: 'Edit phone number' });
-    expect(second).toMatchObject({ identifier: 'jane@acme.com', editable: false });
+    expect(codeIdentity(step, m)).toEqual({ identifier: '+1******0123', editLabel: 'Edit phone number' });
+    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the verification code to continue to Acme');
+  });
+
+  it('names the identifier in the description when it cannot be edited', () => {
+    const step = { kind: 'code', purpose: 'second-factor', channel: 'email', identifier: 'jane@acme.com' } as const;
+
+    expect(codeIdentity(step, m).identifier).toBeUndefined();
+    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the verification code sent to jane@acme.com');
   });
 
   it('keeps the identifier in the description where the copy already names it', () => {
     const step = { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' } as const;
 
     expect(codeIdentity(step, m).identifier).toBeUndefined();
-    expect(codeCopy(step, m).description).toContain('jane@acme.com');
+    expect(codeCopy(step, m, 'Acme').description).toContain('jane@acme.com');
   });
 
   it('warns on a new device and on an SSO bypass', () => {
@@ -85,8 +85,8 @@ describe('code step copy', () => {
   it('lets a phone being verified be edited and offers no other method', () => {
     const step = { kind: 'code', purpose: 'verify-phone', channel: 'phone', identifier: '+1 555 555 0123' } as const;
 
-    expect(codeCopy(step, m).title).toBe('Verify your phone');
-    expect(codeIdentity(step, m)).toMatchObject({ identifier: '+1 555 555 0123', editable: true });
+    expect(codeCopy(step, m, 'Acme').title).toBe('Verify your phone');
+    expect(codeIdentity(step, m).identifier).toBe('+1 555 555 0123');
     expect(
       codeSecondaryAction(step, m, { onCancel: () => undefined, onBack: () => undefined }).onClick,
     ).toBeUndefined();

@@ -78,7 +78,8 @@ export const signInMessages = {
   },
   emailCode: {
     title: 'Check your email',
-    description: 'Enter the verification code sent to your email',
+    description: 'Enter the verification code to continue to {applicationName}',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
@@ -86,7 +87,8 @@ export const signInMessages = {
   },
   phoneCode: {
     title: 'Check your phone',
-    description: 'Enter the verification code sent to your phone',
+    description: 'Enter the verification code to continue to {applicationName}',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
@@ -94,7 +96,8 @@ export const signInMessages = {
   },
   phoneCodeMfa: {
     title: 'Check your phone',
-    description: 'To continue, enter the verification code sent to your phone',
+    description: 'Enter the verification code sent to your phone',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
@@ -102,7 +105,8 @@ export const signInMessages = {
   },
   alternativePhoneCode: {
     title: 'Check your {provider}',
-    description: 'Enter the verification code sent to your {provider}',
+    description: 'Enter the verification code to continue to {applicationName}',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
     label: 'Verification code',
     useSms: 'Send code via SMS instead',
     resendText: 'Didn’t receive a code?',

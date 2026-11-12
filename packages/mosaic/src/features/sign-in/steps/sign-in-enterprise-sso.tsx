@@ -10,7 +10,6 @@ import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { styles } from '../sign-in.styles';
 import type { SignInSocialProvider } from '../sign-in.types';
-import { SignInLogo } from './sign-in-logo';
 
 interface SignInEnterpriseSsoProps {
   applicationName: string;
@@ -45,7 +44,15 @@ export function SignInEnterpriseSso({
   return (
     <>
       <Card.Header>
-        <SignInLogo logo={logo} />
+        {logo ? (
+          <Card.Media>
+            <img
+              src={logo.src}
+              alt={logo.alt}
+              {...stylex.props(styles.logo)}
+            />
+          </Card.Media>
+        ) : null}
         <Card.Title>{choosing ? m.enterpriseSso.chooseTitle : fill(m.start.title, { applicationName })}</Card.Title>
         <Card.Description>{choosing ? m.enterpriseSso.chooseDescription : m.start.description}</Card.Description>
       </Card.Header>

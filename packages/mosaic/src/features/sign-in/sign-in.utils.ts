@@ -33,7 +33,11 @@ type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
 type CodeResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
 
-export function codeCopy(step: CodeStepData, m: Messages): { title: string; description: string; fieldLabel: string } {
+export function codeCopy(
+  step: CodeStepData,
+  m: Messages,
+  applicationName: string,
+): { title: string; description: string; fieldLabel: string } {
   const identifier = step.identifier ?? '';
   if (step.purpose === 'reset-password') {
     const description =
@@ -64,19 +68,15 @@ export function codeCopy(step: CodeStepData, m: Messages): { title: string; desc
   if (step.channel === 'totp') {
     return { title: m.totpMfa.title, description: m.totpMfa.description, fieldLabel: m.totpMfa.label };
   }
-  if (step.channel === 'phone' && step.provider) {
-    const provider = step.provider;
-    return {
-      title: fill(m.alternativePhoneCode.title, { provider }),
-      description: fill(m.alternativePhoneCode.description, { provider }),
-      fieldLabel: m.alternativePhoneCode.label,
-    };
-  }
-  if (step.channel === 'phone') {
-    const copy = step.purpose === 'first-factor' ? m.phoneCode : m.phoneCodeMfa;
-    return { title: copy.title, description: copy.description, fieldLabel: copy.label };
-  }
-  return { title: m.emailCode.title, description: m.emailCode.description, fieldLabel: m.emailCode.label };
+  const copy = channelCopy(step, m);
+  const description = sentToIdentifier(step)
+    ? fill(copy.descriptionSentTo, { identifier })
+    : fill(copy.description, { applicationName });
+  const title =
+    step.channel === 'phone' && step.provider
+      ? fill(m.alternativePhoneCode.title, { provider: step.provider })
+      : copy.title;
+  return { title, description, fieldLabel: copy.label };
 }
 
 export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy {
@@ -89,6 +89,10 @@ export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy 
   if (step.purpose === 'verify-phone') {
     return m.verifyPhone;
   }
+  return channelCopy(step, m);
+}
+
+function channelCopy(step: CodeStepData, m: Messages) {
   if (step.channel === 'phone' && step.provider) {
     return m.alternativePhoneCode;
   }
@@ -98,16 +102,18 @@ export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy 
   return m.emailCode;
 }
 
-export function codeIdentity(
-  step: CodeStepData,
-  m: Messages,
-): { identifier?: string; editLabel: string; editable: boolean } {
-  const describesIdentifier =
-    step.channel === 'totp' || step.purpose === 'reset-password' || step.purpose === 'verify-email';
+function identifierEditable(step: CodeStepData): boolean {
+  return step.purpose === 'first-factor' || step.purpose === 'sso-bypass' || step.purpose === 'verify-phone';
+}
+
+function sentToIdentifier(step: CodeStepData): boolean {
+  return Boolean(step.identifier) && !identifierEditable(step);
+}
+
+export function codeIdentity(step: CodeStepData, m: Messages): { identifier?: string; editLabel: string } {
   return {
-    identifier: describesIdentifier ? undefined : step.identifier,
+    identifier: step.channel !== 'totp' && identifierEditable(step) ? step.identifier : undefined,
     editLabel: step.channel === 'phone' ? m.editPhoneNumber : m.editIdentifier,
-    editable: step.purpose === 'first-factor' || step.purpose === 'sso-bypass' || step.purpose === 'verify-phone',
   };
 }
 

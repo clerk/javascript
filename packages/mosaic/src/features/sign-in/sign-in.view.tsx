@@ -175,7 +175,7 @@ export function SignInView({
                   <CodeStep
                     focusRef={focusRef}
                     messages={{
-                      ...codeCopy(current, m),
+                      ...codeCopy(current, m, applicationName),
                       ...actions,
                       secondaryActionLabel: secondary?.label ?? actions.secondaryActionLabel,
                       ...(current.purpose === 'reset-password'

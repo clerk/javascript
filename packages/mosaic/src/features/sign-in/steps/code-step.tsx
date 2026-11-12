@@ -9,7 +9,7 @@ import { SignInIdentityPreview } from './sign-in-identity-preview';
 interface CodeStepProps {
   messages: VerificationCodeMessages;
   resend?: VerificationCodeResend;
-  identity: { identifier?: string; editLabel: string; editable: boolean };
+  identity: { identifier?: string; editLabel: string };
   notice?: string;
   onEditIdentifier: () => void;
   form: UseFormResult<SignInValues>;
@@ -54,7 +54,7 @@ export function CodeStep({
             identifier={identity.identifier}
             editLabel={identity.editLabel}
             disabled={isPending}
-            onEdit={identity.editable ? onEditIdentifier : undefined}
+            onEdit={onEditIdentifier}
           />
         ) : undefined
       }
