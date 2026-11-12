@@ -25,7 +25,7 @@ The docs describe the Mosaic we are building toward. Code that differs from them
 
 Read every line that matches your task. Paths below are relative to this package.
 
-- Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If the repo's `packages/ui` has a legacy version, [Migration](docs/migration.md) first
+- Add a feature, or a file to one → [Features](docs/features.md), then the guide for each layer below. If `packages/ui` or `packages/react` has a legacy version, [Migration](docs/migration.md) first, even for a headless port
 - Write or change a model, or add a Clerk read, mutation or permission check → [Models](docs/models.md)
 - Build a feature from a design before Clerk's API can back it → [Models → Before the API exists](docs/models.md#before-the-api-exists)
 - Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
@@ -41,7 +41,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Write, move or review a test → [Testing](docs/testing.md)
 - Fix or silence a lint error → [Lint](docs/lint.md)
 - Move a legacy component's logic or styles into Mosaic → [Migration](docs/migration.md)
-- Check that a migration kept every legacy behavior → [Parity audit](docs/parity-audit.md)
+- Implement or review a migration, or check that it kept every legacy behavior → [Parity audit](docs/parity-audit.md)
 - Add or change a component's Swingset page → [Documenting components](docs/documenting-components.md)
 - Prove a change in a browser → [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)
 - Remove or rename a public export, prop, `--cl-*` token or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)

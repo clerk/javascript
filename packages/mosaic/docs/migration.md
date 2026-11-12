@@ -1,6 +1,6 @@
 # Migration
 
-Read this when you move a legacy component (usually under `packages/ui/src/components/<Feature>/`) into Mosaic, whether its flow logic or only its styles. It covers the five phases from inventory to ship; the finished shape is in [Features](features.md), and the parity check is in [Parity audit](parity-audit.md).
+Read this when you move a legacy component (under `packages/ui/src/components/<Feature>/` or `packages/react/src/components/`) into Mosaic, including a headless port framed as a new feature, whether its flow logic or only its styles. It covers the five phases from inventory to ship; the finished shape is in [Features](features.md), and the parity check is in [Parity audit](parity-audit.md).
 
 Worked example: `src/features/reverification/`.
 
@@ -8,6 +8,8 @@ Worked example: `src/features/reverification/`.
 
 - The legacy component is the spec. A legacy file fuses rendering, data fetching and flow logic, and splitting it three ways drops behavior that was only implicit (a per-field error map, a step-up reverification, an empty-state gate, a derived callout) without failing a test or a type check.
 - Inventory the legacy behavior first, then make each layer account for a row. Do not write the layers first and ask what you missed.
+- Apply this workflow to the current task, not every Mosaic change already on the branch.
+- Write the inventory to `tmp/mosaic-parity/<feature>.md` before the model, with the legacy path and the features in scope. Run the [Parity audit](parity-audit.md) into the same file before you call the work done, review it or open a PR.
 - Every inventory row lands in exactly one layer, and later in exactly one parity bucket. A row with no home is a behavior you are about to drop.
 - A deferred behavior gets a tracked ticket, never a buried `// TODO`.
 - Share a business-rule helper when legacy and Mosaic must behave the same. Do not extract similar presentation code only to remove duplication, since the designs may diverge.
@@ -15,7 +17,7 @@ Worked example: `src/features/reverification/`.
 
 ## Phase 1: inventory the legacy behavior
 
-Grep the legacy files for the primitives that carry hidden logic. Every hit is a row you must place or consciously drop:
+Locate the legacy files: the prebuilt component under `packages/ui/src/components/<Feature>/`, the `@clerk/react` component under `packages/react/src/components/`, or both. Grep them for the primitives that carry hidden logic. Every hit is a row you must place or consciously drop:
 
 | Primitive                         | The behavior it usually hides                      |
 | --------------------------------- | -------------------------------------------------- |
@@ -30,10 +32,23 @@ Grep the legacy files for the primitives that carry hidden logic. Every hit is a
 
 ```bash
 rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useOrganization|\.reload\(|useInView' \
-  packages/ui/src/components/<Feature>/
+  packages/ui/src/components/<Feature>/ packages/react/src/components/<Feature>.tsx
 ```
 
 Turn the hits into a behavior inventory, one row per effect, guard, error path, empty or loading state, permission gate, revalidate, reset-on-close and derived label. The table does not cover every behavior; read the files too. For shared answers (`save`, `useReverificationFlow`), use [Reuse before you write](../AGENTS.md#reuse-before-you-write).
+
+Include shared prop types and mode-dependent options, defaults, callback order and error delivery; the full list is in [Parity audit → Rules](parity-audit.md#rules). Write the inventory to `tmp/mosaic-parity/<feature>.md`:
+
+```md
+# checkout-button parity
+
+Legacy: packages/react/src/components/CheckoutButton.tsx
+
+## Inventory
+
+- `for="organization"` throws without an active organization
+- …
+```
 
 ### Screens
 
@@ -64,7 +79,7 @@ Test with one `*.feature.test.tsx` that uses the feature the way a user would ([
 
 ## Phase 4: verify parity
 
-Tests cover only the branches you remembered. Run the [Parity audit](parity-audit.md) against the legacy files and the new layers, and place every Phase 1 row as Migrated, Deliberately changed (such as infinite scroll becoming a "Load more" button) or Deferred.
+Tests cover only the branches you remembered. Run the [Parity audit](parity-audit.md) against the legacy files and the new layers, and place every Phase 1 row as Migrated, Deliberately changed (such as infinite scroll becoming a "Load more" button) or Deferred, under `## Parity audit` in `tmp/mosaic-parity/<feature>.md`.
 
 ## Phase 5: ship
 
