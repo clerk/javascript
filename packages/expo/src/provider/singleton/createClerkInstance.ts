@@ -167,11 +167,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // @ts-expect-error - This is an internal API
         __internal_clerk.__internal_getPublicCredentials = ({
           publicKeyOptions,
+          preferImmediatelyAvailableCredentials,
         }: {
           publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+          preferImmediatelyAvailableCredentials?: boolean;
         }) => {
           return options?.__experimental_passkeys?.get
-            ? options?.__experimental_passkeys?.get({ publicKeyOptions })
+            ? options?.__experimental_passkeys?.get({ publicKeyOptions, preferImmediatelyAvailableCredentials })
             : errorThrower.throw('get() for passkeys is missing');
         };
         // @ts-expect-error - This is an internal API
