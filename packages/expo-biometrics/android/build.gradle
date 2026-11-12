@@ -1,34 +1,19 @@
-apply plugin: 'com.android.library'
-// AGP 9+ registers the `kotlin` extension itself, and applying kotlin-android on top of that fails configuration.
-if (project.extensions.findByName('kotlin') == null) {
-  apply plugin: 'kotlin-android'
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
 }
-
-apply plugin: 'maven-publish'
 
 group = 'expo.modules.clerk.biometrics'
 version = '1.0.0'
 
-def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
-apply from: expoModulesCorePlugin
-applyKotlinExpoModulesCorePlugin()
-useCoreDependencies()
-useExpoPublishing()
-
-buildscript {
-  ext.safeExtGet = { prop, fallback ->
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-  }
+expoModule {
+  v2 true
 }
 
 android {
   namespace "expo.modules.clerk.biometrics"
 
-  compileSdkVersion safeExtGet("compileSdkVersion", 36)
-
   defaultConfig {
-    minSdkVersion safeExtGet("minSdkVersion", 24)
-    targetSdkVersion safeExtGet("targetSdkVersion", 36)
     versionCode 1
     versionName "1.0.0"
   }
@@ -41,7 +26,6 @@ android {
 }
 
 dependencies {
-  implementation project(':expo-modules-core')
   implementation "androidx.biometric:biometric:1.1.0"
 
   testImplementation "junit:junit:4.13.2"

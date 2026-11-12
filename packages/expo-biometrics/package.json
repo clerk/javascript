@@ -47,7 +47,7 @@
     "expo": "~54.0.36"
   },
   "peerDependencies": {
-    "expo": "catalog:peer-expo"
+    "expo": ">=58 <59"
   },
   "publishConfig": {
     "access": "public"

@@ -109,6 +109,11 @@ export function parseNativeFunctions(source: string, file: string) {
   for (const match of source.matchAll(/\b(?:Async)?Function\("([^"]+)"\)\s*\{/g)) {
     functions.set(match[1], closureParams(source, match.index + match[0].length - 1, language).length);
   }
+  const jsMember =
+    /@JS\b(?:\(\s*(?:"([^"]+)")?[^)]*\))?\s+(?:@\w+(?:\([^)]*\))?\s+)*(?:(?:public|internal|nonisolated|suspend)\s+)*(?:func|fun)\s+(\w+)\s*\(/g;
+  for (const match of source.matchAll(jsMember)) {
+    functions.set(match[1] ?? match[2], splitTopLevel(balanced(source, match.index + match[0].length - 1)).length);
+  }
   return functions;
 }
 
