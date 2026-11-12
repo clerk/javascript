@@ -9,22 +9,6 @@ const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>
     {} as Record<T, number>,
   );
 
-const STRATEGY_SORT_ORDER_PASSWORD_PREF = makeSortingOrderMap([
-  'passkey',
-  'password',
-  'email_link',
-  'email_code',
-  'phone_code',
-] as SignInStrategy[]);
-
-const STRATEGY_SORT_ORDER_OTP_PREF = makeSortingOrderMap([
-  'email_link',
-  'email_code',
-  'phone_code',
-  'passkey',
-  'password',
-] as SignInStrategy[]);
-
 const STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS = makeSortingOrderMap([
   'email_link',
   'email_code',
@@ -51,7 +35,5 @@ const makeSortingFunction =
     return orderA - orderB;
   };
 
-export const passwordPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_PASSWORD_PREF);
-export const otpPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_OTP_PREF);
 export const backupCodePrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_BACKUP_CODE_PREF);
 export const allStrategiesButtonsComparator = makeSortingFunction(STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS);

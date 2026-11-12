@@ -1,3 +1,4 @@
+import { determineStartingSignInFactor } from '@clerk/shared/internal/clerk-js/signInFactors';
 import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/shared/types';
 import React, { useEffect, useMemo } from 'react';
 
@@ -9,7 +10,7 @@ import { useEnvironment } from '../../contexts';
 import { useIsWebAuthnSupported } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
-import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
+import { factorHasLocalStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
