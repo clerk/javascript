@@ -70,7 +70,7 @@ Sign-up:
 
 `identifier` and `start` are what Mosaic shows before the resource exists; a sign-in with no status and a sign-up not yet created both return them. `sent` means a code or link is out, so a reload on the same `:factor` doesn't send another. Picking a different factor always sends, because `sent` can't tell two targets with the same strategy apart (see [Bridge](#bridge)).
 
-With no `:factor`, `factorOne` starts on the factor `ui`'s `determineStartingSignInFactor` picks (`ui/src/components/SignIn/utils.ts:76`). That rule moves to `shared` so both use one copy.
+With no `:factor`, `factorOne` starts on the factor `determineStartingSignInFactor` picks (`shared/src/internal/clerk-js/signInFactors.ts`), the same copy `ui` uses.
 
 ## Back, forward and reload
 
