@@ -41,7 +41,11 @@ export const deriveFromSsrInitialState = (initialState: InitialState): ReturnTyp
   const orgPermissions = initialState.orgPermissions as OrganizationCustomPermissionKey[];
   const orgSlug = initialState.orgSlug;
   const actor = initialState.actor;
-  const agent = initialState.agent;
+  let agent = initialState.agent;
+  if (agent?.poppy) {
+    const { poppy: _poppy, ...agentWithoutPoppy } = agent;
+    agent = agentWithoutPoppy;
+  }
   const factorVerificationAge = initialState.factorVerificationAge;
 
   return {

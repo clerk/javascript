@@ -34,6 +34,17 @@ describe('deriveState', () => {
     expect(result.agent).toEqual(agent);
   });
 
+  it('drops poppy from the agent in the SSR initial state', () => {
+    const agent = { sub: 'https://agent.example.com/client.json', type: 'agent', restricted: true };
+    const poppy = { session_id: 'ps_1', client_id: agent.sub, user_id: 'pu_1' };
+    const result = deriveState(
+      false,
+      {} as Resources,
+      { ...mockInitialState, agent: { ...agent, poppy } } as InitialState,
+    );
+    expect(result.agent).toStrictEqual(agent);
+  });
+
   it('derives the agent from the session when clerk is loaded', () => {
     const agent = { sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' };
     const result = deriveState(

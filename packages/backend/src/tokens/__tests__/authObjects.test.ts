@@ -44,24 +44,6 @@ describe('makeAuthObjectSerializable', () => {
       restricted: false,
     });
   });
-
-  it('keeps the Poppy identity so it reaches the client initial state', () => {
-    const clientId = 'https://agent.example.com/client.json';
-    const poppy = { session_id: 'ps_1', client_id: clientId, user_id: 'pu_1', agent_id: 'agent-7' };
-    const authObject = signedInAuthObject({} as AuthenticateContext, 'token', {
-      v: 2,
-      sid: 'sessionId',
-      sub: 'userId',
-      agt: { id: clientId, reg: clientId, poppy, rst: true },
-    } as unknown as JwtPayload);
-
-    expect(makeAuthObjectSerializable(authObject).agent).toEqual({
-      sub: clientId,
-      type: 'agent',
-      restricted: true,
-      poppy,
-    });
-  });
 });
 
 describe('signedInAuthObject', () => {

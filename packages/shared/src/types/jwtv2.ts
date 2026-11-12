@@ -283,7 +283,7 @@ export type AgentActClaim = ActClaim & {
    */
   task_id?: string;
   /**
-   * The Poppy identity of a Poppy session, from the session token. Set on the `agent` property returned by `auth()` and by `useAuth()` during server rendering. `undefined` on `Session.agent`, on `useAuth()` after Clerk has loaded, and for an agent task session.
+   * The Poppy identity of a Poppy session, from the session token. Set on the `agent` property returned by `auth()` on the server. `useAuth()` and `Session.agent` never set it, and it is `undefined` for an agent task session.
    *
    * @experimental This field can change in a minor release.
    */

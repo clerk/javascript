@@ -46,6 +46,24 @@ describe('createClientFromJwt', () => {
     expect(client.signedInSessions[0]?.agent).toStrictEqual(agent);
   });
 
+  it('leaves poppy off the actor and agent on the stub session for a Poppy JWT', () => {
+    const clientId = 'https://agent.example.com/client.json';
+    const client = createClientFromJwt(
+      jwtWithClaims({
+        agt: {
+          id: clientId,
+          reg: clientId,
+          poppy: { session_id: 'ps_1', client_id: clientId, user_id: 'pu_1' },
+          rst: true,
+        },
+      }),
+    );
+    const agent = { sub: clientId, type: 'agent', task_id: undefined, restricted: true };
+
+    expect(client.signedInSessions[0]?.actor).toStrictEqual(agent);
+    expect(client.signedInSessions[0]?.agent).toStrictEqual(agent);
+  });
+
   it('leaves actor and agent null on the stub session when the JWT has an act claim', () => {
     const client = createClientFromJwt(jwtWithClaims({ act: { sub: 'user_impersonator' } }));
 
