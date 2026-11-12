@@ -1,7 +1,7 @@
 import {
   __internal_createCacheKeys,
-  __internal_useClearQueriesOnSignOut,
   __internal_useClerkQuery,
+  __internal_usePersistentQueryCleanupOnSignOut,
   useSession,
   useUser,
 } from '@clerk/shared/react';
@@ -15,7 +15,7 @@ export function useUserSessionsQuery() {
   const userId = user?.id;
   const sessionId = session?.id;
 
-  const { queryKey, stableKey, authenticated } = useMemo(
+  const { queryKey, stableKey } = useMemo(
     () =>
       __internal_createCacheKeys({
         stablePrefix: USER_SESSIONS_KEY,
@@ -26,12 +26,7 @@ export function useUserSessionsQuery() {
     [userId, sessionId],
   );
 
-  // Only runs while this hook is mounted, matching the shared hooks. Sign-out after unmount leaves the entry until it is garbage collected.
-  __internal_useClearQueriesOnSignOut({
-    isSignedOut: user === null,
-    authenticated,
-    stableKeys: stableKey,
-  });
+  __internal_usePersistentQueryCleanupOnSignOut(stableKey);
 
   return __internal_useClerkQuery({
     queryKey,
