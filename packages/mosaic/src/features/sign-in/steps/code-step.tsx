@@ -9,7 +9,8 @@ import { SignInIdentityPreview } from './sign-in-identity-preview';
 interface CodeStepProps {
   messages: VerificationCodeMessages;
   resend?: VerificationCodeResend;
-  identity: { identifier?: string; editLabel: string; editable: boolean; notice?: string };
+  identity: { identifier?: string; editLabel: string; editable: boolean };
+  notice?: string;
   onEditIdentifier: () => void;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
@@ -25,6 +26,7 @@ export function CodeStep({
   messages,
   resend,
   identity,
+  notice,
   onEditIdentifier,
   form,
   errorMessage,
@@ -56,7 +58,7 @@ export function CodeStep({
           />
         ) : undefined
       }
-      notice={identity.notice}
+      notice={notice}
       onValueChange={onValueChange}
       onComplete={onCodeComplete}
       onSubmit={() => onSubmit()}

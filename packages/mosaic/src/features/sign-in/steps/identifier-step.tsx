@@ -14,6 +14,7 @@ import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignInSocialProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import { SignInLogo } from './sign-in-logo';
 
 interface IdentifierStepProps {
   applicationName: string;
@@ -56,15 +57,7 @@ export function IdentifierStep({
   return (
     <>
       <Card.Header>
-        {logo ? (
-          <Card.Media>
-            <img
-              src={logo.src}
-              alt={logo.alt}
-              {...stylex.props(styles.logo)}
-            />
-          </Card.Media>
-        ) : null}
+        <SignInLogo logo={logo} />
         <Card.Title>{fill(combined ? m.start.titleCombined : m.start.title, { applicationName })}</Card.Title>
         <Card.Description>{combined ? m.start.descriptionCombined : m.start.description}</Card.Description>
       </Card.Header>

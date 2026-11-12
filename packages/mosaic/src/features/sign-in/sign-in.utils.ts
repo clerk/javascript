@@ -101,20 +101,29 @@ export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy 
 export function codeIdentity(
   step: CodeStepData,
   m: Messages,
-): { identifier?: string; editLabel: string; editable: boolean; notice?: string } {
+): { identifier?: string; editLabel: string; editable: boolean } {
   const describesIdentifier =
     step.channel === 'totp' || step.purpose === 'reset-password' || step.purpose === 'verify-email';
   return {
     identifier: describesIdentifier ? undefined : step.identifier,
     editLabel: step.channel === 'phone' ? m.editPhoneNumber : m.editIdentifier,
     editable: step.purpose === 'first-factor' || step.purpose === 'sso-bypass' || step.purpose === 'verify-phone',
-    notice:
-      step.purpose === 'client-trust'
-        ? m.clientTrust.notice
-        : step.purpose === 'sso-bypass'
-          ? m.ssoBypass.notice
-          : undefined,
   };
+}
+
+export function codeNotice(step: CodeStepData, m: Messages): string | undefined {
+  switch (step.purpose) {
+    case 'client-trust':
+      return m.clientTrust.notice;
+    case 'sso-bypass':
+      return m.ssoBypass.notice;
+    case 'first-factor':
+    case 'second-factor':
+    case 'reset-password':
+    case 'verify-email':
+    case 'verify-phone':
+      return undefined;
+  }
 }
 
 export function codeSecondaryAction(

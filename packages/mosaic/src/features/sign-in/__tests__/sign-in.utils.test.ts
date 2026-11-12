@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { signInMessages } from '../sign-in.messages';
 import type { SignInStep } from '../sign-in.types';
-import { codeCopy, codeIdentity, codeSecondaryAction, httpsUrl, stepKey } from '../sign-in.utils';
+import { codeCopy, codeIdentity, codeNotice, codeSecondaryAction, httpsUrl, stepKey } from '../sign-in.utils';
 
 describe('stepKey', () => {
   it('keys each step by its kind and the variant that changes its copy', () => {
@@ -77,11 +77,9 @@ describe('code step copy', () => {
   });
 
   it('warns on a new device and on an SSO bypass', () => {
-    expect(codeIdentity({ kind: 'code', purpose: 'client-trust', channel: 'email' }, m).notice).toBe(
-      m.clientTrust.notice,
-    );
-    expect(codeIdentity({ kind: 'code', purpose: 'sso-bypass', channel: 'email' }, m).notice).toBe(m.ssoBypass.notice);
-    expect(codeIdentity({ kind: 'code', purpose: 'first-factor', channel: 'email' }, m).notice).toBeUndefined();
+    expect(codeNotice({ kind: 'code', purpose: 'client-trust', channel: 'email' }, m)).toBe(m.clientTrust.notice);
+    expect(codeNotice({ kind: 'code', purpose: 'sso-bypass', channel: 'email' }, m)).toBe(m.ssoBypass.notice);
+    expect(codeNotice({ kind: 'code', purpose: 'first-factor', channel: 'email' }, m)).toBeUndefined();
   });
 
   it('lets a phone being verified be edited and offers no other method', () => {

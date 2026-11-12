@@ -21,6 +21,8 @@ interface NoticeStepProps {
   onEmailSupport: () => void;
   onBack: () => void;
   onEditIdentifier: () => void;
+  pendingProviderId?: string;
+  onSelectProvider: (id: string) => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -39,6 +41,8 @@ export function NoticeStep({
   onEditIdentifier,
   onForgotPassword,
   onCancel,
+  pendingProviderId,
+  onSelectProvider,
   focusRef,
 }: NoticeStepProps) {
   const m = useMessages('signIn');
@@ -95,6 +99,9 @@ export function NoticeStep({
       return (
         <SignInEnterpriseSso
           focusRef={focusRef}
+          connections={step.connections}
+          pendingConnectionId={pendingProviderId}
+          onSelectConnection={onSelectProvider}
           applicationName={applicationName}
           logo={logo}
           globalErrorMessage={globalErrorMessage}

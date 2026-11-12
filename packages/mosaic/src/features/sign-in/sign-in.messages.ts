@@ -113,6 +113,8 @@ export const signInMessages = {
     continue: 'Continue with SSO',
     pending: 'Redirecting to SSO',
     bypass: 'Can’t use SSO?',
+    chooseTitle: 'Choose an account',
+    chooseDescription: 'Select an enterprise account to continue.',
   },
   ssoBypass: {
     notice: 'Your organization requires single sign-on. Continuing without it is recorded.',

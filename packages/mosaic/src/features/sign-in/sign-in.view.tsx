@@ -8,7 +8,7 @@ import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
-import { codeCopy, codeIdentity, codeResendCopy, codeSecondaryAction, stepKey } from './sign-in.utils';
+import { codeCopy, codeIdentity, codeNotice, codeResendCopy, codeSecondaryAction, stepKey } from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CodeStep } from './steps/code-step';
 import { CredentialStep } from './steps/credential-step';
@@ -113,158 +113,166 @@ export function SignInView({
         direction={direction}
         state={step}
       >
-        {current => (
-          <>
-            <Flow.Step ids={['identifier']}>
-              <IdentifierStep
-                focusRef={focusRef}
-                logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
-                applicationName={applicationName}
-                combined={combined}
-                socialProviders={socialProviders}
-                pendingProviderId={pendingProviderId}
-                onSelectProvider={onSelectProvider}
-                form={form}
-                errorMessage={errorMessage}
-                globalErrorMessage={globalErrorMessage}
-                isPending={isPending}
-                isDisabled={isDisabled}
-                onSubmit={onSubmit}
-                onSignUp={onSignUp}
-              />
-            </Flow.Step>
-
-            <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
-              {current.kind === 'credential' ? (
-                <CredentialStep
+        {current => {
+          const secondary = current.kind === 'code' ? codeSecondaryAction(current, m, { onCancel, onBack }) : undefined;
+          return (
+            <>
+              <Flow.Step ids={['identifier']}>
+                <IdentifierStep
                   focusRef={focusRef}
-                  step={current}
-                  messages={{
-                    title: m.backupCodeMfa.title,
-                    description: m.backupCodeMfa.description,
-                    fieldLabel: m.backupCodeMfa.label,
-                    ...actions,
-                  }}
-                  form={form}
-                  errorMessage={errorMessage}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  onSubmit={onSubmit}
-                  onEditIdentifier={onEditIdentifier}
-                  onForgotPassword={onForgotPassword}
-                  onCancel={onCancel}
-                  onShowHelp={onShowHelp}
-                />
-              ) : null}
-            </Flow.Step>
-
-            <Flow.Step
-              ids={[
-                'code:first-factor',
-                'code:second-factor',
-                'code:client-trust',
-                'code:sso-bypass',
-                'code:reset-password',
-                'code:verify-email',
-                'code:verify-phone',
-              ]}
-            >
-              {current.kind === 'code' ? (
-                <CodeStep
-                  focusRef={focusRef}
-                  messages={{
-                    ...codeCopy(current, m),
-                    ...actions,
-                    secondaryActionLabel: codeSecondaryAction(current, m, { onCancel, onBack }).label,
-                    ...(current.purpose === 'reset-password' ? { primaryActionLabel: m.resetPasswordCode.verify } : {}),
-                  }}
-                  resend={resendFor(codeResendCopy(current, m))}
-                  identity={codeIdentity(current, m)}
-                  form={form}
-                  errorMessage={errorMessage}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  onSubmit={onSubmit}
-                  onCodeComplete={onCodeComplete}
-                  onEditIdentifier={onEditIdentifier}
-                  onCancel={codeSecondaryAction(current, m, { onCancel, onBack }).onClick}
-                />
-              ) : null}
-            </Flow.Step>
-
-            <Flow.Step ids={['choice:methods', 'choice:reset-methods']}>
-              {current.kind === 'choice' ? (
-                <ChoiceStep
-                  focusRef={focusRef}
-                  step={current}
-                  messages={{
-                    ...choiceCopy(current, m),
-                    backButton: m.back,
-                    helpText: m.alternativeMethods.helpPrompt,
-                    helpButton: m.alternativeMethods.helpLink,
-                  }}
-                  factorLabel={factor => factorLabel(factor, m)}
-                  pendingFactorId={pendingFactorId}
-                  onSelectFactor={onSelectFactor}
-                  onShowHelp={onShowHelp}
-                  onBack={onBack}
-                />
-              ) : null}
-            </Flow.Step>
-
-            <Flow.Step
-              ids={[
-                'notice:help',
-                'notice:forgot-password',
-                'notice:no-methods',
-                'notice:action-blocked',
-                'notice:password-compromised',
-                'notice:enterprise-sso',
-                'notice:email-link',
-              ]}
-            >
-              {current.kind === 'notice' ? (
-                <NoticeStep
-                  focusRef={focusRef}
-                  step={current}
-                  applicationName={applicationName}
                   logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                  applicationName={applicationName}
+                  combined={combined}
+                  socialProviders={socialProviders}
+                  pendingProviderId={pendingProviderId}
+                  onSelectProvider={onSelectProvider}
+                  form={form}
+                  errorMessage={errorMessage}
                   globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
-                  resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}
-                  onSubmit={() => onSubmit()}
-                  onEmailSupport={onEmailSupport}
-                  onBack={onBack}
-                  onEditIdentifier={onEditIdentifier}
-                  onForgotPassword={onForgotPassword}
-                  onCancel={onCancel}
+                  isDisabled={isDisabled}
+                  onSubmit={onSubmit}
+                  onSignUp={onSignUp}
                 />
-              ) : null}
-            </Flow.Step>
+              </Flow.Step>
 
-            <Flow.Step ids={['new-password:forgot']}>
-              <NewPasswordStep
-                focusRef={focusRef}
-                form={form}
-                isPending={isPending}
-                onSubmit={onSubmit}
-                passwordFeedback={newPasswordFeedback}
-                onBack={onBack}
-              />
-            </Flow.Step>
+              <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
+                {current.kind === 'credential' ? (
+                  <CredentialStep
+                    focusRef={focusRef}
+                    step={current}
+                    messages={{
+                      title: m.backupCodeMfa.title,
+                      description: m.backupCodeMfa.description,
+                      fieldLabel: m.backupCodeMfa.label,
+                      ...actions,
+                    }}
+                    form={form}
+                    errorMessage={errorMessage}
+                    globalErrorMessage={globalErrorMessage}
+                    isPending={isPending}
+                    onSubmit={onSubmit}
+                    onEditIdentifier={onEditIdentifier}
+                    onForgotPassword={onForgotPassword}
+                    onCancel={onCancel}
+                    onShowHelp={onShowHelp}
+                  />
+                ) : null}
+              </Flow.Step>
 
-            <Flow.Step ids={['sign-up']}>
-              <SignUpDetailsStep
-                focusRef={focusRef}
-                form={form}
-                globalErrorMessage={globalErrorMessage}
-                isPending={isPending}
-                onSubmit={onSubmit}
-                onSignIn={onEditIdentifier}
-              />
-            </Flow.Step>
-          </>
-        )}
+              <Flow.Step
+                ids={[
+                  'code:first-factor',
+                  'code:second-factor',
+                  'code:client-trust',
+                  'code:sso-bypass',
+                  'code:reset-password',
+                  'code:verify-email',
+                  'code:verify-phone',
+                ]}
+              >
+                {current.kind === 'code' ? (
+                  <CodeStep
+                    focusRef={focusRef}
+                    messages={{
+                      ...codeCopy(current, m),
+                      ...actions,
+                      secondaryActionLabel: secondary?.label ?? actions.secondaryActionLabel,
+                      ...(current.purpose === 'reset-password'
+                        ? { primaryActionLabel: m.resetPasswordCode.verify }
+                        : {}),
+                    }}
+                    resend={resendFor(codeResendCopy(current, m))}
+                    identity={codeIdentity(current, m)}
+                    notice={codeNotice(current, m)}
+                    form={form}
+                    errorMessage={errorMessage}
+                    globalErrorMessage={globalErrorMessage}
+                    isPending={isPending}
+                    onSubmit={onSubmit}
+                    onCodeComplete={onCodeComplete}
+                    onEditIdentifier={onEditIdentifier}
+                    onCancel={secondary?.onClick}
+                  />
+                ) : null}
+              </Flow.Step>
+
+              <Flow.Step ids={['choice:methods', 'choice:reset-methods']}>
+                {current.kind === 'choice' ? (
+                  <ChoiceStep
+                    focusRef={focusRef}
+                    step={current}
+                    messages={{
+                      ...choiceCopy(current, m),
+                      backButton: m.back,
+                      helpText: m.alternativeMethods.helpPrompt,
+                      helpButton: m.alternativeMethods.helpLink,
+                    }}
+                    factorLabel={factor => factorLabel(factor, m)}
+                    pendingFactorId={pendingFactorId}
+                    onSelectFactor={onSelectFactor}
+                    onShowHelp={onShowHelp}
+                    onBack={onBack}
+                  />
+                ) : null}
+              </Flow.Step>
+
+              <Flow.Step
+                ids={[
+                  'notice:help',
+                  'notice:forgot-password',
+                  'notice:no-methods',
+                  'notice:action-blocked',
+                  'notice:password-compromised',
+                  'notice:enterprise-sso',
+                  'notice:email-link',
+                ]}
+              >
+                {current.kind === 'notice' ? (
+                  <NoticeStep
+                    focusRef={focusRef}
+                    step={current}
+                    applicationName={applicationName}
+                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    globalErrorMessage={globalErrorMessage}
+                    isPending={isPending}
+                    resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}
+                    onSubmit={() => onSubmit()}
+                    onEmailSupport={onEmailSupport}
+                    onBack={onBack}
+                    onEditIdentifier={onEditIdentifier}
+                    onForgotPassword={onForgotPassword}
+                    onCancel={onCancel}
+                    pendingProviderId={pendingProviderId}
+                    onSelectProvider={onSelectProvider}
+                  />
+                ) : null}
+              </Flow.Step>
+
+              <Flow.Step ids={['new-password:forgot']}>
+                <NewPasswordStep
+                  focusRef={focusRef}
+                  form={form}
+                  isPending={isPending}
+                  onSubmit={onSubmit}
+                  passwordFeedback={newPasswordFeedback}
+                  onBack={onBack}
+                />
+              </Flow.Step>
+
+              <Flow.Step ids={['sign-up']}>
+                <SignUpDetailsStep
+                  focusRef={focusRef}
+                  form={form}
+                  globalErrorMessage={globalErrorMessage}
+                  isPending={isPending}
+                  onSubmit={onSubmit}
+                  onSignIn={onEditIdentifier}
+                />
+              </Flow.Step>
+            </>
+          );
+        }}
       </Flow.Root>
     </Card.Root>
   );
