@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import * as React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -157,11 +157,11 @@ describe('Freeze', () => {
 
       await act(() => screen.getByText('freeze').click());
       expect(screen.getByRole('status').textContent).toBe('frozen');
-      expect(screen.getByText('Acme')).toBeInTheDocument();
+      expect(screen.getByText('Acme')).toBeVisible();
       expect(screen.queryByText('Globex')).toBeNull();
 
       await act(() => screen.getByText('relabel').click());
-      expect(screen.getByText('Acme')).toBeInTheDocument();
+      expect(screen.getByText('Acme')).toBeVisible();
       expect(screen.queryByText('Initech')).toBeNull();
 
       await act(() => screen.getByText('thaw').click());
@@ -170,18 +170,36 @@ describe('Freeze', () => {
   });
 
   describe('under scheduling', () => {
-    function Child({ label, onEffect }: { label: string; onEffect: (label: string) => void }) {
+    function Child({
+      label,
+      onEffect,
+      onRender,
+    }: {
+      label: string;
+      onEffect: (label: string) => void;
+      onRender: (label: string) => void;
+    }) {
+      onRender(label);
       React.useEffect(() => {
         onEffect(label);
       }, [label, onEffect]);
       return <span>{label}</span>;
     }
 
-    function Scheduled({ onEffect, strict = false }: { onEffect?: (label: string) => void; strict?: boolean }) {
+    function Scheduled({
+      onEffect,
+      onRender,
+      strict = false,
+    }: {
+      onEffect?: (label: string) => void;
+      onRender?: (label: string) => void;
+      strict?: boolean;
+    }) {
       const [frozen, setFrozen] = React.useState(false);
       const [label, setLabel] = React.useState('Acme');
       const [tick, setTick] = React.useState(0);
       const noteEffect = React.useCallback((value: string) => onEffect?.(value), [onEffect]);
+      const noteRender = React.useCallback((value: string) => onRender?.(value), [onRender]);
       const tree = (
         <>
           <output>
@@ -232,6 +250,7 @@ describe('Freeze', () => {
             <Child
               label={label}
               onEffect={noteEffect}
+              onRender={noteRender}
             />
           </Freeze>
         </>
@@ -249,7 +268,7 @@ describe('Freeze', () => {
 
       await click('freeze later');
       expect(status()).toBe('frozen:0');
-      expect(screen.getByText('Acme')).toBeInTheDocument();
+      expect(screen.getByText('Acme')).toBeVisible();
       expect(effects).toEqual([]);
 
       await click('thaw later');
@@ -257,34 +276,68 @@ describe('Freeze', () => {
       expect(effects).toEqual(['Globex']);
     });
 
-    it('releases a hold whose transition was thawed before it committed', async () => {
-      render(<Scheduled />);
+    // These two run on React's own scheduler rather than inside `act`, which would flush the
+    // transition to completion before the second click. The child renders slowly while it shows
+    // the transition's label, so the transition yields, and the hold's sync commit and then the
+    // click land before the transition commits. The render log shows the transition had rendered,
+    // and so had requested the hold, before the click.
+    async function scheduled(run: (renders: string[]) => Promise<void>) {
+      const flag = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+      const previous = flag.IS_REACT_ACT_ENVIRONMENT;
+      flag.IS_REACT_ACT_ENVIRONMENT = false;
+      const renders: string[] = [];
+      try {
+        render(
+          <Scheduled
+            onRender={label => {
+              renders.push(label);
+              if (label === 'Globex') {
+                const until = performance.now() + 20;
+                while (performance.now() < until) {
+                  // keep the transition rendering long enough to yield
+                }
+              }
+            }}
+          />,
+        );
+        await run(renders);
+      } finally {
+        flag.IS_REACT_ACT_ENVIRONMENT = previous;
+      }
+    }
 
-      await act(async () => {
+    const settle = () => new Promise(resolve => setTimeout(resolve, 5));
+
+    it('releases a hold whose transition is thawed before it commits', async () => {
+      await scheduled(async renders => {
         screen.getByText('freeze later').click();
-        await Promise.resolve();
-        screen.getByText('thaw now').click();
-      });
+        await settle();
+        expect(renders).toContain('Globex');
+        expect(status()).toBe('live:0');
 
-      expect(status()).toBe('live:0');
-      expect(screen.getByText('Globex')).toBeVisible();
+        screen.getByText('thaw now').click();
+
+        await waitFor(() => expect(screen.getByText('Globex')).toBeVisible());
+        expect(status()).toBe('live:0');
+      });
     });
 
     it('keeps the transition alive through an unrelated sync update while it is pending', async () => {
-      render(<Scheduled />);
-
-      await act(async () => {
+      await scheduled(async renders => {
         screen.getByText('freeze later').click();
-        await Promise.resolve();
+        await settle();
+        expect(renders).toContain('Globex');
+        expect(status()).toBe('live:0');
+
         screen.getByText('tick').click();
+
+        await waitFor(() => expect(status()).toBe('frozen:1'));
+        expect(screen.getByText('Acme')).toBeVisible();
+        expect(screen.queryByText('Globex')).toBeNull();
+
+        screen.getByText('thaw later').click();
+        await waitFor(() => expect(screen.getByText('Globex')).toBeVisible());
       });
-
-      expect(status()).toBe('frozen:1');
-      expect(screen.getByText('Acme')).toBeInTheDocument();
-      expect(screen.queryByText('Globex')).toBeNull();
-
-      await click('thaw later');
-      expect(screen.getByText('Globex')).toBeVisible();
     });
 
     it('holds the frame committed by a thaw when frozen again right after it', async () => {
@@ -299,7 +352,7 @@ describe('Freeze', () => {
       await click('freeze later');
 
       expect(status()).toBe('frozen:0');
-      expect(screen.getByText('Initech')).toBeInTheDocument();
+      expect(screen.getByText('Initech')).toBeVisible();
       expect(screen.queryByText('Globex')).toBeNull();
     });
 
@@ -314,7 +367,7 @@ describe('Freeze', () => {
       });
 
       expect(status()).toBe('frozen:0');
-      expect(screen.getByText('Acme')).toBeInTheDocument();
+      expect(screen.getByText('Acme')).toBeVisible();
       expect(screen.queryByText('Initech')).toBeNull();
     });
 
@@ -323,7 +376,7 @@ describe('Freeze', () => {
 
       await click('freeze later');
       expect(status()).toBe('frozen:0');
-      expect(screen.getByText('Acme')).toBeInTheDocument();
+      expect(screen.getByText('Acme')).toBeVisible();
       expect(screen.queryByText('Globex')).toBeNull();
 
       await click('thaw now');
@@ -376,7 +429,7 @@ describe('Freeze', () => {
       await click('freeze outer');
       await click('thaw outer and relabel');
 
-      expect(screen.getByText('Acme')).toBeInTheDocument();
+      expect(screen.getByText('Acme')).toBeVisible();
       expect(screen.queryByText('Globex')).toBeNull();
     });
   });
