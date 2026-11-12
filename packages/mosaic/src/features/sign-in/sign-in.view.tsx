@@ -121,11 +121,11 @@ export function SignInView({
           const secondary = current.kind === 'code' ? codeSecondaryAction(current, m, { onCancel, onBack }) : undefined;
           return (
             <>
-              <Flow.Step ids={['identifier']}>
+              <Flow.Step ids={['identifier', 'identifier:channel']}>
                 {current.kind === 'identifier' ? (
                   <IdentifierStep
-                    field={current.field}
-                    nextField={current.nextField}
+                    step={current}
+                    onCancel={onCancel}
                     onSwitchField={onSwitchField}
                     focusRef={focusRef}
                     logo={logo}

@@ -465,6 +465,8 @@ function StepPanel({
   otherMethods = true,
   onSwitchField,
   onPasskey,
+  onSelectProvider,
+  onCancel,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -477,6 +479,8 @@ function StepPanel({
   otherMethods?: boolean;
   onSwitchField?: () => void;
   onPasskey?: () => void;
+  onSelectProvider?: (id: string) => void;
+  onCancel?: () => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -498,7 +502,7 @@ function StepPanel({
       combined={combined}
       socialProviders={providers}
       pendingProviderId={pendingProviderId}
-      onSelectProvider={() => undefined}
+      onSelectProvider={onSelectProvider ?? (() => undefined)}
       onSwitchField={onSwitchField}
       onPasskey={onPasskey}
       form={form}
@@ -512,7 +516,8 @@ function StepPanel({
       onSignUp={combined ? undefined : () => undefined}
       onForgotPassword={() => undefined}
       onCancel={
-        !otherMethods || (step.kind === 'code' && step.purpose === 'verify-email') ? undefined : () => undefined
+        onCancel ??
+        (!otherMethods || (step.kind === 'code' && step.purpose === 'verify-email') ? undefined : () => undefined)
       }
       onShowHelp={() => undefined}
       onBack={() => undefined}
@@ -605,6 +610,28 @@ export function IdentifierPasskey() {
     <StepPanel
       step={{ kind: 'identifier', field: 'email' }}
       onPasskey={() => undefined}
+    />
+  );
+}
+
+const whatsApp: SignInProvider = {
+  id: 'whatsapp',
+  name: 'WhatsApp',
+  iconUrl: 'https://img.clerk.com/static/whatsapp.svg',
+};
+
+export function IdentifierAlternativePhoneChannel() {
+  const [step, setStep] = useState<SignInStep>({ kind: 'identifier', field: 'phone', channel: whatsApp });
+  return (
+    <StepPanel
+      step={step}
+      providers={[...socialProviders, whatsApp]}
+      onSelectProvider={id => {
+        if (id === whatsApp.id) {
+          setStep({ kind: 'identifier', field: 'phone', channel: whatsApp });
+        }
+      }}
+      onCancel={() => setStep({ kind: 'identifier', field: 'email' })}
     />
   );
 }

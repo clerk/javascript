@@ -14,10 +14,51 @@ import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { SignInIdentifierField, SignInProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import type {
+  SignInIdentifierField,
+  SignInProvider,
+  SignInStep,
+  SignInSubmitEvent,
+  SignInValues,
+} from '../sign-in.types';
 import { identifierFieldCopy } from '../sign-in.utils';
+import { SignInAlternativeChannel } from './sign-in-alternative-channel';
 
-interface IdentifierStepProps {
+type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
+
+interface IdentifierStepProps extends Omit<IdentifierStartProps, 'field' | 'nextField'> {
+  step: IdentifierStepData;
+  onCancel?: () => void;
+}
+
+export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps) {
+  if ('channel' in step) {
+    return (
+      <SignInAlternativeChannel
+        channel={step.channel}
+        applicationName={props.applicationName}
+        logo={props.logo}
+        form={props.form}
+        errorMessage={props.errorMessage}
+        globalErrorMessage={props.globalErrorMessage}
+        isPending={props.isPending}
+        isDisabled={props.isDisabled}
+        onSubmit={props.onSubmit}
+        onCancel={onCancel}
+        focusRef={props.focusRef}
+      />
+    );
+  }
+  return (
+    <IdentifierStart
+      field={step.field}
+      nextField={step.nextField}
+      {...props}
+    />
+  );
+}
+
+interface IdentifierStartProps {
   field: SignInIdentifierField;
   nextField?: SignInIdentifierField;
   onSwitchField?: () => void;
@@ -38,7 +79,7 @@ interface IdentifierStepProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function IdentifierStep({
+function IdentifierStart({
   field,
   nextField,
   onSwitchField,
@@ -57,7 +98,7 @@ export function IdentifierStep({
   onSubmit,
   onSignUp,
   focusRef,
-}: IdentifierStepProps) {
+}: IdentifierStartProps) {
   const m = useMessages('signIn');
   const { ref: identifierFieldRef, ...identifier } = form.register('identifier');
   const { ref: phoneFieldRef, ...phone } = form.registerValue('identifier');

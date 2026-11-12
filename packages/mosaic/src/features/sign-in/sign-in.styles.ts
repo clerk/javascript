@@ -15,6 +15,10 @@ export const styles = stylex.create({
     height: space['4'],
     width: space['4'],
   },
+  channelIcon: {
+    height: space['8'],
+    width: space['8'],
+  },
   divider: {
     gap: space['4'],
     alignItems: 'center',

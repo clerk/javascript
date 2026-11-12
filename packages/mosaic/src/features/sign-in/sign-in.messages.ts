@@ -25,6 +25,11 @@ export const signInMessages = {
     signUpPrompt: 'Don’t have an account?',
     signUpLink: 'Sign up',
   },
+  alternativeChannel: {
+    title: 'Sign in to {applicationName} with {provider}',
+    description: 'Enter your phone number to get a verification code on {provider}.',
+    label: '{provider} phone number',
+  },
   password: {
     title: 'Enter your password',
     description: 'Enter the password associated with your account',

@@ -5,6 +5,7 @@ import type { SignInIdentifierField, SignInStep } from './sign-in.types';
 export function stepKey(step: SignInStep): string {
   switch (step.kind) {
     case 'identifier':
+      return 'channel' in step ? 'identifier:channel' : 'identifier';
     case 'sign-up':
       return step.kind;
     case 'credential':

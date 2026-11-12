@@ -16,6 +16,14 @@ describe('stepKey', () => {
   it('keys each step by its kind and the variant that changes its copy', () => {
     const steps: [SignInStep, string][] = [
       [{ kind: 'identifier', field: 'email' }, 'identifier'],
+      [
+        {
+          kind: 'identifier',
+          field: 'phone',
+          channel: { id: 'whatsapp', name: 'WhatsApp', iconUrl: 'https://img.clerk.com/static/whatsapp.svg' },
+        },
+        'identifier:channel',
+      ],
       [{ kind: 'credential', credential: 'password', identifier: 'jane@acme.com' }, 'credential:password'],
       [{ kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' }, 'credential:backup-code'],
       [{ kind: 'credential', credential: 'passkey', identifier: 'jane@acme.com' }, 'credential:passkey'],

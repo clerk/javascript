@@ -20,6 +20,7 @@ export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' |
 
 export type SignInStep =
   | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField }
+  | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
