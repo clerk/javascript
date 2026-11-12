@@ -1,5 +1,6 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
 
+import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
@@ -351,9 +352,9 @@ function createBackupCodeActions(
   const generateBackupCodes = () => {
     const generate = model.generateBackupCodes;
     if (!generate) {
-      return;
+      return Promise.resolve();
     }
-    void run('generate', async () => {
+    return run('generate', async () => {
       const codes = await generate();
       return { kind: 'backup', codes };
     }).catch(() => undefined);
@@ -482,6 +483,7 @@ function createSetupProps(
 }
 
 export function useUserProfileMfaController(model: ReadyModel) {
+  const pendingAction = usePendingAction();
   const errorText = useErrorText();
   const backupCodeMessages = useMessages('userProfile').mfa.backupCodes;
   const [{ context, value }, send] = useMachine(mfaMachine);
@@ -528,7 +530,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
         prepareAuthenticator();
       }
     } else if (method === 'backup-codes') {
-      generateBackupCodes();
+      void generateBackupCodes();
     } else {
       send({ type: 'SELECT_SMS', phoneId: model.phones[0]?.id ?? '', hasPhones: model.phones.length > 0 });
     }
@@ -545,7 +547,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
       submitSms,
       resendSms,
       verifyAuthenticator,
-      generateBackupCodes,
+      generateBackupCodes: () => void generateBackupCodes(),
       copy,
       download,
       print,
@@ -557,11 +559,12 @@ export function useUserProfileMfaController(model: ReadyModel) {
   );
 
   const sectionProps: UserProfileMfaSectionViewProps = {
+    pendingAction,
     methods: [...model.methods],
     addableMethods: model.addableMethods,
     regenerate: model.generateBackupCodes
       ? {
-          onClick: generateBackupCodes,
+          onClick: () => void pendingAction.run('regenerate', generateBackupCodes),
           status: context.pending === 'generate' && !dialogOpen ? 'pending' : 'idle',
           error: flow.kind === 'closed' && flow.error ? errorText(flow.error) : undefined,
         }
@@ -579,7 +582,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
     dialogOpen,
     showAddTrigger,
     showAddControl: showAddTrigger || dialogOpen,
-    isPending: isBusy,
+    isPending: isBusy || pendingAction.isPending,
     reverifying,
     onDialogOpenChange: (open: boolean) => {
       if (!open && !canClose) {
