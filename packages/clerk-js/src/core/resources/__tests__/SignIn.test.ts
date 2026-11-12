@@ -1020,6 +1020,93 @@ describe('SignIn', () => {
         }),
       );
     });
+
+    it('forwards preferImmediatelyAvailableCredentials to the credential request in the discoverable flow', async () => {
+      const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: mockPublicKeyCredential,
+        error: null,
+      });
+
+      SignIn.clerk = {
+        __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        __internal_getPublicCredentials: mockWebAuthnGetCredential,
+      } as any;
+
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_456',
+            status: 'needs_first_factor',
+            first_factor_verification: {
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_456', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.authenticateWithPasskey({ flow: 'discoverable', preferImmediatelyAvailableCredentials: true });
+
+      expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+        expect.objectContaining({ preferImmediatelyAvailableCredentials: true }),
+      );
+    });
+
+    it('forwards preferImmediatelyAvailableCredentials to the credential request for a passkey second factor', async () => {
+      const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: mockPublicKeyCredential,
+        error: null,
+      });
+
+      SignIn.clerk = {
+        __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        __internal_getPublicCredentials: mockWebAuthnGetCredential,
+      } as any;
+
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_123',
+            status: 'needs_second_factor',
+            supported_second_factors: [{ strategy: 'passkey' }],
+            second_factor_verification: {
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        status: 'needs_second_factor',
+        supported_second_factors: [{ strategy: 'passkey' }, { strategy: 'totp' }],
+      } as any);
+      await signIn.authenticateWithPasskey({ preferImmediatelyAvailableCredentials: true });
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          path: '/client/sign_ins/signin_123/prepare_second_factor',
+        }),
+      );
+      expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+        expect.objectContaining({ preferImmediatelyAvailableCredentials: true }),
+      );
+    });
   });
 
   describe('trusted_device strategy', () => {
@@ -2591,6 +2678,58 @@ describe('SignIn', () => {
         );
 
         expect(mockWebAuthnGetCredential).toHaveBeenCalled();
+      });
+
+      it('forwards preferImmediatelyAvailableCredentials to the credential request', async () => {
+        const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+        const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+          publicKeyCredential: {
+            id: 'credential_123',
+            rawId: new ArrayBuffer(32),
+            response: {
+              authenticatorData: new ArrayBuffer(37),
+              clientDataJSON: new ArrayBuffer(121),
+              signature: new ArrayBuffer(64),
+              userHandle: null,
+            },
+            type: 'public-key',
+          },
+          error: null,
+        });
+
+        SignIn.clerk = {
+          __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+          __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              first_factor_verification: {
+                nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_123', status: 'complete' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.passkey({ flow: 'discoverable', preferImmediatelyAvailableCredentials: true });
+
+        expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+          expect.objectContaining({ preferImmediatelyAvailableCredentials: true }),
+        );
       });
 
       it('throws error when WebAuthn is not supported', async () => {

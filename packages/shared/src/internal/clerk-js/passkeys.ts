@@ -91,6 +91,7 @@ async function webAuthnGetCredential({
 }: {
   publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
   conditionalUI: boolean;
+  preferImmediatelyAvailableCredentials?: boolean;
 }): Promise<WebAuthnGetCredentialReturn> {
   try {
     // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.

@@ -377,6 +377,25 @@ describe('User profile MFA', () => {
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
   });
 
+  it('unlocks the SMS resend by the clock when timers were held up', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await screen.findByRole('textbox', { name: 'Verification code' });
+    try {
+      expect(screen.getByRole('button', { name: /Resend/ })).toBeDisabled();
+      vi.setSystemTime(Date.now() + 60_000);
+      await act(async () => vi.advanceTimersByTimeAsync(1000));
+      expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('disables verification and Back while resending an SMS code', async () => {
     const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
     vi.useFakeTimers({ shouldAdvanceTime: true });

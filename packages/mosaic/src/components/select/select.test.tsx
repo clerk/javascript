@@ -178,6 +178,36 @@ describe('Mosaic Select', () => {
     expect(trigger.querySelector('.cl-select-trigger-icon')).toBeInTheDocument();
   });
 
+  it('renders and selects items whose values are objects', async () => {
+    const user = userEvent.setup();
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const onValueChange = vi.fn();
+    const admin = { value: { id: 'admin' }, label: 'Admin' };
+    const member = { value: { id: 'member' }, label: 'Member' };
+    const renderItems = (items: (typeof admin)[]) => (
+      <Select.Root
+        items={items}
+        onValueChange={onValueChange}
+      >
+        <Select.Trigger />
+        <Select.Popup />
+      </Select.Root>
+    );
+    const { rerender } = render(renderItems([admin, member]));
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: 'Member' }));
+    rerender(renderItems([member, admin]));
+    await user.click(screen.getByRole('combobox'));
+
+    expect(onValueChange).toHaveBeenCalledWith(member.value);
+    expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual(['Member', 'Admin']);
+    expect(screen.getByRole('option', { name: 'Member' })).toHaveAttribute('data-selected', '');
+    expect(screen.getByRole('option', { name: 'Admin' })).not.toHaveAttribute('data-selected');
+    expect(log).not.toHaveBeenCalled();
+    log.mockRestore();
+  });
+
   it('renders one option per item when the popup is given no children', () => {
     render(
       <Select.Root

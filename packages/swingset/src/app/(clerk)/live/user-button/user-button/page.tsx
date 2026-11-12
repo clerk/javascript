@@ -30,7 +30,7 @@ export default function UserButtonLivePage() {
         ) : null}
         <div className='flex flex-wrap items-center gap-4'>
           <UserButton />
-          <UserButton mode='user' />
+          <UserButton combined={false} />
         </div>
       </div>
     </MosaicProvider>

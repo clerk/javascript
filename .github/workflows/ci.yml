@@ -148,7 +148,7 @@ jobs:
         if: steps.changed.outputs.package == 'true'
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: 24.15.0
+          node-version: 24.22.0
 
       - name: Install the package's own dependencies
         if: steps.changed.outputs.package == 'true'
@@ -321,10 +321,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - node-version: 24.15.0
+          - node-version: 22.23.4
             test-filter: '**'
             filter-label: '**'
-          - node-version: 20.19.0
+          - node-version: 24.22.2
+            test-filter: '**'
+            filter-label: '**'
+          - node-version: 26.13.0
             test-filter: '**'
             filter-label: '**'
 
@@ -367,20 +370,16 @@ jobs:
             echo "Running tests: ${{ matrix.filter-label }}"
             pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
           fi
-        env:
-          NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Run Typedoc tests
         run: |
           # Only run Typedoc tests for one matrix version and main test run
-          if [ "${{ matrix.node-version }}" == "24.15.0" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
+          if [ "${{ matrix.node-version }}" == "24.22.2" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
             pnpm turbo run //#test:typedoc
           fi
-        env:
-          NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Run verify script tests
-        if: matrix.node-version == '24.15.0'
+        if: matrix.node-version == '24.22.2'
         run: pnpm vitest run --root scripts verify-attach verify-flaky
 
       - name: Upload Turbo Summary
@@ -637,14 +636,12 @@ jobs:
       - name: Publish to local registry
         run: pkglab pub --force
 
-      - name: Edit .npmrc [link-workspace-packages=false]
-        run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
-
       - name: Install @clerk/clerk-js in os temp
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
           pnpm init
+          pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
@@ -652,6 +649,7 @@ jobs:
         run: |
           mkdir clerk-ui && cd clerk-ui
           pnpm init
+          pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
           pkglab add @clerk/ui
 
       - name: Copy components @clerk/astro
@@ -772,7 +770,7 @@ jobs:
         with:
           cache-enabled: true
           turbo-enabled: true
-          node-version: 24.15.0
+          node-version: 24.22.0
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}

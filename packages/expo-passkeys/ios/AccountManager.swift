@@ -58,7 +58,7 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
     }
     
     
-    func getPasskey(challengeBase64URL: String, rpId: String,  promise: Promise) {
+    func getPasskey(challengeBase64URL: String, rpId: String, preferImmediatelyAvailableCredentials: Bool, promise: Promise) {
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
         
         let challenge = dataFromBase64URL(base64urlString: challengeBase64URL)!
@@ -68,7 +68,11 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
         let authController = ASAuthorizationController(authorizationRequests: [ assertionRequest ] )
         authController.delegate = self
         authController.presentationContextProvider = self
-        authController.performRequests()
+        if preferImmediatelyAvailableCredentials, #available(iOS 16.0, *) {
+            authController.performRequests(options: .preferImmediatelyAvailableCredentials)
+        } else {
+            authController.performRequests()
+        }
         
         self.authCallback = { result,error in
             if (error != nil) {

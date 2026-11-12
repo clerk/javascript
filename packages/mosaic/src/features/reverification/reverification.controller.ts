@@ -1,14 +1,15 @@
 import { isClerkRuntimeError } from '@clerk/shared/error';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
+import { useResendSeconds } from '../../hooks/use-resend-seconds';
 import type { ErrorDescription } from '../../localization';
 import { isLocalizableError, useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, ErrorInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { toLocalizableErrors } from '../../utils/errors';
-import { CODE_RESEND_SECONDS } from '../../utils/verification';
+import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../utils/verification';
 import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
 import type {
   ReverificationErrorReason,
@@ -78,7 +79,7 @@ const unseatedDeps: ReverificationDeps = {
 };
 
 function lockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
-  return { resendAvailableAt: Date.now() + CODE_RESEND_SECONDS * 1000 };
+  return { resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) };
 }
 
 function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
@@ -290,7 +291,7 @@ export const reverificationMachine = createMachine({
           guard: ctx =>
             ctx.overlay.length === 0 &&
             Boolean(ctx.activeMethod && needsPrepare(ctx.activeMethod)) &&
-            (ctx.resendAvailableAt === undefined || Date.now() >= ctx.resendAvailableAt),
+            isResendUnlocked(ctx.resendAvailableAt),
           actions: assign(() => ({
             ...lockResend(),
             inputValue: '',
@@ -435,18 +436,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       : undefined,
   );
 
-  const [now, setNow] = useState(() => Date.now());
-  const resendAvailableAt = snapshot.context.resendAvailableAt;
-  const canResend = resendAvailableAt === undefined || now >= resendAvailableAt;
-  const countingDown = !canResend;
-
-  useEffect(() => {
-    if (!countingDown) {
-      return;
-    }
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, [countingDown, resendAvailableAt]);
+  const resendSeconds = useResendSeconds(snapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
 
   const cancelModel =
     (model.status === 'loading' || model.status === 'active') && snapshot.value !== 'retrying'
@@ -527,19 +517,10 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       onSelectMethod: (id: string) => send({ type: 'SELECT_METHOD', id }),
       otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
       onResend: () => send({ type: 'RESEND' }),
-      canResend,
-      // We clamp this to 30s because the first render after locking resend
-      // will have the old `now` state set, which would result in a value above
-      // 30s. There are other solutions like reading Date.now() in render and
-      // letting the interval only retrigger render, but that makes the render
-      // impure which is something the React compiler would warn about.
-      // useSyncExternalStore feels unnecessarily complex here
-      resendRemainingSeconds:
-        countingDown && resendAvailableAt
-          ? Math.min(CODE_RESEND_SECONDS, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
-          : undefined,
+      canResend: resendSeconds === 0,
+      resendRemainingSeconds: resendSeconds > 0 ? resendSeconds : undefined,
     };
 
     return state === 'retrying' ? { status: 'retrying', ...view } : { status: 'ready', onCancel, ...view };
-  }, [inactive, snapshot, onCancel, send, m, errorText, canResend, countingDown, resendAvailableAt, now]);
+  }, [inactive, snapshot, onCancel, send, m, errorText, resendSeconds]);
 }

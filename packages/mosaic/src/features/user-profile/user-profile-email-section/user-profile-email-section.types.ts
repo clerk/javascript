@@ -3,12 +3,13 @@ import type { Ref } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import type { ReverificationController } from '../../reverification';
-import type { UserProfileEmail, UserProfileEmailVerifier } from '../user-profile-contact.types';
+import type { UserProfileContactRow, UserProfileEmail, UserProfileEmailVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddEmailController } from './user-profile-add-email.controller';
 
 export interface UserProfileEmailSectionViewProps {
-  emails: UserProfileEmail[];
+  emails: UserProfileContactRow[];
   canAdd: boolean;
+  isDisabled: boolean;
   verification: UserProfileAddEmailController;
   error: string | undefined;
   rowRef: Ref<HTMLDivElement>;

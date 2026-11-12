@@ -2111,6 +2111,7 @@ export const hrHR: LocalizationResource = {
       'Registracija neuspješna zbog neuspjelih sigurnosnih provjera. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     captcha_unavailable:
       'Registracija neuspješna zbog neuspjele provjere bota. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Uneseni kod je netočan. Pokušajte ponovno.',
     form_email_address_blocked:
       'Privremene e-mail usluge nisu podržane. Molimo koristite svoju redovitu e-mail adresu za kreiranje računa.',
@@ -2192,9 +2193,11 @@ export const hrHR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Već ste prijavljeni.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Nije pronađeno proširenje za Web3 novčanik. Molimo instalirajte jedno za nastavak.',
     web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',

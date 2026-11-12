@@ -67,6 +67,30 @@ describe('useNow', () => {
     unmount();
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  const renderUntil = (until: number) =>
+    renderHook(({ until }) => useNow({ updateInterval: 1_000, until }), { initialProps: { until } });
+
+  it('stops ticking once it reaches the until time', async () => {
+    const { result } = renderUntil(Date.now() + 2_000);
+
+    await advance(2_000);
+    expect(result.current).toEqual(new Date('2026-01-01T00:00:02Z'));
+    expect(vi.getTimerCount()).toBe(0);
+
+    await advance(5_000);
+    expect(result.current).toEqual(new Date('2026-01-01T00:00:02Z'));
+  });
+
+  it('ticks again when the until time moves later', async () => {
+    const { result, rerender } = renderUntil(Date.now() + 2_000);
+    await advance(2_000);
+
+    rerender({ until: Date.now() + 2_000 });
+    await advance(1_000);
+
+    expect(result.current).toEqual(new Date('2026-01-01T00:00:03Z'));
+  });
   it('starts from the provider time instead of reading the clock', () => {
     const providerNow = new Date('2025-06-01T00:00:00Z');
     const wrapper = ({ children }: { children: ReactNode }) => (

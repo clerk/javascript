@@ -3,8 +3,7 @@ import { createContext, useContext } from 'react';
 export interface MosaicExperimental {
   /**
    * Opens Mosaic's own `UserProfile` and `OrganizationProfile` from `UserButton` and
-   * `OrganizationSwitcher`, instead of Clerk's profile modals. They skip `appearance` and the link
-   * entries of `customPages`.
+   * `OrganizationSwitcher`, instead of Clerk's profile modals.
    *
    * @default false
    */

@@ -16,6 +16,11 @@ const compactCard = '@container card (max-width: 20rem)' as const;
 
 export const root = stylex.create({
   base: {
+    '--_cl-card-footer-border': {
+      default: '0px',
+      // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one draws no footer divider.
+      [stylex.when.descendant(':where(*)', cardContentMarker)]: '1px',
+    },
     color: colorVars['--cl-color-foreground'],
     containerName: 'card',
     containerType: 'inline-size',
@@ -215,10 +220,7 @@ export const footer = stylex.create({
     justifyContent: 'space-between',
     borderTopColor: colorVars['--cl-color-border-subtle'],
     borderTopStyle: 'solid',
-    borderTopWidth: {
-      default: '0px',
-      [stylex.when.siblingBefore(':where(*)', cardContentMarker)]: '1px',
-    },
+    borderTopWidth: 'var(--_cl-card-footer-border)',
     width: '100%',
   },
 });

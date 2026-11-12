@@ -107,6 +107,17 @@ export function homeLinks(screen: Screen) {
   };
 }
 
+export function updateRequiredScreen(screen: Screen, platform: string) {
+  const ios = platform === 'ios';
+  return {
+    title: screen.getByText('Update required'),
+    yourVersion: (version: string): Locator =>
+      ios ? screen.getByLabel(`Your version, ${version}`) : screen.getByText(version),
+    required: (minimum: string): Locator => screen.getByLabel(`Required, ${minimum}+`),
+    storeButton: screen.getByText(ios ? 'Go to App Store' : 'Go to Google Play'),
+  };
+}
+
 export function nativeUserButton(screen: Screen, platform: string): Locator {
   return platform === 'ios' ? screen.getByTestId('clerk.userButton.profile') : screen.getByLabel('Open user profile');
 }

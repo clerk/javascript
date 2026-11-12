@@ -48,7 +48,7 @@ function refuse(message) {
 
 const isVideo = name => name.endsWith('.mp4');
 
-const everyFile = manifest => [...manifest.files, ...(manifest.before?.files ?? [])];
+const everyFile = manifest => [...manifest.files, ...(manifest.before?.files ?? []).filter(file => file !== null)];
 
 function sessionRunMismatch(run, repo) {
   if (run.event !== 'workflow_dispatch') {
@@ -259,7 +259,7 @@ function parseBefore(value, run, files) {
     passed: whole(raw.passed, 0, LIMITS.tests, 'passed of before'),
     flaky: whole(raw.flaky, 0, LIMITS.tests, 'flaky of before'),
     total: whole(raw.total, 1, LIMITS.tests, 'total of before'),
-    files: parseFiles(raw.files, 'the files of before'),
+    files: parseBeforeFiles(raw.files, files),
   };
   if (before.run === run) {
     refuse('before is the run itself');
@@ -267,13 +267,23 @@ function parseBefore(value, run, files) {
   if (before.passed + before.flaky > before.total) {
     refuse('passed and flaky of before must count at most total');
   }
-  if (
-    before.files.length !== files.length ||
-    before.files.some((file, i) => isVideo(file.name) !== isVideo(files[i].name))
-  ) {
-    refuse('before must have one file for each file, of the same kind');
-  }
   return before;
+}
+
+function parseBeforeFiles(list, files) {
+  const entries = Array.isArray(list) ? list : [];
+  const present = parseFiles(
+    Array.isArray(list) ? entries.filter(entry => entry !== null) : list,
+    'the files of before',
+  );
+  let next = 0;
+  const paired = entries.map(entry => (entry === null ? null : present[next++]));
+  const unpaired = (file, i) =>
+    file === null ? isVideo(files[i].name) : isVideo(file.name) !== isVideo(files[i].name);
+  if (paired.length !== files.length || paired.some(unpaired)) {
+    refuse('before must have one file for each file, of the same kind, or null for a screenshot of a new screen');
+  }
+  return paired;
 }
 
 function parseManifest(text) {
@@ -427,17 +437,24 @@ const table = (header, rows) =>
   [header, header.map(() => CENTERED), ...rows].map(cells => `| ${cells.join(' | ')} |`).join('\n');
 const inTables = block => block.includes(CENTERED);
 
+const NEW_SCREEN = 'New screen';
+
+const beforeUploads = (files, hasBefore) =>
+  hasBefore.map((has, at) => (has ? files.length + hasBefore.slice(0, at).filter(Boolean).length : null));
+
 function mediaTables(files, hasBefore, uploaded) {
+  const befores = hasBefore === null ? null : beforeUploads(files, hasBefore);
   const shown = files.map((name, at) => {
     const label = stem(name);
     const cell = (url, alt) => (isVideo(name) ? url : `<img src="${url}" width="${IMAGE_WIDTH}" alt="${alt}">`);
+    const before = befores?.[at];
     return {
       label,
-      after: cell(uploaded[at], hasBefore ? `After: ${label}` : label),
-      before: hasBefore ? cell(uploaded[files.length + at], `Before: ${label}`) : '',
+      after: cell(uploaded[at], befores === null ? label : `After: ${label}`),
+      before: before === undefined ? '' : before === null ? NEW_SCREEN : cell(uploaded[before], `Before: ${label}`),
     };
   });
-  if (hasBefore) {
+  if (befores !== null) {
     return [
       table(
         ['Before', 'After'],
@@ -471,7 +488,7 @@ function evidenceBlock(manifest, session, onDisk = file => file.name, uploaded =
       ? everyFile(manifest).map(file => `![${isVideo(file.name) ? file.name : stem(file.name)}](./${onDisk(file)})`)
       : mediaTables(
           manifest.files.map(file => file.name),
-          before !== null,
+          before === null ? null : before.files.map(file => file !== null),
           uploaded,
         );
   return [start, '', line, ...media.flatMap(part => ['', part]), '', end].join('\n');

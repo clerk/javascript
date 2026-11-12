@@ -90,7 +90,7 @@ function userProfilePageList(
           icon: (
             <Icon
               glyph={USER_PROFILE_PAGE_ICONS[entry.id]}
-              size='sm'
+              size='md'
             />
           ),
           content: pages[entry.id],

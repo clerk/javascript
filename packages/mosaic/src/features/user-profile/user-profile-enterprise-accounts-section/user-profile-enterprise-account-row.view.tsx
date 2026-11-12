@@ -67,7 +67,7 @@ export function UserProfileEnterpriseAccountRowView({
               <Icon
                 glyph={ArrowUpRight}
                 placement='inline-end'
-                size='sm'
+                size='md'
               />
             </SubmitButton>
           </Section.Actions>

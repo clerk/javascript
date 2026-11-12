@@ -170,4 +170,43 @@ describe('useConfirmController', () => {
     await waitFor(() => expect(result.current.isPending).toBe(false));
     expect(result.current.isOpen).toBe(false);
   });
+  it.each(['resolve', 'reject'] as const)(
+    'stays pending after the dialog is cancelled until the run can %s, without a second run',
+    async outcome => {
+      const run = deferred<void>();
+      const onConfirm = vi.fn(() => run.promise);
+      const reverification = { status: 'loading' as const, onCancel: vi.fn(), visible: false };
+      const { result } = renderHook(() => useConfirmController({ onConfirm, reverification }));
+
+      act(() => result.current.onOpenChange(true));
+      act(() => result.current.confirm());
+      act(() => result.current.onOpenChange(false));
+
+      expect(reverification.onCancel).toHaveBeenCalledOnce();
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.isPending).toBe(true);
+
+      act(() => result.current.onOpenChange(true));
+      act(() => result.current.confirm());
+
+      expect(onConfirm).toHaveBeenCalledOnce();
+      expect(result.current.isOpen).toBe(false);
+
+      await act(async () => {
+        if (outcome === 'resolve') {
+          run.resolve();
+        } else {
+          run.reject(blocked);
+        }
+        await run.promise.catch(() => undefined);
+      });
+
+      expect(result.current.isPending).toBe(false);
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.errorMessage).toBeUndefined();
+
+      act(() => result.current.onOpenChange(true));
+      expect(result.current.isOpen).toBe(true);
+    },
+  );
 });

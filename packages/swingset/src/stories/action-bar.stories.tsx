@@ -160,7 +160,7 @@ function MembersProfile({
           icon={
             <Icon
               glyph={Users}
-              size='sm'
+              size='md'
             />
           }
         >

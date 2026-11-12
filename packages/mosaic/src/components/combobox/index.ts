@@ -1,9 +1,13 @@
 export {
   Combobox,
+  ComboboxClear,
   ComboboxCollection,
+  ComboboxDetail,
   ComboboxEmpty,
   ComboboxInput,
+  ComboboxLabel,
   ComboboxList,
+  ComboboxMedia,
   ComboboxOption,
   ComboboxOptionIndicator,
   ComboboxPopup,
@@ -11,9 +15,13 @@ export {
   ComboboxTrigger,
 } from './combobox';
 export type {
+  ComboboxClearProps,
+  ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
+  ComboboxLabelProps,
   ComboboxListProps,
+  ComboboxMediaProps,
   ComboboxOptionProps,
   ComboboxOptionIndicatorProps,
   ComboboxPopupProps,

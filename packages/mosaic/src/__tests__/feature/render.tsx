@@ -4,6 +4,7 @@ import { act, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
+import type { MosaicProfile } from '../../features/profile-pages/use-mosaic-profile';
 import type { MosaicExperimental } from '../../hooks/use-mosaic-experimental';
 import type { MosaicLocalization } from '../../localization';
 import { MosaicProvider } from '../../mosaic-provider';
@@ -14,6 +15,7 @@ export async function renderWithClerk(
   options?: Parameters<Clerk['load']>[0],
   localization?: MosaicLocalization,
   experimental?: MosaicExperimental,
+  profile?: MosaicProfile,
 ) {
   const clerk = new Clerk(publishableKey());
   const navigate = vi.fn((_to: string) => Promise.resolve());
@@ -26,6 +28,7 @@ export async function renderWithClerk(
       <MosaicProvider
         localization={localization}
         experimental={experimental}
+        profile={profile}
       >
         {element}
       </MosaicProvider>

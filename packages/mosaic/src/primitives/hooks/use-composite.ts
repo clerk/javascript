@@ -35,9 +35,9 @@ export interface UseCompositeReturn {
 
 export interface CompositeItems {
   getItems: () => HTMLElement[];
-  getItem: (value: string) => HTMLElement | undefined;
-  getValue: (item: HTMLElement) => string | undefined;
-  register: (item: HTMLElement, value: string | undefined) => void;
+  getItem: (value: unknown) => HTMLElement | undefined;
+  getValue: (item: HTMLElement) => unknown;
+  register: (item: HTMLElement, value: unknown) => void;
   unregister: (item: HTMLElement) => void;
 }
 
@@ -56,7 +56,7 @@ export function useCompositeItems(): CompositeItems {
   return items;
 }
 
-export function useCompositeItem(value?: string): React.RefCallback<HTMLElement> {
+export function useCompositeItem(value?: unknown): React.RefCallback<HTMLElement> {
   const { register, unregister } = React.useContext(CompositeItemsContext);
   const registeredRef = React.useRef<HTMLElement | null>(null);
   return React.useCallback(
@@ -213,11 +213,11 @@ export function useComposite(element: HTMLElement | null, options: UseCompositeO
 }
 
 function createCompositeItems(): CompositeItems {
-  const items = new Map<HTMLElement, string | undefined>();
+  const items = new Map<HTMLElement, unknown>();
   const getItems = () => Array.from(items.keys()).sort(sortByDocumentPosition);
   return {
     getItems,
-    getItem: value => getItems().find(item => items.get(item) === value),
+    getItem: value => getItems().find(item => Object.is(items.get(item), value)),
     getValue: item => items.get(item),
     register: (item, value) => {
       items.set(item, value);

@@ -193,8 +193,14 @@ describe('OrganizationList', () => {
 
       await user.click(screen.getByRole('button', { name: 'Request to join' }));
 
-      expect(await screen.findByText('Pending approval')).toBeVisible();
+      const pending = await screen.findByRole('button', { name: 'Pending approval' });
+      await waitFor(() => expect(pending).not.toHaveAttribute('aria-busy'));
+      expect(pending).toHaveAttribute('aria-disabled', 'true');
+      expect(pending).toHaveFocus();
       expect(screen.queryByRole('button', { name: 'Request to join' })).toBeNull();
+      expect(fapi.suggestions[0]?.status).toBe('accepted');
+
+      await user.click(pending);
       expect(fapi.suggestions[0]?.status).toBe('accepted');
     });
 

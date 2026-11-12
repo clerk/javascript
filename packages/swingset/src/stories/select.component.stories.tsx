@@ -211,7 +211,7 @@ const languages = [
   { value: 'swift', label: 'Swift' },
 ];
 
-function renderLanguages(value: string[]) {
+function renderLanguages(value: unknown[]) {
   if (value.length === 0) {
     return 'Select languages';
   }

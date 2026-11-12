@@ -16,8 +16,6 @@ import { isSlug, toSlug } from './create-organization.utils';
 
 export type CreateOrganizationReadyModel = Extract<CreateOrganizationModel, { status: 'ready' }>;
 
-const initialValues: CreateOrganizationValues = { name: '', slug: '', logo: null };
-
 export interface CreateOrganizationController {
   step: CreateOrganizationStep;
   form: UseFormResult<CreateOrganizationValues>;
@@ -26,9 +24,14 @@ export interface CreateOrganizationController {
   onInvitationsSent: () => void;
 }
 
+export interface CreateOrganizationControllerOptions {
+  onRestart?: () => void;
+  initialValues?: Partial<Pick<CreateOrganizationValues, 'name' | 'slug'>>;
+}
+
 export function useCreateOrganizationController(
   model: CreateOrganizationReadyModel,
-  { onRestart }: { onRestart?: () => void } = {},
+  { onRestart, initialValues }: CreateOrganizationControllerOptions = {},
 ): CreateOrganizationController {
   const m = useMessages('createOrganization');
   const [step, setStep] = useState<CreateOrganizationStep>({ step: 'create' });
@@ -39,7 +42,7 @@ export function useCreateOrganizationController(
   };
 
   const form = useForm<CreateOrganizationValues, CreatedOrganization>({
-    initialValues,
+    initialValues: { name: initialValues?.name ?? '', slug: initialValues?.slug ?? '', logo: null },
     fields: {
       slug: {
         validate: slug =>

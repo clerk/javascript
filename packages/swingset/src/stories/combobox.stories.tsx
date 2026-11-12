@@ -1,11 +1,8 @@
 'use client';
 
-import { Button } from '@clerk/mosaic/components/button';
 import { Combobox } from '@clerk/mosaic/components/combobox';
 import { Field } from '@clerk/mosaic/components/field';
-import { Icon } from '@clerk/mosaic/components/icon';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
-import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -33,15 +30,8 @@ export function Default() {
         <InputGroup.Root>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
-            <Combobox.Trigger
-              aria-label='Toggle fruit options'
-              render={<Button />}
-            >
-              <Icon
-                glyph={ChevronDown}
-                size='sm'
-              />
-            </Combobox.Trigger>
+            <Combobox.Clear aria-label='Clear fruit' />
+            <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
         </InputGroup.Root>
       </Field.Root>
@@ -77,15 +67,8 @@ export function Scrolling() {
         <InputGroup.Root>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
-            <Combobox.Trigger
-              aria-label='Toggle fruit options'
-              render={<Button />}
-            >
-              <Icon
-                glyph={ChevronDown}
-                size='sm'
-              />
-            </Combobox.Trigger>
+            <Combobox.Clear aria-label='Clear fruit' />
+            <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
         </InputGroup.Root>
       </Field.Root>
@@ -102,6 +85,50 @@ export function Scrolling() {
               label={option}
             >
               {option}
+              <Combobox.OptionIndicator />
+            </Combobox.Option>
+          )}
+        </Combobox.Collection>
+      </Combobox.Popup>
+    </Combobox.Root>
+  );
+}
+
+export function OptionParts() {
+  const currencies = [
+    { code: 'USD', name: 'US Dollar', symbol: '$' },
+    { code: 'EUR', name: 'Euro', symbol: '€' },
+    { code: 'GBP', name: 'British Pound', symbol: '£' },
+    { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+    { code: 'CHF', name: 'Swiss Franc with a long name that truncates', symbol: '₣' },
+  ];
+
+  return (
+    <Combobox.Root>
+      <Field.Root xstyle={styles.fieldWidth}>
+        <Field.Label>Currency</Field.Label>
+        <InputGroup.Root>
+          <Combobox.Input placeholder='Search currencies…' />
+          <InputGroup.End>
+            <Combobox.Trigger aria-label='Toggle currency options' />
+          </InputGroup.End>
+        </InputGroup.Root>
+      </Field.Root>
+      <Combobox.Popup>
+        <Combobox.Collection
+          items={currencies}
+          itemToStringLabel={currency => currency.name}
+          empty={<Combobox.Empty>No currency found</Combobox.Empty>}
+        >
+          {currency => (
+            <Combobox.Option
+              key={currency.code}
+              value={currency.code}
+              label={currency.name}
+            >
+              <Combobox.Media aria-hidden='true'>{currency.symbol}</Combobox.Media>
+              <Combobox.Label>{currency.name}</Combobox.Label>
+              <Combobox.Detail>{currency.code}</Combobox.Detail>
               <Combobox.OptionIndicator />
             </Combobox.Option>
           )}

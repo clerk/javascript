@@ -62,7 +62,8 @@ export const styles = stylex.create({
       ':where([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
         default: null,
-        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-surface-subtle'],
+        ':where([data-actionable]:not([data-selected]):hover:not(:disabled, [data-disabled], [aria-disabled="true"]))':
+          colorVars['--cl-color-surface-subtle'],
       },
     },
     backgroundColor: {
@@ -70,7 +71,8 @@ export const styles = stylex.create({
       ':where([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
         default: null,
-        ':where([data-actionable]:not([data-selected]):hover)': colorVars['--cl-color-surface-subtle'],
+        ':where([data-actionable]:not([data-selected]):hover:not(:disabled, [data-disabled], [aria-disabled="true"]))':
+          colorVars['--cl-color-surface-subtle'],
       },
     },
     borderBlockStartColor: colorVars['--cl-color-border-subtle'],
@@ -93,7 +95,10 @@ export const styles = stylex.create({
   sortableColumn: {
     color: {
       default: colorVars['--cl-color-foreground-secondary'],
-      '@media (hover: hover)': { default: null, ':hover': colorVars['--cl-color-foreground'] },
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-foreground'],
+      },
     },
     cursor: 'pointer',
     userSelect: 'none',
@@ -147,8 +152,10 @@ export const styles = stylex.create({
     cursor: 'pointer',
     display: 'inline-flex',
     justifyContent: 'center',
-    marginInlineEnd: space['1'],
+    marginInlineEnd: space['0.5'],
     verticalAlign: 'middle',
+    height: space['4'],
+    width: space['4'],
   },
   expandIcon: {
     transform: {

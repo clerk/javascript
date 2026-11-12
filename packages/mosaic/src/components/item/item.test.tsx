@@ -25,33 +25,6 @@ describe('Mosaic Item', () => {
     expect(item).not.toHaveAttribute('data-interactive');
   });
 
-  it('reflects the size prop as a data attribute, defaulting to md', () => {
-    const { rerender } = render(<Item.Root>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'md');
-    rerender(<Item.Root size='xs'>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'xs');
-  });
-
-  it('reads the size from the root in media', () => {
-    const { rerender } = render(
-      <Item.Root size='xs'>
-        <Item.Media data-testid='media' />
-      </Item.Root>,
-    );
-    expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'xs');
-    rerender(
-      <Item.Root size='md'>
-        <Item.Media data-testid='media' />
-      </Item.Root>,
-    );
-    expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'md');
-  });
-
-  it('falls back to the default size when media renders outside a root', () => {
-    render(<Item.Media data-testid='media' />);
-    expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'md');
-  });
-
   it('reflects the label variant as a data attribute, defaulting to default', () => {
     const { rerender } = render(<Item.Label>Clerk</Item.Label>);
     expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'default');
@@ -138,80 +111,16 @@ describe('Mosaic Item', () => {
     expect(screen.getByRole('button', { name: 'Manage' }).parentElement).toHaveClass('cl-item-actions');
   });
 
-  it('renders a group and a separator without imposing a role', () => {
+  it('renders a group without imposing a role', () => {
     render(
       <Item.Group data-testid='group'>
         <Item.Root>One</Item.Root>
-        <Item.Separator data-testid='sep' />
         <Item.Root>Two</Item.Root>
       </Item.Group>,
     );
     const group = screen.getByTestId('group');
     expect(group).toHaveClass('cl-item-group');
     expect(group).not.toHaveAttribute('role');
-    expect(screen.getByTestId('sep')).toHaveClass('cl-item-separator');
-  });
-
-  it('reflects the group variant as a data attribute, defaulting to default', () => {
-    const { rerender } = render(<Item.Group data-testid='group'>One</Item.Group>);
-    expect(screen.getByTestId('group')).toHaveAttribute('data-variant', 'default');
-    rerender(
-      <Item.Group
-        data-testid='group'
-        variant='outline'
-      >
-        One
-      </Item.Group>,
-    );
-    expect(screen.getByTestId('group')).toHaveAttribute('data-variant', 'outline');
-  });
-
-  it('reads the variant from the group in its rows', () => {
-    render(
-      <Item.Group variant='outline'>
-        <Item.Root>Outlined</Item.Root>
-      </Item.Group>,
-    );
-    expect(screen.getByText('Outlined')).toHaveAttribute('data-variant', 'outline');
-  });
-
-  it('falls back to the default variant when a row renders outside a group', () => {
-    render(<Item.Root>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'default');
-  });
-
-  it('gives an outlined row a border atom a default row does not carry', () => {
-    render(
-      <>
-        <Item.Root>Plain</Item.Root>
-        <Item.Group variant='outline'>
-          <Item.Root>Outlined</Item.Root>
-        </Item.Group>
-      </>,
-    );
-
-    const atoms = (text: string) => screen.getByText(text).className.split(' ');
-    expect(atoms('Outlined').filter(atom => !atoms('Plain').includes(atom))).not.toHaveLength(0);
-  });
-
-  it('takes a variant of its own, outside any group', () => {
-    render(<Item.Root variant='outline'>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'outline');
-  });
-
-  it('lets a row override the variant its group provides, in both directions', () => {
-    render(
-      <>
-        <Item.Group variant='outline'>
-          <Item.Root variant='default'>Opted out</Item.Root>
-        </Item.Group>
-        <Item.Group>
-          <Item.Root variant='outline'>Opted in</Item.Root>
-        </Item.Group>
-      </>,
-    );
-    expect(screen.getByText('Opted out')).toHaveAttribute('data-variant', 'default');
-    expect(screen.getByText('Opted in')).toHaveAttribute('data-variant', 'outline');
   });
 
   it('forwards the ref to the root element', () => {

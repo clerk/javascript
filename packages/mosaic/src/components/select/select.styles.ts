@@ -13,15 +13,44 @@ import {
 } from '../../tokens.stylex';
 import { selectOptionScope } from './select.markers.stylex';
 
-const popupRadius = radiusVars['--cl-radius-lg'];
+const popupRadius = radiusVars['--cl-radius-xl'];
 const popupBorder = '1px';
-const inset = space['0.5'];
-const optionRadius = `max(0px, calc(${popupRadius} - ${popupBorder} - ${inset}))`;
+const inset = space['1.5'];
+const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 
 // With `alignItemWithTrigger` the selected option's box lands over the trigger's, so the two
-// boxes must inset their text identically: the trigger is a `md` Button (32px, 1px border, 12px
-// inline padding, sm text), and the option gets the same 13px from the popup's 1px border, the
-// viewport's 2px padding, and its own 10px padding at the same 32px height.
+// boxes must inset their text and trailing icon identically: the trigger is a `md` Button (32px,
+// 1px border, 11px start and end padding, sm text), and the option gets the same 12px from the
+// popup's 1px border, the viewport's 5px padding, and its own 6px padding, on both the text and
+// the icon's edge, at the same 32px height.
+
+const hoverBorderColor = 'light-dark(#bebebe, #525252)';
+
+export const trigger = stylex.create({
+  base: {
+    '--_cl-icon-color': {
+      default: colorVars['--cl-color-foreground-secondary'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
+      },
+    },
+    borderColor: {
+      default: colorVars['--cl-color-border'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover:not(:active):not([data-open])': hoverBorderColor,
+      },
+    },
+    backgroundColor: {
+      default: 'transparent',
+      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+    },
+    paddingInlineEnd: `calc(${space['3']} - 1px)`,
+    paddingInlineStart: `calc(${space['3']} - 1px)`,
+  },
+});
 
 export const value = stylex.create({
   base: {
@@ -76,13 +105,13 @@ export const popup = stylex.create({
     maxHeight: 'var(--cl-available-height)',
     maxWidth: 'min(18rem, calc(100vw - 2rem))',
     // Never narrower than the trigger, or the trigger's chevron shows from under the overlay.
-    minWidth: 'max(10rem, var(--cl-anchor-width, 0px))',
+    minWidth: 'var(--cl-anchor-width, 10rem)',
   },
 });
 
 export const viewport = stylex.create({
   base: {
-    padding: inset,
+    padding: `calc(${inset} - ${popupBorder})`,
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
@@ -96,14 +125,13 @@ export const option = stylex.create({
     gap: space['2'],
     outline: 'none',
     paddingBlock: space['1.5'],
-    paddingInline: '0.625rem',
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
       ':where([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       '@media (hover: hover)': {
         default: null,
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     color: colorVars['--cl-color-foreground'],
@@ -117,6 +145,8 @@ export const option = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':where([data-disabled])': 0.5 },
     outlineOffset: 0,
+    paddingInlineEnd: space['1.5'],
+    paddingInlineStart: space['1.5'],
     position: 'relative',
     textAlign: 'start',
     minHeight: space['8'],

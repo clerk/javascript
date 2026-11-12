@@ -1,117 +1,87 @@
 import { useMergeRefs } from '@floating-ui/react';
-import type { FormEvent, Ref } from 'react';
-import { useId, useState } from 'react';
+import type { Ref } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
-import { Icon } from '../../../components/icon';
-import { InputGroup } from '../../../components/input-group';
-import { Eye } from '../../../icons/glyphs/eye';
-import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import type { FieldFeedback, UseFormResult } from '../../../components/form';
+import { PasswordInput } from '../../../components/password-input';
+import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
+import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
-export interface SignInPasswordMessages {
-  title: string;
-  description: string;
-  identityEditLabel: string;
-  fieldLabel: string;
-  fieldPlaceholder: string;
-  showPasswordLabel: string;
-  hidePasswordLabel: string;
-  forgotPasswordLabel: string;
-  secondaryActionLabel: string;
-  primaryActionLabel: string;
-  pendingLabel: string;
-}
-
-export interface SignInPasswordProps {
-  messages: SignInPasswordMessages;
+interface SignInPasswordProps {
   identifier: string;
   onEditIdentifier?: () => void;
-  value: string;
+  form: UseFormResult<SignInValues>;
   errorMessage?: string;
-  isPending?: boolean;
-  onValueChange: (value: string) => void;
-  onSubmit: () => void;
+  globalErrorMessage?: string;
+  isPending: boolean;
+  onSubmit: (event: SignInSubmitEvent) => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
 export function SignInPassword({
-  messages,
   identifier,
   onEditIdentifier,
-  value,
+  form,
   errorMessage,
-  isPending = false,
-  onValueChange,
+  globalErrorMessage,
+  isPending,
   onSubmit,
   onForgotPassword,
   onCancel,
   focusRef,
 }: SignInPasswordProps) {
-  const formId = useId();
-  const [visible, setVisible] = useState(false);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!isPending) {
-      onSubmit();
-    }
-  };
+  const m = useMessages('signIn');
+  const { ref: passwordFieldRef, ...password } = form.register('password');
+  const passwordRef = useMergeRefs<HTMLElement>([passwordFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
+  const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
 
   return (
     <>
       <Card.Header>
-        <Card.Title>{messages.title}</Card.Title>
-        <Card.Description>{messages.description}</Card.Description>
+        <Card.Title>{m.password.title}</Card.Title>
+        <Card.Description>{m.password.description}</Card.Description>
         <SignInIdentityPreview
           identifier={identifier}
-          editLabel={messages.identityEditLabel}
+          editLabel={m.editIdentifier}
           disabled={isPending}
           onEdit={onEditIdentifier}
         />
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {globalErrorMessage}
+      </Card.Banner>
       <Card.Content>
         <Form
-          id={formId}
-          onSubmit={handleSubmit}
+          id={form.id}
+          onSubmit={onSubmit}
         >
           <Field.Root
             required
-            invalid={Boolean(errorMessage)}
+            invalid={feedback?.type === 'error'}
             disabled={isPending}
             focusableWhenDisabled
           >
-            <Field.Label>{messages.fieldLabel}</Field.Label>
-            <InputGroup.Root>
-              <InputGroup.Input
-                ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
-                name='password'
-                type={visible ? 'text' : 'password'}
-                autoComplete='current-password'
-                placeholder={messages.fieldPlaceholder}
-                value={value}
-                onChange={event => onValueChange(event.target.value)}
-              />
-              <InputGroup.End>
-                <Button
-                  type='button'
-                  aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
-                  onClick={() => setVisible(current => !current)}
-                >
-                  <Icon glyph={visible ? EyeSlash : Eye} />
-                </Button>
-              </InputGroup.End>
-            </InputGroup.Root>
-            <Field.Message>
-              <Field.Error>{errorMessage}</Field.Error>
-            </Field.Message>
+            <Field.Label>{m.password.label}</Field.Label>
+            <PasswordInput
+              ref={passwordRef}
+              autoComplete='current-password'
+              placeholder={m.password.placeholder}
+              {...password}
+              showPasswordLabel={m.showPassword}
+              hidePasswordLabel={m.hidePassword}
+            />
+            <Field.Feedback feedback={feedback} />
             {onForgotPassword ? (
               <Button
                 type='button'
@@ -121,7 +91,7 @@ export function SignInPassword({
                 onClick={onForgotPassword}
                 xstyle={styles.forgotPassword}
               >
-                {messages.forgotPasswordLabel}
+                {m.password.forgotPassword}
               </Button>
             ) : null}
           </Field.Root>
@@ -137,16 +107,16 @@ export function SignInPassword({
             disabled={isPending}
             onClick={onCancel}
           >
-            {messages.secondaryActionLabel}
+            {m.useAnotherMethod}
           </Button>
         ) : null}
         <SubmitButton
-          form={formId}
+          form={form.id}
           fullWidth
           isPending={isPending}
-          pendingLabel={messages.pendingLabel}
+          pendingLabel={m.verifying}
         >
-          {messages.primaryActionLabel}
+          {m.continue}
         </SubmitButton>
       </Card.Footer>
     </>

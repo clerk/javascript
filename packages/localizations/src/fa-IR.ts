@@ -2099,6 +2099,7 @@ export const faIR: LocalizationResource = {
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'کد وارد شده نادرست است.',
     form_email_address_blocked:
       'سرویس‌های ایمیل موقت پشتیبانی نمی‌شوند. لطفاً از آدرس ایمیل معمولی خود برای ایجاد حساب استفاده کنید.',
@@ -2172,9 +2173,11 @@ export const faIR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'جلسه از قبل وجود دارد.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
     web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',

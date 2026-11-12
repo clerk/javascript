@@ -138,7 +138,7 @@ export function generateConfig({ mode, matchedKeys = true }: { mode: 'test' | 'l
     return {
       token: jwt.sign(claims, rsa.private, {
         algorithm: 'RS256',
-        header: { kid: ins_id },
+        header: { kid: ins_id, cat: 'cl_B7d4PD111AAA' },
       }),
       claims,
     };

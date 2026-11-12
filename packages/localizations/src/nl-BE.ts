@@ -2089,6 +2089,7 @@ export const nlBE: LocalizationResource = {
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:
       'Aanmelding mislukt vanwege mislukte botvalidatie. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'De ingevoerde code is incorrect.',
     form_email_address_blocked:
       'Tijdelijke e-maildiensten worden niet ondersteund. Gebruik uw normale e-mailadres om een account aan te maken.',
@@ -2162,9 +2163,11 @@ export const nlBE: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Je bent al ingelogd.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:

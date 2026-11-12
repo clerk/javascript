@@ -1,5 +1,14 @@
 # Change Log
 
+## 7.9.25
+
+### Patch Changes
+
+- Updated dependencies [[`11d5dfb`](https://github.com/clerk/javascript/commit/11d5dfb1bec6f3e5f61db0b078e87fc3b8ecd8e2), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/backend@3.27.0
+  - @clerk/shared@4.44.1
+  - @clerk/react@6.18.6
+
 ## 7.9.24
 
 ### Patch Changes

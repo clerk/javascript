@@ -82,7 +82,7 @@ export function UserProfilePasskeysSectionView({
                   <Icon
                     glyph={Plus}
                     placement='inline-start'
-                    size='sm'
+                    size='md'
                   />
                   {m.add}
                 </Button>

@@ -1,6 +1,6 @@
 import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { OrganizationListProps } from '@clerk/shared/types';
+import type { OrganizationListProps, OrganizationResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
@@ -37,7 +37,7 @@ export type OrganizationListModel =
 
 const UNAVAILABLE_ORGANIZATION_CODES = ['organization_not_found_or_unauthorized', 'not_a_member_in_organization'];
 
-function unavailableOrganization(error: unknown, createOrganizationEnabled: boolean): unknown {
+export function unavailableOrganization(error: unknown, createOrganizationEnabled: boolean): unknown {
   if (
     createOrganizationEnabled ||
     !isClerkAPIResponseError(error) ||
@@ -51,27 +51,17 @@ function unavailableOrganization(error: unknown, createOrganizationEnabled: bool
   });
 }
 
-export function useOrganizationListModel(options: OrganizationListModelOptions = {}): OrganizationListModel {
-  const { isLoaded: isUserLoaded, user } = useUser();
-  const clerk = useClerk();
-  const environment = useMosaicEnvironment();
-  const createOrganization = useCreateOrganizationModel({
-    afterCreateOrganizationUrl: options.afterCreateOrganizationUrl,
-    skipInvitationScreen: options.skipInvitationScreen,
-  });
+export type OrganizationListEntries = Pick<
+  OrganizationListData,
+  'organizationsLoading' | 'memberships' | 'invitations' | 'suggestions' | 'paging'
+> & {
+  findOrganization: (organizationId: string) => OrganizationResource | undefined;
+  onAcceptInvitation: (invitationId: string) => Promise<unknown>;
+  onAcceptSuggestion: (suggestionId: string) => Promise<unknown>;
+};
+
+export function useOrganizationListEntries(): OrganizationListEntries {
   const { userMemberships, userInvitations, userSuggestions, ref } = useOrganizationListInView();
-
-  if (!isUserLoaded || !environment) {
-    return { status: 'loading' };
-  }
-
-  if (!user) {
-    return { status: 'hidden' };
-  }
-
-  if (createOrganization.status === 'loading') {
-    return { status: 'loading' };
-  }
 
   const membershipData = userMemberships.data ?? [];
   const invitationData = userInvitations.data?.filter(Boolean) ?? [];
@@ -113,25 +103,7 @@ export function useOrganizationListModel(options: OrganizationListModelOptions =
           status: s.status,
         }));
 
-  const afterSelectUrl = async (organizationId: string | null): Promise<string | undefined> => {
-    if (!organizationId) {
-      return resolveAfterUrl(options.afterSelectPersonalUrl, user);
-    }
-    if (!options.afterSelectOrganizationUrl) {
-      return undefined;
-    }
-    const selected =
-      membershipData.find(m => m.organization.id === organizationId)?.organization ??
-      (await clerk.getOrganization(organizationId));
-    return resolveAfterUrl(options.afterSelectOrganizationUrl, selected);
-  };
-
   return {
-    status: 'ready',
-    applicationName: environment.displayConfig.applicationName,
-    renderBranding: environment.displayConfig.branded,
-    hidePersonal: environment.organizationSettings.forceOrganizationSelection || (options.hidePersonal ?? false),
-    personalImageUrl: user.imageUrl || undefined,
     organizationsLoading: userMemberships.isLoading || userInvitations.isLoading || userSuggestions.isLoading,
     memberships,
     invitations,
@@ -140,15 +112,7 @@ export function useOrganizationListModel(options: OrganizationListModelOptions =
       ref,
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
-    createOrganization:
-      createOrganization.status === 'ready' && user.createOrganizationEnabled ? createOrganization : undefined,
-    onSelectOrganization: async organizationId => {
-      try {
-        await clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) });
-      } catch (error) {
-        throw unavailableOrganization(error, user.createOrganizationEnabled);
-      }
-    },
+    findOrganization: organizationId => membershipData.find(m => m.organization.id === organizationId)?.organization,
     onAcceptInvitation: async invitationId => {
       const invitation = invitationData.find(i => i.id === invitationId);
       try {
@@ -171,6 +135,58 @@ export function useOrganizationListModel(options: OrganizationListModelOptions =
       } catch (error) {
         await Promise.allSettled([userSuggestions.revalidate?.()]);
         throw error;
+      }
+    },
+  };
+}
+
+export function useOrganizationListModel(options: OrganizationListModelOptions = {}): OrganizationListModel {
+  const { isLoaded: isUserLoaded, user } = useUser();
+  const clerk = useClerk();
+  const environment = useMosaicEnvironment();
+  const createOrganization = useCreateOrganizationModel({
+    afterCreateOrganizationUrl: options.afterCreateOrganizationUrl,
+    skipInvitationScreen: options.skipInvitationScreen,
+  });
+  const { findOrganization, ...entries } = useOrganizationListEntries();
+
+  if (!isUserLoaded || !environment) {
+    return { status: 'loading' };
+  }
+
+  if (!user) {
+    return { status: 'hidden' };
+  }
+
+  if (createOrganization.status === 'loading') {
+    return { status: 'loading' };
+  }
+
+  const afterSelectUrl = async (organizationId: string | null): Promise<string | undefined> => {
+    if (!organizationId) {
+      return resolveAfterUrl(options.afterSelectPersonalUrl, user);
+    }
+    if (!options.afterSelectOrganizationUrl) {
+      return undefined;
+    }
+    const selected = findOrganization(organizationId) ?? (await clerk.getOrganization(organizationId));
+    return resolveAfterUrl(options.afterSelectOrganizationUrl, selected);
+  };
+
+  return {
+    status: 'ready',
+    applicationName: environment.displayConfig.applicationName,
+    renderBranding: environment.displayConfig.branded,
+    hidePersonal: environment.organizationSettings.forceOrganizationSelection || (options.hidePersonal ?? false),
+    personalImageUrl: user.imageUrl || undefined,
+    ...entries,
+    createOrganization:
+      createOrganization.status === 'ready' && user.createOrganizationEnabled ? createOrganization : undefined,
+    onSelectOrganization: async organizationId => {
+      try {
+        await clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) });
+      } catch (error) {
+        throw unavailableOrganization(error, user.createOrganizationEnabled);
       }
     },
   };

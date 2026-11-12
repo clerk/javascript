@@ -5,4 +5,5 @@ export const ORGANIZATION_PERMISSIONS = {
   membershipsManage: 'org:sys_memberships:manage',
   profileManage: 'org:sys_profile:manage',
   profileDelete: 'org:sys_profile:delete',
+  ssoBypassManage: 'org:sys_entconns_sso_bypass:manage',
 } as const;
