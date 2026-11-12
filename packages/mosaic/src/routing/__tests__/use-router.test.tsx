@@ -239,6 +239,45 @@ describe('useRouterScope', () => {
     expect(result.current.segment).toEqual([]);
   });
 
+  it('shows the root instead of a notFound route that needs params, and warns', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const { result } = renderHook(
+      () => ({
+        router: useRouterScope(routes, { ...userScope, notFound: () => 'statement' }),
+        segment: useUserSegment(),
+      }),
+      { wrapper: wrapperWith({ '/user': ['nowhere'] }) },
+    );
+    expect(result.current.router.route).toBe('account');
+    expect(result.current.router.params).toEqual({});
+    expect(result.current.segment).toEqual([]);
+    expect(warn).toHaveBeenCalledWith(
+      '[Clerk] notFound returned "statement", which needs params, so the root is shown instead.',
+    );
+    warn.mockRestore();
+  });
+
+  it('reports a root whose name is an Object.prototype property', () => {
+    const protoRoutes: RouteTable = Object.fromEntries([
+      ['__proto__', 'home'],
+      ['security', 'security'],
+    ]);
+    const { result } = renderHook(
+      () => ({
+        router: useRouterScope(protoRoutes, { routing: 'virtual', path: '/user', root: '__proto__' }),
+        segment: useUserSegment(),
+      }),
+      { wrapper: wrapperWith({ '/user': ['security'] }) },
+    );
+    expect(result.current.router.route).toBe('security');
+
+    act(() => {
+      result.current.router.go('__proto__');
+    });
+    expect(result.current.router.route).toBe('__proto__');
+    expect(result.current.segment).toEqual([]);
+  });
+
   it('keeps the same result object between unrelated renders', () => {
     const { result, rerender } = renderHook(() => useRouterScope(routes, userScope), {
       wrapper: wrapperWith({ '/user': ['security'] }),

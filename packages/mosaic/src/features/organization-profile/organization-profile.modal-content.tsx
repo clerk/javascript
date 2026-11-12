@@ -8,6 +8,7 @@ export default function OrganizationProfileModalContent({
   options,
   close,
   path,
+  routing,
 }: OrganizationProfileModalContentProps): React.ReactElement {
   const { isLoaded, organization } = useOrganization();
   const inactive = isLoaded && !organization;
@@ -23,6 +24,7 @@ export default function OrganizationProfileModalContent({
     <OrganizationProfile
       {...props}
       path={path}
+      routing={routing}
     />
   );
 }

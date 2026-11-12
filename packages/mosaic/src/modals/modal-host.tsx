@@ -7,8 +7,21 @@ import { useMessages } from '../localization';
 import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
+import { normalizeBase } from '../routing/base-path';
+import { useRoutingConfig } from '../routing/router-adapter';
 import { useMosaicLocation } from '../routing/use-mosaic-location';
-import type { ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
+import type { ModalHandle, ModalRoutingMode, ModalSurface, ModalSurfaces } from './modal.types';
+
+// The open modals in the order they opened. Modals are hosted side by side rather than inside
+// one another, so the dialogs cannot tell through the floating tree that one is on top of
+// another: to the one beneath, a press inside the one on top is an outside press, and Escape
+// reaches both. Only the modal on top takes a dismissal.
+interface ModalStack {
+  top: string | undefined;
+  register: (id: string) => () => void;
+}
+
+const ModalStackContext = React.createContext<ModalStack | null>(null);
 
 export function ModalHost({
   surfaces,
@@ -17,15 +30,22 @@ export function ModalHost({
   surfaces: ModalSurfaces;
   children: React.ReactNode;
 }): React.ReactElement {
+  const [open, setOpen] = React.useState<readonly string[]>([]);
+  const register = React.useCallback((id: string) => {
+    setOpen(previous => [...previous.filter(other => other !== id), id]);
+    return () => setOpen(previous => previous.filter(other => other !== id));
+  }, []);
+  const stack = React.useMemo<ModalStack>(() => ({ top: open[open.length - 1], register }), [open, register]);
+
   return (
-    <>
+    <ModalStackContext.Provider value={stack}>
       {surfaces.reduceRight<React.ReactNode>(
         (inner, { id, Host }) => (
           <Host key={id}>{inner}</Host>
         ),
         children,
       )}
-    </>
+    </ModalStackContext.Provider>
   );
 }
 
@@ -48,9 +68,18 @@ export function ModalSurfaceHost<Options>({
   // opening/closing is just writing to the appropriate routing state. This means that in a mode
   // that writes to the url, the modal opens automatically on page load if the url says so,
   // the Back button just works etc. The public modal open/close are just routing writes.
-  const base = surface.path ?? `/modal/${surface.id}`;
-  const location = useMosaicLocation({ routing: 'virtual', path: base });
+  const modals = useRoutingConfig().modals;
+  const routing = modals?.routing ?? surface.routing ?? 'virtual';
+  const own = surface.path ?? `/modal/${surface.id}`;
+  // In the pathname the modal lives under the page it opens from and closes back to it.
+  const page = routing === 'path' ? (modals?.path ?? '') : undefined;
+  const base = page === undefined ? own : `${normalizeBase(page)}${normalizeBase(own)}`;
+  const location = useMosaicLocation({ routing, path: base, clearedPath: page });
   const isOpen = location.useSegmentParts() !== undefined;
+  const stack = React.useContext(ModalStackContext);
+  const register = stack?.register;
+  React.useEffect(() => (isOpen ? register?.(surface.id) : undefined), [isOpen, register, surface.id]);
+  const isTop = stack === null || stack.top === surface.id;
   // wasOpen guarantees this only runs once as we are opening the modal
   if (isOpen && !state.wasOpen) {
     setState(previous =>
@@ -111,7 +140,9 @@ export function ModalSurfaceHost<Options>({
         state={state}
         open={isOpen}
         base={base}
+        routing={routing}
         close={modal.close}
+        dismissible={isTop}
       />
     </surface.context.Provider>
   );
@@ -122,13 +153,17 @@ function ModalSlot<Options>({
   state,
   open,
   base,
+  routing,
   close,
+  dismissible,
 }: {
   surface: ModalSurface<Options>;
   state: ModalState<Options>;
   open: boolean;
   base: string;
+  routing: ModalRoutingMode;
   close: () => void;
+  dismissible: boolean;
 }) {
   const [content] = useActor(surface.loader);
   const { Content } = content.context;
@@ -138,7 +173,7 @@ function ModalSlot<Options>({
     <Dialog.Root
       open={open && (Content !== undefined || failed)}
       onOpenChange={open => {
-        if (!open) {
+        if (!open && dismissible) {
           close();
         }
       }}
@@ -150,6 +185,7 @@ function ModalSlot<Options>({
             options={state.options}
             close={close}
             path={base}
+            routing={routing}
           />
         ) : failed ? (
           <LoadFailed />

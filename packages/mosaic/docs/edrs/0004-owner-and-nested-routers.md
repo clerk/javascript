@@ -23,6 +23,8 @@ If every router could redirect, two tables under one base would fight. Not-found
 
 Earlier shape: a `notFound` route, which the owner redirected unknown segments to. Two owners on one base with different fallbacks then looped, and three guards were tried: remembering the last redirected-from segment (blocked legitimately recurring segments), detecting an overwritten redirect (only worked at mount), and an ownership registry (correct, but a queue, two contexts and a provider). A redirect fuse replaced them. Naming the root made all of it unnecessary: every owner's fallback is its own base, so two owners of one base write the same thing and cannot loop, and the fuse was removed as untestable. A separate `aliases` map for the root's own segment was folded into `root` for the same reason.
 
+`notFound` came back as an option of the owner, for the combined profile, which sends an unknown page in the organization group to that group's first page. It names another route for a segment nothing matches, so it reopens the loop for two owners of one base whose `notFound` disagree, and a route it names that needs params would be written without them, match nothing and redirect forever. The second is checked: a name whose built parts do not match back to it shows the root, with a warning. The first is left as the configuration error below rather than guarded with a fuse again.
+
 Not-ready: the combined profile routed while the organization model loaded, and a deep link to an organization page was replaced with the base before the pages existed. Withholding the table at the call site was `main`'s answer; `ready` is the same answer as a routing-layer concept.
 
 ## Decision
@@ -32,7 +34,7 @@ Two hooks with an opaque scope between them. The owner names its `root`, redirec
 ## Consequences
 
 - `route` can be switched on without a guard. Passing `ready` at all makes it optional in the type, so an owner with an unsettled table has to decide what the loading window shows.
-- Owners of one base cannot loop each other, but the second keeps snapping the first back to its root on every navigation; a configuration error shows as that, with no warning.
+- Owners of one base that fall back to their root cannot loop each other, but the second keeps snapping the first back to its root on every navigation; a configuration error shows as that, with no warning. Two such owners whose `notFound` send one segment to different routes redirect each other forever, also with no warning.
 - An empty table, as when a profile has no pages yet, routes to a placeholder root and writes nothing.
 - Nesting lands on the scope later: a sub-surface's base is the parent's base plus its segment.
 
@@ -45,3 +47,4 @@ Two hooks with an opaque scope between them. The owner names its `root`, redirec
 
 - **2026-11-06**: Accepted.
 - **2026-11-06**: Amended after review: `notFound` and the redirect fuse replaced by `root`; `ready` added.
+- **2026-11-12**: Amended: `notFound` as an owner option recorded; a route it names that needs params shows the root with a warning; two owners of one base whose `notFound` disagree can loop.

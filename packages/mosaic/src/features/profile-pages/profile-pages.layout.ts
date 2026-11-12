@@ -6,7 +6,8 @@ const BUILT_IN_SEGMENTS: Readonly<Record<string, string>> = {
 };
 
 export function pageSegment(id: string): string {
-  return BUILT_IN_SEGMENTS[id] ?? id;
+  const segment = Object.hasOwn(BUILT_IN_SEGMENTS, id) ? BUILT_IN_SEGMENTS[id] : undefined;
+  return segment ?? id;
 }
 
 export function pageParts(page: string | undefined): string[] {
@@ -42,6 +43,12 @@ export function withRoutablePaths<Page extends { path: string }>(
     }
     if (parts.some(part => part.startsWith(':'))) {
       logger.warnOnce(`[Clerk] Custom page path "${page.path}" cannot start with a colon, so the page is left out.`);
+      return false;
+    }
+    if (parts.some(part => part === '.' || part === '..')) {
+      logger.warnOnce(
+        `[Clerk] Custom page path "${page.path}" has a "." or ".." part, which a URL resolves away, so the page is left out.`,
+      );
       return false;
     }
     if (parts.some(part => part.includes('%'))) {

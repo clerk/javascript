@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, onTestFinished } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
@@ -477,5 +477,92 @@ describe('UserProfile with an active organization', () => {
       'aria-selected',
       'true',
     );
+  });
+});
+
+describe('UserProfile routed in the URL', () => {
+  function startAt(url: string) {
+    const original = window.location.href;
+    window.history.replaceState(null, '', url);
+    onTestFinished(() => window.history.replaceState(null, '', original));
+  }
+
+  function expectSelected(name: string) {
+    expect(screen.getByRole('tab', { name })).toHaveAttribute('aria-selected', 'true');
+  }
+
+  it('opens on the page in the pathname and writes each page change there', async () => {
+    serve();
+    startAt('/profile/security?keep=1');
+    await renderWithClerk(
+      <UserProfile
+        routing='path'
+        path='/profile'
+      />,
+    );
+    const user = userEvent.setup();
+    expectSelected('Security');
+
+    await user.click(screen.getByRole('tab', { name: 'Account' }));
+    expectSelected('Account');
+    expect(window.location.pathname).toBe('/profile');
+    expect(window.location.search).toBe('?keep=1');
+
+    await user.click(screen.getByRole('tab', { name: 'Security' }));
+    expectSelected('Security');
+    expect(window.location.pathname).toBe('/profile/security');
+
+    act(() => window.history.back());
+    await waitFor(() => expectSelected('Account'));
+    expect(window.location.pathname).toBe('/profile');
+  });
+
+  it('opens on the page in its query param and writes each page change there', async () => {
+    serve();
+    startAt('/app?keep=1&p.user=security');
+    await renderWithClerk(<UserProfile routing='query' />);
+    const user = userEvent.setup();
+    expectSelected('Security');
+
+    await user.click(screen.getByRole('tab', { name: 'Account' }));
+    expectSelected('Account');
+    expect(window.location.pathname).toBe('/app');
+    expect(window.location.search).toBe('?keep=1&p.user=');
+
+    await user.click(screen.getByRole('tab', { name: 'Security' }));
+    expectSelected('Security');
+    expect(window.location.search).toBe('?keep=1&p.user=security');
+  });
+
+  it('replaces a page it does not have with its first page', async () => {
+    serve();
+    startAt('/app?p.user=nowhere');
+    await renderWithClerk(<UserProfile routing='query' />);
+    expectSelected('Account');
+    await waitFor(() => expect(window.location.search).toBe('?p.user='));
+  });
+
+  it('starts over from the URL when its mode changes', async () => {
+    serve();
+    startAt('/app?p.user=security');
+    const { rerender } = await renderWithClerk(<UserProfile />);
+    const user = userEvent.setup();
+    expectSelected('Account');
+
+    await user.click(screen.getByRole('tab', { name: 'Security' }));
+    rerender(<UserProfile routing='hash' />);
+    expectSelected('Account');
+
+    rerender(<UserProfile routing='query' />);
+    expectSelected('Security');
+  });
+
+  it('takes the mode from MosaicProvider', async () => {
+    serve();
+    startAt('/app?p.account=security');
+    await renderWithClerk(<UserProfile />, undefined, undefined, undefined, {
+      userProfileProps: { routing: 'query', path: '/account' },
+    });
+    expectSelected('Security');
   });
 });
