@@ -98,6 +98,7 @@ export interface SignInViewProps {
   onEditIdentifier: () => void;
   onSwitchField?: () => void;
   onSignUp?: () => void;
+  onJoinWaitlist?: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   onShowHelp: () => void;

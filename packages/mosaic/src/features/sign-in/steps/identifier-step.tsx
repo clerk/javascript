@@ -81,6 +81,7 @@ interface IdentifierStartProps {
   isDisabled: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   onSignUp?: () => void;
+  onJoinWaitlist?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -104,6 +105,7 @@ function IdentifierStart({
   isDisabled,
   onSubmit,
   onSignUp,
+  onJoinWaitlist,
   focusRef,
 }: IdentifierStartProps) {
   const m = useMessages('signIn');
@@ -205,24 +207,11 @@ function IdentifierStart({
             {m.start.usePasskey}
           </Button>
         ) : null}
-        {onSignUp ? (
-          <Text
-            size='sm'
-            color='foreground-secondary'
-            xstyle={styles.footerText}
-          >
-            {m.start.signUpPrompt}{' '}
-            <Button
-              type='button'
-              size='sm'
-              variant='link'
-              disabled={isDisabled}
-              onClick={onSignUp}
-            >
-              {m.start.signUpLink}
-            </Button>
-          </Text>
-        ) : null}
+        <StartPrompt
+          onSignUp={onSignUp}
+          onJoinWaitlist={onJoinWaitlist}
+          isDisabled={isDisabled}
+        />
       </Card.Content>
       <Card.Footer>
         <SubmitButton
@@ -301,5 +290,42 @@ function SignInProviders({
         <span {...stylex.props(styles.dividerLine)} />
       </div>
     </>
+  );
+}
+
+interface StartPromptProps {
+  onSignUp?: () => void;
+  onJoinWaitlist?: () => void;
+  isDisabled: boolean;
+}
+
+function StartPrompt({ onSignUp, onJoinWaitlist, isDisabled }: StartPromptProps) {
+  const m = useMessages('signIn');
+  const prompt = onJoinWaitlist
+    ? { text: m.start.waitlistPrompt, link: m.start.waitlistLink, onClick: onJoinWaitlist }
+    : onSignUp
+      ? { text: m.start.signUpPrompt, link: m.start.signUpLink, onClick: onSignUp }
+      : undefined;
+  if (!prompt) {
+    return null;
+  }
+
+  return (
+    <Text
+      size='sm'
+      color='foreground-secondary'
+      xstyle={styles.footerText}
+    >
+      {prompt.text}{' '}
+      <Button
+        type='button'
+        size='sm'
+        variant='link'
+        disabled={isDisabled}
+        onClick={prompt.onClick}
+      >
+        {prompt.link}
+      </Button>
+    </Text>
   );
 }

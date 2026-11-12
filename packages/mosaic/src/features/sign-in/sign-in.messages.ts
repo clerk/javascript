@@ -25,6 +25,8 @@ export const signInMessages = {
     usePasskey: 'Use passkey instead',
     signUpPrompt: 'Don’t have an account?',
     signUpLink: 'Sign up',
+    waitlistPrompt: 'Want early access?',
+    waitlistLink: 'Join waitlist',
   },
   alternativeChannel: {
     title: 'Sign in to {applicationName} with {provider}',

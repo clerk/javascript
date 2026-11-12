@@ -72,6 +72,7 @@ export function SignInView({
   onEditIdentifier,
   onSwitchField,
   onSignUp,
+  onJoinWaitlist,
   onForgotPassword,
   onCancel,
   onShowHelp,
@@ -144,6 +145,7 @@ export function SignInView({
                     isDisabled={isDisabled}
                     onSubmit={onSubmit}
                     onSignUp={onSignUp}
+                    onJoinWaitlist={onJoinWaitlist}
                   />
                 ) : null}
               </Flow.Step>

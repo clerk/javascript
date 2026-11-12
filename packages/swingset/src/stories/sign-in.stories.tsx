@@ -469,6 +469,7 @@ function StepPanel({
   onSelectProvider,
   onCancel,
   lastUsedProviderId,
+  onJoinWaitlist,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -484,6 +485,7 @@ function StepPanel({
   onSelectProvider?: (id: string) => void;
   onCancel?: () => void;
   lastUsedProviderId?: string;
+  onJoinWaitlist?: () => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -518,6 +520,7 @@ function StepPanel({
       globalErrorMessage={globalErrorMessage}
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
+      onJoinWaitlist={onJoinWaitlist}
       onForgotPassword={() => undefined}
       onCancel={
         onCancel ??
@@ -661,6 +664,16 @@ export function IdentifierCaptcha() {
     <div ref={ref}>
       <StepPanel step={{ kind: 'identifier', field: 'email' }} />
     </div>
+  );
+}
+
+export function IdentifierWaitlist() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier', field: 'email' }}
+      combined={false}
+      onJoinWaitlist={() => undefined}
+    />
   );
 }
 
