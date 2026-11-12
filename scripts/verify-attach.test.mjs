@@ -37,7 +37,7 @@ const JPG = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.from('t
 const MP4 = Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftypmp42'), Buffer.alloc(4096, 'v')]);
 
 const manifestFor = (files, change = {}) => ({
-  v: 2,
+  v: 3,
   pr: 669,
   run: 'r20261008-052713-253e',
   platform: 'ios',
@@ -48,6 +48,7 @@ const manifestFor = (files, change = {}) => ({
   total: 3,
   files: files.map(([name, data]) => ({ name, bytes: data.length, sha256: sha256(data) })),
   before: null,
+  parts: [],
   ...change,
 });
 
@@ -151,6 +152,7 @@ const beforeFor = (files, change = {}) => ({
   flaky: 0,
   total: 3,
   files: files.map(([name, data]) => ({ name, bytes: data.length, sha256: sha256(data) })),
+  parts: [],
   ...change,
 });
 const WITH_BEFORE = manifestFor(MEDIA, { before: beforeFor(WAS_MEDIA) });
@@ -557,23 +559,52 @@ describe('the manifest', () => {
     const { before: _, ...versionOne } = { ...GOOD, v: 1 };
     assert.equal(
       refusal(() => parseManifest(JSON.stringify(versionOne))),
-      'the manifest is version 1, and this script publishes only version 2',
+      'the manifest is version 1, and this script publishes only versions 2 and 3',
     );
     assert.equal(
-      refusal(() => parseManifest(JSON.stringify({ ...GOOD, v: 3, layout: 'a key of a later version' }))),
-      'the manifest is version 3, and this script publishes only version 2',
+      refusal(() => parseManifest(JSON.stringify({ ...GOOD, v: 4, layout: 'a key of a later version' }))),
+      'the manifest is version 4, and this script publishes only versions 2 and 3',
     );
     for (const v of ['2', 2.5, -1, 1000, null, '<img src=x>\n::error::pwned']) {
       assert.equal(
         refusal(() => parse({ v })),
-        'the manifest is of no version this script knows, and this script publishes only version 2',
+        'the manifest is of no version this script knows, and this script publishes only versions 2 and 3',
         JSON.stringify(v),
       );
     }
     assert.equal(
       refusal(() => parseManifest(JSON.stringify({ device: 'x' }))),
-      'the manifest is of no version this script knows, and this script publishes only version 2',
+      'the manifest is of no version this script knows, and this script publishes only versions 2 and 3',
     );
+  });
+
+  it('reads a version 2 manifest, which has no parts, as one with no parts', () => {
+    const { parts: _, ...versionTwo } = { ...GOOD, v: 2 };
+    assert.deepEqual(parseManifest(JSON.stringify(versionTwo)), { ...GOOD, parts: [] });
+    assert.match(
+      refusal(() => parseManifest(JSON.stringify({ ...versionTwo, parts: [] }))),
+      /the manifest must have exactly the keys/,
+    );
+  });
+
+  it('refuses parts that are not a short list of one-line labels without markup', () => {
+    assert.deepEqual(parseManifest(JSON.stringify({ ...GOOD, parts: ['search members'] })).parts, ['search members']);
+    for (const parts of [
+      'a label',
+      [''],
+      ['two\nlines'],
+      ['<b>bold</b>'],
+      ['a `tick`'],
+      ['a | pipe'],
+      ['x'.repeat(201)],
+      Array.from({ length: 21 }, () => 'a part'),
+    ]) {
+      assert.match(
+        refusal(() => parseManifest(JSON.stringify({ ...GOOD, parts }))),
+        /^part|^parts/,
+        JSON.stringify(parts).slice(0, 30),
+      );
+    }
   });
 
   it('accepts a before run, which may have passed nothing, with one file of the same kind for each file of the run', () => {
@@ -1466,8 +1497,11 @@ describe('the step that edits the description', () => {
   const WAS_SHOT = [['before-profile.png', WAS_PNG]];
   const CLIP = [['video.mp4', MP4]];
   const WAS_CLIP = [['before-video.mp4', WAS_MP4]];
-  const published = async (media, wasMedia) => {
-    const manifest = manifestFor(media, wasMedia === undefined ? {} : { before: beforeFor(wasMedia) });
+  const published = async (media, wasMedia, parts = [], beforeParts = parts) => {
+    const manifest = manifestFor(media, {
+      parts,
+      ...(wasMedia === undefined ? {} : { before: beforeFor(wasMedia, { parts: beforeParts }) }),
+    });
     const fake = fakeGh({ ...PULL, body: '' });
     const { outcome } = publish(await fetched(manifest, [...media, ...(wasMedia ?? [])]), fake);
     assert.equal(outcome, 'published');
@@ -1513,6 +1547,65 @@ describe('the step that edits the description', () => {
       await published(CLIP, WAS_CLIP),
       laidOut(`${SAID}${WAS}`, '', '| Before | After |', '| :---: | :---: |', `| ${asset(2)} | ${asset(1)} |`),
     );
+  });
+
+  it('lists the parts of a video under its table, in the order the run marked them', async () => {
+    const parts = ['search members for a +clerk_test address', 'search members for a name nobody has'];
+    assert.equal(
+      await published(CLIP, WAS_CLIP, parts),
+      laidOut(
+        `${SAID}${WAS}`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| ${asset(2)} | ${asset(1)} |`,
+        '',
+        'Each video shows these parts, in order:',
+        `1. ${parts[0]}`,
+        `2. ${parts[1]}`,
+      ),
+    );
+    assert.equal(
+      await published(CLIP, undefined, parts),
+      laidOut(
+        SAID,
+        '',
+        '| `video` |',
+        '| :---: |',
+        `| ${asset(1)} |`,
+        '',
+        'The video shows these parts, in order:',
+        `1. ${parts[0]}`,
+        `2. ${parts[1]}`,
+      ),
+    );
+    assert.equal(
+      await published(CLIP, WAS_CLIP, parts, [parts[0]]),
+      laidOut(
+        `${SAID}${WAS}`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| ${asset(2)} | ${asset(1)} |`,
+        '',
+        'The before video shows these parts, in order:',
+        `1. ${parts[0]}`,
+        '',
+        'The after video shows these parts, in order:',
+        `1. ${parts[0]}`,
+        `2. ${parts[1]}`,
+      ),
+    );
+  });
+
+  it('reads the before of a version 2 manifest as having no parts', () => {
+    const { parts: _, ...versionTwo } = { ...WITH_BEFORE, v: 2 };
+    const { parts: __, ...beforeTwo } = WITH_BEFORE.before;
+    assert.deepEqual(parseManifest(JSON.stringify({ ...versionTwo, before: beforeTwo })), {
+      ...WITH_BEFORE,
+      parts: [],
+      before: { ...WITH_BEFORE.before, parts: [] },
+    });
   });
 
   it('lays out a flow that is new as its video alone, in a table that keeps it from the full width', async () => {
