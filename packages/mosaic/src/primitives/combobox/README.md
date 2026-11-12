@@ -29,7 +29,7 @@ import { Combobox } from '../../primitives/combobox';
 </Combobox.Root>;
 ```
 
-`value`, `defaultValue`, and `onValueChange` control the selected option. Clearing the input clears selection with `null`. `inputValue`, `defaultInputValue`, and `onInputValueChange` control search text separately. `disabled` disables the input, trigger, Clear and chip remove buttons, marks options and chips `aria-disabled`, and ignores every change to the selection.
+`value`, `defaultValue`, and `onValueChange` control the selected option. Clearing the input clears selection with `null`. `inputValue`, `defaultInputValue`, and `onInputValueChange` control search text separately. `disabled` disables the input, trigger, Clear and chip remove buttons, marks options and chips `aria-disabled`, and ignores every change to the selection. With `focusableWhenDisabled`, the input becomes read-only and the input and buttons stay focusable, marked `aria-disabled`. The popup positions against `Chips` when it is rendered, otherwise against the input; `Positioner`'s `anchor` overrides both.
 
 Dismissal restores the selected label. Reopening shows all options until typing starts. Hover and keyboard highlighting do not change selection.
 

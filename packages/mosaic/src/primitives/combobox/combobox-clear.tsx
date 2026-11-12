@@ -2,21 +2,21 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { Button } from '../button';
+import { type ComponentProps, type DefaultProps, mergeProps } from '../utils';
 import { useComboboxContext } from './combobox-context';
 
 export type ComboboxClearProps = ComponentProps<'button'>;
 
 export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearProps>(
   function ComboboxClear(props, ref) {
-    const { render, ...otherProps } = props;
-    const { inputValue, selectedValues, clear, disabled } = useComboboxContext();
+    const { render, disabled: disabledProp, ...otherProps } = props;
+    const { inputValue, selectedValues, clear, disabled: rootDisabled, focusableWhenDisabled } = useComboboxContext();
+    const disabled = disabledProp === true || rootDisabled;
 
     const defaultProps = {
-      type: 'button',
       tabIndex: -1,
       'aria-label': 'Clear',
-      disabled,
       onPointerDown(event: React.PointerEvent<HTMLButtonElement>) {
         event.preventDefault();
       },
@@ -25,17 +25,18 @@ export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearPr
       },
     } satisfies DefaultProps<'button'>;
 
-    const element = useRender({
-      defaultTagName: 'button',
-      render,
-      ref,
-      state: { disabled },
-      stateAttributesMapping: {
-        disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
-      },
-      props: mergeProps<'button'>(defaultProps, otherProps),
-    });
+    if (inputValue === '' && selectedValues.length === 0) {
+      return null;
+    }
 
-    return inputValue !== '' || selectedValues.length > 0 ? element : null;
+    return (
+      <Button
+        ref={ref}
+        render={render}
+        disabled={disabled}
+        focusableWhenDisabled={focusableWhenDisabled}
+        {...mergeProps<'button'>(defaultProps, otherProps)}
+      />
+    );
   },
 );

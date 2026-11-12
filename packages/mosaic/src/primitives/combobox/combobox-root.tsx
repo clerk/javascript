@@ -49,6 +49,8 @@ interface ComboboxBaseProps {
   openOnInputClick?: boolean;
   /** Disables the input, the options, the chips and the buttons, so the selection can't change. */
   disabled?: boolean;
+  /** Keeps the input and the buttons focusable while `disabled`, marked `aria-disabled` instead. */
+  focusableWhenDisabled?: boolean;
 }
 
 export interface ComboboxSingleProps extends ComboboxBaseProps {
@@ -81,6 +83,7 @@ function ComboboxInner(props: ComboboxProps) {
   const { placement: placementProp = 'bottom-start', sideOffset = 4, children } = props;
   const multiple = props.multiple === true;
   const disabled = props.disabled === true;
+  const focusableWhenDisabled = props.focusableWhenDisabled === true;
   const onSingleValueChange = props.multiple ? undefined : props.onValueChange;
   const onMultipleValueChange = props.multiple ? props.onValueChange : undefined;
 
@@ -159,7 +162,7 @@ function ComboboxInner(props: ComboboxProps) {
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const chipsRef = useRef<HTMLDivElement | null>(null);
+  const [chipsElement, setChipsElement] = useState<HTMLDivElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
   const registerOption = useCallback((index: number) => {
     if (index === 0 && highlightFirstRef.current) {
@@ -233,7 +236,7 @@ function ComboboxInner(props: ComboboxProps) {
         return false;
       }
       const target = event.target;
-      return !(target instanceof Node && (triggerRef.current?.contains(target) || chipsRef.current?.contains(target)));
+      return !(target instanceof Node && (triggerRef.current?.contains(target) || chipsElement?.contains(target)));
     },
     bubbles: {
       escapeKey: inlineMode,
@@ -247,11 +250,15 @@ function ComboboxInner(props: ComboboxProps) {
     selectedIndex,
     onNavigate: setActiveIndex,
     virtual: true,
+    enabled: !disabled,
     loop: true,
     scrollItemIntoView: true,
   });
 
-  const click = useClick(floatingContext, { enabled: Boolean(props.openOnInputClick) && !props.inline, toggle: false });
+  const click = useClick(floatingContext, {
+    enabled: Boolean(props.openOnInputClick) && !props.inline && !disabled,
+    toggle: false,
+  });
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([dismiss, role, listNav, click]);
   const referenceProps = getReferenceProps();
   const popupId = typeof referenceProps['aria-controls'] === 'string' ? referenceProps['aria-controls'] : undefined;
@@ -345,6 +352,7 @@ function ComboboxInner(props: ComboboxProps) {
       filterQuery,
       multiple,
       disabled,
+      focusableWhenDisabled,
       selectedValues,
       labelsByValueRef,
       removeValue,
@@ -360,7 +368,8 @@ function ComboboxInner(props: ComboboxProps) {
       labelsRef,
       popupRef,
       triggerRef,
-      chipsRef,
+      chipsElement,
+      setChipsElement,
       arrowRef,
       valuesByIndexRef,
       setInlineMode,
@@ -379,6 +388,7 @@ function ComboboxInner(props: ComboboxProps) {
       filterQuery,
       multiple,
       disabled,
+      focusableWhenDisabled,
       selectedValues,
       removeValue,
       floatingContext,
@@ -389,6 +399,8 @@ function ComboboxInner(props: ComboboxProps) {
       getFloatingProps,
       activeIndex,
       selectedIndex,
+      chipsElement,
+      setChipsElement,
       handleSelect,
       handleInputChange,
       setOpen,

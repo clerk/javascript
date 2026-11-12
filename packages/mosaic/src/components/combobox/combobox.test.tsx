@@ -426,11 +426,13 @@ describe('Mosaic Combobox', () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('locks a multiple combobox inside a disabled Field', async () => {
-    const user = userEvent.setup();
-    const onValueChange = vi.fn();
-    render(
-      <Field.Root disabled>
+  function DisabledFieldMultiple(props: { focusableWhenDisabled?: boolean; onValueChange: (value: string[]) => void }) {
+    const { focusableWhenDisabled, onValueChange } = props;
+    return (
+      <Field.Root
+        disabled
+        focusableWhenDisabled={focusableWhenDisabled}
+      >
         <Field.Label>Fruits</Field.Label>
         <Combobox.Root
           multiple
@@ -455,6 +457,8 @@ describe('Mosaic Combobox', () => {
             </Combobox.Value>
             <Combobox.Input />
           </Combobox.Chips>
+          <Combobox.Trigger aria-label='Show fruits' />
+          <Combobox.Clear aria-label='Clear fruits' />
           <Combobox.List>
             <Combobox.Option
               value='banana'
@@ -464,10 +468,40 @@ describe('Mosaic Combobox', () => {
             </Combobox.Option>
           </Combobox.List>
         </Combobox.Root>
-      </Field.Root>,
+      </Field.Root>
     );
+  }
+
+  it('locks a multiple combobox inside a disabled Field', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<DisabledFieldMultiple onValueChange={onValueChange} />);
     expect(screen.getByRole('combobox', { name: 'Fruits' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Remove apple' })).toBeDisabled();
+    await user.click(screen.getByRole('option', { name: 'Banana' }));
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('keeps a multiple combobox focusable inside a focusableWhenDisabled Field', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <DisabledFieldMultiple
+        focusableWhenDisabled
+        onValueChange={onValueChange}
+      />,
+    );
+    const input = screen.getByRole('combobox', { name: 'Fruits' });
+    expect(input).not.toBeDisabled();
+    expect(input).toHaveAttribute('readonly');
+    expect(input).toHaveAttribute('aria-disabled', 'true');
+    for (const name of ['Remove apple', 'Show fruits', 'Clear fruits']) {
+      const button = screen.getByRole('button', { name });
+      expect(button).not.toBeDisabled();
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      expect(button).toHaveAttribute('data-disabled');
+      await user.click(button);
+    }
     await user.click(screen.getByRole('option', { name: 'Banana' }));
     expect(onValueChange).not.toHaveBeenCalled();
   });

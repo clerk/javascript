@@ -1,22 +1,31 @@
 'use client';
 
+import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { Button } from '../button';
+import { type ComponentProps, type DefaultProps, mergeProps } from '../utils';
 import { useComboboxContext } from './combobox-context';
 
 export type ComboboxTriggerProps = ComponentProps<'button'>;
 
 export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
   function ComboboxTrigger(props, ref) {
-    const { render, ...otherProps } = props;
-    const { open, setOpen, focusInput, popupId, triggerRef, disabled } = useComboboxContext();
-    const state = { open, disabled };
+    const { render, disabled: disabledProp, ...otherProps } = props;
+    const {
+      open,
+      setOpen,
+      focusInput,
+      popupId,
+      triggerRef,
+      disabled: rootDisabled,
+      focusableWhenDisabled,
+    } = useComboboxContext();
+    const disabled = disabledProp === true || rootDisabled;
+    const mergedRef = useMergeRefs([triggerRef, ref]);
 
     const defaultProps = {
-      type: 'button',
       tabIndex: -1,
-      disabled,
       'aria-controls': popupId,
       'aria-expanded': open,
       'aria-haspopup': 'listbox',
@@ -29,16 +38,16 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
       },
     } satisfies DefaultProps<'button'>;
 
-    return useRender({
-      defaultTagName: 'button',
-      render,
-      ref: [triggerRef, ref],
-      state,
-      stateAttributesMapping: {
-        open: (value: boolean): Record<string, string> | null => (value ? { 'data-open': '' } : { 'data-closed': '' }),
-        disabled: (value: boolean) => (value ? { 'data-disabled': '' } : null),
-      },
-      props: mergeProps<'button'>(defaultProps, otherProps),
-    });
+    return (
+      <Button
+        ref={mergedRef}
+        render={render}
+        disabled={disabled}
+        focusableWhenDisabled={focusableWhenDisabled}
+        data-open={open ? '' : undefined}
+        data-closed={open ? undefined : ''}
+        {...mergeProps<'button'>(defaultProps, otherProps)}
+      />
+    );
   },
 );

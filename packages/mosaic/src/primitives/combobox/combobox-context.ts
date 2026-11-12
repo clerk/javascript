@@ -16,6 +16,7 @@ export interface ComboboxContextValue {
   filterQuery: string;
   multiple: boolean;
   disabled: boolean;
+  focusableWhenDisabled: boolean;
   selectedValues: string[];
   labelsByValueRef: React.MutableRefObject<Map<string, string>>;
   removeValue: (value: string) => void;
@@ -31,7 +32,8 @@ export interface ComboboxContextValue {
   labelsRef: React.MutableRefObject<Array<string | null>>;
   popupRef: React.RefObject<HTMLDivElement | null>;
   triggerRef: React.MutableRefObject<HTMLButtonElement | null>;
-  chipsRef: React.MutableRefObject<HTMLDivElement | null>;
+  chipsElement: HTMLDivElement | null;
+  setChipsElement: (element: HTMLDivElement | null) => void;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   setInlineMode: React.Dispatch<React.SetStateAction<boolean>>;

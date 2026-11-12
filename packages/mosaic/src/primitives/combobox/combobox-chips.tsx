@@ -12,7 +12,7 @@ export type ComboboxChipsProps = ComponentProps<'div'>;
 
 export const ComboboxChips = React.forwardRef<HTMLDivElement, ComboboxChipsProps>(function ComboboxChips(props, ref) {
   const { render, ...otherProps } = props;
-  const { selectedValues, removeValue, focusInput, refs, chipsRef } = useComboboxContext();
+  const { selectedValues, removeValue, focusInput, refs, setChipsElement } = useComboboxContext();
 
   const chipRefs = useRef(new Map<string, HTMLElement>());
   const [element, setElement] = useState<HTMLDivElement | null>(null);
@@ -94,7 +94,7 @@ export const ComboboxChips = React.forwardRef<HTMLDivElement, ComboboxChipsProps
       {useRender({
         defaultTagName: 'div',
         render,
-        ref: [setElement, chipsRef, ref],
+        ref: [setElement, setChipsElement, ref],
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}
     </ComboboxChipsContext.Provider>

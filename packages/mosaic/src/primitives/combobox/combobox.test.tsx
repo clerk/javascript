@@ -897,9 +897,11 @@ describe('Combobox multiple', () => {
     onValueChange?: (value: string[]) => void;
     chips?: boolean;
     disabled?: boolean;
+    focusableWhenDisabled?: boolean;
     open?: boolean;
+    onButtonClick?: () => void;
   }) {
-    const { chips = true, ...rootProps } = props;
+    const { chips = true, onButtonClick, ...rootProps } = props;
     return (
       <Combobox.Root
         multiple
@@ -917,7 +919,10 @@ describe('Combobox multiple', () => {
                     data-testid='chip'
                   >
                     {labelOf(value)}
-                    <Combobox.ChipRemove aria-label={`Remove ${labelOf(value)}`} />
+                    <Combobox.ChipRemove
+                      aria-label={`Remove ${labelOf(value)}`}
+                      onClick={onButtonClick}
+                    />
                   </Combobox.Chip>
                 ))
               }
@@ -932,8 +937,11 @@ describe('Combobox multiple', () => {
             <Combobox.Input aria-label='Fruits' />
           </>
         )}
-        <Combobox.Trigger aria-label='Show fruits' />
-        <Combobox.Clear />
+        <Combobox.Trigger
+          aria-label='Show fruits'
+          onClick={onButtonClick}
+        />
+        <Combobox.Clear onClick={onButtonClick} />
         <Combobox.Positioner>
           <Combobox.Popup>
             <Combobox.Collection
@@ -1187,6 +1195,80 @@ describe('Combobox multiple', () => {
       const cherry = screen.getByRole('option', { name: 'Cherry' });
       expect(cherry).toHaveAttribute('aria-disabled', 'true');
       await user.click(cherry);
+      expect(chipNames()).toEqual(['Apple']);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+  });
+
+  it('positions the popup against the chips', async () => {
+    const user = userEvent.setup();
+    const measure = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect');
+    render(<Multiple defaultValue={['apple']} />);
+    const chips = screen.getByRole('toolbar', { name: 'Selected fruits' });
+    await user.click(screen.getByRole('button', { name: 'Show fruits' }));
+    await waitFor(() => expect(measure.mock.contexts).toContain(chips));
+    measure.mockRestore();
+  });
+
+  describe('focusableWhenDisabled', () => {
+    it('keeps the input and buttons focusable but marks them aria-disabled', () => {
+      render(
+        <Multiple
+          defaultValue={['apple']}
+          disabled
+          focusableWhenDisabled
+        />,
+      );
+      const input = screen.getByRole('combobox');
+      expect(input).not.toBeDisabled();
+      expect(input).toHaveAttribute('readonly');
+      expect(input).toHaveAttribute('aria-disabled', 'true');
+      for (const name of ['Remove Apple', 'Show fruits', 'Clear']) {
+        const button = screen.getByRole('button', { name });
+        expect(button).not.toBeDisabled();
+        expect(button).toHaveAttribute('aria-disabled', 'true');
+        expect(button).toHaveAttribute('data-disabled');
+      }
+    });
+
+    it('runs no click handler and changes nothing when a button is clicked', async () => {
+      const user = userEvent.setup();
+      const onButtonClick = vi.fn();
+      const onValueChange = vi.fn();
+      render(
+        <Multiple
+          defaultValue={['apple']}
+          onValueChange={onValueChange}
+          onButtonClick={onButtonClick}
+          disabled
+          focusableWhenDisabled
+        />,
+      );
+      for (const name of ['Remove Apple', 'Show fruits', 'Clear']) {
+        await user.click(screen.getByRole('button', { name }));
+      }
+      expect(onButtonClick).not.toHaveBeenCalled();
+      expect(onValueChange).not.toHaveBeenCalled();
+      expect(chipNames()).toEqual(['Apple']);
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('does not open, type or remove chips from the input', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      render(
+        <Multiple
+          defaultValue={['apple']}
+          onValueChange={onValueChange}
+          disabled
+          focusableWhenDisabled
+        />,
+      );
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+      await user.keyboard('b{ArrowDown}{Backspace}');
+      expect(input).toHaveValue('');
+      expect(input).toHaveAttribute('aria-expanded', 'false');
       expect(chipNames()).toEqual(['Apple']);
       expect(onValueChange).not.toHaveBeenCalled();
     });

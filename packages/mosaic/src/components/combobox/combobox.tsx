@@ -1,6 +1,5 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -40,7 +39,7 @@ const ComboboxAnchorContext = React.createContext<{
 const ComboboxInChipsContext = React.createContext(false);
 
 export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
-  const fieldDisabled = useOptionalFieldContext()?.disabled;
+  const field = useOptionalFieldContext();
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
   const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
   return (
@@ -49,7 +48,8 @@ export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props
         sideOffset={sideOffset}
         openOnInputClick={openOnInputClick}
         {...props}
-        disabled={props.disabled ?? fieldDisabled}
+        disabled={props.disabled ?? field?.disabled}
+        focusableWhenDisabled={props.focusableWhenDisabled ?? field?.focusableWhenDisabled}
       />
     </ComboboxAnchorContext.Provider>
   );
@@ -164,7 +164,6 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
 const ChipsInput = React.forwardRef<HTMLInputElement, MosaicComponentProps<'input'>>(function MosaicComboboxChipsInput(
   {
     id,
-    disabled: disabledProp,
     required: requiredProp,
     'aria-invalid': ariaInvalid,
     'aria-labelledby': ariaLabelledBy,
@@ -176,7 +175,6 @@ const ChipsInput = React.forwardRef<HTMLInputElement, MosaicComponentProps<'inpu
 ) {
   const fieldProps = useOptionalFieldControlProps({
     id,
-    disabled: disabledProp,
     required: requiredProp,
     ariaInvalid,
     ariaLabelledBy,
@@ -187,7 +185,6 @@ const ChipsInput = React.forwardRef<HTMLInputElement, MosaicComponentProps<'inpu
     <HeadlessCombobox.Input
       ref={ref}
       id={fieldProps?.id ?? id}
-      disabled={fieldProps?.disabled ?? disabledProp}
       required={fieldProps?.required ?? requiredProp}
       aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
       aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
@@ -204,18 +201,10 @@ export const ComboboxChips = React.forwardRef<HTMLDivElement, ComboboxChipsProps
   { xstyle, ...rest },
   ref,
 ) {
-  const setAnchor = React.useContext(ComboboxAnchorContext)?.setAnchor;
-  const [element, setElement] = React.useState<HTMLDivElement | null>(null);
-  const mergedRef = useMergeRefs([setElement, ref]);
-  React.useLayoutEffect(() => {
-    setAnchor?.(element);
-    return () => setAnchor?.(null);
-  }, [element, setAnchor]);
-
   return (
     <ComboboxInChipsContext.Provider value>
       <HeadlessCombobox.Chips
-        ref={mergedRef}
+        ref={ref}
         {...mergeStyleProps(
           themeProps('combobox-chips'),
           stylex.props(reset.base, inputStyles.group, chipStyles.field, styles.chips, xstyle),

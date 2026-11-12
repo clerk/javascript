@@ -8,7 +8,7 @@ import { parsePlacement } from '../utils/side-offset';
 import { useComboboxContext } from './combobox-context';
 
 export interface ComboboxPositionerProps extends ComponentProps<'div'> {
-  /** Element used for popup positioning. Defaults to the input. */
+  /** Element used for popup positioning. Defaults to `Chips` when rendered, otherwise the input. */
   anchor?: HTMLElement | null;
 }
 
@@ -25,18 +25,19 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
       getFloatingProps,
       elementsRef,
       labelsRef,
-      chipsRef,
+      chipsElement,
     } = useComboboxContext();
+    const resolvedAnchor = anchor ?? chipsElement;
 
     const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
 
     React.useLayoutEffect(() => {
-      if (!anchor) {
+      if (!resolvedAnchor) {
         return;
       }
-      refs.setPositionReference(anchor);
+      refs.setPositionReference(resolvedAnchor);
       return restoreReference;
-    }, [anchor, refs, restoreReference]);
+    }, [resolvedAnchor, refs, restoreReference]);
 
     const side = parsePlacement(placement).side;
 
@@ -78,7 +79,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
         returnFocus={false}
         visuallyHiddenDismiss
         modal={false}
-        getInsideElements={() => (chipsRef.current ? [chipsRef.current] : [])}
+        getInsideElements={() => (chipsElement ? [chipsElement] : [])}
       >
         <FloatingList
           elementsRef={elementsRef}
