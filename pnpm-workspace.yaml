@@ -86,6 +86,8 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+  # Renovate security update: electron@42.11.16
+  - electron@42.11.16
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
