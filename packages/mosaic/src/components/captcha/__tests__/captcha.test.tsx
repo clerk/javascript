@@ -1,6 +1,6 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Captcha } from '../captcha';
 
@@ -30,5 +30,17 @@ describe('Captcha', () => {
 
     expect(element).toHaveAttribute('data-cl-interactive', 'true');
     expect(element).toHaveAttribute('data-cl-theme', 'dark');
+  });
+
+  it('reports when clerk-js starts and stops showing an interactive challenge', async () => {
+    const onInteractiveChange = vi.fn();
+    const { container } = render(<Captcha onInteractiveChange={onInteractiveChange} />);
+    const element = container.querySelector<HTMLElement>('#clerk-captcha');
+
+    element?.setAttribute('data-cl-interactive', 'true');
+    await waitFor(() => expect(onInteractiveChange).toHaveBeenLastCalledWith(true));
+    element?.removeAttribute('data-cl-interactive');
+    await waitFor(() => expect(onInteractiveChange).toHaveBeenLastCalledWith(false));
+    expect(onInteractiveChange).toHaveBeenCalledTimes(2);
   });
 });
