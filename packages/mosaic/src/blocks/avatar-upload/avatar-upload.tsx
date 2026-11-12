@@ -10,7 +10,7 @@ import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import { useOptionalFieldControlProps } from '../../components/field/field.context';
 import { Icon } from '../../components/icon';
-import { usePendingAction } from '../../hooks/use-pending-action';
+import { type PendingAction, usePendingAction } from '../../hooks/use-pending-action';
 import { ArrowUp } from '../../icons/glyphs/arrow-up';
 import { Block } from '../../icons/glyphs/block';
 import { Minus } from '../../icons/glyphs/minus';
@@ -204,12 +204,14 @@ function Actions({ labels, render, ...rest }: AvatarUploadActionsProps) {
 function Crop({ labels, shape = 'circle' }: AvatarUploadCropProps) {
   const { pick, closeCrop } = useAvatarUploadContext();
   const src = FileUpload.useObjectUrl(pick?.file);
+  const save = usePendingAction();
 
   return (
     <Dialog.Root
       open={pick?.open ?? false}
       onOpenChange={open => {
-        if (!open) {
+        if (!open && !save.isPending) {
+          save.reset();
           closeCrop();
         }
       }}
@@ -223,6 +225,7 @@ function Crop({ labels, shape = 'circle' }: AvatarUploadCropProps) {
             src={src}
             labels={labels}
             shape={shape}
+            save={save}
           />
         ) : null}
       </Dialog.Popup>
@@ -233,12 +236,12 @@ function Crop({ labels, shape = 'circle' }: AvatarUploadCropProps) {
 interface CropStepProps extends Required<AvatarUploadCropProps> {
   file: File;
   src: string;
+  save: PendingAction<string>;
 }
 
-function CropStep({ file, src, labels, shape }: CropStepProps) {
+function CropStep({ file, src, labels, shape, save }: CropStepProps) {
   const { onChange, closeCrop } = useAvatarUploadContext();
   const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
-  const save = usePendingAction();
 
   const apply = () =>
     save.run('crop', async () => {
@@ -352,6 +355,7 @@ function CropStep({ file, src, labels, shape }: CropStepProps) {
           </ImageCropper.Reset>
           <div {...stylex.props(styles.footerActions)}>
             <Dialog.Close
+              disabled={save.isPending}
               render={
                 <Button
                   color='neutral'

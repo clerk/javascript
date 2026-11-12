@@ -1,7 +1,7 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { dragFilesOver, dropFiles } from '../../../../__tests__/feature/drag';
 import {
@@ -185,6 +185,53 @@ describe('the user profile profile section', () => {
     expect(upload.requests).toHaveLength(0);
     expect(screen.queryByRole('button', { name: 'Manage profile picture' })).not.toBeInTheDocument();
     upload.release();
+  });
+
+  it('keeps the crop open until a pending save finishes', async () => {
+    const { actor, container } = await renderSection();
+    const upload = holdRequests('post', '/v1/me/profile_image');
+    const encodes: Array<() => void> = [];
+    const toBlob = HTMLCanvasElement.prototype.toBlob;
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(function (
+      this: HTMLCanvasElement,
+      ...args: Parameters<HTMLCanvasElement['toBlob']>
+    ) {
+      encodes.push(() => toBlob.apply(this, args));
+    });
+
+    await actor.upload(fileInput(container), await imageFile('me.png'));
+    const dialog = await screen.findByRole('dialog', { name: 'Adjust profile picture' });
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Rotate' })).toBeEnabled());
+    await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(encodes).toHaveLength(1));
+
+    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    await actor.keyboard('{Escape}');
+    expect(dialog).toBeInTheDocument();
+    expect(upload.requests).toHaveLength(0);
+
+    encodes[0]();
+    await waitFor(() => expect(dialog).not.toBeInTheDocument());
+    await waitFor(() => expect(upload.requests).toHaveLength(1));
+    upload.release();
+  });
+
+  it('shows why a crop failed, and clears it for the next pick', async () => {
+    const { actor, container } = await renderSection();
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementationOnce(callback => callback(null));
+
+    await actor.upload(fileInput(container), await imageFile('me.png'));
+    const dialog = await screen.findByRole('dialog', { name: 'Adjust profile picture' });
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Rotate' })).toBeEnabled());
+    await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveAttribute('data-open'));
+
+    await actor.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(dialog).not.toBeInTheDocument());
+    await actor.upload(fileInput(container), await imageFile('me.png'));
+    const next = await screen.findByRole('dialog', { name: 'Adjust profile picture' });
+    expect(within(next).getByRole('alert')).not.toHaveAttribute('data-open');
+    expect(within(next).getByRole('alert').textContent).toBe('');
   });
 
   it('uploads a GIF as picked, without cropping it', async () => {
