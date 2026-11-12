@@ -91,7 +91,7 @@
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "15.5.24",
+    "next": "15.5.28",
     "tslib": "catalog:repo"
   },
   "peerDependencies": {
