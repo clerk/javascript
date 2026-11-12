@@ -59,13 +59,6 @@ export function SignInAlternativeChannel({
             />
           </Card.Media>
         ) : null}
-        <Card.Media>
-          <img
-            src={channel.iconUrl}
-            alt=''
-            {...stylex.props(styles.channelIcon)}
-          />
-        </Card.Media>
         <Card.Title>{fill(m.alternativeChannel.title, { applicationName, provider })}</Card.Title>
         <Card.Description>{fill(m.alternativeChannel.description, { provider })}</Card.Description>
       </Card.Header>
