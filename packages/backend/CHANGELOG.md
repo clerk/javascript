@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.33.9
+
+### Patch Changes
+
+- Reject JWTs of another category, such as JWT templates, M2M tokens and OIDC ID tokens, where a session or handshake token is expected. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token in the `Authorization` header or `__session` cookie. Tokens with no category tag are unaffected. ([#10771](https://github.com/clerk/javascript/pull/10771)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`8451b05`](https://github.com/clerk/javascript/commit/8451b05cb55c5453d80aa2c84f3c220f86926127)]:
+  - @clerk/shared@3.48.1
+  - @clerk/types@4.101.29
+
 ## 2.33.8
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @clerk/vue
 
+## 1.17.27
+
+### Patch Changes
+
+- Updated dependencies [[`8451b05`](https://github.com/clerk/javascript/commit/8451b05cb55c5453d80aa2c84f3c220f86926127)]:
+  - @clerk/shared@3.48.1
+  - @clerk/types@4.101.29
+
 ## 1.17.26
 
 ### Patch Changes

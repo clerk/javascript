@@ -14,6 +14,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken 
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
+import { hasNonSessionJwtCategory } from './jwtCategories';
 import { getMachineTokenType, isMachineJwt, isMachineToken, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
@@ -411,11 +412,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
-    // Reject machine JWTs (OAuth or M2M) that may appear in headers when expecting session tokens.
-    // These are valid Clerk-signed JWTs and will pass verify() verification,
-    // but should not be accepted as session tokens.
+    // Reject JWTs of another class (machine tokens, JWT templates, OIDC ID tokens) presented where
+    // a session token is expected. They are validly signed by the same instance key and pass
+    // verifyToken(), but must not authenticate a session.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (isMachineJwt(tokenInHeader!)) {
+    if (isMachineJwt(tokenInHeader!) || hasNonSessionJwtCategory(tokenInHeader!)) {
       return signedOut({
         tokenType: TokenType.SessionToken,
         authenticateContext,
@@ -565,6 +566,17 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     if (decodedErrors) {
       return handleSessionTokenError(decodedErrors[0], 'cookie');
+    }
+
+    // Non-session JWTs pass verifyToken() but must not be accepted as session tokens (mirrors header path).
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (hasNonSessionJwtCategory(authenticateContext.sessionTokenInCookie!)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
@@ -772,7 +784,16 @@ export const authenticateRequest: AuthenticateRequest = (async (
       });
     }
 
-    // Handle as a regular session token
+    // Handle as a regular session token. Mirrors the session-only header path.
+    if (hasNonSessionJwtCategory(tokenInHeader)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
     if (errors) {
       return handleSessionTokenError(errors[0], 'header');

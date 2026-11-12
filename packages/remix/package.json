@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.13.51",
+  "version": "4.13.52",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -100,5 +100,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "deprecated": "@clerk/remix is deprecated and no longer receiving updates. Use @clerk/react-router for React Router v7 apps: https://clerk.com/docs/references/react-router/overview"
 }

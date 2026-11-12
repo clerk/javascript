@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.13.52
+
+### Patch Changes
+
+- Publish `@clerk/remix` as deprecated on npm. Use `@clerk/react-router` for React Router v7 apps instead, following the [React Router SDK reference](https://clerk.com/docs/references/react-router/overview). ([#10772](https://github.com/clerk/javascript/pull/10772)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`8451b05`](https://github.com/clerk/javascript/commit/8451b05cb55c5453d80aa2c84f3c220f86926127)]:
+  - @clerk/backend@2.33.9
+  - @clerk/shared@3.48.1
+  - @clerk/clerk-react@5.61.12
+  - @clerk/types@4.101.29
+
 ## 4.13.51
 
 ### Patch Changes
