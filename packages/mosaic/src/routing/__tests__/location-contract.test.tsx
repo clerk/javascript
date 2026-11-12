@@ -1,13 +1,17 @@
 import { logger } from '@clerk/shared/logger';
 import { act, cleanup, configure, fireEvent, render, screen } from '@testing-library/react';
 import type { ComponentType, ReactNode } from 'react';
+import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { normalizeBase } from '../base-path';
 import type { SegmentParts } from '../location';
+import { RouterAdapterProvider } from '../router-adapter';
 import type { MosaicLocationOptions } from '../use-mosaic-location';
 import { useRouterScope } from '../use-router';
 import { useVirtualEntries, useVirtualWrite, VirtualStoreProvider } from '../virtual-store';
+import type { HostUrl } from '../window-location';
+import { useWindowUrl } from '../window-location';
 
 // The contract every location mode keeps towards the components above it. A mode plugs in a
 // provider, a way to read an entry and a way to write one from outside, the way a host or a modal
@@ -19,9 +23,23 @@ interface LocationMode {
   Provider: ComponentType<{ initial?: Record<string, SegmentParts>; children: ReactNode }>;
   useEntry: (base: string) => SegmentParts | null;
   useOutsideWrite: () => (base: string, parts: SegmentParts | undefined) => void;
+  // Leaving the page and coming back to it. `away` and `back` are handed what unmounts and mounts
+  // the owner again, which is what leaving is in virtual mode; a URL mode navigates instead.
+  leave: {
+    away: (unmount: () => void) => void;
+    back: (remount: () => void) => void;
+  };
   excludes: {
     // A carrier that holds exactly one entry, such as the pathname, cannot host two bases at once.
     severalBases?: boolean;
+    // A URL keeps what was written under a base until the host navigates; nothing counts owners,
+    // so a base the owner moved away from keeps its entry.
+    dropsOnMove?: boolean;
+    // Parking keeps a hidden owner's segment in the owner. A URL mode keeps it in the URL instead.
+    parks?: boolean;
+    // A param's value is the host's to re-serialise, so it is read decoded and a part there cannot
+    // contain a slash. The pathname and the virtual store keep one inside a part.
+    slashInPart?: boolean;
   };
 }
 
@@ -31,10 +49,125 @@ const virtual: LocationMode = {
   Provider: VirtualStoreProvider,
   useEntry: base => useVirtualEntries().get(normalizeBase(base)) ?? null,
   useOutsideWrite: useVirtualWrite,
+  leave: { away: unmount => unmount(), back: remount => remount() },
   excludes: {},
 };
 
-const modes: LocationMode[] = [virtual];
+// What a host does: write the URL it wants and tell the page with `popstate`. The URL modes are
+// read back here on their own terms rather than through the carriers under test.
+const encode = (parts: SegmentParts) => parts.map(encodeURIComponent).join('/');
+const decode = (raw: string): SegmentParts => (raw === '' ? [] : raw.split('/').map(decodeURIComponent));
+const paramName = (prefix: string, base: string) => prefix + normalizeBase(base).slice(1).replaceAll('/', '.');
+const pairValue = (body: string, key: string) => new URLSearchParams(body).get(key) ?? undefined;
+const withPair = (body: string, key: string, value: string | undefined) =>
+  [
+    ...body.split('&').filter(pair => pair !== '' && pair.split('=')[0] !== key),
+    ...(value === undefined ? [] : [`${key}=${value}`]),
+  ].join('&');
+const urlOf = ({ pathname, search, hash }: HostUrl) =>
+  `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
+const currentUrl = (): HostUrl => ({
+  pathname: window.location.pathname,
+  search: window.location.search.slice(1),
+  hash: window.location.hash.slice(1),
+});
+
+function navigate(url: string) {
+  window.history.pushState(null, '', url);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+}
+
+interface UrlCarrierSpec {
+  entryOf: (url: HostUrl, base: string) => SegmentParts | null;
+  urlWith: (url: HostUrl, base: string, parts: SegmentParts | undefined) => string;
+}
+
+function urlMode(
+  routing: 'path' | 'hash' | 'query',
+  { entryOf, urlWith }: UrlCarrierSpec,
+  excludes: LocationMode['excludes'],
+): LocationMode {
+  let before = currentUrl();
+  function UrlModeProvider({ initial, children }: { initial?: Record<string, SegmentParts>; children: ReactNode }) {
+    useState(() => {
+      for (const [base, parts] of Object.entries(initial ?? {})) {
+        window.history.replaceState(null, '', urlWith(currentUrl(), base, parts));
+      }
+      return null;
+    });
+    return (
+      <RouterAdapterProvider>
+        <VirtualStoreProvider>{children}</VirtualStoreProvider>
+      </RouterAdapterProvider>
+    );
+  }
+  return {
+    name: routing,
+    routing,
+    Provider: UrlModeProvider,
+    useEntry: base => {
+      const url = useWindowUrl(true);
+      return url === undefined ? null : entryOf(url, base);
+    },
+    useOutsideWrite: () => (base, parts) => navigate(urlWith(currentUrl(), base, parts)),
+    // Leaving is the host navigating to another page and unmounting the owner; returning is the host
+    // navigating back to the owner's page, without its segment, and mounting it again.
+    leave: {
+      away: unmount =>
+        act(() => {
+          before = currentUrl();
+          navigate('/elsewhere');
+          unmount();
+        }),
+      back: remount =>
+        act(() => {
+          navigate(urlWith(before, '/user', undefined));
+          remount();
+        }),
+    },
+    excludes: { dropsOnMove: true, parks: true, ...excludes },
+  };
+}
+
+const path = urlMode(
+  'path',
+  {
+    entryOf: ({ pathname }, base) => {
+      const root = normalizeBase(base);
+      if (pathname === root) {
+        return [];
+      }
+      return pathname.startsWith(`${root}/`) ? decode(pathname.slice(root.length + 1)) : null;
+    },
+    urlWith: (url, base, parts) =>
+      parts === undefined
+        ? '/'
+        : urlOf({ ...url, pathname: parts.length ? `${normalizeBase(base)}/${encode(parts)}` : normalizeBase(base) }),
+  },
+  { severalBases: true },
+);
+
+function paramMode(routing: 'hash' | 'query', field: 'hash' | 'search', prefix: string) {
+  return urlMode(
+    routing,
+    {
+      entryOf: (url, base) => {
+        const value = pairValue(url[field], paramName(prefix, base));
+        return value === undefined ? null : value === '' ? [] : value.split('/');
+      },
+      urlWith: (url, base, parts) =>
+        urlOf({
+          ...url,
+          [field]: withPair(url[field], paramName(prefix, base), parts === undefined ? undefined : encode(parts)),
+        }),
+    },
+    { slashInPart: true },
+  );
+}
+
+const modes: LocationMode[] = [virtual, path, paramMode('hash', 'hash', ''), paramMode('query', 'search', 'p.')];
+
+beforeEach(() => window.history.replaceState(null, '', '/'));
 
 const routes = {
   index: '',
@@ -60,7 +193,12 @@ describe.each(modes)('$name location', mode => {
       return (
         <>
           <output data-testid={`route${path}`}>{route}</output>
-          <button onClick={() => go('security')}>Go to security {path}</button>
+          <button
+            type='button'
+            onClick={() => go('security')}
+          >
+            Go to security {path}
+          </button>
         </>
       );
     }
@@ -70,7 +208,12 @@ describe.each(modes)('$name location', mode => {
       return (
         <>
           <output data-testid={`other${path}`}>{route}</output>
-          <button onClick={() => go('members')}>Go to members {path}</button>
+          <button
+            type='button'
+            onClick={() => go('members')}
+          >
+            Go to members {path}
+          </button>
         </>
       );
     }
@@ -82,7 +225,10 @@ describe.each(modes)('$name location', mode => {
     function Outside({ base = '/user', parts }: { base?: string; parts: SegmentParts | undefined }) {
       const write = mode.useOutsideWrite();
       return (
-        <button onClick={() => write(base, parts)}>
+        <button
+          type='button'
+          onClick={() => write(base, parts)}
+        >
           Write {base} {JSON.stringify(parts ?? null)}
         </button>
       );
@@ -119,6 +265,41 @@ describe.each(modes)('$name location', mode => {
       expect(route()).toBe('security');
       expect(entry()).toEqual(['security']);
     });
+
+    it.skipIf(mode.excludes.slashInPart)('round-trips a slash inside a param value', () => {
+      const value = 'st/1';
+      expect(openStatement(value)).toEqual({ shown: value, entry: ['billing', 'statement', value] });
+    });
+
+    it('round-trips any other param value through the entry', () => {
+      const value = 'a %25 c+d&e=f#g?h é';
+      expect(openStatement(value)).toEqual({ shown: value, entry: ['billing', 'statement', value] });
+    });
+
+    function openStatement(value: string) {
+      function Statement() {
+        const { route, params, go } = useRouterScope(routes, { routing: mode.routing, path: '/user', root: 'index' });
+        return (
+          <>
+            <output data-testid='statement'>{route === 'statement' ? params.statementId : route}</output>
+            <button
+              type='button'
+              onClick={() => go('statement', { statementId: value })}
+            >
+              Open statement
+            </button>
+          </>
+        );
+      }
+      render(
+        <Page>
+          <Statement />
+          <Entry />
+        </Page>,
+      );
+      click('Open statement');
+      return { shown: screen.getByTestId('statement').textContent, entry: entry() };
+    }
 
     it('honours an entry written before mount on the first render', () => {
       const seen: string[] = [];
@@ -180,16 +361,20 @@ describe.each(modes)('$name location', mode => {
       click('Go to security /user');
       expect(route()).toBe('security');
 
-      view.rerender(
-        <Page>
-          <Entry />
-        </Page>,
+      mode.leave.away(() =>
+        view.rerender(
+          <Page>
+            <Entry />
+          </Page>,
+        ),
       );
-      view.rerender(
-        <Page>
-          <Owner />
-          <Entry />
-        </Page>,
+      mode.leave.back(() =>
+        view.rerender(
+          <Page>
+            <Owner />
+            <Entry />
+          </Page>,
+        ),
       );
       expect(route()).toBe('index');
       expect(entry()).toBeNull();
@@ -204,31 +389,41 @@ describe.each(modes)('$name location', mode => {
       );
       expect(route()).toBe('security');
 
-      view.rerender(
-        <Page initial={{ '/user': ['security'] }}>
-          <Entry />
-        </Page>,
+      mode.leave.away(() =>
+        view.rerender(
+          <Page initial={{ '/user': ['security'] }}>
+            <Entry />
+          </Page>,
+        ),
       );
       expect(entry()).toBeNull();
     });
 
-    it('starts on the root after moving to another base, leaving nothing behind', () => {
-      function Tree({ path }: { path: string }) {
-        return (
-          <Page>
-            <Owner path={path} />
-            <Entry />
-            <Entry base='/account' />
-          </Page>
-        );
-      }
-      const view = render(<Tree path='/user' />);
+    function MovingTree({ path }: { path: string }) {
+      return (
+        <Page>
+          <Owner path={path} />
+          <Entry />
+          <Entry base='/account' />
+        </Page>
+      );
+    }
+
+    it('starts on the root after moving to another base', () => {
+      const view = render(<MovingTree path='/user' />);
       click('Go to security /user');
       expect(route()).toBe('security');
 
-      view.rerender(<Tree path='/account' />);
+      view.rerender(<MovingTree path='/account' />);
       expect(route('/account')).toBe('index');
       expect(entry('/account')).toBeNull();
+    });
+
+    it.skipIf(mode.excludes.dropsOnMove)('leaves nothing behind under the base it moved away from', () => {
+      const view = render(<MovingTree path='/user' />);
+      click('Go to security /user');
+
+      view.rerender(<MovingTree path='/account' />);
       expect(entry()).toBeNull();
     });
 
@@ -250,7 +445,7 @@ describe.each(modes)('$name location', mode => {
     // Needs React 19.2's Activity: a parked owner's effects stop and its state survives, and on
     // resume it restores its segment unless the base was written meanwhile. React 18 has no way to
     // produce that cycle, so this waits for a React 19 test project.
-    it.todo('comes back where it was after being parked and resumed');
+    it.skipIf(mode.excludes.parks).todo('comes back where it was after being parked and resumed');
 
     it('lets an outside writer clear the entry after the owner navigated', () => {
       render(
@@ -271,7 +466,12 @@ describe.each(modes)('$name location', mode => {
         const write = mode.useOutsideWrite();
         return (
           <>
-            <button onClick={() => write('/user', ['security'])}>Write then replace</button>
+            <button
+              type='button'
+              onClick={() => write('/user', ['security'])}
+            >
+              Write then replace
+            </button>
             <Owner key={generation} />
           </>
         );
