@@ -40,12 +40,14 @@ Bug fixes, implementation detail inside a decided design, and open questions. Op
 
 ## Index
 
-| Record                                                 | Summary                                                                                                              |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| [MEDR-0001](./0001-embedded-segment-router.md)         | A component owns one segment and derives its route from it; everything outside the segment is an exit via clerk-js.  |
-| [MEDR-0002](./0002-names-in-parts-out.md)              | Routes are named; the codec works on decoded parts and never sees a URL; the location encodes once each way.         |
-| [MEDR-0003](./0003-page-state-acts-like-a-url.md)      | Routing state is a map above the components; an entry lives while its base has an owner; a modal is its entry.       |
-| [MEDR-0004](./0004-owner-and-nested-routers.md)        | The owner names the root that lives at the base and redirects unknown segments there; nested routers never write.    |
-| [MEDR-0005](./0005-profile-url-shape.md)               | Profiles use legacy's segments with the first page as root, and have no opening-page prop.                           |
-| [MEDR-0006](./0006-validate-host-paths-at-the-edge.md) | A custom page path must be exactly its segment, checked where it enters; the codec throws only on Mosaic's own bugs. |
-| [MEDR-0007](./0007-location-contract-suite.md)         | Every location mode passes one contract suite; differences are declared, not discovered.                             |
+| Record                                                 | Summary                                                                                                                     |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| [MEDR-0001](./0001-embedded-segment-router.md)         | A component owns one segment and derives its route from it; everything outside the segment is an exit via clerk-js.         |
+| [MEDR-0002](./0002-names-in-parts-out.md)              | Routes are named; the codec works on decoded parts and never sees a URL; the location encodes once each way.                |
+| [MEDR-0003](./0003-page-state-acts-like-a-url.md)      | Routing state is a map above the components; an entry lives while its base has an owner; a modal is its entry.              |
+| [MEDR-0004](./0004-owner-and-nested-routers.md)        | The owner names the root that lives at the base and redirects unknown segments there; nested routers never write.           |
+| [MEDR-0005](./0005-profile-url-shape.md)               | Profiles use legacy's segments with the first page as root, and have no opening-page prop.                                  |
+| [MEDR-0006](./0006-validate-host-paths-at-the-edge.md) | A custom page path must be exactly its segment, checked where it enters; the codec throws only on Mosaic's own bugs.        |
+| [MEDR-0007](./0007-location-contract-suite.md)         | Every location mode passes one contract suite; differences are declared, not discovered.                                    |
+| [MEDR-0008](./0008-url-carriers.md)                    | A URL mode derives its segment from the host URL and writes the URL back at once; one param per base in hash and query.     |
+| [MEDR-0009](./0009-router-adapter.md)                  | The host router is reached through a plain adapter of optional hooks on `MosaicProvider`; missing ones fall back to window. |

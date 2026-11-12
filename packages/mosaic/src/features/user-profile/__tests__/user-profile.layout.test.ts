@@ -1,7 +1,7 @@
 import { logger } from '@clerk/shared/logger';
 import { describe, expect, it, vi } from 'vitest';
 
-import { getAvailableUserProfilePages, resolveUserProfilePages } from '../user-profile.layout';
+import { getAvailableUserProfilePages, resolveUserProfilePages, userProfileNavEntries } from '../user-profile.layout';
 import type { CustomProfilePage, UserProfilePages } from '../user-profile.types';
 
 const terms: CustomProfilePage = { label: 'Terms', path: 'terms', content: null };
@@ -84,6 +84,14 @@ describe('resolveUserProfilePages', () => {
     warn.mockRestore();
   });
 
+  it('keeps a custom page whose path is an Object.prototype property', () => {
+    const toString: CustomProfilePage = { label: 'To string', path: 'toString', content: null };
+    expect(resolveUserProfilePages(['account'], [toString])).toEqual([
+      { id: 'account' },
+      { id: 'toString', custom: toString },
+    ]);
+  });
+
   it('lists the built-ins, then the custom pages by path', () => {
     expect(resolveUserProfilePages(['account', 'security'], [terms, help])).toEqual([
       { id: 'account' },
@@ -106,5 +114,20 @@ describe('resolveUserProfilePages', () => {
       { id: 'security', custom: shadow },
       { id: 'billing' },
     ]);
+  });
+});
+
+describe('userProfileNavEntries', () => {
+  it('leaves out a custom page under the organization prefix, and says where it goes', () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const members: CustomProfilePage = { label: 'Members', path: 'organization/members', content: null };
+
+    expect(
+      userProfileNavEntries({ pages: { account: {} } as UserProfilePages, customPages: [members, terms] }),
+    ).toEqual([{ id: 'account' }, { id: 'terms', custom: terms }]);
+    expect(warn).toHaveBeenCalledWith(
+      '[Clerk] UserProfile custom page "organization/members" uses the reserved "organization/" prefix, so the page is left out. Use "members" in organizationProfileProps.customPages to add it to the organization\'s pages.',
+    );
+    warn.mockRestore();
   });
 });

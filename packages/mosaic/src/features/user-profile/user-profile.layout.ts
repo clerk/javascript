@@ -89,7 +89,7 @@ function withoutOrganizationPaths(customPages: readonly CustomProfilePage[] = []
       return true;
     }
     logger.warnOnce(
-      `[Clerk] UserProfile custom page "${page.path}" uses the reserved "${ORGANIZATION_PAGE_PREFIX}" prefix and was skipped.`,
+      `[Clerk] UserProfile custom page "${page.path}" uses the reserved "${ORGANIZATION_PAGE_PREFIX}" prefix, so the page is left out. Use "${page.path.slice(ORGANIZATION_PAGE_PREFIX.length)}" in organizationProfileProps.customPages to add it to the organization's pages.`,
     );
     return false;
   });
