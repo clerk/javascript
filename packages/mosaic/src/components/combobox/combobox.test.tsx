@@ -350,6 +350,32 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByRole('option', { name: 'United States' })).toHaveClass('cl-combobox-option');
   });
 
+  it('composes an option from media, label and detail parts', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <Combobox.Input aria-label='Country' />
+        <Combobox.Popup>
+          <Combobox.Option
+            value='dz'
+            label='Algeria'
+          >
+            <Combobox.Media data-testid='flag'>🇩🇿</Combobox.Media>
+            <Combobox.Label>Algeria</Combobox.Label>
+            <Combobox.Detail>+213</Combobox.Detail>
+          </Combobox.Option>
+        </Combobox.Popup>
+      </Combobox.Root>,
+    );
+
+    await user.click(screen.getByRole('combobox', { name: 'Country' }));
+
+    const option = screen.getByRole('option', { name: /Algeria/ });
+    expect(screen.getByTestId('flag')).toHaveClass('cl-combobox-option-media');
+    expect(option).toContainElement(screen.getByText('Algeria', { selector: '.cl-combobox-option-label' }));
+    expect(option).toContainElement(screen.getByText('+213', { selector: '.cl-combobox-option-detail' }));
+  });
+
   it('renders a reusable empty state', () => {
     render(<Combobox.Empty>No matches</Combobox.Empty>);
 

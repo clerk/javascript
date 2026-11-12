@@ -36,9 +36,12 @@ export type {
 } from '../components/empty-state';
 export { Combobox } from '../components/combobox';
 export type {
+  ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
+  ComboboxLabelProps,
   ComboboxListProps,
+  ComboboxMediaProps,
   ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,

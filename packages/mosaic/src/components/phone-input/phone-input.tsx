@@ -17,6 +17,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { styles as buttonStyles } from '../button/button.styles';
+import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
@@ -305,25 +306,22 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               >
                 {filteredCountries.length > 0 ? (
                   filteredCountries.map(option => (
-                    <HeadlessCombobox.Option
+                    <Combobox.Option
                       key={option.iso}
                       value={option.iso}
                       label={option.name}
-                      {...mergeStyleProps(
-                        themeProps('combobox-option'),
-                        themeProps('phone-input-country-option'),
-                        stylex.props(reset.base, styles.option),
-                      )}
+                      {...themeProps('phone-input-country-option')}
+                      xstyle={styles.option}
                     >
-                      <span
+                      <Combobox.Media
                         aria-hidden='true'
-                        {...stylex.props(reset.base, styles.optionFlag)}
+                        xstyle={styles.optionFlag}
                       >
-                        <span {...stylex.props(reset.base, styles.flag)}>{getFlagEmojiFromCountryIso(option.iso)}</span>
-                      </span>
-                      <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
-                      <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                    </HeadlessCombobox.Option>
+                        {getFlagEmojiFromCountryIso(option.iso)}
+                      </Combobox.Media>
+                      <Combobox.Label>{option.name}</Combobox.Label>
+                      <Combobox.Detail xstyle={styles.optionCode}>+{option.code}</Combobox.Detail>
+                    </Combobox.Option>
                   ))
                 ) : (
                   <p {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty))}>
