@@ -57,8 +57,6 @@ export function ChoiceStep({
     return (
       <SignInEnterpriseConnections
         focusRef={focusRef}
-        title={messages.title}
-        description={messages.description}
         logo={logo}
         connections={step.options}
         globalErrorMessage={globalErrorMessage}

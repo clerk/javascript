@@ -45,14 +45,9 @@ function choiceCopy(
   step: Extract<SignInStep, { kind: 'choice' }>,
   m: Messages,
 ): { title: string; description: string } {
-  switch (step.purpose) {
-    case 'methods':
-      return { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
-    case 'reset-methods':
-      return { title: m.resetMethods.title, description: m.resetMethods.description };
-    case 'enterprise-connections':
-      return { title: m.enterpriseConnections.title, description: m.enterpriseConnections.description };
-  }
+  return step.purpose === 'reset-methods'
+    ? { title: m.resetMethods.title, description: m.resetMethods.description }
+    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
 }
 
 export function SignInView({

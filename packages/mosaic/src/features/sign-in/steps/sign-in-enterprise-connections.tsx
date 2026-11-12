@@ -12,8 +12,6 @@ import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 
 interface SignInEnterpriseConnectionsProps {
-  title: string;
-  description: string;
   logo?: { src: string; alt: string };
   connections: readonly SignInProvider[];
   globalErrorMessage?: string;
@@ -24,8 +22,6 @@ interface SignInEnterpriseConnectionsProps {
 }
 
 export function SignInEnterpriseConnections({
-  title,
-  description,
   logo,
   connections,
   globalErrorMessage,
@@ -50,8 +46,8 @@ export function SignInEnterpriseConnections({
             />
           </Card.Media>
         ) : null}
-        <Card.Title>{title}</Card.Title>
-        <Card.Description>{description}</Card.Description>
+        <Card.Title>{m.enterpriseConnections.title}</Card.Title>
+        <Card.Description>{m.enterpriseConnections.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
