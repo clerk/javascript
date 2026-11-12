@@ -5,6 +5,8 @@ import type {
   PasskeyFactor,
   PasswordFactor,
   PhoneCodeFactor,
+  ResetPasswordEmailCodeFactor,
+  ResetPasswordPhoneCodeFactor,
   TOTPFactor,
 } from './factors';
 import type { ClerkResource } from './resource';
@@ -22,6 +24,20 @@ export interface SessionVerificationResource extends ClerkResource {
 }
 
 export type SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
+
+/**
+ * What a completed reverification did, passed to the fetcher of `useReverification` with `passReverificationResult`.
+ */
+export type ReverificationResult = {
+  /**
+   * Set when the user reset their password to reverify. The new password is
+   * already saved, so a retried password change should not send it again.
+   */
+  passwordReset?: {
+    newPassword: string;
+    signOutOfOtherSessions: boolean;
+  };
+};
 
 /**
  * @inline
@@ -55,6 +71,8 @@ export type SessionVerificationFirstFactor =
   | PhoneCodeFactor
   | PasswordFactor
   | PasskeyFactor
+  | ResetPasswordEmailCodeFactor
+  | ResetPasswordPhoneCodeFactor
   /**
    * @experimental
    */

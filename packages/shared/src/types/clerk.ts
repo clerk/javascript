@@ -38,7 +38,7 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { SessionResource, SessionTask, SignedInSessionResource } from './session';
-import type { SessionVerificationLevel } from './sessionVerification';
+import type { ReverificationResult, SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
@@ -1972,7 +1972,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
-  afterVerification?: () => void;
+  afterVerification?: (result?: ReverificationResult) => void;
 
   /**
    * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
@@ -1986,6 +1986,15 @@ export type __internal_UserVerificationProps = RoutingOptions & {
    * @default `'secondFactor'`
    */
   level?: SessionVerificationLevel;
+
+  /**
+   * A new password the caller already collected. When the user resets their
+   * password to verify, it's used instead of asking for one.
+   */
+  resetPassword?: {
+    password: string;
+    signOutOfOtherSessions: boolean;
+  };
 
   /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
