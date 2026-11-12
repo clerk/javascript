@@ -467,6 +467,7 @@ function StepPanel({
   onPasskey,
   onSelectProvider,
   onCancel,
+  lastUsedProviderId,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -481,6 +482,7 @@ function StepPanel({
   onPasskey?: () => void;
   onSelectProvider?: (id: string) => void;
   onCancel?: () => void;
+  lastUsedProviderId?: string;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -502,6 +504,7 @@ function StepPanel({
       combined={combined}
       socialProviders={providers}
       pendingProviderId={pendingProviderId}
+      lastUsedProviderId={lastUsedProviderId}
       onSelectProvider={onSelectProvider ?? (() => undefined)}
       onSwitchField={onSwitchField}
       onPasskey={onPasskey}
@@ -634,6 +637,20 @@ export function IdentifierAlternativePhoneChannel() {
       onCancel={() => setStep({ kind: 'identifier', field: 'email' })}
     />
   );
+}
+
+export function IdentifierLastUsed() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier', field: 'email' }}
+      providers={[...socialProviders, { id: 'oauth_x', name: 'X', iconUrl: 'https://img.clerk.com/static/x.svg' }]}
+      lastUsedProviderId='oauth_github'
+    />
+  );
+}
+
+export function IdentifierLastUsedField() {
+  return <StepPanel step={{ kind: 'identifier', field: 'email', lastUsed: true }} />;
 }
 
 export function IdentifierEmailOrUsername() {

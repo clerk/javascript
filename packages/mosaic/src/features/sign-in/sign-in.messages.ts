@@ -6,6 +6,7 @@ export const signInMessages = {
     descriptionCombined: 'Welcome! Sign in or create an account to continue',
     socialButton: 'Continue with {provider}',
     divider: 'or',
+    lastUsed: 'Last used',
     emailLabel: 'Email address',
     emailPlaceholder: 'Enter your email address',
     phoneLabel: 'Phone number',

@@ -58,6 +58,7 @@ export function SignInView({
   combined,
   socialProviders,
   pendingProviderId,
+  lastUsedProviderId,
   onSelectProvider,
   onPasskey,
   form,
@@ -133,6 +134,7 @@ export function SignInView({
                     combined={combined}
                     socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
+                    lastUsedProviderId={lastUsedProviderId}
                     onSelectProvider={onSelectProvider}
                     onPasskey={onPasskey}
                     form={form}

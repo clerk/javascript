@@ -19,7 +19,7 @@ type SignInCodeChannel = 'email' | 'phone' | 'totp';
 export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
 
 export type SignInStep =
-  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField }
+  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField; lastUsed?: boolean }
   | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
@@ -84,6 +84,7 @@ export interface SignInViewProps {
   combined: boolean;
   socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
+  lastUsedProviderId?: string;
   onSelectProvider: (id: string) => void;
   onPasskey?: () => void;
   form: UseFormResult<SignInValues>;

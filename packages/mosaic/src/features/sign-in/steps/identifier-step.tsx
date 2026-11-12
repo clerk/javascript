@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
+import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
@@ -26,7 +27,7 @@ import { SignInAlternativeChannel } from './sign-in-alternative-channel';
 
 type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
 
-interface IdentifierStepProps extends Omit<IdentifierStartProps, 'field' | 'nextField'> {
+interface IdentifierStepProps extends Omit<IdentifierStartProps, 'field' | 'nextField' | 'lastUsed'> {
   step: IdentifierStepData;
   onCancel?: () => void;
 }
@@ -53,6 +54,7 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
     <IdentifierStart
       field={step.field}
       nextField={step.nextField}
+      lastUsed={step.lastUsed}
       {...props}
     />
   );
@@ -61,6 +63,8 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
 interface IdentifierStartProps {
   field: SignInIdentifierField;
   nextField?: SignInIdentifierField;
+  lastUsed?: boolean;
+  lastUsedProviderId?: string;
   onSwitchField?: () => void;
   applicationName: string;
   combined: boolean;
@@ -82,6 +86,8 @@ interface IdentifierStartProps {
 function IdentifierStart({
   field,
   nextField,
+  lastUsed = false,
+  lastUsedProviderId,
   onSwitchField,
   applicationName,
   combined,
@@ -130,42 +136,13 @@ function IdentifierStart({
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
-        {socialProviders.length > 0 ? (
-          <>
-            <ProviderButtonGroup disabled={isDisabled}>
-              {socialProviders.map(provider => (
-                <ProviderButton
-                  key={provider.id}
-                  icon={
-                    <img
-                      src={provider.iconUrl}
-                      alt=''
-                      {...stylex.props(styles.providerIcon)}
-                    />
-                  }
-                  longLabel={fill(m.start.socialButton, { provider: provider.name })}
-                  shortLabel={provider.name}
-                  isPending={pendingProviderId === provider.id}
-                  pendingLabel={m.verifying}
-                  onClick={() => onSelectProvider(provider.id)}
-                />
-              ))}
-            </ProviderButtonGroup>
-            <div
-              role='separator'
-              {...stylex.props(styles.divider)}
-            >
-              <span {...stylex.props(styles.dividerLine)} />
-              <Text
-                size='sm'
-                color='foreground-secondary'
-              >
-                {m.start.divider}
-              </Text>
-              <span {...stylex.props(styles.dividerLine)} />
-            </div>
-          </>
-        ) : null}
+        <SignInProviders
+          providers={socialProviders}
+          pendingProviderId={pendingProviderId}
+          lastUsedProviderId={lastUsedProviderId}
+          isDisabled={isDisabled}
+          onSelectProvider={onSelectProvider}
+        />
         <Form
           id={form.id}
           onSubmit={onSubmit}
@@ -188,6 +165,8 @@ function IdentifierStart({
                 >
                   {identifierFieldCopy(nextField, m).switchLabel}
                 </Button>
+              ) : lastUsed ? (
+                <Badge color='neutral'>{m.start.lastUsed}</Badge>
               ) : null}
             </Field.Header>
             {field === 'phone' ? (
@@ -254,6 +233,71 @@ function IdentifierStart({
           {m.continue}
         </SubmitButton>
       </Card.Footer>
+    </>
+  );
+}
+
+interface SignInProvidersProps {
+  providers: readonly SignInProvider[];
+  pendingProviderId?: string;
+  lastUsedProviderId?: string;
+  isDisabled: boolean;
+  onSelectProvider: (id: string) => void;
+}
+
+function SignInProviders({
+  providers,
+  pendingProviderId,
+  lastUsedProviderId,
+  isDisabled,
+  onSelectProvider,
+}: SignInProvidersProps) {
+  const m = useMessages('signIn');
+  if (providers.length === 0) {
+    return null;
+  }
+  const lastUsedProvider = providers.find(provider => provider.id === lastUsedProviderId);
+  const otherProviders = providers.filter(provider => provider !== lastUsedProvider);
+  const providerButton = (provider: SignInProvider, badge?: string) => (
+    <ProviderButton
+      key={provider.id}
+      icon={
+        <img
+          src={provider.iconUrl}
+          alt=''
+          {...stylex.props(styles.providerIcon)}
+        />
+      }
+      longLabel={fill(m.start.socialButton, { provider: provider.name })}
+      shortLabel={provider.name}
+      badge={badge}
+      isPending={pendingProviderId === provider.id}
+      pendingLabel={m.verifying}
+      onClick={() => onSelectProvider(provider.id)}
+    />
+  );
+
+  return (
+    <>
+      <ProviderButtonGroup
+        disabled={isDisabled}
+        lastUsed={lastUsedProvider ? providerButton(lastUsedProvider, m.start.lastUsed) : undefined}
+      >
+        {otherProviders.map(provider => providerButton(provider))}
+      </ProviderButtonGroup>
+      <div
+        role='separator'
+        {...stylex.props(styles.divider)}
+      >
+        <span {...stylex.props(styles.dividerLine)} />
+        <Text
+          size='sm'
+          color='foreground-secondary'
+        >
+          {m.start.divider}
+        </Text>
+        <span {...stylex.props(styles.dividerLine)} />
+      </div>
     </>
   );
 }
