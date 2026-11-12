@@ -18,13 +18,13 @@ import { Plus } from '../../icons/glyphs/plus';
 import { RotateAntiClockwise } from '../../icons/glyphs/rotate-anti-clockwise';
 import type { FileUploadProps } from '../../primitives/file-upload';
 import { FileUpload } from '../../primitives/file-upload';
-import { type Crop, cropImage, ImageCropper, INITIAL_CROP } from '../../primitives/image-cropper';
+import { type Crop, ImageCropper, INITIAL_CROP } from '../../primitives/image-cropper';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
-import { AVATAR_CROP, AVATAR_UPLOAD, croppedFile, skipsCrop } from '../../utils/avatar-upload';
+import { AVATAR_UPLOAD, cropAvatar, croppedFile, skipsCrop } from '../../utils/avatar-upload';
 import { avatarUploadDropzoneScope } from './avatar-upload.markers.stylex';
 import { styles } from './avatar-upload.styles';
 
@@ -113,11 +113,15 @@ function Root({ name, imageUrl, hasImage, onChange, onRemove, disabled = false, 
           if (!file) {
             return;
           }
-          if (skipsCrop(file)) {
-            onChange?.(file);
-          } else {
-            setPick(current => ({ id: (current?.id ?? 0) + 1, file, open: true }));
-          }
+          void skipsCrop(file)
+            .catch(() => false)
+            .then(skip => {
+              if (skip) {
+                onChange?.(file);
+              } else {
+                setPick(current => ({ id: (current?.id ?? 0) + 1, file, open: true }));
+              }
+            });
         }}
       />
     </AvatarUploadContext.Provider>
@@ -245,7 +249,7 @@ function CropStep({ file, src, labels, shape, save }: CropStepProps) {
 
   const apply = () =>
     save.run('crop', async () => {
-      const blob = await cropImage(src, crop, AVATAR_CROP);
+      const blob = await cropAvatar(src, crop, file.type);
       onChange?.(croppedFile(file, blob));
       closeCrop();
     });

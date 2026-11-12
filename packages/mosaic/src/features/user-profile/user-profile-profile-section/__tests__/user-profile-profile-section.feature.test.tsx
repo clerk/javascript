@@ -21,7 +21,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
-import { imageFile, saveCrop } from '../../../../__tests__/feature/image';
+import { animatedPngFile, imageFile, saveCrop } from '../../../../__tests__/feature/image';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileProfileSection } from '../user-profile-profile-section';
@@ -168,9 +168,45 @@ describe('the user profile profile section', () => {
     if (!(sent instanceof File)) {
       throw new Error('expected an uploaded file');
     }
-    expect(sent).toMatchObject({ name: 'me.png', type: 'image/png' });
+    expect(sent).toMatchObject({ name: 'me.jpg', type: 'image/jpeg' });
     const image = await createImageBitmap(sent);
-    expect([image.width, image.height]).toEqual([512, 512]);
+    expect([image.width, image.height]).toEqual([100, 100]);
+  });
+
+  it('keeps a picked WebP a WebP', async () => {
+    const { actor, container } = await renderSection();
+    const upload = holdRequests('post', '/v1/me/profile_image');
+
+    await actor.upload(fileInput(container), await imageFile('me.webp', { type: 'image/webp' }));
+    await saveCrop(actor, 'Adjust profile picture');
+
+    await waitFor(() => expect(upload.requests).toHaveLength(1));
+    expect((await upload.requests[0].formData()).get('file')).toMatchObject({ name: 'me.webp', type: 'image/webp' });
+    upload.release();
+  });
+
+  it('says a picture is too large when its crop cannot be saved under the limit, and uploads nothing', async () => {
+    const { actor, container } = await renderSection();
+    const upload = holdRequests('post', '/v1/me/profile_image');
+    const toBlob = vi
+      .spyOn(HTMLCanvasElement.prototype, 'toBlob')
+      .mockImplementation(callback =>
+        callback(new Blob([new Uint8Array(10 * 1000 * 1000 + 1)], { type: 'image/png' })),
+      );
+
+    await actor.upload(fileInput(container), await imageFile('me.png'));
+    const dialog = await screen.findByRole('dialog', { name: 'Adjust profile picture' });
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Rotate' })).toBeEnabled());
+    await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(within(dialog).getByRole('alert')).toHaveTextContent(
+        'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+      ),
+    );
+    expect(toBlob).toHaveBeenCalledTimes(3);
+    expect(upload.requests).toHaveLength(0);
+    upload.release();
   });
 
   it('uploads nothing when the crop is cancelled', async () => {
@@ -244,6 +280,18 @@ describe('the user profile profile section', () => {
     await waitFor(() => expect(upload.requests).toHaveLength(1));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect((await upload.requests[0].formData()).get('file')).toMatchObject({ name: 'me.gif', type: 'image/gif' });
+    upload.release();
+  });
+
+  it('uploads an animated PNG as picked, without cropping it', async () => {
+    const { actor, container } = await renderSection();
+    const upload = holdRequests('post', '/v1/me/profile_image');
+
+    await actor.upload(fileInput(container), await animatedPngFile('me.png'));
+
+    await waitFor(() => expect(upload.requests).toHaveLength(1));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect((await upload.requests[0].formData()).get('file')).toMatchObject({ name: 'me.png', type: 'image/png' });
     upload.release();
   });
 

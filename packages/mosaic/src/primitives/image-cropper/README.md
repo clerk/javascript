@@ -37,7 +37,7 @@ function Cropper({ src, onSave }: { src: string; onSave: (blob: Blob) => void })
       <ImageCropper.ZoomIn aria-label='Zoom in'>+</ImageCropper.ZoomIn>
       <ImageCropper.Rotate>Rotate</ImageCropper.Rotate>
       <ImageCropper.Reset>Reset</ImageCropper.Reset>
-      <button onClick={async () => onSave(await cropImage(src, crop, { size: 512, type: 'image/png' }))}>Save</button>
+      <button onClick={async () => onSave(await cropImage(src, crop, { type: 'image/png' }))}>Save</button>
     </ImageCropper.Root>
   );
 }
@@ -83,10 +83,13 @@ fraction of the frame. `zoom` 1 is the smallest scale that still covers the fram
 Other parts take no additional props. All parts except `Root` accept a `render` prop and standard
 HTML attributes for their default element.
 
-### `cropImage(src, crop, { size, type })`
+### `cropImage(src, crop, { type, size })`
 
-Returns a `Promise<Blob>` holding the square the crop shows, `size` pixels wide, encoded as `type`.
-It draws to a canvas, so an animated image keeps only its first frame.
+Returns a `Promise<Blob>` holding the square the crop shows, encoded as `type`. A browser that
+cannot encode `type` returns `image/png`, so read the type from the blob. The square keeps the
+image's own resolution unless `size` says otherwise: it gets the square's side in the image's pixels
+and returns the side to draw, such as `side => Math.min(side, 1024)` to cap it. Colors outside sRGB
+are kept. It draws to a canvas, so an animated image keeps only its first frame.
 
 ## Keyboard
 
