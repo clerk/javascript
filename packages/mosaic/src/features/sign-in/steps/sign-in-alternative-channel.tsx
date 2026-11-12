@@ -99,7 +99,7 @@ export function SignInAlternativeChannel({
             <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>
-        <Captcha />
+        <Captcha xstyle={styles.captcha} />
       </Card.Content>
       <Card.Footer>
         {onCancel ? (

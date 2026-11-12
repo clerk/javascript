@@ -48,6 +48,9 @@ export const styles = stylex.create({
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
   },
+  captcha: {
+    justifySelf: 'center',
+  },
   spotlightGroup: {
     display: 'contents',
   },

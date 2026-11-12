@@ -201,7 +201,10 @@ function IdentifierStart({
             </Field.Root>
           </Form>
         </div>
-        <Captcha onInteractiveChange={setIsChallengeShown} />
+        <Captcha
+          xstyle={styles.captcha}
+          onInteractiveChange={setIsChallengeShown}
+        />
         {onPasskey ? (
           <Button
             type='button'
