@@ -207,6 +207,10 @@ function LogoField({
           </Field.Content>
           <AvatarUpload.Actions labels={m.create.logo} />
         </AvatarUpload.Dropzone>
+        <AvatarUpload.Crop
+          labels={m.create.logo.crop}
+          shape='square'
+        />
       </AvatarUpload.Root>
       <Field.Feedback feedback={rejection ? { type: 'error', message: errorText(rejection) } : undefined} />
     </Field.Root>
