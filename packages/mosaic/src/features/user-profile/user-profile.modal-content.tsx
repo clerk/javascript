@@ -8,6 +8,7 @@ export default function UserProfileModalContent({
   options,
   close,
   path,
+  routing,
 }: UserProfileModalContentProps): React.ReactElement {
   const profile = useMosaicProfile();
   // An opening the routing state caused on its own, a deep link or a return, carries no options;
@@ -17,6 +18,7 @@ export default function UserProfileModalContent({
       options={options ?? userProfileModalOptions(profile)}
       close={close}
       path={path}
+      routing={routing}
       combined={false}
     />
   );

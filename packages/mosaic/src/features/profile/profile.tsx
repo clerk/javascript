@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import { organizationProfilePageIds } from '../organization-profile/organization-profile.layout';
@@ -89,8 +90,10 @@ export function Profile(props: ProfileProps): ReactNode {
   if (props.mode === 'organization') {
     return (
       <OrganizationProfileSurface
+        key={props.routing ?? provider.organizationProfileProps?.routing}
         {...withOrganizationDefaults(props, provider.organizationProfileProps)}
         path={props.path ?? provider.organizationProfileProps?.path}
+        routing={props.routing ?? provider.organizationProfileProps?.routing}
       />
     );
   }
@@ -125,7 +128,7 @@ function withUserDefaults(
   props: UserProfileProps,
   defaults: Pick<
     UserProfileProps,
-    'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'path'
+    'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'path' | 'routing'
   > = {},
 ): UserProfileProps {
   const {
@@ -134,9 +137,10 @@ function withUserDefaults(
     additionalOAuthScopes = defaults.additionalOAuthScopes,
     apiKeysProps = defaults.apiKeysProps,
     path = defaults.path,
+    routing = defaults.routing,
     fallback,
   } = props;
-  return { customPages, pageOrder, additionalOAuthScopes, apiKeysProps, path, fallback };
+  return { customPages, pageOrder, additionalOAuthScopes, apiKeysProps, path, routing, fallback };
 }
 
 function withOrganizationDefaults<Props extends NonNullable<CombinedProfileProps['organizationProfileProps']>>(
@@ -159,6 +163,7 @@ export function UserProfileSurface({
   customPages,
   pageOrder,
   path = '/user',
+  routing = 'virtual',
   additionalOAuthScopes,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
@@ -176,6 +181,7 @@ export function UserProfileSurface({
   const viewProps: AccountViewProps = {
     elevation: 'flush',
     path,
+    routing,
     customPages,
     pageOrder,
     pages: {
@@ -194,12 +200,16 @@ export function UserProfileSurface({
     >
       {combined ? (
         <CombinedUserProfileView
+          key={routing}
           {...viewProps}
           organizationProfileProps={organizationProfileProps}
           fallback={fallback}
         />
       ) : (
-        <AccountUserProfileView {...viewProps} />
+        <AccountUserProfileView
+          key={routing}
+          {...viewProps}
+        />
       )}
     </UserProfileProvider>
   );
@@ -207,11 +217,12 @@ export function UserProfileSurface({
 
 type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
   path: string;
+  routing: MosaicRoutingMode;
 };
 
-function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
+function AccountUserProfileView({ path, routing, ...viewProps }: AccountViewProps) {
   const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds(viewProps), {
-    routing: 'virtual',
+    routing,
     path,
   });
 
@@ -230,6 +241,7 @@ function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
 
 function CombinedUserProfileView({
   path,
+  routing,
   fallback,
   organizationProfileProps: { customPages, pageOrder, apiKeysProps, afterLeaveOrganizationUrl } = {},
   ...viewProps
@@ -241,7 +253,7 @@ function CombinedUserProfileView({
       : undefined;
   const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
   const { activePage, onPageChange } = useProfilePagesController(pageIds, {
-    routing: 'virtual',
+    routing,
     path,
     notFound: parts =>
       `${parts[0]}/` === ORGANIZATION_PAGE_PREFIX
@@ -269,6 +281,7 @@ export function OrganizationProfileSurface({
   customPages,
   pageOrder,
   path = '/organization',
+  routing = 'virtual',
   afterLeaveOrganizationUrl,
   fallback,
   apiKeysProps,
@@ -277,7 +290,7 @@ export function OrganizationProfileSurface({
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
   const { activePage, onPageChange } = useProfilePagesController(
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
-    { routing: 'virtual', path },
+    { routing, path },
   );
 
   if (model.status === 'loading') {

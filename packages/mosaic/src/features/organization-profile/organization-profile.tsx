@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { Profile } from '../profile/profile';
 import type { OrganizationProfileOptions } from './organization-profile.provider';
@@ -18,6 +19,15 @@ export interface OrganizationProfileProps
    * @default '/organization'
    */
   path?: string;
+  /**
+   * Where the profile keeps the page that is open. `virtual` keeps it in memory, so the URL does not
+   * change. `path` puts it in the URL's pathname under `path`, `query` and `hash` in a param of the
+   * query string or the hash named after `path`, so the page survives a reload and Back returns to
+   * the previous one.
+   *
+   * @default 'virtual'
+   */
+  routing?: MosaicRoutingMode;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that there is no active
    * organization.

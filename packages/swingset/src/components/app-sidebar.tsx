@@ -1,6 +1,6 @@
 'use client';
 
-import { FlaskConicalIcon, SearchIcon } from 'lucide-react';
+import { FlaskConicalIcon, RouteIcon, SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -126,6 +126,16 @@ export function AppSidebar({
         <SidebarGroup className='py-1'>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className='h-auto py-1 text-xs'
+                  isActive={pathname.startsWith('/routing')}
+                  render={<Link href='/routing' />}
+                >
+                  <RouteIcon className='size-3.5!' />
+                  Routing
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   className='h-auto py-1 text-xs'
