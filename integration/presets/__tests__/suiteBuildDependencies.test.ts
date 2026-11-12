@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -31,26 +31,83 @@ const harnessPackages = Object.entries<string>(rootPackage.devDependencies)
   .map(([name]) => name);
 
 const scopedSuites = Object.entries<{ dependsOn?: string[]; inputs: string[] }>(turbo.tasks)
-  .filter(([id, task]) => id.startsWith('//#test:integration:') && !task.inputs.some(i => i.startsWith('packages/')))
-  .map(([id, task]) => ({ suite: id.replace('//#test:integration:', ''), dependsOn: task.dependsOn ?? [] }));
+  .filter(([id, task]) => id.startsWith('//#test:integration:') && !task.inputs.includes('packages/*/src/**'))
+  .map(([id, task]) => ({
+    suite: id.replace('//#test:integration:', ''),
+    dependsOn: task.dependsOn ?? [],
+    inputs: task.inputs,
+  }));
 
-const listTestFiles = (dir: string): string[] =>
+const helperDirs = [testsDir, resolve(repoRoot, 'integration/testUtils')];
+
+const listFiles = (dir: string, pattern: RegExp): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
-      return listTestFiles(path);
+      return listFiles(path, pattern);
     }
-    return /\.test\.tsx?$/.test(entry.name) ? [path] : [];
+    return pattern.test(entry.name) ? [path] : [];
   });
 
 const parseScript = (suite: string) => {
   const script: string | undefined = rootPackage.scripts[`test:integration:${suite}`];
+  const config = script?.match(/--config (\S+)/)?.[1];
   return {
     script,
     appIds: script?.match(/E2E_APP_ID=(\S+)/)?.[1].split(','),
     tag: script?.match(/--grep (@[\w:-]+)/)?.[1],
+    ownConfig: config && config !== 'integration/playwright.config.ts' ? config : undefined,
   };
 };
+
+const resolveImport = (from: string, specifier: string) =>
+  ['', '.ts', '.tsx', '/index.ts']
+    .map(suffix => resolve(dirname(from), specifier + suffix))
+    .find(path => existsSync(path) && statSync(path).isFile());
+
+const withLocalImports = (entryFiles: string[]) => {
+  const seen = new Set<string>();
+  const queue = [...entryFiles];
+  while (queue.length) {
+    const file = queue.pop()!;
+    if (seen.has(file)) {
+      continue;
+    }
+    seen.add(file);
+    const source = readFileSync(file, 'utf8');
+    for (const [, specifier] of source.matchAll(/from '(\.{1,2}\/[^']+)'/g)) {
+      const target = resolveImport(file, specifier);
+      if (target && helperDirs.some(dir => target.startsWith(dir + sep))) {
+        queue.push(target);
+      }
+    }
+  }
+  return [...seen];
+};
+
+const suiteFiles = (suite: string) => {
+  const { tag, ownConfig } = parseScript(suite);
+  if (tag) {
+    const tagPattern = new RegExp(`${tag}(?![\\w-])`);
+    return withLocalImports(
+      listFiles(testsDir, /\.test\.tsx?$/).filter(file => tagPattern.test(readFileSync(file, 'utf8'))),
+    );
+  }
+  if (ownConfig) {
+    const configPath = resolve(repoRoot, ownConfig);
+    const testDir = readFileSync(configPath, 'utf8').match(/testDir:\s*'([^']+)'/)?.[1];
+    return testDir ? withLocalImports(listFiles(resolve(dirname(configPath), testDir), /\.tsx?$/)) : [];
+  }
+  return [];
+};
+
+const importsOutsideIntegration = (suite: string) =>
+  suiteFiles(suite).flatMap(file =>
+    [...readFileSync(file, 'utf8').matchAll(/^import (?!type )[^;]*?from '(\.{1,2}\/[^']+)'/gm)]
+      .map(([, specifier]) => resolveImport(file, specifier))
+      .filter((target): target is string => !!target && !target.startsWith(resolve(repoRoot, 'integration') + sep))
+      .map(target => relative(repoRoot, target)),
+  );
 
 let appConfigs: typeof AppConfigs;
 
@@ -61,17 +118,14 @@ beforeAll(async () => {
 });
 
 const appsLoadedBy = (suite: string) => {
-  const { appIds, tag } = parseScript(suite);
+  const { appIds } = parseScript(suite);
   const longRunning = appIds
     ? (appConfigs.longRunningApps.getByPattern(appIds) as unknown as { config: ApplicationConfig }[]).map(
         app => app.config,
       )
     : [];
 
-  const tagPattern = new RegExp(`${tag}(?![\\w-])`);
-  const taggedSources = listTestFiles(testsDir)
-    .map(file => readFileSync(file, 'utf8'))
-    .filter(source => tagPattern.test(source));
+  const taggedSources = suiteFiles(suite).map(file => readFileSync(file, 'utf8'));
   const referenced = taggedSources
     .flatMap(source => [...source.matchAll(/appConfigs\.(\w+)\.(\w+)/g)])
     .filter(([, group]) => group !== 'envs' && group !== 'longRunningApps')
@@ -85,9 +139,22 @@ const appsLoadedBy = (suite: string) => {
   return { configs: [...longRunning, ...referenced], addedInTests };
 };
 
+const workspaceDependenciesOf = (template: string | undefined) => {
+  if (!template) {
+    return [];
+  }
+  const manifest = JSON.parse(readFileSync(join(template, 'package.json'), 'utf8'));
+  return Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }).filter(name =>
+    name.startsWith('@clerk/'),
+  );
+};
+
 const packagesLoadedBy = (suite: string) => {
   const { configs, addedInTests } = appsLoadedBy(suite);
-  return [...configs.flatMap(config => config.pkglabDependencies), ...addedInTests];
+  return [
+    ...configs.flatMap(config => [...config.pkglabDependencies, ...workspaceDependenciesOf(config.template)]),
+    ...addedInTests,
+  ];
 };
 
 describe('scoped integration suites declare the builds they load', () => {
@@ -99,14 +166,17 @@ describe('scoped integration suites declare the builds they load', () => {
     expect(harnessPackages).toEqual(expect.arrayContaining(['@clerk/backend', '@clerk/shared', '@clerk/testing']));
   });
 
-  describe.each(scopedSuites)('$suite', ({ suite, dependsOn }) => {
-    it('selects its tests with a --grep tag and its apps by id or from its tagged tests', () => {
-      const { script, tag } = parseScript(suite);
+  describe.each(scopedSuites)('$suite', ({ suite, dependsOn, inputs }) => {
+    it('selects its tests with a --grep tag or its own config, and its apps by id or from its tests', () => {
+      const { script, tag, ownConfig } = parseScript(suite);
       expect(script, `package.json has no test:integration:${suite} script`).toBeDefined();
-      expect(tag, `test:integration:${suite} must pass --grep @tag to be scoped`).toBeDefined();
+      expect(
+        tag ?? ownConfig,
+        `test:integration:${suite} must pass --grep @tag or its own --config to be scoped`,
+      ).toBeDefined();
       expect(
         appsLoadedBy(suite).configs.length,
-        `test:integration:${suite} must set E2E_APP_ID or its tagged tests must use appConfigs apps to be scoped`,
+        `test:integration:${suite} must set E2E_APP_ID or its tests must use appConfigs apps to be scoped`,
       ).toBeGreaterThan(0);
     });
 
@@ -115,6 +185,10 @@ describe('scoped integration suites declare the builds they load', () => {
         .map(name => `${name}#build`)
         .sort();
       expect([...dependsOn].sort()).toEqual(expected);
+    });
+
+    it('hashes the files its tests import from outside integration/', () => {
+      expect(inputs).toEqual(expect.arrayContaining(importsOutsideIntegration(suite)));
     });
   });
 });
