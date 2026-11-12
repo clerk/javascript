@@ -3,6 +3,7 @@ import { useSession } from '@clerk/shared/react';
 import type { ResetPasswordCodeFactor } from '@clerk/shared/types';
 
 import { Flow, localizationKeys } from '../../customizables';
+import { useResetPasswordAttempt } from './useResetPasswordAttempt';
 import type { UVFactorOneCodeCard } from './UVFactorOneCodeForm';
 import { UVFactorOneCodeForm } from './UVFactorOneCodeForm';
 
@@ -23,6 +24,7 @@ type UVFactorOneResetPasswordCodeCardProps = UVFactorOneCodeCard & {
 export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPasswordCodeCardProps) => {
   const { newPassword, signOutOfOtherSessions, hasNewPassword, onNewPasswordRejected, ...codeCardProps } = props;
   const { session } = useSession();
+  const resetPasswordAttempt = useResetPasswordAttempt();
   const isEmail = props.factor.strategy === 'reset_password_email_code';
 
   return (
@@ -54,15 +56,18 @@ export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPassword
         identityPreviewEditButtonAriaLabel={localizationKeys(
           isEmail ? 'identityPreviewEditButton__emailAddress' : 'identityPreviewEditButton__phoneNumber',
         )}
-        attempt={code =>
+        attempt={code => {
+          if (resetPasswordAttempt) {
+            resetPasswordAttempt.current = { newPassword, signOutOfOtherSessions };
+          }
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          session!.attemptFirstFactorVerification({
+          return session!.attemptFirstFactorVerification({
             strategy: props.factor.strategy,
             code,
             password: newPassword,
             signOutOfOtherSessions,
-          })
-        }
+          });
+        }}
         onAttemptError={(err, reject) => {
           if (isClerkAPIResponseError(err) && err.errors[0]?.meta?.paramName === 'password') {
             onNewPasswordRejected(err);

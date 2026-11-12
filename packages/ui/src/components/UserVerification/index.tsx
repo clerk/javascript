@@ -6,6 +6,7 @@ import { Flow } from '@/customizables';
 import type { WithInternalRouting } from '@/internal';
 import { Route, Switch } from '@/router';
 
+import { ResetPasswordAttemptProvider } from './useResetPasswordAttempt';
 import { UserVerificationFactorOne } from './UserVerificationFactorOne';
 import { UserVerificationFactorTwo } from './UserVerificationFactorTwo';
 import { useUserVerificationSession } from './useUserVerificationSession';
@@ -19,14 +20,16 @@ function UserVerificationRoutes(): JSX.Element {
   }, []);
   return (
     <Flow.Root flow='userVerification'>
-      <Switch>
-        <Route path='factor-two'>
-          <UserVerificationFactorTwo />
-        </Route>
-        <Route index>
-          <UserVerificationFactorOne />
-        </Route>
-      </Switch>
+      <ResetPasswordAttemptProvider>
+        <Switch>
+          <Route path='factor-two'>
+            <UserVerificationFactorTwo />
+          </Route>
+          <Route index>
+            <UserVerificationFactorOne />
+          </Route>
+        </Switch>
+      </ResetPasswordAttemptProvider>
     </Flow.Root>
   );
 }

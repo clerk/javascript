@@ -9,3 +9,14 @@ Let users whose password was found in a data breach pass reverification by reset
 From UserProfile's change password form, the modal reuses the new password the user already entered, so they only enter the code.
 
 `session.prepareFirstFactorVerification()` and `session.attemptFirstFactorVerification()` accept the `reset_password_email_code` and `reset_password_phone_code` strategies, so custom flows can build the same reset.
+
+`useReverification()` accepts a new `passReverificationResult` option. With it, the fetcher receives what the reverification did as its first argument: `passwordReset` holds the new password and sign out choice when the user reset their password in the modal. Custom password change flows should adopt it: after the user resets their password to reverify, retrying `user.updatePassword()` would fail on the old `currentPassword` or overwrite the password the user just set.
+
+```tsx
+const { user } = useUser();
+const updatePassword = useReverification(
+  (reverification: ReverificationResult | undefined, params: UpdateUserPasswordParams) =>
+    reverification?.passwordReset ? user!.reload().catch(() => user!) : user!.updatePassword(params),
+  { passReverificationResult: true },
+);
+```

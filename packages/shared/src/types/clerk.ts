@@ -38,7 +38,7 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { SessionResource, SessionTask, SignedInSessionResource } from './session';
-import type { SessionVerificationLevel } from './sessionVerification';
+import type { ReverificationResult, SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
@@ -1972,7 +1972,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
-  afterVerification?: () => void;
+  afterVerification?: (result?: ReverificationResult) => void;
 
   /**
    * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
@@ -1994,12 +1994,6 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   resetPassword?: {
     password: string;
     signOutOfOtherSessions: boolean;
-    /**
-     * Called when the user enters a different password in the modal because
-     * this one was rejected. A caller that retries its own request after
-     * verification must send this password instead.
-     */
-    onPasswordChange?: (password: string) => void;
   };
 
   /**

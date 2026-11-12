@@ -380,30 +380,33 @@ describe('PasswordSection', () => {
         return { fixtures, modalProps: openReverification.mock.calls[0][0]! };
       };
 
-      // The retry sends the same password; the backend treats it as already done.
-      it('passes the new password to the modal and retries the change after verification', async () => {
+      it('passes the new password to the modal and skips the change after the modal resets it', async () => {
         const { fixtures, modalProps } = await submitAndOpenReverification();
-        expect(modalProps.resetPassword).toMatchObject({ password: 'testtest', signOutOfOtherSessions: true });
+        expect(modalProps.resetPassword).toEqual({ password: 'testtest', signOutOfOtherSessions: true });
+        const reload = vi.spyOn(fixtures.clerk.user!, 'reload').mockResolvedValue(fixtures.clerk.user!);
 
-        await act(() => modalProps.afterVerification?.());
+        await act(() =>
+          modalProps.afterVerification?.({
+            passwordReset: { newPassword: 'testtest', signOutOfOtherSessions: true },
+          }),
+        );
+
+        // The form closes on success; sending its password again would overwrite the one the modal saved
+        await waitFor(() =>
+          expect(screen.queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument(),
+        );
+        expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledOnce();
+        expect(reload).toHaveBeenCalledOnce();
+      });
+
+      it('retries the change when the modal verified without a reset', async () => {
+        const { fixtures, modalProps } = await submitAndOpenReverification();
+
+        await act(() => modalProps.afterVerification?.({}));
 
         await waitFor(() => expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(2));
         expect(fixtures.clerk.user?.updatePassword).toHaveBeenLastCalledWith({
           newPassword: 'testtest',
-          signOutOfOtherSessions: true,
-        });
-      });
-
-      it('retries with the password the modal set after it rejected the form password', async () => {
-        const { fixtures, modalProps } = await submitAndOpenReverification();
-
-        // The modal rejected 'testtest' and the user picked another password there
-        act(() => modalProps.resetPassword?.onPasswordChange?.('picked-in-the-modal-456'));
-        await act(() => modalProps.afterVerification?.());
-
-        await waitFor(() => expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(2));
-        expect(fixtures.clerk.user?.updatePassword).toHaveBeenLastCalledWith({
-          newPassword: 'picked-in-the-modal-456',
           signOutOfOtherSessions: true,
         });
       });

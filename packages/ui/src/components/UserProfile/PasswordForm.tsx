@@ -1,5 +1,5 @@
 import { useClerk, useReverification, useSession, useUser } from '@clerk/shared/react';
-import type { UserResource } from '@clerk/shared/types';
+import type { ReverificationResult, UserResource } from '@clerk/shared/types';
 import { useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -44,21 +44,19 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   // to reset a breached password, the modal uses it instead of asking again.
   const pendingPasswordRef = useRef<UserVerificationResetPassword>();
   const updatePasswordWithReverification = useReverification(
-    (user: UserResource, [params]: Parameters<UserResource['updatePassword']>) =>
-      // The retry after reverification must send the password the modal set,
-      // which differs from the form's when the modal rejected it.
-      user.updatePassword({ ...params, newPassword: pendingPasswordRef.current?.password ?? params.newPassword }),
+    (
+      reverification: ReverificationResult | undefined,
+      user: UserResource,
+      opts: Parameters<UserResource['updatePassword']>,
+    ) =>
+      // The modal already saved the password it reset; sending the form's would overwrite it.
+      reverification?.passwordReset ? user.reload().catch(() => user) : user.updatePassword(...opts),
     {
+      passReverificationResult: true,
       onNeedsReverification: ({ level, complete, cancel }) => {
-        const pending = pendingPasswordRef.current;
         clerk.__internal_openReverification({
           level,
-          resetPassword: pending && {
-            ...pending,
-            onPasswordChange: password => {
-              pendingPasswordRef.current = { ...pending, password };
-            },
-          },
+          resetPassword: pendingPasswordRef.current,
           afterVerification: complete,
           afterVerificationCancelled: cancel,
         });

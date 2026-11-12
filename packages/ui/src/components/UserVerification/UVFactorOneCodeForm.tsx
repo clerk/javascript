@@ -1,3 +1,4 @@
+import { isKnownError } from '@clerk/shared/error';
 import { useSession } from '@clerk/shared/react';
 import type {
   EmailCodeFactor,
@@ -70,7 +71,14 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
     void session!
       .prepareFirstFactorVerification(props.factor)
       .then(() => props.onFactorPrepare())
-      .catch(err => handleError(err, [], card.setError));
+      .catch(err => {
+        // An older clerk-js throws a plain Error for a strategy it doesn't know (a newer ui's reset
+        // password code). Show it instead of leaving the user waiting for a code that was never sent.
+        if (!isKnownError(err)) {
+          return card.setError(err instanceof Error ? err.message : String(err));
+        }
+        return handleError(err, [], card.setError);
+      });
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {

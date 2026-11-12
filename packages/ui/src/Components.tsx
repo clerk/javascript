@@ -14,6 +14,7 @@ import type {
   GoogleOneTapProps,
   InviteMembersModalProps,
   OrganizationProfileModalProps,
+  ReverificationResult,
   SignInModalProps,
   SignInProps,
   SignUpModalProps,
@@ -468,8 +469,8 @@ const Components = (props: ComponentsProps) => {
             /**
              * When a UserVerification flow is completed, we need to close the modal without trigger a cancellation callback
              */
-            afterVerification() {
-              props.afterVerification?.();
+            afterVerification(result?: ReverificationResult) {
+              props.afterVerification?.(result);
               componentsControls.closeModal(name, { notify: false });
             },
           },

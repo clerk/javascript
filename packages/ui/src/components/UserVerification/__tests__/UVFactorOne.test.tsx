@@ -6,6 +6,7 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 
 import { clearFetchCache } from '../../../hooks';
+import { ResetPasswordAttemptProvider } from '../useResetPasswordAttempt';
 import { UserVerificationFactorOne } from '../UserVerificationFactorOne';
 import type { UserVerificationResetPassword } from '../utils';
 
@@ -304,7 +305,12 @@ describe('UserVerificationFactorOne', () => {
       fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({});
       fixtures.session?.attemptFirstFactorVerification.mockRejectedValueOnce(apiError('form_password_pwned'));
 
-      const utils = render(<UserVerificationFactorOne />, { wrapper });
+      const utils = render(
+        <ResetPasswordAttemptProvider>
+          <UserVerificationFactorOne />
+        </ResetPasswordAttemptProvider>,
+        { wrapper },
+      );
       await waitFor(() => utils.getByText('Verification required'));
       await utils.userEvent.type(utils.getByLabelText(/^password/i), 'breached');
       await utils.userEvent.click(utils.getByText('Continue'));
@@ -345,7 +351,11 @@ describe('UserVerificationFactorOne', () => {
       screen.getByText('Verification required');
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
 
-      await waitFor(() => expect(afterVerification).toHaveBeenCalled());
+      await waitFor(() =>
+        expect(afterVerification).toHaveBeenCalledWith({
+          passwordReset: { newPassword: 'a-much-better-password-123', signOutOfOtherSessions: true },
+        }),
+      );
       expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledOnce();
       expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledWith(resetFactor);
       expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenLastCalledWith({
@@ -415,7 +425,11 @@ describe('UserVerificationFactorOne', () => {
       screen.getByText('Enter the code sent to your email address to save your new password');
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
 
-      await waitFor(() => expect(afterVerification).toHaveBeenCalled());
+      await waitFor(() =>
+        expect(afterVerification).toHaveBeenCalledWith({
+          passwordReset: { newPassword: 'from-the-form-123', signOutOfOtherSessions: false },
+        }),
+      );
       expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenLastCalledWith({
         strategy: 'reset_password_email_code',
         code: '123456',
@@ -424,10 +438,9 @@ describe('UserVerificationFactorOne', () => {
       });
     });
 
-    it('reports a new password picked in the modal after the caller password was rejected', async () => {
-      const onPasswordChange = vi.fn();
+    it('resets with a new password picked in the modal after the caller password was rejected', async () => {
       const { userEvent, fixtures, afterVerification } = await submitPwnedPassword({
-        resetPassword: { password: 'from-the-form-123', signOutOfOtherSessions: false, onPasswordChange },
+        resetPassword: { password: 'from-the-form-123', signOutOfOtherSessions: false },
         resetButtonText: 'Email code to xxx@hello.com',
       });
       fixtures.session?.attemptFirstFactorVerification
@@ -444,17 +457,57 @@ describe('UserVerificationFactorOne', () => {
       await userEvent.clear(screen.getByLabelText(/^new password/i));
       await userEvent.clear(screen.getByLabelText(/^confirm password/i));
       await setNewPassword(userEvent, 'another-better-password-456');
-      expect(onPasswordChange).toHaveBeenCalledWith('another-better-password-456');
 
       await screen.findByText('Enter the code sent to your email address to save your new password');
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-      await waitFor(() => expect(afterVerification).toHaveBeenCalled());
+      await waitFor(() =>
+        expect(afterVerification).toHaveBeenCalledWith({
+          passwordReset: { newPassword: 'another-better-password-456', signOutOfOtherSessions: false },
+        }),
+      );
       expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenLastCalledWith({
         strategy: 'reset_password_email_code',
         code: '123456',
         password: 'another-better-password-456',
         signOutOfOtherSessions: false,
       });
+    });
+
+    it('reports no reset when the user tried one but verified with a plain code', async () => {
+      const { userEvent, fixtures, afterVerification } = await submitPwnedPassword();
+      fixtures.session?.attemptFirstFactorVerification
+        .mockRejectedValueOnce(apiError('form_new_password_matches_current'))
+        .mockResolvedValueOnce({
+          status: 'complete',
+          session: { id: 'sess_1' },
+          supportedFirstFactors: [],
+          firstFactorVerification: { strategy: 'email_code' },
+        });
+
+      // The reset attempt is rejected, then the user verifies with the plain email code
+      await reachResetCodeStep(userEvent);
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      await screen.findByText('Set new password');
+      await userEvent.click(screen.getByText('Back'));
+      await userEvent.click(await screen.findByText('Email code to xxx@hello.com'));
+      await userEvent.type(await screen.findByLabelText(/Enter verification code/i), '654321');
+
+      await waitFor(() => expect(afterVerification).toHaveBeenCalledWith({ passwordReset: undefined }));
+    });
+
+    it('shows the error when an older clerk-js rejects the reset password code strategy', async () => {
+      const { userEvent, fixtures } = await submitPwnedPassword();
+      // What clerk-js versions without the reset strategies throw from prepareFirstFactorVerification
+      fixtures.session?.prepareFirstFactorVerification.mockRejectedValueOnce(
+        new Error(
+          '🔒 Clerk: Strategy "reset_password_email_code" is not a valid strategy for Session.prepareFirstFactorVerification.',
+        ),
+      );
+
+      await userEvent.click(screen.getByText('Reset your password'));
+      await setNewPassword(userEvent, 'a-much-better-password-123');
+
+      await screen.findByText(/is not a valid strategy for Session.prepareFirstFactorVerification/);
     });
 
     it('goes back from the code step to the new password step, then to the breached screen, without old errors', async () => {
