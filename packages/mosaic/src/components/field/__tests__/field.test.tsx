@@ -18,6 +18,7 @@ const overrides = stylex.create({
   label: { fontWeight: 700 },
   description: { opacity: 0.8 },
   content: { gap: '4px' },
+  header: { columnGap: '4px' },
   error: { fontWeight: 600 },
 });
 
@@ -239,6 +240,32 @@ describe('Mosaic Field', () => {
     expect(checkbox).toBeChecked();
   });
 
+  it('keeps the label associated when it shares a header row with an action', async () => {
+    const onAction = vi.fn();
+    render(
+      <Field.Root>
+        <Field.Header data-testid='header'>
+          <Field.Label>Password</Field.Label>
+          <button
+            type='button'
+            onClick={onAction}
+          >
+            Forgot password?
+          </button>
+        </Field.Header>
+        <Input />
+      </Field.Root>,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Password' });
+    expect(screen.getByTestId('header')).toHaveClass('cl-field-header');
+    await userEvent.click(screen.getByRole('button', { name: 'Forgot password?' }));
+    expect(onAction).toHaveBeenCalledOnce();
+    expect(input).not.toHaveFocus();
+    await userEvent.click(screen.getByText('Password'));
+    expect(input).toHaveFocus();
+  });
+
   it('toggles a checkbox wrapped in its label', async () => {
     render(
       <Field.Root>
@@ -380,6 +407,7 @@ describe('Mosaic Field', () => {
     const labelRef = React.createRef<HTMLLabelElement>();
     const descriptionRef = React.createRef<HTMLParagraphElement>();
     const contentRef = React.createRef<HTMLDivElement>();
+    const headerRef = React.createRef<HTMLDivElement>();
     const errorRef = React.createRef<HTMLParagraphElement>();
 
     render(
@@ -403,6 +431,10 @@ describe('Mosaic Field', () => {
           ref={contentRef}
           data-content='field'
         />
+        <Field.Header
+          ref={headerRef}
+          data-header='field'
+        />
         <Field.Error
           ref={errorRef}
           role='status'
@@ -416,6 +448,7 @@ describe('Mosaic Field', () => {
     expect(labelRef.current).toHaveAttribute('for', 'name');
     expect(descriptionRef.current).toHaveAttribute('title', 'Help');
     expect(contentRef.current).toHaveAttribute('data-content', 'field');
+    expect(headerRef.current).toHaveAttribute('data-header', 'field');
     expect(errorRef.current).toHaveAttribute('role', 'status');
   });
 
@@ -431,12 +464,17 @@ describe('Mosaic Field', () => {
           xstyle={overrides.content}
           data-testid='content'
         />
+        <Field.Header
+          xstyle={overrides.header}
+          data-testid='header'
+        />
         <Field.Error xstyle={overrides.error}>Error</Field.Error>
       </Field.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveClass('cl-field-root', ...atoms(overrides.root));
     expect(screen.getByTestId('content')).toHaveClass('cl-field-content', ...atoms(overrides.content));
+    expect(screen.getByTestId('header')).toHaveClass('cl-field-header', ...atoms(overrides.header));
     expect(screen.getByText('Email')).toHaveClass('cl-field-label', ...atoms(overrides.label));
     expect(screen.getByText('Description')).toHaveClass('cl-field-description', ...atoms(overrides.description));
     expect(screen.getByText('Error').closest('p')).toHaveClass('cl-field-error', ...atoms(overrides.error));
@@ -471,6 +509,7 @@ describe('Mosaic Field', () => {
         <Field.Label render={props => <label {...props} />}>Biography</Field.Label>
         <Field.Description render={props => <div {...props} />}>Description</Field.Description>
         <Field.Content render={props => <section {...props} />}>Content</Field.Content>
+        <Field.Header render={props => <header {...props} />}>Header</Field.Header>
         <Field.Error render={props => <div {...props} />}>Error</Field.Error>
       </Field.Root>,
     );
@@ -478,6 +517,7 @@ describe('Mosaic Field', () => {
     expect(screen.getByText('Biography').closest('section')).not.toBeNull();
     expect(screen.getByText('Description').tagName).toBe('DIV');
     expect(screen.getByText('Content').tagName).toBe('SECTION');
+    expect(screen.getByText('Header').tagName).toBe('HEADER');
     expect(screen.getByText('Error').closest('div')).toHaveClass('cl-field-error');
   });
 
