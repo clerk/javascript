@@ -12,14 +12,14 @@ describe('getSignUpNextStep with the SignUp resource', () => {
 
   it('returns fields for a created sign-up with missing fields', () => {
     const signUp = new SignUp({
-      object: 'sign_up_attempt',
+      object: 'sign_up',
       id: 'sua_1',
       status: 'missing_requirements',
       required_fields: ['email_address', 'password'],
       optional_fields: [],
       missing_fields: ['password'],
       unverified_fields: [],
-      verifications: { email_address: null, phone_number: null, web3_wallet: null, external_account: null },
+      verifications: null,
       username: null,
       first_name: null,
       last_name: null,
@@ -35,6 +35,7 @@ describe('getSignUpNextStep with the SignUp resource', () => {
       abandon_at: null,
       legal_accepted_at: null,
       locale: null,
+      timezone: null,
     });
 
     expect(getSignUpNextStep(signUp.__internal_future)).toEqual({ type: 'fields', fields: ['password'] });
