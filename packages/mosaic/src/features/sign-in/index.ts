@@ -2,7 +2,7 @@ export { SignInView } from './sign-in.view';
 export type {
   SignInActionBlockedDetails,
   SignInFactor,
-  SignInSocialProvider,
+  SignInProvider,
   SignInStep,
   SignInSubmitEvent,
   SignInValues,

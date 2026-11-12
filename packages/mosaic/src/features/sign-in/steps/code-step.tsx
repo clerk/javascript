@@ -4,10 +4,14 @@ import type { VerificationCodeMessages, VerificationCodeResend } from '../../../
 import { VerificationCode } from '../../../blocks/verification';
 import type { UseFormResult } from '../../../components/form';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface CodeStepProps {
   messages: VerificationCodeMessages;
   resend?: VerificationCodeResend;
+  identity: { identifier?: string; editLabel: string };
+  notice?: string;
+  onEditIdentifier: () => void;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
@@ -21,6 +25,9 @@ interface CodeStepProps {
 export function CodeStep({
   messages,
   resend,
+  identity,
+  notice,
+  onEditIdentifier,
   form,
   errorMessage,
   globalErrorMessage,
@@ -41,6 +48,17 @@ export function CodeStep({
       globalErrorMessage={globalErrorMessage}
       isPending={isPending}
       resend={resend}
+      identity={
+        identity.identifier ? (
+          <SignInIdentityPreview
+            identifier={identity.identifier}
+            editLabel={identity.editLabel}
+            disabled={isPending}
+            onEdit={onEditIdentifier}
+          />
+        ) : undefined
+      }
+      notice={notice}
       onValueChange={onValueChange}
       onComplete={onCodeComplete}
       onSubmit={() => onSubmit()}

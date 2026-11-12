@@ -21,14 +21,23 @@ export type SignInStep =
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
-      purpose: 'first-factor' | 'second-factor' | 'reset-password' | 'verify-email';
+      purpose:
+        | 'first-factor'
+        | 'second-factor'
+        | 'client-trust'
+        | 'sso-bypass'
+        | 'reset-password'
+        | 'verify-email'
+        | 'verify-phone';
       channel: SignInCodeChannel;
       identifier?: string;
+      provider?: string;
     }
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
+  | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' }
@@ -42,7 +51,7 @@ export interface SignInActionBlockedDetails {
   traceId?: string;
 }
 
-export interface SignInSocialProvider {
+export interface SignInProvider {
   id: string;
   name: string;
   iconUrl: string;
@@ -70,7 +79,7 @@ export interface SignInViewProps {
   applicationName: string;
   applicationLogoUrl?: string;
   combined: boolean;
-  socialProviders: readonly SignInSocialProvider[];
+  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   form: UseFormResult<SignInValues>;
