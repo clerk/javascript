@@ -1,6 +1,7 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { Ref } from 'react';
+import React, { type Ref } from 'react';
 
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
@@ -115,6 +116,7 @@ function IdentifierStart({
   const identifierRef = useMergeRefs<HTMLElement>([identifierFieldRef, focusRef, autoFocusRef]);
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, autoFocusRef]);
   const copy = identifierFieldCopy(field, m);
+  const [isChallengeShown, setIsChallengeShown] = React.useState(false);
   const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
 
   return (
@@ -139,62 +141,67 @@ function IdentifierStart({
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
-        <SignInProviders
-          providers={socialProviders}
-          pendingProviderId={pendingProviderId}
-          lastUsedProviderId={lastUsedProviderId}
-          isDisabled={isDisabled}
-          onSelectProvider={onSelectProvider}
-        />
-        <Form
-          id={form.id}
-          onSubmit={onSubmit}
+        <div
+          {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
+          {...inertProps(isChallengeShown)}
         >
-          <Field.Root
-            required
-            invalid={feedback?.type === 'error'}
-            disabled={isDisabled}
-            focusableWhenDisabled
+          <SignInProviders
+            providers={socialProviders}
+            pendingProviderId={pendingProviderId}
+            lastUsedProviderId={lastUsedProviderId}
+            isDisabled={isDisabled}
+            onSelectProvider={onSelectProvider}
+          />
+          <Form
+            id={form.id}
+            onSubmit={onSubmit}
           >
-            <Field.Header>
-              <Field.Label>{copy.label}</Field.Label>
-              {nextField && onSwitchField ? (
-                <Button
-                  type='button'
-                  size='sm'
-                  variant='link'
-                  disabled={isDisabled}
-                  onClick={onSwitchField}
-                >
-                  {identifierFieldCopy(nextField, m).switchLabel}
-                </Button>
-              ) : lastUsed ? (
-                <Badge color='neutral'>{m.start.lastUsed}</Badge>
-              ) : null}
-            </Field.Header>
-            {field === 'phone' ? (
-              <PhoneInput
-                ref={phoneRef}
-                autoComplete='tel webauthn'
-                placeholder={copy.placeholder}
-                countryTriggerLabel={m.start.selectedCountry}
-                countryPopupLabel={m.start.chooseCountry}
-                countrySearchLabel={m.start.searchCountries}
-                {...phone}
-              />
-            ) : (
-              <Input
-                ref={identifierRef}
-                type={field === 'email' ? 'email' : 'text'}
-                autoComplete={field === 'email' ? 'email webauthn' : 'username webauthn'}
-                placeholder={copy.placeholder}
-                {...identifier}
-              />
-            )}
-            <Field.Feedback feedback={feedback} />
-          </Field.Root>
-        </Form>
-        <Captcha />
+            <Field.Root
+              required
+              invalid={feedback?.type === 'error'}
+              disabled={isDisabled}
+              focusableWhenDisabled
+            >
+              <Field.Header>
+                <Field.Label>{copy.label}</Field.Label>
+                {nextField && onSwitchField ? (
+                  <Button
+                    type='button'
+                    size='sm'
+                    variant='link'
+                    disabled={isDisabled}
+                    onClick={onSwitchField}
+                  >
+                    {identifierFieldCopy(nextField, m).switchLabel}
+                  </Button>
+                ) : lastUsed ? (
+                  <Badge color='neutral'>{m.start.lastUsed}</Badge>
+                ) : null}
+              </Field.Header>
+              {field === 'phone' ? (
+                <PhoneInput
+                  ref={phoneRef}
+                  autoComplete='tel webauthn'
+                  placeholder={copy.placeholder}
+                  countryTriggerLabel={m.start.selectedCountry}
+                  countryPopupLabel={m.start.chooseCountry}
+                  countrySearchLabel={m.start.searchCountries}
+                  {...phone}
+                />
+              ) : (
+                <Input
+                  ref={identifierRef}
+                  type={field === 'email' ? 'email' : 'text'}
+                  autoComplete={field === 'email' ? 'email webauthn' : 'username webauthn'}
+                  placeholder={copy.placeholder}
+                  {...identifier}
+                />
+              )}
+              <Field.Feedback feedback={feedback} />
+            </Field.Root>
+          </Form>
+        </div>
+        <Captcha onInteractiveChange={setIsChallengeShown} />
         {onPasskey ? (
           <Button
             type='button'
@@ -213,7 +220,10 @@ function IdentifierStart({
           isDisabled={isDisabled}
         />
       </Card.Content>
-      <Card.Footer>
+      <Card.Footer
+        xstyle={isChallengeShown && styles.spotlightHidden}
+        {...inertProps(isChallengeShown)}
+      >
         <SubmitButton
           form={form.id}
           fullWidth
