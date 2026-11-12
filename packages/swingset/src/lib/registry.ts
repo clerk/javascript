@@ -36,6 +36,7 @@ import {
   meta as bannerMeta,
 } from '../stories/banner.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import {
   Default as CheckboxDefault,
@@ -996,6 +997,11 @@ const fieldModule: StoryModule = {
   VisuallyHiddenLabel: FieldVisuallyHiddenLabel,
 };
 
+const captchaModule: StoryModule = {
+  meta: captchaMeta,
+  Default: CaptchaDefault,
+};
+
 const visuallyHiddenModule: StoryModule = {
   meta: visuallyHiddenMeta,
   Default: VisuallyHiddenDefault,
@@ -1442,6 +1448,7 @@ export const registry: StoryModule[] = [
   toastModule,
   tooltipComponentModule,
   fieldModule,
+  captchaModule,
   visuallyHiddenModule,
   // Primitives
   accordionModule,
