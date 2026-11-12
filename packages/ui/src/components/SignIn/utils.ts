@@ -1,22 +1,9 @@
-import type {
-  PhoneCodeChannel,
-  PreferredSignInStrategy,
-  SignInFactor,
-  SignInResource,
-  SignInStrategy,
-} from '@clerk/shared/types';
+import type { PhoneCodeChannel, SignInFactor, SignInResource, SignInStrategy } from '@clerk/shared/types';
 import { titleize } from '@clerk/shared/underscore';
 
 import { isEmail } from '@/ui/utils/emailUtils';
 import { getPreferredPhoneCodeChannelByCountry } from '@/ui/utils/phoneUtils';
 import type { FormControlState } from '@/ui/utils/useFormControl';
-
-import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
-import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
-
-const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
-  return 'safeIdentifier' in f && f.safeIdentifier === i;
-};
 
 export function isOfferableSecondFactor(factor: { strategy: SignInStrategy }, webAuthnSupported: boolean): boolean {
   return factor.strategy !== 'passkey' || webAuthnSupported;
@@ -32,60 +19,6 @@ function findPasskeyStrategy(factors: SignInFactor[], webAuthnSupported: boolean
     }
   }
   return null;
-}
-
-function determineStrategyWhenPasswordIsPreferred(
-  factors: SignInFactor[],
-  identifier: string | null,
-  webAuthnSupported: boolean,
-): SignInFactor | null {
-  const passkeyFactor = findPasskeyStrategy(factors, webAuthnSupported);
-  if (passkeyFactor) {
-    return passkeyFactor;
-  }
-  const selected = factors.sort(passwordPrefFactorComparator)[0];
-  if (selected.strategy === 'password') {
-    return selected;
-  }
-  return factors.find(factorForIdentifier(identifier)) || selected || null;
-}
-
-function determineStrategyWhenOTPIsPreferred(
-  factors: SignInFactor[],
-  identifier: string | null,
-  webAuthnSupported: boolean,
-): SignInFactor | null {
-  const passkeyFactor = findPasskeyStrategy(factors, webAuthnSupported);
-  if (passkeyFactor) {
-    return passkeyFactor;
-  }
-  const sortedBasedOnPrefFactor = factors.sort(otpPrefFactorComparator);
-  const forIdentifier = sortedBasedOnPrefFactor.find(factorForIdentifier(identifier));
-  if (forIdentifier) {
-    return forIdentifier;
-  }
-  const firstBasedOnPref = sortedBasedOnPrefFactor[0];
-  if (firstBasedOnPref.strategy === 'email_link') {
-    return firstBasedOnPref;
-  }
-  return factors.find(factorForIdentifier(identifier)) || firstBasedOnPref || null;
-}
-
-// The algorithm can be found at
-// https://www.notion.so/clerkdev/Implement-sign-in-alt-methods-e6e60ffb644645b3a0553b50556468ce
-export function determineStartingSignInFactor(
-  firstFactors: SignInFactor[] | null,
-  identifier: string | null,
-  preferredSignInStrategy: PreferredSignInStrategy,
-  webAuthnSupported: boolean,
-): SignInFactor | null | undefined {
-  if (!firstFactors || firstFactors.length === 0) {
-    return null;
-  }
-
-  return preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Password
-    ? determineStrategyWhenPasswordIsPreferred(firstFactors, identifier, webAuthnSupported)
-    : determineStrategyWhenOTPIsPreferred(firstFactors, identifier, webAuthnSupported);
 }
 
 export function determineSalutation(signIn: Partial<SignInResource>): string {

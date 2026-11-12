@@ -1,3 +1,4 @@
+import { determineStartingSignInFactor } from '@clerk/shared/internal/clerk-js/signInFactors';
 import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
@@ -26,7 +27,7 @@ import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { SignInFactorOneSSOBypass } from './SignInFactorOneSSOBypass';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
-import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
+import { factorHasLocalStrategy } from './utils';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {
