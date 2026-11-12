@@ -18,7 +18,6 @@ const overrides = stylex.create({
   label: { fontWeight: 700 },
   description: { opacity: 0.8 },
   content: { gap: '4px' },
-  header: { columnGap: '4px' },
   error: { fontWeight: 600 },
 });
 
@@ -244,7 +243,7 @@ describe('Mosaic Field', () => {
     const onAction = vi.fn();
     render(
       <Field.Root>
-        <Field.Header data-testid='header'>
+        <Field.Header>
           <Field.Label>Password</Field.Label>
           <button
             type='button'
@@ -258,7 +257,6 @@ describe('Mosaic Field', () => {
     );
 
     const input = screen.getByRole('textbox', { name: 'Password' });
-    expect(screen.getByTestId('header')).toHaveClass('cl-field-header');
     await userEvent.click(screen.getByRole('button', { name: 'Forgot password?' }));
     expect(onAction).toHaveBeenCalledOnce();
     expect(input).not.toHaveFocus();
@@ -464,17 +462,12 @@ describe('Mosaic Field', () => {
           xstyle={overrides.content}
           data-testid='content'
         />
-        <Field.Header
-          xstyle={overrides.header}
-          data-testid='header'
-        />
         <Field.Error xstyle={overrides.error}>Error</Field.Error>
       </Field.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveClass('cl-field-root', ...atoms(overrides.root));
     expect(screen.getByTestId('content')).toHaveClass('cl-field-content', ...atoms(overrides.content));
-    expect(screen.getByTestId('header')).toHaveClass('cl-field-header', ...atoms(overrides.header));
     expect(screen.getByText('Email')).toHaveClass('cl-field-label', ...atoms(overrides.label));
     expect(screen.getByText('Description')).toHaveClass('cl-field-description', ...atoms(overrides.description));
     expect(screen.getByText('Error').closest('p')).toHaveClass('cl-field-error', ...atoms(overrides.error));
