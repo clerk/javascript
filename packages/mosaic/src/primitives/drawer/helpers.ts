@@ -31,21 +31,6 @@ export function getSnapPointSwipeMovement(baseOffset: number, movementValue: num
 }
 
 /**
- * Best-effort iOS detection. Used only to work around iOS not dispatching
- * `pointerup` after a scroll-cancelled gesture; never reached in happy-dom.
- */
-export function isIOS(): boolean {
-  if (typeof navigator === 'undefined') {
-    return false;
-  }
-  return (
-    /iP(hone|ad|od)/.test(navigator.platform) ||
-    // iPadOS 13+ reports as a Mac, so additionally check for touch support.
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  );
-}
-
-/**
  * Pointer capture that tolerates environments/states where it is unavailable.
  * happy-dom may not implement `set/releasePointerCapture` (calling an absent
  * method would throw `TypeError`), and releasing a pointer that was never

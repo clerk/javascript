@@ -3,6 +3,7 @@ export type {
   ComboboxCollectionProps,
   ComboboxArrowProps,
   ComboboxClearProps,
+  ComboboxEmptyProps,
   ComboboxInputProps,
   ComboboxListProps,
   ComboboxOptionProps,

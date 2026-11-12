@@ -13,3 +13,4 @@ export {
   ComboboxOptionIndicator as OptionIndicator,
 } from './combobox-option-indicator';
 export { type ComboboxArrowProps, ComboboxArrow as Arrow } from './combobox-arrow';
+export { type ComboboxEmptyProps, ComboboxEmpty as Empty } from './combobox-empty';

@@ -114,8 +114,14 @@ export const styles = stylex.create({
     },
   },
   empty: {
-    paddingBlock: space['6'],
-    paddingInline: space['3'],
+    paddingBlock: {
+      default: space['6'],
+      ':empty': 0,
+    },
+    paddingInline: {
+      default: space['3'],
+      ':empty': 0,
+    },
     color: colorVars['--cl-color-foreground-secondary'],
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],

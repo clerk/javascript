@@ -5,16 +5,14 @@ import type { ReactNode } from 'react';
 import { useComboboxContext } from './combobox-context';
 
 export interface ComboboxCollectionProps<Item> {
-  items: readonly Item[];
-  itemToStringLabel: (item: Item) => string;
+  /** Renders one matching item. Annotate `item` with the type of `Root`'s `items`. */
   children: (item: Item) => ReactNode;
-  empty?: ReactNode;
 }
 
-/** Filters items using the search query rather than the selected label. */
-export function ComboboxCollection<Item>({ items, itemToStringLabel, children, empty }: ComboboxCollectionProps<Item>) {
-  const { filterQuery } = useComboboxContext();
-  const query = filterQuery.trim().toLocaleLowerCase();
-  const filtered = query ? items.filter(item => itemToStringLabel(item).toLocaleLowerCase().includes(query)) : items;
-  return <>{filtered.length ? filtered.map(children) : empty}</>;
+/** Renders the root's `items` that match the search query rather than the selected label. */
+export function ComboboxCollection<Item>({ children }: ComboboxCollectionProps<Item>) {
+  const { filteredItems } = useComboboxContext();
+  // eslint-disable-next-line typescript/consistent-type-assertions -- Context cannot carry Root's item type to a sibling; the caller annotates `children` with it.
+  const items = filteredItems as readonly Item[];
+  return <>{items.map(children)}</>;
 }
