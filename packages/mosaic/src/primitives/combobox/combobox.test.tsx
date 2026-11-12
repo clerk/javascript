@@ -177,6 +177,87 @@ describe('Combobox', () => {
     anchor.remove();
   });
 
+  describe('input group', () => {
+    function GroupedCombobox({ anchor }: { anchor?: HTMLElement }) {
+      return (
+        <Combobox.Root>
+          <Combobox.InputGroup data-testid='group'>
+            <Combobox.Input aria-label='Fruit' />
+            <span data-testid='end'>kg</span>
+          </Combobox.InputGroup>
+          <Combobox.Positioner anchor={anchor}>
+            <Combobox.Popup>
+              <Combobox.Option value='apple'>Apple</Combobox.Option>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Root>
+      );
+    }
+
+    it('positions the popup against the group', async () => {
+      const user = userEvent.setup();
+      render(<GroupedCombobox />);
+      const measureGroup = vi.spyOn(screen.getByTestId('group'), 'getBoundingClientRect');
+
+      await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+
+      await waitFor(() => expect(measureGroup).toHaveBeenCalled());
+    });
+
+    it('lets an explicit anchor win over the group', async () => {
+      const user = userEvent.setup();
+      const anchor = document.createElement('div');
+      document.body.append(anchor);
+      const measureAnchor = vi.spyOn(anchor, 'getBoundingClientRect');
+      render(<GroupedCombobox anchor={anchor} />);
+      const measureGroup = vi.spyOn(screen.getByTestId('group'), 'getBoundingClientRect');
+
+      await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+
+      await waitFor(() => expect(measureAnchor).toHaveBeenCalled());
+      expect(measureGroup).not.toHaveBeenCalled();
+      anchor.remove();
+    });
+
+    it('stays open when the group padding or an end slot is pressed', async () => {
+      const user = userEvent.setup();
+      render(<GroupedCombobox />);
+      const input = screen.getByRole('combobox', { name: 'Fruit' });
+      await user.type(input, 'a');
+
+      await user.click(screen.getByTestId('group'));
+      await user.click(screen.getByTestId('end'));
+      expect(input).toHaveAttribute('aria-expanded', 'true');
+
+      await user.click(document.body);
+      expect(input).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('leaves an inline list working inside a group', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      render(
+        <Combobox.Root
+          inline
+          open
+          onValueChange={onValueChange}
+        >
+          <Combobox.InputGroup data-testid='group'>
+            <Combobox.Input aria-label='Fruit' />
+          </Combobox.InputGroup>
+          <Combobox.List>
+            <Combobox.Option value='apple'>Apple</Combobox.Option>
+          </Combobox.List>
+        </Combobox.Root>,
+      );
+
+      await user.click(screen.getByTestId('group'));
+      await user.click(screen.getByRole('option', { name: 'Apple' }));
+
+      expect(onValueChange).toHaveBeenCalledWith('apple');
+    });
+  });
+
   it('toggles from a popup button while keeping focus on the input', async () => {
     const user = userEvent.setup();
     const triggerProps: ComboboxTriggerProps = { 'aria-label': 'Toggle fruit options' };

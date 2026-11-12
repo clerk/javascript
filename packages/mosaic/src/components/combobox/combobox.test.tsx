@@ -14,7 +14,7 @@ import { Combobox } from './combobox';
 function FloatingCombobox(props?: { onValueChange?: (value: string | null) => void; anchor?: HTMLElement }) {
   return (
     <Combobox.Root onValueChange={props?.onValueChange}>
-      <InputGroup.Root data-testid='fruit-group'>
+      <Combobox.InputGroup data-testid='fruit-group'>
         <Combobox.Input
           aria-label='Fruit'
           placeholder='Search fruit'
@@ -30,7 +30,7 @@ function FloatingCombobox(props?: { onValueChange?: (value: string | null) => vo
             />
           </Combobox.Trigger>
         </InputGroup.End>
-      </InputGroup.Root>
+      </Combobox.InputGroup>
       <Combobox.Popup anchor={props?.anchor}>
         <Combobox.Option
           value='apple'
@@ -118,6 +118,18 @@ describe('Mosaic Combobox', () => {
 
     await waitFor(() => expect(measureGroup).toHaveBeenCalled());
     expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
+  });
+
+  it('stays open when the input group padding is pressed', async () => {
+    const user = userEvent.setup();
+    render(<FloatingCombobox />);
+    const input = screen.getByRole('combobox', { name: 'Fruit' });
+    await user.click(screen.getByRole('button', { name: 'Toggle fruit options' }));
+
+    await user.click(screen.getByTestId('fruit-group'));
+
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).toHaveFocus();
   });
 
   it('opens its options from a composed trigger', async () => {
@@ -400,13 +412,13 @@ describe('Mosaic Combobox', () => {
         defaultInputValue='Apple'
         onValueChange={props?.onValueChange}
       >
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input aria-label='Fruit' />
           <InputGroup.End>
             <Combobox.Clear />
             <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
         <Combobox.Popup>
           <Combobox.Option
             value='apple'
@@ -435,12 +447,12 @@ describe('Mosaic Combobox', () => {
     const user = userEvent.setup();
     render(
       <Combobox.Root>
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input aria-label='Fruit' />
           <InputGroup.End>
             <Combobox.Clear />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
       </Combobox.Root>,
     );
 

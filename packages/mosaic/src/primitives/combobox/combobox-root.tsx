@@ -141,6 +141,7 @@ function ComboboxInner<Item>(props: ComboboxProps<Item>) {
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [inputGroup, setInputGroup] = useState<HTMLElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
   const registerOption = useCallback((index: number) => {
     if (index === 0 && highlightFirstRef.current) {
@@ -210,7 +211,7 @@ function ComboboxInner<Item>(props: ComboboxProps<Item>) {
         return false;
       }
       const target = event.target;
-      return !(target instanceof Node && triggerRef.current?.contains(target));
+      return !(target instanceof Node && (triggerRef.current?.contains(target) || inputGroup?.contains(target)));
     },
     bubbles: {
       escapeKey: inlineMode,
@@ -299,6 +300,8 @@ function ComboboxInner<Item>(props: ComboboxProps<Item>) {
       labelsRef,
       popupRef,
       triggerRef,
+      inputGroup,
+      setInputGroup,
       arrowRef,
       valuesByIndexRef,
       setInlineMode,
@@ -324,6 +327,8 @@ function ComboboxInner<Item>(props: ComboboxProps<Item>) {
       getFloatingProps,
       activeIndex,
       selectedIndex,
+      inputGroup,
+      setInputGroup,
       handleSelect,
       handleInputChange,
       setOpen,

@@ -30,13 +30,13 @@ export function Default() {
     >
       <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Fruit</Field.Label>
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Clear aria-label='Clear fruit' />
             <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
       </Field.Root>
       <Combobox.Popup>
         <Combobox.Empty>No fruit found</Combobox.Empty>
@@ -67,13 +67,13 @@ export function Scrolling() {
     >
       <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Fruit</Field.Label>
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Clear aria-label='Clear fruit' />
             <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
       </Field.Root>
       <Combobox.Popup>
         <Combobox.Empty>No fruit found</Combobox.Empty>
@@ -110,12 +110,12 @@ export function OptionParts() {
     >
       <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Currency</Field.Label>
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input placeholder='Search currencies…' />
           <InputGroup.End>
             <Combobox.Trigger aria-label='Toggle currency options' />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
       </Field.Root>
       <Combobox.Popup>
         <Combobox.Empty>No currency found</Combobox.Empty>
