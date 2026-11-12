@@ -54,7 +54,7 @@ export function Default() {
           <button
             type='button'
             onClick={() => {
-              void cropImage(SAMPLE, crop, { size: 128, type: 'image/png' }).then(blob =>
+              void cropImage(SAMPLE, crop, { type: 'image/png', size: () => 128 }).then(blob =>
                 setResult(URL.createObjectURL(blob)),
               );
             }}
