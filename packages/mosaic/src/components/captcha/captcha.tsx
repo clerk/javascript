@@ -4,6 +4,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useRender } from '../../primitives/utils';
+import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
