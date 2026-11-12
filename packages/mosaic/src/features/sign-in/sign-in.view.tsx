@@ -45,9 +45,14 @@ function choiceCopy(
   step: Extract<SignInStep, { kind: 'choice' }>,
   m: Messages,
 ): { title: string; description: string } {
-  return step.purpose === 'reset-methods'
-    ? { title: m.resetMethods.title, description: m.resetMethods.description }
-    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
+  switch (step.purpose) {
+    case 'methods':
+      return { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
+    case 'reset-methods':
+      return { title: m.resetMethods.title, description: m.resetMethods.description };
+    case 'enterprise-connections':
+      return { title: m.enterpriseConnections.title, description: m.enterpriseConnections.description };
+  }
 }
 
 export function SignInView({
@@ -197,7 +202,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={['choice:methods', 'choice:reset-methods']}>
+              <Flow.Step ids={['choice:methods', 'choice:reset-methods', 'choice:enterprise-connections']}>
                 {current.kind === 'choice' ? (
                   <ChoiceStep
                     focusRef={focusRef}
@@ -213,6 +218,11 @@ export function SignInView({
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}
                     onBack={onBack}
+                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    globalErrorMessage={globalErrorMessage}
+                    pendingProviderId={pendingProviderId}
+                    onSelectProvider={onSelectProvider}
+                    onCancel={onCancel}
                   />
                 ) : null}
               </Flow.Step>
@@ -243,8 +253,6 @@ export function SignInView({
                     onEditIdentifier={onEditIdentifier}
                     onForgotPassword={onForgotPassword}
                     onCancel={onCancel}
-                    pendingProviderId={pendingProviderId}
-                    onSelectProvider={onSelectProvider}
                   />
                 ) : null}
               </Flow.Step>

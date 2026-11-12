@@ -342,6 +342,7 @@ import {
   meta as separatorMeta,
 } from '../stories/separator.stories';
 import {
+  ChoiceEnterpriseConnections as SignInChoiceEnterpriseConnections,
   ChoiceMethods as SignInChoiceMethods,
   ChoiceResetMethods as SignInChoiceResetMethods,
   CodeAlternativePhoneChannel as SignInCodeAlternativePhoneChannel,
@@ -373,7 +374,6 @@ import {
   NewPasswordReset as SignInNewPasswordReset,
   NoticeActionBlocked as SignInNoticeActionBlocked,
   NoticeEmailLinkSent as SignInNoticeEmailLinkSent,
-  NoticeEnterpriseConnections as SignInNoticeEnterpriseConnections,
   NoticeEnterpriseSso as SignInNoticeEnterpriseSso,
   NoticeForgotPassword as SignInNoticeForgotPassword,
   NoticeForgotPasswordPending as SignInNoticeForgotPasswordPending,
@@ -1303,7 +1303,6 @@ const signInModule: StoryModule = {
   CodeClientTrust: SignInCodeClientTrust,
   CodeVerifyPhone: SignInCodeVerifyPhone,
   NoticeEnterpriseSso: SignInNoticeEnterpriseSso,
-  NoticeEnterpriseConnections: SignInNoticeEnterpriseConnections,
   CodePhone: SignInCodePhone,
   CodeAlternativePhoneChannel: SignInCodeAlternativePhoneChannel,
   CodeSecondFactorPhone: SignInCodeSecondFactorPhone,
@@ -1313,6 +1312,7 @@ const signInModule: StoryModule = {
   CodeResetPasswordPhone: SignInCodeResetPasswordPhone,
   CodeVerifyEmail: SignInCodeVerifyEmail,
   ChoiceMethods: SignInChoiceMethods,
+  ChoiceEnterpriseConnections: SignInChoiceEnterpriseConnections,
   ChoiceResetMethods: SignInChoiceResetMethods,
   NoticeHelp: SignInNoticeHelp,
   NoticeForgotPassword: SignInNoticeForgotPassword,

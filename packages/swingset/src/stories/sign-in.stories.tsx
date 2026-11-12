@@ -661,22 +661,6 @@ export function NoticeEnterpriseSso() {
   );
 }
 
-export function NoticeEnterpriseConnections() {
-  return (
-    <StepPanel
-      step={{
-        kind: 'notice',
-        purpose: 'enterprise-sso',
-        connections: [
-          { id: 'okta', name: 'Acme Okta', iconUrl: 'https://img.clerk.com/static/okta.svg' },
-          { id: 'entra', name: 'Acme Contractors (Entra ID)', iconUrl: 'https://img.clerk.com/static/microsoft.svg' },
-        ],
-      }}
-      combined={false}
-    />
-  );
-}
-
 export function CodeClientTrust() {
   return <StepPanel step={{ kind: 'code', purpose: 'client-trust', channel: 'email', identifier: IDENTIFIER }} />;
 }
@@ -697,6 +681,22 @@ export function CodeVerifyEmail() {
 
 export function ChoiceMethods() {
   return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
+}
+
+export function ChoiceEnterpriseConnections() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'choice',
+        purpose: 'enterprise-connections',
+        options: [
+          { id: 'okta', name: 'Acme Okta', iconUrl: 'https://img.clerk.com/static/okta.svg' },
+          { id: 'entra', name: 'Acme Contractors (Entra ID)', iconUrl: 'https://img.clerk.com/static/microsoft.svg' },
+        ],
+      }}
+      combined={false}
+    />
+  );
 }
 
 export function ChoiceResetMethods() {
