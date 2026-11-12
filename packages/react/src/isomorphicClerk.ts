@@ -604,6 +604,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
+      // Attach an already loaded instance before the first await so the provider's initial render sees its current status.
+      // An explicit Clerk JS URL still takes precedence over the supplied instance.
+      if (
+        this.options.Clerk &&
+        !this.options.__internal_clerkJSUrl &&
+        !isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk) &&
+        this.options.Clerk.loaded
+      ) {
+        globalThis.Clerk = this.options.Clerk;
+        this.replayInterceptedInvocations(this.options.Clerk);
+        return;
+      }
+
       const clerk = await this.getClerkJsEntryChunk();
 
       if (!clerk.loaded) {
