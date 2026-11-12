@@ -25,6 +25,12 @@ describe('Captcha color scheme', () => {
     expect(container.querySelector('#clerk-captcha')).toHaveAttribute('data-cl-theme', 'light');
   });
 
+  it('uses the light theme when no color scheme is set', () => {
+    const { container } = render(<Captcha />);
+
+    expect(container.querySelector('#clerk-captcha')).toHaveAttribute('data-cl-theme', 'light');
+  });
+
   it('leaves the theme to Turnstile when the color scheme follows the visitor', () => {
     const { container } = render(
       <div style={{ colorScheme: 'light dark' }}>

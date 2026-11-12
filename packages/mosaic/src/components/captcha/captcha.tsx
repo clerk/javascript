@@ -10,7 +10,7 @@ import { reset } from '../../styles/reset.styles';
 import { styles } from './captcha.styles';
 
 export interface CaptchaProps extends Omit<MosaicComponentProps<'div'>, 'id' | 'children'> {
-  /** The Turnstile widget's theme. When unset, it follows the `color-scheme` the element renders in: `dark` or `light` when one is set, otherwise the visitor's color scheme. */
+  /** The Turnstile widget's theme. When unset, it matches the `color-scheme` the element renders in: `dark`, `light` (also when none is set), or the visitor's color scheme when both are allowed. */
   theme?: 'auto' | 'light' | 'dark';
   /** The Turnstile widget's size. Turnstile uses `normal` when it is unset. */
   size?: 'normal' | 'flexible' | 'compact';
@@ -58,11 +58,8 @@ export const Captcha = React.forwardRef<HTMLDivElement, CaptchaProps>(function M
 
 function themeFromColorScheme(colorScheme: string): CaptchaProps['theme'] {
   const schemes = colorScheme.split(/\s+/);
-  if (schemes.includes('dark') && !schemes.includes('light')) {
-    return 'dark';
-  }
-  if (schemes.includes('light') && !schemes.includes('dark')) {
+  if (!schemes.includes('dark')) {
     return 'light';
   }
-  return 'auto';
+  return schemes.includes('light') ? 'auto' : 'dark';
 }
