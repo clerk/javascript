@@ -4,6 +4,7 @@ import type { Ref } from 'react';
 
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
+import { Captcha } from '../../../components/captcha';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -191,6 +192,7 @@ function IdentifierStart({
             <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>
+        <Captcha />
         {onPasskey ? (
           <Button
             type='button'

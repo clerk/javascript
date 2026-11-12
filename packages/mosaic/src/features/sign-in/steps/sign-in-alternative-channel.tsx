@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
+import { Captcha } from '../../../components/captcha';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -98,6 +99,7 @@ export function SignInAlternativeChannel({
             <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>
+        <Captcha />
       </Card.Content>
       <Card.Footer>
         {onCancel ? (

@@ -12,6 +12,7 @@ import type {
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 import { useRef, useState } from 'react';
 
+import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './sign-in.stories?raw';
@@ -651,6 +652,16 @@ export function IdentifierLastUsed() {
 
 export function IdentifierLastUsedField() {
   return <StepPanel step={{ kind: 'identifier', field: 'email', lastUsed: true }} />;
+}
+
+export function IdentifierCaptcha() {
+  const ref = useRef<HTMLDivElement>(null);
+  useTestTurnstile(() => ref.current?.querySelector<HTMLElement>('.cl-captcha'));
+  return (
+    <div ref={ref}>
+      <StepPanel step={{ kind: 'identifier', field: 'email' }} />
+    </div>
+  );
 }
 
 export function IdentifierEmailOrUsername() {
