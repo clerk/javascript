@@ -7,6 +7,7 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { styles } from './captcha.styles';
 
 export interface CaptchaProps extends Omit<MosaicComponentProps<'div'>, 'id' | 'children'> {
   /** The Turnstile widget's theme. When unset, it follows the `color-scheme` the element renders in: `dark` or `light` when one is set, otherwise the visitor's color scheme. */
@@ -20,8 +21,9 @@ export interface CaptchaProps extends Omit<MosaicComponentProps<'div'>, 'id' | '
 /**
  * The element clerk-js renders Cloudflare Turnstile into when a sign-in or sign-up requires a
  * CAPTCHA. It stays empty and collapsed unless Turnstile asks the visitor to solve an interactive
- * challenge, when clerk-js expands it and sets `data-cl-interactive`. Render one per page, mounted
- * before the sign-in or sign-up is created.
+ * challenge, when clerk-js expands it and sets `data-cl-interactive`. Until then it is out of the
+ * layout, so it adds no gap to a flex parent. Render one per page, mounted before the sign-in or
+ * sign-up is created.
  *
  * @example
  * <Captcha theme='dark' />
@@ -45,7 +47,7 @@ export const Captcha = React.forwardRef<HTMLDivElement, CaptchaProps>(function M
     render,
     ref: [ref, setElement],
     props: {
-      ...mergeStyleProps(themeProps('captcha'), stylex.props(reset.base, xstyle), rest),
+      ...mergeStyleProps(themeProps('captcha'), stylex.props(reset.base, styles.root, xstyle), rest),
       id: CAPTCHA_ELEMENT_ID,
       'data-cl-theme': theme ?? schemeTheme,
       'data-cl-size': size,
