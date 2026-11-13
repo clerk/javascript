@@ -104,6 +104,8 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
       return { kind: 'code', purpose: 'second-factor', channel: 'totp' };
     case 'email_code':
       return { kind: 'code', purpose: 'first-factor', channel: 'email', identifier: factor.identifier };
+    case 'email_link':
+      return { kind: 'notice', purpose: 'email-link', identifier: factor.identifier };
     case 'phone_code':
       return {
         kind: 'code',
@@ -495,6 +497,7 @@ function StepPanel({
   onJoinWaitlist,
   passwordFeedback,
   onRetry,
+  password,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -513,6 +516,7 @@ function StepPanel({
   onJoinWaitlist?: () => void;
   passwordFeedback?: FieldFeedback;
   onRetry?: () => void;
+  password?: string;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -520,7 +524,7 @@ function StepPanel({
       ...emptyValues,
       identifier:
         identifier ?? (step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER),
-      password: attempted,
+      password: password ?? attempted,
       backupCode: attempted,
     },
     onSubmit: () => Promise.resolve(),
@@ -660,6 +664,27 @@ export function IdentifierWeb3() {
           iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
         },
       ]}
+    />
+  );
+}
+
+export function IdentifierSocialOnly() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier' }}
+    />
+  );
+}
+
+export function IdentifierPassword() {
+  return (
+    <StepPanel
+      combined={false}
+      providers={[]}
+      identifier={IDENTIFIER}
+      password='correct-horse-9'
+      step={{ kind: 'identifier', field: 'email', password: true }}
     />
   );
 }
@@ -903,6 +928,62 @@ const wallets: SignInProvider[] = [
   { id: 'metamask', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
 ];
 
+export function ChoiceMethodsEmailLink() {
+  return (
+    <StepPanel
+      providers={[{ id: 'oauth_google', name: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' }]}
+      step={{
+        kind: 'choice',
+        purpose: 'methods',
+        options: [
+          { id: 'email_link', stage: 'first', strategy: 'email_link', emailAddressId: 'idn_1', identifier: IDENTIFIER },
+          { id: 'email_code', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_1', identifier: IDENTIFIER },
+        ],
+      }}
+    />
+  );
+}
+
+export function ChoiceMethodsEntry() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'choice',
+        purpose: 'methods',
+        canGoBack: false,
+        options: [
+          {
+            id: 'email_link',
+            stage: 'first',
+            strategy: 'email_link',
+            emailAddressId: 'idn_1',
+            identifier: 'j***@acme.com',
+          },
+          ...firstFactors,
+        ],
+      }}
+    />
+  );
+}
+
+export function ChoiceMethodsSecondFactor() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{ kind: 'choice', purpose: 'methods', options: secondFactors, canStartOver: true }}
+    />
+  );
+}
+
+export function ChoiceWalletsNone() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: [] }} />;
+}
+
+export function ChoiceWalletsLoading() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: [], loading: true }} />;
+}
+
 export function ChoiceWallets() {
   return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: wallets }} />;
 }
@@ -995,6 +1076,37 @@ export function NoticeEmailLinkClientMismatch() {
   return (
     <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'client-mismatch', flow: 'sign-in' }} />
   );
+}
+
+export function CredentialPasswordOnly() {
+  return (
+    <StepPanel
+      step={passwordStep}
+      otherMethods={false}
+    />
+  );
+}
+
+export function CredentialPasskeySecondFactor() {
+  return <StepPanel step={{ kind: 'credential', credential: 'passkey' }} />;
+}
+
+export function CredentialBackupCodeResetting() {
+  return (
+    <StepPanel step={{ kind: 'credential', credential: 'backup-code', identifier: IDENTIFIER, resetting: true }} />
+  );
+}
+
+export function CodeSecondFactorResetting() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'second-factor', channel: 'phone', identifier: PHONE, resetting: true }}
+    />
+  );
+}
+
+export function NoticeEmailLinkNewDevice() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER, newDevice: true }} />;
 }
 
 export function CredentialPasskey() {

@@ -18,6 +18,7 @@ const factorIcon = {
   password: SecurityLockSquare,
   passkey: SecurityPasskey,
   email_code: Envelope,
+  email_link: Envelope,
   phone_code: SecurityPhone,
   totp: SecurityLockSquare,
   backup_code: Key,
@@ -33,6 +34,7 @@ interface ChoiceStepProps {
   onSelectFactor: (id: string) => void;
   onShowHelp: () => void;
   onBack: () => void;
+  onStartOver: () => void;
   logo?: { src: string; alt: string };
   globalErrorMessage?: string;
   socialProviders: readonly SignInProvider[];
@@ -55,6 +57,7 @@ export function ChoiceStep({
   onSelectFactor,
   onShowHelp,
   onBack,
+  onStartOver,
   logo,
   globalErrorMessage,
   socialProviders,
@@ -73,6 +76,7 @@ export function ChoiceStep({
       <SignInWallets
         focusRef={focusRef}
         wallets={step.options}
+        loading={step.loading}
         globalErrorMessage={globalErrorMessage}
         pendingWalletId={pendingProviderId}
         isDisabled={isDisabled}
@@ -131,7 +135,8 @@ export function ChoiceStep({
         onSelectProvider={onSelectProvider}
         isDisabled={isDisabled}
         globalErrorMessage={globalErrorMessage}
-        onBack={onBack}
+        onBack={step.canGoBack === false ? undefined : onBack}
+        onStartOver={step.canStartOver ? onStartOver : undefined}
         onShowHelp={onShowHelp}
       />
     );

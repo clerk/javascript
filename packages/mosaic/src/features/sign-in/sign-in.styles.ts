@@ -78,6 +78,17 @@ export const styles = stylex.create({
   protectCheckContainerEmpty: {
     position: 'absolute',
   },
+  startPasswordHidden: {
+    overflow: 'hidden',
+    opacity: 0,
+    pointerEvents: 'none',
+    position: 'absolute',
+    height: 0,
+  },
+  walletsLoading: {
+    display: 'grid',
+    justifyItems: 'center',
+  },
   status: {
     alignItems: 'center',
     display: 'flex',

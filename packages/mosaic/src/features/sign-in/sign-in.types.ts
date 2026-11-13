@@ -7,7 +7,8 @@ import type { SignUpFields, SignUpLegalConsent } from '../sign-up/sign-up.types'
 export type SignInFactor =
   | { id: string; stage: 'first'; strategy: 'password' }
   | { id: string; stage: 'first' | 'second'; strategy: 'passkey' }
-  | { id: string; stage: 'first'; strategy: 'email_code'; emailAddressId: string; identifier: string }
+  | { id: string; stage: 'first' | 'second'; strategy: 'email_code'; emailAddressId: string; identifier: string }
+  | { id: string; stage: 'first' | 'second'; strategy: 'email_link'; emailAddressId: string; identifier: string }
   | { id: string; stage: 'first' | 'second'; strategy: 'phone_code'; phoneNumberId: string; identifier: string }
   | { id: string; stage: 'second'; strategy: 'totp' | 'backup_code' }
   | {
@@ -22,9 +23,17 @@ type SignInCodeChannel = 'email' | 'phone' | 'totp';
 export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
 
 export type SignInStep =
-  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField; lastUsed?: boolean }
+  | {
+      kind: 'identifier';
+      field?: SignInIdentifierField;
+      nextField?: SignInIdentifierField;
+      lastUsed?: boolean;
+      password?: boolean;
+    }
   | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
-  | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
+  | { kind: 'credential'; credential: 'password'; identifier: string }
+  | { kind: 'credential'; credential: 'backup-code'; identifier: string; resetting?: boolean }
+  | { kind: 'credential'; credential: 'passkey'; identifier?: string }
   | {
       kind: 'code';
       purpose:
@@ -38,17 +47,25 @@ export type SignInStep =
       channel: SignInCodeChannel;
       identifier?: string;
       provider?: string;
+      resetting?: boolean;
     }
-  | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
+  | {
+      kind: 'choice';
+      purpose: 'methods';
+      options: readonly SignInFactor[];
+      canGoBack?: boolean;
+      canStartOver?: boolean;
+    }
+  | { kind: 'choice'; purpose: 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
   | { kind: 'choice'; purpose: 'accounts'; options: readonly SignInAccount[] }
-  | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
+  | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[]; loading?: boolean }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
   | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' | 'loading' }
   | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
-  | { kind: 'notice'; purpose: 'email-link'; identifier: string }
+  | { kind: 'notice'; purpose: 'email-link'; identifier: string; newDevice?: boolean }
   | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' | 'required' }
