@@ -11,17 +11,22 @@ import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { PasswordInput } from '../../../components/password-input';
 import { PhoneInput } from '../../../components/phone-input';
+import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
-import { useMessages } from '../../../localization';
+import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { SignInSubmitEvent, SignInValues, SignUpFieldName, SignUpFields } from '../sign-in.types';
+import type { SignInProvider, SignInSubmitEvent, SignInValues, SignUpFieldName, SignUpFields } from '../sign-in.types';
 import { signUpFieldNames } from '../sign-in.utils';
 
 interface SignUpDetailsProps {
   fields: SignUpFields;
   nextField?: 'emailAddress' | 'phoneNumber';
   onSwitchField?: () => void;
+  socialProviders: readonly SignInProvider[];
+  pendingProviderId?: string;
+  onSelectProvider: (id: string) => void;
+  isDisabled: boolean;
   form: UseFormResult<SignInValues>;
   globalErrorMessage?: string;
   isPending: boolean;
@@ -35,6 +40,10 @@ export function SignUpDetailsStep({
   fields,
   nextField,
   onSwitchField,
+  socialProviders,
+  pendingProviderId,
+  onSelectProvider,
+  isDisabled,
   form,
   globalErrorMessage,
   isPending,
@@ -55,7 +64,7 @@ export function SignUpDetailsStep({
   const field = (name: SignUpFieldName) => ({
     form,
     required: fields[name]?.required ?? false,
-    disabled: isPending,
+    disabled: isDisabled,
     autoFocus: first === name,
     inputRef: first === name ? focusRef : undefined,
   });
@@ -84,6 +93,12 @@ export function SignUpDetailsStep({
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
+        <SignUpProviders
+          providers={socialProviders}
+          pendingProviderId={pendingProviderId}
+          isDisabled={isDisabled}
+          onSelectProvider={onSelectProvider}
+        />
         <Form
           id={form.id}
           onSubmit={onSubmit}
@@ -138,7 +153,7 @@ export function SignUpDetailsStep({
               type='button'
               size='sm'
               variant='link'
-              disabled={isPending}
+              disabled={isDisabled}
               onClick={onSignIn}
             >
               {m.signUp.signInLink}
@@ -156,6 +171,60 @@ export function SignUpDetailsStep({
           {m.continue}
         </SubmitButton>
       </Card.Footer>
+    </>
+  );
+}
+
+function SignUpProviders({
+  providers,
+  pendingProviderId,
+  isDisabled,
+  onSelectProvider,
+}: {
+  providers: readonly SignInProvider[];
+  pendingProviderId?: string;
+  isDisabled: boolean;
+  onSelectProvider: (id: string) => void;
+}) {
+  const m = useMessages('signIn');
+  if (providers.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      <ProviderButtonGroup disabled={isDisabled}>
+        {providers.map(provider => (
+          <ProviderButton
+            key={provider.id}
+            icon={
+              <img
+                src={provider.iconUrl}
+                alt=''
+                {...stylex.props(styles.providerIcon)}
+              />
+            }
+            longLabel={fill(m.start.socialButton, { provider: provider.name })}
+            shortLabel={provider.name}
+            isPending={pendingProviderId === provider.id}
+            pendingLabel={m.verifying}
+            onClick={() => onSelectProvider(provider.id)}
+          />
+        ))}
+      </ProviderButtonGroup>
+      <div
+        role='separator'
+        {...stylex.props(styles.divider)}
+      >
+        <span {...stylex.props(styles.dividerLine)} />
+        <Text
+          size='sm'
+          color='foreground-secondary'
+        >
+          {m.start.divider}
+        </Text>
+        <span {...stylex.props(styles.dividerLine)} />
+      </div>
     </>
   );
 }

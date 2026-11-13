@@ -297,6 +297,10 @@ export function SignInView({
                     fields={current.fields}
                     nextField={current.nextField}
                     onSwitchField={onSwitchField}
+                    socialProviders={socialProviders}
+                    pendingProviderId={pendingProviderId}
+                    onSelectProvider={onSelectProvider}
+                    isDisabled={isDisabled}
                     form={form}
                     globalErrorMessage={globalErrorMessage}
                     isPending={isPending}

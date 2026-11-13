@@ -992,6 +992,7 @@ export function SignUpDetails() {
 export function SignUpSettingsFields() {
   return (
     <StepPanel
+      providers={[]}
       step={{
         kind: 'sign-up',
         fields: {
@@ -1011,6 +1012,7 @@ export function SignUpEmailOrPhone() {
 
   return (
     <StepPanel
+      providers={[]}
       step={{
         kind: 'sign-up',
         fields: { [active]: { required: true }, password: { required: true } },
@@ -1024,6 +1026,7 @@ export function SignUpEmailOrPhone() {
 export function SignUpPasswordRequirements() {
   return (
     <StepPanel
+      providers={[]}
       step={{ kind: 'sign-up', fields: { emailAddress: { required: true }, password: { required: true } } }}
       passwordFeedback={{ type: 'info', message: 'Your password must contain 8 or more characters.' }}
     />
