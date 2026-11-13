@@ -79,6 +79,36 @@ export const signInMessages = {
     resendText: 'Didn’t receive a link?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
+    loading: {
+      title: 'Signing in...',
+      description: 'You will be redirected soon',
+    },
+    signedIn: {
+      title: 'Successfully signed in',
+      description: 'Return to original tab to continue',
+    },
+    signedInOtherTab: {
+      title: 'Signed in on other tab',
+      description: 'Return to the newly opened tab to continue',
+    },
+    transferable: {
+      title: 'Email verified',
+      description: 'Return to original tab to continue',
+    },
+    expired: {
+      title: 'This verification link has expired',
+      description: 'Return to the original tab to continue.',
+    },
+    failed: {
+      title: 'This verification link is invalid',
+      description: 'Return to the original tab to continue.',
+    },
+    clientMismatch: {
+      title: 'Verification link is invalid for this device',
+      description:
+        'To continue, open the verification link on the device and browser from which you initiated the sign-in',
+    },
+    closeTab: 'You may close this tab',
   },
   passkey: {
     title: 'Use your passkey',

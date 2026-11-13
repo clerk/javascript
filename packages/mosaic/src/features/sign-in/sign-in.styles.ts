@@ -64,4 +64,9 @@ export const styles = stylex.create({
   footerText: {
     textAlign: 'center',
   },
+  status: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+  },
 });

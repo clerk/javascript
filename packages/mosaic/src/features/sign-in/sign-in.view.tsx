@@ -8,7 +8,15 @@ import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
-import { codeCopy, codeIdentity, codeNotice, codeResendCopy, codeSecondaryAction, stepKey } from './sign-in.utils';
+import {
+  codeCopy,
+  codeIdentity,
+  codeNotice,
+  codeResendCopy,
+  codeSecondaryAction,
+  stepIds,
+  stepKey,
+} from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CodeStep } from './steps/code-step';
 import { CredentialStep } from './steps/credential-step';
@@ -152,13 +160,15 @@ export function SignInView({
             ) : null;
           return (
             <>
-              <Flow.Step ids={['identifier']}>{stepKey(current) === 'identifier' ? identifierStep : null}</Flow.Step>
+              <Flow.Step ids={stepIds.identifier}>
+                {stepKey(current) === 'identifier' ? identifierStep : null}
+              </Flow.Step>
 
-              <Flow.Step ids={['identifier:channel']}>
+              <Flow.Step ids={stepIds.identifierChannel}>
                 {stepKey(current) === 'identifier:channel' ? identifierStep : null}
               </Flow.Step>
 
-              <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
+              <Flow.Step ids={stepIds.credential}>
                 {current.kind === 'credential' ? (
                   <CredentialStep
                     focusRef={focusRef}
@@ -182,17 +192,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step
-                ids={[
-                  'code:first-factor',
-                  'code:second-factor',
-                  'code:client-trust',
-                  'code:sso-bypass',
-                  'code:reset-password',
-                  'code:verify-email',
-                  'code:verify-phone',
-                ]}
-              >
+              <Flow.Step ids={stepIds.code}>
                 {current.kind === 'code' ? (
                   <CodeStep
                     focusRef={focusRef}
@@ -219,15 +219,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step
-                ids={[
-                  'choice:methods',
-                  'choice:reset-methods',
-                  'choice:enterprise-connections',
-                  'choice:accounts',
-                  'choice:wallets',
-                ]}
-              >
+              <Flow.Step ids={stepIds.choice}>
                 {current.kind === 'choice' ? (
                   <ChoiceStep
                     focusRef={focusRef}
@@ -258,17 +250,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step
-                ids={[
-                  'notice:help',
-                  'notice:forgot-password',
-                  'notice:no-methods',
-                  'notice:action-blocked',
-                  'notice:password-compromised',
-                  'notice:enterprise-sso',
-                  'notice:email-link',
-                ]}
-              >
+              <Flow.Step ids={stepIds.notice}>
                 {current.kind === 'notice' ? (
                   <NoticeStep
                     focusRef={focusRef}
@@ -288,7 +270,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={['new-password:forgot']}>
+              <Flow.Step ids={stepIds.newPassword}>
                 <NewPasswordStep
                   focusRef={focusRef}
                   form={form}
@@ -299,7 +281,7 @@ export function SignInView({
                 />
               </Flow.Step>
 
-              <Flow.Step ids={['sign-up']}>
+              <Flow.Step ids={stepIds.signUp}>
                 <SignUpDetailsStep
                   focusRef={focusRef}
                   form={form}
