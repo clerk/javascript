@@ -14,9 +14,16 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useModal } from '../../../modals/use-modal';
 import { Profile } from '../profile';
+import { profileModal } from '../profile.modal';
 
 beforeAll(() => page.viewport(1280, 800));
+
+function OpenProfile({ page }: { page: string }) {
+  const profile = useModal(profileModal);
+  return <button onClick={() => profile.open({ page })}>Open profile</button>;
+}
 
 function tabNames() {
   return screen.getAllByRole('tab').map(tab => tab.textContent);
@@ -112,6 +119,20 @@ describe('Profile with an active organization', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeVisible();
   });
 
+  it('opens as a modal on the first organization page when the requested organization page is unavailable', async () => {
+    serveWithOrganization({ permissions: [] });
+    await renderWithClerk(<OpenProfile page='organization/members' />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Open profile' }));
+    const dialog = await screen.findByRole('dialog');
+
+    expect(await within(dialog).findByRole('tab', { name: 'General', description: 'Organization' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
   it('opens the organization page that shares an account page name', async () => {
     serveWithOrganization();
     await renderWithClerk(
@@ -130,9 +151,7 @@ describe('Profile with an active organization', () => {
   it('skips an account page whose path is an organization page id', async () => {
     serveWithOrganization();
     await renderWithClerk(
-      <Profile
-        customPages={[{ path: 'organization/general', label: 'Imposter', content: <p>Imposter content</p> }]}
-      />,
+      <Profile customPages={[{ path: 'organization/general', label: 'Imposter', content: <p>Imposter content</p> }]} />,
     );
 
     expect(tabNames()).toEqual(['Account', 'Security', 'General', 'Members']);

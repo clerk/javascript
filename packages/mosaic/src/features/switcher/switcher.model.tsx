@@ -18,8 +18,9 @@ import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
 import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
+import { profileModal } from '../profile/profile.modal';
 import type { MosaicProfile } from '../profile-pages/use-mosaic-profile';
-import { userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
+import { profileModalOptions, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
 import { ORGANIZATION_PAGE_PREFIX } from '../user-profile/user-profile.layout';
 import { userProfileModal } from '../user-profile/user-profile.modal';
 import type {
@@ -178,6 +179,7 @@ export function useSwitcherModel(
   const clerk = useClerk();
   const router = useMosaicRouter();
   const userProfile = useModal(userProfileModal);
+  const combinedProfile = useModal(profileModal);
   const organizationProfile = useModal(organizationProfileModal);
   const { newProfiles } = useMosaicExperimental();
   const { userProfileProps, organizationProfileProps, userProfileUrl, organizationProfileUrl } = profile;
@@ -193,13 +195,14 @@ export function useSwitcherModel(
   });
 
   const profileCombined = opensCombinedProfile(menuMode, profile);
-  const mosaicUserProfile = userProfileModalOptions({ ...profile, combined: profileCombined });
 
   const manageAccount = openOrNavigate({
     url: userProfileUrl,
     openModal: () =>
       newProfiles
-        ? userProfile.open(mosaicUserProfile, getContainer?.())
+        ? profileCombined
+          ? combinedProfile.open(profileModalOptions(profile), getContainer?.())
+          : userProfile.open(userProfileModalOptions(profile), getContainer?.())
         : clerk.openUserProfile({
             getContainer,
             customPages: bridgedCustomPages.userProfile,
@@ -221,9 +224,9 @@ export function useSwitcherModel(
           apiKeysProps: organizationProfileProps?.apiKeysProps,
         });
       } else if (profileCombined) {
-        userProfile.open(
+        combinedProfile.open(
           {
-            ...mosaicUserProfile,
+            ...profileModalOptions(profile),
             page: `${ORGANIZATION_PAGE_PREFIX}${organizationProfileProps?.pageOrder?.[0] ?? 'general'}`,
           },
           getContainer?.(),

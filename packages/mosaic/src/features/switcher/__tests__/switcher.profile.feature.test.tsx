@@ -341,14 +341,41 @@ function OpenByRouting({ base }: { base: string }) {
   return <button onClick={() => write(base, [])}>Open by routing</button>;
 }
 
-describe('a user profile modal opened by the routing state', () => {
-  it("renders with the provider's options", async () => {
-    await renderWithProfile(<OpenByRouting base='/modal/user' />, { userProfileProps: { customPages: [terms] } });
+describe('a profile modal opened by the routing state', () => {
+  it.each([
+    { name: 'the account pages at /modal/user', base: '/modal/user', expected: [...accountTabs, 'Terms'] },
+    {
+      name: 'both groups at /modal/profile',
+      base: '/modal/profile',
+      expected: [...accountTabs, 'Terms', ...organizationTabs],
+    },
+  ])("renders $name with the provider's options", async ({ base, expected }) => {
+    await renderWithProfile(<OpenByRouting base={base} />, { userProfileProps: { customPages: [terms] } });
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Open by routing' }));
     const dialog = await screen.findByRole('dialog');
 
-    expect(await within(dialog).findByRole('tab', { name: 'Terms' })).toBeInTheDocument();
+    await within(dialog).findByRole('tab', { name: 'Terms' });
+    expect(tabs()).toEqual(expected);
+  });
+});
+
+describe('the route of the profile a switcher opens', () => {
+  it.each([
+    { name: 'a user-only button opens the account profile', ui: <UserButton />, base: '/modal/user' },
+    { name: 'a combined button opens the combined profile', ui: <Switcher />, base: '/modal/profile' },
+  ])('$name at $base', async ({ ui, base }) => {
+    await renderWithProfile(
+      <>
+        {ui}
+        <Entry base={base} />
+      </>,
+    );
+
+    await clickSettings(buttonTrigger);
+
+    await selectedTab('Account');
+    expect(JSON.parse(screen.getByTestId('entry').textContent ?? 'null')).toEqual([]);
   });
 });
 

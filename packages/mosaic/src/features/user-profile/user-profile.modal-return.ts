@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { useModal } from '../../modals/use-modal';
-import { useMosaicProfile, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
+import { profileModal } from '../profile/profile.modal';
+import { profileModalOptions, useMosaicProfile, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
 import { userProfileModal } from './user-profile.modal';
 import type { UserProfileOptions } from './user-profile.provider';
 
@@ -22,7 +23,8 @@ export function withUserProfileModalReturn(
 }
 
 export function UserProfileModalReturn(): null {
-  const { open } = useModal(userProfileModal);
+  const { open: openUserProfile } = useModal(userProfileModal);
+  const { open: openProfile } = useModal(profileModal);
   const profile = useMosaicProfile();
 
   React.useEffect(() => {
@@ -34,9 +36,13 @@ export function UserProfileModalReturn(): null {
       }
       url.searchParams.delete(MODAL_PARAM);
       window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
-      open({ ...userProfileModalOptions(profile), combined: page === COMBINED_ACCOUNT_PAGE, page: 'account' });
+      if (page === COMBINED_ACCOUNT_PAGE) {
+        openProfile({ ...profileModalOptions(profile), page: 'account' });
+      } else {
+        openUserProfile({ ...userProfileModalOptions(profile), page: 'account' });
+      }
     });
-  }, [open, profile]);
+  }, [openProfile, openUserProfile, profile]);
 
   return null;
 }

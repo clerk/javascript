@@ -125,7 +125,10 @@ export function Profile(props: ProfileProps): ReactNode {
 
 function withUserDefaults(
   props: UserProfileProps,
-  defaults: Pick<UserProfileProps, 'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'path'> = {},
+  defaults: Pick<
+    UserProfileProps,
+    'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'path'
+  > = {},
 ): UserProfileProps {
   const {
     customPages = defaults.customPages,

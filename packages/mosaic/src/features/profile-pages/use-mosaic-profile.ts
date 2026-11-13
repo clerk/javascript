@@ -2,7 +2,9 @@ import { createContext, useContext } from 'react';
 
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
+import type { ProfileModalOptions } from '../profile/profile.modal.types';
 import type { UserProfileProps } from '../user-profile/user-profile';
+import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 
 export interface MosaicProfile {
@@ -69,10 +71,14 @@ export function useMosaicProfile(): MosaicProfile {
 }
 
 /** What the user profile modal opens with, whichever path opens it. */
-export function userProfileModalOptions({
-  combined = true,
+export function userProfileModalOptions({ userProfileProps }: MosaicProfile): UserProfileModalOptions {
+  return { ...userProfileProps };
+}
+
+/** What the combined profile modal opens with, whichever path opens it. */
+export function profileModalOptions({
   userProfileProps,
   organizationProfileProps,
-}: MosaicProfile) {
-  return { ...userProfileProps, combined, organizationProfileProps };
+}: MosaicProfile): ProfileModalOptions {
+  return { ...userProfileProps, organizationProfileProps };
 }

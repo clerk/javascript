@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
 import { organizationProfileModal } from './features/organization-profile/organization-profile.modal';
+import { profileModal } from './features/profile/profile.modal';
 import type { MosaicProfile } from './features/profile-pages/use-mosaic-profile';
 import { MosaicProfileProvider } from './features/profile-pages/use-mosaic-profile';
 import { userProfileModal } from './features/user-profile/user-profile.modal';
@@ -75,4 +76,4 @@ export function MosaicProvider({
 }
 
 const defaultProfile: MosaicProfile = {};
-const modalSurfaces: ModalSurfaces = [userProfileModal, organizationProfileModal];
+const modalSurfaces: ModalSurfaces = [profileModal, userProfileModal, organizationProfileModal];
