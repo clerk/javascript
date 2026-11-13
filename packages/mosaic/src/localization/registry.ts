@@ -18,6 +18,7 @@ import { signInMessages } from '../features/sign-in/sign-in.messages';
 import { signInButtonMessages } from '../features/sign-in-button/sign-in-button.messages';
 import { signInWithMetamaskButtonMessages } from '../features/sign-in-with-metamask-button/sign-in-with-metamask-button.messages';
 import { signOutButtonMessages } from '../features/sign-out-button/sign-out-button.messages';
+import { signUpMessages } from '../features/sign-up/sign-up.messages';
 import { signUpButtonMessages } from '../features/sign-up-button/sign-up-button.messages';
 import { taskChooseOrganizationMessages } from '../features/task-choose-organization/task-choose-organization.messages';
 import { taskSetupMfaMessages } from '../features/task-setup-mfa/task-setup-mfa.messages';
@@ -97,6 +98,7 @@ export const mosaicMessages = {
   signInButton: signInButtonMessages,
   signInWithMetamaskButton: signInWithMetamaskButtonMessages,
   signUpButton: signUpButtonMessages,
+  signUp: signUpMessages,
   signOutButton: signOutButtonMessages,
 };
 

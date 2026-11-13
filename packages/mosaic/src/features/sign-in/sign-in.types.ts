@@ -69,7 +69,7 @@ export type SignInEmailLinkStatus =
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
 
-export type SignUpFields = Partial<Record<SignUpFieldName, { required: boolean }>>;
+export type SignUpFields = Partial<Record<SignUpFieldName, { required: boolean; disabled?: boolean }>>;
 
 export interface SignUpLegalConsent {
   termsUrl?: string;
