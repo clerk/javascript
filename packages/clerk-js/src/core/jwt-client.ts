@@ -44,8 +44,13 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
     } as unknown as ClientJSON);
   }
 
-  const { sessionId, userId, orgId, orgRole, orgPermissions, orgSlug, factorVerificationAge } =
+  const { sessionId, userId, orgId, orgRole, orgPermissions, orgSlug, factorVerificationAge, agent } =
     __experimental_JWTPayloadToAuthObjectProperties(token.jwt.claims);
+  let actor = agent;
+  if (actor?.poppy) {
+    const { poppy: _poppy, ...actorWithoutPoppy } = actor;
+    actor = actorWithoutPoppy;
+  }
 
   // TODO(jwt-v2): when JWT version 2 is available, we should revise org permissions
   const defaultClient = {
@@ -57,6 +62,7 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
         object: 'session',
         id: sessionId,
         status: 'active',
+        actor: actor ?? null,
         last_active_organization_id: orgId || null,
         // @ts-expect-error - ts is not happy about `id:undefined`, but this is allowed and expected
         last_active_token: {

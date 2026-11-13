@@ -1,0 +1,84 @@
+import type { SessionWithActivitiesJSON } from '@clerk/shared/types';
+import { describe, expect, it } from 'vitest';
+
+import { SessionWithActivities } from '../SessionWithActivities';
+
+const build = (actor: SessionWithActivitiesJSON['actor']) =>
+  new SessionWithActivities(
+    {
+      object: 'session',
+      id: 'sess_1',
+      status: 'active',
+      user: null,
+      actor,
+      latest_activity: {},
+      expire_at: 1,
+      abandon_at: 2,
+      last_active_at: 3,
+    } as unknown as SessionWithActivitiesJSON,
+    '/me/sessions',
+  );
+
+describe('SessionWithActivities', () => {
+  it('sets agent to only sub, type, task_id and restricted and keeps the full actor when the actor has type "agent"', () => {
+    const actor = { sub: 'agent_1', type: 'agent', task_id: 'task_1', restricted: true };
+    const session = build(actor as SessionWithActivitiesJSON['actor']);
+
+    expect(session.actor).toEqual(actor);
+    expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: 'task_1', restricted: true });
+  });
+
+  it('leaves agent task_id undefined when an agent actor has no task_id', () => {
+    const actor = { sub: 'agent_1', type: 'agent' };
+    const session = build(actor as SessionWithActivitiesJSON['actor']);
+
+    expect(session.actor).toEqual(actor);
+    expect(session.agent).toStrictEqual({ sub: 'agent_1', type: 'agent', task_id: undefined, restricted: false });
+  });
+
+  it('does not map the Poppy fields of a Poppy actor into agent', () => {
+    const actor = {
+      sub: 'https://agent.example.com/client.json',
+      type: 'agent',
+      restricted: true,
+      source: 'poppy',
+      source_id: 'ps_1',
+      external_user_id: 'pu_1',
+    };
+    const session = build(actor as SessionWithActivitiesJSON['actor']);
+
+    expect(session.actor).toEqual(actor);
+    expect(session.agent).toStrictEqual({
+      sub: 'https://agent.example.com/client.json',
+      type: 'agent',
+      task_id: undefined,
+      restricted: true,
+    });
+  });
+
+  it.each([
+    ['a number', { sub: 42, type: 'agent', task_id: 'task_1' }],
+    ['missing', { type: 'agent', task_id: 'task_1' }],
+    ['an empty string', { sub: '', type: 'agent', task_id: 'task_1' }],
+  ])('sets agent sub to an empty string when the agent actor sub is %s', (_, actor) => {
+    const session = build(actor as unknown as SessionWithActivitiesJSON['actor']);
+
+    expect(session.actor).toEqual(actor);
+    expect(session.agent).toStrictEqual({ sub: '', type: 'agent', task_id: 'task_1', restricted: false });
+  });
+
+  it('sets actor and a null agent for an impersonation session', () => {
+    const actor = { sub: 'user_2' };
+    const session = build(actor);
+
+    expect(session.actor).toEqual(actor);
+    expect(session.agent).toBeNull();
+  });
+
+  it('sets a null actor and a null agent when there is no actor', () => {
+    const session = build(null);
+
+    expect(session.actor).toBeNull();
+    expect(session.agent).toBeNull();
+  });
+});

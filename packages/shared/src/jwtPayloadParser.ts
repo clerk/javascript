@@ -1,8 +1,10 @@
 import { splitByScope } from './authorization';
 import type {
+  AgentActClaim,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  PoppyClaim,
   SharedSignedInAuthObjectProperties,
 } from './types';
 
@@ -98,6 +100,42 @@ function buildOrgPermissions({
   return orgPermissions;
 }
 
+const parsePoppyClaim = (poppy: unknown): PoppyClaim | undefined => {
+  if (poppy === null || poppy === undefined) {
+    return undefined;
+  }
+  const { session_id, client_id, user_id, agent_id } = (typeof poppy === 'object' ? poppy : {}) as Record<
+    string,
+    unknown
+  >;
+  return {
+    session_id: typeof session_id === 'string' ? session_id : '',
+    client_id: typeof client_id === 'string' ? client_id : '',
+    user_id: typeof user_id === 'string' ? user_id : '',
+    agent_id: typeof agent_id === 'string' ? agent_id : undefined,
+  };
+};
+
+const parseAgentClaim = (agt: unknown): AgentActClaim | null => {
+  if (agt === null || agt === undefined) {
+    return null;
+  }
+  const { id, tsk, rst, poppy } = (typeof agt === 'object' ? agt : {}) as {
+    id?: unknown;
+    tsk?: unknown;
+    rst?: unknown;
+    poppy?: unknown;
+  };
+  const poppyClaim = parsePoppyClaim(poppy);
+  return {
+    sub: typeof id === 'string' ? id : '',
+    type: 'agent',
+    task_id: typeof tsk === 'string' ? tsk : undefined,
+    restricted: rst === true,
+    ...(poppyClaim && { poppy: poppyClaim }),
+  };
+};
+
 /**
  * Resolves the signed-in auth state from JWT claims.
  *
@@ -150,6 +188,7 @@ const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): Sh
     sessionId: claims.sid,
     sessionStatus,
     actor: claims.act,
+    agent: parseAgentClaim(claims.agt),
     userId: claims.sub,
     orgId: orgId,
     orgRole: orgRole,

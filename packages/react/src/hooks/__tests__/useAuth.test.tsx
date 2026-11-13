@@ -72,6 +72,34 @@ describe('useAuth', () => {
   });
 });
 
+describe('useAuth agent', () => {
+  test('exposes the agent from the initial state', () => {
+    const agent = { sub: 'agt_1', type: 'agent', task_id: 'agttsk_1' };
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <ClerkInstanceContext.Provider value={{ value: { addListener: vi.fn() } as unknown as LoadedClerk }}>
+          <InitialStateProvider
+            initialState={
+              {
+                sessionId: 'sess_1',
+                sessionStatus: 'active',
+                sessionClaims: stubSessionClaims({ sessionId: 'sess_1', userId: 'user_1' }),
+                userId: 'user_1',
+                agent,
+              } as any
+            }
+          >
+            {children}
+          </InitialStateProvider>
+        </ClerkInstanceContext.Provider>
+      ),
+    });
+
+    expect(result.current.agent).toEqual(agent);
+  });
+});
+
 describe('useAuth.getToken', () => {
   test('throws an error if getToken is called in a non-browser environment', async () => {
     const originalWindow = global.window;
@@ -113,6 +141,7 @@ describe('useDerivedAuth', () => {
     expect(current.sessionClaims).toBeUndefined();
     expect(current.userId).toBeUndefined();
     expect(current.actor).toBeUndefined();
+    expect(current.agent).toBeUndefined();
     expect(current.orgId).toBeUndefined();
     expect(current.orgRole).toBeUndefined();
     expect(current.orgSlug).toBeUndefined();
@@ -130,11 +159,29 @@ describe('useDerivedAuth', () => {
     expect(current.sessionClaims).toBeNull();
     expect(current.userId).toBeNull();
     expect(current.actor).toBeNull();
+    expect(current.agent).toBeNull();
     expect(current.orgId).toBeNull();
     expect(current.orgRole).toBeNull();
     expect(current.orgSlug).toBeNull();
     expect(current.has).toBeInstanceOf(Function);
     expect(current.has?.({ permission: 'test' })).toBe(false);
+  });
+
+  it('returns the agent for a signed in session', () => {
+    const agent = { sub: 'agent_123', type: 'agent', task_id: 'agttsk_456' };
+    const {
+      result: { current },
+    } = renderHook(() =>
+      useDerivedAuth({
+        sessionId: 'session123',
+        userId: 'user123',
+        sessionClaims: {},
+        agent,
+        signOut: vi.fn(),
+        getToken: vi.fn(),
+      }),
+    );
+    expect(current.agent).toEqual(agent);
   });
 
   it('returns signed out state when session has pending status by default', () => {

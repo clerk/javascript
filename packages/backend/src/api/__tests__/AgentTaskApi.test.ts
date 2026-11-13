@@ -94,5 +94,95 @@ describe('AgentTaskAPI', () => {
       expect(response.taskId).toBe('agent_task_456');
       expect(response.agentTaskId).toBe('agent_task_456');
     });
+
+    it('sends sessionRestricted and organizationId and reads them from the response', async () => {
+      server.use(
+        http.post(
+          'https://api.clerk.test/v1/agents/tasks',
+          validateHeaders(async ({ request }) => {
+            const body = await request.json();
+
+            expect(body).toEqual({
+              on_behalf_of: {
+                user_id: 'user_123',
+              },
+              permissions: '*',
+              agent_name: 'test-agent',
+              task_description: 'Test task',
+              redirect_url: 'https://example.com/callback',
+              session_restricted: true,
+              session_organization_id: 'org_123',
+            });
+
+            return HttpResponse.json({
+              ...mockAgentTaskResponse,
+              session_restricted: true,
+              session_organization_id: 'org_123',
+            });
+          }),
+        ),
+      );
+
+      const response = await apiClient.agentTasks.create({
+        onBehalfOf: {
+          userId: 'user_123',
+        },
+        permissions: '*',
+        agentName: 'test-agent',
+        taskDescription: 'Test task',
+        redirectUrl: 'https://example.com/callback',
+        sessionRestricted: true,
+        organizationId: 'org_123',
+      });
+
+      expect(response.sessionRestricted).toBe(true);
+      expect(response.organizationId).toBe('org_123');
+    });
+
+    it('defaults sessionRestricted to false and organizationId to null when the response omits them', async () => {
+      server.use(
+        http.post(
+          'https://api.clerk.test/v1/agents/tasks',
+          validateHeaders(() => HttpResponse.json(mockAgentTaskResponse)),
+        ),
+      );
+
+      const response = await apiClient.agentTasks.create({
+        onBehalfOf: {
+          userId: 'user_123',
+        },
+        permissions: '*',
+        agentName: 'test-agent',
+        taskDescription: 'Test task',
+        redirectUrl: 'https://example.com/callback',
+      });
+
+      expect(response.sessionRestricted).toBe(false);
+      expect(response.organizationId).toBeNull();
+    });
+  });
+
+  describe('revoke', () => {
+    it('reads sessionRestricted and organizationId from the response', async () => {
+      server.use(
+        http.post(
+          'https://api.clerk.test/v1/agents/tasks/agent_task_456/revoke',
+          validateHeaders(() =>
+            HttpResponse.json({
+              ...mockAgentTaskResponse,
+              url: undefined,
+              session_restricted: true,
+              session_organization_id: 'org_123',
+            }),
+          ),
+        ),
+      );
+
+      const response = await apiClient.agentTasks.revoke('agent_task_456');
+
+      expect(response.agentTaskId).toBe('agent_task_456');
+      expect(response.sessionRestricted).toBe(true);
+      expect(response.organizationId).toBe('org_123');
+    });
   });
 });

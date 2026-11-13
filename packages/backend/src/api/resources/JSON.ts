@@ -610,6 +610,8 @@ export interface AgentTaskJSON extends ClerkResourceJSON {
    */
   task_id: string;
   url: string;
+  session_restricted?: boolean;
+  session_organization_id?: string | null;
 }
 
 export interface SignUpJSON extends ClerkResourceJSON {

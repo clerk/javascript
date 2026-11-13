@@ -69,6 +69,7 @@ export type SignedOutAuthObject = {
   sessionId: null;
   sessionStatus: SessionStatusClaim | null;
   actor: null;
+  agent: null;
   tokenType: SessionTokenType;
   userId: null;
   orgId: null;
@@ -195,8 +196,18 @@ export function signedInAuthObject(
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
-  const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
-    __experimental_JWTPayloadToAuthObjectProperties(sessionClaims);
+  const {
+    actor,
+    agent,
+    sessionId,
+    sessionStatus,
+    userId,
+    orgId,
+    orgRole,
+    orgSlug,
+    orgPermissions,
+    factorVerificationAge,
+  } = __experimental_JWTPayloadToAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
@@ -207,6 +218,7 @@ export function signedInAuthObject(
   return {
     tokenType: TokenType.SessionToken,
     actor,
+    agent,
     sessionClaims,
     sessionId,
     sessionStatus,
@@ -245,6 +257,7 @@ export function signedOutAuthObject(
     sessionStatus: initialSessionStatus ?? null,
     userId: null,
     actor: null,
+    agent: null,
     orgId: null,
     orgRole: null,
     orgSlug: null,

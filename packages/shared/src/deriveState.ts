@@ -41,6 +41,11 @@ export const deriveFromSsrInitialState = (initialState: InitialState): ReturnTyp
   const orgPermissions = initialState.orgPermissions as OrganizationCustomPermissionKey[];
   const orgSlug = initialState.orgSlug;
   const actor = initialState.actor;
+  let agent = initialState.agent;
+  if (agent?.poppy) {
+    const { poppy: _poppy, ...agentWithoutPoppy } = agent;
+    agent = agentWithoutPoppy;
+  }
   const factorVerificationAge = initialState.factorVerificationAge;
 
   return {
@@ -56,6 +61,7 @@ export const deriveFromSsrInitialState = (initialState: InitialState): ReturnTyp
     orgPermissions,
     orgSlug,
     actor,
+    agent,
     factorVerificationAge,
   };
 };
@@ -71,6 +77,7 @@ export const deriveFromClientSideState = (state: Resources) => {
     : null;
   const factorVerificationAge: [number, number] | null = state.session ? state.session.factorVerificationAge : null;
   const actor = session?.actor;
+  const agent = session?.agent;
   const organization = state.organization;
   const orgId: string | null | undefined = state.organization ? state.organization.id : state.organization;
   const orgSlug = organization?.slug;
@@ -93,6 +100,7 @@ export const deriveFromClientSideState = (state: Resources) => {
     orgSlug,
     orgPermissions,
     actor,
+    agent,
     factorVerificationAge,
   };
 };

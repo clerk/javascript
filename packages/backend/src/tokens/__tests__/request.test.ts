@@ -21,7 +21,12 @@ import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
-import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN, JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
+import {
+  JWT_CATEGORY_JWT_TEMPLATE,
+  JWT_CATEGORY_M2M_TOKEN,
+  JWT_CATEGORY_OIDC_ID_TOKEN,
+  JWT_CATEGORY_SESSION_TOKEN,
+} from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import { type MachineTokenType, TokenType } from '../tokenTypes';
@@ -1364,13 +1369,16 @@ describe('tokens.authenticateRequest(options)', () => {
       { acceptsToken: ['session_token', 'm2m_token'] as const },
     ],
   ])('%s: OIDC id_token presented as a session token (AISEC-21)', (_label, buildRequest, options) => {
-    test('returns signed out', async () => {
+    test.each([
+      ['without a category', {}],
+      ['with the OIDC ID token category', { cat: JWT_CATEGORY_OIDC_ID_TOKEN }],
+    ])('returns signed out %s', async (_kind, category) => {
       server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
       const { azp: _azp, ...payloadWithoutAzp } = mockJwtPayload;
       const { data: idToken } = await signJwt(
         { ...payloadWithoutAzp, aud: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc' },
         signingJwks,
-        { algorithm: 'RS256', header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' } },
+        { algorithm: 'RS256', header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...category } },
       );
 
       const requestState = await authenticateRequest(buildRequest(idToken!), mockOptions(options));

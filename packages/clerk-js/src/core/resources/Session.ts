@@ -448,7 +448,15 @@ export class Session extends BaseResource implements SessionResource {
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor || null;
-    this.agent = data.actor?.type === 'agent' ? (data.actor as AgentActClaim) : null;
+    this.agent =
+      data.actor?.type === 'agent'
+        ? {
+            sub: typeof data.actor.sub === 'string' ? data.actor.sub : '',
+            type: 'agent',
+            task_id: typeof data.actor.task_id === 'string' ? data.actor.task_id : undefined,
+            restricted: data.actor.restricted === true,
+          }
+        : null;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
