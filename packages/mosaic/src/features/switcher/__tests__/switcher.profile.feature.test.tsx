@@ -237,6 +237,7 @@ describe('the profile the switchers open', () => {
     await chooseSetting(buttonTrigger, 'Manage organization');
 
     expect(await selectedTab('Terms')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Account' })).toBeInTheDocument();
   });
 
   it('skips a page this organization does not have when opening a combined profile', async () => {
