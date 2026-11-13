@@ -494,6 +494,8 @@ function StepPanel({
   lastUsedProviderId,
   onJoinWaitlist,
   passwordFeedback,
+  onRetry,
+  protectCheckRef,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -511,6 +513,8 @@ function StepPanel({
   lastUsedProviderId?: string;
   onJoinWaitlist?: () => void;
   passwordFeedback?: FieldFeedback;
+  onRetry?: () => void;
+  protectCheckRef?: (element: HTMLDivElement | null) => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -558,6 +562,8 @@ function StepPanel({
       onShowHelp={() => undefined}
       onBack={() => undefined}
       onStartOver={() => undefined}
+      onRetry={onRetry}
+      protectCheckRef={protectCheckRef}
       onEmailSupport={() => undefined}
       onSelectFactor={() => undefined}
       onResend={offersResend(step) ? () => undefined : undefined}
@@ -1000,6 +1006,58 @@ export function CredentialPasskey() {
 
 export function NoticeStartOver() {
   return <StepPanel step={{ kind: 'notice', purpose: 'start-over' }} />;
+}
+
+export function NoticeLoading() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'loading' }} />;
+}
+
+export function NoticeLoadingError() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'loading' }}
+      globalErrorMessage='Unable to complete action at this time. If the problem persists please contact support.'
+    />
+  );
+}
+
+export function NoticeProtectCheck() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'protect-check', challenge: false }}
+      isPending
+    />
+  );
+}
+
+function showStandInChallenge(element: HTMLDivElement | null) {
+  if (element && !element.firstChild) {
+    const widget = document.createElement('div');
+    widget.textContent = 'Challenge widget';
+    widget.style.cssText =
+      'display:grid;place-items:center;width:300px;height:65px;border:1px dashed currentColor;font:12px system-ui';
+    element.append(widget);
+  }
+}
+
+export function NoticeProtectCheckChallenge() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'protect-check', challenge: true }}
+      isPending
+      protectCheckRef={showStandInChallenge}
+    />
+  );
+}
+
+export function NoticeProtectCheckError() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'protect-check', challenge: false }}
+      globalErrorMessage='Verification couldn’t start. Please contact support.'
+      onRetry={() => undefined}
+    />
+  );
 }
 
 export function NewPasswordReset() {
