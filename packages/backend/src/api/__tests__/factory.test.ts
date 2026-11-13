@@ -92,25 +92,30 @@ describe('api.client', () => {
     expect(totalCount).toBe(7);
   });
 
-  // Each case lists `users` users, and the count endpoint answers 99, so a
-  // totalCount of 99 means the count was used and any other value means the
-  // page gave the total.
+  // The list endpoint answers with `usersToReturn` users and the count endpoint
+  // answers 99, so a totalCount of 99 means the count was used and any other
+  // value means the page gave the total.
   it.each([
-    { name: 'a page shorter than its limit', params: { limit: 5 }, users: 2, totalCount: 2 },
-    { name: 'a short page at an offset', params: { limit: 5, offset: 10 }, users: 2, totalCount: 12 },
-    { name: 'no users at offset 0, without a limit', params: {}, users: 0, totalCount: 0 },
-    { name: 'no users at offset 0, with a limit', params: { limit: 5 }, users: 0, totalCount: 0 },
-    { name: 'a full page', params: { limit: 2 }, users: 2, totalCount: 99 },
-    { name: 'no users past offset 0', params: { limit: 5, offset: 10 }, users: 0, totalCount: 99 },
-    { name: 'users without a limit', params: {}, users: 2, totalCount: 99 },
-    { name: 'a limit the API replaces with its default', params: { limit: 501 }, users: 2, totalCount: 99 },
-    { name: 'a page after a cursor', params: { limit: 5, startingAfter: 'user_previous' }, users: 2, totalCount: 99 },
-  ])('users.getUserList() returns totalCount $totalCount for $name', async ({ params, users, totalCount }) => {
+    { name: 'a page shorter than its limit', params: { limit: 5 }, usersToReturn: 2, totalCount: 2 },
+    { name: 'a short page at an offset', params: { limit: 5, offset: 10 }, usersToReturn: 2, totalCount: 12 },
+    { name: 'no users at offset 0, without a limit', params: {}, usersToReturn: 0, totalCount: 0 },
+    { name: 'no users at offset 0, with a limit', params: { limit: 5 }, usersToReturn: 0, totalCount: 0 },
+    { name: 'a full page', params: { limit: 2 }, usersToReturn: 2, totalCount: 99 },
+    { name: 'no users past offset 0', params: { limit: 5, offset: 10 }, usersToReturn: 0, totalCount: 99 },
+    { name: 'users without a limit', params: {}, usersToReturn: 2, totalCount: 99 },
+    { name: 'a limit the API replaces with its default', params: { limit: 501 }, usersToReturn: 2, totalCount: 99 },
+    {
+      name: 'a page after a cursor',
+      params: { limit: 5, startingAfter: 'user_previous' },
+      usersToReturn: 2,
+      totalCount: 99,
+    },
+  ])('users.getUserList() returns totalCount $totalCount for $name', async ({ params, usersToReturn, totalCount }) => {
     server.use(
       http.get(
         `https://api.clerk.test/v1/users`,
         validateHeaders(() => {
-          return HttpResponse.json(Array.from({ length: users }, () => userJson));
+          return HttpResponse.json(Array.from({ length: usersToReturn }, () => userJson));
         }),
       ),
       http.get(
@@ -123,7 +128,7 @@ describe('api.client', () => {
 
     const response = await apiClient.users.getUserList({ ...params, query: 'john' });
 
-    expect(response.data.length).toBe(users);
+    expect(response.data.length).toBe(usersToReturn);
     expect(response.totalCount).toBe(totalCount);
   });
 
