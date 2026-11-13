@@ -29,6 +29,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
     stable: 'OrganizationSwitcher',
     beta: 'OrganizationSwitcher',
     status: 'available',
+    renamedTo: 'Switcher',
     notes:
       'Profile props and URLs move to `MosaicProvider`. `afterLeaveOrganizationUrl` moves to `profile.organizationProfileProps`.',
   },
@@ -36,6 +37,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
     stable: 'OrganizationProfile',
     beta: 'OrganizationProfile',
     status: 'available',
+    renamedTo: 'Profile',
     notes: 'No path or hash routing yet, so URLs don’t update. `defaultPage` is removed; use `pageOrder`.',
   },
   {
@@ -53,7 +55,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
     status: 'in-progress',
     notes: 'Only inside the `UserProfile` and `OrganizationProfile` API keys pages for now.',
   },
-  { stable: 'OAuthConsent', beta: 'OAuthConsent', status: 'in-progress' },
+  { stable: 'OAuthConsent', beta: 'OAuthConsent', status: 'in-progress', renamedTo: 'Consent' },
   { stable: 'TaskChooseOrganization', beta: 'TaskChooseOrganization', status: 'in-progress' },
   { stable: 'TaskSetupMFA', beta: 'TaskSetupMFA', status: 'in-progress' },
   { stable: 'SignInButton', beta: 'SignInButton', status: 'in-progress' },
