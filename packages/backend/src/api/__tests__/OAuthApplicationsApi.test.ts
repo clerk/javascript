@@ -391,10 +391,87 @@ describe('OAuthApplications', () => {
       expect(requested).toBe(true);
     });
 
+    it.each([301, 302, 303, 307, 308])('does not follow a %i redirect to an HTTP endpoint', async status => {
+      const redirectedUrl = 'http://proxy.example.test/oauth/token';
+      const requested: string[] = [];
+      let redirect: RequestRedirect | undefined;
+      server.use(
+        http.post(tokenFetchUrl, ({ request }) => {
+          requested.push(request.url);
+          redirect = request.redirect;
+          return HttpResponse.redirect(redirectedUrl, status);
+        }),
+        http.all(redirectedUrl, ({ request }) => {
+          requested.push(request.url);
+          return tokenResponse();
+        }),
+      );
+
+      await expect(exchange()).rejects.toThrow();
+      expect(redirect).toBe('error');
+      expect(requested).toEqual([tokenFetchUrl]);
+    });
+
+    it('does not follow redirects from an HTTPS proxy, even to another HTTPS endpoint', async () => {
+      const proxyUrl = 'https://proxy.example.test/__clerk';
+      const proxyTokenEndpoint = `${proxyUrl}/oauth/token`;
+      const requested: string[] = [];
+      let redirect: RequestRedirect | undefined;
+      server.use(
+        http.post(proxyTokenEndpoint, ({ request }) => {
+          requested.push(request.url);
+          redirect = request.redirect;
+          return HttpResponse.redirect(tokenFetchUrl, 307);
+        }),
+        http.post(tokenFetchUrl, ({ request }) => {
+          requested.push(request.url);
+          return tokenResponse();
+        }),
+      );
+
+      await expect(exchange({ proxyUrl })).rejects.toThrow();
+      expect(redirect).toBe('error');
+      expect(requested).toEqual([proxyTokenEndpoint]);
+    });
+
     it.each([
       ['the publishable key is missing', { publishableKey: '' }, 'Publishable key is missing.'],
       ['the publishable key is invalid', { publishableKey: 'pk_invalid' }, 'Publishable key not valid'],
-      ['the proxy URL is relative', { publishableKey, proxyUrl: '/__clerk' }, '`proxyUrl` must be an absolute URL'],
+      [
+        'the proxy URL is relative',
+        { publishableKey, proxyUrl: '/__clerk' },
+        '`proxyUrl` must be an absolute HTTPS URL',
+      ],
+      [
+        'the proxy URL has no host',
+        { publishableKey, proxyUrl: 'https://' },
+        '`proxyUrl` must be an absolute HTTPS URL',
+      ],
+      [
+        'the proxy URL uses a non-HTTP scheme',
+        { publishableKey, proxyUrl: 'ftp://proxy.example.test' },
+        '`proxyUrl` must be an absolute HTTPS URL',
+      ],
+      [
+        'the proxy URL uses plain HTTP',
+        { publishableKey, proxyUrl: 'http://proxy.example.test' },
+        '`proxyUrl` must be an absolute HTTPS URL',
+      ],
+      [
+        'the proxy URL uses plain HTTP on localhost',
+        { publishableKey, proxyUrl: 'http://localhost:8080/__clerk' },
+        '`proxyUrl` must be an absolute HTTPS URL',
+      ],
+      [
+        'the proxy URL uses plain HTTP on IPv4 loopback',
+        { publishableKey, proxyUrl: 'http://127.0.0.1:8080/__clerk' },
+        '`proxyUrl` must be an absolute HTTPS URL',
+      ],
+      [
+        'the proxy URL uses plain HTTP on IPv6 loopback',
+        { publishableKey, proxyUrl: 'http://[::1]:8080/__clerk' },
+        '`proxyUrl` must be an absolute HTTPS URL',
+      ],
     ])('throws before making any request when %s', async (_, endpointParams, message) => {
       let requested = false;
       server.use(
