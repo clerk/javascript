@@ -332,6 +332,14 @@ const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
   return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
 
+const signedBearerRequest = async (payload: Record<string, unknown>, header: Record<string, unknown>) => {
+  const { data } = await signJwt(payload, signingJwks, {
+    algorithm: 'RS256',
+    header: { kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...header },
+  });
+  return mockRequest({ authorization: `Bearer ${data}` });
+};
+
 // @ts-expect-error - Testing
 const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
   const cookieStr = Object.entries(cookies)
@@ -1712,14 +1720,6 @@ describe('tokens.authenticateRequest(options)', () => {
     const maxDateSeconds = 8.64e12;
     const rawNumber = (text: string) => (JSON as unknown as { rawJSON: (text: string) => unknown }).rawJSON(text);
 
-    const signedBearerRequest = async (payload: Record<string, unknown>, header: Record<string, unknown>) => {
-      const { data } = await signJwt(payload, signingJwks, {
-        algorithm: 'RS256',
-        header: { kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...header },
-      });
-      return mockRequest({ authorization: `Bearer ${data}` });
-    };
-
     const authenticateOAuthJwt = async (claims: Record<string, unknown>) => {
       const request = await signedBearerRequest(
         { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss, ...claims },
@@ -1926,6 +1926,59 @@ describe('tokens.authenticateRequest(options)', () => {
       },
     );
 
+    describe('OAuth JWT issuer', () => {
+      const expectedIssuer = mockJwtPayload.iss;
+
+      const authenticateOAuthJwt = async (iss: unknown, options: Record<string, unknown> = {}) => {
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        const payload: Record<string, unknown> = { ...mockOAuthAccessTokenJwtPayload, iss };
+        if (iss === undefined) {
+          delete payload.iss;
+        }
+        const request = await signedBearerRequest(payload, { typ: 'at+jwt' });
+        return authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token', ...options }));
+      };
+
+      test.each(['oauth_token', 'any'] as const)(
+        'authenticates an OAuth JWT whose iss is the instance Frontend API when acceptsToken is %s',
+        async acceptsToken => {
+          const requestState = await authenticateOAuthJwt(expectedIssuer, { acceptsToken });
+
+          expect(requestState).toBeMachineAuthenticated();
+        },
+      );
+
+      test('authenticates an OAuth JWT whose iss is the instance Frontend API when a proxy URL is configured', async () => {
+        const requestState = await authenticateOAuthJwt(expectedIssuer, { proxyUrl: 'https://example.com/__clerk' });
+
+        expect(requestState).toBeMachineAuthenticated();
+      });
+
+      test.each([
+        ['a different', 'https://untrusted.example'],
+        ['a trailing-slash', `${expectedIssuer}/`],
+        ['a scheme-less', 'clerk.inspired.puma-74.lcl.dev'],
+        ['the proxy URL as', 'https://example.com/__clerk'],
+        ['an empty', ''],
+        ['a missing', undefined],
+        ['a null', null],
+        ['a numeric', 42],
+        ['an array', [expectedIssuer]],
+      ] as Array<[string, unknown]>)('rejects an OAuth JWT with %s iss', async (_label, iss) => {
+        const requestState = await authenticateOAuthJwt(iss, { proxyUrl: 'https://example.com/__clerk' });
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: `Invalid JWT issuer claim (iss) ${JSON.stringify(iss)}. Expected "${expectedIssuer}". (code=token-verification-failed, status=n/a)`,
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: 'oauth_token',
+          isAuthenticated: false,
+        });
+      });
+    });
+
     describe.each(['opaque', 'JWT'] as const)('%s OAuth token without aud', format => {
       test.each(['oauth_token', 'any'] as const)(
         'rejects a configured audience when acceptsToken is %s',
@@ -1936,8 +1989,13 @@ describe('tokens.authenticateRequest(options)', () => {
             }),
             http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)),
           );
-          const token = format === 'opaque' ? mockTokens.oauth_token : mockSignedOAuthAccessTokenJwt;
-          const request = mockRequest({ authorization: `Bearer ${token}` });
+          const request =
+            format === 'opaque'
+              ? mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` })
+              : await signedBearerRequest(
+                  { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss },
+                  { typ: 'at+jwt' },
+                );
           const requestState = await authenticateRequest(
             request,
             mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),
