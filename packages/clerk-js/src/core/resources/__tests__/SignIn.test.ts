@@ -1514,6 +1514,78 @@ describe('SignIn', () => {
       });
     });
 
+    describe('clientTrustState', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+      });
+
+      it.each([
+        { reported: 'new', status: 'needs_second_factor' },
+        { reported: 'known', status: 'needs_first_factor' },
+        { reported: 'pending', status: 'needs_first_factor' },
+      ])('exposes $reported when FAPI reports it', async ({ reported, status }) => {
+        BaseResource._fetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status, client_trust_state: reported },
+        });
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.password({ identifier: 'user@example.com', password: 'password123' });
+
+        expect(signIn.__internal_future.clientTrustState).toBe(reported);
+      });
+
+      it('is undefined when FAPI does not report it', async () => {
+        BaseResource._fetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.password({ identifier: 'user@example.com', password: 'password123' });
+
+        expect(signIn.__internal_future.clientTrustState).toBeUndefined();
+      });
+
+      it('is new while the status is needs_client_trust and FAPI omits the field', async () => {
+        BaseResource._fetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_client_trust' },
+        });
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.password({ identifier: 'user@example.com', password: 'password123' });
+
+        expect(signIn.__internal_future.clientTrustState).toBe('new');
+        expect(signIn.clientTrustState).toBeUndefined();
+      });
+
+      it('prefers the value FAPI reports over the needs_client_trust status', async () => {
+        BaseResource._fetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_client_trust', client_trust_state: 'pending' },
+        });
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.password({ identifier: 'user@example.com', password: 'password123' });
+
+        expect(signIn.__internal_future.clientTrustState).toBe('pending');
+      });
+
+      it('survives a snapshot round trip', () => {
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_second_factor',
+          client_trust_state: 'new',
+        } as any);
+
+        const restored = new SignIn(signIn.__internal_toSnapshot());
+
+        expect(restored.__internal_future.clientTrustState).toBe('new');
+      });
+    });
+
     describe('password', () => {
       afterEach(() => {
         vi.clearAllMocks();

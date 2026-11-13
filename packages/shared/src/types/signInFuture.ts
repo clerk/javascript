@@ -1,5 +1,6 @@
 import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
+import type { ClientTrustState } from './json';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { ProtectCheckResource } from './signUpCommon';
@@ -405,6 +406,17 @@ export interface SignInFutureResource {
    * The state of the verification process for the selected second factor. Initially, this property contains an empty verification object, since there is no second factor selected.
    */
   readonly secondFactorVerification: VerificationResource;
+
+  /**
+   * The [Device Trust](https://clerk.com/docs/guides/protect/device-trust) state of the device the user is signing in from, as of the latest response. With the Device Trust Status update, Clerk returns it once the first factor, such as the password, is verified, so entering an identifier doesn't reveal whether that account has signed in on this device. Without that update, Clerk returns it on every response.
+   * <ul>
+   *  <li>`'new'` - Clerk doesn't trust this device for the user yet, or can't confirm that it does. While `status` is `'needs_client_trust'`, this is `'new'`.</li>
+   *  <li>`'known'` - Clerk trusts this device for the user. Completing a sign-in makes the device trusted in most cases, so a `'complete'` sign-in usually reads `'known'`.</li>
+   *  <li>`'pending'` - Clerk can't tell yet.</li>
+   * </ul>
+   * `undefined` when Device Trust is off. With the Device Trust Status update, it's also `undefined` before the first factor is verified.
+   */
+  readonly clientTrustState?: ClientTrustState;
 
   /**
    * The authentication identifier value for the current sign-in. `null` if the `strategy` is `'oauth_<provider>'` or `'enterprise_sso'`.
