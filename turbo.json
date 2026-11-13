@@ -170,11 +170,16 @@
       "dependsOn": ["build"],
       "env": [
         "BUNDLEWATCH_GITHUB_TOKEN",
-        "CI_BRANCH",
-        "CI_BRANCH_BASE",
-        "CI_REPO_NAME",
-        "CI_REPO_OWNER",
-        "CI_COMMIT_SHA"
+        "GITHUB_ACTION",
+        "GITHUB_ACTIONS",
+        "GITHUB_API_URL",
+        "GITHUB_BASE_REF",
+        "GITHUB_EVENT_NAME",
+        "GITHUB_EVENT_PATH",
+        "GITHUB_HEAD_REF",
+        "GITHUB_REF",
+        "GITHUB_REPOSITORY",
+        "GITHUB_SHA"
       ],
       "outputs": []
     },

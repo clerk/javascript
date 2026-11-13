@@ -1,4 +1,6 @@
 {
+  "prefix": "clerk-js",
+  "compare": false,
   "files": [
     { "path": "./dist/clerk.js", "maxSize": "557KB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "84KB" },
