@@ -13,7 +13,7 @@ import { fill, useMessages } from '../../../localization';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 
-export interface SignInMethodOption {
+interface SignInMethodOption {
   id: string;
   label: string;
   icon: IconComponent;
