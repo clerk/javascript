@@ -60,6 +60,11 @@ export const signInMessages = {
     title: 'Cannot sign in',
     description: 'Cannot proceed with sign in. There’s no available authentication factor.',
   },
+  startOver: {
+    title: 'Something went wrong',
+    description: 'We couldn’t continue signing you in. Start over to try again.',
+    action: 'Start over',
+  },
   actionBlocked: {
     title: 'We couldn’t complete this request',
     description: 'For your security, this request could not be completed.',
@@ -135,6 +140,7 @@ export const signInMessages = {
     passwordLabel: 'New password',
     confirmPasswordLabel: 'Confirm password',
     signOutOfOtherSessions: 'Sign out of all other devices',
+    requiredMessage: 'For security reasons, it is required to reset your password.',
     submit: 'Reset password',
     pending: 'Resetting password',
   },

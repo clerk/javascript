@@ -33,8 +33,9 @@ export const stepIds = {
     'notice:enterprise-sso',
     'notice:email-link',
     'notice:email-link-status',
+    'notice:start-over',
   ],
-  newPassword: ['new-password:forgot'],
+  newPassword: ['new-password:forgot', 'new-password:required'],
   signUp: ['sign-up'],
 } as const;
 

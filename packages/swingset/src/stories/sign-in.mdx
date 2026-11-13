@@ -226,7 +226,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Notice step
 
-`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password, a sent email link and the outcome of opening one.
+`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password, a sent email link, the outcome of opening one, and starting over when the sign-in is in a state the flow does not know.
 
 #### Help
 
@@ -298,7 +298,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### New password step
 
-`new-password-step.tsx` draws `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices.
+`new-password-step.tsx` draws `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices. A reset the instance requires says why and has no sign-out option.
 
 #### Set new password
 

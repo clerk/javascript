@@ -45,7 +45,9 @@ const stepsByKey: Record<SignInStepKey, SignInStep> = {
   'notice:enterprise-sso': { kind: 'notice', purpose: 'enterprise-sso' },
   'notice:email-link': { kind: 'notice', purpose: 'email-link', identifier: 'jane@acme.com' },
   'notice:email-link-status': { kind: 'notice', purpose: 'email-link-status', status: 'expired' },
+  'notice:start-over': { kind: 'notice', purpose: 'start-over' },
   'new-password:forgot': { kind: 'new-password', reason: 'forgot' },
+  'new-password:required': { kind: 'new-password', reason: 'required' },
   'sign-up': { kind: 'sign-up' },
 };
 

@@ -373,6 +373,7 @@ import {
   IdentifierProviderPending as SignInIdentifierProviderPending,
   IdentifierSignInOnly as SignInIdentifierSignInOnly,
   meta as signInMeta,
+  NewPasswordRequired as SignInNewPasswordRequired,
   NewPasswordReset as SignInNewPasswordReset,
   NoticeActionBlocked as SignInNoticeActionBlocked,
   NoticeEmailLinkClientMismatch as SignInNoticeEmailLinkClientMismatch,
@@ -390,6 +391,7 @@ import {
   NoticeNoMethods as SignInNoticeNoMethods,
   NoticePasswordCompromised as SignInNoticePasswordCompromised,
   NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
+  NoticeStartOver as SignInNoticeStartOver,
   SignUpDetails as SignInSignUpDetails,
 } from '../stories/sign-in.stories';
 import {
@@ -1344,7 +1346,9 @@ const signInModule: StoryModule = {
   NoticeEmailLinkExpired: SignInNoticeEmailLinkExpired,
   NoticeEmailLinkInvalid: SignInNoticeEmailLinkInvalid,
   NoticeEmailLinkClientMismatch: SignInNoticeEmailLinkClientMismatch,
+  NoticeStartOver: SignInNoticeStartOver,
   NewPasswordReset: SignInNewPasswordReset,
+  NewPasswordRequired: SignInNewPasswordRequired,
   SignUpDetails: SignInSignUpDetails,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {

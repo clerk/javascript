@@ -42,11 +42,11 @@ export type SignInStep =
   | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus }
-  | { kind: 'new-password'; reason: 'forgot' }
+  | { kind: 'new-password'; reason: 'forgot' | 'required' }
   | { kind: 'sign-up' };
 
 export type SignInEmailLinkStatus =
@@ -123,6 +123,7 @@ export interface SignInViewProps {
   onCancel?: () => void;
   onShowHelp: () => void;
   onBack: () => void;
+  onStartOver: () => void;
   onEmailSupport: () => void;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
