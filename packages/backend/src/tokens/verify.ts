@@ -267,7 +267,7 @@ async function verifyAPIKey(
  * @param token - The token to verify (e.g., starts with "mt_", "oat_", "ak_", or a JWT)
  * @param options - Options including secretKey for BAPI authorization
  */
-export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
+export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions & { publishableKey?: string }) {
   if (isJwtFormat(token)) {
     let decodedResult: Jwt;
     try {
