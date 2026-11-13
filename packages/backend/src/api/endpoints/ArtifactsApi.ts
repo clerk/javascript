@@ -1,10 +1,8 @@
-import type { RequestFunction } from '../request';
+import { AbstractAPI } from './AbstractApi';
 
 export type PoppyMetadata = unknown;
 
-export class ArtifactsAPI {
-  constructor(private readonly request: RequestFunction) {}
-
+export class ArtifactsAPI extends AbstractAPI {
   public async __experimental_getPoppyJson() {
     const artifact = await this.request<{ object: 'artifact'; data: PoppyMetadata }>({
       method: 'GET',
