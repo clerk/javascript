@@ -2,53 +2,90 @@ import { describe, expect, it } from 'vitest';
 
 import { signInMessages } from '../sign-in.messages';
 import type { SignInStep } from '../sign-in.types';
+import type { SignInStepKey } from '../sign-in.utils';
 import {
   codeCopy,
   codeIdentity,
   codeNotice,
   codeSecondaryAction,
+  emailLinkStatusCopy,
   httpsUrl,
   identifierFieldCopy,
   splitLastUsedProvider,
   startPrompt,
+  stepIds,
   stepKey,
 } from '../sign-in.utils';
 
+const provider = { id: 'whatsapp', name: 'WhatsApp', iconUrl: 'https://img.clerk.com/static/whatsapp.svg' };
+
+const stepsByKey: Record<SignInStepKey, SignInStep> = {
+  identifier: { kind: 'identifier', field: 'email' },
+  'identifier:channel': { kind: 'identifier', field: 'phone', channel: provider },
+  'credential:password': { kind: 'credential', credential: 'password', identifier: 'jane@acme.com' },
+  'credential:backup-code': { kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' },
+  'credential:passkey': { kind: 'credential', credential: 'passkey', identifier: 'jane@acme.com' },
+  'code:first-factor': { kind: 'code', purpose: 'first-factor', channel: 'email', identifier: 'jane@acme.com' },
+  'code:second-factor': { kind: 'code', purpose: 'second-factor', channel: 'totp' },
+  'code:client-trust': { kind: 'code', purpose: 'client-trust', channel: 'email' },
+  'code:sso-bypass': { kind: 'code', purpose: 'sso-bypass', channel: 'email' },
+  'code:reset-password': { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' },
+  'code:verify-email': { kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' },
+  'code:verify-phone': { kind: 'code', purpose: 'verify-phone', channel: 'phone' },
+  'choice:methods': { kind: 'choice', purpose: 'methods', options: [] },
+  'choice:reset-methods': { kind: 'choice', purpose: 'reset-methods', options: [] },
+  'choice:enterprise-connections': { kind: 'choice', purpose: 'enterprise-connections', options: [] },
+  'choice:accounts': { kind: 'choice', purpose: 'accounts', options: [] },
+  'choice:wallets': { kind: 'choice', purpose: 'wallets', options: [] },
+  'notice:help': { kind: 'notice', purpose: 'help' },
+  'notice:forgot-password': { kind: 'notice', purpose: 'forgot-password', identifier: 'jane@acme.com' },
+  'notice:no-methods': { kind: 'notice', purpose: 'no-methods' },
+  'notice:action-blocked': { kind: 'notice', purpose: 'action-blocked' },
+  'notice:password-compromised': { kind: 'notice', purpose: 'password-compromised' },
+  'notice:enterprise-sso': { kind: 'notice', purpose: 'enterprise-sso' },
+  'notice:email-link': { kind: 'notice', purpose: 'email-link', identifier: 'jane@acme.com' },
+  'notice:email-link-status': { kind: 'notice', purpose: 'email-link-status', status: 'expired' },
+  'new-password:forgot': { kind: 'new-password', reason: 'forgot' },
+  'sign-up': { kind: 'sign-up' },
+};
+
 describe('stepKey', () => {
   it('keys each step by its kind and the variant that changes its copy', () => {
-    const steps: [SignInStep, string][] = [
-      [{ kind: 'identifier', field: 'email' }, 'identifier'],
-      [
-        {
-          kind: 'identifier',
-          field: 'phone',
-          channel: { id: 'whatsapp', name: 'WhatsApp', iconUrl: 'https://img.clerk.com/static/whatsapp.svg' },
-        },
-        'identifier:channel',
-      ],
-      [{ kind: 'credential', credential: 'password', identifier: 'jane@acme.com' }, 'credential:password'],
-      [{ kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' }, 'credential:backup-code'],
-      [{ kind: 'credential', credential: 'passkey', identifier: 'jane@acme.com' }, 'credential:passkey'],
-      [{ kind: 'code', purpose: 'first-factor', channel: 'email', identifier: 'jane@acme.com' }, 'code:first-factor'],
-      [{ kind: 'code', purpose: 'second-factor', channel: 'totp' }, 'code:second-factor'],
-      [{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }, 'code:verify-email'],
-      [{ kind: 'choice', purpose: 'methods', options: [] }, 'choice:methods'],
-      [{ kind: 'choice', purpose: 'reset-methods', options: [] }, 'choice:reset-methods'],
-      [{ kind: 'choice', purpose: 'accounts', options: [] }, 'choice:accounts'],
-      [{ kind: 'choice', purpose: 'wallets', options: [] }, 'choice:wallets'],
-      [{ kind: 'notice', purpose: 'help' }, 'notice:help'],
-      [
-        { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' },
-        'code:reset-password',
-      ],
-      [{ kind: 'notice', purpose: 'forgot-password', identifier: 'jane@acme.com' }, 'notice:forgot-password'],
-      [{ kind: 'notice', purpose: 'action-blocked' }, 'notice:action-blocked'],
-      [{ kind: 'notice', purpose: 'email-link', identifier: 'jane@acme.com' }, 'notice:email-link'],
-      [{ kind: 'new-password', reason: 'forgot' }, 'new-password:forgot'],
-      [{ kind: 'sign-up' }, 'sign-up'],
-    ];
+    const steps = Object.entries(stepsByKey);
 
-    expect(steps.map(([step]) => stepKey(step))).toEqual(steps.map(([, key]) => key));
+    expect(steps.map(([, step]) => stepKey(step))).toEqual(steps.map(([key]) => key));
+  });
+
+  it('gives every step a key the view lists in a flow step, and lists no key a step cannot produce', () => {
+    const listed = Object.values(stepIds).flat();
+    const produced = Object.values(stepsByKey).map(step => stepKey(step));
+
+    expect([...listed].sort()).toEqual([...produced].sort());
+  });
+});
+
+describe('emailLinkStatusCopy', () => {
+  const m = signInMessages;
+
+  it('tells the tab the link opened in to go back to the original tab', () => {
+    expect(emailLinkStatusCopy('signed-in', m)).toEqual({
+      title: 'Successfully signed in',
+      description: 'Return to original tab to continue',
+    });
+    expect(emailLinkStatusCopy('transferable', m).title).toBe('Email verified');
+  });
+
+  it('tells the original tab to go to the newly opened one', () => {
+    expect(emailLinkStatusCopy('signed-in-other-tab', m)).toEqual({
+      title: 'Signed in on other tab',
+      description: 'Return to the newly opened tab to continue',
+    });
+  });
+
+  it('names what went wrong with the link', () => {
+    expect(emailLinkStatusCopy('expired', m).title).toBe('This verification link has expired');
+    expect(emailLinkStatusCopy('failed', m).title).toBe('This verification link is invalid');
+    expect(emailLinkStatusCopy('client-mismatch', m).title).toBe('Verification link is invalid for this device');
   });
 });
 

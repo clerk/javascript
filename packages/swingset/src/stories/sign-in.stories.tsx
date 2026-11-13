@@ -918,6 +918,34 @@ export function NoticeEmailLinkSent() {
   return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER }} />;
 }
 
+export function NoticeEmailLinkSignedInOtherTab() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in-other-tab' }} />;
+}
+
+export function NoticeEmailLinkVerified() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'transferable' }} />;
+}
+
+export function NoticeEmailLinkSigningIn() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'loading' }} />;
+}
+
+export function NoticeEmailLinkSignedIn() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in' }} />;
+}
+
+export function NoticeEmailLinkExpired() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'expired' }} />;
+}
+
+export function NoticeEmailLinkInvalid() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'failed' }} />;
+}
+
+export function NoticeEmailLinkClientMismatch() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'client-mismatch' }} />;
+}
+
 export function CredentialPasskey() {
   return <StepPanel step={{ kind: 'credential', credential: 'passkey', identifier: IDENTIFIER }} />;
 }

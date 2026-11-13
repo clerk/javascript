@@ -226,7 +226,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Notice step
 
-`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password and a sent email link.
+`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password, a sent email link and the outcome of opening one.
 
 #### Help
 
@@ -291,10 +291,6 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Email link for another device
 
 <Story name='NoticeEmailLinkClientMismatch' storyModule={Stories} />
-
-#### Close this tab
-
-<Story name='NoticeEmailLinkCloseTab' storyModule={Stories} />
 
 #### Start over
 

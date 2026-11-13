@@ -6,6 +6,7 @@ import { useMessages } from '../../../localization';
 import type { SignInStep } from '../sign-in.types';
 import { SignInActionBlocked } from './sign-in-action-blocked';
 import { SignInEmailLink } from './sign-in-email-link';
+import { SignInEmailLinkStatus } from './sign-in-email-link-status';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
@@ -113,6 +114,13 @@ export function NoticeStep({
           isPending={isPending}
           resend={resend}
           onCancel={onCancel}
+        />
+      );
+    case 'email-link-status':
+      return (
+        <SignInEmailLinkStatus
+          status={step.status}
+          globalErrorMessage={globalErrorMessage}
         />
       );
   }

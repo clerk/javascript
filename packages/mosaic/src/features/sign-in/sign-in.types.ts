@@ -45,8 +45,18 @@ export type SignInStep =
   | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
+  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus }
   | { kind: 'new-password'; reason: 'forgot' }
   | { kind: 'sign-up' };
+
+export type SignInEmailLinkStatus =
+  | 'loading'
+  | 'signed-in'
+  | 'signed-in-other-tab'
+  | 'transferable'
+  | 'expired'
+  | 'failed'
+  | 'client-mismatch';
 
 export interface SignInActionBlockedDetails {
   title?: string;
