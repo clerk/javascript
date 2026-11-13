@@ -2,6 +2,7 @@ import { Button } from '@clerk/mosaic/components/button';
 import type { FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
+  SignInAccount,
   SignInFactor,
   SignInIdentifierField,
   SignInProvider,
@@ -471,6 +472,7 @@ function StepPanel({
   onCancel,
   lastUsedProviderId,
   onJoinWaitlist,
+  onSelectAccount,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -487,6 +489,7 @@ function StepPanel({
   onCancel?: () => void;
   lastUsedProviderId?: string;
   onJoinWaitlist?: () => void;
+  onSelectAccount?: (id: string) => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -522,6 +525,9 @@ function StepPanel({
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
       onJoinWaitlist={onJoinWaitlist}
+      onSelectAccount={onSelectAccount}
+      onAddAccount={() => undefined}
+      onSignOutAll={() => undefined}
       onForgotPassword={() => undefined}
       onCancel={
         onCancel ??
@@ -813,6 +819,25 @@ export function ChoiceEnterpriseConnections() {
         ],
       }}
       combined={false}
+    />
+  );
+}
+
+const accounts: SignInAccount[] = [
+  {
+    id: 'sess_1',
+    name: 'Cameron Walker',
+    identifier: 'cameron@acme.com',
+    imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+  },
+  { id: 'sess_2', name: 'Jane Doe', identifier: 'jane@acme.com' },
+];
+
+export function ChoiceAccounts() {
+  return (
+    <StepPanel
+      step={{ kind: 'choice', purpose: 'accounts', options: accounts }}
+      onSelectAccount={() => undefined}
     />
   );
 }

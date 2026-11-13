@@ -33,6 +33,12 @@ export const signInMessages = {
     description: 'Enter your phone number to get a verification code on {provider}.',
     label: '{provider} phone number',
   },
+  accounts: {
+    title: 'Choose an account',
+    description: 'Select the account with which you wish to continue.',
+    addAccount: 'Add account',
+    signOutAll: 'Sign out of all accounts',
+  },
   password: {
     title: 'Enter your password',
     description: 'Enter the password associated with your account',

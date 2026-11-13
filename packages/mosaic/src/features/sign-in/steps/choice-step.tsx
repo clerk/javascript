@@ -9,6 +9,7 @@ import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import type { SignInFactor, SignInStep } from '../sign-in.types';
+import { SignInAccounts } from './sign-in-accounts';
 import { SignInEnterpriseConnections } from './sign-in-enterprise-connections';
 
 const factorIcon = {
@@ -35,6 +36,11 @@ interface ChoiceStepProps {
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   onCancel?: () => void;
+  pendingAccountId?: string;
+  isDisabled: boolean;
+  onSelectAccount?: (id: string) => void;
+  onAddAccount?: () => void;
+  onSignOutAll?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -51,8 +57,28 @@ export function ChoiceStep({
   pendingProviderId,
   onSelectProvider,
   onCancel,
+  pendingAccountId,
+  isDisabled,
+  onSelectAccount,
+  onAddAccount,
+  onSignOutAll,
   focusRef,
 }: ChoiceStepProps) {
+  if (step.purpose === 'accounts') {
+    return (
+      <SignInAccounts
+        focusRef={focusRef}
+        accounts={step.options}
+        globalErrorMessage={globalErrorMessage}
+        pendingAccountId={pendingAccountId}
+        isDisabled={isDisabled}
+        onSelectAccount={id => onSelectAccount?.(id)}
+        onAddAccount={onAddAccount}
+        onSignOutAll={onSignOutAll}
+      />
+    );
+  }
+
   if (step.purpose === 'enterprise-connections') {
     return (
       <SignInEnterpriseConnections
