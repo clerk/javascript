@@ -9,6 +9,8 @@ import { useMessages } from '../../../localization';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface SignInEmailLinkProps {
+  title: string;
+  description: string;
   identifier: string;
   onEditIdentifier?: () => void;
   globalErrorMessage?: string;
@@ -19,6 +21,8 @@ interface SignInEmailLinkProps {
 }
 
 export function SignInEmailLink({
+  title,
+  description,
   identifier,
   onEditIdentifier,
   globalErrorMessage,
@@ -33,8 +37,8 @@ export function SignInEmailLink({
   return (
     <>
       <Card.Header>
-        <Card.Title>{m.emailLink.title}</Card.Title>
-        <Card.Description>{m.emailLink.description}</Card.Description>
+        <Card.Title>{title}</Card.Title>
+        <Card.Description>{description}</Card.Description>
         <SignInIdentityPreview
           identifier={identifier}
           editLabel={m.editIdentifier}

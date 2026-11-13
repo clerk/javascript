@@ -3,17 +3,17 @@ import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
 import { styles } from '../sign-in.styles';
-import type { SignInEmailLinkStatus as Status } from '../sign-in.types';
+import type { SignInStep } from '../sign-in.types';
 import { emailLinkStatusCopy } from '../sign-in.utils';
 
 interface SignInEmailLinkStatusProps {
-  status: Status;
+  step: Extract<SignInStep, { purpose: 'email-link-status' }>;
   globalErrorMessage?: string;
 }
 
-export function SignInEmailLinkStatus({ status, globalErrorMessage }: SignInEmailLinkStatusProps) {
+export function SignInEmailLinkStatus({ step, globalErrorMessage }: SignInEmailLinkStatusProps) {
   const m = useMessages('signIn');
-  const copy = emailLinkStatusCopy(status, m);
+  const copy = emailLinkStatusCopy(step, m);
 
   return (
     <>
@@ -28,7 +28,7 @@ export function SignInEmailLinkStatus({ status, globalErrorMessage }: SignInEmai
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content xstyle={styles.status}>
-        {status === 'loading' ? <Spinner /> : <Text color='foreground-secondary'>{m.emailLink.closeTab}</Text>}
+        {step.status === 'loading' ? <Spinner /> : <Text color='foreground-secondary'>{m.emailLink.closeTab}</Text>}
       </Card.Content>
     </>
   );

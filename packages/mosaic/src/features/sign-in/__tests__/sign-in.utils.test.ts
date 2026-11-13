@@ -11,6 +11,9 @@ import {
   emailLinkStatusCopy,
   httpsUrl,
   identifierFieldCopy,
+  legalConsentLabel,
+  signUpFieldNames,
+  signUpHeading,
   splitLastUsedProvider,
   startPrompt,
   stepIds,
@@ -44,11 +47,12 @@ const stepsByKey: Record<SignInStepKey, SignInStep> = {
   'notice:password-compromised': { kind: 'notice', purpose: 'password-compromised' },
   'notice:enterprise-sso': { kind: 'notice', purpose: 'enterprise-sso' },
   'notice:email-link': { kind: 'notice', purpose: 'email-link', identifier: 'jane@acme.com' },
-  'notice:email-link-status': { kind: 'notice', purpose: 'email-link-status', status: 'expired' },
+  'notice:email-link-status': { kind: 'notice', purpose: 'email-link-status', status: 'expired', flow: 'sign-in' },
+  'notice:verify-email-link': { kind: 'notice', purpose: 'verify-email-link', identifier: 'new@acme.com' },
   'notice:start-over': { kind: 'notice', purpose: 'start-over' },
   'new-password:forgot': { kind: 'new-password', reason: 'forgot' },
   'new-password:required': { kind: 'new-password', reason: 'required' },
-  'sign-up': { kind: 'sign-up' },
+  'sign-up': { kind: 'sign-up', fields: {} },
 };
 
 describe('stepKey', () => {
@@ -70,24 +74,43 @@ describe('emailLinkStatusCopy', () => {
   const m = signInMessages;
 
   it('tells the tab the link opened in to go back to the original tab', () => {
-    expect(emailLinkStatusCopy('signed-in', m)).toEqual({
+    expect(emailLinkStatusCopy({ status: 'signed-in', flow: 'sign-in' }, m)).toEqual({
       title: 'Successfully signed in',
       description: 'Return to original tab to continue',
     });
-    expect(emailLinkStatusCopy('transferable', m).title).toBe('Email verified');
+    expect(emailLinkStatusCopy({ status: 'transferable', flow: 'sign-in' }, m).title).toBe('Email verified');
   });
 
   it('tells the original tab to go to the newly opened one', () => {
-    expect(emailLinkStatusCopy('signed-in-other-tab', m)).toEqual({
+    expect(emailLinkStatusCopy({ status: 'signed-in-other-tab', flow: 'sign-in' }, m)).toEqual({
       title: 'Signed in on other tab',
       description: 'Return to the newly opened tab to continue',
     });
   });
 
+  it('uses the sign-up wording where it differs, and the sign-in wording elsewhere', () => {
+    expect(emailLinkStatusCopy({ status: 'loading', flow: 'sign-up' }, m).title).toBe('Signing up...');
+    expect(emailLinkStatusCopy({ status: 'signed-in', flow: 'sign-up' }, m).title).toBe('Successfully signed up');
+    expect(emailLinkStatusCopy({ status: 'signed-in-other-tab', flow: 'sign-up' }, m)).toEqual({
+      title: 'Successfully verified email',
+      description: 'Return to previous tab to continue',
+    });
+    expect(emailLinkStatusCopy({ status: 'client-mismatch', flow: 'sign-up' }, m).description).toContain('sign-up');
+    expect(emailLinkStatusCopy({ status: 'expired', flow: 'sign-up' }, m)).toEqual(
+      emailLinkStatusCopy({ status: 'expired', flow: 'sign-in' }, m),
+    );
+  });
+
   it('names what went wrong with the link', () => {
-    expect(emailLinkStatusCopy('expired', m).title).toBe('This verification link has expired');
-    expect(emailLinkStatusCopy('failed', m).title).toBe('This verification link is invalid');
-    expect(emailLinkStatusCopy('client-mismatch', m).title).toBe('Verification link is invalid for this device');
+    expect(emailLinkStatusCopy({ status: 'expired', flow: 'sign-in' }, m).title).toBe(
+      'This verification link has expired',
+    );
+    expect(emailLinkStatusCopy({ status: 'failed', flow: 'sign-in' }, m).title).toBe(
+      'This verification link is invalid',
+    );
+    expect(emailLinkStatusCopy({ status: 'client-mismatch', flow: 'sign-in' }, m).title).toBe(
+      'Verification link is invalid for this device',
+    );
   });
 });
 
@@ -241,5 +264,41 @@ describe('splitLastUsedProvider', () => {
       lastUsed: undefined,
       others: [google, github],
     });
+  });
+});
+
+describe('signUpFieldNames', () => {
+  it('lists the fields the sign-up asks for in the order the form shows them', () => {
+    expect(
+      signUpFieldNames({
+        password: { required: true },
+        username: { required: false },
+        firstName: { required: true },
+        phoneNumber: { required: false },
+      }),
+    ).toEqual(['firstName', 'username', 'phoneNumber', 'password']);
+    expect(signUpFieldNames({})).toEqual([]);
+  });
+});
+
+describe('sign-up legal consent', () => {
+  const m = signInMessages;
+
+  it('names only the pages the instance links to', () => {
+    expect(legalConsentLabel({ termsUrl: 'https://acme.com/terms' }, m)).toBe(m.signUp.legalConsent.termsOnly);
+    expect(legalConsentLabel({ privacyPolicyUrl: 'https://acme.com/privacy' }, m)).toBe(
+      m.signUp.legalConsent.privacyOnly,
+    );
+    expect(
+      legalConsentLabel({ termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' }, m),
+    ).toBe(m.signUp.legalConsent.termsAndPrivacy);
+  });
+
+  it('titles the step for consent when consent is all that is missing', () => {
+    expect(signUpHeading({ kind: 'sign-up', fields: {}, legalConsent: {} }, m).title).toBe('Legal consent');
+    expect(
+      signUpHeading({ kind: 'sign-up', fields: { password: { required: true } }, legalConsent: {} }, m).title,
+    ).toBe('Create your account');
+    expect(signUpHeading({ kind: 'sign-up', fields: {} }, m).title).toBe('Create your account');
   });
 });
