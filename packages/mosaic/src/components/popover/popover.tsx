@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -114,12 +116,12 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
   );
 });
 
-/** A floating box anchored to a trigger. */
-export const Popover = {
-  Root: Primitive.Root,
-  Trigger,
-  Popup,
-  Title,
-  Description,
-  Close,
+const PopoverRoot = Primitive.Root;
+export {
+  PopoverRoot,
+  Trigger as PopoverTrigger,
+  Popup as PopoverPopup,
+  Title as PopoverTitle,
+  Description as PopoverDescription,
+  Close as PopoverClose,
 };

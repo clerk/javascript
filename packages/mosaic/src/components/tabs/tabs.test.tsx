@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Tabs } from './tabs';
+import { Tabs } from '.';
 import { styles } from './tabs.styles';
 
 const atoms = stylex.create({

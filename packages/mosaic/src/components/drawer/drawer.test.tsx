@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../mosaic-provider';
 import { Dialog } from '../dialog';
-import { Drawer } from './drawer';
+import { Drawer } from '.';
 
 function Sheet({ defaultOpen = true }: { defaultOpen?: boolean }) {
   return (

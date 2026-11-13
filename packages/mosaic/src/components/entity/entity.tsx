@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -84,10 +86,10 @@ const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>
   });
 });
 
-export const Entity = {
-  Root,
-  Media,
-  Content,
-  Label,
-  Description,
+export {
+  Root as EntityRoot,
+  Media as EntityMedia,
+  Content as EntityContent,
+  Label as EntityLabel,
+  Description as EntityDescription,
 };

@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -239,15 +241,7 @@ export const MenuSeparator = React.forwardRef<HTMLDivElement, MenuSeparatorProps
   );
 });
 
-export const Menu = {
-  // Renders no element of its own; re-exported unchanged so the state provider sits
-  // alongside the styled parts.
-  Root: Primitive.Root,
-  Trigger: MenuTrigger,
-  Popup: MenuPopup,
-  Item: MenuItem,
-  Media: MenuMedia,
-  Label: MenuLabel,
-  Indicator: MenuIndicator,
-  Separator: MenuSeparator,
-};
+// Renders no element of its own; re-exported unchanged so the state provider sits
+// alongside the styled parts.
+const MenuRoot = Primitive.Root;
+export { MenuRoot };

@@ -1,3 +1,5 @@
+'use client';
+
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -193,15 +195,4 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
   );
 });
 
-/**
- * Compound avatar. `Avatar.Root` positions and sizes the box; `Avatar.Image` renders
- * once its source loads; `Avatar.Fallback` holds the space until then, as a blank
- * placeholder that shimmers only while an image is actually on its way; `Avatar.Icon`
- * adds an optional corner affordance.
- */
-export const Avatar = {
-  Root: AvatarRoot,
-  Image: AvatarImage,
-  Fallback: AvatarFallback,
-  Icon: AvatarIcon,
-};
+export { AvatarRoot, AvatarImage, AvatarFallback, AvatarIcon };

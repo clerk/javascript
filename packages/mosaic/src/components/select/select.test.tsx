@@ -5,7 +5,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Field } from '../field';
-import { Select } from './select';
+import { Select } from '.';
 
 const roles = [
   { value: 'all', label: 'All roles' },

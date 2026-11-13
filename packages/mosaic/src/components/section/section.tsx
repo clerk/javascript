@@ -1,3 +1,5 @@
+'use client';
+
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -347,25 +349,20 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
   });
 });
 
-/**
- * A compound component for a topic of settings. `Section.Root` stacks groups; each `Section.Group`
- * is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding
- * either `Section.Row`s (one setting each) or a `Section.Items` list of values.
- */
-export const Section = {
-  Root,
-  Group,
-  Header,
-  Title,
-  Body,
-  Row,
-  Items,
-  Item,
-  Media,
-  Content,
-  Label,
-  Description,
-  Actions,
-  Note,
-  Error: SectionError,
+export {
+  Root as SectionRoot,
+  Group as SectionGroup,
+  Header as SectionHeader,
+  Title as SectionTitle,
+  Body as SectionBody,
+  Row as SectionRow,
+  Items as SectionItems,
+  Item as SectionItem,
+  Media as SectionMedia,
+  Content as SectionContent,
+  Label as SectionLabel,
+  Description as SectionDescription,
+  Actions as SectionActions,
+  Note as SectionNote,
+  SectionError,
 };

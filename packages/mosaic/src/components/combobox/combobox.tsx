@@ -248,16 +248,3 @@ export const ComboboxEmpty = React.forwardRef<HTMLParagraphElement, ComboboxEmpt
     },
   });
 });
-
-export const Combobox = {
-  Root: ComboboxRoot,
-  Collection: ComboboxCollection,
-  Input: ComboboxInput,
-  Trigger: ComboboxTrigger,
-  Clear: ComboboxClear,
-  Popup: ComboboxPopup,
-  List: ComboboxList,
-  Option: ComboboxOption,
-  OptionIndicator: ComboboxOptionIndicator,
-  Empty: ComboboxEmpty,
-};

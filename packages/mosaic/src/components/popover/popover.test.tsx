@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Button } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { Card } from '../card';
-import { Popover } from './popover';
+import { Popover } from '.';
 
 afterEach(() => cleanup());
 

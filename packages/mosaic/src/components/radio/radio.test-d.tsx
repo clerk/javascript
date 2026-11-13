@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
-import { Radio } from './radio';
+import { Radio } from '.';
 
 type Access = 'all' | 'selected';
 

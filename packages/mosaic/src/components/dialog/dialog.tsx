@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -485,44 +487,13 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 });
 
-/**
- * Mosaic `Dialog` — a modal surface built on the `primitives/dialog` primitive, composed
- * via dot syntax:
- *
- * ```tsx
- * <Dialog.Root>
- *   <Dialog.Trigger render={<Button />}>Open</Dialog.Trigger>
- *   <Dialog.Popup>
- *     <Card.Root elevation='overlay'>
- *       <Card.Header>
- *         <Card.Title>…</Card.Title>
- *         <Card.Description>…</Card.Description>
- *       </Card.Header>
- *     </Card.Root>
- *   </Dialog.Popup>
- * </Dialog.Root>
- * ```
- *
- * The dialog brings the geometry, the motion and the floating tree; the SURFACE comes from what
- * is rendered inside it — a `Card` for a `card`, a `Profile` for a `profile`. Those surfaces read
- * `DialogContext`, so `Card.Title` names the dialog and `Card.Header` carries its dismiss without
- * either knowing it is in one.
- *
- * `Dialog.Popup` renders the portal, the scrim and the centering viewport itself, so those are
- * not parts. `role='alertdialog'` on the root makes it an alert dialog — one that interrupts to
- * ask for a decision and waits for one. In the compact band a card is a bottom sheet unless
- * `compactPlacement='center'`.
- *
- * Each styled part spreads `themeProps` + `stylex.props` through `mergeStyleProps`, so it
- * carries the public `.cl-<slot>` class and StyleX atoms while the headless part keeps its focus
- * management, scroll lock, and ARIA wiring.
- */
-export const Dialog = {
-  Root,
-  Trigger,
-  Popup,
-  Close,
-  CloseButton,
-  /** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
-  createHandle: Primitive.createHandle,
+/** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
+const createDialogHandle = Primitive.createHandle;
+export {
+  Root as DialogRoot,
+  Trigger as DialogTrigger,
+  Popup as DialogPopup,
+  Close as DialogClose,
+  CloseButton as DialogCloseButton,
+  createDialogHandle,
 };

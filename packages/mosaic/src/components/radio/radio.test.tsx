@@ -5,7 +5,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Field } from '../field';
-import { Radio } from './radio';
+import { Radio } from '.';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },

@@ -1,5 +1,5 @@
+export * as Combobox from './combobox.parts';
 export {
-  Combobox,
   ComboboxClear,
   ComboboxCollection,
   ComboboxEmpty,

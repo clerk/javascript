@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -323,15 +325,14 @@ const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function M
   );
 });
 
-/** Styled parts for composing an automatically associated single-control field. */
-export const Field = {
-  Root,
-  Label,
-  Content,
-  Description,
-  Message,
-  Feedback,
-  Error: FieldError,
-  Success: FieldSuccess,
-  Hint: FieldHint,
+export {
+  Root as FieldRoot,
+  Label as FieldLabel,
+  Content as FieldContent,
+  Description as FieldDescription,
+  Message as FieldMessage,
+  Feedback as FieldFeedback,
+  FieldError,
+  FieldSuccess,
+  FieldHint,
 };
