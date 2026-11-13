@@ -8,18 +8,26 @@ import type {
   SignInProvider,
   SignInSubmitEvent,
   SignInValues,
-  SignUpFields,
-  SignUpLegalConsent,
 } from '../sign-in';
 
+export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
+
+export type SignUpFields = Partial<Record<SignUpFieldName, { required: boolean; disabled?: boolean }>>;
+
+export interface SignUpLegalConsent {
+  termsUrl?: string;
+  privacyPolicyUrl?: string;
+}
+
+export interface SignUpDetails {
+  purpose?: 'start' | 'continue';
+  fields: SignUpFields;
+  nextField?: 'emailAddress' | 'phoneNumber';
+  legalConsent?: SignUpLegalConsent;
+}
+
 export type SignUpStep =
-  | {
-      kind: 'details';
-      purpose: 'start' | 'continue';
-      fields: SignUpFields;
-      nextField?: 'emailAddress' | 'phoneNumber';
-      legalConsent?: SignUpLegalConsent;
-    }
+  | ({ kind: 'details'; purpose: 'start' | 'continue' } & SignUpDetails)
   | { kind: 'alternative-phone'; channel: SignInProvider }
   | { kind: 'code'; purpose: 'verify-email' | 'verify-phone'; identifier: string; provider?: string }
   | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly SignInProvider[] }

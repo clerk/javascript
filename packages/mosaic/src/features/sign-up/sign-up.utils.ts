@@ -1,6 +1,8 @@
 import type { MosaicMessages } from '../../localization';
 import type { SignInStep } from '../sign-in';
-import type { SignUpStep } from './sign-up.types';
+import type { SignUpDetails, SignUpFieldName, SignUpFields, SignUpLegalConsent, SignUpStep } from './sign-up.types';
+
+type Messages = MosaicMessages['signUp'];
 
 export const signUpStepIds = {
   details: ['details:start', 'details:continue'],
@@ -35,17 +37,34 @@ export function signUpStepKey(step: SignUpStep): SignUpStepKey {
   }
 }
 
-type DetailsStep = Extract<SignUpStep, { kind: 'details' }>;
+const signUpFieldOrder: readonly SignUpFieldName[] = [
+  'firstName',
+  'lastName',
+  'username',
+  'emailAddress',
+  'phoneNumber',
+  'password',
+];
 
-export function signUpDetailsHeading(
-  step: DetailsStep,
-  m: MosaicMessages['signUp'],
-  legalConsent: MosaicMessages['signIn']['signUp']['legalConsent'],
-): { title: string; description: string } {
-  if (step.legalConsent && Object.keys(step.fields).length === 0) {
-    return { title: legalConsent.title, description: legalConsent.description };
+export function signUpFieldNames(fields: SignUpFields): SignUpFieldName[] {
+  return signUpFieldOrder.filter(name => fields[name]);
+}
+
+export function signUpDetailsHeading(step: SignUpDetails, m: Messages): { title: string; description: string } {
+  if (step.legalConsent && signUpFieldNames(step.fields).length === 0) {
+    return { title: m.legalConsent.title, description: m.legalConsent.description };
   }
-  return step.purpose === 'start' ? m.start : m.continue;
+  return step.purpose === 'continue' ? m.continue : m.start;
+}
+
+export function legalConsentLabel({ termsUrl, privacyPolicyUrl }: SignUpLegalConsent, m: Messages) {
+  if (termsUrl && !privacyPolicyUrl) {
+    return m.legalConsent.termsOnly;
+  }
+  if (privacyPolicyUrl && !termsUrl) {
+    return m.legalConsent.privacyOnly;
+  }
+  return m.legalConsent.termsAndPrivacy;
 }
 
 export function signUpCodeStep(step: Extract<SignUpStep, { kind: 'code' }>): Extract<SignInStep, { kind: 'code' }> {

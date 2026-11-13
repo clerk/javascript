@@ -16,9 +16,9 @@ import { SignInEnterpriseConnections } from '../sign-in/steps/sign-in-enterprise
 import { SignInLoading } from '../sign-in/steps/sign-in-loading';
 import { SignInProtectCheck } from '../sign-in/steps/sign-in-protect-check';
 import { SignInWallets } from '../sign-in/steps/sign-in-wallets';
-import { SignUpDetailsStep } from '../sign-in/steps/sign-up-details';
 import type { SignUpStep, SignUpViewProps } from './sign-up.types';
-import { signUpCodeStep, signUpDetailsHeading, signUpStepIds, signUpStepKey } from './sign-up.utils';
+import { signUpCodeStep, signUpStepIds, signUpStepKey } from './sign-up.utils';
+import { SignUpDetailsStep } from './steps/sign-up-details';
 import { SignUpRestricted } from './steps/sign-up-restricted';
 
 type ResendCopy = { resendText: string; resend: string; resendCountdown: `${string}{seconds}${string}` };
@@ -167,13 +167,7 @@ export function SignUpView({
               {current.kind === 'details' ? (
                 <SignUpDetailsStep
                   focusRef={focusRef}
-                  step={{
-                    kind: 'sign-up',
-                    fields: current.fields,
-                    nextField: current.nextField,
-                    legalConsent: current.legalConsent,
-                  }}
-                  heading={signUpDetailsHeading(current, m, shared.signUp.legalConsent)}
+                  step={current}
                   logo={current.purpose === 'start' ? logo : undefined}
                   captcha={current.purpose === 'start'}
                   onSwitchField={onSwitchField}

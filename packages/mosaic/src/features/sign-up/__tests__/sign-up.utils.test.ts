@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { signInMessages } from '../../sign-in/sign-in.messages';
 import { signUpMessages } from '../sign-up.messages';
-import type { SignUpStep } from '../sign-up.types';
+import type { SignUpDetails, SignUpStep } from '../sign-up.types';
 import type { SignUpStepKey } from '../sign-up.utils';
-import { signUpCodeStep, signUpDetailsHeading, signUpStepIds, signUpStepKey } from '../sign-up.utils';
+import {
+  legalConsentLabel,
+  signUpCodeStep,
+  signUpDetailsHeading,
+  signUpFieldNames,
+  signUpStepIds,
+  signUpStepKey,
+} from '../sign-up.utils';
 
 const provider = { id: 'whatsapp', name: 'WhatsApp', iconUrl: 'https://img.clerk.com/static/whatsapp.svg' };
 
@@ -41,21 +47,47 @@ describe('signUpStepKey', () => {
 });
 
 describe('signUpDetailsHeading', () => {
-  const heading = (step: Extract<SignUpStep, { kind: 'details' }>) =>
-    signUpDetailsHeading(step, signUpMessages, signInMessages.signUp.legalConsent);
+  const heading = (step: SignUpDetails) => signUpDetailsHeading(step, signUpMessages);
 
   it('welcomes a new sign-up on start and asks for what is missing on continue', () => {
-    expect(heading({ kind: 'details', purpose: 'start', fields: { emailAddress: { required: true } } }).title).toBe(
+    expect(heading({ purpose: 'start', fields: { emailAddress: { required: true } } }).title).toBe(
       'Create your account',
     );
-    expect(heading({ kind: 'details', purpose: 'continue', fields: { username: { required: true } } }).title).toBe(
+    expect(heading({ purpose: 'continue', fields: { username: { required: true } } }).title).toBe(
       'Fill in missing fields',
     );
   });
 
   it('titles the step for consent when consent is all that is missing', () => {
-    expect(heading({ kind: 'details', purpose: 'continue', fields: {}, legalConsent: {} }).title).toBe('Legal consent');
-    expect(heading({ kind: 'details', purpose: 'start', fields: {} }).title).toBe('Create your account');
+    expect(heading({ purpose: 'continue', fields: {}, legalConsent: {} }).title).toBe('Legal consent');
+    expect(heading({ purpose: 'start', fields: {} }).title).toBe('Create your account');
+    expect(heading({ fields: { password: { required: true } }, legalConsent: {} }).title).toBe('Create your account');
+  });
+});
+
+describe('signUpFieldNames', () => {
+  it('lists the fields the sign-up asks for in the order the form shows them', () => {
+    expect(
+      signUpFieldNames({
+        password: { required: true },
+        username: { required: false },
+        firstName: { required: true },
+        phoneNumber: { required: false },
+      }),
+    ).toEqual(['firstName', 'username', 'phoneNumber', 'password']);
+    expect(signUpFieldNames({})).toEqual([]);
+  });
+});
+
+describe('legalConsentLabel', () => {
+  const m = signUpMessages;
+
+  it('names only the pages the instance links to', () => {
+    expect(legalConsentLabel({ termsUrl: 'https://acme.com/terms' }, m)).toBe(m.legalConsent.termsOnly);
+    expect(legalConsentLabel({ privacyPolicyUrl: 'https://acme.com/privacy' }, m)).toBe(m.legalConsent.privacyOnly);
+    expect(
+      legalConsentLabel({ termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' }, m),
+    ).toBe(m.legalConsent.termsAndPrivacy);
   });
 });
 

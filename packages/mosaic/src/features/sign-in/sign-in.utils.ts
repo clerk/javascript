@@ -2,14 +2,7 @@ import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
-import type {
-  SignInIdentifierField,
-  SignInProvider,
-  SignInStep,
-  SignUpFieldName,
-  SignUpFields,
-  SignUpLegalConsent,
-} from './sign-in.types';
+import type { SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
 
 export const stepIds = {
   identifier: ['identifier'],
@@ -283,36 +276,4 @@ export function splitLastUsedProvider(
 ): { lastUsed?: SignInProvider; others: readonly SignInProvider[] } {
   const lastUsed = providers.find(provider => provider.id === lastUsedProviderId);
   return { lastUsed, others: lastUsed ? providers.filter(provider => provider !== lastUsed) : providers };
-}
-
-const signUpFieldOrder: readonly SignUpFieldName[] = [
-  'firstName',
-  'lastName',
-  'username',
-  'emailAddress',
-  'phoneNumber',
-  'password',
-];
-
-export function signUpFieldNames(fields: SignUpFields): SignUpFieldName[] {
-  return signUpFieldOrder.filter(name => fields[name]);
-}
-
-export function signUpHeading(
-  step: Extract<SignInStep, { kind: 'sign-up' }>,
-  m: Messages,
-): { title: string; description: string } {
-  return step.legalConsent && signUpFieldNames(step.fields).length === 0
-    ? { title: m.signUp.legalConsent.title, description: m.signUp.legalConsent.description }
-    : { title: m.signUp.title, description: m.signUp.description };
-}
-
-export function legalConsentLabel({ termsUrl, privacyPolicyUrl }: SignUpLegalConsent, m: Messages) {
-  if (termsUrl && !privacyPolicyUrl) {
-    return m.signUp.legalConsent.termsOnly;
-  }
-  if (privacyPolicyUrl && !termsUrl) {
-    return m.signUp.legalConsent.privacyOnly;
-  }
-  return m.signUp.legalConsent.termsAndPrivacy;
 }
