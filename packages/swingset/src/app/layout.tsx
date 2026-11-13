@@ -6,6 +6,7 @@ import Script from 'next/script';
 import type React from 'react';
 
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { THEME_STYLE_INIT_SCRIPT } from '@/components/ThemeStyleProvider';
 import { cn } from '@/lib/utils';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={cn('font-sans', geist.variable)}
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_STYLE_INIT_SCRIPT }} />
         {process.env.NODE_ENV === 'development' && (
           <>
             <Script
