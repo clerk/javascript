@@ -1,17 +1,16 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
-import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
-import { Icon, IconFrame } from '../../../components/icon';
+import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
-import { ChevronRight } from '../../../icons/glyphs/chevron-right';
 import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
-import { rtl } from '../../../styles/rtl.styles';
+import { Button as HeadlessButton } from '../../../primitives/button';
+import { RowAvatar } from '../../switcher/switcher-avatar.view';
 import type { SignInAccount } from '../sign-in.types';
 
 interface SignInAccountsProps {
@@ -56,80 +55,68 @@ export function SignInAccounts({
             <Item.Root
               key={account.id}
               ref={index === 0 ? firstRowRef : undefined}
+              aria-busy={pendingAccountId === account.id || undefined}
               render={
-                <button
-                  type='button'
+                <HeadlessButton
                   disabled={isDisabled}
-                  onClick={() => onSelectAccount(account.id)}
+                  focusableWhenDisabled
                 />
               }
+              onClick={() => onSelectAccount(account.id)}
             >
               <Item.Media>
-                <Avatar.Root aria-hidden>
-                  {account.imageUrl ? (
-                    <Avatar.Image
-                      src={account.imageUrl}
-                      alt=''
-                    />
-                  ) : null}
-                  <Avatar.Fallback />
-                </Avatar.Root>
+                <RowAvatar
+                  name={account.name}
+                  imageUrl={account.imageUrl}
+                  shape='circle'
+                  size='fit'
+                />
               </Item.Media>
               <Item.Content>
                 <Item.Label>{account.name}</Item.Label>
                 <Item.Description>{account.identifier}</Item.Description>
               </Item.Content>
-              <Item.Actions>
-                {pendingAccountId === account.id ? (
+              {pendingAccountId === account.id ? (
+                <Item.Media>
                   <Spinner
                     size='sm'
                     label={m.verifying}
                   />
-                ) : (
-                  <Icon
-                    glyph={ChevronRight}
-                    xstyle={rtl.mirror}
-                  />
-                )}
-              </Item.Actions>
+                </Item.Media>
+              ) : null}
             </Item.Root>
           ))}
-          {onAddAccount ? (
-            <Item.Root
-              render={
-                <button
-                  type='button'
-                  disabled={isDisabled}
-                  onClick={onAddAccount}
-                />
-              }
-            >
-              <Item.Media>
-                <IconFrame
-                  filled
-                  bordered={false}
-                >
-                  <Icon glyph={Plus} />
-                </IconFrame>
-              </Item.Media>
-              <Item.Content>
-                <Item.Label>{m.accounts.addAccount}</Item.Label>
-              </Item.Content>
-            </Item.Root>
-          ) : null}
+        </Item.Group>
+      </Card.Content>
+      {onAddAccount || onSignOutAll ? (
+        <Card.Footer>
           {onSignOutAll ? (
             <Button
               type='button'
-              color='neutral'
               variant='ghost'
+              color='neutral'
               disabled={isDisabled}
+              focusableWhenDisabled
               onClick={onSignOutAll}
             >
               {m.accounts.signOutAll}
             </Button>
           ) : null}
-        </Item.Group>
-      </Card.Content>
+          {onAddAccount ? (
+            <Button
+              type='button'
+              variant='outline'
+              color='neutral'
+              disabled={isDisabled}
+              focusableWhenDisabled
+              onClick={onAddAccount}
+            >
+              <Icon glyph={Plus} />
+              {m.accounts.addAccount}
+            </Button>
+          ) : null}
+        </Card.Footer>
+      ) : null}
     </>
   );
 }
