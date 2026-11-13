@@ -1,13 +1,15 @@
 import { ClerkUILogo } from '@/components/marketing/clerk-logo';
-import { Badge, type BadgeTone } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { InlineCode } from '@/components/ui/inline-code';
 import { COMPONENT_STATUS, type ComponentStatus } from '@/lib/component-status';
+import { cn } from '@/lib/utils';
 
-const STATUS: Record<ComponentStatus, { label: string; tone: BadgeTone }> = {
-  available: { label: 'Available', tone: 'beta' },
-  'in-progress': { label: 'In progress', tone: 'neutral' },
-  'not-yet': { label: 'Not yet', tone: 'neutral' },
+const STATUS: Record<ComponentStatus, { label: string; icon: React.ReactNode }> = {
+  done: { label: 'Done', icon: <StatusDot className='bg-green-500 dark:bg-green-400' /> },
+  available: { label: 'Stable', icon: <StatusDot className='bg-blue-500 dark:bg-blue-400' /> },
+  'in-progress': { label: 'In progress', icon: <HalfCircleIcon /> },
+  'not-yet': { label: 'Not yet', icon: <StatusDot className='ring-1 ring-inset ring-gray-400 dark:ring-gray-500' /> },
 };
 
 export function ComponentStatusTable() {
@@ -88,10 +90,8 @@ export function ComponentStatusTable() {
                     )}
                   </td>
                   <td className='whitespace-nowrap py-3 pl-4'>
-                    <Badge
-                      tone={STATUS[row.status].tone}
-                      className='w-fit'
-                    >
+                    <Badge className='w-fit gap-1.5'>
+                      {STATUS[row.status].icon}
                       {STATUS[row.status].label}
                     </Badge>
                   </td>
@@ -105,5 +105,37 @@ export function ComponentStatusTable() {
         </div>
       </Container>
     </section>
+  );
+}
+
+function StatusDot({ className }: { className: string }) {
+  return (
+    <span
+      aria-hidden='true'
+      className={cn('size-1.5 shrink-0 rounded-full', className)}
+    />
+  );
+}
+
+function HalfCircleIcon() {
+  return (
+    <svg
+      viewBox='0 0 10 10'
+      aria-hidden='true'
+      className='size-2.5 shrink-0 text-gray-400 dark:text-gray-500'
+    >
+      <circle
+        cx='5'
+        cy='5'
+        r='4.25'
+        fill='none'
+        stroke='currentColor'
+        strokeWidth='1.5'
+      />
+      <path
+        d='M5 2.5a2.5 2.5 0 0 1 0 5z'
+        fill='currentColor'
+      />
+    </svg>
   );
 }

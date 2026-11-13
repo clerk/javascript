@@ -1,4 +1,4 @@
-export type ComponentStatus = 'available' | 'in-progress' | 'not-yet';
+export type ComponentStatus = 'done' | 'available' | 'in-progress' | 'not-yet';
 
 export type ComponentRow = {
   stable: string;
@@ -12,7 +12,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
   {
     stable: 'UserButton',
     beta: 'UserButton',
-    status: 'available',
+    status: 'done',
     renamedTo: 'Switcher',
     notes:
       '`mode` is now `combined`, and profile props and URLs move to `MosaicProvider`. No `href` link items in `customPages`.',
