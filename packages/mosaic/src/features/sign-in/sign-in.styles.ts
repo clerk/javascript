@@ -64,6 +64,20 @@ export const styles = stylex.create({
   footerText: {
     textAlign: 'center',
   },
+  loading: {
+    justifyItems: 'center',
+    paddingBlockEnd: space['10'],
+    paddingBlockStart: space['10'],
+  },
+  protectCheck: {
+    justifyItems: 'center',
+  },
+  protectCheckContainer: {
+    display: 'block',
+  },
+  protectCheckContainerEmpty: {
+    position: 'absolute',
+  },
   status: {
     alignItems: 'center',
     display: 'flex',

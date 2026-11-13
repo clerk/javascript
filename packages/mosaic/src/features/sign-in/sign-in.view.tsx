@@ -86,6 +86,8 @@ export function SignInView({
   onShowHelp,
   onBack,
   onStartOver,
+  onRetry,
+  protectCheckRef,
   onEmailSupport,
   pendingFactorId,
   onSelectFactor,
@@ -269,6 +271,8 @@ export function SignInView({
                     onEmailSupport={onEmailSupport}
                     onBack={onBack}
                     onStartOver={onStartOver}
+                    onRetry={onRetry}
+                    protectCheckRef={protectCheckRef}
                     onEditIdentifier={onEditIdentifier}
                     onForgotPassword={onForgotPassword}
                     onCancel={onCancel}

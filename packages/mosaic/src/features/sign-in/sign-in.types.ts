@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 
@@ -42,7 +44,8 @@ export type SignInStep =
   | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' | 'loading' }
+  | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
@@ -141,6 +144,8 @@ export interface SignInViewProps {
   onShowHelp: () => void;
   onBack: () => void;
   onStartOver: () => void;
+  onRetry?: () => void;
+  protectCheckRef?: Ref<HTMLDivElement>;
   onEmailSupport: () => void;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
