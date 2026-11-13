@@ -637,6 +637,24 @@ export function IdentifierUsername() {
   return <SwitchingIdentifier fields={['username']} />;
 }
 
+export function IdentifierWeb3() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email' }}
+      providers={[
+        { id: 'oauth_google', name: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
+        { id: 'web3_metamask_signature', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+        {
+          id: 'web3_coinbase_wallet_signature',
+          name: 'Coinbase Wallet',
+          iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
+        },
+      ]}
+    />
+  );
+}
+
 export function IdentifierPasskey() {
   return (
     <StepPanel
