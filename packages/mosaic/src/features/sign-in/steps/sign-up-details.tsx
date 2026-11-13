@@ -182,6 +182,7 @@ export function SignUpDetailsStep({
         <SubmitButton
           form={form.id}
           fullWidth
+          disabled={Boolean(pendingProviderId)}
           isPending={isPending}
           pendingLabel={m.verifying}
         >
@@ -415,6 +416,8 @@ function PhoneField({ form, required, disabled, autoFocus, inputRef, switchRef, 
         countryTriggerLabel={m.signUp.selectedCountry}
         countryPopupLabel={m.signUp.chooseCountry}
         countrySearchLabel={m.signUp.searchCountries}
+        countrySearchPlaceholder={m.signUp.countrySearchPlaceholder}
+        noResultsMessage={m.signUp.noCountries}
         {...control}
       />
       <Field.Feedback feedback={feedback} />

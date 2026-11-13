@@ -87,6 +87,8 @@ export function SignInAlternativeChannel({
               countryTriggerLabel={m.start.selectedCountry}
               countryPopupLabel={m.start.chooseCountry}
               countrySearchLabel={m.start.searchCountries}
+              countrySearchPlaceholder={m.start.countrySearchPlaceholder}
+              noResultsMessage={m.start.noCountries}
               {...phone}
             />
             <Field.Feedback feedback={feedback} />
