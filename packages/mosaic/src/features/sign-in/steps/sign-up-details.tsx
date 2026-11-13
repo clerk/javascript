@@ -1,6 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
+import { useState } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -8,6 +9,7 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
+import { PasswordInput } from '../../../components/password-input';
 import { PhoneInput } from '../../../components/phone-input';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
@@ -15,7 +17,6 @@ import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
 import type { SignInSubmitEvent, SignInValues, SignUpFieldName, SignUpFields } from '../sign-in.types';
 import { signUpFieldNames } from '../sign-in.utils';
-import { SignInOptionalHint, SignInPasswordField } from './sign-in-password-field';
 
 interface SignUpDetailsProps {
   fields: SignUpFields;
@@ -109,11 +110,8 @@ export function SignUpDetailsStep({
             ) : null}
             {fields.phoneNumber ? <PhoneField {...field('phoneNumber')} /> : null}
             {fields.password ? (
-              <SignInPasswordField
+              <PasswordField
                 {...field('password')}
-                name='password'
-                label={m.signUp.passwordLabel}
-                placeholder={m.signUp.passwordPlaceholder}
                 advisoryFeedback={passwordFeedback}
               />
             ) : null}
@@ -192,7 +190,7 @@ function TextField({
     >
       <Field.Header>
         <Field.Label>{label}</Field.Label>
-        {required ? null : <SignInOptionalHint />}
+        {required ? null : <OptionalHint />}
       </Field.Header>
       <Input
         ref={mergedRef}
@@ -222,7 +220,7 @@ function PhoneField({ form, required, disabled, autoFocus, inputRef }: FieldProp
     >
       <Field.Header>
         <Field.Label>{m.signUp.phoneLabel}</Field.Label>
-        {required ? null : <SignInOptionalHint />}
+        {required ? null : <OptionalHint />}
       </Field.Header>
       <PhoneInput
         ref={mergedRef}
@@ -235,5 +233,65 @@ function PhoneField({ form, required, disabled, autoFocus, inputRef }: FieldProp
       />
       <Field.Feedback feedback={feedback} />
     </Field.Root>
+  );
+}
+
+function PasswordField({
+  form,
+  required,
+  disabled,
+  autoFocus,
+  inputRef,
+  advisoryFeedback,
+}: FieldProps & { advisoryFeedback?: FieldFeedback }) {
+  const m = useMessages('signIn');
+  const [focused, setFocused] = useState(false);
+  const { feedback } = form.fields.password;
+  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
+  const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
+  const { ref, ...control } = form.register('password');
+  const flowAutoFocusRef = useFlowAutoFocus<HTMLInputElement>();
+  const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, autoFocus ? flowAutoFocusRef : undefined]);
+
+  return (
+    <Field.Root
+      required={required}
+      invalid={feedbackType === 'error'}
+      disabled={disabled}
+      focusableWhenDisabled
+    >
+      <Field.Header>
+        <Field.Label>{m.signUp.passwordLabel}</Field.Label>
+        {required ? null : <OptionalHint />}
+      </Field.Header>
+      <PasswordInput
+        ref={mergedRef}
+        autoComplete='new-password'
+        placeholder={m.signUp.passwordPlaceholder}
+        {...control}
+        onFocus={() => setFocused(true)}
+        onBlur={() => {
+          setFocused(false);
+          control.onBlur();
+        }}
+        showPasswordLabel={m.showPassword}
+        hidePasswordLabel={m.hidePassword}
+      />
+      <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
+    </Field.Root>
+  );
+}
+
+function OptionalHint() {
+  const m = useMessages('signIn');
+
+  return (
+    <Text
+      size='sm'
+      color='foreground-secondary'
+      render={<span />}
+    >
+      {m.signUp.optional}
+    </Text>
   );
 }
