@@ -48,7 +48,7 @@ const secondFactors: SignInFactor[] = [
 
 const resetFactors: SignInFactor[] = [
   { id: 'reset_email', stage: 'first', strategy: 'reset_password_email_code', identifier: 'j***@acme.com' },
-  { id: 'reset_phone', stage: 'first', strategy: 'reset_password_phone_code', identifier: '+1 ••• ••• 0123' },
+  { id: 'reset_phone', stage: 'first', strategy: 'reset_password_phone_code', identifier: PHONE },
 ];
 
 const emptyValues: SignInValues = {
@@ -670,9 +670,7 @@ export function CodeResetPassword() {
 }
 
 export function CodeResetPasswordPhone() {
-  return (
-    <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: '+1 ••• ••• 0123' }} />
-  );
+  return <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: PHONE }} />;
 }
 
 export function CodeVerifyEmail() {
