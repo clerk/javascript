@@ -37,6 +37,8 @@ export const stepIds = {
     'notice:verify-email-link',
     'notice:loading',
     'notice:protect-check',
+    'notice:restricted',
+    'notice:waitlist',
   ],
   newPassword: ['new-password:forgot', 'new-password:required'],
   signUp: ['sign-up'],
@@ -120,7 +122,7 @@ export function codeCopy(
   if (step.purpose === 'verify-email') {
     return {
       title: m.verifyEmail.title,
-      description: fill(m.verifyEmail.description, { identifier }),
+      description: m.verifyEmail.description,
       fieldLabel: m.verifyEmail.label,
     };
   }
@@ -195,6 +197,7 @@ function identifierEditable(step: CodeStepData): boolean {
   return (
     step.purpose === 'first-factor' ||
     step.purpose === 'sso-bypass' ||
+    step.purpose === 'verify-email' ||
     step.purpose === 'verify-phone' ||
     step.purpose === 'reset-password'
   );

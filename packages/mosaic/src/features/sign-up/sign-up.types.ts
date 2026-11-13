@@ -28,7 +28,7 @@ export interface SignUpDetails {
 
 export type SignUpStep =
   | ({ kind: 'details'; purpose: 'start' | 'continue' } & SignUpDetails)
-  | { kind: 'alternative-phone'; channel: SignInProvider }
+  | { kind: 'alternative-phone'; channel: SignInProvider; legalConsent?: SignUpLegalConsent }
   | { kind: 'code'; purpose: 'verify-email' | 'verify-phone'; identifier: string; provider?: string }
   | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }

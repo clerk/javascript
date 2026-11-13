@@ -270,6 +270,10 @@ A second-factor code screen has one secondary action, so the way back to the sta
 
 <Story name='ChoiceWalletsNone' storyModule={Stories} />
 
+#### A single wallet
+
+<Story name='ChoiceWalletsSingle' storyModule={Stories} />
+
 #### Wallets loading
 
 <Story name='ChoiceWalletsLoading' storyModule={Stories} />
@@ -411,6 +415,26 @@ Protect's challenge is Cloudflare Turnstile, drawn by a script Clerk serves for 
 #### Legal consent only
 
 <Story name='SignUpLegalConsentOnly' storyModule={Stories} />
+
+#### Continue, missing fields
+
+With `purpose: 'continue'` the step is titled "Fill in missing fields" and has no sign-in prompt.
+
+<Story name='SignUpContinue' storyModule={Stories} />
+
+#### Sign-up by alternative phone channel
+
+`flow: 'sign-up'` on the alternative channel step gives it the sign-up wording, and `legalConsent` adds the checkbox.
+
+<Story name='SignUpAlternativePhone' storyModule={Stories} />
+
+#### Access restricted
+
+<Story name='SignUpRestricted' storyModule={Stories} />
+
+#### Access restricted, waitlist
+
+<Story name='SignUpWaitlist' storyModule={Stories} />
 
 #### Password requirements
 
