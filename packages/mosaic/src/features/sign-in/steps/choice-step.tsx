@@ -8,9 +8,10 @@ import { Key } from '../../../icons/glyphs/key';
 import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
-import type { SignInFactor, SignInStep } from '../sign-in.types';
+import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
 import { SignInAccounts } from './sign-in-accounts';
 import { SignInEnterpriseConnections } from './sign-in-enterprise-connections';
+import { SignInProviderButtons } from './sign-in-provider-buttons';
 import { SignInWallets } from './sign-in-wallets';
 
 const factorIcon = {
@@ -34,6 +35,7 @@ interface ChoiceStepProps {
   onBack: () => void;
   logo?: { src: string; alt: string };
   globalErrorMessage?: string;
+  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   onCancel?: () => void;
@@ -55,6 +57,7 @@ export function ChoiceStep({
   onBack,
   logo,
   globalErrorMessage,
+  socialProviders,
   pendingProviderId,
   onSelectProvider,
   onCancel,
@@ -120,6 +123,16 @@ export function ChoiceStep({
       onSelect={onSelectFactor}
       onHelp={onShowHelp}
       onBack={onBack}
+      providers={
+        step.purpose === 'methods' && socialProviders.length > 0 ? (
+          <SignInProviderButtons
+            providers={socialProviders}
+            pendingProviderId={pendingProviderId}
+            isDisabled={isDisabled}
+            onSelectProvider={onSelectProvider}
+          />
+        ) : undefined
+      }
     />
   );
 }

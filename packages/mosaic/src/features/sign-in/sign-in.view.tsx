@@ -245,6 +245,7 @@ export function SignInView({
                     onBack={onBack}
                     logo={logo}
                     globalErrorMessage={globalErrorMessage}
+                    socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
                     onSelectProvider={onSelectProvider}
                     onCancel={onCancel}

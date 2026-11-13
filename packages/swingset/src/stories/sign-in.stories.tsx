@@ -804,7 +804,24 @@ export function CodeVerifyEmail() {
 }
 
 export function ChoiceMethods() {
-  return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
+  return (
+    <StepPanel
+      step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }}
+      providers={[]}
+    />
+  );
+}
+
+export function ChoiceMethodsWithProviders() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'choice',
+        purpose: 'methods',
+        options: [{ id: 'passkey', stage: 'first', strategy: 'passkey' }, ...firstFactors.slice(1)],
+      }}
+    />
+  );
 }
 
 export function ChoiceEnterpriseConnections() {
