@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * Mosaic `Item` — a row for lists of accounts, organizations, and settings.
  * Composed via dot syntax: `Item.Root`, `Item.Media`, `Item.Content`,
