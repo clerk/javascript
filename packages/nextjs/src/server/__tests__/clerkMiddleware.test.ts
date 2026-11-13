@@ -1553,7 +1553,7 @@ describe('Poppy middleware', () => {
       data: [{ code, message: 'Authentication failed' }],
     });
     authenticateRequestMock.mockRejectedValueOnce(failure);
-    const middleware = clerkMiddleware(enabled ? { __experimental_poppy: true } : {});
+    const middleware = clerkMiddleware(enabled ? { poppy: true } : {});
     await expect(middleware(mockRequest({ url: 'https://company.example/' }), {} as NextFetchEvent)).rejects.toBe(
       failure,
     );
@@ -1576,11 +1576,9 @@ describe('Poppy middleware', () => {
     'https://preview.example/.well-known/poppy.json',
     'https://preview.example/.well-known/oauth-protected-resource',
   ])('serves %s from the Backend API artifact before authentication', async url => {
-    const __experimental_getPoppyJson = vi.fn().mockResolvedValue(metadata);
-    vi.mocked(clerkClient).mockResolvedValue(
-      Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
-    );
-    const middleware = clerkMiddleware({ __experimental_poppy: true });
+    const getPoppyJson = vi.fn().mockResolvedValue(metadata);
+    vi.mocked(clerkClient).mockResolvedValue(Object.assign(await clerkClient(), { artifacts: { getPoppyJson } }));
+    const middleware = clerkMiddleware({ poppy: true });
     const response = await middleware(mockRequest({ url }), {} as NextFetchEvent);
     assert(response instanceof Response);
     expect(response.status).toBe(200);
@@ -1595,7 +1593,7 @@ describe('Poppy middleware', () => {
           },
     );
     expect(response.headers.get('cache-control')).toBe('no-store');
-    expect(__experimental_getPoppyJson).toHaveBeenCalledExactlyOnceWith();
+    expect(getPoppyJson).toHaveBeenCalledExactlyOnceWith();
     expect(authenticateRequestMock).not.toHaveBeenCalled();
   });
 
@@ -1605,11 +1603,9 @@ describe('Poppy middleware', () => {
     { path: '/.well-known/oauth-protected-resource', method: 'POST' },
     { path: '/.well-known/oauth-protected-resource', method: 'OPTIONS' },
   ])('rejects discovery $method $path without fetching the artifact', async ({ path, method }) => {
-    const __experimental_getPoppyJson = vi.fn();
-    vi.mocked(clerkClient).mockResolvedValue(
-      Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
-    );
-    const middleware = clerkMiddleware({ __experimental_poppy: true });
+    const getPoppyJson = vi.fn();
+    vi.mocked(clerkClient).mockResolvedValue(Object.assign(await clerkClient(), { artifacts: { getPoppyJson } }));
+    const middleware = clerkMiddleware({ poppy: true });
     const response = await middleware(
       mockRequest({ url: 'https://company.example' + path, method }),
       {} as NextFetchEvent,
@@ -1617,34 +1613,30 @@ describe('Poppy middleware', () => {
     assert(response instanceof Response);
     expect(response.status).toBe(405);
     expect(response.headers.get('allow')).toBe('GET');
-    expect(__experimental_getPoppyJson).not.toHaveBeenCalled();
+    expect(getPoppyJson).not.toHaveBeenCalled();
     expect(authenticateRequestMock).not.toHaveBeenCalled();
   });
 
   it.each(['/.well-known/poppy.json', '/.well-known/oauth-protected-resource'])(
     'keeps %s available to the application when Poppy is off',
     async path => {
-      const __experimental_getPoppyJson = vi.fn();
-      vi.mocked(clerkClient).mockResolvedValue(
-        Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
-      );
+      const getPoppyJson = vi.fn();
+      vi.mocked(clerkClient).mockResolvedValue(Object.assign(await clerkClient(), { artifacts: { getPoppyJson } }));
       const handler = vi.fn().mockResolvedValue(new Response('application discovery'));
       const middleware = clerkMiddleware(handler);
       const response = await middleware(mockRequest({ url: 'https://company.example' + path }), {} as NextFetchEvent);
       assert(response instanceof Response);
       expect(await response.text()).toBe('application discovery');
-      expect(__experimental_getPoppyJson).not.toHaveBeenCalled();
+      expect(getPoppyJson).not.toHaveBeenCalled();
       expect(handler).toHaveBeenCalledOnce();
       expect(authenticateRequestMock).toHaveBeenCalledOnce();
     },
   );
 
   it('serves discovery for the configured Company host behind a reverse proxy', async () => {
-    const __experimental_getPoppyJson = vi.fn().mockResolvedValue(metadata);
-    vi.mocked(clerkClient).mockResolvedValue(
-      Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
-    );
-    const middleware = clerkMiddleware({ __experimental_poppy: true });
+    const getPoppyJson = vi.fn().mockResolvedValue(metadata);
+    vi.mocked(clerkClient).mockResolvedValue(Object.assign(await clerkClient(), { artifacts: { getPoppyJson } }));
+    const middleware = clerkMiddleware({ poppy: true });
     const response = await middleware(
       mockRequest({
         url: 'http://localhost:3000/.well-known/poppy.json',
@@ -1654,7 +1646,7 @@ describe('Poppy middleware', () => {
     );
     assert(response instanceof Response);
     expect(await response.json()).toEqual(metadata);
-    expect(__experimental_getPoppyJson).toHaveBeenCalledExactlyOnceWith();
+    expect(getPoppyJson).toHaveBeenCalledExactlyOnceWith();
     expect(authenticateRequestMock).not.toHaveBeenCalled();
   });
 
@@ -1662,11 +1654,9 @@ describe('Poppy middleware', () => {
     'propagates an artifact failure for %s without fabricated discovery',
     async path => {
       const failure = new Error('Backend artifact unavailable');
-      const __experimental_getPoppyJson = vi.fn().mockRejectedValue(failure);
-      vi.mocked(clerkClient).mockResolvedValue(
-        Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
-      );
-      const middleware = clerkMiddleware({ __experimental_poppy: true });
+      const getPoppyJson = vi.fn().mockRejectedValue(failure);
+      vi.mocked(clerkClient).mockResolvedValue(Object.assign(await clerkClient(), { artifacts: { getPoppyJson } }));
+      const middleware = clerkMiddleware({ poppy: true });
       await expect(
         middleware(mockRequest({ url: 'https://company.example' + path }), {} as NextFetchEvent),
       ).rejects.toBe(failure);
@@ -1702,7 +1692,7 @@ describe('Poppy middleware', () => {
       headers: new Headers(),
       publishableKey,
     });
-    const middleware = clerkMiddleware({ __experimental_poppy: true });
+    const middleware = clerkMiddleware({ poppy: true });
     const response = await middleware(mockRequest({ url: 'https://company.example/cart' }), {} as NextFetchEvent);
     assert(response instanceof Response);
     const serverHeaders = new Headers();

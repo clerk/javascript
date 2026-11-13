@@ -22,7 +22,7 @@ export type AuthenticateRequestOptions = {
    * The Backend API supplies Clerk's hosted browser Session endpoint. No application join or callback route is needed.
    * This option may change while Poppy is a draft.
    */
-  __experimental_poppy?: boolean;
+  poppy?: boolean;
   /**
    * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */

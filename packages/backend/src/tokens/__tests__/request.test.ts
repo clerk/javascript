@@ -592,7 +592,7 @@ describe('tokens.authenticateRequest(options)', () => {
           url.searchParams.set('__clerk_db_jwt', 'dev-browser');
         }
         const fetch = vi.spyOn(globalThis, 'fetch');
-        const options = mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey, __experimental_poppy: discovery });
+        const options = mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey, poppy: discovery });
         const state = await authenticateRequest(
           mockRequestWithCookies({}, production ? { __clerk_handshake: handshake! } : {}, url.toString()),
           options,
@@ -620,7 +620,7 @@ describe('tokens.authenticateRequest(options)', () => {
     it('does not interpret an application cookie as authenticated agent identity', async () => {
       const state = await authenticateRequest(
         mockRequestWithCookies({}, { '__Host-poppy_session': 'untrusted' }),
-        mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey: PK_LIVE, __experimental_poppy: true }),
+        mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey: PK_LIVE, poppy: true }),
       );
       expect(state.isAuthenticated).toBe(false);
       expect(state.toAuth()).toMatchObject({ userId: null, sessionId: null });

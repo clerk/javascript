@@ -206,7 +206,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
     return clerkMiddlewareRequestDataStorage.run(requestDataStore, async () => {
       const resolvedClerkClient = await clerkClient();
 
-      if (options.__experimental_poppy) {
+      if (options.poppy) {
         const poppyRequestUrl = createClerkRequest(request).clerkUrl;
         if (
           poppyRequestUrl.pathname === '/.well-known/poppy.json' ||
@@ -215,7 +215,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
           if (request.method !== 'GET') {
             return new Response(null, { status: 405, headers: { Allow: 'GET' } });
           }
-          const metadata = await resolvedClerkClient.artifacts.__experimental_getPoppyJson();
+          const metadata = await resolvedClerkClient.artifacts.getPoppyJson();
           const headers = { 'Cache-Control': 'no-store' };
           if (poppyRequestUrl.pathname === '/.well-known/poppy.json') {
             return Response.json(metadata, { headers });
