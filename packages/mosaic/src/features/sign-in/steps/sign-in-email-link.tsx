@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
 import type { VerificationCodeResend } from '../../../blocks/verification';
+import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -18,6 +19,7 @@ interface SignInEmailLinkProps {
   resend?: VerificationCodeResend;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
+  notice?: string;
 }
 
 export function SignInEmailLink({
@@ -30,6 +32,7 @@ export function SignInEmailLink({
   resend,
   onCancel,
   focusRef,
+  notice,
 }: SignInEmailLinkProps) {
   const m = useMessages('signIn');
   const ref = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
@@ -68,6 +71,13 @@ export function SignInEmailLink({
       >
         {globalErrorMessage}
       </Card.Banner>
+      {notice ? (
+        <Card.Content>
+          <Banner.Root color='warning'>
+            <Banner.Label>{notice}</Banner.Label>
+          </Banner.Root>
+        </Card.Content>
+      ) : null}
       {onCancel ? (
         <Card.Footer>
           <Button

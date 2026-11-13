@@ -22,6 +22,7 @@ interface SignInPasswordProps {
   onSubmit: (event: SignInSubmitEvent) => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
+  onShowHelp?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -35,6 +36,7 @@ export function SignInPassword({
   onSubmit,
   onForgotPassword,
   onCancel,
+  onShowHelp,
   focusRef,
 }: SignInPasswordProps) {
   const m = useMessages('signIn');
@@ -98,16 +100,16 @@ export function SignInPassword({
         </Form>
       </Card.Content>
       <Card.Footer>
-        {onCancel ? (
+        {onCancel || onShowHelp ? (
           <Button
             type='button'
             variant='outline'
             color='neutral'
             fullWidth
             disabled={isPending}
-            onClick={onCancel}
+            onClick={onCancel ?? onShowHelp}
           >
-            {m.useAnotherMethod}
+            {onCancel ? m.useAnotherMethod : m.alternativeMethods.helpLink}
           </Button>
         ) : null}
         <SubmitButton

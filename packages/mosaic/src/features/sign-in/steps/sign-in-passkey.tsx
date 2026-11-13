@@ -8,7 +8,7 @@ import { useMessages } from '../../../localization';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface SignInPasskeyProps {
-  identifier: string;
+  identifier?: string;
   onEditIdentifier?: () => void;
   globalErrorMessage?: string;
   isPending: boolean;
@@ -36,12 +36,14 @@ export function SignInPasskey({
       <Card.Header>
         <Card.Title>{m.passkey.title}</Card.Title>
         <Card.Description>{m.passkey.description}</Card.Description>
-        <SignInIdentityPreview
-          identifier={identifier}
-          editLabel={m.editIdentifier}
-          disabled={isPending}
-          onEdit={onEditIdentifier}
-        />
+        {identifier ? (
+          <SignInIdentityPreview
+            identifier={identifier}
+            editLabel={m.editIdentifier}
+            disabled={isPending}
+            onEdit={onEditIdentifier}
+          />
+        ) : null}
       </Card.Header>
       <Card.Banner
         role='alert'

@@ -10,6 +10,7 @@ import { tabularNumbersStyle } from '../../styles/typography.styles';
 import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
 import {
+  backupCodeDescription,
   codeCopy,
   codeIdentity,
   codeNotice,
@@ -36,6 +37,8 @@ function factorLabel(factor: SignInFactor, m: Messages): string {
       return m.alternativeMethods.passkey;
     case 'email_code':
       return fill(m.alternativeMethods.emailCode, { identifier: factor.identifier });
+    case 'email_link':
+      return fill(m.alternativeMethods.emailLink, { identifier: factor.identifier });
     case 'phone_code':
       return fill(m.alternativeMethods.phoneCode, { identifier: factor.identifier });
     case 'totp':
@@ -47,6 +50,10 @@ function factorLabel(factor: SignInFactor, m: Messages): string {
     case 'reset_password_phone_code':
       return fill(m.resetMethods.phoneCode, { identifier: factor.identifier });
   }
+}
+
+function backupCodeMessage(step: Extract<SignInStep, { kind: 'credential' }>, m: Messages): string {
+  return step.credential === 'backup-code' ? backupCodeDescription(step, m) : m.backupCodeMfa.description;
 }
 
 function choiceCopy(
@@ -142,6 +149,7 @@ export function SignInView({
                 step={current}
                 onCancel={onCancel}
                 onSwitchField={onSwitchField}
+                onForgotPassword={onForgotPassword}
                 focusRef={focusRef}
                 logo={logo}
                 applicationName={applicationName}
@@ -178,7 +186,7 @@ export function SignInView({
                     step={current}
                     messages={{
                       title: m.backupCodeMfa.title,
-                      description: m.backupCodeMfa.description,
+                      description: backupCodeMessage(current, m),
                       fieldLabel: m.backupCodeMfa.label,
                       ...actions,
                     }}
@@ -238,6 +246,7 @@ export function SignInView({
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}
                     onBack={onBack}
+                    onStartOver={onStartOver}
                     logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     socialProviders={socialProviders}

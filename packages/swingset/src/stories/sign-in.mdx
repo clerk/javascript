@@ -96,6 +96,16 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='IdentifierPasskey' storyModule={Stories} />
 
+#### Social only
+
+<Story name='IdentifierSocialOnly' storyModule={Stories} />
+
+#### Password shown
+
+The password field appears on the start screen once it has a value, as when the browser autofills it.
+
+<Story name='IdentifierPassword' storyModule={Stories} />
+
 #### Web3 wallets
 
 <Story name='IdentifierWeb3' storyModule={Stories} />
@@ -143,6 +153,20 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Passkey
 
 <Story name='CredentialPasskey' storyModule={Stories} />
+
+#### Password with no other method
+
+When the password is the only method, the secondary action is "Get help".
+
+<Story name='CredentialPasswordOnly' storyModule={Stories} />
+
+#### Passkey as a second factor
+
+<Story name='CredentialPasskeySecondFactor' storyModule={Stories} />
+
+#### Backup code while resetting a password
+
+<Story name='CredentialBackupCodeResetting' storyModule={Stories} />
 
 ### Code step
 
@@ -196,6 +220,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='CodeVerifyPhone' storyModule={Stories} />
 
+#### Second factor while resetting a password
+
+<Story name='CodeSecondFactorResetting' storyModule={Stories} />
+
 ### Choice step
 
 `choice-step.tsx` draws `{ kind: 'choice' }`. Other sign-in methods are full-width buttons under the social providers, as in legacy; where to send a password reset code uses `VerificationMethodPicker`. Enterprise connections, accounts and wallets each have their own screen.
@@ -220,9 +248,31 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='ChoiceAccounts' storyModule={Stories} />
 
+#### Methods with an email link
+
+<Story name='ChoiceMethodsEmailLink' storyModule={Stories} />
+
+#### Methods as the first screen
+
+<Story name='ChoiceMethodsEntry' storyModule={Stories} />
+
+#### Second-factor methods
+
+A second-factor code screen has one secondary action, so the way back to the start is here.
+
+<Story name='ChoiceMethodsSecondFactor' storyModule={Stories} />
+
 #### Wallets
 
 <Story name='ChoiceWallets' storyModule={Stories} />
+
+#### No wallets installed
+
+<Story name='ChoiceWalletsNone' storyModule={Stories} />
+
+#### Wallets loading
+
+<Story name='ChoiceWalletsLoading' storyModule={Stories} />
 
 ### Notice step
 
@@ -263,6 +313,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Email link sent
 
 <Story name='NoticeEmailLinkSent' storyModule={Stories} />
+
+#### Email link on a new device
+
+<Story name='NoticeEmailLinkNewDevice' storyModule={Stories} />
 
 #### Signed in on other tab
 
