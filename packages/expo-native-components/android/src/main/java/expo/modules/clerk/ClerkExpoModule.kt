@@ -21,6 +21,7 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
@@ -216,8 +217,12 @@ class ClerkExpoModule : Module() {
         }
 
         clientInvalidationObserverJob = coroutineScope.launch {
+            val signOutDetector = ClerkSignOutDetector()
             Clerk.clientFlow.collect { client ->
                 clientInvalidationTracker.observe(clientFingerprint(client))
+                if (signOutDetector.signedOut(client, System.currentTimeMillis())) {
+                    launch(start = CoroutineStart.UNDISPATCHED) { clearRestoreCredential() }
+                }
             }
         }
     }
@@ -292,6 +297,12 @@ class ClerkExpoModule : Module() {
             } catch (e: Exception) {
                 promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
             }
+        }
+    }
+
+    private suspend fun clearRestoreCredential() {
+        if (Clerk.restoreCredentials.clear() is ClerkResult.Failure) {
+            debugLog(TAG, "Restore credential cleanup after a sign-out did not complete")
         }
     }
 
