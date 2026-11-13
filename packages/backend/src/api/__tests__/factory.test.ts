@@ -76,20 +76,114 @@ describe('api.client', () => {
       http.get(
         `https://api.clerk.test/v1/users/count`,
         validateHeaders(() => {
-          return HttpResponse.json({ object: 'total_count', total_count: 2 });
+          return HttpResponse.json({ object: 'total_count', total_count: 7 });
         }),
       ),
     );
     const { data, totalCount } = await apiClient.users.getUserList({
       offset: 2,
-      limit: 5,
+      limit: 1,
       userId: ['user_cafebabe'],
     });
 
     expect(data[0].firstName).toBe('John');
     expect(data[0].id).toBe('user_cafebabe');
     expect(data.length).toBe(1);
-    expect(totalCount).toBe(2);
+    expect(totalCount).toBe(7);
+  });
+
+  // Each case lists `users` users, and the count endpoint answers 99, so a
+  // totalCount of 99 means the count was used and any other value means the
+  // page gave the total.
+  it.each([
+    { name: 'a page shorter than its limit', params: { limit: 5 }, users: 2, totalCount: 2 },
+    { name: 'a short page at an offset', params: { limit: 5, offset: 10 }, users: 2, totalCount: 12 },
+    { name: 'no users at offset 0, without a limit', params: {}, users: 0, totalCount: 0 },
+    { name: 'no users at offset 0, with a limit', params: { limit: 5 }, users: 0, totalCount: 0 },
+    { name: 'a full page', params: { limit: 2 }, users: 2, totalCount: 99 },
+    { name: 'no users past offset 0', params: { limit: 5, offset: 10 }, users: 0, totalCount: 99 },
+    { name: 'users without a limit', params: {}, users: 2, totalCount: 99 },
+    { name: 'a limit the API replaces with its default', params: { limit: 501 }, users: 2, totalCount: 99 },
+    { name: 'a page after a cursor', params: { limit: 5, startingAfter: 'user_previous' }, users: 2, totalCount: 99 },
+  ])('users.getUserList() returns totalCount $totalCount for $name', async ({ params, users, totalCount }) => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(() => {
+          return HttpResponse.json(Array.from({ length: users }, () => userJson));
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/count`,
+        validateHeaders(() => {
+          return HttpResponse.json({ object: 'total_count', total_count: 99 });
+        }),
+      ),
+    );
+
+    const response = await apiClient.users.getUserList({ ...params, query: 'john' });
+
+    expect(response.data.length).toBe(users);
+    expect(response.totalCount).toBe(totalCount);
+  });
+
+  it('users.getUserList() does not wait for the count when the page gives the total', async () => {
+    let releaseCount = () => {};
+    const countHeld = new Promise<void>(resolve => {
+      releaseCount = resolve;
+    });
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(() => {
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(`https://api.clerk.test/v1/users/count`, async () => {
+        await countHeld;
+        return HttpResponse.json({ object: 'total_count', total_count: 99 });
+      }),
+    );
+
+    const response = await apiClient.users.getUserList({ query: 'john', limit: 5 });
+    releaseCount();
+
+    expect(response.totalCount).toBe(1);
+  });
+
+  it('users.getUserList() succeeds when the count fails and the page gives the total', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(() => {
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(`https://api.clerk.test/v1/users/count`, () => {
+        return HttpResponse.json({ errors: [{ code: 'internal_clerk_error', message: 'boom' }] }, { status: 500 });
+      }),
+    );
+
+    const response = await apiClient.users.getUserList({ query: 'john', limit: 5 });
+
+    expect(response.data.length).toBe(1);
+    expect(response.totalCount).toBe(1);
+  });
+
+  it('users.getUserList() fails when the count fails and the page is full', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(() => {
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(`https://api.clerk.test/v1/users/count`, () => {
+        return HttpResponse.json({ errors: [{ code: 'internal_clerk_error', message: 'boom' }] }, { status: 500 });
+      }),
+    );
+
+    await expect(apiClient.users.getUserList({ query: 'john', limit: 1 })).rejects.toMatchObject({ status: 500 });
   });
 
   it('sends startingAfter only to the users list request', async () => {
