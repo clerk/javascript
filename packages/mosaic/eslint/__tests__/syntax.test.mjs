@@ -288,19 +288,21 @@ describe('JSX guards', () => {
         name: 'keeps JSX restrictions: export const Sample = () => <form />;',
         filename: 'src/components/sample.tsx',
         code: 'export const Sample = () => <form />;',
-        errors: [/Use `Form` from mosaic\/primitives\/form/],
+        errors: [/^Use `Form` from src\/primitives\/form, driven by `useForm` from src\/components\/form/],
       },
       {
         name: "keeps JSX restrictions: export const Sample = ({ Part }: { Part: 'div' }) => <Part className='x' />;",
         filename: 'src/components/sample.tsx',
         code: "export const Sample = ({ Part }: { Part: 'div' }) => <Part className='x' />;",
-        errors: [/Mosaic parts take `xstyle`/],
+        errors: [
+          /^Mosaic parts take `xstyle` instead of `className`\/`style`\. Define the atoms with `stylex\.create` in the sibling `\*\.styles\.ts` file/,
+        ],
       },
       {
         name: 'rejects native forms in views',
         filename: 'src/features/reverification/sample.view.tsx',
         code: 'export function View() { return <form />; }',
-        errors: [/Use `Form` from mosaic\/primitives\/form/],
+        errors: [/^Use `Form` from src\/primitives\/form, driven by `useForm` from src\/components\/form/],
       },
       {
         name: 'rejects logical AND in conditional JSX',
@@ -312,14 +314,104 @@ describe('JSX guards', () => {
         name: `rejects ${attribute} on member components`,
         filename: 'src/components/sample.tsx',
         code: `export const Sample = () => <Card.Root ${attribute} />;`,
-        errors: [/Mosaic parts take `xstyle`/],
+        errors: [
+          /^Mosaic parts take `xstyle` instead of `className`\/`style`\. Define the atoms with `stylex\.create` in the sibling `\*\.styles\.ts` file/,
+        ],
       })),
       ...['Part', 'Card.Root'].map(component => ({
         name: `rejects stylex.props spreads on ${component}`,
         filename: 'src/components/sample.tsx',
         code: `export const Sample = () => <${component} {...stylex.props(styles.root)} />;`,
-        errors: [/Mosaic parts take the atoms as `xstyle`/],
+        errors: [
+          /^Mosaic parts take the atoms as `xstyle`, not a `stylex\.props\(\.\.\.\)` spread\. Define them with `stylex\.create` in the sibling `\*\.styles\.ts` file/,
+        ],
       })),
     ].map(testCase => ({ ...testCase, options })),
+  });
+});
+
+describe('raw element guards in features and blocks', () => {
+  const override = config.overrides.find(
+    override => override.files.includes('src/features/**/*') && override.rules['eslint-compat/no-restricted-syntax'],
+  );
+  const options = override.rules['eslint-compat/no-restricted-syntax'].slice(1);
+  ruleTester.run('no-restricted-syntax', syntaxPlugin.rules['no-restricted-syntax'], {
+    valid: [
+      "export const View = () => <Menu.Item render={<button type='button' onClick={onPick} />} />;",
+      'export const View = () => <Part render={<svg aria-hidden />} />;',
+      "export const View = () => <input type='hidden' name='id' value={id} />;",
+      "export const View = () => <input readOnly hidden name='identifier' value={identifier} />;",
+      "export const View = () => <input type='password' hidden name='password' />;",
+      'export const View = () => <Menu.Item render={props => <button {...props} />} />;',
+      'export const View = () => <Part render={function render(props) { return <svg {...props} />; }} />;',
+      'export const View = () => <Part render={(props, state) => { return <input {...props} />; }} />;',
+      "export const View = () => <input hidden={true} name='identifier' />;",
+      "export const View = () => <Button type='button' />;",
+      "export const View = () => <Icon name='check' />;",
+    ].flatMap(code =>
+      ['src/features/sample/sample.view.tsx', 'src/blocks/sample/sample.tsx'].map(filename => ({
+        code,
+        filename,
+        options,
+      })),
+    ),
+    invalid: [
+      {
+        name: 'rejects a raw button',
+        code: "export const View = () => <button type='button' />;",
+        errors: [/^Use `Button` from src\/components\/button, or `SubmitButton` when the click runs an async action/],
+      },
+      {
+        name: 'rejects a raw button nested in a render prop element',
+        code: "export const View = () => <Part render={<div><button type='button' /></div>} />;",
+        errors: [/^Use `Button` from src\/components\/button/],
+      },
+      {
+        name: 'rejects a raw button nested in a render callback element',
+        code: 'export const View = () => <Part render={props => <div {...props}><button type="button" /></div>} />;',
+        errors: [/^Use `Button` from src\/components\/button/],
+      },
+      {
+        name: 'rejects a visible input with hidden={false}',
+        code: "export const View = () => <input hidden={false} name='field' />;",
+        errors: [/^Use `Input` from src\/components\/input inside `Field`/],
+      },
+      {
+        name: 'rejects a visible password input with hidden={false}',
+        code: "export const View = () => <input type='password' hidden={false} name='field' />;",
+        errors: [/^Use `PasswordInput` from src\/components\/password-input/],
+      },
+      {
+        name: 'rejects a raw svg',
+        code: 'export const View = () => <svg viewBox="0 0 16 16"><path d="M0 0" /></svg>;',
+        errors: [/^Use an icon from src\/icons through `Icon`.*stop and ask the user/],
+      },
+      ...[
+        ["type='password'", /^Use `PasswordInput` from src\/components\/password-input inside `Field`/],
+        ["type='tel'", /^Use `PhoneInput` from src\/components\/phone-input inside `Field`/],
+        ["type='checkbox'", /^Use `Checkbox` from src\/components\/checkbox, or `Switch`/],
+        ["type='radio'", /^Use `Radio` from src\/components\/radio/],
+        ["type='file'", /^Use `FileUpload` from src\/primitives\/file-upload, or `AvatarUpload`/],
+        ["type='email'", /^Use `Input` from src\/components\/input inside `Field`/],
+        ["type='text'", /^Use `Input` from src\/components\/input inside `Field`/],
+        ['', /^Use `Input` from src\/components\/input inside `Field`/],
+      ].map(([type, message]) => ({
+        name: `rejects a visible input: <input ${type} />`,
+        code: `export const View = () => <input ${type} name='field' />;`,
+        errors: [message],
+      })),
+      {
+        name: 'keeps the shared JSX guards',
+        code: 'export const View = () => <form />;',
+        errors: [/^Use `Form` from src\/primitives\/form, driven by `useForm` from src\/components\/form/],
+      },
+    ].flatMap(testCase =>
+      ['src/features/sample/sample.view.tsx', 'src/blocks/sample/sample.tsx'].map(filename => ({
+        ...testCase,
+        name: `${testCase.name} in ${filename}`,
+        filename,
+        options,
+      })),
+    ),
   });
 });
