@@ -165,8 +165,12 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
  */
 async function withInstanceKeys(keyName: string, env: EnvironmentConfig): Promise<EnvironmentConfig> {
   const configPath = resolve(import.meta.dirname, '..', 'configs', `${keyName}.js`);
-  const keys = instanceKeys.get(keyName)!;
-  env.setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk).setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
+  const keys = instanceKeys.get(keyName);
+  if (keys) {
+    env
+      .setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk)
+      .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
+  }
 
   if (canProvisionPlatformApplications && (await fs.pathExists(configPath))) {
     env.setResolver(async target => {
@@ -175,6 +179,8 @@ async function withInstanceKeys(keyName: string, env: EnvironmentConfig): Promis
         .setEnvVariable('private', 'CLERK_SECRET_KEY', resolved.sk)
         .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', resolved.pk);
     });
+  } else if (!keys) {
+    throw new Error(`No instance keys found for ${keyName}.`);
   }
 
   if (process.env.E2E_STAGING !== '1') {
