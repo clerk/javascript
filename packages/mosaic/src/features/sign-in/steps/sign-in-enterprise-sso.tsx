@@ -7,7 +7,7 @@ import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
-import { styles } from '../sign-in.styles';
+import { styles } from '../../auth-flow/auth-flow.styles';
 
 interface SignInEnterpriseSsoProps {
   applicationName: string;

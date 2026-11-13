@@ -16,9 +16,9 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import type { SignInProvider } from '../../sign-in';
-import { styles } from '../../sign-in/sign-in.styles';
-import { SignInCaptcha } from '../../sign-in/steps/sign-in-captcha';
+import { styles } from '../../auth-flow/auth-flow.styles';
+import type { AuthFlowProvider } from '../../auth-flow/auth-flow.types';
+import { FlowCaptcha } from '../../auth-flow/steps/captcha';
 import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';
 import { signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
 import { SignUpLegalConsentField } from './sign-up-legal-consent';
@@ -26,7 +26,7 @@ import { SignUpLegalConsentField } from './sign-up-legal-consent';
 interface SignUpDetailsProps {
   step: SignUpDetails;
   onSwitchField?: () => void;
-  socialProviders: readonly SignInProvider[];
+  socialProviders: readonly AuthFlowProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   isDisabled: boolean;
@@ -110,7 +110,7 @@ export function SignUpDetailsStep({
             />
           ) : null}
         </div>
-        {step.purpose === 'continue' ? null : <SignInCaptcha onInteractiveChange={setIsChallengeShown} />}
+        {step.purpose === 'continue' ? null : <FlowCaptcha onInteractiveChange={setIsChallengeShown} />}
         {onSignIn ? (
           <Text
             size='sm'
@@ -249,7 +249,7 @@ function SignUpProviders({
   onSelectProvider,
   showDivider,
 }: {
-  providers: readonly SignInProvider[];
+  providers: readonly AuthFlowProvider[];
   showDivider: boolean;
   pendingProviderId?: string;
   isDisabled: boolean;

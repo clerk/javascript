@@ -9,8 +9,8 @@ import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
+import { IdentityPreview } from '../../auth-flow/steps/identity-preview';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
-import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface SignInPasswordProps {
   identifier: string;
@@ -49,7 +49,7 @@ export function SignInPassword({
       <Card.Header>
         <Card.Title>{m.password.title}</Card.Title>
         <Card.Description>{m.password.description}</Card.Description>
-        <SignInIdentityPreview
+        <IdentityPreview
           identifier={identifier}
           editLabel={m.editIdentifier}
           disabled={isPending}

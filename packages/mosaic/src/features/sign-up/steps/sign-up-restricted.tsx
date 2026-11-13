@@ -7,7 +7,7 @@ import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
-import { styles } from '../../sign-in/sign-in.styles';
+import { styles } from '../../auth-flow/auth-flow.styles';
 
 interface SignUpRestrictedProps {
   waitlist: boolean;

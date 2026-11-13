@@ -8,11 +8,11 @@ import { Key } from '../../../icons/glyphs/key';
 import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
+import { EnterpriseConnectionsChoice } from '../../auth-flow/steps/enterprise-connections';
+import { WalletsChoice } from '../../auth-flow/steps/wallets';
 import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
 import { SignInAccounts } from './sign-in-accounts';
 import { SignInAlternativeMethods } from './sign-in-alternative-methods';
-import { SignInEnterpriseConnections } from './sign-in-enterprise-connections';
-import { SignInWallets } from './sign-in-wallets';
 
 const factorIcon = {
   password: SecurityLockSquare,
@@ -73,7 +73,7 @@ export function ChoiceStep({
 }: ChoiceStepProps) {
   if (step.purpose === 'wallets') {
     return (
-      <SignInWallets
+      <WalletsChoice
         focusRef={focusRef}
         wallets={step.options}
         loading={step.loading}
@@ -103,7 +103,7 @@ export function ChoiceStep({
 
   if (step.purpose === 'enterprise-connections') {
     return (
-      <SignInEnterpriseConnections
+      <EnterpriseConnectionsChoice
         focusRef={focusRef}
         logo={logo}
         connections={step.options}

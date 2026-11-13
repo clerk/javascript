@@ -10,27 +10,27 @@ import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PhoneInput } from '../../../components/phone-input';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles } from '../sign-in.styles';
-import type { SignInProvider, SignInSubmitEvent, SignInValues } from '../sign-in.types';
-import { SignInCaptcha } from './sign-in-captcha';
+import { styles } from '../auth-flow.styles';
+import type { AuthFlowProvider, AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow.types';
+import { FlowCaptcha } from './captcha';
 
-interface SignInAlternativeChannelProps {
-  channel: SignInProvider;
+interface AlternativeChannelStepProps {
+  channel: AuthFlowProvider;
   applicationName: string;
   logo?: { src: string; alt: string };
-  form: UseFormResult<SignInValues>;
+  form: UseFormResult<AuthFlowValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
   isPending: boolean;
   isDisabled: boolean;
-  onSubmit: (event: SignInSubmitEvent) => void;
+  onSubmit: (event: AuthFlowSubmitEvent) => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
   copy?: { title: string; description: string; label: string };
   children?: ReactNode;
 }
 
-export function SignInAlternativeChannel({
+export function AlternativeChannelStep({
   channel,
   applicationName,
   logo,
@@ -44,7 +44,7 @@ export function SignInAlternativeChannel({
   focusRef,
   copy: copyProp,
   children,
-}: SignInAlternativeChannelProps) {
+}: AlternativeChannelStepProps) {
   const m = useMessages('signIn');
   const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
@@ -102,7 +102,7 @@ export function SignInAlternativeChannel({
             {children}
           </div>
         </Form>
-        <SignInCaptcha />
+        <FlowCaptcha />
       </Card.Content>
       <Card.Footer>
         {onCancel ? (

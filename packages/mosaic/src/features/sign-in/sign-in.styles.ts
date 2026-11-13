@@ -1,82 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, space } from '../../tokens.stylex';
+import { space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  logo: {
-    display: 'block',
-    objectFit: 'contain',
-    height: space['8'],
-    maxWidth: '100%',
-  },
-  providerIcon: {
-    display: 'block',
-    objectFit: 'contain',
-    height: space['4'],
-    width: space['4'],
-  },
   buttonStack: {
     gap: space['2'],
     display: 'flex',
     flexDirection: 'column',
   },
-  divider: {
-    gap: space['4'],
-    alignItems: 'center',
-    display: 'flex',
-  },
-  dividerLine: {
-    backgroundColor: colorVars['--cl-color-border'],
-    flexGrow: 1,
-    height: '1px',
-  },
-  identity: {
-    gap: space['1'],
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    minWidth: 0,
-  },
-  identityText: {
-    minWidth: 0,
-  },
-  fieldStack: {
-    gap: space['4'],
-    display: 'grid',
-  },
-  nameRow: {
-    gap: space['4'],
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-  },
-  captcha: {
-    justifySelf: 'center',
-  },
-  spotlightGroup: {
-    display: 'contents',
-  },
-  spotlightHidden: {
-    display: 'none',
-  },
   passkeyAction: {
     alignSelf: 'center',
-  },
-  footerText: {
-    textAlign: 'center',
-  },
-  loading: {
-    justifyItems: 'center',
-    paddingBlockEnd: space['10'],
-    paddingBlockStart: space['10'],
-  },
-  protectCheck: {
-    justifyItems: 'center',
-  },
-  protectCheckContainer: {
-    display: 'block',
-  },
-  protectCheckContainerEmpty: {
-    position: 'absolute',
   },
   startPasswordHidden: {
     overflow: 'hidden',
@@ -84,14 +17,5 @@ export const styles = stylex.create({
     pointerEvents: 'none',
     position: 'absolute',
     height: 0,
-  },
-  walletsLoading: {
-    display: 'grid',
-    justifyItems: 'center',
-  },
-  status: {
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'column',
   },
 });

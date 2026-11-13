@@ -10,6 +10,7 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import type { IconComponent } from '../../../icons/glyph';
 import { fill, useMessages } from '../../../localization';
+import { styles as flowStyles } from '../../auth-flow/auth-flow.styles';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 
@@ -78,7 +79,7 @@ export function SignInAlternativeMethods({
                     <img
                       src={provider.iconUrl}
                       alt=''
-                      {...stylex.props(styles.providerIcon)}
+                      {...stylex.props(flowStyles.providerIcon)}
                     />
                   }
                   longLabel={fill(m.start.socialButton, { provider: provider.name })}
@@ -111,7 +112,7 @@ export function SignInAlternativeMethods({
         {onBack ? (
           <Text
             size='sm'
-            xstyle={styles.footerText}
+            xstyle={flowStyles.footerText}
           >
             <Button
               type='button'
@@ -128,7 +129,7 @@ export function SignInAlternativeMethods({
         {onStartOver ? (
           <Text
             size='sm'
-            xstyle={styles.footerText}
+            xstyle={flowStyles.footerText}
           >
             <Button
               type='button'
@@ -145,7 +146,7 @@ export function SignInAlternativeMethods({
         <Text
           size='xs'
           color='foreground-secondary'
-          xstyle={styles.footerText}
+          xstyle={flowStyles.footerText}
         >
           {m.alternativeMethods.helpPrompt}{' '}
           <Button

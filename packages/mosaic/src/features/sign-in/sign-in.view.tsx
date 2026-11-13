@@ -7,20 +7,12 @@ import { Flow } from '../../components/flow';
 import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { codeCopy, codeIdentity, codeNotice, codeResendCopy, codeSecondaryAction } from '../auth-flow/auth-flow.utils';
+import { CodeStep } from '../auth-flow/steps/code-step';
 import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
-import {
-  backupCodeDescription,
-  codeCopy,
-  codeIdentity,
-  codeNotice,
-  codeResendCopy,
-  codeSecondaryAction,
-  stepIds,
-  stepKey,
-} from './sign-in.utils';
+import { backupCodeDescription, stepIds, stepKey } from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
-import { CodeStep } from './steps/code-step';
 import { CredentialStep } from './steps/credential-step';
 import { IdentifierStep } from './steps/identifier-step';
 import { NewPasswordStep } from './steps/new-password-step';
