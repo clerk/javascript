@@ -136,6 +136,17 @@ describe('cropImage', () => {
     expect(image.at(32, 56)).toEqual([...BLUE, 255]);
   });
 
+  it('leaves the frame around a zoomed out image empty', async () => {
+    const blob = await cropImage(halves(200, 100), { ...INITIAL_CROP, zoom: 0.5 }, { type: 'image/png' });
+    const image = await pixels(blob);
+
+    expect([image.width, image.height]).toEqual([200, 200]);
+    expect(image.at(50, 25)).toEqual([0, 0, 0, 0]);
+    expect(image.at(50, 100)).toEqual([...RED, 255]);
+    expect(image.at(150, 100)).toEqual([...BLUE, 255]);
+    expect(image.at(150, 175)).toEqual([0, 0, 0, 0]);
+  });
+
   it('clamps a crop that would leave part of the square outside the image', async () => {
     const blob = await cropImage(halves(100, 100), { ...INITIAL_CROP, x: 0.5 }, { type: 'image/png', size: () => 64 });
     const image = await pixels(blob);

@@ -13,13 +13,18 @@ export const AVATAR_UPLOAD = {
 const AVATAR_CROP = { maxSide: 4096, attempts: 3 } as const;
 
 /**
- * Crops the picked image in its own format and at its own resolution. A crop that encodes over
+ * Crops the picked image in its own format and at its own resolution. A JPEG zoomed out past the
+ * frame is saved as PNG, because JPEG would fill the empty frame around it with black. A crop that encodes over
  * `AVATAR_UPLOAD.maxSize` is drawn smaller until it fits, or fails with the size error after `AVATAR_CROP.attempts` tries.
  */
 export async function cropAvatar(src: string, crop: Crop, type: string): Promise<Blob> {
+  const output = crop.zoom < 1 && type === 'image/jpeg' ? 'image/png' : type;
   let scale = 1;
   for (let attempt = 1; ; attempt++) {
-    const blob = await cropImage(src, crop, { type, size: side => Math.min(side, AVATAR_CROP.maxSide) * scale });
+    const blob = await cropImage(src, crop, {
+      type: output,
+      size: side => Math.min(side, AVATAR_CROP.maxSide) * scale,
+    });
     if (blob.size <= AVATAR_UPLOAD.maxSize) {
       return blob;
     }

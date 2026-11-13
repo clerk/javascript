@@ -26,7 +26,7 @@ export async function animatedPngFile(name: string): Promise<File> {
 
 export async function saveCrop(actor: UserEvent, title: string): Promise<void> {
   const dialog = await screen.findByRole('dialog', { name: title });
-  await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Rotate' })).toBeEnabled());
+  await waitFor(() => expect(within(dialog).getByRole('slider', { name: 'Zoom' })).toBeEnabled());
   await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
   await waitFor(() => expect(dialog).not.toBeInTheDocument());
 }

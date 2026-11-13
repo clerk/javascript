@@ -196,7 +196,7 @@ describe('the user profile profile section', () => {
 
     await actor.upload(fileInput(container), await imageFile('me.png'));
     const dialog = await screen.findByRole('dialog', { name: 'Adjust profile picture' });
-    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Rotate' })).toBeEnabled());
+    await waitFor(() => expect(within(dialog).getByRole('slider', { name: 'Zoom' })).toBeEnabled());
     await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     await waitFor(() =>
@@ -237,7 +237,7 @@ describe('the user profile profile section', () => {
 
     await actor.upload(fileInput(container), await imageFile('me.png'));
     const dialog = await screen.findByRole('dialog', { name: 'Adjust profile picture' });
-    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Rotate' })).toBeEnabled());
+    await waitFor(() => expect(within(dialog).getByRole('slider', { name: 'Zoom' })).toBeEnabled());
     await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(encodes).toHaveLength(1));
 
@@ -258,7 +258,7 @@ describe('the user profile profile section', () => {
 
     await actor.upload(fileInput(container), await imageFile('me.png'));
     const dialog = await screen.findByRole('dialog', { name: 'Adjust profile picture' });
-    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Rotate' })).toBeEnabled());
+    await waitFor(() => expect(within(dialog).getByRole('slider', { name: 'Zoom' })).toBeEnabled());
     await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveAttribute('data-open'));
 

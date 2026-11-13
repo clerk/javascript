@@ -115,6 +115,24 @@ describe('ImageCropper', () => {
     expect(lastCrop(onValueChange)?.zoom).toBeLessThan(2);
   });
 
+  it('zooms out until a wide image fits in the frame', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn<(crop: Crop) => void>();
+    render(<Harness onValueChange={onValueChange} />);
+    load(200, 100);
+    const zoomOut = screen.getByRole('button', { name: 'Zoom out' });
+    expect(screen.getByRole('slider', { name: 'Zoom' })).toHaveAttribute('min', '0.5');
+    expect(zoomOut).toBeEnabled();
+
+    for (let step = 0; step < 4; step++) {
+      await user.click(zoomOut);
+    }
+
+    expect(lastCrop(onValueChange)?.zoom).toBe(0.5);
+    expect(zoomOut).toBeDisabled();
+    expect(document.querySelector('img')?.style.width).toBe('100%');
+  });
+
   it('turns the image a quarter clockwise', async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn<(crop: Crop) => void>();

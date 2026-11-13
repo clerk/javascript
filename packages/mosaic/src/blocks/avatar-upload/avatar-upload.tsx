@@ -15,7 +15,6 @@ import { ArrowUp } from '../../icons/glyphs/arrow-up';
 import { Block } from '../../icons/glyphs/block';
 import { Minus } from '../../icons/glyphs/minus';
 import { Plus } from '../../icons/glyphs/plus';
-import { RotateAntiClockwise } from '../../icons/glyphs/rotate-anti-clockwise';
 import type { FileUploadProps } from '../../primitives/file-upload';
 import { FileUpload } from '../../primitives/file-upload';
 import { type Crop, ImageCropper, INITIAL_CROP } from '../../primitives/image-cropper';
@@ -60,7 +59,6 @@ export interface AvatarUploadCropLabels {
   zoom: string;
   zoomIn: string;
   zoomOut: string;
-  rotate: string;
   reset: string;
   cancel: string;
   save: string;
@@ -275,40 +273,21 @@ function CropStep({ file, src, labels, shape, save }: CropStepProps) {
         disabled={save.isPending}
       >
         <Card.Content xstyle={styles.cropContent}>
-          <div {...stylex.props(styles.stage)}>
-            <ImageCropper.Viewport
-              aria-label={labels.frame}
-              {...mergeStyleProps(
-                themeProps('avatar-upload-crop-frame'),
-                stylex.props(styles.frame, focusOutline.visible),
-              )}
-            >
-              <ImageCropper.Area {...mergeStyleProps(themeProps('avatar-upload-crop-area'), stylex.props(styles.area))}>
-                <ImageCropper.Image />
-                <span
-                  aria-hidden
-                  {...stylex.props(styles.mask, shape === 'circle' && styles.circleMask)}
-                />
-              </ImageCropper.Area>
-            </ImageCropper.Viewport>
-            <ImageCropper.Rotate
-              aria-label={labels.rotate}
-              render={
-                <Button
-                  color='neutral'
-                  size='sm'
-                  shape='circle'
-                  variant='outline'
-                  xstyle={styles.rotate}
-                />
-              }
-            >
-              <Icon
-                glyph={RotateAntiClockwise}
-                xstyle={styles.clockwise}
+          <ImageCropper.Viewport
+            aria-label={labels.frame}
+            {...mergeStyleProps(
+              themeProps('avatar-upload-crop-frame'),
+              stylex.props(styles.frame, focusOutline.visible),
+            )}
+          >
+            <ImageCropper.Area {...mergeStyleProps(themeProps('avatar-upload-crop-area'), stylex.props(styles.area))}>
+              <ImageCropper.Image />
+              <span
+                aria-hidden
+                {...stylex.props(styles.mask, shape === 'circle' && styles.circleMask)}
               />
-            </ImageCropper.Rotate>
-          </div>
+            </ImageCropper.Area>
+          </ImageCropper.Viewport>
           <div {...stylex.props(styles.zoomRow)}>
             <ImageCropper.ZoomOut
               aria-label={labels.zoomOut}

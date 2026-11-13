@@ -25,9 +25,16 @@ describe('clampCrop', () => {
     expect(clampCrop(crop({ x: 5, y: 5, zoom: 2 }), square, maxZoom)).toEqual(crop({ x: 0.5, y: 0.5, zoom: 2 }));
   });
 
-  it('keeps zoom between cover and the max', () => {
+  it('keeps zoom between fitting the whole image in the frame and the max', () => {
+    expect(clampCrop(crop({ zoom: 0.1 }), wide, maxZoom).zoom).toBe(0.5);
+    expect(clampCrop(crop({ zoom: 0.1 }), tall, maxZoom).zoom).toBe(0.5);
     expect(clampCrop(crop({ zoom: 0.5 }), square, maxZoom).zoom).toBe(1);
     expect(clampCrop(crop({ zoom: 9 }), square, maxZoom).zoom).toBe(4);
+  });
+
+  it('keeps an image smaller than the frame inside it', () => {
+    expect(clampCrop(crop({ x: 2, y: 2, zoom: 0.5 }), wide, maxZoom)).toEqual(crop({ x: 0, y: 0.25, zoom: 0.5 }));
+    expect(clampCrop(crop({ x: -2, y: -2, zoom: 0.5 }), wide, maxZoom)).toEqual(crop({ x: 0, y: -0.25, zoom: 0.5 }));
   });
 
   it('swaps the pan axes for an image turned a quarter', () => {
@@ -42,6 +49,10 @@ describe('zoomCrop', () => {
 
   it('pulls the pan back inside the image when zooming out', () => {
     expect(zoomCrop(crop({ x: 1.5, zoom: 2 }), 1, wide, maxZoom)).toEqual(crop({ x: 0.5, zoom: 1 }));
+  });
+
+  it('zooms out until the whole image fits in the frame', () => {
+    expect(zoomCrop(crop({ x: 0.5 }), 0.1, wide, maxZoom)).toEqual(crop({ x: 0, zoom: 0.5 }));
   });
 });
 
@@ -70,6 +81,10 @@ describe('pixelCrop', () => {
 
   it('takes a smaller square when zoomed in', () => {
     expect(pixelCrop(crop({ zoom: 2 }), wide)).toEqual({ x: 75, y: 25, size: 50 });
+  });
+
+  it('takes a square larger than the image when zoomed out', () => {
+    expect(pixelCrop(crop({ zoom: 0.5 }), wide)).toEqual({ x: 0, y: -50, size: 200 });
   });
 
   it('measures from the turned image', () => {

@@ -55,9 +55,6 @@ export const styles = stylex.create({
     flexDirection: 'column',
     rowGap: space['4'],
   },
-  stage: {
-    position: 'relative',
-  },
   frame: {
     borderRadius: radiusVars['--cl-radius-lg'],
     overflow: 'hidden',
@@ -84,14 +81,6 @@ export const styles = stylex.create({
   },
   circleMask: {
     borderRadius: '50%',
-  },
-  rotate: {
-    insetBlockStart: space['2'],
-    insetInlineEnd: space['2'],
-    position: 'absolute',
-  },
-  clockwise: {
-    transform: 'scaleX(-1)',
   },
   zoomRow: {
     alignItems: 'center',
