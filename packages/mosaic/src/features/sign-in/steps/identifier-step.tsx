@@ -197,6 +197,8 @@ function IdentifierStart({
                   countryTriggerLabel={m.start.selectedCountry}
                   countryPopupLabel={m.start.chooseCountry}
                   countrySearchLabel={m.start.searchCountries}
+                  countrySearchPlaceholder={m.start.countrySearchPlaceholder}
+                  noResultsMessage={m.start.noCountries}
                   {...phone}
                 />
               ) : (
