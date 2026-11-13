@@ -495,7 +495,6 @@ function StepPanel({
   onJoinWaitlist,
   passwordFeedback,
   onRetry,
-  protectCheckRef,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -514,7 +513,6 @@ function StepPanel({
   onJoinWaitlist?: () => void;
   passwordFeedback?: FieldFeedback;
   onRetry?: () => void;
-  protectCheckRef?: (element: HTMLDivElement | null) => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -563,7 +561,6 @@ function StepPanel({
       onBack={() => undefined}
       onStartOver={() => undefined}
       onRetry={onRetry}
-      protectCheckRef={protectCheckRef}
       onEmailSupport={() => undefined}
       onSelectFactor={() => undefined}
       onResend={offersResend(step) ? () => undefined : undefined}
@@ -1030,23 +1027,16 @@ export function NoticeProtectCheck() {
   );
 }
 
-function showStandInChallenge(element: HTMLDivElement | null) {
-  if (element && !element.firstChild) {
-    const widget = document.createElement('div');
-    widget.textContent = 'Challenge widget';
-    widget.style.cssText =
-      'display:grid;place-items:center;width:300px;height:65px;border:1px dashed currentColor;font:12px system-ui';
-    element.append(widget);
-  }
-}
-
 export function NoticeProtectCheckChallenge() {
+  const ref = useRef<HTMLDivElement>(null);
+  const status = useTestTurnstile(() => ref.current?.querySelector<HTMLElement>('#clerk-protect-check'));
   return (
-    <StepPanel
-      step={{ kind: 'notice', purpose: 'protect-check', challenge: true }}
-      isPending
-      protectCheckRef={showStandInChallenge}
-    />
+    <div ref={ref}>
+      <StepPanel
+        step={{ kind: 'notice', purpose: 'protect-check', challenge: status === 'Interactive challenge shown' }}
+        isPending
+      />
+    </div>
   );
 }
 
