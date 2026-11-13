@@ -10,7 +10,7 @@ ssoSuite('SSO configuration results', ({ app }) => {
   }) => {
     test.setTimeout(180_000);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
 

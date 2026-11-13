@@ -9,7 +9,7 @@ ssoSuite('SAML sign-in', ({ app }) => {
     createConnection,
     organization,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
 

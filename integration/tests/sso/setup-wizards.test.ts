@@ -14,7 +14,7 @@ ssoSuite('Self-serve setup wizards', ({ app }) => {
     }) => {
       test.setTimeout(180_000);
 
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
 
@@ -97,7 +97,7 @@ ssoSuite('Self-serve setup wizards', ({ app }) => {
     context,
     organization,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
 

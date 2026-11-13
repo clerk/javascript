@@ -47,7 +47,7 @@ export const test = base.extend<{
     await provide(context);
   },
   organization: async ({ app, keycloak }, provide) => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     const fakeAdmin = {
       ...u.services.users.createFakeUser(test, { withPassword: false }),
       email: `admin+clerk_test@admin-${keycloak.realm}.clerk.test`,
@@ -73,7 +73,7 @@ export const test = base.extend<{
     }
   },
   createConnection: async ({ app, organization, keycloak }, provide) => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     let connection: EnterpriseConnection | undefined;
     try {
       await provide(async page => {

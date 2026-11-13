@@ -48,7 +48,7 @@ ssoSuite('SSO bypass components', ({ app }) => {
     keycloak,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
 
@@ -111,7 +111,7 @@ ssoSuite('SSO bypass components', ({ app }) => {
     keycloak,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
 
@@ -169,7 +169,7 @@ ssoSuite('SSO bypass components', ({ app }) => {
       organization,
       keycloak,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
 

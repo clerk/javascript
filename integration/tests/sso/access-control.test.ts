@@ -8,7 +8,7 @@ ssoSuite('SSO access control', ({ app }) => {
     organization,
     keycloak,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const fakeMember = {
       ...u.services.users.createFakeUser(test, { withPassword: false }),
       email: `member+clerk_test@member-${keycloak.realm}.clerk.test`,

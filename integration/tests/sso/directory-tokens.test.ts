@@ -12,7 +12,7 @@ ssoSuite('Directory token controls', ({ app }) => {
     organization,
     keycloak,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
 
