@@ -1,0 +1,38 @@
+import * as CaptchaStories from './captcha.stories';
+
+# Captcha
+
+The element clerk-js renders Cloudflare Turnstile into when a sign-in or sign-up requires a CAPTCHA. It renders an empty `div` with the id `clerk-captcha`. clerk-js keeps it collapsed, and expands it and sets `data-cl-interactive` only when Turnstile asks the visitor to solve an interactive challenge.
+
+Render one per page, inside the step that creates the sign-in or sign-up, so it is mounted when clerk-js looks for it. Without it, clerk-js falls back to an invisible widget and has nowhere to show an interactive challenge.
+
+## Playground
+
+The playground stands in for clerk-js: it loads Turnstile with Cloudflare's test sitekey that always asks for an interactive challenge, and renders it into the element the way clerk-js does. It needs network access to `challenges.cloudflare.com`. In an app, the element stays empty unless Turnstile asks for a challenge. Without a `theme`, the widget matches the `color-scheme` it renders in, so it follows Swingset's dark mode toggle.
+
+<Preview
+  name='Default'
+  storyModule={CaptchaStories}
+/>
+
+## Props
+
+<PropTable
+  meta={CaptchaStories.meta}
+  extra={[
+    { name: 'theme', type: "'auto' | 'light' | 'dark'", default: 'the color scheme it renders in' },
+    { name: 'language', type: 'string' }, { name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+<Usage
+  component='Captcha'
+  module='@clerk/mosaic/components/captcha'
+/>
+
+## Styling
+
+| Part      | Stable slot class | Description                                                                                                  |
+| --------- | ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| `Captcha` | `.cl-captcha`     | `div#clerk-captcha`. `data-cl-interactive="true"` is present while Turnstile shows an interactive challenge. |

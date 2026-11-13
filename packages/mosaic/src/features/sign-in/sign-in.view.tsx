@@ -8,7 +8,15 @@ import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
-import { codeCopy, codeIdentity, codeNotice, codeResendCopy, codeSecondaryAction, stepKey } from './sign-in.utils';
+import {
+  codeCopy,
+  codeIdentity,
+  codeNotice,
+  codeResendCopy,
+  codeSecondaryAction,
+  stepIds,
+  stepKey,
+} from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CodeStep } from './steps/code-step';
 import { CredentialStep } from './steps/credential-step';
@@ -58,7 +66,9 @@ export function SignInView({
   combined,
   socialProviders,
   pendingProviderId,
+  lastUsedProviderId,
   onSelectProvider,
+  onPasskey,
   form,
   onSubmit,
   onCodeComplete,
@@ -68,14 +78,21 @@ export function SignInView({
   globalErrorMessage,
   newPasswordFeedback,
   onEditIdentifier,
+  onSwitchField,
   onSignUp,
+  onJoinWaitlist,
   onForgotPassword,
   onCancel,
   onShowHelp,
   onBack,
+  onStartOver,
   onEmailSupport,
   pendingFactorId,
   onSelectFactor,
+  pendingAccountId,
+  onSelectAccount,
+  onAddAccount,
+  onSignOutAll,
   onResend,
   canResend,
   resendRemainingSeconds,
@@ -106,6 +123,8 @@ export function SignInView({
       onClick: onResend,
     };
 
+  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+
   return (
     <Card.Root align='center'>
       <Flow.Root
@@ -115,28 +134,42 @@ export function SignInView({
       >
         {current => {
           const secondary = current.kind === 'code' ? codeSecondaryAction(current, m, { onCancel, onBack }) : undefined;
+          const identifierStep =
+            current.kind === 'identifier' ? (
+              <IdentifierStep
+                step={current}
+                onCancel={onCancel}
+                onSwitchField={onSwitchField}
+                focusRef={focusRef}
+                logo={logo}
+                applicationName={applicationName}
+                combined={combined}
+                socialProviders={socialProviders}
+                pendingProviderId={pendingProviderId}
+                lastUsedProviderId={lastUsedProviderId}
+                onSelectProvider={onSelectProvider}
+                onPasskey={onPasskey}
+                form={form}
+                errorMessage={errorMessage}
+                globalErrorMessage={globalErrorMessage}
+                isPending={isPending}
+                isDisabled={isDisabled}
+                onSubmit={onSubmit}
+                onSignUp={onSignUp}
+                onJoinWaitlist={onJoinWaitlist}
+              />
+            ) : null;
           return (
             <>
-              <Flow.Step ids={['identifier']}>
-                <IdentifierStep
-                  focusRef={focusRef}
-                  logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
-                  applicationName={applicationName}
-                  combined={combined}
-                  socialProviders={socialProviders}
-                  pendingProviderId={pendingProviderId}
-                  onSelectProvider={onSelectProvider}
-                  form={form}
-                  errorMessage={errorMessage}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  isDisabled={isDisabled}
-                  onSubmit={onSubmit}
-                  onSignUp={onSignUp}
-                />
+              <Flow.Step ids={stepIds.identifier}>
+                {stepKey(current) === 'identifier' ? identifierStep : null}
               </Flow.Step>
 
-              <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
+              <Flow.Step ids={stepIds.identifierChannel}>
+                {stepKey(current) === 'identifier:channel' ? identifierStep : null}
+              </Flow.Step>
+
+              <Flow.Step ids={stepIds.credential}>
                 {current.kind === 'credential' ? (
                   <CredentialStep
                     focusRef={focusRef}
@@ -160,17 +193,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step
-                ids={[
-                  'code:first-factor',
-                  'code:second-factor',
-                  'code:client-trust',
-                  'code:sso-bypass',
-                  'code:reset-password',
-                  'code:verify-email',
-                  'code:verify-phone',
-                ]}
-              >
+              <Flow.Step ids={stepIds.code}>
                 {current.kind === 'code' ? (
                   <CodeStep
                     focusRef={focusRef}
@@ -197,7 +220,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={['choice:methods', 'choice:reset-methods', 'choice:enterprise-connections']}>
+              <Flow.Step ids={stepIds.choice}>
                 {current.kind === 'choice' ? (
                   <ChoiceStep
                     focusRef={focusRef}
@@ -213,38 +236,35 @@ export function SignInView({
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}
                     onBack={onBack}
-                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
+                    socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
                     onSelectProvider={onSelectProvider}
                     onCancel={onCancel}
+                    pendingAccountId={pendingAccountId}
+                    isDisabled={isDisabled}
+                    onSelectAccount={onSelectAccount}
+                    onAddAccount={onAddAccount}
+                    onSignOutAll={onSignOutAll}
                   />
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step
-                ids={[
-                  'notice:help',
-                  'notice:forgot-password',
-                  'notice:no-methods',
-                  'notice:action-blocked',
-                  'notice:password-compromised',
-                  'notice:enterprise-sso',
-                  'notice:email-link',
-                ]}
-              >
+              <Flow.Step ids={stepIds.notice}>
                 {current.kind === 'notice' ? (
                   <NoticeStep
                     focusRef={focusRef}
                     step={current}
                     applicationName={applicationName}
-                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     isPending={isPending}
                     resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}
                     onSubmit={() => onSubmit()}
                     onEmailSupport={onEmailSupport}
                     onBack={onBack}
+                    onStartOver={onStartOver}
                     onEditIdentifier={onEditIdentifier}
                     onForgotPassword={onForgotPassword}
                     onCancel={onCancel}
@@ -252,18 +272,21 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={['new-password:forgot']}>
-                <NewPasswordStep
-                  focusRef={focusRef}
-                  form={form}
-                  isPending={isPending}
-                  onSubmit={onSubmit}
-                  passwordFeedback={newPasswordFeedback}
-                  onBack={onBack}
-                />
+              <Flow.Step ids={stepIds.newPassword}>
+                {current.kind === 'new-password' ? (
+                  <NewPasswordStep
+                    focusRef={focusRef}
+                    required={current.reason === 'required'}
+                    form={form}
+                    isPending={isPending}
+                    onSubmit={onSubmit}
+                    passwordFeedback={newPasswordFeedback}
+                    onBack={onBack}
+                  />
+                ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={['sign-up']}>
+              <Flow.Step ids={stepIds.signUp}>
                 <SignUpDetailsStep
                   focusRef={focusRef}
                   form={form}

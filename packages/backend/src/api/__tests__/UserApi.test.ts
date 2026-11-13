@@ -237,4 +237,35 @@ describe('UserAPI', () => {
       );
     });
   });
+
+  describe('getUserOauthAccessToken', () => {
+    it('exposes the provider error from a failed token retrieval', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/users/user_123/oauth_access_tokens/oauth_apple',
+          validateHeaders(() =>
+            HttpResponse.json(
+              {
+                errors: [
+                  {
+                    code: 'oauth_token_retrieval_error',
+                    message: 'Token retrieval failed',
+                    long_message: 'Failed to retrieve a new access token from the OAuth provider',
+                    meta: { provider_error: 'Apple Key ID is missing from the Apple OAuth settings' },
+                  },
+                ],
+              },
+              { status: 400 },
+            ),
+          ),
+        ),
+      );
+
+      const errResponse = await apiClient.users.getUserOauthAccessToken('user_123', 'apple').catch(err => err);
+
+      expect(errResponse.status).toBe(400);
+      expect(errResponse.errors[0].code).toBe('oauth_token_retrieval_error');
+      expect(errResponse.errors[0].meta.providerError).toBe('Apple Key ID is missing from the Apple OAuth settings');
+    });
+  });
 });

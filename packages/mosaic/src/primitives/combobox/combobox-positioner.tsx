@@ -8,25 +8,35 @@ import { parsePlacement } from '../utils/side-offset';
 import { useComboboxContext } from './combobox-context';
 
 export interface ComboboxPositionerProps extends ComponentProps<'div'> {
-  /** Element used for popup positioning. Defaults to the input. */
+  /** Element used for popup positioning. Defaults to the input group, then the input. */
   anchor?: HTMLElement | null;
 }
 
 export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPositionerProps>(
   function ComboboxPositioner(props, ref) {
     const { anchor, render, ...otherProps } = props;
-    const { mounted, floatingContext, refs, floatingStyles, placement, getFloatingProps, elementsRef, labelsRef } =
-      useComboboxContext();
+    const {
+      mounted,
+      floatingContext,
+      refs,
+      floatingStyles,
+      placement,
+      getFloatingProps,
+      elementsRef,
+      labelsRef,
+      inputGroup,
+    } = useComboboxContext();
+    const reference = anchor ?? inputGroup;
 
     const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
 
     React.useLayoutEffect(() => {
-      if (!anchor) {
+      if (!reference) {
         return;
       }
-      refs.setPositionReference(anchor);
+      refs.setPositionReference(reference);
       return restoreReference;
-    }, [anchor, refs, restoreReference]);
+    }, [reference, refs, restoreReference]);
 
     const side = parsePlacement(placement).side;
 

@@ -36,6 +36,7 @@ import {
   meta as bannerMeta,
 } from '../stories/banner.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import {
   Default as CheckboxDefault,
@@ -123,6 +124,7 @@ import {
   Sizes as IconFrameSizes,
   Treatments as IconFrameTreatments,
 } from '../stories/icon-frame.stories';
+import { meta as imageCropperMeta } from '../stories/image-cropper.stories';
 import {
   Default,
   Disabled as InputDisabled,
@@ -371,9 +373,17 @@ import {
   IdentifierProviderPending as SignInIdentifierProviderPending,
   IdentifierSignInOnly as SignInIdentifierSignInOnly,
   meta as signInMeta,
+  NewPasswordRequired as SignInNewPasswordRequired,
   NewPasswordReset as SignInNewPasswordReset,
   NoticeActionBlocked as SignInNoticeActionBlocked,
+  NoticeEmailLinkClientMismatch as SignInNoticeEmailLinkClientMismatch,
+  NoticeEmailLinkExpired as SignInNoticeEmailLinkExpired,
+  NoticeEmailLinkInvalid as SignInNoticeEmailLinkInvalid,
   NoticeEmailLinkSent as SignInNoticeEmailLinkSent,
+  NoticeEmailLinkSignedIn as SignInNoticeEmailLinkSignedIn,
+  NoticeEmailLinkSignedInOtherTab as SignInNoticeEmailLinkSignedInOtherTab,
+  NoticeEmailLinkSigningIn as SignInNoticeEmailLinkSigningIn,
+  NoticeEmailLinkVerified as SignInNoticeEmailLinkVerified,
   NoticeEnterpriseSso as SignInNoticeEnterpriseSso,
   NoticeForgotPassword as SignInNoticeForgotPassword,
   NoticeForgotPasswordPending as SignInNoticeForgotPasswordPending,
@@ -381,6 +391,7 @@ import {
   NoticeNoMethods as SignInNoticeNoMethods,
   NoticePasswordCompromised as SignInNoticePasswordCompromised,
   NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
+  NoticeStartOver as SignInNoticeStartOver,
   SignUpDetails as SignInSignUpDetails,
 } from '../stories/sign-in.stories';
 import {
@@ -996,6 +1007,11 @@ const fieldModule: StoryModule = {
   VisuallyHiddenLabel: FieldVisuallyHiddenLabel,
 };
 
+const captchaModule: StoryModule = {
+  meta: captchaMeta,
+  Default: CaptchaDefault,
+};
+
 const visuallyHiddenModule: StoryModule = {
   meta: visuallyHiddenMeta,
   Default: VisuallyHiddenDefault,
@@ -1035,6 +1051,7 @@ const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const flowModule: StoryModule = { meta: flowMeta };
+const imageCropperModule: StoryModule = { meta: imageCropperMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
@@ -1322,7 +1339,16 @@ const signInModule: StoryModule = {
   NoticePasswordCompromised: SignInNoticePasswordCompromised,
   NoticePasswordCompromisedPending: SignInNoticePasswordCompromisedPending,
   NoticeEmailLinkSent: SignInNoticeEmailLinkSent,
+  NoticeEmailLinkSignedInOtherTab: SignInNoticeEmailLinkSignedInOtherTab,
+  NoticeEmailLinkVerified: SignInNoticeEmailLinkVerified,
+  NoticeEmailLinkSigningIn: SignInNoticeEmailLinkSigningIn,
+  NoticeEmailLinkSignedIn: SignInNoticeEmailLinkSignedIn,
+  NoticeEmailLinkExpired: SignInNoticeEmailLinkExpired,
+  NoticeEmailLinkInvalid: SignInNoticeEmailLinkInvalid,
+  NoticeEmailLinkClientMismatch: SignInNoticeEmailLinkClientMismatch,
+  NoticeStartOver: SignInNoticeStartOver,
   NewPasswordReset: SignInNewPasswordReset,
+  NewPasswordRequired: SignInNewPasswordRequired,
   SignUpDetails: SignInSignUpDetails,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
@@ -1442,6 +1468,7 @@ export const registry: StoryModule[] = [
   toastModule,
   tooltipComponentModule,
   fieldModule,
+  captchaModule,
   visuallyHiddenModule,
   // Primitives
   accordionModule,
@@ -1452,6 +1479,7 @@ export const registry: StoryModule[] = [
   drawerModule,
   fileUploadModule,
   flowModule,
+  imageCropperModule,
   menuModule,
   otpModule,
   popoverModule,

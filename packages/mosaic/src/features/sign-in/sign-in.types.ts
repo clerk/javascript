@@ -16,8 +16,11 @@ export type SignInFactor =
 
 type SignInCodeChannel = 'email' | 'phone' | 'totp';
 
+export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
+
 export type SignInStep =
-  | { kind: 'identifier' }
+  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField; lastUsed?: boolean }
+  | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
@@ -35,13 +38,25 @@ export type SignInStep =
     }
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
+  | { kind: 'choice'; purpose: 'accounts'; options: readonly SignInAccount[] }
+  | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
-  | { kind: 'new-password'; reason: 'forgot' }
+  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus }
+  | { kind: 'new-password'; reason: 'forgot' | 'required' }
   | { kind: 'sign-up' };
+
+export type SignInEmailLinkStatus =
+  | 'loading'
+  | 'signed-in'
+  | 'signed-in-other-tab'
+  | 'transferable'
+  | 'expired'
+  | 'failed'
+  | 'client-mismatch';
 
 export interface SignInActionBlockedDetails {
   title?: string;
@@ -49,6 +64,13 @@ export interface SignInActionBlockedDetails {
   linkUrl?: string;
   linkText?: string;
   traceId?: string;
+}
+
+export interface SignInAccount {
+  id: string;
+  name: string;
+  identifier: string;
+  imageUrl?: string;
 }
 
 export interface SignInProvider {
@@ -59,6 +81,7 @@ export interface SignInProvider {
 
 export interface SignInValues {
   identifier: string;
+  phoneNumber: string;
   password: string;
   code: string;
   backupCode: string;
@@ -81,7 +104,9 @@ export interface SignInViewProps {
   combined: boolean;
   socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
+  lastUsedProviderId?: string;
   onSelectProvider: (id: string) => void;
+  onPasskey?: () => void;
   form: UseFormResult<SignInValues>;
   onSubmit: (event?: SignInSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
@@ -91,14 +116,21 @@ export interface SignInViewProps {
   globalErrorMessage?: string;
   newPasswordFeedback?: FieldFeedback;
   onEditIdentifier: () => void;
+  onSwitchField?: () => void;
   onSignUp?: () => void;
+  onJoinWaitlist?: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   onShowHelp: () => void;
   onBack: () => void;
+  onStartOver: () => void;
   onEmailSupport: () => void;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
+  pendingAccountId?: string;
+  onSelectAccount: (id: string) => void;
+  onAddAccount?: () => void;
+  onSignOutAll?: () => void;
   onResend?: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;

@@ -14,6 +14,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { imageFile, saveCrop } from '../../../__tests__/feature/image';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
@@ -362,7 +363,8 @@ describe('OrganizationProfileGeneralPanel', () => {
         throw new Error('Logo upload input is missing');
       }
       const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
-      await user.upload(input, new File(['image'], 'logo.png', { type: 'image/png' }));
+      await user.upload(input, await imageFile('logo.png'));
+      await saveCrop(user, 'Adjust logo');
       await waitFor(() => expect(upload.requests).toHaveLength(1));
       expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
       expect(screen.queryByRole('button', { name: 'Manage logo' })).toBeNull();
@@ -386,14 +388,16 @@ describe('OrganizationProfileGeneralPanel', () => {
 
     it('marks the row while a file is dragged over it and uploads the file dropped on it', async () => {
       const { fapi } = await renderPanel();
+      const user = userEvent.setup();
       const row = await screen.findByText('Logo');
-      const file = new File(['image'], 'logo.png', { type: 'image/png' });
+      const file = await imageFile('logo.png');
 
       dragFilesOver(row, file);
       expect(row.closest('[data-dragging]')).not.toBeNull();
 
       dropFiles(row, file);
       expect(row.closest('[data-dragging]')).toBeNull();
+      await saveCrop(user, 'Adjust logo');
       await waitFor(() => expect(fapi.memberships[0]?.organization.has_image).toBe(true));
     });
 
@@ -440,12 +444,9 @@ describe('OrganizationProfileGeneralPanel', () => {
         throw new Error('Logo upload input is missing');
       }
       expect(container.querySelector('img[alt="Acme"]')).toBeNull();
-      const png = Uint8Array.from(
-        atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/zXcAAAAASUVORK5CYII='),
-        character => character.charCodeAt(0),
-      );
       const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
-      await user.upload(input, new File([png], 'logo.png', { type: 'image/png' }));
+      await user.upload(input, await imageFile('logo.png'));
+      await saveCrop(user, 'Adjust logo');
       await waitFor(() => expect(upload.requests).toHaveLength(1));
       await waitFor(() => expect(container.querySelector('img[alt="Acme"]')?.getAttribute('src')).toMatch(/^blob:/));
       upload.fail('image_invalid', 'Server rejected logo');
@@ -453,7 +454,8 @@ describe('OrganizationProfileGeneralPanel', () => {
       await waitFor(() => expect(screen.getByText('Server rejected logo')).toBeVisible());
       await waitFor(() => expect(container.querySelector('img[alt="Acme"]')).toBeNull());
       const retry = serveFapi(signedIn());
-      await user.upload(input, new File(['image2'], 'second.png', { type: 'image/png' }));
+      await user.upload(input, await imageFile('second.png'));
+      await saveCrop(user, 'Adjust logo');
       await waitFor(() => expect(retry.memberships[0]?.organization.has_image).toBe(true));
       expect(await screen.findByRole('button', { name: 'Manage logo' })).toBeVisible();
     });

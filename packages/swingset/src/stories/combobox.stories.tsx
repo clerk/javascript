@@ -24,24 +24,24 @@ export function Default() {
   const options = ['Apple', 'Apricot', 'Banana', 'Blackberry', 'Cherry', 'Fig', 'Grape', 'Pear', 'Plum'];
 
   return (
-    <Combobox.Root>
+    <Combobox.Root
+      items={options}
+      itemToStringLabel={option => option}
+    >
       <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Fruit</Field.Label>
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Clear aria-label='Clear fruit' />
             <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
       </Field.Root>
       <Combobox.Popup>
-        <Combobox.Collection
-          items={options}
-          itemToStringLabel={option => option}
-          empty={<Combobox.Empty>No fruit found</Combobox.Empty>}
-        >
-          {option => (
+        <Combobox.Empty>No fruit found</Combobox.Empty>
+        <Combobox.Collection>
+          {(option: string) => (
             <Combobox.Option
               key={option}
               value={option.toLowerCase()}
@@ -61,24 +61,24 @@ export function Scrolling() {
   const options = Array.from({ length: 40 }, (_, index) => `Fruit ${index + 1}`);
 
   return (
-    <Combobox.Root>
+    <Combobox.Root
+      items={options}
+      itemToStringLabel={option => option}
+    >
       <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Fruit</Field.Label>
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input placeholder='Search fruit…' />
           <InputGroup.End>
             <Combobox.Clear aria-label='Clear fruit' />
             <Combobox.Trigger aria-label='Toggle fruit options' />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
       </Field.Root>
       <Combobox.Popup>
-        <Combobox.Collection
-          items={options}
-          itemToStringLabel={option => option}
-          empty={<Combobox.Empty>No fruit found</Combobox.Empty>}
-        >
-          {option => (
+        <Combobox.Empty>No fruit found</Combobox.Empty>
+        <Combobox.Collection>
+          {(option: string) => (
             <Combobox.Option
               key={option}
               value={option.toLowerCase()}
@@ -104,23 +104,23 @@ export function OptionParts() {
   ];
 
   return (
-    <Combobox.Root>
+    <Combobox.Root
+      items={currencies}
+      itemToStringLabel={currency => currency.name}
+    >
       <Field.Root xstyle={styles.fieldWidth}>
         <Field.Label>Currency</Field.Label>
-        <InputGroup.Root>
+        <Combobox.InputGroup>
           <Combobox.Input placeholder='Search currencies…' />
           <InputGroup.End>
             <Combobox.Trigger aria-label='Toggle currency options' />
           </InputGroup.End>
-        </InputGroup.Root>
+        </Combobox.InputGroup>
       </Field.Root>
       <Combobox.Popup>
-        <Combobox.Collection
-          items={currencies}
-          itemToStringLabel={currency => currency.name}
-          empty={<Combobox.Empty>No currency found</Combobox.Empty>}
-        >
-          {currency => (
+        <Combobox.Empty>No currency found</Combobox.Empty>
+        <Combobox.Collection>
+          {(currency: (typeof currencies)[number]) => (
             <Combobox.Option
               key={currency.code}
               value={currency.code}

@@ -2525,6 +2525,7 @@ type UnstableErrors = WithParamName<{
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
+  too_many_requests: LocalizationValue;
   too_many_unverified_identifications: LocalizationValue;
   web3_missing_identifier: LocalizationValue;
   web3_solana_signature_generation_failed: LocalizationValue;
@@ -2570,6 +2571,7 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  signup_rate_limit_exceeded: LocalizationValue;
   sso_bypass_domain_not_served: LocalizationValue;
   ticket_expired_code: LocalizationValue;
   ticket_invalid_code: LocalizationValue;

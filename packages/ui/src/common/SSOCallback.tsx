@@ -36,11 +36,22 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
           return;
         }
 
-        bounceTimeoutRef.current = setTimeout(() => void navigate('../'), 4000);
+        let shownError: Parameters<typeof card.setError>[0];
+        const showError = (error: typeof shownError) => {
+          shownError = error;
+          card.setError(error);
+        };
+
+        bounceTimeoutRef.current = setTimeout(() => {
+          if (window.Clerk) {
+            window.Clerk.__internal_last_error = shownError;
+          }
+          void navigate('../');
+        }, 4000);
         try {
-          handleError(e, [], card.setError);
+          handleError(e, [], showError);
         } catch {
-          card.setError('Unable to complete action at this time. If the problem persists please contact support.');
+          showError('Unable to complete action at this time. If the problem persists please contact support.');
         }
       });
     }

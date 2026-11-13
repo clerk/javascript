@@ -65,6 +65,15 @@ Wrap `Field.Error` in `Field.Message` and pass the message as its children. `Fie
 
 `Field.Success` is the positive counterpart. Render both inside one `Field.Message` and pass each its own message; when one replaces the other, the outgoing message fades out over the incoming one while the container height moves once from the old height to the new.
 
+### Header action
+
+<Story
+  name='WithHeaderAction'
+  storyModule={FieldStories}
+/>
+
+Wrap `Field.Label` in `Field.Header` to put an action, such as a link-style `Button`, at the end of the label's row. The action sits outside the `label`, so pressing it doesn't focus the control.
+
 ### Controls without a native label
 
 <Story
@@ -103,6 +112,7 @@ Pass `orientation='horizontal'` to `Field.Root` to place the control beside its 
 | Part                | Stable slot class       | Description                                                                                                                                          |
 | ------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Field.Root`        | `.cl-field-root`        | `div` that stacks its parts, or places the control beside `Field.Content` when horizontal, and provides the field context.                           |
+| `Field.Header`      | `.cl-field-header`      | `div` that puts the label at the start of a row and an action at the end.                                                                            |
 | `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control; a `span` that focuses the control when it cannot be natively labelled, such as a `Select` trigger. |
 | `Field.Content`     | `.cl-field-content`     | `div` that stacks the label, description, and messages beside the control in a horizontal field.                                                     |
 | `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control.                                                                                                    |
