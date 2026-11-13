@@ -18,6 +18,12 @@ import type { VerifyTokenOptions } from './verify';
  */
 export type AuthenticateRequestOptions = {
   /**
+   * Clerk's preview flag for publishing Poppy discovery through `clerkMiddleware()`.
+   * The Backend API supplies Clerk's hosted browser Session endpoint. No application join or callback route is needed.
+   * This option may change while Poppy is a draft.
+   */
+  poppy?: boolean;
+  /**
    * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */
   publishableKey?: string;

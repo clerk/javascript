@@ -18,6 +18,6 @@ describe('ArtifactsAPI', () => {
       apiUrl: 'https://api.clerk.test',
       secretKey: 'sk_live_example',
     });
-    await expect(artifacts.__experimental_getPoppyJson()).resolves.toEqual(data);
+    await expect(artifacts.getPoppyJson()).resolves.toEqual(data);
   });
 });
