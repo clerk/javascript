@@ -1,2 +1,10 @@
 export { SignUpView } from './sign-up.view';
-export type { SignUpStep, SignUpSubmitEvent, SignUpValues, SignUpViewProps } from './sign-up.types';
+export type {
+  SignUpFieldName,
+  SignUpFields,
+  SignUpLegalConsent,
+  SignUpStep,
+  SignUpSubmitEvent,
+  SignUpValues,
+  SignUpViewProps,
+} from './sign-up.types';

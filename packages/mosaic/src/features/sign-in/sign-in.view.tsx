@@ -7,6 +7,7 @@ import { Flow } from '../../components/flow';
 import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
 import {
   codeCopy,
@@ -23,7 +24,6 @@ import { CredentialStep } from './steps/credential-step';
 import { IdentifierStep } from './steps/identifier-step';
 import { NewPasswordStep } from './steps/new-password-step';
 import { NoticeStep } from './steps/notice-step';
-import { SignUpDetailsStep } from './steps/sign-up-details';
 
 type Messages = MosaicMessages['signIn'];
 type ResendCopy = Pick<Messages['emailCode'] | Messages['emailLink'], 'resendText' | 'resend' | 'resendCountdown'>;
