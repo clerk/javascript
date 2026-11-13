@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode, Ref } from 'react';
@@ -17,31 +18,34 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { fill, rich, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles } from '../sign-in.styles';
+import type { SignInProvider } from '../../sign-in';
+import { styles } from '../../sign-in/sign-in.styles';
+import { SignInCaptcha } from '../../sign-in/steps/sign-in-captcha';
 import type {
-  SignInProvider,
-  SignInStep,
-  SignInSubmitEvent,
-  SignInValues,
+  SignUpDetails,
   SignUpFieldName,
   SignUpLegalConsent,
-} from '../sign-in.types';
-import { legalConsentLabel, signUpFieldNames, signUpHeading } from '../sign-in.utils';
+  SignUpSubmitEvent,
+  SignUpValues,
+} from '../sign-up.types';
+import { legalConsentLabel, signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
 
 interface SignUpDetailsProps {
-  step: Extract<SignInStep, { kind: 'sign-up' }>;
+  step: SignUpDetails;
   onSwitchField?: () => void;
   socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   isDisabled: boolean;
-  form: UseFormResult<SignInValues>;
+  form: UseFormResult<SignUpValues>;
   globalErrorMessage?: string;
   isPending: boolean;
-  onSubmit: (event: SignInSubmitEvent) => void;
+  onSubmit: (event: SignUpSubmitEvent) => void;
   passwordFeedback?: FieldFeedback;
   onSignIn?: () => void;
   focusRef?: Ref<HTMLElement>;
+  logo?: { src: string; alt: string };
+  captcha?: boolean;
 }
 
 export function SignUpDetailsStep({
@@ -58,41 +62,29 @@ export function SignUpDetailsStep({
   passwordFeedback,
   onSignIn,
   focusRef,
+  logo,
+  captcha = false,
 }: SignUpDetailsProps) {
-  const m = useMessages('signIn');
-  const { fields, nextField, legalConsent } = step;
-  const heading = signUpHeading(step, m);
+  const m = useMessages('signUp');
+  const shared = useMessages('signIn');
+  const { fields, legalConsent } = step;
+  const heading = signUpDetailsHeading(step, m);
   const [first] = signUpFieldNames(fields);
   const onlyLegalConsent = Boolean(legalConsent) && !first;
-  const switchedRef = useRef(false);
-  const focusAfterSwitch = useCallback((element: HTMLElement | null) => {
-    if (element && switchedRef.current) {
-      switchedRef.current = false;
-      element.focus();
-    }
-  }, []);
-  const field = (name: SignUpFieldName) => ({
-    form,
-    required: fields[name]?.required ?? false,
-    disabled: isDisabled,
-    autoFocus: first === name,
-    inputRef: first === name ? focusRef : undefined,
-  });
-  const switchField =
-    nextField && onSwitchField
-      ? {
-          switchRef: focusAfterSwitch,
-          switchLabel: nextField === 'phoneNumber' ? m.signUp.usePhone : m.signUp.useEmail,
-          onSwitch: () => {
-            switchedRef.current = true;
-            onSwitchField();
-          },
-        }
-      : undefined;
-
+  const hasForm = Boolean(first) || Boolean(legalConsent);
+  const [isChallengeShown, setIsChallengeShown] = useState(false);
   return (
     <>
       <Card.Header>
+        {logo ? (
+          <Card.Media>
+            <img
+              src={logo.src}
+              alt={logo.alt}
+              {...stylex.props(styles.logo)}
+            />
+          </Card.Media>
+        ) : null}
         <Card.Title>{heading.title}</Card.Title>
         <Card.Description>{heading.description}</Card.Description>
       </Card.Header>
@@ -103,69 +95,37 @@ export function SignUpDetailsStep({
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
-        <SignUpProviders
-          providers={onlyLegalConsent ? [] : socialProviders}
-          pendingProviderId={pendingProviderId}
-          isDisabled={isDisabled}
-          onSelectProvider={onSelectProvider}
-        />
-        <Form
-          id={form.id}
-          onSubmit={onSubmit}
+        <div
+          {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
+          {...inertProps(isChallengeShown)}
         >
-          <div {...stylex.props(styles.fieldStack)}>
-            <NameFields
-              firstName={fields.firstName ? field('firstName') : undefined}
-              lastName={fields.lastName ? field('lastName') : undefined}
+          <SignUpProviders
+            providers={onlyLegalConsent ? [] : socialProviders}
+            showDivider={hasForm}
+            pendingProviderId={pendingProviderId}
+            isDisabled={isDisabled}
+            onSelectProvider={onSelectProvider}
+          />
+          {hasForm ? (
+            <SignUpFields
+              step={step}
+              form={form}
+              isDisabled={isDisabled}
+              onSubmit={onSubmit}
+              onSwitchField={onSwitchField}
+              passwordFeedback={passwordFeedback}
+              focusRef={focusRef}
             />
-            {fields.username ? (
-              <TextField
-                {...field('username')}
-                name='username'
-                label={m.signUp.usernameLabel}
-                placeholder={m.signUp.usernamePlaceholder}
-                autoComplete='username'
-              />
-            ) : null}
-            {fields.emailAddress ? (
-              <TextField
-                {...field('emailAddress')}
-                {...switchField}
-                name='identifier'
-                type='email'
-                label={m.signUp.emailLabel}
-                placeholder={m.signUp.emailPlaceholder}
-                autoComplete='email'
-              />
-            ) : null}
-            {fields.phoneNumber ? (
-              <PhoneField
-                {...field('phoneNumber')}
-                {...switchField}
-              />
-            ) : null}
-            {fields.password ? (
-              <PasswordField
-                {...field('password')}
-                advisoryFeedback={passwordFeedback}
-              />
-            ) : null}
-            {legalConsent ? (
-              <LegalConsentField
-                form={form}
-                consent={legalConsent}
-                disabled={isDisabled}
-              />
-            ) : null}
-          </div>
-        </Form>
+          ) : null}
+        </div>
+        {captcha ? <SignInCaptcha onInteractiveChange={setIsChallengeShown} /> : null}
         {onSignIn ? (
           <Text
             size='sm'
             color='foreground-secondary'
             xstyle={styles.footerText}
           >
-            {m.signUp.signInPrompt}{' '}
+            {m.signInPrompt}{' '}
             <Button
               type='button'
               size='sm'
@@ -173,23 +133,120 @@ export function SignUpDetailsStep({
               disabled={isDisabled}
               onClick={onSignIn}
             >
-              {m.signUp.signInLink}
+              {m.signInLink}
             </Button>
           </Text>
         ) : null}
       </Card.Content>
-      <Card.Footer>
-        <SubmitButton
-          form={form.id}
-          fullWidth
-          disabled={Boolean(pendingProviderId)}
-          isPending={isPending}
-          pendingLabel={m.verifying}
-        >
-          {m.continue}
-        </SubmitButton>
-      </Card.Footer>
+      {hasForm ? (
+        <Card.Footer xstyle={isChallengeShown && styles.spotlightHidden}>
+          <SubmitButton
+            form={form.id}
+            fullWidth
+            disabled={Boolean(pendingProviderId)}
+            isPending={isPending}
+            pendingLabel={shared.verifying}
+          >
+            {shared.continue}
+          </SubmitButton>
+        </Card.Footer>
+      ) : null}
     </>
+  );
+}
+
+function SignUpFields({
+  step,
+  form,
+  isDisabled,
+  onSubmit,
+  onSwitchField,
+  passwordFeedback,
+  focusRef,
+}: Pick<
+  SignUpDetailsProps,
+  'step' | 'form' | 'isDisabled' | 'onSubmit' | 'onSwitchField' | 'passwordFeedback' | 'focusRef'
+>) {
+  const m = useMessages('signUp');
+  const { fields, nextField, legalConsent } = step;
+  const [first] = signUpFieldNames(fields);
+  const switchedRef = useRef(false);
+  const focusAfterSwitch = useCallback((element: HTMLElement | null) => {
+    if (element && switchedRef.current) {
+      switchedRef.current = false;
+      element.focus();
+    }
+  }, []);
+  const field = (name: SignUpFieldName) => ({
+    form,
+    required: fields[name]?.required ?? false,
+    disabled: isDisabled || Boolean(fields[name]?.disabled),
+    autoFocus: first === name,
+    inputRef: first === name ? focusRef : undefined,
+  });
+  const switchField =
+    nextField && onSwitchField
+      ? {
+          switchRef: focusAfterSwitch,
+          switchLabel: nextField === 'phoneNumber' ? m.form.usePhone : m.form.useEmail,
+          onSwitch: () => {
+            switchedRef.current = true;
+            onSwitchField();
+          },
+        }
+      : undefined;
+
+  return (
+    <Form
+      id={form.id}
+      onSubmit={onSubmit}
+    >
+      <div {...stylex.props(styles.fieldStack)}>
+        <NameFields
+          firstName={fields.firstName ? field('firstName') : undefined}
+          lastName={fields.lastName ? field('lastName') : undefined}
+        />
+        {fields.username ? (
+          <TextField
+            {...field('username')}
+            name='username'
+            label={m.form.usernameLabel}
+            placeholder={m.form.usernamePlaceholder}
+            autoComplete='username'
+          />
+        ) : null}
+        {fields.emailAddress ? (
+          <TextField
+            {...field('emailAddress')}
+            {...switchField}
+            name='identifier'
+            type='email'
+            label={m.form.emailLabel}
+            placeholder={m.form.emailPlaceholder}
+            autoComplete='email'
+          />
+        ) : null}
+        {fields.phoneNumber ? (
+          <PhoneField
+            {...field('phoneNumber')}
+            {...switchField}
+          />
+        ) : null}
+        {fields.password ? (
+          <PasswordField
+            {...field('password')}
+            advisoryFeedback={passwordFeedback}
+          />
+        ) : null}
+        {legalConsent ? (
+          <LegalConsentField
+            form={form}
+            consent={legalConsent}
+            disabled={isDisabled}
+          />
+        ) : null}
+      </div>
+    </Form>
   );
 }
 
@@ -198,13 +255,15 @@ function SignUpProviders({
   pendingProviderId,
   isDisabled,
   onSelectProvider,
+  showDivider,
 }: {
   providers: readonly SignInProvider[];
+  showDivider: boolean;
   pendingProviderId?: string;
   isDisabled: boolean;
   onSelectProvider: (id: string) => void;
 }) {
-  const m = useMessages('signIn');
+  const shared = useMessages('signIn');
   if (providers.length === 0) {
     return null;
   }
@@ -222,27 +281,29 @@ function SignUpProviders({
                 {...stylex.props(styles.providerIcon)}
               />
             }
-            longLabel={fill(m.start.socialButton, { provider: provider.name })}
+            longLabel={fill(shared.start.socialButton, { provider: provider.name })}
             shortLabel={provider.name}
             isPending={pendingProviderId === provider.id}
-            pendingLabel={m.verifying}
+            pendingLabel={shared.verifying}
             onClick={() => onSelectProvider(provider.id)}
           />
         ))}
       </ProviderButtonGroup>
-      <div
-        role='separator'
-        {...stylex.props(styles.divider)}
-      >
-        <span {...stylex.props(styles.dividerLine)} />
-        <Text
-          size='sm'
-          color='foreground-secondary'
+      {showDivider ? (
+        <div
+          role='separator'
+          {...stylex.props(styles.divider)}
         >
-          {m.start.divider}
-        </Text>
-        <span {...stylex.props(styles.dividerLine)} />
-      </div>
+          <span {...stylex.props(styles.dividerLine)} />
+          <Text
+            size='sm'
+            color='foreground-secondary'
+          >
+            {shared.start.divider}
+          </Text>
+          <span {...stylex.props(styles.dividerLine)} />
+        </div>
+      ) : null}
     </>
   );
 }
@@ -252,11 +313,11 @@ function LegalConsentField({
   consent,
   disabled,
 }: {
-  form: UseFormResult<SignInValues>;
+  form: UseFormResult<SignUpValues>;
   consent: SignUpLegalConsent;
   disabled: boolean;
 }) {
-  const m = useMessages('signIn');
+  const m = useMessages('signUp');
   const { feedback } = form.fields.legalAccepted;
   const link = (href: string | undefined) => (children: ReactNode) =>
     href ? (
@@ -292,7 +353,7 @@ function LegalConsentField({
 }
 
 function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?: FieldProps }) {
-  const m = useMessages('signIn');
+  const m = useMessages('signUp');
   if (!firstName && !lastName) {
     return null;
   }
@@ -303,8 +364,8 @@ function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?
         <TextField
           {...firstName}
           name='firstName'
-          label={m.signUp.firstNameLabel}
-          placeholder={m.signUp.firstNamePlaceholder}
+          label={m.form.firstNameLabel}
+          placeholder={m.form.firstNamePlaceholder}
           autoComplete='given-name'
         />
       ) : null}
@@ -312,8 +373,8 @@ function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?
         <TextField
           {...lastName}
           name='lastName'
-          label={m.signUp.lastNameLabel}
-          placeholder={m.signUp.lastNamePlaceholder}
+          label={m.form.lastNameLabel}
+          placeholder={m.form.lastNamePlaceholder}
           autoComplete='family-name'
         />
       ) : null}
@@ -322,7 +383,7 @@ function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?
 }
 
 interface FieldProps {
-  form: UseFormResult<SignInValues>;
+  form: UseFormResult<SignUpValues>;
   required: boolean;
   disabled: boolean;
   autoFocus: boolean;
@@ -387,7 +448,7 @@ function TextField({
 }
 
 function PhoneField({ form, required, disabled, autoFocus, inputRef, switchRef, switchLabel, onSwitch }: FieldProps) {
-  const m = useMessages('signIn');
+  const m = useMessages('signUp');
   const { ref, ...control } = form.registerValue('phoneNumber');
   const flowAutoFocusRef = useFlowAutoFocus<HTMLInputElement>();
   const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, switchRef, autoFocus ? flowAutoFocusRef : undefined]);
@@ -401,7 +462,7 @@ function PhoneField({ form, required, disabled, autoFocus, inputRef, switchRef, 
       focusableWhenDisabled
     >
       <Field.Header>
-        <Field.Label>{m.signUp.phoneLabel}</Field.Label>
+        <Field.Label>{m.form.phoneLabel}</Field.Label>
         <FieldHeaderEnd
           required={required}
           disabled={disabled}
@@ -412,12 +473,12 @@ function PhoneField({ form, required, disabled, autoFocus, inputRef, switchRef, 
       <PhoneInput
         ref={mergedRef}
         autoComplete='tel'
-        placeholder={m.signUp.phonePlaceholder}
-        countryTriggerLabel={m.signUp.selectedCountry}
-        countryPopupLabel={m.signUp.chooseCountry}
-        countrySearchLabel={m.signUp.searchCountries}
-        countrySearchPlaceholder={m.signUp.countrySearchPlaceholder}
-        noResultsMessage={m.signUp.noCountries}
+        placeholder={m.form.phonePlaceholder}
+        countryTriggerLabel={m.form.selectedCountry}
+        countryPopupLabel={m.form.chooseCountry}
+        countrySearchLabel={m.form.searchCountries}
+        countrySearchPlaceholder={m.form.countrySearchPlaceholder}
+        noResultsMessage={m.form.noCountries}
         {...control}
       />
       <Field.Feedback feedback={feedback} />
@@ -433,7 +494,8 @@ function PasswordField({
   inputRef,
   advisoryFeedback,
 }: FieldProps & { advisoryFeedback?: FieldFeedback }) {
-  const m = useMessages('signIn');
+  const m = useMessages('signUp');
+  const shared = useMessages('signIn');
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields.password;
   const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
@@ -450,21 +512,21 @@ function PasswordField({
       focusableWhenDisabled
     >
       <Field.Header>
-        <Field.Label>{m.signUp.passwordLabel}</Field.Label>
+        <Field.Label>{m.form.passwordLabel}</Field.Label>
         {required ? null : <OptionalHint />}
       </Field.Header>
       <PasswordInput
         ref={mergedRef}
         autoComplete='new-password'
-        placeholder={m.signUp.passwordPlaceholder}
+        placeholder={m.form.passwordPlaceholder}
         {...control}
         onFocus={() => setFocused(true)}
         onBlur={() => {
           setFocused(false);
           control.onBlur();
         }}
-        showPasswordLabel={m.showPassword}
-        hidePasswordLabel={m.hidePassword}
+        showPasswordLabel={shared.showPassword}
+        hidePasswordLabel={shared.hidePassword}
       />
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>
@@ -494,7 +556,7 @@ function FieldHeaderEnd({
 }
 
 function OptionalHint() {
-  const m = useMessages('signIn');
+  const m = useMessages('signUp');
 
   return (
     <Text
@@ -502,7 +564,7 @@ function OptionalHint() {
       color='foreground-secondary'
       render={<span />}
     >
-      {m.signUp.optional}
+      {m.form.optional}
     </Text>
   );
 }

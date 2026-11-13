@@ -26,6 +26,7 @@ interface SignInAlternativeChannelProps {
   onSubmit: (event: SignInSubmitEvent) => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
+  copy?: { title: string; description: string; label: string };
 }
 
 export function SignInAlternativeChannel({
@@ -40,12 +41,14 @@ export function SignInAlternativeChannel({
   onSubmit,
   onCancel,
   focusRef,
+  copy: copyProp,
 }: SignInAlternativeChannelProps) {
   const m = useMessages('signIn');
   const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
   const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
   const provider = channel.name;
+  const copy = copyProp ?? m.alternativeChannel;
 
   return (
     <>
@@ -59,8 +62,8 @@ export function SignInAlternativeChannel({
             />
           </Card.Media>
         ) : null}
-        <Card.Title>{fill(m.alternativeChannel.title, { applicationName, provider })}</Card.Title>
-        <Card.Description>{fill(m.alternativeChannel.description, { provider })}</Card.Description>
+        <Card.Title>{fill(copy.title, { applicationName, provider })}</Card.Title>
+        <Card.Description>{fill(copy.description, { provider })}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -79,7 +82,7 @@ export function SignInAlternativeChannel({
             disabled={isDisabled}
             focusableWhenDisabled
           >
-            <Field.Label>{fill(m.alternativeChannel.label, { provider })}</Field.Label>
+            <Field.Label>{fill(copy.label, { provider })}</Field.Label>
             <PhoneInput
               ref={phoneRef}
               autoComplete='tel'
