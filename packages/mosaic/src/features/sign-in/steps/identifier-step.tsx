@@ -16,6 +16,7 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
+import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';
 import type {
   SignInIdentifierField,
@@ -36,10 +37,12 @@ interface IdentifierStepProps extends Omit<IdentifierStartProps, 'field' | 'next
 }
 
 export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps) {
+  const signUp = useMessages('signUp');
   if ('channel' in step) {
     return (
       <SignInAlternativeChannel
         channel={step.channel}
+        copy={step.flow === 'sign-up' ? signUp.alternativePhone : undefined}
         applicationName={props.applicationName}
         logo={props.logo}
         form={props.form}
@@ -50,7 +53,15 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
         onSubmit={props.onSubmit}
         onCancel={onCancel}
         focusRef={props.focusRef}
-      />
+      >
+        {step.legalConsent ? (
+          <SignUpLegalConsentField
+            form={props.form}
+            consent={step.legalConsent}
+            disabled={props.isDisabled}
+          />
+        ) : null}
+      </SignInAlternativeChannel>
     );
   }
   return (

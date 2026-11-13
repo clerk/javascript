@@ -19,6 +19,7 @@ import { SignInWallets } from '../sign-in/steps/sign-in-wallets';
 import type { SignUpStep, SignUpViewProps } from './sign-up.types';
 import { signUpCodeStep, signUpStepIds, signUpStepKey } from './sign-up.utils';
 import { SignUpDetailsStep } from './steps/sign-up-details';
+import { SignUpLegalConsentField } from './steps/sign-up-legal-consent';
 import { SignUpRestricted } from './steps/sign-up-restricted';
 
 type ResendCopy = { resendText: string; resend: string; resendCountdown: `${string}{seconds}${string}` };
@@ -168,8 +169,7 @@ export function SignUpView({
                 <SignUpDetailsStep
                   focusRef={focusRef}
                   step={current}
-                  logo={current.purpose === 'start' ? logo : undefined}
-                  captcha={current.purpose === 'start'}
+                  logo={logo}
                   onSwitchField={onSwitchField}
                   socialProviders={socialProviders}
                   pendingProviderId={pendingProviderId}
@@ -200,7 +200,15 @@ export function SignUpView({
                   isDisabled={isDisabled}
                   onSubmit={onSubmit}
                   onCancel={onCancel}
-                />
+                >
+                  {current.legalConsent ? (
+                    <SignUpLegalConsentField
+                      form={form}
+                      consent={current.legalConsent}
+                      disabled={isDisabled}
+                    />
+                  ) : null}
+                </SignInAlternativeChannel>
               ) : null}
             </Flow.Step>
 

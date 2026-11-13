@@ -976,6 +976,10 @@ export function ChoiceMethodsSecondFactor() {
   );
 }
 
+export function ChoiceWalletsSingle() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: wallets.slice(0, 1) }} />;
+}
+
 export function ChoiceWalletsNone() {
   return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: [] }} />;
 }
@@ -1238,6 +1242,43 @@ export function SignUpLegalConsent() {
 
 export function SignUpLegalConsentOnly() {
   return <StepPanel step={{ kind: 'sign-up', fields: {}, legalConsent }} />;
+}
+
+export function SignUpContinue() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        purpose: 'continue',
+        fields: { username: { required: true }, emailAddress: { required: true }, password: { required: true } },
+        nextField: 'phoneNumber',
+      }}
+      onSwitchField={() => undefined}
+    />
+  );
+}
+
+export function SignUpAlternativePhone() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier', field: 'phone', channel: whatsApp, flow: 'sign-up', legalConsent }}
+      onCancel={() => undefined}
+    />
+  );
+}
+
+export function SignUpRestricted() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'restricted' }} />;
+}
+
+export function SignUpWaitlist() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'waitlist' }}
+      onJoinWaitlist={() => undefined}
+    />
+  );
 }
 
 export function SignUpPasswordRequirements() {

@@ -38,6 +38,7 @@ export const signInMessages = {
   wallets: {
     title: 'Sign in with Solana',
     description: 'Select a wallet below to sign in',
+    continueWith: 'Continue with {wallet}',
     noneAvailable: 'No Solana Web3 wallets detected. Please install a Web3 supported {#link}wallet extension{/link}.',
   },
   accounts: {
@@ -262,7 +263,7 @@ export const signInMessages = {
   },
   verifyEmail: {
     title: 'Verify your email',
-    description: 'Enter the verification code sent to {identifier}',
+    description: 'Enter the verification code sent to your email',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',

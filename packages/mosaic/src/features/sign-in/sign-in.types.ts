@@ -30,7 +30,13 @@ export type SignInStep =
       lastUsed?: boolean;
       password?: boolean;
     }
-  | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
+  | {
+      kind: 'identifier';
+      field: 'phone';
+      channel: SignInProvider;
+      flow?: 'sign-in' | 'sign-up';
+      legalConsent?: SignUpLegalConsent;
+    }
   | { kind: 'credential'; credential: 'password'; identifier: string }
   | { kind: 'credential'; credential: 'backup-code'; identifier: string; resetting?: boolean }
   | { kind: 'credential'; credential: 'passkey'; identifier?: string }
@@ -68,9 +74,11 @@ export type SignInStep =
   | { kind: 'notice'; purpose: 'email-link'; identifier: string; newDevice?: boolean }
   | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
+  | { kind: 'notice'; purpose: 'restricted' | 'waitlist' }
   | { kind: 'new-password'; reason: 'forgot' | 'required' }
   | {
       kind: 'sign-up';
+      purpose?: 'start' | 'continue';
       fields: SignUpFields;
       nextField?: 'emailAddress' | 'phoneNumber';
       legalConsent?: SignUpLegalConsent;

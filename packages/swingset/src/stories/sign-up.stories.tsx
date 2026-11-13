@@ -225,6 +225,15 @@ export function ContinueLegalConsentOnly() {
   return <StepPanel step={{ kind: 'details', purpose: 'continue', fields: {}, legalConsent }} />;
 }
 
+export function ContinueNoFields() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{ kind: 'details', purpose: 'continue', fields: {} }}
+    />
+  );
+}
+
 export function Restricted() {
   return (
     <StepPanel
@@ -247,6 +256,15 @@ export function AlternativePhone() {
   return (
     <StepPanel
       step={{ kind: 'alternative-phone', channel: whatsApp }}
+      onCancel={() => undefined}
+    />
+  );
+}
+
+export function AlternativePhoneLegalConsent() {
+  return (
+    <StepPanel
+      step={{ kind: 'alternative-phone', channel: whatsApp, legalConsent }}
       onCancel={() => undefined}
     />
   );
@@ -318,6 +336,18 @@ export function Wallets() {
           { id: 'phantom', name: 'Phantom', iconUrl: 'https://img.clerk.com/static/phantom.svg' },
           { id: 'metamask', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
         ],
+      }}
+    />
+  );
+}
+
+export function WalletsSingle() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'choice',
+        purpose: 'wallets',
+        options: [{ id: 'phantom', name: 'Phantom', iconUrl: 'https://img.clerk.com/static/phantom.svg' }],
       }}
     />
   );
