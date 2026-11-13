@@ -439,6 +439,36 @@ type UserID = {
   userId: string;
 };
 
+// The API replaces a limit outside this range with its default instead of
+// rejecting it, so a page can only be compared against a limit inside it.
+const MIN_LIST_LIMIT = 1;
+const MAX_LIST_LIMIT = 500;
+
+/**
+ * Returns the total number of users when a list page already shows it, so the
+ * caller need not wait for the count request, which can be slow or fail for a
+ * search over many users.
+ * A page with fewer users than its limit is the last one, and the total is the
+ * users before it plus the users on it.
+ */
+function totalCountFromLastPage(
+  pageLength: number,
+  { limit, offset = 0, startingAfter }: Pick<UserListParams, 'limit' | 'offset' | 'startingAfter'>,
+): number | undefined {
+  // After a cursor, the number of users before the page is unknown.
+  if (startingAfter || !Number.isInteger(offset) || offset < 0) {
+    return undefined;
+  }
+  // No users at offset 0 means there are none, whatever the limit.
+  if (pageLength === 0) {
+    return offset === 0 ? 0 : undefined;
+  }
+  if (limit === undefined || !Number.isInteger(limit) || limit < MIN_LIST_LIMIT || limit > MAX_LIST_LIMIT) {
+    return undefined;
+  }
+  return pageLength < limit ? offset + pageLength : undefined;
+}
+
 /** @generateWithEmptyComment */
 export class UserAPI extends AbstractAPI {
   /**
@@ -450,14 +480,15 @@ export class UserAPI extends AbstractAPI {
     // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
     // until we update the /users endpoint to be paginated in a next BAPI version.
     // In some edge cases the data.length != totalCount due to a creation of a user between the 2 api responses
-    const [data, totalCount] = await Promise.all([
-      this.request<User[]>({
-        method: 'GET',
-        path: basePath,
-        queryParams: params,
-      }),
-      this.getCount(userCountParams),
-    ]);
+    const countRequest = this.getCount(userCountParams);
+    // The count is not awaited when the page shows the total, so a failure must not go unhandled.
+    countRequest.catch(() => {});
+    const data = await this.request<User[]>({
+      method: 'GET',
+      path: basePath,
+      queryParams: params,
+    });
+    const totalCount = totalCountFromLastPage(data.length, { limit, offset, startingAfter }) ?? (await countRequest);
     return { data, totalCount } as PaginatedResourceResponse<User[]>;
   }
 
