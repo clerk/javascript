@@ -117,7 +117,7 @@ export interface SignInViewProps {
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
   pendingAccountId?: string;
-  onSelectAccount?: (id: string) => void;
+  onSelectAccount: (id: string) => void;
   onAddAccount?: () => void;
   onSignOutAll?: () => void;
   onResend?: () => void;

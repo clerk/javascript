@@ -53,7 +53,6 @@ export function SignInAlternativeMethods({
 }: SignInAlternativeMethodsProps) {
   const m = useMessages('signIn');
   const firstMethodRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
-  const busy = isDisabled || Boolean(pendingMethodId);
 
   return (
     <>
@@ -73,13 +72,13 @@ export function SignInAlternativeMethods({
             <SignInProviderButtons
               providers={socialProviders}
               pendingProviderId={pendingProviderId}
-              isDisabled={busy}
+              isDisabled={isDisabled}
               onSelectProvider={onSelectProvider}
             />
           ) : null}
           <ProviderButtonGroup
             layout='stacked'
-            disabled={busy}
+            disabled={isDisabled}
           >
             {methods.map((method, index) => (
               <ProviderButton
@@ -104,7 +103,7 @@ export function SignInAlternativeMethods({
             size='sm'
             variant='link'
             color='neutral'
-            disabled={busy}
+            disabled={isDisabled}
             onClick={onBack}
           >
             {m.back}
@@ -121,7 +120,7 @@ export function SignInAlternativeMethods({
             size='sm'
             variant='link'
             color='neutral'
-            disabled={busy}
+            disabled={isDisabled}
             onClick={onShowHelp}
           >
             {m.alternativeMethods.helpLink}

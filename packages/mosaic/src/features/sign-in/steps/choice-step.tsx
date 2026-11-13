@@ -41,7 +41,7 @@ interface ChoiceStepProps {
   onCancel?: () => void;
   pendingAccountId?: string;
   isDisabled: boolean;
-  onSelectAccount?: (id: string) => void;
+  onSelectAccount: (id: string) => void;
   onAddAccount?: () => void;
   onSignOutAll?: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -75,6 +75,7 @@ export function ChoiceStep({
         wallets={step.options}
         globalErrorMessage={globalErrorMessage}
         pendingWalletId={pendingProviderId}
+        isDisabled={isDisabled}
         onSelectWallet={onSelectProvider}
         onBack={onBack}
       />
@@ -89,7 +90,7 @@ export function ChoiceStep({
         globalErrorMessage={globalErrorMessage}
         pendingAccountId={pendingAccountId}
         isDisabled={isDisabled}
-        onSelectAccount={id => onSelectAccount?.(id)}
+        onSelectAccount={onSelectAccount}
         onAddAccount={onAddAccount}
         onSignOutAll={onSignOutAll}
       />

@@ -387,7 +387,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           void submitCode(code);
         }}
         isPending={isPending || form.isSubmitting}
-        isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId)}
+        isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId) || Boolean(pendingFactorId)}
         errorMessage={errorMessage}
         globalErrorMessage={globalErrorMessage}
         newPasswordFeedback={
@@ -408,6 +408,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         onEmailSupport={() => setSupportRequested(true)}
         pendingFactorId={pendingFactorId}
         onSelectFactor={onSelectFactor}
+        onSelectAccount={() => undefined}
         onResend={offersResend(step) ? onResend : undefined}
         canResend={canResend && !isPending}
       />
@@ -472,7 +473,6 @@ function StepPanel({
   onCancel,
   lastUsedProviderId,
   onJoinWaitlist,
-  onSelectAccount,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -489,7 +489,6 @@ function StepPanel({
   onCancel?: () => void;
   lastUsedProviderId?: string;
   onJoinWaitlist?: () => void;
-  onSelectAccount?: (id: string) => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -525,7 +524,7 @@ function StepPanel({
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
       onJoinWaitlist={onJoinWaitlist}
-      onSelectAccount={onSelectAccount}
+      onSelectAccount={() => undefined}
       onAddAccount={() => undefined}
       onSignOutAll={() => undefined}
       onForgotPassword={() => undefined}
@@ -851,12 +850,7 @@ const accounts: SignInAccount[] = [
 ];
 
 export function ChoiceAccounts() {
-  return (
-    <StepPanel
-      step={{ kind: 'choice', purpose: 'accounts', options: accounts }}
-      onSelectAccount={() => undefined}
-    />
-  );
+  return <StepPanel step={{ kind: 'choice', purpose: 'accounts', options: accounts }} />;
 }
 
 const wallets: SignInProvider[] = [

@@ -15,6 +15,7 @@ interface SignInWalletsProps {
   wallets: readonly SignInProvider[];
   globalErrorMessage?: string;
   pendingWalletId?: string;
+  isDisabled: boolean;
   onSelectWallet: (id: string) => void;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -24,13 +25,13 @@ export function SignInWallets({
   wallets,
   globalErrorMessage,
   pendingWalletId,
+  isDisabled,
   onSelectWallet,
   onBack,
   focusRef,
 }: SignInWalletsProps) {
   const m = useMessages('signIn');
   const firstRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
-  const pending = Boolean(pendingWalletId);
 
   return (
     <>
@@ -45,7 +46,7 @@ export function SignInWallets({
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
-        <ProviderButtonGroup disabled={pending}>
+        <ProviderButtonGroup disabled={isDisabled}>
           {wallets.map((wallet, index) => (
             <ProviderButton
               key={wallet.id}
@@ -74,7 +75,7 @@ export function SignInWallets({
             size='sm'
             variant='link'
             color='neutral'
-            disabled={pending}
+            disabled={isDisabled}
             onClick={onBack}
           >
             {m.back}
