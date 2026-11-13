@@ -6,6 +6,7 @@ import {
   MOSAIC_SKELETON_URL,
   MosaicSkeleton,
 } from '@/components/marketing/baked-mosaic';
+import { ComponentStatusTable } from '@/components/marketing/component-status-table';
 import { HeroQuilt } from '@/components/marketing/hero-quilt';
 import { HomeHeader } from '@/components/marketing/home-header';
 import { OverviewSections } from '@/components/marketing/overview';
@@ -54,6 +55,7 @@ export default function Page() {
           anchor={<MosaicSkeleton />}
         />
         <OverviewSections />
+        <ComponentStatusTable />
       </main>
       <SiteFooter />
     </>
