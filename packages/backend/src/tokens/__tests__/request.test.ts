@@ -10,6 +10,7 @@ import {
   mockJwtHeader,
   mockJwtPayload,
   mockM2MJwtPayload,
+  mockOAuthAccessTokenJwtPayload,
   pemEncodedPublicKey,
   signingJwks,
 } from '../../fixtures';
@@ -1703,6 +1704,129 @@ describe('tokens.authenticateRequest(options)', () => {
 
       const result = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
       expect(result.tokenType).toBe('session_token');
+    });
+  });
+
+  describe('JWT time claims', () => {
+    const now = mockJwtPayload.iat;
+    const maxDateSeconds = 8.64e12;
+    const rawNumber = (text: string) => (JSON as unknown as { rawJSON: (text: string) => unknown }).rawJSON(text);
+
+    const signedBearerRequest = async (payload: Record<string, unknown>, header: Record<string, unknown>) => {
+      const { data } = await signJwt(payload, signingJwks, {
+        algorithm: 'RS256',
+        header: { kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...header },
+      });
+      return mockRequest({ authorization: `Bearer ${data}` });
+    };
+
+    const authenticateOAuthJwt = async (claims: Record<string, unknown>) => {
+      const request = await signedBearerRequest(
+        { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss, ...claims },
+        { typ: 'at+jwt' },
+      );
+      return authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
+    };
+
+    const authenticateSessionJwt = async (claims: Record<string, unknown>) => {
+      const request = await signedBearerRequest(
+        { ...mockJwtPayload, ...claims },
+        { typ: 'JWT', cat: JWT_CATEGORY_SESSION_TOKEN },
+      );
+      return authenticateRequest(request, mockOptions());
+    };
+
+    beforeEach(() => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+    });
+
+    const acceptedExp: Array<[string, unknown]> = [
+      ['a future exp', now + 300],
+      ['an exp just inside the clock skew', now - 4],
+      ['an exp just beyond the Date upper bound', maxDateSeconds + 1],
+      ['an exp of 1e300', 1e300],
+    ];
+
+    const expiredExp: Array<[string, unknown]> = [
+      ['an ordinary past exp', now - 100],
+      ['an exp at the clock skew boundary', now - 5],
+      ['an exp just beyond the Date lower bound', -maxDateSeconds - 1],
+      ['an exp of -1e300', -1e300],
+      ['an exp of -Number.MAX_VALUE', -Number.MAX_VALUE],
+    ];
+
+    const nonfiniteExp: Array<[string, unknown]> = [
+      ['an exp that overflows to Infinity', rawNumber('1e400')],
+      ['an exp that overflows to -Infinity', rawNumber('-1e400')],
+    ];
+
+    test.each(acceptedExp)('authenticates an OAuth JWT with %s', async (_label, exp) => {
+      const requestState = await authenticateOAuthJwt({ exp });
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+
+    test.each(expiredExp)('rejects an OAuth JWT with %s as expired', async (_label, exp) => {
+      const requestState = await authenticateOAuthJwt({ exp });
+
+      expect(requestState.isAuthenticated).toBe(false);
+      expect(requestState.tokenType).toBe('oauth_token');
+      expect(requestState.reason).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
+      expect(requestState.message).toMatch(/^JWT is expired\./);
+    });
+
+    test.each(nonfiniteExp)('rejects an OAuth JWT with %s', async (_label, exp) => {
+      const requestState = await authenticateOAuthJwt({ exp });
+
+      expect(requestState.isAuthenticated).toBe(false);
+      expect(requestState.tokenType).toBe('oauth_token');
+      expect(requestState.reason).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
+      expect(requestState.message).toMatch(/^Invalid JWT expiry date claim \(exp\)/);
+    });
+
+    test.each(acceptedExp)('authenticates a session JWT with %s', async (_label, exp) => {
+      const requestState = await authenticateSessionJwt({ exp });
+
+      expect(requestState).toBeSignedIn();
+    });
+
+    test.each(expiredExp)('rejects a session JWT with %s as expired', async (_label, exp) => {
+      const requestState = await authenticateSessionJwt({ exp });
+
+      expect(requestState).toMatchHandshake({
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
+    });
+
+    test.each(nonfiniteExp)('rejects a session JWT with %s', async (_label, exp) => {
+      const requestState = await authenticateSessionJwt({ exp });
+
+      expect(requestState.isAuthenticated).toBe(false);
+      expect(requestState.message).toMatch(/Invalid JWT expiry date claim \(exp\)/);
+    });
+
+    test.each([
+      ['a far-future nbf', { nbf: 1e300 }, /^JWT cannot be used prior to not before date claim \(nbf\)/],
+      ['an nbf just beyond the Date upper bound', { nbf: maxDateSeconds + 1 }, /^JWT cannot be used prior/],
+      ['an nbf that overflows to Infinity', { nbf: rawNumber('1e400') }, /^Invalid JWT not before date claim \(nbf\)/],
+    ] as Array<[string, Record<string, unknown>, RegExp]>)(
+      'rejects an OAuth JWT with %s',
+      async (_label, claims, message) => {
+        const requestState = await authenticateOAuthJwt(claims);
+
+        expect(requestState.isAuthenticated).toBe(false);
+        expect(requestState.reason).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
+        expect(requestState.message).toMatch(message);
+      },
+    );
+
+    test.each([
+      ['a far-past nbf', { nbf: -1e300 }],
+      ['an nbf just inside the clock skew', { nbf: now + 4 }],
+    ] as Array<[string, Record<string, unknown>]>)('authenticates an OAuth JWT with %s', async (_label, claims) => {
+      const requestState = await authenticateOAuthJwt(claims);
+
+      expect(requestState).toBeMachineAuthenticated();
     });
   });
 
