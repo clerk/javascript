@@ -310,7 +310,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Sign-up step
 
-`sign-up-details.tsx` draws `{ kind: 'sign-up' }` in the combined flow.
+`sign-up-details.tsx` draws `{ kind: 'sign-up' }` in the combined flow, with the fields the step lists. Verifying the new email by link is a notice step, and the email link outcomes take the sign-up wording with `flow: 'sign-up'`.
 
 #### Details
 
@@ -327,3 +327,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Verify by email link
 
 <Story name='SignUpVerifyEmailLink' storyModule={Stories} />
+
+#### Signed up from email link
+
+<Story name='SignUpEmailLinkSignedUp' storyModule={Stories} />
