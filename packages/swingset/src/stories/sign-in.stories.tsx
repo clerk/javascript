@@ -62,6 +62,8 @@ const signUpDetailFields: SignUpFields = {
   password: { required: true },
 };
 
+const legalConsent = { termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' };
+
 const emptyValues: SignInValues = {
   identifier: '',
   phoneNumber: '',
@@ -183,7 +185,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       }
       if (identifier.toLowerCase().includes('new')) {
-        navigate({ kind: 'sign-up', fields: signUpDetailFields }, 1);
+        navigate({ kind: 'sign-up', fields: signUpDetailFields, legalConsent }, 1);
         return;
       }
       setStage('first');
@@ -265,6 +267,10 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       }
       if (values.password.length < 8) {
         setGlobalErrorMessage('Your password must contain 8 or more characters.');
+        return;
+      }
+      if (!values.legalAccepted) {
+        setGlobalErrorMessage('Accept the Terms of Service and Privacy Policy to continue.');
         return;
       }
       navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier }, 1);
@@ -1056,8 +1062,6 @@ export function SignUpEmailOrPhone() {
     />
   );
 }
-
-const legalConsent = { termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' };
 
 export function SignUpLegalConsent() {
   return (
