@@ -10,4 +10,6 @@ export type {
   SignInSubmitEvent,
   SignInValues,
   SignInViewProps,
+  SignUpFieldName,
+  SignUpFields,
 } from './sign-in.types';

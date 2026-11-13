@@ -45,9 +45,10 @@ export type SignInStep =
   | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
-  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus }
+  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
+  | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' | 'required' }
-  | { kind: 'sign-up' };
+  | { kind: 'sign-up'; fields: SignUpFields };
 
 export type SignInEmailLinkStatus =
   | 'loading'
@@ -57,6 +58,10 @@ export type SignInEmailLinkStatus =
   | 'expired'
   | 'failed'
   | 'client-mismatch';
+
+export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
+
+export type SignUpFields = Partial<Record<SignUpFieldName, { required: boolean }>>;
 
 export interface SignInActionBlockedDetails {
   title?: string;
@@ -87,6 +92,7 @@ export interface SignInValues {
   backupCode: string;
   firstName: string;
   lastName: string;
+  username: string;
   newPassword: string;
   confirmPassword: string;
   signOutOfOtherSessions: boolean;

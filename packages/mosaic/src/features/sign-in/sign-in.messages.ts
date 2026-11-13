@@ -114,6 +114,29 @@ export const signInMessages = {
         'To continue, open the verification link on the device and browser from which you initiated the sign-in',
     },
     closeTab: 'You may close this tab',
+    signUp: {
+      loading: {
+        title: 'Signing up...',
+        description: 'You will be redirected soon',
+      },
+      signedIn: {
+        title: 'Successfully signed up',
+        description: 'Return to original tab to continue',
+      },
+      signedInOtherTab: {
+        title: 'Successfully verified email',
+        description: 'Return to previous tab to continue',
+      },
+      clientMismatch: {
+        title: 'Verification link is invalid for this device',
+        description:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-up',
+      },
+    },
+  },
+  verifyEmailLink: {
+    title: 'Verify your email',
+    description: 'Use the verification link sent to your email address',
   },
   passkey: {
     title: 'Use your passkey',
@@ -231,8 +254,16 @@ export const signInMessages = {
     firstNamePlaceholder: 'First name',
     lastNameLabel: 'Last name',
     lastNamePlaceholder: 'Last name',
+    usernameLabel: 'Username',
+    usernamePlaceholder: 'Enter your username',
     emailLabel: 'Email address',
     emailPlaceholder: 'Enter your email address',
+    phoneLabel: 'Phone number',
+    phonePlaceholder: 'Enter your phone number',
+    selectedCountry: 'Country, {country}',
+    chooseCountry: 'Choose a country',
+    searchCountries: 'Search countries',
+    optional: 'Optional',
     passwordLabel: 'Password',
     passwordPlaceholder: 'Enter your password',
     signInPrompt: 'Already have an account?',

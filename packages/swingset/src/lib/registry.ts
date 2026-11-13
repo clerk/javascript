@@ -393,6 +393,10 @@ import {
   NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
   NoticeStartOver as SignInNoticeStartOver,
   SignUpDetails as SignInSignUpDetails,
+  SignUpEmailLinkSignedUp as SignInSignUpEmailLinkSignedUp,
+  SignUpPasswordRequirements as SignInSignUpPasswordRequirements,
+  SignUpSettingsFields as SignInSignUpSettingsFields,
+  SignUpVerifyEmailLink as SignInSignUpVerifyEmailLink,
 } from '../stories/sign-in.stories';
 import {
   CustomElement as SignInButtonCustomElement,
@@ -1350,6 +1354,10 @@ const signInModule: StoryModule = {
   NewPasswordReset: SignInNewPasswordReset,
   NewPasswordRequired: SignInNewPasswordRequired,
   SignUpDetails: SignInSignUpDetails,
+  SignUpSettingsFields: SignInSignUpSettingsFields,
+  SignUpPasswordRequirements: SignInSignUpPasswordRequirements,
+  SignUpVerifyEmailLink: SignInSignUpVerifyEmailLink,
+  SignUpEmailLinkSignedUp: SignInSignUpEmailLinkSignedUp,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
