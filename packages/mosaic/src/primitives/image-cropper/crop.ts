@@ -3,7 +3,8 @@ export type Rotation = 0 | 90 | 180 | 270;
 
 /**
  * Where the image sits in the square frame. `x` and `y` move the image centre from the frame
- * centre, as a fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame.
+ * centre, as a fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame,
+ * and below 1 the whole image fits inside it, down to `minZoom`.
  */
 export interface Crop {
   x: number;
@@ -30,17 +31,28 @@ export const INITIAL_CROP: Crop = { x: 0, y: 0, zoom: 1, rotation: 0 };
 export const ZOOM_STEP = 1.25;
 
 /**
- * Keeps the frame covered: zoom stays between 1 and `maxZoom`, and the image cannot pan past its edge.
+ * The smallest zoom, where the whole image fits in the frame.
+ *
+ * @example
+ * minZoom({ width: 200, height: 100 }) // 0.5
+ */
+export function minZoom(size: Size): number {
+  return Math.min(size.width, size.height) / Math.max(size.width, size.height);
+}
+
+/**
+ * Keeps zoom between `minZoom` and `maxZoom`, and stops each edge of the image at the frame's: an
+ * image larger than the frame still covers it, and one smaller than the frame stays inside it.
  *
  * @example
  * clampCrop({ x: 2, y: 0, zoom: 1, rotation: 0 }, { width: 200, height: 100 }, 4) // x: 0.5
  */
 export function clampCrop(crop: Crop, size: Size, maxZoom: number): Crop {
-  const zoom = clamp(crop.zoom, 1, maxZoom);
+  const zoom = clamp(crop.zoom, minZoom(size), maxZoom);
   const { width, height } = turned(size, crop.rotation);
   const short = Math.min(width, height);
-  const rangeX = ((width / short) * zoom - 1) / 2;
-  const rangeY = ((height / short) * zoom - 1) / 2;
+  const rangeX = Math.abs((width / short) * zoom - 1) / 2;
+  const rangeY = Math.abs((height / short) * zoom - 1) / 2;
   return { x: clamp(crop.x, -rangeX, rangeX), y: clamp(crop.y, -rangeY, rangeY), zoom, rotation: crop.rotation };
 }
 
@@ -51,7 +63,7 @@ export function clampCrop(crop: Crop, size: Size, maxZoom: number): Crop {
  * zoomCrop(crop, crop.zoom * 1.1, size, 4)
  */
 export function zoomCrop(crop: Crop, zoom: number, size: Size, maxZoom: number): Crop {
-  const next = clamp(zoom, 1, maxZoom);
+  const next = clamp(zoom, minZoom(size), maxZoom);
   const ratio = next / crop.zoom;
   return clampCrop({ ...crop, x: crop.x * ratio, y: crop.y * ratio, zoom: next }, size, maxZoom);
 }

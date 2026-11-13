@@ -13,7 +13,6 @@ export const organizationProfileProfileSectionMessages = {
       zoom: 'Zoom',
       zoomIn: 'Zoom in',
       zoomOut: 'Zoom out',
-      rotate: 'Rotate',
       reset: 'Reset',
       cancel: 'Cancel',
       save: 'Save',

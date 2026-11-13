@@ -10,12 +10,12 @@ export type ImageCropperZoomProps = ComponentProps<'input'>;
 export const ImageCropperZoom = React.forwardRef<HTMLInputElement, ImageCropperZoomProps>(
   function ImageCropperZoom(props, ref) {
     const { render, ...otherProps } = props;
-    const { crop, size, maxZoom, disabled, zoomTo } = useImageCropperContext();
+    const { crop, size, minZoom, maxZoom, disabled, zoomTo } = useImageCropperContext();
     const inactive = disabled || size === undefined;
 
     const defaultProps = {
       type: 'range',
-      min: 1,
+      min: minZoom,
       max: maxZoom,
       step: 0.01,
       value: crop.zoom,

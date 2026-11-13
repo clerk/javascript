@@ -18,8 +18,8 @@ export const ImageCropperZoomIn = React.forwardRef<HTMLButtonElement, ImageCropp
 
 export const ImageCropperZoomOut = React.forwardRef<HTMLButtonElement, ImageCropperZoomOutProps>(
   function ImageCropperZoomOut(props, ref) {
-    const { crop } = useImageCropperContext();
-    return useZoomStep(props, ref, 1 / ZOOM_STEP, crop.zoom <= 1);
+    const { crop, minZoom } = useImageCropperContext();
+    return useZoomStep(props, ref, 1 / ZOOM_STEP, crop.zoom <= minZoom);
   },
 );
 
