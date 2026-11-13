@@ -2110,6 +2110,7 @@ export const fiFI: LocalizationResource = {
       'Rekisteröityminen epäonnistui epäonnistuneiden tietoturvatarkistusten vuoksi. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Väliaikaiset sähköpostipalvelut eivät ole tuettuja. Käytä tavallista sähköpostiosoitetta tilin luomiseen.',
@@ -2190,9 +2191,11 @@ export const fiFI: LocalizationResource = {
     protect_check_unsupported_environment:
       'Tarkistusta ei tueta tässä ympäristössä. Jatka tavallisella selaimella tai ota yhteyttä tukeen.',
     session_exists: 'Olet jo kirjautunut sisään.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3-lompakkoa ei löytynyt. Asenna sellainen jatkaaksesi.',
     web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',

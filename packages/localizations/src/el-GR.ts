@@ -2100,6 +2100,7 @@ export const elGR: LocalizationResource = {
       'Η εγγραφή απέτυχε λόγω αποτυχημένων ελέγχων ασφαλείας. Ανανεώστε τη σελίδα για να δοκιμάσετε ξανά ή επικοινωνήστε με το κέντρο υποστήριξης για περισσότερη βοήθεια.',
     captcha_unavailable:
       'Η εγγραφή απέτυχε λόγω αποτυχημένης επαλήθευσης bot. Παρακαλώ ανανεώστε τη σελίδα για να δοκιμάσετε ξανά ή επικοινωνήστε με την υποστήριξη για περισσότερη βοήθεια.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Ο κωδικός δεν είναι σωστός.',
     form_email_address_blocked:
       'Οι προσωρινές υπηρεσίες email δεν υποστηρίζονται. Παρακαλώ χρησιμοποιήστε τη συνηθισμένη διεύθυνση email σας για να δημιουργήσετε λογαριασμό.',
@@ -2182,9 +2183,11 @@ export const elGR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Έχετε ήδη συνδεθεί.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Δεν εντοπίστηκε αναγνωριστικό Web3. Παρακαλώ δοκιμάστε ξανά.',
     web3_signature_request_rejected: 'Απορρίψατε το αίτημα υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',

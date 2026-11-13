@@ -2105,6 +2105,7 @@ export const viVN: LocalizationResource = {
     captcha_invalid: undefined,
     captcha_unavailable:
       'Đăng ký không thành công do lỗi bot. Vui lòng tải lại trang để thử lại hoặc liên hệ hỗ trợ để được hỗ trợ.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Các dịch vụ email tạm thời không được hỗ trợ. Vui lòng sử dụng địa chỉ email thông thường của bạn để tạo tài khoản.',
@@ -2182,9 +2183,11 @@ export const viVN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
     web3_signature_request_rejected: 'Bạn đã từ chối yêu cầu ký. Vui lòng thử lại để tiếp tục.',

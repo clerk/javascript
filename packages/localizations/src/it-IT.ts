@@ -2097,6 +2097,7 @@ export const itIT: LocalizationResource = {
       'Registrazione non riuscita a causa di fallite convalide di sicurezza. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
     captcha_unavailable:
       'Registrazione non riuscita a causa della convalida del bot non riuscita. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Il codice inserito non è corretto. Riprova.',
     form_email_address_blocked:
       'I servizi di posta elettronica temporanea non sono supportati. Si prega di utilizzare il proprio indirizzo email normale per creare un account.',
@@ -2170,9 +2171,11 @@ export const itIT: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Sei già loggato.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Hai rifiutato la richiesta di firma. Riprova per continuare.',

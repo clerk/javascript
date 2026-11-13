@@ -35,6 +35,14 @@ rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protec
 
 Turn the hits into a behavior inventory, one row per effect, guard, error path, empty or loading state, permission gate, revalidate, reset-on-close and derived label. The table does not cover every behavior; read the files too. For shared answers (`save`, `useReverificationFlow`), use [Reuse before you write](../AGENTS.md#reuse-before-you-write).
 
+### Screens
+
+Before you build a view, screenshot each legacy screen it replaces and list what the screen shows: each header line (title, description, identity preview), alerts, the primary and secondary actions, fallback links such as "Get help", and what the actions do while a request runs. Build against that list.
+
+To reach a screen that needs a server state, run the legacy sandbox (`pnpm dev:sandbox`, `packages/clerk-js/sandbox/README.md`) with a scenario from `packages/clerk-js/sandbox/scenarios/` that mocks the response with `@clerk/msw`, then activate it with `scenario.setScenario('<Name>')`.
+
+For each screen, decide whether it is its own step or a state of another one. A failure the user can recover from on the same screen is an error state of that step, not a step: legacy shows a lockout as a banner on the sign-in start screen, so Mosaic does too. If the flow has a design doc in `docs/internals/`, check it before you add a step the doc has no route for.
+
 ## Phase 2: map every row to a layer
 
 - Clerk reads, mutations, permission gates, revalidate timing, first-load empty states and capability flags go in the **model** ([Models](models.md)).

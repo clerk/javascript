@@ -36,6 +36,7 @@ import {
   meta as bannerMeta,
 } from '../stories/banner.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import {
   Default as CheckboxDefault,
@@ -123,6 +124,7 @@ import {
   Sizes as IconFrameSizes,
   Treatments as IconFrameTreatments,
 } from '../stories/icon-frame.stories';
+import { meta as imageCropperMeta } from '../stories/image-cropper.stories';
 import {
   Default,
   Disabled as InputDisabled,
@@ -342,13 +344,21 @@ import {
   meta as separatorMeta,
 } from '../stories/separator.stories';
 import {
+  ChoiceEnterpriseConnections as SignInChoiceEnterpriseConnections,
   ChoiceMethods as SignInChoiceMethods,
   ChoiceResetMethods as SignInChoiceResetMethods,
+  CodeAlternativePhoneChannel as SignInCodeAlternativePhoneChannel,
   CodeAuthenticatorApp as SignInCodeAuthenticatorApp,
+  CodeClientTrust as SignInCodeClientTrust,
   CodeEmail as SignInCodeEmail,
+  CodePhone as SignInCodePhone,
   CodeResetPassword as SignInCodeResetPassword,
   CodeResetPasswordPhone as SignInCodeResetPasswordPhone,
+  CodeSecondFactorEmail as SignInCodeSecondFactorEmail,
+  CodeSecondFactorPhone as SignInCodeSecondFactorPhone,
+  CodeSsoBypass as SignInCodeSsoBypass,
   CodeVerifyEmail as SignInCodeVerifyEmail,
+  CodeVerifyPhone as SignInCodeVerifyPhone,
   CredentialBackupCode as SignInCredentialBackupCode,
   CredentialPasskey as SignInCredentialPasskey,
   CredentialPassword as SignInCredentialPassword,
@@ -366,6 +376,7 @@ import {
   NewPasswordReset as SignInNewPasswordReset,
   NoticeActionBlocked as SignInNoticeActionBlocked,
   NoticeEmailLinkSent as SignInNoticeEmailLinkSent,
+  NoticeEnterpriseSso as SignInNoticeEnterpriseSso,
   NoticeForgotPassword as SignInNoticeForgotPassword,
   NoticeForgotPasswordPending as SignInNoticeForgotPasswordPending,
   NoticeHelp as SignInNoticeHelp,
@@ -987,6 +998,11 @@ const fieldModule: StoryModule = {
   VisuallyHiddenLabel: FieldVisuallyHiddenLabel,
 };
 
+const captchaModule: StoryModule = {
+  meta: captchaMeta,
+  Default: CaptchaDefault,
+};
+
 const visuallyHiddenModule: StoryModule = {
   meta: visuallyHiddenMeta,
   Default: VisuallyHiddenDefault,
@@ -1026,6 +1042,7 @@ const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const flowModule: StoryModule = { meta: flowMeta };
+const imageCropperModule: StoryModule = { meta: imageCropperMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
@@ -1291,10 +1308,19 @@ const signInModule: StoryModule = {
   CredentialPasskey: SignInCredentialPasskey,
   CodeEmail: SignInCodeEmail,
   CodeAuthenticatorApp: SignInCodeAuthenticatorApp,
+  CodeClientTrust: SignInCodeClientTrust,
+  CodeVerifyPhone: SignInCodeVerifyPhone,
+  NoticeEnterpriseSso: SignInNoticeEnterpriseSso,
+  CodePhone: SignInCodePhone,
+  CodeAlternativePhoneChannel: SignInCodeAlternativePhoneChannel,
+  CodeSecondFactorPhone: SignInCodeSecondFactorPhone,
+  CodeSecondFactorEmail: SignInCodeSecondFactorEmail,
+  CodeSsoBypass: SignInCodeSsoBypass,
   CodeResetPassword: SignInCodeResetPassword,
   CodeResetPasswordPhone: SignInCodeResetPasswordPhone,
   CodeVerifyEmail: SignInCodeVerifyEmail,
   ChoiceMethods: SignInChoiceMethods,
+  ChoiceEnterpriseConnections: SignInChoiceEnterpriseConnections,
   ChoiceResetMethods: SignInChoiceResetMethods,
   NoticeHelp: SignInNoticeHelp,
   NoticeForgotPassword: SignInNoticeForgotPassword,
@@ -1424,6 +1450,7 @@ export const registry: StoryModule[] = [
   toastModule,
   tooltipComponentModule,
   fieldModule,
+  captchaModule,
   visuallyHiddenModule,
   // Primitives
   accordionModule,
@@ -1434,6 +1461,7 @@ export const registry: StoryModule[] = [
   drawerModule,
   fileUploadModule,
   flowModule,
+  imageCropperModule,
   menuModule,
   otpModule,
   popoverModule,

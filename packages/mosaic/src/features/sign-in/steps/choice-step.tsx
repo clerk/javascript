@@ -9,6 +9,7 @@ import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import type { SignInFactor, SignInStep } from '../sign-in.types';
+import { SignInEnterpriseConnections } from './sign-in-enterprise-connections';
 
 const factorIcon = {
   password: SecurityLockSquare,
@@ -29,6 +30,11 @@ interface ChoiceStepProps {
   onSelectFactor: (id: string) => void;
   onShowHelp: () => void;
   onBack: () => void;
+  logo?: { src: string; alt: string };
+  globalErrorMessage?: string;
+  pendingProviderId?: string;
+  onSelectProvider: (id: string) => void;
+  onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -40,8 +46,27 @@ export function ChoiceStep({
   onSelectFactor,
   onShowHelp,
   onBack,
+  logo,
+  globalErrorMessage,
+  pendingProviderId,
+  onSelectProvider,
+  onCancel,
   focusRef,
 }: ChoiceStepProps) {
+  if (step.purpose === 'enterprise-connections') {
+    return (
+      <SignInEnterpriseConnections
+        focusRef={focusRef}
+        logo={logo}
+        connections={step.options}
+        globalErrorMessage={globalErrorMessage}
+        pendingConnectionId={pendingProviderId}
+        onSelectConnection={onSelectProvider}
+        onCancel={onCancel}
+      />
+    );
+  }
+
   return (
     <VerificationMethodPicker
       focusRef={focusRef}

@@ -13,7 +13,7 @@ export interface ComboboxContextValue {
   open: boolean;
   clear: () => void;
   inputValue: string;
-  filterQuery: string;
+  filteredItems: readonly unknown[];
   selectedValue: string | null;
   floatingContext: FloatingContext;
   refs: ExtendedRefs<ReferenceType>;
@@ -27,6 +27,8 @@ export interface ComboboxContextValue {
   labelsRef: React.MutableRefObject<Array<string | null>>;
   popupRef: React.RefObject<HTMLDivElement | null>;
   triggerRef: React.MutableRefObject<HTMLButtonElement | null>;
+  inputGroup: HTMLElement | null;
+  setInputGroup: (element: HTMLElement | null) => void;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   setInlineMode: React.Dispatch<React.SetStateAction<boolean>>;

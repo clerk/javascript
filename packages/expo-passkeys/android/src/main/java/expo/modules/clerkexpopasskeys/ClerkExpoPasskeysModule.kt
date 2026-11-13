@@ -5,9 +5,15 @@ import androidx.credentials.exceptions.GetCredentialException
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.records.Field
+import expo.modules.kotlin.records.Record
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+class GetPasskeyOptionsArgument : Record {
+    @Field var preferImmediatelyAvailableCredentials: Boolean = false
+}
 
 class ClerkExpoPasskeysModule : Module() {
     private val mCoroutine = CoroutineScope(Dispatchers.Default)
@@ -30,17 +36,24 @@ class ClerkExpoPasskeysModule : Module() {
         }
 
         AsyncFunction("get") { request: String, promise: Promise ->
+            launchGet(request, false, promise)
+        }
 
-            mCoroutine.launch {
-                try {
-                    val response = getPasskey(request, appContext)
-                    promise.resolve(response)
-                } catch (e: GetCredentialException) {
-                    handleGetFailure(e, promise)
-                }
-            }
+        AsyncFunction("getWithOptions") { request: String, options: GetPasskeyOptionsArgument, promise: Promise ->
+            launchGet(request, options.preferImmediatelyAvailableCredentials, promise)
         }
 
 
+    }
+
+    private fun launchGet(request: String, preferImmediatelyAvailableCredentials: Boolean, promise: Promise) {
+        mCoroutine.launch {
+            try {
+                val response = getPasskey(request, preferImmediatelyAvailableCredentials, appContext)
+                promise.resolve(response)
+            } catch (e: GetCredentialException) {
+                handleGetFailure(e, promise)
+            }
+        }
     }
 }

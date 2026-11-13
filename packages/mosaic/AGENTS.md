@@ -85,8 +85,9 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - An inline message row; height is undefined until measured → `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts`
 - Data read from a Clerk resource that should be cached across mounts → A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)
 - The seconds left on a resend cooldown, for display → `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine
-- An avatar or logo row: picker, drop target, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
+- An avatar or logo row: picker, drop target, crop dialog, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
 - Any other file picker or drop zone, such as a metadata or key file → `FileUpload` (`src/primitives/file-upload/`), see its `README.md`
+- Cropping an image to a square: pan, zoom, rotate, then draw the result → `ImageCropper` and `cropImage` (`src/primitives/image-cropper/`), see its `README.md`
 - An inline notice inside content: info, warning, error or success → `Banner` (`src/components/banner/`); a form-level error on a card uses `Card.Banner`
 - Siblings that slide when an item is added or removed → `useLayoutAnimation` (`src/primitives/hooks/`)
 - An input that reformats as the user types without moving the caret → `useFormattedInput` (`src/primitives/hooks/`)
@@ -131,6 +132,7 @@ A bug in a feature is often a gap in a shared helper. These rules apply to `fix`
 - **A changed shared signature is a new pattern.** A new parameter, a return type that goes from `void` to a promise, or a returned field whose meaning changes all go through "When nothing fits: ask first".
 - **One source of truth for busy.** When a machine, `usePendingAction` or `useForm` already knows an action is running, derive the flag from it: `isDisabled: actions.isPending || remove.isPending`. Do not mirror it into a second lock, or turn machine state into a promise to feed one.
 - **Handle staleness through lifecycle.** A new identity remounts through a React `key`. A busy action keeps running when its surface closes (Controllers → Rules). Do not thread run ids or `AbortSignal`s through the model, controller and machine.
+- **Ship a shared change on its own.** A change to `src/styles/`, `src/components/`, `src/blocks/` or `src/hooks/` made for one feature goes in its own PR, unless the user asks for it in the feature's PR. Its values come from Mosaic tokens; another Clerk app's design shows the intent, not the values.
 - **Extend a contract with an options object.** Make a field required when every caller has it: `connect(strategy, { walletName, onTarget })`, not `connect(strategy, walletName?, onTarget?)`.
 - **Pass shared results through whole.** The view gets `form`, not an object that renames `form.id`, `form.isSubmitting` and `form.handleSubmit`.
 - **Keep controller state off model types.** Pending and error flags the controller sets go on a row type the controller builds, not as optional fields on the type the model returns.

@@ -13,6 +13,8 @@ export type { BrandingProps } from '../components/branding';
 export type { BannerDescriptionProps, BannerLabelProps, BannerRootProps } from '../components/banner';
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
+export { Captcha } from '../components/captcha';
+export type { CaptchaProps } from '../components/captcha';
 export { Card } from '../components/card';
 export { Checkbox } from '../components/checkbox';
 export type { CheckboxProps } from '../components/checkbox';
@@ -36,9 +38,12 @@ export type {
 } from '../components/empty-state';
 export { Combobox } from '../components/combobox';
 export type {
+  ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
+  ComboboxLabelProps,
   ComboboxListProps,
+  ComboboxMediaProps,
   ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,

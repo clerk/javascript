@@ -7,6 +7,17 @@ export const organizationProfileProfileSectionMessages = {
     manage: 'Manage logo',
     change: 'Change logo',
     remove: 'Remove logo',
+    crop: {
+      title: 'Adjust logo',
+      frame: 'Logo crop. Drag or use the arrow keys to move, plus and minus to zoom.',
+      zoom: 'Zoom',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
+      rotate: 'Rotate',
+      reset: 'Reset',
+      cancel: 'Cancel',
+      save: 'Save',
+    },
   },
   name: {
     label: 'Name',

@@ -3,7 +3,8 @@ import type { FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
   SignInFactor,
-  SignInSocialProvider,
+  SignInIdentifierField,
+  SignInProvider,
   SignInStep,
   SignInSubmitEvent,
   SignInValues,
@@ -11,6 +12,7 @@ import type {
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 import { useRef, useState } from 'react';
 
+import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './sign-in.stories?raw';
@@ -27,10 +29,11 @@ export const meta: StoryMeta = {
 const APPLICATION_NAME = 'Acme';
 const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 const IDENTIFIER = 'jane@acme.com';
+const PHONE = '+1******0123';
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
-const socialProviders: SignInSocialProvider[] = [
+const socialProviders: SignInProvider[] = [
   { id: 'oauth_google', name: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
   { id: 'oauth_github', name: 'GitHub', iconUrl: 'https://img.clerk.com/static/github.svg' },
 ];
@@ -47,11 +50,12 @@ const secondFactors: SignInFactor[] = [
 
 const resetFactors: SignInFactor[] = [
   { id: 'reset_email', stage: 'first', strategy: 'reset_password_email_code', identifier: 'j***@acme.com' },
-  { id: 'reset_phone', stage: 'first', strategy: 'reset_password_phone_code', identifier: '+1 ••• ••• 0123' },
+  { id: 'reset_phone', stage: 'first', strategy: 'reset_password_phone_code', identifier: PHONE },
 ];
 
 const emptyValues: SignInValues = {
   identifier: '',
+  phoneNumber: '',
   password: '',
   code: '',
   backupCode: '',
@@ -108,7 +112,7 @@ function offersResend(step: SignInStep): boolean {
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
 
 function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void }) {
-  const [step, setStep] = useState<SignInStep>({ kind: 'identifier' });
+  const [step, setStep] = useState<SignInStep>({ kind: 'identifier', field: 'email' });
   const [direction, setDirection] = useState<-1 | 1>(1);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [globalErrorMessage, setGlobalErrorMessage] = useState<string>();
@@ -184,7 +188,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       }
       if (values.password.toLowerCase() === 'locked') {
-        navigate({ kind: 'identifier' }, -1);
+        navigate({ kind: 'identifier', field: 'email' }, -1);
         setGlobalErrorMessage('Your account is locked. You will be able to try again in 30 minutes.');
         return;
       }
@@ -394,7 +398,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         }
         onEditIdentifier={() => {
           setStage('first');
-          navigate({ kind: 'identifier' }, -1);
+          navigate({ kind: 'identifier', field: 'email' }, -1);
         }}
         onForgotPassword={() => navigate({ kind: 'notice', purpose: 'forgot-password', identifier }, 1)}
         onCancel={cancelFor(step)}
@@ -460,6 +464,13 @@ function StepPanel({
   pendingProviderId,
   providers = socialProviders,
   identifier,
+  otherMethods = true,
+  onSwitchField,
+  onPasskey,
+  onSelectProvider,
+  onCancel,
+  lastUsedProviderId,
+  onJoinWaitlist,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -467,8 +478,15 @@ function StepPanel({
   globalErrorMessage?: string;
   isPending?: boolean;
   pendingProviderId?: string;
-  providers?: SignInSocialProvider[];
+  providers?: SignInProvider[];
   identifier?: string;
+  otherMethods?: boolean;
+  onSwitchField?: () => void;
+  onPasskey?: () => void;
+  onSelectProvider?: (id: string) => void;
+  onCancel?: () => void;
+  lastUsedProviderId?: string;
+  onJoinWaitlist?: () => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -490,7 +508,10 @@ function StepPanel({
       combined={combined}
       socialProviders={providers}
       pendingProviderId={pendingProviderId}
-      onSelectProvider={() => undefined}
+      lastUsedProviderId={lastUsedProviderId}
+      onSelectProvider={onSelectProvider ?? (() => undefined)}
+      onSwitchField={onSwitchField}
+      onPasskey={onPasskey}
       form={form}
       onSubmit={event => event?.preventDefault()}
       onCodeComplete={code => form.setValue('code', code)}
@@ -500,8 +521,12 @@ function StepPanel({
       globalErrorMessage={globalErrorMessage}
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
+      onJoinWaitlist={onJoinWaitlist}
       onForgotPassword={() => undefined}
-      onCancel={step.kind === 'code' && step.purpose === 'verify-email' ? undefined : () => undefined}
+      onCancel={
+        onCancel ??
+        (!otherMethods || (step.kind === 'code' && step.purpose === 'verify-email') ? undefined : () => undefined)
+      }
       onShowHelp={() => undefined}
       onBack={() => undefined}
       onEmailSupport={() => undefined}
@@ -515,13 +540,13 @@ function StepPanel({
 const passwordStep: SignInStep = { kind: 'credential', credential: 'password', identifier: IDENTIFIER };
 
 export function IdentifierDefault() {
-  return <StepPanel step={{ kind: 'identifier' }} />;
+  return <StepPanel step={{ kind: 'identifier', field: 'email' }} />;
 }
 
 export function IdentifierSignInOnly() {
   return (
     <StepPanel
-      step={{ kind: 'identifier' }}
+      step={{ kind: 'identifier', field: 'email' }}
       combined={false}
     />
   );
@@ -530,7 +555,7 @@ export function IdentifierSignInOnly() {
 export function IdentifierManyProviders() {
   return (
     <StepPanel
-      step={{ kind: 'identifier' }}
+      step={{ kind: 'identifier', field: 'email' }}
       providers={[
         ...socialProviders,
         { id: 'oauth_apple', name: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
@@ -543,7 +568,7 @@ export function IdentifierManyProviders() {
 export function IdentifierProviderPending() {
   return (
     <StepPanel
-      step={{ kind: 'identifier' }}
+      step={{ kind: 'identifier', field: 'email' }}
       pendingProviderId='oauth_google'
     />
   );
@@ -552,7 +577,7 @@ export function IdentifierProviderPending() {
 export function IdentifierError() {
   return (
     <StepPanel
-      step={{ kind: 'identifier' }}
+      step={{ kind: 'identifier', field: 'email' }}
       errorMessage='Enter a valid email address.'
     />
   );
@@ -561,7 +586,7 @@ export function IdentifierError() {
 export function IdentifierLocked() {
   return (
     <StepPanel
-      step={{ kind: 'identifier' }}
+      step={{ kind: 'identifier', field: 'email' }}
       combined={false}
       identifier={IDENTIFIER}
       globalErrorMessage='Your account is locked. You will be able to try again in 30 minutes. For more information, please contact support.'
@@ -569,10 +594,110 @@ export function IdentifierLocked() {
   );
 }
 
+function SwitchingIdentifier({ fields }: { fields: readonly SignInIdentifierField[] }) {
+  const [index, setIndex] = useState(0);
+  const next = fields.length > 1 ? fields[(index + 1) % fields.length] : undefined;
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: fields[index], nextField: next }}
+      onSwitchField={() => setIndex(current => (current + 1) % fields.length)}
+    />
+  );
+}
+
+export function IdentifierPhone() {
+  return <SwitchingIdentifier fields={['phone', 'email']} />;
+}
+
+export function IdentifierUsername() {
+  return <SwitchingIdentifier fields={['username']} />;
+}
+
+export function IdentifierPasskey() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email' }}
+      onPasskey={() => undefined}
+    />
+  );
+}
+
+const whatsApp: SignInProvider = {
+  id: 'whatsapp',
+  name: 'WhatsApp',
+  iconUrl: 'https://img.clerk.com/static/whatsapp.svg',
+};
+
+export function IdentifierAlternativePhoneChannel() {
+  const [step, setStep] = useState<SignInStep>({ kind: 'identifier', field: 'phone', channel: whatsApp });
+  return (
+    <StepPanel
+      combined={false}
+      step={step}
+      providers={[...socialProviders, whatsApp]}
+      onSelectProvider={id => {
+        if (id === whatsApp.id) {
+          setStep({ kind: 'identifier', field: 'phone', channel: whatsApp });
+        }
+      }}
+      onCancel={() => setStep({ kind: 'identifier', field: 'email' })}
+    />
+  );
+}
+
+export function IdentifierLastUsed() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email' }}
+      providers={[...socialProviders, { id: 'oauth_x', name: 'X', iconUrl: 'https://img.clerk.com/static/x.svg' }]}
+      lastUsedProviderId='oauth_github'
+    />
+  );
+}
+
+export function IdentifierLastUsedField() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email', lastUsed: true }}
+    />
+  );
+}
+
+export function IdentifierCaptcha() {
+  const ref = useRef<HTMLDivElement>(null);
+  useTestTurnstile(() => ref.current?.querySelector<HTMLElement>('.cl-captcha'));
+  return (
+    <div ref={ref}>
+      <StepPanel
+        combined={false}
+        step={{ kind: 'identifier', field: 'email' }}
+      />
+    </div>
+  );
+}
+
+export function IdentifierWaitlist() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier', field: 'email' }}
+      combined={false}
+      onJoinWaitlist={() => undefined}
+    />
+  );
+}
+
+export function IdentifierEmailOrUsername() {
+  return <SwitchingIdentifier fields={['email-or-username', 'phone']} />;
+}
+
 export function IdentifierBannerError() {
   return (
     <StepPanel
-      step={{ kind: 'identifier' }}
+      step={{ kind: 'identifier', field: 'email' }}
       globalErrorMessage='Too many requests. Try again in a few minutes.'
     />
   );
@@ -612,14 +737,60 @@ export function CodeAuthenticatorApp() {
   return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }} />;
 }
 
+export function CodePhone() {
+  return <StepPanel step={{ kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: PHONE }} />;
+}
+
+export function CodeAlternativePhoneChannel() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: PHONE, provider: 'WhatsApp' }}
+    />
+  );
+}
+
+export function CodeSecondFactorPhone() {
+  return <StepPanel step={{ kind: 'code', purpose: 'second-factor', channel: 'phone', identifier: PHONE }} />;
+}
+
+export function CodeSecondFactorEmail() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'second-factor', channel: 'email', identifier: IDENTIFIER }}
+      otherMethods={false}
+    />
+  );
+}
+
+export function CodeSsoBypass() {
+  return <StepPanel step={{ kind: 'code', purpose: 'sso-bypass', channel: 'email', identifier: IDENTIFIER }} />;
+}
+
+export function CodeVerifyPhone() {
+  return (
+    <StepPanel step={{ kind: 'code', purpose: 'verify-phone', channel: 'phone', identifier: '+1 555 555 0123' }} />
+  );
+}
+
+export function NoticeEnterpriseSso() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'enterprise-sso' }}
+      combined={false}
+    />
+  );
+}
+
+export function CodeClientTrust() {
+  return <StepPanel step={{ kind: 'code', purpose: 'client-trust', channel: 'email', identifier: IDENTIFIER }} />;
+}
+
 export function CodeResetPassword() {
   return <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'email', identifier: IDENTIFIER }} />;
 }
 
 export function CodeResetPasswordPhone() {
-  return (
-    <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: '+1 ••• ••• 0123' }} />
-  );
+  return <StepPanel step={{ kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: PHONE }} />;
 }
 
 export function CodeVerifyEmail() {
@@ -628,6 +799,22 @@ export function CodeVerifyEmail() {
 
 export function ChoiceMethods() {
   return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
+}
+
+export function ChoiceEnterpriseConnections() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'choice',
+        purpose: 'enterprise-connections',
+        options: [
+          { id: 'okta', name: 'Acme Okta', iconUrl: 'https://img.clerk.com/static/okta.svg' },
+          { id: 'entra', name: 'Acme Contractors (Entra ID)', iconUrl: 'https://img.clerk.com/static/microsoft.svg' },
+        ],
+      }}
+      combined={false}
+    />
+  );
 }
 
 export function ChoiceResetMethods() {

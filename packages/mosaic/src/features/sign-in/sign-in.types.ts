@@ -16,19 +16,31 @@ export type SignInFactor =
 
 type SignInCodeChannel = 'email' | 'phone' | 'totp';
 
+export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
+
 export type SignInStep =
-  | { kind: 'identifier' }
+  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField; lastUsed?: boolean }
+  | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
-      purpose: 'first-factor' | 'second-factor' | 'reset-password' | 'verify-email';
+      purpose:
+        | 'first-factor'
+        | 'second-factor'
+        | 'client-trust'
+        | 'sso-bypass'
+        | 'reset-password'
+        | 'verify-email'
+        | 'verify-phone';
       channel: SignInCodeChannel;
       identifier?: string;
+      provider?: string;
     }
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
+  | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' }
@@ -42,7 +54,7 @@ export interface SignInActionBlockedDetails {
   traceId?: string;
 }
 
-export interface SignInSocialProvider {
+export interface SignInProvider {
   id: string;
   name: string;
   iconUrl: string;
@@ -50,6 +62,7 @@ export interface SignInSocialProvider {
 
 export interface SignInValues {
   identifier: string;
+  phoneNumber: string;
   password: string;
   code: string;
   backupCode: string;
@@ -70,9 +83,11 @@ export interface SignInViewProps {
   applicationName: string;
   applicationLogoUrl?: string;
   combined: boolean;
-  socialProviders: readonly SignInSocialProvider[];
+  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
+  lastUsedProviderId?: string;
   onSelectProvider: (id: string) => void;
+  onPasskey?: () => void;
   form: UseFormResult<SignInValues>;
   onSubmit: (event?: SignInSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
@@ -82,7 +97,9 @@ export interface SignInViewProps {
   globalErrorMessage?: string;
   newPasswordFeedback?: FieldFeedback;
   onEditIdentifier: () => void;
+  onSwitchField?: () => void;
   onSignUp?: () => void;
+  onJoinWaitlist?: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   onShowHelp: () => void;

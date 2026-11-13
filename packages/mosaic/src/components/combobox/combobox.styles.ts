@@ -104,15 +104,50 @@ export const styles = stylex.create({
     },
     paddingInlineEnd: space['1.5'],
     paddingInlineStart: space['1.5'],
+    position: 'relative',
     height: space['8'],
+    '::before': {
+      insetBlock: `calc(-1 * ${space['0.5']})`,
+      insetInline: `calc(-1 * ${space['0.5']})`,
+      content: '""',
+      position: 'absolute',
+    },
   },
   empty: {
-    paddingBlock: space['6'],
-    paddingInline: space['3'],
+    paddingBlock: {
+      default: space['6'],
+      ':empty': 0,
+    },
+    paddingInline: {
+      default: space['3'],
+      ':empty': 0,
+    },
     color: colorVars['--cl-color-foreground-secondary'],
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
+    position: {
+      default: null,
+      ':empty': 'absolute',
+    },
     textAlign: 'center',
+  },
+  media: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['4'],
+  },
+  label: {
+    flexGrow: 1,
+    minWidth: 0,
+  },
+  detail: {
+    color: colorVars['--cl-color-foreground-secondary'],
+    flexShrink: 0,
+    fontVariantNumeric: 'tabular-nums',
+    whiteSpace: 'nowrap',
   },
   indicator: {
     alignItems: 'center',

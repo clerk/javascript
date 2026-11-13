@@ -2098,6 +2098,7 @@ export const caES: LocalizationResource = {
       "El registre no ha estat exitós a causa de validacions de seguretat fallides. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     captcha_unavailable:
       "El registre no ha estat exitós a causa de la validació fallida de bot. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
+    external_account_not_found: undefined,
     form_code_incorrect: 'El codi introduït no és vàlid. Si us plau, comprova el codi i torna-ho a intentar.',
     form_email_address_blocked:
       'Els serveis de correu electrònic temporal no estan suportats. Si us plau, utilitzeu la vostra adreça de correu electrònic habitual per crear un compte.',
@@ -2174,9 +2175,11 @@ export const caES: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Ja estàs connectat.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Has rebutjat la sol·licitud de signatura. Torna-ho a provar per continuar.',
