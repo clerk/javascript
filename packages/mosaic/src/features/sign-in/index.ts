@@ -12,4 +12,5 @@ export type {
   SignInViewProps,
   SignUpFieldName,
   SignUpFields,
+  SignUpLegalConsent,
 } from './sign-in.types';

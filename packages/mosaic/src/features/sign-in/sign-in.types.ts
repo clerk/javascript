@@ -48,7 +48,12 @@ export type SignInStep =
   | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' | 'required' }
-  | { kind: 'sign-up'; fields: SignUpFields; nextField?: 'emailAddress' | 'phoneNumber' };
+  | {
+      kind: 'sign-up';
+      fields: SignUpFields;
+      nextField?: 'emailAddress' | 'phoneNumber';
+      legalConsent?: SignUpLegalConsent;
+    };
 
 export type SignInEmailLinkStatus =
   | 'loading'
@@ -62,6 +67,11 @@ export type SignInEmailLinkStatus =
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
 
 export type SignUpFields = Partial<Record<SignUpFieldName, { required: boolean }>>;
+
+export interface SignUpLegalConsent {
+  termsUrl?: string;
+  privacyPolicyUrl?: string;
+}
 
 export interface SignInActionBlockedDetails {
   title?: string;
@@ -96,6 +106,7 @@ export interface SignInValues {
   newPassword: string;
   confirmPassword: string;
   signOutOfOtherSessions: boolean;
+  legalAccepted: boolean;
 }
 
 export interface SignInSubmitEvent {

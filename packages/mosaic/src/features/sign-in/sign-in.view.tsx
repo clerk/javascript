@@ -294,8 +294,7 @@ export function SignInView({
                 {current.kind === 'sign-up' ? (
                   <SignUpDetailsStep
                     focusRef={focusRef}
-                    fields={current.fields}
-                    nextField={current.nextField}
+                    step={current}
                     onSwitchField={onSwitchField}
                     socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
