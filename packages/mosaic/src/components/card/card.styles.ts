@@ -21,6 +21,13 @@ export const root = stylex.create({
       // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one draws no footer divider.
       [stylex.when.descendant(':where(*)', cardContentMarker)]: '1px',
     },
+    '--_cl-card-header-padding-end': {
+      default: space['5'],
+      // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one pads under the header of a card that also has content.
+      [stylex.when.descendant(':where(*)', cardContentMarker)]: '0px',
+      // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- as above, for a card whose header is followed by a footer.
+      [stylex.when.descendant(':where(*)', cardFooterMarker)]: '0px',
+    },
     color: colorVars['--cl-color-foreground'],
     containerName: 'card',
     containerType: 'inline-size',
@@ -76,6 +83,7 @@ export const header = stylex.create({
     columnGap: HEADER_COLUMN_GAP,
     display: 'flex',
     flexDirection: 'row-reverse',
+    paddingBlockEnd: 'var(--_cl-card-header-padding-end)',
     paddingBlockStart: space['4'],
   },
   content: {
