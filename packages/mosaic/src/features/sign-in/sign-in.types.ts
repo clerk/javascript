@@ -48,7 +48,7 @@ export type SignInStep =
   | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
   | { kind: 'new-password'; reason: 'forgot' | 'required' }
-  | { kind: 'sign-up'; fields: SignUpFields };
+  | { kind: 'sign-up'; fields: SignUpFields; nextField?: 'emailAddress' | 'phoneNumber' };
 
 export type SignInEmailLinkStatus =
   | 'loading'

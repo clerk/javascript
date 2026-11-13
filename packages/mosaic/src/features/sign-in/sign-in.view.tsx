@@ -295,6 +295,8 @@ export function SignInView({
                   <SignUpDetailsStep
                     focusRef={focusRef}
                     fields={current.fields}
+                    nextField={current.nextField}
+                    onSwitchField={onSwitchField}
                     form={form}
                     globalErrorMessage={globalErrorMessage}
                     isPending={isPending}

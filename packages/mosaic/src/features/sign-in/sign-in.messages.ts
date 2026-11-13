@@ -264,6 +264,8 @@ export const signInMessages = {
     chooseCountry: 'Choose a country',
     searchCountries: 'Search countries',
     optional: 'Optional',
+    useEmail: 'Use email instead',
+    usePhone: 'Use phone instead',
     passwordLabel: 'Password',
     passwordPlaceholder: 'Enter your password',
     signInPrompt: 'Already have an account?',

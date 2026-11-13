@@ -1006,6 +1006,21 @@ export function SignUpSettingsFields() {
   );
 }
 
+export function SignUpEmailOrPhone() {
+  const [active, setActive] = useState<'emailAddress' | 'phoneNumber'>('emailAddress');
+
+  return (
+    <StepPanel
+      step={{
+        kind: 'sign-up',
+        fields: { [active]: { required: true }, password: { required: true } },
+        nextField: active === 'emailAddress' ? 'phoneNumber' : 'emailAddress',
+      }}
+      onSwitchField={() => setActive(current => (current === 'emailAddress' ? 'phoneNumber' : 'emailAddress'))}
+    />
+  );
+}
+
 export function SignUpPasswordRequirements() {
   return (
     <StepPanel

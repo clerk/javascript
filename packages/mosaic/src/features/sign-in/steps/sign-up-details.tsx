@@ -1,7 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -20,6 +20,8 @@ import { signUpFieldNames } from '../sign-in.utils';
 
 interface SignUpDetailsProps {
   fields: SignUpFields;
+  nextField?: 'emailAddress' | 'phoneNumber';
+  onSwitchField?: () => void;
   form: UseFormResult<SignInValues>;
   globalErrorMessage?: string;
   isPending: boolean;
@@ -31,6 +33,8 @@ interface SignUpDetailsProps {
 
 export function SignUpDetailsStep({
   fields,
+  nextField,
+  onSwitchField,
   form,
   globalErrorMessage,
   isPending,
@@ -41,6 +45,13 @@ export function SignUpDetailsStep({
 }: SignUpDetailsProps) {
   const m = useMessages('signIn');
   const [first] = signUpFieldNames(fields);
+  const switchedRef = useRef(false);
+  const focusAfterSwitch = useCallback((element: HTMLElement | null) => {
+    if (element && switchedRef.current) {
+      switchedRef.current = false;
+      element.focus();
+    }
+  }, []);
   const field = (name: SignUpFieldName) => ({
     form,
     required: fields[name]?.required ?? false,
@@ -48,6 +59,17 @@ export function SignUpDetailsStep({
     autoFocus: first === name,
     inputRef: first === name ? focusRef : undefined,
   });
+  const switchField =
+    nextField && onSwitchField
+      ? {
+          switchRef: focusAfterSwitch,
+          switchLabel: nextField === 'phoneNumber' ? m.signUp.usePhone : m.signUp.useEmail,
+          onSwitch: () => {
+            switchedRef.current = true;
+            onSwitchField();
+          },
+        }
+      : undefined;
 
   return (
     <>
@@ -67,28 +89,10 @@ export function SignUpDetailsStep({
           onSubmit={onSubmit}
         >
           <div {...stylex.props(styles.fieldStack)}>
-            {fields.firstName || fields.lastName ? (
-              <div {...stylex.props(fields.firstName && fields.lastName ? styles.nameRow : styles.fieldStack)}>
-                {fields.firstName ? (
-                  <TextField
-                    {...field('firstName')}
-                    name='firstName'
-                    label={m.signUp.firstNameLabel}
-                    placeholder={m.signUp.firstNamePlaceholder}
-                    autoComplete='given-name'
-                  />
-                ) : null}
-                {fields.lastName ? (
-                  <TextField
-                    {...field('lastName')}
-                    name='lastName'
-                    label={m.signUp.lastNameLabel}
-                    placeholder={m.signUp.lastNamePlaceholder}
-                    autoComplete='family-name'
-                  />
-                ) : null}
-              </div>
-            ) : null}
+            <NameFields
+              firstName={fields.firstName ? field('firstName') : undefined}
+              lastName={fields.lastName ? field('lastName') : undefined}
+            />
             {fields.username ? (
               <TextField
                 {...field('username')}
@@ -101,6 +105,7 @@ export function SignUpDetailsStep({
             {fields.emailAddress ? (
               <TextField
                 {...field('emailAddress')}
+                {...switchField}
                 name='identifier'
                 type='email'
                 label={m.signUp.emailLabel}
@@ -108,7 +113,12 @@ export function SignUpDetailsStep({
                 autoComplete='email'
               />
             ) : null}
-            {fields.phoneNumber ? <PhoneField {...field('phoneNumber')} /> : null}
+            {fields.phoneNumber ? (
+              <PhoneField
+                {...field('phoneNumber')}
+                {...switchField}
+              />
+            ) : null}
             {fields.password ? (
               <PasswordField
                 {...field('password')}
@@ -150,12 +160,45 @@ export function SignUpDetailsStep({
   );
 }
 
+function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?: FieldProps }) {
+  const m = useMessages('signIn');
+  if (!firstName && !lastName) {
+    return null;
+  }
+
+  return (
+    <div {...stylex.props(firstName && lastName ? styles.nameRow : styles.fieldStack)}>
+      {firstName ? (
+        <TextField
+          {...firstName}
+          name='firstName'
+          label={m.signUp.firstNameLabel}
+          placeholder={m.signUp.firstNamePlaceholder}
+          autoComplete='given-name'
+        />
+      ) : null}
+      {lastName ? (
+        <TextField
+          {...lastName}
+          name='lastName'
+          label={m.signUp.lastNameLabel}
+          placeholder={m.signUp.lastNamePlaceholder}
+          autoComplete='family-name'
+        />
+      ) : null}
+    </div>
+  );
+}
+
 interface FieldProps {
   form: UseFormResult<SignInValues>;
   required: boolean;
   disabled: boolean;
   autoFocus: boolean;
   inputRef?: Ref<HTMLElement>;
+  switchRef?: Ref<HTMLElement>;
+  switchLabel?: string;
+  onSwitch?: () => void;
 }
 
 function TextField({
@@ -169,6 +212,9 @@ function TextField({
   disabled,
   autoFocus,
   inputRef,
+  switchRef,
+  switchLabel,
+  onSwitch,
 }: FieldProps & {
   name: 'firstName' | 'lastName' | 'username' | 'identifier';
   type?: 'text' | 'email';
@@ -178,7 +224,7 @@ function TextField({
 }) {
   const { ref, ...control } = form.register(name);
   const flowAutoFocusRef = useFlowAutoFocus<HTMLInputElement>();
-  const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, autoFocus ? flowAutoFocusRef : undefined]);
+  const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, switchRef, autoFocus ? flowAutoFocusRef : undefined]);
   const { feedback } = form.fields[name];
 
   return (
@@ -190,7 +236,12 @@ function TextField({
     >
       <Field.Header>
         <Field.Label>{label}</Field.Label>
-        {required ? null : <OptionalHint />}
+        <FieldHeaderEnd
+          required={required}
+          disabled={disabled}
+          switchLabel={switchLabel}
+          onSwitch={onSwitch}
+        />
       </Field.Header>
       <Input
         ref={mergedRef}
@@ -204,11 +255,11 @@ function TextField({
   );
 }
 
-function PhoneField({ form, required, disabled, autoFocus, inputRef }: FieldProps) {
+function PhoneField({ form, required, disabled, autoFocus, inputRef, switchRef, switchLabel, onSwitch }: FieldProps) {
   const m = useMessages('signIn');
   const { ref, ...control } = form.registerValue('phoneNumber');
   const flowAutoFocusRef = useFlowAutoFocus<HTMLInputElement>();
-  const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, autoFocus ? flowAutoFocusRef : undefined]);
+  const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, switchRef, autoFocus ? flowAutoFocusRef : undefined]);
   const { feedback } = form.fields.phoneNumber;
 
   return (
@@ -220,7 +271,12 @@ function PhoneField({ form, required, disabled, autoFocus, inputRef }: FieldProp
     >
       <Field.Header>
         <Field.Label>{m.signUp.phoneLabel}</Field.Label>
-        {required ? null : <OptionalHint />}
+        <FieldHeaderEnd
+          required={required}
+          disabled={disabled}
+          switchLabel={switchLabel}
+          onSwitch={onSwitch}
+        />
       </Field.Header>
       <PhoneInput
         ref={mergedRef}
@@ -280,6 +336,28 @@ function PasswordField({
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>
   );
+}
+
+function FieldHeaderEnd({
+  required,
+  disabled,
+  switchLabel,
+  onSwitch,
+}: Pick<FieldProps, 'required' | 'disabled' | 'switchLabel' | 'onSwitch'>) {
+  if (switchLabel && onSwitch) {
+    return (
+      <Button
+        type='button'
+        size='sm'
+        variant='link'
+        disabled={disabled}
+        onClick={onSwitch}
+      >
+        {switchLabel}
+      </Button>
+    );
+  }
+  return required ? null : <OptionalHint />;
 }
 
 function OptionalHint() {
