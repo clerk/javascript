@@ -1,27 +1,35 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { useCallback, useRef, useState } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
+import { Checkbox } from '../../../components/checkbox';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
+import { Link } from '../../../components/link';
 import { PasswordInput } from '../../../components/password-input';
 import { PhoneInput } from '../../../components/phone-input';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
-import { fill, useMessages } from '../../../localization';
+import { fill, rich, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-in.styles';
-import type { SignInProvider, SignInSubmitEvent, SignInValues, SignUpFieldName, SignUpFields } from '../sign-in.types';
-import { signUpFieldNames } from '../sign-in.utils';
+import type {
+  SignInProvider,
+  SignInStep,
+  SignInSubmitEvent,
+  SignInValues,
+  SignUpFieldName,
+  SignUpLegalConsent,
+} from '../sign-in.types';
+import { legalConsentLabel, signUpFieldNames, signUpHeading } from '../sign-in.utils';
 
 interface SignUpDetailsProps {
-  fields: SignUpFields;
-  nextField?: 'emailAddress' | 'phoneNumber';
+  step: Extract<SignInStep, { kind: 'sign-up' }>;
   onSwitchField?: () => void;
   socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
@@ -37,8 +45,7 @@ interface SignUpDetailsProps {
 }
 
 export function SignUpDetailsStep({
-  fields,
-  nextField,
+  step,
   onSwitchField,
   socialProviders,
   pendingProviderId,
@@ -53,7 +60,10 @@ export function SignUpDetailsStep({
   focusRef,
 }: SignUpDetailsProps) {
   const m = useMessages('signIn');
+  const { fields, nextField, legalConsent } = step;
+  const heading = signUpHeading(step, m);
   const [first] = signUpFieldNames(fields);
+  const onlyLegalConsent = Boolean(legalConsent) && !first;
   const switchedRef = useRef(false);
   const focusAfterSwitch = useCallback((element: HTMLElement | null) => {
     if (element && switchedRef.current) {
@@ -83,8 +93,8 @@ export function SignUpDetailsStep({
   return (
     <>
       <Card.Header>
-        <Card.Title>{m.signUp.title}</Card.Title>
-        <Card.Description>{m.signUp.description}</Card.Description>
+        <Card.Title>{heading.title}</Card.Title>
+        <Card.Description>{heading.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -94,7 +104,7 @@ export function SignUpDetailsStep({
       </Card.Banner>
       <Card.Content>
         <SignUpProviders
-          providers={socialProviders}
+          providers={onlyLegalConsent ? [] : socialProviders}
           pendingProviderId={pendingProviderId}
           isDisabled={isDisabled}
           onSelectProvider={onSelectProvider}
@@ -138,6 +148,13 @@ export function SignUpDetailsStep({
               <PasswordField
                 {...field('password')}
                 advisoryFeedback={passwordFeedback}
+              />
+            ) : null}
+            {legalConsent ? (
+              <LegalConsentField
+                form={form}
+                consent={legalConsent}
+                disabled={isDisabled}
               />
             ) : null}
           </div>
@@ -226,6 +243,51 @@ function SignUpProviders({
         <span {...stylex.props(styles.dividerLine)} />
       </div>
     </>
+  );
+}
+
+function LegalConsentField({
+  form,
+  consent,
+  disabled,
+}: {
+  form: UseFormResult<SignInValues>;
+  consent: SignUpLegalConsent;
+  disabled: boolean;
+}) {
+  const m = useMessages('signIn');
+  const { feedback } = form.fields.legalAccepted;
+  const link = (href: string | undefined) => (children: ReactNode) =>
+    href ? (
+      <Link
+        href={href}
+        target='_blank'
+        rel='noopener noreferrer'
+        size='sm'
+      >
+        {children}
+      </Link>
+    ) : (
+      children
+    );
+
+  return (
+    <Field.Root
+      orientation='horizontal'
+      required
+      invalid={feedback?.type === 'error'}
+      disabled={disabled}
+    >
+      <Checkbox
+        checked={form.values.legalAccepted}
+        onChange={event => form.setValue('legalAccepted', event.target.checked)}
+      />
+      <Field.Label>
+        {rich(legalConsentLabel(consent, m), {
+          components: { terms: link(consent.termsUrl), privacy: link(consent.privacyPolicyUrl) },
+        })}
+      </Field.Label>
+    </Field.Root>
   );
 }
 

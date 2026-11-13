@@ -74,6 +74,7 @@ const emptyValues: SignInValues = {
   newPassword: '',
   confirmPassword: '',
   signOutOfOtherSessions: true,
+  legalAccepted: false,
 };
 
 const newPasswordFields: FieldsConfig<SignInValues> = {
@@ -1036,6 +1037,25 @@ export function SignUpEmailOrPhone() {
       onSwitchField={() => setActive(current => (current === 'emailAddress' ? 'phoneNumber' : 'emailAddress'))}
     />
   );
+}
+
+const legalConsent = { termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' };
+
+export function SignUpLegalConsent() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        fields: { emailAddress: { required: true }, password: { required: true } },
+        legalConsent,
+      }}
+    />
+  );
+}
+
+export function SignUpLegalConsentOnly() {
+  return <StepPanel step={{ kind: 'sign-up', fields: {}, legalConsent }} />;
 }
 
 export function SignUpPasswordRequirements() {

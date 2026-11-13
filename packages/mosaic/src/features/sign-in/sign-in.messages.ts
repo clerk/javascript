@@ -268,6 +268,13 @@ export const signInMessages = {
     usePhone: 'Use phone instead',
     passwordLabel: 'Password',
     passwordPlaceholder: 'Enter your password',
+    legalConsent: {
+      title: 'Legal consent',
+      description: 'Please read and accept the terms to continue',
+      termsAndPrivacy: 'I agree to the {#terms}Terms of Service{/terms} and {#privacy}Privacy Policy{/privacy}',
+      termsOnly: 'I agree to the {#terms}Terms of Service{/terms}',
+      privacyOnly: 'I agree to the {#privacy}Privacy Policy{/privacy}',
+    },
     signInPrompt: 'Already have an account?',
     signInLink: 'Sign in',
   },
