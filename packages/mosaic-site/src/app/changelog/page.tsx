@@ -26,7 +26,7 @@ export default function ChangelogPage() {
           <h1 className='heading-3 sm:heading-2'>Changelog</h1>
           <p className='body-2 mt-2 text-balance text-neutral-600 dark:text-neutral-400'>
             Clerk UI is in beta, so minor releases can include breaking changes. Highlights from each{' '}
-            <code>@clerk/mosaic</code> release are below.
+            <code className='code-inline'>@clerk/mosaic</code> release are below.
           </p>
         </div>
         <ol className='mt-12 max-w-2xl'>
@@ -55,7 +55,7 @@ export default function ChangelogPage() {
                         Breaking
                       </span>
                     )}
-                    {item.text}{' '}
+                    <InlineCode text={item.text} />{' '}
                     <a
                       href={`https://github.com/clerk/javascript/pull/${item.pr}`}
                       target='_blank'
@@ -81,5 +81,20 @@ export default function ChangelogPage() {
       </Container>
       <SiteFooter />
     </main>
+  );
+}
+
+function InlineCode({ text }: { text: string }) {
+  return text.split('`').map((part, i) =>
+    i % 2 ? (
+      <code
+        key={i}
+        className='code-inline'
+      >
+        {part}
+      </code>
+    ) : (
+      part
+    ),
   );
 }

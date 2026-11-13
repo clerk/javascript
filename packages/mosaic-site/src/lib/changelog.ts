@@ -10,7 +10,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: '2026-11-12',
     items: [
       {
-        text: 'Screen readers now announce Combobox.Empty when a search matches no options. Combobox.Root now owns the items.',
+        text: 'Screen readers now announce `Combobox.Empty` when a search matches no options. `Combobox.Root` now owns the items.',
         pr: 10794,
         breaking: true,
       },
@@ -21,17 +21,19 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: '2026-11-12',
     items: [
       {
-        text: 'Configure the profile once on MosaicProvider, so UserButton, OrganizationSwitcher and UserProfile share one setup.',
+        text: 'Configure the profile once with the new `profile` prop on `MosaicProvider`, so `UserButton`, `OrganizationSwitcher` and `UserProfile` share one setup.',
         pr: 10546,
-        breaking: true,
       },
       {
-        text: 'UserProfile and OrganizationProfile route their pages through a location, with a new path prop.',
+        text: '`UserProfile` and `OrganizationProfile` route their pages through a location, with a new `path` prop. This removes `defaultPage`.',
         pr: 10602,
         breaking: true,
       },
-      { text: 'Add Combobox.Media, Combobox.Label and Combobox.Detail for composing options.', pr: 10764 },
-      { text: 'Simplify Item to one size and one bordered look.', pr: 10665, breaking: true },
+      {
+        text: 'Add `Combobox.Media`, `Combobox.Label` and `Combobox.Detail` for composing options.',
+        pr: 10764,
+      },
+      { text: 'Simplify `Item` to one size and one bordered look.', pr: 10665, breaking: true },
     ],
   },
   {
@@ -47,8 +49,8 @@ export const CHANGELOG: ChangelogEntry[] = [
     version: '0.2.1',
     date: '2026-11-03',
     items: [
-      { text: 'Add UserAvatar, which shows the signed-in user’s profile image.', pr: 10500 },
-      { text: 'Add Card.Media, a slot for a logo, icon or image at the top of a card.', pr: 10590 },
+      { text: 'Add `UserAvatar`, which shows the signed-in user’s profile image.', pr: 10500 },
+      { text: 'Add `Card.Media`, a slot for a logo, icon or image at the top of a card.', pr: 10590 },
       { text: 'Users can confirm their identity again with a passkey set up as their second step.', pr: 10570 },
     ],
   },

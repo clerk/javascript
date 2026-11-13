@@ -56,10 +56,10 @@ export function ComponentStatusTable() {
                   className='border-border label-3 border-b'
                 >
                   <td className='py-3 pr-4'>
-                    <code>{`<${row.stable} />`}</code>
+                    <code className='code-inline'>{`<${row.stable} />`}</code>
                   </td>
                   <td className='py-3 pr-4 text-neutral-600 dark:text-neutral-400'>
-                    {row.beta ? <code>{`<${row.beta} />`}</code> : '—'}
+                    {row.beta ? <code className='code-inline'>{`<${row.beta} />`}</code> : '—'}
                   </td>
                   <td className='py-3'>
                     <Badge
