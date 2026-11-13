@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 import type { EnhancedPage } from './app';
 
 type WizardMode = 'manual' | 'metadata file';
@@ -5,10 +7,14 @@ type SamlConfiguration = { domain: string; metadata: string; issuer: string; sig
 const providers: Record<WizardMode, string> = { manual: 'Custom SAML Provider', 'metadata file': 'Google Workspace' };
 
 async function configureIdp(page: EnhancedPage, mode: WizardMode, { metadata, issuer, signOnUrl }: SamlConfiguration) {
+  const stepDescription = page.locator('.cl-configureSSOStepHeaderDescription');
   if (mode === 'manual') {
     const configureManually = page.getByRole('radio', { name: 'Configure manually', exact: true });
     while (!(await configureManually.isVisible())) {
+      const previousStep = await stepDescription.innerText();
       await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+      await expect(stepDescription.filter({ hasText: previousStep })).toHaveCount(0);
     }
 
     await configureManually.check();
@@ -37,7 +43,10 @@ async function configureIdp(page: EnhancedPage, mode: WizardMode, { metadata, is
 
   if (mode === 'metadata file') {
     while (!(await page.getByRole('button', { name: 'Open test URL', exact: true }).isVisible())) {
+      const previousStep = await stepDescription.innerText();
       await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
+      await expect(stepDescription.filter({ hasText: previousStep })).toHaveCount(0);
     }
   }
 }
