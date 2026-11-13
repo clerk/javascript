@@ -1,3 +1,4 @@
+import { ClerkUILogo } from '@/components/marketing/clerk-logo';
 import { Badge, type BadgeTone } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { COMPONENT_STATUS, type ComponentStatus } from '@/lib/component-status';
@@ -37,13 +38,20 @@ export function ComponentStatusTable() {
                 </th>
                 <th
                   scope='col'
-                  className='py-3 pr-4 font-normal'
+                  className='bg-foreground/[0.04] px-4 py-3 font-normal'
                 >
-                  Clerk UI beta
+                  <span className='text-foreground flex items-center gap-2'>
+                    <ClerkUILogo
+                      aria-hidden='true'
+                      className='h-4'
+                    />
+                    <Badge tone='beta'>Beta</Badge>
+                    <span className='sr-only'>Clerk UI beta</span>
+                  </span>
                 </th>
                 <th
                   scope='col'
-                  className='py-3 font-normal'
+                  className='py-3 pl-4 font-normal'
                 >
                   Status
                 </th>
@@ -58,10 +66,10 @@ export function ComponentStatusTable() {
                   <td className='py-3 pr-4'>
                     <code className='code-inline'>{`<${row.stable} />`}</code>
                   </td>
-                  <td className='py-3 pr-4 text-neutral-600 dark:text-neutral-400'>
+                  <td className='bg-foreground/[0.04] text-foreground px-4 py-3'>
                     {row.beta ? <code className='code-inline'>{`<${row.beta} />`}</code> : '—'}
                   </td>
-                  <td className='py-3'>
+                  <td className='py-3 pl-4'>
                     <Badge
                       tone={STATUS[row.status].tone}
                       className='w-fit'
