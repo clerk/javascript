@@ -215,23 +215,23 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
           if (request.method !== 'GET') {
             return new Response(null, { status: 405, headers: { Allow: 'GET' } });
           }
-          const metadata = (await resolvedClerkClient.artifacts.__experimental_getPoppyJson()) as {
+          const metadata = await resolvedClerkClient.artifacts.__experimental_getPoppyJson();
+          const headers = { 'Cache-Control': 'no-store' };
+          if (poppyRequestUrl.pathname === '/.well-known/poppy.json') {
+            return Response.json(metadata, { headers });
+          }
+          const { organization, auth } = metadata as {
             organization: { domain: string };
             auth: { issuer: string; scopes: Record<string, unknown> };
           };
-          if (poppyRequestUrl.origin !== `https://${metadata.organization.domain}`) {
-            throw new Error('Poppy discovery must use the configured Company origin.');
-          }
           return Response.json(
-            poppyRequestUrl.pathname === '/.well-known/poppy.json'
-              ? metadata
-              : {
-                  resource: poppyRequestUrl.origin,
-                  authorization_servers: [metadata.auth.issuer],
-                  scopes_supported: Object.keys(metadata.auth.scopes),
-                  bearer_methods_supported: ['header'],
-                },
-            { headers: { 'Cache-Control': 'no-store' } },
+            {
+              resource: `https://${organization.domain}`,
+              authorization_servers: [auth.issuer],
+              scopes_supported: Object.keys(auth.scopes),
+              bearer_methods_supported: ['header'],
+            },
+            { headers },
           );
         }
       }
