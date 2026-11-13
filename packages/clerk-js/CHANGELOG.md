@@ -1,5 +1,18 @@
 # Change Log
 
+## 6.43.0
+
+### Minor Changes
+
+- Add a `preferImmediatelyAvailableCredentials` option to `signIn.authenticateWithPasskey()` and `signIn.passkey()`. With `@clerk/expo-passkeys` on iOS 16+ and Android, it limits sign-in to passkeys already on the device, and the request fails without showing the "use a passkey from another device" sheet when there are none. This lets an app prompt for a passkey automatically when its sign-in screen opens. Browsers ignore it. ([#10776](https://github.com/clerk/javascript/pull/10776)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix sign-ups failing with "There is no account to transfer" when `handleRedirectCallback()` was called again while an earlier call was still running, for example because `<SignIn />` remounted during the OAuth callback. Calls made while one is running now share its result instead of starting a second transfer. ([#10671](https://github.com/clerk/javascript/pull/10671)) by [@Ephem](https://github.com/Ephem)
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.45.0
+
 ## 6.42.3
 
 ### Patch Changes

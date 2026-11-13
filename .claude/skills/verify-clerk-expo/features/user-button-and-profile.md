@@ -31,7 +31,7 @@ Preconditions:
 ## Gotchas
 
 - The UserButton is `clerk.userButton.profile` on iOS and the accessibility label `Open user profile` on Android (`nativeUserButton` in `specs/native.ts`).
-- Profile rows have no stable identifier on Android, and on iOS the profile that the UserButton opens is inside a sheet, so the specs find the rows by text (`Manage account`, `Sign out`).
+- The pinned clerk-android release sets the profile rows' `clerk.userProfile.row.*` names as resource ids under UserProfileView, but Android specs find native views by text, and on iOS the profile that the UserButton opens is inside a sheet, so `nativeProfile` in `specs/native.ts` finds the rows by text (`Manage account`, `Sign out`).
 - A seeded user has no name, so the profile header shows only the avatar. The email appears under `Manage account`.
 - Open the profile from the UserButton, as a user does. Use the `embeddedProfile` screen for `onHostBack` and for custom pages, which the test app passes only to its inline UserProfileView. The UserButton also takes custom pages through `userProfileProps.customPages`, and no spec covers that. No spec covers a row with `href`, which opens a URL instead of React Native content, a row's `placement` among Clerk's rows, or a page in `customDestinations` that a custom page pushes with `useUserProfileCustomPageNavigation().push` (`packages/expo-native-components/src/UserProfileCustomPages.tsx`).
 - Tap the profile's Back button with `tapProfileBack` from `specs/native.ts`, which taps the middle of its frame. On Android the label `Back` is on a group that holds the button, and `locator.tap()` on it fails with "no parent-owned touch point".

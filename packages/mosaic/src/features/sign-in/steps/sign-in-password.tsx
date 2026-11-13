@@ -9,7 +9,6 @@ import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles } from '../sign-in.styles';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
@@ -72,7 +71,20 @@ export function SignInPassword({
             disabled={isPending}
             focusableWhenDisabled
           >
-            <Field.Label>{m.password.label}</Field.Label>
+            <Field.Header>
+              <Field.Label>{m.password.label}</Field.Label>
+              {onForgotPassword ? (
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='link'
+                  disabled={isPending}
+                  onClick={onForgotPassword}
+                >
+                  {m.password.forgotPassword}
+                </Button>
+              ) : null}
+            </Field.Header>
             <PasswordInput
               ref={passwordRef}
               autoComplete='current-password'
@@ -82,18 +94,6 @@ export function SignInPassword({
               hidePasswordLabel={m.hidePassword}
             />
             <Field.Feedback feedback={feedback} />
-            {onForgotPassword ? (
-              <Button
-                type='button'
-                size='sm'
-                variant='link'
-                disabled={isPending}
-                onClick={onForgotPassword}
-                xstyle={styles.forgotPassword}
-              >
-                {m.password.forgotPassword}
-              </Button>
-            ) : null}
           </Field.Root>
         </Form>
       </Card.Content>

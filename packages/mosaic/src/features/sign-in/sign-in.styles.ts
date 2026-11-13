@@ -15,6 +15,11 @@ export const styles = stylex.create({
     height: space['4'],
     width: space['4'],
   },
+  buttonStack: {
+    gap: space['2'],
+    display: 'flex',
+    flexDirection: 'column',
+  },
   divider: {
     gap: space['4'],
     alignItems: 'center',
@@ -44,11 +49,24 @@ export const styles = stylex.create({
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
   },
-  forgotPassword: {
-    alignSelf: 'start',
-    justifySelf: 'start',
+  captcha: {
+    justifySelf: 'center',
+  },
+  spotlightGroup: {
+    display: 'contents',
+  },
+  spotlightHidden: {
+    display: 'none',
+  },
+  passkeyAction: {
+    alignSelf: 'center',
   },
   footerText: {
     textAlign: 'center',
+  },
+  status: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
   },
 });

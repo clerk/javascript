@@ -85,8 +85,9 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - An inline message row; height is undefined until measured → `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts`
 - Data read from a Clerk resource that should be cached across mounts → A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)
 - The seconds left on a resend cooldown, for display → `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine
-- An avatar or logo row: picker, drop target, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
+- An avatar or logo row: picker, drop target, crop dialog, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
 - Any other file picker or drop zone, such as a metadata or key file → `FileUpload` (`src/primitives/file-upload/`), see its `README.md`
+- Cropping an image to a square: pan, zoom, rotate, then draw the result → `ImageCropper` and `cropImage` (`src/primitives/image-cropper/`), see its `README.md`
 - An inline notice inside content: info, warning, error or success → `Banner` (`src/components/banner/`); a form-level error on a card uses `Card.Banner`
 - Siblings that slide when an item is added or removed → `useLayoutAnimation` (`src/primitives/hooks/`)
 - An input that reformats as the user types without moving the caret → `useFormattedInput` (`src/primitives/hooks/`)

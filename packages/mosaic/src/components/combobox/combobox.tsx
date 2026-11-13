@@ -16,34 +16,44 @@ import { truncationStyles } from '../../styles/typography.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
+import { InputGroup, type InputGroupRootProps } from '../input-group';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { styles, trigger } from './combobox.styles';
 
-export type ComboboxRootProps = ComboboxProps;
+export type ComboboxRootProps<Item = unknown> = ComboboxProps<Item>;
 export type ComboboxSize = 'sm' | 'md' | 'lg';
 export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
 export type ComboboxClearProps = MosaicComponentProps<'button'>;
 export const ComboboxCollection = HeadlessCombobox.Collection;
 
-const ComboboxAnchorContext = React.createContext<{
-  anchor: HTMLElement | null;
-  setAnchor: React.Dispatch<React.SetStateAction<HTMLElement | null>>;
-} | null>(null);
-
-export function ComboboxRoot({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps) {
-  const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
-  const context = React.useMemo(() => ({ anchor, setAnchor }), [anchor]);
+export function ComboboxRoot<Item>({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps<Item>) {
   return (
-    <ComboboxAnchorContext.Provider value={context}>
-      <HeadlessCombobox.Root
-        sideOffset={sideOffset}
-        openOnInputClick={openOnInputClick}
-        {...props}
-      />
-    </ComboboxAnchorContext.Provider>
+    <HeadlessCombobox.Root
+      sideOffset={sideOffset}
+      openOnInputClick={openOnInputClick}
+      {...props}
+    />
   );
 }
+
+export type ComboboxInputGroupProps = InputGroupRootProps;
+
+export const ComboboxInputGroup = React.forwardRef<HTMLDivElement, ComboboxInputGroupProps>(
+  function MosaicComboboxInputGroup(props, ref) {
+    return (
+      <HeadlessCombobox.InputGroup
+        ref={ref}
+        render={groupProps => (
+          <InputGroup.Root
+            {...groupProps}
+            {...props}
+          />
+        )}
+      />
+    );
+  },
+);
 
 export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(function MosaicComboboxTrigger(
   { xstyle, render, children, ...rest },
@@ -112,12 +122,6 @@ export const ComboboxInput = React.forwardRef<HTMLInputElement, ComboboxInputPro
 ) {
   const inputGroup = useOptionalInputGroupContext();
   const variant = variantProp ?? (inputGroup ? 'ghost' : 'default');
-  const setAnchor = React.useContext(ComboboxAnchorContext)?.setAnchor;
-  const groupElement = inputGroup?.element;
-  React.useLayoutEffect(() => {
-    setAnchor?.(groupElement ?? null);
-    return () => setAnchor?.(null);
-  }, [groupElement, setAnchor]);
   const size = inputGroup?.size ?? sizeProp ?? 'md';
 
   return (
@@ -148,11 +152,10 @@ export const ComboboxPopup = React.forwardRef<HTMLDivElement, ComboboxPopupProps
   { anchor, portalRoot, xstyle, children, ...rest },
   ref,
 ) {
-  const context = React.useContext(ComboboxAnchorContext);
   return (
     <HeadlessCombobox.Portal root={portalRoot}>
       <HeadlessCombobox.Positioner
-        anchor={anchor ?? context?.anchor}
+        anchor={anchor}
         {...mergeStyleProps(themeProps('combobox-positioner'), stylex.props(reset.base, styles.positioner))}
       >
         <HeadlessCombobox.Popup
@@ -264,7 +267,7 @@ export const ComboboxDetail = React.forwardRef<HTMLSpanElement, ComboboxDetailPr
   });
 });
 
-export type ComboboxEmptyProps = MosaicComponentProps<'p'>;
+export type ComboboxEmptyProps = MosaicComponentProps<'div'>;
 
 export type ComboboxOptionIndicatorProps = MosaicComponentProps<'span'>;
 
@@ -286,23 +289,22 @@ export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, Combobo
   },
 );
 
-export const ComboboxEmpty = React.forwardRef<HTMLParagraphElement, ComboboxEmptyProps>(function MosaicComboboxEmpty(
-  { render, xstyle, ...rest },
+export const ComboboxEmpty = React.forwardRef<HTMLDivElement, ComboboxEmptyProps>(function MosaicComboboxEmpty(
+  { xstyle, ...rest },
   ref,
 ) {
-  return useRender({
-    defaultTagName: 'p',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty, xstyle), rest),
-    },
-  });
+  return (
+    <HeadlessCombobox.Empty
+      ref={ref}
+      {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty, xstyle), rest)}
+    />
+  );
 });
 
 export const Combobox = {
   Root: ComboboxRoot,
   Collection: ComboboxCollection,
+  InputGroup: ComboboxInputGroup,
   Input: ComboboxInput,
   Trigger: ComboboxTrigger,
   Clear: ComboboxClear,

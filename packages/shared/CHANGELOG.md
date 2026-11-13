@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.45.0
+
+### Minor Changes
+
+- Add a `preferImmediatelyAvailableCredentials` option to `signIn.authenticateWithPasskey()` and `signIn.passkey()`. With `@clerk/expo-passkeys` on iOS 16+ and Android, it limits sign-in to passkeys already on the device, and the request fails without showing the "use a passkey from another device" sheet when there are none. This lets an app prompt for a passkey automatically when its sign-in screen opens. Browsers ignore it. ([#10776](https://github.com/clerk/javascript/pull/10776)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Expose `meta.providerError` on `ClerkAPIError`. When `getUserOauthAccessToken()` fails with `oauth_token_retrieval_error`, it holds the OAuth provider's error, or the OAuth setting to fix when Clerk could not authenticate to the provider. ([#10798](https://github.com/clerk/javascript/pull/10798)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Show "Too many requests. Please try again in a bit." for both `too_many_requests` and `signup_rate_limit_exceeded` errors in the prebuilt components. Replace "The External Account was not found." with "Account not found. Please sign up or try signing in to a different account." ([#10774](https://github.com/clerk/javascript/pull/10774)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix sign-ups failing with "There is no account to transfer" when `handleRedirectCallback()` was called again while an earlier call was still running, for example because `<SignIn />` remounted during the OAuth callback. Calls made while one is running now share its result instead of starting a second transfer. ([#10671](https://github.com/clerk/javascript/pull/10671)) by [@Ephem](https://github.com/Ephem)
+
 ## 4.44.1
 
 ### Patch Changes

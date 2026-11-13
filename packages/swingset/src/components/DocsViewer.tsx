@@ -125,6 +125,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
+    captcha: dynamic(() => import('../stories/captcha.mdx')),
     'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
   },
   primitives: {
@@ -137,6 +138,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     drawer: dynamic(() => import('../stories/drawer.mdx')),
     'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
     flow: dynamic(() => import('../stories/flow.mdx')),
+    'image-cropper': dynamic(() => import('../stories/image-cropper.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),

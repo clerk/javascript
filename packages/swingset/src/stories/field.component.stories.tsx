@@ -47,6 +47,28 @@ export function Default() {
   );
 }
 
+export function WithHeaderAction() {
+  return (
+    <Field.Root xstyle={styles.errorStack}>
+      <Field.Header>
+        <Field.Label>Password</Field.Label>
+        <Button
+          type='button'
+          size='sm'
+          variant='link'
+        >
+          Forgot password?
+        </Button>
+      </Field.Header>
+      <Input
+        name='password'
+        type='password'
+        placeholder='Enter your password'
+      />
+    </Field.Root>
+  );
+}
+
 export function VisuallyHiddenLabel() {
   return (
     <Field.Root xstyle={styles.stack}>
