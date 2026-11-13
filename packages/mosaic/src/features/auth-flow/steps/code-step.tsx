@@ -3,8 +3,8 @@ import type { Ref } from 'react';
 import type { VerificationCodeMessages, VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationCode } from '../../../blocks/verification';
 import type { UseFormResult } from '../../../components/form';
-import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
-import { SignInIdentityPreview } from './sign-in-identity-preview';
+import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow.types';
+import { IdentityPreview } from './identity-preview';
 
 interface CodeStepProps {
   messages: VerificationCodeMessages;
@@ -12,11 +12,11 @@ interface CodeStepProps {
   identity: { identifier?: string; editLabel: string };
   notice?: string;
   onEditIdentifier: () => void;
-  form: UseFormResult<SignInValues>;
+  form: UseFormResult<AuthFlowValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
   isPending: boolean;
-  onSubmit: (event?: SignInSubmitEvent) => void;
+  onSubmit: (event?: AuthFlowSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
@@ -50,7 +50,7 @@ export function CodeStep({
       resend={resend}
       identity={
         identity.identifier ? (
-          <SignInIdentityPreview
+          <IdentityPreview
             identifier={identity.identifier}
             editLabel={identity.editLabel}
             disabled={isPending}

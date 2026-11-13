@@ -3,16 +3,16 @@ import type { Ref } from 'react';
 import type { VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
+import { ActionBlockedNotice } from '../../auth-flow/steps/action-blocked';
+import { EmailLinkNotice } from '../../auth-flow/steps/email-link';
+import { EmailLinkStatusNotice } from '../../auth-flow/steps/email-link-status';
+import { LoadingNotice } from '../../auth-flow/steps/loading';
+import { ProtectCheckNotice } from '../../auth-flow/steps/protect-check';
 import { SignUpRestricted } from '../../sign-up/steps/sign-up-restricted';
 import type { SignInStep } from '../sign-in.types';
-import { SignInActionBlocked } from './sign-in-action-blocked';
-import { SignInEmailLink } from './sign-in-email-link';
-import { SignInEmailLinkStatus } from './sign-in-email-link-status';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
-import { SignInLoading } from './sign-in-loading';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
-import { SignInProtectCheck } from './sign-in-protect-check';
 import { SignInStartOver } from './sign-in-start-over';
 
 interface NoticeStepProps {
@@ -93,7 +93,7 @@ export function NoticeStep({
         />
       );
     case 'action-blocked':
-      return <SignInActionBlocked details={step.details} />;
+      return <ActionBlockedNotice details={step.details} />;
     case 'password-compromised':
       return (
         <SignInPasswordCompromised
@@ -118,7 +118,7 @@ export function NoticeStep({
       );
     case 'email-link':
       return (
-        <SignInEmailLink
+        <EmailLinkNotice
           focusRef={focusRef}
           title={m.emailLink.title}
           description={m.emailLink.description}
@@ -133,7 +133,7 @@ export function NoticeStep({
       );
     case 'verify-email-link':
       return (
-        <SignInEmailLink
+        <EmailLinkNotice
           focusRef={focusRef}
           title={m.verifyEmailLink.title}
           description={m.verifyEmailLink.description}
@@ -158,10 +158,10 @@ export function NoticeStep({
         />
       );
     case 'loading':
-      return <SignInLoading globalErrorMessage={globalErrorMessage} />;
+      return <LoadingNotice globalErrorMessage={globalErrorMessage} />;
     case 'protect-check':
       return (
-        <SignInProtectCheck
+        <ProtectCheckNotice
           challenge={step.challenge}
           logo={logo}
           globalErrorMessage={globalErrorMessage}
@@ -174,7 +174,7 @@ export function NoticeStep({
       return <SignInStartOver onStartOver={onStartOver} />;
     case 'email-link-status':
       return (
-        <SignInEmailLinkStatus
+        <EmailLinkStatusNotice
           step={step}
           globalErrorMessage={globalErrorMessage}
         />

@@ -7,9 +7,9 @@ import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { useMessages } from '../../../localization';
-import { SignInIdentityPreview } from './sign-in-identity-preview';
+import { IdentityPreview } from './identity-preview';
 
-interface SignInEmailLinkProps {
+interface EmailLinkNoticeProps {
   title: string;
   description: string;
   identifier: string;
@@ -22,7 +22,7 @@ interface SignInEmailLinkProps {
   notice?: string;
 }
 
-export function SignInEmailLink({
+export function EmailLinkNotice({
   title,
   description,
   identifier,
@@ -33,7 +33,7 @@ export function SignInEmailLink({
   onCancel,
   focusRef,
   notice,
-}: SignInEmailLinkProps) {
+}: EmailLinkNoticeProps) {
   const m = useMessages('signIn');
   const ref = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
 
@@ -42,7 +42,7 @@ export function SignInEmailLink({
       <Card.Header>
         <Card.Title>{title}</Card.Title>
         <Card.Description>{description}</Card.Description>
-        <SignInIdentityPreview
+        <IdentityPreview
           identifier={identifier}
           editLabel={m.editIdentifier}
           disabled={isPending}

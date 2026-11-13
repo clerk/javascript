@@ -8,12 +8,12 @@ import { useFlowAutoFocus } from '../../../components/flow';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
-import { styles } from '../sign-in.styles';
-import type { SignInProvider } from '../sign-in.types';
+import { styles } from '../auth-flow.styles';
+import type { AuthFlowProvider } from '../auth-flow.types';
 
-interface SignInEnterpriseConnectionsProps {
+interface EnterpriseConnectionsChoiceProps {
   logo?: { src: string; alt: string };
-  connections: readonly SignInProvider[];
+  connections: readonly AuthFlowProvider[];
   globalErrorMessage?: string;
   pendingConnectionId?: string;
   onSelectConnection: (id: string) => void;
@@ -21,7 +21,7 @@ interface SignInEnterpriseConnectionsProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function SignInEnterpriseConnections({
+export function EnterpriseConnectionsChoice({
   logo,
   connections,
   globalErrorMessage,
@@ -29,7 +29,7 @@ export function SignInEnterpriseConnections({
   onSelectConnection,
   onCancel,
   focusRef,
-}: SignInEnterpriseConnectionsProps) {
+}: EnterpriseConnectionsChoiceProps) {
   const m = useMessages('signIn');
   const firstRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
   const pending = Boolean(pendingConnectionId);

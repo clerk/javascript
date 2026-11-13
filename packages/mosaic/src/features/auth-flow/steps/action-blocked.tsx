@@ -4,14 +4,14 @@ import { Field } from '../../../components/field';
 import { InputGroup } from '../../../components/input-group';
 import { Link } from '../../../components/link';
 import { useMessages } from '../../../localization';
-import type { SignInActionBlockedDetails } from '../sign-in.types';
-import { httpsUrl } from '../sign-in.utils';
+import type { AuthFlowActionBlockedDetails } from '../auth-flow.types';
+import { httpsUrl } from '../auth-flow.utils';
 
-interface SignInActionBlockedProps {
-  details?: SignInActionBlockedDetails;
+interface ActionBlockedNoticeProps {
+  details?: AuthFlowActionBlockedDetails;
 }
 
-export function SignInActionBlocked({ details }: SignInActionBlockedProps) {
+export function ActionBlockedNotice({ details }: ActionBlockedNoticeProps) {
   const m = useMessages('signIn').actionBlocked;
   const href = httpsUrl(details?.linkUrl);
 

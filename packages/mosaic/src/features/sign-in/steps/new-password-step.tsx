@@ -12,7 +12,7 @@ import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles } from '../sign-in.styles';
+import { styles } from '../../auth-flow/auth-flow.styles';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface NewPasswordStepProps {

@@ -5,7 +5,7 @@ import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { useMessages } from '../../../localization';
-import { SignInIdentityPreview } from './sign-in-identity-preview';
+import { IdentityPreview } from '../../auth-flow/steps/identity-preview';
 
 interface SignInPasskeyProps {
   identifier?: string;
@@ -37,7 +37,7 @@ export function SignInPasskey({
         <Card.Title>{m.passkey.title}</Card.Title>
         <Card.Description>{m.passkey.description}</Card.Description>
         {identifier ? (
-          <SignInIdentityPreview
+          <IdentityPreview
             identifier={identifier}
             editLabel={m.editIdentifier}
             disabled={isPending}

@@ -3,12 +3,12 @@ import type { Ref } from 'react';
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type {
-  SignInActionBlockedDetails,
-  SignInEmailLinkStatus,
-  SignInProvider,
-  SignInSubmitEvent,
-  SignInValues,
-} from '../sign-in';
+  AuthFlowActionBlockedDetails,
+  AuthFlowEmailLinkStatus,
+  AuthFlowProvider,
+  AuthFlowSubmitEvent,
+  AuthFlowValues,
+} from '../auth-flow/auth-flow.types';
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
 
@@ -28,25 +28,25 @@ export interface SignUpDetails {
 
 export type SignUpStep =
   | ({ kind: 'details'; purpose: 'start' | 'continue' } & SignUpDetails)
-  | { kind: 'alternative-phone'; channel: SignInProvider; legalConsent?: SignUpLegalConsent }
+  | { kind: 'alternative-phone'; channel: AuthFlowProvider; legalConsent?: SignUpLegalConsent }
   | { kind: 'code'; purpose: 'verify-email' | 'verify-phone'; identifier: string; provider?: string }
-  | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly SignInProvider[] }
+  | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly AuthFlowProvider[] }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
-  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus }
+  | { kind: 'notice'; purpose: 'email-link-status'; status: AuthFlowEmailLinkStatus }
   | { kind: 'notice'; purpose: 'restricted' | 'waitlist' | 'loading' }
   | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
-  | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails };
+  | { kind: 'notice'; purpose: 'action-blocked'; details?: AuthFlowActionBlockedDetails };
 
-export type SignUpValues = SignInValues;
+export type SignUpValues = AuthFlowValues;
 
-export type SignUpSubmitEvent = SignInSubmitEvent;
+export type SignUpSubmitEvent = AuthFlowSubmitEvent;
 
 export interface SignUpViewProps {
   step: SignUpStep;
   direction?: FlowDirection;
   applicationName: string;
   applicationLogoUrl?: string;
-  socialProviders: readonly SignInProvider[];
+  socialProviders: readonly AuthFlowProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   form: UseFormResult<SignUpValues>;

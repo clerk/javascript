@@ -2,16 +2,16 @@ import { Card } from '../../../components/card';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
-import { styles } from '../sign-in.styles';
-import type { SignInStep } from '../sign-in.types';
-import { emailLinkStatusCopy } from '../sign-in.utils';
+import { styles } from '../auth-flow.styles';
+import type { AuthFlowEmailLinkState } from '../auth-flow.types';
+import { emailLinkStatusCopy } from '../auth-flow.utils';
 
-interface SignInEmailLinkStatusProps {
-  step: Extract<SignInStep, { purpose: 'email-link-status' }>;
+interface EmailLinkStatusNoticeProps {
+  step: AuthFlowEmailLinkState;
   globalErrorMessage?: string;
 }
 
-export function SignInEmailLinkStatus({ step, globalErrorMessage }: SignInEmailLinkStatusProps) {
+export function EmailLinkStatusNotice({ step, globalErrorMessage }: EmailLinkStatusNoticeProps) {
   const m = useMessages('signIn');
   const copy = emailLinkStatusCopy(step, m);
 

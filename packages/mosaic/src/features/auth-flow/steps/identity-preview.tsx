@@ -5,16 +5,16 @@ import { Card } from '../../../components/card';
 import { Icon } from '../../../components/icon';
 import { Pen } from '../../../icons/glyphs/pen';
 import { truncationStyles } from '../../../styles/typography.styles';
-import { styles } from '../sign-in.styles';
+import { styles } from '../auth-flow.styles';
 
-interface SignInIdentityPreviewProps {
+interface IdentityPreviewProps {
   identifier: string;
   editLabel: string;
   disabled?: boolean;
   onEdit?: () => void;
 }
 
-export function SignInIdentityPreview({ identifier, editLabel, disabled = false, onEdit }: SignInIdentityPreviewProps) {
+export function IdentityPreview({ identifier, editLabel, disabled = false, onEdit }: IdentityPreviewProps) {
   return (
     <Card.Description xstyle={styles.identity}>
       <span {...stylex.props(styles.identityText, truncationStyles.singleLine)}>{identifier}</span>
