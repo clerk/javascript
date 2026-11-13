@@ -1,18 +1,57 @@
 export type ComponentStatus = 'available' | 'in-progress' | 'not-yet';
 
-export type ComponentRow = { stable: string; beta: string | null; status: ComponentStatus };
+export type ComponentRow = {
+  stable: string;
+  beta: string | null;
+  status: ComponentStatus;
+  renamedTo?: string;
+  notes?: string;
+};
 
 export const COMPONENT_STATUS: ComponentRow[] = [
-  { stable: 'UserButton', beta: 'UserButton', status: 'available' },
-  { stable: 'UserProfile', beta: 'UserProfile', status: 'available' },
+  {
+    stable: 'UserButton',
+    beta: 'UserButton',
+    status: 'available',
+    renamedTo: 'Switcher',
+    notes:
+      '`mode` is now `combined`, and profile props and URLs move to `MosaicProvider`. No `href` link items in `customPages`.',
+  },
+  {
+    stable: 'UserProfile',
+    beta: 'UserProfile',
+    status: 'available',
+    notes: 'No path or hash routing yet, so URLs don’t update. `defaultPage` is removed; use `pageOrder`.',
+  },
   { stable: 'UserAvatar', beta: 'UserAvatar', status: 'available' },
-  { stable: 'OrganizationSwitcher', beta: 'OrganizationSwitcher', status: 'available' },
-  { stable: 'OrganizationProfile', beta: 'OrganizationProfile', status: 'available' },
-  { stable: 'SignIn', beta: 'SignIn', status: 'in-progress' },
+  {
+    stable: 'OrganizationSwitcher',
+    beta: 'OrganizationSwitcher',
+    status: 'available',
+    notes:
+      'Profile props and URLs move to `MosaicProvider`. `afterLeaveOrganizationUrl` moves to `profile.organizationProfileProps`.',
+  },
+  {
+    stable: 'OrganizationProfile',
+    beta: 'OrganizationProfile',
+    status: 'available',
+    notes: 'No path or hash routing yet, so URLs don’t update. `defaultPage` is removed; use `pageOrder`.',
+  },
+  {
+    stable: 'SignIn',
+    beta: 'SignIn',
+    status: 'in-progress',
+    notes: 'Screens are built but not yet available as a drop-in component.',
+  },
   { stable: 'CreateOrganization', beta: 'CreateOrganization', status: 'in-progress' },
   { stable: 'OrganizationList', beta: 'OrganizationList', status: 'in-progress' },
   { stable: 'Waitlist', beta: 'Waitlist', status: 'in-progress' },
-  { stable: 'APIKeys', beta: 'APIKeys', status: 'in-progress' },
+  {
+    stable: 'APIKeys',
+    beta: 'APIKeys',
+    status: 'in-progress',
+    notes: 'Only inside the `UserProfile` and `OrganizationProfile` API keys pages for now.',
+  },
   { stable: 'OAuthConsent', beta: 'OAuthConsent', status: 'in-progress' },
   { stable: 'TaskChooseOrganization', beta: 'TaskChooseOrganization', status: 'in-progress' },
   { stable: 'TaskSetupMFA', beta: 'TaskSetupMFA', status: 'in-progress' },

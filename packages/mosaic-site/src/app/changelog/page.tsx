@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { HomeHeader } from '@/components/marketing/home-header';
 import { SiteFooter } from '@/components/marketing/site-footer';
 import { Container } from '@/components/ui/container';
+import { InlineCode } from '@/components/ui/inline-code';
 import { CHANGELOG } from '@/lib/changelog';
 
 export const metadata: Metadata = {
@@ -81,20 +82,5 @@ export default function ChangelogPage() {
       </Container>
       <SiteFooter />
     </main>
-  );
-}
-
-function InlineCode({ text }: { text: string }) {
-  return text.split('`').map((part, i) =>
-    i % 2 ? (
-      <code
-        key={i}
-        className='code-inline'
-      >
-        {part}
-      </code>
-    ) : (
-      part
-    ),
   );
 }

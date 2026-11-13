@@ -1,6 +1,7 @@
 import { ClerkUILogo } from '@/components/marketing/clerk-logo';
 import { Badge, type BadgeTone } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
+import { InlineCode } from '@/components/ui/inline-code';
 import { COMPONENT_STATUS, type ComponentStatus } from '@/lib/component-status';
 
 const STATUS: Record<ComponentStatus, { label: string; tone: BadgeTone }> = {
@@ -27,7 +28,7 @@ export function ComponentStatusTable() {
           components.
         </p>
         <div className='mt-8 overflow-x-auto'>
-          <table className='w-full min-w-[32rem] text-left'>
+          <table className='w-full min-w-[56rem] text-left'>
             <thead>
               <tr className='border-border body-3 border-b text-gray-500 dark:text-gray-400'>
                 <th
@@ -45,7 +46,7 @@ export function ComponentStatusTable() {
                       aria-hidden='true'
                       className='h-4'
                     />
-                    <Badge tone='beta'>Beta</Badge>
+                    <Badge tone='purple'>Beta</Badge>
                     <span className='sr-only'>Clerk UI beta</span>
                   </span>
                 </th>
@@ -55,6 +56,12 @@ export function ComponentStatusTable() {
                 >
                   Status
                 </th>
+                <th
+                  scope='col'
+                  className='w-[30%] py-3 pl-4 font-normal'
+                >
+                  Notes
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -63,19 +70,33 @@ export function ComponentStatusTable() {
                   key={row.stable}
                   className='border-border label-3 border-b'
                 >
-                  <td className='py-3 pr-4'>
+                  <td className='py-3 pr-4 text-neutral-600 dark:text-neutral-400'>
                     <code className='code-inline'>{`<${row.stable} />`}</code>
                   </td>
                   <td className='bg-foreground/[0.04] text-foreground px-4 py-3'>
-                    {row.beta ? <code className='code-inline'>{`<${row.beta} />`}</code> : '—'}
+                    {row.beta && row.renamedTo ? (
+                      <>
+                        <s>
+                          <code className='code-inline'>{`<${row.beta} />`}</code>
+                        </s>{' '}
+                        renamed <code className='code-inline'>{`<${row.renamedTo} />`}</code>
+                      </>
+                    ) : row.beta ? (
+                      <code className='code-inline'>{`<${row.beta} />`}</code>
+                    ) : (
+                      '—'
+                    )}
                   </td>
-                  <td className='py-3 pl-4'>
+                  <td className='whitespace-nowrap py-3 pl-4'>
                     <Badge
                       tone={STATUS[row.status].tone}
                       className='w-fit'
                     >
                       {STATUS[row.status].label}
                     </Badge>
+                  </td>
+                  <td className='body-3 min-w-[16rem] py-3 pl-4 text-neutral-600 dark:text-neutral-400'>
+                    {row.notes && <InlineCode text={row.notes} />}
                   </td>
                 </tr>
               ))}
