@@ -1,6 +1,7 @@
 export { type ComboboxProps, ComboboxRoot as Root } from './combobox-root';
 export { type ComboboxCollectionProps, ComboboxCollection as Collection } from './combobox-collection';
 export { type ComboboxInputProps, ComboboxInput as Input } from './combobox-input';
+export { type ComboboxInputGroupProps, ComboboxInputGroup as InputGroup } from './combobox-input-group';
 export { type ComboboxClearProps, ComboboxClear as Clear } from './combobox-clear';
 export { type ComboboxTriggerProps, ComboboxTrigger as Trigger } from './combobox-trigger';
 export { type ComboboxPortalProps, ComboboxPortal as Portal } from './combobox-portal';

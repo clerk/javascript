@@ -4,6 +4,7 @@ export type {
   ComboboxArrowProps,
   ComboboxClearProps,
   ComboboxEmptyProps,
+  ComboboxInputGroupProps,
   ComboboxInputProps,
   ComboboxListProps,
   ComboboxOptionProps,
