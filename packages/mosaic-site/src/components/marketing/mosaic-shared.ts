@@ -32,8 +32,8 @@ export const PALETTE_TOKENS: Record<Mode, Record<keyof Palette, [string, string]
   },
 };
 
-function readColor(context: CanvasRenderingContext2D, [token, fallback]: [string, string]): Rgb {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+function readColor(context: CanvasRenderingContext2D, [token, fallback]: [string, string], from: Element): Rgb {
+  const value = getComputedStyle(from).getPropertyValue(token).trim();
   context.clearRect(0, 0, 1, 1);
   context.fillStyle = value || fallback;
   context.fillRect(0, 0, 1, 1);
@@ -41,7 +41,7 @@ function readColor(context: CanvasRenderingContext2D, [token, fallback]: [string
   return [r / 255, g / 255, b / 255];
 }
 
-export function readPalette(mode: Mode): Palette | null {
+export function readPalette(mode: Mode, from?: Element): Palette | null {
   if (typeof document === 'undefined') {
     return null;
   }
@@ -53,13 +53,14 @@ export function readPalette(mode: Mode): Palette | null {
     return null;
   }
   const tokens = PALETTE_TOKENS[mode];
+  const root = from ?? document.documentElement;
   return {
-    tileLow: readColor(context, tokens.tileLow),
-    tileHigh: readColor(context, tokens.tileHigh),
-    logoLow: readColor(context, tokens.logoLow),
-    logoHigh: readColor(context, tokens.logoHigh),
-    logoTint: readColor(context, tokens.logoTint),
-    page: readColor(context, tokens.page),
+    tileLow: readColor(context, tokens.tileLow, root),
+    tileHigh: readColor(context, tokens.tileHigh, root),
+    logoLow: readColor(context, tokens.logoLow, root),
+    logoHigh: readColor(context, tokens.logoHigh, root),
+    logoTint: readColor(context, tokens.logoTint, root),
+    page: readColor(context, tokens.page, root),
   };
 }
 
@@ -73,12 +74,14 @@ export const FALLBACK_PALETTE: Palette = {
 };
 
 const BELOW_HEADLINE = 160;
+export const FOCUS_SIZE = 256;
 
 export function useSceneLayout(ref: React.RefObject<HTMLDivElement | null>) {
   const [height, setHeight] = React.useState<number | null>(null);
   const [focus, setFocus] = React.useState<Focus>({ x: 0, y: 0 });
   const [textBox, setTextBox] = React.useState<TextBox>([0, 0, 0, 0]);
   const [width, setWidth] = React.useState(0);
+  const [scale, setScale] = React.useState(1);
   React.useEffect(() => {
     const scene = ref.current;
     const section = scene?.parentElement;
@@ -94,6 +97,7 @@ export function useSceneLayout(ref: React.RefObject<HTMLDivElement | null>) {
       if (focusBox) {
         const box = focusBox.getBoundingClientRect();
         setFocus({ x: box.left + box.width / 2 - sceneRect.left, y: box.top + box.height / 2 - sceneRect.top });
+        setScale(box.width / FOCUS_SIZE);
       } else {
         setFocus({ x: sceneRect.width / 2, y: sceneRect.height / 3 });
       }
@@ -123,5 +127,5 @@ export function useSceneLayout(ref: React.RefObject<HTMLDivElement | null>) {
     observer.observe(headline);
     return () => observer.disconnect();
   }, [ref]);
-  return { height, focus, textBox, width };
+  return { height, focus, textBox, width, scale };
 }

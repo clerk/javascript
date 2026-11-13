@@ -242,6 +242,8 @@ export async function bakeScene({
   width,
   height,
   focus,
+  focusSize,
+  target,
   settings,
 }: {
   source: string;
@@ -249,8 +251,11 @@ export async function bakeScene({
   width: number;
   height: number;
   focus: { x: number; y: number };
+  focusSize: number;
+  target: 'desktop' | 'mobile';
   settings: Record<string, number>;
 }) {
+  const suffix = target === 'mobile' ? '-mobile' : '';
   const view = { ...uniforms, u_view: { type: 'uniform1i', value: 0 } } as Uniforms;
   const mask = renderPass(source, { ...view, u_bake: { type: 'uniform1i', value: 1 } }, width, height);
   const box = bounds(mask);
@@ -270,10 +275,10 @@ export async function bakeScene({
     [0, 3],
   );
   const written = [
-    await upload('mask.webp', maskImage, 2),
-    await upload('surface.webp', crop(surface, box, [0, 1, 2, 3]), 4),
-    await upload('skeleton.webp', skeletonImage, 2),
-    await upload('reveal.webp', revealTextures(maskImage, skeletonImage), 3),
+    await upload(`mask${suffix}.webp`, maskImage, 2),
+    await upload(`surface${suffix}.webp`, crop(surface, box, [0, 1, 2, 3]), 4),
+    await upload(`skeleton${suffix}.webp`, skeletonImage, 2),
+    await upload(`reveal${suffix}.webp`, revealTextures(maskImage, skeletonImage), 3),
   ];
   const meta = {
     version: Date.now(),
@@ -282,9 +287,13 @@ export async function bakeScene({
     height: (box.bottom - box.y) / BAKE_SCALE,
     offsetX: box.x / BAKE_SCALE - MARGIN - focus.x,
     offsetY: box.y / BAKE_SCALE - MARGIN - focus.y,
+    focusSize,
     settings,
   };
-  const response = await fetch('/api/scene-bake?file=meta', { method: 'POST', body: JSON.stringify(meta, null, 2) });
+  const response = await fetch(`/api/scene-bake?file=meta${suffix}`, {
+    method: 'POST',
+    body: JSON.stringify(meta, null, 2),
+  });
   if (!response.ok) {
     throw new Error(await response.text());
   }

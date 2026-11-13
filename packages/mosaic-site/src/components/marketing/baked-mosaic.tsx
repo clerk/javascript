@@ -3,11 +3,13 @@ import { useMotionValue, useSpring } from 'motion/react';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 
-import bake from '@/components/marketing/mosaic-bake.json';
+import desktopBake from '@/components/marketing/mosaic-bake.json';
+import mobileBake from '@/components/marketing/mosaic-bake-mobile.json';
 import {
   BAKE_BLUR,
   BAKE_EDGE_MAX,
   FALLBACK_PALETTE,
+  FOCUS_SIZE,
   type Palette,
   readPalette,
   useSceneLayout,
@@ -24,12 +26,29 @@ import {
 import { Shader, type Uniforms } from '@/components/shader';
 import { type Mode, useMode } from '@/components/use-mode';
 
-export const MOSAIC_MASK_URL = `/mosaic/mask.webp?v=${bake.version}`;
-export const MOSAIC_SURFACE_URL = `/mosaic/surface.webp?v=${bake.version}`;
-export const MOSAIC_SKELETON_URL = `/mosaic/skeleton.webp?v=${bake.version}`;
-const MOSAIC_REVEAL_URL = `/mosaic/reveal.webp?v=${bake.version}`;
+type Bake = typeof desktopBake;
+type Variant = 'desktop' | 'mobile';
 
-const TEXTURES = [MOSAIC_SURFACE_URL, MOSAIC_MASK_URL, MOSAIC_SKELETON_URL, MOSAIC_REVEAL_URL];
+const BAKES: Record<Variant, Bake> = { desktop: desktopBake, mobile: mobileBake };
+const SUFFIX: Record<Variant, string> = { desktop: '', mobile: '-mobile' };
+const MOBILE_QUERY = '(max-width: 639px)';
+
+const bakeUrl = (variant: Variant, name: string) =>
+  `/mosaic/${name}${SUFFIX[variant]}.webp?v=${BAKES[variant].version}`;
+
+export const MOSAIC_SKELETON_URL = bakeUrl('desktop', 'skeleton');
+export const MOSAIC_SKELETON_MOBILE_URL = bakeUrl('mobile', 'skeleton');
+
+const TEXTURES: Record<Variant, string[]> = {
+  desktop: ['surface', 'mask', 'skeleton', 'reveal'].map(name => bakeUrl('desktop', name)),
+  mobile: ['surface', 'mask', 'skeleton', 'reveal'].map(name => bakeUrl('mobile', name)),
+};
+
+function visibleSkeleton() {
+  return [...document.querySelectorAll<HTMLElement>('.mosaic-skeleton')].find(
+    element => element.getClientRects().length > 0,
+  );
+}
 
 type Reveal = {
   duration: number;
@@ -131,21 +150,27 @@ type Sheen = {
   base: number;
   edge: number;
   glint: number;
+  lightStrength: number;
+  lightTint: number;
+  darkStrength: number;
 };
 
 const SHEEN_DEFAULTS: Sheen = {
-  sheen: bake.settings.sheen,
-  scale: bake.settings.sheenScale,
-  octaves: 5,
+  sheen: 0.135,
+  scale: 675,
+  octaves: 4,
   drift: 3.8,
   hueSpread: 2.4,
   flow: 4.2,
   warp: 540,
-  angle: bake.settings.sheenAngle,
-  fresnelHue: 0,
-  base: bake.settings.sheenBase,
-  edge: bake.settings.sheenEdge,
-  glint: bake.settings.sheenGlint,
+  angle: 0,
+  fresnelHue: 1.5,
+  base: 1.5,
+  edge: 3,
+  glint: 0,
+  lightStrength: 0.5,
+  lightTint: 0.6,
+  darkStrength: 0.5,
 };
 
 const SHEEN_SLIDERS: Array<{ key: keyof Sheen; min: number; max: number; step: number }> = [
@@ -161,10 +186,47 @@ const SHEEN_SLIDERS: Array<{ key: keyof Sheen; min: number; max: number; step: n
   { key: 'base', min: 0, max: 4, step: 0.05 },
   { key: 'edge', min: 0, max: 8, step: 0.05 },
   { key: 'glint', min: 0, max: 2, step: 0.01 },
+  { key: 'lightStrength', min: 0, max: 1, step: 0.01 },
+  { key: 'lightTint', min: 0, max: 1, step: 0.01 },
+  { key: 'darkStrength', min: 0, max: 1, step: 0.01 },
 ];
 
 const SHOW_REVEAL_PANEL = false;
 const SHOW_SHEEN_PANEL = false;
+
+type Sway = { x: number; y: number; speed: number; detail: number; glint: number; size: number };
+
+const SWAY_DEFAULTS: Sway = { x: 0.2, y: 160, speed: 0.1, detail: 0.5, glint: 0.05, size: 12 };
+
+const SWAY_SLIDERS: Array<{ key: keyof Sway; min: number; max: number; step: number }> = [
+  { key: 'x', min: 0, max: 0.2, step: 0.005 },
+  { key: 'y', min: 0, max: 200, step: 1 },
+  { key: 'speed', min: 0, max: 1, step: 0.005 },
+  { key: 'detail', min: 0, max: 1, step: 0.01 },
+  { key: 'glint', min: 0, max: 0.3, step: 0.005 },
+  { key: 'size', min: 2, max: 60, step: 0.5 },
+];
+
+const SHOW_SWAY_PANEL = false;
+const SWAY_FRAME_MS = 32;
+
+function noiseHash(n: number) {
+  const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+  return (x - Math.floor(x)) * 2 - 1;
+}
+
+function gradientNoise(t: number, seed: number) {
+  const i = Math.floor(t);
+  const f = t - i;
+  const u = f * f * f * (f * (f * 6 - 15) + 10);
+  const a = noiseHash(i + seed) * f;
+  const b = noiseHash(i + 1 + seed) * (f - 1);
+  return (a + (b - a) * u) * 2;
+}
+
+function swayNoise(t: number, seed: number, detail: number) {
+  return (gradientNoise(t, seed) + detail * gradientNoise(t * 2.13 + 7.7, seed + 31)) / (1 + detail);
+}
 const SWEEP_MS = 1800;
 const MIN_SWEEPS = 1.5;
 
@@ -180,8 +242,7 @@ function markReady() {
     return;
   }
   loaded = true;
-  const sweep = document
-    .querySelector('.mosaic-skeleton')
+  const sweep = visibleSkeleton()
     ?.getAnimations({ subtree: true })
     .find(animation => animation instanceof CSSAnimation && animation.animationName === 'mosaic-skeleton-sweep');
   const elapsed = typeof sweep?.currentTime === 'number' ? sweep.currentTime : null;
@@ -208,27 +269,55 @@ function useMosaicReady() {
   );
 }
 
-const SKELETON_MASK = `url("${MOSAIC_SKELETON_URL}")`;
+const SKELETON_FADE_MS = 300;
 
-export function MosaicSkeleton() {
-  const shown = !useMosaicReady();
+function skeletonFade(start: number | null) {
+  if (start === null) {
+    return 0;
+  }
+  const t = Math.min(1, Math.max(0, (performance.now() - start) / SKELETON_FADE_MS));
+  return 1 - (1 - t) * (1 - t);
+}
+
+function SkeletonLayer({ variant, shown, className }: { variant: Variant; shown: boolean; className: string }) {
+  const bake = BAKES[variant];
+  const focusSize = bake.focusSize;
+  const mask = `url("${bakeUrl(variant, 'skeleton')}")`;
   return (
     <div
       aria-hidden='true'
-      className='mosaic-skeleton dark:bg-gray-850 bg-gray-150 pointer-events-none absolute -z-10 transition-opacity duration-300 ease-out'
+      className={`mosaic-skeleton dark:bg-gray-850 bg-gray-150 pointer-events-none absolute -z-10 transition-opacity duration-300 ease-out ${className}`}
       style={{
-        left: `calc(50% + ${bake.offsetX}px)`,
-        top: `calc(50% + ${bake.offsetY}px)`,
-        width: bake.width,
-        height: bake.height,
-        maskImage: SKELETON_MASK,
-        WebkitMaskImage: SKELETON_MASK,
+        left: `${50 + (bake.offsetX / focusSize) * 100}%`,
+        top: `${50 + (bake.offsetY / focusSize) * 100}%`,
+        width: `${(bake.width / focusSize) * 100}%`,
+        height: `${(bake.height / focusSize) * 100}%`,
+        maskImage: mask,
+        WebkitMaskImage: mask,
         maskSize: '100% 100%',
         WebkitMaskSize: '100% 100%',
         opacity: shown ? 1 : 0,
         ['--mosaic-sweep' as string]: `${SWEEP_MS}ms`,
       }}
     />
+  );
+}
+
+export function MosaicSkeleton() {
+  const shown = !useMosaicReady();
+  return (
+    <>
+      <SkeletonLayer
+        variant='desktop'
+        shown={shown}
+        className='max-sm:hidden'
+      />
+      <SkeletonLayer
+        variant='mobile'
+        shown={shown}
+        className='sm:hidden'
+      />
+    </>
   );
 }
 
@@ -265,9 +354,21 @@ uniform float u_light_z;
 uniform float u_camera;
 uniform float u_diffuse;
 uniform float u_shadow;
+uniform float u_edge_light;
+uniform float u_falloff;
+uniform float u_falloff_reach;
+uniform float u_add_glow;
+uniform float u_add_catch;
+uniform float u_add_tone;
 uniform float u_specular;
 uniform float u_spec_size;
+uniform float u_sway_glint;
+uniform float u_sheen_light;
+uniform float u_sheen_light_tint;
+uniform float u_sheen_dark;
+uniform float u_sway_size;
 uniform float u_fresnel;
+uniform float u_highlight;
 uniform float u_fresnel_power;
 uniform float u_rim;
 uniform float u_prism;
@@ -315,6 +416,7 @@ uniform float u_wave_width;
 uniform float u_wave_amp;
 uniform float u_wave_film;
 uniform vec3 u_skeleton_color;
+uniform float u_skeleton_fade;
 
 const float TAU = 6.28318530718;
 const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
@@ -419,7 +521,10 @@ void main() {
 
     vec3 toEye = normalize(vec3(vec2(u_center_x, u_center_y) - scene, max(u_camera, 1.0)));
     float lit = u_diffuse * (max(dot(surface, toLight), 0.0) - max(toLight.z, 0.0));
-    float shade = 1.0 + (lit < 0.0 ? lit * u_shadow : lit);
+    float shade = 1.0 + (lit < 0.0 ? lit * u_shadow : lit * u_edge_light);
+    vec2 lightPoint = vec2(u_light_x * u_scene_w, -u_light_y);
+    float falloffT = clamp((length(scene - lightPoint) - u_light_y) / max(u_falloff_reach, 1.0), 0.0, 1.0);
+    shade *= mix(1.0 + u_falloff, 1.0 - u_falloff, falloffT);
     vec3 halfway = normalize(toLight + toEye);
     float spread = acos(clamp(dot(surface, halfway), -1.0, 1.0)) / max(radians(u_spec_size), 0.001);
     float glint = exp(-spread * spread) * u_specular;
@@ -427,7 +532,10 @@ void main() {
     float fresnel = pow(1.0 - facing, u_fresnel_power) * u_fresnel;
     vec3 reflected = reflect(-toEye, surface);
     float sky = mix(1.0 - u_rim, 1.0, smoothstep(0.0, 0.6, -reflected.y));
-    color = albedo * shade + vec3(glint + fresnel * sky);
+    color = albedo * shade + vec3(glint + fresnel * sky) * u_highlight;
+    color += vec3(u_add_glow * (1.0 - falloffT) + u_add_catch * (dot(surface, toLight) - toLight.z) * smoothstep(0.6, 0.9, thick) + u_add_tone * (tone - 0.5));
+    float swaySpread = acos(clamp(dot(surface, halfway), -1.0, 1.0)) / max(radians(u_sway_size), 0.001);
+    color += exp(-swaySpread * swaySpread) * u_sway_glint;
 
     float sheenReveal = u_sheen > 0.0 ? trailReveal(at) : 0.0;
     if (sheenReveal > 0.0) {
@@ -441,7 +549,10 @@ void main() {
       float trailGlint = pow(max(dot(surface, normalize(toTrail + vec3(0.0, 0.0, 1.0))), 0.0), 88.0);
       float sheenBand = (1.0 - thick) * (1.0 - thick);
       float sheenAmount = sheenReveal * u_sheen * (u_sheen_base + u_sheen_edge * sheenBand + 0.24 * trailGlint);
-      color += sheenFilm * sheenAmount + vec3(trailGlint * sheenReveal * u_sheen_glint);
+      float sheenModeScale = mix(u_sheen_dark, u_sheen_light, u_film_light);
+      vec3 sheenChroma = sheenFilm - vec3(dot(sheenFilm, vec3(0.333)));
+      vec3 sheenColor = mix(sheenFilm, sheenChroma, u_sheen_light_tint * u_film_light);
+      color += (sheenColor * sheenAmount + vec3(trailGlint * sheenReveal * u_sheen_glint)) * sheenModeScale;
     }
 
     if (u_prism > 0.0) {
@@ -463,7 +574,7 @@ void main() {
   }
 
   vec4 glass = vec4(color * alpha, alpha + shadow * (1.0 - alpha));
-  vec4 skeleton = vec4(u_skeleton_color * skeletonAlpha, skeletonAlpha);
+  vec4 skeleton = vec4(u_skeleton_color * skeletonAlpha, skeletonAlpha) * u_skeleton_fade;
   float revealed = u_reveal >= 0.9999 ? 1.0 : smoothstep(u_edge, -u_edge, k) * step(0.0001, u_reveal);
   outColor = mix(skeleton, glass, revealed);
   if (pulse > 0.001) {
@@ -498,6 +609,7 @@ function buildUniforms(
   sceneWidth: number,
   reveal: Reveal,
   sheen: Sheen,
+  bake: Bake,
 ): Uniforms {
   const cx = reveal.originX * bake.width;
   const cy = reveal.originY * bake.height;
@@ -538,12 +650,21 @@ function buildUniforms(
     u_camera: f(s.camera),
     u_diffuse: f(s.diffuse),
     u_shadow: f(light ? s.lmShadow : 1),
+    u_edge_light: f(light ? 1 : (s.dmEdge ?? 1)),
+    u_falloff: f(light ? (s.lmFalloff ?? 0) : (s.dmFalloff ?? 0)),
+    u_falloff_reach: f(s.falloffReach ?? 700),
+    u_add_glow: f(light ? 0 : (s.dmGlow ?? 0)),
+    u_add_catch: f(light ? 0 : (s.dmCatch ?? 0)),
+    u_add_tone: f(light ? 0 : (s.dmTone ?? 0)),
     u_specular: f(s.specular),
     u_spec_size: f(s.specSize),
+    u_sway_glint: f(SWAY_DEFAULTS.glint),
+    u_sway_size: f(SWAY_DEFAULTS.size),
     u_fresnel: f(s.fresnel),
+    u_highlight: f(s.highlight ?? 1),
     u_fresnel_power: f(s.fresnelPower),
     u_rim: f(s.rim),
-    u_prism: f(s.prism),
+    u_prism: f(s.prism * (light ? 1 : (s.dmPrism ?? 1))),
     u_prism_width: f(s.prismWidth),
     u_prism_spread: f(s.prismSpread),
     u_prism_side: f(s.prismSide),
@@ -553,6 +674,7 @@ function buildUniforms(
     u_reveal: f(0),
     u_front: f(0),
     u_skeleton_color: v(palette.tileLow),
+    u_skeleton_fade: f(0),
     u_reveal_max: f(revealMax),
     u_reveal_max_linear: f(linearMax),
     u_linear_offset: f(linearOffset),
@@ -571,6 +693,9 @@ function buildUniforms(
     u_grow: f(reveal.grow),
     u_gap_glow: f(reveal.gapGlow),
     u_sheen: f(sheen.sheen),
+    u_sheen_light: f(sheen.lightStrength),
+    u_sheen_light_tint: f(sheen.lightTint),
+    u_sheen_dark: f(sheen.darkStrength),
     u_sheen_scale: f(sheen.scale),
     u_sheen_angle: f(sheen.angle),
     u_sheen_warp: f(sheen.warp),
@@ -751,21 +876,45 @@ function useLightSpring(ref: React.RefObject<HTMLDivElement | null>, enabled: bo
 
 export function BakedMosaic() {
   const sceneRef = React.useRef<HTMLDivElement>(null);
-  const { height, focus, width } = useSceneLayout(sceneRef);
+  const { height, focus, width, scale: tierScale } = useSceneLayout(sceneRef);
+  const [variant, setVariant] = React.useState<Variant | null>(null);
+  React.useEffect(() => {
+    const query = window.matchMedia(MOBILE_QUERY);
+    const update = () => setVariant(query.matches ? 'mobile' : 'desktop');
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  const bake = BAKES[variant ?? 'desktop'];
+  const scale = (tierScale * FOCUS_SIZE) / bake.focusSize;
   const isReady = useMosaicReady();
   const mode = useMode();
   const palette = React.useMemo(() => readPalette(mode) ?? FALLBACK_PALETTE, [mode]);
   const settings = bake.settings as Record<string, number>;
-  const origin: [number, number] = [focus.x + bake.offsetX, focus.y + bake.offsetY];
-  const center: [number, number] = [focus.x, focus.y + settings.logoSize * settings.logoY];
+  const origin: [number, number] = [focus.x + bake.offsetX * scale, focus.y + bake.offsetY * scale];
+  const center: [number, number] = [focus.x, focus.y + settings.logoSize * settings.logoY * scale];
   const skeletonColorRef = React.useRef<[number, number, number]>(palette.tileLow);
   React.useEffect(() => {
-    const element = document.querySelector('.mosaic-skeleton');
+    const element = visibleSkeleton();
     const parsed = element ? parseRgb(getComputedStyle(element).backgroundColor) : null;
     skeletonColorRef.current = parsed ?? palette.tileLow;
   }, [mode, palette]);
   const [reveal, setReveal] = React.useState(REVEAL_DEFAULTS);
   const [sheen, setSheen] = React.useState(SHEEN_DEFAULTS);
+  const [sway, setSway] = React.useState(SWAY_DEFAULTS);
+  const visibleRef = React.useRef(true);
+  const swayFrameRef = React.useRef(0);
+  React.useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) {
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      visibleRef.current = entry.isIntersecting;
+    });
+    observer.observe(scene);
+    return () => observer.disconnect();
+  }, []);
   const mounted = React.useSyncExternalStore(
     subscribeNothing,
     () => true,
@@ -777,9 +926,9 @@ export function BakedMosaic() {
     }
   }, [reveal.scrub]);
   const uniforms = React.useMemo(
-    () => buildUniforms(palette, mode, origin, center, width, reveal, sheen),
+    () => buildUniforms(palette, mode, origin, center, width, reveal, sheen, bake),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [palette, mode, origin[0], origin[1], center[0], center[1], width, reveal, sheen],
+    [palette, mode, origin[0], origin[1], center[0], center[1], width, reveal, sheen, bake],
   );
   const pointerEffects = usePointerEffects(true);
   const canvasRef = React.useRef<HTMLDivElement>(null);
@@ -800,20 +949,59 @@ export function BakedMosaic() {
       u_reveal: { type: 'uniform1f', value: revealTime(startRef.current, reveal) },
       u_front: { type: 'uniform1f', value: revealFront(revealTime(startRef.current, reveal), reveal) },
       u_skeleton_color: { type: 'uniform3f', value: skeletonColorRef.current },
-      u_light_x: { type: 'uniform1f', value: lightX + (spring.get() - lightX) * follow },
+      u_skeleton_fade: { type: 'uniform1f', value: skeletonFade(startRef.current) },
+      ...(() => {
+        const t = (performance.now() / 1000) * sway.speed;
+        const swaying = pointerEffects && sway.speed > 0;
+        const dx = swaying ? swayNoise(t, 0, sway.detail) * sway.x : 0;
+        const dy = swaying ? swayNoise(t, 57, sway.detail) * sway.y : 0;
+        return {
+          u_light_x: { type: 'uniform1f', value: lightX + (spring.get() - lightX) * follow + dx },
+          u_light_y: { type: 'uniform1f', value: settings.lightY + dy },
+          u_sway_glint: { type: 'uniform1f', value: swaying ? sway.glint : 0 },
+          u_sway_size: { type: 'uniform1f', value: sway.size },
+        } satisfies Uniforms;
+      })(),
     }),
-    [reveal, spring, lightX, follow],
+    [reveal, spring, lightX, follow, sway, pointerEffects, settings.lightY],
   );
   const shouldRender = React.useCallback(() => {
     const start = startRef.current;
     const revealing =
       !reveal.scrub && start !== null && start !== -Infinity && performance.now() - start < reveal.duration + 100;
-    return (
+    if (
       revealing ||
       (pointerEffects && TRAIL_ENERGY_UNIFORM.value > 0.001) ||
       (pointerEffects && follow > 0 && spring.isAnimating())
-    );
-  }, [reveal, pointerEffects, follow, spring]);
+    ) {
+      return true;
+    }
+    const now = performance.now();
+    if (
+      pointerEffects &&
+      sway.speed > 0 &&
+      (sway.x > 0 || sway.y > 0) &&
+      visibleRef.current &&
+      now - swayFrameRef.current >= SWAY_FRAME_MS
+    ) {
+      swayFrameRef.current = now;
+      return true;
+    }
+    return false;
+  }, [reveal, pointerEffects, follow, spring, sway]);
+  const coarseRef = React.useRef(false);
+  React.useEffect(() => {
+    coarseRef.current = window.matchMedia('(pointer: coarse)').matches;
+  }, []);
+  const pixelRatio = React.useCallback(() => {
+    const full = Math.round(Math.max(1, Math.min(window.devicePixelRatio || 1, 2)));
+    if (!coarseRef.current) {
+      return full;
+    }
+    const start = startRef.current;
+    const settled = start === -Infinity || (start !== null && performance.now() - start >= reveal.duration + 100);
+    return settled ? full : 1;
+  }, [reveal]);
   React.useEffect(() => (pointerEffects ? startTrail() : undefined), [pointerEffects]);
   const onRender = React.useCallback(() => {
     markReady();
@@ -828,19 +1016,21 @@ export function BakedMosaic() {
       className='pointer-events-none absolute left-1/2 top-0 -z-10 h-[38rem] w-[min(96rem,100%)] -translate-x-1/2'
       style={height ? { height } : undefined}
     >
-      {height ? (
+      {height && variant ? (
         <div
           ref={canvasRef}
           className='absolute'
-          style={{ left: origin[0], top: origin[1], width: bake.width, height: bake.height }}
+          style={{ left: origin[0], top: origin[1], width: bake.width * scale, height: bake.height * scale }}
         >
           <Shader
+            key={variant}
             source={source}
             uniforms={uniforms}
-            textures={TEXTURES}
+            textures={TEXTURES[variant]}
             liveUniforms={liveUniforms}
             shouldRender={shouldRender}
             onRender={onRender}
+            pixelRatio={pixelRatio}
             premultiplied
           />
         </div>
@@ -874,6 +1064,114 @@ export function BakedMosaic() {
             document.body,
           )
         : null}
+      {SHOW_SWAY_PANEL && process.env.NODE_ENV === 'development' && mounted
+        ? createPortal(
+            <TweakPanel
+              title='Light sway'
+              values={sway}
+              defaults={SWAY_DEFAULTS}
+              sliders={SWAY_SLIDERS}
+              onChange={setSway}
+            />,
+            document.body,
+          )
+        : null}
+    </div>
+  );
+}
+
+function loopNoise(phase: number, steps: number, seed: number) {
+  const t = (((phase % 1) + 1) % 1) * steps;
+  const i = Math.floor(t);
+  const f = t - i;
+  const u = f * f * f * (f * (f * 6 - 15) + 10);
+  const a = noiseHash((i % steps) + seed) * f;
+  const b = noiseHash(((i + 1) % steps) + seed) * (f - 1);
+  return (a + (b - a) * u) * 2;
+}
+
+function loopSway(phase: number, steps: number, seed: number, detail: number) {
+  return (loopNoise(phase, steps, seed) + detail * loopNoise(phase, steps * 2, seed + 31)) / (1 + detail);
+}
+
+export type MosaicFrameProps = {
+  mode: Mode;
+  focus: { x: number; y: number };
+  scale: number;
+  sceneWidth: number;
+  loopMs: number;
+  swaySteps: number;
+  phaseRef?: React.RefObject<number | null>;
+};
+
+export function MosaicFrame({ mode, focus, scale, sceneWidth, loopMs, swaySteps, phaseRef }: MosaicFrameProps) {
+  const bake = BAKES.desktop;
+  const settings = bake.settings as Record<string, number>;
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const [palette, setPalette] = React.useState<Palette | null>(null);
+  React.useLayoutEffect(() => {
+    const host = rootRef.current?.parentElement;
+    setPalette((host && readPalette(mode, host)) ?? FALLBACK_PALETTE);
+  }, [mode]);
+  const origin: [number, number] = [focus.x + bake.offsetX * scale, focus.y + bake.offsetY * scale];
+  const center: [number, number] = [focus.x, focus.y + settings.logoSize * settings.logoY * scale];
+  const uniforms = React.useMemo(
+    () =>
+      palette ? buildUniforms(palette, mode, origin, center, sceneWidth, REVEAL_DEFAULTS, SHEEN_DEFAULTS, bake) : {},
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [palette, mode, origin[0], origin[1], center[0], center[1], sceneWidth, bake],
+  );
+  const lastRef = React.useRef<number | null>(null);
+  const liveUniforms = React.useCallback((): Uniforms => {
+    const phase = phaseRef?.current ?? (performance.now() % loopMs) / loopMs;
+    const dx = loopSway(phase, swaySteps, 0, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.x;
+    const dy = loopSway(phase, swaySteps, 57, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.y;
+    return {
+      u_reveal: { type: 'uniform1f', value: 1 },
+      u_front: { type: 'uniform1f', value: revealFront(1, REVEAL_DEFAULTS) },
+      u_skeleton_color: { type: 'uniform3f', value: (palette ?? FALLBACK_PALETTE).tileLow },
+      u_skeleton_fade: { type: 'uniform1f', value: 1 },
+      u_light_x: { type: 'uniform1f', value: settings.lightX + dx },
+      u_light_y: { type: 'uniform1f', value: settings.lightY + dy },
+      u_sway_glint: { type: 'uniform1f', value: SWAY_DEFAULTS.glint },
+      u_sway_size: { type: 'uniform1f', value: SWAY_DEFAULTS.size },
+    };
+  }, [phaseRef, loopMs, swaySteps, palette, settings.lightX, settings.lightY]);
+  const shouldRender = React.useCallback(() => {
+    const fixed = phaseRef?.current;
+    if (fixed !== null && fixed !== undefined) {
+      if (fixed === lastRef.current) {
+        return false;
+      }
+      lastRef.current = fixed;
+      return true;
+    }
+    const now = performance.now();
+    if (now - (lastRef.current ?? 0) < SWAY_FRAME_MS) {
+      return false;
+    }
+    lastRef.current = now;
+    return true;
+  }, [phaseRef]);
+  const pixelRatio = React.useCallback(() => Math.round(Math.max(1, Math.min(window.devicePixelRatio || 1, 2))), []);
+  return (
+    <div
+      ref={rootRef}
+      aria-hidden='true'
+      className='pointer-events-none absolute'
+      style={{ left: origin[0], top: origin[1], width: bake.width * scale, height: bake.height * scale }}
+    >
+      {palette ? (
+        <Shader
+          source={source}
+          uniforms={uniforms}
+          textures={TEXTURES.desktop}
+          liveUniforms={liveUniforms}
+          shouldRender={shouldRender}
+          pixelRatio={pixelRatio}
+          premultiplied
+        />
+      ) : null}
     </div>
   );
 }

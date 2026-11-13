@@ -8,6 +8,7 @@ import {
   BAKE_EDGE_MAX,
   FALLBACK_PALETTE,
   type Focus,
+  FOCUS_SIZE,
   type Palette,
   readPalette,
   type Rgb,
@@ -30,6 +31,7 @@ const MARKS = [
   { label: 'Original', stroke: 28, gap: 16, corner: 3 },
   { label: 'Loop gap', stroke: 32, gap: 8, corner: 4 },
   { label: 'Slit', stroke: 36, gap: 3, corner: 4 },
+  { label: 'Clerk symbol', stroke: 28, gap: 8, corner: 2, symbol: true },
 ];
 
 const POINTER_EFFECTS = false;
@@ -45,6 +47,7 @@ uniform mediump vec2 u_resolution;
 uniform float u_stroke;
 uniform float u_gap;
 uniform float u_corner;
+uniform float u_symbol;
 
 uniform float u_cell;
 uniform float u_jitter;
@@ -103,6 +106,10 @@ uniform float u_sheen_base;
 uniform float u_sheen_edge;
 uniform float u_vig_width;
 uniform vec4 u_text_box;
+uniform float u_fade_top;
+uniform float u_bottom_fade;
+uniform float u_fade_height;
+uniform float u_fade_offset;
 uniform float u_text_pad;
 uniform float u_underlay;
 uniform float u_base_mix;
@@ -130,7 +137,14 @@ uniform float u_diffuse;
 uniform float u_specular;
 uniform float u_spec_size;
 uniform float u_shadow;
+uniform float u_edge_light;
+uniform float u_falloff;
+uniform float u_falloff_reach;
+uniform float u_add_glow;
+uniform float u_add_catch;
+uniform float u_add_tone;
 uniform float u_fresnel;
+uniform float u_highlight;
 uniform float u_fresnel_power;
 uniform float u_rim;
 uniform float u_warp;
@@ -152,6 +166,7 @@ uniform float u_break_var;
 uniform float u_hug;
 uniform float u_hug_len;
 uniform float u_hug_jitter;
+uniform float u_solid_logo;
 uniform float u_fine;
 uniform float u_fine_near;
 uniform float u_fine_chance;
@@ -247,9 +262,35 @@ float smax(float a, float b, float k) {
   return max(a, b) + h * h * k * 0.25;
 }
 
+float symbolSdf(vec2 m, out float piece) {
+  float k = 2.0 * u_corner;
+  float head = length(m) - 20.0;
+  float annulus = abs(length(m) - 50.0) - 14.0;
+  float u = (m.x + m.y) * 0.70710678;
+  float v = (m.x - m.y) * 0.70710678;
+  float arc = smax(annulus, u + 0.5 * u_gap, k);
+  float smile = smax(smax(annulus, 0.5 * u_gap - u, k), v + 0.5 * u_gap, k);
+  piece = head < min(arc, smile) ? 0.0 : (arc < smile ? 1.0 : 2.0);
+  return min(head, min(arc, smile));
+}
+
+float logoPiece(vec2 p) {
+  vec2 m = (p - logoCenter()) / (u_logo_size / 128.0);
+  if (u_symbol > 0.5) {
+    float piece;
+    symbolSdf(m, piece);
+    return piece;
+  }
+  return length(m) < 64.0 - u_stroke - 0.5 * u_gap ? 0.0 : 1.0;
+}
+
 float logoSdf(vec2 p) {
   float unit = u_logo_size / 128.0;
   vec2 m = (p - logoCenter()) / unit;
+  if (u_symbol > 0.5) {
+    float piece;
+    return symbolSdf(m, piece) * unit;
+  }
   float halfGap = 0.5 * u_gap;
   float head = length(m) - (64.0 - u_stroke - u_gap);
   float annulus = abs(length(m) - (64.0 - 0.5 * u_stroke)) - 0.5 * u_stroke;
@@ -478,8 +519,16 @@ void tileAt(vec2 p, out vec3 e, out vec2 tileId, out vec2 anchor, out float logo
   vec3 boundary;
   bool inside;
   voronoi(p / u_cell, cellId, seed, edge, boundary, inside);
+  bool solid = u_solid_logo > 0.5;
+  float solidSd = solid ? logoSdf(p) : 1.0;
 
-  if (inside) {
+  if (solid && solidSd < 0.0) {
+    e = vec3(-solidSd, -logoNormal(p));
+    tileId = vec2(1.0 + logoPiece(p), 9000.0);
+    anchor = center;
+    logoAmount = u_logo_mix;
+    color = mix(tileTone(tileId, anchor, u_tile_low, u_tile_high), tileTone(tileId, anchor, u_logo_low, u_logo_high), logoAmount);
+  } else if (!solid && inside) {
     float sd = logoSdf(p);
     vec2 normal = logoNormal(p);
     float sideSign = sd < 0.0 ? -1.0 : 1.0;
@@ -534,13 +583,24 @@ void tileAt(vec2 p, out vec3 e, out vec2 tileId, out vec2 anchor, out float logo
     float inner = radius;
     float ring = 0.0;
     float width = u_row;
-    for (int k = 0; k < 96; k++) {
-      width = u_row * (1.0 + (hash1(vec2(ring, 7.0)) - 0.5) * u_row_var);
-      if (r < inner + width) {
-        break;
+    if (r < radius) {
+      for (int k = 0; k < 96; k++) {
+        ring -= 1.0;
+        width = u_row * (1.0 + (hash1(vec2(ring, 7.0)) - 0.5) * u_row_var);
+        inner -= width;
+        if (r >= inner) {
+          break;
+        }
       }
-      inner += width;
-      ring += 1.0;
+    } else {
+      for (int k = 0; k < 96; k++) {
+        width = u_row * (1.0 + (hash1(vec2(ring, 7.0)) - 0.5) * u_row_var);
+        if (r < inner + width) {
+          break;
+        }
+        inner += width;
+        ring += 1.0;
+      }
     }
     float outer = inner + width;
     float count = max(3.0, floor(TAU * (inner + 0.5 * width) / u_brick + 0.5));
@@ -562,7 +622,7 @@ void tileAt(vec2 p, out vec3 e, out vec2 tileId, out vec2 anchor, out float logo
     vec2 tangent = vec2(-radial.y, radial.x);
     vec3 along = gmin(vec3((t - lo) * pxPerUnit, tangent), vec3((hi - t) * pxPerUnit, -tangent));
     vec3 across = gmin(vec3(r - inner, radial), vec3(outer - r, -radial));
-    e = gsmin(roundedEdge(along, across), boundary, u_round);
+    e = solid ? gsmin(roundedEdge(along, across), vec3(solidSd, logoNormal(p)), u_round) : gsmin(roundedEdge(along, across), boundary, u_round);
     tileId = vec2(mod(i, count), ring) + 500.0;
     float angle = ((0.5 * (lo + hi) - hash1(vec2(ring, 13.0))) / count - 0.5) * TAU;
     anchor = center + vec2(cos(angle), sin(angle)) * (inner + 0.5 * width);
@@ -638,7 +698,8 @@ void main() {
   vec3 tileNormal = normalize(vec3(-(bevelGrad + clayGrad), 1.0));
   float tileHeight = height * (u_bevel_height + clayHeight);
 
-  vec3 world = mix(worldAt(p), worldAt(anchor), u_rigid);
+  bool brickInLogo = abs(tileId.y - 9000.0) > 0.5 && logoSdf(anchor) < 0.0;
+  vec3 world = mix(worldAt(p), brickInLogo ? vec3(0.0) : worldAt(anchor), u_rigid);
   vec3 worldNormal = normalize(vec3(-world.yz, 1.0));
   vec3 base = worldNormal + vec3(0.0, 0.0, 1.0);
   vec3 local = tileNormal * vec3(-1.0, -1.0, 1.0);
@@ -656,7 +717,9 @@ void main() {
   vec3 toEye = normalize(vec3(logoCenter() - fragCoord, max(u_camera, 1.0)));
   float flatLight = max(toLight.z, 0.0);
   float lit = u_diffuse * (max(dot(surface, toLight), 0.0) - flatLight);
-  float shade = 1.0 + (lit < 0.0 ? lit * u_shadow : lit);
+  float shade = 1.0 + (lit < 0.0 ? lit * u_shadow : lit * u_edge_light);
+  float falloffT = clamp((length(fragCoord - lightPos.xy) - u_light_y) / max(u_falloff_reach, 1.0), 0.0, 1.0);
+  shade *= mix(1.0 + u_falloff, 1.0 - u_falloff, falloffT);
   vec3 halfway = normalize(toLight + toEye);
   float spread = acos(clamp(dot(surface, halfway), -1.0, 1.0)) / max(radians(u_spec_size), 0.001);
   float glint = exp(-spread * spread) * u_specular;
@@ -664,7 +727,8 @@ void main() {
   float fresnel = pow(1.0 - facing, u_fresnel_power) * u_fresnel;
   vec3 reflected = reflect(-toEye, surface);
   float sky = mix(1.0 - u_rim, 1.0, smoothstep(0.0, 0.6, -reflected.y));
-  color = albedo * shade + vec3(glint + fresnel * sky);
+  color = albedo * shade + vec3(glint + fresnel * sky) * u_highlight;
+  color += vec3(u_add_glow * (1.0 - falloffT) + u_add_catch * (dot(surface, toLight) - toLight.z) * smoothstep(0.6, 0.9, thick) + u_add_tone * (tileToneT(tileId, anchor) - 0.5));
 
   float near = exp(-max(logoSdf(p), 0.0) / max(u_glow_reach, 1.0));
   float backRim = pow(1.0 - facing, u_fresnel_power) * smoothstep(0.0, 0.6, reflected.y);
@@ -714,7 +778,9 @@ void main() {
   }
 
   float vignette = tileVisibility(fragCoord, anchor, tileId);
-  float alpha = tileMask * clamp(vignette * u_cover, 0.0, 1.0);
+  float fadeEnd = u_fade_top + u_fade_offset;
+  float bottomFade = 1.0 - u_bottom_fade * smoothstep(fadeEnd - max(u_fade_height, 1.0), fadeEnd, fragCoord.y);
+  float alpha = tileMask * clamp(vignette * u_cover, 0.0, 1.0) * bottomFade;
   vec3 faded = mix(u_page_color, color, vignette);
   faded = mix(faded, u_page_color, (1.0 - vignetteAt(fragCoord)) * u_vig_dim * u_vig_cells);
   float under = tileMask * clamp(vignetteAt(fragCoord) * u_cover, 0.0, 1.0) * u_underlay;
@@ -725,7 +791,7 @@ void main() {
     vec2 reach = toSun.xy / max(toSun.z, 0.05) * u_shadow_height;
     float shadow = occluderAt(fragCoord + reach) * u_shadow_strength;
     back *= 1.0 - shadow;
-    backAlpha = shadow + backAlpha * (1.0 - shadow);
+    backAlpha = (shadow + backAlpha * (1.0 - shadow)) * bottomFade;
   }
   outColor = vec4(faded * alpha + back * (1.0 - alpha), alpha + backAlpha * (1.0 - alpha));
   float covered = step(0.0001, alpha);
@@ -733,7 +799,7 @@ void main() {
     outColor = vec4(1.0, 1.0, 1.0, alpha);
   } else if (u_bake == 3) {
     float skeletonEdge = groutHalf + 0.5 * u_skeleton_grout;
-    float skeleton = smoothstep(skeletonEdge - 0.5, skeletonEdge + 0.5, e.x) * clamp(vignette * u_cover, 0.0, 1.0);
+    float skeleton = smoothstep(skeletonEdge - 0.5, skeletonEdge + 0.5, e.x) * clamp(vignette * u_cover, 0.0, 1.0) * bottomFade;
     outColor = vec4(1.0, 1.0, 1.0, skeleton);
   } else if (u_bake == 2) {
     float edgeDistance = clamp((e.x - groutHalf) / BAKE_EDGE_MAX, 0.0, 1.0);
@@ -743,7 +809,7 @@ void main() {
 }
 `;
 
-type Settings = {
+export type Settings = {
   view: number;
   bevelWidth: number;
   bevelShape: number;
@@ -771,6 +837,9 @@ type Settings = {
   vigWidth: number;
   textClear: number;
   textPad: number;
+  bottomFade: number;
+  fadeHeight: number;
+  fadeOffset: number;
   underlay: number;
   skeletonGrout: number;
   lmBase: number;
@@ -813,8 +882,17 @@ type Settings = {
   specSize: number;
   lmShadow: number;
   lmDepth: number;
+  dmEdge: number;
+  dmPrism: number;
+  dmFalloff: number;
+  dmGlow: number;
+  dmCatch: number;
+  dmTone: number;
+  lmFalloff: number;
+  falloffReach: number;
   fresnel: number;
   fresnelPower: number;
+  highlight: number;
   rim: number;
   warp: number;
   camera: number;
@@ -836,6 +914,7 @@ type Settings = {
   hug: number;
   hugLen: number;
   hugJitter: number;
+  solidLogo: number;
   fine: number;
   fineNear: number;
   fineChance: number;
@@ -851,17 +930,17 @@ type Settings = {
 
 const DEFAULTS: Settings = {
   view: 0,
-  bevelWidth: 4,
+  bevelWidth: 3,
   bevelShape: 1,
   bevelHeight: 1.7,
-  clayTilt: 0.025,
+  clayTilt: 0.02,
   clayThickness: 1.1,
   clayWobble: 0,
   clayScale: 74,
-  domeHeight: 3.5,
-  domeReach: 41,
-  edgeHeight: 0.5,
-  edgeWidth: 78,
+  domeHeight: 0,
+  domeReach: 30,
+  edgeHeight: 5,
+  edgeWidth: 1,
   dishDepth: 0,
   dishReach: 130,
   rigid: 1,
@@ -874,9 +953,12 @@ const DEFAULTS: Settings = {
   backGlow: 0.02,
   backRim: 0,
   glowReach: 800,
-  vigWidth: 0.79,
+  vigWidth: 1.14,
   textClear: 1,
   textPad: 24,
+  bottomFade: 0.8,
+  fadeHeight: 160,
+  fadeOffset: 120,
   underlay: 0,
   skeletonGrout: 4,
   lmBase: 0.3,
@@ -888,15 +970,15 @@ const DEFAULTS: Settings = {
   vigDim: 0,
   textRound: 47,
   textJitter: 16,
-  shadowStrength: 0.21,
+  shadowStrength: 0.22,
   dmShadow: 3.8,
-  shadowHeight: 6,
-  shadowSoft: 25,
+  shadowHeight: 3,
+  shadowSoft: 24,
   vigCells: 1,
-  vigCut: 0.79,
-  vigJitter: 0.09,
+  vigCut: 1,
+  vigJitter: 0,
   logoY: -0.025,
-  zoom: 0.75,
+  zoom: 0.74,
   cover: 4,
   sheen: 0.07,
   sheenScale: 530,
@@ -906,52 +988,192 @@ const DEFAULTS: Settings = {
   sheenGlint: 0,
   sheenBase: 1.5,
   sheenEdge: 3,
-  vigHeight: 0.71,
-  vigSoft: 0.16,
-  vigTop: 0,
-  vigBottom: 0,
+  vigHeight: 1.1,
+  vigSoft: 0.1,
+  vigTop: 245,
+  vigBottom: 290,
   lightX: 0.5,
   follow: 0,
-  lightY: 650,
-  lightZ: 740,
-  diffuse: 3,
-  specular: 0.12,
-  specSize: 7,
+  lightY: 520,
+  lightZ: 510,
+  diffuse: 1.23,
+  specular: 1.44,
+  specSize: 40,
   lmShadow: 0.08,
   lmDepth: 0.02,
-  fresnel: 0.42,
-  fresnelPower: 7,
-  rim: 0.29,
-  warp: 9.2,
-  camera: 2300,
+  dmEdge: 0.5,
+  dmPrism: 0.7,
+  dmFalloff: 0.35,
+  dmGlow: 0.08,
+  dmCatch: 1.5,
+  dmTone: 0.05,
+  lmFalloff: 0,
+  falloffReach: 520,
+  fresnel: 0.87,
+  fresnelPower: 2.5,
+  highlight: 0.03,
+  rim: 0.35,
+  warp: 9.8,
+  camera: 4000,
   viewX: 0,
-  viewY: 0,
-  mark: 1,
-  logoSize: 650,
+  viewY: 0.03,
+  mark: 3,
+  logoSize: 610,
   threshold: 0.42,
   cut: 0.12,
   cell: 82,
   jitter: 0,
-  row: 45,
+  row: 43,
   rowVar: 0,
-  brick: 187,
-  brickVar: 0,
-  breakOut: 53,
+  brick: 240,
+  brickVar: 0.9,
+  breakOut: 0,
   breakFreq: 1.5,
   breakVar: 0,
-  hug: 25,
+  hug: 0,
   hugLen: 120,
   hugJitter: 1,
-  fine: 0.9,
+  solidLogo: 1,
+  fine: 0.46,
   fineNear: 71,
   fineChance: 0.7,
-  grout: 0.6,
+  grout: 7.1,
   groutVar: 0,
-  logoMix: 0.38,
+  logoMix: 0,
   flow: 0,
-  flowScale: 970,
-  tone: 1,
-  round: 12.5,
+  flowScale: 40,
+  tone: 0.28,
+  round: 16,
+  seed: 35,
+};
+const MOBILE_QUERY = '(max-width: 639px)';
+
+function subscribeMobile(listener: () => void) {
+  const query = window.matchMedia(MOBILE_QUERY);
+  query.addEventListener('change', listener);
+  return () => query.removeEventListener('change', listener);
+}
+
+function readTarget() {
+  return window.matchMedia(MOBILE_QUERY).matches ? ('mobile' as const) : ('desktop' as const);
+}
+
+export const MOBILE_DEFAULTS: Settings = {
+  view: 0,
+  bevelWidth: 3,
+  bevelShape: 1,
+  bevelHeight: 1.7,
+  clayTilt: 0.04,
+  clayThickness: 1.1,
+  clayWobble: 0,
+  clayScale: 46.3,
+  domeHeight: 0,
+  domeReach: 30,
+  edgeHeight: 5,
+  edgeWidth: 1,
+  dishDepth: 0,
+  dishReach: 130,
+  rigid: 1,
+  lift: 3.5,
+  tint: 0,
+  hueSpread: 0.77,
+  logoTint: 0,
+  depth: 1.5,
+  depthReach: 4.5,
+  backGlow: 0.02,
+  backRim: 0,
+  glowReach: 500,
+  vigWidth: 0.98,
+  textClear: 1,
+  textPad: 15,
+  bottomFade: 0.8,
+  fadeHeight: 100,
+  fadeOffset: 75,
+  underlay: 0,
+  skeletonGrout: 2.5,
+  lmBase: 0.3,
+  dmBase: 0.33,
+  prism: 0.13,
+  prismWidth: 9.5,
+  prismSpread: 1.78,
+  prismSide: 0,
+  vigDim: 0,
+  textRound: 29.4,
+  textJitter: 10,
+  shadowStrength: 0.22,
+  dmShadow: 3.8,
+  shadowHeight: 3,
+  shadowSoft: 24,
+  vigCells: 1,
+  vigCut: 1,
+  vigJitter: 0.02,
+  logoY: 0.025,
+  zoom: 0.67,
+  cover: 2.9,
+  sheen: 0.07,
+  sheenScale: 530,
+  sheenAngle: 0,
+  sheenWarp: 300,
+  sheenDetail: 1,
+  sheenGlint: 0,
+  sheenBase: 1.5,
+  sheenEdge: 3,
+  vigHeight: 0.75,
+  vigSoft: 0.23,
+  vigTop: 200,
+  vigBottom: 0,
+  lightX: 0.5,
+  follow: 0,
+  lightY: 325,
+  lightZ: 318.8,
+  diffuse: 1.23,
+  specular: 1.44,
+  specSize: 40,
+  lmShadow: 0.16,
+  lmDepth: 0.02,
+  dmEdge: 0.5,
+  dmPrism: 0.7,
+  dmFalloff: 0.35,
+  dmGlow: 0.08,
+  dmCatch: 0.75,
+  dmTone: 0.03,
+  lmFalloff: 0.035,
+  falloffReach: 325,
+  fresnel: 0.87,
+  fresnelPower: 2.5,
+  highlight: 0.03,
+  rim: 0.35,
+  warp: 9.8,
+  camera: 2500,
+  viewX: 0,
+  viewY: 0.03,
+  mark: 3,
+  logoSize: 320,
+  threshold: 0.42,
+  cut: 0.12,
+  cell: 51.3,
+  jitter: 0,
+  row: 29,
+  rowVar: 0,
+  brick: 104,
+  brickVar: 0.6,
+  breakOut: 0,
+  breakFreq: 1.5,
+  breakVar: 0,
+  hug: 0,
+  hugLen: 75,
+  hugJitter: 1,
+  solidLogo: 1,
+  fine: 0.46,
+  fineNear: 71,
+  fineChance: 0.7,
+  grout: 3.9,
+  groutVar: 0,
+  logoMix: 0,
+  flow: 0,
+  flowScale: 40,
+  tone: 0.6,
+  round: 10,
   seed: 35,
 };
 
@@ -1017,6 +1239,9 @@ const PRISM_SLIDERS: Slider[] = [
 const TEXT_SLIDERS: Slider[] = [
   { key: 'textClear', min: 0, max: 1, step: 1 },
   { key: 'textPad', min: -40, max: 160, step: 1 },
+  { key: 'bottomFade', min: 0, max: 1, step: 0.01 },
+  { key: 'fadeHeight', min: 1, max: 600, step: 1 },
+  { key: 'fadeOffset', min: -300, max: 300, step: 1 },
   { key: 'textRound', min: 0, max: 200, step: 1 },
   { key: 'textJitter', min: 0, max: 160, step: 1 },
 ];
@@ -1029,6 +1254,14 @@ const SHADOW_SLIDERS: Slider[] = [
 ];
 
 const LIGHT_MODE_SLIDERS: Slider[] = [
+  { key: 'dmEdge', min: 0, max: 1, step: 0.01 },
+  { key: 'dmPrism', min: 0, max: 1, step: 0.01 },
+  { key: 'dmFalloff', min: 0, max: 0.8, step: 0.01 },
+  { key: 'dmGlow', min: 0, max: 0.2, step: 0.005 },
+  { key: 'dmCatch', min: 0, max: 6, step: 0.05 },
+  { key: 'dmTone', min: 0, max: 0.2, step: 0.005 },
+  { key: 'lmFalloff', min: 0, max: 0.8, step: 0.01 },
+  { key: 'falloffReach', min: 100, max: 2000, step: 10 },
   { key: 'lmShadow', min: 0, max: 1, step: 0.01 },
   { key: 'lmDepth', min: 0, max: 1, step: 0.01 },
 ];
@@ -1060,6 +1293,7 @@ const LIGHT_SLIDERS: Slider[] = [
   { key: 'specSize', min: 0.5, max: 40, step: 0.5 },
   { key: 'fresnel', min: 0, max: 2, step: 0.01 },
   { key: 'fresnelPower', min: 1, max: 10, step: 0.1 },
+  { key: 'highlight', min: 0, max: 1, step: 0.01 },
   { key: 'rim', min: 0, max: 1, step: 0.01 },
 ];
 
@@ -1100,6 +1334,7 @@ const SLIDERS: Slider[] = [
   { key: 'hug', min: 0, max: 60, step: 1 },
   { key: 'hugLen', min: 8, max: 120, step: 1 },
   { key: 'hugJitter', min: 0, max: 1, step: 0.01 },
+  { key: 'solidLogo', min: 0, max: 1, step: 1 },
   { key: 'fine', min: 0.2, max: 1, step: 0.01 },
   { key: 'fineNear', min: 0, max: 200, step: 1 },
   { key: 'fineChance', min: 0, max: 1, step: 0.01 },
@@ -1137,6 +1372,12 @@ function buildUniforms(settings: Settings, focus: Focus, palette: Palette, mode:
     u_logo_tint: { type: 'uniform1f', value: settings.logoTint },
     u_depth: { type: 'uniform1f', value: settings.depth * (light ? settings.lmDepth : 1) },
     u_shadow: { type: 'uniform1f', value: light ? settings.lmShadow : 1 },
+    u_edge_light: { type: 'uniform1f', value: light ? 1 : settings.dmEdge },
+    u_falloff: { type: 'uniform1f', value: light ? settings.lmFalloff : settings.dmFalloff },
+    u_falloff_reach: { type: 'uniform1f', value: settings.falloffReach },
+    u_add_glow: { type: 'uniform1f', value: light ? 0 : settings.dmGlow },
+    u_add_catch: { type: 'uniform1f', value: light ? 0 : settings.dmCatch },
+    u_add_tone: { type: 'uniform1f', value: light ? 0 : settings.dmTone },
     u_depth_reach: { type: 'uniform1f', value: settings.depthReach },
     u_back_color: { type: 'uniform3f', value: palette.logoTint },
     u_back_glow: { type: 'uniform1f', value: settings.backGlow },
@@ -1144,10 +1385,14 @@ function buildUniforms(settings: Settings, focus: Focus, palette: Palette, mode:
     u_glow_reach: { type: 'uniform1f', value: settings.glowReach },
     u_vig_width: { type: 'uniform1f', value: settings.vigWidth },
     u_text_box: { type: 'uniform4f', value: settings.textClear ? textBox : [0, 0, 0, 0] },
+    u_fade_top: { type: 'uniform1f', value: textBox[1] },
+    u_bottom_fade: { type: 'uniform1f', value: settings.bottomFade },
+    u_fade_height: { type: 'uniform1f', value: settings.fadeHeight },
+    u_fade_offset: { type: 'uniform1f', value: settings.fadeOffset },
     u_text_pad: { type: 'uniform1f', value: settings.textPad },
     u_underlay: { type: 'uniform1f', value: settings.underlay },
     u_base_mix: { type: 'uniform1f', value: light ? settings.lmBase : settings.dmBase },
-    u_prism: { type: 'uniform1f', value: settings.prism },
+    u_prism: { type: 'uniform1f', value: settings.prism * (light ? 1 : settings.dmPrism) },
     u_prism_width: { type: 'uniform1f', value: settings.prismWidth },
     u_prism_spread: { type: 'uniform1f', value: settings.prismSpread },
     u_prism_side: { type: 'uniform1f', value: settings.prismSide },
@@ -1208,6 +1453,7 @@ function buildUniforms(settings: Settings, focus: Focus, palette: Palette, mode:
     u_specular: { type: 'uniform1f', value: settings.specular },
     u_spec_size: { type: 'uniform1f', value: settings.specSize },
     u_fresnel: { type: 'uniform1f', value: settings.fresnel },
+    u_highlight: { type: 'uniform1f', value: settings.highlight },
     u_fresnel_power: { type: 'uniform1f', value: settings.fresnelPower },
     u_rim: { type: 'uniform1f', value: settings.rim },
     u_warp: { type: 'uniform1f', value: settings.warp },
@@ -1221,6 +1467,7 @@ function buildUniforms(settings: Settings, focus: Focus, palette: Palette, mode:
     u_stroke: { type: 'uniform1f', value: MARKS[settings.mark].stroke },
     u_gap: { type: 'uniform1f', value: MARKS[settings.mark].gap },
     u_corner: { type: 'uniform1f', value: MARKS[settings.mark].corner },
+    u_symbol: { type: 'uniform1f', value: 'symbol' in MARKS[settings.mark] ? 1 : 0 },
     u_cut: { type: 'uniform1f', value: settings.cut },
     u_row: { type: 'uniform1f', value: settings.row },
     u_row_var: { type: 'uniform1f', value: settings.rowVar },
@@ -1232,6 +1479,7 @@ function buildUniforms(settings: Settings, focus: Focus, palette: Palette, mode:
     u_hug: { type: 'uniform1f', value: settings.hug },
     u_hug_len: { type: 'uniform1f', value: settings.hugLen },
     u_hug_jitter: { type: 'uniform1f', value: settings.hugJitter },
+    u_solid_logo: { type: 'uniform1f', value: settings.solidLogo },
     u_fine: { type: 'uniform1f', value: settings.fine },
     u_fine_near: { type: 'uniform1f', value: settings.fineNear },
     u_fine_chance: { type: 'uniform1f', value: settings.fineChance },
@@ -1321,16 +1569,20 @@ function PanelSection({
   );
 }
 
-function Panel({
+export function Panel({
   settings,
   onChange,
   onBake,
   bakeStatus,
+  defaults,
+  target,
 }: {
   settings: Settings;
   onChange: (next: Settings) => void;
   onBake: () => void;
   bakeStatus: string;
+  defaults: Settings;
+  target: 'desktop' | 'mobile';
 }) {
   const [copied, setCopied] = React.useState(false);
   const patternSliders = SLIDERS.filter(({ key }) => settings.hug === 0 || (key !== 'threshold' && key !== 'cut'));
@@ -1390,7 +1642,7 @@ function Panel({
         <button
           type='button'
           className='rounded border border-neutral-300 py-1 dark:border-neutral-700'
-          onClick={() => onChange(DEFAULTS)}
+          onClick={() => onChange(defaults)}
         >
           Reset
         </button>
@@ -1400,7 +1652,7 @@ function Panel({
         className='rounded bg-neutral-900 py-1.5 font-medium text-white dark:bg-white dark:text-neutral-900'
         onClick={onBake}
       >
-        Bake
+        {target === 'mobile' ? 'Bake mobile' : 'Bake'}
       </button>
       {bakeStatus ? <p className='text-[11px] leading-4 text-neutral-500'>{bakeStatus}</p> : null}
     </div>
@@ -1425,10 +1677,23 @@ function useLightSpring(ref: React.RefObject<HTMLDivElement | null>, enabled: bo
   return spring;
 }
 
-export function MosaicScene() {
+const LAB_MESSAGE = 'mosaic-lab';
+
+export type LabMessage =
+  | { type: `${typeof LAB_MESSAGE}:state`; settings: Settings; target: 'desktop' | 'mobile'; bakeStatus: string }
+  | { type: `${typeof LAB_MESSAGE}:set`; settings: Settings }
+  | { type: `${typeof LAB_MESSAGE}:bake` };
+
+export function MosaicScene({ framed = false }: { framed?: boolean }) {
   const sceneRef = React.useRef<HTMLDivElement>(null);
-  const { height, focus, textBox } = useSceneLayout(sceneRef);
-  const [settings, setSettings] = React.useState(DEFAULTS);
+  const { height, focus, textBox, scale } = useSceneLayout(sceneRef);
+  const target = React.useSyncExternalStore(subscribeMobile, readTarget, () => 'desktop' as const);
+  const [edits, setEdits] = React.useState<Partial<Record<'desktop' | 'mobile', Settings>>>({});
+  const settings = edits[target] ?? (target === 'mobile' ? MOBILE_DEFAULTS : DEFAULTS);
+  const setSettings = React.useCallback(
+    (next: Settings) => setEdits(current => ({ ...current, [target]: next })),
+    [target],
+  );
   const mode = useMode();
   const palette = React.useMemo(() => readPalette(mode) ?? FALLBACK_PALETTE, [mode]);
   const spring = useLightSpring(sceneRef, POINTER_EFFECTS && settings.follow > 0);
@@ -1462,13 +1727,52 @@ export function MosaicScene() {
       return;
     }
     setBakeStatus('Baking…');
-    bakeScene({ source, uniforms, width: scene.offsetWidth, height: scene.offsetHeight, focus, settings })
+    bakeScene({
+      source,
+      uniforms,
+      width: scene.offsetWidth,
+      height: scene.offsetHeight,
+      focus,
+      focusSize: scale * FOCUS_SIZE,
+      target,
+      settings,
+    })
       .then(({ meta, written }) => {
         const files = written.map(entry => `${entry.file.split('/').pop()} ${Math.round(entry.bytes / 1024)} KB`);
         setBakeStatus(`Baked ${meta.width}×${meta.height}: ${files.join(', ')}`);
       })
       .catch((error: unknown) => setBakeStatus(error instanceof Error ? error.message : 'Bake failed'));
-  }, [uniforms, focus, settings]);
+  }, [uniforms, focus, settings, scale, target]);
+  const bakeRef = React.useRef(bake);
+  const setSettingsRef = React.useRef(setSettings);
+  React.useEffect(() => {
+    bakeRef.current = bake;
+    setSettingsRef.current = setSettings;
+  }, [bake, setSettings]);
+  React.useEffect(() => {
+    if (!framed) {
+      return;
+    }
+    const message: LabMessage = { type: `${LAB_MESSAGE}:state`, settings, target, bakeStatus };
+    window.parent.postMessage(message, window.location.origin);
+  }, [framed, settings, target, bakeStatus]);
+  React.useEffect(() => {
+    if (!framed) {
+      return;
+    }
+    const onMessage = (event: MessageEvent<LabMessage>) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+      if (event.data.type === `${LAB_MESSAGE}:set`) {
+        setSettingsRef.current(event.data.settings);
+      } else if (event.data.type === `${LAB_MESSAGE}:bake`) {
+        bakeRef.current();
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [framed]);
   const shouldRender = React.useCallback(
     () =>
       POINTER_EFFECTS && ((sheen > 0 && TRAIL_ENERGY_UNIFORM.value > 0.001) || (follow > 0 && spring.isAnimating())),
@@ -1491,13 +1795,15 @@ export function MosaicScene() {
           premultiplied
         />
       </div>
-      {process.env.NODE_ENV === 'development' && mounted
+      {process.env.NODE_ENV === 'development' && mounted && !framed
         ? createPortal(
             <Panel
               settings={settings}
               onChange={setSettings}
               onBake={bake}
               bakeStatus={bakeStatus}
+              defaults={target === 'mobile' ? MOBILE_DEFAULTS : DEFAULTS}
+              target={target}
             />,
             document.body,
           )

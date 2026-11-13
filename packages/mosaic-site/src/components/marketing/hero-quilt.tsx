@@ -9,7 +9,7 @@ import { INSTALL_COMMAND } from '@/lib/agent-prompt';
 
 export function HeroQuilt({ scene, anchor }: { scene: React.ReactNode; anchor?: React.ReactNode }) {
   return (
-    <section className='bg-background text-foreground relative isolate -mt-14 flex flex-col items-center overflow-hidden px-6 pb-28 pt-[360px] text-center sm:pt-[336px] 2xl:pt-[312px]'>
+    <section className='bg-background text-foreground relative isolate -mt-14 flex flex-col items-center overflow-hidden px-6 pb-28 pt-[104px] text-center sm:pt-[240px] 2xl:pt-[280px]'>
       <HeroGrid />
       {scene}
       <div
@@ -19,7 +19,7 @@ export function HeroQuilt({ scene, anchor }: { scene: React.ReactNode; anchor?: 
         {anchor}
       </div>
       <HeroMicrographic />
-      <h1 className='heading-3 sm:heading-2 lg:heading-1 mt-2 max-w-3xl text-balance'>
+      <h1 className='heading-3 sm:heading-2 2xl:heading-1 mt-2 max-w-3xl text-balance'>
         Production-ready UI
         <br />
         built for agents

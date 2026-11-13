@@ -73,6 +73,7 @@ interface ShaderProps {
   liveUniforms?: () => Uniforms;
   shouldRender?: () => boolean;
   premultiplied?: boolean;
+  pixelRatio?: () => number;
 }
 
 function loadImageAndCreateTextureInfo(
@@ -144,6 +145,7 @@ export const Shader = forwardRef(function Shader(
     liveUniforms,
     shouldRender,
     premultiplied = false,
+    pixelRatio,
   }: ShaderProps,
   ref: React.ForwardedRef<ShaderHandle>,
 ) {
@@ -157,14 +159,16 @@ export const Shader = forwardRef(function Shader(
   const runRef = useRef(0);
   const dirtyRef = useRef(true);
   const shouldRenderRef = useRef(shouldRender);
+  const pixelRatioRef = useRef(pixelRatio);
 
   useAnimationFrame(timestamp => renderRef.current?.(timestamp));
   useEffect(() => {
     uniformsRef.current = uniforms;
     liveUniformsRef.current = liveUniforms;
     shouldRenderRef.current = shouldRender;
+    pixelRatioRef.current = pixelRatio;
     dirtyRef.current = true;
-  }, [uniforms, liveUniforms, shouldRender]);
+  }, [uniforms, liveUniforms, shouldRender, pixelRatio]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -188,9 +192,11 @@ export const Shader = forwardRef(function Shader(
       return;
     }
     const scale = Math.round(Math.max(1, Math.min(window.devicePixelRatio ?? 1, 2)));
+    let ratio = pixelRatioRef.current?.() ?? scale;
+    const surface: HTMLCanvasElement = canvas;
 
-    canvas.width = canvas.offsetWidth * scale;
-    canvas.height = canvas.offsetHeight * scale;
+    canvas.width = Math.round(canvas.offsetWidth * ratio);
+    canvas.height = Math.round(canvas.offsetHeight * ratio);
 
     let gl = canvas.getContext('webgl2');
 
@@ -244,7 +250,7 @@ export const Shader = forwardRef(function Shader(
       customUniformLocations.set(name, location);
     }
 
-    gl.uniform2f(resolutionUniformLocation, canvas.width / scale, canvas.height / scale);
+    gl.uniform2f(resolutionUniformLocation, canvas.offsetWidth, canvas.offsetHeight);
     if (premultiplied) {
       gl.disable(gl.BLEND);
     } else {
@@ -296,6 +302,13 @@ export const Shader = forwardRef(function Shader(
 
       currentTime.current = now - startTime;
       onRender?.(currentTime.current);
+      const nextRatio = pixelRatioRef.current?.() ?? scale;
+      if (nextRatio !== ratio) {
+        ratio = nextRatio;
+        surface.width = Math.round(surface.offsetWidth * ratio);
+        surface.height = Math.round(surface.offsetHeight * ratio);
+        dirtyRef.current = true;
+      }
       const wanted = shouldRenderRef.current;
       if (wanted && !dirtyRef.current && !wanted()) {
         return;
@@ -399,9 +412,9 @@ export const Shader = forwardRef(function Shader(
     }
 
     const observer = new window.ResizeObserver(() => {
-      canvas.width = canvas.offsetWidth * scale;
-      canvas.height = canvas.offsetHeight * scale;
-      gl?.uniform2f(resolutionUniformLocation, canvas.width / scale, canvas.height / scale);
+      canvas.width = Math.round(canvas.offsetWidth * ratio);
+      canvas.height = Math.round(canvas.offsetHeight * ratio);
+      gl?.uniform2f(resolutionUniformLocation, canvas.offsetWidth, canvas.offsetHeight);
       dirtyRef.current = true;
     });
     observer.observe(canvas);

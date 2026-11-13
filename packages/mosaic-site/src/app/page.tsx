@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 
-import { BakedMosaic, MOSAIC_SKELETON_URL, MosaicSkeleton } from '@/components/marketing/baked-mosaic';
+import {
+  BakedMosaic,
+  MOSAIC_SKELETON_MOBILE_URL,
+  MOSAIC_SKELETON_URL,
+  MosaicSkeleton,
+} from '@/components/marketing/baked-mosaic';
 import { HeroQuilt } from '@/components/marketing/hero-quilt';
 import { HomeHeader } from '@/components/marketing/home-header';
 import { OverviewSections } from '@/components/marketing/overview';
@@ -17,6 +22,14 @@ export default function Page() {
         rel='preload'
         as='image'
         href={MOSAIC_SKELETON_URL}
+        media='(min-width: 640px)'
+        fetchPriority='high'
+      />
+      <link
+        rel='preload'
+        as='image'
+        href={MOSAIC_SKELETON_MOBILE_URL}
+        media='(max-width: 639px)'
         fetchPriority='high'
       />
       <HomeHeader />

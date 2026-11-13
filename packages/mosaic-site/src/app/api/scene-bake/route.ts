@@ -11,8 +11,13 @@ type Sharp = (
 
 const ROOT = process.cwd();
 const PUBLIC_DIR = join(ROOT, 'public', 'mosaic');
-const META_FILE = join(ROOT, 'src', 'components', 'marketing', 'mosaic-bake.json');
-const FILES = new Set(['mask.webp', 'surface.webp', 'skeleton.webp', 'reveal.webp', 'meta']);
+const META_FILES: Record<string, string> = {
+  meta: join(ROOT, 'src', 'components', 'marketing', 'mosaic-bake.json'),
+  'meta-mobile': join(ROOT, 'src', 'components', 'marketing', 'mosaic-bake-mobile.json'),
+};
+const IMAGES = ['mask', 'surface', 'skeleton', 'reveal'];
+const FILES = new Set([...IMAGES.flatMap(name => [`${name}.webp`, `${name}-mobile.webp`]), ...Object.keys(META_FILES)]);
+const LOSSLESS = new Set(['mask.webp', 'skeleton.webp', 'mask-mobile.webp', 'skeleton-mobile.webp']);
 
 const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
   let c = n;
@@ -84,9 +89,10 @@ export async function POST(request: Request) {
   if (!FILES.has(file)) {
     return new NextResponse('Unknown file', { status: 400 });
   }
-  if (file === 'meta') {
-    await writeFile(META_FILE, `${await request.text()}\n`);
-    return NextResponse.json({ file: META_FILE, bytes: (await stat(META_FILE)).size });
+  const metaFile = META_FILES[file];
+  if (metaFile) {
+    await writeFile(metaFile, `${await request.text()}\n`);
+    return NextResponse.json({ file: metaFile, bytes: (await stat(metaFile)).size });
   }
   const width = Number(params.get('width'));
   const height = Number(params.get('height'));
@@ -100,7 +106,7 @@ export async function POST(request: Request) {
   const target = join(PUBLIC_DIR, file);
   const bytes = file.endsWith('.png')
     ? encodePng(data, width, height, channels)
-    : await encodeWebp(data, width, height, channels, file === 'mask.webp' || file === 'skeleton.webp');
+    : await encodeWebp(data, width, height, channels, LOSSLESS.has(file));
   await writeFile(target, bytes);
   return NextResponse.json({ file: target, bytes: bytes.length });
 }

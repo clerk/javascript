@@ -7,7 +7,7 @@ const MAJOR = 32;
 const MINOR = 8;
 const SPAN = 160 * MAJOR;
 
-type GridLook = { color: string; major: number; minor: number; mask: string };
+type GridLook = { color: string; major: number; minor: number; mask: string; phoneMask: string };
 
 const TOP_FADE = 'linear-gradient(to bottom, transparent, black 20rem)';
 
@@ -21,12 +21,18 @@ const LOOKS: Record<Mode, GridLook> = {
       'radial-gradient(ellipse 22rem 18rem at 50% 38%, rgb(0 0 0 / 0.3) 0%, black 100%)',
       TOP_FADE,
     ].join(', '),
+    phoneMask: [
+      'radial-gradient(ellipse 100% 70% at 50% 32%, black 60%, transparent 100%)',
+      'radial-gradient(ellipse 14rem 12rem at 50% 38%, rgb(0 0 0 / 0.3) 0%, black 100%)',
+      TOP_FADE,
+    ].join(', '),
   },
   dark: {
     color: 'var(--foreground)',
-    major: 7,
-    minor: 3,
+    major: 5,
+    minor: 2,
     mask: ['radial-gradient(ellipse 65% 75% at 50% 34%, black 40%, transparent 100%)', TOP_FADE].join(', '),
+    phoneMask: ['radial-gradient(ellipse 100% 75% at 50% 34%, black 65%, transparent 100%)', TOP_FADE].join(', '),
   },
 };
 
@@ -63,11 +69,13 @@ export function HeroGrid() {
     <div
       ref={ref}
       aria-hidden='true'
-      className='pointer-events-none absolute inset-0 -z-20 [-webkit-mask-image:var(--grid-mask-light)] [mask-image:var(--grid-mask-light)] dark:[-webkit-mask-image:var(--grid-mask-dark)] dark:[mask-image:var(--grid-mask-dark)]'
+      className='pointer-events-none absolute inset-0 -z-20 [-webkit-mask-image:var(--grid-mask-light)] [mask-image:var(--grid-mask-light)] max-sm:[-webkit-mask-image:var(--grid-mask-light-phone)] max-sm:[mask-image:var(--grid-mask-light-phone)] dark:[-webkit-mask-image:var(--grid-mask-dark)] dark:[mask-image:var(--grid-mask-dark)] max-sm:dark:[-webkit-mask-image:var(--grid-mask-dark-phone)] max-sm:dark:[mask-image:var(--grid-mask-dark-phone)]'
       style={
         {
           '--grid-mask-light': LOOKS.light.mask,
           '--grid-mask-dark': LOOKS.dark.mask,
+          '--grid-mask-light-phone': LOOKS.light.phoneMask,
+          '--grid-mask-dark-phone': LOOKS.dark.phoneMask,
           maskComposite: 'intersect',
           WebkitMaskComposite: 'source-in',
         } as React.CSSProperties
