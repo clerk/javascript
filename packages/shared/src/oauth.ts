@@ -180,6 +180,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     name: 'AgentID',
     docsUrl: 'https://clerk.com/docs/guides/configure/auth-strategies/social-connections/agentid',
   },
+  {
+    provider: 'world_id',
+    strategy: 'oauth_world_id',
+    name: 'World ID',
+    docsUrl: 'https://clerk.com/docs/guides/configure/auth-strategies/social-connections/world-id',
+  },
 ];
 
 interface getOAuthProviderDataProps {
