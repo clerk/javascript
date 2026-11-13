@@ -54,9 +54,10 @@ const jsxGuards = [
       'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread. Define them with `stylex.create` in the sibling `*.styles.ts` file and pass `xstyle={styles.root}`.',
   },
 ];
-const notInRenderProp =
-  ":not(JSXAttribute[name.name='render'] > JSXExpressionContainer > JSXElement > JSXOpeningElement)";
-const visibleInput = `JSXOpeningElement[name.name='input']${notInRenderProp}:not(:has(> JSXAttribute[name.name='hidden']))`;
+const renderProp = "JSXAttribute[name.name='render'] > JSXExpressionContainer";
+const renderCallback = `${renderProp} > :matches(ArrowFunctionExpression, FunctionExpression)`;
+const notInRenderProp = `:not(${renderProp} > JSXElement > JSXOpeningElement, ${renderCallback} > JSXElement > JSXOpeningElement, ${renderCallback} > BlockStatement > ReturnStatement > JSXElement > JSXOpeningElement)`;
+const visibleInput = `JSXOpeningElement[name.name='input']${notInRenderProp}:not(:has(> JSXAttribute[name.name='hidden']:matches([value=null], [value.expression.value=true])))`;
 const inputOfType = type => `${visibleInput}:has(> JSXAttribute[name.name='type'][value.value='${type}'])`;
 const inputTypeGuards = [
   ['password', 'Use `PasswordInput` from src/components/password-input inside `Field` from src/components/field.'],

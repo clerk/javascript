@@ -342,6 +342,10 @@ describe('raw element guards in features and blocks', () => {
       "export const View = () => <input type='hidden' name='id' value={id} />;",
       "export const View = () => <input readOnly hidden name='identifier' value={identifier} />;",
       "export const View = () => <input type='password' hidden name='password' />;",
+      'export const View = () => <Menu.Item render={props => <button {...props} />} />;',
+      'export const View = () => <Part render={function render(props) { return <svg {...props} />; }} />;',
+      'export const View = () => <Part render={(props, state) => { return <input {...props} />; }} />;',
+      "export const View = () => <input hidden={true} name='identifier' />;",
       "export const View = () => <Button type='button' />;",
       "export const View = () => <Icon name='check' />;",
     ].flatMap(code =>
@@ -361,6 +365,21 @@ describe('raw element guards in features and blocks', () => {
         name: 'rejects a raw button nested in a render prop element',
         code: "export const View = () => <Part render={<div><button type='button' /></div>} />;",
         errors: [/^Use `Button` from src\/components\/button/],
+      },
+      {
+        name: 'rejects a raw button nested in a render callback element',
+        code: 'export const View = () => <Part render={props => <div {...props}><button type="button" /></div>} />;',
+        errors: [/^Use `Button` from src\/components\/button/],
+      },
+      {
+        name: 'rejects a visible input with hidden={false}',
+        code: "export const View = () => <input hidden={false} name='field' />;",
+        errors: [/^Use `Input` from src\/components\/input inside `Field`/],
+      },
+      {
+        name: 'rejects a visible password input with hidden={false}',
+        code: "export const View = () => <input type='password' hidden={false} name='field' />;",
+        errors: [/^Use `PasswordInput` from src\/components\/password-input/],
       },
       {
         name: 'rejects a raw svg',
