@@ -1570,32 +1570,34 @@ describe('Poppy middleware', () => {
     extension: { unchanged: true },
   };
 
-  it.each(['/.well-known/poppy.json', '/.well-known/oauth-protected-resource'])(
-    'serves %s from the Backend API artifact before authentication',
-    async path => {
-      const __experimental_getPoppyJson = vi.fn().mockResolvedValue(metadata);
-      vi.mocked(clerkClient).mockResolvedValue(
-        Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
-      );
-      const middleware = clerkMiddleware({ __experimental_poppy: true });
-      const response = await middleware(mockRequest({ url: 'https://company.example' + path }), {} as NextFetchEvent);
-      assert(response instanceof Response);
-      expect(response.status).toBe(200);
-      expect(await response.json()).toEqual(
-        path === '/.well-known/poppy.json'
-          ? metadata
-          : {
-              resource: 'https://company.example',
-              authorization_servers: ['https://clerk.company.example'],
-              scopes_supported: ['poppy:browser-sign-in', 'profile'],
-              bearer_methods_supported: ['header'],
-            },
-      );
-      expect(response.headers.get('cache-control')).toBe('no-store');
-      expect(__experimental_getPoppyJson).toHaveBeenCalledExactlyOnceWith();
-      expect(authenticateRequestMock).not.toHaveBeenCalled();
-    },
-  );
+  it.each([
+    'https://company.example/.well-known/poppy.json',
+    'https://company.example/.well-known/oauth-protected-resource',
+    'https://preview.example/.well-known/poppy.json',
+    'https://preview.example/.well-known/oauth-protected-resource',
+  ])('serves %s from the Backend API artifact before authentication', async url => {
+    const __experimental_getPoppyJson = vi.fn().mockResolvedValue(metadata);
+    vi.mocked(clerkClient).mockResolvedValue(
+      Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
+    );
+    const middleware = clerkMiddleware({ __experimental_poppy: true });
+    const response = await middleware(mockRequest({ url }), {} as NextFetchEvent);
+    assert(response instanceof Response);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(
+      url.endsWith('/.well-known/poppy.json')
+        ? metadata
+        : {
+            resource: 'https://company.example',
+            authorization_servers: ['https://clerk.company.example'],
+            scopes_supported: ['poppy:browser-sign-in', 'profile'],
+            bearer_methods_supported: ['header'],
+          },
+    );
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    expect(__experimental_getPoppyJson).toHaveBeenCalledExactlyOnceWith();
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
 
   it.each([
     { path: '/.well-known/poppy.json', method: 'POST' },
@@ -1654,20 +1656,6 @@ describe('Poppy middleware', () => {
     expect(await response.json()).toEqual(metadata);
     expect(__experimental_getPoppyJson).toHaveBeenCalledExactlyOnceWith();
     expect(authenticateRequestMock).not.toHaveBeenCalled();
-  });
-
-  it('rejects discovery on a different Company origin', async () => {
-    const __experimental_getPoppyJson = vi.fn().mockResolvedValue({
-      ...metadata,
-      organization: { ...metadata.organization, domain: 'other.example' },
-    });
-    vi.mocked(clerkClient).mockResolvedValue(
-      Object.assign(await clerkClient(), { artifacts: { __experimental_getPoppyJson } }),
-    );
-    const middleware = clerkMiddleware({ __experimental_poppy: true });
-    await expect(
-      middleware(mockRequest({ url: 'https://company.example/.well-known/poppy.json' }), {} as NextFetchEvent),
-    ).rejects.toThrow('configured Company origin');
   });
 
   it.each(['/.well-known/poppy.json', '/.well-known/oauth-protected-resource'])(
