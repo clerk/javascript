@@ -48,7 +48,7 @@ const livePages = new Set([
   '/misc/sign-in-with-metamask-button',
   '/misc/sign-up-button',
   '/misc/sign-out-button',
-  '/user-button/user-button',
+  '/switcher/switcher',
 ]);
 
 const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);

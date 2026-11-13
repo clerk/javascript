@@ -58,13 +58,13 @@ Import the stylesheet and render Mosaic components beneath the SDK `ClerkProvide
 
 ```tsx
 import { ClerkProvider } from '@clerk/react';
-import { UserButton } from '@clerk/mosaic';
+import { Switcher } from '@clerk/mosaic';
 import '@clerk/mosaic/styles.css';
 
 export function App({ children }) {
   return (
     <ClerkProvider publishableKey={process.env.CLERK_PUBLISHABLE_KEY}>
-      <UserButton />
+      <Switcher />
       {children}
     </ClerkProvider>
   );

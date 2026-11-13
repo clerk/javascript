@@ -18,7 +18,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
-import type { OrganizationSwitcherProps } from '../organization-switcher';
+import type { OrganizationSwitcherProps } from '../../switcher/switcher';
 import { OrganizationSwitcher } from '../organization-switcher';
 
 beforeAll(async () => {

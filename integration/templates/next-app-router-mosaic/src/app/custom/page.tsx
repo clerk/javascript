@@ -1,6 +1,6 @@
 'use client';
 
-import { MosaicProvider, UserButton } from '@clerk/mosaic';
+import { Switcher, MosaicProvider } from '@clerk/mosaic';
 
 export default function Page() {
   return (
@@ -12,7 +12,7 @@ export default function Page() {
         },
       }}
     >
-      <UserButton customMenuItems={[{ id: 'custom-link', label: 'Custom link', href: '/custom/link-target' }]} />
+      <Switcher customMenuItems={[{ id: 'custom-link', label: 'Custom link', href: '/custom/link-target' }]} />
     </MosaicProvider>
   );
 }

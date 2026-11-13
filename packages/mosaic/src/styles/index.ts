@@ -192,6 +192,7 @@ export type {
 export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
+export { Switcher } from '../features/switcher/switcher';
 export { TaskChooseOrganization } from '../features/task-choose-organization/task-choose-organization';
 export { TaskSetupMFA } from '../features/task-setup-mfa/task-setup-mfa';
 export { UserButton } from '../features/user-button/user-button';

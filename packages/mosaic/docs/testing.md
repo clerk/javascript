@@ -2,7 +2,7 @@
 
 Read this when you write, move or review a test in `packages/mosaic` (`*.test.ts(x)`, `*.feature.test.tsx`, `*.browser.test.tsx`, `*.visual.test.tsx`, `*.test-d.ts`, or anything under `__tests__/`). It covers which tier a behavior belongs in, where test files go, the feature-test toolkit and screenshot tests; what a feature test should assert for each layer is in the Testing section of [Models](models.md#testing), [Controllers](controllers.md#testing) and [Views](views.md#testing).
 
-Worked example: `src/features/user-button/__tests__/user-button.feature.test.tsx`.
+Worked example: `src/features/switcher/__tests__/switcher.feature.test.tsx`.
 
 ## Rules
 
@@ -64,7 +64,7 @@ it('makes the selected organization active and closes', async () => {
     client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: 'org_1' })]),
     memberships: [fapiMembership(acme), fapiMembership(other)],
   });
-  await renderWithClerk(<UserButton />);
+  await renderWithClerk(<Switcher />);
   const user = userEvent.setup();
 
   await user.click(screen.getByRole('button', { name: /Open account menu/ }));
