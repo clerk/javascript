@@ -140,7 +140,7 @@ export const assertIssuerClaim = (iss: unknown, issuer?: string | string[]) => {
 };
 
 export const assertExpirationClaim = (exp: number, clockSkewInMs: number) => {
-  if (typeof exp !== 'number') {
+  if (typeof exp !== 'number' || !Number.isFinite(exp)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
@@ -152,7 +152,7 @@ export const assertExpirationClaim = (exp: number, clockSkewInMs: number) => {
   const expiryDate = new Date(0);
   expiryDate.setUTCSeconds(exp);
 
-  const expired = expiryDate.getTime() <= currentDate.getTime() - clockSkewInMs;
+  const expired = Math.trunc(exp) * 1000 <= currentDate.getTime() - clockSkewInMs;
   if (expired) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenExpired,
@@ -166,7 +166,7 @@ export const assertActivationClaim = (nbf: number | undefined, clockSkewInMs: nu
     return;
   }
 
-  if (typeof nbf !== 'number') {
+  if (typeof nbf !== 'number' || !Number.isFinite(nbf)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
@@ -178,7 +178,7 @@ export const assertActivationClaim = (nbf: number | undefined, clockSkewInMs: nu
   const notBeforeDate = new Date(0);
   notBeforeDate.setUTCSeconds(nbf);
 
-  const early = notBeforeDate.getTime() > currentDate.getTime() + clockSkewInMs;
+  const early = Math.trunc(nbf) * 1000 > currentDate.getTime() + clockSkewInMs;
   if (early) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenNotActiveYet,
@@ -192,7 +192,7 @@ export const assertIssuedAtClaim = (iat: number | undefined, clockSkewInMs: numb
     return;
   }
 
-  if (typeof iat !== 'number') {
+  if (typeof iat !== 'number' || !Number.isFinite(iat)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
@@ -204,7 +204,7 @@ export const assertIssuedAtClaim = (iat: number | undefined, clockSkewInMs: numb
   const issuedAtDate = new Date(0);
   issuedAtDate.setUTCSeconds(iat);
 
-  const postIssued = issuedAtDate.getTime() > currentDate.getTime() + clockSkewInMs;
+  const postIssued = Math.trunc(iat) * 1000 > currentDate.getTime() + clockSkewInMs;
   if (postIssued) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenIatInTheFuture,
