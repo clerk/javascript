@@ -30,6 +30,7 @@ export * from './Feature';
 export * from './IdentificationLink';
 export * from './Image';
 export * from './Organization';
+export * from './OrganizationAccessPolicy';
 export * from './OrganizationDomain';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';

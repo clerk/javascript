@@ -12,6 +12,11 @@ import type {
   GetEnterpriseConnectionTestRunsParams,
 } from './enterpriseConnectionTestRun';
 import type {
+  CreateOrganizationAccessPolicyParams,
+  OrganizationAccessDomainOwnership,
+  OrganizationAccessPolicyResource,
+} from './organizationAccessPolicy';
+import type {
   CreateOrganizationDomainParams,
   OrganizationDomainResource,
   OrganizationDomainsBulkOwnershipVerificationResource,
@@ -190,6 +195,27 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     domainName: string,
     params?: Pick<CreateOrganizationDomainParams, 'enrollmentMode'>,
   ) => Promise<OrganizationDomainResource>;
+  /** @experimental */
+  getAccessPolicies: (
+    params?: ClerkPaginationParams,
+  ) => Promise<ClerkPaginatedResponse<OrganizationAccessPolicyResource>>;
+
+  /** @experimental */
+  getAccessPolicy: (params: { policyId: string }) => Promise<OrganizationAccessPolicyResource>;
+
+  /** @experimental */
+  createAccessPolicy: (params: CreateOrganizationAccessPolicyParams) => Promise<OrganizationAccessPolicyResource>;
+
+  /** @experimental */
+  prepareAccessPolicyOwnershipVerification: (params: {
+    domains: string[];
+  }) => Promise<ClerkPaginatedResponse<OrganizationAccessDomainOwnership>>;
+
+  /** @experimental */
+  attemptAccessPolicyOwnershipVerification: (params: {
+    domains: string[];
+  }) => Promise<ClerkPaginatedResponse<OrganizationAccessDomainOwnership>>;
+
   /**
    * Starts the verification process of multiple [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) at once by issuing a fresh TXT challenge for each of the given domains in a single request. Each resolved domain's `ownershipVerification` property carries the `txtRecordName` and `txtRecordValue` the Organization [admin](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) must publish. A single bad domain does not fail the batch; it lands in the returned [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object's `errors` array.
    * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.

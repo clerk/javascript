@@ -1,3 +1,4 @@
+import { hashKey } from '@tanstack/query-core';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
@@ -75,7 +76,13 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     staleTime: 60_000,
     enabled: queriesEnabled && !triggerInfinite,
     // Use placeholderData to keep previous data while fetching new page
-    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
+    placeholderData:
+      keepPreviousData && params.keepPreviousDataWithinScope
+        ? (previousData, previousQuery) =>
+            previousQuery && hashKey(previousQuery.queryKey.slice(0, 3)) === hashKey(keys.invalidationKey)
+              ? previousData
+              : undefined
+        : defineKeepPreviousDataFn(keepPreviousData),
   });
 
   // Infinite mode: accumulate pages

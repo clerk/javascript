@@ -1,4 +1,6 @@
-import type { EnterpriseConnectionJSON, OrganizationJSON } from '@clerk/shared/types';
+import { stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
+import type { EnterpriseConnectionJSON, OrganizationAccessPolicyJSON, OrganizationJSON } from '@clerk/shared/types';
+import { camelToSnake } from '@clerk/shared/underscore';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, Organization } from '../internal';
@@ -575,6 +577,155 @@ describe('Organization', () => {
 
       expect(() => JSON.stringify(organization)).not.toThrow();
       expect(JSON.parse(JSON.stringify(organization)).ssoBypassAllowlist).toEqual({});
+    });
+  });
+});
+
+describe('experimental organization access policies', () => {
+  const path = `/organizations/${ORG_ID}/access_policies`;
+  const policyJSON: OrganizationAccessPolicyJSON = {
+    object: 'organization_access_policy',
+    id: 'policy_123',
+    organization_id: ORG_ID,
+    default: false,
+    domains: [{ name: 'acme.com', affiliation_verified: false, ownership_verified: true }],
+    enrollment_mode: 'sso',
+    status: 'draft',
+    authentication: {
+      connections: [{ id: 'connection_1', name: 'Okta', active: true }],
+      directories: [],
+      provisioning: 'jit',
+      connection_required: false,
+    },
+    created_at: 1000,
+    updated_at: 2000,
+  };
+
+  it('reads paginated policies and preserves server fields and null values', async () => {
+    const defaultPolicy = {
+      ...policyJSON,
+      default: true,
+      enrollment_mode: 'invitation_only',
+      status: null,
+      authentication: null,
+      domains: [],
+    };
+    const fetchMock = vi.fn().mockResolvedValue({ response: { data: [policyJSON, defaultPolicy], total_count: 12 } });
+    BaseResource._fetch = fetchMock;
+
+    const result = await createOrganization().getAccessPolicies({ initialPage: 2, pageSize: 5 });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      { path, method: 'GET', search: new URLSearchParams({ limit: '5', offset: '5' }) },
+      { forceUpdateClient: true },
+    );
+    expect(result.total_count).toBe(12);
+    expect(result.data[0]).toMatchObject({
+      organizationId: ORG_ID,
+      domains: [{ name: 'acme.com', affiliationVerified: false, ownershipVerified: true }],
+      authentication: { connectionRequired: false },
+      createdAt: new Date(1000),
+    });
+    expect(result.data[1]).toMatchObject({ isDefault: true, status: null, authentication: null });
+  });
+
+  it('encodes SSO mutations and updates the resource from affiliation and reload responses', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ response: policyJSON });
+    BaseResource._fetch = fetchMock;
+    const org = createOrganization();
+    const policy = await org.createAccessPolicy({
+      domains: ['acme.com', 'acme.org'],
+      enrollmentMode: 'sso',
+      authentication: { connectionIds: ['connection_1'], connectionRequired: false },
+    });
+    const [createRequest] = fetchMock.mock.calls[0];
+    expect(createRequest).toMatchObject({ path, method: 'POST' });
+    const form = new URLSearchParams(stringifyQueryParams(createRequest.body, { keyEncoder: camelToSnake }));
+    expect(form.getAll('domains')).toEqual(['acme.com', 'acme.org']);
+    expect(form.get('enrollment_mode')).toBe('sso');
+    expect(JSON.parse(form.get('authentication') ?? '{}')).toEqual({
+      connections: ['connection_1'],
+      connection_required: false,
+    });
+
+    const policyPath = `${path}/${policy.id}`;
+    expect(await policy.update({ authentication: { directoryIds: [] } })).toBe(policy);
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        path: policyPath,
+        method: 'PATCH',
+        body: expect.objectContaining({ authentication: expect.objectContaining({ directories: [] }) }),
+      }),
+    );
+    await policy.prepareAffiliationVerification({ domain: 'acme.com', affiliationEmailAddress: 'admin@acme.com' });
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        path: `${policyPath}/prepare_affiliation_verification`,
+        method: 'POST',
+      }),
+    );
+
+    fetchMock.mockResolvedValue({
+      response: { ...policyJSON, domains: [{ ...policyJSON.domains[0], affiliation_verified: true }] },
+    });
+    expect(await policy.attemptAffiliationVerification({ domain: 'acme.com', code: '123456' })).toBe(policy);
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        path: `${policyPath}/attempt_affiliation_verification`,
+        method: 'POST',
+      }),
+    );
+    expect(policy.domains[0]?.affiliationVerified).toBe(true);
+
+    await policy.reload();
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ path: policyPath, method: 'GET' }),
+      expect.anything(),
+    );
+    await org.getAccessPolicy({ policyId: policy.id });
+    expect(fetchMock).toHaveBeenLastCalledWith({ path: policyPath, method: 'GET' });
+  });
+
+  it('verifies ownership by domain name before a policy exists', async () => {
+    const result = {
+      object: 'organization_access_domain_ownership',
+      domain: 'acme.com',
+      ownership_verified: false,
+      txt_record_name: '_clerk.acme.com',
+      txt_record_value: 'challenge',
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ response: { data: [result], total_count: 1 } })
+      .mockResolvedValueOnce({
+        response: {
+          data: [{ ...result, ownership_verified: true, txt_record_name: null, txt_record_value: null }],
+          total_count: 1,
+        },
+      });
+    BaseResource._fetch = fetchMock;
+    const org = createOrganization();
+    const params = { domains: ['acme.com'] };
+
+    expect(await org.prepareAccessPolicyOwnershipVerification(params)).toEqual({
+      data: [
+        { domain: 'acme.com', ownershipVerified: false, txtRecordName: '_clerk.acme.com', txtRecordValue: 'challenge' },
+      ],
+      total_count: 1,
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith({
+      path: `${path}/prepare_ownership_verification`,
+      method: 'POST',
+      body: params,
+    });
+    expect(await org.attemptAccessPolicyOwnershipVerification(params)).toEqual({
+      data: [{ domain: 'acme.com', ownershipVerified: true, txtRecordName: null, txtRecordValue: null }],
+      total_count: 1,
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith({
+      path: `${path}/attempt_ownership_verification`,
+      method: 'POST',
+      body: params,
     });
   });
 });

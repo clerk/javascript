@@ -89,3 +89,20 @@ export function isDirectoryConfigured(values: ConnectionConfiguration) {
       Boolean(values.serviceAccountFile && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.subjectEmail)))
   );
 }
+export async function isServiceAccountFile(file: File) {
+  try {
+    const key: unknown = JSON.parse(await file.text());
+    return Boolean(
+      key &&
+      typeof key === 'object' &&
+      'type' in key &&
+      key.type === 'service_account' &&
+      'private_key' in key &&
+      typeof key.private_key === 'string' &&
+      'client_email' in key &&
+      typeof key.client_email === 'string',
+    );
+  } catch {
+    return false;
+  }
+}

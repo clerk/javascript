@@ -37,6 +37,7 @@ function renderAccess(overrides: Partial<AccessData> = {}) {
         serviceProvider,
         onSavePolicy,
         onTestConnection: () => Promise.resolve({ success: true, email: 'person@example.com' }),
+        onRotateDirectoryToken: () => Promise.resolve('mock-token'),
         onVerifyDomain: () => Promise.resolve(true),
         ...overrides,
         onSaveConnection: async (...args) => {

@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
-import { Button } from '../../../components/button';
+import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { Flow } from '../../../components/flow';
@@ -11,8 +11,10 @@ import { Panel } from '../../../components/panel';
 import { Section } from '../../../components/section';
 import { Table } from '../../../components/table';
 import { Tabs } from '../../../components/tabs';
+import { Tooltip } from '../../../components/tooltip';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { ArrowLeft } from '../../../icons/glyphs/arrow-left';
+import { InformationCircle } from '../../../icons/glyphs/information-circle';
 import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
 import { themeProps } from '../../../props';
@@ -23,41 +25,64 @@ import type { AccessConnection, AccessPolicy, ConnectionKind } from './access.ty
 import { AccessConnectionFooter, AccessConnectionHeader, AccessConnectionSteps } from './access-connection.view';
 import { AccessDomainsView } from './access-domains.view';
 import { AccessProviderIcon } from './access-fields.view';
+import { AccessManageConnectionView } from './access-manage-connection.view';
 import { AccessPolicyView } from './access-policy.view';
 
 export function AccessBackAction({ controller: c }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
+  const manageBackLabel = c.step === 'editor' ? (c.form.values.id ? m.managePolicy : m.addPolicy) : m.connections;
   return (
     <Button
       variant='ghost'
       color='neutral'
-      aria-label={m.back}
-      xstyle={styles.back}
-      disabled={c.form.isSubmitting || c.wizard.pending}
-      onClick={c.request?.kind === 'directory' ? () => c.wizard.onOpenChange(false) : c.onBack}
+      aria-label={c.manageKind ? manageBackLabel : m.back}
+      xstyle={c.manageKind ? undefined : styles.back}
+      disabled={c.form.isSubmitting || c.wizard.pending || c.manager.pending}
+      onClick={
+        c.manageKind
+          ? c.manager.onClose
+          : c.request?.kind === 'directory'
+            ? () => c.wizard.onOpenChange(false)
+            : c.onBack
+      }
     >
       <Icon
         glyph={ArrowLeft}
         xstyle={rtl.mirror}
       />
+      {c.manageKind ? manageBackLabel : null}
     </Button>
   );
 }
 export function AccessFooter({ controller: c }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
+  if (c.manageKind) {
+    const { form, pending } = c.manager;
+    return (
+      <SubmitButton
+        form={form.id}
+        isPending={form.isSubmitting}
+        disabled={!form.isDirty || !form.canSubmit || pending}
+      >
+        {m.saveConnection}
+      </SubmitButton>
+    );
+  }
   if (c.request?.kind === 'directory') {
     return <AccessConnectionFooter controller={c.wizard} />;
   }
   return (
     <>
-      <Button
-        variant='outline'
-        color='neutral'
-        disabled={c.form.isSubmitting}
-        onClick={c.onSaveDraft}
-      >
-        {m.saveDraft}
-      </Button>
+      {!c.data.live || c.form.values.authentication === 'sso' ? (
+        <Button
+          variant='outline'
+          color='neutral'
+          disabled={c.form.isSubmitting}
+          onClick={c.onSaveDraft}
+        >
+          {m.saveDraft}
+        </Button>
+      ) : null}
       <Button
         disabled={c.form.isSubmitting || !c.canActivate}
         onClick={c.onActivate}
@@ -70,18 +95,19 @@ export function AccessFooter({ controller: c }: { controller: AccessController }
 export function OrganizationProfileAccessPanelView({
   controller: c,
   title,
+  showEditorControls = false,
 }: {
   controller: AccessController;
   title?: string;
+  showEditorControls?: boolean;
 }) {
-  const m = useMessages('organizationProfile').access;
-  const step = c.request?.kind === 'directory' ? 'directory' : c.step;
   return (
     <Panel.Root render={<div {...themeProps('organization-profile-access-panel')} />}>
-      <Panel.Title>{title ?? m.title}</Panel.Title>
+      <Panel.Title>{title ?? c.pageTitle}</Panel.Title>
+      {showEditorControls && c.pageStep !== 'list' ? <AccessBackAction controller={c} /> : null}
       <Flow.Root
         xstyle={styles.pageFlow}
-        value={step}
+        value={c.pageStep}
         direction={c.direction}
         state={c}
       >
@@ -100,6 +126,18 @@ export function OrganizationProfileAccessPanelView({
               <AccessPolicyView controller={current} />
             </Flow.Step>
             <Flow.Step
+              ids={['manage']}
+              xstyle={styles.pageStep}
+            >
+              {current.manageKind ? (
+                <AccessManageConnectionView
+                  controller={current.manager}
+                  kind={current.manageKind}
+                  serviceProvider={current.manageServiceProvider}
+                />
+              ) : null}
+            </Flow.Step>
+            <Flow.Step
               ids={['directory']}
               xstyle={styles.pageStep}
             >
@@ -114,6 +152,11 @@ export function OrganizationProfileAccessPanelView({
           </>
         )}
       </Flow.Root>
+      {showEditorControls && c.pageStep !== 'list' ? (
+        <Section.Actions>
+          <AccessFooter controller={c} />
+        </Section.Actions>
+      ) : null}
       <AccessDomainsView controller={c} />
       <Dialog.Root
         open={c.request?.kind === 'sso'}
@@ -125,7 +168,7 @@ export function OrganizationProfileAccessPanelView({
             xstyle={styles.dialogCard}
             renderBranding={false}
           >
-            <AccessConnectionHeader editing={c.wizard.editing} />
+            <AccessConnectionHeader />
             <Card.Banner color='negative'>{c.wizard.form.error}</Card.Banner>
             <Card.Content>
               <AccessConnectionSteps
@@ -157,6 +200,8 @@ function AccessOverview({ controller: c }: { controller: AccessController }) {
         value='policies'
         xstyle={styles.stack}
       >
+        {c.policyLoad.isPending ? <div role='status'>{m.loadingPolicy}</div> : null}
+        <Section.Error>{c.policyLoad.error}</Section.Error>
         <Section.Root>
           <Section.Group>
             <Section.Header>
@@ -165,7 +210,14 @@ function AccessOverview({ controller: c }: { controller: AccessController }) {
                 <Section.Description>{m.description}</Section.Description>
               </Section.Content>
               <Section.Actions xstyle={styles.headerActions}>
-                <Button onClick={() => c.onEdit()}>{m.addPolicy}</Button>
+                {c.data.canCreatePolicy !== false ? (
+                  <Button
+                    disabled={c.policyLoad.isPending}
+                    onClick={() => c.onEdit()}
+                  >
+                    {m.addPolicy}
+                  </Button>
+                ) : null}
               </Section.Actions>
             </Section.Header>
             <PolicyTable
@@ -187,6 +239,20 @@ function AccessOverview({ controller: c }: { controller: AccessController }) {
               />
             </Section.Group>
           </Section.Root>
+        ) : null}
+        {c.data.policyListError ? (
+          <div>
+            <Section.Error>{m.loadPoliciesError}</Section.Error>
+            <Button onClick={() => void c.data.retryPolicies?.()}>{m.retry}</Button>
+          </div>
+        ) : c.data.loadMorePolicies ? (
+          <SubmitButton
+            type='button'
+            isPending={Boolean(c.data.isLoadingMorePolicies)}
+            onClick={c.data.loadMorePolicies}
+          >
+            {m.loadMorePolicies}
+          </SubmitButton>
         ) : null}
       </Tabs.Panel>
       <Tabs.Panel
@@ -213,18 +279,30 @@ function ConnectionsTable({ controller: c, kind }: { controller: AccessControlle
       <Section.Group>
         <Section.Header>
           <Section.Title>{title}</Section.Title>
-          <Section.Actions xstyle={styles.headerActions}>
-            <Button
-              variant='outline'
-              color='neutral'
-              aria-label={kind === 'sso' ? m.addConnection : m.addDirectory}
-              onClick={() => c.onSetup(kind)}
-            >
-              <Icon glyph={Plus} />
-              {m.add}
-            </Button>
-          </Section.Actions>
+          {(kind === 'sso' ? c.data.canCreateSso : c.data.canCreateDirectory) !== false ? (
+            <Section.Actions xstyle={styles.headerActions}>
+              <Button
+                size='sm'
+                variant='outline'
+                color='neutral'
+                aria-label={kind === 'sso' ? m.addConnection : m.addDirectory}
+                onClick={() => c.onSetup(kind)}
+              >
+                <Icon glyph={Plus} />
+                {m.add}
+              </Button>
+            </Section.Actions>
+          ) : null}
         </Section.Header>
+        {c.data.isLoadingConnections ? (
+          <Section.Description role='status'>{m.loadingConnections}</Section.Description>
+        ) : null}
+        {c.data.connectionLoadError ? (
+          <Section.Error>
+            {m.loadConnectionsError}
+            <Button onClick={() => void c.data.retryConnections?.()}>{m.retry}</Button>
+          </Section.Error>
+        ) : null}
         <Table.Root aria-label={title}>
           <Table.Header>
             <Table.Column width='50%'>{m.connection}</Table.Column>
@@ -252,10 +330,12 @@ function ConnectionsTable({ controller: c, kind }: { controller: AccessControlle
                   </Badge>
                 </Table.Cell>
                 <Table.Cell align='end'>
-                  <ActionMenu
-                    label={m.actions}
-                    actions={[{ label: m.manage, onClick: () => c.onSetup(kind, item) }]}
-                  />
+                  {item.canManage !== false ? (
+                    <ActionMenu
+                      label={m.actions}
+                      actions={[{ label: m.manage, onClick: () => c.onManage(item.id) }]}
+                    />
+                  ) : null}
                 </Table.Cell>
               </Table.Row>
             )}
@@ -286,14 +366,20 @@ function PolicyTable({
 }) {
   const m = useMessages('organizationProfile').access;
   const rows = policies.map(policy => ({ id: policy.id, policy }));
-  const items: { id: string; policy?: AccessPolicy }[] = includeDefault ? [...rows, { id: 'everyone' }] : rows;
+  const items: { id: string; policy?: AccessPolicy }[] =
+    includeDefault && (c.data.defaultPolicy || !c.data.live)
+      ? [...rows, { id: c.data.defaultPolicy?.id ?? 'everyone' }]
+      : rows;
   return (
     <Table.Root aria-label={m.policies}>
       <Table.Header>
         <Table.Column>{m.target}</Table.Column>
         <Table.Column>{m.enrollment}</Table.Column>
         <Table.Column>{m.authentication}</Table.Column>
-        <Table.Column>
+        <Table.Column
+          width='3.5rem'
+          align='end'
+        >
           <VisuallyHidden>{m.actions}</VisuallyHidden>
         </Table.Column>
       </Table.Header>
@@ -305,11 +391,14 @@ function PolicyTable({
         {item => (
           <Table.Row key={item.id}>
             <Table.Cell>
-              {item.policy
-                ? item.policy.domains.map(domain => domain.name).join(', ') || m.draft
-                : policies.length
-                  ? m.everyoneElse
-                  : m.everyone}
+              {item.policy ? (
+                item.policy.domains.map(domain => domain.name).join(', ') || m.draft
+              ) : (
+                <PolicyLabelWithHelp
+                  label={policies.length ? m.everyoneElse : m.everyone}
+                  description={m.everyoneDescription}
+                />
+              )}
               {item.policy && item.policy.status !== 'active' ? (
                 <Badge
                   color='neutral'
@@ -325,22 +414,38 @@ function PolicyTable({
                   connection =>
                     item.policy?.enrollment === 'directory' && item.policy.directoryConnectionId === connection.id,
                 )}
-                fallback={item.policy ? m[item.policy.enrollment] : m.invitation}
+                fallback={
+                  (item.policy?.directoryConnectionId &&
+                    item.policy.connectionNames?.[item.policy.directoryConnectionId]) ||
+                  m[item.policy?.enrollment ?? c.data.defaultPolicy?.enrollment ?? 'invitation']
+                }
               />
             </Table.Cell>
             <Table.Cell>
-              <PolicyConnections
-                connections={c.data.connections.filter(
-                  connection =>
-                    item.policy?.authentication === 'sso' && item.policy.ssoConnectionIds.includes(connection.id),
-                )}
-                fallback={item.policy?.authentication === 'sso' ? m.sso : m.defaultAuthentication}
-              />
+              {item.policy?.authentication === 'sso' ? (
+                <PolicyConnections
+                  connections={c.data.connections.filter(connection =>
+                    item.policy?.ssoConnectionIds.includes(connection.id),
+                  )}
+                  fallback={
+                    item.policy.ssoConnectionIds
+                      .map(id => item.policy?.connectionNames?.[id])
+                      .filter(Boolean)
+                      .join(', ') || m.sso
+                  }
+                />
+              ) : (
+                <PolicyLabelWithHelp
+                  label={m.defaultAuthentication}
+                  description={m.defaultDescription}
+                />
+              )}
             </Table.Cell>
-            <Table.Cell>
-              {item.policy ? (
+            <Table.Cell align='end'>
+              {item.policy && item.policy.canEdit !== false ? (
                 <ActionMenu
                   label={m.actions}
+                  disabled={c.policyLoad.isPending}
                   actions={[{ label: m.manage, onClick: () => c.onEdit(item.policy) }]}
                 />
               ) : null}
@@ -349,6 +454,32 @@ function PolicyTable({
         )}
       </Table.Body>
     </Table.Root>
+  );
+}
+
+function PolicyLabelWithHelp({ label, description }: { label: string; description: string }) {
+  return (
+    <span {...stylex.props(styles.policyLabel)}>
+      {label}
+      <Tooltip.Root>
+        <Tooltip.Trigger
+          aria-label={description}
+          render={
+            <Button
+              variant='link'
+              color='neutral'
+              size='xs'
+            />
+          }
+        >
+          <Icon
+            glyph={InformationCircle}
+            size='sm'
+          />
+        </Tooltip.Trigger>
+        <Tooltip.Popup>{description}</Tooltip.Popup>
+      </Tooltip.Root>
+    </span>
   );
 }
 

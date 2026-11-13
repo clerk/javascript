@@ -12,6 +12,7 @@ import { OrganizationProfileProvider } from './organization-profile.provider';
 import type { OrganizationProfilePageId, OrganizationProfilePages } from './organization-profile.types';
 import type { OrganizationProfileViewProps } from './organization-profile.view';
 import { OrganizationProfileView } from './organization-profile.view';
+import { OrganizationProfileAccessPanel } from './organization-profile-access-panel/access';
 import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 import { OrganizationProfileMembersPanel } from './organization-profile-members-panel/organization-profile-members-panel';
@@ -83,7 +84,8 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
     apiKeysProps = organizationProfileProps?.apiKeysProps,
   } = props;
   const model = useOrganizationProfileModel();
-  const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
+  const pages =
+    model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps, model.organizationId) : undefined;
   const { activePage, onPageChange } = useProfilePagesController(
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
     { routing: 'virtual', path },
@@ -117,10 +119,12 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
 export function organizationProfilePanels(
   available: readonly OrganizationProfilePageId[],
   { hide: hideAPIKeys = false, ...apiKeysProps }: APIKeysPageProps = {},
+  organizationId?: string,
 ): OrganizationProfilePages {
   return {
     general: <OrganizationProfileGeneralPanel />,
     members: available.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
+    access: available.includes('access') ? <OrganizationProfileAccessPanel key={organizationId} /> : undefined,
     apiKeys:
       available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
   };

@@ -227,7 +227,7 @@ function CombinedUserProfileView({
   const model = useOrganizationProfileModel();
   const organization =
     model.status === 'ready'
-      ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
+      ? { pages: organizationProfilePanels(model.pages, apiKeysProps, model.organizationId), customPages, pageOrder }
       : undefined;
   const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
   const { activePage, onPageChange } = useProfilePagesController(pageIds, {
