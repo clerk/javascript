@@ -80,6 +80,10 @@ export function SignInView({
   onEmailSupport,
   pendingFactorId,
   onSelectFactor,
+  pendingAccountId,
+  onSelectAccount,
+  onAddAccount,
+  onSignOutAll,
   onResend,
   canResend,
   resendRemainingSeconds,
@@ -215,7 +219,15 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={['choice:methods', 'choice:reset-methods', 'choice:enterprise-connections']}>
+              <Flow.Step
+                ids={[
+                  'choice:methods',
+                  'choice:reset-methods',
+                  'choice:enterprise-connections',
+                  'choice:accounts',
+                  'choice:wallets',
+                ]}
+              >
                 {current.kind === 'choice' ? (
                   <ChoiceStep
                     focusRef={focusRef}
@@ -233,9 +245,15 @@ export function SignInView({
                     onBack={onBack}
                     logo={logo}
                     globalErrorMessage={globalErrorMessage}
+                    socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
                     onSelectProvider={onSelectProvider}
                     onCancel={onCancel}
+                    pendingAccountId={pendingAccountId}
+                    isDisabled={isDisabled}
+                    onSelectAccount={onSelectAccount}
+                    onAddAccount={onAddAccount}
+                    onSignOutAll={onSignOutAll}
                   />
                 ) : null}
               </Flow.Step>

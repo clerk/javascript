@@ -38,6 +38,8 @@ export type SignInStep =
     }
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
+  | { kind: 'choice'; purpose: 'accounts'; options: readonly SignInAccount[] }
+  | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
   | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
@@ -52,6 +54,13 @@ export interface SignInActionBlockedDetails {
   linkUrl?: string;
   linkText?: string;
   traceId?: string;
+}
+
+export interface SignInAccount {
+  id: string;
+  name: string;
+  identifier: string;
+  imageUrl?: string;
 }
 
 export interface SignInProvider {
@@ -107,6 +116,10 @@ export interface SignInViewProps {
   onEmailSupport: () => void;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
+  pendingAccountId?: string;
+  onSelectAccount: (id: string) => void;
+  onAddAccount?: () => void;
+  onSignOutAll?: () => void;
   onResend?: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;

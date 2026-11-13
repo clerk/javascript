@@ -8,8 +8,11 @@ import { Key } from '../../../icons/glyphs/key';
 import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
-import type { SignInFactor, SignInStep } from '../sign-in.types';
+import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
+import { SignInAccounts } from './sign-in-accounts';
+import { SignInAlternativeMethods } from './sign-in-alternative-methods';
 import { SignInEnterpriseConnections } from './sign-in-enterprise-connections';
+import { SignInWallets } from './sign-in-wallets';
 
 const factorIcon = {
   password: SecurityLockSquare,
@@ -32,9 +35,15 @@ interface ChoiceStepProps {
   onBack: () => void;
   logo?: { src: string; alt: string };
   globalErrorMessage?: string;
+  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   onCancel?: () => void;
+  pendingAccountId?: string;
+  isDisabled: boolean;
+  onSelectAccount: (id: string) => void;
+  onAddAccount?: () => void;
+  onSignOutAll?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -48,11 +57,46 @@ export function ChoiceStep({
   onBack,
   logo,
   globalErrorMessage,
+  socialProviders,
   pendingProviderId,
   onSelectProvider,
   onCancel,
+  pendingAccountId,
+  isDisabled,
+  onSelectAccount,
+  onAddAccount,
+  onSignOutAll,
   focusRef,
 }: ChoiceStepProps) {
+  if (step.purpose === 'wallets') {
+    return (
+      <SignInWallets
+        focusRef={focusRef}
+        wallets={step.options}
+        globalErrorMessage={globalErrorMessage}
+        pendingWalletId={pendingProviderId}
+        isDisabled={isDisabled}
+        onSelectWallet={onSelectProvider}
+        onBack={onBack}
+      />
+    );
+  }
+
+  if (step.purpose === 'accounts') {
+    return (
+      <SignInAccounts
+        focusRef={focusRef}
+        accounts={step.options}
+        globalErrorMessage={globalErrorMessage}
+        pendingAccountId={pendingAccountId}
+        isDisabled={isDisabled}
+        onSelectAccount={onSelectAccount}
+        onAddAccount={onAddAccount}
+        onSignOutAll={onSignOutAll}
+      />
+    );
+  }
+
   if (step.purpose === 'enterprise-connections') {
     return (
       <SignInEnterpriseConnections
@@ -67,15 +111,37 @@ export function ChoiceStep({
     );
   }
 
+  const methods = step.options.map(factor => ({
+    id: factor.id,
+    label: factorLabel(factor),
+    icon: factorIcon[factor.strategy],
+  }));
+
+  if (step.purpose === 'methods') {
+    return (
+      <SignInAlternativeMethods
+        focusRef={focusRef}
+        title={messages.title}
+        description={messages.description}
+        methods={methods}
+        pendingMethodId={pendingFactorId}
+        onSelectMethod={onSelectFactor}
+        socialProviders={socialProviders}
+        pendingProviderId={pendingProviderId}
+        onSelectProvider={onSelectProvider}
+        isDisabled={isDisabled}
+        globalErrorMessage={globalErrorMessage}
+        onBack={onBack}
+        onShowHelp={onShowHelp}
+      />
+    );
+  }
+
   return (
     <VerificationMethodPicker
       focusRef={focusRef}
       messages={messages}
-      methods={step.options.map(factor => ({
-        id: factor.id,
-        label: factorLabel(factor),
-        icon: factorIcon[factor.strategy],
-      }))}
+      methods={methods}
       pendingMethodId={pendingFactorId}
       onSelect={onSelectFactor}
       onHelp={onShowHelp}

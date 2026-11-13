@@ -34,6 +34,8 @@ describe('stepKey', () => {
       [{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }, 'code:verify-email'],
       [{ kind: 'choice', purpose: 'methods', options: [] }, 'choice:methods'],
       [{ kind: 'choice', purpose: 'reset-methods', options: [] }, 'choice:reset-methods'],
+      [{ kind: 'choice', purpose: 'accounts', options: [] }, 'choice:accounts'],
+      [{ kind: 'choice', purpose: 'wallets', options: [] }, 'choice:wallets'],
       [{ kind: 'notice', purpose: 'help' }, 'notice:help'],
       [
         { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' },

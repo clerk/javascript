@@ -2,6 +2,7 @@ import { Button } from '@clerk/mosaic/components/button';
 import type { FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
+  SignInAccount,
   SignInFactor,
   SignInIdentifierField,
   SignInProvider,
@@ -386,7 +387,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           void submitCode(code);
         }}
         isPending={isPending || form.isSubmitting}
-        isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId)}
+        isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId) || Boolean(pendingFactorId)}
         errorMessage={errorMessage}
         globalErrorMessage={globalErrorMessage}
         newPasswordFeedback={
@@ -407,6 +408,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         onEmailSupport={() => setSupportRequested(true)}
         pendingFactorId={pendingFactorId}
         onSelectFactor={onSelectFactor}
+        onSelectAccount={() => undefined}
         onResend={offersResend(step) ? onResend : undefined}
         canResend={canResend && !isPending}
       />
@@ -522,6 +524,9 @@ function StepPanel({
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
       onJoinWaitlist={onJoinWaitlist}
+      onSelectAccount={() => undefined}
+      onAddAccount={() => undefined}
+      onSignOutAll={() => undefined}
       onForgotPassword={() => undefined}
       onCancel={
         onCancel ??
@@ -798,7 +803,24 @@ export function CodeVerifyEmail() {
 }
 
 export function ChoiceMethods() {
-  return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
+  return (
+    <StepPanel
+      step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }}
+      providers={[]}
+    />
+  );
+}
+
+export function ChoiceMethodsWithProviders() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'choice',
+        purpose: 'methods',
+        options: [{ id: 'passkey', stage: 'first', strategy: 'passkey' }, ...firstFactors.slice(1)],
+      }}
+    />
+  );
 }
 
 export function ChoiceEnterpriseConnections() {
@@ -815,6 +837,29 @@ export function ChoiceEnterpriseConnections() {
       combined={false}
     />
   );
+}
+
+const accounts: SignInAccount[] = [
+  {
+    id: 'sess_1',
+    name: 'Cameron Walker',
+    identifier: 'cameron@acme.com',
+    imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+  },
+  { id: 'sess_2', name: 'Jane Doe', identifier: 'jane@acme.com' },
+];
+
+export function ChoiceAccounts() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'accounts', options: accounts }} />;
+}
+
+const wallets: SignInProvider[] = [
+  { id: 'phantom', name: 'Phantom', iconUrl: 'https://img.clerk.com/static/phantom.svg' },
+  { id: 'metamask', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+];
+
+export function ChoiceWallets() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: wallets }} />;
 }
 
 export function ChoiceResetMethods() {
