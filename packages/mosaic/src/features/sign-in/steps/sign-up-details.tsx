@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode, Ref } from 'react';
@@ -27,6 +28,7 @@ import type {
   SignUpLegalConsent,
 } from '../sign-in.types';
 import { legalConsentLabel, signUpFieldNames, signUpHeading } from '../sign-in.utils';
+import { SignInCaptcha } from './sign-in-captcha';
 
 interface SignUpDetailsProps {
   step: Extract<SignInStep, { kind: 'sign-up' }>;
@@ -42,6 +44,9 @@ interface SignUpDetailsProps {
   passwordFeedback?: FieldFeedback;
   onSignIn?: () => void;
   focusRef?: Ref<HTMLElement>;
+  heading?: { title: string; description: string };
+  logo?: { src: string; alt: string };
+  captcha?: boolean;
 }
 
 export function SignUpDetailsStep({
@@ -58,41 +63,29 @@ export function SignUpDetailsStep({
   passwordFeedback,
   onSignIn,
   focusRef,
+  heading: headingProp,
+  logo,
+  captcha = false,
 }: SignUpDetailsProps) {
   const m = useMessages('signIn');
-  const { fields, nextField, legalConsent } = step;
-  const heading = signUpHeading(step, m);
+  const { fields, legalConsent } = step;
+  const heading = headingProp ?? signUpHeading(step, m);
   const [first] = signUpFieldNames(fields);
   const onlyLegalConsent = Boolean(legalConsent) && !first;
-  const switchedRef = useRef(false);
-  const focusAfterSwitch = useCallback((element: HTMLElement | null) => {
-    if (element && switchedRef.current) {
-      switchedRef.current = false;
-      element.focus();
-    }
-  }, []);
-  const field = (name: SignUpFieldName) => ({
-    form,
-    required: fields[name]?.required ?? false,
-    disabled: isDisabled,
-    autoFocus: first === name,
-    inputRef: first === name ? focusRef : undefined,
-  });
-  const switchField =
-    nextField && onSwitchField
-      ? {
-          switchRef: focusAfterSwitch,
-          switchLabel: nextField === 'phoneNumber' ? m.signUp.usePhone : m.signUp.useEmail,
-          onSwitch: () => {
-            switchedRef.current = true;
-            onSwitchField();
-          },
-        }
-      : undefined;
-
+  const hasForm = Boolean(first) || Boolean(legalConsent);
+  const [isChallengeShown, setIsChallengeShown] = useState(false);
   return (
     <>
       <Card.Header>
+        {logo ? (
+          <Card.Media>
+            <img
+              src={logo.src}
+              alt={logo.alt}
+              {...stylex.props(styles.logo)}
+            />
+          </Card.Media>
+        ) : null}
         <Card.Title>{heading.title}</Card.Title>
         <Card.Description>{heading.description}</Card.Description>
       </Card.Header>
@@ -103,62 +96,30 @@ export function SignUpDetailsStep({
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
-        <SignUpProviders
-          providers={onlyLegalConsent ? [] : socialProviders}
-          pendingProviderId={pendingProviderId}
-          isDisabled={isDisabled}
-          onSelectProvider={onSelectProvider}
-        />
-        <Form
-          id={form.id}
-          onSubmit={onSubmit}
+        <div
+          {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
+          {...inertProps(isChallengeShown)}
         >
-          <div {...stylex.props(styles.fieldStack)}>
-            <NameFields
-              firstName={fields.firstName ? field('firstName') : undefined}
-              lastName={fields.lastName ? field('lastName') : undefined}
+          <SignUpProviders
+            providers={onlyLegalConsent ? [] : socialProviders}
+            showDivider={hasForm}
+            pendingProviderId={pendingProviderId}
+            isDisabled={isDisabled}
+            onSelectProvider={onSelectProvider}
+          />
+          {hasForm ? (
+            <SignUpFields
+              step={step}
+              form={form}
+              isDisabled={isDisabled}
+              onSubmit={onSubmit}
+              onSwitchField={onSwitchField}
+              passwordFeedback={passwordFeedback}
+              focusRef={focusRef}
             />
-            {fields.username ? (
-              <TextField
-                {...field('username')}
-                name='username'
-                label={m.signUp.usernameLabel}
-                placeholder={m.signUp.usernamePlaceholder}
-                autoComplete='username'
-              />
-            ) : null}
-            {fields.emailAddress ? (
-              <TextField
-                {...field('emailAddress')}
-                {...switchField}
-                name='identifier'
-                type='email'
-                label={m.signUp.emailLabel}
-                placeholder={m.signUp.emailPlaceholder}
-                autoComplete='email'
-              />
-            ) : null}
-            {fields.phoneNumber ? (
-              <PhoneField
-                {...field('phoneNumber')}
-                {...switchField}
-              />
-            ) : null}
-            {fields.password ? (
-              <PasswordField
-                {...field('password')}
-                advisoryFeedback={passwordFeedback}
-              />
-            ) : null}
-            {legalConsent ? (
-              <LegalConsentField
-                form={form}
-                consent={legalConsent}
-                disabled={isDisabled}
-              />
-            ) : null}
-          </div>
-        </Form>
+          ) : null}
+        </div>
+        {captcha ? <SignInCaptcha onInteractiveChange={setIsChallengeShown} /> : null}
         {onSignIn ? (
           <Text
             size='sm'
@@ -178,18 +139,115 @@ export function SignUpDetailsStep({
           </Text>
         ) : null}
       </Card.Content>
-      <Card.Footer>
-        <SubmitButton
-          form={form.id}
-          fullWidth
-          disabled={Boolean(pendingProviderId)}
-          isPending={isPending}
-          pendingLabel={m.verifying}
-        >
-          {m.continue}
-        </SubmitButton>
-      </Card.Footer>
+      {hasForm ? (
+        <Card.Footer xstyle={isChallengeShown && styles.spotlightHidden}>
+          <SubmitButton
+            form={form.id}
+            fullWidth
+            disabled={Boolean(pendingProviderId)}
+            isPending={isPending}
+            pendingLabel={m.verifying}
+          >
+            {m.continue}
+          </SubmitButton>
+        </Card.Footer>
+      ) : null}
     </>
+  );
+}
+
+function SignUpFields({
+  step,
+  form,
+  isDisabled,
+  onSubmit,
+  onSwitchField,
+  passwordFeedback,
+  focusRef,
+}: Pick<
+  SignUpDetailsProps,
+  'step' | 'form' | 'isDisabled' | 'onSubmit' | 'onSwitchField' | 'passwordFeedback' | 'focusRef'
+>) {
+  const m = useMessages('signIn');
+  const { fields, nextField, legalConsent } = step;
+  const [first] = signUpFieldNames(fields);
+  const switchedRef = useRef(false);
+  const focusAfterSwitch = useCallback((element: HTMLElement | null) => {
+    if (element && switchedRef.current) {
+      switchedRef.current = false;
+      element.focus();
+    }
+  }, []);
+  const field = (name: SignUpFieldName) => ({
+    form,
+    required: fields[name]?.required ?? false,
+    disabled: isDisabled || Boolean(fields[name]?.disabled),
+    autoFocus: first === name,
+    inputRef: first === name ? focusRef : undefined,
+  });
+  const switchField =
+    nextField && onSwitchField
+      ? {
+          switchRef: focusAfterSwitch,
+          switchLabel: nextField === 'phoneNumber' ? m.signUp.usePhone : m.signUp.useEmail,
+          onSwitch: () => {
+            switchedRef.current = true;
+            onSwitchField();
+          },
+        }
+      : undefined;
+
+  return (
+    <Form
+      id={form.id}
+      onSubmit={onSubmit}
+    >
+      <div {...stylex.props(styles.fieldStack)}>
+        <NameFields
+          firstName={fields.firstName ? field('firstName') : undefined}
+          lastName={fields.lastName ? field('lastName') : undefined}
+        />
+        {fields.username ? (
+          <TextField
+            {...field('username')}
+            name='username'
+            label={m.signUp.usernameLabel}
+            placeholder={m.signUp.usernamePlaceholder}
+            autoComplete='username'
+          />
+        ) : null}
+        {fields.emailAddress ? (
+          <TextField
+            {...field('emailAddress')}
+            {...switchField}
+            name='identifier'
+            type='email'
+            label={m.signUp.emailLabel}
+            placeholder={m.signUp.emailPlaceholder}
+            autoComplete='email'
+          />
+        ) : null}
+        {fields.phoneNumber ? (
+          <PhoneField
+            {...field('phoneNumber')}
+            {...switchField}
+          />
+        ) : null}
+        {fields.password ? (
+          <PasswordField
+            {...field('password')}
+            advisoryFeedback={passwordFeedback}
+          />
+        ) : null}
+        {legalConsent ? (
+          <LegalConsentField
+            form={form}
+            consent={legalConsent}
+            disabled={isDisabled}
+          />
+        ) : null}
+      </div>
+    </Form>
   );
 }
 
@@ -198,8 +256,10 @@ function SignUpProviders({
   pendingProviderId,
   isDisabled,
   onSelectProvider,
+  showDivider,
 }: {
   providers: readonly SignInProvider[];
+  showDivider: boolean;
   pendingProviderId?: string;
   isDisabled: boolean;
   onSelectProvider: (id: string) => void;
@@ -230,19 +290,21 @@ function SignUpProviders({
           />
         ))}
       </ProviderButtonGroup>
-      <div
-        role='separator'
-        {...stylex.props(styles.divider)}
-      >
-        <span {...stylex.props(styles.dividerLine)} />
-        <Text
-          size='sm'
-          color='foreground-secondary'
+      {showDivider ? (
+        <div
+          role='separator'
+          {...stylex.props(styles.divider)}
         >
-          {m.start.divider}
-        </Text>
-        <span {...stylex.props(styles.dividerLine)} />
-      </div>
+          <span {...stylex.props(styles.dividerLine)} />
+          <Text
+            size='sm'
+            color='foreground-secondary'
+          >
+            {m.start.divider}
+          </Text>
+          <span {...stylex.props(styles.dividerLine)} />
+        </div>
+      ) : null}
     </>
   );
 }

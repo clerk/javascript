@@ -421,6 +421,32 @@ import {
   Pending as SignOutButtonPending,
 } from '../stories/sign-out-button.stories';
 import {
+  ActionBlocked as SignUpActionBlocked,
+  AlternativePhone as SignUpAlternativePhone,
+  Continue as SignUpContinue,
+  ContinueLegalConsentOnly as SignUpContinueLegalConsentOnly,
+  Default as SignUpDefault,
+  EmailLinkSignedUp as SignUpEmailLinkSignedUp,
+  EnterpriseConnections as SignUpEnterpriseConnections,
+  Loading as SignUpLoading,
+  meta as signUpMeta,
+  ProtectCheck as SignUpProtectCheck,
+  Restricted as SignUpRestricted,
+  StartCaptcha as SignUpStartCaptcha,
+  StartEmailOrPhone as SignUpStartEmailOrPhone,
+  StartFormOnly as SignUpStartFormOnly,
+  StartInvitation as SignUpStartInvitation,
+  StartLegalConsent as SignUpStartLegalConsent,
+  StartProviderPending as SignUpStartProviderPending,
+  StartSocialOnly as SignUpStartSocialOnly,
+  VerifyEmail as SignUpVerifyEmail,
+  VerifyEmailLink as SignUpVerifyEmailLink,
+  VerifyPhone as SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel as SignUpVerifyPhoneAlternativeChannel,
+  Waitlist as SignUpWaitlist,
+  Wallets as SignUpWallets,
+} from '../stories/sign-up.stories';
+import {
   CustomElement as SignUpButtonCustomElement,
   Default as SignUpButtonDefault,
   meta as signUpButtonMeta,
@@ -1308,6 +1334,33 @@ const reverificationModule: StoryModule = {
   Help: ReverificationHelp,
 };
 
+const signUpModule: StoryModule = {
+  meta: signUpMeta,
+  Default: SignUpDefault,
+  StartSocialOnly: SignUpStartSocialOnly,
+  StartFormOnly: SignUpStartFormOnly,
+  StartInvitation: SignUpStartInvitation,
+  StartEmailOrPhone: SignUpStartEmailOrPhone,
+  StartLegalConsent: SignUpStartLegalConsent,
+  StartCaptcha: SignUpStartCaptcha,
+  StartProviderPending: SignUpStartProviderPending,
+  Continue: SignUpContinue,
+  ContinueLegalConsentOnly: SignUpContinueLegalConsentOnly,
+  Restricted: SignUpRestricted,
+  Waitlist: SignUpWaitlist,
+  AlternativePhone: SignUpAlternativePhone,
+  VerifyEmail: SignUpVerifyEmail,
+  VerifyPhone: SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel: SignUpVerifyPhoneAlternativeChannel,
+  VerifyEmailLink: SignUpVerifyEmailLink,
+  EmailLinkSignedUp: SignUpEmailLinkSignedUp,
+  EnterpriseConnections: SignUpEnterpriseConnections,
+  Wallets: SignUpWallets,
+  Loading: SignUpLoading,
+  ProtectCheck: SignUpProtectCheck,
+  ActionBlocked: SignUpActionBlocked,
+};
+
 const signInModule: StoryModule = {
   meta: signInMeta,
   Default: SignInDefault,
@@ -1433,6 +1486,7 @@ export const registry: StoryModule[] = [
   signOutButtonModule,
   // Authentication
   signInModule,
+  signUpModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
