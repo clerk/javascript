@@ -22,7 +22,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
     status: 'in-progress',
     renamedTo: 'Profile mode="user"',
   },
-  { stable: 'UserAvatar', beta: 'UserAvatar', status: 'available' },
+  { stable: 'UserAvatar', beta: 'UserAvatar', status: 'done' },
   {
     stable: 'OrganizationSwitcher',
     beta: 'OrganizationSwitcher',
@@ -42,7 +42,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
   },
   { stable: 'CreateOrganization', beta: 'CreateOrganization', status: 'in-progress' },
   { stable: 'OrganizationList', beta: 'OrganizationList', status: 'in-progress' },
-  { stable: 'Waitlist', beta: 'Waitlist', status: 'available' },
+  { stable: 'Waitlist', beta: 'Waitlist', status: 'done' },
   {
     stable: 'APIKeys',
     beta: 'APIKeys',
@@ -50,7 +50,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
   },
   { stable: 'OAuthConsent', beta: 'OAuthConsent', status: 'in-progress', renamedTo: 'Consent' },
   { stable: 'TaskChooseOrganization', beta: 'TaskChooseOrganization', status: 'in-progress' },
-  { stable: 'TaskSetupMFA', beta: 'TaskSetupMFA', status: 'in-progress' },
+  { stable: 'TaskSetupMFA', beta: 'TaskSetupMFA', status: 'done' },
   { stable: 'SignInButton', beta: 'SignInButton', status: 'done' },
   { stable: 'SignUpButton', beta: 'SignUpButton', status: 'done' },
   { stable: 'SignOutButton', beta: 'SignOutButton', status: 'done' },
