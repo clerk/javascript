@@ -11,6 +11,7 @@ import { useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { PhoneInput } from '../../../components/phone-input';
+import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
@@ -22,10 +23,9 @@ import type {
   SignInSubmitEvent,
   SignInValues,
 } from '../sign-in.types';
-import { identifierFieldCopy, startPrompt } from '../sign-in.utils';
+import { identifierFieldCopy, splitLastUsedProvider, startPrompt } from '../sign-in.utils';
 import { SignInAlternativeChannel } from './sign-in-alternative-channel';
 import { SignInCaptcha } from './sign-in-captcha';
-import { SignInProviderButtons } from './sign-in-provider-buttons';
 
 type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
 
@@ -268,15 +268,34 @@ function SignInProviders({
   if (providers.length === 0) {
     return null;
   }
+  const { lastUsed: lastUsedProvider, others: otherProviders } = splitLastUsedProvider(providers, lastUsedProviderId);
+  const providerButton = (provider: SignInProvider, badge?: string) => (
+    <ProviderButton
+      key={provider.id}
+      icon={
+        <img
+          src={provider.iconUrl}
+          alt=''
+          {...stylex.props(styles.providerIcon)}
+        />
+      }
+      longLabel={fill(m.start.socialButton, { provider: provider.name })}
+      shortLabel={provider.name}
+      badge={badge}
+      isPending={pendingProviderId === provider.id}
+      pendingLabel={m.verifying}
+      onClick={() => onSelectProvider(provider.id)}
+    />
+  );
+
   return (
     <>
-      <SignInProviderButtons
-        providers={providers}
-        pendingProviderId={pendingProviderId}
-        lastUsedProviderId={lastUsedProviderId}
-        isDisabled={isDisabled}
-        onSelectProvider={onSelectProvider}
-      />
+      <ProviderButtonGroup
+        disabled={isDisabled}
+        lastUsed={lastUsedProvider ? providerButton(lastUsedProvider, m.start.lastUsed) : undefined}
+      >
+        {otherProviders.map(provider => providerButton(provider))}
+      </ProviderButtonGroup>
       <div
         role='separator'
         {...stylex.props(styles.divider)}

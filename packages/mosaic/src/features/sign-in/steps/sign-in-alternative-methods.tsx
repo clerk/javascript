@@ -9,10 +9,9 @@ import { Icon } from '../../../components/icon';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
 import type { IconComponent } from '../../../icons/glyph';
-import { useMessages } from '../../../localization';
+import { fill, useMessages } from '../../../localization';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
-import { SignInProviderButtons } from './sign-in-provider-buttons';
 
 export interface SignInMethodOption {
   id: string;
@@ -69,12 +68,25 @@ export function SignInAlternativeMethods({
       <Card.Content>
         <div {...stylex.props(styles.buttonStack)}>
           {socialProviders.length > 0 ? (
-            <SignInProviderButtons
-              providers={socialProviders}
-              pendingProviderId={pendingProviderId}
-              isDisabled={isDisabled}
-              onSelectProvider={onSelectProvider}
-            />
+            <ProviderButtonGroup disabled={isDisabled}>
+              {socialProviders.map(provider => (
+                <ProviderButton
+                  key={provider.id}
+                  icon={
+                    <img
+                      src={provider.iconUrl}
+                      alt=''
+                      {...stylex.props(styles.providerIcon)}
+                    />
+                  }
+                  longLabel={fill(m.start.socialButton, { provider: provider.name })}
+                  shortLabel={provider.name}
+                  isPending={pendingProviderId === provider.id}
+                  pendingLabel={m.verifying}
+                  onClick={() => onSelectProvider(provider.id)}
+                />
+              ))}
+            </ProviderButtonGroup>
           ) : null}
           <ProviderButtonGroup
             layout='stacked'
