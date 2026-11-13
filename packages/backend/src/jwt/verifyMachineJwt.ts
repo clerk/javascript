@@ -14,12 +14,14 @@ import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../tokens/keys';
 import { OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
 import { TokenType } from '../tokens/tokenTypes';
+import { parsePublishableKey } from '../util/shared';
 import { assertOAuthAudienceClaim } from './assertions';
 
 export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {
   audience?: string | string[];
   jwtKey?: string;
   clockSkewInMs?: number;
+  publishableKey?: string;
 };
 
 export function getOAuthAudienceVerificationError(
@@ -53,6 +55,7 @@ async function resolveKeyAndVerifyJwt(
   kid: string,
   options: JwtMachineVerifyOptions,
   headerType?: string[],
+  issuer?: string,
 ): Promise<{ payload: JwtPayload } | { error: MachineTokenVerificationError }> {
   try {
     let key: JsonWebKey;
@@ -75,6 +78,7 @@ async function resolveKeyAndVerifyJwt(
       key,
       audience: options.audience,
       clockSkewInMs: options.clockSkewInMs,
+      issuer,
       ...(headerType ? { headerType } : {}),
     });
 
@@ -144,8 +148,10 @@ export async function verifyOAuthJwt(
   decoded: Jwt,
   options: JwtMachineVerifyOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  const { audience, ...jwtOptions } = options;
-  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, OAUTH_ACCESS_TOKEN_TYPES);
+  const { audience, publishableKey, ...jwtOptions } = options;
+  const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
+  const issuer = frontendApi ? `https://${frontendApi}` : undefined;
+  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, OAUTH_ACCESS_TOKEN_TYPES, issuer);
 
   if ('error' in result) {
     return { data: undefined, tokenType: TokenType.OAuthToken, errors: [result.error] };
