@@ -2,13 +2,12 @@ import type {
   UserProfileMfaAddableMethod,
   UserProfileMfaMethod,
   UserProfileMfaSectionViewProps,
-} from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
-import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-setup.view';
-import { stringToFormattedPhoneString } from '@clerk/shared/phone';
+} from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
+import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
 import { useEffect, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosRows } from '@/lib/chaos';
+import { chaosPhone, chaosRows } from '@/lib/chaos';
 
 import { authenticatorSetup } from './user-profile-authenticator';
 
@@ -82,17 +81,28 @@ export function useUserProfileMfaFixture({
     onBack: () => void;
   };
   section: UserProfileMfaSectionViewProps;
-  authenticator: UserProfileMfaSetupViewProps['authenticator'];
+  authenticator: NonNullable<UserProfileMfaSetupViewProps['authenticator']>;
   sms: UserProfileMfaSetupViewProps['sms'];
   backupCodes: UserProfileMfaSetupViewProps['backupCodes'];
 } {
-  const phones = useChaosFixture(examplePhones, items => chaosRows(items, 12));
-  const [account, setAccount] = useState({
-    phones,
-    authenticator: false,
-    defaultPhoneId: 'personal',
-    hasBackupCodes: initialFlow === 'backup-codes' && Boolean(enrollmentBackupCodes?.length),
-  });
+  const seed = useChaosFixture(
+    {
+      phones: examplePhones,
+      authenticator: false,
+      hasBackupCodes: initialFlow === 'backup-codes' && Boolean(enrollmentBackupCodes?.length),
+    },
+    current => ({
+      phones: chaosRows(current.phones, 6).map((phone, index) => ({
+        ...phone,
+        phoneNumber: chaosPhone(index),
+        verified: index % 3 !== 1,
+        enrolled: index % 2 === 0,
+      })),
+      authenticator: true,
+      hasBackupCodes: true,
+    }),
+  );
+  const [account, setAccount] = useState({ ...seed, defaultPhoneId: 'personal' });
   const [flow, setFlow] = useState<UserProfileMfaAddableMethod | 'select' | undefined>(initialFlow);
   const [backupCodesSource, setBackupCodesSource] = useState<'select' | 'regenerate'>('regenerate');
   const [pending, setPending] = useState<'submit' | 'resend' | 'generate' | 'copy' | 'download'>();
@@ -129,7 +139,7 @@ export function useUserProfileMfaFixture({
       return {
         id: phone.id,
         type: 'sms' as const,
-        description: stringToFormattedPhoneString(phone.phoneNumber),
+        description: phone.phoneNumber,
         isDefault,
         canSetDefault: !isDefault,
       };
@@ -334,8 +344,10 @@ export function useUserProfileMfaFixture({
       methods,
       addableMethods,
       onAdd: open,
-      onRegenerateBackupCodes:
-        account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes('regenerate') : undefined,
+      regenerate:
+        account.hasBackupCodes && onGenerateBackupCodes
+          ? { onClick: () => void generateBackupCodes('regenerate'), status: 'idle' as const }
+          : undefined,
       onSetDefault: async id => {
         await pause();
         setAccount(current => ({ ...current, defaultPhoneId: id }));
@@ -359,7 +371,6 @@ export function useUserProfileMfaFixture({
     },
     authenticator: {
       setup: authenticatorSetup,
-      onRetry: () => undefined,
       code,
       onCodeChange,
       onSubmit: value => void verifyAuthenticator(value),

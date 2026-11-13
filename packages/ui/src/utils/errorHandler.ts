@@ -115,6 +115,13 @@ export function getClerkAPIErrorMessage(err: ClerkAPIError): string {
   return err.longMessage || err.message;
 }
 
+export function getAPIErrorMessage(err: Error): string | undefined {
+  if (!isClerkAPIResponseError(err) || !err.errors.length) {
+    return;
+  }
+  return getClerkAPIErrorMessage(err.errors[0]);
+}
+
 const handleMetamaskError: HandleError = (err, _, setGlobalError) => {
   return setGlobalError?.(err.message);
 };

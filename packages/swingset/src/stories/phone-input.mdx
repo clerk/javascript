@@ -24,7 +24,15 @@ It composes `InputGroup` for the telephone field and the inline `Combobox` compo
     { name: 'country', type: 'CountryIso', default: '—' },
     { name: 'defaultCountry', type: 'CountryIso', default: "'us'" },
     { name: 'onCountryChange', type: '(country: CountryIso) => void', default: '—' },
-    { name: 'countrySearchPlaceholder', type: 'string', default: "'Search country or code'" },
+    {
+      name: 'countryTriggerLabel',
+      type: 'string',
+      default: '—',
+      description: "The country trigger's accessible name. `{country}` is replaced with the selected country's name.",
+    },
+    { name: 'countryPopupLabel', type: 'string', default: '—', description: "The country popup's accessible name." },
+    { name: 'countrySearchLabel', type: 'string', default: '—', description: "The country search input's accessible name." },
+    { name: 'countrySearchPlaceholder', type: 'string', default: "'Search'" },
     { name: 'noResultsMessage', type: 'string', default: "'No countries found'" },
   ]}
 />
@@ -36,7 +44,13 @@ It composes `InputGroup` for the telephone field and the inline `Combobox` compo
 <Usage
   component='PhoneInput'
   module='@clerk/mosaic/components/phone-input'
-  props={{ name: 'phoneNumber', placeholder: '202 555 0123' }}
+  props={{
+    name: 'phoneNumber',
+    placeholder: '202 555 0123',
+    countryTriggerLabel: 'Country, {country}',
+    countryPopupLabel: 'Choose a country',
+    countrySearchLabel: 'Search countries',
+  }}
 />
 
 ---

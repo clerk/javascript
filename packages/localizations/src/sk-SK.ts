@@ -302,9 +302,45 @@ export const skSK: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1594,6 +1630,11 @@ export const skSK: LocalizationResource = {
         'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
       title: 'Použiť Passkey',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použiť inú metódu',
       subtitle: 'Pre pokračovanie vložte svoje aktuálne heslo',
@@ -1744,6 +1785,10 @@ export const skSK: LocalizationResource = {
       subtitle:
         'Použitie passkey potvrdí vašu identitu. Vaše zariadenie vás môže vyzvať na potvrdenie odtlačkom, tvárou alebo kódom.',
       title: 'Prihlásiť sa pomocou Passkey',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Použiť inú metódu',
@@ -2049,6 +2094,7 @@ export const skSK: LocalizationResource = {
       'Registrácia zlyhala z dôvodu neúspešného overenia zabezpečenia. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     captcha_unavailable:
       'Registrácia zlyhala z dôvodu neúspešného overenia proti botom. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Dočasné e-mailové služby nie sú podporované. Prosím, použite svoju bežnú e-mailovú adresu na vytvorenie účtu.',
@@ -2124,9 +2170,11 @@ export const skSK: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Jste už přihlášen.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
     web3_signature_request_rejected: 'Odmietli ste žiadosť o podpis. Skúste to znova, aby ste mohli pokračovať.',

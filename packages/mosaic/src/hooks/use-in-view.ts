@@ -8,10 +8,10 @@ interface IntersectionOptions extends IntersectionObserverInit {
 export const useInView = (params: IntersectionOptions) => {
   const [inView, setInView] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const thresholds = Array.isArray(params.threshold) ? params.threshold : [params.threshold || 0];
-  const internalOnChange = useRef<IntersectionOptions['onChange']>();
+  const paramsRef = useRef(params);
 
-  internalOnChange.current = params.onChange;
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
+  paramsRef.current = params;
 
   const ref = useCallback((element: HTMLElement | null) => {
     if (!element) {
@@ -21,6 +21,9 @@ export const useInView = (params: IntersectionOptions) => {
       return;
     }
 
+    const { root, rootMargin, threshold } = paramsRef.current;
+    const thresholds = Array.isArray(threshold) ? threshold : [threshold || 0];
+
     observerRef.current = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -28,14 +31,12 @@ export const useInView = (params: IntersectionOptions) => {
 
           setInView(_inView);
 
-          if (internalOnChange.current) {
-            internalOnChange.current(_inView, entry);
-          }
+          paramsRef.current.onChange?.(_inView, entry);
         });
       },
       {
-        root: params.root,
-        rootMargin: params.rootMargin,
+        root,
+        rootMargin,
         threshold: thresholds,
       },
     );

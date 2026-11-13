@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Icon } from '../../components/icon';
 import { Section, sectionCompactStyles } from '../../components/section';
+import { Lock } from '../../icons/glyphs/lock';
 
 /** The enterprise connection a row's value comes from, which is why the row has nothing to edit. */
 export interface UserProfileManagedBy {
@@ -14,8 +15,8 @@ export function UserProfileManagedByLabel({ managedBy, label }: { managedBy: Use
       icon={
         <Icon
           aria-hidden
-          name='lock'
-          size='sm'
+          glyph={Lock}
+          size='md'
         />
       }
     >

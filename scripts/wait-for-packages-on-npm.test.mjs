@@ -4,7 +4,12 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import { getPublicPackages, getUnavailablePackages, waitForPackagesOnNpm } from './wait-for-packages-on-npm.mjs';
+import {
+  getPublicPackages,
+  getUnavailablePackages,
+  JSDELIVR_REGISTRY,
+  waitForPackages,
+} from './wait-for-packages-on-npm.mjs';
 
 const roots = [];
 
@@ -56,9 +61,17 @@ describe('getUnavailablePackages', () => {
       { name: '@clerk/error', version: '3.0.0', error: 'network unavailable' },
     ]);
   });
+
+  test('requests package.json from jsDelivr', async () => {
+    const fetchPackage = vi.fn().mockResolvedValue({ ok: true, status: 200 });
+
+    await getUnavailablePackages([{ name: '@clerk/ui', version: '1.0.0' }], fetchPackage, JSDELIVR_REGISTRY);
+
+    expect(fetchPackage).toHaveBeenCalledWith('https://cdn.jsdelivr.net/npm/@clerk/ui@1.0.0/package.json');
+  });
 });
 
-describe('waitForPackagesOnNpm', () => {
+describe('waitForPackages', () => {
   test('retries only unavailable packages', async () => {
     const packages = [
       { name: '@clerk/available', version: '1.0.0' },
@@ -73,7 +86,7 @@ describe('waitForPackagesOnNpm', () => {
     const sleep = vi.fn();
     const log = vi.fn();
 
-    await waitForPackagesOnNpm(packages, { fetchPackage, maxAttempts: 3, delayMs: 1, sleep, log });
+    await waitForPackages(packages, { fetchPackage, maxAttempts: 3, delayMs: 1, sleep, log });
 
     expect(fetchPackage).toHaveBeenCalledTimes(3);
     expect(sleep).toHaveBeenCalledTimes(1);
@@ -87,10 +100,26 @@ describe('waitForPackagesOnNpm', () => {
     const sleep = vi.fn();
 
     await expect(
-      waitForPackagesOnNpm(packages, { fetchPackage, maxAttempts: 2, delayMs: 1, sleep, log: vi.fn() }),
+      waitForPackages(packages, { fetchPackage, maxAttempts: 2, delayMs: 1, sleep, log: vi.fn() }),
     ).rejects.toThrow('Package versions did not become available on npm after 2 attempts: @clerk/missing@1.0.0');
     expect(fetchPackage).toHaveBeenCalledTimes(2);
     expect(sleep).toHaveBeenCalledTimes(1);
     expect(sleep).toHaveBeenCalledWith(1);
+  });
+
+  test('names the registry when exhausting retries', async () => {
+    const packages = [{ name: '@clerk/ui', version: '1.0.0' }];
+    const fetchPackage = vi.fn().mockResolvedValue({ ok: false, status: 404 });
+
+    await expect(
+      waitForPackages(packages, {
+        registry: JSDELIVR_REGISTRY,
+        fetchPackage,
+        maxAttempts: 1,
+        delayMs: 1,
+        sleep: vi.fn(),
+        log: vi.fn(),
+      }),
+    ).rejects.toThrow('Package versions did not become available on jsDelivr after 1 attempts: @clerk/ui@1.0.0');
   });
 });

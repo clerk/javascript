@@ -302,9 +302,45 @@ export const daDK: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1591,6 +1627,11 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1740,6 +1781,10 @@ export const daDK: LocalizationResource = {
     passkey: {
       subtitle: 'Brug adgangsnøgle til at logge ind.',
       title: 'Adgangsnøgle',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Brug en anden metode',
@@ -2040,6 +2085,7 @@ export const daDK: LocalizationResource = {
       'Tilmelding mislykkedes på grund af fejlede sikkerhedsvalideringer. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     captcha_unavailable:
       'Tilmelding mislykkedes på grund af fejlet botvalidering. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Koden er forkert.',
     form_email_address_blocked:
       'Midlertidige e-mailtjenester understøttes ikke. Brug venligst din almindelige e-mailadresse til at oprette en konto.',
@@ -2113,9 +2159,11 @@ export const daDK: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Du er allerede logget ind.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Du har afvist signaturanmodningen. Prøv igen for at fortsætte.',

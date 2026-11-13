@@ -2,19 +2,15 @@ import '../polyfills';
 
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
+import { getNativeAppIdentity } from '../app-version/nativeAppIdentity';
 import type { TokenCache } from '../cache/types';
+import { UpdateRequiredModal } from '../update-required/UpdateRequiredModal';
+import { ClerkExpoModule } from '../utils/native-module';
 import { isNative, isWeb } from '../utils/runtime';
 import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
-import {
-  type DeviceTokenCacheListener,
-  NativeClientSync,
-  type NativeRefreshFromJsController,
-  useNativeClientBootstrap,
-  useNativeClientEventSync,
-  useSyncableTokenCache,
-} from './nativeClientSync';
+import { createNativeClientSync, type SyncableClerk } from './nativeClientSync';
 import { getClerkInstance } from './singleton';
 import type { BuildClerkOptions } from './singleton/types';
 
@@ -56,6 +52,12 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_disableNativeClientSync?: boolean;
+  /**
+   * Shows an update screen over your app on iOS and Android when its version is older than the minimum set in the Clerk Dashboard. The screen covers the whole app and can't be dismissed until the user updates. Set this to `false` to show your own UI from `useAppVersionSupport()` instead.
+   *
+   * @default true
+   */
+  updateRequiredViewEnabled?: boolean;
 };
 
 const SDK_METADATA = {
@@ -74,23 +76,34 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     experimental,
     __experimental_resourceCache,
     __experimental_disableNativeClientSync = false,
+    updateRequiredViewEnabled = true,
     ...rest
   } = props;
   const pk = publishableKey;
-  const nativeClientSyncEnabled = isNative() && !__experimental_disableNativeClientSync;
-  const tokenCacheListenersRef = useRef<Set<DeviceTokenCacheListener>>(new Set());
-  const suppressTokenCacheNotificationsRef = useRef(0);
-  const nativeRefreshFromJsControllerRef = useRef<NativeRefreshFromJsController | null>(null);
-  const syncableTokenCache = useSyncableTokenCache({
-    suppressTokenCacheNotificationsRef,
-    tokenCache,
-    tokenCacheListenersRef,
-  });
+  const nativeModule = isNative() && !__experimental_disableNativeClientSync ? ClerkExpoModule : null;
+  const tokenCacheRef = useRef(tokenCache);
+  tokenCacheRef.current = tokenCache;
+  const nativeProxyUrl = typeof proxyUrl === 'string' && proxyUrl ? proxyUrl : null;
+  const nativeUpdateRequiredViewEnabledRef = useRef(true);
+  nativeUpdateRequiredViewEnabledRef.current = updateRequiredViewEnabled && !getNativeAppIdentity();
+  const nativeClientSync = useMemo(
+    () =>
+      nativeModule
+        ? createNativeClientSync(
+            nativeModule,
+            pk,
+            nativeProxyUrl,
+            () => tokenCacheRef.current,
+            () => nativeUpdateRequiredViewEnabledRef.current,
+          )
+        : null,
+    [nativeModule, pk, nativeProxyUrl],
+  );
 
   const clerkInstance = isNative()
     ? getClerkInstance({
         publishableKey: pk,
-        tokenCache: syncableTokenCache,
+        tokenCache: nativeClientSync?.tokenCache ?? tokenCache,
         proxyUrl,
         domain,
         __experimental_passkeys,
@@ -98,24 +111,13 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       })
     : null;
 
-  const suppressJsClientChangedRef = useRef(0);
-  const { isMountedRef, isNativeClientReady } = useNativeClientBootstrap({
-    enabled: nativeClientSyncEnabled,
-    publishableKey: pk,
-    nativeRefreshFromJsControllerRef,
-    suppressTokenCacheNotificationsRef,
-    tokenCache: syncableTokenCache,
-    clerkInstance,
-  });
-  useNativeClientEventSync({
-    enabled: nativeClientSyncEnabled && isNativeClientReady,
-    clerkInstance,
-    isMountedRef,
-    nativeRefreshFromJsControllerRef,
-    suppressJsClientChangedRef,
-    suppressTokenCacheNotificationsRef,
-    tokenCache: syncableTokenCache,
-  });
+  useEffect(
+    () =>
+      nativeClientSync && clerkInstance
+        ? nativeClientSync.attach(clerkInstance as unknown as SyncableClerk)
+        : undefined,
+    [nativeClientSync, clerkInstance],
+  );
 
   // Needed for `useOAuth` / `useSSO` to work correctly on web — must stay synchronous during render
   // so the redirect URL is caught before children mount. Resolves to a no-op on native via the
@@ -144,18 +146,8 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         ...(isNative() && { runtimeEnvironment: 'headless' as const }),
       }}
     >
-      {nativeClientSyncEnabled && (
-        <NativeClientSync
-          enabled={isNativeClientReady}
-          clerkInstance={clerkInstance}
-          nativeRefreshFromJsControllerRef={nativeRefreshFromJsControllerRef}
-          suppressJsClientChangedRef={suppressJsClientChangedRef}
-          suppressTokenCacheNotificationsRef={suppressTokenCacheNotificationsRef}
-          tokenCache={syncableTokenCache}
-          tokenCacheListenersRef={tokenCacheListenersRef}
-        />
-      )}
       {children}
+      {isNative() && updateRequiredViewEnabled && <UpdateRequiredModal />}
     </ClerkReactProvider>
   );
 }

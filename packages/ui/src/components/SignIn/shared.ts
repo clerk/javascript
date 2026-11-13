@@ -12,6 +12,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { isResettingPassword } from './utils';
 
 /** Search param set when navigating from the start page "Forgot password?" action. */
 export const SIGN_IN_RESET_PASSWORD_INTENT_PARAM = '__clerk_reset_password';
@@ -51,6 +52,16 @@ function useHandleAuthenticateWithPasskey(
       }
       switch (res.status) {
         case 'complete':
+          // A passkey can complete the SECOND factor of a reset-password
+          // sign-in (reset password -> needs_second_factor -> passkey); that
+          // flow ends on the reset-password success screen, mirroring the
+          // other factor-two cards. Unreachable from factor-one usages of
+          // this hook, where the first-factor strategy is the passkey itself.
+          if (isResettingPassword(res) && res.createdSessionId) {
+            const queryParams = new URLSearchParams();
+            queryParams.set('createdSessionId', res.createdSessionId);
+            return navigate(`../reset-password-success?${queryParams.toString()}`);
+          }
           return setActive({
             session: res.createdSessionId,
             navigate: async ({ session, decorateUrl }) => {
@@ -87,5 +98,9 @@ function useHandleAuthenticateWithPasskey(
   }, []);
 }
 
-export { getSSOBypassFactor, hasMultipleEnterpriseConnections } from './enterpriseSSOFactors';
+export {
+  getEnterpriseConnectionFactors,
+  getSSOBypassFactor,
+  hasMultipleEnterpriseConnections,
+} from './enterpriseSSOFactors';
 export { useHandleAuthenticateWithPasskey };

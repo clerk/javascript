@@ -86,6 +86,7 @@ function PopoverInner(props: PopoverProps) {
         padding: 5,
       }),
       shift({ padding: 5 }),
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       arrow({ element: arrowRef }),
       cssVars({ sideOffset }),
     ],

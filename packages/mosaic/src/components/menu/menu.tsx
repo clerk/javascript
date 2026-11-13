@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { EllipsisHorizontal } from '../../icons/glyphs/ellipsis-horizontal';
 import type {
   MenuItemProps as PrimitiveMenuItemProps,
   MenuPopupProps as PrimitiveMenuPopupProps,
@@ -44,6 +45,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
     render ??
     (props => (
       <Button
+        color='neutral'
         variant='ghost'
         size='sm'
         shape={children ? 'default' : 'square'}
@@ -58,7 +60,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
       render={trigger}
       {...mergeStyleProps(themeProps('menu-trigger'), stylex.props(xstyle), rest)}
     >
-      {children ?? <Icon name='ellipsis-horizontal' />}
+      {children ?? <Icon glyph={EllipsisHorizontal} />}
     </Primitive.Trigger>
   );
 });
@@ -132,7 +134,7 @@ export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(funct
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('menu-media', { size }),
+        themeProps('menu-item-media', { size }),
         stylex.props(reset.base, slots.media.base, slots.media[size], xstyle),
         rest,
       ),
@@ -158,8 +160,28 @@ export const MenuLabel = React.forwardRef<HTMLSpanElement, MenuLabelProps>(funct
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('menu-label'),
+        themeProps('menu-item-label'),
         stylex.props(reset.base, slots.label.base, truncationStyles.singleLine, xstyle),
+        rest,
+      ),
+    },
+  });
+});
+
+export type MenuIndicatorProps = MosaicComponentProps<'span'>;
+
+export const MenuIndicator = React.forwardRef<HTMLSpanElement, MenuIndicatorProps>(function MosaicMenuIndicator(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('menu-item-indicator'),
+        stylex.props(reset.base, slots.indicator.base, xstyle),
         rest,
       ),
     },
@@ -170,7 +192,7 @@ export interface MenuItemProps extends Omit<PrimitiveMenuItemProps, 'className' 
   /** Semantic color of the action. */
   color?: 'neutral' | 'negative';
   /**
-   * The row's content, composed from `Menu.Media` and `Menu.Label`. Required, and text goes in
+   * The row's content, composed from `Menu.Media`, `Menu.Label` and `Menu.Indicator`. Required, and text goes in
    * `Menu.Label` rather than straight in here: a bare text node is not a flex item the row can
    * size, so it neither lines up with the other rows nor truncates.
    */
@@ -209,13 +231,17 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
 export type MenuSeparatorProps = Omit<PrimitiveMenuSeparatorProps, 'className' | 'style'> & MosaicStyleProps;
 
 /** A full-bleed divider between groups of items. */
-export function MenuSeparator({ xstyle, ...rest }: MenuSeparatorProps): React.ReactElement {
+export const MenuSeparator = React.forwardRef<HTMLDivElement, MenuSeparatorProps>(function MosaicMenuSeparator(
+  { xstyle, ...rest },
+  ref,
+) {
   return (
     <Primitive.Separator
+      ref={ref}
       {...mergeStyleProps(themeProps('menu-separator'), stylex.props(reset.base, slots.separator.base, xstyle), rest)}
     />
   );
-}
+});
 
 export const Menu = {
   // Renders no element of its own; re-exported unchanged so the state provider sits
@@ -226,5 +252,6 @@ export const Menu = {
   Item: MenuItem,
   Media: MenuMedia,
   Label: MenuLabel,
+  Indicator: MenuIndicator,
   Separator: MenuSeparator,
 };

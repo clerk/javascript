@@ -29,6 +29,7 @@ await Promise.allSettled([
   asyncSearchRHC('clerk-js Hotloading', '/npm/@clerk/clerk-js'),
   asyncSearchRHC('clerk-ui Hotloading', '/npm/@clerk/ui'),
   asyncSearchRHC('Google One Tap', 'accounts.google.com/gsi/client'),
+  asyncSearchRHC('Protect loader', '[protect] loader'),
   asyncSearchRHC('Coinbase', 'coinbase.com'),
   asyncSearchRHC('Coinbase Wallet import', 'import\s*"@coinbase/wallet-sdk', true), // eslint-disable-line no-useless-escape
   asyncSearchRHC('Stripe', 'js.stripe.com'),

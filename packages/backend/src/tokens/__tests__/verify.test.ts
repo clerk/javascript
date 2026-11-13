@@ -19,7 +19,7 @@ import {
 } from '../../fixtures/machine';
 import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
-import { JWT_CATEGORY_M2M_TOKEN } from '../jwtCategories';
+import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN, JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 async function createSignedOAuthJwt(
@@ -35,11 +35,11 @@ async function createSignedOAuthJwt(
 
 async function createSignedM2MJwt(
   payload: Record<string, unknown> = mockM2MJwtPayload,
-  cat: string | undefined = JWT_CATEGORY_M2M_TOKEN,
+  cat: string | null = JWT_CATEGORY_M2M_TOKEN,
 ) {
   const { data } = await signJwt(payload, signingJwks, {
     algorithm: 'RS256',
-    header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...(cat !== undefined ? { cat } : {}) },
+    header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...(cat !== null ? { cat } : {}) },
   });
   return data!;
 }
@@ -84,6 +84,28 @@ describe('tokens.verify(token, options)', () => {
 
     expect(result.data).toEqual(mockJwtPayload);
     expect(result.errors).toBeUndefined();
+  });
+
+  it('rejects the token when the provided issuer option does not match the iss claim', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    const { data, errors } = await verifyToken(mockJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      issuer: 'https://clerk.another-app.com',
+      skipJwksCache: true,
+    });
+
+    expect(data).toBeUndefined();
+    expect(errors?.[0].reason).toBe('token-invalid-issuer');
   });
 
   it('verifies the token by fetching the JWKs from Backend API when secretKey is provided', async () => {
@@ -145,6 +167,36 @@ describe('tokens.verify(token, options)', () => {
     expect(data).toBeUndefined();
     expect(errors?.[0].reason).toBe('token-invalid');
     expect(errors?.[0].message).toBe('Invalid session token category.');
+  });
+
+  it('rejects an OIDC id_token, which carries no cat header, before key resolution (AISEC-21)', async () => {
+    const { azp: _azp, ...payloadWithoutAzp } = mockJwtPayload;
+    const token = await createSignedM2MJwt({ ...payloadWithoutAzp, aud: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc' }, null);
+
+    const { data, errors } = await verifyToken(token, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      skipJwksCache: true,
+    });
+
+    expect(data).toBeUndefined();
+    expect(errors?.[0].reason).toBe('token-invalid');
+    expect(errors?.[0].message).toBe('Invalid session token category.');
+  });
+
+  it('still verifies a JWT-template token for direct callers', async () => {
+    server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+    const { sid: _sid, ...payloadWithoutSid } = mockJwtPayload;
+    const token = await createSignedM2MJwt(payloadWithoutSid, JWT_CATEGORY_JWT_TEMPLATE);
+
+    const { data, errors } = await verifyToken(token, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      skipJwksCache: true,
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data).toEqual(payloadWithoutSid);
   });
 });
 
@@ -866,6 +918,45 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors).toBeUndefined();
     });
 
+    it('rejects an M2M JWT whose aud does not include the configured audience', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const token = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience: 'mch_3xxxxx',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors?.[0].code).toBe('token-verification-failed');
+      expect(result.errors?.[0].message).toContain('Invalid JWT audience claim array (aud)');
+    });
+
+    it('ignores a session-token issuer option when verifying an M2M JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.errors).toBeUndefined();
+      expect(result.data).toBeDefined();
+    });
+
     it('rejects M2M JWT with alg: none', async () => {
       server.use(
         http.get(
@@ -877,7 +968,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       );
 
       const m2mJwt = createJwt({
-        header: { typ: 'JWT', alg: 'none', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        header: { typ: 'JWT', alg: 'none', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_M2M_TOKEN },
         payload: mockM2MJwtPayload,
       });
 
@@ -926,7 +1017,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const m2mJwt = await createSignedM2MJwt(mockM2MJwtPayload, undefined);
+      const m2mJwt = await createSignedM2MJwt(mockM2MJwtPayload, null);
 
       const result = await verifyMachineAuthToken(m2mJwt, {
         apiUrl: 'https://api.clerk.test',
@@ -938,8 +1029,8 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     });
 
     describe.each([
-      ['session-token', 'cl_B7d4PD111AAA'],
-      ['jwt-template', 'cl_B7d4PD222AAA'],
+      ['session-token', JWT_CATEGORY_SESSION_TOKEN],
+      ['jwt-template', JWT_CATEGORY_JWT_TEMPLATE],
       ['unknown', 'cl_some_future_unknown_cat'],
     ])('rejects M2M JWT masquerading with a non-M2M cat', (label, cat) => {
       it(`rejects cat=${label} without attempting signature verification`, async () => {

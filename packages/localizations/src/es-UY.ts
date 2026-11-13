@@ -302,9 +302,45 @@ export const esUY: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1596,6 +1632,11 @@ export const esUY: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Usar otro método',
       subtitle: 'Ingresá tu contraseña para continuar',
@@ -1747,6 +1788,10 @@ export const esUY: LocalizationResource = {
       subtitle:
         'Usar tu clave de acceso confirma que sos vos. Tu dispositivo puede solicitar tu huella, rostro o bloqueo de pantalla.',
       title: 'Usar tu clave de acceso',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Usar otro método',
@@ -2052,6 +2097,7 @@ export const esUY: LocalizationResource = {
       'El registro no se pudo completar debido a validaciones de seguridad fallidas. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
     captcha_unavailable:
       'El registro no se pudo completar debido a la validación fallida contra bots. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Los servicios de correo electrónico temporal no están soportados. Por favor, usá tu dirección de correo electrónico habitual para crear una cuenta.',
@@ -2130,9 +2176,11 @@ export const esUY: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Ya has iniciado sesión',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'No se encontró una extensión de cartera Web3. Por favor, instalá una para continuar.',
     web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',

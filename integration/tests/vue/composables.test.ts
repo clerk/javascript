@@ -11,7 +11,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('composab
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
@@ -23,14 +23,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('composab
     await app.teardown();
   });
 
-  test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.signOut();
-    await u.page.context().clearCookies();
-  });
-
   test('useAuth() returns correct values when signed in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -44,7 +38,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('composab
   });
 
   test('useAuth() returns organization data when org is active', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -61,7 +55,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('composab
   });
 
   test('useUser() returns user data when signed in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -77,7 +71,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('composab
   });
 
   test('useSession() returns session data when signed in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -91,7 +85,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('composab
   });
 
   test('useOrganization() returns organization data when org is active', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });

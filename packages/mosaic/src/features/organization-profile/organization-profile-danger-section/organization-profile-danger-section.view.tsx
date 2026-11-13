@@ -1,5 +1,5 @@
+import type { ConfirmController } from '../../../blocks/confirm';
 import { Destructive } from '../../../blocks/destructive';
-import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
@@ -7,8 +7,8 @@ import { fill, plural, useLocale, useMessages } from '../../../localization';
 export interface OrganizationProfileDangerSectionViewProps {
   name: string;
   memberCount: number;
-  leave?: DestructiveController;
-  destroy?: DestructiveController;
+  leave?: ConfirmController;
+  destroy?: ConfirmController;
 }
 
 export function OrganizationProfileDangerSectionView({
@@ -17,7 +17,7 @@ export function OrganizationProfileDangerSectionView({
   leave,
   destroy,
 }: OrganizationProfileDangerSectionViewProps) {
-  const m = useMessages('organizationProfileDangerSection');
+  const m = useMessages('organizationProfile').danger;
   const locale = useLocale();
 
   if (!leave && !destroy) {
@@ -28,7 +28,9 @@ export function OrganizationProfileDangerSectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>{m.sectionTitle}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.sectionTitle}</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           {leave ? (
@@ -68,7 +70,7 @@ function DangerRow({
   dialogTitle,
   dialogDescription,
 }: {
-  controller: DestructiveController;
+  controller: ConfirmController;
   confirmationValue: string;
   label: string;
   description: string;
@@ -76,7 +78,7 @@ function DangerRow({
   dialogTitle: string;
   dialogDescription: string;
 }) {
-  const m = useMessages('organizationProfileDangerSection');
+  const m = useMessages('organizationProfile').danger;
 
   return (
     <Section.Row>
@@ -87,7 +89,7 @@ function DangerRow({
         </Section.Content>
         <Section.Actions>
           <Destructive
-            {...controller}
+            controller={controller}
             trigger={
               <Button
                 color='negative'

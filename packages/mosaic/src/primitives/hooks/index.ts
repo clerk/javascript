@@ -1,18 +1,19 @@
 export { useAnimationsFinished } from './use-animations-finished';
-export { useDataTable } from './use-data-table';
-export type {
-  ColumnFiltersState,
-  DataTableRow,
-  OnChangeFn,
-  PaginationState,
-  RowSelectionState,
-  SortingState,
-  Updater,
-  UseDataTableOptions,
-  UseDataTableReturn,
-} from './use-data-table';
+export {
+  type CompositeItems,
+  CompositeItemsProvider,
+  type CompositeKeyEvent,
+  type SetTabIndex,
+  useComposite,
+  useCompositeItem,
+  useCompositeItems,
+  type UseCompositeOptions,
+  type UseCompositeReturn,
+} from './use-composite';
 export { useControllableState } from './use-controllable-state';
+export { useFormattedInput, type UseFormattedInputOptions } from './use-formatted-input';
 export { useLayoutAnimation } from './use-layout-animation';
+export { usePanelSize } from './use-panel-size';
 export {
   type TransitionProps,
   useTransition,

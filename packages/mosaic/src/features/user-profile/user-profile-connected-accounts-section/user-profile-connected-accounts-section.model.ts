@@ -1,24 +1,27 @@
 import { iconImageUrl } from '@clerk/shared/constants';
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
   CustomOauthProvider,
-  EnterpriseAccountConnectionResource,
-  EnterpriseAccountResource,
-  EnterpriseSSOSettings,
   ExternalAccountResource,
   OAuthProvider,
   OAuthProviders,
   OAuthScope,
   OAuthStrategy,
+  UserResource,
   VerificationResource,
 } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
+import { withUserProfileModalReturn } from '../user-profile.modal-return';
+import { useUserProfileOptions } from '../user-profile.provider';
+import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
@@ -30,11 +33,6 @@ type AccountData = Pick<ExternalAccountResource, 'id' | 'provider' | 'approvedSc
   verification:
     | (Pick<VerificationResource, 'strategy'> & { error: Pick<ClerkAPIError, 'code' | 'longMessage'> | null })
     | null;
-};
-type EnterpriseUser = {
-  enterpriseAccounts: (Pick<EnterpriseAccountResource, 'active'> & {
-    enterpriseConnection?: Pick<EnterpriseAccountConnectionResource, 'disableAdditionalIdentifications'> | null;
-  })[];
 };
 type ProjectedUser = {
   verifiedExternalAccounts: AccountData[];
@@ -74,8 +72,6 @@ const RECONNECT_ERROR_CODES = [
   'external_account_email_address_verification_required',
 ];
 
-const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
-
 type SocialSettings = Partial<
   Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
@@ -92,8 +88,9 @@ export function createProviderCatalog(
     enabled: enabled.has(strategy),
     display: {
       provider: name,
+      iconId: provider,
       iconUrl: iconImageUrl(provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
+      monochromeIcon: isMonochromeProvider(provider),
     },
   }));
   const candidates = new Set([
@@ -113,7 +110,7 @@ export function createProviderCatalog(
       strategy,
       provider,
       enabled: enabled.has(strategy),
-      display: { provider: settings?.name || provider, iconUrl: settings?.logo_url || undefined },
+      display: { provider: settings?.name || provider, iconId: provider, iconUrl: settings?.logo_url || undefined },
     });
   }
   return [
@@ -123,18 +120,6 @@ export function createProviderCatalog(
     }),
     ...providers.filter(provider => !provider.enabled),
   ];
-}
-
-export function allowsIdentificationCreation(
-  user: EnterpriseUser,
-  enterpriseSSO: Pick<EnterpriseSSOSettings, 'enabled'>,
-): boolean {
-  if (!enterpriseSSO.enabled) {
-    return true;
-  }
-  return !user.enterpriseAccounts.some(
-    account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
-  );
 }
 
 function findAdditionalScopes(account: AccountData, scopes: AdditionalOAuthScopes | undefined): string[] {
@@ -230,19 +215,38 @@ export type UserProfileConnectedAccountsModel =
       connect: (strategy: string) => Promise<ConnectedAccountActionResult>;
       reconnect: (accountId: string) => Promise<ConnectedAccountActionResult>;
       remove: (accountId: string) => Promise<void>;
+      removeReverification: ReverificationController;
+      reconnectReverification: ReverificationController;
+      connectReverification: ReverificationController;
     };
 
-export function useUserProfileConnectedAccountsModel({
-  additionalOAuthScopes,
-  mode,
-}: {
-  additionalOAuthScopes?: AdditionalOAuthScopes;
-  mode?: 'modal' | 'mounted';
-}): UserProfileConnectedAccountsModel {
+function unavailable() {
+  return new ClerkRuntimeError('This connected account is no longer available.', {
+    code: 'connected_account_unavailable',
+  });
+}
+
+export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
+  const { additionalOAuthScopes, mode } = useUserProfileOptions();
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
+  const [removeAccount, removeReverification] = useReverificationFlow((current: UserResource, accountId: string) => {
+    const account = current.externalAccounts.find(candidate => candidate.id === accountId);
+    if (!account) {
+      throw unavailable();
+    }
+    return account.destroy();
+  });
+  const [recreateAccount, reconnectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
+  const [createAccount, connectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -270,9 +274,6 @@ export function useUserProfileConnectedAccountsModel({
   const userId = user.id;
   const transport = clerk.__internal_oauthTransport;
 
-  const unavailable = () =>
-    new ClerkRuntimeError('This connected account is no longer available.', { code: 'connected_account_unavailable' });
-
   const requireCurrentUser = () => {
     const current = clerk.user;
     if (!current || current.id !== userId) {
@@ -282,8 +283,7 @@ export function useUserProfileConnectedAccountsModel({
   };
 
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
-  const withModalState = (url: string, socialProvider?: string) =>
-    mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile', socialProvider }) : url;
+  const withModalState = (url: string) => withUserProfileModalReturn(url, mode);
 
   const completeVerification = async (response: ExternalAccountResource): Promise<ConnectedAccountActionResult> => {
     const url = response.verification?.externalVerificationRedirectURL;
@@ -316,9 +316,9 @@ export function useUserProfileConnectedAccountsModel({
       }
       const redirectUrl = await getRedirectUrl();
       const current = requireCurrentUser();
-      const response = await current.createExternalAccount({
+      const response = await createAccount(current, {
         strategy: provider.strategy,
-        redirectUrl: withModalState(redirectUrl, provider.provider),
+        redirectUrl: withModalState(redirectUrl),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
       });
       return completeVerification(response);
@@ -341,7 +341,7 @@ export function useUserProfileConnectedAccountsModel({
               additionalScopes: recovery.additionalScopes,
               redirectUrl: withModalState(redirectUrl),
             })
-          : await current.createExternalAccount({
+          : await recreateAccount(current, {
               strategy: recovery.strategy,
               redirectUrl: withModalState(redirectUrl),
               additionalScopes: recovery.additionalScopes,
@@ -349,11 +349,10 @@ export function useUserProfileConnectedAccountsModel({
       return completeVerification(response);
     },
     remove: async accountId => {
-      const account = requireCurrentUser().externalAccounts.find(candidate => candidate.id === accountId);
-      if (!account) {
-        throw unavailable();
-      }
-      await account.destroy();
+      await removeAccount(requireCurrentUser(), accountId);
     },
+    removeReverification,
+    reconnectReverification,
+    connectReverification,
   };
 }

@@ -11,7 +11,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
@@ -25,13 +25,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   });
 
   test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.signOut();
     await u.page.context().clearCookies();
   });
 
   test('render user profile with SSR data', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -49,7 +49,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   });
 
   test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/user-profile');
     await u.page.waitForURL(`${app.serverUrl}/sign-in`);
@@ -57,7 +57,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   });
 
   test('renders control components contents in SSR', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToAppHome();
     await expect(u.page.getByText('You are signed out')).toBeVisible();
@@ -70,7 +70,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   });
 
   test('renders <Show /> component contents to admin', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();

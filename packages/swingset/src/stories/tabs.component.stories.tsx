@@ -18,7 +18,6 @@ export function Default() {
         <Tabs.Tab value='account'>Account</Tabs.Tab>
         <Tabs.Tab value='security'>Security</Tabs.Tab>
         <Tabs.Tab value='notifications'>Notifications</Tabs.Tab>
-        <Tabs.Indicator />
       </Tabs.List>
       <Tabs.Panels>
         <Tabs.Panel value='account'>Manage your account details.</Tabs.Panel>

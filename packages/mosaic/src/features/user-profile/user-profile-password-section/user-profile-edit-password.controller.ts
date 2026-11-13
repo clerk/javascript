@@ -6,9 +6,11 @@ import { useForm } from '../../../components/form';
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
 import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import type {
   UserProfileEditPasswordValue,
   UserProfileEditPasswordValues,
+  UserProfilePasswordPolicy,
 } from './user-profile-password-section.types';
 
 const initialValues: UserProfileEditPasswordValues = {
@@ -19,9 +21,10 @@ const initialValues: UserProfileEditPasswordValues = {
 };
 
 export interface UserProfileEditPasswordControllerOptions {
-  requiresCurrentPassword?: boolean;
+  policy: UserProfilePasswordPolicy;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown>;
   validatePassword?: (password: string) => Promise<FieldFeedback | undefined>;
+  reverification?: ReverificationController;
 }
 
 export interface UserProfileEditPasswordController {
@@ -29,15 +32,18 @@ export interface UserProfileEditPasswordController {
   onOpenChange: (open: boolean) => void;
   form: UseFormResult<UserProfileEditPasswordValues>;
   passwordFeedback: FieldFeedback | undefined;
+  step: 'edit' | 'verify';
 }
 
 export function useUserProfileEditPasswordController({
-  requiresCurrentPassword = false,
+  policy,
   onSubmit,
   validatePassword,
+  reverification,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
+  const requiresCurrentPassword = policy.requiresCurrentPassword;
   const validationError = useMessages('errors').generic;
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm({
@@ -53,12 +59,13 @@ export function useUserProfileEditPasswordController({
       values.newPassword !== '' &&
       values.confirmPassword === values.newPassword &&
       (!requiresCurrentPassword || values.currentPassword !== ''),
-    onSubmit: async values => {
-      await onSubmit({
+    onSubmit: values =>
+      onSubmit({
         currentPassword: requiresCurrentPassword ? values.currentPassword : undefined,
         newPassword: values.newPassword,
         signOutOfOtherSessions: values.signOutOfOtherSessions,
-      });
+      }),
+    onSuccess: () => {
       // TODO: Discuss confirming the password was set or updated and other devices were signed out with a success page or toast. https://github.com/clerk/javascript/pull/9930#discussion_r4151641473
       setIsOpen(false);
     },
@@ -76,13 +83,18 @@ export function useUserProfileEditPasswordController({
     ? { type: 'error', message: validationError }
     : strength.data;
 
+  const step = form.isSubmitting && reverification?.visible ? 'verify' : 'edit';
+
   const onOpenChange = (open: boolean) => {
     if (form.isSubmitting) {
-      return;
+      if (open || !reverification?.onCancel) {
+        return;
+      }
+      reverification.onCancel();
     }
     form.reset();
     setIsOpen(open);
   };
 
-  return { isOpen, onOpenChange, form, passwordFeedback };
+  return { isOpen, onOpenChange, form, passwordFeedback, step };
 }

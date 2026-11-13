@@ -7,11 +7,11 @@ import { sizes, styles } from './spinner.styles';
 
 export type SpinnerProps = MosaicElementProps<'span'> & {
   size?: 'sm' | 'md';
+  label?: string;
 };
 
 /**
- * Indeterminate loading spinner. Decorative (`aria-hidden`) — pair it with a disabled control or an
- * `aria-busy` container so assistive tech is informed of the pending state.
+ * Indeterminate loading spinner. Decorative by default; pass `label` to announce progress.
  *
  * @example
  * // Default (md), sized to match a `md` Icon
@@ -22,13 +22,15 @@ export type SpinnerProps = MosaicElementProps<'span'> & {
  * <Spinner size='sm' />
  */
 export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(function MosaicSpinner(
-  { size = 'md', xstyle, ...rest },
+  { size = 'md', label, xstyle, ...rest },
   ref,
 ) {
   return (
     <span
       ref={ref}
-      aria-hidden
+      role={label ? 'progressbar' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
       {...mergeStyleProps(themeProps('spinner', { size }), stylex.props(styles.base, sizes[size], xstyle), rest)}
     />
   );

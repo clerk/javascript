@@ -32,8 +32,10 @@ export type BuildClerkOptions = {
      */
     get: ({
       publicKeyOptions,
+      preferImmediatelyAvailableCredentials,
     }: {
       publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+      preferImmediatelyAvailableCredentials?: boolean;
     }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>;
     create: (
       publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,

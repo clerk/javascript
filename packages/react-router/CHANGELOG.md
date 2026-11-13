@@ -1,5 +1,122 @@
 # Change Log
 
+## 3.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`b9d10ba`](https://github.com/clerk/javascript/commit/b9d10ba5d3a177d63abc47544f8fdfa27a995761), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d), [`d71a6a1`](https://github.com/clerk/javascript/commit/d71a6a166313d01b48b525294d39eb685aa63934)]:
+  - @clerk/shared@4.45.0
+  - @clerk/backend@3.28.0
+  - @clerk/react@6.18.7
+
+## 3.7.0
+
+### Minor Changes
+
+- Remove the `options` argument from `rootAuthLoader()`. It had no effect, since `rootAuthLoader` reads auth state from `clerkMiddleware()`. Pass options like `secretKey` or `signInUrl` to `clerkMiddleware()` instead. The `rootAuthLoader()` callback request no longer types `request.user`, `request.session`, or `request.organization`, because they were always `undefined`. `RootAuthLoaderOptions` is deprecated in favor of `ClerkMiddlewareOptions`, and its unused `loadUser`, `loadSession`, and `loadOrganization` flags are removed. ([#10663](https://github.com/clerk/javascript/pull/10663)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`11d5dfb`](https://github.com/clerk/javascript/commit/11d5dfb1bec6f3e5f61db0b078e87fc3b8ecd8e2), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/backend@3.27.0
+  - @clerk/shared@4.44.1
+  - @clerk/react@6.18.6
+
+## 3.6.42
+
+### Patch Changes
+
+- Updated dependencies [[`ed3fe79`](https://github.com/clerk/javascript/commit/ed3fe791dca5af8ace0d05592728c06da2cf5e4d), [`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/backend@3.26.6
+  - @clerk/react@6.18.5
+  - @clerk/shared@4.44.0
+
+## 3.6.41
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`11907aa`](https://github.com/clerk/javascript/commit/11907aa0f17bd9c861ccdd5a469d2694d7a503cf), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/backend@3.26.5
+  - @clerk/react@6.18.4
+  - @clerk/shared@4.43.1
+
+## 3.6.40
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+  - @clerk/backend@3.26.4
+  - @clerk/react@6.18.3
+
+## 3.6.39
+
+### Patch Changes
+
+- Updated dependencies [[`d005fee`](https://github.com/clerk/javascript/commit/d005fee54006ecb2536f45042e0856c89577b1c1), [`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/backend@3.26.3
+  - @clerk/shared@4.42.0
+  - @clerk/react@6.18.2
+
+## 3.6.38
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+  - @clerk/react@6.18.1
+  - @clerk/backend@3.26.2
+
+## 3.6.37
+
+### Patch Changes
+
+- Updated dependencies [[`49c8afd`](https://github.com/clerk/javascript/commit/49c8afd12724d83418a0c1b85d009c389330dcb6)]:
+  - @clerk/backend@3.26.1
+
+## 3.6.36
+
+### Patch Changes
+
+- Updated dependencies [[`85dec02`](https://github.com/clerk/javascript/commit/85dec028a0320c32023fa58139e269db0202b1eb), [`b799bad`](https://github.com/clerk/javascript/commit/b799bad6057c469f777506b4bc40b1c44b0d4cb4), [`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/backend@3.26.0
+  - @clerk/shared@4.41.0
+  - @clerk/react@6.18.0
+
+## 3.6.35
+
+### Patch Changes
+
+- Updated dependencies [[`57aeba8`](https://github.com/clerk/javascript/commit/57aeba8420be67296a8dda5b049586bf42c2767f)]:
+  - @clerk/backend@3.25.0
+
+## 3.6.34
+
+### Patch Changes
+
+- Updated dependencies [[`9159465`](https://github.com/clerk/javascript/commit/9159465ac02cafec69a3e4e2235cddd1ed3639b7)]:
+  - @clerk/backend@3.24.0
+
+## 3.6.33
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+  - @clerk/backend@3.23.2
+
+## 3.6.32
+
+### Patch Changes
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+  - @clerk/backend@3.23.1
+
 ## 3.6.31
 
 ### Patch Changes

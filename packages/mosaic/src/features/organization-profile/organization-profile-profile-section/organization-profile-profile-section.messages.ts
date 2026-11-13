@@ -7,11 +7,16 @@ export const organizationProfileProfileSectionMessages = {
     manage: 'Manage logo',
     change: 'Change logo',
     remove: 'Remove logo',
-
-    errors: {
-      accept: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
-      size: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
-      overflow: 'Only one file can be uploaded at a time.',
+    crop: {
+      title: 'Adjust logo',
+      frame: 'Logo crop. Drag or use the arrow keys to move, plus and minus to zoom.',
+      zoom: 'Zoom',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
+      rotate: 'Rotate',
+      reset: 'Reset',
+      cancel: 'Cancel',
+      save: 'Save',
     },
   },
   name: {

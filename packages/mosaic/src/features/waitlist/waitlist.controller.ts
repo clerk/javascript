@@ -1,0 +1,57 @@
+import { useForm } from '../../components/form';
+import { setup } from '../../machine/setup';
+import { useMachine } from '../../machine/use-machine';
+import type { WaitlistModel } from './waitlist.types';
+import type { WaitlistViewProps } from './waitlist.view';
+
+export const WAITLIST_REDIRECT_DELAY_MS = 2000;
+
+interface WaitlistMachineContext {
+  onRedirect: (() => void) | undefined;
+}
+
+type WaitlistMachineEvent = { type: 'JOINED' };
+
+const { createMachine } = setup<WaitlistMachineContext, WaitlistMachineEvent>();
+
+const waitlistMachine = createMachine({
+  id: 'waitlist',
+  initial: 'form',
+  context: { onRedirect: undefined },
+  states: {
+    form: {
+      on: { JOINED: 'joined' },
+    },
+    joined: {
+      after: {
+        [WAITLIST_REDIRECT_DELAY_MS]: {
+          guard: context => context.onRedirect !== undefined,
+          actions: context => context.onRedirect?.(),
+        },
+      },
+    },
+  },
+});
+
+export type WaitlistReadyModel = Extract<WaitlistModel, { status: 'ready' }>;
+
+export function useWaitlistController(model: WaitlistReadyModel): WaitlistViewProps {
+  const { initialEmailAddress, renderBranding, onJoinWaitlist, onSignIn, onRedirect } = model;
+  const [snapshot, send] = useMachine(waitlistMachine, { context: { onRedirect } });
+  const form = useForm({
+    initialValues: { emailAddress: initialEmailAddress },
+    canSubmit: values => values.emailAddress.trim() !== '',
+    onSubmit: async values => {
+      await onJoinWaitlist(values.emailAddress);
+      send({ type: 'JOINED' });
+    },
+  });
+
+  return {
+    step: snapshot.value === 'form' ? 'form' : 'joined',
+    form,
+    renderBranding,
+    isRedirecting: onRedirect !== undefined,
+    onSignIn,
+  };
+}

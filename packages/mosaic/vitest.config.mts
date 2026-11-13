@@ -1,15 +1,34 @@
-import stylex from '@stylexjs/unplugin/vite';
-import { playwright } from '@vitest/browser-playwright';
-import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
+
+import stylex from '@stylexjs/unplugin/vite';
+import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
+
+import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
 
 const mosaicPath = resolve(import.meta.dirname, 'src');
 const featureTests = 'src/**/*.feature.test.tsx';
+const visualTests = 'src/**/*.visual.test.tsx';
+const webkitTests = 'src/**/*.webkit.test.tsx';
+const browserTests = 'src/**/*.browser.test.tsx';
+const browserDependencies = [
+  '@clerk/clerk-js',
+  '@wallet-standard/core',
+  '@testing-library/jest-dom/matchers',
+  '@testing-library/react',
+  '@testing-library/user-event',
+  'msw',
+  'msw/browser',
+];
 
 export default defineConfig({
   plugins: [
-    stylex({ dev: true, unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicPath } }),
+    stylex({
+      dev: true,
+      unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicPath },
+      lightningcssOptions: { targets: mosaicLightningCssTargets },
+    }),
     react({ jsxRuntime: 'automatic' }),
   ],
   test: {
@@ -21,6 +40,8 @@ export default defineConfig({
       },
     },
     globals: false,
+    restoreMocks: true,
+    unstubGlobals: true,
     exclude: ['node_modules/**', 'dist/**'],
     testTimeout: 5000,
     // Primitives ran as their own package on happy-dom with no setup beyond matchers, so they
@@ -34,6 +55,7 @@ export default defineConfig({
           name: 'primitives',
           environment: 'happy-dom',
           include: ['src/primitives/**/*.test.?(c|m)[jt]s?(x)', 'src/primitives/**/*.spec.?(c|m)[jt]s?(x)'],
+          exclude: [webkitTests, browserTests, visualTests],
           setupFiles: ['./src/primitives/test-utils/vitest.setup.ts'],
         },
       },
@@ -42,27 +64,85 @@ export default defineConfig({
         test: {
           name: 'mosaic',
           include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
-          exclude: ['src/primitives/**', featureTests],
+          exclude: ['src/primitives/**', featureTests, webkitTests, browserTests, visualTests],
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
         },
       },
       {
         extends: true,
         publicDir: 'test/public',
+        server: {
+          warmup: {
+            clientFiles: ['./src/**/*.modal-content.tsx'],
+          },
+        },
         optimizeDeps: {
-          include: [
-            '@clerk/clerk-js',
-            '@testing-library/jest-dom/matchers',
-            '@testing-library/react',
-            '@testing-library/user-event',
-            'msw',
-            'msw/browser',
-          ],
+          include: browserDependencies,
         },
         test: {
           name: 'feature',
           include: [featureTests],
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        publicDir: 'test/public',
+        optimizeDeps: { include: [...browserDependencies, 'qrcode.react'] },
+        test: {
+          name: 'visual',
+          include: [visualTests],
+          setupFiles: [
+            resolve(import.meta.dirname, 'vitest.setup.browser.mts'),
+            resolve(import.meta.dirname, 'vitest.setup.visual.mts'),
+          ],
+          browser: {
+            enabled: true,
+            headless: true,
+            viewport: { width: 1280, height: 900 },
+            provider: playwright({
+              contextOptions: {
+                colorScheme: 'light',
+                deviceScaleFactor: 1,
+                locale: 'en-US',
+                timezoneId: 'UTC',
+                reducedMotion: 'reduce',
+              },
+            }),
+            instances: [{ browser: 'chromium' }],
+            expect: {
+              toMatchScreenshot: {
+                comparatorName: 'pixelmatch',
+                comparatorOptions: { threshold: 0, allowedMismatchedPixelRatio: 0 },
+              },
+            },
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'webkit',
+          include: [webkitTests],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'webkit' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'browser',
+          include: [browserTests],
           browser: {
             enabled: true,
             headless: true,

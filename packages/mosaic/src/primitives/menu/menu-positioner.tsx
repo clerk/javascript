@@ -3,7 +3,8 @@
 import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isHoverOpen, isKeyboardOpen, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useMenuContext } from './menu-context';
 
 export type MenuPositionerProps = ComponentProps<'div'>;
@@ -25,7 +26,7 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       setActiveIndex,
     } = useMenuContext();
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
@@ -33,14 +34,14 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
           event.preventDefault();
           const items = elementsRef.current;
           if (event.key === 'Home') {
-            const firstEnabled = items.findIndex(el => el != null && !el.hasAttribute('aria-disabled'));
+            const firstEnabled = items.findIndex(el => el != null && el.getAttribute('aria-disabled') !== 'true');
             if (firstEnabled !== -1) {
               setActiveIndex(firstEnabled);
             }
           } else {
             for (let i = items.length - 1; i >= 0; i--) {
               const item = items[i];
-              if (item != null && !item.hasAttribute('aria-disabled')) {
+              if (item != null && item.getAttribute('aria-disabled') !== 'true') {
                 setActiveIndex(i);
                 break;
               }
@@ -60,18 +61,16 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The menu id is owned by floating-ui's menu role: a consumer-supplied id must
     // not override it, or the trigger's aria-controls pairing would silently break.
-    if (floatingProps.id != null) {
-      merged.id = floatingProps.id;
+    const wiredId = floatingProps['id'];
+    if (typeof wiredId === 'string') {
+      merged.id = wiredId;
     }
 
     const element = useRender({
       defaultTagName: 'div',
       render,
       enabled: mounted,
-      // floating-ui types `setFloating` as a method signature, but at runtime it's
-      // a stable callback that doesn't use `this`, so the unbound-method check is a
-      // false positive here.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setFloating, ref],
       props: merged,
     });
@@ -84,7 +83,9 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       <FloatingFocusManager
         context={floatingContext}
         modal={false}
-        initialFocus={isNested ? -1 : isKeyboardOpen(floatingContext) ? 0 : refs.floating}
+        initialFocus={
+          isNested || isHoverOpen(floatingContext) ? -1 : isKeyboardOpen(floatingContext) ? 0 : refs.floating
+        }
         returnFocus={isNested ? false : returnFocusRef}
       >
         <FloatingList

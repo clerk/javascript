@@ -43,7 +43,7 @@ export const styles = stylex.create({
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     animationTimingFunction: easingVars['--cl-ease-default'],
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-lg'],
     color: colorVars['--cl-color-foreground'],
     display: {
@@ -65,12 +65,18 @@ export const styles = stylex.create({
       default: `translateY(calc(var(--toast-index) * -1 * ${stackGap})) scale(calc(1 - var(--toast-index) * 0.05))`,
       ':where([data-expanded])': `translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${stackGap}))`,
     },
-    transitionDuration: durationVars['--cl-duration-slow'],
+    transitionDuration: {
+      default: durationVars['--cl-duration-slow'],
+      ':where([data-ending-style])': durationVars['--cl-duration-base'],
+    },
     transitionProperty: {
       default: 'opacity, transform, translate, height',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
-    transitionTimingFunction: easingVars['--cl-ease-enter'],
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-enter'],
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
     translate: {
       default: '0 0',
       ':where([data-starting-style], [data-ending-style])': '0 100%',
@@ -162,11 +168,11 @@ export const styles = stylex.create({
 
 export const iconColors = stylex.create({
   success: {
-    backgroundColor: colorVars['--cl-color-positive-alpha-200'],
+    backgroundColor: colorVars['--cl-color-positive-subtle'],
     color: colorVars['--cl-color-positive'],
   },
   error: {
-    backgroundColor: colorVars['--cl-color-negative-alpha-200'],
+    backgroundColor: colorVars['--cl-color-negative-subtle'],
     color: colorVars['--cl-color-negative'],
   },
   loading: {

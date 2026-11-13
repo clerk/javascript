@@ -1,5 +1,7 @@
 import { createContext, useContext } from 'react';
 
+export type TabsDirection = 'forward' | 'backward';
+
 export interface TabsContextValue {
   value: string;
   setValue: (value: string) => void;
@@ -7,13 +9,7 @@ export interface TabsContextValue {
   activationMode: 'automatic' | 'manual';
   tabsId: string;
   registerTab: (value: string, element: HTMLElement | null) => void;
-  getTabElement: (value: string) => HTMLElement | null;
-  // The list element is tracked as state (not a ref) so the indicator, a child,
-  // re-renders once the list mounts. A child's layout effect runs before its
-  // parent's ref is attached, so a plain ref would read null on first measure.
-  listElement: HTMLElement | null;
-  setListElement: (element: HTMLElement | null) => void;
-  direction: 1 | -1;
+  direction: TabsDirection;
 }
 
 export const TabsContext = createContext<TabsContextValue | null>(null);

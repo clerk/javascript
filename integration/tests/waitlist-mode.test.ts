@@ -81,7 +81,7 @@ test.describe('Waitlist mode', () => {
     await app.withEnv(appConfigs.envs.withWaitlistMode);
     await app.dev();
 
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
@@ -100,7 +100,7 @@ test.describe('Waitlist mode', () => {
   });
 
   test('Existing user signs in succesfull', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -111,7 +111,7 @@ test.describe('Waitlist mode', () => {
   });
 
   test('Sign up page return restricted and click Back to sign in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signUp.goTo();
     await u.po.signUp.waitForMounted();
 
@@ -124,12 +124,11 @@ test.describe('Waitlist mode', () => {
   });
 
   test('Sign up page with invitation render correctly and sign up', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const invitedUser = u.services.users.createFakeUser(test, { fictionalEmail: true });
 
     const invitation = await u.services.invitations.createBapiInvitation(invitedUser.email);
 
-    await u.po.testingToken.setup();
     await u.page.goto(invitation.url);
     await u.po.signUp.waitForMounted();
     await expect(u.page.getByText(/Create your account/i).first()).toBeVisible();
@@ -144,7 +143,7 @@ test.describe('Waitlist mode', () => {
   });
 
   test('Navigate to waitlist page and join the waitlist', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.waitlist.goTo();
     await u.po.waitlist.waitForMounted();
 
@@ -155,7 +154,7 @@ test.describe('Waitlist mode', () => {
   });
 
   test('Navigate between sign-in and waitlist', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
 

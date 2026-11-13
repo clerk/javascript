@@ -20,31 +20,37 @@ import {
   useRole,
   useTypeahead,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactElement, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
 import { alignSelectedItem } from './align-selected-item';
-import { SelectContext, type SelectContextValue, type SelectItem } from './select-context';
+import {
+  SelectContext,
+  type SelectContextValue,
+  SelectHighlightContext,
+  type SelectHighlightContextValue,
+  type SelectItem,
+  SelectOptionsContext,
+  type SelectOptionsContextValue,
+} from './select-context';
 
 export type { SelectItem } from './select-context';
 
-export interface SelectProps {
+interface SelectBaseProps<Value> {
   /** Array of `{ label, value }` items for label resolution before options mount. */
-  items?: SelectItem[];
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
+  items?: SelectItem<Value>[];
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   /**
    * When true, the popup is positioned so the selected item overlays the
    * trigger — like a native `<select>`. Defaults to `true`. Falls back to
-   * menu-like placement below the trigger when opened by touch, or when the
-   * trigger sits too close to a viewport edge for the overlay to be usable.
+   * menu-like placement below the trigger when opened by touch, when nothing
+   * is selected, or when the trigger sits too close to a viewport edge for the
+   * overlay to be usable.
    */
   alignItemWithTrigger?: boolean;
   placement?: Placement;
@@ -52,7 +58,31 @@ export interface SelectProps {
   children: ReactNode;
 }
 
-function SelectInner(props: SelectProps) {
+export interface SelectSingleProps<Value = string> extends SelectBaseProps<Value> {
+  multiple?: false;
+  value?: Value | null;
+  defaultValue?: Value | null;
+  onValueChange?: (value: Value) => void;
+}
+
+export interface SelectMultipleProps<Value = string> extends SelectBaseProps<Value> {
+  /** Lets several options be selected. Picking an option toggles it and keeps the popup open. */
+  multiple: true;
+  value?: Value[];
+  defaultValue?: Value[];
+  onValueChange?: (value: Value[]) => void;
+}
+
+export type SelectProps<Value = string> = SelectSingleProps<Value> | SelectMultipleProps<Value>;
+
+function toValues(value: unknown): unknown[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  return value === null ? [] : [value];
+}
+
+function SelectInner(props: SelectProps<unknown>) {
   const {
     items,
     alignItemWithTrigger: alignProp = true,
@@ -60,28 +90,34 @@ function SelectInner(props: SelectProps) {
     sideOffset = 4,
     children,
   } = props;
+  const multiple = props.multiple === true;
+  const onSingleValueChange = props.multiple ? undefined : props.onValueChange;
+  const onMultipleValueChange = props.multiple ? props.onValueChange : undefined;
 
   const nodeId = useFloatingNodeId();
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
-  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(
-    props.value,
-    props.defaultValue,
-    props.onValueChange as ((value: string | undefined) => void) | undefined,
+  const singleValue = props.multiple ? undefined : props.value;
+  const controlledSingle = useMemo(() => toValues(singleValue), [singleValue]);
+  const controlledValues = props.multiple ? props.value : controlledSingle;
+  const [selectedValues, setSelectedValues] = useControllableState<unknown[]>(
+    controlledValues,
+    (props.multiple ? props.defaultValue : toValues(props.defaultValue)) ?? [],
   );
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<unknown, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
-  const valueToLabelRef = useRef<Map<string, string>>(new Map());
+  const valueToLabelRef = useRef<Map<unknown, string>>(new Map());
   const selectedItemRef = useRef<HTMLElement | null>(null);
   const openRef = useRef(open);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   openRef.current = open;
   const openMethodRef = useRef<string | null>(null);
   const updateRef = useRef<() => void>(() => {});
@@ -91,6 +127,7 @@ function SelectInner(props: SelectProps) {
   // Memoized so its held position survives re-renders during the exit transition.
   const align = useMemo(
     () =>
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       alignSelectedItem({
         selectedItemRef,
         openRef,
@@ -107,7 +144,7 @@ function SelectInner(props: SelectProps) {
       }
       setOpen(next);
     },
-    [setOpen],
+    [setOpen, setTouchOpen],
   );
 
   const {
@@ -134,12 +171,14 @@ function SelectInner(props: SelectProps) {
               });
             },
           }),
+          // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
           arrow({ element: arrowRef }),
           cssVars({ sideOffset }),
         ],
     whileElementsMounted: autoUpdate,
   });
 
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   updateRef.current = update;
 
   const returnFocusRef = useReturnFocus(floatingContext);
@@ -152,26 +191,50 @@ function SelectInner(props: SelectProps) {
   // Reset only once the popup is gone, or the exit transition would reposition.
   useEffect(() => {
     if (!mounted) {
+      // eslint-disable-next-line react/set-state-in-effect -- Recompute positioning fallback after the selected item changes.
       setFallback(false);
     }
   }, [mounted]);
 
-  const isControlled = props.value !== undefined;
+  const isControlled = controlledValues !== undefined;
 
   const handleSelect = useCallback(
-    (value: string, index: number) => {
-      setSelectedValue(value);
-      setSelectedIndex(index);
+    (value: unknown, index: number) => {
+      if (multiple) {
+        const next = selectedValues.some(selected => Object.is(selected, value))
+          ? selectedValues.filter(selected => !Object.is(selected, value))
+          : [...selectedValues, value];
+        setSelectedValues(next);
+        onMultipleValueChange?.(next);
+        if (next.length === 0) {
+          setSelectedIndex(null);
+        }
+      } else {
+        setSelectedValues([value]);
+        onSingleValueChange?.(value);
+        setSelectedIndex(index);
+      }
       // In controlled mode the parent decides whether to accept the new value.
-      // If they reject it, selectedValue rolls back but selectedLabel would not,
-      // showing a stale label. Only cache the label in uncontrolled mode where
+      // If they reject it, the selection rolls back but a cached label would not,
+      // showing a stale label. Only cache labels in uncontrolled mode where
       // the value always persists after selection.
       if (!isControlled) {
-        setSelectedLabel(valueToLabelRef.current.get(value) ?? value);
+        const label = valueToLabelRef.current.get(value) ?? String(value);
+        setCachedLabels(prev => new Map(prev).set(value, label));
       }
-      handleOpenChange(false);
+      if (!multiple) {
+        handleOpenChange(false);
+      }
     },
-    [isControlled, setSelectedValue, handleOpenChange],
+    [
+      multiple,
+      selectedValues,
+      isControlled,
+      setSelectedValues,
+      handleOpenChange,
+      onSingleValueChange,
+      onMultipleValueChange,
+    ],
   );
 
   const handleTypeaheadMatch = useCallback(
@@ -220,13 +283,13 @@ function SelectInner(props: SelectProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       setActiveIndex,
       selectedIndex,
       setSelectedIndex,
-      selectedValue,
-      selectedLabel: isControlled ? null : selectedLabel,
+      multiple,
+      selectedValues,
+      cachedLabels: isControlled ? null : cachedLabels,
       elementsRef,
       labelsRef,
       popupRef,
@@ -249,13 +312,13 @@ function SelectInner(props: SelectProps) {
       placement,
       getReferenceProps,
       getFloatingProps,
-      getItemProps,
       activeIndex,
       setActiveIndex,
       selectedIndex,
       setSelectedIndex,
-      selectedValue,
-      selectedLabel,
+      multiple,
+      selectedValues,
+      cachedLabels,
       isControlled,
       returnFocusRef,
       alignActive,
@@ -265,14 +328,35 @@ function SelectInner(props: SelectProps) {
     ],
   );
 
+  const optionsContextValue = useMemo<SelectOptionsContextValue>(
+    () => ({
+      getItemProps,
+      handleSelect,
+      setSelectedIndex,
+      valueToLabelRef,
+      selectedItemRef,
+    }),
+    [getItemProps, handleSelect],
+  );
+
+  const highlightContextValue = useMemo<SelectHighlightContextValue>(
+    () => ({ activeIndex, selectedValues }),
+    [activeIndex, selectedValues],
+  );
+
   return (
     <FloatingNode id={nodeId}>
-      <SelectContext.Provider value={contextValue}>{children}</SelectContext.Provider>
+      <SelectContext.Provider value={contextValue}>
+        <SelectOptionsContext.Provider value={optionsContextValue}>
+          <SelectHighlightContext.Provider value={highlightContextValue}>{children}</SelectHighlightContext.Provider>
+        </SelectOptionsContext.Provider>
+      </SelectContext.Provider>
     </FloatingNode>
   );
 }
 
-export function SelectRoot(props: SelectProps) {
+// eslint-disable-next-line typescript/consistent-type-assertions -- The implementation is value-agnostic; the root only hands back values its caller passed in.
+export const SelectRoot = function SelectRoot(props: SelectProps<unknown>) {
   const parentId = useFloatingParentNodeId();
 
   if (parentId === null) {
@@ -284,4 +368,4 @@ export function SelectRoot(props: SelectProps) {
   }
 
   return <SelectInner {...props} />;
-}
+} as <Value = string>(props: SelectProps<Value>) => ReactElement;

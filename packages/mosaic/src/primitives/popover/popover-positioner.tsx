@@ -4,6 +4,7 @@ import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { usePopoverContext } from './popover-context';
 
 export interface PopoverPositionerProps extends ComponentProps<'div'> {
@@ -30,15 +31,17 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       hasDescription,
     } = usePopoverContext();
 
+    const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
+
     React.useLayoutEffect(() => {
       if (!anchor) {
         return;
       }
       refs.setPositionReference(anchor);
-      return () => refs.setPositionReference(refs.domReference.current);
-    }, [anchor, refs]);
+      return restoreReference;
+    }, [anchor, refs, restoreReference]);
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
 
     const ownProps = {
       'data-side': side,
@@ -53,8 +56,7 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       defaultTagName: 'div',
       render,
       enabled: mounted,
-      // `setFloating` is a stable callback that does not use `this`.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setFloating, ref],
       props: mergeProps<'div'>(defaultProps, otherProps),
     });

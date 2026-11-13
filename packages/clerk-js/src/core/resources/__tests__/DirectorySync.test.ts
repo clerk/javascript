@@ -1,4 +1,4 @@
-import type { DirectorySyncJSON } from '@clerk/shared/types';
+import type { DirectorySyncJSON, RoleJSON } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, DirectorySync } from '../internal';
@@ -19,6 +19,17 @@ const directoryJSON: DirectorySyncJSON = {
   created_at: 1700000000000,
   updated_at: 1700000000000,
 };
+
+const roleJSON = (key: string, name: string): RoleJSON => ({
+  object: 'role',
+  id: `role_${key}`,
+  key,
+  name,
+  description: '',
+  permissions: [],
+  created_at: 1700000000000,
+  updated_at: 1700000000000,
+});
 
 function createDirectorySync(): DirectorySync {
   return new DirectorySync(directoryJSON, ORG_ID);
@@ -257,5 +268,106 @@ describe('DirectorySync', () => {
     expect(result.data[0].userId).toBe('user_1');
     expect(result.data[0].identifier).toBe('ada@example.com');
     expect(result.data[0].active).toBe(true);
+  });
+
+  it('turns group role mapping on through update', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi
+      .fn()
+      .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, group_role_mapping_enabled: true } }));
+
+    const result = await createDirectorySync().update({ groupRoleMappingEnabled: true });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PATCH',
+      path: DIRECTORY_PATH,
+      body: { group_role_mapping_enabled: true },
+    });
+    expect(result.groupRoleMappingEnabled).toBe(true);
+  });
+
+  it('lists directory groups with cursor pagination', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: {
+          data: [{ object: 'directory_group', id: 'dirgrp_1', display_name: 'Engineering', updated_at: 1700000000000 }],
+          cursor: { starting_after: 'dirgrp_1', ending_before: null, has_next_page: true },
+        },
+      }),
+    );
+
+    const page = await createDirectorySync().getGroups({ limit: 1, startingAfter: 'dirgrp_0' });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'GET',
+      path: `${DIRECTORY_PATH}/groups`,
+      search: { limit: '1', starting_after: 'dirgrp_0' },
+    });
+    expect(page.data).toEqual([{ id: 'dirgrp_1', displayName: 'Engineering', updatedAt: new Date(1700000000000) }]);
+    expect(page.startingAfter).toBe('dirgrp_1');
+    expect(page.hasNextPage).toBe(true);
+  });
+
+  const mappingsResponse = {
+    data: [
+      {
+        object: 'directory_group_role_mapping',
+        id: 'dgrm_1',
+        directory_id: 'scimdir_1',
+        directory_group_id: 'dirgrp_1',
+        directory_group_display_name: 'Engineering',
+        role: roleJSON('org:admin', 'Admin'),
+        precedence: 1,
+        created_at: 1700000000000,
+        updated_at: 1700000000000,
+      },
+    ],
+    total_count: 1,
+    default_role: roleJSON('org:member', 'Member'),
+  };
+
+  it('reads the group role mappings and the default role', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: mappingsResponse }));
+
+    const result = await createDirectorySync().getGroupRoleMappings();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: `${DIRECTORY_PATH}/group_role_mappings` });
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0]).toMatchObject({
+      directoryGroupId: 'dirgrp_1',
+      directoryGroupDisplayName: 'Engineering',
+      precedence: 1,
+      role: { key: 'org:admin', name: 'Admin' },
+    });
+    expect(result.defaultRole).toMatchObject({ key: 'org:member', name: 'Member' });
+  });
+
+  it('replaces the group role mappings, serializing them as JSON in priority order', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: mappingsResponse }));
+
+    await createDirectorySync().replaceGroupRoleMappings({
+      mappings: [
+        { directoryGroupId: 'dirgrp_2', role: 'org:member' },
+        { directoryGroupId: 'dirgrp_1', role: 'org:admin' },
+      ],
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PUT',
+      path: `${DIRECTORY_PATH}/group_role_mappings`,
+      body: {
+        mappings: JSON.stringify([
+          { directory_group_id: 'dirgrp_2', role: 'org:member' },
+          { directory_group_id: 'dirgrp_1', role: 'org:admin' },
+        ]),
+      },
+    });
   });
 });

@@ -1,5 +1,119 @@
 # Change Log
 
+## 3.28.0
+
+### Minor Changes
+
+- JWTs without a `cat` header are no longer accepted as session tokens: `authenticateRequest()` returns signed out (`token-type-mismatch`) and `verifyToken()` returns `token-invalid`. This includes OIDC `id_token`s issued by Clerk. Tests that sign their own session tokens must add `cat: 'cl_B7d4PD111AAA'` to the header. ([#10257](https://github.com/clerk/javascript/pull/10257)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Add `startingAfter` to `users.getUserList()` so applications can page through user lists with a cursor. ([#10200](https://github.com/clerk/javascript/pull/10200)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+### Patch Changes
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.45.0
+
+## 3.27.0
+
+### Minor Changes
+
+- Add `DirectoryGroupWebhookEvent` and `DirectoryGroupMembershipWebhookEvent` to `WebhookEvent`, so `verifyWebhook()` narrows the `directoryGroup.created`, `directoryGroup.updated`, `directoryGroup.synced`, `directoryGroup.deleted`, `directoryGroupMembership.created` and `directoryGroupMembership.deleted` events that Directory Sync sends. Their payload types are exported as `DirectoryGroupWebhookEventJSON`, `DirectoryGroupMembershipWebhookEventJSON` and `DeletedDirectoryGroupMembershipWebhookEventJSON`. ([#10378](https://github.com/clerk/javascript/pull/10378)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+
+## 3.26.6
+
+### Patch Changes
+
+- Published packages no longer include compiled test files, test type declarations, or test fixtures. ([#10522](https://github.com/clerk/javascript/pull/10522)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
+## 3.26.5
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Add `bcrypt_peppered`, `md5_salted`, `pbkdf2_sha512`, `pbkdf2_sha512_hex`, `sha256_salted`, and `sha512_symfony` to the `PasswordHasher` type, so TypeScript accepts every hasher the `createUser()` JSDoc documents. The JSDoc for `md5_salted` and `sha256_salted` now also shows the `password_digest` format the Backend API accepts: `hash$salt`, not `salt$hash`. ([#10504](https://github.com/clerk/javascript/pull/10504)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
+## 3.26.4
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+
+## 3.26.3
+
+### Patch Changes
+
+- Update the `lockUser()` JSDoc to link to the **Protections** page under **Protect** (`/~/protect/protections`) in the Clerk Dashboard. Point the user lock links in the `lockUser()`, `unlockUser()`, `CreateUserParams.locked`, and `User.locked` JSDoc to the current guide on user locks. ([#10395](https://github.com/clerk/javascript/pull/10395)) by [@mwickett](https://github.com/mwickett)
+
+- Session `expireAt` and `abandonAt` no longer special-case a `0` deadline; the backend now always sends a real deadline. ([#10389](https://github.com/clerk/javascript/pull/10389)) by [@swolfand](https://github.com/swolfand)
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/shared@4.42.0
+
+## 3.26.2
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+
+## 3.26.1
+
+### Patch Changes
+
+- Stop accepting the legacy `cl_I7d4PD111III` JWT category as a session or handshake token. Clerk no longer issues it, so `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for a token carrying it, the same as for other non-session categories. ([#10286](https://github.com/clerk/javascript/pull/10286)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.26.0
+
+### Minor Changes
+
+- Add webhook types for transactional email delivery, delays, bounces, complaints, failures, and suppressions. Bounce events distinguish `Permanent`, `Transient`, and `Undetermined` classifications. `verifyWebhook()` preserves the original event timestamp and instance ID for outcome handlers. These types prepare for the transactional email pilot; receiving the events requires the corresponding backend rollout. ([#9776](https://github.com/clerk/javascript/pull/9776)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Clarify issuer validation for session tokens and document that machine token verification ignores the issuer option. ([#10282](https://github.com/clerk/javascript/pull/10282)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+
+## 3.25.0
+
+### Minor Changes
+
+- Added an optional `issuer` option to `verifyJwt()`, `verifyToken()`, and `authenticateRequest()` to validate the JWT `iss` claim against a string or list of allowed strings. For `verifyToken()` and `authenticateRequest()`, this applies only to session tokens. Omitting `issuer` preserves existing behavior. ([#8772](https://github.com/clerk/javascript/pull/8772)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.24.0
+
+### Minor Changes
+
+- Add `deprovisioned` to the Backend `User` object and `UserJSON`, so you can tell when Directory Sync has deactivated a user, including in `user.updated` webhook payloads, without casting. It's separate from `banned`: Directory Sync sets and clears `deprovisioned`, while you set `banned` through the Dashboard or Backend API. ([#10245](https://github.com/clerk/javascript/pull/10245)) by [@manovotny](https://github.com/manovotny)
+
+## 3.23.2
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+
+## 3.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/shared@4.39.1
+
 ## 3.23.0
 
 ### Minor Changes

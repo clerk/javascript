@@ -18,7 +18,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
     'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
-    'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
+    'user-profile-profile-section': dynamic(() => import('../stories/user-profile-profile-section.mdx')),
+    'user-profile-email-section': dynamic(() => import('../stories/user-profile-email-section.mdx')),
+    'user-profile-phone-section': dynamic(() => import('../stories/user-profile-phone-section.mdx')),
     'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
     'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
@@ -49,11 +51,26 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
   },
-  'api-keys': {
+  misc: {
+    'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
+    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
+    'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
+    'organization-list': dynamic(() => import('../stories/organization-list.mdx')),
+    'task-choose-organization': dynamic(() => import('../stories/task-choose-organization.mdx')),
+    'user-avatar': dynamic(() => import('../stories/user-avatar.mdx')),
+    'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
-  },
-  reverification: {
+    'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
+    waitlist: dynamic(() => import('../stories/waitlist.mdx')),
+    'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),
+    'sign-in-button': dynamic(() => import('../stories/sign-in-button.mdx')),
+    'sign-in-with-metamask-button': dynamic(() => import('../stories/sign-in-with-metamask-button.mdx')),
+    'sign-up-button': dynamic(() => import('../stories/sign-up-button.mdx')),
+    'sign-out-button': dynamic(() => import('../stories/sign-out-button.mdx')),
+  },
+  authentication: {
+    'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
@@ -63,21 +80,27 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'action-bar': dynamic(() => import('../stories/action-bar.mdx')),
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
+    link: dynamic(() => import('../stories/link.mdx')),
+    skeleton: dynamic(() => import('../stories/skeleton.mdx')),
     banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
     checkbox: dynamic(() => import('../stories/checkbox.mdx')),
     combobox: dynamic(() => import('../stories/combobox.mdx')),
     'copy-button': dynamic(() => import('../stories/copy-button.mdx')),
+    'provider-button': dynamic(() => import('../stories/provider-button.mdx')),
     'data-list': dynamic(() => import('../stories/data-list.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
     pagination: dynamic(() => import('../stories/pagination.mdx')),
+    'password-input': dynamic(() => import('../stories/password-input.mdx')),
     'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
+    stepper: dynamic(() => import('../stories/stepper.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     drawer: dynamic(() => import('../stories/drawer.component.mdx')),
     'empty-state': dynamic(() => import('../stories/empty-state.mdx')),
+    entity: dynamic(() => import('../stories/entity.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
@@ -86,8 +109,13 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     panel: dynamic(() => import('../stories/panel.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
+    radio: dynamic(() => import('../stories/radio.mdx')),
+    reveal: dynamic(() => import('../stories/reveal.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    separator: dynamic(() => import('../stories/separator.mdx')),
+    'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
+    switch: dynamic(() => import('../stories/switch.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     'tag-input': dynamic(() => import('../stories/tag-input.component.mdx')),
@@ -96,6 +124,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
+    captcha: dynamic(() => import('../stories/captcha.mdx')),
     'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
   },
   primitives: {
@@ -108,10 +137,13 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     drawer: dynamic(() => import('../stories/drawer.mdx')),
     'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
     flow: dynamic(() => import('../stories/flow.mdx')),
+    'image-cropper': dynamic(() => import('../stories/image-cropper.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),
+    portal: dynamic(() => import('../stories/portal.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
+    table: dynamic(() => import('../stories/table.primitive.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     'tag-input': dynamic(() => import('../stories/tag-input.mdx')),
     toast: dynamic(() => import('../stories/toast.primitive.mdx')),
@@ -123,7 +155,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   hooks: {
     // Headless hooks — alphabetical.
-    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
     'use-form': dynamic(() => import('../stories/use-form.mdx')),
   },
   localization: {
@@ -153,7 +184,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose prose-headings:scroll-mt-16 mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
         <DocContent />
       </article>

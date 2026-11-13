@@ -51,3 +51,14 @@ export function Overlay() {
     </Dialog.Root>
   );
 }
+
+export function Fullscreen() {
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={<Button />}>Manage organization</Dialog.Trigger>
+      <Dialog.Popup variant='fullscreen'>
+        <OverlayProfile />
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}

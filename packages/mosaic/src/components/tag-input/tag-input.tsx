@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
 import { useLayoutAnimation } from '../../primitives/hooks';
 import type {
   TagInputInputProps as PrimitiveTagInputInputProps,
@@ -20,7 +21,17 @@ import { styles } from './tag-input.styles';
 
 type TagInputRootProps = Pick<
   PrimitiveTagInputProps,
-  'value' | 'defaultValue' | 'onValueChange' | 'validate' | 'delimiters' | 'name' | 'form' | 'disabled'
+  | 'value'
+  | 'defaultValue'
+  | 'onValueChange'
+  | 'inputValue'
+  | 'defaultInputValue'
+  | 'onInputValueChange'
+  | 'validate'
+  | 'delimiters'
+  | 'name'
+  | 'form'
+  | 'disabled'
 >;
 
 export interface TagInputProps
@@ -55,8 +66,8 @@ function Tags({ removeLabel, itemProps }: { removeLabel: (value: string) => stri
         {...mergeStyleProps(themeProps('tag-input-tag-remove'), stylex.props(reset.base, styles.tagRemove))}
       >
         <Icon
-          name='x'
-          size='sm'
+          glyph={X}
+          size='md'
         />
       </Primitive.TagRemove>
     </Primitive.Tag>
@@ -91,6 +102,9 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
     value,
     defaultValue,
     onValueChange,
+    inputValue,
+    defaultInputValue,
+    onInputValueChange,
     validate,
     delimiters,
     name,
@@ -129,11 +143,15 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
+      inputValue={inputValue}
+      defaultInputValue={defaultInputValue}
+      onInputValueChange={onInputValueChange}
       validate={validate}
       delimiters={delimiters}
       name={name}
       form={form}
       disabled={disabled}
+      focusableWhenDisabled={fieldProps?.focusableWhenDisabled}
       {...mergeStyleProps(
         themeProps('tag-input', { disabled, invalid }),
         stylex.props(reset.base, inputStyles.group, styles.root, disabled && styles.disabled, xstyle),
@@ -150,6 +168,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
         ref={ref}
         itemProps={itemProps}
         id={fieldProps?.id ?? id}
+        form={form}
         required={required}
         aria-invalid={ariaInvalid}
         aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}

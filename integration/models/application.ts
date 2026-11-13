@@ -80,6 +80,7 @@ export const application = (
       return state.env;
     },
     withEnv: async (env: EnvironmentConfig) => {
+      await env.resolve();
       state.env = env;
       return envWriter(appDirPath, env);
     },

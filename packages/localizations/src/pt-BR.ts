@@ -308,9 +308,45 @@ export const ptBR: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1603,6 +1639,11 @@ export const ptBR: LocalizationResource = {
         'Usar sua chave de acesso confirma a sua identidade. Seu dispositivo pode solicitar sua impressão digital, reconhecimento facial ou PIN.',
       title: 'Use sua chave de acesso.',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Usar outro método',
       subtitle: 'Digite sua senha para continuar.',
@@ -1753,6 +1794,10 @@ export const ptBR: LocalizationResource = {
       subtitle:
         'Usar sua chave de acesso confirma a sua identidade. Seu dispositivo pode solicitar sua impressão digital, reconhecimento facial ou PIN.',
       title: 'Use sua chave de acesso.',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utilize outro método',
@@ -2058,6 +2103,7 @@ export const ptBR: LocalizationResource = {
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
       'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Código incorreto.',
     form_email_address_blocked:
       'Serviços de e-mail temporários não são suportados. Por favor, use seu endereço de e-mail regular para criar uma conta.',
@@ -2135,9 +2181,11 @@ export const ptBR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Você já está conectado.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier:
       'Uma extensão de carteira Web3 não pode ser encontrada. Por favor, instale uma para continuar.',

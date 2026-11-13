@@ -2,6 +2,9 @@ export * as Combobox from './parts';
 export type {
   ComboboxCollectionProps,
   ComboboxArrowProps,
+  ComboboxClearProps,
+  ComboboxEmptyProps,
+  ComboboxInputGroupProps,
   ComboboxInputProps,
   ComboboxListProps,
   ComboboxOptionProps,

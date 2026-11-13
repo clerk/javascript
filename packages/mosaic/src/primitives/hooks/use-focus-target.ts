@@ -26,11 +26,13 @@ export type FocusTarget =
  * index disables the focus move). The function form reads the open event floating-ui has
  * already recorded by the time the popup mounts; it must be pure, as re-renders re-invoke it.
  */
+export type ResolvedInitialFocus = number | React.MutableRefObject<HTMLElement | null>;
+
 export function useInitialFocus(
   initialFocus: FocusTarget | undefined,
   open: boolean,
   floatingContext: FloatingContext,
-): number | React.MutableRefObject<HTMLElement | null> {
+): ResolvedInitialFocus {
   const elementRef = React.useRef<HTMLElement | null>(null);
   return React.useMemo(() => {
     if (!open || initialFocus === undefined || initialFocus === true) {
@@ -40,17 +42,19 @@ export function useInitialFocus(
       return -1;
     }
     if (typeof initialFocus !== 'function') {
-      return initialFocus as React.MutableRefObject<HTMLElement | null>;
+      return initialFocus;
     }
     const result = initialFocus(interactionTypeFromEvent(floatingContext.dataRef.current.openEvent));
     if (result === false) {
       return -1;
     }
     if (result instanceof HTMLElement) {
+      // eslint-disable-next-line react/refs -- Floating UI needs this ref for the element returned by the focus callback.
       elementRef.current = result;
       return elementRef;
     }
     return 0;
+    // eslint-disable-next-line react/preserve-manual-memoization -- Keep the existing callback timing while Floating UI stores the open event in a ref.
   }, [open, initialFocus, floatingContext]);
 }
 
@@ -116,5 +120,5 @@ export function useFinalFocus(
   if (typeof finalFocus === 'function') {
     return resolvedRef;
   }
-  return finalFocus as React.MutableRefObject<HTMLElement | null>;
+  return finalFocus;
 }

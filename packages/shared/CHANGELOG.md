@@ -1,5 +1,107 @@
 # Change Log
 
+## 4.45.0
+
+### Minor Changes
+
+- Add a `preferImmediatelyAvailableCredentials` option to `signIn.authenticateWithPasskey()` and `signIn.passkey()`. With `@clerk/expo-passkeys` on iOS 16+ and Android, it limits sign-in to passkeys already on the device, and the request fails without showing the "use a passkey from another device" sheet when there are none. This lets an app prompt for a passkey automatically when its sign-in screen opens. Browsers ignore it. ([#10776](https://github.com/clerk/javascript/pull/10776)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Expose `meta.providerError` on `ClerkAPIError`. When `getUserOauthAccessToken()` fails with `oauth_token_retrieval_error`, it holds the OAuth provider's error, or the OAuth setting to fix when Clerk could not authenticate to the provider. ([#10798](https://github.com/clerk/javascript/pull/10798)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Show "Too many requests. Please try again in a bit." for both `too_many_requests` and `signup_rate_limit_exceeded` errors in the prebuilt components. Replace "The External Account was not found." with "Account not found. Please sign up or try signing in to a different account." ([#10774](https://github.com/clerk/javascript/pull/10774)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix sign-ups failing with "There is no account to transfer" when `handleRedirectCallback()` was called again while an earlier call was still running, for example because `<SignIn />` remounted during the OAuth callback. Calls made while one is running now share its result instead of starting a second transfer. ([#10671](https://github.com/clerk/javascript/pull/10671)) by [@Ephem](https://github.com/Ephem)
+
+## 4.44.1
+
+### Patch Changes
+
+- Move the OAuth consent redirect domain helper into `@clerk/shared` so it can be shared across UI packages. No behavior change. ([#10218](https://github.com/clerk/javascript/pull/10218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.44.0
+
+### Minor Changes
+
+- Add the experimental `NativeAppSettingsJSON`, `IOSMinimumVersionJSON` and `AndroidMinimumVersionJSON` types for the minimum app versions in the environment's `native_app_settings`. These may change in minor releases. ([#10343](https://github.com/clerk/javascript/pull/10343)) by [@seanperez29](https://github.com/seanperez29)
+
+### Patch Changes
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
+## 4.43.1
+
+### Patch Changes
+
+- Wait up to 10 seconds, instead of 5, for the Device Intelligence check to finish before sending a sign-in or sign-up without its result. This applies when an instance hasn't configured its own limit. Users on slow connections are less likely to have sign-ups blocked by protections that require a Device Intelligence result. ([#10275](https://github.com/clerk/javascript/pull/10275)) by [@mwickett](https://github.com/mwickett)
+
+  Keep the wait bounded when the device clock changes so later attempts can recover after another tab's lock is released.
+
+  The shared loader type reference now documents the same 10-second default.
+
+## 4.43.0
+
+### Minor Changes
+
+- Add the optional `slackTeamIdHint` workspace hint to Slack sign-in and sign-up attempts, including redirect, popup, and unified SSO flows. ([#10402](https://github.com/clerk/javascript/pull/10402)) by [@tmilewski](https://github.com/tmilewski)
+
+## 4.42.0
+
+### Minor Changes
+
+- Add `selfServeDirectorySyncEnabled` to `OrganizationResource`. Self-serve Directory Sync is now enabled per organization by this setting instead of following `selfServeSSOEnabled`. In `<OrganizationProfile />`, the Security page now appears for organizations that have only Directory Sync enabled, and their admins can manage the connection's directory. Organizations that have self-serve SSO without Directory Sync no longer see the Directory Sync section. ([#10374](https://github.com/clerk/javascript/pull/10374)) by [@kalafut](https://github.com/kalafut)
+
+### Patch Changes
+
+- Session `expireAt` and `abandonAt` no longer special-case a `0` deadline; the backend now always sends a real deadline. ([#10389](https://github.com/clerk/javascript/pull/10389)) by [@swolfand](https://github.com/swolfand)
+
+## 4.41.1
+
+### Patch Changes
+
+- Add internal query helpers used by `@clerk/mosaic`. ([#10342](https://github.com/clerk/javascript/pull/10342)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Keep a session's `expireAt` and `abandonAt` at Unix epoch zero when the session has no maximum lifetime, instead of falling back to the current time. ([#9871](https://github.com/clerk/javascript/pull/9871)) by [@swolfand](https://github.com/swolfand)
+
+## 4.41.0
+
+### Minor Changes
+
+- Support passkeys as a second factor during sign-in and session reverification. ([#9127](https://github.com/clerk/javascript/pull/9127)) by [@dmoerner](https://github.com/dmoerner)
+
+  When a user has a passkey, the prebuilt `<SignIn/>` and `<UserVerification/>`
+  components preselect it as the second factor, as they already do for the first
+  factor. Other methods stay available under "Use another method".
+
+  To use it, your instance must allow passkeys to satisfy the second factor. This
+  is on by default for instances created after 2026-07-08, and can be turned on
+  in the Dashboard for older ones. Web apps also need to opt in to the passkey
+  second factor update in the Dashboard.
+
+  If you build a custom flow, `supportedSecondFactors` can now include `passkey`.
+  Call `signIn.authenticateWithPasskey()` to complete it.
+
+  Passkeys are no longer preselected, for either factor, where the SDK reports
+  that WebAuthn is unavailable (for example, Electron apps without passkey
+  support enabled).
+
+## 4.40.0
+
+### Minor Changes
+
+- Add a role mapping step to the self-serve Directory Sync setup in `<OrganizationProfile />`. Organization admins can now assign an organization role to each directory group their identity provider pushes, set which group wins when a member belongs to several, and turn role syncing on or off. Members in no mapped group keep the organization's default role. The step is read-only for members without the `org:sys_memberships:manage` permission and while the organization's role set is being migrated. ([#10081](https://github.com/clerk/javascript/pull/10081)) by [@kalafut](https://github.com/kalafut)
+
+### Patch Changes
+
+- Add an `enterpriseConnectionsUrl` option to `handleRedirectCallback()` and `<AuthenticateWithRedirectCallback />`. When the Clerk API asks an OAuth sign-up to choose between several enterprise connections for the same email domain, the callback navigates to this URL, which defaults to the `enterprise-connections` route of your sign-up page. ([#9947](https://github.com/clerk/javascript/pull/9947)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.39.1
+
+### Patch Changes
+
+- The missing and invalid key errors now say that `npx clerk@latest init` does not need a Clerk account and writes temporary dev keys. Readers previously saw `init` listed beside `link`, `env pull` and the Dashboard link, and assumed signing up was required before any of the steps would work. ([#10099](https://github.com/clerk/javascript/pull/10099)) by [@eatmorespinach](https://github.com/eatmorespinach)
+
 ## 4.39.0
 
 ### Minor Changes

@@ -17,7 +17,7 @@ The example pauses briefly in each pending state. Enter `error` in password or b
 
 ## Usage
 
-The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the error state. Isolated panel stories below are for visual development only.
+The feature's model drives the reverification flow around its Clerk call and hands the controller to the feature's controller and view. The component renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the error state. Isolated panel stories below are for visual development only.
 
 ```tsx
 import { Card } from '@clerk/mosaic/components/card';
@@ -26,7 +26,7 @@ import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/re
 const [runAction, reverification] = useReverificationFlow(action);
 
 <Card.Root renderBranding={false}>
-  <Reverification {...reverification} />
+  <Reverification controller={reverification} />
 </Card.Root>;
 ```
 
@@ -44,30 +44,23 @@ A parent should decide its layout from its own state and `visible`, not from `st
 const step = isRunning && reverification.visible ? 'verify' : 'confirm';
 ```
 
+The card covers the wrapped action and nothing more. Work that should happen while the card is up, such as reloading after the mutation, goes inside the action the flow wraps. A parent that has work of its own after the action keeps the step it moved to and leaves `<Reverification>` mounted until it is done, rather than deriving the step from `visible`, which turns false as soon as the action resolves.
+
 ### When the run ends
 
-The reverification card does not disappear when the action settles. If the user was shown a card during the run, the run ends in a settled state, whether it succeeded, failed, or was cancelled. The controller keeps returning the last card, inert: it is pending and has no `onCancel`. `visible` stays true unless the last thing shown was the pending card.
+The controller follows the run. When the action resolves or fails, `status` returns to `idle` and `visible` to false. `<Reverification>` keeps showing the last card it rendered, pending and without a way to cancel, for as long as it stays mounted, so a parent that animates the card away does not show an empty card. Gate the card on your own running state and `visible`, as above, so the held card is not shown again before the next run.
 
-This lets the parent finish its own work after the action returns, such as refetching or closing a dialog, without the screen falling back to an earlier step in between. The parent leaves the card by unmounting `<Reverification>` or changing its own step when it is done.
-
-A run that never asked for reverification never settles in this way. `status` stays `idle`, and `visible` stays false for the whole run.
-
-The settled card is released by whichever happens first.
-
-- The action is run again.
-- `reverification.reset()` is called.
-
-Call `reset()` when a parent leaves the flow without running the action again and wants a clean state, so the next render does not show a stale card.
+A run that never asked for reverification shows no card. `status` stays `idle`, and `visible` stays false for the whole run.
 
 ### Cancelling
 
-`reverification.onCancel` is a request. It is undefined when the user cannot cancel, which is the case while the action is being retried and once the run has settled. Calling it rejects the action with a `reverification_cancelled` error and settles the card.
+`reverification.onCancel` is a request. It is undefined when the user cannot cancel, which is the case while the action is being retried. Calling it rejects the action with a `reverification_cancelled` error. The controller returns to `idle` at once and the rejection reaches the parent shortly after, so close from the same handler that calls `onCancel` rather than from the rejection, or the parent's own step can change before it closes.
 
 The parent decides what cancelling means for its own flow. Pass `onClose` to `<Reverification>` to run that instead of `onCancel` when the user presses the Close button on the error card. The parent is then responsible for calling `onCancel` itself, as `Destructive` does when its dialog closes. This lets the parent close or leave the step at the moment of the click, instead of waiting for its own action to unwind.
 
 ```tsx
 <Reverification
-  {...reverification}
+  controller={reverification}
   onClose={() => closeDialog()}
 />
 ```

@@ -6,7 +6,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
-  status: 'wip',
+  status: 'stable',
   title: 'Combobox',
   source: 'packages/mosaic/src/primitives/combobox/index.ts',
 };
@@ -15,7 +15,10 @@ const FRUITS = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig'];
 
 export function Default() {
   return (
-    <Combobox.Root>
+    <Combobox.Root
+      items={FRUITS}
+      itemToStringLabel={fruit => fruit}
+    >
       <Combobox.Input
         aria-label='Fruit'
         placeholder='Choose a fruit…'
@@ -24,12 +27,9 @@ export function Default() {
       <Combobox.Portal>
         <Combobox.Positioner>
           <Combobox.Popup>
-            <Combobox.Collection
-              items={FRUITS}
-              itemToStringLabel={fruit => fruit}
-              empty='No fruit found'
-            >
-              {fruit => (
+            <Combobox.Empty>No fruit found</Combobox.Empty>
+            <Combobox.Collection>
+              {(fruit: string) => (
                 <Combobox.Option
                   key={fruit}
                   value={fruit}

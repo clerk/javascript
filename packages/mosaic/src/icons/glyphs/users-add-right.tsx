@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const UsersAddRight = glyph(
+  'users-add-right',
   <>
     <path
       d='M7.91664 12.6667H5.43748C4.79314 12.6667 4.25739 12.1388 4.38705 11.5076C4.78335 9.57856 6.18667 8 8.49998 8'

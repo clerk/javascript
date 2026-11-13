@@ -1,5 +1,148 @@
 # Change Log
 
+## 3.1.106
+
+### Patch Changes
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6)]:
+  - @clerk/clerk-js@6.43.0
+  - @clerk/shared@4.45.0
+  - @clerk/ui@1.42.5
+  - @clerk/react@6.18.7
+
+## 3.1.105
+
+### Patch Changes
+
+- Prevent Chrome extensions from loading Device Intelligence scripts from remote URLs. ([#10565](https://github.com/clerk/javascript/pull/10565)) by [@mwickett](https://github.com/mwickett)
+
+  Initialize production Chrome extension authentication without requiring a previously stored client token.
+
+- Updated dependencies [[`805c158`](https://github.com/clerk/javascript/commit/805c1586667807bd973ab9563d7900f7a59d1b1f), [`256153a`](https://github.com/clerk/javascript/commit/256153a1b410e7137b51681abefee8ee7038af95), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc), [`700f375`](https://github.com/clerk/javascript/commit/700f37569453d3b21c773bbb3ffc05d8035fc776), [`0d6bff9`](https://github.com/clerk/javascript/commit/0d6bff97f825227b609624dfb5e432883926d868)]:
+  - @clerk/clerk-js@6.42.3
+  - @clerk/shared@4.44.1
+  - @clerk/ui@1.42.4
+  - @clerk/react@6.18.6
+
+## 3.1.104
+
+### Patch Changes
+
+- Published packages no longer include compiled test files, test type declarations, or test fixtures. ([#10522](https://github.com/clerk/javascript/pull/10522)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`c44d34a`](https://github.com/clerk/javascript/commit/c44d34a24f7e99ce77119ce4467a4272d0a49aa7), [`5bb8efc`](https://github.com/clerk/javascript/commit/5bb8efca8f3ba658f77c2d1331c6facd8fc8df7d), [`397280b`](https://github.com/clerk/javascript/commit/397280b07dc4c31844433a23be782403c9b472fe), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/clerk-js@6.42.2
+  - @clerk/ui@1.42.3
+  - @clerk/react@6.18.5
+  - @clerk/shared@4.44.0
+
+## 3.1.103
+
+### Patch Changes
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`690edf2`](https://github.com/clerk/javascript/commit/690edf28f799996cf5d274bb7a1193f8435e3689), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0), [`1bce44b`](https://github.com/clerk/javascript/commit/1bce44bed5c54b2c788262462d3ac80391c090f7)]:
+  - @clerk/react@6.18.4
+  - @clerk/clerk-js@6.42.1
+  - @clerk/shared@4.43.1
+  - @clerk/ui@1.42.2
+
+## 3.1.102
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/clerk-js@6.42.0
+  - @clerk/shared@4.43.0
+  - @clerk/react@6.18.3
+  - @clerk/ui@1.42.1
+
+## 3.1.101
+
+### Patch Changes
+
+- Updated dependencies [[`eec2699`](https://github.com/clerk/javascript/commit/eec2699f2050084f0bd1059efee95b5e94fe9607)]:
+  - @clerk/clerk-js@6.41.1
+
+## 3.1.100
+
+### Patch Changes
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/clerk-js@6.41.0
+  - @clerk/shared@4.42.0
+  - @clerk/ui@1.42.0
+  - @clerk/react@6.18.2
+
+## 3.1.99
+
+### Patch Changes
+
+- Updated dependencies [[`91780f8`](https://github.com/clerk/javascript/commit/91780f8852dc112dc462db3013faad7cd76eb4b5), [`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c), [`17eecac`](https://github.com/clerk/javascript/commit/17eecac0e70c084f58603217d29ba3586a1aa3f5)]:
+  - @clerk/ui@1.41.2
+  - @clerk/shared@4.41.1
+  - @clerk/clerk-js@6.40.1
+  - @clerk/react@6.18.1
+
+## 3.1.98
+
+### Patch Changes
+
+- Fix production builds that drop the setup code `@clerk/chrome-extension` runs when it loads. The package no longer declares `sideEffects: false`, which let bundlers such as Parcel skip that setup. With `plasmo build`, this left the extension popup blank. Measured Plasmo and esbuild bundle sizes are unchanged. ([#10313](https://github.com/clerk/javascript/pull/10313)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`8e8746d`](https://github.com/clerk/javascript/commit/8e8746d177c363b8e8d98887f04cc07c277f34df), [`1c450df`](https://github.com/clerk/javascript/commit/1c450dfcf5d0161c97ff5686545a31b24d8dcbd7)]:
+  - @clerk/ui@1.41.1
+
+## 3.1.97
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18), [`7f4b9a8`](https://github.com/clerk/javascript/commit/7f4b9a8dbf4aaabe3efeedc2d7e2c227d655a247)]:
+  - @clerk/shared@4.41.0
+  - @clerk/clerk-js@6.40.0
+  - @clerk/ui@1.41.0
+  - @clerk/react@6.18.0
+
+## 3.1.96
+
+### Patch Changes
+
+- Updated dependencies [[`c0ba3bc`](https://github.com/clerk/javascript/commit/c0ba3bc728d76bd40f80c2c4c506cbfeb5d0807a), [`560ff50`](https://github.com/clerk/javascript/commit/560ff507af494b43210fd2d9a7bd109c4eb6902c)]:
+  - @clerk/clerk-js@6.39.1
+
+## 3.1.95
+
+### Patch Changes
+
+- Updated dependencies [[`f9aa91e`](https://github.com/clerk/javascript/commit/f9aa91e611a271b0c8e9ebc9cc3075f1d255172c)]:
+  - @clerk/ui@1.40.2
+
+## 3.1.94
+
+### Patch Changes
+
+- Updated dependencies [[`3b4ceb6`](https://github.com/clerk/javascript/commit/3b4ceb677056fb20dc1f44b7657edc5aeeb5e1cb)]:
+  - @clerk/ui@1.40.1
+
+## 3.1.93
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/clerk-js@6.39.0
+  - @clerk/shared@4.40.0
+  - @clerk/ui@1.40.0
+  - @clerk/react@6.17.8
+
+## 3.1.92
+
+### Patch Changes
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/clerk-js@6.38.1
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+  - @clerk/ui@1.39.1
+
 ## 3.1.91
 
 ### Patch Changes

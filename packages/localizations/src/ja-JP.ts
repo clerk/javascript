@@ -309,9 +309,45 @@ export const jaJP: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1602,6 +1638,11 @@ export const jaJP: LocalizationResource = {
         'パスキーを使用すると、ご本人であることを確認できます。デバイスから指紋認証、顔認証、または画面ロックの解除を求められる場合があります。',
       title: 'パスキーを使用する',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '別の方法を使用',
       subtitle: '続行するには現在のパスワードを入力してください',
@@ -1752,6 +1793,10 @@ export const jaJP: LocalizationResource = {
       subtitle:
         'パスキーを使用すると、ご本人であることを確認できます。デバイスから指紋認証、顔認証、または画面ロックの解除を求められる場合があります。',
       title: 'パスキーを使用する',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '別の方法を使用',
@@ -2061,6 +2106,7 @@ export const jaJP: LocalizationResource = {
     captcha_invalid: 'セキュリティ検証に失敗しました。もう一度お試しください。',
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
+    external_account_not_found: undefined,
     form_code_incorrect: '入力されたコードが正しくありません。',
     form_email_address_blocked:
       '一時的なメールサービスはサポートされていません。アカウントを作成するには、通常のメールアドレスを使用してください。',
@@ -2140,9 +2186,11 @@ export const jaJP: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '既にサインインしています。',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3ウォレット拡張機能が見つかりません。続行するにはインストールしてください。',
     web3_signature_request_rejected: '署名リクエストを拒否しました。続行するにはもう一度お試しください。',

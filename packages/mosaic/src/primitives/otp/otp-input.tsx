@@ -2,7 +2,8 @@
 
 import React, { useCallback } from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { readingDirectionKeys, useDirection } from '../direction-provider';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useOtpContext } from './otp-context';
 import { inputModeForPattern, removeAt, replaceAt, sanitize } from './otp-utils';
 
@@ -17,6 +18,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     value,
     length,
     disabled,
+    focusableWhenDisabled,
     required,
     pattern,
     mask,
@@ -30,6 +32,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     onSlotFocus,
     onSlotBlur,
   } = useOtpContext();
+  const { previousKey, nextKey } = readingDirectionKeys(useDirection());
 
   const char = value[index] ?? '';
 
@@ -48,7 +51,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
 
   const state = { active: activeIndex === index, filled: char !== '', disabled };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     id: getInputId(index),
     ...labelProps,
     value: char,
@@ -63,7 +66,8 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     // single characters handled by onChange/onPaste.
     maxLength: index === 0 ? length : 1,
     tabIndex: tabStop === index ? 0 : -1,
-    disabled,
+    disabled: disabled && !focusableWhenDisabled,
+    ...(disabled && focusableWhenDisabled ? { readOnly: true, 'aria-disabled': true } : null),
     // Constraint validation rides on the visible slots: the hidden input is `readOnly`,
     // which bars it from validation entirely.
     required,
@@ -112,6 +116,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
       setValue(next);
       queueFocus(Math.min(index + inserted.length, length - 1), next);
     },
+    // eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
     onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (disabled) {
         return;
@@ -123,13 +128,6 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
       const endIndex = Math.min(value.length, lastIndex);
       // Ctrl/Cmd (without Alt) turns navigation and delete into boundary actions.
       const boundaryModifier = (event.ctrlKey || event.metaKey) && !event.altKey;
-
-      // Resolve direction from the nearest ancestor with an explicit `dir` so
-      // arrow keys follow reading order: in RTL, Left moves to the next slot and
-      // Right to the previous one.
-      const isRtl = (event.currentTarget.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl';
-      const previousKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
-      const nextKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
 
       if (event.key === previousKey) {
         event.preventDefault();
@@ -197,7 +195,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
         return;
       }
       event.preventDefault();
-      const inserted = sanitize(event.clipboardData?.getData('text') ?? '', pattern, length);
+      const inserted = sanitize(event.clipboardData.getData('text'), pattern, length);
       if (inserted === '') {
         return;
       }
@@ -205,7 +203,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
       setValue(next);
       queueFocus(Math.min(index + inserted.length, length - 1), next);
     },
-  };
+  } satisfies DefaultProps<'input'>;
 
   return useRender({
     defaultTagName: 'input',

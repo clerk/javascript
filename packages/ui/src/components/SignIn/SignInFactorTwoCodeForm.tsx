@@ -15,7 +15,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
-import { isResetPasswordStrategy } from './utils';
+import { isResettingPassword } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   showClientTrustNotice?: boolean;
@@ -31,10 +31,6 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
   inputLabel: LocalizationKey;
   resendButton?: LocalizationKey;
 };
-
-const isResettingPassword = (resource: SignInResource) =>
-  isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
-  resource.firstFactorVerification?.status === 'verified';
 
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const env = useEnvironment();
@@ -57,14 +53,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
     );
     return signIn.clientTrustState === 'new' && !anyAttributeUsedForSecondFactor;
   }, [signIn.clientTrustState, env.userSettings.attributes]);
-
-  React.useEffect(() => {
-    if (props.factorAlreadyPrepared) {
-      return;
-    }
-
-    void prepare?.();
-  }, []);
 
   const prepare = props.prepare
     ? () => {
@@ -116,6 +104,14 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         return reject(err);
       });
   };
+
+  React.useEffect(() => {
+    if (props.factorAlreadyPrepared) {
+      return;
+    }
+
+    void prepare?.();
+  }, []);
 
   return (
     <VerificationCodeCard

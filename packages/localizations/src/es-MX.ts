@@ -303,9 +303,45 @@ export const esMX: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1598,6 +1634,11 @@ export const esMX: LocalizationResource = {
         'Utilizar tu llave de acceso confirma que eres tú. Tu dispositivo puede solicitar tu huella dactilar, rostro o pantalla de bloqueo.',
       title: 'Utiliza tu llave de acceso',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utiliza otro método',
       subtitle: 'Ingresa tu contraseña actual para continuar',
@@ -1749,6 +1790,10 @@ export const esMX: LocalizationResource = {
       subtitle:
         'Usando tu llave de acceso confirmas que eres tú. Tu dispositivo puede pedirte la huella dactilar, el rostro o el bloqueo de pantalla.',
       title: 'Usa tu llave de acceso',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utiliza otro método',
@@ -2053,6 +2098,7 @@ export const esMX: LocalizationResource = {
       'El registro falló debido a fallos en la validación de seguridad. Por favor, recarga la página o contáctanos para obtener más asistencia.',
     captcha_unavailable:
       'El registro falló debido a fallos en la validación de robot. Por favor, recarga la página o contáctanos para obtener más asistencia.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Código incorrecto.',
     form_email_address_blocked:
       'Los servicios de correo electrónico temporal no están soportados. Por favor, use su dirección de correo electrónico regular para crear una cuenta.',
@@ -2129,9 +2175,11 @@ export const esMX: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Ya has iniciado sesión',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'No se puede encontrar la extension de la billetera Web3. Instala una para continuar',
     web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',

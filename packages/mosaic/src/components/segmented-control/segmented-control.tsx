@@ -1,0 +1,67 @@
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
+import type {
+  SegmentedControlItemProps as HeadlessSegmentedControlItemProps,
+  SegmentedControlRootProps as HeadlessSegmentedControlRootProps,
+} from '../../primitives/segmented-control';
+import { SegmentedControl as Primitive } from '../../primitives/segmented-control';
+import type { MosaicStyleProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
+import { styles } from './segmented-control.styles';
+
+type StyledProps<Props> = Omit<Props, 'className' | 'style'> & MosaicStyleProps;
+
+export type SegmentedControlRootProps<Value = string> = StyledProps<HeadlessSegmentedControlRootProps<Value>>;
+export type SegmentedControlItemProps = StyledProps<HeadlessSegmentedControlItemProps>;
+
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the value type parameter; the root only hands back values its caller passed in.
+const Root = React.forwardRef<HTMLDivElement, SegmentedControlRootProps<unknown>>(function MosaicSegmentedControlRoot(
+  { xstyle, children, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.Root
+      ref={ref}
+      {...mergeStyleProps(themeProps('segmented-control-root'), stylex.props(reset.base, styles.root, xstyle), rest)}
+    >
+      <Primitive.Indicator
+        {...mergeStyleProps(themeProps('segmented-control-indicator'), stylex.props(reset.base, styles.indicator))}
+      />
+      {children}
+    </Primitive.Root>
+  );
+}) as <Value = string>(
+  props: SegmentedControlRootProps<Value> & { ref?: React.Ref<HTMLDivElement> },
+) => React.ReactElement;
+
+const Item = React.forwardRef<HTMLButtonElement, SegmentedControlItemProps>(function MosaicSegmentedControlItem(
+  { xstyle, children, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.Item
+      ref={ref}
+      {...mergeStyleProps(
+        themeProps('segmented-control-item'),
+        stylex.props(reset.base, styles.item, focusOutline.visible, xstyle),
+        rest,
+      )}
+    >
+      <Primitive.Indicator
+        {...mergeStyleProps(
+          themeProps('segmented-control-indicator'),
+          stylex.props(reset.base, styles.fallbackIndicator),
+        )}
+      />
+      {children}
+    </Primitive.Item>
+  );
+});
+
+export const SegmentedControl = {
+  Root,
+  Item,
+};

@@ -17,7 +17,7 @@ The app enables cache components in `next.config.js`:
 cacheComponents: true,  // Enables PPR and cache components
 ```
 
-**Important**: ClerkProvider must be wrapped in `<Suspense>` for cache components to work correctly.
+`ClerkProvider` sits inside `<body>` without a `<Suspense>` boundary. The pages wrap the code that reads the request, such as `auth()`, `currentUser()`, and the catch-all `<SignIn />`, in `<Suspense>`.
 
 ## Test Scenarios
 

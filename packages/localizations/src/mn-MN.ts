@@ -302,9 +302,45 @@ export const mnMN: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1594,6 +1630,11 @@ export const mnMN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1744,6 +1785,10 @@ export const mnMN: LocalizationResource = {
       subtitle:
         'Passkey-ээ ашигласнаар таныг мөн болохыг баталгаажуулна. Таны төхөөрөмж хурууны хээ, нүүр эсвэл дэлгэцийн түгжээг асууж магадгүй.',
       title: 'Passkey ашиглана уу',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Өөр аргыг ашигла',
@@ -2044,6 +2089,7 @@ export const mnMN: LocalizationResource = {
       'Аюулгүй байдлын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Маягтын код буруу байна',
     form_email_address_blocked:
       'Түр зуурын имэйл үйлчилгээг дэмжихгүй. Данс үүсгэхийн тулд ердийн имэйл хаягаа ашиглана уу.',
@@ -2118,9 +2164,11 @@ export const mnMN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:

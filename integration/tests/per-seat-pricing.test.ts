@@ -12,7 +12,7 @@ testAgainstRunningApps({})('per-seat pricing @billing', ({ app }) => {
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
 
     fakeAdmin = u.services.users.createFakeUser(test);
     const admin = await u.services.users.createBapiUser(fakeAdmin);
@@ -26,7 +26,7 @@ testAgainstRunningApps({})('per-seat pricing @billing', ({ app }) => {
   });
 
   test('invites a member after purchasing additional seats', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const fillInviteForm = async () => {
       const emailInput = u.po.page.getByTestId('tag-input');
       await emailInput.fill(INVITEE_EMAIL);

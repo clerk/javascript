@@ -8,8 +8,7 @@ export { default as __source } from './organization-profile-profile-section.stor
 
 export const meta: StoryMeta = {
   group: 'Organization Profile',
-  status: 'wip',
-  substatus: 'needs wire-up',
+  status: 'stable',
   title: 'OrganizationProfileProfileSection',
   label: 'Organization details',
   navigation: { category: 'Sections' },
@@ -18,33 +17,33 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const { general } = useOrganizationProfileFixture();
+  const { profile } = useOrganizationProfileFixture();
   return (
     <OrganizationProfileProfileSectionView
-      name={general.name}
-      slug={general.slug}
-      imageUrl={general.imageUrl}
-      hasImage={general.hasImage}
-      onLogoChange={general.onLogoChange}
-      onRemoveLogo={general.onRemoveLogo}
-      onSubmitName={general.onSubmitName}
-      onSubmitSlug={general.onSubmitSlug}
+      name={profile.name}
+      slug={profile.slug}
+      imageUrl={profile.imageUrl}
+      hasImage={profile.hasImage}
+      onLogoChange={profile.onLogoChange}
+      onRemoveLogo={profile.onRemoveLogo}
+      onSubmitName={profile.onSubmitName}
+      onSubmitSlug={profile.onSubmitSlug}
     />
   );
 }
 
 export function SaveFails() {
-  const { general } = useOrganizationProfileFixture({ failWith: { slug: 'That slug is already taken.' } });
+  const { profile } = useOrganizationProfileFixture({ failWith: { slug: 'That slug is already taken.' } });
   return (
     <OrganizationProfileProfileSectionView
-      name={general.name}
-      slug={general.slug}
-      imageUrl={general.imageUrl}
-      hasImage={general.hasImage}
-      onLogoChange={general.onLogoChange}
-      onRemoveLogo={general.onRemoveLogo}
-      onSubmitName={general.onSubmitName}
-      onSubmitSlug={general.onSubmitSlug}
+      name={profile.name}
+      slug={profile.slug}
+      imageUrl={profile.imageUrl}
+      hasImage={profile.hasImage}
+      onLogoChange={profile.onLogoChange}
+      onRemoveLogo={profile.onRemoveLogo}
+      onSubmitName={profile.onSubmitName}
+      onSubmitSlug={profile.onSubmitSlug}
     />
   );
 }

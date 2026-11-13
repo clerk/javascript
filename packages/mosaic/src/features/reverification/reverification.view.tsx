@@ -1,10 +1,26 @@
+import * as stylex from '@stylexjs/stylex';
+import type { JSX, Ref } from 'react';
+
+import {
+  VerificationBackupCode,
+  VerificationCode,
+  VerificationHelp,
+  VerificationMethodPicker,
+  VerificationPasskey,
+  VerificationPassword,
+} from '../../blocks/verification';
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { Spinner } from '../../components/spinner';
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Code } from '../../icons/glyphs/code';
+import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
+import { SecurityPasskey } from '../../icons/glyphs/security-passkey';
+import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import type { MosaicMessages } from '../../localization';
-import { fill, useMessages } from '../../localization';
+import { fill, rich, useMessages } from '../../localization';
+import { tabularNumbersStyle } from '../../styles/typography.styles';
 import { styles } from './reverification.styles';
 import type {
   ReverificationErrorReason,
@@ -12,39 +28,33 @@ import type {
   ReverificationOtpChannel,
   ReverificationViewProps,
 } from './reverification.types';
-import { ReverificationBackupCode } from './steps/reverification-backup-code';
-import { ReverificationHelp } from './steps/reverification-help';
-import { ReverificationMethodPicker } from './steps/reverification-method-picker';
-import { ReverificationOTP } from './steps/reverification-otp';
-import { ReverificationPasskey } from './steps/reverification-passkey';
-import { ReverificationPassword } from './steps/reverification-password';
 
 type Messages = MosaicMessages['reverification'];
 
 const methodIcon = {
-  password: 'security-lock-square',
-  passkey: 'security-passkey',
-  email_code: 'code',
-  phone_code: 'security-phone',
-  totp: 'security-lock-square',
-  backup_code: 'security-phone',
-} as const satisfies Record<ReverificationMethod['strategy'], IconName>;
+  password: SecurityLockSquare,
+  passkey: SecurityPasskey,
+  email_code: Code,
+  phone_code: SecurityPhone,
+  totp: SecurityLockSquare,
+  backup_code: SecurityPhone,
+} as const satisfies Record<ReverificationMethod['strategy'], IconComponent>;
 
 function methodLabel(method: ReverificationMethod, m: Messages): string {
   const identifier = 'identifier' in method ? method.identifier : '';
   switch (method.strategy) {
     case 'password':
-      return m.alternativeMethods.blockButton__password;
+      return m.methods.password;
     case 'passkey':
-      return m.alternativeMethods.blockButton__passkey;
+      return m.methods.passkey;
     case 'email_code':
-      return fill(m.alternativeMethods.blockButton__emailCode, { identifier });
+      return fill(m.methods.emailCode, { identifier });
     case 'phone_code':
-      return fill(m.alternativeMethods.blockButton__phoneCode, { identifier });
+      return fill(m.methods.phoneCode, { identifier });
     case 'totp':
-      return m.alternativeMethods.blockButton__totp;
+      return m.methods.totp;
     case 'backup_code':
-      return m.alternativeMethods.blockButton__backupCode;
+      return m.methods.backupCode;
   }
 }
 
@@ -65,10 +75,9 @@ export function ReverificationError({ reason, onClose }: { reason: Reverificatio
             type='button'
             variant='outline'
             color='neutral'
-            fullWidth
             onClick={onClose}
           >
-            {m.error.closeButton}
+            {m.error.close}
           </Button>
         </Card.Footer>
       ) : null}
@@ -95,9 +104,10 @@ export function ReverificationPending() {
         <Button
           type='button'
           disabled
+          fullWidth={false}
           xstyle={styles.pendingAction}
         >
-          {m.formButtonPrimary}
+          {m.continue}
         </Button>
       </Card.Footer>
     </>
@@ -111,7 +121,7 @@ function otpCopy(channel: ReverificationOtpChannel | undefined, m: Messages) {
   if (channel === 'phone') {
     return m.phoneCode;
   }
-  return m.totpMfa;
+  return m.totp;
 }
 
 export function ReverificationView({
@@ -120,6 +130,7 @@ export function ReverificationView({
   value,
   onValueChange,
   errorMessage,
+  globalErrorMessage,
   isPending,
   onSubmit,
   onShowMethods,
@@ -133,21 +144,33 @@ export function ReverificationView({
   onResend,
   canResend,
   resendRemainingSeconds,
-}: ReverificationViewProps): JSX.Element {
+  focusRef,
+}: ReverificationViewProps & { focusRef?: Ref<HTMLElement> }): JSX.Element {
   const m = useMessages('reverification');
 
   const otp = otpCopy(otpChannel, m);
   const actions = {
-    secondaryActionLabel: m.footerActionLink__useAnotherMethod,
-    primaryActionLabel: m.formButtonPrimary,
+    secondaryActionLabel: m.useAnotherMethod,
+    primaryActionLabel: m.continue,
     pendingLabel: m.verifying,
   };
   const hasAlternatives = methods.length > 0;
-  const resendLabel = otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton;
+  const resendCopy = otpChannel === 'phone' ? m.phoneCode : m.emailCode;
   const resend =
     otpChannel === 'email' || otpChannel === 'phone'
       ? {
-          label: resendRemainingSeconds ? `${resendLabel} (${resendRemainingSeconds})` : resendLabel,
+          text: resendCopy.resendText,
+          label: resendRemainingSeconds ? (
+            <span>
+              {rich(resendCopy.resendCountdown, {
+                values: {
+                  seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
+                },
+              })}
+            </span>
+          ) : (
+            resendCopy.resend
+          ),
           disabled: !canResend || isPending,
           onClick: onResend,
         }
@@ -162,16 +185,20 @@ export function ReverificationView({
       {() => (
         <>
           <Flow.Step ids={['password']}>
-            <ReverificationPassword
+            <VerificationPassword
+              focusRef={focusRef}
               messages={{
                 title: m.password.title,
                 description: m.password.description,
-                fieldLabel: m.formFieldLabel__password,
-                fieldPlaceholder: m.formFieldInputPlaceholder__password,
+                fieldLabel: m.password.label,
+                fieldPlaceholder: m.password.placeholder,
+                showPasswordLabel: m.password.showPassword,
+                hidePasswordLabel: m.password.hidePassword,
                 ...actions,
               }}
               value={value}
               errorMessage={errorMessage}
+              globalErrorMessage={globalErrorMessage}
               isPending={isPending}
               onValueChange={onValueChange}
               onSubmit={onSubmit}
@@ -180,13 +207,14 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['passkey']}>
-            <ReverificationPasskey
+            <VerificationPasskey
+              focusRef={focusRef}
               messages={{
                 title: m.passkey.title,
                 description: m.passkey.description,
                 ...actions,
               }}
-              errorMessage={errorMessage}
+              errorMessage={globalErrorMessage}
               isPending={isPending}
               onSubmit={onSubmit}
               onCancel={hasAlternatives ? onShowMethods : undefined}
@@ -194,15 +222,17 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['otp']}>
-            <ReverificationOTP
+            <VerificationCode
+              focusRef={focusRef}
               messages={{
                 title: otp.title,
                 description: otp.description,
-                fieldLabel: otp.formTitle,
+                fieldLabel: otp.label,
                 ...actions,
               }}
               value={value}
               errorMessage={errorMessage}
+              globalErrorMessage={globalErrorMessage}
               isPending={isPending}
               resend={resend}
               onValueChange={onValueChange}
@@ -216,15 +246,17 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['backup-code']}>
-            <ReverificationBackupCode
+            <VerificationBackupCode
+              focusRef={focusRef}
               messages={{
-                title: m.backupCodeMfa.title,
-                description: m.backupCodeMfa.description,
-                fieldLabel: m.formFieldLabel__backupCode,
+                title: m.backupCode.title,
+                description: m.backupCode.description,
+                fieldLabel: m.backupCode.label,
                 ...actions,
               }}
               value={value}
               errorMessage={errorMessage}
+              globalErrorMessage={globalErrorMessage}
               isPending={isPending}
               onValueChange={onValueChange}
               onSubmit={onSubmit}
@@ -233,13 +265,14 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['method-picker']}>
-            <ReverificationMethodPicker
+            <VerificationMethodPicker
+              focusRef={focusRef}
               messages={{
-                title: m.alternativeMethods.title,
-                description: m.alternativeMethods.description,
-                backButton: m.backButton,
-                helpText: m.alternativeMethods.actionText,
-                helpButton: m.alternativeMethods.actionLink,
+                title: m.methods.title,
+                description: m.methods.description,
+                backButton: m.back,
+                helpText: m.methods.helpText,
+                helpButton: m.methods.help,
               }}
               methods={methods.map(method => ({
                 id: method.id,
@@ -254,12 +287,12 @@ export function ReverificationView({
           </Flow.Step>
 
           <Flow.Step ids={['help']}>
-            <ReverificationHelp
+            <VerificationHelp
               messages={{
-                title: m.alternativeMethods.getHelp.title,
-                description: m.alternativeMethods.getHelp.description,
-                backButton: m.backButton,
-                supportButton: m.alternativeMethods.getHelp.blockButton__emailSupport,
+                title: m.help.title,
+                description: m.help.description,
+                backButton: m.back,
+                supportButton: m.help.emailSupport,
               }}
               onEmailSupport={onEmailSupport}
               onBack={onBack}

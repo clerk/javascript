@@ -24,6 +24,6 @@ export interface UserProfilePasswordSectionViewProps {
   managedBy?: UserProfileManagedBy;
 }
 
-export interface UserProfilePasswordSlot {
-  content: ReactNode;
-}
+export type UserProfilePasswordPolicy =
+  | { mode: 'set'; requiresCurrentPassword: false }
+  | { mode: 'change'; requiresCurrentPassword: boolean };

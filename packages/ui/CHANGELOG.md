@@ -1,5 +1,151 @@
 # @clerk/ui
 
+## 1.42.5
+
+### Patch Changes
+
+- Fix `<SignIn />` showing "The External Account was not found." to new users when the sign-up transfer after an OAuth sign-in fails, for example when a firewall, rate limit or Protect blocks the request. The start screen now keeps the error shown on the SSO callback screen, and a Protect block shows the blocked screen with its reference. The account not found message still appears when transfers are turned off with `transferable={false}`. ([#10774](https://github.com/clerk/javascript/pull/10774)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.45.0
+  - @clerk/localizations@4.24.7
+
+## 1.42.4
+
+### Patch Changes
+
+- Move the OAuth consent redirect domain helper into `@clerk/shared` so it can be shared across UI packages. No behavior change. ([#10218](https://github.com/clerk/javascript/pull/10218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix an issue where annual base-fees were shown with incorrect labels. ([#10660](https://github.com/clerk/javascript/pull/10660)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+  - @clerk/localizations@4.24.6
+
+## 1.42.3
+
+### Patch Changes
+
+- Fix custom OAuth provider names and icons incorrectly carrying over from a previously loaded environment. ([#10526](https://github.com/clerk/javascript/pull/10526)) by [@Ephem](https://github.com/Ephem)
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+  - @clerk/localizations@4.24.5
+
+## 1.42.2
+
+### Patch Changes
+
+- Updated dependencies [[`83c06bb`](https://github.com/clerk/javascript/commit/83c06bbbd018846b411328c5f9f1902946fdc095), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/localizations@4.24.4
+  - @clerk/shared@4.43.1
+
+## 1.42.1
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+  - @clerk/localizations@4.24.3
+
+## 1.42.0
+
+### Minor Changes
+
+- Add `selfServeDirectorySyncEnabled` to `OrganizationResource`. Self-serve Directory Sync is now enabled per organization by this setting instead of following `selfServeSSOEnabled`. In `<OrganizationProfile />`, the Security page now appears for organizations that have only Directory Sync enabled, and their admins can manage the connection's directory. Organizations that have self-serve SSO without Directory Sync no longer see the Directory Sync section. ([#10374](https://github.com/clerk/javascript/pull/10374)) by [@kalafut](https://github.com/kalafut)
+
+### Patch Changes
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/shared@4.42.0
+  - @clerk/localizations@4.24.2
+
+## 1.41.2
+
+### Patch Changes
+
+- Fix the impersonation button moving faster than the pointer when dragged. It now starts dragging only after the pointer moves a few pixels, prevents page text selection during dragging, and springs back inside the window when released off-screen instead of jumping to its default position. Its background now follows the theme, so its text is readable in dark mode. ([#10241](https://github.com/clerk/javascript/pull/10241)) by [@joshrowley](https://github.com/joshrowley)
+
+- Sign-in and sign-up identifier fields now set standard `autocomplete` tokens so browsers and password managers can offer email, name, and phone. ([#10365](https://github.com/clerk/javascript/pull/10365)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+  - @clerk/localizations@4.24.1
+
+## 1.41.1
+
+### Patch Changes
+
+- In Electron apps, the social sign-in and sign-up buttons become clickable again when the user returns to the app without finishing OAuth in the browser. Before, they stayed disabled for up to 3 minutes. ([#10337](https://github.com/clerk/javascript/pull/10337)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `<OrganizationProfile />` Security page showing Directory Sync and SSO setup actions to organization admins when the organization isn't allowed to set up enterprise SSO and Directory Sync. Those organizations now see their enterprise connections read-only, alongside the SSO bypass section. ([#10321](https://github.com/clerk/javascript/pull/10321)) by [@kalafut](https://github.com/kalafut)
+
+## 1.41.0
+
+### Minor Changes
+
+- Support passkeys as a second factor during sign-in and session reverification. ([#9127](https://github.com/clerk/javascript/pull/9127)) by [@dmoerner](https://github.com/dmoerner)
+
+  When a user has a passkey, the prebuilt `<SignIn/>` and `<UserVerification/>`
+  components preselect it as the second factor, as they already do for the first
+  factor. Other methods stay available under "Use another method".
+
+  To use it, your instance must allow passkeys to satisfy the second factor. This
+  is on by default for instances created after 2026-07-08, and can be turned on
+  in the Dashboard for older ones. Web apps also need to opt in to the passkey
+  second factor update in the Dashboard.
+
+  If you build a custom flow, `supportedSecondFactors` can now include `passkey`.
+  Call `signIn.authenticateWithPasskey()` to complete it.
+
+  Passkeys are no longer preselected, for either factor, where the SDK reports
+  that WebAuthn is unavailable (for example, Electron apps without passkey
+  support enabled).
+
+### Patch Changes
+
+- Fix the OrganizationProfile sidebar to hide API keys when the user has neither `org:sys_api_keys:read` nor `org:sys_api_keys:manage` permission. ([#10290](https://github.com/clerk/javascript/pull/10290)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`9066bf9`](https://github.com/clerk/javascript/commit/9066bf9f4499278f8d1dc065ce8096476308f109), [`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/localizations@4.24.0
+  - @clerk/shared@4.41.0
+
+## 1.40.2
+
+### Patch Changes
+
+- Fix `<SignUp />` asking a returning user to fill in missing fields after a verification challenge. When someone signs up with a social account that already belongs to a user, they are now signed in to that account once the challenge clears, as they are when no challenge is shown. ([#10158](https://github.com/clerk/javascript/pull/10158)) by [@mwickett](https://github.com/mwickett)
+
+## 1.40.1
+
+### Patch Changes
+
+- Fix localization strings whose `link("…")` labels contain apostrophes, quotes, commas or parentheses. Previously, a custom label such as `link("Conditions d'utilisation")` rendered as "Conditions dutilisation"; quoted labels now render exactly as written. ([#10091](https://github.com/clerk/javascript/pull/10091)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.40.0
+
+### Minor Changes
+
+- Add a role mapping step to the self-serve Directory Sync setup in `<OrganizationProfile />`. Organization admins can now assign an organization role to each directory group their identity provider pushes, set which group wins when a member belongs to several, and turn role syncing on or off. Members in no mapped group keep the organization's default role. The step is read-only for members without the `org:sys_memberships:manage` permission and while the organization's role set is being migrated. ([#10081](https://github.com/clerk/javascript/pull/10081)) by [@kalafut](https://github.com/kalafut)
+
+### Patch Changes
+
+- Add an `enterpriseConnectionsUrl` option to `handleRedirectCallback()` and `<AuthenticateWithRedirectCallback />`. When the Clerk API asks an OAuth sign-up to choose between several enterprise connections for the same email domain, the callback navigates to this URL, which defaults to the `enterprise-connections` route of your sign-up page. ([#9947](https://github.com/clerk/javascript/pull/9947)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/localizations@4.23.0
+  - @clerk/shared@4.40.0
+
+## 1.39.1
+
+### Patch Changes
+
+- Updated dependencies [[`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/shared@4.39.1
+  - @clerk/localizations@4.22.1
+
 ## 1.39.0
 
 ### Minor Changes

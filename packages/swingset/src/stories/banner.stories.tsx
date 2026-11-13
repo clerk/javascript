@@ -16,7 +16,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/banner/banner.tsx',
   styles: {
     _variants: {
-      color: { neutral: {}, warning: {}, negative: {} },
+      color: { neutral: {}, warning: {}, negative: {}, positive: {} },
     },
     _defaultVariants: {
       color: 'neutral',
@@ -42,6 +42,10 @@ export function Default(props: Record<string, unknown>) {
 export function Colors() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Banner.Root color='positive'>
+        <Banner.Label>Positive banner</Banner.Label>
+        <Banner.Description>This is the description for a positive banner</Banner.Description>
+      </Banner.Root>
       <Banner.Root color='negative'>
         <Banner.Label>Error banner</Banner.Label>
         <Banner.Description>

@@ -10,7 +10,7 @@ import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import type { ThemableCssProp } from '@/ui/styledSystem';
-import { handleError } from '@/utils/errorHandler';
+import { getAPIErrorMessage, handleError } from '@/utils/errorHandler';
 
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
@@ -93,7 +93,7 @@ export const SecurityDirectorySyncSection = ({
         <Alert
           variant='danger'
           title={localizationKeys('organizationProfile.securityPage.directorySyncSection.error__load')}
-          subtitle={error.message}
+          subtitle={getAPIErrorMessage(error)}
         />
       ) : status === 'unconfigured' ? (
         <Col

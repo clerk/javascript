@@ -1,0 +1,313 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SELF="$HERE/$(basename "${BASH_SOURCE[0]}")"
+START_MARKER='<!-- verify-evidence:mosaic -->'
+END_MARKER='<!-- /verify-evidence:mosaic -->'
+STOPPED_ATTACH="FAIL    attach stopped after it began uploading, so https://github.com/o/r/pull/1 may list some screenshots as plain links; check its description, then attach again"
+
+main() {
+  local failed=0 name out
+  TMP="$(cd "$(mktemp -d)" && pwd -P)"
+  trap 'rm -rf "$TMP"' EXIT
+  for name in $(declare -F | awk '{ print $3 }' | grep '^test_'); do
+    mkdir -p "$TMP/$name"
+    if out="$(cd "$TMP/$name" && bash "$SELF" --case "$name" 2>&1)"; then
+      echo "ok    $name"
+    else
+      echo "FAIL  $name"
+      printf '%s\n' "$out" | sed 's/^/      /'
+      failed=1
+    fi
+  done
+  return "$failed"
+}
+
+test_attach_appends_the_block_after_the_description() {
+  printf '## Description\n\nHello\n' >body
+  rewrite
+  expect_eq "$OUT" "$(printf '## Description\n\nHello\n\n%s\n\n**Verified in swingset** NEW\n\n%s' "$START_MARKER" "$END_MARKER")"
+}
+
+test_attach_replaces_only_the_block() {
+  printf '## Description\n\n%s\n\n**Verified in swingset** OLD\n\n%s\n\n## Checklist\n' "$START_MARKER" "$END_MARKER" >body
+  rewrite
+  expect_eq "$OUT" "$(printf '## Description\n\n%s\n\n**Verified in swingset** NEW\n\n%s\n\n## Checklist' "$START_MARKER" "$END_MARKER")"
+}
+
+test_attach_ignores_markers_in_a_code_fence() {
+  printf 'x\n```md\n%s\n%s\n```\n' "$START_MARKER" "$END_MARKER" >body
+  rewrite
+  expect_eq "$(printf '%s\n' "$OUT" | grep -c 'verify-evidence:mosaic')" 4
+  expect_eq "$(printf '%s\n' "$OUT" | grep -c NEW)" 1
+}
+
+test_attach_keeps_crlf_line_endings() {
+  printf 'x\r\n%s\r\n**Verified in swingset** OLD\r\n%s\r\n' "$START_MARKER" "$END_MARKER" >body
+  rewrite
+  expect_eq "$(printf '%s\n' "$OUT" | grep -vc $'\r$')" 0
+}
+
+test_attach_refuses_unsafe_descriptions() {
+  local body why
+  while IFS='|' read -r body why; do
+    printf '%b' "$body" | sed -e "s#START#$START_MARKER#" -e "s#END#$END_MARKER#" >body
+    rewrite
+    expect_eq "$STATUS" 1
+    expect_eq "$OUT" "refuse  the pull request description $why"
+  done <<'EOF'
+x\nSTART\nSTART\nEND\n|has the start marker 2 times and the end marker 1 times
+x\nSTART\n|has the start marker 1 times and the end marker 0 times
+x\nEND\nSTART\n|has the end marker before the start marker
+x\nSTART\nhand written\nEND\n|has text between the markers that is not an evidence block
+x\n```\nnever closed\n|ends inside a code fence that is never closed
+x\nSTART\n**Verified in swingset** OLD\nEND\n```\nnever closed\n|ends inside a code fence that is never closed
+EOF
+}
+
+test_attach_says_how_to_recover_when_it_stops_after_uploading() {
+  in_a_repo
+  local after
+  after="$(cmd_evidence after)" && touch "$after/a.png"
+  gh() {
+    case "$*" in
+      --version) echo 'gh version 2.99.0' ;;
+      *headRefOid*) echo 0123456789abcdef ;;
+      *'--json url'*) echo https://github.com/o/r/pull/1 ;;
+      *'--json body'*) [ ! -f "$TMPDIR_CASE/edited" ] || return 1 ;;
+      'pr edit'*) touch "$TMPDIR_CASE/edited" ;;
+    esac
+  }
+  attempt cmd_attach "$after" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "$STOPPED_ATTACH"
+}
+
+test_attach_says_how_to_recover_when_some_uploads_fail() {
+  in_a_repo
+  local after
+  after="$(cmd_evidence after)" && touch "$after/a.png"
+  gh() {
+    case "$*" in
+      --version) echo 'gh version 2.99.0' ;;
+      *headRefOid*) echo 0123456789abcdef ;;
+      *'--json url'*) echo https://github.com/o/r/pull/1 ;;
+      'pr edit'*) return 1 ;;
+    esac
+  }
+  attempt cmd_attach "$after" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "$STOPPED_ATTACH"
+}
+
+test_attach_refuses_evidence_captured_with_an_env_file_loaded() {
+  in_a_repo
+  local log dir
+  for log in '   - Environments: .env.local' ' Reload env: .env.local'; do
+    printf '%s\n' "$log" >"$LOG_FILE"
+    dir="$(cmd_evidence live)"
+    attempt cmd_attach "$dir" --pr 1
+    expect_eq "$STATUS" 1
+    expect_eq "$OUT" "$(printf '%s\n' \
+      "refuse  $(basename "$dir") was captured while swingset had an env file loaded, so it can show real instance data" \
+      "fix     capture it again with swingset started without packages/swingset/.env.local")"
+    rm -rf "$dir"
+  done
+}
+
+test_attach_refuses_while_swingset_has_an_env_file_loaded() {
+  in_a_repo
+  local dir
+  dir="$(cmd_evidence fixture)"
+  printf ' Reload env: .env.local\n' >"$LOG_FILE"
+  attempt cmd_attach "$dir" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "$(printf '%s\n' \
+    "refuse  swingset has loaded an env file since it started, so screenshots taken since can show real instance data" \
+    "fix     start swingset again without packages/swingset/.env.local, capture again, then attach")"
+}
+
+test_attach_refuses_a_folder_evidence_did_not_make() {
+  mkdir -p "$EVIDENCE_ROOT/old"
+  attempt cmd_attach "$EVIDENCE_ROOT/old" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "$(printf '%s\n' \
+    "refuse  old has no source.env from control-swingset evidence" \
+    "fix     capture it again in a folder from control-swingset evidence")"
+}
+
+test_attach_refuses_a_folder_outside_this_worktrees_evidence() {
+  in_a_repo
+  local dir other
+  dir="$(cmd_evidence after)"
+  mkdir "$VERIFY_DIR/elsewhere" && cp "$dir/source.env" "$VERIFY_DIR/elsewhere/"
+  ln -s ../elsewhere "$EVIDENCE_ROOT/link"
+  for other in "$VERIFY_DIR/elsewhere" "$EVIDENCE_ROOT/../elsewhere" "$EVIDENCE_ROOT/link" "$EVIDENCE_ROOT"; do
+    attempt cmd_attach "$dir" --pr 1 --before "$other"
+    expect_eq "$STATUS" 1
+    expect_eq "$OUT" "refuse  $other is not a folder in $EVIDENCE_ROOT"
+  done
+}
+
+test_attach_runs_nothing_from_a_source_env() {
+  mkdir -p "$EVIDENCE_ROOT/bad"
+  printf 'COMMIT=$(touch %s/pwned)\nDIRTY=0\nLIVE=0\n' "$TMPDIR_CASE" >"$EVIDENCE_ROOT/bad/source.env"
+  touch "$EVIDENCE_ROOT/bad/a.png"
+  gh() {
+    case "$*" in
+      --version) echo 'gh version 2.99.0' ;;
+      *headRefOid*) echo 0123456789abcdef ;;
+      *'--json url'*) echo https://github.com/o/r/pull/1 ;;
+      *) return 1 ;;
+    esac
+  }
+  attempt cmd_attach "$EVIDENCE_ROOT/bad" --pr 1
+  expect_eq "$STATUS" 1
+  expect_eq "$([ -e pwned ] && echo ran || echo not run)" "not run"
+}
+
+test_doctor_runs_nothing_from_the_state_file() {
+  printf 'PID=1\nURL=http://localhost:1"$(touch %s/pwned)"\n' "$TMPDIR_CASE" >"$STATE_FILE"
+  attempt cmd_doctor
+  printf 'PID=1$(touch %s/pwned)\n' "$TMPDIR_CASE" >"$STATE_FILE"
+  attempt cmd_doctor
+  expect_eq "$([ -e pwned ] && echo ran || echo not run)" "not run"
+}
+
+test_attach_puts_each_before_beside_its_after() {
+  attempt evidence_block LINE before 2 end.png start.png a1 a2 b1 b2
+  expect_eq "$(printf '%s\n' "$OUT" | grep '^| <img')" "$(
+    printf '%s\n' \
+      '| <img src="b1" width="280" alt="Before: end"> | <img src="a1" width="280" alt="After: end"> |' \
+      '| <img src="b2" width="280" alt="Before: start"> | <img src="a2" width="280" alt="After: start"> |'
+  )"
+}
+
+test_attach_lays_screenshots_two_across() {
+  attempt evidence_block LINE '' 3 a.png b.png c.png u1 u2 u3
+  expect_eq "$(printf '%s\n' "$OUT" | grep '^| `')" "$(printf '%s\n' '| `a` | `b` |' '| `c` |')"
+}
+
+test_attach_names_the_commit_each_evidence_folder_was_captured_at() {
+  in_a_repo
+  local clean dirty commit
+  commit="$(git rev-parse HEAD)"
+  clean="$(cmd_evidence clean)"
+  touch change
+  dirty="$(cmd_evidence dirty)"
+  expect_eq "$(evidence_label "$clean")" "\`$(basename "$clean")\`, captured at \`${commit:0:12}\`"
+  expect_eq "$(evidence_label "$dirty")" "\`$(basename "$dirty")\`, captured at \`${commit:0:12}\` with uncommitted changes"
+}
+
+test_attach_explains_a_missing_gh() {
+  gh() { return 127; }
+  attempt require_gh_attach
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "refuse  attach needs gh 2.99 or newer for gh pr edit --attach (found none)"
+}
+
+test_attach_refuses_an_old_gh() {
+  gh() { echo 'gh version 2.98.1 (2026-01-01)'; }
+  attempt require_gh_attach
+  expect_eq "$STATUS" 1
+  expect_eq "$OUT" "refuse  attach needs gh 2.99 or newer for gh pr edit --attach (found 2.98.1)"
+}
+
+test_doctor_fails_an_old_agent_browser() {
+  agent-browser() { echo 'agent-browser 0.26.4'; }
+  attempt cmd_doctor
+  expect_eq "$(printf '%s\n' "$OUT" | head -1)" \
+    "FAIL  agent-browser 0.27 or newer (found 0.26.4)  fix: brew upgrade agent-browser"
+}
+
+test_doctor_finds_the_listener_in_this_worktree() {
+  local port server
+  (cd "$SWINGSET_DIR" && exec node -e 'process.title = "next-server (v16.0.0)"; require("http").createServer().listen(0, function () { console.log(this.address().port) })' >"$TMPDIR_CASE/port") &
+  server=$!
+  for _ in $(seq 1 50); do
+    port="$(cat "$TMPDIR_CASE/port" 2>/dev/null || true)"
+    [ -n "$port" ] && break
+    sleep 0.1
+  done
+  URL="http://localhost:$port"
+  attempt listener_is_ours
+  kill "$server"
+  expect_eq "$STATUS" 0
+}
+
+test_up_skips_a_process_it_cannot_inspect() {
+  pgrep() { echo 4242; }
+  lsof() { return 1; }
+  attempt refuse_foreign_instance
+  expect_eq "$STATUS" 0
+}
+
+test_up_stops_swingset_when_it_never_listens() {
+  mkdir -p "$SWINGSET_DIR/scripts"
+  echo 'setInterval(() => {}, 1000)' >"$SWINGSET_DIR/scripts/dev.mjs"
+  require_deps_built() { :; }
+  refuse_foreign_instance() { :; }
+  wait_for_url() { fail_start "never listened"; }
+  attempt cmd_up
+  local pid
+  pid="$(printf '%s\n' "$OUT" | sed -n 's/^start   pid \([0-9]*\).*/\1/p')"
+  expect_eq "$STATUS" 1
+  expect_eq "$(kill -0 "$pid" 2>/dev/null && echo alive || echo stopped)" stopped
+}
+
+test_down_leaves_a_process_it_did_not_start() {
+  sleep 30 &
+  local other=$!
+  printf 'PID=%s\nURL=http://localhost:1\n' "$other" >"$STATE_FILE"
+  attempt cmd_down
+  local state
+  state="$(kill -0 "$other" 2>/dev/null && echo alive || echo stopped)"
+  kill "$other" 2>/dev/null || true
+  expect_eq "$state" alive
+}
+
+run_case() {
+  TMPDIR_CASE="$PWD"
+  cd "$HERE"
+  # shellcheck source=control-swingset
+  . ./control-swingset
+  cd "$TMPDIR_CASE"
+  VERIFY_DIR="$PWD/verify"
+  STATE_FILE="$VERIFY_DIR/instance.env"
+  LOG_FILE="$VERIFY_DIR/swingset.log"
+  EVIDENCE_ROOT="$VERIFY_DIR/evidence"
+  SWINGSET_DIR="$PWD/swingset"
+  mkdir -p "$VERIFY_DIR" "$SWINGSET_DIR"
+  agent-browser() { echo 'agent-browser 0.27.0'; }
+  "$1"
+}
+
+in_a_repo() {
+  git init -q . && git -c user.name=test -c user.email=test@example.com commit -q --allow-empty -m one
+}
+
+rewrite() {
+  printf '%s\n\n**Verified in swingset** NEW\n\n%s\n' "$START_MARKER" "$END_MARKER" >block
+  attempt body_with_block body block
+}
+
+attempt() {
+  set +e
+  OUT="$( (set -e && "$@") 2>&1)"
+  STATUS=$?
+  set -e
+}
+
+expect_eq() {
+  if [ "$1" != "$2" ]; then
+    printf 'expected:\n%s\nactual:\n%s\n' "$2" "$1" >&2
+    return 1
+  fi
+}
+
+if [ "${1:-}" = --case ]; then
+  run_case "$2"
+else
+  main
+fi

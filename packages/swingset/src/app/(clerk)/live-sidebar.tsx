@@ -31,12 +31,12 @@ export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
     label: group,
     categories: categories.map(({ category, components }) => ({
       label: category,
-      items: components.map(({ mod, href }) => ({
+      items: components.map(({ mod, href, status, substatus }) => ({
         href,
         usage: `<${mod.meta.title} />`,
         isActive: pageIsActive(pathname, href),
-        status: mod.meta.status,
-        substatus: mod.meta.substatus,
+        status,
+        substatus,
       })),
     })),
   }));

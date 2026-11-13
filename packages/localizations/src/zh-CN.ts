@@ -302,9 +302,45 @@ export const zhCN: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1582,6 +1618,11 @@ export const zhCN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1727,6 +1768,10 @@ export const zhCN: LocalizationResource = {
       title: '无法登录',
     },
     passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkeyMfa: {
       subtitle: undefined,
       title: undefined,
     },
@@ -2027,6 +2072,7 @@ export const zhCN: LocalizationResource = {
     avatar_file_type_invalid: '不支持的文件类型。请上传 JPG、PNG、GIF 或 WEBP 格式的图片。',
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable: '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked: '不支持临时电子邮件服务。请使用您的常规电子邮件地址创建账户。',
     form_identifier_exists__email_address: undefined,
@@ -2097,9 +2143,11 @@ export const zhCN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '您已登录。',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: '您已拒绝签名请求。请重试以继续。',

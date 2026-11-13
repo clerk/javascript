@@ -302,9 +302,45 @@ export const heIL: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1586,6 +1622,11 @@ export const heIL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'השתמש בשיטה אחרת',
       subtitle: 'הכנס את הסיסמה המקושרת עם חשבונך',
@@ -1731,6 +1772,10 @@ export const heIL: LocalizationResource = {
       title: 'לא ניתן להתחבר',
     },
     passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkeyMfa: {
       subtitle: undefined,
       title: undefined,
     },
@@ -2031,6 +2076,7 @@ export const heIL: LocalizationResource = {
     avatar_file_type_invalid: 'סוג הקובץ אינו נתמך. אנא העלה תמונה בפורמט JPG, PNG, GIF או WEBP.',
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     captcha_unavailable: 'ההרשמה נכשלה עקב כשל באימות נגד בוטים. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'שירותי אימייל זמניים אינם נתמכים. אנא השתמש בכתובת האימייל הרגילה שלך כדי ליצור חשבון.',
@@ -2104,9 +2150,11 @@ export const heIL: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'אתה כבר מחובר לחשבון.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'דחית את בקשת החתימה. נסה/י שוב כדי להמשיך.',

@@ -310,9 +310,45 @@ export const taIN: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1607,6 +1643,11 @@ export const taIN: LocalizationResource = {
         'உங்கள் பாஸ்கீயைப் பயன்படுத்துவது உங்கள் அடையாளத்தை உறுதிப்படுத்துகிறது. உங்கள் சாதனம் உங்கள் கைரேகை, முகம் அல்லது திரை பூட்டைக் கேட்கலாம்.',
       title: 'உங்கள் பாஸ்கீயைப் பயன்படுத்தவும்',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'வேறு முறையைப் பயன்படுத்துங்கள்',
       subtitle: 'தொடர உங்கள் தற்போதைய கடவுச்சொல்லை உள்ளிடவும்',
@@ -1757,6 +1798,10 @@ export const taIN: LocalizationResource = {
       subtitle:
         'உங்கள் பாஸ்கீயைப் பயன்படுத்துவது நீங்கள் தான் என்பதை உறுதிப்படுத்துகிறது. உங்கள் சாதனம் உங்கள் கைரேகை, முகம் அல்லது திரை பூட்டைக் கேட்கலாம்.',
       title: 'உங்கள் பாஸ்கீயைப் பயன்படுத்தவும்',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'வேறு முறையைப் பயன்படுத்துங்கள்',
@@ -2068,6 +2113,7 @@ export const taIN: LocalizationResource = {
       'பாதுகாப்பு சரிபார்ப்புகள் தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     captcha_unavailable:
       'போட் சரிபார்ப்பு தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'தற்காலிக மின்னஞ்சல் சேவைகள் ஆதரிக்கப்படவில்லை. கணக்கை உருவாக்க உங்கள் வழக்கமான மின்னஞ்சல் முகவரியைப் பயன்படுத்தவும்.',
@@ -2152,9 +2198,11 @@ export const taIN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
     web3_signature_request_rejected: 'நீங்கள் கையொப்ப கோரிக்கையை நிராகரித்துவிட்டீர்கள். தொடர மீண்டும் முயற்சிக்கவும்.',

@@ -1,0 +1,43 @@
+export const createOrganizationMessages = {
+  create: {
+    title: 'Create organization',
+    logo: {
+      label: 'Logo',
+      description: 'Recommended size 1:1, up to 10MB.',
+      upload: 'Upload',
+      manage: 'Manage logo',
+      change: 'Change logo',
+      remove: 'Remove logo',
+      crop: {
+        title: 'Adjust logo',
+        frame: 'Logo crop. Drag or use the arrow keys to move, plus and minus to zoom.',
+        zoom: 'Zoom',
+        zoomIn: 'Zoom in',
+        zoomOut: 'Zoom out',
+        rotate: 'Rotate',
+        reset: 'Reset',
+        cancel: 'Cancel',
+        save: 'Save',
+      },
+    },
+    nameLabel: 'Name',
+    namePlaceholder: 'Organization name',
+    slugLabel: 'Slug',
+    slugPlaceholder: 'my-org',
+    slugInvalid: 'Use lowercase letters, numbers and hyphens only.',
+    submit: 'Create organization',
+    cancel: 'Cancel',
+    error: 'Unable to create the organization. Please try again.',
+  },
+  invite: {
+    title: 'Invite new members',
+    skip: 'Skip',
+    submit: 'Send invitations',
+    error: 'Unable to send invitations. Please try again.',
+  },
+  sent: {
+    title: 'Invitations sent',
+    description: 'Invitations successfully sent',
+    finish: 'Finish',
+  },
+} as const;

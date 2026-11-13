@@ -41,6 +41,30 @@ describe('api.client', () => {
     expect(response.publicMetadata.zodiac_sign).toBe('leo');
   });
 
+  it('parses the deprovisioned flag on a user, defaulting to false when absent', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deprovisioned`,
+        validateHeaders(() => {
+          return HttpResponse.json({ ...userJson, deprovisioned: true });
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json(userJson);
+        }),
+      ),
+    );
+
+    const deprovisionedUser = await apiClient.users.getUser('user_deprovisioned');
+    const user = await apiClient.users.getUser('user_deadbeef');
+
+    expect(deprovisionedUser.deprovisioned).toBe(true);
+    expect(deprovisionedUser.banned).toBe(false);
+    expect(user.deprovisioned).toBe(false);
+  });
+
   it('executes 2 backend API request for users.getUserList()', async () => {
     server.use(
       http.get(
@@ -65,6 +89,37 @@ describe('api.client', () => {
     expect(data[0].firstName).toBe('John');
     expect(data[0].id).toBe('user_cafebabe');
     expect(data.length).toBe(1);
+    expect(totalCount).toBe(2);
+  });
+
+  it('sends startingAfter only to the users list request', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('starting_after')).toBe('user_previous');
+          expect(url.searchParams.has('startingAfter')).toBe(false);
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(
+        `https://api.clerk.test/v1/users/count`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.has('starting_after')).toBe(false);
+          expect(url.searchParams.has('startingAfter')).toBe(false);
+          return HttpResponse.json({ object: 'total_count', total_count: 2 });
+        }),
+      ),
+    );
+
+    const { data, totalCount } = await apiClient.users.getUserList({
+      startingAfter: 'user_previous',
+      orderBy: '-created_at',
+    });
+
+    expect(data[0].id).toBe('user_cafebabe');
     expect(totalCount).toBe(2);
   });
 

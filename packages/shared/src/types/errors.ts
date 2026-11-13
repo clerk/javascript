@@ -30,6 +30,7 @@ export interface ClerkAPIErrorJSON {
     link_url?: string;
     link_text?: string;
     data?: Record<string, string | number | boolean>;
+    provider_error?: string;
   };
 }
 
@@ -122,6 +123,7 @@ export interface ClerkAPIError {
      * sensitive.
      */
     data?: Record<string, string | number | boolean>;
+    providerError?: string;
   };
 }
 

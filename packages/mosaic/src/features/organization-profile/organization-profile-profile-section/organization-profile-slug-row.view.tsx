@@ -5,17 +5,17 @@ import { CopyButton } from '../../../components/copy-button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
-import { useOrganizationProfileEditFieldController } from './organization-profile-edit-field.controller';
-import { OrganizationProfileEditFieldDialog } from './organization-profile-edit-field.dialog';
+import { useOrganizationProfileEditSlugController } from './organization-profile-edit-slug.controller';
+import { OrganizationProfileEditSlugDialog } from './organization-profile-edit-slug.dialog';
 import { styles } from './organization-profile-profile-section.styles';
 
-export interface OrganizationProfileSlugRowViewProps {
+interface OrganizationProfileSlugRowViewProps {
   slug: string;
   onSubmit?: (slug: string) => Promise<void>;
 }
 
 export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationProfileSlugRowViewProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   return (
     <Section.Row>
       <Section.Item>
@@ -28,12 +28,14 @@ export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationP
             >
               {slug}
             </span>
-            <CopyButton
-              value={slug}
-              label={m.slug.copy}
-              copiedLabel={m.slug.copied}
-              xstyle={styles.copyAction}
-            />
+            {slug ? (
+              <CopyButton
+                value={slug}
+                label={m.slug.copy}
+                copiedLabel={m.slug.copied}
+                xstyle={styles.copyAction}
+              />
+            ) : null}
           </Section.Description>
         </Section.Content>
         {onSubmit ? (
@@ -50,18 +52,14 @@ export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationP
 }
 
 function EditSlug({ slug, onSubmit }: { slug: string; onSubmit: (slug: string) => Promise<void> }) {
-  const m = useMessages('organizationProfileProfileSection');
-  const controller = useOrganizationProfileEditFieldController({ value: slug, onSubmit });
+  const m = useMessages('organizationProfile').profile;
+  const controller = useOrganizationProfileEditSlugController({ slug, onSubmit });
 
   return (
-    <OrganizationProfileEditFieldDialog
-      {...controller}
+    <OrganizationProfileEditSlugDialog
+      form={controller.form}
       open={controller.isOpen}
-      title={m.slug.dialogTitle}
-      description={m.slug.dialogDescription}
-      fieldLabel={m.slug.fieldLabel}
-      cancelLabel={m.slug.cancel}
-      saveLabel={m.slug.save}
+      onOpenChange={controller.onOpenChange}
       trigger={
         <Button
           color='neutral'

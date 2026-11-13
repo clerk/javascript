@@ -309,9 +309,45 @@ export const caES: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1601,6 +1637,11 @@ export const caES: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Has oblidat la contrasenya? Recupera-la aquí.',
       subtitle: 'Utilitza la teva contrasenya per verificar la teva identitat.',
@@ -1750,6 +1791,10 @@ export const caES: LocalizationResource = {
     passkey: {
       subtitle: "Utilitza la teva clau d'accés per continuar amb l'autenticació.",
       title: "Clau d'accés",
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utilitza un altre mètode',
@@ -2053,6 +2098,7 @@ export const caES: LocalizationResource = {
       "El registre no ha estat exitós a causa de validacions de seguretat fallides. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     captcha_unavailable:
       "El registre no ha estat exitós a causa de la validació fallida de bot. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
+    external_account_not_found: undefined,
     form_code_incorrect: 'El codi introduït no és vàlid. Si us plau, comprova el codi i torna-ho a intentar.',
     form_email_address_blocked:
       'Els serveis de correu electrònic temporal no estan suportats. Si us plau, utilitzeu la vostra adreça de correu electrònic habitual per crear un compte.',
@@ -2129,9 +2175,11 @@ export const caES: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Ja estàs connectat.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Has rebutjat la sol·licitud de signatura. Torna-ho a provar per continuar.',

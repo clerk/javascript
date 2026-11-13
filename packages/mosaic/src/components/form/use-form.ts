@@ -3,16 +3,18 @@ import { useCallback, useId, useRef } from 'react';
 import { useErrorText, useMessages } from '../../localization';
 import type { StateMachine } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
-import { keysOf, mapKeys } from '../../utils/object';
+import { keysOf, mapKeys } from '../../primitives/utils/object';
 import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
-import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
+import { createFormMachine, fieldConfig, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
 import type { FieldFeedback } from './form-submit-error';
 
-export interface UseFormOptions<TValues extends object> {
+export interface UseFormOptions<TValues extends object, TResult = unknown> {
   initialValues: TValues;
   fields?: FieldsConfig<TValues>;
-  onSubmit: (values: TValues) => Promise<unknown>;
+  onSubmit: (values: TValues) => Promise<TResult>;
+  onSuccess?: (result: TResult, submittedValues: TValues) => void;
   canSubmit?: (values: TValues) => boolean;
+  errorFallback?: string;
 }
 
 export interface FormField {
@@ -67,7 +69,12 @@ export interface UseFormResult<TValues extends object> {
    * `register`.
    *
    * @example
-   * <PhoneInput {...form.registerValue('phoneNumber')} />
+   * <PhoneInput
+   *   {...form.registerValue('phoneNumber')}
+   *   countryTriggerLabel='Country, {country}'
+   *   countryPopupLabel='Choose a country'
+   *   countrySearchLabel='Search countries'
+   * />
    */
   registerValue: <K extends keyof TValues>(name: K) => RegisteredValueField<TValues, K>;
   setValue: <K extends keyof TValues>(name: K, value: TValues[K]) => void;
@@ -81,7 +88,9 @@ type ElementRef = (element: HTMLElement | null) => void;
 
 const always = () => true;
 
-export function useForm<TValues extends object>(options: UseFormOptions<TValues>): UseFormResult<TValues> {
+export function useForm<TValues extends object, TResult = unknown>(
+  options: UseFormOptions<TValues, TResult>,
+): UseFormResult<TValues> {
   const id = useId();
   const m = useMessages('form');
   const errorText = useErrorText();
@@ -91,15 +100,20 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   const deps = {
     initialValues: options.initialValues,
     fields: options.fields,
-    onSubmit: options.onSubmit,
+    onSubmit: async (submittedValues: TValues) => {
+      const { onSubmit, onSuccess } = options;
+      const result = await onSubmit(submittedValues);
+      return () => onSuccess?.(result, submittedValues);
+    },
     canSubmit: options.canSubmit ?? always,
-    fallbackMessage: m.error,
+    fallbackMessage: options.errorFallback ?? m.error,
     errorText,
   };
   const machineRef = useRef<StateMachine<FormContext<TValues>, FormEvent<TValues>> | null>(null);
   if (machineRef.current === null) {
     machineRef.current = createFormMachine(deps);
   }
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const [snapshot, send, actor] = useMachine(machineRef.current, { context: deps });
   const context = { ...snapshot.context, ...deps };
   const { values } = context;
@@ -114,14 +128,14 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     <K extends keyof TValues>(name: K, value: TValues[K]) => {
       send({ type: 'CHANGE', name, value });
       const { async, fields, values: next } = actor.getSnapshot().context;
-      const validateAsync = fields?.[name]?.validateAsync;
+      const validateAsync = fieldConfig(fields, name)?.validateAsync;
       if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
         return;
       }
       const settle = (feedback: FieldFeedback | undefined) => {
-        const { submitQueued } = actor.getSnapshot().context;
+        const wasQueued = actor.getSnapshot().value === 'queued';
         send({ type: 'VALIDATED', name, value, feedback });
-        if (submitQueued) {
+        if (wasQueued) {
           focusFirstInvalid();
         }
       };
@@ -175,7 +189,6 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     ref: refFor(name),
   });
 
-  const isSubmitting = snapshot.value === 'submitting' || context.submitQueued;
   const initial = initialOf(context);
   const fields = mapKeys(values, (name): FormField => {
     const feedback = fieldFeedback(context, name);
@@ -195,10 +208,10 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     error: context.error?.message,
     get isSubmitting() {
       const current = actor.getSnapshot();
-      return current.value === 'submitting' || current.context.submitQueued;
+      return current.value !== 'editing';
     },
     isDirty: keysOf(values).some(name => fields[name].isDirty),
-    canSubmit: !isSubmitting && isValid(context),
+    canSubmit: isValid(context),
     register,
     registerValue,
     setValue,

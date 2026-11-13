@@ -309,9 +309,45 @@ export const nbNO: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1604,6 +1640,11 @@ export const nbNO: LocalizationResource = {
         'Bruk av passnøkkelen bekrefter identiteten din. Enheten din kan be om fingeravtrykk, ansiktsgjenkjenning eller skjermlås.',
       title: 'Bruk passnøkkelen din',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Bruk en annen metode',
       subtitle: 'Skriv inn ditt nåværende passord for å fortsette',
@@ -1754,6 +1795,10 @@ export const nbNO: LocalizationResource = {
       subtitle:
         'Bruk av passnøkkelen bekrefter at det er deg. Enheten din kan be om fingeravtrykk, ansiktsgjenkjenning eller skjermlås.',
       title: 'Bruk passnøkkelen din',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Bruk en annen metode',
@@ -2065,6 +2110,7 @@ export const nbNO: LocalizationResource = {
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     captcha_unavailable:
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Midlertidige e-posttjenester støttes ikke. Vennligst bruk din vanlige e-postadresse for å opprette en konto.',
@@ -2144,9 +2190,11 @@ export const nbNO: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Du er allerede logget inn.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'En Web3-lommebokutvidelse ble ikke funnet. Installer en for å fortsette.',
     web3_signature_request_rejected: 'Du avviste signaturforespørselen. Prøv igjen for å fortsette.',

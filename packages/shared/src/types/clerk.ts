@@ -201,6 +201,8 @@ export type SignOutCallback = () => void | Promise<any>;
  * Configuration options.
  */
 export type SignOutOptions = {
+  /** @internal */
+  __internal_satelliteSignOutRedirectUrl?: string;
   /**
    * Specify a specific session to sign out. Useful for multi-session applications.
    */
@@ -1203,6 +1205,8 @@ export interface Clerk {
   /**
    * Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-up).
    *
+   * If this is called while a previous call is still running, it returns the promise of the running call, and the `params` and `customNavigate` passed to the later call are ignored.
+   *
    * @param params - Additional props that define where the user will be redirected to at the end of a successful OAuth or SAML flow.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
@@ -1392,6 +1396,11 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-up component.
      */
     signUpProtectCheckUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-up must choose between several enterprise connections
+     * (`enterprise_sso` is missing). Defaults to the `enterprise-connections` route on the sign-up URL.
+     */
+    enterpriseConnectionsUrl?: string | null;
     /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */

@@ -1,6 +1,10 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDoubleLeft } from '../../icons/glyphs/chevron-double-left';
+import { ChevronDoubleRight } from '../../icons/glyphs/chevron-double-right';
+import { ChevronLeft } from '../../icons/glyphs/chevron-left';
+import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { fill } from '../../localization/messages';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -85,7 +89,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     const sizes = new Set(
       [...pageSizeOptions, itemsPerPage].filter(size => Number.isFinite(size) && size >= 1).map(Math.floor),
     );
-    return [...sizes].sort((a, b) => a - b).map(size => ({ value: String(size), label: String(size) }));
+    return [...sizes].sort((a, b) => a - b).map(size => ({ value: size, label: String(size) }));
   }, [pageSizeOptions, itemsPerPage]);
   const isFirst = current <= 1;
   const isLast = current >= pageCount;
@@ -122,8 +126,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 </span>
                 <Select.Root
                   items={pageSizeItems}
-                  value={String(itemsPerPage)}
-                  onValueChange={value => onPageSizeChange(Number(value))}
+                  value={itemsPerPage}
+                  onValueChange={onPageSizeChange}
                 >
                   <Select.Trigger
                     aria-label={pageSizeLabel}
@@ -166,8 +170,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 onClick={() => goTo(1)}
               >
                 <Icon
-                  name='chevron-double-left'
-                  size='sm'
+                  glyph={ChevronDoubleLeft}
+                  size='md'
                   xstyle={rtl.mirror}
                 />
               </Button>
@@ -183,8 +187,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               onClick={() => goTo(current - pageStep)}
             >
               <Icon
-                name='chevron-left'
-                size='sm'
+                glyph={ChevronLeft}
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Button>
@@ -209,8 +213,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               onClick={() => goTo(current + pageStep)}
             >
               <Icon
-                name='chevron-right'
-                size='sm'
+                glyph={ChevronRight}
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Button>
@@ -226,8 +230,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 onClick={() => goTo(pageCount)}
               >
                 <Icon
-                  name='chevron-double-right'
-                  size='sm'
+                  glyph={ChevronDoubleRight}
+                  size='md'
                   xstyle={rtl.mirror}
                 />
               </Button>

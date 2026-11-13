@@ -1,12 +1,11 @@
 # Why adopt the Mosaic state machine?
 
 The [README](./README.md) explains **how** to use the library. This document
-answers **why** — by walking through three real migrations from today's
+answers **why** — by walking through five real migrations from today's
 `@clerk/ui` code, showing what collapses and what the numbers look like.
 
-The README already covers the delete-organization flow (`idle → confirming →
-deleting`) and the ConfigureSSO Wizard (see the worked example in the `<details>`
-block and the parity test at
+The README already covers the ConfigureSSO Wizard (see the worked example in the `<details>`
+block and the migration test at
 [`__tests__/wizard-migration.test.tsx`](./__tests__/wizard-migration.test.tsx)).
 Everything below is a fresh example.
 
@@ -19,7 +18,8 @@ Two patterns appear over and over in `@clerk/ui` flows:
 1. **`useLoadingStatus`** — a hand-rolled 3-state machine:
 
    ```ts
-   // hooks/useLoadingStatus.ts
+   // hooks/useLoadingStatus.ts (abridged: the real setters also take a
+   // `metadata` value, returned as `loadingMetadata`)
    type Status = 'idle' | 'loading' | 'error';
    export const useLoadingStatus = () => {
      const [state, setState] = useSafeState({ status: 'idle' as Status });
@@ -115,10 +115,9 @@ Problems:
 ### After
 
 ```ts
-import { createMachine } from '@/mosaic/machine/create-machine';
-import { assign } from '@/mosaic/machine/assign';
+import { setup } from '../../machine/setup';
 
-type Context = { error: string | null };
+type Context = { emailAddress: string; error: string | null };
 type Event = { type: 'SUBMIT'; emailAddress: string } | { type: 'NAVIGATE_DONE' };
 
 type WaitlistDeps = {
@@ -127,20 +126,25 @@ type WaitlistDeps = {
   afterJoinWaitlistUrl?: string;
 };
 
+const { createMachine, assign, fromPromise } = setup<Context, Event>();
+
 function createWaitlistMachine(deps: WaitlistDeps) {
-  return createMachine<Context, Event>({
+  return createMachine({
     id: 'waitlist',
     initial: 'idle',
-    context: { error: null },
+    context: { emailAddress: '', error: null },
     states: {
       idle: {
-        on: { SUBMIT: 'submitting' },
+        on: {
+          SUBMIT: {
+            target: 'submitting',
+            actions: assign((_ctx, e) => ({ emailAddress: e.emailAddress })),
+          },
+        },
       },
       submitting: {
         // Double-submit is impossible: SUBMIT is not handled here.
-        invoke: {
-          src: (ctx, event) =>
-            deps.joinWaitlist({ emailAddress: (event as Extract<Event, { type: 'SUBMIT' }>).emailAddress }),
+        invoke: fromPromise(ctx => deps.joinWaitlist({ emailAddress: ctx.emailAddress }), {
           onDone: {
             target: 'success',
             actions: assign(() => ({ error: null })),
@@ -149,7 +153,7 @@ function createWaitlistMachine(deps: WaitlistDeps) {
             target: 'idle',
             actions: assign((_ctx, e) => ({ error: String(e.error) })),
           },
-        },
+        }),
       },
       success: {
         // Optional auto-navigate on entry:
@@ -375,7 +379,9 @@ type SignInEvent =
   | { type: 'CLEAR_PROVIDER' }
   | { type: 'SUBMIT'; identifier: string };
 
-const signInStartMachine = createMachine<SignInContext, SignInEvent>({
+const { createMachine, assign, fromPromise } = setup<SignInContext, SignInEvent>();
+
+const signInStartMachine = createMachine({
   id: 'signInStart',
   initial: 'idle',
   context: { selectedProvider: null, identifier: '', error: null },
@@ -405,14 +411,13 @@ const signInStartMachine = createMachine<SignInContext, SignInEvent>({
       },
     },
     submitting: {
-      invoke: {
-        src: ctx => signIn.create({ identifier: ctx.identifier }),
+      invoke: fromPromise(ctx => signIn.create({ identifier: ctx.identifier }), {
         onDone: { target: 'idle', actions: assign(() => ({ error: null })) },
         onError: {
           target: 'idle',
           actions: assign((_ctx, e) => ({ error: String(e.error) })),
         },
-      },
+      }),
     },
   },
 });
@@ -497,8 +502,8 @@ const handleSubmit = async e => {
 ```
 
 The component then disables all buttons with `status.isLoading` and shows a
-spinner on whichever button was clicked by passing the strategy down as a
-separate prop or via a ref. Two sync calls per async entry point, a
+spinner on whichever button was clicked through `setLoading(strategy)` and
+`loadingMetadata`. Two sync calls per async entry point, a
 required `finally` in each, and nothing that prevents both handlers
 from calling `setLoading` simultaneously.
 
@@ -507,7 +512,7 @@ from calling `setLoading` simultaneously.
 A single `submitting` state with `activeStrategy` in context replaces both hooks:
 
 ```ts
-import { setup } from '@/mosaic/machine/setup';
+import { setup } from '../../machine/setup';
 
 interface SignInStartContext {
   activeStrategy: OAuthStrategy | 'email' | null;
@@ -521,7 +526,7 @@ type SignInStartEvent =
   | { type: 'TYPE_IDENTIFIER'; value: string }
   | { type: 'SUBMIT_IDENTIFIER' };
 
-const { createMachine, assign } = setup<SignInStartContext, SignInStartEvent>();
+const { createMachine, assign, fromPromise } = setup<SignInStartContext, SignInStartEvent>();
 
 export function createSignInStartMachine(deps: { signInFn: SignInStartContext['signInFn'] }) {
   return createMachine({
@@ -546,17 +551,19 @@ export function createSignInStartMachine(deps: { signInFn: SignInStartContext['s
       submitting: {
         // Both entry points converge here. idle's on-handlers are inactive,
         // so a second CLICK_SOCIAL while already submitting is dropped automatically.
-        invoke: {
-          src: ctx =>
+        invoke: fromPromise(
+          ctx =>
             ctx.activeStrategy === 'email'
               ? ctx.signInFn({ identifier: ctx.identifier })
               : ctx.signInFn({ strategy: ctx.activeStrategy! }),
-          onDone: 'success',
-          onError: {
-            target: 'idle',
-            actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+          {
+            onDone: 'success',
+            onError: {
+              target: 'idle',
+              actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+            },
           },
-        },
+        ),
       },
       success: { type: 'final' },
     },
@@ -568,8 +575,10 @@ In React, `isLocked` replaces `card.setLoading()` and `activeStrategy`
 replaces the per-button `status.isLoading` check:
 
 ```tsx
-const [snapshot, send] = useMachine(signInStartMachine, {
-  context: { signInFn: params => signIn.create(params) },
+const signInFn = params => signIn.create(params);
+const machine = useMemo(() => createSignInStartMachine({ signInFn }), []);
+const [snapshot, send] = useMachine(machine, {
+  context: { signInFn },
   onDone: () => setActive({ session: signIn.createdSessionId }),
 });
 
@@ -781,6 +790,17 @@ collocated with the value that drives it.
 
 ---
 
+## In Mosaic today
+
+The controllers that already made this call are the best reference:
+
+- `blocks/confirm/confirm.controller.ts`: a machine
+- `features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`: one `useState` beside `useForm`
+- `features/switcher/switcher.controller.tsx`: a machine
+- `hooks/use-pending-action.ts`: keyed `useState` plus a lock
+
+---
+
 ## When NOT to reach for a machine
 
 A machine earns its keep when **two or more** of these are true:
@@ -831,11 +851,11 @@ patterns above show a few natural entry points:
 
 ## The proven precedent
 
-The ConfigureSSO Wizard was the most complex existing implicit machine in
-`@clerk/ui`. It was a hand-rolled `reduce(state, event, config)` pure reducer
+The ConfigureSSO Wizard is the most complex existing implicit machine in
+`@clerk/ui`. It is a hand-rolled `reduce(state, event, config)` pure reducer
 plus a React seam full of `useRef` mirrors and two "adjust-state-during-
 render" passes. The migration parity test
 ([`__tests__/wizard-migration.test.tsx`](./__tests__/wizard-migration.test.tsx))
-confirms the machine version reproduces every behavior while discarding the
-seam entirely. The comparison table at the bottom of the README's worked
+ports the reducer's test cases to a machine version that drops the seam
+entirely. The wizard itself has not moved yet. The comparison table at the bottom of the README's worked
 example is worth reading if you're considering a similar migration.

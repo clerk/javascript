@@ -1,5 +1,15 @@
 # @clerk/expo-biometrics
 
+## 1.1.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix iOS builds on Expo SDK 58. `@clerk/expo-biometrics` no longer fails to compile with `cannot override with a stored property 'message'`. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.0.0
 
 ### Major Changes

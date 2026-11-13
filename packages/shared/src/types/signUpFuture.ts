@@ -66,6 +66,10 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
     | AppleIdTokenStrategy
     | PhoneCodeStrategy;
   /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
+  /**
    * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
    */
   emailAddress?: string;
@@ -248,6 +252,10 @@ export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
    * The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+  /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
   /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental

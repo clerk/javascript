@@ -1,23 +1,22 @@
 import * as stylex from '@stylexjs/stylex';
-import { useMemo, useRef, useState } from 'react';
+import type { Ref } from 'react';
+import { useState } from 'react';
 
 import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { Spinner } from '../../components/spinner';
-import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
+import { Key } from '../../icons/glyphs/key';
 import { fill } from '../../localization';
-import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
 import { styles } from './api-keys-table.styles';
-import type { APIKey, APIKeysTableMessages, APIKeysTableSort, APIKeysTableViewProps } from './api-keys-table.types';
+import type { APIKey, APIKeysTableMessages, APIKeysTableViewProps } from './api-keys-table.types';
 import { CreateAPIKeyDialog } from './create-api-key.dialog';
 
 const getRowId = (row: APIKey) => row.id;
@@ -32,75 +31,19 @@ export function APIKeysTableView({
   onPageSizeChange,
   searchValue,
   onSearchChange,
+  searchInputRef,
+  createButtonRef,
   onCreate,
   createDialog,
-  onRevoke,
+  registerTrigger,
+  revoke,
+  finalFocus,
   onBulkAction,
-  sort,
-  onSortChange,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
 }: APIKeysTableViewProps) {
-  const searchInput = useRef<HTMLInputElement>(null);
-  const createButton = useRef<HTMLButtonElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: apiKeys.map(getRowId),
-    onRemove: onRevoke,
-    fallback: () => createButton.current ?? searchInput.current,
-  });
-  const revokeKey = useMemo(() => Destructive.createHandle<APIKey>(), []);
-  const pagination = { pageIndex: page - 1, pageSize };
-  const table = useDataTable({
-    data: apiKeys,
-    totalCount,
-    getRowId,
-    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
-    onSortingChange: onSortChange
-      ? update => {
-          const next = typeof update === 'function' ? update(table.sorting) : update;
-          const active = next[0];
-          table.setRowSelection({});
-          onSortChange(
-            active && (active.id === 'name' || active.id === 'createdAt' || active.id === 'lastUsed')
-              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
-              : null,
-          );
-        }
-      : undefined,
-    pagination,
-    onPaginationChange: update => {
-      const next = typeof update === 'function' ? update(pagination) : update;
-      table.setRowSelection({});
-      if (next.pageSize !== pageSize) {
-        onPageSizeChange?.(next.pageSize);
-      }
-      onPageChange(next.pageIndex + 1);
-    },
-    globalFilter: searchValue,
-    onGlobalFilterChange: update => {
-      table.setRowSelection({});
-      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
-    },
-  });
-  const sortHeader = (column: APIKeysTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
-    const active = table.sorting[0];
-    return {
-      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
-      onSort: onSortChange
-        ? () =>
-            table.setSorting(current => {
-              const active = current[0];
-              if (active?.id !== column) {
-                return [{ id: column, desc: false }];
-              }
-              return active.desc ? [] : [{ id: column, desc: true }];
-            })
-        : undefined,
-    };
-  };
-  const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
+  const showPagination = Math.ceil(totalCount / pageSize) > 1 || (totalCount > 0 && Boolean(onPageSizeChange));
   const query = searchValue.trim();
   const emptyState = query
     ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
@@ -108,17 +51,18 @@ export function APIKeysTableView({
   return (
     <>
       <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
+        <VisuallyHidden role='status'>{isError ? m.loadError : m.loaded}</VisuallyHidden>
         <Table.Toolbar>
           <Table.Search
-            ref={searchInput}
+            ref={searchInputRef}
             label={m.search}
             clearLabel={m.clearSearch}
-            value={table.globalFilter}
-            onValueChange={table.setGlobalFilter}
+            value={searchValue}
+            onValueChange={onSearchChange}
           />
           {onCreate ? (
             <Button
-              ref={createButton}
+              ref={createButtonRef}
               onClick={onCreate}
             >
               {m.create}
@@ -127,41 +71,32 @@ export function APIKeysTableView({
         </Table.Toolbar>
         <Table.Root
           aria-label={m.title}
-          aria-busy={isLoading || isFetching}
+          aria-busy={isFetching}
+          layout='fixed'
+          minWidth='36rem'
+          selectionMode={onBulkAction ? 'multiple' : 'none'}
         >
           <Table.Header>
-            <Table.Row>
-              {onBulkAction ? (
-                <Table.SelectAllCell
-                  aria-label={m.selectAll}
-                  checked={table.getIsAllRowsSelected()}
-                  indeterminate={table.getIsSomeRowsSelected()}
-                  onChange={table.toggleAllRowsSelected}
-                />
-              ) : null}
-              <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('createdAt')}>{m.createdAt}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('lastUsed')}>{m.lastUsed}</Table.HeaderCell>
-              {onRevoke ? (
-                <Table.HeaderCell align='end'>
-                  <VisuallyHidden>{m.actions}</VisuallyHidden>
-                </Table.HeaderCell>
-              ) : null}
-            </Table.Row>
+            {onBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+            <Table.Column>{m.name}</Table.Column>
+            <Table.Column width='9rem'>{m.createdAt}</Table.Column>
+            <Table.Column width='9rem'>{m.lastUsed}</Table.Column>
+            {revoke ? (
+              <Table.Column
+                align='end'
+                width='4rem'
+              >
+                <VisuallyHidden>{m.actions}</VisuallyHidden>
+              </Table.Column>
+            ) : null}
           </Table.Header>
-          <Table.Body>
-            {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
-            {isLoading ? (
-              <Table.Empty colSpan={columnCount}>
-                <span role='status'>
-                  <Spinner />
-                  <VisuallyHidden>{m.loading}</VisuallyHidden>
-                </span>
-              </Table.Empty>
-            ) : isError ? (
-              <Table.Empty colSpan={columnCount}>
+          <Table.Body
+            items={isError ? [] : apiKeys}
+            itemToStringValue={getRowId}
+            renderEmptyState={() =>
+              isError ? (
                 <EmptyState.Root>
-                  <EmptyState.Icon name='exclamation-circle' />
+                  <EmptyState.Icon glyph={ExclamationCircle} />
                   <EmptyState.Label>{m.loadError}</EmptyState.Label>
                   <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
                   {onRetry ? (
@@ -176,103 +111,108 @@ export function APIKeysTableView({
                     </EmptyState.Actions>
                   ) : null}
                 </EmptyState.Root>
-              </Table.Empty>
-            ) : table.rows.length === 0 ? (
-              <Table.Empty colSpan={columnCount}>
+              ) : (
                 <EmptyState.Root>
-                  <EmptyState.Icon name='key' />
+                  <EmptyState.Icon glyph={Key} />
                   <EmptyState.Label>{emptyState.label}</EmptyState.Label>
                   <EmptyState.Description>{emptyState.description}</EmptyState.Description>
                 </EmptyState.Root>
-              </Table.Empty>
-            ) : (
-              table.rows.map(row => (
-                <Table.Row
-                  key={row.id}
-                  selected={Boolean(onBulkAction) && row.getIsSelected()}
-                >
-                  {onBulkAction ? (
-                    <Table.SelectCell
-                      aria-label={fill(m.select, { name: row.original.name })}
-                      checked={row.getIsSelected()}
-                      onToggleSelected={row.toggleSelected}
+              )
+            }
+          >
+            {apiKey => (
+              <Table.Row>
+                {onBulkAction ? <Table.SelectionCell aria-label={fill(m.select, { name: apiKey.name })} /> : null}
+                <Table.Cell>
+                  <APIKeyMetadata
+                    messages={m}
+                    apiKey={apiKey}
+                  />
+                </Table.Cell>
+                <Table.Cell noWrap>
+                  <Text>{apiKey.createdAtLabel}</Text>
+                </Table.Cell>
+                <Table.Cell noWrap>
+                  <Text>{apiKey.lastUsedAtLabel ?? m.neverUsed}</Text>
+                </Table.Cell>
+                {revoke ? (
+                  <Table.Cell align='end'>
+                    <APIKeyActions
+                      messages={m}
+                      apiKey={apiKey}
+                      registerTrigger={registerTrigger}
+                      onSelect={key => revoke.open(key)}
                     />
-                  ) : null}
-                  <Table.Cell>
-                    <div {...stylex.props(styles.metadata)}>
-                      <Text xstyle={styles.name}>{row.original.name}</Text>
-                      <Text
-                        size='xs'
-                        color='foreground-secondary'
-                      >
-                        {truncateWithEndVisible(row.original.id, 10, 4)} ·{' '}
-                        <Text
-                          render={<span />}
-                          size='xs'
-                          color={row.original.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
-                        >
-                          {row.original.expiresAtLabel === null
-                            ? m.neverExpires
-                            : fill(m.expires, {
-                                expiresDate: row.original.expiresAtLabel,
-                              })}
-                        </Text>
-                      </Text>
-                    </div>
                   </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.createdAtLabel}</Text>
-                  </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
-                  </Table.Cell>
-                  {onRevoke ? (
-                    <Table.Cell align='end'>
-                      <APIKeyActions
-                        messages={m}
-                        apiKey={row.original}
-                        registerTrigger={removalFocus.registerTrigger}
-                        onSelect={apiKey => revokeKey.open(apiKey)}
-                      />
-                    </Table.Cell>
-                  ) : null}
-                </Table.Row>
-              ))
+                ) : null}
+              </Table.Row>
             )}
           </Table.Body>
         </Table.Root>
-        {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+        {showPagination ? (
           <Pagination
-            page={table.pagination.pageIndex + 1}
-            pageSize={table.pagination.pageSize}
+            page={page}
+            pageSize={pageSize}
             totalItems={totalCount}
+            disabled={isFetching}
+            onChange={onPageChange}
             onPageSizeChange={
-              onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
+              onPageSizeChange
+                ? next => {
+                    onPageSizeChange(next);
+                    onPageChange(1);
+                  }
+                : undefined
             }
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
             nextPageLabel={m.nextPage}
-            onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
           />
         ) : null}
       </div>
       {createDialog ? <CreateAPIKeyDialog {...createDialog} /> : null}
-      {onRevoke ? (
+      {revoke ? (
         <Destructive
-          handle={revokeKey}
+          controller={revoke}
           title={apiKey => fill(m.revokeTitle, { name: apiKey.name })}
           description={m.revokeDescription}
           fieldLabel={apiKey => fill(m.revokeFieldLabel, { name: apiKey.name })}
           confirmationValue={apiKey => apiKey.name}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onDelete={apiKey => removalFocus.remove(apiKey.id)}
-          errorFallback={m.revokeError}
-          finalFocus={removalFocus.finalFocus}
+          finalFocus={finalFocus}
         />
       ) : null}
     </>
+  );
+}
+
+function APIKeyMetadata({ messages: m, apiKey }: { messages: APIKeysTableMessages; apiKey: APIKey }) {
+  const id = truncateWithEndVisible(apiKey.id, 10, 4);
+  const expiry =
+    apiKey.expiresAtLabel === null
+      ? m.neverExpires
+      : fill(m.expires, {
+          expiresDate: apiKey.expiresAtLabel,
+        });
+  return (
+    <div {...stylex.props(styles.metadata)}>
+      <Text xstyle={styles.name}>{apiKey.name}</Text>
+      <Text
+        size='xs'
+        color='foreground-secondary'
+      >
+        {id} ·{' '}
+        <Text
+          render={<span />}
+          size='xs'
+          color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
+        >
+          {expiry}
+        </Text>
+      </Text>
+    </div>
   );
 }
 
@@ -284,7 +224,7 @@ function APIKeyActions({
 }: {
   messages: APIKeysTableMessages;
   apiKey: APIKey;
-  registerTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   onSelect: (key: APIKey) => void;
 }) {
   const [triggerRef] = useState(() => registerTrigger(apiKey.id));

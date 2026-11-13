@@ -307,9 +307,45 @@ export const faIR: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1601,6 +1637,11 @@ export const faIR: LocalizationResource = {
         'استفاده از کلید عبور، هویت شما را تأیید می‌کند. ممکن است دستگاه شما از شما اثر انگشت، چهره یا قفل صفحه را درخواست کند.',
       title: 'از کلید عبور خود استفاده کنید',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'استفاده از روش دیگر',
       subtitle: 'برای ادامه، رمز عبور فعلی خود را وارد کنید',
@@ -1752,6 +1793,10 @@ export const faIR: LocalizationResource = {
       subtitle:
         'ستفاده از کلید عبور، هویت شما را تأیید می‌کند. ممکن است دستگاه از شما اثر انگشت، چهره یا قفل صفحه را درخواست کند.',
       title: 'از کلید عبور خود استفاده کنید',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'استفاده از روش دیگر',
@@ -2054,6 +2099,7 @@ export const faIR: LocalizationResource = {
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'کد وارد شده نادرست است.',
     form_email_address_blocked:
       'سرویس‌های ایمیل موقت پشتیبانی نمی‌شوند. لطفاً از آدرس ایمیل معمولی خود برای ایجاد حساب استفاده کنید.',
@@ -2127,9 +2173,11 @@ export const faIR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'جلسه از قبل وجود دارد.',
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
     web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',

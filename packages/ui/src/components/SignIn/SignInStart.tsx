@@ -11,7 +11,7 @@ import type {
   SignInCreateParams,
   SignInResource,
 } from '@clerk/shared/types';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -37,7 +37,7 @@ import {
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus } from '../../hooks';
+import { useIsWebAuthnSupported, useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
@@ -111,9 +111,7 @@ function SignInStartInternal(): JSX.Element {
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
-  // @ts-expect-error - This is not a public API
-  const { __internal_isWebAuthnSupported } = clerk;
-  const isWebSupported = (__internal_isWebAuthnSupported ?? isWebAuthnSupported)();
+  const isWebSupported = useIsWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -215,121 +213,6 @@ function SignInStartInternal(): JSX.Element {
       setHasSwitchedByAutofill(true);
     }
   }, [identifierField.value, identifierAttributes]);
-
-  useEffect(() => {
-    if (!organizationTicket) {
-      return;
-    }
-
-    if (clerkStatus === 'sign_up') {
-      const paramsToForward = new URLSearchParams();
-      if (organizationTicket) {
-        paramsToForward.set('__clerk_ticket', organizationTicket);
-      }
-      // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
-      // signUpUrl triggers a full page reload when used with the hash router.
-      void navigate(isCombinedFlow ? `create` : signUpUrl, { searchParams: paramsToForward });
-      return;
-    }
-
-    status.setLoading();
-    card.setLoading();
-    signIn
-      .create({
-        strategy: 'ticket',
-        ticket: organizationTicket,
-      })
-      .then(res => {
-        if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
-          return;
-        }
-        switch (res.status) {
-          case 'needs_first_factor': {
-            if (!shouldHandOffToEnterpriseConnection(res)) {
-              return navigate('factor-one');
-            }
-
-            return authenticateWithEnterpriseSSO();
-          }
-          case 'needs_second_factor':
-            return navigate('factor-two');
-          case 'needs_client_trust':
-            return navigate('client-trust');
-          case 'complete':
-            removeClerkQueryParam('__clerk_ticket');
-            return clerk.setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-              },
-            });
-          default: {
-            console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-            return;
-          }
-        }
-      })
-      .catch(err => {
-        return attemptToRecoverFromSignInError(err);
-      })
-      .finally(() => {
-        // Keep the card in loading state during SSO redirect to prevent UI flicker
-        // This is necessary because there's a brief delay between initiating the SSO flow
-        // and the actual redirect to the external Identity Provider
-        const isRedirectingToSSOProvider = !!hasOnlyEnterpriseSSOFirstFactors(signIn);
-        if (isRedirectingToSSOProvider) {
-          return;
-        }
-
-        status.setIdle();
-        card.setIdle();
-      });
-  }, []);
-
-  useEffect(() => {
-    async function handleOauthError() {
-      const defaultErrorHandler = () => {
-        // Error from server may be too much information for the end user, so set a generic error
-        card.setError('Unable to complete action at this time. If the problem persists please contact support.');
-      };
-
-      const error = signIn?.firstFactorVerification?.error;
-      if (error) {
-        switch (error.code) {
-          case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
-          case ERROR_CODES.OAUTH_ACCESS_DENIED:
-          case ERROR_CODES.NOT_ALLOWED_ACCESS:
-          case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
-          case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
-          case ERROR_CODES.USER_LOCKED:
-          case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
-          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
-          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
-          case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
-          case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
-          case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
-          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
-          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
-          case ERROR_CODES.CAPTCHA_INVALID:
-          case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
-          case ERROR_CODES.FRAUD_ACTION_BLOCKED:
-          case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
-          case ERROR_CODES.USER_BANNED:
-          case ERROR_CODES.USER_DEACTIVATED:
-            card.setError(error);
-            break;
-          default:
-            defaultErrorHandler();
-        }
-
-        // TODO: This is a workaround in order to reset the sign in attempt
-        // so that the oauth error does not persist on full page reloads.
-        void (await signIn.create({}));
-      }
-    }
-
-    void handleOauthError();
-  }, []);
 
   const buildSignInParams = (fields: Array<FormControlState<string>>): SignInCreateParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
@@ -534,8 +417,6 @@ function SignInStartInternal(): JSX.Element {
         return navigate(waitlistUrl);
       }
 
-      clerk.client.signUp[attribute] = identifierField.value;
-
       const redirectUrl = ctx.ssoCallbackUrl;
       const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
@@ -566,6 +447,123 @@ function SignInStartInternal(): JSX.Element {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
   };
+
+  useEffect(() => {
+    if (!organizationTicket) {
+      return;
+    }
+
+    if (clerkStatus === 'sign_up') {
+      const paramsToForward = new URLSearchParams();
+      if (organizationTicket) {
+        paramsToForward.set('__clerk_ticket', organizationTicket);
+      }
+      // We explicitly navigate to 'create' in the combined flow to trigger a client-side navigation. Navigating to
+      // signUpUrl triggers a full page reload when used with the hash router.
+      void navigate(isCombinedFlow ? `create` : signUpUrl, { searchParams: paramsToForward });
+      return;
+    }
+
+    status.setLoading();
+    card.setLoading();
+    signIn
+      .create({
+        strategy: 'ticket',
+        ticket: organizationTicket,
+      })
+      .then(res => {
+        if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+          return;
+        }
+        switch (res.status) {
+          case 'needs_first_factor': {
+            if (!shouldHandOffToEnterpriseConnection(res)) {
+              return navigate('factor-one');
+            }
+
+            return authenticateWithEnterpriseSSO();
+          }
+          case 'needs_second_factor':
+            return navigate('factor-two');
+          case 'needs_client_trust':
+            return navigate('client-trust');
+          case 'complete':
+            removeClerkQueryParam('__clerk_ticket');
+            return clerk.setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session, decorateUrl }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
+              },
+            });
+          default: {
+            console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
+            return;
+          }
+        }
+      })
+      .catch(err => {
+        return attemptToRecoverFromSignInError(err);
+      })
+      .finally(() => {
+        // Keep the card in loading state during SSO redirect to prevent UI flicker
+        // This is necessary because there's a brief delay between initiating the SSO flow
+        // and the actual redirect to the external Identity Provider
+        const isRedirectingToSSOProvider = !!hasOnlyEnterpriseSSOFirstFactors(signIn);
+        if (isRedirectingToSSOProvider) {
+          return;
+        }
+
+        status.setIdle();
+        card.setIdle();
+      });
+  }, []);
+
+  useEffect(() => {
+    async function handleOauthError() {
+      const defaultErrorHandler = () => {
+        // Error from server may be too much information for the end user, so set a generic error
+        card.setError('Unable to complete action at this time. If the problem persists please contact support.');
+      };
+
+      const error = signIn?.firstFactorVerification?.error;
+      if (error) {
+        if (!card.error) {
+          switch (error.code) {
+            case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+            case ERROR_CODES.OAUTH_ACCESS_DENIED:
+            case ERROR_CODES.NOT_ALLOWED_ACCESS:
+            case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
+            case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+            case ERROR_CODES.USER_LOCKED:
+            case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
+            case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
+            case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
+            case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+            case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+            case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+            case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+            case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+            case ERROR_CODES.CAPTCHA_INVALID:
+            case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
+            case ERROR_CODES.FRAUD_ACTION_BLOCKED:
+            case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
+            case ERROR_CODES.USER_BANNED:
+            case ERROR_CODES.USER_DEACTIVATED:
+              card.setError(error);
+              break;
+            default:
+              defaultErrorHandler();
+          }
+        }
+
+        // TODO: This is a workaround in order to reset the sign in attempt
+        // so that the oauth error does not persist on full page reloads.
+        void (await signIn.create({}));
+      }
+    }
+
+    void handleOauthError();
+  }, []);
 
   const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -673,7 +671,11 @@ function SignInStartInternal(): JSX.Element {
                           onActionClicked={switchToNextIdentifier}
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
-                          autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                          autoComplete={
+                            isWebAuthnAutofillSupported
+                              ? `${currentIdentifier.autoComplete} webauthn`
+                              : currentIdentifier.autoComplete
+                          }
                           isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>

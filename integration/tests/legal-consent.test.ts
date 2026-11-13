@@ -13,7 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test('sign up with email and password and legal consent', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -40,7 +40,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test('cant sign up when legal consent checkbox is not checked', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,

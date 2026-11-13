@@ -1,22 +1,27 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { CheckmarkCircle } from '../../icons/glyphs/checkmark-circle';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
+import { InformationCircle } from '../../icons/glyphs/information-circle';
+import { XCircle } from '../../icons/glyphs/x-circle';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { Icon } from '../icon';
-import { descriptionColors, rootColors, styles } from './banner.styles';
+import { iconColors, rootColors, styles } from './banner.styles';
 
-type BannerColor = 'neutral' | 'warning' | 'negative';
+type BannerColor = 'neutral' | 'warning' | 'negative' | 'positive';
 
 const DEFAULT_COLOR: BannerColor = 'neutral';
 
-const ICONS: Record<BannerColor, IconName> = {
-  neutral: 'information-circle',
-  warning: 'exclamation-circle',
-  negative: 'exclamation-circle',
+const ICONS: Record<BannerColor, IconComponent> = {
+  neutral: InformationCircle,
+  warning: ExclamationCircle,
+  negative: XCircle,
+  positive: CheckmarkCircle,
 };
 
 const BannerColorContext = React.createContext<BannerColor>(DEFAULT_COLOR);
@@ -44,8 +49,8 @@ const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBa
       children: (
         <>
           <Icon
-            name={ICONS[color]}
-            xstyle={styles.icon}
+            glyph={ICONS[color]}
+            xstyle={[styles.icon, iconColors[color]]}
             {...themeProps('banner-icon')}
           />
           <div {...mergeStyleProps(themeProps('banner-content'), stylex.props(reset.base, styles.content))}>
@@ -92,7 +97,7 @@ const Description = React.forwardRef<HTMLParagraphElement, BannerDescriptionProp
     props: {
       ...mergeStyleProps(
         themeProps('banner-description', { color }),
-        stylex.props(reset.base, styles.description, descriptionColors[color], xstyle),
+        stylex.props(reset.base, styles.description, xstyle),
         rest,
       ),
     },

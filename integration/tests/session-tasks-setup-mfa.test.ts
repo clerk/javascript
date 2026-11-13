@@ -15,13 +15,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
     });
 
     test.afterEach(async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.signOut();
       await u.page.context().clearCookies();
     });
 
     test('setup MFA with new phone number - happy path', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const user = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -56,7 +56,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
     });
 
     test('setup MFA with existing phone number - happy path', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const user = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -93,7 +93,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
     });
 
     test('setup MFA with invalid phone number - error handling', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const user = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -134,7 +134,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
     });
 
     test('setup MFA with invalid verification code - error handling', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const user = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPassword: true,
@@ -167,7 +167,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
     });
 
     test('can navigate back during MFA setup', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const user = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -205,7 +205,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
     });
 
     test('can sign in as a different account from the two-step verification step', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const user = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,

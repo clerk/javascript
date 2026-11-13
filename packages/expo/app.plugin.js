@@ -1,27 +1,15 @@
 /**
- * Expo config plugin for @clerk/clerk-expo
- * Automatically configures iOS and Android to work with Clerk native components
+ * Expo config plugin for @clerk/expo
  *
  * When this plugin is used:
- * 1. iOS is configured with the required deployment target and metadata
- * 2. Android is configured with packaging exclusions for dependencies
- *
- * Native modules and views are registered via Expo Modules autolinking.
+ * 1. Android registers the hosted auth callback intent filter
+ * 2. iOS gets the Sign in with Apple entitlement and, when configured, the Face ID usage description
+ * 3. If @clerk/expo-native-components is installed, its config plugin is applied for the Clerk native SDKs
  */
-const {
-  AndroidConfig,
-  withXcodeProject,
-  withDangerousMod,
-  withInfoPlist,
-  withAppBuildGradle,
-  withAndroidManifest,
-  withEntitlementsPlist,
-} = require('@expo/config-plugins');
-const path = require('path');
-const fs = require('fs');
-const packageJson = require('./package.json');
+const { AndroidConfig, withAndroidManifest, withEntitlementsPlist, withInfoPlist } = require('@expo/config-plugins');
 
-const CLERK_MIN_IOS_VERSION = '17.0';
+const CLERK_EXPO_NATIVE = '@clerk/expo-native-components';
+const CLERK_EXPO_NATIVE_OPTIONS = ['keychainService', 'theme'];
 
 const addHostedAuthIntentFilter = (mainActivity, packageName) => {
   const callbackHost = `${packageName}.hosted-callback`;
@@ -52,162 +40,13 @@ const addHostedAuthIntentFilter = (mainActivity, packageName) => {
   mainActivity['intent-filter'] = intentFilters;
 };
 
-const withClerkIOS = config => {
-  console.log('✅ Clerk iOS plugin loaded');
-
-  // IMPORTANT: Set iOS deployment target in Podfile.properties.json BEFORE pod install
-  // This ensures ClerkExpo pod gets installed (it requires iOS 17.0)
-  config = withDangerousMod(config, [
-    'ios',
-    async config => {
-      const podfilePropertiesPath = path.join(config.modRequest.platformProjectRoot, 'Podfile.properties.json');
-
-      let properties = {};
-      if (fs.existsSync(podfilePropertiesPath)) {
-        try {
-          properties = JSON.parse(fs.readFileSync(podfilePropertiesPath, 'utf8'));
-        } catch {
-          // If file exists but is invalid JSON, start fresh
-        }
-      }
-
-      // Set the iOS deployment target
-      if (
-        !properties['ios.deploymentTarget'] ||
-        parseFloat(properties['ios.deploymentTarget']) < parseFloat(CLERK_MIN_IOS_VERSION)
-      ) {
-        properties['ios.deploymentTarget'] = CLERK_MIN_IOS_VERSION;
-        fs.writeFileSync(podfilePropertiesPath, JSON.stringify(properties, null, 2) + '\n');
-        console.log(`✅ Set ios.deploymentTarget to ${CLERK_MIN_IOS_VERSION} in Podfile.properties.json`);
-      }
-
-      return config;
-    },
-  ]);
-
-  // First update the iOS deployment target to 17.0 (required by Clerk iOS SDK)
-  config = withXcodeProject(config, config => {
-    const xcodeProject = config.modResults;
-
-    try {
-      // Update deployment target in all build configurations
-      const buildConfigs = xcodeProject.hash.project.objects.XCBuildConfiguration || {};
-
-      for (const [uuid, buildConfig] of Object.entries(buildConfigs)) {
-        if (buildConfig && buildConfig.buildSettings) {
-          const currentTarget = buildConfig.buildSettings.IPHONEOS_DEPLOYMENT_TARGET;
-          if (currentTarget && parseFloat(currentTarget) < parseFloat(CLERK_MIN_IOS_VERSION)) {
-            buildConfig.buildSettings.IPHONEOS_DEPLOYMENT_TARGET = CLERK_MIN_IOS_VERSION;
-          }
-        }
-      }
-
-      console.log(`✅ Updated iOS deployment target to ${CLERK_MIN_IOS_VERSION}`);
-    } catch (error) {
-      console.error('❌ Error updating deployment target:', error.message);
-    }
-
-    return config;
-  });
-
-  config = withInfoPlist(config, modConfig => {
-    modConfig.modResults.ClerkExpoVersion = packageJson.version;
-    return modConfig;
-  });
-
-  return config;
-};
-
-/**
- * Add packaging exclusions to Android app build.gradle to resolve
- * duplicate META-INF file conflicts from clerk-android dependencies.
- */
-const withClerkAndroid = config => {
-  console.log('✅ Clerk Android plugin loaded');
-
-  config = withAndroidManifest(config, modConfig => {
+const withClerkHostedAuthCallback = config => {
+  return withAndroidManifest(config, modConfig => {
     const packageName = config.android?.package;
     if (packageName) {
       const mainActivity = AndroidConfig.Manifest.getMainActivityOrThrow(modConfig.modResults);
       addHostedAuthIntentFilter(mainActivity, packageName);
     }
-    return modConfig;
-  });
-
-  return withAppBuildGradle(config, modConfig => {
-    let buildGradle = modConfig.modResults.contents;
-
-    // --- META-INF exclusion ---
-    if (!buildGradle.includes('META-INF/versions/9/OSGI-INF/MANIFEST.MF')) {
-      // AGP 8+ uses `packaging` DSL, older versions use `packagingOptions`
-      const packagingMatch = buildGradle.match(/packaging\s*\{/) || buildGradle.match(/packagingOptions\s*\{/);
-      if (packagingMatch) {
-        const blockName = packagingMatch[0].trim().replace(/\s*\{$/, '');
-        const resourcesExclude = `${blockName} {
-        // Clerk Android SDK: exclude duplicate META-INF files
-        resources {
-            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']
-        }`;
-
-        buildGradle = buildGradle.replace(new RegExp(`${blockName}\\s*\\{`), resourcesExclude);
-      } else {
-        // No packaging block found; append one at the end of the android block
-        const androidBlockEnd = buildGradle.lastIndexOf('}');
-        if (androidBlockEnd !== -1) {
-          const packagingBlock = `\n    packaging {\n        resources {\n            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']\n        }\n    }\n`;
-          buildGradle = buildGradle.slice(0, androidBlockEnd) + packagingBlock + buildGradle.slice(androidBlockEnd);
-        }
-      }
-      console.log('✅ Clerk Android packaging exclusions added');
-    }
-
-    // --- Kotlin metadata version check skip ---
-    if (!buildGradle.includes('-Xskip-metadata-version-check')) {
-      const kotlinOptionsMatch = buildGradle.match(/kotlinOptions\s*\{/);
-      if (kotlinOptionsMatch) {
-        buildGradle = buildGradle.replace(
-          /kotlinOptions\s*\{/,
-          `kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']`,
-        );
-      } else {
-        const androidMatch = buildGradle.match(/android\s*\{/);
-        if (androidMatch) {
-          buildGradle = buildGradle.replace(
-            /android\s*\{/,
-            `android {\n    kotlinOptions {\n        // Clerk: allow reading metadata from newer Kotlin versions\n        freeCompilerArgs += ['-Xskip-metadata-version-check']\n    }`,
-          );
-        }
-      }
-      console.log('✅ Clerk Android Kotlin metadata version check skip added');
-    }
-
-    modConfig.modResults.contents = buildGradle;
-    return modConfig;
-  });
-};
-
-/**
- * Combined Clerk Expo plugin
- *
- * When this plugin is configured in app.json/app.config.js:
- * 1. iOS gets the deployment target and metadata required by Clerk native views
- * 2. Android gets packaging exclusions for dependency conflicts
- *
- * Native modules and views are registered via Expo Modules autolinking.
- */
-/**
- * Write ClerkKeychainService to Info.plist when keychainService is provided.
- * This allows extension apps (watch, widget, app clip) to share the same
- * keychain entry as the main app by using a custom service identifier.
- */
-const withClerkKeychainService = (config, { keychainService } = {}) => {
-  if (!keychainService) {
-    return config;
-  }
-
-  return withInfoPlist(config, modConfig => {
-    modConfig.modResults.ClerkKeychainService = keychainService;
-    console.log(`✅ Set ClerkKeychainService in Info.plist: ${keychainService}`);
     return modConfig;
   });
 };
@@ -243,145 +82,75 @@ const withClerkAppleSignIn = config => {
   });
 };
 
+const resolveClerkExpoNativePlugin = config => {
+  try {
+    const paths = [config._internal?.projectRoot, process.cwd()].filter(Boolean);
+    return require(require.resolve(`${CLERK_EXPO_NATIVE}/app.plugin.js`, { paths }));
+  } catch {
+    return null;
+  }
+};
+
+const getListedPluginProps = (config, name) => {
+  for (const entry of config.plugins || []) {
+    if (entry === name) {
+      return {};
+    }
+    if (Array.isArray(entry) && entry[0] === name) {
+      return entry[1] || {};
+    }
+  }
+  return {};
+};
+
 /**
- * Apply a custom theme to Clerk native components (iOS + Android).
- *
- * Accepts a `theme` prop pointing to a JSON file with optional keys:
- *   - colors: { primary, background, input, danger, success, warning,
- *               foreground, mutedForeground, primaryForeground, inputForeground,
- *               neutral, border, ring, muted, shadow, secondaryButtonBackground,
- *               secondaryButtonForeground }  (hex color strings)
- *   - darkColors: same keys as colors (for dark mode)
- *   - design: { fontFamily: string, borderRadius: number }
- *
- * iOS: Embeds the parsed JSON into Info.plist under key "ClerkTheme".
- * Android: Copies the JSON file to android/app/src/main/assets/clerk_theme.json.
+ * Apply the @clerk/expo-native-components config plugin when it is installed, so apps that only list
+ * "@clerk/expo" keep the iOS deployment target and native SDK configuration they need.
  */
-const VALID_COLOR_KEYS = [
-  'primary',
-  'background',
-  'input',
-  'danger',
-  'success',
-  'warning',
-  'foreground',
-  'mutedForeground',
-  'primaryForeground',
-  'inputForeground',
-  'neutral',
-  'border',
-  'ring',
-  'muted',
-  'shadow',
-  'secondaryButtonBackground',
-  'secondaryButtonForeground',
-];
+const withClerkExpoNativeComponents = (config, props = {}, resolvePlugin = resolveClerkExpoNativePlugin) => {
+  const nativeProps = Object.fromEntries(
+    CLERK_EXPO_NATIVE_OPTIONS.filter(option => props[option] !== undefined).map(option => [option, props[option]]),
+  );
+  const nativeOptionNames = Object.keys(nativeProps)
+    .map(option => `"${option}"`)
+    .join(', ');
 
-const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
-
-function isPlainObject(value) {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function validateThemeJson(theme) {
-  if (!isPlainObject(theme)) {
-    throw new Error('Clerk theme: theme JSON must be a plain object');
-  }
-
-  const validateColors = (colors, label) => {
-    if (!isPlainObject(colors)) {
-      throw new Error(`Clerk theme: ${label} must be an object`);
+  if (config._internal?.pluginHistory?.[CLERK_EXPO_NATIVE]) {
+    if (nativeOptionNames) {
+      console.warn(
+        `⚠️  Clerk: The following "@clerk/expo" plugin options are ignored because the "${CLERK_EXPO_NATIVE}" plugin already ran: ${nativeOptionNames}. Pass them to the "${CLERK_EXPO_NATIVE}" plugin instead.`,
+      );
     }
-    for (const [key, value] of Object.entries(colors)) {
-      if (!VALID_COLOR_KEYS.includes(key)) {
-        console.warn(`⚠️  Clerk theme: unknown color key "${key}" in ${label}, ignoring`);
-        continue;
-      }
-      if (typeof value !== 'string' || !HEX_COLOR_REGEX.test(value)) {
-        throw new Error(`Clerk theme: invalid hex color for ${label}.${key}: "${value}"`);
-      }
-    }
-  };
-
-  if (theme.colors != null) validateColors(theme.colors, 'colors');
-  if (theme.darkColors != null) validateColors(theme.darkColors, 'darkColors');
-
-  if (theme.design != null) {
-    if (!isPlainObject(theme.design)) {
-      throw new Error(`Clerk theme: design must be an object`);
-    }
-    if (theme.design.fontFamily != null && typeof theme.design.fontFamily !== 'string') {
-      throw new Error(`Clerk theme: design.fontFamily must be a string`);
-    }
-    if (theme.design.borderRadius != null && typeof theme.design.borderRadius !== 'number') {
-      throw new Error(`Clerk theme: design.borderRadius must be a number`);
-    }
-  }
-}
-
-const withClerkTheme = (config, props = {}) => {
-  const { theme } = props;
-  if (!theme) return config;
-
-  // Resolve the theme file path relative to the project root
-  const themePath = path.resolve(theme);
-  if (!fs.existsSync(themePath)) {
-    console.warn(`⚠️  Clerk theme file not found: ${themePath}, skipping theme`);
     return config;
   }
 
-  let themeJson;
-  try {
-    themeJson = JSON.parse(fs.readFileSync(themePath, 'utf8'));
-    validateThemeJson(themeJson);
-  } catch (e) {
-    throw new Error(`Clerk theme: failed to parse ${themePath}: ${e.message}`);
+  const clerkExpoNativePlugin = resolvePlugin(config);
+  if (!clerkExpoNativePlugin) {
+    if (nativeOptionNames) {
+      console.warn(
+        `⚠️  Clerk: The following "@clerk/expo" plugin options require ${CLERK_EXPO_NATIVE} and are ignored: ${nativeOptionNames}. Install it with \`npx expo install ${CLERK_EXPO_NATIVE}\` and add "${CLERK_EXPO_NATIVE}" to the plugins array in your app config.`,
+      );
+    }
+    return config;
   }
 
-  // iOS: Embed theme in Info.plist under "ClerkTheme"
-  config = withInfoPlist(config, modConfig => {
-    modConfig.modResults.ClerkTheme = themeJson;
-    console.log('✅ Embedded Clerk theme in Info.plist');
-    return modConfig;
-  });
-
-  // Android: Copy theme JSON to assets
-  config = withDangerousMod(config, [
-    'android',
-    async config => {
-      const assetsDir = path.join(config.modRequest.platformProjectRoot, 'app', 'src', 'main', 'assets');
-      if (!fs.existsSync(assetsDir)) {
-        fs.mkdirSync(assetsDir, { recursive: true });
-      }
-      const destPath = path.join(assetsDir, 'clerk_theme.json');
-      fs.writeFileSync(destPath, JSON.stringify(themeJson, null, 2) + '\n');
-      console.log('✅ Copied Clerk theme to Android assets');
-      return config;
-    },
-  ]);
-
-  return config;
+  return clerkExpoNativePlugin(config, { ...nativeProps, ...getListedPluginProps(config, CLERK_EXPO_NATIVE) });
 };
 
 const withClerkExpo = (config, props = {}) => {
   const { appleSignIn = true } = props;
-  config = withClerkIOS(config);
   if (appleSignIn !== false) {
     config = withClerkAppleSignIn(config);
   }
-  config = withClerkAndroid(config);
-  config = withClerkKeychainService(config, props);
+  config = withClerkHostedAuthCallback(config);
   config = withClerkFaceIDPermission(config, props);
-  config = withClerkTheme(config, props);
+  config = withClerkExpoNativeComponents(config, props);
   return config;
 };
 
 module.exports = withClerkExpo;
 module.exports._testing = {
   addHostedAuthIntentFilter,
+  withClerkExpoNativeComponents,
   withClerkFaceIDPermission,
-  validateThemeJson,
-  isPlainObject,
-  VALID_COLOR_KEYS,
-  HEX_COLOR_REGEX,
 };

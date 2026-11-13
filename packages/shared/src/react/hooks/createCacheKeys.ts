@@ -8,7 +8,7 @@ export function createCacheKeys<
   T extends Record<string, unknown> = Record<string, unknown>,
   U extends Record<string, unknown> | undefined = undefined,
 >(params: {
-  stablePrefix: ResourceCacheStableKey | __internal_ResourceCacheStableKey;
+  stablePrefix: ResourceCacheStableKey | __internal_ResourceCacheStableKey | `mosaic-${string}`;
   authenticated: boolean;
   tracked: T;
   untracked: U extends { args: Params } ? U : never;

@@ -1,0 +1,37 @@
+import * as Stories from './user-profile-profile-section.stories';
+
+# UserProfileProfileSection
+
+The profile image, name and username, composed with `Section`. Upload and remove act on the image in
+place; Edit name opens a dialog for the first and last name, and Edit username opens one seeded with
+the saved username. With no username yet, the row offers Add instead.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  ]}
+/>
+
+## Name managed by a connection
+
+An enterprise connection owns the name, so the Name row names who manages it in place of an edit
+action. The connection's logo leads the label, or a generic lock when it ships none.
+
+<Story name='NameManagedByConnection' storyModule={Stories} />
+
+## Edit name failure
+
+Every save is rejected, so the dialog shows the form error and the field error together.
+
+<Story name='EditNameFails' storyModule={Stories} />
+
+## Edit username failure
+
+Every save is rejected, so the dialog shows the form error and the field error together.
+
+<Story name='EditUsernameFails' storyModule={Stories} />

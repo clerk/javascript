@@ -37,7 +37,7 @@ export function useAccessibleDescriptionWarning(
       const described = describedBy
         ?.split(/\s+/)
         .filter(Boolean)
-        .some(id => node.ownerDocument.getElementById(id)?.textContent?.trim());
+        .some(id => node.ownerDocument.getElementById(id)?.textContent.trim());
       if (described) {
         return;
       }

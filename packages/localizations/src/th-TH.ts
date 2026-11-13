@@ -306,9 +306,45 @@ export const thTH: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1593,6 +1629,11 @@ export const thTH: LocalizationResource = {
       subtitle: 'การใช้พาสคีย์ของคุณยืนยันตัวตนของคุณ อุปกรณ์ของคุณอาจขอลายนิ้วมือ ใบหน้า หรือการล็อคหน้าจอ',
       title: 'ใช้พาสคีย์ของคุณ',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'ใช้วิธีอื่น',
       subtitle: 'ใส่รหัสผ่านปัจจุบันของคุณเพื่อดำเนินการต่อ',
@@ -1742,6 +1783,10 @@ export const thTH: LocalizationResource = {
     passkey: {
       subtitle: 'การใช้พาสคีย์ของคุณยืนยันว่าเป็นคุณ อุปกรณ์ของคุณอาจขอลายนิ้วมือ ใบหน้า หรือการล็อคหน้าจอ',
       title: 'ใช้พาสคีย์ของคุณ',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'ใช้วิธีอื่น',
@@ -2042,6 +2087,7 @@ export const thTH: LocalizationResource = {
     captcha_invalid: undefined,
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked: 'บริการอีเมลชั่วคราวไม่ได้รับการสนับสนุน กรุณาใช้อีเมลปกติของคุณเพื่อสร้างบัญชี',
     form_identifier_exists__email_address: undefined,
@@ -2114,9 +2160,11 @@ export const thTH: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
     web3_signature_request_rejected: 'คุณได้ปฏิเสธคำขอการลงลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',

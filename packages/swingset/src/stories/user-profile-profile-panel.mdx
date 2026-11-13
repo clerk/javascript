@@ -15,41 +15,34 @@ import * as UserProfileProfilePanelStories from './user-profile-profile-panel.st
 
 ## Usage
 
+`UserProfileProfilePanel` renders the Account title and every account section. Each section shows itself only when the signed-in user and the instance settings call for it.
+
 ```tsx
-import { useRef } from 'react';
-import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { UserProfileConnectedAccountsSection } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section';
-import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
 
-const titleRef = useRef<HTMLDivElement>(null);
+<UserProfileProfilePanel />;
+```
 
-<UserProfileProfilePanelView
-  allowMultipleAccounts={allowMultipleAccounts}
-  imageUrl={user.imageUrl}
-  name={user.fullName ?? ''}
-  username={user.username ?? ''}
-  emails={user.emailAddresses.map(email => ({
-    id: email.id,
-    value: email.emailAddress,
-    isDefault: email.id === user.primaryEmailAddressId,
-    isVerified: email.verification.status === 'verified',
-  }))}
-  phones={user.phoneNumbers.map(phone => ({
-    id: phone.id,
-    value: phone.phoneNumber,
-    isDefault: phone.id === user.primaryPhoneNumberId,
-    isVerified: phone.verification.status === 'verified',
-  }))}
-  titleRef={titleRef}
-  connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
-  web3WalletsSlot={<UserProfileWeb3WalletsSectionView wallets={wallets} onRemove={removeWeb3Wallet} fallbackFocus={() => titleRef.current} />}
-  onVerifyEmail={verifyEmail}
-  onSendEmailCode={sendEmailCode}
-  onVerifyEmailCode={verifyEmailCode}
-  onSetPrimaryEmail={setPrimaryEmail}
-  onRemoveEmail={removeEmail}
-  onVerifyPhone={verifyPhone}
-  onSetPrimaryPhone={setPrimaryPhone}
-  onRemovePhone={removePhone}
-/>
+Pass sections as children to choose which ones render and in what order.
+
+```tsx
+import { UserProfileEmailSection } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section';
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+import { UserProfileProfileSection } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section';
+
+<UserProfileProfilePanel>
+  <UserProfileProfileSection />
+  <UserProfileEmailSection />
+</UserProfileProfilePanel>;
+```
+
+Wrap the panel in `UserProfileProvider` to set `additionalOAuthScopes` for connected accounts, or `mode='modal'` when the panel renders inside a modal.
+
+```tsx
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+import { UserProfileProvider } from '@clerk/mosaic/features/user-profile/user-profile.provider';
+
+<UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+  <UserProfileProfilePanel />
+</UserProfileProvider>;
 ```
