@@ -39,6 +39,7 @@ export type SignInStep =
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
   | { kind: 'choice'; purpose: 'accounts'; options: readonly SignInAccount[] }
+  | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
   | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }

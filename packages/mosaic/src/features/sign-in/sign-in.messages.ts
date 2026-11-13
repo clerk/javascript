@@ -33,6 +33,10 @@ export const signInMessages = {
     description: 'Enter your phone number to get a verification code on {provider}.',
     label: '{provider} phone number',
   },
+  wallets: {
+    title: 'Sign in with Solana',
+    description: 'Select a wallet below to sign in',
+  },
   accounts: {
     title: 'Choose an account',
     description: 'Select the account with which you wish to continue.',

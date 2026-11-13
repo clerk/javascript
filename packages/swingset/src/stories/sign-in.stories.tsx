@@ -842,6 +842,15 @@ export function ChoiceAccounts() {
   );
 }
 
+const wallets: SignInProvider[] = [
+  { id: 'phantom', name: 'Phantom', iconUrl: 'https://img.clerk.com/static/phantom.svg' },
+  { id: 'metamask', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+];
+
+export function ChoiceWallets() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: wallets }} />;
+}
+
 export function ChoiceResetMethods() {
   return <StepPanel step={{ kind: 'choice', purpose: 'reset-methods', options: resetFactors }} />;
 }

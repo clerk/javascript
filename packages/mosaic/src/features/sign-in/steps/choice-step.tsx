@@ -11,6 +11,7 @@ import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import type { SignInFactor, SignInStep } from '../sign-in.types';
 import { SignInAccounts } from './sign-in-accounts';
 import { SignInEnterpriseConnections } from './sign-in-enterprise-connections';
+import { SignInWallets } from './sign-in-wallets';
 
 const factorIcon = {
   password: SecurityLockSquare,
@@ -64,6 +65,19 @@ export function ChoiceStep({
   onSignOutAll,
   focusRef,
 }: ChoiceStepProps) {
+  if (step.purpose === 'wallets') {
+    return (
+      <SignInWallets
+        focusRef={focusRef}
+        wallets={step.options}
+        globalErrorMessage={globalErrorMessage}
+        pendingWalletId={pendingProviderId}
+        onSelectWallet={onSelectProvider}
+        onBack={onBack}
+      />
+    );
+  }
+
   if (step.purpose === 'accounts') {
     return (
       <SignInAccounts

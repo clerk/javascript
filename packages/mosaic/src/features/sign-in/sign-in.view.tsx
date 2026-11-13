@@ -220,7 +220,13 @@ export function SignInView({
               </Flow.Step>
 
               <Flow.Step
-                ids={['choice:methods', 'choice:reset-methods', 'choice:enterprise-connections', 'choice:accounts']}
+                ids={[
+                  'choice:methods',
+                  'choice:reset-methods',
+                  'choice:enterprise-connections',
+                  'choice:accounts',
+                  'choice:wallets',
+                ]}
               >
                 {current.kind === 'choice' ? (
                   <ChoiceStep
