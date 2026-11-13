@@ -3,6 +3,7 @@ import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
 import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
 import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
+import { logsTableMessages } from '../features/logs/logs-table.messages';
 import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
@@ -82,6 +83,7 @@ export const mosaicMessages = {
   },
   inviteMembersButton: inviteMembersButtonMessages,
   apiKeys: apiKeysTableMessages,
+  logsTable: logsTableMessages,
   createOrganization: createOrganizationMessages,
   organizationList: organizationListMessages,
   taskChooseOrganization: taskChooseOrganizationMessages,

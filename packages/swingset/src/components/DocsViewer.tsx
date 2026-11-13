@@ -50,6 +50,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+    'organization-profile-logs-panel': dynamic(() => import('../stories/organization-profile-logs-panel.mdx')),
   },
   misc: {
     'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
@@ -60,6 +61,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-avatar': dynamic(() => import('../stories/user-avatar.mdx')),
     'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
+    'logs-table': dynamic(() => import('../stories/logs-table.mdx')),
     'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
