@@ -11,8 +11,14 @@ describe('ArtifactsAPI', () => {
     const metadata = {
       protocol_version: '0.4',
       organization: { name: 'Company', domain: 'company.example' },
-      auth: { issuer: frontendApi, scopes: { 'poppy:browser-sign-in': 'Full website access' } },
-      extension: { unchanged: true },
+      web: { browser_session_endpoint: `${frontendApi}/v1/poppy/browser_sessions`, unscoped: true },
+      auth: {
+        issuer: frontendApi,
+        scopes: {
+          'poppy:browser-sign-in': 'Browse the website, and see and do anything your account can do there.',
+          profile: 'Your basic profile information',
+        },
+      },
     };
     server.use(
       http.get('https://api.clerk.test/v1/artifacts/well-known-poppy', ({ request }) => {
@@ -28,23 +34,41 @@ describe('ArtifactsAPI', () => {
     await expect(artifacts.__experimental_getPoppyJson()).resolves.toEqual(metadata);
   });
 
-  it.each([401, 404, 503])('propagates Backend API artifact status %s', async status => {
+  it.each([
+    {
+      status: 401,
+      code: 'clerk_key_invalid',
+      message: 'The provided Clerk Secret Key is invalid. Make sure that your Clerk Secret Key is correct.',
+      long_message: 'The provided Clerk Secret Key is invalid. Make sure that your Clerk Secret Key is correct.',
+    },
+    { status: 404, code: 'resource_not_found', message: 'not found', long_message: 'Resource not found' },
+    {
+      status: 500,
+      code: 'internal_clerk_error',
+      message: 'Oops, an unexpected error occurred',
+      long_message: "There was an internal error on our servers. We've been notified and are working on fixing it.",
+    },
+    {
+      status: 503,
+      code: 'service_unavailable',
+      message: 'Service unavailable',
+      long_message: 'Service unavailable',
+    },
+  ])('propagates Backend API artifact status $status ($code)', async ({ status, ...error }) => {
+    const traceId = 'trace_id_artifact';
     server.use(
       http.get('https://api.clerk.test/v1/artifacts/well-known-poppy', () =>
-        HttpResponse.json(
-          {
-            errors: [
-              { code: 'artifact_unavailable', message: 'Artifact unavailable', long_message: 'Artifact unavailable' },
-            ],
-          },
-          { status },
-        ),
+        HttpResponse.json({ errors: [error], clerk_trace_id: traceId }, { status }),
       ),
     );
     const { artifacts } = createBackendApiClient({
       apiUrl: 'https://api.clerk.test',
       secretKey: 'sk_live_example',
     });
-    await expect(artifacts.__experimental_getPoppyJson()).rejects.toMatchObject({ status });
+    await expect(artifacts.__experimental_getPoppyJson()).rejects.toMatchObject({
+      status,
+      clerkTraceId: traceId,
+      errors: [{ code: error.code, message: error.message, longMessage: error.long_message }],
+    });
   });
 });
