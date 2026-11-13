@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -91,4 +93,10 @@ const Actions = React.forwardRef<HTMLDivElement, EmptyStateActionsProps>(functio
   });
 });
 
-export const EmptyState = { Root, Icon: EmptyStateIcon, Label, Description, Actions };
+export {
+  Root as EmptyStateRoot,
+  EmptyStateIcon,
+  Label as EmptyStateLabel,
+  Description as EmptyStateDescription,
+  Actions as EmptyStateActions,
+};

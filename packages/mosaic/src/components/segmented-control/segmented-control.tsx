@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -61,7 +63,4 @@ const Item = React.forwardRef<HTMLButtonElement, SegmentedControlItemProps>(func
   );
 });
 
-export const SegmentedControl = {
-  Root,
-  Item,
-};
+export { Root as SegmentedControlRoot, Item as SegmentedControlItem };

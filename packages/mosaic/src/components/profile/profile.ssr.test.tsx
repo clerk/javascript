@@ -5,7 +5,7 @@ import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../mosaic-provider';
-import { Profile } from './profile';
+import { Profile } from '.';
 
 describe('Profile SSR', () => {
   it('names the page in the page title heading on the server', () => {

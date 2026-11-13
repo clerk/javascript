@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { Tooltip } from './tooltip';
+import { Tooltip } from '.';
 
 afterEach(() => cleanup());
 

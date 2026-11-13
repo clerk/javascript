@@ -9,7 +9,7 @@ import { Button } from '../button';
 import { Field } from '../field';
 import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
-import { Combobox } from './combobox';
+import { Combobox } from '.';
 
 function FloatingCombobox(props?: { onValueChange?: (value: string | null) => void; anchor?: HTMLElement }) {
   return (

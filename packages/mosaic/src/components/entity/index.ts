@@ -1,3 +1,3 @@
 'use client';
 
-export { Entity } from './entity';
+export * as Entity from './entity.parts';

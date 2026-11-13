@@ -1,4 +1,4 @@
-export { ActionBar } from './action-bar';
+export * as ActionBar from './action-bar.parts';
 export type {
   ActionBarActionProps,
   ActionBarCountProps,

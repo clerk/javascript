@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PortalProvider } from '../../primitives/portal';
 import { Dialog } from '../dialog';
 import { Menu } from '../menu';
-import { ActionBar } from './action-bar';
+import { ActionBar } from '.';
 
 const testStyles = stylex.create({
   positioner: {

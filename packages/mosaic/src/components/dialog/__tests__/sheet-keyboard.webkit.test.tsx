@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { Card } from '../../card';
-import { Dialog } from '../dialog';
+import { Dialog } from '..';
 
 const KEYBOARD = 336;
 

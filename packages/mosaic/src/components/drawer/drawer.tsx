@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -118,17 +120,11 @@ const Description = React.forwardRef<HTMLParagraphElement, DrawerDescriptionProp
   );
 });
 
-/**
- * A bottom sheet: `Drawer.Root` holds the state, `Drawer.Trigger` opens it, and `Drawer.Popup`
- * renders the sheet with its scrim, portal and grip. `Drawer.Title` and `Drawer.Description` name
- * and describe it; `Drawer.Close` dismisses it from inside. Drag it down, press Escape, or press
- * outside to dismiss.
- */
-export const Drawer = {
-  Root,
-  Popup,
-  Trigger,
-  Title,
-  Description,
-  Close,
+export {
+  Root as DrawerRoot,
+  Popup as DrawerPopup,
+  Trigger as DrawerTrigger,
+  Title as DrawerTitle,
+  Description as DrawerDescription,
+  Close as DrawerClose,
 };

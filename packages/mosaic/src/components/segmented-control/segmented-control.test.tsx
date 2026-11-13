@@ -4,7 +4,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DirectionProvider } from '../../primitives/direction-provider';
-import { SegmentedControl } from './segmented-control';
+import { SegmentedControl } from '.';
 
 function BillingPeriod(props: Partial<React.ComponentProps<typeof SegmentedControl.Root>>) {
   return (

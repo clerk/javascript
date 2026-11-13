@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -112,11 +114,11 @@ const Panels = React.forwardRef<HTMLDivElement, TabsPanelsProps>(function Mosaic
   });
 });
 
-export const Tabs = {
-  Root,
-  List,
-  Tab,
-  Trigger,
-  Panels,
-  Panel,
+export {
+  Root as TabsRoot,
+  List as TabsList,
+  Tab as TabsTab,
+  Trigger as TabsTrigger,
+  Panels as TabsPanels,
+  Panel as TabsPanel,
 };

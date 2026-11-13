@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -42,9 +44,6 @@ const Popup = React.forwardRef<HTMLDivElement, TooltipPopupProps>(function Toolt
   );
 });
 
-export const Tooltip = {
-  Root: Primitive.Root,
-  Group: Primitive.Group,
-  Trigger,
-  Popup,
-};
+const TooltipRoot = Primitive.Root;
+const TooltipGroup = Primitive.Group;
+export { TooltipRoot, TooltipGroup, Trigger as TooltipTrigger, Popup as TooltipPopup };

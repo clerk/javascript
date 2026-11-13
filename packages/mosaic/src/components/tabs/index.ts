@@ -1,4 +1,4 @@
-export { Tabs } from './tabs';
+export * as Tabs from './tabs.parts';
 export type {
   TabsListProps,
   TabsPanelProps,

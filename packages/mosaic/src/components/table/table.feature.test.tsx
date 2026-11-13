@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../mosaic-provider';
-import { Table } from './table';
+import { Table } from '.';
 
 function renderNarrowTable(minWidth: string) {
   return render(
