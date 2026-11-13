@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -66,7 +68,6 @@ const Step = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(
   );
 });
 
-/** A controlled set of screens driven by opaque caller state. */
-export const Flow = { Root, Step };
+export { Root as FlowRoot, Step as FlowStep };
 
 export type { FlowDirection };
