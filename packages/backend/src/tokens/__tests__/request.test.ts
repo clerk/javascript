@@ -7,8 +7,10 @@ import {
   mockInvalidSignatureJwt,
   mockJwks,
   mockJwt,
+  mockJwtHeader,
   mockJwtPayload,
   mockM2MJwtPayload,
+  pemEncodedPublicKey,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -19,6 +21,7 @@ import {
 } from '../../fixtures/machine';
 import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
+import { getCookieSuffix } from '../../util/shared';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
 import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN, JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
@@ -507,6 +510,122 @@ describe('tokens.authenticateRequest(options)', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.clearAllMocks();
+  });
+
+  describe('agent Session JWT authentication', () => {
+    const identity = { session_id: 'protocol-session', client_id: 'https://agent.example', user_id: 'pseudonym' };
+
+    it.each([
+      { name: 'valid bearer token', cookie: false, expired: false },
+      { name: 'valid session cookie', cookie: true, expired: false },
+      { name: 'expired bearer token', cookie: false, expired: true },
+    ])('uses normal JWT verification for $name without a backend call', async ({ cookie, expired }) => {
+      const { data: jwt } = await signJwt(
+        {
+          ...mockJwtPayload,
+          ...(expired ? { exp: mockJwtPayload.iat - 10 } : {}),
+          agt: { id: identity.client_id, poppy: identity },
+        },
+        signingJwks,
+        { algorithm: 'RS256', header: { ...mockJwtHeader } },
+      );
+      const fetch = vi.spyOn(globalThis, 'fetch');
+      const request = cookie
+        ? mockRequestWithCookies({}, { __session: jwt, __client_uat: mockJwtPayload.iat })
+        : mockRequestWithHeaderAuth({ authorization: `Bearer ${jwt}` });
+      const state = await authenticateRequest(
+        request,
+        mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey: PK_LIVE }),
+      );
+      expect(fetch).not.toHaveBeenCalled();
+      expect(state.isAuthenticated).toBe(!expired);
+      if (expired) {
+        expect(state.status).toBe(AuthStatus.Handshake);
+        expect(state.toAuth()).toBeNull();
+      } else {
+        expect(state.toAuth()).toMatchObject({
+          userId: mockJwtPayload.sub,
+          sessionId: mockJwtPayload.sid,
+          agent: {
+            type: 'agent',
+            sub: identity.client_id,
+          },
+        });
+      }
+      fetch.mockRestore();
+    });
+
+    it.each([
+      { production: true, discovery: true },
+      { production: true, discovery: false },
+      { production: false, discovery: true },
+      { production: false, discovery: false },
+    ])(
+      'accepts a signed agent handshake with production=$production and discovery=$discovery',
+      async ({ production, discovery }) => {
+        const publishableKey = production ? PK_LIVE : PK_TEST;
+        const suffix = await getCookieSuffix(publishableKey);
+        const { data: sessionToken } = await signJwt(
+          { ...mockJwtPayload, agt: { id: identity.client_id, reg: identity.client_id, poppy: identity } },
+          signingJwks,
+          { algorithm: 'RS256', header: { ...mockJwtHeader, cat: JWT_CATEGORY_SESSION_TOKEN } },
+        );
+        const cookies = {
+          __client_uat: String(mockJwtPayload.iat),
+          [`__client_uat_${suffix}`]: String(mockJwtPayload.iat),
+          [`__session_${suffix}`]: sessionToken!,
+          ...(!production ? { [`__clerk_db_jwt_${suffix}`]: 'dev-browser' } : {}),
+        };
+        const directives = Object.entries(cookies).map(
+          ([name, value]) => `${name}=${value}; Path=/; SameSite=Lax; Secure`,
+        );
+        if (production) {
+          directives.unshift('__clerk_handshake=; Path=/; Max-Age=0');
+        }
+        const { data: handshake } = await signJwt({ handshake: directives }, signingJwks, {
+          algorithm: 'RS256',
+          header: { ...mockJwtHeader, cat: JWT_CATEGORY_SESSION_TOKEN },
+        });
+        const url = new URL('https://example.com/');
+        if (!production) {
+          url.searchParams.set('__clerk_handshake', handshake!);
+          url.searchParams.set('__clerk_db_jwt', 'dev-browser');
+        }
+        const fetch = vi.spyOn(globalThis, 'fetch');
+        const options = mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey, __experimental_poppy: discovery });
+        const state = await authenticateRequest(
+          mockRequestWithCookies({}, production ? { __clerk_handshake: handshake! } : {}, url.toString()),
+          options,
+        );
+        const expectedAuth = {
+          userId: mockJwtPayload.sub,
+          sessionId: mockJwtPayload.sid,
+          agent: { type: 'agent', sub: identity.client_id },
+        };
+        expect(state.isAuthenticated).toBe(true);
+        expect(state.toAuth()).toMatchObject(expectedAuth);
+        expect(state.headers.getSetCookie()).toEqual(directives);
+        expect(state.headers.get('location')).toBe(production ? null : 'https://example.com/');
+        const nextRequest = await authenticateRequest(
+          mockRequestWithCookies({}, cookies, 'https://example.com/'),
+          options,
+        );
+        expect(nextRequest.isAuthenticated).toBe(true);
+        expect(nextRequest.toAuth()).toMatchObject(expectedAuth);
+        expect(fetch).not.toHaveBeenCalled();
+        fetch.mockRestore();
+      },
+    );
+
+    it('does not interpret an application cookie as authenticated agent identity', async () => {
+      const state = await authenticateRequest(
+        mockRequestWithCookies({}, { '__Host-poppy_session': 'untrusted' }),
+        mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey: PK_LIVE, __experimental_poppy: true }),
+      );
+      expect(state.isAuthenticated).toBe(false);
+      expect(state.toAuth()).toMatchObject({ userId: null, sessionId: null });
+      expect(state.toAuth()).not.toHaveProperty('agent');
+    });
   });
 
   //

@@ -206,6 +206,36 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
     return clerkMiddlewareRequestDataStorage.run(requestDataStore, async () => {
       const resolvedClerkClient = await clerkClient();
 
+      if (options.__experimental_poppy) {
+        const poppyRequestUrl = createClerkRequest(request).clerkUrl;
+        if (
+          poppyRequestUrl.pathname === '/.well-known/poppy.json' ||
+          poppyRequestUrl.pathname === '/.well-known/oauth-protected-resource'
+        ) {
+          if (request.method !== 'GET') {
+            return new Response(null, { status: 405, headers: { Allow: 'GET' } });
+          }
+          const metadata = (await resolvedClerkClient.artifacts.__experimental_getPoppyJson()) as {
+            organization: { domain: string };
+            auth: { issuer: string; scopes: Record<string, unknown> };
+          };
+          if (poppyRequestUrl.origin !== `https://${metadata.organization.domain}`) {
+            throw new Error('Poppy discovery must use the configured Company origin.');
+          }
+          return Response.json(
+            poppyRequestUrl.pathname === '/.well-known/poppy.json'
+              ? metadata
+              : {
+                  resource: poppyRequestUrl.origin,
+                  authorization_servers: [metadata.auth.issuer],
+                  scopes_supported: Object.keys(metadata.auth.scopes),
+                  bearer_methods_supported: ['header'],
+                },
+            { headers: { 'Cache-Control': 'no-store' } },
+          );
+        }
+      }
+
       if (options.debug) {
         logger.enable();
       }
