@@ -654,6 +654,16 @@ export interface OrganizationMembershipRequestJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface AgentConnectionJSON extends ClerkResourceJSON {
+  object: 'agent_connection';
+  id: string;
+  name: string;
+  domain: string | null;
+  image_url?: string | null;
+  scopes: string[];
+  last_used_at: number | null;
+}
+
 export interface UserOrganizationInvitationJSON extends ClerkResourceJSON {
   object: 'organization_invitation';
   id: string;

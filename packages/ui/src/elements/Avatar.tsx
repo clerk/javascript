@@ -11,6 +11,7 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   title?: string;
   initials?: string;
   imageUrl?: string | null;
+  imageCrossOrigin?: React.ImgHTMLAttributes<HTMLImageElement>['crossOrigin'] | null;
   imageFetchSize?: number;
   rounded?: boolean;
   boxElementDescriptor?: ElementDescriptor;
@@ -28,6 +29,7 @@ export const Avatar = (props: AvatarProps) => {
     title,
     initials,
     imageUrl,
+    imageCrossOrigin = 'anonymous',
     rounded = true,
     imageFetchSize = 80,
     sx,
@@ -97,6 +99,7 @@ export const Avatar = (props: AvatarProps) => {
         title={title}
         alt={`${title}'s logo`}
         src={imageUrl || ''}
+        crossOrigin={imageCrossOrigin ?? undefined}
         // Decode the (typically cached) avatar bytes before presenting so a freshly-mounted
         // <img> paints on its first frame instead of flashing the avatar background for a tick.
         // Safe for avatar-sized images: decode is off-thread/sub-ms and only affects already-fetched bytes.

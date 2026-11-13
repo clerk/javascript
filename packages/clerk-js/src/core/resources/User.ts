@@ -17,6 +17,7 @@ import type {
   EnterpriseConnectionResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetAgentConnectionsParams,
   GetEnterpriseConnectionsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
@@ -46,6 +47,7 @@ import { computeMergePatch } from '../../utils/mergePatch';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
+import { AgentConnection } from './AgentConnection';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
@@ -352,6 +354,10 @@ export class User extends BaseResource implements UserResource {
 
   getOrganizationInvitations = (params?: GetUserOrganizationInvitationsParams) => {
     return UserOrganizationInvitation.retrieve(params);
+  };
+
+  __experimental_getAgentConnections = (params?: GetAgentConnectionsParams) => {
+    return AgentConnection.retrieve(params);
   };
 
   getOrganizationSuggestions = (params?: GetUserOrganizationSuggestionsParams) => {
