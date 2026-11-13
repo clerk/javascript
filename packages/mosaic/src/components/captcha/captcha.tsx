@@ -1,5 +1,6 @@
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useLatestRef } from '@floating-ui/react/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -17,6 +18,8 @@ export interface CaptchaProps extends Omit<MosaicComponentProps<'div'>, 'id' | '
   size?: 'normal' | 'flexible' | 'compact';
   /** The Turnstile widget's language, an ISO 639-1 code such as `en` or `en-us`. Turnstile follows the visitor's language when it is unset. */
   language?: string;
+  /** Called when Turnstile starts or stops asking the visitor to solve an interactive challenge, so the caller can make room for it. */
+  onInteractiveChange?: (interactive: boolean) => void;
 }
 
 /**
@@ -30,7 +33,7 @@ export interface CaptchaProps extends Omit<MosaicComponentProps<'div'>, 'id' | '
  * <Captcha theme='dark' />
  */
 export const Captcha = React.forwardRef<HTMLDivElement, CaptchaProps>(function MosaicCaptcha(
-  { render, xstyle, theme, size, language, ...rest },
+  { render, xstyle, theme, size, language, onInteractiveChange, ...rest },
   ref,
 ) {
   const [element, setElement] = React.useState<HTMLDivElement | null>(null);
@@ -42,6 +45,24 @@ export const Captcha = React.forwardRef<HTMLDivElement, CaptchaProps>(function M
     }
     setSchemeTheme(themeFromColorScheme(getComputedStyle(element).colorScheme));
   });
+
+  const onInteractiveChangeRef = useLatestRef(onInteractiveChange);
+
+  React.useEffect(() => {
+    if (!element) {
+      return undefined;
+    }
+    let interactive = element.hasAttribute('data-cl-interactive');
+    const observer = new MutationObserver(() => {
+      const next = element.hasAttribute('data-cl-interactive');
+      if (next !== interactive) {
+        interactive = next;
+        onInteractiveChangeRef.current?.(next);
+      }
+    });
+    observer.observe(element, { attributes: true, attributeFilter: ['data-cl-interactive'] });
+    return () => observer.disconnect();
+  }, [element, onInteractiveChangeRef]);
 
   return useRender({
     defaultTagName: 'div',

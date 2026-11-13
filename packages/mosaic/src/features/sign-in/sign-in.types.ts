@@ -16,8 +16,11 @@ export type SignInFactor =
 
 type SignInCodeChannel = 'email' | 'phone' | 'totp';
 
+export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
+
 export type SignInStep =
-  | { kind: 'identifier' }
+  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField; lastUsed?: boolean }
+  | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
   | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
   | {
       kind: 'code';
@@ -59,6 +62,7 @@ export interface SignInProvider {
 
 export interface SignInValues {
   identifier: string;
+  phoneNumber: string;
   password: string;
   code: string;
   backupCode: string;
@@ -81,7 +85,9 @@ export interface SignInViewProps {
   combined: boolean;
   socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
+  lastUsedProviderId?: string;
   onSelectProvider: (id: string) => void;
+  onPasskey?: () => void;
   form: UseFormResult<SignInValues>;
   onSubmit: (event?: SignInSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
@@ -91,7 +97,9 @@ export interface SignInViewProps {
   globalErrorMessage?: string;
   newPasswordFeedback?: FieldFeedback;
   onEditIdentifier: () => void;
+  onSwitchField?: () => void;
   onSignUp?: () => void;
+  onJoinWaitlist?: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
   onShowHelp: () => void;

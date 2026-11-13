@@ -2,12 +2,30 @@ import { describe, expect, it } from 'vitest';
 
 import { signInMessages } from '../sign-in.messages';
 import type { SignInStep } from '../sign-in.types';
-import { codeCopy, codeIdentity, codeNotice, codeSecondaryAction, httpsUrl, stepKey } from '../sign-in.utils';
+import {
+  codeCopy,
+  codeIdentity,
+  codeNotice,
+  codeSecondaryAction,
+  httpsUrl,
+  identifierFieldCopy,
+  splitLastUsedProvider,
+  startPrompt,
+  stepKey,
+} from '../sign-in.utils';
 
 describe('stepKey', () => {
   it('keys each step by its kind and the variant that changes its copy', () => {
     const steps: [SignInStep, string][] = [
-      [{ kind: 'identifier' }, 'identifier'],
+      [{ kind: 'identifier', field: 'email' }, 'identifier'],
+      [
+        {
+          kind: 'identifier',
+          field: 'phone',
+          channel: { id: 'whatsapp', name: 'WhatsApp', iconUrl: 'https://img.clerk.com/static/whatsapp.svg' },
+        },
+        'identifier:channel',
+      ],
       [{ kind: 'credential', credential: 'password', identifier: 'jane@acme.com' }, 'credential:password'],
       [{ kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' }, 'credential:backup-code'],
       [{ kind: 'credential', credential: 'passkey', identifier: 'jane@acme.com' }, 'credential:passkey'],
@@ -113,6 +131,74 @@ describe('code step copy', () => {
     expect(codeSecondaryAction(step, m, { onCancel, onBack })).toEqual({
       label: 'Use another method',
       onClick: onCancel,
+    });
+  });
+});
+
+describe('identifierFieldCopy', () => {
+  it('labels each identifier field and the link that switches to it', () => {
+    const m = signInMessages;
+    expect(identifierFieldCopy('email', m)).toEqual({
+      label: 'Email address',
+      placeholder: 'Enter your email address',
+      switchLabel: 'Use email',
+    });
+    expect(identifierFieldCopy('email-or-username', m)).toEqual({
+      label: 'Email address or username',
+      placeholder: 'Enter email or username',
+      switchLabel: 'Use email or username',
+    });
+    expect(identifierFieldCopy('username', m)).toEqual({
+      label: 'Username',
+      placeholder: 'Enter your username',
+      switchLabel: 'Use username',
+    });
+    expect(identifierFieldCopy('phone', m)).toEqual({
+      label: 'Phone number',
+      placeholder: 'Enter your phone number',
+      switchLabel: 'Use phone',
+    });
+  });
+});
+
+describe('startPrompt', () => {
+  it('offers the waitlist over sign-up, and nothing without either', () => {
+    const onSignUp = () => undefined;
+    const onJoinWaitlist = () => undefined;
+    expect(startPrompt(signInMessages, { onSignUp })).toEqual({
+      text: 'Don’t have an account?',
+      link: 'Sign up',
+      onClick: onSignUp,
+    });
+    expect(startPrompt(signInMessages, { onSignUp, onJoinWaitlist })).toEqual({
+      text: 'Want early access?',
+      link: 'Join waitlist',
+      onClick: onJoinWaitlist,
+    });
+    expect(startPrompt(signInMessages, {})).toBeUndefined();
+  });
+});
+
+describe('splitLastUsedProvider', () => {
+  const google = { id: 'oauth_google', name: 'Google', iconUrl: 'google.svg' };
+  const github = { id: 'oauth_github', name: 'GitHub', iconUrl: 'github.svg' };
+  const x = { id: 'oauth_x', name: 'X', iconUrl: 'x.svg' };
+
+  it('takes the last used provider out of the others, keeping their order', () => {
+    expect(splitLastUsedProvider([google, github, x], 'oauth_github')).toEqual({
+      lastUsed: github,
+      others: [google, x],
+    });
+  });
+
+  it('leaves every provider in the others when none was used last or it is not offered', () => {
+    expect(splitLastUsedProvider([google, github], undefined)).toEqual({
+      lastUsed: undefined,
+      others: [google, github],
+    });
+    expect(splitLastUsedProvider([google, github], 'oauth_apple')).toEqual({
+      lastUsed: undefined,
+      others: [google, github],
     });
   });
 });

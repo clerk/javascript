@@ -142,6 +142,21 @@ const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFiel
   });
 });
 
+/** Props for the row that puts a field's label at the start and an action, such as a link, at the end. */
+export type FieldHeaderProps = MosaicComponentProps<'div'>;
+
+const Header = React.forwardRef<HTMLDivElement, FieldHeaderProps>(function MosaicFieldHeader(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('field-header'), stylex.props(reset.base, styles.header, xstyle), rest),
+  });
+});
+
 /** Props for the container that stacks a horizontal field's label and supporting text. */
 export type FieldContentProps = MosaicComponentProps<'div'>;
 
@@ -326,6 +341,7 @@ const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function M
 /** Styled parts for composing an automatically associated single-control field. */
 export const Field = {
   Root,
+  Header,
   Label,
   Content,
   Description,

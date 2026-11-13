@@ -58,7 +58,9 @@ export function SignInView({
   combined,
   socialProviders,
   pendingProviderId,
+  lastUsedProviderId,
   onSelectProvider,
+  onPasskey,
   form,
   onSubmit,
   onCodeComplete,
@@ -68,7 +70,9 @@ export function SignInView({
   globalErrorMessage,
   newPasswordFeedback,
   onEditIdentifier,
+  onSwitchField,
   onSignUp,
+  onJoinWaitlist,
   onForgotPassword,
   onCancel,
   onShowHelp,
@@ -106,6 +110,8 @@ export function SignInView({
       onClick: onResend,
     };
 
+  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+
   return (
     <Card.Root align='center'>
       <Flow.Root
@@ -115,25 +121,37 @@ export function SignInView({
       >
         {current => {
           const secondary = current.kind === 'code' ? codeSecondaryAction(current, m, { onCancel, onBack }) : undefined;
+          const identifierStep =
+            current.kind === 'identifier' ? (
+              <IdentifierStep
+                step={current}
+                onCancel={onCancel}
+                onSwitchField={onSwitchField}
+                focusRef={focusRef}
+                logo={logo}
+                applicationName={applicationName}
+                combined={combined}
+                socialProviders={socialProviders}
+                pendingProviderId={pendingProviderId}
+                lastUsedProviderId={lastUsedProviderId}
+                onSelectProvider={onSelectProvider}
+                onPasskey={onPasskey}
+                form={form}
+                errorMessage={errorMessage}
+                globalErrorMessage={globalErrorMessage}
+                isPending={isPending}
+                isDisabled={isDisabled}
+                onSubmit={onSubmit}
+                onSignUp={onSignUp}
+                onJoinWaitlist={onJoinWaitlist}
+              />
+            ) : null;
           return (
             <>
-              <Flow.Step ids={['identifier']}>
-                <IdentifierStep
-                  focusRef={focusRef}
-                  logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
-                  applicationName={applicationName}
-                  combined={combined}
-                  socialProviders={socialProviders}
-                  pendingProviderId={pendingProviderId}
-                  onSelectProvider={onSelectProvider}
-                  form={form}
-                  errorMessage={errorMessage}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  isDisabled={isDisabled}
-                  onSubmit={onSubmit}
-                  onSignUp={onSignUp}
-                />
+              <Flow.Step ids={['identifier']}>{stepKey(current) === 'identifier' ? identifierStep : null}</Flow.Step>
+
+              <Flow.Step ids={['identifier:channel']}>
+                {stepKey(current) === 'identifier:channel' ? identifierStep : null}
               </Flow.Step>
 
               <Flow.Step ids={['credential:password', 'credential:backup-code', 'credential:passkey']}>
@@ -213,7 +231,7 @@ export function SignInView({
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}
                     onBack={onBack}
-                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     pendingProviderId={pendingProviderId}
                     onSelectProvider={onSelectProvider}
@@ -238,7 +256,7 @@ export function SignInView({
                     focusRef={focusRef}
                     step={current}
                     applicationName={applicationName}
-                    logo={applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined}
+                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     isPending={isPending}
                     resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}

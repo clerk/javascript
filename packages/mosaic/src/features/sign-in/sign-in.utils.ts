@@ -2,11 +2,12 @@ import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
-import type { SignInStep } from './sign-in.types';
+import type { SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
 
 export function stepKey(step: SignInStep): string {
   switch (step.kind) {
     case 'identifier':
+      return 'channel' in step ? 'identifier:channel' : 'identifier';
     case 'sign-up':
       return step.kind;
     case 'credential':
@@ -160,4 +161,52 @@ export function codeSecondaryAction(
     return { label: m.back, onClick: onBack };
   }
   return { label: m.useAnotherMethod, onClick: onCancel };
+}
+
+interface IdentifierFieldCopy {
+  label: string;
+  placeholder: string;
+  switchLabel: string;
+}
+
+export function identifierFieldCopy(field: SignInIdentifierField, m: Messages): IdentifierFieldCopy {
+  switch (field) {
+    case 'email':
+      return { label: m.start.emailLabel, placeholder: m.start.emailPlaceholder, switchLabel: m.start.useEmail };
+    case 'email-or-username':
+      return {
+        label: m.start.emailOrUsernameLabel,
+        placeholder: m.start.emailOrUsernamePlaceholder,
+        switchLabel: m.start.useEmailOrUsername,
+      };
+    case 'username':
+      return {
+        label: m.start.usernameLabel,
+        placeholder: m.start.usernamePlaceholder,
+        switchLabel: m.start.useUsername,
+      };
+    case 'phone':
+      return { label: m.start.phoneLabel, placeholder: m.start.phonePlaceholder, switchLabel: m.start.usePhone };
+  }
+}
+
+export function startPrompt(
+  m: Messages,
+  { onSignUp, onJoinWaitlist }: { onSignUp?: () => void; onJoinWaitlist?: () => void },
+): { text: string; link: string; onClick: () => void } | undefined {
+  if (onJoinWaitlist) {
+    return { text: m.start.waitlistPrompt, link: m.start.waitlistLink, onClick: onJoinWaitlist };
+  }
+  if (onSignUp) {
+    return { text: m.start.signUpPrompt, link: m.start.signUpLink, onClick: onSignUp };
+  }
+  return undefined;
+}
+
+export function splitLastUsedProvider(
+  providers: readonly SignInProvider[],
+  lastUsedProviderId: string | undefined,
+): { lastUsed?: SignInProvider; others: readonly SignInProvider[] } {
+  const lastUsed = providers.find(provider => provider.id === lastUsedProviderId);
+  return { lastUsed, others: lastUsed ? providers.filter(provider => provider !== lastUsed) : providers };
 }

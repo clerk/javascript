@@ -44,9 +44,17 @@ export const styles = stylex.create({
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
   },
-  forgotPassword: {
-    alignSelf: 'start',
-    justifySelf: 'start',
+  captcha: {
+    justifySelf: 'center',
+  },
+  spotlightGroup: {
+    display: 'contents',
+  },
+  spotlightHidden: {
+    display: 'none',
+  },
+  passkeyAction: {
+    alignSelf: 'center',
   },
   footerText: {
     textAlign: 'center',
