@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * Mosaic `DataList` — label/value pairs for read-only detail, such as the fields describing a
  * device or a payment method. Composed via dot syntax: `DataList.Root`, `DataList.Item`,

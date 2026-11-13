@@ -117,6 +117,7 @@
     "dist",
     "!dist/**/*.d.ts.map",
     "!dist/**/*.d.mts.map",
+    "!dist/.bundlewatch",
     "styles.css.d.ts",
     "CHANGELOG.md"
   ],
@@ -124,7 +125,7 @@
     "build": "pnpm build:js && pnpm build:css && pnpm check:bundle && pnpm typecheck",
     "build:css": "tsdown --config tsdown.css.config.mts",
     "build:js": "tsdown --config tsdown.config.mts",
-    "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
+    "bundlewatch": "node ./scripts/bundle-for-size.mjs && FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "check:bundle": "node ./scripts/check-bundle.mjs",
     "clean": "rimraf ./dist ./dist-css",
     "dev": "tsdown --config tsdown.config.mts --watch",
