@@ -35,6 +35,7 @@ import {
   WaitlistEntryAPI,
   WebhookAPI,
 } from './endpoints';
+import { ArtifactsAPI } from './endpoints/ArtifactsApi';
 import { BillingAPI } from './endpoints/BillingApi';
 import { buildRequest } from './request';
 
@@ -63,6 +64,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
         skipApiVersionInUrl: true,
       }),
     ),
+    artifacts: new ArtifactsAPI(request),
     betaFeatures: new BetaFeaturesAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
     /**
