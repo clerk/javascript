@@ -18,6 +18,7 @@ import type {
   SMSMessageJSON,
   UserDeletedJSON,
   UserJSON,
+  UserMergedJSON,
   WaitlistEntryJSON,
 } from './JSON';
 
@@ -37,9 +38,16 @@ type Webhook<EvtType, Data> = {
   instance_id: string;
 };
 
+/**
+ * `user.merged` carries two users instead of one resource, so its data has no `id` of its own.
+ * Declaring `id` as absent keeps `event.data.id` readable on a `WebhookEvent` that has not been narrowed by `type`.
+ */
+type UserMergedWebhookEventJSON = UserMergedJSON & { id?: never };
+
 export type UserWebhookEvent =
   | Webhook<'user.created' | 'user.updated', UserJSON>
-  | Webhook<'user.deleted', UserDeletedJSON>;
+  | Webhook<'user.deleted', UserDeletedJSON>
+  | Webhook<'user.merged', UserMergedWebhookEventJSON>;
 
 export type EmailWebhookEvent = Webhook<'email.created', EmailJSON>;
 

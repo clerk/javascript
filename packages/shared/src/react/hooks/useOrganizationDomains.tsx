@@ -133,6 +133,13 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
   );
 
   const response = query.data;
+  // if we're on a development instance and every domain is a clerk.test domain, only wait 500ms since we're
+  // (probably!) in an e2e test
+  const ownershipVerificationPollInterval =
+    clerk.instanceType === 'development' &&
+    response?.data.every(domain => domain.name.toLowerCase().endsWith('.clerk.test'))
+      ? 500
+      : OWNERSHIP_VERIFICATION_POLL_INTERVAL_MS;
 
   const unverifiedOwnershipDomainIds = useMemo(
     () =>
@@ -155,7 +162,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const scheduleNext = () => {
-      timeoutId = setTimeout(() => void runAttempt(), OWNERSHIP_VERIFICATION_POLL_INTERVAL_MS);
+      timeoutId = setTimeout(() => void runAttempt(), ownershipVerificationPollInterval);
     };
 
     const domainIds = unverifiedOwnershipKey.split(',');
@@ -201,7 +208,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       clearTimeout(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unverifiedOwnershipKey, queryEnabled]);
+  }, [unverifiedOwnershipKey, queryEnabled, ownershipVerificationPollInterval]);
 
   return {
     data: response?.data,

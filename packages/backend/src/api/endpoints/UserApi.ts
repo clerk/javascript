@@ -10,9 +10,10 @@ import type {
   OrganizationInvitation,
   OrganizationMembership,
   PhoneNumber,
-  User,
 } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
+import type { UserMergedJSON } from '../resources/JSON';
+import { User } from '../resources/User';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
 
@@ -423,6 +424,22 @@ export type DeleteUserExternalAccountParams = {
 export type SetPasswordCompromisedParams = {
   /** Whether to revoke all sessions of the user. Defaults to `false`. */
   revokeAllSessions?: boolean;
+};
+
+/** @generateWithEmptyComment */
+export type MergeUserParams = {
+  /** The ID of the user to merge into the other user. This user is deleted. */
+  fromUserId: string;
+  /** Whether to return the result of the merge without changing anything. Defaults to `false`. */
+  dryRun?: boolean;
+};
+
+/** @generateWithEmptyComment */
+export type UserMergeResult = {
+  /** The user that remains, as it is after the merge. */
+  user: User;
+  /** The merged user as it was before it was deleted. */
+  deletedUser: User;
 };
 
 type ReplaceUserEmailAddressParams = {
@@ -929,5 +946,23 @@ export class UserAPI extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, userId, 'password', 'unset_compromised'),
     });
+  }
+
+  /**
+   * Merges the `fromUserId` user into the given user: moves its identifications, connected accounts, second factors, organization memberships, and metadata onto the given user, then deletes the `fromUserId` user. Where both users have a value, the given user keeps its own.
+   *
+   * A merge cannot be undone. Use `dryRun` to preview one.
+   * @param userId - The ID of the user that remains after the merge.
+   * @param params - The parameters for the merge.
+   * @returns The remaining [`User`](https://clerk.com/docs/reference/backend/types/backend-user) after the merge, and the deleted user as it was before the merge.
+   */
+  public async mergeUser(userId: string, params: MergeUserParams): Promise<UserMergeResult> {
+    this.requireId(userId);
+    const result = await this.request<UserMergedJSON>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'merge'),
+      bodyParams: params,
+    });
+    return { user: User.fromJSON(result.user), deletedUser: User.fromJSON(result.deleted_user) };
   }
 }

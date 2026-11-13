@@ -4,6 +4,7 @@ import { createAPIKeysComponentPageObject } from './apiKeys';
 import { createAppPageObject } from './app';
 import { createCheckoutPageObject } from './checkout';
 import { createClerkPageObject } from './clerk';
+import { createConfigureSSOPageObject } from './configureSSO';
 import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
@@ -38,6 +39,7 @@ export const createPageObjects = ({
     page: app,
     clerk: createClerkPageObject(testArgs),
     checkout: createCheckoutPageObject(testArgs),
+    configureSSO: createConfigureSSOPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     impersonation: createImpersonationPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),
