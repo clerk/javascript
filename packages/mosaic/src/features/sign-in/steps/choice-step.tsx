@@ -10,8 +10,8 @@ import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
 import { SignInAccounts } from './sign-in-accounts';
+import { SignInAlternativeMethods } from './sign-in-alternative-methods';
 import { SignInEnterpriseConnections } from './sign-in-enterprise-connections';
-import { SignInProviderButtons } from './sign-in-provider-buttons';
 import { SignInWallets } from './sign-in-wallets';
 
 const factorIcon = {
@@ -110,29 +110,41 @@ export function ChoiceStep({
     );
   }
 
+  const methods = step.options.map(factor => ({
+    id: factor.id,
+    label: factorLabel(factor),
+    icon: factorIcon[factor.strategy],
+  }));
+
+  if (step.purpose === 'methods') {
+    return (
+      <SignInAlternativeMethods
+        focusRef={focusRef}
+        title={messages.title}
+        description={messages.description}
+        methods={methods}
+        pendingMethodId={pendingFactorId}
+        onSelectMethod={onSelectFactor}
+        socialProviders={socialProviders}
+        pendingProviderId={pendingProviderId}
+        onSelectProvider={onSelectProvider}
+        isDisabled={isDisabled}
+        globalErrorMessage={globalErrorMessage}
+        onBack={onBack}
+        onShowHelp={onShowHelp}
+      />
+    );
+  }
+
   return (
     <VerificationMethodPicker
       focusRef={focusRef}
       messages={messages}
-      methods={step.options.map(factor => ({
-        id: factor.id,
-        label: factorLabel(factor),
-        icon: factorIcon[factor.strategy],
-      }))}
+      methods={methods}
       pendingMethodId={pendingFactorId}
       onSelect={onSelectFactor}
       onHelp={onShowHelp}
       onBack={onBack}
-      providers={
-        step.purpose === 'methods' && socialProviders.length > 0 ? (
-          <SignInProviderButtons
-            providers={socialProviders}
-            pendingProviderId={pendingProviderId}
-            isDisabled={isDisabled}
-            onSelectProvider={onSelectProvider}
-          />
-        ) : undefined
-      }
     />
   );
 }

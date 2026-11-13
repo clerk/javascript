@@ -1,5 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
-import type { ReactNode, Ref } from 'react';
+import type { Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
@@ -35,8 +35,6 @@ interface VerificationMethodPickerProps {
   onSelect: (methodId: string) => void;
   onHelp: () => void;
   onBack?: () => void;
-  /** Rendered above the methods, such as a group of social sign-in buttons. */
-  providers?: ReactNode;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -47,7 +45,6 @@ export function VerificationMethodPicker({
   onSelect,
   onHelp,
   onBack,
-  providers,
   focusRef,
 }: VerificationMethodPickerProps) {
   const firstMethodRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLDivElement>()]);
@@ -59,7 +56,6 @@ export function VerificationMethodPicker({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        {providers}
         <Item.Group>
           {methods.map((method, index) => {
             const isPending = pendingMethodId === method.id;
