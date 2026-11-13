@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { BetaBanner } from '@/components/marketing/beta-banner';
 import { ClerkUILogo } from '@/components/marketing/clerk-logo';
 import { NpmDownloads } from '@/components/marketing/npm-downloads';
 import { VersionBadge } from '@/components/marketing/version-badge';
@@ -8,6 +9,7 @@ import { Container } from '@/components/ui/container';
 export function HomeHeader() {
   return (
     <header className='relative z-20'>
+      <BetaBanner />
       <Container className='flex h-14 items-center justify-between gap-4'>
         <div className='flex items-center gap-2'>
           <Link
@@ -21,6 +23,12 @@ export function HomeHeader() {
         </div>
         <div className='flex items-baseline gap-4'>
           <NpmDownloads className='max-sm:hidden' />
+          <Link
+            href='/changelog'
+            className='label-3 text-foreground transition-colors hover:text-gray-600 dark:hover:text-gray-300'
+          >
+            Changelog
+          </Link>
           <a
             href='https://www.npmjs.com/package/@clerk/mosaic'
             target='_blank'
