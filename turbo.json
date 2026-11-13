@@ -580,7 +580,6 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:sso": {
-      "cache": false,
       "env": ["CI", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
       "inputs": ["integration/**", "packages/*/src/**"],
       "outputs": []
