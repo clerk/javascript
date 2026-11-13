@@ -1,3 +1,5 @@
+'use client';
+
 export { Icon } from './icon';
 export type { IconProps } from './icon';
 export { IconFrame } from './icon-frame';

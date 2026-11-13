@@ -1,3 +1,5 @@
+'use client';
+
 export { Button } from './button';
 export type { ButtonProps } from './button';
 export { SubmitButton } from './submit-button';

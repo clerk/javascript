@@ -61,6 +61,7 @@ export type {
   DialogVariant,
   DialogTriggerProps,
 } from '../components/dialog';
+export { Entity } from '../components/entity';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Flow, useFlowAutoFocus } from '../components/flow';

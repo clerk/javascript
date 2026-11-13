@@ -13,7 +13,24 @@ const { default: getTypeScriptExecutablePath } = await import(
 );
 
 export default defineConfig({
-  entry: ['./src/index.ts'],
+  entry: {
+    index: './src/index.ts',
+    'components/avatar': './src/components/avatar/index.ts',
+    'components/badge': './src/components/badge/index.ts',
+    'components/banner': './src/components/banner/index.ts',
+    'components/button': './src/components/button/index.ts',
+    'components/data-list': './src/components/data-list/index.ts',
+    'components/empty-state': './src/components/empty-state/index.ts',
+    'components/entity': './src/components/entity/index.ts',
+    'components/heading': './src/components/heading/index.ts',
+    'components/icon': './src/components/icon/index.ts',
+    'components/input': './src/components/input/index.ts',
+    'components/item': './src/components/item/index.ts',
+    'components/skeleton': './src/components/skeleton/index.ts',
+    'components/table': './src/components/table/index.ts',
+    'components/text': './src/components/text/index.ts',
+    'icons/glyphs/external': './src/icons/glyphs/external.tsx',
+  },
   outDir: './dist',
   format: ['esm'],
   dts: {

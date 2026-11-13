@@ -31,6 +31,81 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./components/avatar": {
+      "types": "./dist/components/avatar.d.ts",
+      "import": "./dist/components/avatar.js",
+      "default": "./dist/components/avatar.js"
+    },
+    "./components/badge": {
+      "types": "./dist/components/badge.d.ts",
+      "import": "./dist/components/badge.js",
+      "default": "./dist/components/badge.js"
+    },
+    "./components/banner": {
+      "types": "./dist/components/banner.d.ts",
+      "import": "./dist/components/banner.js",
+      "default": "./dist/components/banner.js"
+    },
+    "./components/button": {
+      "types": "./dist/components/button.d.ts",
+      "import": "./dist/components/button.js",
+      "default": "./dist/components/button.js"
+    },
+    "./components/data-list": {
+      "types": "./dist/components/data-list.d.ts",
+      "import": "./dist/components/data-list.js",
+      "default": "./dist/components/data-list.js"
+    },
+    "./components/empty-state": {
+      "types": "./dist/components/empty-state.d.ts",
+      "import": "./dist/components/empty-state.js",
+      "default": "./dist/components/empty-state.js"
+    },
+    "./components/entity": {
+      "types": "./dist/components/entity.d.ts",
+      "import": "./dist/components/entity.js",
+      "default": "./dist/components/entity.js"
+    },
+    "./components/heading": {
+      "types": "./dist/components/heading.d.ts",
+      "import": "./dist/components/heading.js",
+      "default": "./dist/components/heading.js"
+    },
+    "./components/icon": {
+      "types": "./dist/components/icon.d.ts",
+      "import": "./dist/components/icon.js",
+      "default": "./dist/components/icon.js"
+    },
+    "./components/input": {
+      "types": "./dist/components/input.d.ts",
+      "import": "./dist/components/input.js",
+      "default": "./dist/components/input.js"
+    },
+    "./components/item": {
+      "types": "./dist/components/item.d.ts",
+      "import": "./dist/components/item.js",
+      "default": "./dist/components/item.js"
+    },
+    "./components/skeleton": {
+      "types": "./dist/components/skeleton.d.ts",
+      "import": "./dist/components/skeleton.js",
+      "default": "./dist/components/skeleton.js"
+    },
+    "./components/table": {
+      "types": "./dist/components/table.d.ts",
+      "import": "./dist/components/table.js",
+      "default": "./dist/components/table.js"
+    },
+    "./components/text": {
+      "types": "./dist/components/text.d.ts",
+      "import": "./dist/components/text.js",
+      "default": "./dist/components/text.js"
+    },
+    "./icons/glyphs/external": {
+      "types": "./dist/icons/glyphs/external.d.ts",
+      "import": "./dist/icons/glyphs/external.js",
+      "default": "./dist/icons/glyphs/external.js"
+    },
     "./styles.css": {
       "types": "./styles.css.d.ts",
       "default": "./dist/styles.css"
