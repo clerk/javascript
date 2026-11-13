@@ -4,6 +4,7 @@ import { signInMessages } from '../sign-in.messages';
 import type { SignInStep } from '../sign-in.types';
 import type { SignInStepKey } from '../sign-in.utils';
 import {
+  backupCodeDescription,
   codeCopy,
   codeIdentity,
   codeNotice,
@@ -150,11 +151,11 @@ describe('code step copy', () => {
     expect(codeCopy(step, m, 'Acme').description).toBe('Enter the verification code sent to jane@acme.com');
   });
 
-  it('keeps the identifier in the description where the copy already names it', () => {
+  it('shows the identifier on its own line, with an edit button, when resetting a password', () => {
     const step = { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' } as const;
 
-    expect(codeIdentity(step, m).identifier).toBeUndefined();
-    expect(codeCopy(step, m, 'Acme').description).toContain('jane@acme.com');
+    expect(codeIdentity(step, m).identifier).toBe('jane@acme.com');
+    expect(codeCopy(step, m, 'Acme').description).toBe('First, enter the code sent to your email address');
   });
 
   it('formats a phone number named in the description', () => {
@@ -166,7 +167,27 @@ describe('code step copy', () => {
   it('leaves a masked phone number as FAPI sent it', () => {
     const step = { kind: 'code', purpose: 'reset-password', channel: 'phone', identifier: '+1******0123' } as const;
 
-    expect(codeCopy(step, m, 'Acme').description).toBe('First, enter the code sent to your phone +1******0123');
+    expect(codeIdentity(step, m).identifier).toBe('+1******0123');
+  });
+
+  it('says why a second factor is asked for while resetting a password', () => {
+    const step = { kind: 'code', purpose: 'second-factor', channel: 'phone', resetting: true } as const;
+
+    expect(codeCopy(step, m, 'Acme').description).toBe(
+      'We need to verify your identity before resetting your password.',
+    );
+    expect(codeCopy({ ...step, channel: 'totp' }, m, 'Acme').description).toBe(
+      'We need to verify your identity before resetting your password.',
+    );
+    expect(
+      backupCodeDescription(
+        { kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com', resetting: true },
+        m,
+      ),
+    ).toBe('We need to verify your identity before resetting your password.');
+    expect(
+      backupCodeDescription({ kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' }, m),
+    ).toBe(m.backupCodeMfa.description);
   });
 
   it('warns on a new device and on an SSO bypass', () => {

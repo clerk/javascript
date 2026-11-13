@@ -119,6 +119,7 @@ export function NoticeStep({
           focusRef={focusRef}
           title={m.emailLink.title}
           description={m.emailLink.description}
+          notice={step.newDevice ? m.clientTrust.notice : undefined}
           identifier={step.identifier}
           onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}

@@ -110,11 +110,10 @@ export function codeCopy(
 ): { title: string; description: string; fieldLabel: string } {
   const identifier = displayIdentifier(step) ?? '';
   if (step.purpose === 'reset-password') {
-    const description =
-      step.channel === 'phone' ? m.resetPasswordCode.descriptionPhone : m.resetPasswordCode.descriptionEmail;
     return {
       title: m.resetPasswordCode.title,
-      description: fill(description, { identifier }),
+      description:
+        step.channel === 'phone' ? m.resetPasswordCode.descriptionPhone : m.resetPasswordCode.descriptionEmail,
       fieldLabel: m.resetPasswordCode.label,
     };
   }
@@ -136,17 +135,23 @@ export function codeCopy(
       : { title: m.verifyPhone.title, description: m.verifyPhone.description, fieldLabel: m.verifyPhone.label };
   }
   if (step.channel === 'totp') {
-    return { title: m.totpMfa.title, description: m.totpMfa.description, fieldLabel: m.totpMfa.label };
+    return {
+      title: m.totpMfa.title,
+      description: step.resetting ? m.resetPasswordMfa.description : m.totpMfa.description,
+      fieldLabel: m.totpMfa.label,
+    };
   }
   const copy = channelCopy(step, m);
-  const description = sentToIdentifier(step)
-    ? fill(copy.descriptionSentTo, { identifier })
-    : fill(copy.description, { applicationName });
+  const description = codeDescription(step, m, copy, { identifier, applicationName });
   const title =
     step.channel === 'phone' && step.provider
       ? fill(m.alternativePhoneCode.title, { provider: step.provider })
       : copy.title;
   return { title, description, fieldLabel: copy.label };
+}
+
+export function backupCodeDescription(step: Extract<SignInStep, { credential: 'backup-code' }>, m: Messages): string {
+  return step.resetting ? m.resetPasswordMfa.description : m.backupCodeMfa.description;
 }
 
 export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy {
@@ -172,8 +177,27 @@ function channelCopy(step: CodeStepData, m: Messages) {
   return m.emailCode;
 }
 
+function codeDescription(
+  step: CodeStepData,
+  m: Messages,
+  copy: ReturnType<typeof channelCopy>,
+  { identifier, applicationName }: { identifier: string; applicationName: string },
+): string {
+  if (step.resetting) {
+    return m.resetPasswordMfa.description;
+  }
+  return sentToIdentifier(step)
+    ? fill(copy.descriptionSentTo, { identifier })
+    : fill(copy.description, { applicationName });
+}
+
 function identifierEditable(step: CodeStepData): boolean {
-  return step.purpose === 'first-factor' || step.purpose === 'sso-bypass' || step.purpose === 'verify-phone';
+  return (
+    step.purpose === 'first-factor' ||
+    step.purpose === 'sso-bypass' ||
+    step.purpose === 'verify-phone' ||
+    step.purpose === 'reset-password'
+  );
 }
 
 function sentToIdentifier(step: CodeStepData): boolean {
