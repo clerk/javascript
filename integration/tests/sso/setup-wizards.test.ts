@@ -154,6 +154,8 @@ ssoSuite('Self-serve setup wizards', ({ app }) => {
 
     await expect(provisioned).toContainText('Deprovisioned', { timeout: 60_000 });
 
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+
     await page.getByRole('button', { name: 'Complete', exact: true }).click();
 
     await page.reload();

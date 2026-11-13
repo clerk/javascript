@@ -113,7 +113,9 @@ export const test = base.extend<{
       }
     }
   },
-  directoryIds: async ({ app, request, organization: _organization }, provide) => {
+  directoryIds: async ({ app, request, organization }, provide) => {
+    const u = await createTestUtils({ app });
+    await u.services.clerk.organizations.updateOrganization(organization.id, { selfServeDirectorySyncEnabled: true });
     const ids = new Set<string>();
     try {
       await provide(ids);
