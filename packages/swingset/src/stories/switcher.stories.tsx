@@ -2,14 +2,11 @@ import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 import { BadgedAvatar } from '@clerk/mosaic/features/switcher/switcher-avatar.view';
-import type {
-  UserProfileModalContentProps,
-  UserProfileModalOptions,
-} from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
+import type { UserProfileModalOptions } from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
 import { defineModalSurface } from '@clerk/mosaic/modals/define-modal-surface';
-import type { ModalSurfaces } from '@clerk/mosaic/modals/modal.types';
+import type { ModalContentProps, ModalSurfaces } from '@clerk/mosaic/modals/modal.types';
 import { ModalHost } from '@clerk/mosaic/modals/modal-host';
 import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { useEffect, useState } from 'react';
@@ -253,7 +250,11 @@ const integrationsPage = {
   content: <p>An app-provided page, passed to the profile modal as a custom page.</p>,
 };
 
-function FixtureUserProfile({ options }: UserProfileModalContentProps) {
+interface FixtureProfileOptions extends UserProfileModalOptions {
+  combined?: boolean;
+}
+
+function FixtureUserProfile({ options }: ModalContentProps<FixtureProfileOptions>) {
   const { pages } = useUserProfileFixture();
   const organization = useOrganizationProfileFixture();
   const [activePage, setActivePage] = useState(options?.page ?? 'account');
@@ -270,7 +271,7 @@ function FixtureUserProfile({ options }: UserProfileModalContentProps) {
   );
 }
 
-const fixtureUserProfileModal = defineModalSurface<UserProfileModalOptions>({
+const fixtureUserProfileModal = defineModalSurface<FixtureProfileOptions>({
   id: 'fixtureUserProfile',
   variant: 'profile',
   load: () => Promise.resolve({ default: FixtureUserProfile }),
