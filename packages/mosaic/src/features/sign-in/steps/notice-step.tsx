@@ -10,6 +10,7 @@ import { SignInEmailLinkStatus } from './sign-in-email-link-status';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
+import { SignInStartOver } from './sign-in-start-over';
 
 interface NoticeStepProps {
   step: Extract<SignInStep, { kind: 'notice' }>;
@@ -21,6 +22,7 @@ interface NoticeStepProps {
   onSubmit: () => void;
   onEmailSupport: () => void;
   onBack: () => void;
+  onStartOver: () => void;
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
@@ -37,6 +39,7 @@ export function NoticeStep({
   onSubmit,
   onEmailSupport,
   onBack,
+  onStartOver,
   onEditIdentifier,
   onForgotPassword,
   onCancel,
@@ -116,6 +119,8 @@ export function NoticeStep({
           onCancel={onCancel}
         />
       );
+    case 'start-over':
+      return <SignInStartOver onStartOver={onStartOver} />;
     case 'email-link-status':
       return (
         <SignInEmailLinkStatus

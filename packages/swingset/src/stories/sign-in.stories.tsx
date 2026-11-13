@@ -405,6 +405,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         onCancel={cancelFor(step)}
         onShowHelp={() => navigate({ kind: 'notice', purpose: 'help' }, 1)}
         onBack={onBack}
+        onStartOver={() => navigate({ kind: 'identifier', field: 'email' }, -1)}
         onEmailSupport={() => setSupportRequested(true)}
         pendingFactorId={pendingFactorId}
         onSelectFactor={onSelectFactor}
@@ -534,6 +535,7 @@ function StepPanel({
       }
       onShowHelp={() => undefined}
       onBack={() => undefined}
+      onStartOver={() => undefined}
       onEmailSupport={() => undefined}
       onSelectFactor={() => undefined}
       onResend={offersResend(step) ? () => undefined : undefined}
@@ -950,8 +952,16 @@ export function CredentialPasskey() {
   return <StepPanel step={{ kind: 'credential', credential: 'passkey', identifier: IDENTIFIER }} />;
 }
 
+export function NoticeStartOver() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'start-over' }} />;
+}
+
 export function NewPasswordReset() {
   return <StepPanel step={{ kind: 'new-password', reason: 'forgot' }} />;
+}
+
+export function NewPasswordRequired() {
+  return <StepPanel step={{ kind: 'new-password', reason: 'required' }} />;
 }
 
 export function SignUpDetails() {

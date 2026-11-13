@@ -85,6 +85,7 @@ export function SignInView({
   onCancel,
   onShowHelp,
   onBack,
+  onStartOver,
   onEmailSupport,
   pendingFactorId,
   onSelectFactor,
@@ -263,6 +264,7 @@ export function SignInView({
                     onSubmit={() => onSubmit()}
                     onEmailSupport={onEmailSupport}
                     onBack={onBack}
+                    onStartOver={onStartOver}
                     onEditIdentifier={onEditIdentifier}
                     onForgotPassword={onForgotPassword}
                     onCancel={onCancel}
@@ -271,14 +273,17 @@ export function SignInView({
               </Flow.Step>
 
               <Flow.Step ids={stepIds.newPassword}>
-                <NewPasswordStep
-                  focusRef={focusRef}
-                  form={form}
-                  isPending={isPending}
-                  onSubmit={onSubmit}
-                  passwordFeedback={newPasswordFeedback}
-                  onBack={onBack}
-                />
+                {current.kind === 'new-password' ? (
+                  <NewPasswordStep
+                    focusRef={focusRef}
+                    required={current.reason === 'required'}
+                    form={form}
+                    isPending={isPending}
+                    onSubmit={onSubmit}
+                    passwordFeedback={newPasswordFeedback}
+                    onBack={onBack}
+                  />
+                ) : null}
               </Flow.Step>
 
               <Flow.Step ids={stepIds.signUp}>
