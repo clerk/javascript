@@ -433,4 +433,18 @@ describe('assertIssuedAtClaim(iat, clockSkewInMs)', () => {
     const nowInSeconds = Date.now() / 1000;
     expect(() => assertIssuedAtClaim(nowInSeconds + 5, 6000)).not.toThrow();
   });
+
+  it.each([1e300, 8.64e12 + 1])('throws error if iat is %s, beyond the Date upper bound', iat => {
+    expect(() => assertIssuedAtClaim(iat, 0)).toThrow('JWT issued at date claim (iat) is in the future.');
+  });
+
+  it('does not throw error if iat is -1e300', () => {
+    expect(() => assertIssuedAtClaim(-1e300, 0)).not.toThrow();
+  });
+
+  it.each([Infinity, -Infinity, NaN])('throws error if iat is %s', iat => {
+    expect(() => assertIssuedAtClaim(iat, 0)).toThrow(
+      `Invalid JWT issued at date claim (iat) ${JSON.stringify(iat)}. Expected number.`,
+    );
+  });
 });
