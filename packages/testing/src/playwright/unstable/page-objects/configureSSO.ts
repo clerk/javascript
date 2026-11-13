@@ -6,11 +6,12 @@ const providers: Record<WizardMode, string> = { manual: 'Custom SAML Provider', 
 
 async function configureIdp(page: EnhancedPage, mode: WizardMode, { metadata, issuer, signOnUrl }: SamlConfiguration) {
   if (mode === 'manual') {
-    for (let step = 1; step <= 3; step++) {
+    const configureManually = page.getByRole('radio', { name: 'Configure manually', exact: true });
+    while (!(await configureManually.isVisible())) {
       await page.getByRole('button', { name: 'Continue', exact: true }).click();
     }
 
-    await page.getByRole('radio', { name: 'Configure manually', exact: true }).check();
+    await configureManually.check();
 
     await page.getByLabel('Issuer', { exact: true }).fill(issuer);
     await page.getByLabel('Sign on URL', { exact: true }).fill(signOnUrl);
@@ -35,7 +36,7 @@ async function configureIdp(page: EnhancedPage, mode: WizardMode, { metadata, is
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
 
   if (mode === 'metadata file') {
-    for (let step = 3; step <= 5; step++) {
+    while (!(await page.getByRole('button', { name: 'Open test URL', exact: true }).isVisible())) {
       await page.getByRole('button', { name: 'Continue', exact: true }).click();
     }
   }
