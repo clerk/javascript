@@ -9,7 +9,9 @@ import { SignInEmailLink } from './sign-in-email-link';
 import { SignInEmailLinkStatus } from './sign-in-email-link-status';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
+import { SignInLoading } from './sign-in-loading';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
+import { SignInProtectCheck } from './sign-in-protect-check';
 import { SignInStartOver } from './sign-in-start-over';
 
 interface NoticeStepProps {
@@ -23,6 +25,8 @@ interface NoticeStepProps {
   onEmailSupport: () => void;
   onBack: () => void;
   onStartOver: () => void;
+  onRetry?: () => void;
+  protectCheckRef?: Ref<HTMLDivElement>;
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
@@ -40,6 +44,8 @@ export function NoticeStep({
   onEmailSupport,
   onBack,
   onStartOver,
+  onRetry,
+  protectCheckRef,
   onEditIdentifier,
   onForgotPassword,
   onCancel,
@@ -132,6 +138,19 @@ export function NoticeStep({
           globalErrorMessage={globalErrorMessage}
           isPending={isPending}
           resend={resend}
+        />
+      );
+    case 'loading':
+      return <SignInLoading globalErrorMessage={globalErrorMessage} />;
+    case 'protect-check':
+      return (
+        <SignInProtectCheck
+          challenge={step.challenge}
+          logo={logo}
+          globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
+          containerRef={protectCheckRef}
+          onRetry={onRetry}
         />
       );
     case 'start-over':

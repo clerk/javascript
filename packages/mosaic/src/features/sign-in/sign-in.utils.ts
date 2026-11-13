@@ -42,6 +42,8 @@ export const stepIds = {
     'notice:email-link-status',
     'notice:start-over',
     'notice:verify-email-link',
+    'notice:loading',
+    'notice:protect-check',
   ],
   newPassword: ['new-password:forgot', 'new-password:required'],
   signUp: ['sign-up'],

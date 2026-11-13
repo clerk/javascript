@@ -494,6 +494,7 @@ function StepPanel({
   lastUsedProviderId,
   onJoinWaitlist,
   passwordFeedback,
+  onRetry,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -511,6 +512,7 @@ function StepPanel({
   lastUsedProviderId?: string;
   onJoinWaitlist?: () => void;
   passwordFeedback?: FieldFeedback;
+  onRetry?: () => void;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -558,6 +560,7 @@ function StepPanel({
       onShowHelp={() => undefined}
       onBack={() => undefined}
       onStartOver={() => undefined}
+      onRetry={onRetry}
       onEmailSupport={() => undefined}
       onSelectFactor={() => undefined}
       onResend={offersResend(step) ? () => undefined : undefined}
@@ -1000,6 +1003,51 @@ export function CredentialPasskey() {
 
 export function NoticeStartOver() {
   return <StepPanel step={{ kind: 'notice', purpose: 'start-over' }} />;
+}
+
+export function NoticeLoading() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'loading' }} />;
+}
+
+export function NoticeLoadingError() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'loading' }}
+      globalErrorMessage='Unable to complete action at this time. If the problem persists please contact support.'
+    />
+  );
+}
+
+export function NoticeProtectCheck() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'protect-check', challenge: false }}
+      isPending
+    />
+  );
+}
+
+export function NoticeProtectCheckChallenge() {
+  const ref = useRef<HTMLDivElement>(null);
+  const status = useTestTurnstile(() => ref.current?.querySelector<HTMLElement>('#clerk-protect-check'));
+  return (
+    <div ref={ref}>
+      <StepPanel
+        step={{ kind: 'notice', purpose: 'protect-check', challenge: status === 'Interactive challenge shown' }}
+        isPending
+      />
+    </div>
+  );
+}
+
+export function NoticeProtectCheckError() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'protect-check', challenge: false }}
+      globalErrorMessage='Verification couldn’t start. Please contact support.'
+      onRetry={() => undefined}
+    />
+  );
 }
 
 export function NewPasswordReset() {

@@ -50,6 +50,8 @@ const stepsByKey: Record<SignInStepKey, SignInStep> = {
   'notice:email-link-status': { kind: 'notice', purpose: 'email-link-status', status: 'expired', flow: 'sign-in' },
   'notice:verify-email-link': { kind: 'notice', purpose: 'verify-email-link', identifier: 'new@acme.com' },
   'notice:start-over': { kind: 'notice', purpose: 'start-over' },
+  'notice:loading': { kind: 'notice', purpose: 'loading' },
+  'notice:protect-check': { kind: 'notice', purpose: 'protect-check', challenge: false },
   'new-password:forgot': { kind: 'new-password', reason: 'forgot' },
   'new-password:required': { kind: 'new-password', reason: 'required' },
   'sign-up': { kind: 'sign-up', fields: {} },
