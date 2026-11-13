@@ -21,6 +21,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
     stable: 'UserProfile',
     beta: 'UserProfile',
     status: 'available',
+    renamedTo: 'Profile mode="user"',
     notes: 'No path or hash routing yet, so URLs don’t update. `defaultPage` is removed; use `pageOrder`.',
   },
   { stable: 'UserAvatar', beta: 'UserAvatar', status: 'available' },
