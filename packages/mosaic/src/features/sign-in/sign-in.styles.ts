@@ -65,15 +65,8 @@ export const styles = stylex.create({
     textAlign: 'center',
   },
   status: {
-    gap: space['2'],
     alignItems: 'center',
     display: 'flex',
     flexDirection: 'column',
   },
-});
-
-export const statusColors = stylex.create({
-  brand: { color: colorVars['--cl-color-brand'] },
-  warning: { color: colorVars['--cl-color-warning'] },
-  negative: { color: colorVars['--cl-color-negative'] },
 });
