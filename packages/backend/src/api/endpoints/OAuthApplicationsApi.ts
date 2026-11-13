@@ -1,4 +1,3 @@
-import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { Autocomplete, ClerkPaginationRequest } from '@clerk/shared/types';
 
 import { OAuthTokenExchangeError } from '../../errors';
@@ -57,7 +56,7 @@ export type OAuthTokenTypeIdentifier = Autocomplete<
 export type ExchangeOAuthApplicationTokenParams = {
   /** The publishable key of the instance, used to derive its token endpoint. */
   publishableKey: string;
-  /** The absolute URL of your Frontend API proxy. When set, the exchange is sent through the proxy instead of the Frontend API host in `publishableKey`. */
+  /** The absolute HTTPS URL of your Frontend API proxy. When set, the exchange is sent through the proxy instead of the Frontend API host in `publishableKey`. */
   proxyUrl?: string;
   /** The client ID of the OAuth application performing the exchange. */
   clientId: string;
@@ -235,8 +234,8 @@ function tokenExchangeError(json: unknown, status: number) {
 
 function oauthTokenEndpoint({ publishableKey, proxyUrl }: ExchangeOAuthApplicationTokenParams) {
   if (proxyUrl) {
-    if (!isHttpOrHttps(proxyUrl)) {
-      throw new Error('`proxyUrl` must be an absolute URL to perform an OAuth token exchange.');
+    if (parseAbsoluteUrl(proxyUrl)?.protocol !== 'https:') {
+      throw new Error('`proxyUrl` must be an absolute HTTPS URL to perform an OAuth token exchange.');
     }
     return `${proxyUrl.replace(/\/+$/, '')}/oauth/token`;
   }
@@ -355,8 +354,8 @@ export class OAuthApplicationsApi extends AbstractAPI {
    * @throws `OAuthTokenExchangeError` with code `invalid_request` and no `status` if `resource` or `scope` is invalid. No request is made.
    * @throws `OAuthTokenExchangeError` with the OAuth error code, `errorDescription` and HTTP `status` if the token endpoint rejects the exchange ([RFC 6749 section 5.2](https://www.rfc-editor.org/rfc/rfc6749#section-5.2)).
    * @throws `OAuthTokenExchangeError` with code `invalid_response` and the HTTP `status` if the token endpoint returns a non-200 success status, an error without an OAuth error code, or a malformed token response.
-   * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute URL.
-   * @throws Network failures from `fetch`, unwrapped and unchanged.
+   * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute HTTPS URL.
+   * @throws Network failures and rejected redirects from `fetch`, unwrapped and unchanged.
    *
    * @example
    * ```ts
@@ -387,7 +386,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
 
-    const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body });
+    const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body, redirect: 'error' });
 
     const json = await response.json().catch(() => undefined);
 
