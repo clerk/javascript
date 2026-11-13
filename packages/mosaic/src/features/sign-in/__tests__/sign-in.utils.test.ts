@@ -50,6 +50,8 @@ const stepsByKey: Record<SignInStepKey, SignInStep> = {
   'notice:start-over': { kind: 'notice', purpose: 'start-over' },
   'notice:loading': { kind: 'notice', purpose: 'loading' },
   'notice:protect-check': { kind: 'notice', purpose: 'protect-check', challenge: false },
+  'notice:restricted': { kind: 'notice', purpose: 'restricted' },
+  'notice:waitlist': { kind: 'notice', purpose: 'waitlist' },
   'new-password:forgot': { kind: 'new-password', reason: 'forgot' },
   'new-password:required': { kind: 'new-password', reason: 'required' },
   'sign-up': { kind: 'sign-up', fields: {} },

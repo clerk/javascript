@@ -9,7 +9,7 @@ import { Link } from '../../../components/link';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
-import { rich, useMessages } from '../../../localization';
+import { fill, rich, useMessages } from '../../../localization';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 
@@ -87,7 +87,7 @@ export function SignInWallets({
                   {...stylex.props(styles.providerIcon)}
                 />
               }
-              longLabel={wallet.name}
+              longLabel={wallets.length === 1 ? fill(m.wallets.continueWith, { wallet: wallet.name }) : wallet.name}
               shortLabel={wallet.name}
               isPending={pendingWalletId === wallet.id}
               pendingLabel={m.verifying}
