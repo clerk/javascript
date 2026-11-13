@@ -61,6 +61,36 @@
         "default": "./dist/keyless/index.js"
       }
     },
+    "./agentRules": {
+      "import": {
+        "types": "./dist/agentRules/index.d.mts",
+        "default": "./dist/agentRules/index.mjs"
+      },
+      "require": {
+        "types": "./dist/agentRules/index.d.ts",
+        "default": "./dist/agentRules/index.js"
+      }
+    },
+    "./agentRulesWriter": {
+      "import": {
+        "types": "./dist/agentRulesWriter.d.mts",
+        "default": "./dist/agentRulesWriter.mjs"
+      },
+      "require": {
+        "types": "./dist/agentRulesWriter.d.ts",
+        "default": "./dist/agentRulesWriter.js"
+      }
+    },
+    "./vite": {
+      "import": {
+        "types": "./dist/vite.d.mts",
+        "default": "./dist/vite.mjs"
+      },
+      "require": {
+        "types": "./dist/vite.d.ts",
+        "default": "./dist/vite.js"
+      }
+    },
     "./utils": {
       "import": {
         "types": "./dist/utils/index.d.mts",

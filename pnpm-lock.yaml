@@ -1502,6 +1502,9 @@ importers:
 
   packages/upgrade:
     dependencies:
+      '@clerk/shared':
+        specifier: workspace:^
+        version: link:../shared
       chalk:
         specifier: ^5.6.2
         version: 5.6.2

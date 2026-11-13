@@ -1,7 +1,10 @@
+import { createClerkAgentRulesWriter } from '@clerk/shared/agentRulesWriter';
 import type { RequestHandler } from 'express';
 
 import { authenticateAndDecorateRequest } from './authenticateRequest';
 import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
+
+const writeAgentRulesOnce = createClerkAgentRulesWriter('express');
 
 /**
  * Middleware that integrates Clerk authentication into your Express application.
@@ -31,6 +34,8 @@ import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './t
 export const clerkMiddleware = (
   options: ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback = {},
 ): RequestHandler => {
+  writeAgentRulesOnce();
+
   if (typeof options !== 'function') {
     const authMiddleware = authenticateAndDecorateRequest({
       ...options,

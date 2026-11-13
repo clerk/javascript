@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
+import { createClerkAgentRulesWriter } from '@clerk/shared/agentRulesWriter';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { patchRequest } from '@clerk/shared/patchRequest';
 import type { PendingSessionOptions } from '@clerk/shared/types';
@@ -31,7 +32,11 @@ export const requestStateContext = createContext<RequestStateContextValue | null
  * // root.tsx
  * export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
  */
+const writeAgentRulesOnce = createClerkAgentRulesWriter('react-router');
+
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFunction<Response> => {
+  writeAgentRulesOnce();
+
   return async (args, next) => {
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
