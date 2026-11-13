@@ -996,10 +996,25 @@ export function SignUpSettingsFields() {
       step={{
         kind: 'sign-up',
         fields: {
-          firstName: { required: false },
-          lastName: { required: false },
           username: { required: true },
           phoneNumber: { required: true },
+          password: { required: true },
+        },
+      }}
+    />
+  );
+}
+
+export function SignUpOptionalFields() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        fields: {
+          firstName: { required: false },
+          lastName: { required: false },
+          emailAddress: { required: true },
           password: { required: true },
         },
       }}
