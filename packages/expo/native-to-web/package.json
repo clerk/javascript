@@ -1,0 +1,4 @@
+{
+  "main": "../dist/native-to-web/index.js",
+  "types": "../dist/native-to-web/index.d.ts"
+}

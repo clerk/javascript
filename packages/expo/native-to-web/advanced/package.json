@@ -1,0 +1,4 @@
+{
+  "main": "../../dist/native-to-web/advanced.js",
+  "types": "../../dist/native-to-web/advanced.d.ts"
+}

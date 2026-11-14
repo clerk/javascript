@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "4.16.1",
+  "version": "4.15.1",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -73,6 +73,14 @@
       "types": "./dist/hosted-auth/index.d.ts",
       "default": "./dist/hosted-auth/index.js"
     },
+    "./native-to-web": {
+      "types": "./dist/native-to-web/index.d.ts",
+      "default": "./dist/native-to-web/index.js"
+    },
+    "./native-to-web/advanced": {
+      "types": "./dist/native-to-web/advanced.d.ts",
+      "default": "./dist/native-to-web/advanced.js"
+    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
@@ -105,6 +113,7 @@
     "apple",
     "biometrics",
     "hosted-auth",
+    "native-to-web",
     "experimental",
     "legacy",
     "app.plugin.js",
@@ -145,6 +154,7 @@
     "expo-secure-store": "^15.0.8",
     "expo-web-browser": "^15.0.11",
     "react-native": "^0.86.0",
+    "react-native-webview": "^14.0.1",
     "tslib": "catalog:repo"
   },
   "peerDependencies": {
