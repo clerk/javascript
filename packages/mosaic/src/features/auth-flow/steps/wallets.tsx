@@ -10,11 +10,11 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
 import { fill, rich, useMessages } from '../../../localization';
-import { styles } from '../sign-in.styles';
-import type { SignInProvider } from '../sign-in.types';
+import { styles } from '../auth-flow.styles';
+import type { AuthFlowProvider } from '../auth-flow.types';
 
-interface SignInWalletsProps {
-  wallets: readonly SignInProvider[];
+interface WalletsChoiceProps {
+  wallets: readonly AuthFlowProvider[];
   globalErrorMessage?: string;
   pendingWalletId?: string;
   isDisabled: boolean;
@@ -26,7 +26,7 @@ interface SignInWalletsProps {
   loading?: boolean;
 }
 
-export function SignInWallets({
+export function WalletsChoice({
   wallets,
   globalErrorMessage,
   pendingWalletId,
@@ -37,7 +37,7 @@ export function SignInWallets({
   title,
   description,
   loading = false,
-}: SignInWalletsProps) {
+}: WalletsChoiceProps) {
   const m = useMessages('signIn');
   const firstRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
 

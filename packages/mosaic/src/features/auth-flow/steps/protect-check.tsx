@@ -7,9 +7,9 @@ import { useFlowAutoFocus } from '../../../components/flow';
 import { Spinner } from '../../../components/spinner';
 import { useSpinDelay } from '../../../hooks/use-spin-delay';
 import { useMessages } from '../../../localization';
-import { styles } from '../sign-in.styles';
+import { styles } from '../auth-flow.styles';
 
-interface SignInProtectCheckProps {
+interface ProtectCheckNoticeProps {
   challenge: boolean;
   logo?: { src: string; alt: string };
   globalErrorMessage?: string;
@@ -18,14 +18,14 @@ interface SignInProtectCheckProps {
   onRetry?: () => void;
 }
 
-export function SignInProtectCheck({
+export function ProtectCheckNotice({
   challenge,
   logo,
   globalErrorMessage,
   isPending,
   containerRef,
   onRetry,
-}: SignInProtectCheckProps) {
+}: ProtectCheckNoticeProps) {
   const m = useMessages('signIn');
   const retryRef = useFlowAutoFocus<HTMLButtonElement>();
   const spinning = useSpinDelay(isPending ? true : null, { delay: 300 });

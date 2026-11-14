@@ -2,25 +2,18 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import type { VerificationCodeResend } from '../../blocks/verification';
+import { VerificationCode } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { codeCopy, codeIdentity, codeNotice, codeResendCopy, codeSecondaryAction } from '../auth-flow/auth-flow.utils';
+import { IdentityPreview } from '../auth-flow/steps/identity-preview';
 import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
-import {
-  backupCodeDescription,
-  codeCopy,
-  codeIdentity,
-  codeNotice,
-  codeResendCopy,
-  codeSecondaryAction,
-  stepIds,
-  stepKey,
-} from './sign-in.utils';
+import { backupCodeDescription, stepIds, stepKey } from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
-import { CodeStep } from './steps/code-step';
 import { CredentialStep } from './steps/credential-step';
 import { IdentifierStep } from './steps/identifier-step';
 import { NewPasswordStep } from './steps/new-password-step';
@@ -137,6 +130,43 @@ export function SignInView({
     };
 
   const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+  const code = form.registerValue('code');
+
+  const codeStep = (current: Extract<SignInStep, { kind: 'code' }>) => {
+    const secondary = codeSecondaryAction(current, m, { onCancel, onBack });
+    const identity = codeIdentity(current, m);
+    return (
+      <VerificationCode
+        focusRef={focusRef}
+        messages={{
+          ...codeCopy(current, m, applicationName),
+          ...actions,
+          secondaryActionLabel: secondary.label,
+          ...(current.purpose === 'reset-password' ? { primaryActionLabel: m.resetPasswordCode.verify } : {}),
+        }}
+        resend={resendFor(codeResendCopy(current, m))}
+        identity={
+          identity.identifier ? (
+            <IdentityPreview
+              identifier={identity.identifier}
+              editLabel={identity.editLabel}
+              disabled={isPending}
+              onEdit={onEditIdentifier}
+            />
+          ) : undefined
+        }
+        notice={codeNotice(current, m)}
+        value={code.value}
+        onValueChange={code.onValueChange}
+        errorMessage={errorMessage}
+        globalErrorMessage={globalErrorMessage}
+        isPending={isPending}
+        onSubmit={() => onSubmit()}
+        onComplete={onCodeComplete}
+        onCancel={secondary.onClick}
+      />
+    );
+  };
 
   return (
     <Card.Root align='center'>
@@ -146,7 +176,6 @@ export function SignInView({
         state={step}
       >
         {current => {
-          const secondary = current.kind === 'code' ? codeSecondaryAction(current, m, { onCancel, onBack }) : undefined;
           const identifierStep =
             current.kind === 'identifier' ? (
               <IdentifierStep
@@ -207,32 +236,7 @@ export function SignInView({
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={stepIds.code}>
-                {current.kind === 'code' ? (
-                  <CodeStep
-                    focusRef={focusRef}
-                    messages={{
-                      ...codeCopy(current, m, applicationName),
-                      ...actions,
-                      secondaryActionLabel: secondary?.label ?? actions.secondaryActionLabel,
-                      ...(current.purpose === 'reset-password'
-                        ? { primaryActionLabel: m.resetPasswordCode.verify }
-                        : {}),
-                    }}
-                    resend={resendFor(codeResendCopy(current, m))}
-                    identity={codeIdentity(current, m)}
-                    notice={codeNotice(current, m)}
-                    form={form}
-                    errorMessage={errorMessage}
-                    globalErrorMessage={globalErrorMessage}
-                    isPending={isPending}
-                    onSubmit={onSubmit}
-                    onCodeComplete={onCodeComplete}
-                    onEditIdentifier={onEditIdentifier}
-                    onCancel={secondary?.onClick}
-                  />
-                ) : null}
-              </Flow.Step>
+              <Flow.Step ids={stepIds.code}>{current.kind === 'code' ? codeStep(current) : null}</Flow.Step>
 
               <Flow.Step ids={stepIds.choice}>
                 {current.kind === 'choice' ? (

@@ -16,6 +16,9 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
+import { styles as flowStyles } from '../../auth-flow/auth-flow.styles';
+import { AlternativeChannelStep } from '../../auth-flow/steps/alternative-channel';
+import { FlowCaptcha } from '../../auth-flow/steps/captcha';
 import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';
 import type {
@@ -26,8 +29,6 @@ import type {
   SignInValues,
 } from '../sign-in.types';
 import { identifierFieldCopy, splitLastUsedProvider, startPrompt } from '../sign-in.utils';
-import { SignInAlternativeChannel } from './sign-in-alternative-channel';
-import { SignInCaptcha } from './sign-in-captcha';
 
 type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
 
@@ -40,7 +41,7 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
   const signUp = useMessages('signUp');
   if ('channel' in step) {
     return (
-      <SignInAlternativeChannel
+      <AlternativeChannelStep
         channel={step.channel}
         copy={step.flow === 'sign-up' ? signUp.alternativePhone : undefined}
         applicationName={props.applicationName}
@@ -61,7 +62,7 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
             disabled={props.isDisabled}
           />
         ) : null}
-      </SignInAlternativeChannel>
+      </AlternativeChannelStep>
     );
   }
   return (
@@ -137,7 +138,7 @@ function IdentifierStart({
             <img
               src={logo.src}
               alt={logo.alt}
-              {...stylex.props(styles.logo)}
+              {...stylex.props(flowStyles.logo)}
             />
           </Card.Media>
         ) : null}
@@ -152,7 +153,7 @@ function IdentifierStart({
       </Card.Banner>
       <Card.Content>
         <div
-          {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
+          {...stylex.props(isChallengeShown ? flowStyles.spotlightHidden : flowStyles.spotlightGroup)}
           {...inertProps(isChallengeShown)}
         >
           <SignInProviders
@@ -179,7 +180,7 @@ function IdentifierStart({
             />
           ) : null}
         </div>
-        <SignInCaptcha onInteractiveChange={setIsChallengeShown} />
+        <FlowCaptcha onInteractiveChange={setIsChallengeShown} />
         {onPasskey ? (
           <Button
             type='button'
@@ -200,7 +201,7 @@ function IdentifierStart({
       </Card.Content>
       {field ? (
         <Card.Footer
-          xstyle={isChallengeShown && styles.spotlightHidden}
+          xstyle={isChallengeShown && flowStyles.spotlightHidden}
           {...inertProps(isChallengeShown)}
         >
           <SubmitButton
@@ -270,7 +271,7 @@ function StartForm({
       id={form.id}
       onSubmit={onSubmit}
     >
-      <div {...stylex.props(styles.fieldStack)}>
+      <div {...stylex.props(flowStyles.fieldStack)}>
         <Field.Root
           required
           invalid={feedback?.type === 'error'}
@@ -424,7 +425,7 @@ function SignInProviders({
         <img
           src={provider.iconUrl}
           alt=''
-          {...stylex.props(styles.providerIcon)}
+          {...stylex.props(flowStyles.providerIcon)}
         />
       }
       longLabel={fill(m.start.socialButton, { provider: provider.name })}
@@ -447,16 +448,16 @@ function SignInProviders({
       {showDivider ? (
         <div
           role='separator'
-          {...stylex.props(styles.divider)}
+          {...stylex.props(flowStyles.divider)}
         >
-          <span {...stylex.props(styles.dividerLine)} />
+          <span {...stylex.props(flowStyles.dividerLine)} />
           <Text
             size='sm'
             color='foreground-secondary'
           >
             {m.start.divider}
           </Text>
-          <span {...stylex.props(styles.dividerLine)} />
+          <span {...stylex.props(flowStyles.dividerLine)} />
         </div>
       ) : null}
     </>
@@ -480,7 +481,7 @@ function StartPrompt({ onSignUp, onJoinWaitlist, isDisabled }: StartPromptProps)
     <Text
       size='sm'
       color='foreground-secondary'
-      xstyle={styles.footerText}
+      xstyle={flowStyles.footerText}
     >
       {prompt.text}{' '}
       <Button

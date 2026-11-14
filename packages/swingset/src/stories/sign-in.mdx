@@ -46,7 +46,7 @@ import { SignInView } from '@clerk/mosaic/features/sign-in';
 
 ## Steps
 
-Each section is one component in `features/sign-in/steps/`, and each example under it is one `SignInStep` value it draws. A red "not found" box marks a view that legacy sign-in has and Mosaic doesn't yet; it turns into the example once its story exists.
+Each section is one component in `features/sign-in/steps/`, or in `features/auth-flow/steps/` for the screens sign-in and sign-up share, and each example under it is one `SignInStep` value it draws. A red "not found" box marks a view that legacy sign-in has and Mosaic doesn't yet; it turns into the example once its story exists.
 
 ### Identifier step
 
@@ -170,7 +170,7 @@ When the password is the only method, the secondary action is "Get help".
 
 ### Code step
 
-`code-step.tsx` draws every `{ kind: 'code' }` with `VerificationCode`. The purpose sets the copy and the second button; the channel decides whether Resend shows.
+The view draws every `{ kind: 'code' }` with the `VerificationCode` block. The purpose sets the copy and the second button; the channel decides whether Resend shows.
 
 #### Email code
 

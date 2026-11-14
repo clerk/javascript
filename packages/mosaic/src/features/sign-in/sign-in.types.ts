@@ -2,6 +2,15 @@ import type { Ref } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
+import type {
+  AuthFlowActionBlockedDetails,
+  AuthFlowCodeStep,
+  AuthFlowEmailLinkState,
+  AuthFlowEmailLinkStatus,
+  AuthFlowProvider,
+  AuthFlowSubmitEvent,
+  AuthFlowValues,
+} from '../auth-flow/auth-flow.types';
 import type { SignUpFields, SignUpLegalConsent } from '../sign-up/sign-up.types';
 
 export type SignInFactor =
@@ -18,7 +27,15 @@ export type SignInFactor =
       identifier: string;
     };
 
-type SignInCodeChannel = 'email' | 'phone' | 'totp';
+export type SignInProvider = AuthFlowProvider;
+
+export type SignInValues = AuthFlowValues;
+
+export type SignInSubmitEvent = AuthFlowSubmitEvent;
+
+export type SignInActionBlockedDetails = AuthFlowActionBlockedDetails;
+
+export type SignInEmailLinkStatus = AuthFlowEmailLinkStatus;
 
 export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
 
@@ -40,21 +57,7 @@ export type SignInStep =
   | { kind: 'credential'; credential: 'password'; identifier: string }
   | { kind: 'credential'; credential: 'backup-code'; identifier: string; resetting?: boolean }
   | { kind: 'credential'; credential: 'passkey'; identifier?: string }
-  | {
-      kind: 'code';
-      purpose:
-        | 'first-factor'
-        | 'second-factor'
-        | 'client-trust'
-        | 'sso-bypass'
-        | 'reset-password'
-        | 'verify-email'
-        | 'verify-phone';
-      channel: SignInCodeChannel;
-      identifier?: string;
-      provider?: string;
-      resetting?: boolean;
-    }
+  | AuthFlowCodeStep
   | {
       kind: 'choice';
       purpose: 'methods';
@@ -72,7 +75,7 @@ export type SignInStep =
   | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string; newDevice?: boolean }
-  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
+  | ({ kind: 'notice'; purpose: 'email-link-status' } & AuthFlowEmailLinkState)
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
   | { kind: 'notice'; purpose: 'restricted' | 'waitlist' }
   | { kind: 'new-password'; reason: 'forgot' | 'required' }
@@ -84,53 +87,11 @@ export type SignInStep =
       legalConsent?: SignUpLegalConsent;
     };
 
-export type SignInEmailLinkStatus =
-  | 'loading'
-  | 'signed-in'
-  | 'signed-in-other-tab'
-  | 'transferable'
-  | 'expired'
-  | 'failed'
-  | 'client-mismatch';
-
-export interface SignInActionBlockedDetails {
-  title?: string;
-  description?: string;
-  linkUrl?: string;
-  linkText?: string;
-  traceId?: string;
-}
-
 export interface SignInAccount {
   id: string;
   name: string;
   identifier: string;
   imageUrl?: string;
-}
-
-export interface SignInProvider {
-  id: string;
-  name: string;
-  iconUrl: string;
-}
-
-export interface SignInValues {
-  identifier: string;
-  phoneNumber: string;
-  password: string;
-  code: string;
-  backupCode: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  newPassword: string;
-  confirmPassword: string;
-  signOutOfOtherSessions: boolean;
-  legalAccepted: boolean;
-}
-
-export interface SignInSubmitEvent {
-  preventDefault: () => void;
 }
 
 export interface SignInViewProps {

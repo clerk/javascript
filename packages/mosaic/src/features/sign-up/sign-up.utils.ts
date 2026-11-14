@@ -1,5 +1,5 @@
 import type { MosaicMessages } from '../../localization';
-import type { SignInStep } from '../sign-in';
+import type { AuthFlowCodeStep } from '../auth-flow/auth-flow.types';
 import type { SignUpDetails, SignUpFieldName, SignUpFields, SignUpLegalConsent, SignUpStep } from './sign-up.types';
 
 type Messages = MosaicMessages['signUp'];
@@ -67,7 +67,7 @@ export function legalConsentLabel({ termsUrl, privacyPolicyUrl }: SignUpLegalCon
   return m.legalConsent.termsAndPrivacy;
 }
 
-export function signUpCodeStep(step: Extract<SignUpStep, { kind: 'code' }>): Extract<SignInStep, { kind: 'code' }> {
+export function signUpCodeStep(step: Extract<SignUpStep, { kind: 'code' }>): AuthFlowCodeStep {
   return {
     kind: 'code',
     purpose: step.purpose,

@@ -1,14 +1,14 @@
 import { Card } from '../../../components/card';
 import { Spinner } from '../../../components/spinner';
 import { useMessages } from '../../../localization';
-import { styles } from '../sign-in.styles';
-import { SignInCaptcha } from './sign-in-captcha';
+import { styles } from '../auth-flow.styles';
+import { FlowCaptcha } from './captcha';
 
-interface SignInLoadingProps {
+interface LoadingNoticeProps {
   globalErrorMessage?: string;
 }
 
-export function SignInLoading({ globalErrorMessage }: SignInLoadingProps) {
+export function LoadingNotice({ globalErrorMessage }: LoadingNoticeProps) {
   const m = useMessages('signIn');
 
   return (
@@ -21,7 +21,7 @@ export function SignInLoading({ globalErrorMessage }: SignInLoadingProps) {
       </Card.Banner>
       <Card.Content xstyle={styles.loading}>
         <Spinner label={m.loading} />
-        <SignInCaptcha />
+        <FlowCaptcha />
       </Card.Content>
     </>
   );
