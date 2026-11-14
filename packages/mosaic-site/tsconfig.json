@@ -11,8 +11,8 @@
     "lib": ["ES2023", "DOM"],
     "paths": {
       "@/lib/types": ["../swingset/src/lib/types"],
-      "@/lib/chaos": ["../swingset/src/lib/chaos"],
-      "@/components/ChaosProvider": ["../swingset/src/components/ChaosProvider"],
+      "@/lib/chaos": ["./src/lib/chaos-off"],
+      "@/components/ChaosProvider": ["./src/lib/chaos-off"],
       "@/*": ["./src/*"],
       "@swingset/*": ["../swingset/src/*"],
       "@clerk/mosaic": ["../mosaic/src"],

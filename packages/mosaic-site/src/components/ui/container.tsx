@@ -5,7 +5,7 @@ export function Container({ className, ...props }: React.ComponentPropsWithoutRe
     <div
       className={clsx(
         className,
-        'mx-auto w-full px-6 sm:max-w-[40rem] md:max-w-[48rem] md:px-8 lg:max-w-[64rem] xl:max-w-[76rem]',
+        'mx-auto w-full px-6 md:max-w-[44rem] md:px-0 lg:max-w-[59rem] xl:max-w-[70rem] 2xl:max-w-[76rem]',
       )}
       {...props}
     />

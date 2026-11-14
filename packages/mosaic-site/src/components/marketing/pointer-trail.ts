@@ -19,12 +19,43 @@ let listeners = 0;
 
 export const TRAIL_POINTS_UNIFORM: Uniforms[string] = { type: 'uniform3fv', value: points };
 export const TRAIL_ENERGY_UNIFORM: { type: 'uniform1f'; value: number } = { type: 'uniform1f', value: 0 };
+const TOUCH_RADIUS_SCALE = 1.8;
+
+export const TRAIL_RADIUS_UNIFORM: { type: 'uniform1f'; value: number } = {
+  type: 'uniform1f',
+  value: settings.radius,
+};
+
 export const TRAIL_ORIGIN_UNIFORM: { type: 'uniform3f'; value: [number, number, number] } = {
   type: 'uniform3f',
   value: [0, 0, 0],
 };
 
+function jumpTo(x: number, y: number) {
+  head.started = true;
+  head.x = x;
+  head.y = y;
+  head.vx = 0;
+  head.vy = 0;
+  head.targetX = x;
+  head.targetY = y;
+  for (const point of points) {
+    point[0] = x;
+    point[1] = y;
+    point[2] = 0;
+  }
+}
+
+function onPointerDown(event: PointerEvent) {
+  if (event.pointerType === 'mouse') {
+    return;
+  }
+  TRAIL_RADIUS_UNIFORM.value = settings.radius * TOUCH_RADIUS_SCALE;
+  jumpTo(event.clientX, event.clientY);
+}
+
 function onPointerMove(event: PointerEvent) {
+  TRAIL_RADIUS_UNIFORM.value = settings.radius * (event.pointerType === 'mouse' ? 1 : TOUCH_RADIUS_SCALE);
   head.targetX = event.clientX;
   head.targetY = event.clientY;
   if (head.started) {
@@ -42,12 +73,14 @@ function onPointerMove(event: PointerEvent) {
 export function startTrail() {
   if (listeners === 0) {
     window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
   }
   listeners += 1;
   return () => {
     listeners -= 1;
     if (listeners === 0) {
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
     }
   };
 }
@@ -103,6 +136,7 @@ export const TRAIL_GLSL = `
 uniform vec3 u_trail[${TRAIL_POINTS}];
 uniform vec3 u_trail_origin;
 uniform float u_trail_energy;
+uniform float u_trail_radius;
 
 float trailHash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -125,7 +159,7 @@ float trailWobble(vec2 point) {
 
 float trailWeight(vec2 point, int i, float wobble) {
   float taper = 1.0 - float(i) / ${TRAIL_POINTS - 1}.0;
-  float radius = ${settings.radius.toFixed(1)} * mix(${settings.taper}, 1.0, taper);
+  float radius = u_trail_radius * mix(${settings.taper}, 1.0, taper);
   float d = distance(point, u_trail[i].xy - u_trail_origin.xy) / (radius * 0.5 * wobble);
   float spacing = i == 0 ? radius : distance(u_trail[i].xy, u_trail[i - 1].xy);
   return u_trail[i].z * clamp(spacing / (radius * 0.3), 0.0, 1.0) * exp(-d * d);

@@ -23,6 +23,7 @@ import {
   TRAIL_ORIGIN_UNIFORM,
   TRAIL_POINTS,
   TRAIL_POINTS_UNIFORM,
+  TRAIL_RADIUS_UNIFORM,
 } from '@/components/marketing/pointer-trail';
 import { Shader, type Uniforms } from '@/components/shader';
 import { type Mode, useMode } from '@/components/use-mode';
@@ -1420,6 +1421,7 @@ function buildUniforms(settings: Settings, focus: Focus, palette: Palette, mode:
     u_trail: TRAIL_POINTS_UNIFORM,
     u_trail_origin: TRAIL_ORIGIN_UNIFORM,
     u_trail_energy: TRAIL_ENERGY_UNIFORM,
+    u_trail_radius: TRAIL_RADIUS_UNIFORM,
     u_vig_height: { type: 'uniform1f', value: settings.vigHeight },
     u_vig_soft: { type: 'uniform1f', value: settings.vigSoft },
     u_vig_top: { type: 'uniform1f', value: settings.vigTop },

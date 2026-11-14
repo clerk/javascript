@@ -22,10 +22,7 @@ const BORDER = 1;
 const INSET = 2;
 const LABEL_HEIGHT = 20;
 const LABEL_RADIUS = RADIUS - BORDER - INSET;
-const TARGETS = [
-  { rule: '.cl-profile', element: '.cl-profile-layout', pad: 0, padBottom: 0 },
-  { rule: '.cl-section', element: '.cl-section', pad: 8, padBottom: LABEL_HEIGHT + INSET + 6 },
-];
+const TARGETS = [{ rule: '.cl-profile', element: '.cl-profile-layout', pad: 0, padBottom: 0 }];
 
 function measure(container: HTMLElement, target: HTMLElement): Region[] {
   const base = container.getBoundingClientRect();
@@ -69,11 +66,9 @@ export function ClerkOutline({ target, active }: { target: HTMLElement | null; a
     update();
     const observer = new ResizeObserver(update);
     observer.observe(target);
-    target.addEventListener('scroll', update, true);
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
-      target.removeEventListener('scroll', update, true);
     };
   }, [active, target]);
 
@@ -118,7 +113,7 @@ export function ClerkOutline({ target, active }: { target: HTMLElement | null; a
               }}
             >
               {region.name}
-              {region.hooks.length > 0 && <span className='font-[460]'>{region.hooks.join(' · ')}</span>}
+              {region.hooks.length > 0 && <span className='font-[460] max-sm:hidden'>{region.hooks.join(' · ')}</span>}
             </span>
           </div>
         );

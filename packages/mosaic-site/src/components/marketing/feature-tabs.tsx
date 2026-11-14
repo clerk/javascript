@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { PrinciplesScene, type SceneId } from '@/components/marketing/principles-scene';
 
-type Feature = { id: SceneId; title: string; description: string; icon: React.ReactNode };
+type Feature = { id: SceneId; title: string; description: string; figure: string; icon: React.ReactNode };
 
 const icon = (...paths: string[]) => (
   <svg
@@ -31,6 +31,7 @@ const FEATURES: Feature[] = [
     id: 'composable',
     title: 'Composable',
     description: 'Rearrange, restyle, or replace any part of a component without forking.',
+    figure: 'A user profile whose account sections can be dragged into a new order.',
     icon: icon(
       'M5.75 10.25H9.25C9.80228 10.25 10.25 9.80228 10.25 9.25V5.75C10.25 5.19772 9.80228 4.75 9.25 4.75H5.75C5.19772 4.75 4.75 5.19772 4.75 5.75V9.25C4.75 9.80228 5.19772 10.25 5.75 10.25Z',
       'M5.75 19.25H9.25C9.80228 19.25 10.25 18.8023 10.25 18.25V14.75C10.25 14.1977 9.80228 13.75 9.25 13.75H5.75C5.19772 13.75 4.75 14.1977 4.75 14.75V18.25C4.75 18.8023 5.19772 19.25 5.75 19.25Z',
@@ -41,7 +42,8 @@ const FEATURES: Feature[] = [
   {
     id: 'agent',
     title: 'Agent-native',
-    description: 'Coding agents can read, extend, and test every model, controller, and view.',
+    description: 'Ask your agent for a change. It edits the view and leaves the logic alone.',
+    figure: 'A user profile beside its source folders, each section split into model, controller, and view files.',
     icon: icon(
       'M10.75 10C13.5114 10 15 7.51142 15 4.75C15 7.51142 16.4886 10 19.25 10C16.4886 10 15 12.4886 15 15.25C15 12.4886 13.5114 10 10.75 10ZM4.75 16C6.40685 16 8 14.4069 8 12.75C8 14.4069 9.59315 16 11.25 16C9.59315 16 8 17.5931 8 19.25C8 17.5931 6.40685 16 4.75 16Z',
     ),
@@ -50,6 +52,7 @@ const FEATURES: Feature[] = [
     id: 'theme',
     title: 'Themeable',
     description: 'Tokens, CSS slots, and themes restyle everything from avatar to account.',
+    figure: 'A user profile with a theme picker that restyles it between Default, Workday, and After hours.',
     icon: icon(
       'M12.7889 8.73613L16.1973 5.32789C16.9168 4.60841 18.0541 4.57917 18.7375 5.26259C19.4209 5.94601 19.3917 7.08328 18.6722 7.80276L15.2375 11.2375',
       'M12.3335 8.33335L15.6665 11.6664C16.4153 12.4152 16.4507 13.6179 15.7471 14.4094L15 15.2499L8.75 8.99988L9.59053 8.25274C10.382 7.54921 11.5847 7.58456 12.3335 8.33335Z',
@@ -61,6 +64,7 @@ const FEATURES: Feature[] = [
     id: 'clerk',
     title: 'Powered by Clerk',
     description: 'Sessions, organizations, and billing run on Clerk, ready for production.',
+    figure: 'A user profile outlined by component, with the Clerk hooks each section uses.',
     icon: icon(
       'M4.75002 8L12 4.75L19.25 8C19.25 8 20 19.25 12 19.25C4.00002 19.25 4.75002 8 4.75002 8Z',
       'M9.75 12.75L11 14.25L14.25 9.75',
@@ -70,39 +74,73 @@ const FEATURES: Feature[] = [
 
 export function FeatureTabs() {
   const [active, setActive] = React.useState(0);
+  const tabRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const baseId = React.useId();
+
+  const onKeyDown = (event: React.KeyboardEvent, index: number) => {
+    const last = FEATURES.length - 1;
+    const next = {
+      ArrowRight: index === last ? 0 : index + 1,
+      ArrowDown: index === last ? 0 : index + 1,
+      ArrowLeft: index === 0 ? last : index - 1,
+      ArrowUp: index === 0 ? last : index - 1,
+      Home: 0,
+      End: last,
+    }[event.key];
+    if (next === undefined) {
+      return;
+    }
+    event.preventDefault();
+    setActive(next);
+    tabRefs.current[next]?.focus();
+  };
 
   return (
-    <div className='md:mt-16'>
+    <div>
       <div
         role='tabpanel'
-        aria-label={FEATURES[active].title}
-        className='feature-glow relative aspect-[1216/480] w-full rounded-[24px] bg-gray-100 supports-[corner-shape:squircle]:rounded-[32px] supports-[corner-shape:squircle]:[corner-shape:squircle] max-md:hidden lg:aspect-auto lg:h-[480px] dark:bg-gray-900'
+        id={`${baseId}-panel`}
+        aria-labelledby={`${baseId}-tab-${active}`}
+        className='feature-glow relative mt-16 h-[25rem] rounded-[24px] bg-gray-100 supports-[corner-shape:squircle]:rounded-[32px] supports-[corner-shape:squircle]:[corner-shape:squircle] max-xl:mx-[calc(50%-50vw)] max-xl:!rounded-none sm:h-[30rem] xl:-mx-8 2xl:mx-0 dark:bg-gray-900'
       >
-        <PrinciplesScene scene={FEATURES[active].id} />
+        <div
+          role='img'
+          aria-label={FEATURES[active].figure}
+          className='absolute inset-0'
+        >
+          <PrinciplesScene scene={FEATURES[active].id} />
+        </div>
       </div>
       <div
         role='tablist'
         aria-label='Principles'
-        className='mt-8 grid gap-y-8 max-md:mt-0 md:grid-cols-2 md:gap-x-12 lg:grid-cols-[repeat(4,minmax(0,264px))] lg:gap-12'
+        className='mt-8 grid items-start gap-y-8 max-lg:mt-16 sm:grid-cols-2 sm:gap-x-12 lg:grid-cols-4 lg:gap-12'
       >
         {FEATURES.map((item, index) => {
           const selected = index === active;
           return (
             <button
               key={item.title}
+              ref={element => {
+                tabRefs.current[index] = element;
+              }}
               type='button'
               role='tab'
+              id={`${baseId}-tab-${index}`}
               aria-selected={selected}
+              aria-controls={`${baseId}-panel`}
+              tabIndex={selected ? 0 : -1}
               onClick={() => setActive(index)}
+              onKeyDown={event => onKeyDown(event, index)}
               className={clsx(
-                'relative text-left outline-none max-md:opacity-100',
+                'focus-visible:outline-focus relative rounded-lg text-left outline-none focus-visible:outline-offset-4',
                 selected ? 'opacity-100' : 'opacity-50 hover:opacity-75',
               )}
             >
               <span className='grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-1'>
                 <span className='mt-0.5 block size-4 text-gray-950 dark:text-white'>{item.icon}</span>
                 <span className='label-3 text-pretty text-gray-950 dark:text-white'>{item.title}</span>
-                <span className='body-3 col-start-2 text-pretty text-gray-600 dark:text-gray-400'>
+                <span className='body-3 col-start-2 text-pretty text-gray-600 max-sm:max-w-[16rem] dark:text-gray-400'>
                   {item.description}
                 </span>
               </span>

@@ -25,7 +25,7 @@ export function HomeHeader() {
             href='https://www.npmjs.com/package/@clerk/mosaic'
             target='_blank'
             rel='noreferrer'
-            className='label-3 rounded-squircle-md focus-visible:outline-focus inline-flex h-[1.625rem] shrink-0 items-center gap-1 bg-white px-2.5 text-gray-950 ring-1 ring-gray-950/[0.03] transition-colors hover:bg-gray-100 dark:ring-0'
+            className='label-3 rounded-squircle-md focus-visible:outline-focus inline-flex h-[1.625rem] shrink-0 items-center gap-1 bg-gray-800 px-2.5 text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-100'
           >
             <span className='trim-cap'>View on npm</span>
             <ExternalLinkIcon />

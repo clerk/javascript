@@ -12,6 +12,9 @@ const swingsetSrc = resolve(__dirname, '../swingset/src');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: { NEXT_PUBLIC_MOSAIC_VERSION: require('../mosaic/package.json').version },
+  async redirects() {
+    return process.env.MOSAIC_BRAND === '1' ? [{ source: '/', destination: '/brand', permanent: false }] : [];
+  },
   webpack(config) {
     const excludeRawQuery = rules => {
       for (const rule of rules) {
@@ -57,8 +60,8 @@ const nextConfig = {
 
     config.resolve.alias['@clerk/mosaic'] = resolve(__dirname, '../mosaic/src');
     config.resolve.alias['@swingset'] = swingsetSrc;
-    config.resolve.alias['@/lib/chaos'] = resolve(swingsetSrc, 'lib/chaos');
-    config.resolve.alias['@/components/ChaosProvider'] = resolve(swingsetSrc, 'components/ChaosProvider');
+    config.resolve.alias['@/lib/chaos'] = resolve(__dirname, 'src/lib/chaos-off');
+    config.resolve.alias['@/components/ChaosProvider'] = resolve(__dirname, 'src/lib/chaos-off');
     config.resolve.alias['@floating-ui/react'] = dirname(require.resolve('@floating-ui/react/package.json'));
     return config;
   },

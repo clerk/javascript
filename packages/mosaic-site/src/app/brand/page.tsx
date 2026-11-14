@@ -9,6 +9,11 @@ const PAGES = [
   { href: '/brand/home-hero', title: 'Home hero', description: 'Tune the home page mosaic scene and bake its assets.' },
   { href: '/brand/palette', title: 'Palette', description: 'Tune the site grays, surfaces and accent colors.' },
   { href: '/brand/type', title: 'Type', description: 'Preview the site type roles.' },
+  {
+    href: '/brand/og',
+    title: 'OG images',
+    description: 'Preview link-preview images and the looping OG video, then export them.',
+  },
   { href: '/brand/mock-themes', title: 'Mock themes', description: 'Preview the themes used by the component mocks.' },
 ];
 

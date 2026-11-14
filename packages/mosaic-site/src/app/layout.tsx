@@ -18,6 +18,7 @@ const mono = localFont({
   variable: '--font-mono',
 });
 export const metadata: Metadata = {
+  metadataBase: new URL('https://mosaic.clerk.com'),
   title: 'Clerk UI',
   description:
     'Sign-in, profiles, consent, and agent experiences. Composable components you can rearrange, restyle, and replace.',

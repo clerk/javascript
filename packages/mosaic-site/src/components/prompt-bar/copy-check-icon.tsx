@@ -29,7 +29,7 @@ export function CopyCheckIcon({ copied }: { copied: boolean }) {
         <CopyIcon className='size-3.5 translate-x-[0.5px]' />
       </span>
       <svg
-        viewBox='0 0 16 16'
+        viewBox='0 0 24 24'
         fill='none'
         stroke='currentColor'
         aria-hidden
@@ -37,10 +37,10 @@ export function CopyCheckIcon({ copied }: { copied: boolean }) {
         style={swap(copied, true)}
       >
         <path
-          d='M3 8l3 3 7-7'
+          d='M4.5 12l4.5 4.5 10.5-10.5'
           strokeLinecap='round'
           strokeLinejoin='round'
-          strokeWidth='1.3'
+          strokeWidth='1.5'
           pathLength={1}
           style={{
             strokeDasharray: 1,

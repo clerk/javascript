@@ -22,6 +22,7 @@ import {
   TRAIL_ORIGIN_UNIFORM,
   TRAIL_POINTS,
   TRAIL_POINTS_UNIFORM,
+  TRAIL_RADIUS_UNIFORM,
 } from '@/components/marketing/pointer-trail';
 import { Shader, type Uniforms } from '@/components/shader';
 import { type Mode, useMode } from '@/components/use-mode';
@@ -381,6 +382,9 @@ uniform float u_shadow_soft;
 uniform float u_reveal;
 uniform float u_reveal_max;
 uniform float u_front;
+uniform float u_invert;
+uniform float u_shimmer;
+uniform float u_shimmer_amp;
 uniform float u_reveal_max_linear;
 uniform float u_linear_offset;
 uniform float u_linear;
@@ -575,7 +579,13 @@ void main() {
 
   vec4 glass = vec4(color * alpha, alpha + shadow * (1.0 - alpha));
   vec4 skeleton = vec4(u_skeleton_color * skeletonAlpha, skeletonAlpha) * u_skeleton_fade;
+  if (u_shimmer_amp > 0.0) {
+    float band = 0.55 * u_resolution.x;
+    float across = (fragCoord.x + fragCoord.y * 0.364 - mix(-1.3, 3.1, u_shimmer) * band) / band;
+    skeleton.rgb += clamp(1.0 - abs(across * 2.0 - 1.0), 0.0, 1.0) * u_shimmer_amp * skeleton.a;
+  }
   float revealed = u_reveal >= 0.9999 ? 1.0 : smoothstep(u_edge, -u_edge, k) * step(0.0001, u_reveal);
+  revealed = mix(revealed, 1.0 - revealed, u_invert);
   outColor = mix(skeleton, glass, revealed);
   if (pulse > 0.001) {
     vec2 drift = vec2(valueNoise(fragCoord * u_grain_scale + 7.0), valueNoise(fragCoord * u_grain_scale + 31.0)) - 0.5;
@@ -673,6 +683,9 @@ function buildUniforms(
     u_shadow_soft: f(s.shadowSoft),
     u_reveal: f(0),
     u_front: f(0),
+    u_invert: f(0),
+    u_shimmer: f(0),
+    u_shimmer_amp: f(0),
     u_skeleton_color: v(palette.tileLow),
     u_skeleton_fade: f(0),
     u_reveal_max: f(revealMax),
@@ -710,6 +723,7 @@ function buildUniforms(
     u_trail: TRAIL_POINTS_UNIFORM,
     u_trail_origin: TRAIL_ORIGIN_UNIFORM,
     u_trail_energy: TRAIL_ENERGY_UNIFORM,
+    u_trail_radius: TRAIL_RADIUS_UNIFORM,
     u_wave_width: f(reveal.width),
     u_wave_amp: f(reveal.amp),
     u_wave_film: f(reveal.film * (light ? 1 : 0.45)),
@@ -839,10 +853,10 @@ function TweakPanel<T extends Record<string, number>>({
   );
 }
 
-function usePointerEffects(enabled: boolean) {
+function usePointerEffects(enabled: boolean, pointer: 'fine' | 'coarse' = 'fine') {
   const [active, setActive] = React.useState(false);
   React.useEffect(() => {
-    const fine = window.matchMedia('(pointer: fine)');
+    const fine = window.matchMedia(`(pointer: ${pointer})`);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setActive(enabled && fine.matches && !reduced.matches);
     update();
@@ -852,7 +866,7 @@ function usePointerEffects(enabled: boolean) {
       fine.removeEventListener('change', update);
       reduced.removeEventListener('change', update);
     };
-  }, [enabled]);
+  }, [enabled, pointer]);
   return active;
 }
 
@@ -931,6 +945,8 @@ export function BakedMosaic() {
     [palette, mode, origin[0], origin[1], center[0], center[1], width, reveal, sheen, bake],
   );
   const pointerEffects = usePointerEffects(true);
+  const touchEffects = usePointerEffects(true, 'coarse');
+  const trailEffects = pointerEffects || touchEffects;
   const canvasRef = React.useRef<HTMLDivElement>(null);
   const lightX = settings.lightX;
   const follow = settings.follow;
@@ -971,7 +987,7 @@ export function BakedMosaic() {
       !reveal.scrub && start !== null && start !== -Infinity && performance.now() - start < reveal.duration + 100;
     if (
       revealing ||
-      (pointerEffects && TRAIL_ENERGY_UNIFORM.value > 0.001) ||
+      (trailEffects && TRAIL_ENERGY_UNIFORM.value > 0.001) ||
       (pointerEffects && follow > 0 && spring.isAnimating())
     ) {
       return true;
@@ -988,7 +1004,7 @@ export function BakedMosaic() {
       return true;
     }
     return false;
-  }, [reveal, pointerEffects, follow, spring, sway]);
+  }, [reveal, pointerEffects, trailEffects, follow, spring, sway]);
   const coarseRef = React.useRef(false);
   React.useEffect(() => {
     coarseRef.current = window.matchMedia('(pointer: coarse)').matches;
@@ -1002,13 +1018,13 @@ export function BakedMosaic() {
     const settled = start === -Infinity || (start !== null && performance.now() - start >= reveal.duration + 100);
     return settled ? full : 1;
   }, [reveal]);
-  React.useEffect(() => (pointerEffects ? startTrail() : undefined), [pointerEffects]);
+  React.useEffect(() => (trailEffects ? startTrail() : undefined), [trailEffects]);
   const onRender = React.useCallback(() => {
     markReady();
-    if (pointerEffects) {
+    if (trailEffects) {
       stepTrail(canvasRef.current);
     }
-  }, [pointerEffects]);
+  }, [trailEffects]);
   return (
     <div
       ref={sceneRef}
@@ -1033,6 +1049,12 @@ export function BakedMosaic() {
             pixelRatio={pixelRatio}
             premultiplied
           />
+          {touchEffects ? (
+            <div
+              aria-hidden='true'
+              className='pointer-events-auto absolute inset-0 touch-none select-none [-webkit-touch-callout:none]'
+            />
+          ) : null}
         </div>
       ) : null}
       {SHOW_REVEAL_PANEL && process.env.NODE_ENV === 'development' && mounted
@@ -1094,6 +1116,49 @@ function loopSway(phase: number, steps: number, seed: number, detail: number) {
   return (loopNoise(phase, steps, seed) + detail * loopNoise(phase, steps * 2, seed + 31)) / (1 + detail);
 }
 
+const LOOP_OUT_MS = 900;
+const LOOP_SHIMMER_MS = 900;
+const LOOP_IN_MS = 1200;
+const LOOP_EDGE_SOFTNESS = 2;
+const LOOP_LEAD = 0.75;
+const LOOP_SHIMMER_AMP: Record<Mode, number> = { dark: 0.08, light: 0.16 };
+
+function loopUniforms(elapsed: number, loopMs: number, strength: number, mode: Mode, base: Uniforms): Uniforms {
+  const film = (scale: number) => {
+    const uniform = base.u_wave_film;
+    return { type: 'uniform1f' as const, value: (uniform?.type === 'uniform1f' ? uniform.value : 0) * scale };
+  };
+  const wave = (progress: number, invert: number, scale: number): Uniforms => ({
+    u_invert: { type: 'uniform1f', value: invert },
+    u_reveal: { type: 'uniform1f', value: progress },
+    u_front: { type: 'uniform1f', value: revealFront(progress, REVEAL_DEFAULTS) },
+    u_shimmer_amp: { type: 'uniform1f', value: 0 },
+    u_wave_film: film(scale),
+    u_edge: { type: 'uniform1f', value: REVEAL_DEFAULTS.edge * LOOP_EDGE_SOFTNESS },
+  });
+  if (strength <= 0) {
+    return wave(1, 0, 0);
+  }
+  const lead = Math.max(0, loopMs - LOOP_OUT_MS - LOOP_SHIMMER_MS - LOOP_IN_MS) * LOOP_LEAD;
+  const out = (elapsed - lead) / LOOP_OUT_MS;
+  if (out < 0) {
+    return wave(1, 0, 0);
+  }
+  if (out < 1) {
+    return wave(out, 1, strength * 0.5);
+  }
+  const shimmer = (elapsed - lead - LOOP_OUT_MS) / LOOP_SHIMMER_MS;
+  if (shimmer < 1) {
+    return {
+      ...wave(1, 1, 0),
+      u_shimmer: { type: 'uniform1f', value: cubicBezier(0.45, 0, 0.55, 1, shimmer) },
+      u_shimmer_amp: { type: 'uniform1f', value: LOOP_SHIMMER_AMP[mode] },
+    };
+  }
+  const back = (elapsed - lead - LOOP_OUT_MS - LOOP_SHIMMER_MS) / LOOP_IN_MS;
+  return wave(Math.min(1, back), 0, strength);
+}
+
 export type MosaicFrameProps = {
   mode: Mode;
   focus: { x: number; y: number };
@@ -1101,10 +1166,22 @@ export type MosaicFrameProps = {
   sceneWidth: number;
   loopMs: number;
   swaySteps: number;
+  swayGain?: number;
+  ripple?: number;
   phaseRef?: React.RefObject<number | null>;
 };
 
-export function MosaicFrame({ mode, focus, scale, sceneWidth, loopMs, swaySteps, phaseRef }: MosaicFrameProps) {
+export function MosaicFrame({
+  mode,
+  focus,
+  scale,
+  sceneWidth,
+  loopMs,
+  swaySteps,
+  swayGain = 1,
+  ripple = 0,
+  phaseRef,
+}: MosaicFrameProps) {
   const bake = BAKES.desktop;
   const settings = bake.settings as Record<string, number>;
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -1124,19 +1201,18 @@ export function MosaicFrame({ mode, focus, scale, sceneWidth, loopMs, swaySteps,
   const lastRef = React.useRef<number | null>(null);
   const liveUniforms = React.useCallback((): Uniforms => {
     const phase = phaseRef?.current ?? (performance.now() % loopMs) / loopMs;
-    const dx = loopSway(phase, swaySteps, 0, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.x;
-    const dy = loopSway(phase, swaySteps, 57, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.y;
+    const dx = loopSway(phase, swaySteps, 0, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.x * swayGain;
+    const dy = loopSway(phase, swaySteps, 57, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.y * swayGain;
     return {
-      u_reveal: { type: 'uniform1f', value: 1 },
-      u_front: { type: 'uniform1f', value: revealFront(1, REVEAL_DEFAULTS) },
+      ...loopUniforms(phase * loopMs, loopMs, ripple, mode, uniforms),
       u_skeleton_color: { type: 'uniform3f', value: (palette ?? FALLBACK_PALETTE).tileLow },
       u_skeleton_fade: { type: 'uniform1f', value: 1 },
       u_light_x: { type: 'uniform1f', value: settings.lightX + dx },
       u_light_y: { type: 'uniform1f', value: settings.lightY + dy },
-      u_sway_glint: { type: 'uniform1f', value: SWAY_DEFAULTS.glint },
+      u_sway_glint: { type: 'uniform1f', value: SWAY_DEFAULTS.glint * swayGain },
       u_sway_size: { type: 'uniform1f', value: SWAY_DEFAULTS.size },
     };
-  }, [phaseRef, loopMs, swaySteps, palette, settings.lightX, settings.lightY]);
+  }, [phaseRef, loopMs, swaySteps, swayGain, ripple, mode, uniforms, palette, settings.lightX, settings.lightY]);
   const shouldRender = React.useCallback(() => {
     const fixed = phaseRef?.current;
     if (fixed !== null && fixed !== undefined) {
