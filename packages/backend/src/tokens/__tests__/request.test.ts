@@ -1930,6 +1930,98 @@ describe('tokens.authenticateRequest(options)', () => {
       },
     );
 
+    describe('OAuth JWT key loading', () => {
+      const jwksUrl = 'https://api.clerk.test/v1/jwks';
+
+      const authenticateOAuthJwtWithJwks = async (
+        resolver: Parameters<typeof http.get>[1],
+        header: Record<string, unknown> = {},
+      ) => {
+        server.use(http.get(jwksUrl, resolver));
+        const request = await signedBearerRequest(mockOAuthJwtPayload, { typ: 'at+jwt', ...header });
+        let settled = false;
+        const pending = authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' })).finally(() => {
+          settled = true;
+        });
+        for (let i = 0; i < 60 && !settled; i++) {
+          await vi.advanceTimersByTimeAsync(1000);
+        }
+        return pending;
+      };
+
+      test('keeps secret-key-invalid when the JWKS call rejects the secret key', async () => {
+        const requestState = await authenticateOAuthJwtWithJwks(() =>
+          HttpResponse.json(
+            { errors: [{ code: 'clerk_key_invalid', message: 'The provided Clerk Secret Key is invalid.' }] },
+            { status: 401 },
+          ),
+        );
+
+        expect(requestState).toMatchObject({
+          status: AuthStatus.SignedOut,
+          isAuthenticated: false,
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.InvalidSecretKey,
+          message: 'The provided Clerk Secret Key is invalid. (code=secret-key-invalid, status=n/a)',
+        });
+      });
+
+      test.each([
+        ['the JWKS fetch throws', () => HttpResponse.error()],
+        ['the JWKS error body is not JSON', () => new HttpResponse('<html>Bad Gateway</html>', { status: 502 })],
+        ['the JWKS response is not 2xx', () => HttpResponse.json({ errors: [] }, { status: 503 })],
+      ] as Array<[string, Parameters<typeof http.get>[1]]>)(
+        'reports jwk-remote-failed-to-load when %s',
+        async (_label, resolver) => {
+          const requestState = await authenticateOAuthJwtWithJwks(resolver);
+
+          expect(requestState).toMatchObject({
+            status: AuthStatus.SignedOut,
+            isAuthenticated: false,
+            tokenType: 'oauth_token',
+            reason: 'jwk-remote-failed-to-load',
+          });
+        },
+      );
+
+      test('keeps token-verification-failed for an unknown kid', async () => {
+        const requestState = await authenticateOAuthJwtWithJwks(() => HttpResponse.json(mockJwks), {
+          kid: 'ins_unknown',
+        });
+
+        expect(requestState).toMatchObject({
+          status: AuthStatus.SignedOut,
+          isAuthenticated: false,
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: expect.stringMatching(/^Unable to find a signing key in JWKS that matches the kid='ins_unknown'/),
+        });
+      });
+
+      test('keeps token-verification-failed for a bad signature', async () => {
+        server.use(http.get(jwksUrl, () => HttpResponse.json(mockJwks)));
+        const { data: token } = await signJwt(mockOAuthJwtPayload, signingJwks, {
+          algorithm: 'RS256',
+          header: { kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', typ: 'at+jwt' },
+        });
+        const [header, payload, signature] = (token as string).split('.');
+        const tampered = `${header}.${payload}.${signature.startsWith('A') ? 'B' : 'A'}${signature.slice(1)}`;
+
+        const requestState = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${tampered}` }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+
+        expect(requestState).toMatchObject({
+          status: AuthStatus.SignedOut,
+          isAuthenticated: false,
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: expect.stringMatching(/^JWT signature is invalid\./),
+        });
+      });
+    });
+
     describe('OAuth JWT issuer', () => {
       const expectedIssuer = mockJwtPayload.iss;
 

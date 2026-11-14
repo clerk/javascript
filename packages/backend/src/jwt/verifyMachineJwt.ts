@@ -5,7 +5,9 @@ import { M2MToken } from '../api/resources/M2MToken';
 import {
   MachineTokenVerificationError,
   MachineTokenVerificationErrorCode,
+  TokenVerificationError,
   TokenVerificationErrorAction,
+  TokenVerificationErrorReason,
 } from '../errors';
 import type { MachineTokenReturnType } from '../jwt/types';
 import type { VerifyJwtOptions } from '../jwt/verifyJwt';
@@ -94,11 +96,24 @@ async function resolveKeyAndVerifyJwt(
   } catch (error) {
     return {
       error: new MachineTokenVerificationError({
-        code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+        code: machineErrorCodeForKeyError(error),
         message: (error as Error).message,
       }),
     };
   }
+}
+
+function machineErrorCodeForKeyError(error: unknown): MachineTokenVerificationErrorCode {
+  if (!(error instanceof TokenVerificationError)) {
+    return MachineTokenVerificationErrorCode.RemoteJWKFailedToLoad;
+  }
+  if (error.reason === TokenVerificationErrorReason.InvalidSecretKey) {
+    return MachineTokenVerificationErrorCode.InvalidSecretKey;
+  }
+  if (error.reason === TokenVerificationErrorReason.RemoteJWKFailedToLoad) {
+    return MachineTokenVerificationErrorCode.RemoteJWKFailedToLoad;
+  }
+  return MachineTokenVerificationErrorCode.TokenVerificationFailed;
 }
 
 /**
