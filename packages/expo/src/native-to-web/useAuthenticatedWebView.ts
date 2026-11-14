@@ -184,7 +184,13 @@ export function useAuthenticatedWebView({ destination }: UseAuthenticatedWebView
   const [attempt, setAttempt] = useState(0);
   const [state, dispatch] = useReducer(transferReducer, null);
   const settledRequestId = useRef<string | null>(null);
-  const requestId = isLoaded && isSignedIn && sessionId ? `${sessionId}\n${destination}\n${attempt}` : null;
+  // Counts target changes, so returning to an earlier destination never matches its consumed result.
+  const target = `${sessionId}\n${destination}`;
+  const [activation, setActivation] = useState({ target, count: 0 });
+  if (activation.target !== target) {
+    setActivation({ target, count: activation.count + 1 });
+  }
+  const requestId = isLoaded && isSignedIn && sessionId ? `${target}\n${activation.count}\n${attempt}` : null;
 
   useEffect(() => {
     if (!requestId || settledRequestId.current === requestId) {

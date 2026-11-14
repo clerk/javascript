@@ -334,6 +334,22 @@ describe('useAuthenticatedWebView', () => {
     );
   });
 
+  test('mints a new URL when the destination changes back before the other mint arrives', async () => {
+    const RETURN_URL = 'https://clerk.example.com/v1/session_transfers/redeem?token=return';
+    mocks.request.mockResolvedValueOnce(mintedResponse());
+    const { result, rerender } = renderWebView();
+    await waitFor(() => expect(result.current.webViewProps?.source.uri).toBe(TRANSFER_URL));
+
+    deferredMint();
+    rerender({ destination: 'https://app.example.com/settings' });
+    mocks.request.mockResolvedValueOnce(mintedResponse(RETURN_URL));
+    rerender({ destination: DESTINATION });
+
+    expect(result.current).toMatchObject({ status: 'preparing', webViewProps: null });
+    await waitFor(() => expect(result.current.webViewProps?.source.uri).toBe(RETURN_URL));
+    expect(mocks.request).toHaveBeenCalledTimes(3);
+  });
+
   test('reports signed-out without minting when there is no session', () => {
     mocks.auth = { isLoaded: true, isSignedIn: false, sessionId: null };
 
