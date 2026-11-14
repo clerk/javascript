@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "strict": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "lib": ["ES2023", "DOM"],
+    "paths": {
+      "@/lib/types": ["../swingset/src/lib/types"],
+      "@/lib/chaos": ["./src/lib/chaos-off"],
+      "@/components/ChaosProvider": ["./src/lib/chaos-off"],
+      "@/*": ["./src/*"],
+      "@swingset/*": ["../swingset/src/*"],
+      "@clerk/mosaic": ["../mosaic/src"],
+      "@clerk/mosaic/*": ["../mosaic/src/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true
+  },
+  "include": ["next-env.d.ts", "next.config.mjs", "src", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

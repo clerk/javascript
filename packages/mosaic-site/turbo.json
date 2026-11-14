@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["@clerk/mosaic#build", "@clerk/shared#build"],
+      "env": ["MOSAIC_BRAND"],
+      "passThroughEnv": ["BLOB_READ_WRITE_TOKEN"],
+      "inputs": [
+        "package.json",
+        "*.d.ts",
+        "next.config.mjs",
+        "postcss.config.mjs",
+        "tsconfig.json",
+        "src/**",
+        "public/**",
+        "$TURBO_ROOT$/packages/swingset/src/**",
+        "!**/*.test.*",
+        "!**/__tests__/**",
+        "!node_modules/**"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "public/fonts/**"]
+    }
+  }
+}
