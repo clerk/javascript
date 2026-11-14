@@ -333,13 +333,16 @@ const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
   return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
 
-const signedBearerRequest = async (payload: Record<string, unknown>, header: Record<string, unknown>) => {
+const signTestJwt = async (payload: Record<string, unknown>, header: Record<string, unknown>) => {
   const { data } = await signJwt(payload, signingJwks, {
     algorithm: 'RS256',
     header: { kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...header },
   });
-  return mockRequest({ authorization: `Bearer ${data}` });
+  return data as string;
 };
+
+const signedBearerRequest = async (payload: Record<string, unknown>, header: Record<string, unknown>) =>
+  mockRequest({ authorization: `Bearer ${await signTestJwt(payload, header)}` });
 
 const mockOAuthJwtPayload = { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss };
 
@@ -2000,11 +2003,8 @@ describe('tokens.authenticateRequest(options)', () => {
 
       test('keeps token-verification-failed for a bad signature', async () => {
         server.use(http.get(jwksUrl, () => HttpResponse.json(mockJwks)));
-        const { data: token } = await signJwt(mockOAuthJwtPayload, signingJwks, {
-          algorithm: 'RS256',
-          header: { kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', typ: 'at+jwt' },
-        });
-        const [header, payload, signature] = (token as string).split('.');
+        const token = await signTestJwt(mockOAuthJwtPayload, { typ: 'at+jwt' });
+        const [header, payload, signature] = token.split('.');
         const tampered = `${header}.${payload}.${signature.startsWith('A') ? 'B' : 'A'}${signature.slice(1)}`;
 
         const requestState = await authenticateRequest(
