@@ -987,7 +987,7 @@ export function BakedMosaic() {
       !reveal.scrub && start !== null && start !== -Infinity && performance.now() - start < reveal.duration + 100;
     if (
       revealing ||
-      (trailEffects && TRAIL_ENERGY_UNIFORM.value > 0.001) ||
+      (trailEffects && visibleRef.current && TRAIL_ENERGY_UNIFORM.value > 0.001) ||
       (pointerEffects && follow > 0 && spring.isAnimating())
     ) {
       return true;
@@ -1052,7 +1052,7 @@ export function BakedMosaic() {
           {touchEffects ? (
             <div
               aria-hidden='true'
-              className='pointer-events-auto absolute inset-0 touch-none select-none [-webkit-touch-callout:none]'
+              className='pointer-events-auto absolute inset-0 touch-pan-y select-none [-webkit-touch-callout:none]'
             />
           ) : null}
         </div>

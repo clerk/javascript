@@ -54,6 +54,22 @@ function onPointerDown(event: PointerEvent) {
   jumpTo(event.clientX, event.clientY);
 }
 
+function onTouchStart(event: TouchEvent) {
+  const touch = event.touches[0];
+  if (touch) {
+    TRAIL_RADIUS_UNIFORM.value = settings.radius * TOUCH_RADIUS_SCALE;
+    jumpTo(touch.clientX, touch.clientY);
+  }
+}
+
+function onTouchMove(event: TouchEvent) {
+  const touch = event.touches[0];
+  if (touch) {
+    head.targetX = touch.clientX;
+    head.targetY = touch.clientY;
+  }
+}
+
 function onPointerMove(event: PointerEvent) {
   TRAIL_RADIUS_UNIFORM.value = settings.radius * (event.pointerType === 'mouse' ? 1 : TOUCH_RADIUS_SCALE);
   head.targetX = event.clientX;
@@ -74,6 +90,8 @@ export function startTrail() {
   if (listeners === 0) {
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
   }
   listeners += 1;
   return () => {
@@ -81,6 +99,8 @@ export function startTrail() {
     if (listeners === 0) {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
     }
   };
 }
