@@ -135,7 +135,7 @@ export type VerifyJwtOptions = {
   /**
    * A string or list of allowed issuers. If passed, the token's `iss` claim must match one exactly. If omitted, the issuer is not checked.
    *
-   * `verifyMachineAuthToken()` accepts this option for compatibility but ignores it when verifying machine tokens.
+   * `verifyMachineAuthToken()` accepts this option for compatibility but ignores it when verifying machine tokens. An OAuth access token JWT's `iss` is instead required to match the Frontend API URL derived from the publishable key.
    */
   issuer?: string | string[];
   /**
