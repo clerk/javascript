@@ -66,6 +66,8 @@ export type GetOrganizationParams = (
 
 /** @inline */
 export type UpdateParams = {
+  selfServeSsoEnabled?: boolean;
+  selfServeDirectorySyncEnabled?: boolean;
   /** The name to update the Organization with. */
   name?: string;
   /** The slug to update the Organization with. */

@@ -764,6 +764,21 @@ export interface UserDeletedJSON extends DeletedObjectJSON {
 }
 
 /**
+ * The result of merging one user into another.
+ * Used for `user.merged` webhook events and the response of the merge user endpoint.
+ */
+export interface UserMergedJSON {
+  /**
+   * The user that remains, as it is after the merge.
+   */
+  user: UserJSON;
+  /**
+   * The merged user as it was before it was deleted.
+   */
+  deleted_user: UserJSON;
+}
+
+/**
  * Directory group webhook event payload: a group as the identity provider reported it to a directory.
  * Used for `directoryGroup.created`, `directoryGroup.updated`, `directoryGroup.synced` and `directoryGroup.deleted` webhook events.
  */

@@ -55,9 +55,9 @@ the `Viewport` around it shows the rest of the image for context. Drags are meas
 | `ImageCropper.Viewport` | `<div>`                | The frame: pans on drag and arrow keys, zooms on wheel, pinch and keys |
 | `ImageCropper.Area`     | `<div>`                | The square that is cropped, when it is smaller than the frame          |
 | `ImageCropper.Image`    | `<img>`                | The image, placed by the crop. Reports its size on load                |
-| `ImageCropper.Zoom`     | `<input type="range">` | Sets the zoom, from 1 to `maxZoom`                                     |
+| `ImageCropper.Zoom`     | `<input type="range">` | Sets the zoom, from `minZoom` to `maxZoom`                             |
 | `ImageCropper.ZoomIn`   | `<button>`             | Zooms in one step. Disabled at `maxZoom`                               |
-| `ImageCropper.ZoomOut`  | `<button>`             | Zooms out one step. Disabled at 1                                      |
+| `ImageCropper.ZoomOut`  | `<button>`             | Zooms out one step. Disabled at `minZoom`                              |
 | `ImageCropper.Rotate`   | `<button>`             | Turns the image a quarter clockwise                                    |
 | `ImageCropper.Reset`    | `<button>`             | Returns to `INITIAL_CROP`                                              |
 
@@ -77,8 +77,9 @@ Every control stays disabled until the image has loaded, because the crop limits
 | `disabled`      | `boolean`              | `false`        | Ignores every gesture and disables the controls |
 
 A `Crop` is `{ x, y, zoom, rotation }`. `x` and `y` move the image centre from the frame centre, as a
-fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame. `rotation` is `0`,
-`90`, `180` or `270`. The crop is always clamped so the image covers the frame.
+fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame. Below 1 the image
+zooms out until it fits inside the frame, such as `0.5` for an image twice as wide as it is tall. `rotation` is `0`, `90`, `180` or `270`. The crop is always clamped so each edge of the image
+stops at the frame's: an image larger than the frame covers it, and a smaller one stays inside it.
 
 Other parts take no additional props. All parts except `Root` accept a `render` prop and standard
 HTML attributes for their default element.
@@ -89,7 +90,9 @@ Returns a `Promise<Blob>` holding the square the crop shows, encoded as `type`. 
 cannot encode `type` returns `image/png`, so read the type from the blob. The square keeps the
 image's own resolution unless `size` says otherwise: it gets the square's side in the image's pixels
 and returns the side to draw, such as `side => Math.min(side, 1024)` to cap it. Colors outside sRGB
-are kept. It draws to a canvas, so an animated image keeps only its first frame.
+are kept. It draws to a canvas, so an animated image keeps only its first frame. Below zoom 1 the
+square is larger than the image and the area around it is left transparent, which a type without
+transparency, such as `image/jpeg`, fills with black.
 
 ## Keyboard
 

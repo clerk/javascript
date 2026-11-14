@@ -6,6 +6,7 @@ export interface ImageCropperContextValue {
   src: string;
   crop: Crop;
   size: Size | undefined;
+  minZoom: number;
   maxZoom: number;
   disabled: boolean;
   area: RefObject<HTMLDivElement | null>;

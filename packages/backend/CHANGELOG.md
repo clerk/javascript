@@ -1,5 +1,24 @@
 # Change Log
 
+## 3.29.0
+
+### Minor Changes
+
+- Fetch the Poppy JSON artifact with the Clerk-defined `clerkClient.artifacts.getPoppyJson()` method. ([#10810](https://github.com/clerk/javascript/pull/10810)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Add support for Personal Agent Protocol signed-in browser sessions. Enable the Clerk-defined `poppy: true` option on `clerkMiddleware()` to publish Poppy and OAuth protected resource discovery on the application domain. ([#10702](https://github.com/clerk/javascript/pull/10702)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  Expose `agent` on the auth object when an agent session is active.
+
+- Add `sessions.updateSession()` to change when a single session expires, and `users.mergeUser()` to merge one user into another. The `user.merged` webhook event is now part of `UserWebhookEvent`, with a payload typed as `UserMergedJSON`. ([#10793](https://github.com/clerk/javascript/pull/10793)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Add `selfServeSsoEnabled` and `selfServeDirectorySyncEnabled` to the parameters accepted by `updateOrganization()`. ([#10094](https://github.com/clerk/javascript/pull/10094)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+
 ## 3.28.0
 
 ### Minor Changes

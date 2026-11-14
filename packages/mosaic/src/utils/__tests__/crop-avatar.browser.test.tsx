@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { INITIAL_CROP } from '../../primitives/image-cropper';
 import { AVATAR_UPLOAD, cropAvatar } from '../avatar-upload';
 
-async function noise(side: number, type: string, quality?: number): Promise<string> {
-  const canvas = new OffscreenCanvas(side, side);
+async function noise(side: number, type: string, quality?: number, height = side): Promise<string> {
+  const canvas = new OffscreenCanvas(side, height);
   const context = canvas.getContext('2d');
   if (!context) {
     throw new Error('expected a 2D canvas');
   }
-  const image = context.createImageData(side, side);
+  const image = context.createImageData(side, height);
   for (let at = 0; at < image.data.length; at += 65536) {
     crypto.getRandomValues(image.data.subarray(at, at + 65536));
   }
@@ -69,5 +69,19 @@ describe('cropAvatar', () => {
 
     expect(blob.size).toBeLessThanOrEqual(AVATAR_UPLOAD.maxSize);
     expect(blob.type).toBe('image/jpeg');
+  });
+
+  it('saves a zoomed out JPEG as PNG, so the frame around it stays transparent', async () => {
+    const blob = await cropAvatar(await solid(300), { ...INITIAL_CROP, zoom: 0.5 }, 'image/jpeg');
+
+    expect(blob.type).toBe('image/png');
+  });
+
+  it('fits a large zoomed out photo saved as PNG', async () => {
+    const src = await noise(4096, 'image/jpeg', 0.8, 2048);
+    const blob = await cropAvatar(src, { ...INITIAL_CROP, zoom: 0.5 }, 'image/jpeg');
+
+    expect(blob.type).toBe('image/png');
+    expect(blob.size).toBeLessThanOrEqual(AVATAR_UPLOAD.maxSize);
   });
 });

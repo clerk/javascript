@@ -2,9 +2,46 @@ import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
-import type { SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
+import type { SignInEmailLinkStatus, SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
 
-export function stepKey(step: SignInStep): string {
+export const stepIds = {
+  identifier: ['identifier'],
+  identifierChannel: ['identifier:channel'],
+  credential: ['credential:password', 'credential:backup-code', 'credential:passkey'],
+  code: [
+    'code:first-factor',
+    'code:second-factor',
+    'code:client-trust',
+    'code:sso-bypass',
+    'code:reset-password',
+    'code:verify-email',
+    'code:verify-phone',
+  ],
+  choice: [
+    'choice:methods',
+    'choice:reset-methods',
+    'choice:enterprise-connections',
+    'choice:accounts',
+    'choice:wallets',
+  ],
+  notice: [
+    'notice:help',
+    'notice:forgot-password',
+    'notice:no-methods',
+    'notice:action-blocked',
+    'notice:password-compromised',
+    'notice:enterprise-sso',
+    'notice:email-link',
+    'notice:email-link-status',
+    'notice:start-over',
+  ],
+  newPassword: ['new-password:forgot', 'new-password:required'],
+  signUp: ['sign-up'],
+} as const;
+
+export type SignInStepKey = (typeof stepIds)[keyof typeof stepIds][number];
+
+export function stepKey(step: SignInStep): SignInStepKey {
   switch (step.kind) {
     case 'identifier':
       return 'channel' in step ? 'identifier:channel' : 'identifier';
@@ -15,9 +52,11 @@ export function stepKey(step: SignInStep): string {
     case 'new-password':
       return `new-password:${step.reason}`;
     case 'code':
+      return `code:${step.purpose}`;
     case 'choice':
+      return `choice:${step.purpose}`;
     case 'notice':
-      return `${step.kind}:${step.purpose}`;
+      return `notice:${step.purpose}`;
   }
 }
 
@@ -35,6 +74,28 @@ export function httpsUrl(url: string | undefined): string | undefined {
 type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
 type CodeResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
+
+export function emailLinkStatusCopy(
+  status: SignInEmailLinkStatus,
+  m: Messages,
+): { title: string; description: string } {
+  switch (status) {
+    case 'loading':
+      return m.emailLink.loading;
+    case 'signed-in':
+      return m.emailLink.signedIn;
+    case 'signed-in-other-tab':
+      return m.emailLink.signedInOtherTab;
+    case 'transferable':
+      return m.emailLink.transferable;
+    case 'expired':
+      return m.emailLink.expired;
+    case 'failed':
+      return m.emailLink.failed;
+    case 'client-mismatch':
+      return m.emailLink.clientMismatch;
+  }
+}
 
 export function codeCopy(
   step: CodeStepData,

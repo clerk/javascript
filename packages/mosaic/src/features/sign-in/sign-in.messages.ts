@@ -33,6 +33,16 @@ export const signInMessages = {
     description: 'Enter your phone number to get a verification code on {provider}.',
     label: '{provider} phone number',
   },
+  wallets: {
+    title: 'Sign in with Solana',
+    description: 'Select a wallet below to sign in',
+  },
+  accounts: {
+    title: 'Choose an account',
+    description: 'Select the account with which you wish to continue.',
+    addAccount: 'Add account',
+    signOutAll: 'Sign out of all accounts',
+  },
   password: {
     title: 'Enter your password',
     description: 'Enter the password associated with your account',
@@ -49,6 +59,11 @@ export const signInMessages = {
   noAvailableMethods: {
     title: 'Cannot sign in',
     description: 'Cannot proceed with sign in. There’s no available authentication factor.',
+  },
+  startOver: {
+    title: 'Something went wrong',
+    description: 'We couldn’t continue signing you in. Start over to try again.',
+    action: 'Start over',
   },
   actionBlocked: {
     title: 'We couldn’t complete this request',
@@ -69,6 +84,36 @@ export const signInMessages = {
     resendText: 'Didn’t receive a link?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
+    loading: {
+      title: 'Signing in...',
+      description: 'You will be redirected soon',
+    },
+    signedIn: {
+      title: 'Successfully signed in',
+      description: 'Return to original tab to continue',
+    },
+    signedInOtherTab: {
+      title: 'Signed in on other tab',
+      description: 'Return to the newly opened tab to continue',
+    },
+    transferable: {
+      title: 'Email verified',
+      description: 'Return to original tab to continue',
+    },
+    expired: {
+      title: 'This verification link has expired',
+      description: 'Return to the original tab to continue.',
+    },
+    failed: {
+      title: 'This verification link is invalid',
+      description: 'Return to the original tab to continue.',
+    },
+    clientMismatch: {
+      title: 'Verification link is invalid for this device',
+      description:
+        'To continue, open the verification link on the device and browser from which you initiated the sign-in',
+    },
+    closeTab: 'You may close this tab',
   },
   passkey: {
     title: 'Use your passkey',
@@ -95,6 +140,7 @@ export const signInMessages = {
     passwordLabel: 'New password',
     confirmPasswordLabel: 'Confirm password',
     signOutOfOtherSessions: 'Sign out of all other devices',
+    requiredMessage: 'For security reasons, it is required to reset your password.',
     submit: 'Reset password',
     pending: 'Resetting password',
   },

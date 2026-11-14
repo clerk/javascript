@@ -1,6 +1,8 @@
 export { SignInView } from './sign-in.view';
 export type {
+  SignInAccount,
   SignInActionBlockedDetails,
+  SignInEmailLinkStatus,
   SignInFactor,
   SignInIdentifierField,
   SignInProvider,

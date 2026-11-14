@@ -132,7 +132,7 @@ const router = createBrowserRouter([
         element: <OrganizationList />,
       },
       {
-        path: '/organization-switcher',
+        path: '/switcher',
         element: <OrganizationSwitcher />,
       },
       {

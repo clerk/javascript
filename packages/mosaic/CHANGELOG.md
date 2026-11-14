@@ -1,5 +1,18 @@
 # @clerk/mosaic
 
+## 0.5.0
+
+### Minor Changes
+
+- Picking a profile picture in `UserProfile`, or a logo in `OrganizationProfile` or `CreateOrganization`, now opens a dialog to crop it to a square before it uploads. Animated images upload as picked. ([#10784](https://github.com/clerk/javascript/pull/10784)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Let the avatar and logo cropper zoom out until the whole image fits, so a wide logo or a tall photo can be uploaded without cutting it off. A JPEG zoomed out this way is saved as a PNG, so the area around it stays transparent. ([#10809](https://github.com/clerk/javascript/pull/10809)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+
 ## 0.4.0
 
 ### Minor Changes

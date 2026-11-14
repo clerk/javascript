@@ -38,13 +38,25 @@ export type SignInStep =
     }
   | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
+  | { kind: 'choice'; purpose: 'accounts'; options: readonly SignInAccount[] }
+  | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
   | { kind: 'notice'; purpose: 'help' }
   | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
-  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string }
-  | { kind: 'new-password'; reason: 'forgot' }
+  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus }
+  | { kind: 'new-password'; reason: 'forgot' | 'required' }
   | { kind: 'sign-up' };
+
+export type SignInEmailLinkStatus =
+  | 'loading'
+  | 'signed-in'
+  | 'signed-in-other-tab'
+  | 'transferable'
+  | 'expired'
+  | 'failed'
+  | 'client-mismatch';
 
 export interface SignInActionBlockedDetails {
   title?: string;
@@ -52,6 +64,13 @@ export interface SignInActionBlockedDetails {
   linkUrl?: string;
   linkText?: string;
   traceId?: string;
+}
+
+export interface SignInAccount {
+  id: string;
+  name: string;
+  identifier: string;
+  imageUrl?: string;
 }
 
 export interface SignInProvider {
@@ -104,9 +123,14 @@ export interface SignInViewProps {
   onCancel?: () => void;
   onShowHelp: () => void;
   onBack: () => void;
+  onStartOver: () => void;
   onEmailSupport: () => void;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
+  pendingAccountId?: string;
+  onSelectAccount: (id: string) => void;
+  onAddAccount?: () => void;
+  onSignOutAll?: () => void;
   onResend?: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;

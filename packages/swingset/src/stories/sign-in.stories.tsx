@@ -2,6 +2,7 @@ import { Button } from '@clerk/mosaic/components/button';
 import type { FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
+  SignInAccount,
   SignInFactor,
   SignInIdentifierField,
   SignInProvider,
@@ -386,7 +387,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           void submitCode(code);
         }}
         isPending={isPending || form.isSubmitting}
-        isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId)}
+        isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId) || Boolean(pendingFactorId)}
         errorMessage={errorMessage}
         globalErrorMessage={globalErrorMessage}
         newPasswordFeedback={
@@ -404,9 +405,11 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         onCancel={cancelFor(step)}
         onShowHelp={() => navigate({ kind: 'notice', purpose: 'help' }, 1)}
         onBack={onBack}
+        onStartOver={() => navigate({ kind: 'identifier', field: 'email' }, -1)}
         onEmailSupport={() => setSupportRequested(true)}
         pendingFactorId={pendingFactorId}
         onSelectFactor={onSelectFactor}
+        onSelectAccount={() => undefined}
         onResend={offersResend(step) ? onResend : undefined}
         canResend={canResend && !isPending}
       />
@@ -522,6 +525,9 @@ function StepPanel({
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
       onJoinWaitlist={onJoinWaitlist}
+      onSelectAccount={() => undefined}
+      onAddAccount={() => undefined}
+      onSignOutAll={() => undefined}
       onForgotPassword={() => undefined}
       onCancel={
         onCancel ??
@@ -529,6 +535,7 @@ function StepPanel({
       }
       onShowHelp={() => undefined}
       onBack={() => undefined}
+      onStartOver={() => undefined}
       onEmailSupport={() => undefined}
       onSelectFactor={() => undefined}
       onResend={offersResend(step) ? () => undefined : undefined}
@@ -798,7 +805,24 @@ export function CodeVerifyEmail() {
 }
 
 export function ChoiceMethods() {
-  return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }} />;
+  return (
+    <StepPanel
+      step={{ kind: 'choice', purpose: 'methods', options: firstFactors.slice(1) }}
+      providers={[]}
+    />
+  );
+}
+
+export function ChoiceMethodsWithProviders() {
+  return (
+    <StepPanel
+      step={{
+        kind: 'choice',
+        purpose: 'methods',
+        options: [{ id: 'passkey', stage: 'first', strategy: 'passkey' }, ...firstFactors.slice(1)],
+      }}
+    />
+  );
 }
 
 export function ChoiceEnterpriseConnections() {
@@ -815,6 +839,29 @@ export function ChoiceEnterpriseConnections() {
       combined={false}
     />
   );
+}
+
+const accounts: SignInAccount[] = [
+  {
+    id: 'sess_1',
+    name: 'Cameron Walker',
+    identifier: 'cameron@acme.com',
+    imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+  },
+  { id: 'sess_2', name: 'Jane Doe', identifier: 'jane@acme.com' },
+];
+
+export function ChoiceAccounts() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'accounts', options: accounts }} />;
+}
+
+const wallets: SignInProvider[] = [
+  { id: 'phantom', name: 'Phantom', iconUrl: 'https://img.clerk.com/static/phantom.svg' },
+  { id: 'metamask', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+];
+
+export function ChoiceWallets() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: wallets }} />;
 }
 
 export function ChoiceResetMethods() {
@@ -873,12 +920,48 @@ export function NoticeEmailLinkSent() {
   return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER }} />;
 }
 
+export function NoticeEmailLinkSignedInOtherTab() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in-other-tab' }} />;
+}
+
+export function NoticeEmailLinkVerified() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'transferable' }} />;
+}
+
+export function NoticeEmailLinkSigningIn() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'loading' }} />;
+}
+
+export function NoticeEmailLinkSignedIn() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in' }} />;
+}
+
+export function NoticeEmailLinkExpired() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'expired' }} />;
+}
+
+export function NoticeEmailLinkInvalid() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'failed' }} />;
+}
+
+export function NoticeEmailLinkClientMismatch() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'client-mismatch' }} />;
+}
+
 export function CredentialPasskey() {
   return <StepPanel step={{ kind: 'credential', credential: 'passkey', identifier: IDENTIFIER }} />;
 }
 
+export function NoticeStartOver() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'start-over' }} />;
+}
+
 export function NewPasswordReset() {
   return <StepPanel step={{ kind: 'new-password', reason: 'forgot' }} />;
+}
+
+export function NewPasswordRequired() {
+  return <StepPanel step={{ kind: 'new-password', reason: 'required' }} />;
 }
 
 export function SignUpDetails() {

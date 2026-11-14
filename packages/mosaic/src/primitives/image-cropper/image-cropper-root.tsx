@@ -3,7 +3,7 @@
 import { type ReactNode, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { clampCrop, type Crop, INITIAL_CROP, rotateCrop, type Size, zoomCrop } from './crop';
+import { clampCrop, type Crop, INITIAL_CROP, minZoom, rotateCrop, type Size, zoomCrop } from './crop';
 import { ImageCropperContext, type ImageCropperContextValue } from './image-cropper-context';
 
 export interface ImageCropperRootProps {
@@ -52,6 +52,7 @@ export function ImageCropperRoot({
       src,
       crop,
       size,
+      minZoom: size ? minZoom(size) : 1,
       maxZoom,
       disabled,
       area,

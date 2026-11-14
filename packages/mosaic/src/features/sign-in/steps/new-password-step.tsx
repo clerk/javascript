@@ -16,6 +16,7 @@ import { styles } from '../sign-in.styles';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface NewPasswordStepProps {
+  required: boolean;
   form: UseFormResult<SignInValues>;
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
@@ -25,6 +26,7 @@ interface NewPasswordStepProps {
 }
 
 export function NewPasswordStep({
+  required,
   form,
   isPending,
   onSubmit,
@@ -43,7 +45,7 @@ export function NewPasswordStep({
         role='alert'
         color='negative'
       >
-        {form.error}
+        {form.error ?? (required ? m.newPassword.requiredMessage : undefined)}
       </Card.Banner>
       <Card.Content
         render={
@@ -75,16 +77,18 @@ export function NewPasswordStep({
             label={m.newPassword.confirmPasswordLabel}
             disabled={isPending}
           />
-          <Field.Root
-            orientation='horizontal'
-            disabled={isPending}
-          >
-            <Checkbox
-              checked={form.values.signOutOfOtherSessions}
-              onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
-            />
-            <Field.Label>{m.newPassword.signOutOfOtherSessions}</Field.Label>
-          </Field.Root>
+          {required ? null : (
+            <Field.Root
+              orientation='horizontal'
+              disabled={isPending}
+            >
+              <Checkbox
+                checked={form.values.signOutOfOtherSessions}
+                onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
+              />
+              <Field.Label>{m.newPassword.signOutOfOtherSessions}</Field.Label>
+            </Field.Root>
+          )}
         </div>
       </Card.Content>
       <Card.Footer>
