@@ -141,24 +141,28 @@ export const assertIssuerClaim = (iss: unknown, issuer?: string | string[]) => {
   }
 };
 
+const formatClaimValue = (value: unknown) => (typeof value === 'number' ? String(value) : JSON.stringify(value));
+
+const formatSecondsAsUTCString = (seconds: number) => {
+  const date = new Date(secondsToMilliseconds(seconds));
+  return Number.isNaN(date.getTime()) ? String(seconds) : date.toUTCString();
+};
+
 export const assertExpirationClaim = (exp: number, clockSkewInMs: number) => {
   if (!Number.isFinite(exp)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Invalid JWT expiry date claim (exp) ${JSON.stringify(exp)}. Expected number.`,
+      message: `Invalid JWT expiry date claim (exp) ${formatClaimValue(exp)}. Expected number.`,
     });
   }
 
-  const currentDate = new Date(Date.now());
-  const expiryInMs = secondsToMilliseconds(exp);
-  const expiryDate = new Date(expiryInMs);
-
-  const expired = expiryInMs <= currentDate.getTime() - clockSkewInMs;
+  const now = Date.now();
+  const expired = secondsToMilliseconds(exp) <= now - clockSkewInMs;
   if (expired) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenExpired,
-      message: `JWT is expired. Expiry date: ${expiryDate.toUTCString()}, Current date: ${currentDate.toUTCString()}.`,
+      message: `JWT is expired. Expiry date: ${formatSecondsAsUTCString(exp)}, Current date: ${new Date(now).toUTCString()}.`,
     });
   }
 };
@@ -172,19 +176,16 @@ export const assertActivationClaim = (nbf: number | undefined, clockSkewInMs: nu
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Invalid JWT not before date claim (nbf) ${JSON.stringify(nbf)}. Expected number.`,
+      message: `Invalid JWT not before date claim (nbf) ${formatClaimValue(nbf)}. Expected number.`,
     });
   }
 
-  const currentDate = new Date(Date.now());
-  const notBeforeInMs = secondsToMilliseconds(nbf);
-  const notBeforeDate = new Date(notBeforeInMs);
-
-  const early = notBeforeInMs > currentDate.getTime() + clockSkewInMs;
+  const now = Date.now();
+  const early = secondsToMilliseconds(nbf) > now + clockSkewInMs;
   if (early) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenNotActiveYet,
-      message: `JWT cannot be used prior to not before date claim (nbf). Not before date: ${notBeforeDate.toUTCString()}; Current date: ${currentDate.toUTCString()};`,
+      message: `JWT cannot be used prior to not before date claim (nbf). Not before date: ${formatSecondsAsUTCString(nbf)}; Current date: ${new Date(now).toUTCString()};`,
     });
   }
 };
@@ -198,19 +199,16 @@ export const assertIssuedAtClaim = (iat: number | undefined, clockSkewInMs: numb
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Invalid JWT issued at date claim (iat) ${JSON.stringify(iat)}. Expected number.`,
+      message: `Invalid JWT issued at date claim (iat) ${formatClaimValue(iat)}. Expected number.`,
     });
   }
 
-  const currentDate = new Date(Date.now());
-  const issuedAtInMs = secondsToMilliseconds(iat);
-  const issuedAtDate = new Date(issuedAtInMs);
-
-  const postIssued = issuedAtInMs > currentDate.getTime() + clockSkewInMs;
+  const now = Date.now();
+  const postIssued = secondsToMilliseconds(iat) > now + clockSkewInMs;
   if (postIssued) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenIatInTheFuture,
-      message: `JWT issued at date claim (iat) is in the future. Issued at date: ${issuedAtDate.toUTCString()}; Current date: ${currentDate.toUTCString()};`,
+      message: `JWT issued at date claim (iat) is in the future. Issued at date: ${formatSecondsAsUTCString(iat)}; Current date: ${new Date(now).toUTCString()};`,
     });
   }
 };
