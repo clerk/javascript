@@ -1,5 +1,14 @@
 # @clerk/swingset
 
+## 0.0.72
+
+### Patch Changes
+
+- Updated dependencies [[`30702ab`](https://github.com/clerk/javascript/commit/30702ab37fb1cfdff495e1dc716fbc1eba5bfa2d), [`d09bc82`](https://github.com/clerk/javascript/commit/d09bc82f553b3ba2a761c90aead12ac04a715acc), [`49972da`](https://github.com/clerk/javascript/commit/49972da75f6384b3f7aa362212f0f3966274d4e9), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/mosaic@0.5.0
+  - @clerk/nextjs@7.10.0
+  - @clerk/shared@4.45.1
+
 ## 0.0.71
 
 ### Patch Changes
