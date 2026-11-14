@@ -1,6 +1,9 @@
-import type { ClerkPaginationRequest } from '@clerk/shared/types';
+import type { Autocomplete, ClerkPaginationRequest } from '@clerk/shared/types';
 
+import { OAuthTokenExchangeError } from '../../errors';
+import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
+import { parsePublishableKey } from '../../util/shared';
 import type { DeletedObject } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { OAuthApplication } from '../resources/OAuthApplication';
@@ -37,6 +40,54 @@ export type RevokeOAuthApplicationTokenParams = {
   token: string;
 };
 
+/**
+ * A token type identifier as defined in [RFC 8693 section 3](https://www.rfc-editor.org/rfc/rfc8693#section-3).
+ */
+export type OAuthTokenTypeIdentifier = Autocomplete<
+  | 'urn:ietf:params:oauth:token-type:access_token'
+  | 'urn:ietf:params:oauth:token-type:refresh_token'
+  | 'urn:ietf:params:oauth:token-type:id_token'
+  | 'urn:ietf:params:oauth:token-type:jwt'
+>;
+
+/**
+ * The parameters for performing an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an OAuth application.
+ */
+export type ExchangeOAuthApplicationTokenParams = {
+  /** The publishable key of the instance, used to derive its token endpoint. */
+  publishableKey: string;
+  /** The absolute HTTPS URL of your Frontend API proxy. When set, the exchange is sent through the proxy instead of the Frontend API host in `publishableKey`. */
+  proxyUrl?: string;
+  /** The client ID of the OAuth application performing the exchange. */
+  clientId: string;
+  /** The client secret of the OAuth application, used to authenticate with the token endpoint. */
+  clientSecret: string;
+  /** The OAuth access token that represents the user on whose behalf the request is being made. */
+  subjectToken: string;
+  /** The absolute URI of the target resource where the issued token will be used. It must use `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`, and must not contain a fragment. It is sent exactly as given. */
+  resource: string;
+  /** The scopes requested for the issued token. Each element must be a single, non-empty [scope token](https://www.rfc-editor.org/rfc/rfc6749#section-3.3): printable ASCII without spaces, `"` or `\`. */
+  scope?: string[];
+};
+
+/**
+ * The result of a successful [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693#section-2.2.1).
+ */
+export type ExchangeOAuthApplicationTokenResult = {
+  /** The issued security token. */
+  accessToken: string;
+  /** The type of the issued token. */
+  issuedTokenType: OAuthTokenTypeIdentifier;
+  /** How the issued token is used, for example `Bearer`, as returned by the authorization server. Compare it case-insensitively ([RFC 6749 section 5.1](https://www.rfc-editor.org/rfc/rfc6749#section-5.1)), and only use the token if your code supports this type ([RFC 6749 section 7.1](https://www.rfc-editor.org/rfc/rfc6749#section-7.1)). */
+  tokenType: string;
+  /** The lifetime of the issued token in seconds, if provided by the authorization server. */
+  expiresIn?: number;
+  /** The scopes of the issued token, if provided by the authorization server. */
+  scope?: string[];
+  /** A refresh token, if issued by the authorization server. */
+  refreshToken?: string;
+};
+
 /** @generateWithEmptyComment */
 export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
   /**
@@ -48,6 +99,149 @@ export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
    */
   orderBy?: WithSign<'name' | 'created_at'>;
 }>;
+
+type TokenExchangeResponseJSON = {
+  access_token: string;
+  issued_token_type: string;
+  token_type: string;
+  expires_in?: number;
+  scope?: string;
+  refresh_token?: string;
+};
+
+const tokenExchangeGrantType = 'urn:ietf:params:oauth:grant-type:token-exchange';
+const accessTokenType = 'urn:ietf:params:oauth:token-type:access_token';
+
+function formUrlEncode(value: string) {
+  return new URLSearchParams({ v: value }).toString().slice(2);
+}
+
+function tokenExchangeRequestError(errorDescription: string) {
+  return new OAuthTokenExchangeError({ error: 'invalid_request', errorDescription });
+}
+
+function tokenExchangeResponseError(status: number) {
+  return new OAuthTokenExchangeError({ error: 'invalid_response', status });
+}
+
+const loopbackHostnames = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+function parseAbsoluteUrl(value: string) {
+  try {
+    return new URL(value);
+  } catch {
+    return undefined;
+  }
+}
+
+function isAllowedResourceUrl({ protocol, hostname }: URL) {
+  return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(hostname));
+}
+
+const rfc3986AbsoluteUriPattern =
+  /^[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[A-Za-z0-9\-._~:/?@!$&'()*+,;=[\]]|%[0-9A-Fa-f]{2})*$/;
+
+function assertValidTokenExchangeResource(resource: string) {
+  if (resource.includes('#')) {
+    throw tokenExchangeRequestError('`resource` must not contain a fragment.');
+  }
+  const url = rfc3986AbsoluteUriPattern.test(resource) ? parseAbsoluteUrl(resource) : undefined;
+  if (!url) {
+    throw tokenExchangeRequestError('`resource` must be an absolute URI.');
+  }
+  if (!isAllowedResourceUrl(url)) {
+    throw tokenExchangeRequestError('`resource` must use https, or http on a loopback host.');
+  }
+}
+
+const scopeTokenPattern = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
+
+function assertValidTokenExchangeScope(scope: string[] | undefined) {
+  if (scope?.some(token => !scopeTokenPattern.test(token))) {
+    throw tokenExchangeRequestError(
+      'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
+    );
+  }
+}
+
+function assertValidTokenExchangeParams(params: ExchangeOAuthApplicationTokenParams) {
+  assertValidTokenExchangeResource(params.resource);
+  assertValidTokenExchangeScope(params.scope);
+}
+
+function tokenExchangeBody(params: ExchangeOAuthApplicationTokenParams) {
+  const body = new URLSearchParams({
+    grant_type: tokenExchangeGrantType,
+    subject_token: params.subjectToken,
+    subject_token_type: accessTokenType,
+    resource: params.resource,
+  });
+  if (params.scope?.length) {
+    body.set('scope', params.scope.join(' '));
+  }
+  return body;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isAbsentOr(value: Record<string, unknown>, key: string, check: (member: unknown) => boolean) {
+  return !(key in value) || check(value[key]);
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isTokenExchangeResponse(value: unknown): value is TokenExchangeResponseJSON {
+  return (
+    isRecord(value) &&
+    isString(value.access_token) &&
+    isString(value.issued_token_type) &&
+    isString(value.token_type) &&
+    isAbsentOr(value, 'scope', isString) &&
+    isAbsentOr(value, 'expires_in', isNonNegativeInteger) &&
+    isAbsentOr(value, 'refresh_token', isString)
+  );
+}
+
+function tokenExchangeResult(json: TokenExchangeResponseJSON): ExchangeOAuthApplicationTokenResult {
+  return {
+    accessToken: json.access_token,
+    issuedTokenType: json.issued_token_type,
+    tokenType: json.token_type,
+    expiresIn: json.expires_in,
+    scope: json.scope ? json.scope.split(' ').filter(Boolean) : undefined,
+    refreshToken: json.refresh_token,
+  };
+}
+
+function tokenExchangeError(json: unknown, status: number) {
+  if (!isRecord(json) || !isString(json.error)) {
+    return tokenExchangeResponseError(status);
+  }
+  return new OAuthTokenExchangeError({
+    error: json.error,
+    errorDescription: isString(json.error_description) ? json.error_description : undefined,
+    status,
+  });
+}
+
+function oauthTokenEndpoint({ publishableKey, proxyUrl }: ExchangeOAuthApplicationTokenParams) {
+  if (proxyUrl) {
+    if (parseAbsoluteUrl(proxyUrl)?.protocol !== 'https:') {
+      throw new Error('`proxyUrl` must be an absolute HTTPS URL to perform an OAuth token exchange.');
+    }
+    return `${proxyUrl.replace(/\/+$/, '')}/oauth/token`;
+  }
+  const { frontendApi } = parsePublishableKey(publishableKey, { fatal: true });
+  return `https://${frontendApi}/oauth/token`;
+}
 
 /** @generateWithEmptyComment */
 export class OAuthApplicationsApi extends AbstractAPI {
@@ -148,5 +342,62 @@ export class OAuthApplicationsApi extends AbstractAPI {
       path: joinPaths(basePath, oauthApplicationId, 'revoke_token'),
       bodyParams,
     });
+  }
+
+  /**
+   * @experimental This is an experimental API for OAuth 2.0 Token Exchange and is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version to avoid breaking changes.
+   *
+   * Performs an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application), exchanging a user's OAuth access token for a new access token for the target resource. The request is sent to the instance's token endpoint, derived from `publishableKey`, or from `proxyUrl` when set, and authenticates with the application's client ID and client secret. The instance secret key is not required.
+   *
+   * @param params - The parameters for the token exchange.
+   * @returns The issued token and its metadata.
+   * @throws `OAuthTokenExchangeError` with code `invalid_request` and no `status` if `resource` or `scope` is invalid. No request is made.
+   * @throws `OAuthTokenExchangeError` with the OAuth error code, `errorDescription` and HTTP `status` if the token endpoint rejects the exchange ([RFC 6749 section 5.2](https://www.rfc-editor.org/rfc/rfc6749#section-5.2)).
+   * @throws `OAuthTokenExchangeError` with code `invalid_response` and the HTTP `status` if the token endpoint returns a non-200 success status, an error without an OAuth error code, or a malformed token response.
+   * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute HTTPS URL.
+   * @throws Network failures and rejected redirects from `fetch`, unwrapped and unchanged.
+   *
+   * @example
+   * ```ts
+   * const { accessToken } = await clerkClient.oauthApplications.__experimental_exchangeToken({
+   *   publishableKey: process.env.CLERK_PUBLISHABLE_KEY!,
+   *   clientId: process.env.OAUTH_CLIENT_ID!,
+   *   clientSecret: process.env.OAUTH_CLIENT_SECRET!,
+   *   subjectToken,
+   *   resource: 'https://api.example.com',
+   * });
+   * ```
+   */
+  public async __experimental_exchangeToken(
+    params: ExchangeOAuthApplicationTokenParams,
+  ): Promise<ExchangeOAuthApplicationTokenResult> {
+    assertValidTokenExchangeParams(params);
+
+    if (!params.clientId) {
+      throw new Error('A valid client ID is required.');
+    }
+
+    const tokenEndpoint = oauthTokenEndpoint(params);
+    const credentials = `${formUrlEncode(params.clientId)}:${formUrlEncode(params.clientSecret)}`;
+    const body = tokenExchangeBody(params);
+    const headers = {
+      Accept: 'application/json',
+      Authorization: `Basic ${btoa(credentials)}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+
+    const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body, redirect: 'error' });
+
+    const json = await response.json().catch(() => undefined);
+
+    if (!response.ok) {
+      throw tokenExchangeError(json, response.status);
+    }
+
+    if (response.status !== 200 || !isTokenExchangeResponse(json)) {
+      throw tokenExchangeResponseError(response.status);
+    }
+
+    return tokenExchangeResult(json);
   }
 }

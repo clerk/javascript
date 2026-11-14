@@ -25,6 +25,7 @@ describe('subpath /errors exports', () => {
         "ClerkAPIResponseError",
         "MachineTokenVerificationError",
         "MachineTokenVerificationErrorCode",
+        "OAuthTokenExchangeError",
         "SignJWTError",
         "TokenVerificationError",
         "TokenVerificationErrorAction",
