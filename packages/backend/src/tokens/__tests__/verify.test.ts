@@ -10,6 +10,7 @@ import {
   mockJwtPayload,
   mockM2MJwtPayload,
   mockOAuthAccessTokenJwtPayload,
+  pkTest,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -21,6 +22,8 @@ import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
 import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN, JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
+
+const oauthPublishableKey = `pk_test_${btoa(`${new URL(mockOAuthAccessTokenJwtPayload.iss).host}$`)}`;
 
 async function createSignedOAuthJwt(
   payload: Record<string, unknown> = mockOAuthAccessTokenJwtPayload,
@@ -364,6 +367,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(token, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
       });
 
       expect(result.errors).toBeUndefined();
@@ -420,6 +424,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       return verifyMachineAuthToken(token, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
         audience,
       });
     }
@@ -644,6 +649,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(mockSignedOAuthAccessTokenJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
       });
 
       expect(result.tokenType).toBe('oauth_token');
@@ -663,6 +669,50 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.updatedAt).toBe(mockOAuthAccessTokenJwtPayload.iat * 1000);
     });
 
+    it.each([
+      ['no', undefined],
+      ['an empty', ''],
+      ['an invalid', 'pk_test_invalid'],
+    ] as Array<[string, string | undefined]>)(
+      'rejects an OAuth JWT verified with %s publishable key',
+      async (_label, publishableKey) => {
+        const jwks = vi.fn(() => HttpResponse.json(mockJwks));
+        server.use(http.get('https://api.clerk.test/v1/jwks', jwks));
+
+        const result = await verifyMachineAuthToken(mockSignedOAuthAccessTokenJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+          publishableKey,
+        });
+
+        expect(result.tokenType).toBe('oauth_token');
+        expect(result.data).toBeUndefined();
+        expect(result.errors).toHaveLength(1);
+        expect(result.errors![0]).toMatchObject({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: 'Failed to resolve the OAuth access token issuer. A valid publishable key is required.',
+        });
+        expect(jwks).not.toHaveBeenCalled();
+      },
+    );
+
+    it("rejects an OAuth JWT whose iss isn't the publishable key's Frontend API", async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+
+      const result = await verifyMachineAuthToken(mockSignedOAuthAccessTokenJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        publishableKey: pkTest,
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors?.[0]).toMatchObject({
+        code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+        message: `Invalid JWT issuer claim (iss) "${mockOAuthAccessTokenJwtPayload.iss}". Expected "https://clerk.inspired.puma-74.lcl.dev".`,
+      });
+    });
+
     it('fails if JWT type is not at+jwt or application/at+jwt', async () => {
       server.use(
         http.get(
@@ -678,6 +728,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
       });
 
       expect(result.errors).toBeDefined();
@@ -697,6 +748,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(mockSignedOAuthAccessTokenJwtApplicationTyp, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
       });
 
       expect(result.tokenType).toBe('oauth_token');
@@ -709,6 +761,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(invalidJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
       });
 
       expect(result.errors).toBeDefined();
@@ -732,6 +785,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
       });
 
       expect(result.errors).toBeDefined();
@@ -758,6 +812,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
       });
 
       expect(result.errors).toBeDefined();
@@ -796,6 +851,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         const result = await verifyMachineAuthToken(oauthJwt, {
           apiUrl: 'https://api.clerk.test',
           secretKey: 'a-valid-key',
+          publishableKey: oauthPublishableKey,
         });
 
         // Reaching a typed OAuth result proves the M2M `sub` check no longer throws.
@@ -825,6 +881,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
         audience,
       });
 
@@ -854,6 +911,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
         audience: 'https://my-resource.example.com',
       });
 
