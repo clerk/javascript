@@ -1,6 +1,5 @@
 'use client';
 
-import { useAnimationFrame } from 'motion/react';
 import type * as React from 'react';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
@@ -161,7 +160,27 @@ export const Shader = forwardRef(function Shader(
   const shouldRenderRef = useRef(shouldRender);
   const pixelRatioRef = useRef(pixelRatio);
 
-  useAnimationFrame(timestamp => renderRef.current?.(timestamp));
+  const frameRef = useRef(0);
+  const startLoopRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    const loop = (timestamp: number) => {
+      renderRef.current?.(timestamp);
+      frameRef.current = state.current === 'playing' ? requestAnimationFrame(loop) : 0;
+    };
+    startLoopRef.current = () => {
+      if (!frameRef.current) {
+        frameRef.current = requestAnimationFrame(loop);
+      }
+    };
+    if (state.current === 'playing') {
+      startLoopRef.current();
+    }
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = 0;
+    };
+  }, []);
   useEffect(() => {
     uniformsRef.current = uniforms;
     liveUniformsRef.current = liveUniforms;
@@ -174,6 +193,7 @@ export const Shader = forwardRef(function Shader(
     return {
       play() {
         state.current = 'playing';
+        startLoopRef.current();
       },
       pause() {
         state.current = 'paused';

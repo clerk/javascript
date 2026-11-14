@@ -76,7 +76,7 @@ export const FALLBACK_PALETTE: Palette = {
 const BELOW_HEADLINE = 160;
 export const FOCUS_SIZE = 256;
 
-export function useSceneLayout(ref: React.RefObject<HTMLDivElement | null>) {
+export function useSceneLayout(ref: React.RefObject<HTMLDivElement | null>, measureText = true) {
   const [height, setHeight] = React.useState<number | null>(null);
   const [focus, setFocus] = React.useState<Focus>({ x: 0, y: 0 });
   const [textBox, setTextBox] = React.useState<TextBox>([0, 0, 0, 0]);
@@ -100,6 +100,9 @@ export function useSceneLayout(ref: React.RefObject<HTMLDivElement | null>) {
         setScale(box.width / FOCUS_SIZE);
       } else {
         setFocus({ x: sceneRect.width / 2, y: sceneRect.height / 3 });
+      }
+      if (!measureText) {
+        return;
       }
       const parts = [
         section.querySelector('[data-hero-eyebrow]'),
@@ -126,6 +129,6 @@ export function useSceneLayout(ref: React.RefObject<HTMLDivElement | null>) {
     observer.observe(section);
     observer.observe(headline);
     return () => observer.disconnect();
-  }, [ref]);
+  }, [ref, measureText]);
   return { height, focus, textBox, width, scale };
 }

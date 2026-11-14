@@ -98,14 +98,22 @@ const FOCUS_CSS = `
   transition-timing-function: var(--cl-ease-enter, ease-out);
 }
 [data-section] .cl-section-body {
-  transition-property: border-color, box-shadow !important;
-  transition-timing-function: linear !important;
-  transition-duration: var(--cl-duration-base, 0.15s) !important;
+  position: relative;
 }
-[data-section][data-active] .cl-section-body {
-  border-color: light-dark(#bebebe, #525252) !important;
-  box-shadow: 0 0 0 calc(3px / var(--scene-scale)) light-dark(color-mix(in oklab, var(--color-purple-500) 16%, transparent), color-mix(in oklab, var(--color-purple-400) 28%, transparent)) !important;
-  transition-duration: 0s !important;
+[data-section] .cl-section-body::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid light-dark(#bebebe, #525252);
+  border-radius: inherit;
+  box-shadow: 0 0 0 calc(3px / var(--scene-scale)) light-dark(color-mix(in oklab, var(--color-purple-500) 16%, transparent), color-mix(in oklab, var(--color-purple-400) 28%, transparent));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--cl-duration-base, 0.15s) linear;
+}
+[data-section][data-active] .cl-section-body::after {
+  opacity: 1;
+  transition-duration: 0s;
 }
 `;
 const GRIP_CSS = `

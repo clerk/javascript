@@ -105,13 +105,38 @@ export function startTrail() {
   };
 }
 
+const origin = { element: null as Element | null, left: 0, top: 0, stale: true };
+let originObserver: ResizeObserver | null = null;
+
+function markOriginStale() {
+  origin.stale = true;
+}
+
+function readOrigin(element: Element) {
+  if (origin.element !== element) {
+    originObserver?.disconnect();
+    origin.element = element;
+    originObserver = new ResizeObserver(markOriginStale);
+    originObserver.observe(element);
+    originObserver.observe(document.documentElement);
+    origin.stale = true;
+  }
+  if (origin.stale) {
+    const rect = element.getBoundingClientRect();
+    origin.left = rect.left + window.scrollX;
+    origin.top = rect.top + window.scrollY;
+    origin.stale = false;
+  }
+  return [origin.left - window.scrollX, origin.top - window.scrollY];
+}
+
 export function stepTrail(element: Element | null) {
   const now = performance.now() / 1000;
   const dt = Math.min(now - lastStep, 0.05);
   lastStep = now;
   if (element) {
-    const rect = element.getBoundingClientRect();
-    TRAIL_ORIGIN_UNIFORM.value = [rect.left, rect.top, now % 1000];
+    const [left, top] = readOrigin(element);
+    TRAIL_ORIGIN_UNIFORM.value = [left, top, now % 1000];
   }
   if (dt <= 0 || !head.started) {
     return;

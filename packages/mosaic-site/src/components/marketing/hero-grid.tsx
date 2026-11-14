@@ -87,8 +87,10 @@ export function HeroGrid() {
           {
             left: `calc(50% - ${SPAN / 2}px)`,
             width: SPAN,
-            top: (top ?? 0) - SPAN / 2,
+            top: -SPAN / 2,
             height: SPAN,
+            translate: `0 ${top ?? 0}px`,
+            opacity: top === null ? 0 : 1,
             '--grid-bg-light': background(LOOKS.light),
             '--grid-bg-dark': background(LOOKS.dark),
           } as React.CSSProperties

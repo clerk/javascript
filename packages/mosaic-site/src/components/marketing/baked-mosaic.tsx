@@ -24,7 +24,7 @@ import {
   TRAIL_POINTS_UNIFORM,
   TRAIL_RADIUS_UNIFORM,
 } from '@/components/marketing/pointer-trail';
-import { Shader, type Uniforms } from '@/components/shader';
+import { Shader, type ShaderHandle, type Uniforms } from '@/components/shader';
 import { type Mode, useMode } from '@/components/use-mode';
 
 type Bake = typeof desktopBake;
@@ -287,6 +287,7 @@ function SkeletonLayer({ variant, shown, className }: { variant: Variant; shown:
   return (
     <div
       aria-hidden='true'
+      data-done={shown ? undefined : ''}
       className={`mosaic-skeleton dark:bg-gray-850 bg-gray-150 pointer-events-none absolute -z-10 transition-opacity duration-300 ease-out ${className}`}
       style={{
         left: `${50 + (bake.offsetX / focusSize) * 100}%`,
@@ -890,7 +891,7 @@ function useLightSpring(ref: React.RefObject<HTMLDivElement | null>, enabled: bo
 
 export function BakedMosaic() {
   const sceneRef = React.useRef<HTMLDivElement>(null);
-  const { height, focus, width, scale: tierScale } = useSceneLayout(sceneRef);
+  const { height, focus, width, scale: tierScale } = useSceneLayout(sceneRef, false);
   const [variant, setVariant] = React.useState<Variant | null>(null);
   React.useEffect(() => {
     const query = window.matchMedia(MOBILE_QUERY);
@@ -917,6 +918,7 @@ export function BakedMosaic() {
   const [sheen, setSheen] = React.useState(SHEEN_DEFAULTS);
   const [sway, setSway] = React.useState(SWAY_DEFAULTS);
   const visibleRef = React.useRef(true);
+  const shaderRef = React.useRef<ShaderHandle>(null);
   const swayFrameRef = React.useRef(0);
   React.useEffect(() => {
     const scene = sceneRef.current;
@@ -925,10 +927,15 @@ export function BakedMosaic() {
     }
     const observer = new IntersectionObserver(([entry]) => {
       visibleRef.current = entry.isIntersecting;
+      if (entry.isIntersecting) {
+        shaderRef.current?.play();
+      } else {
+        shaderRef.current?.pause();
+      }
     });
     observer.observe(scene);
     return () => observer.disconnect();
-  }, []);
+  }, [height, variant]);
   const mounted = React.useSyncExternalStore(
     subscribeNothing,
     () => true,
@@ -987,7 +994,7 @@ export function BakedMosaic() {
       !reveal.scrub && start !== null && start !== -Infinity && performance.now() - start < reveal.duration + 100;
     if (
       revealing ||
-      (trailEffects && visibleRef.current && TRAIL_ENERGY_UNIFORM.value > 0.001) ||
+      (trailEffects && visibleRef.current && TRAIL_ENERGY_UNIFORM.value > 0.01) ||
       (pointerEffects && follow > 0 && spring.isAnimating())
     ) {
       return true;
@@ -1039,6 +1046,7 @@ export function BakedMosaic() {
           style={{ left: origin[0], top: origin[1], width: bake.width * scale, height: bake.height * scale }}
         >
           <Shader
+            ref={shaderRef}
             key={variant}
             source={source}
             uniforms={uniforms}
