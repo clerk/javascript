@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import type { VerificationCodeResend } from '../../blocks/verification';
+import { VerificationCode } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { rich, useMessages } from '../../localization';
@@ -9,10 +10,10 @@ import { tabularNumbersStyle } from '../../styles/typography.styles';
 import { codeCopy, codeIdentity, codeResendCopy, codeSecondaryAction } from '../auth-flow/auth-flow.utils';
 import { ActionBlockedNotice } from '../auth-flow/steps/action-blocked';
 import { AlternativeChannelStep } from '../auth-flow/steps/alternative-channel';
-import { CodeStep } from '../auth-flow/steps/code-step';
 import { EmailLinkNotice } from '../auth-flow/steps/email-link';
 import { EmailLinkStatusNotice } from '../auth-flow/steps/email-link-status';
 import { EnterpriseConnectionsChoice } from '../auth-flow/steps/enterprise-connections';
+import { IdentityPreview } from '../auth-flow/steps/identity-preview';
 import { LoadingNotice } from '../auth-flow/steps/loading';
 import { ProtectCheckNotice } from '../auth-flow/steps/protect-check';
 import { WalletsChoice } from '../auth-flow/steps/wallets';
@@ -132,8 +133,10 @@ export function SignUpView({
   const code = (current: Extract<SignUpStep, { kind: 'code' }>) => {
     const codeStep = signUpCodeStep(current);
     const secondary = codeSecondaryAction(codeStep, shared, { onCancel, onBack });
+    const identity = codeIdentity(codeStep, shared);
+    const field = form.registerValue('code');
     return (
-      <CodeStep
+      <VerificationCode
         focusRef={focusRef}
         messages={{
           ...codeCopy(codeStep, shared, applicationName),
@@ -142,14 +145,23 @@ export function SignUpView({
           pendingLabel: shared.verifying,
         }}
         resend={resendFor(codeResendCopy(codeStep, shared))}
-        identity={codeIdentity(codeStep, shared)}
-        form={form}
+        identity={
+          identity.identifier ? (
+            <IdentityPreview
+              identifier={identity.identifier}
+              editLabel={identity.editLabel}
+              disabled={isPending}
+              onEdit={onEditIdentifier}
+            />
+          ) : undefined
+        }
+        value={field.value}
+        onValueChange={field.onValueChange}
         errorMessage={errorMessage}
         globalErrorMessage={globalErrorMessage}
         isPending={isPending}
-        onSubmit={onSubmit}
-        onCodeComplete={onCodeComplete}
-        onEditIdentifier={onEditIdentifier}
+        onSubmit={() => onSubmit()}
+        onComplete={onCodeComplete}
         onCancel={secondary.onClick}
       />
     );
