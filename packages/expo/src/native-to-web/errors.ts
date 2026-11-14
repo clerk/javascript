@@ -2,7 +2,7 @@
  * Why a session transfer failed.
  *
  * The SDK raises `unsupported_platform`, `clerk_not_loaded`, `signed_out`, `invalid_destination`,
- * `load_failed`, `network_error`, and `unexpected_response`.
+ * `missing_dependency`, `browser_unavailable`, `load_failed`, `network_error`, and `unexpected_response`.
  * When Clerk refuses to create the transfer, the code is the first Clerk API error code,
  * such as `feature_not_enabled`. When the web page refuses to redeem it, the code is the
  * `__clerk_error_code` the page redirected with, such as `expired` or `already_used`.
@@ -12,6 +12,8 @@ export type SessionTransferErrorCode =
   | 'clerk_not_loaded'
   | 'signed_out'
   | 'invalid_destination'
+  | 'missing_dependency'
+  | 'browser_unavailable'
   | 'load_failed'
   | 'network_error'
   | 'unexpected_response'
@@ -45,7 +47,7 @@ export type SessionTransferError = Error & {
  * ### Send a signed-out user to sign in
  * ```ts
  * try {
- *   await prepareSessionTransfer({ destination: 'https://app.example.com/settings', presentation: 'webview' });
+ *   await openExternalBrowser({ destination: 'https://app.example.com/settings' });
  * } catch (error) {
  *   if (isSessionTransferError(error) && error.code === 'signed_out') {
  *     router.replace('/sign-in');
