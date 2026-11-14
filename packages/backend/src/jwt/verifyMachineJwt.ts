@@ -65,7 +65,11 @@ async function resolveKeyAndVerifyJwt(
     if (options.jwtKey) {
       key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
     } else if (options.secretKey) {
-      key = await loadClerkJWKFromRemote({ ...options, kid });
+      const remote = await loadRemoteMachineJwk(options, kid);
+      if ('error' in remote) {
+        return remote;
+      }
+      key = remote.key;
     } else {
       return {
         error: new MachineTokenVerificationError({
@@ -96,14 +100,30 @@ async function resolveKeyAndVerifyJwt(
   } catch (error) {
     return {
       error: new MachineTokenVerificationError({
-        code: machineErrorCodeForKeyError(error),
+        code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
         message: (error as Error).message,
       }),
     };
   }
 }
 
-function machineErrorCodeForKeyError(error: unknown): MachineTokenVerificationErrorCode {
+async function loadRemoteMachineJwk(
+  options: JwtMachineVerifyOptions,
+  kid: string,
+): Promise<{ key: JsonWebKey } | { error: MachineTokenVerificationError }> {
+  try {
+    return { key: await loadClerkJWKFromRemote({ ...options, kid }) };
+  } catch (error) {
+    return {
+      error: new MachineTokenVerificationError({
+        code: machineErrorCodeForRemoteKeyError(error),
+        message: (error as Error).message,
+      }),
+    };
+  }
+}
+
+function machineErrorCodeForRemoteKeyError(error: unknown): MachineTokenVerificationErrorCode {
   if (!(error instanceof TokenVerificationError)) {
     return MachineTokenVerificationErrorCode.RemoteJWKFailedToLoad;
   }
