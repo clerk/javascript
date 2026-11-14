@@ -1756,9 +1756,9 @@ describe('tokens.authenticateRequest(options)', () => {
       ['an exp of -Number.MAX_VALUE', -Number.MAX_VALUE],
     ];
 
-    const nonfiniteExp: Array<[string, unknown]> = [
-      ['an exp that overflows to Infinity', rawNumber('1e400')],
-      ['an exp that overflows to -Infinity', rawNumber('-1e400')],
+    const nonfiniteExp: Array<[string, unknown, string]> = [
+      ['an exp that overflows to Infinity', rawNumber('1e400'), 'Infinity'],
+      ['an exp that overflows to -Infinity', rawNumber('-1e400'), '-Infinity'],
     ];
 
     test.each(acceptedExp)('authenticates an OAuth JWT with %s', async (_label, exp) => {
@@ -1774,6 +1774,7 @@ describe('tokens.authenticateRequest(options)', () => {
       expect(requestState.tokenType).toBe('oauth_token');
       expect(requestState.reason).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
       expect(requestState.message).toMatch(/^JWT is expired\./);
+      expect(requestState.message).not.toContain('Invalid Date');
     });
 
     test.each(nonfiniteExp)('rejects an OAuth JWT with %s', async (_label, exp) => {
@@ -1799,13 +1800,12 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
-    test.each(nonfiniteExp)('rejects a session JWT with %s', async (_label, exp) => {
+    test.each(nonfiniteExp)('rejects a session JWT with %s', async (_label, exp, rendered) => {
       const requestState = await authenticateSessionJwt({ exp });
 
       expect(requestState).toBeSignedOut({
         reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message:
-          'Invalid JWT expiry date claim (exp) null. Expected number. Make sure that this is a valid Clerk-generated JWT. (reason=token-verification-failed, token-carrier=header)',
+        message: `Invalid JWT expiry date claim (exp) ${rendered}. Expected number. Make sure that this is a valid Clerk-generated JWT. (reason=token-verification-failed, token-carrier=header)`,
       });
     });
 
