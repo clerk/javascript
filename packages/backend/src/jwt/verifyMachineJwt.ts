@@ -184,10 +184,22 @@ export async function verifyOAuthJwt(
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   const { audience, publishableKey, ...jwtOptions } = options;
   const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
-  const issuer = frontendApi ? `https://${frontendApi}` : undefined;
+  if (!frontendApi) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: 'Failed to resolve the OAuth access token issuer. A valid publishable key is required.',
+        }),
+      ],
+    };
+  }
+
   const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, {
     headerType: OAUTH_ACCESS_TOKEN_TYPES,
-    issuer,
+    issuer: `https://${frontendApi}`,
   });
 
   if ('error' in result) {
