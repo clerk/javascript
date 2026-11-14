@@ -6,5 +6,9 @@ export default defineConfig({
     environment: 'jsdom',
     includeSource: ['**/*.{js,ts,jsx,tsx}'],
     setupFiles: './vitest.setup.mts',
+    typecheck: {
+      enabled: true,
+      tsconfig: './tsconfig.typecheck.json',
+    },
   },
 });
