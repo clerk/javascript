@@ -817,7 +817,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Protections**](https://dashboard.clerk.com/~/protect/protections) page under **Protect**. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
+   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Brute force protection**](https://dashboard.clerk.com/~/protect/brute-force) page under **Protect**. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
    * @param userId - The ID of the user to lock.
    */
   public async lockUser(userId: string) {
