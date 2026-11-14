@@ -1,4 +1,6 @@
 {
+  "prefix": "ui",
+  "compare": false,
   "files": [
     { "path": "./dist/ui.browser.js", "maxSize": "45KB" },
     { "path": "./dist/ui.legacy.browser.js", "maxSize": "86KB" },
