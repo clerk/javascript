@@ -16,7 +16,7 @@ const DESCRIPTION =
 const OG_IMAGE = { url: '/og/og.png?v=3b4ee2fa', width: 1200, height: 630, alt: 'Clerk UI' };
 
 export const metadata: Metadata = {
-  title: TITLE,
+  title: 'Clerk UI',
   description: DESCRIPTION,
   openGraph: {
     type: 'website',
@@ -31,28 +31,30 @@ export const metadata: Metadata = {
 };
 export default function Page() {
   return (
-    <main className='relative isolate overflow-x-clip'>
-      <link
-        rel='preload'
-        as='image'
-        href={MOSAIC_SKELETON_URL}
-        media='(min-width: 640px)'
-        fetchPriority='high'
-      />
-      <link
-        rel='preload'
-        as='image'
-        href={MOSAIC_SKELETON_MOBILE_URL}
-        media='(max-width: 639px)'
-        fetchPriority='high'
-      />
+    <>
       <HomeHeader />
-      <HeroQuilt
-        scene={<BakedMosaic />}
-        anchor={<MosaicSkeleton />}
-      />
-      <OverviewSections />
+      <main className='relative isolate overflow-x-clip'>
+        <link
+          rel='preload'
+          as='image'
+          href={MOSAIC_SKELETON_URL}
+          media='(min-width: 640px)'
+          fetchPriority='high'
+        />
+        <link
+          rel='preload'
+          as='image'
+          href={MOSAIC_SKELETON_MOBILE_URL}
+          media='(max-width: 639px)'
+          fetchPriority='high'
+        />
+        <HeroQuilt
+          scene={<BakedMosaic />}
+          anchor={<MosaicSkeleton />}
+        />
+        <OverviewSections />
+      </main>
       <SiteFooter />
-    </main>
+    </>
   );
 }

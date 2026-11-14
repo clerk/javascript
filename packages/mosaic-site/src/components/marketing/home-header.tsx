@@ -28,6 +28,7 @@ export function HomeHeader() {
             className='label-3 rounded-squircle-md focus-visible:outline-focus inline-flex h-[1.625rem] shrink-0 items-center gap-1 bg-gray-800 px-2.5 text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-100'
           >
             <span className='trim-cap'>View on npm</span>
+            <span className='sr-only'> (opens in a new tab)</span>
             <ExternalLinkIcon />
           </a>
         </div>

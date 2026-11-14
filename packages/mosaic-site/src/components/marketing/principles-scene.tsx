@@ -768,6 +768,24 @@ export function PrinciplesScene({ scene }: { scene: SceneId }) {
     return () => observer.disconnect();
   }, [surface]);
 
+  React.useEffect(() => {
+    const root = portalRef.current;
+    if (!root) {
+      return;
+    }
+    const unfocusable = () => {
+      root.querySelectorAll<HTMLElement>('a[href], button, input, select, textarea, [tabindex]').forEach(element => {
+        if (element.tabIndex !== -1) {
+          element.tabIndex = -1;
+        }
+      });
+    };
+    unfocusable();
+    const observer = new MutationObserver(unfocusable);
+    observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['tabindex'] });
+    return () => observer.disconnect();
+  }, []);
+
   const freezeTransitions = React.useCallback(() => {
     const elements = [portalRef.current, surfaceRef.current].filter(element => element !== null);
     if (elements.length === 0) {
@@ -873,6 +891,7 @@ export function PrinciplesScene({ scene }: { scene: SceneId }) {
       ref={portalRef}
       aria-hidden='true'
       className='scene-root absolute inset-x-0 -top-16 bottom-0'
+      onMouseDown={event => event.preventDefault()}
     >
       <style>{`${LAYOUT_CSS}${SCENE_THEME_CSS}${RIM_CSS}${STRIP_CSS}${FOCUS_CSS}${GRIP_CSS}[data-theme-switching]:not(#\\#), [data-theme-switching] *:not(#\\#) { transition: none !important; } @media (prefers-reduced-motion: reduce) { .scene-pop { scale: 1 !important; } .scene-travel { transition: none !important; } }`}</style>
       <PortalProvider container={portalRef}>

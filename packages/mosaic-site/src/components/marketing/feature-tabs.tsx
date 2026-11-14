@@ -101,7 +101,8 @@ export function FeatureTabs() {
         role='tabpanel'
         id={`${baseId}-panel`}
         aria-labelledby={`${baseId}-tab-${active}`}
-        className='feature-glow relative mt-16 h-[25rem] rounded-[24px] bg-gray-100 supports-[corner-shape:squircle]:rounded-[32px] supports-[corner-shape:squircle]:[corner-shape:squircle] max-xl:mx-[calc(50%-50vw)] max-xl:!rounded-none sm:h-[30rem] xl:-mx-8 2xl:mx-0 dark:bg-gray-900'
+        tabIndex={0}
+        className='feature-glow focus-visible:outline-focus relative mt-16 h-[25rem] rounded-[24px] bg-gray-100 outline-none focus-visible:outline-offset-4 supports-[corner-shape:squircle]:rounded-[32px] supports-[corner-shape:squircle]:[corner-shape:squircle] max-xl:mx-[calc(50%-50vw)] max-xl:!rounded-none sm:h-[30rem] xl:-mx-8 2xl:mx-0 dark:bg-gray-900'
       >
         <div
           role='img'
@@ -129,18 +130,44 @@ export function FeatureTabs() {
               id={`${baseId}-tab-${index}`}
               aria-selected={selected}
               aria-controls={`${baseId}-panel`}
+              aria-labelledby={`${baseId}-title-${index}`}
+              aria-describedby={`${baseId}-description-${index}`}
               tabIndex={selected ? 0 : -1}
               onClick={() => setActive(index)}
               onKeyDown={event => onKeyDown(event, index)}
               className={clsx(
-                'focus-visible:outline-focus relative rounded-lg text-left outline-none focus-visible:outline-offset-4',
-                selected ? 'opacity-100' : 'opacity-50 hover:opacity-75',
+                'focus-visible:outline-focus group relative rounded-lg text-left outline-none focus-visible:outline-offset-4',
               )}
             >
               <span className='grid grid-cols-[auto_minmax(0,1fr)] gap-x-2 gap-y-1'>
-                <span className='mt-0.5 block size-4 text-gray-950 dark:text-white'>{item.icon}</span>
-                <span className='label-3 text-pretty text-gray-950 dark:text-white'>{item.title}</span>
-                <span className='body-3 col-start-2 text-pretty text-gray-600 max-sm:max-w-[16rem] dark:text-gray-400'>
+                <span
+                  className={clsx(
+                    'mt-0.5 block size-4 transition-colors',
+                    selected
+                      ? 'text-gray-950 dark:text-white'
+                      : 'text-gray-600 group-hover:text-gray-950 dark:text-gray-400 dark:group-hover:text-white',
+                  )}
+                >
+                  {item.icon}
+                </span>
+                <span
+                  id={`${baseId}-title-${index}`}
+                  className={clsx(
+                    'label-3 text-pretty transition-colors',
+                    selected
+                      ? 'text-gray-950 dark:text-white'
+                      : 'text-gray-600 group-hover:text-gray-950 dark:text-gray-400 dark:group-hover:text-white',
+                  )}
+                >
+                  {item.title}
+                </span>
+                <span
+                  id={`${baseId}-description-${index}`}
+                  className={clsx(
+                    'body-3 col-start-2 text-pretty max-sm:max-w-[16rem]',
+                    selected ? 'text-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400',
+                  )}
+                >
                   {item.description}
                 </span>
               </span>

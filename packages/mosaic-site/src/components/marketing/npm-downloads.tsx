@@ -24,7 +24,7 @@ export async function NpmDownloads({ className }: { className?: string }) {
     return null;
   }
   return (
-    <span className={cn('label-3 tabular-nums text-gray-500 dark:text-gray-400', className)}>
+    <span className={cn('label-3 tabular-nums text-gray-600 dark:text-gray-400', className)}>
       <span className='trim-cap'>
         <span className='text-foreground'>{downloads.toLocaleString('en-US')}</span> downloads
       </span>

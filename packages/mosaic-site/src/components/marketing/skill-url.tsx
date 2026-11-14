@@ -33,7 +33,7 @@ export function SkillUrl({ className }: { className?: string }) {
         type='button'
         aria-label={`Copy skill URL: ${SKILL_URL}`}
         onClick={() => void handleCopy()}
-        className='focus-visible:outline-focus inline-flex cursor-pointer items-center gap-1.5 rounded-sm font-mono text-neutral-800 transition-colors hover:text-neutral-950 dark:text-neutral-200 dark:hover:text-white'
+        className='focus-visible:outline-focus -my-0.5 inline-flex cursor-pointer items-center gap-1.5 rounded-sm py-0.5 font-mono text-neutral-800 transition-colors hover:text-neutral-950 dark:text-neutral-200 dark:hover:text-white'
       >
         {label}
         <span

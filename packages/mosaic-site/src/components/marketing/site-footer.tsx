@@ -77,13 +77,13 @@ export function SiteFooter() {
               </li>
               {COLUMNS.map(column => (
                 <li key={column.title}>
-                  <div className='body-3 text-gray-500 dark:text-gray-400'>{column.title}</div>
+                  <h2 className='body-3 text-gray-600 dark:text-gray-400'>{column.title}</h2>
                   <ul className='stack-1 mt-4'>
                     {column.links.map(link => (
                       <li key={link.label}>
                         <a
                           href={link.href}
-                          className='label-3 text-foreground block w-fit transition-colors hover:text-gray-600 dark:hover:text-gray-300'
+                          className='label-3 text-foreground -my-0.5 block w-fit py-0.5 transition-colors hover:text-gray-600 dark:hover:text-gray-300'
                         >
                           {link.label}
                         </a>
