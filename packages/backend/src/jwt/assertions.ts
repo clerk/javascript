@@ -5,6 +5,8 @@ const isArrayString = (s: unknown): s is string[] => {
   return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
 };
 
+const secondsToMilliseconds = (seconds: number) => Math.trunc(seconds) * 1000;
+
 export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   const audienceList = [audience].flat().filter(a => !!a);
   const audList = [aud].flat().filter(a => !!a);
@@ -140,7 +142,7 @@ export const assertIssuerClaim = (iss: unknown, issuer?: string | string[]) => {
 };
 
 export const assertExpirationClaim = (exp: number, clockSkewInMs: number) => {
-  if (typeof exp !== 'number' || !Number.isFinite(exp)) {
+  if (!Number.isFinite(exp)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
@@ -149,10 +151,10 @@ export const assertExpirationClaim = (exp: number, clockSkewInMs: number) => {
   }
 
   const currentDate = new Date(Date.now());
-  const expiryDate = new Date(0);
-  expiryDate.setUTCSeconds(exp);
+  const expiryInMs = secondsToMilliseconds(exp);
+  const expiryDate = new Date(expiryInMs);
 
-  const expired = Math.trunc(exp) * 1000 <= currentDate.getTime() - clockSkewInMs;
+  const expired = expiryInMs <= currentDate.getTime() - clockSkewInMs;
   if (expired) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenExpired,
@@ -166,7 +168,7 @@ export const assertActivationClaim = (nbf: number | undefined, clockSkewInMs: nu
     return;
   }
 
-  if (typeof nbf !== 'number' || !Number.isFinite(nbf)) {
+  if (!Number.isFinite(nbf)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
@@ -175,10 +177,10 @@ export const assertActivationClaim = (nbf: number | undefined, clockSkewInMs: nu
   }
 
   const currentDate = new Date(Date.now());
-  const notBeforeDate = new Date(0);
-  notBeforeDate.setUTCSeconds(nbf);
+  const notBeforeInMs = secondsToMilliseconds(nbf);
+  const notBeforeDate = new Date(notBeforeInMs);
 
-  const early = Math.trunc(nbf) * 1000 > currentDate.getTime() + clockSkewInMs;
+  const early = notBeforeInMs > currentDate.getTime() + clockSkewInMs;
   if (early) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenNotActiveYet,
@@ -192,7 +194,7 @@ export const assertIssuedAtClaim = (iat: number | undefined, clockSkewInMs: numb
     return;
   }
 
-  if (typeof iat !== 'number' || !Number.isFinite(iat)) {
+  if (!Number.isFinite(iat)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
@@ -201,10 +203,10 @@ export const assertIssuedAtClaim = (iat: number | undefined, clockSkewInMs: numb
   }
 
   const currentDate = new Date(Date.now());
-  const issuedAtDate = new Date(0);
-  issuedAtDate.setUTCSeconds(iat);
+  const issuedAtInMs = secondsToMilliseconds(iat);
+  const issuedAtDate = new Date(issuedAtInMs);
 
-  const postIssued = Math.trunc(iat) * 1000 > currentDate.getTime() + clockSkewInMs;
+  const postIssued = issuedAtInMs > currentDate.getTime() + clockSkewInMs;
   if (postIssued) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenIatInTheFuture,

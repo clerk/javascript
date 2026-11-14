@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
 import {
+  maxDateSeconds,
   mockExpiredJwt,
   mockInvalidSignatureJwt,
   mockJwks,
@@ -339,6 +340,27 @@ const signedBearerRequest = async (payload: Record<string, unknown>, header: Rec
   });
   return mockRequest({ authorization: `Bearer ${data}` });
 };
+
+const mockOAuthJwtPayload = { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss };
+
+const authenticateSignedJwt = async (
+  payload: Record<string, unknown>,
+  header: Record<string, unknown>,
+  options?: Record<string, unknown>,
+) => {
+  server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+  return authenticateRequest(await signedBearerRequest(payload, header), mockOptions(options));
+};
+
+const authenticateOAuthJwt = (claims: Record<string, unknown>, options: Record<string, unknown> = {}) =>
+  authenticateSignedJwt(
+    { ...mockOAuthJwtPayload, ...claims },
+    { typ: 'at+jwt' },
+    { acceptsToken: 'oauth_token', ...options },
+  );
+
+const authenticateSessionJwt = (claims: Record<string, unknown>) =>
+  authenticateSignedJwt({ ...mockJwtPayload, ...claims }, { typ: 'JWT', cat: JWT_CATEGORY_SESSION_TOKEN });
 
 // @ts-expect-error - Testing
 const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
@@ -1717,28 +1739,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
   describe('JWT time claims', () => {
     const now = mockJwtPayload.iat;
-    const maxDateSeconds = 8.64e12;
     const rawNumber = (text: string) => (JSON as unknown as { rawJSON: (text: string) => unknown }).rawJSON(text);
-
-    const authenticateOAuthJwt = async (claims: Record<string, unknown>) => {
-      const request = await signedBearerRequest(
-        { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss, ...claims },
-        { typ: 'at+jwt' },
-      );
-      return authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
-    };
-
-    const authenticateSessionJwt = async (claims: Record<string, unknown>) => {
-      const request = await signedBearerRequest(
-        { ...mockJwtPayload, ...claims },
-        { typ: 'JWT', cat: JWT_CATEGORY_SESSION_TOKEN },
-      );
-      return authenticateRequest(request, mockOptions());
-    };
-
-    beforeEach(() => {
-      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
-    });
 
     const acceptedExp: Array<[string, unknown]> = [
       ['a future exp', now + 300],
@@ -1801,8 +1802,11 @@ describe('tokens.authenticateRequest(options)', () => {
     test.each(nonfiniteExp)('rejects a session JWT with %s', async (_label, exp) => {
       const requestState = await authenticateSessionJwt({ exp });
 
-      expect(requestState.isAuthenticated).toBe(false);
-      expect(requestState.message).toMatch(/Invalid JWT expiry date claim \(exp\)/);
+      expect(requestState).toBeSignedOut({
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message:
+          'Invalid JWT expiry date claim (exp) null. Expected number. Make sure that this is a valid Clerk-generated JWT. (reason=token-verification-failed, token-carrier=header)',
+      });
     });
 
     test.each([
@@ -1929,27 +1933,20 @@ describe('tokens.authenticateRequest(options)', () => {
     describe('OAuth JWT issuer', () => {
       const expectedIssuer = mockJwtPayload.iss;
 
-      const authenticateOAuthJwt = async (iss: unknown, options: Record<string, unknown> = {}) => {
-        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
-        const payload: Record<string, unknown> = { ...mockOAuthAccessTokenJwtPayload, iss };
-        if (iss === undefined) {
-          delete payload.iss;
-        }
-        const request = await signedBearerRequest(payload, { typ: 'at+jwt' });
-        return authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token', ...options }));
-      };
-
       test.each(['oauth_token', 'any'] as const)(
         'authenticates an OAuth JWT whose iss is the instance Frontend API when acceptsToken is %s',
         async acceptsToken => {
-          const requestState = await authenticateOAuthJwt(expectedIssuer, { acceptsToken });
+          const requestState = await authenticateOAuthJwt({ iss: expectedIssuer }, { acceptsToken });
 
           expect(requestState).toBeMachineAuthenticated();
         },
       );
 
       test('authenticates an OAuth JWT whose iss is the instance Frontend API when a proxy URL is configured', async () => {
-        const requestState = await authenticateOAuthJwt(expectedIssuer, { proxyUrl: 'https://example.com/__clerk' });
+        const requestState = await authenticateOAuthJwt(
+          { iss: expectedIssuer },
+          { proxyUrl: 'https://example.com/__clerk' },
+        );
 
         expect(requestState).toBeMachineAuthenticated();
       });
@@ -1965,7 +1962,7 @@ describe('tokens.authenticateRequest(options)', () => {
         ['a numeric', 42],
         ['an array', [expectedIssuer]],
       ] as Array<[string, unknown]>)('rejects an OAuth JWT with %s iss', async (_label, iss) => {
-        const requestState = await authenticateOAuthJwt(iss, { proxyUrl: 'https://example.com/__clerk' });
+        const requestState = await authenticateOAuthJwt({ iss }, { proxyUrl: 'https://example.com/__clerk' });
 
         expect(requestState).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
@@ -1992,10 +1989,7 @@ describe('tokens.authenticateRequest(options)', () => {
           const request =
             format === 'opaque'
               ? mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` })
-              : await signedBearerRequest(
-                  { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss },
-                  { typ: 'at+jwt' },
-                );
+              : await signedBearerRequest(mockOAuthJwtPayload, { typ: 'at+jwt' });
           const requestState = await authenticateRequest(
             request,
             mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),

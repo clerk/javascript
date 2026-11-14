@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { maxDateSeconds } from '../../fixtures';
 import {
   assertActivationClaim,
   assertAudienceClaim,
@@ -434,7 +435,7 @@ describe('assertIssuedAtClaim(iat, clockSkewInMs)', () => {
     expect(() => assertIssuedAtClaim(nowInSeconds + 5, 6000)).not.toThrow();
   });
 
-  it.each([1e300, 8.64e12 + 1])('throws error if iat is %s, beyond the Date upper bound', iat => {
+  it.each([1e300, maxDateSeconds + 1])('throws error if iat is %s, beyond the Date upper bound', iat => {
     expect(() => assertIssuedAtClaim(iat, 0)).toThrow('JWT issued at date claim (iat) is in the future.');
   });
 
