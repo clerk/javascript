@@ -6,3 +6,5 @@ export type {
   AuthenticatedWebViewProps,
   UseAuthenticatedWebViewParams,
 } from './useAuthenticatedWebView';
+export { useNativeToWeb } from './useNativeToWeb';
+export type { OpenExternalBrowserParams, UseNativeToWebReturn } from './useNativeToWeb';
