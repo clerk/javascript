@@ -8,6 +8,7 @@ import {
   TokenVerificationErrorAction,
 } from '../errors';
 import type { MachineTokenReturnType } from '../jwt/types';
+import type { VerifyJwtOptions } from '../jwt/verifyJwt';
 import { verifyJwt } from '../jwt/verifyJwt';
 import { JWT_CATEGORY_M2M_TOKEN } from '../tokens/jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
@@ -54,8 +55,7 @@ async function resolveKeyAndVerifyJwt(
   token: string,
   kid: string,
   options: JwtMachineVerifyOptions,
-  headerType?: string[],
-  issuer?: string,
+  claimOptions: Pick<VerifyJwtOptions, 'headerType' | 'issuer'> = {},
 ): Promise<{ payload: JwtPayload } | { error: MachineTokenVerificationError }> {
   try {
     let key: JsonWebKey;
@@ -78,8 +78,7 @@ async function resolveKeyAndVerifyJwt(
       key,
       audience: options.audience,
       clockSkewInMs: options.clockSkewInMs,
-      issuer,
-      ...(headerType ? { headerType } : {}),
+      ...claimOptions,
     });
 
     if (verifyErrors) {
@@ -151,7 +150,10 @@ export async function verifyOAuthJwt(
   const { audience, publishableKey, ...jwtOptions } = options;
   const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
   const issuer = frontendApi ? `https://${frontendApi}` : undefined;
-  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, OAUTH_ACCESS_TOKEN_TYPES, issuer);
+  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, {
+    headerType: OAUTH_ACCESS_TOKEN_TYPES,
+    issuer,
+  });
 
   if ('error' in result) {
     return { data: undefined, tokenType: TokenType.OAuthToken, errors: [result.error] };
