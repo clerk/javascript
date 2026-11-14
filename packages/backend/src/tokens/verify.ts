@@ -13,6 +13,7 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
+import type { JwtMachineVerifyOptions } from '../jwt/verifyMachineJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
 import { isNonSessionJwtCategory, JWT_CATEGORY_JWT_TEMPLATE } from './jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
@@ -267,7 +268,10 @@ async function verifyAPIKey(
  * @param token - The token to verify (e.g., starts with "mt_", "oat_", "ak_", or a JWT)
  * @param options - Options including secretKey for BAPI authorization
  */
-export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
+export async function verifyMachineAuthToken(
+  token: string,
+  options: VerifyTokenOptions & Pick<JwtMachineVerifyOptions, 'publishableKey'>,
+) {
   if (isJwtFormat(token)) {
     let decodedResult: Jwt;
     try {

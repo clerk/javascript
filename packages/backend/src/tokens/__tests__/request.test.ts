@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
 import {
+  maxDateSeconds,
   mockExpiredJwt,
   mockInvalidSignatureJwt,
   mockJwks,
@@ -10,6 +11,7 @@ import {
   mockJwtHeader,
   mockJwtPayload,
   mockM2MJwtPayload,
+  mockOAuthAccessTokenJwtPayload,
   pemEncodedPublicKey,
   signingJwks,
 } from '../../fixtures';
@@ -330,6 +332,38 @@ const mockOptions = (options?) => {
 const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
   return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
+
+const signTestJwt = async (payload: Record<string, unknown>, header: Record<string, unknown>) => {
+  const { data } = await signJwt(payload, signingJwks, {
+    algorithm: 'RS256',
+    header: { kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...header },
+  });
+  return data as string;
+};
+
+const signedBearerRequest = async (payload: Record<string, unknown>, header: Record<string, unknown>) =>
+  mockRequest({ authorization: `Bearer ${await signTestJwt(payload, header)}` });
+
+const mockOAuthJwtPayload = { ...mockOAuthAccessTokenJwtPayload, iss: mockJwtPayload.iss };
+
+const authenticateSignedJwt = async (
+  payload: Record<string, unknown>,
+  header: Record<string, unknown>,
+  options?: Record<string, unknown>,
+) => {
+  server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+  return authenticateRequest(await signedBearerRequest(payload, header), mockOptions(options));
+};
+
+const authenticateOAuthJwt = (claims: Record<string, unknown>, options: Record<string, unknown> = {}) =>
+  authenticateSignedJwt(
+    { ...mockOAuthJwtPayload, ...claims },
+    { typ: 'at+jwt' },
+    { acceptsToken: 'oauth_token', ...options },
+  );
+
+const authenticateSessionJwt = (claims: Record<string, unknown>) =>
+  authenticateSignedJwt({ ...mockJwtPayload, ...claims }, { typ: 'JWT', cat: JWT_CATEGORY_SESSION_TOKEN });
 
 // @ts-expect-error - Testing
 const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
@@ -1706,6 +1740,103 @@ describe('tokens.authenticateRequest(options)', () => {
     });
   });
 
+  describe('JWT time claims', () => {
+    const now = mockJwtPayload.iat;
+    const rawNumber = (text: string) => (JSON as unknown as { rawJSON: (text: string) => unknown }).rawJSON(text);
+
+    const acceptedExp: Array<[string, unknown]> = [
+      ['a future exp', now + 300],
+      ['an exp just inside the clock skew', now - 4],
+      ['an exp just beyond the Date upper bound', maxDateSeconds + 1],
+      ['an exp of 1e300', 1e300],
+    ];
+
+    const expiredExp: Array<[string, unknown]> = [
+      ['an ordinary past exp', now - 100],
+      ['an exp at the clock skew boundary', now - 5],
+      ['an exp just beyond the Date lower bound', -maxDateSeconds - 1],
+      ['an exp of -1e300', -1e300],
+      ['an exp of -Number.MAX_VALUE', -Number.MAX_VALUE],
+    ];
+
+    const nonfiniteExp: Array<[string, unknown, string]> = [
+      ['an exp that overflows to Infinity', rawNumber('1e400'), 'Infinity'],
+      ['an exp that overflows to -Infinity', rawNumber('-1e400'), '-Infinity'],
+    ];
+
+    test.each(acceptedExp)('authenticates an OAuth JWT with %s', async (_label, exp) => {
+      const requestState = await authenticateOAuthJwt({ exp });
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+
+    test.each(expiredExp)('rejects an OAuth JWT with %s as expired', async (_label, exp) => {
+      const requestState = await authenticateOAuthJwt({ exp });
+
+      expect(requestState.isAuthenticated).toBe(false);
+      expect(requestState.tokenType).toBe('oauth_token');
+      expect(requestState.reason).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
+      expect(requestState.message).toMatch(/^JWT is expired\./);
+      expect(requestState.message).not.toContain('Invalid Date');
+    });
+
+    test.each(nonfiniteExp)('rejects an OAuth JWT with %s', async (_label, exp) => {
+      const requestState = await authenticateOAuthJwt({ exp });
+
+      expect(requestState.isAuthenticated).toBe(false);
+      expect(requestState.tokenType).toBe('oauth_token');
+      expect(requestState.reason).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
+      expect(requestState.message).toMatch(/^Invalid JWT expiry date claim \(exp\)/);
+    });
+
+    test.each(acceptedExp)('authenticates a session JWT with %s', async (_label, exp) => {
+      const requestState = await authenticateSessionJwt({ exp });
+
+      expect(requestState).toBeSignedIn();
+    });
+
+    test.each(expiredExp)('rejects a session JWT with %s as expired', async (_label, exp) => {
+      const requestState = await authenticateSessionJwt({ exp });
+
+      expect(requestState).toMatchHandshake({
+        reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+      });
+    });
+
+    test.each(nonfiniteExp)('rejects a session JWT with %s', async (_label, exp, rendered) => {
+      const requestState = await authenticateSessionJwt({ exp });
+
+      expect(requestState).toBeSignedOut({
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Invalid JWT expiry date claim (exp) ${rendered}. Expected number. Make sure that this is a valid Clerk-generated JWT. (reason=token-verification-failed, token-carrier=header)`,
+      });
+    });
+
+    test.each([
+      ['a far-future nbf', { nbf: 1e300 }, /^JWT cannot be used prior to not before date claim \(nbf\)/],
+      ['an nbf just beyond the Date upper bound', { nbf: maxDateSeconds + 1 }, /^JWT cannot be used prior/],
+      ['an nbf that overflows to Infinity', { nbf: rawNumber('1e400') }, /^Invalid JWT not before date claim \(nbf\)/],
+    ] as Array<[string, Record<string, unknown>, RegExp]>)(
+      'rejects an OAuth JWT with %s',
+      async (_label, claims, message) => {
+        const requestState = await authenticateOAuthJwt(claims);
+
+        expect(requestState.isAuthenticated).toBe(false);
+        expect(requestState.reason).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
+        expect(requestState.message).toMatch(message);
+      },
+    );
+
+    test.each([
+      ['a far-past nbf', { nbf: -1e300 }],
+      ['an nbf just inside the clock skew', { nbf: now + 4 }],
+    ] as Array<[string, Record<string, unknown>]>)('authenticates an OAuth JWT with %s', async (_label, claims) => {
+      const requestState = await authenticateOAuthJwt(claims);
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+  });
+
   describe('Machine authentication', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -1802,6 +1933,141 @@ describe('tokens.authenticateRequest(options)', () => {
       },
     );
 
+    describe('OAuth JWT key loading', () => {
+      const jwksUrl = 'https://api.clerk.test/v1/jwks';
+
+      const authenticateOAuthJwtWithJwks = async (
+        resolver: Parameters<typeof http.get>[1],
+        header: Record<string, unknown> = {},
+      ) => {
+        server.use(http.get(jwksUrl, resolver));
+        const request = await signedBearerRequest(mockOAuthJwtPayload, { typ: 'at+jwt', ...header });
+        let settled = false;
+        const pending = authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' })).finally(() => {
+          settled = true;
+        });
+        for (let i = 0; i < 60 && !settled; i++) {
+          await vi.advanceTimersByTimeAsync(1000);
+        }
+        return pending;
+      };
+
+      test('keeps secret-key-invalid when the JWKS call rejects the secret key', async () => {
+        const requestState = await authenticateOAuthJwtWithJwks(() =>
+          HttpResponse.json(
+            { errors: [{ code: 'clerk_key_invalid', message: 'The provided Clerk Secret Key is invalid.' }] },
+            { status: 401 },
+          ),
+        );
+
+        expect(requestState).toMatchObject({
+          status: AuthStatus.SignedOut,
+          isAuthenticated: false,
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.InvalidSecretKey,
+          message: 'The provided Clerk Secret Key is invalid. (code=secret-key-invalid, status=n/a)',
+        });
+      });
+
+      test.each([
+        ['the JWKS fetch throws', () => HttpResponse.error()],
+        ['the JWKS error body is not JSON', () => new HttpResponse('<html>Bad Gateway</html>', { status: 502 })],
+        ['the JWKS response is not 2xx', () => HttpResponse.json({ errors: [] }, { status: 503 })],
+      ] as Array<[string, Parameters<typeof http.get>[1]]>)(
+        'reports jwk-remote-failed-to-load when %s',
+        async (_label, resolver) => {
+          const requestState = await authenticateOAuthJwtWithJwks(resolver);
+
+          expect(requestState).toMatchObject({
+            status: AuthStatus.SignedOut,
+            isAuthenticated: false,
+            tokenType: 'oauth_token',
+            reason: 'jwk-remote-failed-to-load',
+          });
+        },
+      );
+
+      test('keeps token-verification-failed for an unknown kid', async () => {
+        const requestState = await authenticateOAuthJwtWithJwks(() => HttpResponse.json(mockJwks), {
+          kid: 'ins_unknown',
+        });
+
+        expect(requestState).toMatchObject({
+          status: AuthStatus.SignedOut,
+          isAuthenticated: false,
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: expect.stringMatching(/^Unable to find a signing key in JWKS that matches the kid='ins_unknown'/),
+        });
+      });
+
+      test('keeps token-verification-failed for a bad signature', async () => {
+        server.use(http.get(jwksUrl, () => HttpResponse.json(mockJwks)));
+        const token = await signTestJwt(mockOAuthJwtPayload, { typ: 'at+jwt' });
+        const [header, payload, signature] = token.split('.');
+        const tampered = `${header}.${payload}.${signature.startsWith('A') ? 'B' : 'A'}${signature.slice(1)}`;
+
+        const requestState = await authenticateRequest(
+          mockRequest({ authorization: `Bearer ${tampered}` }),
+          mockOptions({ acceptsToken: 'oauth_token' }),
+        );
+
+        expect(requestState).toMatchObject({
+          status: AuthStatus.SignedOut,
+          isAuthenticated: false,
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: expect.stringMatching(/^JWT signature is invalid\./),
+        });
+      });
+    });
+
+    describe('OAuth JWT issuer', () => {
+      const expectedIssuer = mockJwtPayload.iss;
+
+      test.each(['oauth_token', 'any'] as const)(
+        'authenticates an OAuth JWT whose iss is the instance Frontend API when acceptsToken is %s',
+        async acceptsToken => {
+          const requestState = await authenticateOAuthJwt({ iss: expectedIssuer }, { acceptsToken });
+
+          expect(requestState).toBeMachineAuthenticated();
+        },
+      );
+
+      test('authenticates an OAuth JWT whose iss is the instance Frontend API when a proxy URL is configured', async () => {
+        const requestState = await authenticateOAuthJwt(
+          { iss: expectedIssuer },
+          { proxyUrl: 'https://example.com/__clerk' },
+        );
+
+        expect(requestState).toBeMachineAuthenticated();
+      });
+
+      test.each([
+        ['a different', 'https://untrusted.example'],
+        ['a trailing-slash', `${expectedIssuer}/`],
+        ['a scheme-less', 'clerk.inspired.puma-74.lcl.dev'],
+        ['the proxy URL as', 'https://example.com/__clerk'],
+        ['an empty', ''],
+        ['a missing', undefined],
+        ['a null', null],
+        ['a numeric', 42],
+        ['an array', [expectedIssuer]],
+      ] as Array<[string, unknown]>)('rejects an OAuth JWT with %s iss', async (_label, iss) => {
+        const requestState = await authenticateOAuthJwt({ iss }, { proxyUrl: 'https://example.com/__clerk' });
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: `Invalid JWT issuer claim (iss) ${JSON.stringify(iss)}. Expected "${expectedIssuer}". (code=token-verification-failed, status=n/a)`,
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: 'oauth_token',
+          isAuthenticated: false,
+        });
+      });
+    });
+
     describe.each(['opaque', 'JWT'] as const)('%s OAuth token without aud', format => {
       test.each(['oauth_token', 'any'] as const)(
         'rejects a configured audience when acceptsToken is %s',
@@ -1812,8 +2078,10 @@ describe('tokens.authenticateRequest(options)', () => {
             }),
             http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)),
           );
-          const token = format === 'opaque' ? mockTokens.oauth_token : mockSignedOAuthAccessTokenJwt;
-          const request = mockRequest({ authorization: `Bearer ${token}` });
+          const request =
+            format === 'opaque'
+              ? mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` })
+              : await signedBearerRequest(mockOAuthJwtPayload, { typ: 'at+jwt' });
           const requestState = await authenticateRequest(
             request,
             mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),

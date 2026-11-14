@@ -5,21 +5,26 @@ import { M2MToken } from '../api/resources/M2MToken';
 import {
   MachineTokenVerificationError,
   MachineTokenVerificationErrorCode,
+  TokenVerificationError,
   TokenVerificationErrorAction,
+  TokenVerificationErrorReason,
 } from '../errors';
 import type { MachineTokenReturnType } from '../jwt/types';
+import type { VerifyJwtOptions } from '../jwt/verifyJwt';
 import { verifyJwt } from '../jwt/verifyJwt';
 import { JWT_CATEGORY_M2M_TOKEN } from '../tokens/jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../tokens/keys';
 import { OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
 import { TokenType } from '../tokens/tokenTypes';
+import { parsePublishableKey } from '../util/shared';
 import { assertOAuthAudienceClaim } from './assertions';
 
 export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {
   audience?: string | string[];
   jwtKey?: string;
   clockSkewInMs?: number;
+  publishableKey?: string;
 };
 
 export function getOAuthAudienceVerificationError(
@@ -52,7 +57,7 @@ async function resolveKeyAndVerifyJwt(
   token: string,
   kid: string,
   options: JwtMachineVerifyOptions,
-  headerType?: string[],
+  claimOptions: Pick<VerifyJwtOptions, 'headerType' | 'issuer'> = {},
 ): Promise<{ payload: JwtPayload } | { error: MachineTokenVerificationError }> {
   try {
     let key: JsonWebKey;
@@ -60,7 +65,11 @@ async function resolveKeyAndVerifyJwt(
     if (options.jwtKey) {
       key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
     } else if (options.secretKey) {
-      key = await loadClerkJWKFromRemote({ ...options, kid });
+      const remote = await loadRemoteMachineJwk(options, kid);
+      if ('error' in remote) {
+        return remote;
+      }
+      key = remote.key;
     } else {
       return {
         error: new MachineTokenVerificationError({
@@ -75,7 +84,7 @@ async function resolveKeyAndVerifyJwt(
       key,
       audience: options.audience,
       clockSkewInMs: options.clockSkewInMs,
-      ...(headerType ? { headerType } : {}),
+      ...claimOptions,
     });
 
     if (verifyErrors) {
@@ -96,6 +105,35 @@ async function resolveKeyAndVerifyJwt(
       }),
     };
   }
+}
+
+async function loadRemoteMachineJwk(
+  options: JwtMachineVerifyOptions,
+  kid: string,
+): Promise<{ key: JsonWebKey } | { error: MachineTokenVerificationError }> {
+  try {
+    return { key: await loadClerkJWKFromRemote({ ...options, kid }) };
+  } catch (error) {
+    return {
+      error: new MachineTokenVerificationError({
+        code: machineErrorCodeForRemoteKeyError(error),
+        message: (error as Error).message,
+      }),
+    };
+  }
+}
+
+function machineErrorCodeForRemoteKeyError(error: unknown): MachineTokenVerificationErrorCode {
+  if (!(error instanceof TokenVerificationError)) {
+    return MachineTokenVerificationErrorCode.RemoteJWKFailedToLoad;
+  }
+  if (error.reason === TokenVerificationErrorReason.InvalidSecretKey) {
+    return MachineTokenVerificationErrorCode.InvalidSecretKey;
+  }
+  if (error.reason === TokenVerificationErrorReason.RemoteJWKFailedToLoad) {
+    return MachineTokenVerificationErrorCode.RemoteJWKFailedToLoad;
+  }
+  return MachineTokenVerificationErrorCode.TokenVerificationFailed;
 }
 
 /**
@@ -144,8 +182,25 @@ export async function verifyOAuthJwt(
   decoded: Jwt,
   options: JwtMachineVerifyOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  const { audience, ...jwtOptions } = options;
-  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, OAUTH_ACCESS_TOKEN_TYPES);
+  const { audience, publishableKey, ...jwtOptions } = options;
+  const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
+  if (!frontendApi) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: 'Failed to resolve the OAuth access token issuer. A valid publishable key is required.',
+        }),
+      ],
+    };
+  }
+
+  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, {
+    headerType: OAUTH_ACCESS_TOKEN_TYPES,
+    issuer: `https://${frontendApi}`,
+  });
 
   if ('error' in result) {
     return { data: undefined, tokenType: TokenType.OAuthToken, errors: [result.error] };
