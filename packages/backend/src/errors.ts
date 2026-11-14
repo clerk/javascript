@@ -80,6 +80,7 @@ export const MachineTokenVerificationErrorCode = {
   InvalidSecretKey: 'secret-key-invalid',
   UnexpectedError: 'unexpected-error',
   TokenVerificationFailed: 'token-verification-failed',
+  RemoteJWKFailedToLoad: 'jwk-remote-failed-to-load',
 } as const;
 
 export type MachineTokenVerificationErrorCode =
