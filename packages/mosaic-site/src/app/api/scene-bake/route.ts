@@ -1,6 +1,5 @@
 import { mkdir, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { deflateSync } from 'node:zlib';
 
 import { NextResponse } from 'next/server';
 
@@ -19,53 +18,19 @@ const IMAGES = ['mask', 'surface', 'skeleton', 'reveal'];
 const FILES = new Set([...IMAGES.flatMap(name => [`${name}.webp`, `${name}-mobile.webp`]), ...Object.keys(META_FILES)]);
 const LOSSLESS = new Set(['mask.webp', 'skeleton.webp', 'mask-mobile.webp', 'skeleton-mobile.webp']);
 
-const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
-  let c = n;
-  for (let k = 0; k < 8; k += 1) {
-    c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-  }
-  return c >>> 0;
-});
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
-function crc32(bytes: Buffer) {
-  let c = 0xffffffff;
-  for (const byte of bytes) {
-    c = CRC_TABLE[(c ^ byte) & 0xff] ^ (c >>> 8);
+function isLocalRequest(request: Request) {
+  const origin = request.headers.get('origin');
+  const host = request.headers.get('host');
+  if (!origin || !host) {
+    return false;
   }
-  return (c ^ 0xffffffff) >>> 0;
-}
-
-function chunk(type: string, data: Buffer) {
-  const length = Buffer.alloc(4);
-  length.writeUInt32BE(data.length);
-  const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(body));
-  return Buffer.concat([length, body, crc]);
-}
-
-function encodePng(data: Uint8Array, width: number, height: number, channels: number) {
-  const header = Buffer.alloc(13);
-  header.writeUInt32BE(width, 0);
-  header.writeUInt32BE(height, 4);
-  header[8] = 8;
-  header[9] = { 1: 0, 2: 4, 3: 2, 4: 6 }[channels] ?? 6;
-  const rowBytes = width * channels;
-  const raw = Buffer.alloc((rowBytes + 1) * height);
-  for (let y = 0; y < height; y += 1) {
-    const row = y * (rowBytes + 1);
-    raw[row] = 1;
-    for (let x = 0; x < rowBytes; x += 1) {
-      const left = x >= channels ? data[y * rowBytes + x - channels] : 0;
-      raw[row + 1 + x] = (data[y * rowBytes + x] - left) & 0xff;
-    }
+  try {
+    return LOCAL_HOSTS.has(new URL(origin).hostname) && LOCAL_HOSTS.has(new URL(`http://${host}`).hostname);
+  } catch {
+    return false;
   }
-  return Buffer.concat([
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    chunk('IHDR', header),
-    chunk('IDAT', deflateSync(raw, { level: 9 })),
-    chunk('IEND', Buffer.alloc(0)),
-  ]);
 }
 
 async function encodeWebp(data: Uint8Array, width: number, height: number, channels: 1 | 2 | 3 | 4, lossless: boolean) {
@@ -83,6 +48,9 @@ async function encodeWebp(data: Uint8Array, width: number, height: number, chann
 export async function POST(request: Request) {
   if (process.env.NODE_ENV !== 'development') {
     return new NextResponse('Not found', { status: 404 });
+  }
+  if (!isLocalRequest(request)) {
+    return new NextResponse('Forbidden', { status: 403 });
   }
   const params = new URL(request.url).searchParams;
   const file = params.get('file') ?? '';
@@ -104,9 +72,7 @@ export async function POST(request: Request) {
   }
   await mkdir(PUBLIC_DIR, { recursive: true });
   const target = join(PUBLIC_DIR, file);
-  const bytes = file.endsWith('.png')
-    ? encodePng(data, width, height, channels)
-    : await encodeWebp(data, width, height, channels, LOSSLESS.has(file));
+  const bytes = await encodeWebp(data, width, height, channels, LOSSLESS.has(file));
   await writeFile(target, bytes);
   return NextResponse.json({ file: target, bytes: bytes.length });
 }

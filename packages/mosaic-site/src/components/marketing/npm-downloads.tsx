@@ -2,17 +2,38 @@ import { cn } from '@/lib/utils';
 
 const FIRST_PUBLISH = '2026-09-17';
 
+const DAY = 24 * 60 * 60 * 1000;
+const RANGE_DAYS = 365;
+
+function downloadRanges() {
+  const ranges: string[] = [];
+  const end = Date.parse(new Date().toISOString().slice(0, 10));
+  for (let start = Date.parse(FIRST_PUBLISH); start <= end; start += RANGE_DAYS * DAY) {
+    const last = Math.min(start + (RANGE_DAYS - 1) * DAY, end);
+    ranges.push(`${new Date(start).toISOString().slice(0, 10)}:${new Date(last).toISOString().slice(0, 10)}`);
+  }
+  return ranges;
+}
+
+async function fetchRange(range: string) {
+  const response = await fetch(`https://api.npmjs.org/downloads/point/${range}/@clerk/mosaic`, {
+    next: { revalidate: 60 * 60 * 24 },
+  });
+  if (!response.ok) {
+    throw new Error(`npm downloads ${response.status}`);
+  }
+  const { downloads } = (await response.json()) as { downloads?: number };
+  if (typeof downloads !== 'number') {
+    throw new Error('npm downloads missing');
+  }
+  return downloads;
+}
+
 async function fetchDownloads() {
-  const today = new Date().toISOString().slice(0, 10);
   try {
-    const response = await fetch(`https://api.npmjs.org/downloads/point/${FIRST_PUBLISH}:${today}/@clerk/mosaic`, {
-      next: { revalidate: 60 * 60 * 24 },
-    });
-    if (!response.ok) {
-      return null;
-    }
-    const { downloads } = (await response.json()) as { downloads?: number };
-    return typeof downloads === 'number' && downloads > 0 ? downloads : null;
+    const counts = await Promise.all(downloadRanges().map(fetchRange));
+    const downloads = counts.reduce((sum, count) => sum + count, 0);
+    return downloads > 0 ? downloads : null;
   } catch {
     return null;
   }

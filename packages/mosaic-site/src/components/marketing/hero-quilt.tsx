@@ -1,4 +1,3 @@
-'use client';
 import type * as React from 'react';
 
 import { HeroGrid } from '@/components/marketing/hero-grid';
@@ -9,12 +8,12 @@ import { INSTALL_COMMAND } from '@/lib/agent-prompt';
 
 export function HeroQuilt({ scene, anchor }: { scene: React.ReactNode; anchor?: React.ReactNode }) {
   return (
-    <section className='bg-background text-foreground relative isolate -mt-14 flex flex-col items-center overflow-hidden px-6 pb-28 pt-[104px] text-center sm:pt-[240px] 2xl:pt-[280px]'>
+    <section className='bg-background text-foreground pt-(--hero-pt) relative isolate -mt-14 flex flex-col items-center overflow-hidden px-6 pb-28 text-center [--hero-anchor:10rem] [--hero-pt:104px] sm:[--hero-anchor:13rem] sm:[--hero-pt:240px] 2xl:[--hero-anchor:16rem] 2xl:[--hero-pt:280px]'>
       <HeroGrid />
       {scene}
       <div
         data-mosaic-focus
-        className='relative size-40 sm:size-52 2xl:size-64'
+        className='size-(--hero-anchor) relative'
       >
         {anchor}
       </div>
@@ -34,7 +33,6 @@ export function HeroQuilt({ scene, anchor }: { scene: React.ReactNode; anchor?: 
       >
         <PromptBar
           command={INSTALL_COMMAND}
-          variant='command'
           align='center'
           tone={{ light: 'gray-50', dark: 'gray-800' }}
         />

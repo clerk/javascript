@@ -396,7 +396,7 @@ function SectionItem({
             transition: `opacity ${FAST} ${draggable ? EASE_ENTER : EASE_EXIT}`,
           } as React.CSSProperties
         }
-        {...(draggable ? {} : { inert: true })}
+        {...inertProps(!draggable)}
       >
         <Grip
           controls={controls}
@@ -465,7 +465,7 @@ function FileTree({
                   gridTemplateRows: open ? '1fr' : '0fr',
                   transition: `grid-template-rows ${SLOW} ${EASE_IN_OUT}`,
                 }}
-                {...(open ? {} : { inert: true })}
+                {...inertProps(!open)}
               >
                 <div className='min-h-0 overflow-clip [mask-image:linear-gradient(to_bottom,black_calc(100%-0.75rem),transparent)]'>
                   <ul className='flex flex-col gap-px pb-3 pl-[1.375rem] pt-px'>
@@ -605,8 +605,6 @@ function ThemeStrip({ value, onChange }: { value: ThemeChoice; onChange: (value:
   );
 }
 
-const keepAccount = () => {};
-
 const scrollerOf = (element: Element, boundary: Element) => {
   let node = element.parentElement;
   while (node && node !== boundary) {
@@ -674,7 +672,14 @@ const DEX_PHONES = [
 ];
 const DEX_ACCOUNTS = [{ ...connectedAccount, identifier: 'dex@clerk.com' }];
 
+const subscribeNothing = () => () => {};
+
 export function PrinciplesScene({ scene }: { scene: SceneId }) {
+  const mounted = React.useSyncExternalStore(
+    subscribeNothing,
+    () => true,
+    () => false,
+  );
   const fixture = useUserProfileFixture();
   const profile = useUserProfileProfileFixture(DEX);
   const emails = useUserProfileEmailsFixture({ initialEmails: DEX_EMAILS, username: DEX.username });
@@ -684,7 +689,6 @@ export function PrinciplesScene({ scene }: { scene: SceneId }) {
   const [selected, setSelected] = React.useState<SectionId>('profile');
 
   const [theme, setTheme] = React.useState<ThemeChoice>('default');
-  const appliedTheme = theme;
   const [reflow, setReflow] = React.useState(false);
   const settleTimer = React.useRef<number | undefined>(undefined);
   React.useEffect(() => () => window.clearTimeout(settleTimer.current), []);
@@ -723,7 +727,7 @@ export function PrinciplesScene({ scene }: { scene: SceneId }) {
         visible = Boolean(entry?.isIntersecting);
         arm();
       },
-      { threshold: 0.95 },
+      { threshold: 0.5 },
     );
     observer.observe(element);
     window.addEventListener('scroll', arm, { passive: true });
@@ -798,7 +802,7 @@ export function PrinciplesScene({ scene }: { scene: SceneId }) {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  React.useLayoutEffect(() => freezeTransitions(), [appliedTheme, freezeTransitions]);
+  React.useLayoutEffect(() => freezeTransitions(), [theme, freezeTransitions]);
 
   React.useEffect(() => {
     const element = portalRef.current;
@@ -894,115 +898,117 @@ export function PrinciplesScene({ scene }: { scene: SceneId }) {
       onMouseDown={event => event.preventDefault()}
     >
       <style>{`${LAYOUT_CSS}${SCENE_THEME_CSS}${RIM_CSS}${STRIP_CSS}${FOCUS_CSS}${GRIP_CSS}[data-theme-switching]:not(#\\#), [data-theme-switching] *:not(#\\#) { transition: none !important; } @media (prefers-reduced-motion: reduce) { .scene-pop { scale: 1 !important; } .scene-travel { transition: none !important; } }`}</style>
-      <PortalProvider container={portalRef}>
-        <div className='absolute inset-0 overflow-clip'>
-          <div
-            className='scene-travel pointer-events-none absolute inset-x-0 bottom-0 top-2'
-            style={{
-              translate: centered ? 'calc(50% - var(--card-w) / 2 - var(--gutter))' : '0',
-              transition: `translate ${SLOW} ${EASE_ENTER}`,
-            }}
-          >
+      {mounted ? (
+        <PortalProvider container={portalRef}>
+          <div className='absolute inset-0 overflow-clip'>
             <div
-              className='pointer-events-auto absolute inset-y-0'
-              style={{ left: 'var(--gutter)', width: 'var(--card-w)' }}
+              className='scene-travel pointer-events-none absolute inset-x-0 bottom-0 top-2'
+              style={{
+                translate: centered ? 'calc(50% - var(--card-w) / 2 - var(--gutter))' : '0',
+                transition: `translate ${SLOW} ${EASE_ENTER}`,
+              }}
             >
               <div
-                ref={attachSurface}
-                data-scene-rim=''
-                data-theme-switching=''
-                data-scene-theme={appliedTheme}
-                data-outlined={scene === 'clerk' ? '' : undefined}
-                data-grip-intro={gripIntro ? '' : undefined}
-                className='origin-top-left [&_.cl-profile-layout]:!h-[var(--scene-layout-h)]'
-                style={
-                  {
-                    width: 'calc(var(--card-w) / var(--scale))',
-                    scale: 'var(--scale)',
-                    '--scene-layout-h': 'calc((var(--stage-h) + 2.5rem) / var(--scale))',
-                  } as React.CSSProperties
-                }
+                className='pointer-events-auto absolute inset-y-0'
+                style={{ left: 'var(--gutter)', width: 'var(--card-w)' }}
               >
-                <UserProfileView
-                  activePage='account'
-                  pages={{ ...withoutUserComingSoon(fixture.pages), account }}
-                  onPageChange={keepAccount}
+                <div
+                  ref={attachSurface}
+                  data-scene-rim=''
+                  data-theme-switching=''
+                  data-scene-theme={theme}
+                  data-outlined={scene === 'clerk' ? '' : undefined}
+                  data-grip-intro={gripIntro ? '' : undefined}
+                  className='origin-top-left [&_.cl-profile-layout]:!h-[var(--scene-layout-h)]'
+                  style={
+                    {
+                      width: 'calc(var(--card-w) / var(--scale))',
+                      scale: 'var(--scale)',
+                      '--scene-layout-h': 'calc((var(--stage-h) + 2.5rem) / var(--scale))',
+                    } as React.CSSProperties
+                  }
+                >
+                  <UserProfileView
+                    activePage='account'
+                    pages={{ ...withoutUserComingSoon(fixture.pages), account }}
+                    onPageChange={() => {}}
+                  />
+                </div>
+                <ClerkOutline
+                  target={surface}
+                  active={scene === 'clerk'}
                 />
               </div>
-              <ClerkOutline
-                target={surface}
-                active={scene === 'clerk'}
+            </div>
+
+            <div
+              aria-hidden='true'
+              className='pointer-events-none absolute inset-x-8 bottom-0 z-10 h-6'
+            >
+              {BLUR_LAYERS.map(layer => (
+                <div
+                  key={layer.blur}
+                  className='absolute inset-0'
+                  style={{
+                    backdropFilter: `blur(${layer.blur}px)`,
+                    WebkitBackdropFilter: `blur(${layer.blur}px)`,
+                    maskImage: layer.mask,
+                    WebkitMaskImage: layer.mask,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          <div
+            className='absolute top-44 z-20 hidden flex-col items-end lg:flex'
+            style={{ left: SATELLITE_LEFT }}
+          >
+            <div
+              className='scene-pop origin-left'
+              style={satellite('agent')}
+              {...inertProps(scene !== 'agent')}
+            >
+              <FileTree
+                order={order}
+                selected={selected}
+                onSelect={setSelected}
+              />
+            </div>
+            <div
+              className='scene-pop absolute left-3 top-0 origin-left'
+              style={satellite('theme')}
+              {...inertProps(scene !== 'theme')}
+            >
+              <ThemePicker
+                value={theme}
+                onChange={setTheme}
               />
             </div>
           </div>
-
           <div
-            aria-hidden='true'
-            className='pointer-events-none absolute inset-x-8 bottom-0 z-10 h-6'
+            ref={satellitesRef}
+            className='absolute bottom-0 left-1/2 z-20 flex -translate-x-1/2 translate-y-1/2 flex-col items-center lg:hidden'
           >
-            {BLUR_LAYERS.map(layer => (
-              <div
-                key={layer.blur}
-                className='absolute inset-0'
-                style={{
-                  backdropFilter: `blur(${layer.blur}px)`,
-                  WebkitBackdropFilter: `blur(${layer.blur}px)`,
-                  maskImage: layer.mask,
-                  WebkitMaskImage: layer.mask,
-                }}
+            <div
+              className='scene-pop origin-bottom'
+              style={satellite('agent')}
+              {...inertProps(scene !== 'agent')}
+            >
+              <FileStrip selected={selected} />
+            </div>
+            <div
+              className='scene-pop absolute inset-x-0 bottom-0 flex origin-bottom justify-center'
+              style={satellite('theme')}
+              {...inertProps(scene !== 'theme')}
+            >
+              <ThemeStrip
+                value={theme}
+                onChange={setTheme}
               />
-            ))}
+            </div>
           </div>
-        </div>
-        <div
-          className='absolute top-44 z-20 hidden flex-col items-end lg:flex'
-          style={{ left: SATELLITE_LEFT }}
-        >
-          <div
-            className='scene-pop origin-left'
-            style={satellite('agent')}
-            {...(scene === 'agent' ? {} : { inert: true })}
-          >
-            <FileTree
-              order={order}
-              selected={selected}
-              onSelect={setSelected}
-            />
-          </div>
-          <div
-            className='scene-pop absolute left-3 top-0 origin-left'
-            style={satellite('theme')}
-            {...(scene === 'theme' ? {} : { inert: true })}
-          >
-            <ThemePicker
-              value={theme}
-              onChange={setTheme}
-            />
-          </div>
-        </div>
-        <div
-          ref={satellitesRef}
-          className='absolute bottom-0 left-1/2 z-20 flex -translate-x-1/2 translate-y-1/2 flex-col items-center lg:hidden'
-        >
-          <div
-            className='scene-pop origin-bottom'
-            style={satellite('agent')}
-            {...(scene === 'agent' ? {} : { inert: true })}
-          >
-            <FileStrip selected={selected} />
-          </div>
-          <div
-            className='scene-pop absolute inset-x-0 bottom-0 flex origin-bottom justify-center'
-            style={satellite('theme')}
-            {...(scene === 'theme' ? {} : { inert: true })}
-          >
-            <ThemeStrip
-              value={theme}
-              onChange={setTheme}
-            />
-          </div>
-        </div>
-      </PortalProvider>
+        </PortalProvider>
+      ) : null}
     </div>
   );
 }

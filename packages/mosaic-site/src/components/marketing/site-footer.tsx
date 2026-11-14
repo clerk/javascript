@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { ClerkUILogo } from '@/components/marketing/clerk-logo';
 import { VersionBadge } from '@/components/marketing/version-badge';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -66,13 +68,13 @@ export function SiteFooter() {
           <nav aria-label='Footer'>
             <ul className='grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 xl:grid-cols-6'>
               <li className='col-span-full flex items-center gap-2 self-start xl:col-auto'>
-                <a
-                  href={CLERK}
-                  aria-label='Clerk home'
+                <Link
+                  href='/'
+                  aria-label='Clerk UI home'
                   className='text-foreground -ml-px block w-fit'
                 >
                   <ClerkUILogo className='h-4' />
-                </a>
+                </Link>
                 <VersionBadge />
               </li>
               {COLUMNS.map(column => (

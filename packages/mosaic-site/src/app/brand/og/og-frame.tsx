@@ -1,11 +1,11 @@
 'use client';
 import * as React from 'react';
 
-import { MosaicFrame } from '@/components/marketing/baked-mosaic';
 import { ClerkUILogo } from '@/components/marketing/clerk-logo';
 import { HeroMicrographic } from '@/components/marketing/hero-micrographic';
 import bake from '@/components/marketing/mosaic-bake.json';
 
+import { MosaicFrame } from './mosaic-frame';
 import type { OgOptions, OgVariant } from './og-config';
 
 const MAJOR = 32;

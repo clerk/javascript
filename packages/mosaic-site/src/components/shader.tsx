@@ -1,7 +1,7 @@
 'use client';
 
 import type * as React from 'react';
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 export const vertexShaderSource = `#version 300 es
 precision mediump float;
@@ -65,10 +65,9 @@ type TextureUnit =
 interface ShaderProps {
   source: string;
   uniforms?: Uniforms;
-  maxFps?: number;
   textures?: Array<string>;
-  initialState?: 'playing' | 'paused';
   onRender?: (time: number) => void;
+  onError?: () => void;
   liveUniforms?: () => Uniforms;
   shouldRender?: () => boolean;
   premultiplied?: boolean;
@@ -80,6 +79,7 @@ function loadImageAndCreateTextureInfo(
   shaderProgram: WebGLProgram | null,
   url: string,
   number: TextureUnit,
+  disposed: () => boolean,
 ): Promise<{
   width: number;
   height: number;
@@ -88,11 +88,11 @@ function loadImageAndCreateTextureInfo(
 }> {
   return new Promise((resolve, reject) => {
     if (!gl || !shaderProgram) {
-      return reject();
+      return reject(new Error('Missing WebGL context'));
     }
     const tex = gl.createTexture();
     if (!tex) {
-      return reject();
+      return reject(new Error('Failed to create texture'));
     }
     gl.activeTexture(gl[`TEXTURE${number}`]);
     gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -108,8 +108,9 @@ function loadImageAndCreateTextureInfo(
     };
     const img = new Image();
     img.addEventListener('load', () => {
-      if (!gl) {
-        return reject();
+      if (disposed()) {
+        gl.deleteTexture(tex);
+        return reject(new Error('Shader disposed'));
       }
 
       textureInfo.width = img.width;
@@ -123,6 +124,10 @@ function loadImageAndCreateTextureInfo(
 
       resolve(textureInfo);
     });
+    img.addEventListener('error', () => {
+      gl.deleteTexture(tex);
+      reject(new Error(`Failed to load texture ${url}`));
+    });
     img.src = url;
   });
 }
@@ -130,17 +135,17 @@ function loadImageAndCreateTextureInfo(
 export interface ShaderHandle {
   play: () => void;
   pause: () => void;
-  fireEvent: () => number;
 }
+
+const NO_TEXTURES: Array<string> = [];
 
 export const Shader = forwardRef(function Shader(
   {
     source: fragmentShaderSource,
     uniforms = {},
-    textures = [],
-    maxFps = Infinity,
-    initialState = 'playing',
+    textures = NO_TEXTURES,
     onRender,
+    onError,
     liveUniforms,
     shouldRender,
     premultiplied = false,
@@ -149,16 +154,18 @@ export const Shader = forwardRef(function Shader(
   ref: React.ForwardedRef<ShaderHandle>,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const state = useRef(initialState);
+  const state = useRef<'playing' | 'paused'>('playing');
   const currentTime = useRef(0);
-  const eventTime = useRef(0);
   const uniformsRef = useRef(uniforms);
   const liveUniformsRef = useRef(liveUniforms);
   const renderRef = useRef<((timestamp: number) => void) | null>(null);
-  const runRef = useRef(0);
+  const loseTimerRef = useRef(0);
   const dirtyRef = useRef(true);
   const shouldRenderRef = useRef(shouldRender);
   const pixelRatioRef = useRef(pixelRatio);
+  const onRenderRef = useRef(onRender);
+  const onErrorRef = useRef(onError);
+  const [generation, setGeneration] = useState(0);
 
   const frameRef = useRef(0);
   const startLoopRef = useRef<() => void>(() => {});
@@ -188,6 +195,10 @@ export const Shader = forwardRef(function Shader(
     pixelRatioRef.current = pixelRatio;
     dirtyRef.current = true;
   }, [uniforms, liveUniforms, shouldRender, pixelRatio]);
+  useEffect(() => {
+    onRenderRef.current = onRender;
+    onErrorRef.current = onError;
+  }, [onRender, onError]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -198,19 +209,17 @@ export const Shader = forwardRef(function Shader(
       pause() {
         state.current = 'paused';
       },
-      fireEvent() {
-        eventTime.current = currentTime.current;
-        return eventTime.current;
-      },
     };
   }, []);
 
   useEffect(() => {
-    const run = ++runRef.current;
+    window.clearTimeout(loseTimerRef.current);
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
     }
+    let disposed = false;
+    dirtyRef.current = true;
     const scale = Math.round(Math.max(1, Math.min(window.devicePixelRatio ?? 1, 2)));
     let ratio = pixelRatioRef.current?.() ?? scale;
     const surface: HTMLCanvasElement = canvas;
@@ -221,23 +230,35 @@ export const Shader = forwardRef(function Shader(
     let gl = canvas.getContext('webgl2');
 
     if (!gl) {
+      onErrorRef.current?.();
       return;
     }
+
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      renderRef.current = null;
+    };
+    const onContextRestored = () => setGeneration(value => value + 1);
+    canvas.addEventListener('webglcontextlost', onContextLost);
+    canvas.addEventListener('webglcontextrestored', onContextRestored);
+    const removeContextListeners = () => {
+      canvas.removeEventListener('webglcontextlost', onContextLost);
+      canvas.removeEventListener('webglcontextrestored', onContextRestored);
+    };
 
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-
-    if (!vertexShader || !fragmentShader) {
-      gl = null;
-      return;
-    }
-
-    const shaderProgram = createProgram(gl, vertexShader, fragmentShader);
+    const shaderProgram = vertexShader && fragmentShader ? createProgram(gl, vertexShader, fragmentShader) : null;
 
     if (!shaderProgram) {
-      gl = null;
-      return;
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      if (!gl.isContextLost()) {
+        onErrorRef.current?.();
+      }
+      return removeContextListeners;
     }
+    const program = shaderProgram;
 
     gl.useProgram(shaderProgram);
 
@@ -252,23 +273,7 @@ export const Shader = forwardRef(function Shader(
 
     const resolutionUniformLocation = gl.getUniformLocation(shaderProgram, 'u_resolution');
     const timeUniformLocation = gl.getUniformLocation(shaderProgram, 'u_time');
-    const scrollUniformLocation = gl.getUniformLocation(shaderProgram, 'u_scroll');
-    let scrollY = 0;
-    let onScroll: (() => void) | null = null;
-    if (scrollUniformLocation !== null) {
-      scrollY = window.scrollY;
-      onScroll = () => {
-        scrollY = window.scrollY;
-      };
-      window.addEventListener('scroll', onScroll, { passive: true });
-    }
-    const eventTimeUniformLocation = gl.getUniformLocation(shaderProgram, 'u_event_time');
     const customUniformLocations = new Map<string, WebGLUniformLocation | null>();
-
-    for (const name in uniforms) {
-      const location = gl.getUniformLocation(shaderProgram, name);
-      customUniformLocations.set(name, location);
-    }
 
     gl.uniform2f(resolutionUniformLocation, canvas.offsetWidth, canvas.offsetHeight);
     if (premultiplied) {
@@ -281,7 +286,6 @@ export const Shader = forwardRef(function Shader(
     gl.disable(gl.DEPTH_TEST);
 
     let startTime: number | null = null;
-    let lastTimestamp = 0;
 
     const textureInfo: Array<{
       width: number;
@@ -312,16 +316,8 @@ export const Shader = forwardRef(function Shader(
         startTime = now;
       }
 
-      if (maxFps !== Infinity) {
-        const timestep = 1000 / maxFps;
-        if (timestamp - lastTimestamp < timestep) {
-          return;
-        }
-        lastTimestamp = timestamp;
-      }
-
       currentTime.current = now - startTime;
-      onRender?.(currentTime.current);
+      onRenderRef.current?.(currentTime.current);
       const nextRatio = pixelRatioRef.current?.() ?? scale;
       if (nextRatio !== ratio) {
         ratio = nextRatio;
@@ -338,14 +334,14 @@ export const Shader = forwardRef(function Shader(
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
       gl.uniform1f(timeUniformLocation, currentTime.current);
-      if (scrollUniformLocation !== null) {
-        gl.uniform1f(scrollUniformLocation, scrollY);
-      }
-      gl.uniform1f(eventTimeUniformLocation, eventTime.current);
       const live = liveUniformsRef.current?.();
       const currentUniforms = live ? { ...uniformsRef.current, ...live } : uniformsRef.current;
       for (const name in currentUniforms) {
-        const location = customUniformLocations.get(name) ?? null;
+        let location = customUniformLocations.get(name);
+        if (location === undefined) {
+          location = gl.getUniformLocation(program, name);
+          customUniformLocations.set(name, location);
+        }
         const uniform = currentUniforms[name];
         switch (uniform.type) {
           case 'uniform1f':
@@ -385,20 +381,24 @@ export const Shader = forwardRef(function Shader(
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 
-    async function start() {
-      for (let i = 0; i < textures.length; i++) {
-        try {
-          textureInfo.push(await loadImageAndCreateTextureInfo(gl, shaderProgram, textures[i], i as TextureUnit));
-        } catch {
-          return;
+    Promise.all(
+      textures.map((url, i) =>
+        loadImageAndCreateTextureInfo(gl, shaderProgram, url, i as TextureUnit, () => disposed).then(info => {
+          textureInfo[i] = info;
+        }),
+      ),
+    ).then(
+      () => {
+        if (!disposed) {
+          renderRef.current = render;
         }
-      }
-      if (gl) {
-        renderRef.current = render;
-      }
-    }
-
-    start();
+      },
+      () => {
+        if (!disposed) {
+          onErrorRef.current?.();
+        }
+      },
+    );
 
     function createShader(gl: WebGL2RenderingContext, type: number, source: string) {
       const shader = gl.createShader(type);
@@ -440,29 +440,24 @@ export const Shader = forwardRef(function Shader(
     observer.observe(canvas);
 
     return () => {
+      disposed = true;
       renderRef.current = null;
       observer.disconnect();
-      if (onScroll) {
-        window.removeEventListener('scroll', onScroll);
-      }
+      removeContextListeners();
       if (gl) {
         gl.deleteShader(vertexShader);
         gl.deleteShader(fragmentShader);
         gl.deleteProgram(shaderProgram);
         gl.deleteBuffer(vertexBuffer);
-        for (const { texture } of textureInfo) {
-          gl.deleteTexture(texture);
-        }
+        textureInfo.forEach(({ texture }) => gl?.deleteTexture(texture));
         const context = gl;
-        setTimeout(() => {
-          if (runRef.current === run) {
-            context.getExtension('WEBGL_lose_context')?.loseContext();
-          }
+        loseTimerRef.current = window.setTimeout(() => {
+          context.getExtension('WEBGL_lose_context')?.loseContext();
         });
         gl = null;
       }
     };
-  }, [fragmentShaderSource, maxFps, textures.join(''), premultiplied]);
+  }, [fragmentShaderSource, textures, premultiplied, generation]);
 
   return (
     <canvas

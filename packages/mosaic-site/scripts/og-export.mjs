@@ -20,10 +20,7 @@ const { values } = parseArgs({
   },
 });
 
-const IMAGES = [
-  { variant: 'og', width: 1200, height: 630 },
-  { variant: 'square', width: 630, height: 630 },
-];
+const IMAGE = { variant: 'og', width: 1200, height: 630 };
 const VIDEO = { variant: 'video', width: 1280, height: 720 };
 const fps = Number(values.fps);
 const frames = Math.round(Number(values.loop) * fps);
@@ -55,13 +52,11 @@ async function shot(page, phase, file) {
 
 await mkdir(values.out, { recursive: true });
 
-for (const image of IMAGES) {
-  const page = await open(image);
-  const file = path.join(values.out, `${image.variant}.png`);
-  await shot(page, 0, file);
-  await page.close();
-  console.log(file);
-}
+const imagePage = await open(IMAGE);
+const image = path.join(values.out, `${IMAGE.variant}.png`);
+await shot(imagePage, 0, image);
+await imagePage.close();
+console.log(image);
 
 const page = await open(VIDEO);
 const dir = await mkdtemp(path.join(tmpdir(), 'og-video-'));
@@ -69,7 +64,6 @@ for (let index = 0; index < frames; index++) {
   await shot(page, index / frames, path.join(dir, `${String(index).padStart(4, '0')}.png`));
 }
 await page.close();
-await shot(await open(VIDEO), 0, path.join(values.out, 'video.png'));
 const file = path.join(values.out, 'video.mp4');
 execFileSync('ffmpeg', [
   '-y',

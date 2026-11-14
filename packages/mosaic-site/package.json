@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "node scripts/fetch-fonts.mjs",
     "build": "next build",
-    "dev": "next dev --port 6007",
+    "predev": "node scripts/fetch-fonts.mjs",
+    "dev": "next dev --port 6120",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
@@ -29,12 +31,14 @@
   "devDependencies": {
     "@babel/plugin-syntax-jsx": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
+    "@clerk/swingset": "workspace:*",
     "@stylexjs/babel-plugin": "0.19.0",
     "@stylexjs/postcss-plugin": "0.19.0",
     "@stylexjs/unplugin": "0.19.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "@vercel/blob": "^2.9.0",
     "tailwindcss": "^4.0.0",
     "typescript": "catalog:repo"
   }

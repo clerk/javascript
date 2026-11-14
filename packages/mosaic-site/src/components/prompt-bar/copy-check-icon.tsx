@@ -9,7 +9,6 @@ const EASE = {
   draw: String(spring(0.2, 0)),
 };
 
-// The hero prompt bar's copy→check swap: the copy mark blurs out as the check pops in and draws its stroke.
 export function CopyCheckIcon({ copied }: { copied: boolean }) {
   const swap = (shown: boolean, pop = false): CSSProperties => ({
     opacity: shown ? 1 : 0,
@@ -20,8 +19,6 @@ export function CopyCheckIcon({ copied }: { copied: boolean }) {
 
   return (
     <span className='grid size-3.5'>
-      {/* Safari shifts a glyph by a pixel when the transition promotes it to a compositor layer and back when it
-          demotes, so both stay on a layer. */}
       <span
         className='will-change-[opacity,filter,scale] [grid-area:1/1]'
         style={swap(!copied)}

@@ -12,8 +12,10 @@ const swingsetSrc = resolve(__dirname, '../swingset/src');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: { NEXT_PUBLIC_MOSAIC_VERSION: require('../mosaic/package.json').version },
-  async redirects() {
-    return process.env.MOSAIC_BRAND === '1' ? [{ source: '/', destination: '/brand', permanent: false }] : [];
+  redirects() {
+    return Promise.resolve(
+      process.env.MOSAIC_BRAND === '1' ? [{ source: '/', destination: '/brand', permanent: false }] : [],
+    );
   },
   webpack(config) {
     const excludeRawQuery = rules => {

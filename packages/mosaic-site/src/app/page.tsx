@@ -18,6 +18,7 @@ const OG_IMAGE = { url: '/og/og.png?v=3b4ee2fa', width: 1200, height: 630, alt: 
 export const metadata: Metadata = {
   title: 'Clerk UI',
   description: DESCRIPTION,
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     url: '/',

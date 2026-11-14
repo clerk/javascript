@@ -1,7 +1,6 @@
 'use client';
 import { useMotionValue, useSpring } from 'motion/react';
 import * as React from 'react';
-import { createPortal } from 'react-dom';
 
 import desktopBake from '@/components/marketing/mosaic-bake.json';
 import mobileBake from '@/components/marketing/mosaic-bake-mobile.json';
@@ -40,7 +39,7 @@ const bakeUrl = (variant: Variant, name: string) =>
 export const MOSAIC_SKELETON_URL = bakeUrl('desktop', 'skeleton');
 export const MOSAIC_SKELETON_MOBILE_URL = bakeUrl('mobile', 'skeleton');
 
-const TEXTURES: Record<Variant, string[]> = {
+export const TEXTURES: Record<Variant, string[]> = {
   desktop: ['surface', 'mask', 'skeleton', 'reveal'].map(name => bakeUrl('desktop', name)),
   mobile: ['surface', 'mask', 'skeleton', 'reveal'].map(name => bakeUrl('mobile', name)),
 };
@@ -76,11 +75,9 @@ type Reveal = {
   linear: number;
   angle: number;
   edge: number;
-  scrub: number;
-  progress: number;
 };
 
-const REVEAL_DEFAULTS: Reveal = {
+export const REVEAL: Reveal = {
   duration: 1900,
   from: -0.02,
   to: 1.2,
@@ -105,38 +102,7 @@ const REVEAL_DEFAULTS: Reveal = {
   linear: 0,
   angle: 28,
   edge: 0.6,
-  scrub: 0,
-  progress: 0.5,
 };
-
-const REVEAL_SLIDERS: Array<{ key: keyof Reveal; min: number; max: number; step: number }> = [
-  { key: 'scrub', min: 0, max: 1, step: 1 },
-  { key: 'progress', min: 0, max: 1, step: 0.005 },
-  { key: 'duration', min: 300, max: 4000, step: 50 },
-  { key: 'from', min: -1, max: 0.5, step: 0.01 },
-  { key: 'to', min: 0.5, max: 2, step: 0.01 },
-  { key: 'x1', min: 0, max: 1, step: 0.01 },
-  { key: 'y1', min: -0.5, max: 1.5, step: 0.01 },
-  { key: 'x2', min: 0, max: 1, step: 0.01 },
-  { key: 'y2', min: -0.5, max: 1.5, step: 0.01 },
-  { key: 'originX', min: -0.5, max: 1.5, step: 0.01 },
-  { key: 'originY', min: -0.5, max: 1.5, step: 0.01 },
-  { key: 'linear', min: 0, max: 1, step: 0.01 },
-  { key: 'angle', min: -180, max: 180, step: 1 },
-  { key: 'width', min: 10, max: 400, step: 1 },
-  { key: 'edge', min: 0.02, max: 2, step: 0.01 },
-  { key: 'amp', min: 0, max: 60, step: 0.5 },
-  { key: 'film', min: 0, max: 1.5, step: 0.01 },
-  { key: 'filmSpread', min: 0, max: 2, step: 0.01 },
-  { key: 'saturation', min: 0, max: 1, step: 0.01 },
-  { key: 'decay', min: 0, max: 4, step: 0.05 },
-  { key: 'rings', min: 0, max: 1.5, step: 0.01 },
-  { key: 'grow', min: 0, max: 3, step: 0.05 },
-  { key: 'gapGlow', min: 0, max: 1, step: 0.01 },
-  { key: 'grain', min: 0, max: 2, step: 0.01 },
-  { key: 'grainScale', min: 0.005, max: 0.2, step: 0.005 },
-  { key: 'blur', min: 0, max: 18, step: 0.5 },
-];
 
 type Sheen = {
   sheen: number;
@@ -156,7 +122,7 @@ type Sheen = {
   darkStrength: number;
 };
 
-const SHEEN_DEFAULTS: Sheen = {
+const SHEEN: Sheen = {
   sheen: 0.135,
   scale: 675,
   octaves: 4,
@@ -174,44 +140,12 @@ const SHEEN_DEFAULTS: Sheen = {
   darkStrength: 0.5,
 };
 
-const SHEEN_SLIDERS: Array<{ key: keyof Sheen; min: number; max: number; step: number }> = [
-  { key: 'sheen', min: 0, max: 0.5, step: 0.005 },
-  { key: 'scale', min: 20, max: 1000, step: 5 },
-  { key: 'octaves', min: 1, max: 6, step: 1 },
-  { key: 'drift', min: 0, max: 6, step: 0.05 },
-  { key: 'hueSpread', min: 0, max: 8, step: 0.05 },
-  { key: 'flow', min: 0, max: 10, step: 0.1 },
-  { key: 'warp', min: 0, max: 800, step: 5 },
-  { key: 'angle', min: 0, max: 4, step: 0.05 },
-  { key: 'fresnelHue', min: 0, max: 6, step: 0.05 },
-  { key: 'base', min: 0, max: 4, step: 0.05 },
-  { key: 'edge', min: 0, max: 8, step: 0.05 },
-  { key: 'glint', min: 0, max: 2, step: 0.01 },
-  { key: 'lightStrength', min: 0, max: 1, step: 0.01 },
-  { key: 'lightTint', min: 0, max: 1, step: 0.01 },
-  { key: 'darkStrength', min: 0, max: 1, step: 0.01 },
-];
+export const SWAY = { x: 0.2, y: 160, speed: 0.1, detail: 0.5, glint: 0.05, size: 12 };
 
-const SHOW_REVEAL_PANEL = false;
-const SHOW_SHEEN_PANEL = false;
+export const SWAY_FRAME_MS = 32;
+const SWAY_IDLE_MS = 20000;
 
-type Sway = { x: number; y: number; speed: number; detail: number; glint: number; size: number };
-
-const SWAY_DEFAULTS: Sway = { x: 0.2, y: 160, speed: 0.1, detail: 0.5, glint: 0.05, size: 12 };
-
-const SWAY_SLIDERS: Array<{ key: keyof Sway; min: number; max: number; step: number }> = [
-  { key: 'x', min: 0, max: 0.2, step: 0.005 },
-  { key: 'y', min: 0, max: 200, step: 1 },
-  { key: 'speed', min: 0, max: 1, step: 0.005 },
-  { key: 'detail', min: 0, max: 1, step: 0.01 },
-  { key: 'glint', min: 0, max: 0.3, step: 0.005 },
-  { key: 'size', min: 2, max: 60, step: 0.5 },
-];
-
-const SHOW_SWAY_PANEL = false;
-const SWAY_FRAME_MS = 32;
-
-function noiseHash(n: number) {
+export function noiseHash(n: number) {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return (x - Math.floor(x)) * 2 - 1;
 }
@@ -252,11 +186,6 @@ function markReady() {
     return;
   }
   window.setTimeout(setReady, Math.max(0, MIN_SWEEPS * SWEEP_MS - elapsed));
-}
-function replayReveal() {
-  ready = false;
-  readyListeners.forEach(listener => listener());
-  window.setTimeout(setReady, 600);
 }
 function subscribeReady(listener: () => void) {
   readyListeners.add(listener);
@@ -323,7 +252,7 @@ export function MosaicSkeleton() {
   );
 }
 
-const source = `#version 300 es
+export const MOSAIC_SOURCE = `#version 300 es
 precision highp float;
 
 in vec2 fragCoord;
@@ -612,16 +541,16 @@ void main() {
 }
 `;
 
-function buildUniforms(
+export function buildUniforms(
   palette: Palette,
   mode: Mode,
   origin: [number, number],
   center: [number, number],
   sceneWidth: number,
-  reveal: Reveal,
-  sheen: Sheen,
   bake: Bake,
 ): Uniforms {
+  const reveal = REVEAL;
+  const sheen = SHEEN;
   const cx = reveal.originX * bake.width;
   const cy = reveal.originY * bake.height;
   const corners = [
@@ -669,8 +598,8 @@ function buildUniforms(
     u_add_tone: f(light ? 0 : (s.dmTone ?? 0)),
     u_specular: f(s.specular),
     u_spec_size: f(s.specSize),
-    u_sway_glint: f(SWAY_DEFAULTS.glint),
-    u_sway_size: f(SWAY_DEFAULTS.size),
+    u_sway_glint: f(SWAY.glint),
+    u_sway_size: f(SWAY.size),
     u_fresnel: f(s.fresnel),
     u_highlight: f(s.highlight ?? 1),
     u_fresnel_power: f(s.fresnelPower),
@@ -737,7 +666,7 @@ function parseRgb(value: string): [number, number, number] | null {
   return match ? [Number(match[1]) / 255, Number(match[2]) / 255, Number(match[3]) / 255] : null;
 }
 
-function cubicBezier(x1: number, y1: number, x2: number, y2: number, x: number) {
+export function cubicBezier(x1: number, y1: number, x2: number, y2: number, x: number) {
   const curve = (a: number, b: number, t: number) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
   let lo = 0;
   let hi = 1;
@@ -753,105 +682,16 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number, x: number) 
   return curve(y1, y2, t);
 }
 
-function revealTime(start: number | null, reveal: Reveal) {
-  if (reveal.scrub) {
-    return reveal.progress;
-  }
+function revealTime(start: number | null) {
   if (start === null) {
     return 0;
   }
-  return Math.min(1, Math.max(0, (performance.now() - start) / reveal.duration));
+  return Math.min(1, Math.max(0, (performance.now() - start) / REVEAL.duration));
 }
 
-function revealFront(time: number, reveal: Reveal) {
-  const eased = cubicBezier(reveal.x1, reveal.y1, reveal.x2, reveal.y2, time);
-  return reveal.from + (reveal.to - reveal.from) * eased;
-}
-
-const subscribeNothing = () => () => {};
-
-function TweakPanel<T extends Record<string, number>>({
-  title,
-  values,
-  defaults,
-  sliders,
-  onChange,
-  onReplay,
-  className,
-}: {
-  title: string;
-  values: T;
-  defaults: T;
-  sliders: Array<{ key: keyof T & string; min: number; max: number; step: number }>;
-  onChange: (next: T) => void;
-  onReplay?: () => void;
-  className?: string;
-}) {
-  const [open, setOpen] = React.useState(true);
-  const [copied, setCopied] = React.useState(false);
-  return (
-    <div
-      className={`fixed bottom-4 z-50 flex max-h-[calc(100vh-2rem)] w-72 flex-col gap-1.5 overflow-y-auto rounded-lg border border-neutral-200 bg-white/90 p-3 text-left text-xs text-neutral-800 shadow-lg backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90 dark:text-neutral-200 ${className ?? 'left-4'}`}
-    >
-      <button
-        type='button'
-        className='flex items-center justify-between font-medium'
-        onClick={() => setOpen(value => !value)}
-      >
-        {title}
-        <span>{open ? '−' : '+'}</span>
-      </button>
-      {open
-        ? sliders.map(({ key, min, max, step }) => (
-            <label
-              key={key}
-              className='grid grid-cols-[4.5rem_1fr_2.75rem] items-center gap-2'
-            >
-              <span>{key}</span>
-              <input
-                type='range'
-                min={min}
-                max={max}
-                step={step}
-                value={values[key]}
-                onChange={event => onChange({ ...values, [key]: Number(event.target.value) })}
-              />
-              <span className='text-right tabular-nums'>{values[key]}</span>
-            </label>
-          ))
-        : null}
-      <div className={`grid gap-2 ${onReplay ? 'grid-cols-3' : 'grid-cols-2'}`}>
-        {onReplay ? (
-          <button
-            type='button'
-            className='rounded border border-neutral-300 py-1 dark:border-neutral-700'
-            onClick={onReplay}
-          >
-            Replay
-          </button>
-        ) : null}
-        <button
-          type='button'
-          className='rounded border border-neutral-300 py-1 dark:border-neutral-700'
-          onClick={() => {
-            void navigator.clipboard.writeText(JSON.stringify(values, null, 2)).then(() => {
-              setCopied(true);
-              window.setTimeout(() => setCopied(false), 1200);
-            });
-          }}
-        >
-          {copied ? 'Copied' : 'Copy'}
-        </button>
-        <button
-          type='button'
-          className='rounded border border-neutral-300 py-1 dark:border-neutral-700'
-          onClick={() => onChange(defaults)}
-        >
-          Reset
-        </button>
-      </div>
-    </div>
-  );
+export function revealFront(time: number) {
+  const eased = cubicBezier(REVEAL.x1, REVEAL.y1, REVEAL.x2, REVEAL.y2, time);
+  return REVEAL.from + (REVEAL.to - REVEAL.from) * eased;
 }
 
 function usePointerEffects(enabled: boolean, pointer: 'fine' | 'coarse' = 'fine') {
@@ -914,9 +754,6 @@ export function BakedMosaic() {
     const parsed = element ? parseRgb(getComputedStyle(element).backgroundColor) : null;
     skeletonColorRef.current = parsed ?? palette.tileLow;
   }, [mode, palette]);
-  const [reveal, setReveal] = React.useState(REVEAL_DEFAULTS);
-  const [sheen, setSheen] = React.useState(SHEEN_DEFAULTS);
-  const [sway, setSway] = React.useState(SWAY_DEFAULTS);
   const visibleRef = React.useRef(true);
   const shaderRef = React.useRef<ShaderHandle>(null);
   const swayFrameRef = React.useRef(0);
@@ -936,20 +773,10 @@ export function BakedMosaic() {
     observer.observe(scene);
     return () => observer.disconnect();
   }, [height, variant]);
-  const mounted = React.useSyncExternalStore(
-    subscribeNothing,
-    () => true,
-    () => false,
-  );
-  React.useEffect(() => {
-    if (reveal.scrub && !ready) {
-      setReady();
-    }
-  }, [reveal.scrub]);
   const uniforms = React.useMemo(
-    () => buildUniforms(palette, mode, origin, center, width, reveal, sheen, bake),
+    () => buildUniforms(palette, mode, origin, center, width, bake),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [palette, mode, origin[0], origin[1], center[0], center[1], width, reveal, sheen, bake],
+    [palette, mode, origin[0], origin[1], center[0], center[1], width, bake],
   );
   const pointerEffects = usePointerEffects(true);
   const touchEffects = usePointerEffects(true, 'coarse');
@@ -958,6 +785,22 @@ export function BakedMosaic() {
   const lightX = settings.lightX;
   const follow = settings.follow;
   const spring = useLightSpring(sceneRef, pointerEffects && follow > 0);
+  const activityRef = React.useRef({ last: 0, idle: 0 });
+  React.useEffect(() => {
+    if (!pointerEffects) {
+      return;
+    }
+    const onActivity = () => {
+      const now = performance.now();
+      const activity = activityRef.current;
+      activity.idle += Math.max(0, now - activity.last - SWAY_IDLE_MS);
+      activity.last = now;
+    };
+    const events = ['pointermove', 'pointerdown', 'wheel', 'scroll', 'keydown'] as const;
+    onActivity();
+    events.forEach(name => window.addEventListener(name, onActivity, { passive: true }));
+    return () => events.forEach(name => window.removeEventListener(name, onActivity));
+  }, [pointerEffects]);
   const startRef = React.useRef<number | null>(null);
   React.useEffect(() => {
     if (!isReady) {
@@ -969,29 +812,29 @@ export function BakedMosaic() {
   }, [isReady]);
   const liveUniforms = React.useCallback(
     (): Uniforms => ({
-      u_reveal: { type: 'uniform1f', value: revealTime(startRef.current, reveal) },
-      u_front: { type: 'uniform1f', value: revealFront(revealTime(startRef.current, reveal), reveal) },
+      u_reveal: { type: 'uniform1f', value: revealTime(startRef.current) },
+      u_front: { type: 'uniform1f', value: revealFront(revealTime(startRef.current)) },
       u_skeleton_color: { type: 'uniform3f', value: skeletonColorRef.current },
       u_skeleton_fade: { type: 'uniform1f', value: skeletonFade(startRef.current) },
       ...(() => {
-        const t = (performance.now() / 1000) * sway.speed;
-        const swaying = pointerEffects && sway.speed > 0;
-        const dx = swaying ? swayNoise(t, 0, sway.detail) * sway.x : 0;
-        const dy = swaying ? swayNoise(t, 57, sway.detail) * sway.y : 0;
+        const { last, idle } = activityRef.current;
+        const t = ((Math.min(performance.now(), last + SWAY_IDLE_MS) - idle) / 1000) * SWAY.speed;
+        const swaying = pointerEffects && SWAY.speed > 0;
+        const dx = swaying ? swayNoise(t, 0, SWAY.detail) * SWAY.x : 0;
+        const dy = swaying ? swayNoise(t, 57, SWAY.detail) * SWAY.y : 0;
         return {
           u_light_x: { type: 'uniform1f', value: lightX + (spring.get() - lightX) * follow + dx },
           u_light_y: { type: 'uniform1f', value: settings.lightY + dy },
-          u_sway_glint: { type: 'uniform1f', value: swaying ? sway.glint : 0 },
-          u_sway_size: { type: 'uniform1f', value: sway.size },
+          u_sway_glint: { type: 'uniform1f', value: swaying ? SWAY.glint : 0 },
+          u_sway_size: { type: 'uniform1f', value: SWAY.size },
         } satisfies Uniforms;
       })(),
     }),
-    [reveal, spring, lightX, follow, sway, pointerEffects, settings.lightY],
+    [spring, lightX, follow, pointerEffects, settings.lightY],
   );
   const shouldRender = React.useCallback(() => {
     const start = startRef.current;
-    const revealing =
-      !reveal.scrub && start !== null && start !== -Infinity && performance.now() - start < reveal.duration + 100;
+    const revealing = start !== null && start !== -Infinity && performance.now() - start < REVEAL.duration + 100;
     if (
       revealing ||
       (trailEffects && visibleRef.current && TRAIL_ENERGY_UNIFORM.value > 0.01) ||
@@ -1002,16 +845,16 @@ export function BakedMosaic() {
     const now = performance.now();
     if (
       pointerEffects &&
-      sway.speed > 0 &&
-      (sway.x > 0 || sway.y > 0) &&
+      SWAY.speed > 0 &&
       visibleRef.current &&
+      now - activityRef.current.last < SWAY_IDLE_MS &&
       now - swayFrameRef.current >= SWAY_FRAME_MS
     ) {
       swayFrameRef.current = now;
       return true;
     }
     return false;
-  }, [reveal, pointerEffects, trailEffects, follow, spring, sway]);
+  }, [pointerEffects, trailEffects, follow, spring]);
   const coarseRef = React.useRef(false);
   React.useEffect(() => {
     coarseRef.current = window.matchMedia('(pointer: coarse)').matches;
@@ -1022,9 +865,9 @@ export function BakedMosaic() {
       return full;
     }
     const start = startRef.current;
-    const settled = start === -Infinity || (start !== null && performance.now() - start >= reveal.duration + 100);
+    const settled = start === -Infinity || (start !== null && performance.now() - start >= REVEAL.duration + 100);
     return settled ? full : 1;
-  }, [reveal]);
+  }, []);
   React.useEffect(() => (trailEffects ? startTrail() : undefined), [trailEffects]);
   const onRender = React.useCallback(() => {
     markReady();
@@ -1032,6 +875,11 @@ export function BakedMosaic() {
       stepTrail(canvasRef.current);
     }
   }, [trailEffects]);
+  const [failed, setFailed] = React.useState(false);
+  const onError = React.useCallback(() => {
+    setFailed(true);
+    markReady();
+  }, []);
   return (
     <div
       ref={sceneRef}
@@ -1045,18 +893,32 @@ export function BakedMosaic() {
           className='absolute'
           style={{ left: origin[0], top: origin[1], width: bake.width * scale, height: bake.height * scale }}
         >
-          <Shader
-            ref={shaderRef}
-            key={variant}
-            source={source}
-            uniforms={uniforms}
-            textures={TEXTURES[variant]}
-            liveUniforms={liveUniforms}
-            shouldRender={shouldRender}
-            onRender={onRender}
-            pixelRatio={pixelRatio}
-            premultiplied
-          />
+          {failed ? (
+            <div
+              className='bg-gray-150 dark:bg-gray-750 absolute inset-0 transition-opacity duration-300 ease-out'
+              style={{
+                maskImage: `url("${bakeUrl(variant, 'mask')}")`,
+                WebkitMaskImage: `url("${bakeUrl(variant, 'mask')}")`,
+                maskSize: '100% 100%',
+                WebkitMaskSize: '100% 100%',
+                opacity: isReady ? 1 : 0,
+              }}
+            />
+          ) : (
+            <Shader
+              ref={shaderRef}
+              key={variant}
+              source={MOSAIC_SOURCE}
+              uniforms={uniforms}
+              textures={TEXTURES[variant]}
+              liveUniforms={liveUniforms}
+              shouldRender={shouldRender}
+              onRender={onRender}
+              onError={onError}
+              pixelRatio={pixelRatio}
+              premultiplied
+            />
+          )}
           {touchEffects ? (
             <div
               aria-hidden='true'
@@ -1064,197 +926,6 @@ export function BakedMosaic() {
             />
           ) : null}
         </div>
-      ) : null}
-      {SHOW_REVEAL_PANEL && process.env.NODE_ENV === 'development' && mounted
-        ? createPortal(
-            <TweakPanel
-              title='Reveal'
-              values={reveal}
-              defaults={REVEAL_DEFAULTS}
-              sliders={REVEAL_SLIDERS}
-              onChange={setReveal}
-              onReplay={() => {
-                setReveal({ ...reveal, scrub: 0 });
-                replayReveal();
-              }}
-            />,
-            document.body,
-          )
-        : null}
-      {SHOW_SHEEN_PANEL && process.env.NODE_ENV === 'development' && mounted
-        ? createPortal(
-            <TweakPanel
-              title='Sheen'
-              values={sheen}
-              defaults={SHEEN_DEFAULTS}
-              sliders={SHEEN_SLIDERS}
-              onChange={setSheen}
-              className='right-4'
-            />,
-            document.body,
-          )
-        : null}
-      {SHOW_SWAY_PANEL && process.env.NODE_ENV === 'development' && mounted
-        ? createPortal(
-            <TweakPanel
-              title='Light sway'
-              values={sway}
-              defaults={SWAY_DEFAULTS}
-              sliders={SWAY_SLIDERS}
-              onChange={setSway}
-            />,
-            document.body,
-          )
-        : null}
-    </div>
-  );
-}
-
-function loopNoise(phase: number, steps: number, seed: number) {
-  const t = (((phase % 1) + 1) % 1) * steps;
-  const i = Math.floor(t);
-  const f = t - i;
-  const u = f * f * f * (f * (f * 6 - 15) + 10);
-  const a = noiseHash((i % steps) + seed) * f;
-  const b = noiseHash(((i + 1) % steps) + seed) * (f - 1);
-  return (a + (b - a) * u) * 2;
-}
-
-function loopSway(phase: number, steps: number, seed: number, detail: number) {
-  return (loopNoise(phase, steps, seed) + detail * loopNoise(phase, steps * 2, seed + 31)) / (1 + detail);
-}
-
-const LOOP_OUT_MS = 900;
-const LOOP_SHIMMER_MS = 900;
-const LOOP_IN_MS = 1200;
-const LOOP_EDGE_SOFTNESS = 2;
-const LOOP_LEAD = 0.75;
-const LOOP_SHIMMER_AMP: Record<Mode, number> = { dark: 0.08, light: 0.16 };
-
-function loopUniforms(elapsed: number, loopMs: number, strength: number, mode: Mode, base: Uniforms): Uniforms {
-  const film = (scale: number) => {
-    const uniform = base.u_wave_film;
-    return { type: 'uniform1f' as const, value: (uniform?.type === 'uniform1f' ? uniform.value : 0) * scale };
-  };
-  const wave = (progress: number, invert: number, scale: number): Uniforms => ({
-    u_invert: { type: 'uniform1f', value: invert },
-    u_reveal: { type: 'uniform1f', value: progress },
-    u_front: { type: 'uniform1f', value: revealFront(progress, REVEAL_DEFAULTS) },
-    u_shimmer_amp: { type: 'uniform1f', value: 0 },
-    u_wave_film: film(scale),
-    u_edge: { type: 'uniform1f', value: REVEAL_DEFAULTS.edge * LOOP_EDGE_SOFTNESS },
-  });
-  if (strength <= 0) {
-    return wave(1, 0, 0);
-  }
-  const lead = Math.max(0, loopMs - LOOP_OUT_MS - LOOP_SHIMMER_MS - LOOP_IN_MS) * LOOP_LEAD;
-  const out = (elapsed - lead) / LOOP_OUT_MS;
-  if (out < 0) {
-    return wave(1, 0, 0);
-  }
-  if (out < 1) {
-    return wave(out, 1, strength * 0.5);
-  }
-  const shimmer = (elapsed - lead - LOOP_OUT_MS) / LOOP_SHIMMER_MS;
-  if (shimmer < 1) {
-    return {
-      ...wave(1, 1, 0),
-      u_shimmer: { type: 'uniform1f', value: cubicBezier(0.45, 0, 0.55, 1, shimmer) },
-      u_shimmer_amp: { type: 'uniform1f', value: LOOP_SHIMMER_AMP[mode] },
-    };
-  }
-  const back = (elapsed - lead - LOOP_OUT_MS - LOOP_SHIMMER_MS) / LOOP_IN_MS;
-  return wave(Math.min(1, back), 0, strength);
-}
-
-export type MosaicFrameProps = {
-  mode: Mode;
-  focus: { x: number; y: number };
-  scale: number;
-  sceneWidth: number;
-  loopMs: number;
-  swaySteps: number;
-  swayGain?: number;
-  ripple?: number;
-  phaseRef?: React.RefObject<number | null>;
-};
-
-export function MosaicFrame({
-  mode,
-  focus,
-  scale,
-  sceneWidth,
-  loopMs,
-  swaySteps,
-  swayGain = 1,
-  ripple = 0,
-  phaseRef,
-}: MosaicFrameProps) {
-  const bake = BAKES.desktop;
-  const settings = bake.settings as Record<string, number>;
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const [palette, setPalette] = React.useState<Palette | null>(null);
-  React.useLayoutEffect(() => {
-    const host = rootRef.current?.parentElement;
-    setPalette((host && readPalette(mode, host)) ?? FALLBACK_PALETTE);
-  }, [mode]);
-  const origin: [number, number] = [focus.x + bake.offsetX * scale, focus.y + bake.offsetY * scale];
-  const center: [number, number] = [focus.x, focus.y + settings.logoSize * settings.logoY * scale];
-  const uniforms = React.useMemo(
-    () =>
-      palette ? buildUniforms(palette, mode, origin, center, sceneWidth, REVEAL_DEFAULTS, SHEEN_DEFAULTS, bake) : {},
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [palette, mode, origin[0], origin[1], center[0], center[1], sceneWidth, bake],
-  );
-  const lastRef = React.useRef<number | null>(null);
-  const liveUniforms = React.useCallback((): Uniforms => {
-    const phase = phaseRef?.current ?? (performance.now() % loopMs) / loopMs;
-    const dx = loopSway(phase, swaySteps, 0, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.x * swayGain;
-    const dy = loopSway(phase, swaySteps, 57, SWAY_DEFAULTS.detail) * SWAY_DEFAULTS.y * swayGain;
-    return {
-      ...loopUniforms(phase * loopMs, loopMs, ripple, mode, uniforms),
-      u_skeleton_color: { type: 'uniform3f', value: (palette ?? FALLBACK_PALETTE).tileLow },
-      u_skeleton_fade: { type: 'uniform1f', value: 1 },
-      u_light_x: { type: 'uniform1f', value: settings.lightX + dx },
-      u_light_y: { type: 'uniform1f', value: settings.lightY + dy },
-      u_sway_glint: { type: 'uniform1f', value: SWAY_DEFAULTS.glint * swayGain },
-      u_sway_size: { type: 'uniform1f', value: SWAY_DEFAULTS.size },
-    };
-  }, [phaseRef, loopMs, swaySteps, swayGain, ripple, mode, uniforms, palette, settings.lightX, settings.lightY]);
-  const shouldRender = React.useCallback(() => {
-    const fixed = phaseRef?.current;
-    if (fixed !== null && fixed !== undefined) {
-      if (fixed === lastRef.current) {
-        return false;
-      }
-      lastRef.current = fixed;
-      return true;
-    }
-    const now = performance.now();
-    if (now - (lastRef.current ?? 0) < SWAY_FRAME_MS) {
-      return false;
-    }
-    lastRef.current = now;
-    return true;
-  }, [phaseRef]);
-  const pixelRatio = React.useCallback(() => Math.round(Math.max(1, Math.min(window.devicePixelRatio || 1, 2))), []);
-  return (
-    <div
-      ref={rootRef}
-      aria-hidden='true'
-      className='pointer-events-none absolute'
-      style={{ left: origin[0], top: origin[1], width: bake.width * scale, height: bake.height * scale }}
-    >
-      {palette ? (
-        <Shader
-          source={source}
-          uniforms={uniforms}
-          textures={TEXTURES.desktop}
-          liveUniforms={liveUniforms}
-          shouldRender={shouldRender}
-          pixelRatio={pixelRatio}
-          premultiplied
-        />
       ) : null}
     </div>
   );

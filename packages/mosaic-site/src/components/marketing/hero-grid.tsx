@@ -64,7 +64,7 @@ export function HeroGrid() {
       }
     >
       <div
-        className='absolute top-[calc(300px-var(--grid-half))] [background-image:var(--grid-bg-light)] sm:top-[calc(484px-var(--grid-half))] 2xl:top-[calc(572px-var(--grid-half))] dark:[background-image:var(--grid-bg-dark)]'
+        className='absolute top-[calc(var(--hero-pt)+var(--hero-anchor)+36px-var(--grid-half))] [background-image:var(--grid-bg-light)] dark:[background-image:var(--grid-bg-dark)]'
         style={
           {
             left: `calc(50% - ${SPAN / 2}px)`,

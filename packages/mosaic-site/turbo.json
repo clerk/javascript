@@ -3,7 +3,22 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "env": ["MOSAIC_BRAND"]
+      "dependsOn": ["@clerk/mosaic#build", "@clerk/shared#build"],
+      "env": ["MOSAIC_BRAND"],
+      "inputs": [
+        "package.json",
+        "*.d.ts",
+        "next.config.mjs",
+        "postcss.config.mjs",
+        "tsconfig.json",
+        "src/**",
+        "public/**",
+        "$TURBO_ROOT$/packages/swingset/src/**",
+        "!**/*.test.*",
+        "!**/__tests__/**",
+        "!node_modules/**"
+      ],
+      "outputs": [".next/**", "!.next/cache/**"]
     }
   }
 }

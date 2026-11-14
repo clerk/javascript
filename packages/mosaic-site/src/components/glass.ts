@@ -1,11 +1,6 @@
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 
-// Pick by what sits behind the bar:
-//   light mode: gray-50 on white, white on gray-50 or gray-100
-//   dark mode:  gray-800 on gray-950 (as on /mcp, /protect, and /agents), gray-950 on gray-900, gray-900 on black
-// The edges are the surface with black mixed in; for these grays, mixing in oklab steps the
-// OKLCH lightness down by a fixed amount (0.1 and 0.04 light, 0.06 and 0.02 dark).
 const TONES = {
   white: { base: 'var(--color-white)', kind: 'light', edge: '10%', edgeMid: '4%' },
   'gray-50': { base: 'var(--color-gray-50)', kind: 'light', edge: '10.2%', edgeMid: '4.1%' },
@@ -22,13 +17,11 @@ const BEVEL = {
   dark: { top: '22%', end: '12%' },
 };
 
-// Light is hot (warm white on top), shade is cold (violet underside and shadows), at about half the brief's chroma.
 const LIGHT = {
   light: { hot: 'oklch(0.995 0.006 85)', cold: 'oklch(0.985 0.008 292)' },
   dark: { hot: 'oklch(0.97 0.012 80)', cold: 'oklch(0.8 0.04 292)' },
 };
 
-// The outer rim darkens toward the bottom, where the surface turns away from the light.
 const RIM = {
   light: { underside: 'oklch(0.5 0.035 288 / 0.22)' },
   dark: { underside: 'oklch(0.08 0.025 275 / 0.45)' },
@@ -96,15 +89,12 @@ export const GLASS_SCHEME = clsx(
   '[--glass-prism:var(--glass-prism-light)] dark:[--glass-prism:var(--glass-prism-dark)]',
 );
 
-// A faint warm-to-cool ring along the bottom inner edge, like glass splitting light. Put it in a
-// `relative isolate` box with a `--glass-r` radius.
 export const GLASS_PRISM = clsx(
   'pointer-events-none absolute inset-0.5 -z-15 rounded-[calc(var(--glass-r)-2px)] [mask:linear-gradient(to_bottom,transparent_55%,#000_90%)]',
   'before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent',
   'before:[background:var(--glass-prism)] before:[mask:linear-gradient(#fff_0_0)_padding-box_exclude,linear-gradient(#fff_0_0)]',
 );
 
-// The surface's outer edge and inner bevel, on a box with `relative isolate` and a `--glass-r` radius.
 export const GLASS_EDGES = clsx(
   'before:absolute before:inset-px before:-z-15 before:rounded-[calc(var(--glass-r)-1px)] before:border before:border-transparent',
   'before:[background:var(--glass-inner-border)] before:[mask:linear-gradient(#fff_0_0)_padding-box_exclude,linear-gradient(#fff_0_0)]',
