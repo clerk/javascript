@@ -53,6 +53,7 @@ export * from './OrganizationPermissionApi';
 export * from './OrganizationRoleApi';
 export * from './OAuthApplicationsApi';
 export * from './PhoneNumberApi';
+export * from './HostedAuthApi';
 export * from './ProxyCheckApi';
 export * from './RedirectUrlApi';
 export * from './RoleSetApi';

@@ -61,6 +61,7 @@ export const ObjectType = {
   OrganizationMembership: 'organization_membership',
   OrganizationSettings: 'organization_settings',
   PhoneNumber: 'phone_number',
+  HostedAuthToken: 'hosted_auth_token',
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlConnection: 'saml_connection',
@@ -528,6 +529,14 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   linked_to: IdentificationLinkJSON[];
   backup_codes: string[];
 }
+
+export type HostedAuthTokenJSON = {
+  object: typeof ObjectType.HostedAuthToken;
+  session_id: string;
+  user_id: string;
+  session_token: string;
+  refresh_token?: string;
+};
 
 export type ProxyCheckJSON = {
   object: typeof ObjectType.ProxyCheck;

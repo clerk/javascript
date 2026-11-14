@@ -52,6 +52,7 @@ export * from './OrganizationMembership';
 export * from './OrganizationSettings';
 export * from './Permission';
 export * from './PhoneNumber';
+export * from './HostedAuthToken';
 export * from './ProxyCheck';
 export * from './RedirectUrl';
 export * from './Role';

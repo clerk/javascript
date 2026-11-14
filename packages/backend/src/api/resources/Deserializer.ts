@@ -12,6 +12,7 @@ import {
   EmailAddress,
   EnterpriseAccount,
   EnterpriseConnection,
+  HostedAuthToken,
   IdPOAuthAccessToken,
   Instance,
   InstanceRestrictions,
@@ -198,6 +199,8 @@ function jsonToObject(item: any): any {
       return Permission.fromJSON(item);
     case ObjectType.PhoneNumber:
       return PhoneNumber.fromJSON(item);
+    case ObjectType.HostedAuthToken:
+      return HostedAuthToken.fromJSON(item);
     case ObjectType.ProxyCheck:
       return ProxyCheck.fromJSON(item);
     case ObjectType.RedirectUrl:
