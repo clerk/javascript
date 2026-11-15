@@ -1,5 +1,5 @@
 {
-  "version": 1794705870595,
+  "version": 1794728136222,
   "scale": 2,
   "width": 988,
   "height": 567,
@@ -72,9 +72,9 @@
     "aoFalloff": 1.1,
     "aoRelief": 6,
     "aoLift": -0.8,
-    "scratch": 0.045,
+    "scratch": 0.01,
     "scratchScale": 376,
-    "scratchGrain": 0.4,
+    "scratchGrain": 0.065,
     "scratchDots": 4,
     "cloud": 0.025,
     "dmCloud": 0.008,

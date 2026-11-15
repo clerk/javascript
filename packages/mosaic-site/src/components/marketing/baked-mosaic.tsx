@@ -148,6 +148,8 @@ const SHEEN: Sheen = {
 
 export const SWAY = { x: 0.2, y: 160, speed: 0.1, detail: 0.5, glint: 0.05, size: 12 };
 
+export const DRIFT = { light: 0.06, dark: 0.08, size: 14, height: 260, reachX: 0.3, reachY: 150, period: 16 };
+
 export const SWAY_FRAME_MS = 32;
 const SWAY_IDLE_MS = 20000;
 
@@ -305,6 +307,11 @@ uniform float u_sheen_light;
 uniform float u_sheen_light_tint;
 uniform float u_sheen_dark;
 uniform float u_sway_size;
+uniform float u_drift_x;
+uniform float u_drift_y;
+uniform float u_drift_z;
+uniform float u_drift_size;
+uniform float u_drift_glint;
 uniform float u_fresnel;
 uniform float u_highlight;
 uniform float u_fresnel_power;
@@ -457,6 +464,8 @@ void main() {
   alpha = mix(alpha, baked.r, frost);
   skeletonAlpha = mix(skeletonAlpha, baked.g, frost);
   vec2 scene = at + vec2(u_origin_x, u_origin_y);
+  vec2 detailAt = (scene - vec2(u_center_x, u_center_y)) / max(u_zoom, 0.05);
+  float detailPixel = max(fwidth(detailAt.x), fwidth(detailAt.y));
   vec3 toLight = normalize(vec3(u_light_x * u_scene_w, -u_light_y, u_light_z) - vec3(scene, 0.0));
   vec3 color = vec3(0.0);
 
@@ -464,16 +473,16 @@ void main() {
     vec2 packedNormal = surfaceData.rg * 2.0 - 1.0;
     vec2 nxy = packedNormal * abs(packedNormal);
     vec3 surface = normalize(vec3(nxy, sqrt(max(1.0 - dot(nxy, nxy), 0.0))));
-    vec2 detail = vec2(0.0);
-    if (u_detail > 0.0) {
-      vec2 detailAt = (scene - vec2(u_center_x, u_center_y)) / max(u_zoom, 0.05);
-      detail = surfaceDetail(detailAt, u_detail_scale, u_detail_grain, u_detail_dots);
-      surface = normalize(surface + vec3(detail * u_detail, 0.0));
-    }
     float packed = floor(surfaceData.b * 255.0 + 0.5);
     float isLogo = step(127.5, packed);
     float tone = clamp((packed - isLogo * 145.0) / 110.0, 0.0, 1.0);
     float edge = clamp(surfaceData.a * 2.0 - 1.0, 0.0, 1.0) * EDGE_MAX;
+    vec2 detail = vec2(0.0);
+    if (u_detail > 0.0) {
+      float detailFace = smoothstep(0.0, max(1.5 * u_depth_reach, 0.001), edge);
+      detail = surfaceDetail(detailAt, detailPixel, u_detail_scale, u_detail_grain, u_detail_dots) * detailFace;
+      surface = normalize(surface + vec3(detail * u_detail, 0.0));
+    }
 
     vec3 tile = mix(u_tile_low, u_tile_high, tone);
     vec3 logoTile = mix(u_logo_low, u_logo_high, tone);
@@ -503,6 +512,11 @@ void main() {
     color += vec3(u_cloud_add * cloudSignal);
     float swaySpread = acos(clamp(dot(surface, halfway), -1.0, 1.0)) / max(radians(u_sway_size), 0.001);
     color += exp(-swaySpread * swaySpread) * u_sway_glint;
+    if (u_drift_glint > 0.0) {
+      vec3 toDrift = normalize(vec3(u_drift_x, u_drift_y, u_drift_z) - vec3(scene, 0.0));
+      float driftSpread = acos(clamp(dot(surface, normalize(toDrift + toEye)), -1.0, 1.0)) / max(radians(u_drift_size), 0.001);
+      color += exp(-driftSpread * driftSpread) * u_drift_glint;
+    }
 
     vec3 sheenAdd = vec3(0.0);
     float sheenReveal = u_sheen > 0.0 ? trailReveal(at) : 0.0;
@@ -549,7 +563,7 @@ void main() {
   float shadow = 0.0;
   if (u_shadow_strength > 0.0 && alpha < 1.0) {
     vec2 reach = toLight.xy / max(toLight.z, 0.05) * u_shadow_height;
-    shadow = occluderAt(at + reach) * u_shadow_strength;
+    shadow = min(occluderAt(at + reach) * u_shadow_strength, 1.0);
   }
 
   vec4 glass = vec4(color * alpha, alpha + shadow * (1.0 - alpha));
@@ -645,6 +659,11 @@ export function buildUniforms(
     u_spec_size: f(s.specSize),
     u_sway_glint: f(SWAY.glint),
     u_sway_size: f(SWAY.size),
+    u_drift_x: f(center[0]),
+    u_drift_y: f(center[1]),
+    u_drift_z: f(DRIFT.height),
+    u_drift_size: f(DRIFT.size),
+    u_drift_glint: f(0),
     u_fresnel: f(s.fresnel),
     u_highlight: f(s.highlight ?? 1),
     u_fresnel_power: f(s.fresnelPower),
@@ -866,12 +885,14 @@ export function BakedMosaic() {
     return () => events.forEach(name => window.removeEventListener(name, onActivity));
   }, [pointerEffects]);
   const startRef = React.useRef<number | null>(null);
+  const reducedRef = React.useRef(false);
   React.useEffect(() => {
     if (!isReady) {
       startRef.current = null;
       return;
     }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    reducedRef.current = reduced;
     startRef.current = reduced ? -Infinity : performance.now();
   }, [isReady]);
   const liveUniforms = React.useCallback(
@@ -882,7 +903,8 @@ export function BakedMosaic() {
       u_skeleton_fade: { type: 'uniform1f', value: skeletonFade(startRef.current) },
       ...(() => {
         const { last, idle } = activityRef.current;
-        const t = ((Math.min(performance.now(), last + SWAY_IDLE_MS) - idle) / 1000) * SWAY.speed;
+        const seconds = (Math.min(performance.now(), last + SWAY_IDLE_MS) - idle) / 1000;
+        const t = seconds * SWAY.speed;
         const swaying = pointerEffects && SWAY.speed > 0;
         const dx = swaying ? swayNoise(t, 0, SWAY.detail) * SWAY.x : 0;
         const dy = swaying ? swayNoise(t, 57, SWAY.detail) * SWAY.y : 0;
@@ -891,10 +913,23 @@ export function BakedMosaic() {
           u_light_y: { type: 'uniform1f', value: settings.lightY + dy },
           u_sway_glint: { type: 'uniform1f', value: swaying ? SWAY.glint : 0 },
           u_sway_size: { type: 'uniform1f', value: SWAY.size },
+          u_drift_x: {
+            type: 'uniform1f',
+            value: center[0] + Math.sin((seconds / DRIFT.period) * Math.PI * 2) * DRIFT.reachX * width,
+          },
+          u_drift_y: {
+            type: 'uniform1f',
+            value: center[1] + Math.sin((seconds / (DRIFT.period * 1.618)) * Math.PI * 2 + 1.3) * DRIFT.reachY,
+          },
+          u_drift_glint: {
+            type: 'uniform1f',
+            value: swaying && !reducedRef.current ? (mode === 'light' ? DRIFT.light : DRIFT.dark) : 0,
+          },
         } satisfies Uniforms;
       })(),
     }),
-    [spring, lightX, follow, pointerEffects, settings.lightY],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [spring, lightX, follow, pointerEffects, settings.lightY, center[0], center[1], width, mode],
   );
   const shouldRender = React.useCallback(() => {
     const start = startRef.current;

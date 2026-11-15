@@ -66,13 +66,17 @@ export function readPalette(mode: Mode, from?: Element): Palette | null {
 
 export const SURFACE_DETAIL_GLSL = `
 float detailHash(vec2 p) {
-  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
 }
 
-vec2 surfaceDetail(vec2 p, float scale, float grain, float dots) {
-  vec2 q = p * (512.0 / max(scale, 1.0));
-  vec2 i = floor(q);
-  vec2 f = fract(q);
+vec2 surfaceDetail(vec2 p, float pixel, float scale, float grain, float dots) {
+  float toTexel = 512.0 / max(scale, 1.0);
+  vec2 q = p * toTexel;
+  vec2 g = mat2(0.8, -0.6, 0.6, 0.8) * q / max(2.5 * pixel * toTexel, 1.0);
+  vec2 i = floor(g);
+  vec2 f = fract(g);
   vec2 u = f * f * (3.0 - 2.0 * f);
   vec2 du = 6.0 * f * (1.0 - f);
   float a = detailHash(i);
@@ -80,7 +84,7 @@ vec2 surfaceDetail(vec2 p, float scale, float grain, float dots) {
   float c = detailHash(i + vec2(0.0, 1.0));
   float d = detailHash(i + vec2(1.0, 1.0));
   float k = a - b - c + d;
-  vec2 slope = du * vec2(b - a + k * u.y, c - a + k * u.x) * grain;
+  vec2 slope = mat2(0.8, 0.6, -0.6, 0.8) * (du * vec2(b - a + k * u.y, c - a + k * u.x)) * grain;
   if (dots > 0.0) {
     float cell = 24.0 / sqrt(dots);
     vec2 id = floor(q / cell);

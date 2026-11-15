@@ -692,6 +692,7 @@ float occluderAt(vec2 screen) {
 
 void main() {
   vec2 p = toPattern(fragCoord);
+  float detailPixel = max(fwidth(p.x), fwidth(p.y));
   vec3 color;
   vec3 e;
   vec2 tileId;
@@ -730,7 +731,8 @@ void main() {
   vec3 local = tileNormal * vec3(-1.0, -1.0, 1.0);
   vec3 surface = normalize(base * dot(base, local) / base.z - local);
   if (u_scratch > 0.0 && u_bake == 0) {
-    vec2 detail = surfaceDetail(p, u_scratch_scale, u_scratch_grain, u_scratch_dots);
+    float detailFace = smoothstep(0.0, max(1.5 * u_depth_reach, 0.001), e.x - groutHalf);
+    vec2 detail = surfaceDetail(p, detailPixel, u_scratch_scale, u_scratch_grain, u_scratch_dots) * detailFace;
     surface = normalize(surface + vec3(detail * u_scratch, 0.0));
   }
 
@@ -839,7 +841,7 @@ void main() {
   if (u_shadow_strength > 0.0 && alpha < 1.0 && u_view == 0) {
     vec3 toSun = normalize(vec3(u_light_x * u_resolution.x, -u_light_y, u_light_z) - vec3(fragCoord, 0.0));
     vec2 reach = toSun.xy / max(toSun.z, 0.05) * u_shadow_height;
-    float shadow = occluderAt(fragCoord + reach) * u_shadow_strength;
+    float shadow = min(occluderAt(fragCoord + reach) * u_shadow_strength, 1.0);
     back *= 1.0 - shadow;
     backAlpha = (shadow + backAlpha * (1.0 - shadow)) * bottomFade;
   }
@@ -854,7 +856,7 @@ void main() {
   } else if (u_bake == 2) {
     float edgeDistance = clamp((e.x - groutHalf) / BAKE_EDGE_MAX, 0.0, 1.0);
     float packedTone = (floor(tileToneT(tileId, anchor) * 110.0 + 0.5) + step(0.5, logoAmount) * 145.0) / 255.0;
-    outColor = mix(vec4(0.5, 0.5, 0.0, 1.0), vec4(sign(surface.xy) * sqrt(abs(surface.xy)) * 0.5 + 0.5, packedTone, 0.5 + 0.5 * edgeDistance), covered);
+    outColor = vec4(mix(vec2(0.5), sign(surface.xy) * sqrt(abs(surface.xy)) * 0.5 + 0.5, covered), packedTone, mix(1.0, 0.5 + 0.5 * edgeDistance, covered));
   } else if (u_bake == 5) {
     outColor = vec4(vec3(0.5 + 0.5 * cloudSignal), covered);
   } else if (u_bake == 4) {
@@ -1077,9 +1079,9 @@ const DEFAULTS: Settings = {
   aoFalloff: 1.1,
   aoRelief: 6,
   aoLift: -0.8,
-  scratch: 0.045,
+  scratch: 0.01,
   scratchScale: 376,
-  scratchGrain: 0.4,
+  scratchGrain: 0.065,
   scratchDots: 4,
   cloud: 0.025,
   dmCloud: 0.008,
@@ -1235,9 +1237,9 @@ export const MOBILE_DEFAULTS: Settings = {
   aoFalloff: 1.1,
   aoRelief: 6,
   aoLift: -0.8,
-  scratch: 0.045,
+  scratch: 0.01,
   scratchScale: 376,
-  scratchGrain: 0.4,
+  scratchGrain: 0.065,
   scratchDots: 4,
   cloud: 0.025,
   dmCloud: 0.008,

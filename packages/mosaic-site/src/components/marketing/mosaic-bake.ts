@@ -5,6 +5,7 @@ export const BAKE_SCALE = 2;
 const PAD = 48;
 const REVEAL_DOWNSAMPLE = 4;
 const SHADE_DOWNSAMPLE = 2;
+const SHADE_DILATE = 4;
 export const BAKE_MARGIN = 400;
 const MARGIN = BAKE_MARGIN;
 
@@ -228,31 +229,81 @@ function revealTextures(
   return { data, width: outWidth, height: outHeight };
 }
 
-function shadeTexture(
-  ao: { data: Uint8Array; width: number; height: number },
-  cloud: { data: Uint8Array; width: number; height: number },
+function coveredAverage(
+  source: { data: Uint8Array; width: number; height: number },
+  mask: { data: Uint8Array },
+  outWidth: number,
+  outHeight: number,
 ) {
   const small = SHADE_DOWNSAMPLE;
-  const outWidth = Math.ceil(ao.width / small);
-  const outHeight = Math.ceil(ao.height / small);
-  const data = new Uint8Array(outWidth * outHeight * 2);
-  [ao, cloud].forEach((source, half) => {
+  let values = new Float32Array(outWidth * outHeight);
+  let filled = new Uint8Array(outWidth * outHeight);
+  for (let y = 0; y < outHeight; y += 1) {
+    for (let x = 0; x < outWidth; x += 1) {
+      let sum = 0;
+      let weight = 0;
+      for (let dy = 0; dy < small; dy += 1) {
+        for (let dx = 0; dx < small; dx += 1) {
+          const sy = y * small + dy;
+          const sx = x * small + dx;
+          if (sy < source.height && sx < source.width) {
+            const at = sy * source.width + sx;
+            const alpha = mask.data[at * 2 + 1];
+            sum += source.data[at] * alpha;
+            weight += alpha;
+          }
+        }
+      }
+      if (weight > 0) {
+        values[y * outWidth + x] = sum / weight;
+        filled[y * outWidth + x] = 1;
+      }
+    }
+  }
+  for (let pass = 0; pass < SHADE_DILATE; pass += 1) {
+    const nextValues = values.slice();
+    const nextFilled = filled.slice();
     for (let y = 0; y < outHeight; y += 1) {
       for (let x = 0; x < outWidth; x += 1) {
+        if (filled[y * outWidth + x]) {
+          continue;
+        }
         let sum = 0;
         let count = 0;
-        for (let dy = 0; dy < small; dy += 1) {
-          for (let dx = 0; dx < small; dx += 1) {
-            const sy = y * small + dy;
-            const sx = x * small + dx;
-            if (sy < source.height && sx < source.width) {
-              sum += source.data[sy * source.width + sx];
+        for (let dy = -1; dy <= 1; dy += 1) {
+          for (let dx = -1; dx <= 1; dx += 1) {
+            const ny = y + dy;
+            const nx = x + dx;
+            if (ny >= 0 && nx >= 0 && ny < outHeight && nx < outWidth && filled[ny * outWidth + nx]) {
+              sum += values[ny * outWidth + nx];
               count += 1;
             }
           }
         }
-        data[(half * outHeight + y) * outWidth + x] = Math.round(sum / Math.max(count, 1));
+        if (count > 0) {
+          nextValues[y * outWidth + x] = sum / count;
+          nextFilled[y * outWidth + x] = 1;
+        }
       }
+    }
+    values = nextValues;
+    filled = nextFilled;
+  }
+  return values;
+}
+
+function shadeTexture(
+  ao: { data: Uint8Array; width: number; height: number },
+  cloud: { data: Uint8Array; width: number; height: number },
+  mask: { data: Uint8Array },
+) {
+  const outWidth = Math.ceil(ao.width / SHADE_DOWNSAMPLE);
+  const outHeight = Math.ceil(ao.height / SHADE_DOWNSAMPLE);
+  const data = new Uint8Array(outWidth * outHeight * 2);
+  [ao, cloud].forEach((source, half) => {
+    const values = coveredAverage(source, mask, outWidth, outHeight);
+    for (let index = 0; index < values.length; index += 1) {
+      data[half * outWidth * outHeight + index] = Math.round(values[index]);
     }
   });
   return { data, width: outWidth, height: outHeight * 2 };
@@ -323,7 +374,7 @@ export async function bakeScene({
     await upload(`surface${suffix}.webp`, crop(surface, box, [0, 1, 2, 3]), 4),
     await upload(`skeleton${suffix}.webp`, skeletonImage, 2),
     await upload(`reveal${suffix}.webp`, revealTextures(maskImage, skeletonImage), 3),
-    await upload(`shade${suffix}.webp`, shadeTexture(aoImage, cloudImage), 1),
+    await upload(`shade${suffix}.webp`, shadeTexture(aoImage, cloudImage, maskImage), 1),
   ];
   const meta = {
     version: Date.now(),
