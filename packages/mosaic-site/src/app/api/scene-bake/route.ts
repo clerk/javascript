@@ -14,9 +14,11 @@ const META_FILES: Record<string, string> = {
   meta: join(ROOT, 'src', 'components', 'marketing', 'mosaic-bake.json'),
   'meta-mobile': join(ROOT, 'src', 'components', 'marketing', 'mosaic-bake-mobile.json'),
 };
-const IMAGES = ['mask', 'surface', 'skeleton', 'reveal'];
+const IMAGES = ['mask', 'surface', 'skeleton', 'reveal', 'shade'];
 const FILES = new Set([...IMAGES.flatMap(name => [`${name}.webp`, `${name}-mobile.webp`]), ...Object.keys(META_FILES)]);
 const LOSSLESS = new Set(['mask.webp', 'skeleton.webp', 'mask-mobile.webp', 'skeleton-mobile.webp']);
+
+const QUALITY: Record<string, number> = { shade: 72, surface: 96 };
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 
@@ -33,15 +35,20 @@ function isLocalRequest(request: Request) {
   }
 }
 
-async function encodeWebp(data: Uint8Array, width: number, height: number, channels: 1 | 2 | 3 | 4, lossless: boolean) {
+async function encodeWebp(
+  data: Uint8Array,
+  width: number,
+  height: number,
+  channels: 1 | 2 | 3 | 4,
+  lossless: boolean,
+  quality: number,
+) {
   const moduleApi = process.getBuiltinModule('node:module');
   const fromSite = moduleApi.createRequire(join(ROOT, 'package.json'));
   const fromNext = moduleApi.createRequire(fromSite.resolve('next/package.json'));
   const sharp = fromNext('sharp') as Sharp;
   return sharp(Buffer.from(data), { raw: { width, height, channels } })
-    .webp(
-      lossless ? { lossless: true, effort: 6 } : { quality: 92, smartSubsample: true, alphaQuality: 100, effort: 6 },
-    )
+    .webp(lossless ? { lossless: true, effort: 6 } : { quality, smartSubsample: true, alphaQuality: 100, effort: 6 })
     .toBuffer();
 }
 
@@ -72,7 +79,14 @@ export async function POST(request: Request) {
   }
   await mkdir(PUBLIC_DIR, { recursive: true });
   const target = join(PUBLIC_DIR, file);
-  const bytes = await encodeWebp(data, width, height, channels, LOSSLESS.has(file));
+  const bytes = await encodeWebp(
+    data,
+    width,
+    height,
+    channels,
+    LOSSLESS.has(file),
+    QUALITY[file.replace(/(-mobile)?\.webp$/, '')] ?? 92,
+  );
   await writeFile(target, bytes);
   return NextResponse.json({ file: target, bytes: bytes.length });
 }

@@ -28,6 +28,9 @@ type Uniform =
 
 export type Uniforms = Record<string, Uniform>;
 
+export type DynamicTexture = { source: TexImageSource; version: number };
+export type DynamicTextures = Record<string, DynamicTexture>;
+
 type TextureUnit =
   | 0
   | 1
@@ -66,6 +69,7 @@ interface ShaderProps {
   source: string;
   uniforms?: Uniforms;
   textures?: Array<string>;
+  dynamicTextures?: DynamicTextures;
   onRender?: (time: number) => void;
   onError?: () => void;
   liveUniforms?: () => Uniforms;
@@ -144,6 +148,7 @@ export const Shader = forwardRef(function Shader(
     source: fragmentShaderSource,
     uniforms = {},
     textures = NO_TEXTURES,
+    dynamicTextures,
     onRender,
     onError,
     liveUniforms,
@@ -163,6 +168,7 @@ export const Shader = forwardRef(function Shader(
   const dirtyRef = useRef(true);
   const shouldRenderRef = useRef(shouldRender);
   const pixelRatioRef = useRef(pixelRatio);
+  const dynamicTexturesRef = useRef(dynamicTextures);
   const onRenderRef = useRef(onRender);
   const onErrorRef = useRef(onError);
   const [generation, setGeneration] = useState(0);
@@ -193,8 +199,9 @@ export const Shader = forwardRef(function Shader(
     liveUniformsRef.current = liveUniforms;
     shouldRenderRef.current = shouldRender;
     pixelRatioRef.current = pixelRatio;
+    dynamicTexturesRef.current = dynamicTextures;
     dirtyRef.current = true;
-  }, [uniforms, liveUniforms, shouldRender, pixelRatio]);
+  }, [uniforms, liveUniforms, shouldRender, pixelRatio, dynamicTextures]);
   useEffect(() => {
     onRenderRef.current = onRender;
     onErrorRef.current = onError;
@@ -294,6 +301,46 @@ export const Shader = forwardRef(function Shader(
       location: WebGLUniformLocation | null;
     }> = [];
 
+    const dynamicInfo = new Map<
+      string,
+      { texture: WebGLTexture; location: WebGLUniformLocation | null; unit: number; version: number }
+    >();
+
+    function bindDynamicTextures() {
+      const wanted = dynamicTexturesRef.current;
+      if (!gl || !wanted) {
+        return;
+      }
+      for (const name in wanted) {
+        let info = dynamicInfo.get(name);
+        if (!info) {
+          const texture = gl.createTexture();
+          if (!texture) {
+            continue;
+          }
+          info = {
+            texture,
+            location: gl.getUniformLocation(program, name),
+            unit: textures.length + dynamicInfo.size,
+            version: -1,
+          };
+          dynamicInfo.set(name, info);
+        }
+        gl.activeTexture(gl.TEXTURE0 + info.unit);
+        gl.bindTexture(gl.TEXTURE_2D, info.texture);
+        if (info.version !== wanted[name].version) {
+          info.version = wanted[name].version;
+          gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+          gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, wanted[name].source);
+        }
+        gl.uniform1i(info.location, info.unit);
+      }
+    }
+
     function drawImage(tex: WebGLTexture, loc: WebGLUniformLocation, unit: TextureUnit) {
       if (!gl) {
         return;
@@ -378,6 +425,8 @@ export const Shader = forwardRef(function Shader(
         }
       }
 
+      bindDynamicTextures();
+
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 
@@ -450,6 +499,7 @@ export const Shader = forwardRef(function Shader(
         gl.deleteProgram(shaderProgram);
         gl.deleteBuffer(vertexBuffer);
         textureInfo.forEach(({ texture }) => gl?.deleteTexture(texture));
+        dynamicInfo.forEach(({ texture }) => gl?.deleteTexture(texture));
         const context = gl;
         loseTimerRef.current = window.setTimeout(() => {
           context.getExtension('WEBGL_lose_context')?.loseContext();

@@ -64,6 +64,51 @@ export function readPalette(mode: Mode, from?: Element): Palette | null {
   };
 }
 
+export const SURFACE_DETAIL_GLSL = `
+float detailHash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+vec2 surfaceDetail(vec2 p, float scale, float grain, float dots) {
+  vec2 q = p * (512.0 / max(scale, 1.0));
+  vec2 i = floor(q);
+  vec2 f = fract(q);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  vec2 du = 6.0 * f * (1.0 - f);
+  float a = detailHash(i);
+  float b = detailHash(i + vec2(1.0, 0.0));
+  float c = detailHash(i + vec2(0.0, 1.0));
+  float d = detailHash(i + vec2(1.0, 1.0));
+  float k = a - b - c + d;
+  vec2 slope = du * vec2(b - a + k * u.y, c - a + k * u.x) * grain;
+  if (dots > 0.0) {
+    float cell = 24.0 / sqrt(dots);
+    vec2 id = floor(q / cell);
+    vec2 center = (id + 0.1 + 0.8 * vec2(detailHash(id + 7.0), detailHash(id + 53.0))) * cell;
+    float radius = 0.8 + 1.4 * detailHash(id + 13.0);
+    float depth = 0.25 + 0.5 * detailHash(id + 29.0);
+    vec2 offset = q - center;
+    if (detailHash(id + 71.0) < 0.3 && dot(offset, offset) < radius * radius) {
+      slope += 1.5 * depth * offset / (radius * radius);
+    }
+  }
+  return normalize(vec3(-slope, 1.0)).xy;
+}
+`;
+
+export function oklchToLinear(lightness: number, chroma: number, hue: number): Rgb {
+  const a = chroma * Math.cos((hue * Math.PI) / 180);
+  const b = chroma * Math.sin((hue * Math.PI) / 180);
+  const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  return [
+    Math.max(0, 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
+    Math.max(0, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
+    Math.max(0, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s),
+  ];
+}
+
 export const FALLBACK_PALETTE: Palette = {
   tileLow: [0.937, 0.933, 0.929],
   tileHigh: [0.894, 0.89, 0.882],

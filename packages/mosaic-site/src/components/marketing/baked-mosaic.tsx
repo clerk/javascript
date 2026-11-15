@@ -9,8 +9,10 @@ import {
   BAKE_EDGE_MAX,
   FALLBACK_PALETTE,
   FOCUS_SIZE,
+  oklchToLinear,
   type Palette,
   readPalette,
+  SURFACE_DETAIL_GLSL,
   useSceneLayout,
 } from '@/components/marketing/mosaic-shared';
 import {
@@ -40,8 +42,8 @@ export const MOSAIC_SKELETON_URL = bakeUrl('desktop', 'skeleton');
 export const MOSAIC_SKELETON_MOBILE_URL = bakeUrl('mobile', 'skeleton');
 
 export const TEXTURES: Record<Variant, string[]> = {
-  desktop: ['surface', 'mask', 'skeleton', 'reveal'].map(name => bakeUrl('desktop', name)),
-  mobile: ['surface', 'mask', 'skeleton', 'reveal'].map(name => bakeUrl('mobile', name)),
+  desktop: ['surface', 'mask', 'skeleton', 'reveal', 'shade'].map(name => bakeUrl('desktop', name)),
+  mobile: ['surface', 'mask', 'skeleton', 'reveal', 'shade'].map(name => bakeUrl('mobile', name)),
 };
 
 function visibleSkeleton() {
@@ -120,6 +122,8 @@ type Sheen = {
   lightStrength: number;
   lightTint: number;
   darkStrength: number;
+  detailHue: number;
+  detailGain: number;
 };
 
 const SHEEN: Sheen = {
@@ -138,6 +142,8 @@ const SHEEN: Sheen = {
   lightStrength: 0.5,
   lightTint: 0.6,
   darkStrength: 0.5,
+  detailHue: 0.8,
+  detailGain: 1,
 };
 
 export const SWAY = { x: 0.2, y: 160, speed: 0.1, detail: 0.5, glint: 0.05, size: 12 };
@@ -263,6 +269,7 @@ uniform sampler2D u_texture_0;
 uniform sampler2D u_texture_1;
 uniform sampler2D u_texture_2;
 uniform sampler2D u_texture_3;
+uniform sampler2D u_texture_4;
 
 uniform float u_origin_x;
 uniform float u_origin_y;
@@ -309,6 +316,19 @@ uniform float u_prism_side;
 uniform float u_shadow_strength;
 uniform float u_shadow_height;
 uniform float u_shadow_soft;
+uniform float u_ao;
+uniform float u_ao_strength;
+uniform float u_ao_multiply;
+uniform float u_ao_hairline;
+uniform float u_ao_symbol_hairline;
+uniform float u_ao_hairline_width;
+uniform vec3 u_ao_color;
+uniform float u_cloud;
+uniform float u_cloud_add;
+uniform float u_detail;
+uniform float u_detail_scale;
+uniform float u_detail_grain;
+uniform float u_detail_dots;
 uniform float u_reveal;
 uniform float u_reveal_max;
 uniform float u_front;
@@ -344,6 +364,8 @@ uniform float u_sheen_drift;
 uniform float u_sheen_hue;
 uniform float u_sheen_flow;
 uniform float u_sheen_fresnel_hue;
+uniform float u_sheen_detail_hue;
+uniform float u_sheen_detail_gain;
 ${TRAIL_GLSL}
 uniform float u_film_light;
 uniform float u_wave_width;
@@ -397,6 +419,7 @@ float sheenFbm(vec2 p) {
   return value;
 }
 
+${SURFACE_DETAIL_GLSL}
 float edgeAt(vec2 point) {
   return clamp(texture(u_texture_0, point / u_resolution).a * 2.0 - 1.0, 0.0, 1.0);
 }
@@ -438,8 +461,15 @@ void main() {
   vec3 color = vec3(0.0);
 
   if (alpha > 0.0) {
-    vec2 nxy = surfaceData.rg * 2.0 - 1.0;
+    vec2 packedNormal = surfaceData.rg * 2.0 - 1.0;
+    vec2 nxy = packedNormal * abs(packedNormal);
     vec3 surface = normalize(vec3(nxy, sqrt(max(1.0 - dot(nxy, nxy), 0.0))));
+    vec2 detail = vec2(0.0);
+    if (u_detail > 0.0) {
+      vec2 detailAt = (scene - vec2(u_center_x, u_center_y)) / max(u_zoom, 0.05);
+      detail = surfaceDetail(detailAt, u_detail_scale, u_detail_grain, u_detail_dots);
+      surface = normalize(surface + vec3(detail * u_detail, 0.0));
+    }
     float packed = floor(surfaceData.b * 255.0 + 0.5);
     float isLogo = step(127.5, packed);
     float tone = clamp((packed - isLogo * 145.0) / 110.0, 0.0, 1.0);
@@ -452,6 +482,8 @@ void main() {
     vec3 deep = tinted * 0.78;
     vec3 thin = mix(tinted, vec3(dot(tinted, LUMA)), 0.5) * 1.35;
     vec3 albedo = mix(tinted, mix(thin, deep, thick), u_depth);
+    float cloudSignal = texture(u_texture_4, vec2(uv.x, 0.5 + 0.5 * uv.y)).r * 2.0 - 1.0;
+    albedo *= 1.0 + u_cloud * cloudSignal;
 
     vec3 toEye = normalize(vec3(vec2(u_center_x, u_center_y) - scene, max(u_camera, 1.0)));
     float lit = u_diffuse * (max(dot(surface, toLight), 0.0) - max(toLight.z, 0.0));
@@ -468,25 +500,27 @@ void main() {
     float sky = mix(1.0 - u_rim, 1.0, smoothstep(0.0, 0.6, -reflected.y));
     color = albedo * shade + vec3(glint + fresnel * sky) * u_highlight;
     color += vec3(u_add_glow * (1.0 - falloffT) + u_add_catch * (dot(surface, toLight) - toLight.z) * smoothstep(0.6, 0.9, thick) + u_add_tone * (tone - 0.5));
+    color += vec3(u_cloud_add * cloudSignal);
     float swaySpread = acos(clamp(dot(surface, halfway), -1.0, 1.0)) / max(radians(u_sway_size), 0.001);
     color += exp(-swaySpread * swaySpread) * u_sway_glint;
 
+    vec3 sheenAdd = vec3(0.0);
     float sheenReveal = u_sheen > 0.0 ? trailReveal(at) : 0.0;
     if (sheenReveal > 0.0) {
       vec2 sheenUv = (at + surface.xy * u_sheen_warp) / max(u_sheen_scale, 1.0);
       float sheenTime = u_time * u_sheen_flow;
       vec2 sheenDrift = vec2(sheenFbm(sheenUv * 0.7 + sheenTime * 0.04), sheenFbm(sheenUv * 0.7 + 5.2 - sheenTime * 0.03));
-      float sheenHue = sheenFbm(sheenUv * 1.1 + sheenDrift * u_sheen_drift + sheenTime * 0.03) * u_sheen_hue + dot(sheenUv, vec2(0.4, 0.3)) + sheenReveal * 0.25 + dot(surface.xy, vec2(0.6, 0.4)) * u_sheen_angle + pow(1.0 - facing, 2.0) * u_sheen_fresnel_hue;
+      float sheenHue = sheenFbm(sheenUv * 1.1 + sheenDrift * u_sheen_drift + sheenTime * 0.03) * u_sheen_hue + dot(sheenUv, vec2(0.4, 0.3)) + sheenReveal * 0.25 + dot(surface.xy, vec2(0.6, 0.4)) * u_sheen_angle + pow(1.0 - facing, 2.0) * u_sheen_fresnel_hue + dot(detail, vec2(0.6, 0.4)) * u_sheen_detail_hue;
       vec3 sheenFilm = 0.5 + 0.5 * cos(TAU * (sheenHue + vec3(0.0, 0.33, 0.67)));
       sheenFilm = mix(sheenFilm, vec3(dot(sheenFilm, vec3(0.333))), 0.2);
       vec3 toTrail = normalize(vec3(trailLight(at) - at, 159.0));
       float trailGlint = pow(max(dot(surface, normalize(toTrail + vec3(0.0, 0.0, 1.0))), 0.0), 88.0);
       float sheenBand = (1.0 - thick) * (1.0 - thick);
-      float sheenAmount = sheenReveal * u_sheen * (u_sheen_base + u_sheen_edge * sheenBand + 0.24 * trailGlint);
+      float sheenAmount = sheenReveal * u_sheen * (u_sheen_base + u_sheen_edge * sheenBand + 0.24 * trailGlint) * (1.0 + u_sheen_detail_gain * length(detail));
       float sheenModeScale = mix(u_sheen_dark, u_sheen_light, u_film_light);
       vec3 sheenChroma = sheenFilm - vec3(dot(sheenFilm, vec3(0.333)));
       vec3 sheenColor = mix(sheenFilm, sheenChroma, u_sheen_light_tint * u_film_light);
-      color += (sheenColor * sheenAmount + vec3(trailGlint * sheenReveal * u_sheen_glint)) * sheenModeScale;
+      sheenAdd = (sheenColor * sheenAmount + vec3(trailGlint * sheenReveal * u_sheen_glint)) * sheenModeScale;
     }
 
     if (u_prism > 0.0) {
@@ -499,6 +533,17 @@ void main() {
       float weight = band * side * u_prism;
       color += (spectrum - vec3(dot(spectrum, vec3(0.333)))) * weight + spectrum * weight * 0.25;
     }
+
+    if (u_ao > 0.0) {
+      float aoEdge = smoothstep(0.0, max(u_ao_hairline_width, 0.01), edge * u_zoom);
+      float hairline = mix(isLogo > 0.5 ? u_ao_symbol_hairline : u_ao_hairline, 1.0, aoEdge);
+      float aoStored = texture(u_texture_4, vec2(uv.x, 0.5 * uv.y)).r;
+      float occlusion = clamp((1.0 - pow(1.0 - aoStored * aoStored, u_ao)) * hairline, 0.0, 1.0);
+      vec3 linearColor = pow(max(color, 0.0), vec3(2.2));
+      vec3 occludedColor = u_ao_color * mix(vec3(1.0), linearColor, u_ao_multiply);
+      color = pow(mix(linearColor, occludedColor, occlusion * u_ao_strength), vec3(1.0 / 2.2));
+    }
+    color += sheenAdd;
   }
 
   float shadow = 0.0;
@@ -611,6 +656,23 @@ export function buildUniforms(
     u_shadow_strength: f(s.shadowStrength * (light ? 1 : s.dmShadow)),
     u_shadow_height: f(s.shadowHeight),
     u_shadow_soft: f(s.shadowSoft),
+    u_ao: f((light ? s.aoIntensity : s.dmAoIntensity) ?? 0),
+    u_ao_strength: f((light ? s.aoStrength : s.dmAoStrength) ?? 0),
+    u_ao_multiply: f(light ? 1 : 0),
+    u_ao_hairline: f((light ? s.aoHairline : s.dmAoHairline) ?? 1),
+    u_ao_symbol_hairline: f((light ? s.aoSymbolHairline : s.dmAoSymbolHairline) ?? 1),
+    u_ao_hairline_width: f(s.aoHairlineWidth ?? 2),
+    u_ao_color: v(
+      light
+        ? oklchToLinear(s.aoTintL ?? 0, s.aoTintC ?? 0, s.aoTintH ?? 0)
+        : oklchToLinear(s.dmAoTintL ?? 0, s.dmAoTintC ?? 0, s.dmAoTintH ?? 0),
+    ),
+    u_cloud: f(light ? (s.cloud ?? 0) : 0),
+    u_cloud_add: f(light ? 0 : (s.dmCloud ?? 0)),
+    u_detail: f(s.scratch ?? 0),
+    u_detail_scale: f(s.scratchScale ?? 512),
+    u_detail_grain: f(s.scratchGrain ?? 0),
+    u_detail_dots: f(s.scratchDots ?? 0),
     u_reveal: f(0),
     u_front: f(0),
     u_invert: f(0),
@@ -650,6 +712,8 @@ export function buildUniforms(
     u_sheen_hue: f(sheen.hueSpread),
     u_sheen_flow: f(sheen.flow),
     u_sheen_fresnel_hue: f(sheen.fresnelHue),
+    u_sheen_detail_hue: f(sheen.detailHue),
+    u_sheen_detail_gain: f(sheen.detailGain),
     u_trail: TRAIL_POINTS_UNIFORM,
     u_trail_origin: TRAIL_ORIGIN_UNIFORM,
     u_trail_energy: TRAIL_ENERGY_UNIFORM,

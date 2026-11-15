@@ -3,15 +3,18 @@ import { useMotionValue, useSpring } from 'motion/react';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 
-import { bakeScene } from '@/components/marketing/mosaic-bake';
+import { AO_BAKE, AO_PREVIEW, createAoRenderer } from '@/components/marketing/mosaic-ao';
+import { BAKE_MARGIN, BAKE_SCALE, bakeScene } from '@/components/marketing/mosaic-bake';
 import {
   BAKE_EDGE_MAX,
   FALLBACK_PALETTE,
   type Focus,
   FOCUS_SIZE,
+  oklchToLinear,
   type Palette,
   readPalette,
   type Rgb,
+  SURFACE_DETAIL_GLSL,
   type TextBox,
   useSceneLayout,
 } from '@/components/marketing/mosaic-shared';
@@ -25,7 +28,8 @@ import {
   TRAIL_POINTS_UNIFORM,
   TRAIL_RADIUS_UNIFORM,
 } from '@/components/marketing/pointer-trail';
-import { Shader, type Uniforms } from '@/components/shader';
+import { type DynamicTextures, Shader, type Uniforms } from '@/components/shader';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { type Mode, useMode } from '@/components/use-mode';
 
 const MARKS = [
@@ -36,6 +40,8 @@ const MARKS = [
 ];
 
 const POINTER_EFFECTS = false;
+const AO_BIAS = 0.05;
+const AO_DEBOUNCE = 120;
 const subscribeNothing = () => () => {};
 
 const source = `#version 300 es
@@ -171,6 +177,23 @@ uniform float u_solid_logo;
 uniform float u_fine;
 uniform float u_fine_near;
 uniform float u_fine_chance;
+uniform sampler2D u_ao_map;
+uniform float u_scratch;
+uniform float u_scratch_scale;
+uniform float u_scratch_grain;
+uniform float u_scratch_dots;
+uniform float u_cloud;
+uniform float u_cloud_add;
+uniform float u_cloud_scale;
+uniform float u_vein;
+uniform float u_ao;
+uniform float u_ao_multiply;
+uniform float u_ao_lift;
+uniform float u_ao_strength;
+uniform float u_ao_hairline;
+uniform float u_ao_symbol_hairline;
+uniform float u_ao_hairline_width;
+uniform vec3 u_ao_color;
 
 ${TRAIL_GLSL}
 const float TAU = 6.28318530718;
@@ -188,6 +211,7 @@ vec2 hash2(vec2 p) {
   return fract(sin(p) * 43758.5453);
 }
 
+${SURFACE_DETAIL_GLSL}
 float valueNoise(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
@@ -705,6 +729,10 @@ void main() {
   vec3 base = worldNormal + vec3(0.0, 0.0, 1.0);
   vec3 local = tileNormal * vec3(-1.0, -1.0, 1.0);
   vec3 surface = normalize(base * dot(base, local) / base.z - local);
+  if (u_scratch > 0.0 && u_bake == 0) {
+    vec2 detail = surfaceDetail(p, u_scratch_scale, u_scratch_grain, u_scratch_dots);
+    surface = normalize(surface + vec3(detail * u_scratch, 0.0));
+  }
 
   float purpleAmount = u_tint * mix(1.0, hash1(tileId + 131.0), u_hue_spread) + u_logo_tint * logoAmount;
   vec3 tint = mix(vec3(1.0), u_logo_tint_color, purpleAmount);
@@ -713,6 +741,14 @@ void main() {
   vec3 deep = tinted * tint * 0.78;
   vec3 thin = mix(tinted, vec3(dot(tinted, LUMA)), 0.5) * 1.35;
   vec3 albedo = mix(tinted, mix(thin, deep, thick), u_depth);
+  float cloudSignal = 0.0;
+  if (u_cloud > 0.0 || u_cloud_add > 0.0 || u_bake == 5) {
+    vec2 cloudAt = p / max(u_cloud_scale, 1.0) + shift.yx * 3.0;
+    float soft = fbm(cloudAt);
+    float ridge = 1.0 - abs(2.0 * fbm(cloudAt * 0.6 + soft * 1.5 + 17.0) - 1.0);
+    cloudSignal = 2.0 * mix(soft - 0.5, -0.5 * pow(ridge, 8.0), u_vein);
+    albedo *= 1.0 + u_cloud * cloudSignal;
+  }
   vec3 lightPos = vec3(u_light_x * u_resolution.x, -u_light_y, u_light_z);
   vec3 toLight = normalize(lightPos - vec3(fragCoord, 0.0));
   vec3 toEye = normalize(vec3(logoCenter() - fragCoord, max(u_camera, 1.0)));
@@ -731,6 +767,8 @@ void main() {
   color = albedo * shade + vec3(glint + fresnel * sky) * u_highlight;
   color += vec3(u_add_glow * (1.0 - falloffT) + u_add_catch * (dot(surface, toLight) - toLight.z) * smoothstep(0.6, 0.9, thick) + u_add_tone * (tileToneT(tileId, anchor) - 0.5));
 
+  color += vec3(u_cloud_add * cloudSignal);
+
   float near = exp(-max(logoSdf(p), 0.0) / max(u_glow_reach, 1.0));
   float backRim = pow(1.0 - facing, u_fresnel_power) * smoothstep(0.0, 0.6, reflected.y);
   float rimZone = 1.0 - smoothstep(0.0, 3.0 * max(u_bevel_width, 0.5), e.x - groutHalf);
@@ -747,7 +785,18 @@ void main() {
     color += (spectrum - vec3(dot(spectrum, vec3(0.333)))) * weight + spectrum * weight * 0.25;
   }
 
-  if (u_view == 7) {
+  float aoStored = texture(u_ao_map, fragCoord / u_resolution).r;
+  float aoEdge = smoothstep(0.0, max(u_ao_hairline_width, 0.01), (e.x - groutHalf) * u_zoom);
+  float ao = 1.0 - clamp((1.0 - pow(1.0 - aoStored * aoStored, u_ao)) * mix(abs(tileId.y - 9000.0) < 0.5 ? u_ao_symbol_hairline : u_ao_hairline, 1.0, aoEdge), 0.0, 1.0);
+  if (u_ao > 0.0) {
+    vec3 linearColor = pow(max(color, 0.0), vec3(2.2));
+    vec3 occludedColor = u_ao_color * mix(vec3(1.0), linearColor, u_ao_multiply);
+    color = pow(mix(linearColor, occludedColor, (1.0 - ao) * u_ao_strength), vec3(1.0 / 2.2));
+  }
+
+  if (u_view == 8) {
+    color = vec3(ao);
+  } else if (u_view == 7) {
     color = albedo;
   } else if (u_view == 1) {
     color = encodeNormal(surface);
@@ -805,7 +854,12 @@ void main() {
   } else if (u_bake == 2) {
     float edgeDistance = clamp((e.x - groutHalf) / BAKE_EDGE_MAX, 0.0, 1.0);
     float packedTone = (floor(tileToneT(tileId, anchor) * 110.0 + 0.5) + step(0.5, logoAmount) * 145.0) / 255.0;
-    outColor = mix(vec4(0.5, 0.5, 0.0, 1.0), vec4(surface.xy * 0.5 + 0.5, packedTone, 0.5 + 0.5 * edgeDistance), covered);
+    outColor = mix(vec4(0.5, 0.5, 0.0, 1.0), vec4(sign(surface.xy) * sqrt(abs(surface.xy)) * 0.5 + 0.5, packedTone, 0.5 + 0.5 * edgeDistance), covered);
+  } else if (u_bake == 5) {
+    outColor = vec4(vec3(0.5 + 0.5 * cloudSignal), covered);
+  } else if (u_bake == 4) {
+    float solid = tileMask * clamp(vignette * u_cover, 0.0, 1.0);
+    outColor = vec4((world.x * u_ao_lift + tileHeight) * u_zoom * solid, 0.0, 0.0, solid);
   }
 }
 `;
@@ -856,6 +910,34 @@ export type Settings = {
   dmShadow: number;
   shadowHeight: number;
   shadowSoft: number;
+  aoIntensity: number;
+  dmAoIntensity: number;
+  aoStrength: number;
+  dmAoStrength: number;
+  aoHairline: number;
+  dmAoHairline: number;
+  aoSymbolHairline: number;
+  dmAoSymbolHairline: number;
+  aoHairlineWidth: number;
+  aoDirectional: number;
+  aoTintL: number;
+  aoTintC: number;
+  aoTintH: number;
+  dmAoTintL: number;
+  dmAoTintC: number;
+  dmAoTintH: number;
+  aoRadius: number;
+  aoFalloff: number;
+  aoRelief: number;
+  aoLift: number;
+  scratch: number;
+  scratchScale: number;
+  scratchGrain: number;
+  scratchDots: number;
+  cloud: number;
+  dmCloud: number;
+  cloudScale: number;
+  vein: number;
   vigCells: number;
   vigCut: number;
   vigJitter: number;
@@ -934,10 +1016,10 @@ const DEFAULTS: Settings = {
   bevelWidth: 3,
   bevelShape: 1,
   bevelHeight: 1.7,
-  clayTilt: 0.02,
-  clayThickness: 1.1,
-  clayWobble: 0,
-  clayScale: 74,
+  clayTilt: 0.01,
+  clayThickness: 0.35,
+  clayWobble: 0.96,
+  clayScale: 222,
   domeHeight: 0,
   domeReach: 30,
   edgeHeight: 5,
@@ -972,9 +1054,37 @@ const DEFAULTS: Settings = {
   textRound: 47,
   textJitter: 16,
   shadowStrength: 0.22,
-  dmShadow: 3.8,
+  dmShadow: 6,
   shadowHeight: 3,
-  shadowSoft: 24,
+  shadowSoft: 20.5,
+  aoIntensity: 0.69,
+  dmAoIntensity: 1.8,
+  aoStrength: 0.08,
+  dmAoStrength: 0.83,
+  aoHairline: 0.22,
+  dmAoHairline: 1.45,
+  aoSymbolHairline: 0.48,
+  dmAoSymbolHairline: 1.3,
+  aoHairlineWidth: 8,
+  aoDirectional: 1,
+  aoTintL: 0.45,
+  aoTintC: 0.12,
+  aoTintH: 280,
+  dmAoTintL: 0.08,
+  dmAoTintC: 0.04,
+  dmAoTintH: 280,
+  aoRadius: 50,
+  aoFalloff: 1.1,
+  aoRelief: 6,
+  aoLift: -0.8,
+  scratch: 0.045,
+  scratchScale: 376,
+  scratchGrain: 0.4,
+  scratchDots: 4,
+  cloud: 0.025,
+  dmCloud: 0.008,
+  cloudScale: 205,
+  vein: 1,
   vigCells: 1,
   vigCut: 1,
   vigJitter: 0,
@@ -1064,10 +1174,10 @@ export const MOBILE_DEFAULTS: Settings = {
   bevelWidth: 3,
   bevelShape: 1,
   bevelHeight: 1.7,
-  clayTilt: 0.04,
-  clayThickness: 1.1,
-  clayWobble: 0,
-  clayScale: 46.3,
+  clayTilt: 0.02,
+  clayThickness: 0.35,
+  clayWobble: 0.96,
+  clayScale: 116,
   domeHeight: 0,
   domeReach: 30,
   edgeHeight: 5,
@@ -1102,9 +1212,37 @@ export const MOBILE_DEFAULTS: Settings = {
   textRound: 29.4,
   textJitter: 10,
   shadowStrength: 0.22,
-  dmShadow: 3.8,
+  dmShadow: 6,
   shadowHeight: 3,
   shadowSoft: 24,
+  aoIntensity: 0.69,
+  dmAoIntensity: 1.8,
+  aoStrength: 0.08,
+  dmAoStrength: 0.83,
+  aoHairline: 0.22,
+  dmAoHairline: 1.45,
+  aoSymbolHairline: 0.48,
+  dmAoSymbolHairline: 1.3,
+  aoHairlineWidth: 4,
+  aoDirectional: 1,
+  aoTintL: 0.45,
+  aoTintC: 0.12,
+  aoTintH: 280,
+  dmAoTintL: 0.08,
+  dmAoTintC: 0.04,
+  dmAoTintH: 280,
+  aoRadius: 26,
+  aoFalloff: 1.1,
+  aoRelief: 6,
+  aoLift: -0.8,
+  scratch: 0.045,
+  scratchScale: 376,
+  scratchGrain: 0.4,
+  scratchDots: 4,
+  cloud: 0.025,
+  dmCloud: 0.008,
+  cloudScale: 107,
+  vein: 1,
   vigCells: 1,
   vigCut: 1,
   vigJitter: 0.02,
@@ -1190,13 +1328,14 @@ const VIEWS = [
   'Tile height',
   'World height',
   'Albedo',
+  'Ambient occlusion',
 ];
 
 const CLAY_SLIDERS: Slider[] = [
   { key: 'clayTilt', min: 0, max: 0.3, step: 0.005 },
   { key: 'clayThickness', min: 0, max: 3, step: 0.05 },
-  { key: 'clayWobble', min: 0, max: 12, step: 0.05 },
-  { key: 'clayScale', min: 4, max: 120, step: 1 },
+  { key: 'clayWobble', min: 0, max: 3, step: 0.01 },
+  { key: 'clayScale', min: 4, max: 600, step: 1 },
 ];
 
 const GLASS_SLIDERS: Slider[] = [
@@ -1249,9 +1388,46 @@ const TEXT_SLIDERS: Slider[] = [
 
 const SHADOW_SLIDERS: Slider[] = [
   { key: 'shadowStrength', min: 0, max: 1, step: 0.01 },
-  { key: 'dmShadow', min: 0, max: 6, step: 0.1 },
+  { key: 'dmShadow', min: 0, max: 12, step: 0.1 },
   { key: 'shadowHeight', min: 0, max: 80, step: 0.5 },
   { key: 'shadowSoft', min: 0.5, max: 30, step: 0.5 },
+];
+
+const AO_SLIDERS: Slider[] = [
+  { key: 'aoIntensity', min: 0, max: 5, step: 0.01 },
+  { key: 'dmAoIntensity', min: 0, max: 10, step: 0.05 },
+  { key: 'aoStrength', min: 0, max: 1, step: 0.01 },
+  { key: 'dmAoStrength', min: 0, max: 1, step: 0.01 },
+  { key: 'aoRadius', min: 1, max: 300, step: 1 },
+  { key: 'aoFalloff', min: 0.05, max: 5, step: 0.05 },
+  { key: 'aoRelief', min: 0.25, max: 12, step: 0.25 },
+  { key: 'aoLift', min: -1, max: 1, step: 0.05 },
+  { key: 'aoDirectional', min: 0, max: 1, step: 0.01 },
+  { key: 'aoHairline', min: 0, max: 3, step: 0.01 },
+  { key: 'dmAoHairline', min: 0, max: 3, step: 0.01 },
+  { key: 'aoSymbolHairline', min: 0, max: 6, step: 0.01 },
+  { key: 'dmAoSymbolHairline', min: 0, max: 6, step: 0.01 },
+  { key: 'aoHairlineWidth', min: 0.25, max: 24, step: 0.25 },
+  { key: 'aoTintL', min: 0, max: 1, step: 0.01 },
+  { key: 'aoTintC', min: 0, max: 0.3, step: 0.005 },
+  { key: 'aoTintH', min: 0, max: 360, step: 1 },
+  { key: 'dmAoTintL', min: 0, max: 1, step: 0.01 },
+  { key: 'dmAoTintC', min: 0, max: 0.3, step: 0.005 },
+  { key: 'dmAoTintH', min: 0, max: 360, step: 1 },
+];
+
+const SCRATCH_SLIDERS: Slider[] = [
+  { key: 'scratch', min: 0, max: 0.5, step: 0.005 },
+  { key: 'scratchScale', min: 64, max: 1024, step: 8 },
+  { key: 'scratchGrain', min: 0, max: 1.5, step: 0.005 },
+  { key: 'scratchDots', min: 0, max: 12, step: 0.05 },
+];
+
+const CLOUD_SLIDERS: Slider[] = [
+  { key: 'cloud', min: 0, max: 0.5, step: 0.005 },
+  { key: 'dmCloud', min: 0, max: 0.2, step: 0.002 },
+  { key: 'cloudScale', min: 20, max: 800, step: 5 },
+  { key: 'vein', min: 0, max: 1, step: 0.01 },
 ];
 
 const LIGHT_MODE_SLIDERS: Slider[] = [
@@ -1403,6 +1579,30 @@ function buildUniforms(settings: Settings, focus: Focus, palette: Palette, mode:
     u_shadow_strength: { type: 'uniform1f', value: settings.shadowStrength * (light ? 1 : settings.dmShadow) },
     u_shadow_height: { type: 'uniform1f', value: settings.shadowHeight },
     u_shadow_soft: { type: 'uniform1f', value: settings.shadowSoft },
+    u_ao: { type: 'uniform1f', value: light ? settings.aoIntensity : settings.dmAoIntensity },
+    u_ao_multiply: { type: 'uniform1f', value: light ? 1 : 0 },
+    u_cloud: { type: 'uniform1f', value: light ? settings.cloud : 0 },
+    u_cloud_add: { type: 'uniform1f', value: light ? 0 : settings.dmCloud },
+    u_cloud_scale: { type: 'uniform1f', value: settings.cloudScale },
+    u_vein: { type: 'uniform1f', value: settings.vein },
+    u_scratch: { type: 'uniform1f', value: settings.scratch },
+    u_scratch_scale: { type: 'uniform1f', value: settings.scratchScale },
+    u_scratch_grain: { type: 'uniform1f', value: settings.scratchGrain },
+    u_scratch_dots: { type: 'uniform1f', value: settings.scratchDots },
+    u_ao_lift: { type: 'uniform1f', value: settings.aoLift },
+    u_ao_strength: { type: 'uniform1f', value: light ? settings.aoStrength : settings.dmAoStrength },
+    u_ao_color: {
+      type: 'uniform3f',
+      value: light
+        ? oklchToLinear(settings.aoTintL, settings.aoTintC, settings.aoTintH)
+        : oklchToLinear(settings.dmAoTintL, settings.dmAoTintC, settings.dmAoTintH),
+    },
+    u_ao_hairline: { type: 'uniform1f', value: light ? settings.aoHairline : settings.dmAoHairline },
+    u_ao_symbol_hairline: {
+      type: 'uniform1f',
+      value: light ? settings.aoSymbolHairline : settings.dmAoSymbolHairline,
+    },
+    u_ao_hairline_width: { type: 'uniform1f', value: settings.aoHairlineWidth },
     u_vig_cells: { type: 'uniform1f', value: settings.vigCells },
     u_vig_cut: { type: 'uniform1f', value: settings.vigCut },
     u_vig_jitter: { type: 'uniform1f', value: settings.vigJitter },
@@ -1499,7 +1699,7 @@ function SliderRow({
 }) {
   const { key, min, max, step } = slider;
   return (
-    <label className='grid grid-cols-[5rem_1fr_2.5rem] items-center gap-2'>
+    <label className='grid grid-cols-[5rem_1fr_3.25rem] items-center gap-2'>
       <span>{key}</span>
       <input
         type='range'
@@ -1509,7 +1709,18 @@ function SliderRow({
         value={settings[key]}
         onChange={event => onChange({ ...settings, [key]: Number(event.target.value) })}
       />
-      <span className='text-right tabular-nums'>{settings[key]}</span>
+      <input
+        type='number'
+        aria-label={`${key} value`}
+        className='w-full rounded border border-transparent bg-transparent text-right tabular-nums [appearance:textfield] hover:border-neutral-300 focus:border-neutral-400 dark:hover:border-neutral-700 [&::-webkit-inner-spin-button]:appearance-none'
+        step={step}
+        value={settings[key]}
+        onChange={event => {
+          if (event.target.value !== '') {
+            onChange({ ...settings, [key]: Number(event.target.value) });
+          }
+        }}
+      />
     </label>
   );
 }
@@ -1612,6 +1823,9 @@ export function Panel({
       <PanelSection title='Prism'>{sliders(PRISM_SLIDERS)}</PanelSection>
       <PanelSection title='Text clearance'>{sliders(TEXT_SLIDERS)}</PanelSection>
       <PanelSection title='Shadow'>{sliders(SHADOW_SLIDERS)}</PanelSection>
+      <PanelSection title='Ambient occlusion'>{sliders(AO_SLIDERS)}</PanelSection>
+      <PanelSection title='Surface detail'>{sliders(SCRATCH_SLIDERS)}</PanelSection>
+      <PanelSection title='Cloud and veins'>{sliders(CLOUD_SLIDERS)}</PanelSection>
       <PanelSection title='Light mode'>{sliders(LIGHT_MODE_SLIDERS)}</PanelSection>
       <PanelSection title='Sheen'>{sliders(SHEEN_SLIDERS)}</PanelSection>
       <PanelSection title='Backlight'>{sliders(BACKLIGHT_SLIDERS)}</PanelSection>
@@ -1721,7 +1935,42 @@ export function MosaicScene({ framed = false }: { framed?: boolean }) {
     }),
     [spring, lightX, follow],
   );
-  const { sheen } = settings;
+  const { sheen, aoRadius, aoFalloff, aoRelief, aoDirectional, lightY } = settings;
+  const aoRendererRef = React.useRef<ReturnType<typeof createAoRenderer> | null>(null);
+  const [aoTextures, setAoTextures] = React.useState<DynamicTextures>();
+  React.useEffect(() => () => aoRendererRef.current?.dispose(), []);
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const scene = sceneRef.current;
+      if (!scene || !scene.offsetWidth || !scene.offsetHeight) {
+        return;
+      }
+      try {
+        aoRendererRef.current ??= createAoRenderer(source, AO_PREVIEW);
+        const canvas = aoRendererRef.current.render(
+          uniforms,
+          {
+            width: scene.offsetWidth,
+            height: scene.offsetHeight,
+            margin: 0,
+            scale: Math.round(Math.max(1, Math.min(window.devicePixelRatio ?? 1, 2))),
+          },
+          {
+            radius: aoRadius,
+            falloff: aoFalloff,
+            relief: aoRelief,
+            bias: AO_BIAS,
+            directional: aoDirectional,
+            light: { x: lightX * scene.offsetWidth, y: -lightY },
+          },
+        );
+        setAoTextures(current => ({ u_ao_map: { source: canvas, version: (current?.u_ao_map.version ?? 0) + 1 } }));
+      } catch (error) {
+        console.error(error);
+      }
+    }, AO_DEBOUNCE);
+    return () => window.clearTimeout(timer);
+  }, [uniforms, height, aoRadius, aoFalloff, aoRelief, aoDirectional, lightX, lightY]);
   const [bakeStatus, setBakeStatus] = React.useState('');
   const bake = React.useCallback(() => {
     const scene = sceneRef.current;
@@ -1729,8 +1978,24 @@ export function MosaicScene({ framed = false }: { framed?: boolean }) {
       return;
     }
     setBakeStatus('Baking…');
+    const aoRenderer = createAoRenderer(source, AO_BAKE);
+    aoRenderer.render(
+      uniforms,
+      { width: scene.offsetWidth, height: scene.offsetHeight, margin: BAKE_MARGIN, scale: BAKE_SCALE },
+      {
+        radius: aoRadius,
+        falloff: aoFalloff,
+        relief: aoRelief,
+        bias: AO_BIAS,
+        directional: aoDirectional,
+        light: { x: lightX * scene.offsetWidth, y: -lightY },
+      },
+    );
+    const ao = aoRenderer.read();
+    aoRenderer.dispose();
     bakeScene({
       source,
+      ao,
       uniforms,
       width: scene.offsetWidth,
       height: scene.offsetHeight,
@@ -1744,7 +2009,7 @@ export function MosaicScene({ framed = false }: { framed?: boolean }) {
         setBakeStatus(`Baked ${meta.width}×${meta.height}: ${files.join(', ')}`);
       })
       .catch((error: unknown) => setBakeStatus(error instanceof Error ? error.message : 'Bake failed'));
-  }, [uniforms, focus, settings, scale, target]);
+  }, [uniforms, focus, settings, scale, target, aoRadius, aoFalloff, aoRelief, aoDirectional, lightX, lightY]);
   const bakeRef = React.useRef(bake);
   const setSettingsRef = React.useRef(setSettings);
   React.useEffect(() => {
@@ -1792,6 +2057,7 @@ export function MosaicScene({ framed = false }: { framed?: boolean }) {
           source={source}
           uniforms={uniforms}
           liveUniforms={liveUniforms}
+          dynamicTextures={aoTextures}
           shouldRender={shouldRender}
           onRender={stepSceneTrail}
           premultiplied
@@ -1799,14 +2065,17 @@ export function MosaicScene({ framed = false }: { framed?: boolean }) {
       </div>
       {process.env.NODE_ENV === 'development' && mounted && !framed
         ? createPortal(
-            <Panel
-              settings={settings}
-              onChange={setSettings}
-              onBake={bake}
-              bakeStatus={bakeStatus}
-              defaults={target === 'mobile' ? MOBILE_DEFAULTS : DEFAULTS}
-              target={target}
-            />,
+            <>
+              <ThemeToggle className='bg-background fixed right-4 top-4 z-50' />
+              <Panel
+                settings={settings}
+                onChange={setSettings}
+                onBake={bake}
+                bakeStatus={bakeStatus}
+                defaults={target === 'mobile' ? MOBILE_DEFAULTS : DEFAULTS}
+                target={target}
+              />
+            </>,
             document.body,
           )
         : null}

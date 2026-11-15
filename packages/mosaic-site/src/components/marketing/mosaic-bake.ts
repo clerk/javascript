@@ -4,9 +4,11 @@ import type { Uniforms } from '@/components/shader';
 export const BAKE_SCALE = 2;
 const PAD = 48;
 const REVEAL_DOWNSAMPLE = 4;
-const MARGIN = 400;
+const SHADE_DOWNSAMPLE = 2;
+export const BAKE_MARGIN = 400;
+const MARGIN = BAKE_MARGIN;
 
-const bakeVertexSource = `#version 300 es
+export const bakeVertexSource = `#version 300 es
 precision highp float;
 in vec2 coordinates;
 
@@ -23,9 +25,9 @@ void main(void) {
 }
 `;
 
-type Pass = { data: Uint8Array; width: number; height: number };
+export type Pass = { data: Uint8Array; width: number; height: number };
 
-function compile(gl: WebGL2RenderingContext, type: number, source: string) {
+export function compile(gl: WebGL2RenderingContext, type: number, source: string) {
   const shader = gl.createShader(type);
   if (!shader) {
     throw new Error('Could not create shader');
@@ -38,7 +40,11 @@ function compile(gl: WebGL2RenderingContext, type: number, source: string) {
   return shader;
 }
 
-function setUniform(gl: WebGL2RenderingContext, location: WebGLUniformLocation | null, uniform: Uniforms[string]) {
+export function setUniform(
+  gl: WebGL2RenderingContext,
+  location: WebGLUniformLocation | null,
+  uniform: Uniforms[string],
+) {
   switch (uniform.type) {
     case 'uniform1f':
       gl.uniform1f(location, uniform.value);
@@ -222,6 +228,36 @@ function revealTextures(
   return { data, width: outWidth, height: outHeight };
 }
 
+function shadeTexture(
+  ao: { data: Uint8Array; width: number; height: number },
+  cloud: { data: Uint8Array; width: number; height: number },
+) {
+  const small = SHADE_DOWNSAMPLE;
+  const outWidth = Math.ceil(ao.width / small);
+  const outHeight = Math.ceil(ao.height / small);
+  const data = new Uint8Array(outWidth * outHeight * 2);
+  [ao, cloud].forEach((source, half) => {
+    for (let y = 0; y < outHeight; y += 1) {
+      for (let x = 0; x < outWidth; x += 1) {
+        let sum = 0;
+        let count = 0;
+        for (let dy = 0; dy < small; dy += 1) {
+          for (let dx = 0; dx < small; dx += 1) {
+            const sy = y * small + dy;
+            const sx = x * small + dx;
+            if (sy < source.height && sx < source.width) {
+              sum += source.data[sy * source.width + sx];
+              count += 1;
+            }
+          }
+        }
+        data[(half * outHeight + y) * outWidth + x] = Math.round(sum / Math.max(count, 1));
+      }
+    }
+  });
+  return { data, width: outWidth, height: outHeight * 2 };
+}
+
 async function upload(file: string, image: { data: Uint8Array; width: number; height: number }, channels: number) {
   const params = new URLSearchParams({
     file,
@@ -245,8 +281,10 @@ export async function bakeScene({
   focusSize,
   target,
   settings,
+  ao,
 }: {
   source: string;
+  ao: Pass;
   uniforms: Uniforms;
   width: number;
   height: number;
@@ -269,6 +307,12 @@ export async function bakeScene({
     height,
   );
   const maskImage = crop(mask, box, [0, 3]);
+  const aoImage = crop(ao, box, [0]);
+  const cloudImage = crop(
+    renderPass(source, { ...view, u_bake: { type: 'uniform1i', value: 5 } }, width, height),
+    box,
+    [0],
+  );
   const skeletonImage = crop(
     renderPass(source, { ...view, u_bake: { type: 'uniform1i', value: 3 } }, width, height),
     box,
@@ -279,6 +323,7 @@ export async function bakeScene({
     await upload(`surface${suffix}.webp`, crop(surface, box, [0, 1, 2, 3]), 4),
     await upload(`skeleton${suffix}.webp`, skeletonImage, 2),
     await upload(`reveal${suffix}.webp`, revealTextures(maskImage, skeletonImage), 3),
+    await upload(`shade${suffix}.webp`, shadeTexture(aoImage, cloudImage), 1),
   ];
   const meta = {
     version: Date.now(),
