@@ -40,8 +40,8 @@ export const COMPONENT_STATUS: ComponentRow[] = [
     beta: 'SignIn',
     status: 'in-progress',
   },
-  { stable: 'CreateOrganization', beta: 'CreateOrganization', status: 'in-progress' },
-  { stable: 'OrganizationList', beta: 'OrganizationList', status: 'in-progress' },
+  { stable: 'CreateOrganization', beta: 'CreateOrganization', status: 'done' },
+  { stable: 'OrganizationList', beta: 'OrganizationList', status: 'done' },
   { stable: 'Waitlist', beta: 'Waitlist', status: 'done' },
   {
     stable: 'APIKeys',
