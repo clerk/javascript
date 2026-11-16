@@ -21,7 +21,7 @@ export function ComponentStatusTable() {
       <Container className='pb-32'>
         <h2
           id='component-status'
-          className='heading-4 sm:heading-3'
+          className='heading-4 sm:heading-3 font-normal!'
         >
           Component support
         </h2>
@@ -48,7 +48,12 @@ export function ComponentStatusTable() {
                       aria-hidden='true'
                       className='h-4'
                     />
-                    <Badge tone='purple'>Beta</Badge>
+                    <Badge
+                      tone='purple'
+                      className='font-normal'
+                    >
+                      Beta
+                    </Badge>
                     <span className='sr-only'>Clerk UI beta</span>
                   </span>
                 </th>
@@ -70,7 +75,7 @@ export function ComponentStatusTable() {
               {COMPONENT_STATUS.map(row => (
                 <tr
                   key={row.stable}
-                  className='border-border label-3 border-b'
+                  className='border-border label-3 border-b font-normal [&_code]:font-normal [&_strong]:font-normal'
                 >
                   <td className='py-3 pr-4 text-neutral-600 dark:text-neutral-400'>
                     <code className='code-inline'>{`<${row.stable} />`}</code>
@@ -90,7 +95,7 @@ export function ComponentStatusTable() {
                     )}
                   </td>
                   <td className='whitespace-nowrap py-3 pl-4'>
-                    <Badge className='w-fit gap-1.5'>
+                    <Badge className='w-fit gap-1.5 font-normal'>
                       {STATUS[row.status].icon}
                       {STATUS[row.status].label}
                     </Badge>
