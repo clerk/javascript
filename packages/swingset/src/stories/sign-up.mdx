@@ -92,6 +92,12 @@ import { SignUpView } from '@clerk/mosaic/features/sign-up';
 
 <Story name='ContinueLegalConsentOnly' storyModule={Stories} />
 
+#### Nothing left to fill in
+
+With no fields and no consent, the step still offers Continue.
+
+<Story name='ContinueNoFields' storyModule={Stories} />
+
 ### Access restricted
 
 Shown when the instance does not take sign-ups: `restricted` offers support, `waitlist` offers the waitlist.
@@ -111,6 +117,10 @@ The phone number screen for an alternative channel, the code screens, and the em
 #### Alternative phone channel
 
 <Story name='AlternativePhone' storyModule={Stories} />
+
+#### Alternative phone channel with legal consent
+
+<Story name='AlternativePhoneLegalConsent' storyModule={Stories} />
 
 #### Verify email
 
@@ -143,6 +153,10 @@ Picking an enterprise connection or a Solana wallet.
 #### Wallets
 
 <Story name='Wallets' storyModule={Stories} />
+
+#### A single wallet
+
+<Story name='WalletsSingle' storyModule={Stories} />
 
 ### Flow notices
 
