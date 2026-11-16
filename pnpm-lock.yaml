@@ -259,6 +259,7 @@ overrides:
   react-dom: 18.3.1
   rolldown: 1.1.0
   semver@<7.7.3: 7.7.4
+  shadcn: 4.11.0
   smol-toml@<1.6.1: 1.7.1
   socket.io-parser@>=4.0.0 <4.2.7: 4.2.7
   svgo@>=3.0.0 <3.3.3: 4.1.0
@@ -1356,7 +1357,7 @@ importers:
         specifier: ^4.0.0
         version: 4.0.1(supports-color@10.2.2)
       shadcn:
-        specifier: ^4.10.0
+        specifier: 4.11.0
         version: 4.11.0(@cfworker/json-schema@4.1.1)(babel-plugin-macros@3.1.0)(supports-color@10.2.2)(typescript@7.0.2)
       shiki:
         specifier: ^1.0.0
