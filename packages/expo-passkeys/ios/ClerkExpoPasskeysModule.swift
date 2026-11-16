@@ -2,6 +2,7 @@ import ExpoModulesCore
 
 struct GetPasskeyOptions: Record {
     @Field var preferImmediatelyAvailableCredentials: Bool = false
+    @Field var userVerification: String? = nil
 }
 
 @available(iOS 15.0, *)
@@ -16,11 +17,11 @@ public class ClerkExpoPasskeysModule: Module {
         }
         
         AsyncFunction("get") { (challenge: String, rpId:String, promise: Promise) in
-            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, preferImmediatelyAvailableCredentials: false, promise: promise)
+            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, preferImmediatelyAvailableCredentials: false, userVerification: nil, promise: promise)
         }
         
         AsyncFunction("getWithOptions") { (challenge: String, rpId: String, options: GetPasskeyOptions, promise: Promise) in
-            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, preferImmediatelyAvailableCredentials: options.preferImmediatelyAvailableCredentials, promise: promise)
+            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, preferImmediatelyAvailableCredentials: options.preferImmediatelyAvailableCredentials, userVerification: options.userVerification, promise: promise)
         }
         
         AsyncFunction("autofill") { (challenge: String, rpId:String, promise: Promise) in
