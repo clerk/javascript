@@ -18,7 +18,6 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles as flowStyles } from '../../auth-flow/auth-flow.styles';
 import { styles } from '../sign-up.styles';
 import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';
 import { signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
@@ -88,7 +87,7 @@ export function SignUpDetailsStep({
       </Card.Banner>
       <Card.Content>
         <div
-          {...stylex.props(isChallengeShown ? flowStyles.spotlightHidden : flowStyles.spotlightGroup)}
+          {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
           {...inertProps(isChallengeShown)}
         >
           <SignUpProviders
@@ -131,7 +130,7 @@ export function SignUpDetailsStep({
         ) : null}
       </Card.Content>
       {hasForm ? (
-        <Card.Footer xstyle={isChallengeShown && flowStyles.spotlightHidden}>
+        <Card.Footer xstyle={isChallengeShown && styles.spotlightHidden}>
           <SubmitButton
             form={form.id}
             fullWidth
@@ -284,16 +283,16 @@ function SignUpProviders({
       {showDivider ? (
         <div
           role='separator'
-          {...stylex.props(flowStyles.divider)}
+          {...stylex.props(styles.divider)}
         >
-          <span {...stylex.props(flowStyles.dividerLine)} />
+          <span {...stylex.props(styles.dividerLine)} />
           <Text
             size='sm'
             color='foreground-secondary'
           >
             {m.form.divider}
           </Text>
-          <span {...stylex.props(flowStyles.dividerLine)} />
+          <span {...stylex.props(styles.dividerLine)} />
         </div>
       ) : null}
     </>
@@ -307,7 +306,7 @@ function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?
   }
 
   return (
-    <div {...stylex.props(firstName && lastName ? flowStyles.nameRow : styles.fieldStack)}>
+    <div {...stylex.props(firstName && lastName ? styles.nameRow : styles.fieldStack)}>
       {firstName ? (
         <TextField
           {...firstName}

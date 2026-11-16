@@ -17,7 +17,6 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles as flowStyles } from '../../auth-flow/auth-flow.styles';
 import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';
 import type {
@@ -167,7 +166,7 @@ function IdentifierStart({
       </Card.Banner>
       <Card.Content>
         <div
-          {...stylex.props(isChallengeShown ? flowStyles.spotlightHidden : flowStyles.spotlightGroup)}
+          {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
           {...inertProps(isChallengeShown)}
         >
           <SignInProviders
@@ -215,7 +214,7 @@ function IdentifierStart({
       </Card.Content>
       {field ? (
         <Card.Footer
-          xstyle={isChallengeShown && flowStyles.spotlightHidden}
+          xstyle={isChallengeShown && styles.spotlightHidden}
           {...inertProps(isChallengeShown)}
         >
           <SubmitButton
@@ -462,16 +461,16 @@ function SignInProviders({
       {showDivider ? (
         <div
           role='separator'
-          {...stylex.props(flowStyles.divider)}
+          {...stylex.props(styles.divider)}
         >
-          <span {...stylex.props(flowStyles.dividerLine)} />
+          <span {...stylex.props(styles.dividerLine)} />
           <Text
             size='sm'
             color='foreground-secondary'
           >
             {m.start.divider}
           </Text>
-          <span {...stylex.props(flowStyles.dividerLine)} />
+          <span {...stylex.props(styles.dividerLine)} />
         </div>
       ) : null}
     </>
