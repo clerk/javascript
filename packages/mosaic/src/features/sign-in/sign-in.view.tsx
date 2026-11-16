@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
+import { AuthIdentityPreview } from '../../blocks/auth';
 import type { VerificationCodeResend } from '../../blocks/verification';
 import { VerificationCode } from '../../blocks/verification';
 import { Card } from '../../components/card';
@@ -8,11 +9,18 @@ import { Flow } from '../../components/flow';
 import type { MosaicMessages } from '../../localization';
 import { fill, rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
-import { codeCopy, codeIdentity, codeNotice, codeResendCopy, codeSecondaryAction } from '../auth-flow/auth-flow.utils';
-import { IdentityPreview } from '../auth-flow/steps/identity-preview';
 import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
 import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
-import { backupCodeDescription, stepIds, stepKey } from './sign-in.utils';
+import {
+  backupCodeDescription,
+  codeCopy,
+  codeIdentity,
+  codeNotice,
+  codeResendCopy,
+  codeSecondaryAction,
+  stepIds,
+  stepKey,
+} from './sign-in.utils';
 import { ChoiceStep } from './steps/choice-step';
 import { CredentialStep } from './steps/credential-step';
 import { IdentifierStep } from './steps/identifier-step';
@@ -147,7 +155,7 @@ export function SignInView({
         resend={resendFor(codeResendCopy(current, m))}
         identity={
           identity.identifier ? (
-            <IdentityPreview
+            <AuthIdentityPreview
               identifier={identity.identifier}
               editLabel={identity.editLabel}
               disabled={isPending}

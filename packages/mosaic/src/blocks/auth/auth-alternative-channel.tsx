@@ -2,35 +2,51 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode, Ref } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { Field } from '../../../components/field';
-import { useFlowAutoFocus } from '../../../components/flow';
-import type { FieldFeedback, UseFormResult } from '../../../components/form';
-import { PhoneInput } from '../../../components/phone-input';
-import { fill, useMessages } from '../../../localization';
-import { Form } from '../../../primitives/form';
-import { styles } from '../auth-flow.styles';
-import type { AuthFlowProvider, AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow.types';
-import { FlowCaptcha } from './captcha';
+import { Button, SubmitButton } from '../../components/button';
+import { Card } from '../../components/card';
+import { Field } from '../../components/field';
+import { useFlowAutoFocus } from '../../components/flow';
+import type { FieldFeedback, UseFormResult } from '../../components/form';
+import { PhoneInput } from '../../components/phone-input';
+import { fill } from '../../localization';
+import { Form } from '../../primitives/form';
+import { styles } from './auth.styles';
+import type { AuthProvider } from './auth.types';
+import { AuthCaptcha } from './auth-captcha';
 
-interface AlternativeChannelStepProps {
-  channel: AuthFlowProvider;
+export interface AuthAlternativeChannelMessages {
+  title: string;
+  description: string;
+  fieldLabel: string;
+  phonePlaceholder: string;
+  selectedCountry: string;
+  chooseCountry: string;
+  searchCountries: string;
+  countrySearchPlaceholder: string;
+  noCountries: string;
+  secondaryActionLabel: string;
+  primaryActionLabel: string;
+  pendingLabel: string;
+}
+
+interface AuthAlternativeChannelProps<TValues extends { phoneNumber: string }> {
+  messages: AuthAlternativeChannelMessages;
+  channel: AuthProvider;
   applicationName: string;
   logo?: { src: string; alt: string };
-  form: UseFormResult<AuthFlowValues>;
+  form: UseFormResult<TValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
   isPending: boolean;
   isDisabled: boolean;
-  onSubmit: (event: AuthFlowSubmitEvent) => void;
+  onSubmit: (event: { preventDefault: () => void }) => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
-  copy?: { title: string; description: string; label: string };
   children?: ReactNode;
 }
 
-export function AlternativeChannelStep({
+export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>({
+  messages,
   channel,
   applicationName,
   logo,
@@ -42,15 +58,12 @@ export function AlternativeChannelStep({
   onSubmit,
   onCancel,
   focusRef,
-  copy: copyProp,
   children,
-}: AlternativeChannelStepProps) {
-  const m = useMessages('signIn');
+}: AuthAlternativeChannelProps<TValues>) {
   const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
   const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
   const provider = channel.name;
-  const copy = copyProp ?? m.alternativeChannel;
 
   return (
     <>
@@ -64,8 +77,8 @@ export function AlternativeChannelStep({
             />
           </Card.Media>
         ) : null}
-        <Card.Title>{fill(copy.title, { applicationName, provider })}</Card.Title>
-        <Card.Description>{fill(copy.description, { provider })}</Card.Description>
+        <Card.Title>{fill(messages.title, { applicationName, provider })}</Card.Title>
+        <Card.Description>{fill(messages.description, { provider })}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -85,16 +98,16 @@ export function AlternativeChannelStep({
               disabled={isDisabled}
               focusableWhenDisabled
             >
-              <Field.Label>{fill(copy.label, { provider })}</Field.Label>
+              <Field.Label>{fill(messages.fieldLabel, { provider })}</Field.Label>
               <PhoneInput
                 ref={phoneRef}
                 autoComplete='tel'
-                placeholder={m.start.phonePlaceholder}
-                countryTriggerLabel={m.start.selectedCountry}
-                countryPopupLabel={m.start.chooseCountry}
-                countrySearchLabel={m.start.searchCountries}
-                countrySearchPlaceholder={m.start.countrySearchPlaceholder}
-                noResultsMessage={m.start.noCountries}
+                placeholder={messages.phonePlaceholder}
+                countryTriggerLabel={messages.selectedCountry}
+                countryPopupLabel={messages.chooseCountry}
+                countrySearchLabel={messages.searchCountries}
+                countrySearchPlaceholder={messages.countrySearchPlaceholder}
+                noResultsMessage={messages.noCountries}
                 {...phone}
               />
               <Field.Feedback feedback={feedback} />
@@ -102,7 +115,7 @@ export function AlternativeChannelStep({
             {children}
           </div>
         </Form>
-        <FlowCaptcha />
+        <AuthCaptcha />
       </Card.Content>
       <Card.Footer>
         {onCancel ? (
@@ -114,16 +127,16 @@ export function AlternativeChannelStep({
             disabled={isDisabled}
             onClick={onCancel}
           >
-            {m.useAnotherMethod}
+            {messages.secondaryActionLabel}
           </Button>
         ) : null}
         <SubmitButton
           form={form.id}
           fullWidth
           isPending={isPending}
-          pendingLabel={m.verifying}
+          pendingLabel={messages.pendingLabel}
         >
-          {m.continue}
+          {messages.primaryActionLabel}
         </SubmitButton>
       </Card.Footer>
     </>

@@ -1,17 +1,22 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
-import type { VerificationCodeResend } from '../../../blocks/verification';
-import { Banner } from '../../../components/banner';
-import { Button } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
-import { useMessages } from '../../../localization';
-import { IdentityPreview } from './identity-preview';
+import { Banner } from '../../components/banner';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
+import type { VerificationCodeResend } from '../verification';
+import { AuthIdentityPreview } from './auth-identity-preview';
 
-interface EmailLinkNoticeProps {
+export interface AuthEmailLinkMessages {
   title: string;
   description: string;
+  editIdentifier: string;
+  secondaryActionLabel: string;
+}
+
+interface AuthEmailLinkProps {
+  messages: AuthEmailLinkMessages;
   identifier: string;
   onEditIdentifier?: () => void;
   globalErrorMessage?: string;
@@ -22,9 +27,8 @@ interface EmailLinkNoticeProps {
   notice?: string;
 }
 
-export function EmailLinkNotice({
-  title,
-  description,
+export function AuthEmailLink({
+  messages,
   identifier,
   onEditIdentifier,
   globalErrorMessage,
@@ -33,18 +37,17 @@ export function EmailLinkNotice({
   onCancel,
   focusRef,
   notice,
-}: EmailLinkNoticeProps) {
-  const m = useMessages('signIn');
+}: AuthEmailLinkProps) {
   const ref = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
 
   return (
     <>
       <Card.Header>
-        <Card.Title>{title}</Card.Title>
-        <Card.Description>{description}</Card.Description>
-        <IdentityPreview
+        <Card.Title>{messages.title}</Card.Title>
+        <Card.Description>{messages.description}</Card.Description>
+        <AuthIdentityPreview
           identifier={identifier}
-          editLabel={m.editIdentifier}
+          editLabel={messages.editIdentifier}
           disabled={isPending}
           onEdit={onEditIdentifier}
         />
@@ -88,7 +91,7 @@ export function EmailLinkNotice({
             disabled={isPending}
             onClick={onCancel}
           >
-            {m.useAnotherMethod}
+            {messages.secondaryActionLabel}
           </Button>
         </Card.Footer>
       ) : null}

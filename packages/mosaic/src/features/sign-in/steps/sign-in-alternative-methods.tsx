@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
+import { styles as authStyles } from '../../../blocks/auth/auth.styles';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -10,7 +11,6 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import type { IconComponent } from '../../../icons/glyph';
 import { fill, useMessages } from '../../../localization';
-import { styles as flowStyles } from '../../auth-flow/auth-flow.styles';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 
@@ -77,7 +77,7 @@ export function SignInAlternativeMethods({
                     <img
                       src={provider.iconUrl}
                       alt=''
-                      {...stylex.props(flowStyles.providerIcon)}
+                      {...stylex.props(authStyles.providerIcon)}
                     />
                   }
                   longLabel={fill(m.start.socialButton, { provider: provider.name })}
@@ -110,7 +110,7 @@ export function SignInAlternativeMethods({
         {onBack ? (
           <Text
             size='sm'
-            xstyle={flowStyles.footerText}
+            xstyle={authStyles.footerText}
           >
             <Button
               type='button'
@@ -127,7 +127,7 @@ export function SignInAlternativeMethods({
         <Text
           size='xs'
           color='foreground-secondary'
-          xstyle={flowStyles.footerText}
+          xstyle={authStyles.footerText}
         >
           {m.alternativeMethods.helpPrompt}{' '}
           <Button

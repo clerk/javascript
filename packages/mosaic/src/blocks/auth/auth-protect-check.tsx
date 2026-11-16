@@ -1,15 +1,22 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import { Button } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
-import { Spinner } from '../../../components/spinner';
-import { useSpinDelay } from '../../../hooks/use-spin-delay';
-import { useMessages } from '../../../localization';
-import { styles } from '../auth-flow.styles';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
+import { Spinner } from '../../components/spinner';
+import { useSpinDelay } from '../../hooks/use-spin-delay';
+import { styles } from './auth.styles';
 
-interface ProtectCheckNoticeProps {
+export interface AuthProtectCheckMessages {
+  title: string;
+  description: string;
+  retry: string;
+  loading: string;
+}
+
+interface AuthProtectCheckProps {
+  messages: AuthProtectCheckMessages;
   challenge: boolean;
   logo?: { src: string; alt: string };
   globalErrorMessage?: string;
@@ -18,15 +25,15 @@ interface ProtectCheckNoticeProps {
   onRetry?: () => void;
 }
 
-export function ProtectCheckNotice({
+export function AuthProtectCheck({
+  messages,
   challenge,
   logo,
   globalErrorMessage,
   isPending,
   containerRef,
   onRetry,
-}: ProtectCheckNoticeProps) {
-  const m = useMessages('signIn');
+}: AuthProtectCheckProps) {
   const retryRef = useFlowAutoFocus<HTMLButtonElement>();
   const spinning = useSpinDelay(isPending ? true : null, { delay: 300 });
 
@@ -42,8 +49,8 @@ export function ProtectCheckNotice({
             />
           </Card.Media>
         ) : null}
-        <Card.Title>{m.protectCheck.title}</Card.Title>
-        <Card.Description>{m.protectCheck.description}</Card.Description>
+        <Card.Title>{messages.title}</Card.Title>
+        <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -58,7 +65,7 @@ export function ProtectCheckNotice({
           aria-busy={isPending}
           {...stylex.props(styles.protectCheckContainer, !challenge && styles.protectCheckContainerEmpty)}
         />
-        {spinning && !globalErrorMessage && !challenge ? <Spinner label={m.loading} /> : null}
+        {spinning && !globalErrorMessage && !challenge ? <Spinner label={messages.loading} /> : null}
         {globalErrorMessage && onRetry ? (
           <Button
             ref={retryRef}
@@ -66,7 +73,7 @@ export function ProtectCheckNotice({
             fullWidth
             onClick={onRetry}
           >
-            {m.protectCheck.retry}
+            {messages.retry}
           </Button>
         ) : null}
       </Card.Content>

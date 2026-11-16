@@ -3,6 +3,8 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React, { type Ref } from 'react';
 
+import { AuthAlternativeChannel, AuthCaptcha } from '../../../blocks/auth';
+import { styles as authStyles } from '../../../blocks/auth/auth.styles';
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -17,8 +19,6 @@ import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles as flowStyles } from '../../auth-flow/auth-flow.styles';
-import { AlternativeChannelStep } from '../../auth-flow/steps/alternative-channel';
-import { FlowCaptcha } from '../../auth-flow/steps/captcha';
 import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';
 import type {
@@ -38,12 +38,27 @@ interface IdentifierStepProps extends Omit<IdentifierStartProps, 'field' | 'next
 }
 
 export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps) {
+  const m = useMessages('signIn');
   const signUp = useMessages('signUp');
   if ('channel' in step) {
+    const copy = step.flow === 'sign-up' ? signUp.alternativePhone : m.alternativeChannel;
     return (
-      <AlternativeChannelStep
+      <AuthAlternativeChannel
+        messages={{
+          title: copy.title,
+          description: copy.description,
+          fieldLabel: copy.label,
+          phonePlaceholder: m.start.phonePlaceholder,
+          selectedCountry: m.start.selectedCountry,
+          chooseCountry: m.start.chooseCountry,
+          searchCountries: m.start.searchCountries,
+          countrySearchPlaceholder: m.start.countrySearchPlaceholder,
+          noCountries: m.start.noCountries,
+          secondaryActionLabel: m.useAnotherMethod,
+          primaryActionLabel: m.continue,
+          pendingLabel: m.verifying,
+        }}
         channel={step.channel}
-        copy={step.flow === 'sign-up' ? signUp.alternativePhone : undefined}
         applicationName={props.applicationName}
         logo={props.logo}
         form={props.form}
@@ -62,7 +77,7 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
             disabled={props.isDisabled}
           />
         ) : null}
-      </AlternativeChannelStep>
+      </AuthAlternativeChannel>
     );
   }
   return (
@@ -138,7 +153,7 @@ function IdentifierStart({
             <img
               src={logo.src}
               alt={logo.alt}
-              {...stylex.props(flowStyles.logo)}
+              {...stylex.props(authStyles.logo)}
             />
           </Card.Media>
         ) : null}
@@ -180,7 +195,7 @@ function IdentifierStart({
             />
           ) : null}
         </div>
-        <FlowCaptcha onInteractiveChange={setIsChallengeShown} />
+        <AuthCaptcha onInteractiveChange={setIsChallengeShown} />
         {onPasskey ? (
           <Button
             type='button'
@@ -271,7 +286,7 @@ function StartForm({
       id={form.id}
       onSubmit={onSubmit}
     >
-      <div {...stylex.props(flowStyles.fieldStack)}>
+      <div {...stylex.props(authStyles.fieldStack)}>
         <Field.Root
           required
           invalid={feedback?.type === 'error'}
@@ -425,7 +440,7 @@ function SignInProviders({
         <img
           src={provider.iconUrl}
           alt=''
-          {...stylex.props(flowStyles.providerIcon)}
+          {...stylex.props(authStyles.providerIcon)}
         />
       }
       longLabel={fill(m.start.socialButton, { provider: provider.name })}
@@ -481,7 +496,7 @@ function StartPrompt({ onSignUp, onJoinWaitlist, isDisabled }: StartPromptProps)
     <Text
       size='sm'
       color='foreground-secondary'
-      xstyle={flowStyles.footerText}
+      xstyle={authStyles.footerText}
     >
       {prompt.text}{' '}
       <Button

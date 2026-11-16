@@ -2,12 +2,12 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
+import { styles } from '../../../blocks/auth/auth.styles';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
-import { styles } from '../../auth-flow/auth-flow.styles';
 
 interface SignUpRestrictedProps {
   waitlist: boolean;

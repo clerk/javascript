@@ -1,14 +1,9 @@
 import type { Ref } from 'react';
 
+import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
-import type {
-  AuthFlowActionBlockedDetails,
-  AuthFlowEmailLinkStatus,
-  AuthFlowProvider,
-  AuthFlowSubmitEvent,
-  AuthFlowValues,
-} from '../auth-flow/auth-flow.types';
+import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
 
@@ -28,14 +23,14 @@ export interface SignUpDetails {
 
 export type SignUpStep =
   | ({ kind: 'details'; purpose: 'start' | 'continue' } & SignUpDetails)
-  | { kind: 'alternative-phone'; channel: AuthFlowProvider; legalConsent?: SignUpLegalConsent }
+  | { kind: 'alternative-phone'; channel: AuthProvider; legalConsent?: SignUpLegalConsent }
   | { kind: 'code'; purpose: 'verify-email' | 'verify-phone'; identifier: string; provider?: string }
-  | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly AuthFlowProvider[] }
+  | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly AuthProvider[] }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
-  | { kind: 'notice'; purpose: 'email-link-status'; status: AuthFlowEmailLinkStatus }
+  | { kind: 'notice'; purpose: 'email-link-status'; status: AuthEmailLinkStatusValue }
   | { kind: 'notice'; purpose: 'restricted' | 'waitlist' | 'loading' }
   | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
-  | { kind: 'notice'; purpose: 'action-blocked'; details?: AuthFlowActionBlockedDetails };
+  | { kind: 'notice'; purpose: 'action-blocked'; details?: AuthActionBlockedDetails };
 
 export type SignUpValues = AuthFlowValues;
 
@@ -46,7 +41,7 @@ export interface SignUpViewProps {
   direction?: FlowDirection;
   applicationName: string;
   applicationLogoUrl?: string;
-  socialProviders: readonly AuthFlowProvider[];
+  socialProviders: readonly AuthProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   form: UseFormResult<SignUpValues>;

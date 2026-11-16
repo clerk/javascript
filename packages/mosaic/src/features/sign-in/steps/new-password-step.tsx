@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 import { useState } from 'react';
 
+import { styles } from '../../../blocks/auth/auth.styles';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Checkbox } from '../../../components/checkbox';
@@ -12,7 +13,6 @@ import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles } from '../../auth-flow/auth-flow.styles';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface NewPasswordStepProps {

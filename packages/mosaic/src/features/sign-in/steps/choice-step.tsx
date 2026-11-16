@@ -1,5 +1,6 @@
 import type { Ref } from 'react';
 
+import { AuthEnterpriseConnections, AuthWallets } from '../../../blocks/auth';
 import type { VerificationMethodPickerMessages } from '../../../blocks/verification';
 import { VerificationMethodPicker } from '../../../blocks/verification';
 import type { IconComponent } from '../../../icons/glyph';
@@ -8,8 +9,7 @@ import { Key } from '../../../icons/glyphs/key';
 import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
-import { EnterpriseConnectionsChoice } from '../../auth-flow/steps/enterprise-connections';
-import { WalletsChoice } from '../../auth-flow/steps/wallets';
+import { useMessages } from '../../../localization';
 import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
 import { SignInAccounts } from './sign-in-accounts';
 import { SignInAlternativeMethods } from './sign-in-alternative-methods';
@@ -69,10 +69,13 @@ export function ChoiceStep({
   onSignOutAll,
   focusRef,
 }: ChoiceStepProps) {
+  const m = useMessages('signIn');
+
   if (step.purpose === 'wallets') {
     return (
-      <WalletsChoice
+      <AuthWallets
         focusRef={focusRef}
+        messages={{ ...m.wallets, backButton: m.back, pendingLabel: m.verifying, loading: m.loading }}
         wallets={step.options}
         loading={step.loading}
         globalErrorMessage={globalErrorMessage}
@@ -101,8 +104,14 @@ export function ChoiceStep({
 
   if (step.purpose === 'enterprise-connections') {
     return (
-      <EnterpriseConnectionsChoice
+      <AuthEnterpriseConnections
         focusRef={focusRef}
+        messages={{
+          title: m.enterpriseConnections.title,
+          description: m.enterpriseConnections.description,
+          pendingLabel: m.enterpriseSso.pending,
+          secondaryActionLabel: m.enterpriseSso.bypass,
+        }}
         logo={logo}
         connections={step.options}
         globalErrorMessage={globalErrorMessage}

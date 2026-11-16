@@ -1,24 +1,31 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
+import {
+  AuthActionBlocked,
+  AuthAlternativeChannel,
+  AuthEmailLink,
+  AuthEmailLinkStatus,
+  AuthEnterpriseConnections,
+  AuthIdentityPreview,
+  AuthLoading,
+  AuthProtectCheck,
+  AuthWallets,
+} from '../../blocks/auth';
 import type { VerificationCodeResend } from '../../blocks/verification';
 import { VerificationCode } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { rich, useMessages } from '../../localization';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
-import { codeCopy, codeIdentity, codeResendCopy, codeSecondaryAction } from '../auth-flow/auth-flow.utils';
-import { ActionBlockedNotice } from '../auth-flow/steps/action-blocked';
-import { AlternativeChannelStep } from '../auth-flow/steps/alternative-channel';
-import { EmailLinkNotice } from '../auth-flow/steps/email-link';
-import { EmailLinkStatusNotice } from '../auth-flow/steps/email-link-status';
-import { EnterpriseConnectionsChoice } from '../auth-flow/steps/enterprise-connections';
-import { IdentityPreview } from '../auth-flow/steps/identity-preview';
-import { LoadingNotice } from '../auth-flow/steps/loading';
-import { ProtectCheckNotice } from '../auth-flow/steps/protect-check';
-import { WalletsChoice } from '../auth-flow/steps/wallets';
 import type { SignUpStep, SignUpViewProps } from './sign-up.types';
-import { signUpCodeStep, signUpStepIds, signUpStepKey } from './sign-up.utils';
+import {
+  signUpCodeCopy,
+  signUpCodeIdentity,
+  signUpCodeSecondaryAction,
+  signUpStepIds,
+  signUpStepKey,
+} from './sign-up.utils';
 import { SignUpDetailsStep } from './steps/sign-up-details';
 import { SignUpLegalConsentField } from './steps/sign-up-legal-consent';
 import { SignUpRestricted } from './steps/sign-up-restricted';
@@ -56,7 +63,6 @@ export function SignUpView({
   focusRef,
 }: SignUpViewProps & { focusRef?: Ref<HTMLElement> }) {
   const m = useMessages('signUp');
-  const shared = useMessages('signIn');
   const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
 
   const resendFor = (copy: ResendCopy): VerificationCodeResend | undefined =>
@@ -81,21 +87,26 @@ export function SignUpView({
     switch (current.purpose) {
       case 'verify-email-link':
         return (
-          <EmailLinkNotice
+          <AuthEmailLink
             focusRef={focusRef}
-            title={shared.verifyEmailLink.title}
-            description={shared.verifyEmailLink.description}
+            messages={{
+              title: m.verifyEmailLink.title,
+              description: m.verifyEmailLink.description,
+              editIdentifier: m.editIdentifier,
+              secondaryActionLabel: m.useAnotherMethod,
+            }}
             identifier={current.identifier}
             onEditIdentifier={onEditIdentifier}
             globalErrorMessage={globalErrorMessage}
             isPending={isPending}
-            resend={resendFor(shared.emailLink)}
+            resend={resendFor(m.verifyEmailLink)}
           />
         );
       case 'email-link-status':
         return (
-          <EmailLinkStatusNotice
-            step={{ status: current.status, flow: 'sign-up' }}
+          <AuthEmailLinkStatus
+            messages={m.emailLinkStatus}
+            status={current.status}
             globalErrorMessage={globalErrorMessage}
           />
         );
@@ -113,10 +124,16 @@ export function SignUpView({
           />
         );
       case 'loading':
-        return <LoadingNotice globalErrorMessage={globalErrorMessage} />;
+        return (
+          <AuthLoading
+            messages={{ loading: m.loading }}
+            globalErrorMessage={globalErrorMessage}
+          />
+        );
       case 'protect-check':
         return (
-          <ProtectCheckNotice
+          <AuthProtectCheck
+            messages={{ ...m.protectCheck, loading: m.loading }}
             challenge={current.challenge}
             logo={logo}
             globalErrorMessage={globalErrorMessage}
@@ -126,28 +143,32 @@ export function SignUpView({
           />
         );
       case 'action-blocked':
-        return <ActionBlockedNotice details={current.details} />;
+        return (
+          <AuthActionBlocked
+            messages={m.actionBlocked}
+            details={current.details}
+          />
+        );
     }
   };
 
   const code = (current: Extract<SignUpStep, { kind: 'code' }>) => {
-    const codeStep = signUpCodeStep(current);
-    const secondary = codeSecondaryAction(codeStep, shared, { onCancel, onBack });
-    const identity = codeIdentity(codeStep, shared);
+    const secondary = signUpCodeSecondaryAction(current, m, onCancel);
+    const identity = signUpCodeIdentity(current, m);
     const field = form.registerValue('code');
     return (
       <VerificationCode
         focusRef={focusRef}
         messages={{
-          ...codeCopy(codeStep, shared, applicationName),
+          ...signUpCodeCopy(current, m),
           secondaryActionLabel: secondary.label,
-          primaryActionLabel: shared.continue,
-          pendingLabel: shared.verifying,
+          primaryActionLabel: m.submit,
+          pendingLabel: m.verifying,
         }}
-        resend={resendFor(codeResendCopy(codeStep, shared))}
+        resend={resendFor(current.purpose === 'verify-email' ? m.verifyEmail : m.verifyPhone)}
         identity={
           identity.identifier ? (
-            <IdentityPreview
+            <AuthIdentityPreview
               identifier={identity.identifier}
               editLabel={identity.editLabel}
               disabled={isPending}
@@ -199,10 +220,23 @@ export function SignUpView({
 
             <Flow.Step ids={signUpStepIds.alternativePhone}>
               {current.kind === 'alternative-phone' ? (
-                <AlternativeChannelStep
+                <AuthAlternativeChannel
                   focusRef={focusRef}
+                  messages={{
+                    title: m.alternativePhone.title,
+                    description: m.alternativePhone.description,
+                    fieldLabel: m.alternativePhone.label,
+                    phonePlaceholder: m.form.phonePlaceholder,
+                    selectedCountry: m.form.selectedCountry,
+                    chooseCountry: m.form.chooseCountry,
+                    searchCountries: m.form.searchCountries,
+                    countrySearchPlaceholder: m.form.countrySearchPlaceholder,
+                    noCountries: m.form.noCountries,
+                    secondaryActionLabel: m.useAnotherMethod,
+                    primaryActionLabel: m.submit,
+                    pendingLabel: m.verifying,
+                  }}
                   channel={current.channel}
-                  copy={m.alternativePhone}
                   applicationName={applicationName}
                   logo={logo}
                   form={form}
@@ -220,7 +254,7 @@ export function SignUpView({
                       disabled={isDisabled}
                     />
                   ) : null}
-                </AlternativeChannelStep>
+                </AuthAlternativeChannel>
               ) : null}
             </Flow.Step>
 
@@ -228,8 +262,13 @@ export function SignUpView({
 
             <Flow.Step ids={signUpStepIds.choice}>
               {current.kind === 'choice' && current.purpose === 'enterprise-connections' ? (
-                <EnterpriseConnectionsChoice
+                <AuthEnterpriseConnections
                   focusRef={focusRef}
+                  messages={{
+                    title: m.enterpriseConnections.title,
+                    description: m.enterpriseConnections.description,
+                    pendingLabel: m.enterpriseConnections.pending,
+                  }}
                   logo={logo}
                   connections={current.options}
                   globalErrorMessage={globalErrorMessage}
@@ -238,11 +277,9 @@ export function SignUpView({
                 />
               ) : null}
               {current.kind === 'choice' && current.purpose === 'wallets' ? (
-                <WalletsChoice
+                <AuthWallets
                   focusRef={focusRef}
-                  title={m.wallets.title}
-                  description={m.wallets.description}
-                  continueWith={m.wallets.continueWith}
+                  messages={{ ...m.wallets, backButton: m.back, pendingLabel: m.verifying, loading: m.loading }}
                   wallets={current.options}
                   globalErrorMessage={globalErrorMessage}
                   pendingWalletId={pendingProviderId}

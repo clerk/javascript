@@ -1,16 +1,9 @@
 import type { Ref } from 'react';
 
+import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
-import type {
-  AuthFlowActionBlockedDetails,
-  AuthFlowCodeStep,
-  AuthFlowEmailLinkState,
-  AuthFlowEmailLinkStatus,
-  AuthFlowProvider,
-  AuthFlowSubmitEvent,
-  AuthFlowValues,
-} from '../auth-flow/auth-flow.types';
+import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
 import type { SignUpFields, SignUpLegalConsent } from '../sign-up/sign-up.types';
 
 export type SignInFactor =
@@ -27,15 +20,15 @@ export type SignInFactor =
       identifier: string;
     };
 
-export type SignInProvider = AuthFlowProvider;
+export type SignInProvider = AuthProvider;
 
 export type SignInValues = AuthFlowValues;
 
 export type SignInSubmitEvent = AuthFlowSubmitEvent;
 
-export type SignInActionBlockedDetails = AuthFlowActionBlockedDetails;
+export type SignInActionBlockedDetails = AuthActionBlockedDetails;
 
-export type SignInEmailLinkStatus = AuthFlowEmailLinkStatus;
+export type SignInEmailLinkStatus = AuthEmailLinkStatusValue;
 
 export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
 
@@ -57,7 +50,21 @@ export type SignInStep =
   | { kind: 'credential'; credential: 'password'; identifier: string }
   | { kind: 'credential'; credential: 'backup-code'; identifier: string; resetting?: boolean }
   | { kind: 'credential'; credential: 'passkey'; identifier?: string }
-  | AuthFlowCodeStep
+  | {
+      kind: 'code';
+      purpose:
+        | 'first-factor'
+        | 'second-factor'
+        | 'client-trust'
+        | 'sso-bypass'
+        | 'reset-password'
+        | 'verify-email'
+        | 'verify-phone';
+      channel: 'email' | 'phone' | 'totp';
+      identifier?: string;
+      provider?: string;
+      resetting?: boolean;
+    }
   | {
       kind: 'choice';
       purpose: 'methods';
@@ -74,7 +81,7 @@ export type SignInStep =
   | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
   | { kind: 'notice'; purpose: 'email-link'; identifier: string; newDevice?: boolean }
-  | ({ kind: 'notice'; purpose: 'email-link-status' } & AuthFlowEmailLinkState)
+  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus; flow: 'sign-in' | 'sign-up' }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
   | { kind: 'notice'; purpose: 'restricted' | 'waitlist' }
   | { kind: 'new-password'; reason: 'forgot' | 'required' }

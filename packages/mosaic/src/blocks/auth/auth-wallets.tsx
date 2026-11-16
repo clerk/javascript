@@ -2,32 +2,41 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import { Button } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
-import { Link } from '../../../components/link';
-import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
-import { Spinner } from '../../../components/spinner';
-import { Text } from '../../../components/text';
-import { fill, rich, useMessages } from '../../../localization';
-import { styles } from '../auth-flow.styles';
-import type { AuthFlowProvider } from '../auth-flow.types';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
+import { Link } from '../../components/link';
+import { ProviderButton, ProviderButtonGroup } from '../../components/provider-button';
+import { Spinner } from '../../components/spinner';
+import { Text } from '../../components/text';
+import { fill, rich } from '../../localization';
+import { styles } from './auth.styles';
+import type { AuthProvider } from './auth.types';
 
-interface WalletsChoiceProps {
-  wallets: readonly AuthFlowProvider[];
+export interface AuthWalletsMessages {
+  title: string;
+  description: string;
+  continueWith: string;
+  noneAvailable: string;
+  backButton: string;
+  pendingLabel: string;
+  loading: string;
+}
+
+interface AuthWalletsProps {
+  messages: AuthWalletsMessages;
+  wallets: readonly AuthProvider[];
   globalErrorMessage?: string;
   pendingWalletId?: string;
   isDisabled: boolean;
   onSelectWallet: (id: string) => void;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
-  title?: string;
-  description?: string;
-  continueWith?: string;
   loading?: boolean;
 }
 
-export function WalletsChoice({
+export function AuthWallets({
+  messages,
   wallets,
   globalErrorMessage,
   pendingWalletId,
@@ -35,19 +44,15 @@ export function WalletsChoice({
   onSelectWallet,
   onBack,
   focusRef,
-  title,
-  description,
-  continueWith,
   loading = false,
-}: WalletsChoiceProps) {
-  const m = useMessages('signIn');
+}: AuthWalletsProps) {
   const firstRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
 
   return (
     <>
       <Card.Header>
-        <Card.Title>{title ?? m.wallets.title}</Card.Title>
-        <Card.Description>{description ?? m.wallets.description}</Card.Description>
+        <Card.Title>{messages.title}</Card.Title>
+        <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -55,7 +60,7 @@ export function WalletsChoice({
       >
         {globalErrorMessage ??
           (!loading && wallets.length === 0
-            ? rich(m.wallets.noneAvailable, {
+            ? rich(messages.noneAvailable, {
                 components: {
                   link: children => (
                     <Link
@@ -74,7 +79,7 @@ export function WalletsChoice({
       <Card.Content>
         {loading ? (
           <div {...stylex.props(styles.walletsLoading)}>
-            <Spinner label={m.loading} />
+            <Spinner label={messages.loading} />
           </div>
         ) : null}
         <ProviderButtonGroup disabled={isDisabled}>
@@ -89,14 +94,10 @@ export function WalletsChoice({
                   {...stylex.props(styles.providerIcon)}
                 />
               }
-              longLabel={
-                wallets.length === 1
-                  ? fill(continueWith ?? m.wallets.continueWith, { wallet: wallet.name })
-                  : wallet.name
-              }
+              longLabel={wallets.length === 1 ? fill(messages.continueWith, { wallet: wallet.name }) : wallet.name}
               shortLabel={wallet.name}
               isPending={pendingWalletId === wallet.id}
-              pendingLabel={m.verifying}
+              pendingLabel={messages.pendingLabel}
               onClick={() => onSelectWallet(wallet.id)}
             />
           ))}
@@ -113,7 +114,7 @@ export function WalletsChoice({
             disabled={isDisabled}
             onClick={onBack}
           >
-            {m.back}
+            {messages.backButton}
           </Button>
         </Text>
       </Card.Content>

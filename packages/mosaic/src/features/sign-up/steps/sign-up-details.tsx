@@ -4,6 +4,9 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 import { useCallback, useRef, useState } from 'react';
 
+import type { AuthProvider } from '../../../blocks/auth';
+import { AuthCaptcha } from '../../../blocks/auth';
+import { styles as authStyles } from '../../../blocks/auth/auth.styles';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
@@ -17,8 +20,6 @@ import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { styles } from '../../auth-flow/auth-flow.styles';
-import type { AuthFlowProvider } from '../../auth-flow/auth-flow.types';
-import { FlowCaptcha } from '../../auth-flow/steps/captcha';
 import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';
 import { signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
 import { SignUpLegalConsentField } from './sign-up-legal-consent';
@@ -26,7 +27,7 @@ import { SignUpLegalConsentField } from './sign-up-legal-consent';
 interface SignUpDetailsProps {
   step: SignUpDetails;
   onSwitchField?: () => void;
-  socialProviders: readonly AuthFlowProvider[];
+  socialProviders: readonly AuthProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   isDisabled: boolean;
@@ -57,7 +58,6 @@ export function SignUpDetailsStep({
   logo,
 }: SignUpDetailsProps) {
   const m = useMessages('signUp');
-  const shared = useMessages('signIn');
   const { fields, legalConsent } = step;
   const heading = signUpDetailsHeading(step, m);
   const [first] = signUpFieldNames(fields);
@@ -73,7 +73,7 @@ export function SignUpDetailsStep({
             <img
               src={logo.src}
               alt={logo.alt}
-              {...stylex.props(styles.logo)}
+              {...stylex.props(authStyles.logo)}
             />
           </Card.Media>
         ) : null}
@@ -110,12 +110,12 @@ export function SignUpDetailsStep({
             />
           ) : null}
         </div>
-        {step.purpose === 'continue' ? null : <FlowCaptcha onInteractiveChange={setIsChallengeShown} />}
+        {step.purpose === 'continue' ? null : <AuthCaptcha onInteractiveChange={setIsChallengeShown} />}
         {onSignIn ? (
           <Text
             size='sm'
             color='foreground-secondary'
-            xstyle={styles.footerText}
+            xstyle={authStyles.footerText}
           >
             {m.signInPrompt}{' '}
             <Button
@@ -137,9 +137,9 @@ export function SignUpDetailsStep({
             fullWidth
             disabled={Boolean(pendingProviderId)}
             isPending={isPending}
-            pendingLabel={shared.verifying}
+            pendingLabel={m.verifying}
           >
-            {shared.continue}
+            {m.submit}
           </SubmitButton>
         </Card.Footer>
       ) : null}
@@ -193,7 +193,7 @@ function SignUpFields({
       id={form.id}
       onSubmit={onSubmit}
     >
-      <div {...stylex.props(styles.fieldStack)}>
+      <div {...stylex.props(authStyles.fieldStack)}>
         <NameFields
           firstName={fields.firstName ? field('firstName') : undefined}
           lastName={fields.lastName ? field('lastName') : undefined}
@@ -249,13 +249,13 @@ function SignUpProviders({
   onSelectProvider,
   showDivider,
 }: {
-  providers: readonly AuthFlowProvider[];
+  providers: readonly AuthProvider[];
   showDivider: boolean;
   pendingProviderId?: string;
   isDisabled: boolean;
   onSelectProvider: (id: string) => void;
 }) {
-  const shared = useMessages('signIn');
+  const m = useMessages('signUp');
   if (providers.length === 0) {
     return null;
   }
@@ -270,13 +270,13 @@ function SignUpProviders({
               <img
                 src={provider.iconUrl}
                 alt=''
-                {...stylex.props(styles.providerIcon)}
+                {...stylex.props(authStyles.providerIcon)}
               />
             }
-            longLabel={fill(shared.start.socialButton, { provider: provider.name })}
+            longLabel={fill(m.form.socialButton, { provider: provider.name })}
             shortLabel={provider.name}
             isPending={pendingProviderId === provider.id}
-            pendingLabel={shared.verifying}
+            pendingLabel={m.verifying}
             onClick={() => onSelectProvider(provider.id)}
           />
         ))}
@@ -291,7 +291,7 @@ function SignUpProviders({
             size='sm'
             color='foreground-secondary'
           >
-            {shared.start.divider}
+            {m.form.divider}
           </Text>
           <span {...stylex.props(styles.dividerLine)} />
         </div>
@@ -307,7 +307,7 @@ function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?
   }
 
   return (
-    <div {...stylex.props(firstName && lastName ? styles.nameRow : styles.fieldStack)}>
+    <div {...stylex.props(firstName && lastName ? styles.nameRow : authStyles.fieldStack)}>
       {firstName ? (
         <TextField
           {...firstName}
@@ -443,7 +443,6 @@ function PasswordField({
   advisoryFeedback,
 }: FieldProps & { advisoryFeedback?: FieldFeedback }) {
   const m = useMessages('signUp');
-  const shared = useMessages('signIn');
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields.password;
   const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
@@ -473,8 +472,8 @@ function PasswordField({
           setFocused(false);
           control.onBlur();
         }}
-        showPasswordLabel={shared.showPassword}
-        hidePasswordLabel={shared.hidePassword}
+        showPasswordLabel={m.form.showPassword}
+        hidePasswordLabel={m.form.hidePassword}
       />
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>

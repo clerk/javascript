@@ -1,11 +1,11 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
+import { AuthIdentityPreview } from '../../../blocks/auth';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { useMessages } from '../../../localization';
-import { IdentityPreview } from '../../auth-flow/steps/identity-preview';
 
 interface SignInPasskeyProps {
   identifier?: string;
@@ -37,7 +37,7 @@ export function SignInPasskey({
         <Card.Title>{m.passkey.title}</Card.Title>
         <Card.Description>{m.passkey.description}</Card.Description>
         {identifier ? (
-          <IdentityPreview
+          <AuthIdentityPreview
             identifier={identifier}
             editLabel={m.editIdentifier}
             disabled={isPending}

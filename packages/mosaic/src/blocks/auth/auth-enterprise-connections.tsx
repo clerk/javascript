@@ -2,18 +2,25 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import { Button } from '../../../components/button';
-import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
-import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
-import { Text } from '../../../components/text';
-import { useMessages } from '../../../localization';
-import { styles } from '../auth-flow.styles';
-import type { AuthFlowProvider } from '../auth-flow.types';
+import { Button } from '../../components/button';
+import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
+import { ProviderButton, ProviderButtonGroup } from '../../components/provider-button';
+import { Text } from '../../components/text';
+import { styles } from './auth.styles';
+import type { AuthProvider } from './auth.types';
 
-interface EnterpriseConnectionsChoiceProps {
+export interface AuthEnterpriseConnectionsMessages {
+  title: string;
+  description: string;
+  pendingLabel: string;
+  secondaryActionLabel?: string;
+}
+
+interface AuthEnterpriseConnectionsProps {
+  messages: AuthEnterpriseConnectionsMessages;
   logo?: { src: string; alt: string };
-  connections: readonly AuthFlowProvider[];
+  connections: readonly AuthProvider[];
   globalErrorMessage?: string;
   pendingConnectionId?: string;
   onSelectConnection: (id: string) => void;
@@ -21,7 +28,8 @@ interface EnterpriseConnectionsChoiceProps {
   focusRef?: Ref<HTMLElement>;
 }
 
-export function EnterpriseConnectionsChoice({
+export function AuthEnterpriseConnections({
+  messages,
   logo,
   connections,
   globalErrorMessage,
@@ -29,8 +37,7 @@ export function EnterpriseConnectionsChoice({
   onSelectConnection,
   onCancel,
   focusRef,
-}: EnterpriseConnectionsChoiceProps) {
-  const m = useMessages('signIn');
+}: AuthEnterpriseConnectionsProps) {
   const firstRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
   const pending = Boolean(pendingConnectionId);
 
@@ -46,8 +53,8 @@ export function EnterpriseConnectionsChoice({
             />
           </Card.Media>
         ) : null}
-        <Card.Title>{m.enterpriseConnections.title}</Card.Title>
-        <Card.Description>{m.enterpriseConnections.description}</Card.Description>
+        <Card.Title>{messages.title}</Card.Title>
+        <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -74,7 +81,7 @@ export function EnterpriseConnectionsChoice({
               longLabel={connection.name}
               shortLabel={connection.name}
               isPending={pendingConnectionId === connection.id}
-              pendingLabel={m.enterpriseSso.pending}
+              pendingLabel={messages.pendingLabel}
               onClick={() => onSelectConnection(connection.id)}
             />
           ))}
@@ -92,7 +99,7 @@ export function EnterpriseConnectionsChoice({
               disabled={pending}
               onClick={onCancel}
             >
-              {m.enterpriseSso.bypass}
+              {messages.secondaryActionLabel}
             </Button>
           </Text>
         ) : null}

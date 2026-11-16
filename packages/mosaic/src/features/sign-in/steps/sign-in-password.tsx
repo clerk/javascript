@@ -1,6 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
+import { AuthIdentityPreview } from '../../../blocks/auth';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
@@ -9,7 +10,6 @@ import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { IdentityPreview } from '../../auth-flow/steps/identity-preview';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 
 interface SignInPasswordProps {
@@ -49,7 +49,7 @@ export function SignInPassword({
       <Card.Header>
         <Card.Title>{m.password.title}</Card.Title>
         <Card.Description>{m.password.description}</Card.Description>
-        <IdentityPreview
+        <AuthIdentityPreview
           identifier={identifier}
           editLabel={m.editIdentifier}
           disabled={isPending}
