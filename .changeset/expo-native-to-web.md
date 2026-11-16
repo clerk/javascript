@@ -19,7 +19,7 @@ export default function AccountScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Render the WebView as soon as it has props, because it has to load the link to sign in */}
+      {/* Render the WebView as soon as it has props. It loads the link to sign the user in. */}
       {web.webViewProps && <WebView {...web.webViewProps} style={{ flex: 1 }} />}
       {/* Cover Clerk's sign-in page until the destination has loaded */}
       {web.status !== 'ready' && <ActivityIndicator style={StyleSheet.absoluteFill} />}
@@ -28,20 +28,20 @@ export default function AccountScreen() {
 }
 ```
 
-Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook instead of to `<WebView>`. Set on `<WebView>`, they would replace the hook's handlers.
+Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook. Setting them on `<WebView>` replaces the hook's own handlers.
 
-For more advanced cases, such as opening the link in a browser or WebView you manage yourself, create it with `prepareSessionTransfer()`:
+For more advanced cases, such as opening the link in a WebView or browser you manage yourself, create it with `prepareSessionTransfer()`:
 
 ```ts
 import { prepareSessionTransfer } from '@clerk/expo/native-to-web';
-import * as WebBrowser from 'expo-web-browser';
 
-// The link works once, within 60 seconds, so create it right before opening it
-const transfer = await prepareSessionTransfer({
+const { url } = await prepareSessionTransfer({
   destination: 'https://app.example.com/reports',
-  presentation: 'browser',
+  // 'webview' for a WebView you render, 'browser' for a browser
+  presentation: 'webview',
 });
 
-// iOS only. Android Custom Tabs can't send the referrer Clerk needs to sign the user in.
-await WebBrowser.openBrowserAsync(transfer.url);
+// Open the link once, within 60 seconds, and never log or store it
 ```
+
+On Android, a browser only accepts the link when the intent that opens it names your app as the referrer.
