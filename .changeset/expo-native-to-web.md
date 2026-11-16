@@ -45,5 +45,3 @@ const transfer = await prepareSessionTransfer({
 // iOS only. Android Custom Tabs can't send the referrer Clerk needs to sign the user in.
 await WebBrowser.openBrowserAsync(transfer.url);
 ```
-
-Session transfers must be enabled for your instance, and `destination` must be on one of your instance's domains. When something fails, you get a `SessionTransferError`. Check for it with `isSessionTransferError()`, then branch on its `code`, such as `signed_out`, `feature_not_enabled`, or `expired`.
