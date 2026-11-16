@@ -1639,6 +1639,14 @@ export const plPL: LocalizationResource = {
       subtitle: 'Wprowadź hasło, aby kontynuować',
       title: 'Wymagana weryfikacja',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kod weryfikacyjny',
       resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
@@ -1650,6 +1658,22 @@ export const plPL: LocalizationResource = {
       resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
       subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wysłany na twój telefon',
       title: 'Wymagana weryfikacja',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Kod weryfikacyjny',
@@ -2172,6 +2196,7 @@ export const plPL: LocalizationResource = {
     protect_check_unsupported_environment: undefined,
     session_exists: 'Jesteś już zalogowany.',
     signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,

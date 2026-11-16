@@ -1647,6 +1647,14 @@ export const itIT: LocalizationResource = {
       subtitle: 'Inserisci la tua password per continuare.',
       title: 'Verifica con la password',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Inserisci il codice che ti è stato inviato via SMS.',
       resendButton: 'Invia di nuovo il codice',
@@ -1658,6 +1666,22 @@ export const itIT: LocalizationResource = {
       resendButton: 'Invia di nuovo il codice',
       subtitle: 'Controlla il tuo SMS per il codice di verifica.',
       title: 'Verifica SMS (MFA)',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Inserisci il codice dalla tua app di autenticazione.',
@@ -2172,6 +2196,7 @@ export const itIT: LocalizationResource = {
     protect_check_unsupported_environment: undefined,
     session_exists: 'Sei già loggato.',
     signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
