@@ -106,34 +106,31 @@ export function ComponentStatusTable() {
                   className='border-border label-3 border-b font-normal [&_code]:font-normal [&_strong]:font-normal'
                 >
                   <td className='py-3 pr-4 text-neutral-600 dark:text-neutral-400'>
+                    <code className='code-inline'>{`<${row.stable} />`}</code>
+                  </td>
+                  <td className='bg-foreground/[0.04] text-foreground px-4 py-3'>
                     <span className='flex items-center gap-1.5'>
-                      <code className='code-inline'>{`<${row.stable} />`}</code>
+                      {row.renamedTo ? (
+                        <span>
+                          Renamed to <code className='code-inline'>{`<${row.renamedTo} />`}</code>
+                        </span>
+                      ) : row.beta ? (
+                        <code className='code-inline'>{`<${row.beta} />`}</code>
+                      ) : (
+                        '—'
+                      )}
                       {row.notes && !notesShown && (
                         <button
                           type='button'
                           aria-label={`Show the note for ${row.stable}`}
                           title='Show note'
                           onClick={() => showNote(row.stable)}
-                          className='rounded-squircle-md hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-focus -my-1 flex size-6 items-center justify-center text-gray-500 transition-colors dark:text-gray-400'
+                          className='rounded-squircle-md hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-focus -my-1 flex size-6 shrink-0 items-center justify-center text-gray-500 transition-colors dark:text-gray-400'
                         >
                           <NoteIcon />
                         </button>
                       )}
                     </span>
-                  </td>
-                  <td className='bg-foreground/[0.04] text-foreground px-4 py-3'>
-                    {row.beta && row.renamedTo ? (
-                      <>
-                        <s>
-                          <code className='code-inline'>{`<${row.beta} />`}</code>
-                        </s>{' '}
-                        renamed <code className='code-inline'>{`<${row.renamedTo} />`}</code>
-                      </>
-                    ) : row.beta ? (
-                      <code className='code-inline'>{`<${row.beta} />`}</code>
-                    ) : (
-                      '—'
-                    )}
                   </td>
                   <td className='whitespace-nowrap py-3 pl-4'>
                     <Badge className='w-fit gap-1.5 font-normal'>
