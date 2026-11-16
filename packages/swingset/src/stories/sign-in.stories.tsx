@@ -952,7 +952,7 @@ export function ChoiceMethodsSecondFactor() {
   return (
     <StepPanel
       providers={[]}
-      step={{ kind: 'choice', purpose: 'methods', options: secondFactors, canStartOver: true }}
+      step={{ kind: 'choice', purpose: 'methods', options: secondFactors }}
     />
   );
 }

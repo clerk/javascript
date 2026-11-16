@@ -54,7 +54,6 @@ export type SignInStep =
       purpose: 'methods';
       options: readonly SignInFactor[];
       canGoBack?: boolean;
-      canStartOver?: boolean;
     }
   | { kind: 'choice'; purpose: 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }

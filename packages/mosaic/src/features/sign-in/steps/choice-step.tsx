@@ -34,7 +34,6 @@ interface ChoiceStepProps {
   onSelectFactor: (id: string) => void;
   onShowHelp: () => void;
   onBack: () => void;
-  onStartOver: () => void;
   logo?: { src: string; alt: string };
   globalErrorMessage?: string;
   socialProviders: readonly SignInProvider[];
@@ -57,7 +56,6 @@ export function ChoiceStep({
   onSelectFactor,
   onShowHelp,
   onBack,
-  onStartOver,
   logo,
   globalErrorMessage,
   socialProviders,
@@ -136,7 +134,6 @@ export function ChoiceStep({
         isDisabled={isDisabled}
         globalErrorMessage={globalErrorMessage}
         onBack={step.canGoBack === false ? undefined : onBack}
-        onStartOver={step.canStartOver ? onStartOver : undefined}
         onShowHelp={onShowHelp}
       />
     );

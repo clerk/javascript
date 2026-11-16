@@ -246,7 +246,6 @@ export function SignInView({
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}
                     onBack={onBack}
-                    onStartOver={onStartOver}
                     logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     socialProviders={socialProviders}

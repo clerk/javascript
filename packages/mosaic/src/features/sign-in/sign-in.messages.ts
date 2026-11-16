@@ -253,7 +253,6 @@ export const signInMessages = {
     passkey: 'Sign in with your passkey',
     totp: 'Use your authenticator app',
     backupCode: 'Use a backup code',
-    startOver: 'Sign in with a different account',
     helpPrompt: 'Don’t have any of these?',
     helpLink: 'Get help',
     getHelp: {

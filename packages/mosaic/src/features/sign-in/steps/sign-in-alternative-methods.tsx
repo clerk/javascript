@@ -31,7 +31,6 @@ interface SignInAlternativeMethodsProps {
   isDisabled: boolean;
   globalErrorMessage?: string;
   onBack?: () => void;
-  onStartOver?: () => void;
   onShowHelp: () => void;
   focusRef?: Ref<HTMLElement>;
 }
@@ -48,7 +47,6 @@ export function SignInAlternativeMethods({
   isDisabled,
   globalErrorMessage,
   onBack,
-  onStartOver,
   onShowHelp,
   focusRef,
 }: SignInAlternativeMethodsProps) {
@@ -122,23 +120,6 @@ export function SignInAlternativeMethods({
               onClick={onBack}
             >
               {m.back}
-            </Button>
-          </Text>
-        ) : null}
-        {onStartOver ? (
-          <Text
-            size='sm'
-            xstyle={styles.footerText}
-          >
-            <Button
-              type='button'
-              size='sm'
-              variant='link'
-              color='neutral'
-              disabled={isDisabled}
-              onClick={onStartOver}
-            >
-              {m.alternativeMethods.startOver}
             </Button>
           </Text>
         ) : null}
