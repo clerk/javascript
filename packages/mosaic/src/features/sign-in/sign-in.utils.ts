@@ -122,7 +122,7 @@ export function codeCopy(
   if (step.purpose === 'verify-email') {
     return {
       title: m.verifyEmail.title,
-      description: m.verifyEmail.description,
+      description: fill<string>(m.verifyEmail.description, { identifier }),
       fieldLabel: m.verifyEmail.label,
     };
   }
