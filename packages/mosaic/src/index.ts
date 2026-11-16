@@ -1,5 +1,7 @@
 'use client';
 
+export type { ConsentProps } from './features/consent/consent';
+export { Consent } from './features/consent/consent';
 export type { UserButtonProps } from './features/user-button/user-button';
 export { UserButton } from './features/user-button/user-button';
 export type { UserAvatarProps } from './features/user-avatar/user-avatar';
