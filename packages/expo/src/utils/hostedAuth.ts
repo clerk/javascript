@@ -1,7 +1,8 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { ClerkAPIErrorJSON, ClientJSON, ClientResource } from '@clerk/shared/types';
+import type { ClientJSON, ClientResource } from '@clerk/shared/types';
 
 import { errorThrower } from './errors';
+import type { FapiResponse } from './fapiRequest';
+import { getResponseJSON, requestWithSignedOutRetry, toClerkAPIResponseError } from './fapiRequest';
 
 /**
  * Controls which Account Portal auth screen opens for hosted auth.
@@ -25,18 +26,7 @@ type HostedAuthJSON = {
   url: string;
 };
 
-type HostedAuthPayload = {
-  response?: HostedAuthJSON | ClientJSON;
-  errors?: ClerkAPIErrorJSON[];
-};
-
-type HostedAuthResponse = {
-  ok: boolean;
-  status: number;
-  statusText: string;
-  headers?: Headers;
-  payload: HostedAuthPayload | null;
-};
+type HostedAuthResponse = FapiResponse<HostedAuthJSON | ClientJSON>;
 
 type FapiClient = {
   request: (requestInit: {
@@ -62,18 +52,9 @@ export async function createHostedAuth(
       body: params,
     });
 
-  let response = await request();
-  if (
-    !response.ok &&
-    response.status === 401 &&
-    getHostedAuthErrors(response.payload).some(error => error.code === 'signed_out')
-  ) {
-    // The Expo response hook has already persisted the replacement device token.
-    response = await request();
-  }
-
+  const response = await requestWithSignedOutRetry(request);
   if (!response.ok) {
-    throw buildHostedAuthAPIResponseError(response);
+    throw toClerkAPIResponseError(response, 'Hosted auth request failed.');
   }
 
   const hostedAuthJSON = getResponseJSON(response.payload, 'hosted_auth');
@@ -110,13 +91,6 @@ export async function redeemHostedAuth(
   return clientJSON;
 }
 
-function getResponseJSON(payload: HostedAuthResponse['payload'], object: 'hosted_auth'): HostedAuthJSON | null;
-function getResponseJSON(payload: HostedAuthResponse['payload'], object: 'client'): ClientJSON | null;
-function getResponseJSON(payload: HostedAuthResponse['payload'], object: string): HostedAuthJSON | ClientJSON | null {
-  const response = payload?.response;
-  return !!response && typeof response === 'object' && response.object === object ? response : null;
-}
-
 export function applyHostedAuthClientJSON(client: ClientResource, clientJSON: ClientJSON): ClientResource {
   // Hosted auth gets the same /client payload as Client.reload(), but its verifier-bound
   // exchange uses a request body. Apply it to the existing ClerkJS client instance here
@@ -140,32 +114,5 @@ async function throwHostedAuthAPIResponseError(
     await clerk.handleUnauthenticated?.();
   }
 
-  throw buildHostedAuthAPIResponseError(response);
-}
-
-function buildHostedAuthAPIResponseError(response: HostedAuthResponse) {
-  const errors = getHostedAuthErrors(response.payload);
-  return new ClerkAPIResponseError(errors[0]?.long_message || response.statusText || 'Hosted auth request failed.', {
-    data: errors,
-    status: response.status,
-    retryAfter: getRetryAfter(response.headers),
-  });
-}
-
-function getHostedAuthErrors(payload: HostedAuthResponse['payload']): ClerkAPIErrorJSON[] {
-  if (!payload || !('errors' in payload)) {
-    return [];
-  }
-
-  return payload.errors ?? [];
-}
-
-function getRetryAfter(headers: Headers | undefined): number | undefined {
-  const retryAfter = headers?.get('retry-after');
-  if (!retryAfter) {
-    return undefined;
-  }
-
-  const retryAfterSeconds = parseInt(retryAfter, 10);
-  return Number.isNaN(retryAfterSeconds) ? undefined : retryAfterSeconds;
+  throw toClerkAPIResponseError(response, 'Hosted auth request failed.');
 }
