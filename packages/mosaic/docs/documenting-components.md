@@ -305,4 +305,5 @@ Which surface the dialog holds, and the geometry that comes with it.
 - [ ] MDX sections match the archetype's required order exactly.
 - [ ] Every props-table row states its default in the **Default** column.
 - [ ] Wiring done per `packages/swingset/README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/(explorer)/page.tsx` redirect if this is now the first component.
+- [ ] Every story added, renamed or removed is changed in `registry.ts` too. It imports each story by name, so an import of a story that no longer exists fails the whole page.
 - [ ] `pnpm format --filter @clerk/swingset` is clean.

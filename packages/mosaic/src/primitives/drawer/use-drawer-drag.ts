@@ -3,6 +3,7 @@
 import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { canScrollToward, isElement } from '../utils/dom';
+import { isIOS } from '../utils/platform';
 import {
   CLOSE_THRESHOLD,
   MIN_SAMPLE_MS,
@@ -12,7 +13,7 @@ import {
   VELOCITY_THRESHOLD,
 } from './constants';
 import { DrawerAttrs, DrawerCssVars } from './css-vars';
-import { clamp, dampen, isIOS, safeCapture } from './helpers';
+import { clamp, dampen, safeCapture } from './helpers';
 import type { SnapController } from './use-snap-points';
 
 export interface UseDrawerDragOptions {

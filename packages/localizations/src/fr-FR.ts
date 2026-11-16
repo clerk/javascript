@@ -1655,6 +1655,14 @@ export const frFR: LocalizationResource = {
       subtitle: 'Entrez votre mot de passe pour continuer.',
       title: 'Vérification par mot de passe',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Entrez le code de vérification',
       resendButton: 'Renvoyer le code',
@@ -1666,6 +1674,22 @@ export const frFR: LocalizationResource = {
       resendButton: 'Renvoyer le code',
       subtitle: 'Un code a été envoyé à votre téléphone pour vérification.',
       title: 'Vérification par téléphone',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Entrez le code de vérification',
@@ -2107,6 +2131,7 @@ export const frFR: LocalizationResource = {
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     captcha_unavailable:
       "Inscription échouée en raison d'une validation de captcha non réussie. Veuillez actualiser la page pour réessayer ou contacter le support pour obtenir de l'aide.",
+    external_account_not_found: undefined,
     form_code_incorrect: 'Code incorrect',
     form_email_address_blocked:
       'Les services de messagerie temporaire ne sont pas pris en charge. Veuillez utiliser votre adresse e-mail habituelle pour créer un compte.',
@@ -2183,9 +2208,12 @@ export const frFR: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Vous êtes déjà connecté.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
     web3_signature_request_rejected: 'Vous avez refusé la demande de signature. Veuillez réessayer pour continuer.',

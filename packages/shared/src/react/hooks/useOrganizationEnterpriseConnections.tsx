@@ -77,10 +77,17 @@ function useOrganizationEnterpriseConnections(
   const createEnterpriseConnection = useCallback(
     async (createParams: CreateOrganizationEnterpriseConnectionParams) => {
       const created = await organization?.createEnterpriseConnection(createParams);
-      await revalidate();
+      if (created) {
+        await queryClient.cancelQueries({ queryKey, exact: true });
+        queryClient.setQueryData<EnterpriseConnectionResource[]>(queryKey, (connections = []) => [
+          ...connections.filter(connection => connection.id !== created.id),
+          created,
+        ]);
+        void revalidate();
+      }
       return created;
     },
-    [organization, revalidate],
+    [organization, queryClient, queryKey, revalidate],
   );
 
   const updateEnterpriseConnection = useCallback(

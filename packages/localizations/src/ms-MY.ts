@@ -1651,6 +1651,14 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kata laluan semasa anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kod pengesahan',
       resendButton: 'Tidak menerima kod? Hantar semula',
@@ -1662,6 +1670,22 @@ export const msMY: LocalizationResource = {
       resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod yang dihantar ke telefon anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Kod pengesahan',
@@ -2113,6 +2137,7 @@ export const msMY: LocalizationResource = {
       'Pendaftaran tidak berjaya kerana pengesahan keselamatan gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     captcha_unavailable:
       'Pendaftaran tidak berjaya kerana pengesahan bot gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Perkhidmatan e-mel sementara tidak disokong. Sila gunakan alamat e-mel biasa anda untuk membuat akaun.',
@@ -2196,9 +2221,12 @@ export const msMY: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
     web3_signature_request_rejected: 'Anda telah menolak permintaan tandatangan. Sila cuba lagi untuk meneruskan.',

@@ -18,14 +18,15 @@ the selected label. Reopening shows all options until you type again.
 ```tsx
 import { Combobox } from '@clerk/mosaic/primitives/combobox';
 
-<Combobox.Root>
+<Combobox.Root items={['Apple', 'Banana']} itemToStringLabel={fruit => fruit}>
   <Combobox.Input aria-label='Fruit' />
   <Combobox.Trigger aria-label='Toggle fruit options'>⌄</Combobox.Trigger>
   <Combobox.Portal>
     <Combobox.Positioner>
       <Combobox.Popup>
-        <Combobox.Collection items={['Apple', 'Banana']} itemToStringLabel={fruit => fruit}>
-          {fruit => (
+        <Combobox.Empty>No fruit found</Combobox.Empty>
+        <Combobox.Collection>
+          {(fruit: string) => (
             <Combobox.Option key={fruit} value={fruit}>
               {fruit}
               <Combobox.OptionIndicator>✓</Combobox.OptionIndicator>
@@ -59,7 +60,8 @@ const [value, setValue] = useState<string | null>(null);
 | `Combobox.Portal`          | none (portal)   | Portals the floating content                                   |
 | `Combobox.Positioner`      | `div`           | Positions the listbox relative to the input or supplied anchor |
 | `Combobox.Popup`           | `div`           | Wraps popup content and preserves it during exit transitions   |
-| `Combobox.Collection`      | none            | Filters items by their labels                                  |
+| `Combobox.Collection`      | none            | Renders the root's items that match the search                 |
+| `Combobox.Empty`           | `div`           | Status region that shows its children when no items match      |
 | `Combobox.Option`          | `div`           | Selectable option                                              |
 | `Combobox.OptionIndicator` | `span`          | Renders its children only for the selected option              |
 | `Combobox.List`            | `div`           | Inline listbox inside another floating surface                 |
@@ -87,15 +89,19 @@ DOM parts using `useRender` accept `render` and standard HTML attributes.
 | `placement`          | `Placement`                       | `'bottom-start'` | Popup placement                                                     |
 | `sideOffset`         | `number`                          | `4`              | Gap from the anchor in pixels                                       |
 | `inline`             | `boolean`                         | `false`          | Separate search inside another surface; bind `open` to that surface |
+| `items`              | `readonly Item[]`                 | —                | Options to filter; pass with `itemToStringLabel`                    |
+| `itemToStringLabel`  | `(item: Item) => string`          | —                | Label used for case-insensitive matching                            |
 
 ### `Combobox.Collection`
 
-| Prop                | Type                        | Default      | Description                              |
-| ------------------- | --------------------------- | ------------ | ---------------------------------------- |
-| `items`             | `readonly Item[]`           | — (required) | Available options                        |
-| `itemToStringLabel` | `(item: Item) => string`    | — (required) | Label used for case-insensitive matching |
-| `children`          | `(item: Item) => ReactNode` | — (required) | Renders each matching option             |
-| `empty`             | `ReactNode`                 | —            | Content when no items match              |
+| Prop       | Type                        | Default      | Description                                                       |
+| ---------- | --------------------------- | ------------ | ----------------------------------------------------------------- |
+| `children` | `(item: Item) => ReactNode` | — (required) | Renders each matching item; annotate `item` with the `items` type |
+
+### `Combobox.Empty`
+
+Renders `role="status"` with `aria-live="polite"`. It stays mounted and shows its children only when none of the root's
+`items` match, so screen readers announce the message. Without `items` it always shows its children.
 
 ### `Combobox.Option`
 

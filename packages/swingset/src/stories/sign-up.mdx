@@ -1,0 +1,161 @@
+import * as Stories from './sign-up.stories';
+
+# SignUp
+
+The standalone sign-up view. It reuses the sign-up screens the sign-in view shows in the combined flow, and adds the screens only a standalone sign-up has.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'PasswordInput', href: '/components/password-input', layer: 'Components' },
+    { name: 'PhoneInput', href: '/components/phone-input', layer: 'Components' },
+    { name: 'Checkbox', href: '/components/checkbox', layer: 'Components' },
+    { name: 'OTP', href: '/components/otp', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'ProviderButton', href: '/components/provider-button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+The view renders its own `Card.Root` and shows one step at a time inside it. `step` says which step and carries that step's data; every other prop is shared across steps. `form` is one `useForm` holding every step's fields, and each step's form submits through `onSubmit`. `isPending` describes the current step's attempt, and `isDisabled` locks every control that would start another action, including while a social provider is pending. `errorMessage` is an error about the step's field; `globalErrorMessage` is an error about the whole step and shows in the card's banner. Leaving out a callback hides the control it drives: `onSignIn` for the sign-in link, `onCancel` for the step's secondary action, `onResend` for the resend line, `onEmailSupport` and `onJoinWaitlist` for the restricted screens.
+
+```tsx
+import { SignUpView } from '@clerk/mosaic/features/sign-up';
+
+<SignUpView
+  step={{ kind: 'details', purpose: 'start', fields: { emailAddress: { required: true } } }}
+  applicationName='Acme'
+  socialProviders={socialProviders}
+  onSelectProvider={startProvider}
+  form={form}
+  onSubmit={submit}
+  onCodeComplete={verify}
+  isPending={isPending}
+  isDisabled={isDisabled}
+  onEditIdentifier={editIdentifier}
+  onBack={back}
+  canResend
+/>;
+```
+
+## Steps
+
+### Start step
+
+`{ kind: 'details', purpose: 'start' }` draws the first sign-up screen: the social providers, the fields the step lists, and the link to sign in. With no fields it shows the providers alone.
+
+#### Social only
+
+<Story name='StartSocialOnly' storyModule={Stories} />
+
+#### Form only
+
+<Story name='StartFormOnly' storyModule={Stories} />
+
+#### Invitation
+
+<Story name='StartInvitation' storyModule={Stories} />
+
+#### Email or phone
+
+<Story name='StartEmailOrPhone' storyModule={Stories} />
+
+#### Legal consent
+
+<Story name='StartLegalConsent' storyModule={Stories} />
+
+#### Captcha
+
+<Story name='StartCaptcha' storyModule={Stories} />
+
+#### Provider pending
+
+<Story name='StartProviderPending' storyModule={Stories} />
+
+### Continue step
+
+`{ kind: 'details', purpose: 'continue' }` asks for what the sign-up still needs. When consent is all that is missing it shows only the checkbox.
+
+#### Missing fields
+
+<Story name='Continue' storyModule={Stories} />
+
+#### Legal consent only
+
+<Story name='ContinueLegalConsentOnly' storyModule={Stories} />
+
+### Access restricted
+
+Shown when the instance does not take sign-ups: `restricted` offers support, `waitlist` offers the waitlist.
+
+#### Restricted
+
+<Story name='Restricted' storyModule={Stories} />
+
+#### Waitlist
+
+<Story name='Waitlist' storyModule={Stories} />
+
+### Verification
+
+The phone number screen for an alternative channel, the code screens, and the email link screens.
+
+#### Alternative phone channel
+
+<Story name='AlternativePhone' storyModule={Stories} />
+
+#### Verify email
+
+<Story name='VerifyEmail' storyModule={Stories} />
+
+#### Verify phone
+
+<Story name='VerifyPhone' storyModule={Stories} />
+
+#### Verify phone by alternative channel
+
+<Story name='VerifyPhoneAlternativeChannel' storyModule={Stories} />
+
+#### Verify by email link
+
+<Story name='VerifyEmailLink' storyModule={Stories} />
+
+#### Signed up from email link
+
+<Story name='EmailLinkSignedUp' storyModule={Stories} />
+
+### Choices
+
+Picking an enterprise connection or a Solana wallet.
+
+#### Enterprise connections
+
+<Story name='EnterpriseConnections' storyModule={Stories} />
+
+#### Wallets
+
+<Story name='Wallets' storyModule={Stories} />
+
+### Flow notices
+
+Shared with sign-in: loading, the Protect check, and a blocked request.
+
+#### Loading
+
+<Story name='Loading' storyModule={Stories} />
+
+#### Protect check
+
+<Story name='ProtectCheck' storyModule={Stories} />
+
+#### Action blocked
+
+<Story name='ActionBlocked' storyModule={Stories} />

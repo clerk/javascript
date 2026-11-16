@@ -6,10 +6,45 @@ export const signInMessages = {
     descriptionCombined: 'Welcome! Sign in or create an account to continue',
     socialButton: 'Continue with {provider}',
     divider: 'or',
+    lastUsed: 'Last used',
     emailLabel: 'Email address',
     emailPlaceholder: 'Enter your email address',
+    phoneLabel: 'Phone number',
+    phonePlaceholder: 'Enter your phone number',
+    usernameLabel: 'Username',
+    usernamePlaceholder: 'Enter your username',
+    emailOrUsernameLabel: 'Email address or username',
+    emailOrUsernamePlaceholder: 'Enter email or username',
+    useEmail: 'Use email',
+    usePhone: 'Use phone',
+    useUsername: 'Use username',
+    useEmailOrUsername: 'Use email or username',
+    selectedCountry: 'Country, {country}',
+    chooseCountry: 'Choose a country',
+    searchCountries: 'Search countries',
+    countrySearchPlaceholder: 'Search',
+    noCountries: 'No countries found',
+    usePasskey: 'Use passkey instead',
     signUpPrompt: 'Don’t have an account?',
     signUpLink: 'Sign up',
+    waitlistPrompt: 'Want early access?',
+    waitlistLink: 'Join waitlist',
+  },
+  alternativeChannel: {
+    title: 'Sign in to {applicationName} with {provider}',
+    description: 'Enter your phone number to get a verification code on {provider}.',
+    label: '{provider} phone number',
+  },
+  wallets: {
+    title: 'Sign in with Solana',
+    description: 'Select a wallet below to sign in',
+    noneAvailable: 'No Solana Web3 wallets detected. Please install a Web3 supported {#link}wallet extension{/link}.',
+  },
+  accounts: {
+    title: 'Choose an account',
+    description: 'Select the account with which you wish to continue.',
+    addAccount: 'Add account',
+    signOutAll: 'Sign out of all accounts',
   },
   password: {
     title: 'Enter your password',
@@ -27,6 +62,17 @@ export const signInMessages = {
   noAvailableMethods: {
     title: 'Cannot sign in',
     description: 'Cannot proceed with sign in. There’s no available authentication factor.',
+  },
+  loading: 'Loading…',
+  protectCheck: {
+    title: 'Verifying your request',
+    description: 'Please wait while we verify your request.',
+    retry: 'Try again',
+  },
+  startOver: {
+    title: 'Something went wrong',
+    description: 'We couldn’t continue signing you in. Start over to try again.',
+    action: 'Start over',
   },
   actionBlocked: {
     title: 'We couldn’t complete this request',
@@ -47,6 +93,59 @@ export const signInMessages = {
     resendText: 'Didn’t receive a link?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
+    loading: {
+      title: 'Signing in...',
+      description: 'You will be redirected soon',
+    },
+    signedIn: {
+      title: 'Successfully signed in',
+      description: 'Return to original tab to continue',
+    },
+    signedInOtherTab: {
+      title: 'Signed in on other tab',
+      description: 'Return to the newly opened tab to continue',
+    },
+    transferable: {
+      title: 'Email verified',
+      description: 'Return to original tab to continue',
+    },
+    expired: {
+      title: 'This verification link has expired',
+      description: 'Return to the original tab to continue.',
+    },
+    failed: {
+      title: 'This verification link is invalid',
+      description: 'Return to the original tab to continue.',
+    },
+    clientMismatch: {
+      title: 'Verification link is invalid for this device',
+      description:
+        'To continue, open the verification link on the device and browser from which you initiated the sign-in',
+    },
+    closeTab: 'You may close this tab',
+    signUp: {
+      loading: {
+        title: 'Signing up...',
+        description: 'You will be redirected soon',
+      },
+      signedIn: {
+        title: 'Successfully signed up',
+        description: 'Return to original tab to continue',
+      },
+      signedInOtherTab: {
+        title: 'Successfully verified email',
+        description: 'Return to previous tab to continue',
+      },
+      clientMismatch: {
+        title: 'Verification link is invalid for this device',
+        description:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-up',
+      },
+    },
+  },
+  verifyEmailLink: {
+    title: 'Verify your email',
+    description: 'Use the verification link sent to your email address',
   },
   passkey: {
     title: 'Use your passkey',
@@ -60,8 +159,8 @@ export const signInMessages = {
   },
   resetPasswordCode: {
     title: 'Reset password',
-    descriptionEmail: 'First, enter the code sent to your email address {identifier}',
-    descriptionPhone: 'First, enter the code sent to your phone {identifier}',
+    descriptionEmail: 'First, enter the code sent to your email address',
+    descriptionPhone: 'First, enter the code sent to your phone',
     label: 'Verification code',
     verify: 'Verify',
     resendText: 'Didn’t receive a code?',
@@ -73,12 +172,14 @@ export const signInMessages = {
     passwordLabel: 'New password',
     confirmPasswordLabel: 'Confirm password',
     signOutOfOtherSessions: 'Sign out of all other devices',
+    requiredMessage: 'For security reasons, it is required to reset your password.',
     submit: 'Reset password',
     pending: 'Resetting password',
   },
   emailCode: {
     title: 'Check your email',
-    description: 'Enter the verification code sent to {identifier}',
+    description: 'Enter the verification code to continue to {applicationName}',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
@@ -86,7 +187,8 @@ export const signInMessages = {
   },
   phoneCode: {
     title: 'Check your phone',
-    description: 'Enter the verification code sent to {identifier}',
+    description: 'Enter the verification code to continue to {applicationName}',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
@@ -94,16 +196,47 @@ export const signInMessages = {
   },
   phoneCodeMfa: {
     title: 'Check your phone',
-    description: 'To continue, enter the verification code sent to {identifier}',
+    description: 'Enter the verification code sent to your phone',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
   },
+  alternativePhoneCode: {
+    title: 'Check your {provider}',
+    description: 'Enter the verification code to continue to {applicationName}',
+    descriptionSentTo: 'Enter the verification code sent to {identifier}',
+    label: 'Verification code',
+    useSms: 'Send code via SMS instead',
+    resendText: 'Didn’t receive a code?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  enterpriseSso: {
+    continue: 'Continue with SSO',
+    pending: 'Redirecting to SSO',
+    bypass: 'Can’t use SSO?',
+  },
+  enterpriseConnections: {
+    title: 'Choose an account',
+    description: 'Select an enterprise account to continue.',
+  },
+  ssoBypass: {
+    notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
+  },
+  clientTrust: {
+    notice: 'You’re signing in from a new device. We’re asking for verification to keep your account secure.',
+  },
   totpMfa: {
     title: 'Two-step verification',
     description: 'To continue, please enter the verification code generated by your authenticator app',
     label: 'Verification code',
+  },
+  resetPasswordMfa: {
+    description: 'We need to verify your identity before resetting your password.',
+    descriptionSentTo:
+      'Enter the verification code sent to {identifier}. We need to verify your identity before resetting your password.',
   },
   backupCodeMfa: {
     title: 'Enter a backup code',
@@ -113,6 +246,7 @@ export const signInMessages = {
   alternativeMethods: {
     title: 'Use another method',
     description: 'Facing issues? You can use any of these methods to sign in.',
+    emailLink: 'Email link to {identifier}',
     emailCode: 'Email code to {identifier}',
     phoneCode: 'Send SMS code to {identifier}',
     password: 'Sign in with your password',
@@ -128,20 +262,6 @@ export const signInMessages = {
       emailSupport: 'Email support',
     },
   },
-  signUp: {
-    title: 'Create your account',
-    description: 'Welcome! Please fill in the details to get started.',
-    firstNameLabel: 'First name',
-    firstNamePlaceholder: 'First name',
-    lastNameLabel: 'Last name',
-    lastNamePlaceholder: 'Last name',
-    emailLabel: 'Email address',
-    emailPlaceholder: 'Enter your email address',
-    passwordLabel: 'Password',
-    passwordPlaceholder: 'Enter your password',
-    signInPrompt: 'Already have an account?',
-    signInLink: 'Sign in',
-  },
   verifyEmail: {
     title: 'Verify your email',
     description: 'Enter the verification code sent to {identifier}',
@@ -150,7 +270,18 @@ export const signInMessages = {
     resend: 'Resend',
     resendCountdown: 'Resend ({seconds})',
   },
+  verifyPhone: {
+    title: 'Verify your phone',
+    titleProvider: 'Verify your {provider}',
+    description: 'Enter the verification code sent to your phone',
+    descriptionProvider: 'Enter the verification code sent to your {provider}',
+    label: 'Verification code',
+    resendText: 'Didn’t receive a code?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
   editIdentifier: 'Edit email address',
+  editPhoneNumber: 'Edit phone number',
   continue: 'Continue',
   verifying: 'Verifying',
   back: 'Back',

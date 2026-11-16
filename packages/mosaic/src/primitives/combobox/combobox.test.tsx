@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createRef, StrictMode, Suspense, useDeferredValue, useState, useTransition } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { axe } from '../test-utils/axe';
 import { Combobox, type ComboboxTriggerProps } from './index';
 
 afterEach(() => cleanup());
@@ -174,6 +175,87 @@ describe('Combobox', () => {
     await waitFor(() => expect(measureInput).toHaveBeenCalled());
     expect(input).toHaveFocus();
     anchor.remove();
+  });
+
+  describe('input group', () => {
+    function GroupedCombobox({ anchor }: { anchor?: HTMLElement }) {
+      return (
+        <Combobox.Root>
+          <Combobox.InputGroup data-testid='group'>
+            <Combobox.Input aria-label='Fruit' />
+            <span data-testid='end'>kg</span>
+          </Combobox.InputGroup>
+          <Combobox.Positioner anchor={anchor}>
+            <Combobox.Popup>
+              <Combobox.Option value='apple'>Apple</Combobox.Option>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Root>
+      );
+    }
+
+    it('positions the popup against the group', async () => {
+      const user = userEvent.setup();
+      render(<GroupedCombobox />);
+      const measureGroup = vi.spyOn(screen.getByTestId('group'), 'getBoundingClientRect');
+
+      await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+
+      await waitFor(() => expect(measureGroup).toHaveBeenCalled());
+    });
+
+    it('lets an explicit anchor win over the group', async () => {
+      const user = userEvent.setup();
+      const anchor = document.createElement('div');
+      document.body.append(anchor);
+      const measureAnchor = vi.spyOn(anchor, 'getBoundingClientRect');
+      render(<GroupedCombobox anchor={anchor} />);
+      const measureGroup = vi.spyOn(screen.getByTestId('group'), 'getBoundingClientRect');
+
+      await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+
+      await waitFor(() => expect(measureAnchor).toHaveBeenCalled());
+      expect(measureGroup).not.toHaveBeenCalled();
+      anchor.remove();
+    });
+
+    it('stays open when the group padding or an end slot is pressed', async () => {
+      const user = userEvent.setup();
+      render(<GroupedCombobox />);
+      const input = screen.getByRole('combobox', { name: 'Fruit' });
+      await user.type(input, 'a');
+
+      await user.click(screen.getByTestId('group'));
+      await user.click(screen.getByTestId('end'));
+      expect(input).toHaveAttribute('aria-expanded', 'true');
+
+      await user.click(document.body);
+      expect(input).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('leaves an inline list working inside a group', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      render(
+        <Combobox.Root
+          inline
+          open
+          onValueChange={onValueChange}
+        >
+          <Combobox.InputGroup data-testid='group'>
+            <Combobox.Input aria-label='Fruit' />
+          </Combobox.InputGroup>
+          <Combobox.List>
+            <Combobox.Option value='apple'>Apple</Combobox.Option>
+          </Combobox.List>
+        </Combobox.Root>,
+      );
+
+      await user.click(screen.getByTestId('group'));
+      await user.click(screen.getByRole('option', { name: 'Apple' }));
+
+      expect(onValueChange).toHaveBeenCalledWith('apple');
+    });
   });
 
   it('toggles from a popup button while keeping focus on the input', async () => {
@@ -364,16 +446,17 @@ describe('Combobox', () => {
     });
     function SelectionOnly({ onValueChange }: { onValueChange?: (value: string | null) => void }) {
       return (
-        <Combobox.Root onValueChange={onValueChange}>
+        <Combobox.Root
+          onValueChange={onValueChange}
+          items={fruits}
+          itemToStringLabel={fruit => fruit.label}
+        >
           <Combobox.Input aria-label='Fruit' />
           <Combobox.Trigger aria-label='Show fruits' />
           <Combobox.Positioner>
             <Combobox.Popup>
-              <Combobox.Collection
-                items={fruits}
-                itemToStringLabel={fruit => fruit.label}
-              >
-                {fruit => (
+              <Combobox.Collection>
+                {(fruit: (typeof fruits)[number]) => (
                   <Combobox.Option
                     key={fruit.value}
                     value={fruit.value}
@@ -504,6 +587,8 @@ describe('Combobox', () => {
             onOpenChange={setOpen}
             value={value}
             onValueChange={setValue}
+            items={fruits}
+            itemToStringLabel={fruit => fruit.label}
           >
             <button
               type='button'
@@ -515,11 +600,8 @@ describe('Combobox', () => {
               <>
                 <Combobox.Input aria-label='Search fruit' />
                 <Combobox.List>
-                  <Combobox.Collection
-                    items={fruits}
-                    itemToStringLabel={fruit => fruit.label}
-                  >
-                    {fruit => (
+                  <Combobox.Collection>
+                    {(fruit: (typeof fruits)[number]) => (
                       <Combobox.Option
                         key={fruit.value}
                         value={fruit.value}
@@ -633,6 +715,157 @@ describe('Combobox', () => {
       expect(onValueChange).toHaveBeenCalledExactlyOnceWith('banana');
       rerender(<Controlled open={false} />);
       expect(input).toHaveValue('Apple');
+    });
+  });
+});
+
+describe('Combobox.Empty', () => {
+  type Fruit = (typeof fruits)[number];
+
+  function FruitOption({ fruit }: { fruit: Fruit }) {
+    return (
+      <Combobox.Option
+        key={fruit.value}
+        value={fruit.value}
+        label={fruit.label}
+      >
+        {fruit.label}
+      </Combobox.Option>
+    );
+  }
+
+  it('announces the empty message in a region that stays mounted while filtering', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root
+        items={fruits}
+        itemToStringLabel={fruit => fruit.label}
+      >
+        <Combobox.Input aria-label='Fruit' />
+        <Combobox.Positioner>
+          <Combobox.Popup>
+            <Combobox.Empty>No fruit found</Combobox.Empty>
+            <Combobox.Collection>
+              {(fruit: Fruit) => (
+                <FruitOption
+                  key={fruit.value}
+                  fruit={fruit}
+                />
+              )}
+            </Combobox.Collection>
+          </Combobox.Popup>
+        </Combobox.Positioner>
+      </Combobox.Root>,
+    );
+    const input = screen.getByRole('combobox', { name: 'Fruit' });
+
+    await user.type(input, 'an');
+    const status = screen.getByRole('status');
+    expect(status).toHaveAttribute('aria-live', 'polite');
+    expect(status).toHaveAttribute('aria-atomic', 'true');
+    expect(status).toBeEmptyDOMElement();
+    expect(screen.getAllByRole('option')).toHaveLength(1);
+
+    await user.type(input, 'zzz');
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
+    expect(screen.getByRole('status')).toBe(status);
+    expect(status).toHaveTextContent('No fruit found');
+
+    await user.clear(input);
+    await user.type(input, 'e');
+    expect(screen.getByRole('status')).toBe(status);
+    expect(status).toBeEmptyDOMElement();
+    expect(screen.getAllByRole('option')).toHaveLength(3);
+  });
+
+  it('fills the region beside an inline list when the search matches nothing', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Combobox.Root
+        inline
+        open
+        items={fruits}
+        itemToStringLabel={fruit => fruit.label}
+      >
+        <Combobox.Input aria-label='Search fruit' />
+        <Combobox.Empty>No fruit found</Combobox.Empty>
+        <Combobox.List aria-label='Fruits'>
+          <Combobox.Collection>
+            {(fruit: Fruit) => (
+              <FruitOption
+                key={fruit.value}
+                fruit={fruit}
+              />
+            )}
+          </Combobox.Collection>
+        </Combobox.List>
+      </Combobox.Root>,
+    );
+    const status = screen.getByRole('status');
+    expect(status).toBeEmptyDOMElement();
+    expect(screen.getAllByRole('option')).toHaveLength(4);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search fruit' }), 'zzz');
+
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
+    expect(screen.getByRole('status')).toBe(status);
+    expect(status).toHaveTextContent('No fruit found');
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('always renders its children when the root has no items', () => {
+    render(
+      <Combobox.Root
+        inline
+        open
+      >
+        <Combobox.Input aria-label='Search fruit' />
+        <Combobox.Empty>No fruit found</Combobox.Empty>
+        <Combobox.List aria-label='Fruits'>
+          <Combobox.Option value='apple'>Apple</Combobox.Option>
+        </Combobox.List>
+      </Combobox.Root>,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('No fruit found');
+  });
+
+  describe('when the region mounts with its message already shown', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    });
+
+    function EmptyOnMount() {
+      return (
+        <Combobox.Root
+          inline
+          open
+          items={[]}
+          itemToStringLabel={(fruit: string) => fruit}
+        >
+          <Combobox.Input aria-label='Search fruit' />
+          <Combobox.Empty>No fruit found</Combobox.Empty>
+        </Combobox.Root>
+      );
+    }
+
+    it('changes the text once after mount so screen readers announce it', () => {
+      vi.useFakeTimers();
+      render(<EmptyOnMount />);
+      const status = screen.getByRole('status');
+
+      expect(status.textContent).toBe('No fruit found⁠');
+
+      vi.advanceTimersByTime(200);
+      expect(status.textContent).toBe('No fruit found');
+    });
+
+    it('leaves the text alone on iOS', () => {
+      vi.spyOn(navigator, 'platform', 'get').mockReturnValue('iPhone');
+      render(<EmptyOnMount />);
+
+      expect(screen.getByRole('status').textContent).toBe('No fruit found');
     });
   });
 });

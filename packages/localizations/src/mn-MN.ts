@@ -1640,6 +1640,14 @@ export const mnMN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1651,6 +1659,22 @@ export const mnMN: LocalizationResource = {
       resendButton: undefined,
       subtitle: undefined,
       title: undefined,
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: undefined,
@@ -2089,6 +2113,7 @@ export const mnMN: LocalizationResource = {
       'Аюулгүй байдлын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Маягтын код буруу байна',
     form_email_address_blocked:
       'Түр зуурын имэйл үйлчилгээг дэмжихгүй. Данс үүсгэхийн тулд ердийн имэйл хаягаа ашиглана уу.',
@@ -2163,9 +2188,12 @@ export const mnMN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:

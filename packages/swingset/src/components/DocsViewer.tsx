@@ -62,7 +62,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
     'logs-table': dynamic(() => import('../stories/logs-table.mdx')),
-    'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
+    consent: dynamic(() => import('../stories/consent.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
     'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),
@@ -73,6 +73,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   authentication: {
     'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
+    'sign-up': dynamic(() => import('../stories/sign-up.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
@@ -126,6 +127,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
+    captcha: dynamic(() => import('../stories/captcha.mdx')),
     'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
   },
   primitives: {
@@ -138,6 +140,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     drawer: dynamic(() => import('../stories/drawer.mdx')),
     'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
     flow: dynamic(() => import('../stories/flow.mdx')),
+    'image-cropper': dynamic(() => import('../stories/image-cropper.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),

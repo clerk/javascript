@@ -1638,6 +1638,14 @@ export const enGB: LocalizationResource = {
       subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",
@@ -1649,6 +1657,22 @@ export const enGB: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the code sent to your phone to continue',
       title: 'Verification required',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -2089,6 +2113,7 @@ export const enGB: LocalizationResource = {
       'Sign up unsuccessful due to failed security validations. Please try using a different browser or disabling browser extensions. If issues persist, contact support for assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Temporary email services are not supported. Please use your regular email address to create an account.',
@@ -2165,9 +2190,12 @@ export const enGB: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: "You're already signed in.",
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',

@@ -51,4 +51,25 @@ describe('Mosaic PasswordInput', () => {
     await user.click(screen.getByRole('button', { name: 'Show password' }));
     expect(input).toHaveAttribute('type', 'password');
   });
+
+  it('keeps the toggle out of the tab order when the input is', async () => {
+    render(
+      <>
+        <input aria-label='Email' />
+        <PasswordInput
+          aria-label='Password'
+          tabIndex={-1}
+          showPasswordLabel='Show password'
+          hidePasswordLabel='Hide password'
+        />
+        <button type='button'>Sign up</button>
+      </>,
+    );
+    const user = userEvent.setup();
+
+    await user.click(screen.getByLabelText('Email'));
+    await user.tab();
+
+    expect(screen.getByRole('button', { name: 'Sign up' })).toHaveFocus();
+  });
 });

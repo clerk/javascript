@@ -1642,6 +1642,14 @@ export const esUY: LocalizationResource = {
       subtitle: 'Ingresá tu contraseña para continuar',
       title: 'Verificación requerida',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -1653,6 +1661,22 @@ export const esUY: LocalizationResource = {
       resendButton: '¿No recibiste un código? Reenviar',
       subtitle: 'Ingresá el código enviado a tu teléfono para continuar',
       title: 'Verificación requerida',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',
@@ -2097,6 +2121,7 @@ export const esUY: LocalizationResource = {
       'El registro no se pudo completar debido a validaciones de seguridad fallidas. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
     captcha_unavailable:
       'El registro no se pudo completar debido a la validación fallida contra bots. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Los servicios de correo electrónico temporal no están soportados. Por favor, usá tu dirección de correo electrónico habitual para crear una cuenta.',
@@ -2175,9 +2200,12 @@ export const esUY: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Ya has iniciado sesión',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'No se encontró una extensión de cartera Web3. Por favor, instalá una para continuar.',
     web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',

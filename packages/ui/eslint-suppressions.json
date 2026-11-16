@@ -89,11 +89,6 @@
       "count": 23
     }
   },
-  "src/components/UserVerification/UserVerificationFactorOne.tsx": {
-    "react-hooks/refs": {
-      "count": 2
-    }
-  },
   "src/components/devPrompts/EnableOrganizationsPrompt/index.tsx": {
     "react-hooks/set-state-in-effect": {
       "count": 1

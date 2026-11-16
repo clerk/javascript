@@ -8,6 +8,7 @@ Read this when you review whether a migrated feature kept every legacy behavior,
 - Each one is **Migrated** (points at a state, transition, context field or prop in the new code), **Deliberately changed** (names the new behavior and why) or **Deferred** (not implemented; say whether a ticket tracks it).
 - A Deferred item tracked only by a `// TODO` is a regression at risk of shipping. Surface it as a tracked item.
 - Run it as a read-only subagent that returns a conclusion, not file dumps. The table guides the work and the PR discussion; nothing is committed.
+- For a migration with views, also compare each screen with the legacy screenshot from [Migration → Screens](migration.md#screens), and put the pairs in a Legacy / Mosaic table in the PR description. A behavior audit reads code; it misses a dropped identity preview or an error shown as plain text.
 
 ## The subagent prompt
 

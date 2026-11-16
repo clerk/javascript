@@ -1639,6 +1639,14 @@ export const svSE: LocalizationResource = {
       subtitle: 'Ange lösenordet som är kopplat till ditt konto',
       title: 'Ange ditt lösenord',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifieringskod',
       resendButton: 'Fick du ingen kod? Skicka igen',
@@ -1650,6 +1658,22 @@ export const svSE: LocalizationResource = {
       resendButton: 'Fick du ingen kod? Skicka igen',
       subtitle: 'För att fortsätta, vänligen ange verifieringskoden som skickats till din telefon',
       title: 'Kontrollera din telefon',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verifieringskod',
@@ -2091,6 +2115,7 @@ export const svSE: LocalizationResource = {
       'Registrering misslyckades på grund av säkerhetskontroller. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     captcha_unavailable:
       'Registrering misslyckades på grund av misslyckad bot-validering. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Koden är felaktig',
     form_email_address_blocked:
       'Tillfälliga e-posttjänster stöds inte. Använd din vanliga e-postadress för att skapa ett konto.',
@@ -2164,9 +2189,12 @@ export const svSE: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Du är redan inloggad.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Du avvisade signaturbegäran. Försök igen för att fortsätta.',

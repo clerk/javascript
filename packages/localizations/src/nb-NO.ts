@@ -1650,6 +1650,14 @@ export const nbNO: LocalizationResource = {
       subtitle: 'Skriv inn ditt nåværende passord for å fortsette',
       title: 'Verifisering påkrevd',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifiseringskode',
       resendButton: 'Ikke mottatt kode? Send på nytt',
@@ -1661,6 +1669,22 @@ export const nbNO: LocalizationResource = {
       resendButton: 'Ikke mottatt kode? Send på nytt',
       subtitle: 'Skriv inn koden sendt til telefonen din for å fortsette',
       title: 'Verifisering påkrevd',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verifiseringskode',
@@ -2110,6 +2134,7 @@ export const nbNO: LocalizationResource = {
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     captcha_unavailable:
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Midlertidige e-posttjenester støttes ikke. Vennligst bruk din vanlige e-postadresse for å opprette en konto.',
@@ -2189,9 +2214,12 @@ export const nbNO: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Du er allerede logget inn.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'En Web3-lommebokutvidelse ble ikke funnet. Installer en for å fortsette.',
     web3_signature_request_rejected: 'Du avviste signaturforespørselen. Prøv igjen for å fortsette.',

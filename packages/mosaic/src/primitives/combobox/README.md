@@ -5,16 +5,17 @@ A headless single-selection input. Typing searches options; choosing one remembe
 ```tsx
 import { Combobox } from '../../primitives/combobox';
 
-<Combobox.Root>
+<Combobox.Root
+  items={['Apple', 'Banana']}
+  itemToStringLabel={item => item}
+>
   <Combobox.Input aria-label='Fruit' />
   <Combobox.Trigger aria-label='Show fruits' />
   <Combobox.Positioner>
     <Combobox.Popup>
-      <Combobox.Collection
-        items={['Apple', 'Banana']}
-        itemToStringLabel={item => item}
-      >
-        {item => (
+      <Combobox.Empty>No fruit found</Combobox.Empty>
+      <Combobox.Collection>
+        {(item: string) => (
           <Combobox.Option
             key={item}
             value={item}
@@ -30,6 +31,17 @@ import { Combobox } from '../../primitives/combobox';
 ```
 
 `value`, `defaultValue`, and `onValueChange` control the selected option. Clearing the input clears selection with `null`. `inputValue`, `defaultInputValue`, and `onInputValueChange` control search text separately.
+
+`items` and `itemToStringLabel` on `Root` give the options to search. `Collection` renders the ones whose label contains the search text, case-insensitively. Annotate its `children` parameter with the item type. `Empty` is a polite `role="status"` region that shows its children only when nothing matches. Keep it mounted, so screen readers announce the message when it appears. Without `items`, it always shows its children.
+
+Wrap the input and its controls in `Combobox.InputGroup` to position the popup against the whole group. Pressing anywhere inside the group keeps the popup open. The popup anchors to the Positioner's `anchor` if given, then the `Combobox.InputGroup`, then the input.
+
+```tsx
+<Combobox.InputGroup>
+  <Combobox.Input aria-label='Fruit' />
+  <Combobox.Trigger aria-label='Show fruits' />
+</Combobox.InputGroup>
+```
 
 Dismissal restores the selected label. Reopening shows all options until typing starts. Hover and keyboard highlighting do not change selection.
 

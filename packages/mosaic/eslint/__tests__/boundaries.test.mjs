@@ -251,7 +251,7 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
         import { useUser as user } from '@clerk/shared/react';
         import { useMosaicRouter as router } from '../../hooks/use-mosaic-router';
       `,
-      errors: [/useMessages\(\)/, /model/, /model/],
+      errors: [/^Read copy with `useMessages\('<namespace>'\)` from src\/localization/, /model/, /model/],
     },
     {
       name: 'sample.view.tsx rejects catalog values and Clerk hooks',
@@ -261,7 +261,7 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
         import { useUser as user } from '@clerk/shared/react';
         import { useMosaicRouter as router } from '../../hooks/use-mosaic-router';
       `,
-      errors: [/useMessages\(\)/, /model/, /model/],
+      errors: [/^Read copy with `useMessages\('<namespace>'\)` from src\/localization/, /model/, /model/],
     },
     {
       name: 'sample.controller.ts rejects catalog values and Clerk hooks',
@@ -271,7 +271,7 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
         import { useUser as user } from '@clerk/shared/react';
         import { useMosaicRouter as router } from '../../hooks/use-mosaic-router';
       `,
-      errors: [/useMessages\(\)/, /model/, /model/],
+      errors: [/^Read copy with `useMessages\('<namespace>'\)` from src\/localization/, /model/, /model/],
     },
     {
       name: 'sample.controller.tsx rejects catalog values and Clerk hooks',
@@ -281,7 +281,7 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
         import { useUser as user } from '@clerk/shared/react';
         import { useMosaicRouter as router } from '../../hooks/use-mosaic-router';
       `,
-      errors: [/useMessages\(\)/, /model/, /model/],
+      errors: [/^Read copy with `useMessages\('<namespace>'\)` from src\/localization/, /model/, /model/],
     },
     {
       name: 'rejects catalog values and environment hooks but allows catalog types',
@@ -292,7 +292,7 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
         import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
         import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
       `,
-      errors: [/useMessages\(\)/, /model/, /model/],
+      errors: [/^Read copy with `useMessages\('<namespace>'\)` from src\/localization/, /model/, /model/],
     },
     {
       name: 'rejects aliased useClerk in a controller',

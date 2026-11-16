@@ -1642,6 +1642,14 @@ export const beBY: LocalizationResource = {
       subtitle: 'Калі вы памятаеце свой пароль, вы можаце ўвесці яго для завершэння верыфікацыі.',
       title: 'Падцвердзіць праз пароль',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Увядзіце код, які быў адпраўлены на ваш тэлефон.',
       resendButton: 'Пераадправіць код на тэлефон',
@@ -1653,6 +1661,22 @@ export const beBY: LocalizationResource = {
       resendButton: 'Пераадправіць код MFA',
       subtitle: 'Праверце смс-паведамленне для атрымання кода MFA.',
       title: 'Код MFA з тэлефона',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Увядзіце код TOTP з вашага прыкладання.',
@@ -2094,6 +2118,7 @@ export const beBY: LocalizationResource = {
       'Рэгістрацыя не ўдалася з-за памылак бяспекі. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз, або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     captcha_unavailable:
       'Рэгістрацыя не ўдалася з-за памылак праверкі ботаў. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Невядомы код. Пераканайцеся, што вы ўвялі правільны код.',
     form_email_address_blocked:
       'Часовая пошта не падтрымліваецца. Калі ласка, выкарыстоўвайце свой звычайны адрас электроннай пошты для стварэння акаўнта.',
@@ -2168,9 +2193,12 @@ export const beBY: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Вы ўжо ўвайшлі.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Вы адхілілі запыт на подпіс. Калі ласка, паспрабуйце яшчэ раз, каб працягнуць.',

@@ -361,6 +361,7 @@ export class Clerk implements ClerkInterface {
         publicKeyOptions,
       }: {
         publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+        preferImmediatelyAvailableCredentials?: boolean;
       }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>)
     | undefined;
 

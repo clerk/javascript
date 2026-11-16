@@ -49,6 +49,7 @@ export function CredentialStep({
         onSubmit={onSubmit}
         onForgotPassword={onForgotPassword}
         onCancel={onCancel}
+        onShowHelp={onShowHelp}
       />
     );
   }

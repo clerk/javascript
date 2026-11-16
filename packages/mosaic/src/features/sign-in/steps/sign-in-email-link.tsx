@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
 import type { VerificationCodeResend } from '../../../blocks/verification';
+import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -9,6 +10,8 @@ import { useMessages } from '../../../localization';
 import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface SignInEmailLinkProps {
+  title: string;
+  description: string;
   identifier: string;
   onEditIdentifier?: () => void;
   globalErrorMessage?: string;
@@ -16,9 +19,12 @@ interface SignInEmailLinkProps {
   resend?: VerificationCodeResend;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
+  notice?: string;
 }
 
 export function SignInEmailLink({
+  title,
+  description,
   identifier,
   onEditIdentifier,
   globalErrorMessage,
@@ -26,6 +32,7 @@ export function SignInEmailLink({
   resend,
   onCancel,
   focusRef,
+  notice,
 }: SignInEmailLinkProps) {
   const m = useMessages('signIn');
   const ref = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
@@ -33,8 +40,8 @@ export function SignInEmailLink({
   return (
     <>
       <Card.Header>
-        <Card.Title>{m.emailLink.title}</Card.Title>
-        <Card.Description>{m.emailLink.description}</Card.Description>
+        <Card.Title>{title}</Card.Title>
+        <Card.Description>{description}</Card.Description>
         <SignInIdentityPreview
           identifier={identifier}
           editLabel={m.editIdentifier}
@@ -64,6 +71,13 @@ export function SignInEmailLink({
       >
         {globalErrorMessage}
       </Card.Banner>
+      {notice ? (
+        <Card.Content>
+          <Banner.Root color='warning'>
+            <Banner.Label>{notice}</Banner.Label>
+          </Banner.Root>
+        </Card.Content>
+      ) : null}
       {onCancel ? (
         <Card.Footer>
           <Button

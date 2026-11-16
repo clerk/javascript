@@ -1650,6 +1650,14 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Introduza a sua palavra-passe atual para continuar',
       title: 'Verificação necessária',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificação',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -1661,6 +1669,22 @@ export const ptPT: LocalizationResource = {
       resendButton: 'Não recebeu um código? Reenviar',
       subtitle: 'Introduza o código enviado para o seu telemóvel para continuar',
       title: 'Verificação necessária',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',
@@ -2108,6 +2132,7 @@ export const ptPT: LocalizationResource = {
       'Não foi possível concluir o registo devido a falhas nas validações de segurança. Atualize a página para tentar novamente ou contacte o suporte para obter ajuda adicional.',
     captcha_unavailable:
       'Não foi possível concluir o registo devido a uma falha na validação de bot. Atualize a página para tentar novamente ou contacte o suporte para obter ajuda adicional.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Código incorreto.',
     form_email_address_blocked:
       'Não são suportados serviços de e-mail temporários. Utilize o seu endereço de e-mail habitual para criar uma conta.',
@@ -2186,9 +2211,12 @@ export const ptPT: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Já está conectado.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Falta um identificador Web3. Tente novamente.',
     web3_signature_request_rejected: 'Rejeitou o pedido de assinatura. Tente novamente para continuar.',

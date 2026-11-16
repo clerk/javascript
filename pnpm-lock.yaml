@@ -259,6 +259,7 @@ overrides:
   react-dom: 18.3.1
   rolldown: 1.1.0
   semver@<7.7.3: 7.7.4
+  shadcn: 4.11.0
   smol-toml@<1.6.1: 1.7.1
   socket.io-parser@>=4.0.0 <4.2.7: 4.2.7
   svgo@>=3.0.0 <3.3.3: 4.1.0
@@ -1063,12 +1064,13 @@ importers:
       msw:
         specifier: 2.13.6
         version: 2.13.6(@types/node@22.20.1)(typescript@6.0.3)
-      next:
-        specifier: '>=15.5.18'
-        version: 16.4.5(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.0)(@playwright/test@1.62.1)(@types/node@22.20.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
+    devDependencies:
+      next:
+        specifier: 16.4.5
+        version: 16.4.5(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.0)(@playwright/test@1.62.1)(@types/node@22.20.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   packages/nextjs:
     dependencies:
@@ -1355,7 +1357,7 @@ importers:
         specifier: ^4.0.0
         version: 4.0.1(supports-color@10.2.2)
       shadcn:
-        specifier: ^4.10.0
+        specifier: 4.11.0
         version: 4.11.0(@cfworker/json-schema@4.1.1)(babel-plugin-macros@3.1.0)(supports-color@10.2.2)(typescript@7.0.2)
       shiki:
         specifier: ^1.0.0
