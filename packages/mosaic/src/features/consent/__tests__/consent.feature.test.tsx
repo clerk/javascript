@@ -19,9 +19,11 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { MosaicLocalization } from '../../../localization';
-import type { OAuthConsentProps } from '../oauth-consent';
-import { OAuthConsent } from '../oauth-consent';
+import type { ConsentProps } from '../consent';
+import { Consent } from '../consent';
 
+const PIXEL =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 const REDIRECT_URI = 'https://app.linear.example.com/oauth/callback';
 const CONSENT_PATH = '/v1/me/oauth/consent/client_1';
 
@@ -70,11 +72,11 @@ function visitConsent(params: Record<string, string> = {}) {
 
 async function renderConsent(
   seed: FakeFapiSeed = signedIn(),
-  props: Partial<OAuthConsentProps> = {},
+  props: Partial<ConsentProps> = {},
   localization?: MosaicLocalization,
 ) {
   const fapi = serveFapi(seed);
-  const view = await renderWithClerk(<OAuthConsent {...props} />, undefined, localization);
+  const view = await renderWithClerk(<Consent {...props} />, undefined, localization);
   return { ...view, fapi, user: userEvent.setup() };
 }
 
@@ -109,7 +111,7 @@ function captureSubmits() {
   return submits;
 }
 
-describe('OAuthConsent', () => {
+describe('Consent', () => {
   describe('consent screen', () => {
     it('names the app and who is granting access, and lists the requested scopes', async () => {
       visitConsent();
@@ -185,7 +187,7 @@ describe('OAuthConsent', () => {
       await renderConsent(
         signedIn({ oauthConsent: consent({ scopes: [scope('private_metadata')] }) }),
         {},
-        { overrides: { 'oauthConsent.privateMetadata': 'Métadonnées privées de {applicationName}' } },
+        { overrides: { 'consent.privateMetadata': 'Métadonnées privées de {applicationName}' } },
       );
 
       await ready();
@@ -240,15 +242,18 @@ describe('OAuthConsent', () => {
 
       await ready();
       expect(screen.getByText(/Only continue if you trust/)).toHaveTextContent('(example.com)');
-      expect(screen.getByRole('button', { name: 'example.com' })).toBeVisible();
+      expect(screen.getByText(/If you allow access, this app will redirect you to/)).toHaveTextContent('example.com');
     });
 
-    it('shows the full redirect URL from the domain', async () => {
+    it.each([
+      ['description', /Only continue if you trust/],
+      ['redirect notice', /If you allow access, this app will redirect you to/],
+    ])('shows the full redirect URL from the domain in the %s', async (_, text) => {
       visitConsent();
       const { user } = await renderConsent();
 
       await ready();
-      const domain = screen.getByRole('button', { name: 'example.com' });
+      const domain = within(screen.getByText(text)).getByRole('button', { name: 'example.com' });
       await user.hover(domain);
       expect(await screen.findByRole('tooltip')).toHaveTextContent('View full URL');
 
@@ -395,6 +400,22 @@ describe('OAuthConsent', () => {
       expect((await submitAllow(user))?.get('organization_id')).toBe('org_2');
     });
 
+    it('shows each organization logo', async () => {
+      visitConsent();
+      const initech = fapiOrganization({ id: 'org_3', name: 'Initech', image_url: PIXEL, has_image: true });
+      const bob = fapiUser({ id: 'user_2', organization_memberships: [fapiMembership(initech)] });
+      const { user } = await renderConsent({
+        ...orgScopes,
+        client: fapiClient([fapiSession({ id: 'sess_2', user: bob, last_active_organization_id: null })]),
+      });
+
+      await ready();
+      await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+      const option = await screen.findByRole('option', { name: 'Initech' });
+
+      await waitFor(() => expect(option.querySelector('img')).toHaveAttribute('src', PIXEL));
+    });
+
     it('does not ask when the app does not read organizations', async () => {
       visitConsent();
       const { user } = await renderConsent();
@@ -438,6 +459,19 @@ describe('OAuthConsent', () => {
       expect(fapi.oauthConsentRequests).toEqual([]);
     });
 
+    it('renders the fallback until Clerk loads', async () => {
+      visitConsent();
+      const held = holdRequests('get', '/v1/environment');
+      const rendering = renderConsent(signedIn(), { fallback: <p>Waiting for Clerk</p> });
+
+      expect(await screen.findByText('Waiting for Clerk')).toBeVisible();
+      expect(screen.queryByRole('status')).toBeNull();
+      held.release();
+      await rendering;
+      await ready();
+      expect(screen.queryByText('Waiting for Clerk')).toBeNull();
+    });
+
     it('shows a skeleton while consent loads', async () => {
       visitConsent();
       const held = holdRequests('get', CONSENT_PATH);
@@ -476,7 +510,7 @@ describe('OAuthConsent', () => {
           ),
         ),
       );
-      await renderWithClerk(<OAuthConsent />);
+      await renderWithClerk(<Consent />);
 
       expect(await screen.findByRole('alert', undefined, { timeout: 15_000 })).toHaveTextContent(
         'Consent metadata unavailable',

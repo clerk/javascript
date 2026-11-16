@@ -3,11 +3,18 @@ import type { OAuthConsentScope } from '@clerk/shared/types';
 import type { SelectItem } from '../../components/select';
 import type { ErrorDescription, MosaicMessages } from '../../localization';
 
-export type OAuthConsentMessages = MosaicMessages['oauthConsent'];
+export type ConsentMessages = MosaicMessages['consent'];
 
-export type OAuthConsentScopeRecord = Pick<OAuthConsentScope, 'scope' | 'description'>;
+export type ConsentScopeRecord = Pick<OAuthConsentScope, 'scope' | 'description'>;
 
-export interface OAuthConsentKnownData {
+export interface ConsentOrganization extends SelectItem {
+  imageUrl?: string;
+}
+
+export interface ConsentData {
+  oauthApplicationName: string;
+  scopes: ConsentScopeRecord[];
+  hasOfflineAccess: boolean;
   applicationName: string;
   identifier: string;
   redirectUrl: string;
@@ -15,57 +22,52 @@ export interface OAuthConsentKnownData {
   actionUrl: string;
   forwardedParams: [string, string][];
   renderBranding: boolean;
-  organizations: SelectItem[];
+  organizations: ConsentOrganization[];
   defaultOrganizationId: string | null;
 }
 
-export interface OAuthConsentData extends OAuthConsentKnownData {
-  oauthApplicationName: string;
-  scopes: OAuthConsentScopeRecord[];
-  hasOfflineAccess: boolean;
-}
+export type ConsentReadyModel = ConsentData & { status: 'ready' };
 
-export type OAuthConsentReadyModel = OAuthConsentData & { status: 'ready' };
-
-export type OAuthConsentModel =
-  | { status: 'loading'; known?: OAuthConsentKnownData }
+export type ConsentModel =
+  | { status: 'loading' }
+  | { status: 'fetching' }
   | { status: 'hidden' }
   | { status: 'error'; error: ErrorDescription }
-  | OAuthConsentReadyModel;
+  | ConsentReadyModel;
 
-export interface OAuthConsentScopeItem {
+export interface ConsentScopeItem {
   scope: string;
   label: string;
   description?: string;
   required?: boolean;
 }
 
-export interface OAuthConsentScopeSelection {
+export interface ConsentScopeSelection {
   checked: readonly string[];
   onCheckedChange: (scope: string, checked: boolean) => void;
 }
 
-export type OAuthConsentOrganizationAccess = 'all' | 'selected';
+export type ConsentOrganizationAccess = 'all' | 'selected';
 
-export interface OAuthConsentOrganizationSelection {
-  access: OAuthConsentOrganizationAccess;
-  onAccessChange: (access: OAuthConsentOrganizationAccess) => void;
+export interface ConsentOrganizationSelection {
+  access: ConsentOrganizationAccess;
+  onAccessChange: (access: ConsentOrganizationAccess) => void;
   selected: readonly string[];
   onSelectedChange: (organizationIds: string[]) => void;
 }
 
-export interface OAuthConsentViewProps {
-  messages: OAuthConsentMessages;
+export interface ConsentViewProps {
+  messages: ConsentMessages;
   oauthApplicationName: string;
   identifier: string;
   applicationName: string;
-  scopes: OAuthConsentScopeItem[];
-  scopeSelection?: OAuthConsentScopeSelection;
+  scopes: ConsentScopeItem[];
+  scopeSelection?: ConsentScopeSelection;
   hasOfflineAccess: boolean;
-  organizations: SelectItem[];
+  organizations: ConsentOrganization[];
   organizationId: string | null;
   onOrganizationChange: (organizationId: string) => void;
-  organizationSelection?: OAuthConsentOrganizationSelection;
+  organizationSelection?: ConsentOrganizationSelection;
   redirectUrl: string;
   redirectDomain: string;
   isRedirectUrlOpen: boolean;

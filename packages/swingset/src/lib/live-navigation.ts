@@ -48,6 +48,7 @@ const livePages = new Set([
   '/misc/sign-in-with-metamask-button',
   '/misc/sign-up-button',
   '/misc/sign-out-button',
+  '/misc/consent',
   '/user-button/user-button',
 ]);
 

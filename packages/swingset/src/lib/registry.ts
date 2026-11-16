@@ -57,6 +57,14 @@ import {
   WithError as ConfirmationWithError,
 } from '../stories/confirmation.stories';
 import {
+  Default as ConsentDefault,
+  ManyScopes as ConsentManyScopes,
+  meta as consentMeta,
+  MultipleOrganizations as ConsentMultipleOrganizations,
+  OfflineAccess as ConsentOfflineAccess,
+  ScopeList as ConsentScopeList,
+} from '../stories/consent.stories';
+import {
   Default as CopyButtonDefault,
   Inline as CopyButtonInline,
   Labelled as CopyButtonLabelled,
@@ -170,14 +178,6 @@ import {
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
-import {
-  Default as OAuthConsentDefault,
-  ManyScopes as OAuthConsentManyScopes,
-  meta as oauthConsentMeta,
-  MultipleOrganizations as OAuthConsentMultipleOrganizations,
-  OfflineAccess as OAuthConsentOfflineAccess,
-  ScopeList as OAuthConsentScopeList,
-} from '../stories/oauth-consent.stories';
 import {
   Default as OrganizationListDefault,
   Empty as OrganizationListEmpty,
@@ -1277,13 +1277,13 @@ const apiKeysTableModule: StoryModule = {
   Empty: APIKeysTableEmpty,
 };
 
-const oauthConsentModule: StoryModule = {
-  meta: oauthConsentMeta,
-  Default: OAuthConsentDefault,
-  ScopeList: OAuthConsentScopeList,
-  ManyScopes: OAuthConsentManyScopes,
-  MultipleOrganizations: OAuthConsentMultipleOrganizations,
-  OfflineAccess: OAuthConsentOfflineAccess,
+const consentModule: StoryModule = {
+  meta: consentMeta,
+  Default: ConsentDefault,
+  ScopeList: ConsentScopeList,
+  ManyScopes: ConsentManyScopes,
+  MultipleOrganizations: ConsentMultipleOrganizations,
+  OfflineAccess: ConsentOfflineAccess,
 };
 
 const reverificationModule: StoryModule = {
@@ -1423,7 +1423,7 @@ export const registry: StoryModule[] = [
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
-  oauthConsentModule,
+  consentModule,
   reverificationModule,
   waitlistModule,
   taskSetupMfaModule,
