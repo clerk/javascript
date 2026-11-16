@@ -235,6 +235,8 @@ export const signInMessages = {
   },
   resetPasswordMfa: {
     description: 'We need to verify your identity before resetting your password.',
+    descriptionSentTo:
+      'Enter the verification code sent to {identifier}. We need to verify your identity before resetting your password.',
   },
   backupCodeMfa: {
     title: 'Enter a backup code',

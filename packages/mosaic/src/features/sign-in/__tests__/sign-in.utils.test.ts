@@ -190,6 +190,21 @@ describe('code step copy', () => {
     ).toBe(m.backupCodeMfa.description);
   });
 
+  it('names the phone a second factor was sent to while resetting a password', () => {
+    const step = {
+      kind: 'code',
+      purpose: 'second-factor',
+      channel: 'phone',
+      identifier: '+1******0123',
+      resetting: true,
+    } as const;
+
+    expect(codeCopy(step, m, 'Acme').description).toBe(
+      'Enter the verification code sent to +1******0123. We need to verify your identity before resetting your password.',
+    );
+    expect(codeNotice(step, m)).toBeUndefined();
+  });
+
   it('warns on a new device and on an SSO bypass', () => {
     expect(codeNotice({ kind: 'code', purpose: 'client-trust', channel: 'email' }, m)).toBe(m.clientTrust.notice);
     expect(codeNotice({ kind: 'code', purpose: 'sso-bypass', channel: 'email' }, m)).toBe(m.ssoBypass.notice);

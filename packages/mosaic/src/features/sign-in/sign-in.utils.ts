@@ -184,7 +184,9 @@ function codeDescription(
   { identifier, applicationName }: { identifier: string; applicationName: string },
 ): string {
   if (step.resetting) {
-    return m.resetPasswordMfa.description;
+    return sentToIdentifier(step)
+      ? fill(m.resetPasswordMfa.descriptionSentTo, { identifier })
+      : m.resetPasswordMfa.description;
   }
   return sentToIdentifier(step)
     ? fill(copy.descriptionSentTo, { identifier })
