@@ -17,7 +17,7 @@ try {
 }
 ```
 
-It resolves once the browser has the link, not once the web page has signed the user in. If it's called again for the same destination before the first call finishes, it still opens one tab.
+It resolves once the browser has the link, not once the web page has signed the user in. A double tap opens one tab, because a second call for the same destination joins the one in progress.
 
 On Android it needs two more packages:
 
