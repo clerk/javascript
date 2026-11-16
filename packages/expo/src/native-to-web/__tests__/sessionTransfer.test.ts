@@ -55,14 +55,6 @@ function errorResponse(status: number, code: string, longMessage: string, header
   };
 }
 
-function deferred<T>() {
-  let resolve: (value: T) => void = () => {};
-  const promise = new Promise<T>(r => {
-    resolve = r;
-  });
-  return { promise, resolve };
-}
-
 async function rejectionOf(promise: Promise<unknown>): Promise<SessionTransferError> {
   const error = await promise.then(
     () => null,
@@ -72,10 +64,6 @@ async function rejectionOf(promise: Promise<unknown>): Promise<SessionTransferEr
     throw new Error('Expected a SessionTransferError rejection');
   }
   return error;
-}
-
-function webviewRequest(destination = DESTINATION) {
-  return sessionTransfer.resolveTransferRequest({ destination, presentation: 'webview' });
 }
 
 describe('sessionTransfer', () => {
@@ -300,122 +288,6 @@ describe('sessionTransfer', () => {
         code,
       });
       expect(mocks.request).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('transfer ledger', () => {
-    test('keys a request by session, presentation, and destination', () => {
-      expect(webviewRequest().key).toBe(`sess_1\nwebview\n${DESTINATION}`);
-    });
-
-    test('hands an unclaimed lease to the next acquire for the same key', async () => {
-      const minted = deferred<ReturnType<typeof mintedResponse>>();
-      mocks.request.mockReturnValue(minted.promise);
-
-      const first = sessionTransfer.acquireTransfer(webviewRequest());
-      const second = sessionTransfer.acquireTransfer(webviewRequest());
-      minted.resolve(mintedResponse());
-
-      expect(second).toBe(first);
-      await expect(second.transfer).resolves.toMatchObject({ url: TRANSFER_URL });
-      expect(sessionTransfer.acquireTransfer(webviewRequest())).toBe(first);
-      expect(mocks.request).toHaveBeenCalledTimes(1);
-    });
-
-    test('mints separately for a different destination or presentation', () => {
-      mocks.request.mockResolvedValue(mintedResponse());
-
-      const lease = sessionTransfer.acquireTransfer(webviewRequest());
-
-      expect(sessionTransfer.acquireTransfer(webviewRequest('https://app.example.com/other'))).not.toBe(lease);
-      expect(
-        sessionTransfer.acquireTransfer(
-          sessionTransfer.resolveTransferRequest({ destination: DESTINATION, presentation: 'browser' }),
-        ),
-      ).not.toBe(lease);
-      expect(mocks.request).toHaveBeenCalledTimes(3);
-    });
-
-    test('mints again after the lease is claimed', async () => {
-      mocks.request.mockResolvedValue(mintedResponse());
-
-      const first = sessionTransfer.acquireTransfer(webviewRequest());
-      await first.transfer;
-      expect(sessionTransfer.claimTransfer(first)).toBe(true);
-      expect(sessionTransfer.claimTransfer(first)).toBe(false);
-      const second = sessionTransfer.acquireTransfer(webviewRequest());
-
-      expect(second).not.toBe(first);
-      expect(mocks.request).toHaveBeenCalledTimes(2);
-    });
-
-    test('leaves a newer lease alone when an older one is claimed', () => {
-      mocks.request.mockResolvedValue(mintedResponse());
-
-      const first = sessionTransfer.acquireTransfer(webviewRequest());
-      sessionTransfer.claimTransfer(first);
-      const second = sessionTransfer.acquireTransfer(webviewRequest());
-      sessionTransfer.claimTransfer(first);
-
-      expect(sessionTransfer.acquireTransfer(webviewRequest())).toBe(second);
-    });
-
-    test('evicts a minted lease with less than 15 seconds left', async () => {
-      mocks.request.mockResolvedValue(mintedResponse());
-
-      const first = sessionTransfer.acquireTransfer(webviewRequest());
-      await first.transfer;
-      vi.setSystemTime(NOW + 45_001);
-
-      expect(sessionTransfer.acquireTransfer(webviewRequest())).not.toBe(first);
-      expect(mocks.request).toHaveBeenCalledTimes(2);
-    });
-
-    test('keeps a minted lease with 15 seconds or more left', async () => {
-      mocks.request.mockResolvedValue(mintedResponse());
-
-      const first = sessionTransfer.acquireTransfer(webviewRequest());
-      await first.transfer;
-      vi.setSystemTime(NOW + 45_000);
-
-      expect(sessionTransfer.acquireTransfer(webviewRequest())).toBe(first);
-    });
-
-    test('evicts expiring leases for other keys on every acquire', async () => {
-      mocks.request.mockResolvedValue(mintedResponse());
-
-      const stale = sessionTransfer.acquireTransfer(webviewRequest());
-      await stale.transfer;
-      vi.setSystemTime(NOW + 50_000);
-      sessionTransfer.acquireTransfer(webviewRequest('https://app.example.com/other'));
-      vi.setSystemTime(NOW);
-
-      expect(sessionTransfer.acquireTransfer(webviewRequest())).not.toBe(stale);
-    });
-
-    test('mints again for a fresh acquire and retires the lease it replaces', async () => {
-      mocks.request.mockReturnValueOnce(new Promise(() => {})).mockResolvedValueOnce(mintedResponse());
-
-      const stuck = sessionTransfer.acquireTransfer(webviewRequest());
-      const fresh = sessionTransfer.acquireTransfer(webviewRequest(), { fresh: true });
-
-      expect(fresh).not.toBe(stuck);
-      await expect(fresh.transfer).resolves.toMatchObject({ url: TRANSFER_URL });
-      expect(sessionTransfer.claimTransfer(stuck)).toBe(false);
-      expect(sessionTransfer.claimTransfer(fresh)).toBe(true);
-    });
-
-    test('deletes a lease whose mint failed', async () => {
-      mocks.request
-        .mockResolvedValueOnce(errorResponse(403, 'feature_not_enabled', 'Session transfers are not enabled'))
-        .mockResolvedValueOnce(mintedResponse());
-
-      const failed = sessionTransfer.acquireTransfer(webviewRequest());
-      await expect(failed.transfer).rejects.toMatchObject({ code: 'feature_not_enabled' });
-      const next = sessionTransfer.acquireTransfer(webviewRequest());
-
-      expect(next).not.toBe(failed);
-      await expect(next.transfer).resolves.toMatchObject({ url: TRANSFER_URL });
     });
   });
 });

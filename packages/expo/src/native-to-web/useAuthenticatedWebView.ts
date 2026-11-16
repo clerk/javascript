@@ -5,8 +5,8 @@ import type { WebView } from 'react-native-webview';
 
 import type { SessionTransferError } from './errors';
 import { sessionTransferError, toSessionTransferError } from './errors';
-import type { SessionTransfer, TransferLease, TransferRequest } from './sessionTransfer';
-import { acquireTransfer, claimTransfer, resolveTransferRequest } from './sessionTransfer';
+import type { SessionTransfer } from './sessionTransfer';
+import { prepareSessionTransfer } from './sessionTransfer';
 import type { NavigationEvent, NavigationVerdict } from './webViewNavigation';
 import { isRedeemPageUrl, judgeNavigation } from './webViewNavigation';
 
@@ -145,7 +145,7 @@ function applyVerdict(
 /**
  * Prepares a one-time URL that signs the active user in on `destination`, and returns props for a
  * `react-native-webview` `<WebView>` that opens it. The URL is prepared when the hook mounts, so mount it
- * on the screen that shows the WebView. Remounts and React Strict Mode reuse a URL the WebView has not received yet.
+ * on the screen that shows the WebView.
  *
  * The WebView keeps its own cookies after the app user signs out. When the user signs out or another
  * user signs in, clear the WebView's cookies or mount the WebView with `incognito`. Otherwise the web
@@ -202,13 +202,13 @@ export function useAuthenticatedWebView({
   const [attempt, setAttempt] = useState(0);
   const [state, dispatch] = useReducer(transferReducer, null);
   const settledRequestId = useRef<string | null>(null);
-  // Counts target changes, so returning to an earlier destination never matches its consumed result.
-  const target = `${sessionId}\n${destination}`;
+  // Counts target changes, signing out included, so a request never matches an earlier, consumed result.
+  const target = isLoaded && isSignedIn && sessionId ? `${sessionId}\n${destination}` : null;
   const [activation, setActivation] = useState({ target, count: 0 });
   if (activation.target !== target) {
     setActivation({ target, count: activation.count + 1 });
   }
-  const requestId = isLoaded && isSignedIn && sessionId ? `${target}\n${activation.count}\n${attempt}` : null;
+  const requestId = target ? `${target}\n${activation.count}\n${attempt}` : null;
 
   useEffect(() => {
     if (!requestId || settledRequestId.current === requestId) {
@@ -222,38 +222,20 @@ export function useAuthenticatedWebView({
         dispatch(result);
       }
     };
-    const fail = (error: unknown) => settle({ type: 'mint-failed', requestId, error: toSessionTransferError(error) });
-
-    let request: TransferRequest;
-    try {
-      request = resolveTransferRequest({ destination, presentation: 'webview' });
-    } catch (error) {
-      fail(error);
-      return;
-    }
-
-    const present = (lease: TransferLease) => {
-      lease.transfer.then(transfer => {
-        if (!attached) {
-          return;
-        }
-        if (claimTransfer(lease)) {
-          settle({
-            type: 'minted',
-            requestId,
-            webViewProps: createWebViewProps(requestId, transfer, dispatch, latestCallbacks),
-          });
-        } else {
-          present(acquireTransfer(request));
-        }
-      }, fail);
-    };
-    present(acquireTransfer(request, { fresh: attempt > 0 }));
+    prepareSessionTransfer({ destination, presentation: 'webview' }).then(
+      transfer =>
+        settle({
+          type: 'minted',
+          requestId,
+          webViewProps: createWebViewProps(requestId, transfer, dispatch, latestCallbacks),
+        }),
+      (error: unknown) => settle({ type: 'mint-failed', requestId, error: toSessionTransferError(error) }),
+    );
 
     return () => {
       attached = false;
     };
-  }, [requestId, destination, attempt]);
+  }, [requestId, destination]);
 
   const retry = useCallback(() => setAttempt(n => n + 1), []);
 
