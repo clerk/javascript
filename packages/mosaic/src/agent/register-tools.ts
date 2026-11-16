@@ -1,3 +1,5 @@
+import { isDevelopmentEnvironment } from '@clerk/shared/utils';
+
 import type { Agent, AgentStep, Allow } from './create-agent';
 
 interface BrowserTool {
@@ -62,7 +64,9 @@ export function registerTools(agent: Agent, { allow }: { allow?: Allow } = {}): 
       if (controller.signal.aborted || (error instanceof DOMException && error.name === 'NotAllowedError')) {
         return;
       }
-      console.error(`[Clerk] Could not register the WebMCP tool ${tool.name}`, error);
+      if (isDevelopmentEnvironment()) {
+        console.error(`[Clerk] Could not register the WebMCP tool ${tool.name}`, error);
+      }
     });
   }
   return () => controller.abort();

@@ -34,6 +34,7 @@ function requiredTool(tools: Map<string, Registered>, name: string): Registered 
 
 afterEach(() => {
   Reflect.deleteProperty(document, 'modelContext');
+  vi.unstubAllEnvs();
 });
 
 const signal = new AbortController().signal;
@@ -85,7 +86,26 @@ describe('registerTools', () => {
     expect(run).not.toHaveBeenCalled();
   });
 
+  it('logs a failed registration with its error only in development', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const taken = new DOMException('Taken', 'InvalidStateError');
+    installModelContext(() => Promise.reject(taken));
+
+    vi.stubEnv('NODE_ENV', 'development');
+    registerTools(createAgent(), { allow: () => true });
+    await Promise.resolve();
+    expect(error).toHaveBeenCalledWith('[Clerk] Could not register the WebMCP tool clerk_snapshot', taken);
+    expect(error).toHaveBeenCalledWith('[Clerk] Could not register the WebMCP tool clerk_act', taken);
+
+    error.mockClear();
+    vi.stubEnv('NODE_ENV', 'production');
+    registerTools(createAgent(), { allow: () => true });
+    await Promise.resolve();
+    expect(error).not.toHaveBeenCalled();
+  });
+
   it('stays quiet when the browser refuses or the page unregisters first', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     installModelContext(() => Promise.reject(new DOMException('Blocked', 'NotAllowedError')));
     registerTools(createAgent(), { allow: () => true })();
