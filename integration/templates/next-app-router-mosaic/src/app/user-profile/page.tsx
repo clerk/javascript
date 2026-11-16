@@ -1,11 +1,11 @@
 'use client';
 
-import { MosaicProvider, Profile } from '@clerk/mosaic';
+import { MosaicProvider, UserProfile } from '@clerk/mosaic';
 
 export default function Page() {
   return (
     <MosaicProvider>
-      <Profile customPages={[{ label: 'Custom page', path: 'custom-page', content: <p>custom-page-content</p> }]} />
+      <UserProfile customPages={[{ label: 'Custom page', path: 'custom-page', content: <p>custom-page-content</p> }]} />
     </MosaicProvider>
   );
 }
