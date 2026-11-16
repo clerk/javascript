@@ -28,7 +28,10 @@ export default {
       text: 'Render every toast from `useToastManager().toasts`, and filter anchored ones with `Toast.isAnchored` into a `Toast.Positioner`.',
     },
     { do: true, text: 'Hide `data-limited` toasts with CSS. They stay in the list, inert, while queued.' },
-    { do: true, text: 'Use `manager.promise()` for an async action instead of adding and updating toasts by hand.' },
+    {
+      do: true,
+      text: 'Use `manager.promise()` for an async action instead of adding and updating toasts by hand. It rethrows a rejection after showing the error toast, so catch it.',
+    },
     {
       do: true,
       text: 'Pass the same `id` to `add` to refresh an open toast. It bumps `repeatCount` and sets `data-repeated`.',
@@ -138,11 +141,13 @@ function ToastList() {
       title: 'Promise',
       code: `
 const manager = Toast.useToastManager();
-manager.promise(saveProfile(), {
-  loading: 'Saving…',
-  success: 'Profile saved',
-  error: 'Could not save',
-});
+manager
+  .promise(saveProfile(), {
+    loading: 'Saving…',
+    success: 'Profile saved',
+    error: 'Could not save',
+  })
+  .catch(() => {});
 `,
     },
   ],

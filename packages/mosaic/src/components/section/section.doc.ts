@@ -20,7 +20,7 @@ import type {
 export default {
   name: 'Section',
   description:
-    'A compound layout for a topic of settings. `Section.Root` stacks groups; each `Section.Group` is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding `Section.Row`s (one setting each) or a `Section.Items` list of values. The root is a `cl-section` size container that switches to a compact layout below 26rem; `sectionCompactStyles.hidden` and `.only` show or hide content at that width.',
+    'A compound layout for a topic of settings. `Section.Root` stacks groups; each `Section.Group` is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding `Section.Row`s (one setting each) or a `Section.Items` list of values. Each `Section.Group` is a `cl-section` size container that switches to a compact layout below 26rem; `sectionCompactStyles.hidden` and `.only` show or hide content inside a group at that width.',
   useFor: [
     'a settings page or profile section with rows of settings',
     'a row with a label, a value and an action, such as an Edit button',

@@ -19,7 +19,7 @@ export default {
     },
     {
       do: true,
-      text: 'Keep `Card.Banner` rendered and pass it the message, or nothing. It collapses while empty and stays a live region.',
+      text: "Keep `Card.Banner` rendered with `role='alert'` and pass it the message, or nothing. It collapses while empty, so the live region is in place before the message arrives.",
     },
     {
       do: false,
@@ -86,7 +86,9 @@ export default {
     <Card.Title>{m.title}</Card.Title>
     <Card.Description>{m.description}</Card.Description>
   </Card.Header>
-  <Card.Banner color='negative'>{form.error}</Card.Banner>
+  <Card.Banner role='alert' color='negative'>
+    {form.error}
+  </Card.Banner>
   <Card.Content>…</Card.Content>
   <Card.Footer>…</Card.Footer>
 </Card.Root>

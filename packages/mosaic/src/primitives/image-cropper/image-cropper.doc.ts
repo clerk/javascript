@@ -11,7 +11,7 @@ import type { ImageCropperZoomInProps, ImageCropperZoomOutProps } from './image-
 export default {
   name: 'ImageCropper',
   description:
-    'Headless, unstyled square image cropper. The user pans by dragging or with the arrow keys, zooms with the wheel, a pinch, the keyboard, a slider or step buttons, turns the image a quarter at a time, and resets it. The crop is a `Crop` (`{ x, y, zoom, rotation }`), always clamped so the image covers the frame. `cropImage(src, crop, { type, size })` draws the chosen square into a `Blob`. Every control stays disabled until the image has loaded.',
+    'Headless, unstyled square image cropper. The user pans by dragging or with the arrow keys, zooms with the wheel, a pinch, the keyboard, a slider or step buttons, turns the image a quarter at a time, and resets it. The crop is a `Crop` (`{ x, y, zoom, rotation }`), with zoom clamped between the zoom where the whole image fits in the frame and `maxZoom`. At zoom `1` and above the image covers the frame; below `1` it sits inside the frame instead. `cropImage(src, crop, { type, size })` draws the chosen square into a `Blob`. Every control stays disabled until the image has loaded.',
   useFor: [
     'cropping a picked image to a square before upload',
     'pan, zoom and rotate controls for an image',
@@ -69,13 +69,15 @@ export default {
         'The `img`, placed by the crop and hidden until loaded. Reports its size on load and carries `data-loaded`.',
     },
     'ImageCropper.Zoom': {
-      description: 'An `input type="range"` from 1 to `maxZoom`. Carries `data-disabled`.',
+      description:
+        'An `input type="range"` from the zoom where the whole image fits to `maxZoom`. Carries `data-disabled`.',
     },
     'ImageCropper.ZoomIn': {
       description: 'A `button` that zooms in one `ZOOM_STEP`. Disabled at `maxZoom`. Carries `data-disabled`.',
     },
     'ImageCropper.ZoomOut': {
-      description: 'A `button` that zooms out one `ZOOM_STEP`. Disabled at 1. Carries `data-disabled`.',
+      description:
+        'A `button` that zooms out one `ZOOM_STEP`. Disabled once the whole image fits in the frame. Carries `data-disabled`.',
     },
     'ImageCropper.Rotate': {
       description: 'A `button` that turns the image a quarter clockwise. Carries `data-disabled`.',

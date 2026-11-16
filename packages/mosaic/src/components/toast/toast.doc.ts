@@ -46,7 +46,7 @@ toast.add({ type: 'success', label: m.sent });
     {
       title: 'Track a promise',
       code: `
-await toast.promise(save(), { loading: m.saving, success: m.saved, error: m.failed });
+await toast.promise(save(), { loading: m.saving, success: m.saved, error: m.failed }).catch(() => {});
 `,
     },
   ],

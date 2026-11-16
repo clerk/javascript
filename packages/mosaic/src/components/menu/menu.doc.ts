@@ -21,7 +21,10 @@ export default {
   ],
   keywords: ['menu', 'dropdown', 'overflow', 'ellipsis', 'more actions', 'kebab'],
   practices: [
-    { do: true, text: 'Give every `Menu.Item` a `label`. It names the item for typeahead and assistive tech.' },
+    {
+      do: true,
+      text: 'Give every `Menu.Item` a `label` for typeahead. It is not rendered or announced, so the item also needs visible text in `Menu.Label`.',
+    },
     {
       do: true,
       text: 'Put the item text in `Menu.Label`, not straight in `Menu.Item`, so it lines up and truncates.',
@@ -86,7 +89,7 @@ export default {
         'One action, as a `button`. What it shows is the `Menu.Media`, `Menu.Label` and `Menu.Indicator` inside it.',
       slot: 'cl-menu-item',
       props: {
-        label: { type: 'string', doc: 'Names the item for typeahead and assistive tech. Not rendered.' },
+        label: { type: 'string', doc: 'The text typeahead matches on. Not rendered and not the accessible name.' },
         color: { type: "'neutral' | 'negative'", doc: '`neutral` or `negative`.', default: "'neutral'" },
         disabled: { type: 'boolean', doc: 'Disables the item and ignores its `onClick`.' },
         closeOnClick: { type: 'boolean', doc: 'Closes the menu after a click.', default: 'true' },

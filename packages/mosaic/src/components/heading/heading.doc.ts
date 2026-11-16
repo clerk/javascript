@@ -14,7 +14,7 @@ export default {
   practices: [
     {
       do: true,
-      text: 'Pass `level={useHeadingLevel()}` when the heading should follow its nesting. `Heading` does not read the level from context on its own.',
+      text: 'Pass `level={useHeadingLevel()}` from a component rendered inside the `HeadingLevelProvider` when the heading should follow its nesting. `Heading` does not read the level from context on its own.',
     },
     { do: true, text: 'Wrap a nested region in `HeadingLevelProvider` so headings inside it sit one level deeper.' },
     { do: false, text: 'Pick `level` for its look. Use `size` for the look and `level` for the outline.' },
@@ -44,8 +44,12 @@ export default {
     {
       title: 'A nested heading',
       code: `
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return <Heading level={useHeadingLevel()}>{children}</Heading>;
+}
+
 <HeadingLevelProvider>
-  <Heading level={useHeadingLevel()}>Members</Heading>
+  <SectionHeading>Members</SectionHeading>
 </HeadingLevelProvider>
 `,
     },

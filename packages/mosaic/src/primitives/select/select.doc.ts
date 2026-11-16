@@ -132,8 +132,12 @@ export default {
   </Select.Trigger>
   <Select.Positioner>
     <Select.Popup>
-      <Select.Option value='apple' label='Apple' />
-      <Select.Option value='banana' label='Banana' />
+      <Select.Option value='apple' label='Apple'>
+        Apple
+      </Select.Option>
+      <Select.Option value='banana' label='Banana'>
+        Banana
+      </Select.Option>
     </Select.Popup>
   </Select.Positioner>
 </Select.Root>

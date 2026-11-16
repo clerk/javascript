@@ -108,9 +108,13 @@ export default {
   <Menu.Trigger>Actions</Menu.Trigger>
   <Menu.Positioner>
     <Menu.Popup>
-      <Menu.Item label='Edit' onClick={onEdit} />
+      <Menu.Item label='Edit' onClick={onEdit}>
+        Edit
+      </Menu.Item>
       <Menu.Separator />
-      <Menu.Item label='Delete' onClick={onDelete} />
+      <Menu.Item label='Delete' onClick={onDelete}>
+        Delete
+      </Menu.Item>
     </Menu.Popup>
   </Menu.Positioner>
 </Menu.Root>

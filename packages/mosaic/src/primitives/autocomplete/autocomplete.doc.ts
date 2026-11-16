@@ -99,7 +99,9 @@ export default {
   <Autocomplete.Positioner>
     <Autocomplete.Popup>
       {matches.map(item => (
-        <Autocomplete.Option key={item.id} value={item.id} label={item.name} />
+        <Autocomplete.Option key={item.id} value={item.id} label={item.name}>
+          {item.name}
+        </Autocomplete.Option>
       ))}
     </Autocomplete.Popup>
   </Autocomplete.Positioner>

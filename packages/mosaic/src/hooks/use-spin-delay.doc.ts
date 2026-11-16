@@ -4,7 +4,7 @@ import type { SpinDelayOptions } from './use-spin-delay';
 export default {
   name: 'useSpinDelay',
   description:
-    'Spin-delays a nullable value. Returns `null` until `value` stays non-null longer than `delay`, then holds the last non-null value at least `minDuration` after it clears. Call it as `useSpinDelay(value, options?)`.',
+    'Spin-delays a nullable value. Returns `null` until `value` stays non-null longer than `delay`, then keeps the last non-null value up for a total of at least `minDuration` from when it was shown. Call it as `useSpinDelay(value, options?)`.',
   useFor: ['a spinner that should not flash or flicker', 'a pending indicator that stays up long enough to read'],
   keywords: ['spinner', 'loading', 'delay', 'flash', 'flicker', 'pending'],
   practices: [
@@ -17,7 +17,11 @@ export default {
       doc: 'Wait this long before showing the value. `0` shows it straight away.',
       default: '150',
     },
-    minDuration: { type: 'number', doc: 'Once shown, keep the value up at least this long.', default: '400' },
+    minDuration: {
+      type: 'number',
+      doc: 'Once shown, keep the value up at least this long in total, counted from when it was shown.',
+      default: '400',
+    },
   },
   returns: {},
   examples: [

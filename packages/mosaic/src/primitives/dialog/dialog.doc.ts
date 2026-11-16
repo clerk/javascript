@@ -160,7 +160,16 @@ export default {
 const detail = Dialog.createHandle<{ name: string }>();
 
 <Dialog.Trigger handle={detail} payload={{ name: 'Alice' }}>Alice</Dialog.Trigger>
-<Dialog.Root handle={detail}>{({ payload }) => <Dialog.Popup>{payload?.name}</Dialog.Popup>}</Dialog.Root>
+<Dialog.Root handle={detail}>
+  {({ payload }) => (
+    <Dialog.Portal>
+      <Dialog.Backdrop />
+      <Dialog.Viewport>
+        <Dialog.Popup>{payload?.name}</Dialog.Popup>
+      </Dialog.Viewport>
+    </Dialog.Portal>
+  )}
+</Dialog.Root>
 `,
     },
   ],
