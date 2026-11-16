@@ -361,7 +361,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run integration harness tests
-        if: matrix.node-version == '24.15.0'
+        if: matrix.node-version == '24.22.2'
         run: |
           pnpm turbo build $TURBO_ARGS --filter=@clerk/backend --filter=@clerk/shared --filter=@clerk/testing
           pnpm vitest run --root integration
