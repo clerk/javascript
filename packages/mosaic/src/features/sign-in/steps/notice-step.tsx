@@ -3,6 +3,7 @@ import type { Ref } from 'react';
 import type { VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
+import { SignUpRestricted } from '../../sign-up/steps/sign-up-restricted';
 import type { SignInStep } from '../sign-in.types';
 import { SignInActionBlocked } from './sign-in-action-blocked';
 import { SignInEmailLink } from './sign-in-email-link';
@@ -30,6 +31,7 @@ interface NoticeStepProps {
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
+  onJoinWaitlist?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -49,6 +51,7 @@ export function NoticeStep({
   onEditIdentifier,
   onForgotPassword,
   onCancel,
+  onJoinWaitlist,
   focusRef,
 }: NoticeStepProps) {
   const m = useMessages('signIn');
@@ -139,6 +142,19 @@ export function NoticeStep({
           globalErrorMessage={globalErrorMessage}
           isPending={isPending}
           resend={resend}
+        />
+      );
+    case 'restricted':
+    case 'waitlist':
+      return (
+        <SignUpRestricted
+          focusRef={focusRef}
+          waitlist={step.purpose === 'waitlist'}
+          logo={logo}
+          globalErrorMessage={globalErrorMessage}
+          onEmailSupport={onEmailSupport}
+          onJoinWaitlist={onJoinWaitlist}
+          onSignIn={onEditIdentifier}
         />
       );
     case 'loading':
