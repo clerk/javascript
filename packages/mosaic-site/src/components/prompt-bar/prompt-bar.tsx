@@ -51,11 +51,13 @@ function PromptScroller({ scrollerRef: ref, children }: { scrollerRef: RefObject
 
 export function PromptBar({
   command,
+  kind = 'command',
   align = 'start',
   className,
   tone = { light: 'gray-50', dark: 'gray-950' },
 }: {
   command: string;
+  kind?: 'command' | 'prompt';
   align?: 'center' | 'start';
   className?: string;
   tone?: GlassTone | { light: GlassTone; dark: GlassTone };
@@ -87,7 +89,8 @@ export function PromptBar({
     <div className={clsx('flex w-full', align === 'start' ? 'justify-start' : 'justify-center', className)}>
       <div
         className={clsx(
-          'motion-reduce:transition-none! motion-reduce:**:transition-none! w-[18.375rem] max-w-full',
+          'motion-reduce:transition-none! motion-reduce:**:transition-none! max-w-full',
+          kind === 'command' ? 'w-[18.375rem]' : 'w-[28rem]',
           GLASS_SCHEME,
         )}
         style={
@@ -101,7 +104,7 @@ export function PromptBar({
         }
       >
         <Button
-          aria-label='Copy command'
+          aria-label={`Copy ${kind}`}
           aria-describedby={promptTextId}
           onPress={() => void handleCopy()}
           onKeyDown={e => {
@@ -130,12 +133,14 @@ export function PromptBar({
               />
 
               <span className='rounded-l-(--glass-r) relative flex min-w-0 flex-1 overflow-hidden pl-[calc(var(--glass-pad)+0.75rem)]'>
-                <span
-                  aria-hidden
-                  className='code-1 text-(--glass-ink) flex items-center opacity-50'
-                >
-                  <span className='trim-cap'>$</span>
-                </span>
+                {kind === 'command' && (
+                  <span
+                    aria-hidden
+                    className='code-1 text-(--glass-ink) flex items-center opacity-50'
+                  >
+                    <span className='trim-cap'>$</span>
+                  </span>
+                )}
                 <span className='flex min-w-0 flex-1'>
                   <PromptScroller scrollerRef={scrollerRef}>{command}</PromptScroller>
                 </span>
@@ -170,7 +175,7 @@ export function PromptBar({
           className='sr-only'
           aria-live='polite'
         >
-          {copied && <span key={copies}>Command copied</span>}
+          {copied && <span key={copies}>{kind === 'command' ? 'Command copied' : 'Prompt copied'}</span>}
         </span>
       </div>
     </div>
