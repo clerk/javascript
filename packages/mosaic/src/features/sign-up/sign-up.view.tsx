@@ -230,6 +230,7 @@ export function SignUpView({
                   focusRef={focusRef}
                   title={m.wallets.title}
                   description={m.wallets.description}
+                  continueWith={m.wallets.continueWith}
                   wallets={current.options}
                   globalErrorMessage={globalErrorMessage}
                   pendingWalletId={pendingProviderId}

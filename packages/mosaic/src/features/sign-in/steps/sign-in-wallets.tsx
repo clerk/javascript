@@ -23,6 +23,7 @@ interface SignInWalletsProps {
   focusRef?: Ref<HTMLElement>;
   title?: string;
   description?: string;
+  continueWith?: string;
   loading?: boolean;
 }
 
@@ -36,6 +37,7 @@ export function SignInWallets({
   focusRef,
   title,
   description,
+  continueWith,
   loading = false,
 }: SignInWalletsProps) {
   const m = useMessages('signIn');
@@ -87,7 +89,11 @@ export function SignInWallets({
                   {...stylex.props(styles.providerIcon)}
                 />
               }
-              longLabel={wallets.length === 1 ? fill(m.wallets.continueWith, { wallet: wallet.name }) : wallet.name}
+              longLabel={
+                wallets.length === 1
+                  ? fill(continueWith ?? m.wallets.continueWith, { wallet: wallet.name })
+                  : wallet.name
+              }
               shortLabel={wallet.name}
               isPending={pendingWalletId === wallet.id}
               pendingLabel={m.verifying}

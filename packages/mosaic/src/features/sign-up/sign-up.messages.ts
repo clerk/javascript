@@ -44,6 +44,7 @@ export const signUpMessages = {
   wallets: {
     title: 'Sign up with Solana',
     description: 'Select a wallet below to sign up',
+    continueWith: 'Continue with {wallet}',
   },
   restricted: {
     title: 'Access restricted',
