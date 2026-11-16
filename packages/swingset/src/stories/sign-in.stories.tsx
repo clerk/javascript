@@ -945,26 +945,7 @@ export function ChoiceMethodsEmailLink() {
 }
 
 export function ChoiceMethodsEntry() {
-  return (
-    <StepPanel
-      providers={[]}
-      step={{
-        kind: 'choice',
-        purpose: 'methods',
-        canGoBack: false,
-        options: [
-          {
-            id: 'email_link',
-            stage: 'first',
-            strategy: 'email_link',
-            emailAddressId: 'idn_1',
-            identifier: 'j***@acme.com',
-          },
-          ...firstFactors,
-        ],
-      }}
-    />
-  );
+  return <StepPanel step={{ kind: 'choice', purpose: 'methods', canGoBack: false, options: [] }} />;
 }
 
 export function ChoiceMethodsSecondFactor() {

@@ -138,7 +138,7 @@ export function SignInAlternativeMethods({
               disabled={isDisabled}
               onClick={onStartOver}
             >
-              {m.forgotPassword.back}
+              {m.alternativeMethods.startOver}
             </Button>
           </Text>
         ) : null}
