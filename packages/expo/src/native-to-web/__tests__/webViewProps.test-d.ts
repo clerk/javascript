@@ -33,6 +33,16 @@ describe('AuthenticatedWebViewProps', () => {
     }>().toExtend<UseAuthenticatedWebViewParams>();
   });
 
+  test('types inline app callbacks with the full WebView events', () => {
+    const params: UseAuthenticatedWebViewParams = {
+      destination: 'https://app.example.com/account',
+      onHttpError: event => expectTypeOf(event.nativeEvent.statusCode).toEqualTypeOf<number>(),
+      onError: event => expectTypeOf(event.nativeEvent.description).toEqualTypeOf<string>(),
+      onShouldStartLoadWithRequest: request => request.navigationType !== 'click',
+    };
+    expectTypeOf(params).toExtend<UseAuthenticatedWebViewParams>();
+  });
+
   test('rejects props the WebView would not accept', () => {
     expectTypeOf<{ source: { url: string } }>().not.toExtend<Partial<ComponentProps<typeof WebView>>>();
   });

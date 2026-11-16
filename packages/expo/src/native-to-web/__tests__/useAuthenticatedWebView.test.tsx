@@ -1,6 +1,12 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { StrictMode } from 'react';
+import type {
+  ShouldStartLoadRequest,
+  WebViewErrorEvent,
+  WebViewHttpErrorEvent,
+  WebViewNavigationEvent,
+} from 'react-native-webview/lib/WebViewTypes';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { UseAuthenticatedWebViewParams } from '../useAuthenticatedWebView';
@@ -36,6 +42,13 @@ const DESTINATION = 'https://app.example.com/billing';
 const TRANSFER_URL = 'https://clerk.example.com/v1/session_transfers/redeem?token=one-time';
 const redeemFailure = (code: string) =>
   `${DESTINATION}?__clerk_status=session_transfer_failed&__clerk_error_code=${code}`;
+
+// Tests send only the fields the hook reads, so these stand in for the full WebView events.
+const navigation = (url: string) => ({ nativeEvent: { url } }) as WebViewNavigationEvent;
+const loadFailure = (url: string, code = -1) => ({ nativeEvent: { url, code } }) as WebViewErrorEvent;
+const httpError = (url: string) => ({ nativeEvent: { url, statusCode: 500 } }) as WebViewHttpErrorEvent;
+const request = (url: string, isTopFrame?: boolean) =>
+  (isTopFrame === undefined ? { url } : { url, isTopFrame }) as ShouldStartLoadRequest;
 
 type MintResponse = ReturnType<typeof mintedResponse>;
 
@@ -164,14 +177,14 @@ describe('useAuthenticatedWebView', () => {
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
     const props = result.current.webViewProps;
 
-    act(() => props?.onLoadStart({ nativeEvent: { url: TRANSFER_URL } }));
-    act(() => props?.onLoadEnd({ nativeEvent: { url: TRANSFER_URL } }));
+    act(() => props?.onLoadStart(navigation(TRANSFER_URL)));
+    act(() => props?.onLoadEnd(navigation(TRANSFER_URL)));
     expect(result.current.status).toBe('loading');
 
-    act(() => props?.onLoadEnd({ nativeEvent: { url: DESTINATION } }));
+    act(() => props?.onLoadEnd(navigation(DESTINATION)));
     expect(result.current).toMatchObject({ status: 'ready', webViewProps: props, error: null });
 
-    act(() => props?.onLoadStart({ nativeEvent: { url: redeemFailure('expired') } }));
+    act(() => props?.onLoadStart(navigation(redeemFailure('expired'))));
     expect(result.current.status).toBe('ready');
   });
 
@@ -181,11 +194,7 @@ describe('useAuthenticatedWebView', () => {
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
     const props = result.current.webViewProps;
 
-    act(() =>
-      props?.onLoadStart({
-        nativeEvent: { url: redeemFailure('already_used') },
-      }),
-    );
+    act(() => props?.onLoadStart(navigation(redeemFailure('already_used'))));
 
     expect(result.current).toMatchObject({
       status: 'error',
@@ -202,16 +211,16 @@ describe('useAuthenticatedWebView', () => {
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
     const props = result.current.webViewProps;
 
-    act(() => props?.onLoadStart({ nativeEvent: { url: TRANSFER_URL } }));
+    act(() => props?.onLoadStart(navigation(TRANSFER_URL)));
     let allowed: boolean | undefined;
     act(() => {
-      allowed = props?.onShouldStartLoadWithRequest({ url: redeemFailure('expired'), isTopFrame: true });
+      allowed = props?.onShouldStartLoadWithRequest(request(redeemFailure('expired'), true));
     });
     act(() => {
-      props?.onShouldStartLoadWithRequest({ url: SIGN_IN, isTopFrame: true });
+      props?.onShouldStartLoadWithRequest(request(SIGN_IN, true));
     });
-    act(() => props?.onLoadStart({ nativeEvent: { url: SIGN_IN } }));
-    act(() => props?.onLoadEnd({ nativeEvent: { url: SIGN_IN } }));
+    act(() => props?.onLoadStart(navigation(SIGN_IN)));
+    act(() => props?.onLoadEnd(navigation(SIGN_IN)));
 
     expect(allowed).toBe(true);
     expect(result.current).toMatchObject({ status: 'error', error: { code: 'expired' } });
@@ -224,9 +233,9 @@ describe('useAuthenticatedWebView', () => {
     const props = result.current.webViewProps;
 
     act(() => {
-      props?.onShouldStartLoadWithRequest({ url: redeemFailure('expired') });
+      props?.onShouldStartLoadWithRequest(request(redeemFailure('expired')));
     });
-    act(() => props?.onLoadEnd({ nativeEvent: { url: `${DESTINATION}/sign-in` } }));
+    act(() => props?.onLoadEnd(navigation(`${DESTINATION}/sign-in`)));
 
     expect(result.current).toMatchObject({ status: 'error', error: { code: 'expired' } });
   });
@@ -238,9 +247,9 @@ describe('useAuthenticatedWebView', () => {
     const props = result.current.webViewProps;
 
     act(() => {
-      props?.onShouldStartLoadWithRequest({ url: redeemFailure('expired'), isTopFrame: false });
+      props?.onShouldStartLoadWithRequest(request(redeemFailure('expired'), false));
     });
-    act(() => props?.onLoadEnd({ nativeEvent: { url: DESTINATION } }));
+    act(() => props?.onLoadEnd(navigation(DESTINATION)));
 
     expect(result.current.status).toBe('ready');
   });
@@ -250,7 +259,7 @@ describe('useAuthenticatedWebView', () => {
     const { result } = renderWebView();
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
 
-    act(() => result.current.webViewProps?.onHttpError({ nativeEvent: { url: TRANSFER_URL } }));
+    act(() => result.current.webViewProps?.onHttpError(httpError(TRANSFER_URL)));
 
     expect(result.current).toMatchObject({ status: 'error', webViewProps: null, error: { code: 'load_failed' } });
   });
@@ -260,7 +269,7 @@ describe('useAuthenticatedWebView', () => {
     const { result } = renderWebView();
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
 
-    act(() => result.current.webViewProps?.onError({ nativeEvent: { url: TRANSFER_URL } }));
+    act(() => result.current.webViewProps?.onError(loadFailure(TRANSFER_URL)));
 
     expect(result.current).toMatchObject({ status: 'error', error: { code: 'load_failed' } });
     expect(result.current.error?.message).not.toContain('one-time');
@@ -271,7 +280,7 @@ describe('useAuthenticatedWebView', () => {
     const { result } = renderWebView();
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
 
-    act(() => result.current.webViewProps?.onLoadEnd({ nativeEvent: { url: TRANSFER_URL, code: -1009 } }));
+    act(() => result.current.webViewProps?.onLoadEnd(loadFailure(TRANSFER_URL, -1009)));
 
     expect(result.current).toMatchObject({ status: 'error', error: { code: 'load_failed' } });
   });
@@ -308,7 +317,7 @@ describe('useAuthenticatedWebView', () => {
     const { result } = renderWebView();
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
     const failedProps = result.current.webViewProps;
-    act(() => failedProps?.onLoadStart({ nativeEvent: { url: redeemFailure('expired') } }));
+    act(() => failedProps?.onLoadStart(navigation(redeemFailure('expired'))));
     expect(result.current).toMatchObject({ status: 'error', webViewProps: null });
 
     act(() => result.current.retry());
@@ -319,7 +328,7 @@ describe('useAuthenticatedWebView', () => {
       ),
     );
     expect(result.current.status).toBe('loading');
-    act(() => failedProps?.onLoadEnd({ nativeEvent: { url: DESTINATION } }));
+    act(() => failedProps?.onLoadEnd(navigation(DESTINATION)));
     expect(result.current.status).toBe('loading');
   });
 
@@ -426,8 +435,8 @@ describe('useAuthenticatedWebView', () => {
       await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
       const props = result.current.webViewProps;
 
-      const destinationLoaded = { nativeEvent: { url: DESTINATION } };
-      act(() => props?.onLoadStart({ nativeEvent: { url: DESTINATION } }));
+      const destinationLoaded = navigation(DESTINATION);
+      act(() => props?.onLoadStart(navigation(DESTINATION)));
       act(() => props?.onLoadEnd(destinationLoaded));
 
       expect(result.current.status).toBe('ready');
@@ -446,10 +455,10 @@ describe('useAuthenticatedWebView', () => {
       const props = result.current.webViewProps;
 
       act(() => {
-        props?.onShouldStartLoadWithRequest({ url: TRANSFER_URL, isTopFrame: true });
-        props?.onLoadStart({ nativeEvent: { url: TRANSFER_URL } });
-        props?.onLoadEnd({ nativeEvent: { url: TRANSFER_URL } });
-        props?.onHttpError({ nativeEvent: { url: TRANSFER_URL } });
+        props?.onShouldStartLoadWithRequest(request(TRANSFER_URL, true));
+        props?.onLoadStart(navigation(TRANSFER_URL));
+        props?.onLoadEnd(navigation(TRANSFER_URL));
+        props?.onHttpError(httpError(TRANSFER_URL));
       });
 
       expect(onLoadStart).not.toHaveBeenCalled();
@@ -464,8 +473,8 @@ describe('useAuthenticatedWebView', () => {
       await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
       const props = result.current.webViewProps;
 
-      expect(props?.onShouldStartLoadWithRequest({ url: TRANSFER_URL, isTopFrame: true })).toBe(true);
-      expect(props?.onShouldStartLoadWithRequest({ url: 'https://other.example.com/', isTopFrame: true })).toBe(false);
+      expect(props?.onShouldStartLoadWithRequest(request(TRANSFER_URL, true))).toBe(true);
+      expect(props?.onShouldStartLoadWithRequest(request('https://other.example.com/', true))).toBe(false);
     });
 
     test('are read from the latest render', async () => {
@@ -476,7 +485,7 @@ describe('useAuthenticatedWebView', () => {
       await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
 
       rerender({ destination: DESTINATION, onLoadEnd: second });
-      act(() => result.current.webViewProps?.onLoadEnd({ nativeEvent: { url: DESTINATION } }));
+      act(() => result.current.webViewProps?.onLoadEnd(navigation(DESTINATION)));
 
       expect(first).not.toHaveBeenCalled();
       expect(second).toHaveBeenCalledTimes(1);

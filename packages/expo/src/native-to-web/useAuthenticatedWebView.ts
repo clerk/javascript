@@ -1,6 +1,7 @@
 import { useAuth } from '@clerk/react';
-import type { Dispatch } from 'react';
+import type { ComponentProps, Dispatch } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
+import type { WebView } from 'react-native-webview';
 
 import type { SessionTransferError } from './errors';
 import { sessionTransferError, toSessionTransferError } from './errors';
@@ -9,47 +10,34 @@ import { acquireTransfer, claimTransfer, resolveTransferRequest } from './sessio
 import type { NavigationEvent, NavigationVerdict } from './webViewNavigation';
 import { isRedeemPageUrl, judgeNavigation } from './webViewNavigation';
 
-type LoadEvent = { nativeEvent: { url: string } };
-type LoadEndEvent = { nativeEvent: { url: string; code?: number } };
-type LoadRequest = { url: string; isTopFrame?: boolean };
+type WebViewCallbacks = Pick<
+  ComponentProps<typeof WebView>,
+  'onLoadStart' | 'onLoadEnd' | 'onHttpError' | 'onError' | 'onShouldStartLoadWithRequest'
+>;
 
 /**
  * Options for `useAuthenticatedWebView`.
  *
  * Pass your own WebView callbacks here instead of on `<WebView>`, so they don't replace the ones in
  * `webViewProps`. They receive the WebView's events for every page except Clerk's sign-in page, which
- * carries the one-time URL.
+ * carries the one-time URL. Returning `false` from `onShouldStartLoadWithRequest` blocks a navigation,
+ * but Clerk's sign-in page always loads.
  */
-export type UseAuthenticatedWebViewParams = {
+export type UseAuthenticatedWebViewParams = WebViewCallbacks & {
   /**
    * Absolute URL on one of your instance's domains. It must use HTTPS outside development instances.
    * Changing it prepares a new transfer.
    */
   destination: string;
-  onLoadStart?(event: LoadEvent): void;
-  onLoadEnd?(event: LoadEndEvent): void;
-  onHttpError?(event: LoadEvent): void;
-  onError?(event: LoadEvent): void;
-  /**
-   * Return `false` to block a navigation. Clerk's sign-in page always loads.
-   */
-  onShouldStartLoadWithRequest?(request: LoadRequest): boolean;
 };
-
-type WebViewCallbacks = Omit<UseAuthenticatedWebViewParams, 'destination'>;
 
 /**
  * Props to spread onto `<WebView>` from `react-native-webview`. They carry the one-time sign-in URL,
  * so never log or store them. Pass your own callbacks to `useAuthenticatedWebView` rather than setting
  * them on `<WebView>` after the spread.
  */
-export type AuthenticatedWebViewProps = {
+export type AuthenticatedWebViewProps = Required<WebViewCallbacks> & {
   source: { uri: string };
-  onLoadStart: (event: LoadEvent) => void;
-  onLoadEnd: (event: LoadEndEvent) => void;
-  onHttpError: (event: LoadEvent) => void;
-  onError: (event: LoadEvent) => void;
-  onShouldStartLoadWithRequest: (request: LoadRequest) => boolean;
 };
 
 /**
@@ -310,7 +298,11 @@ function createWebViewProps(
       }
     },
     onLoadEnd: event => {
-      judge({ kind: 'load-end', url: event.nativeEvent.url, failed: typeof event.nativeEvent.code === 'number' });
+      judge({
+        kind: 'load-end',
+        url: event.nativeEvent.url,
+        failed: 'code' in event.nativeEvent && typeof event.nativeEvent.code === 'number',
+      });
       if (!isSignInPage(event.nativeEvent.url)) {
         callbacks.current.onLoadEnd?.(event);
       }
