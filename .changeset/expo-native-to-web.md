@@ -28,9 +28,9 @@ export default function AccountScreen() {
 }
 ```
 
-Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook instead of to `<WebView>`, so they run alongside Clerk's.
+Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook instead of to `<WebView>`. Set on `<WebView>`, they would replace the hook's handlers.
 
-To open the link some other way, create it with `prepareSessionTransfer()`:
+For more advanced cases, such as opening the link in a browser or WebView you manage yourself, create it with `prepareSessionTransfer()`:
 
 ```ts
 import { prepareSessionTransfer } from '@clerk/expo/native-to-web';
@@ -46,4 +46,4 @@ const transfer = await prepareSessionTransfer({
 await WebBrowser.openBrowserAsync(transfer.url);
 ```
 
-Session transfers must be enabled for your instance, and `destination` must be on one of your instance's domains. Failures reject or report a `SessionTransferError`, which you can detect with `isSessionTransferError()` and branch on through its `code`, such as `signed_out`, `feature_not_enabled`, or `expired`.
+Session transfers must be enabled for your instance, and `destination` must be on one of your instance's domains. When something fails, you get a `SessionTransferError`. Check for it with `isSessionTransferError()`, then branch on its `code`, such as `signed_out`, `feature_not_enabled`, or `expired`.
