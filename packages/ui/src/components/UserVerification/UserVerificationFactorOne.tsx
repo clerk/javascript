@@ -56,7 +56,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const card = useCardState();
   const { navigate } = useRouter();
 
-  const lastPreparedFactorKeyRef = React.useRef('');
+  const [lastPreparedFactorKey, setLastPreparedFactorKey] = React.useState('');
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const sessionVerification = data!;
 
@@ -110,7 +110,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     : undefined;
 
   const handleFactorPrepare = () => {
-    lastPreparedFactorKeyRef.current = factorKey(currentFactor);
+    setLastPreparedFactorKey(factorKey(currentFactor));
   };
 
   const selectFactor = (factor: SignInFactor) => {
@@ -181,10 +181,8 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     return (
       <UVFactorOneResetPasswordCodeCard
         factor={resetPasswordFactor}
-        factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(resetPasswordFactor)}
-        onFactorPrepare={() => {
-          lastPreparedFactorKeyRef.current = factorKey(resetPasswordFactor);
-        }}
+        factorAlreadyPrepared={lastPreparedFactorKey === factorKey(resetPasswordFactor)}
+        onFactorPrepare={() => setLastPreparedFactorKey(factorKey(resetPasswordFactor))}
         newPassword={newPassword.password}
         signOutOfOtherSessions={newPassword.signOutOfOtherSessions}
         hasNewPassword={!!resetPassword}
@@ -240,7 +238,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     case 'email_code':
       return (
         <UVFactorOneEmailCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={lastPreparedFactorKey === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
@@ -250,7 +248,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     case 'phone_code':
       return (
         <UVFactorOnePhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={lastPreparedFactorKey === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
