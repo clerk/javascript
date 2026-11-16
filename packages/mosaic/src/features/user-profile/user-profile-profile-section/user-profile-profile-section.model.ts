@@ -22,7 +22,7 @@ function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfil
   return { name: connection?.name || providerId(account.provider) };
 }
 
-function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {
+function toNameAttribute(attribute: AttributeData | undefined): Required<UserProfileNameAttribute> {
   return { enabled: attribute?.enabled ?? false, required: attribute?.required ?? false };
 }
 

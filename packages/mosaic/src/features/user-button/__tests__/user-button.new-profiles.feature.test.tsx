@@ -16,6 +16,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { installWebmcp } from '../../../__tests__/feature/webmcp';
 import { PortalProvider } from '../../../primitives/portal';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import { signedIn as withConnectedAccounts } from '../../user-profile/user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
@@ -207,5 +208,30 @@ describe('UserButton with experimental.newProfiles', () => {
 
     expect(await screen.findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
     expect(profileTabs()).toEqual(['Account', 'Security']);
+  });
+
+  it('lets an agent open the profile and rename the user in the section that appeared', async () => {
+    await page.viewport(1280, 800);
+    onTestFinished(() => page.viewport(414, 896));
+    const webmcp = installWebmcp();
+    serveFapi(signedIn());
+    await renderWithClerk(tree(), undefined, undefined, { ...newProfiles, webmcp: true });
+
+    const result = await webmcp.call('clerk_act', { steps: [{ ref: 'userButton', action: 'openProfile' }] });
+
+    expect(result).toMatchObject({
+      appeared: expect.arrayContaining([
+        expect.objectContaining({ ref: 'userProfile', state: expect.objectContaining({ page: 'account' }) }),
+        expect.objectContaining({ ref: 'profileSection', state: { firstName: 'Alice', lastName: 'Smith' } }),
+      ]),
+    });
+    expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+
+    const renamed = await webmcp.call('clerk_act', {
+      steps: [{ ref: 'profileSection', action: 'updateName', input: { firstName: 'Alicia' } }],
+    });
+
+    expect(renamed).toMatchObject({ ok: true });
+    expect(within(screen.getByRole('dialog')).getByText('Alicia Smith')).toBeInTheDocument();
   });
 });

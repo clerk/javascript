@@ -41,8 +41,8 @@ export type UserProfileProfileSectionModel =
       /** Passed alongside `name`, which cannot be split back into its two halves. */
       firstName: string;
       lastName: string;
-      firstNameAttribute: UserProfileNameAttribute;
-      lastNameAttribute: UserProfileNameAttribute;
+      firstNameAttribute: Required<UserProfileNameAttribute>;
+      lastNameAttribute: Required<UserProfileNameAttribute>;
       nameManagedBy?: UserProfileManagedBy;
       imageUrl: string;
       hasImage: boolean;

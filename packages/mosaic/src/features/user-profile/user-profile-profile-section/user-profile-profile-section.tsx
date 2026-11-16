@@ -1,3 +1,4 @@
+import { useAgentSurface } from '../../../agent/use-agent-surface';
 import { Button } from '../../../components/button';
 import { useMessages } from '../../../localization';
 import type { UserProfileEditNameControllerOptions } from './user-profile-edit-name.controller';
@@ -7,6 +8,7 @@ import type { UserProfileEditUsernameControllerOptions } from './user-profile-ed
 import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
 import { UserProfileEditUsernameDialog } from './user-profile-edit-username.dialog';
 import { useUserProfilePictureController } from './user-profile-picture.controller';
+import { profileSectionAgent } from './user-profile-profile-section.agent';
 import { useUserProfileProfileSectionModel } from './user-profile-profile-section.model';
 import type { ReadyProfileSectionModel, UserProfileNameAttribute } from './user-profile-profile-section.types';
 import { UserProfileProfileSectionView } from './user-profile-profile-section.view';
@@ -31,13 +33,14 @@ function Profile({ model }: { model: ReadyProfileSectionModel }) {
     onChange: model.onProfilePictureChange,
     onRemove: model.onRemoveProfilePicture,
   });
+  useAgentSurface(profileSectionAgent(model));
 
   return (
     <UserProfileProfileSectionView
       name={model.name}
       imageUrl={model.imageUrl}
       hasImage={model.hasImage}
-      showName={model.firstNameAttribute.enabled !== false || model.lastNameAttribute.enabled !== false}
+      showName={model.firstNameAttribute.enabled || model.lastNameAttribute.enabled}
       nameManagedBy={model.nameManagedBy}
       nameAction={
         model.onSubmitName ? (
