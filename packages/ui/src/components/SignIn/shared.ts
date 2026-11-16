@@ -92,7 +92,6 @@ function useHandleAuthenticateWithPasskey(
         }
       }
 
-      // A prior sign-in completed but its redirect never landed; resume that session like the other sign-in paths do.
       if (isClerkAPIResponseError(err) && err.errors.some(e => e.code === ERROR_CODES.SESSION_EXISTS)) {
         return setActive({
           session: clerk.client.lastActiveSessionId,
