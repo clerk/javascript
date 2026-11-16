@@ -2,7 +2,7 @@
 
 import { Switcher, MosaicProvider } from '@clerk/mosaic';
 
-export function MosaicUserButton() {
+export function MosaicSwitcher() {
   return (
     <MosaicProvider experimental={{ newProfiles: true }}>
       <Switcher />
