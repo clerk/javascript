@@ -2,9 +2,11 @@
 
 import type { ReactElement, ReactNode } from 'react';
 
+import type { AgentSurface } from '../../agent/create-agent';
+import { useAgentSurface } from '../../agent/use-agent-surface';
 import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useSwitcherController } from './switcher.controller';
-import type { SwitcherModelOptions } from './switcher.model';
+import type { SwitcherModel, SwitcherModelOptions } from './switcher.model';
 import { useSwitcherModel } from './switcher.model';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './switcher.pages';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
@@ -24,10 +26,23 @@ export type SwitcherProps = SwitcherModelOptions &
   };
 
 export function Switcher(
-  props: SwitcherProps & { mode: SwitcherMode; triggerVariant?: SwitcherTriggerVariant },
+  props: SwitcherProps & {
+    mode: SwitcherMode;
+    triggerVariant?: SwitcherTriggerVariant;
+    agentSurface?: (model: Extract<SwitcherModel, { status: 'ready' }>) => AgentSurface;
+  },
 ): ReactElement | null {
-  const { showTriggerLabel, triggerBadge, triggerVariant, mode, customMenuItems, menuItemOrder, fallback, ...options } =
-    props;
+  const {
+    showTriggerLabel,
+    triggerBadge,
+    triggerVariant,
+    mode,
+    customMenuItems,
+    menuItemOrder,
+    fallback,
+    agentSurface,
+    ...options
+  } = props;
   const profile = useMosaicProfile();
   const { userProfileProps, organizationProfileProps } = profile;
   // The portals must outlive the popover, so custom pages are bridged here rather than inside it.
@@ -55,6 +70,7 @@ export function Switcher(
     },
     menuMode: mode,
   });
+  useAgentSurface(model.status === 'ready' && agentSurface ? agentSurface(model) : undefined);
   const controller = useSwitcherController(model, { mode, customMenuItems, menuItemOrder });
 
   if (controller.status === 'loading') {

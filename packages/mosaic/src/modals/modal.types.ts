@@ -38,4 +38,5 @@ export interface ModalHandle<Options> {
   close: () => void;
   preload: () => void;
   isOpen: boolean;
+  isLoading: boolean;
 }
