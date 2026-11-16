@@ -1,10 +1,10 @@
 import type * as React from 'react';
 
+import { CopyLine } from '@/components/marketing/copy-line';
 import { HeroGrid } from '@/components/marketing/hero-grid';
 import { HeroMicrographic } from '@/components/marketing/hero-micrographic';
-import { SkillUrl } from '@/components/marketing/skill-url';
 import { PromptBar } from '@/components/prompt-bar/prompt-bar';
-import { INSTALL_COMMAND } from '@/lib/agent-prompt';
+import { AGENT_PROMPT, INSTALL_COMMAND } from '@/lib/agent-prompt';
 
 export function HeroQuilt({ scene, anchor }: { scene: React.ReactNode; anchor?: React.ReactNode }) {
   return (
@@ -32,11 +32,16 @@ export function HeroQuilt({ scene, anchor }: { scene: React.ReactNode; anchor?: 
         className='mt-8 flex w-full max-w-xl flex-col items-center gap-3'
       >
         <PromptBar
-          command={INSTALL_COMMAND}
+          command={AGENT_PROMPT}
+          kind='prompt'
           align='center'
           tone={{ light: 'gray-50', dark: 'gray-800' }}
         />
-        <SkillUrl />
+        <CopyLine
+          lead='Or install with npm'
+          value={INSTALL_COMMAND}
+          name='install command'
+        />
       </div>
     </section>
   );
