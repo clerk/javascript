@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.45.1
+
+### Patch Changes
+
+- Modify the polling interval for SSO domain verification on development instances. ([#10094](https://github.com/clerk/javascript/pull/10094)) by [@dstaley](https://github.com/dstaley)
+
+- Fix an issue where the self-serve SSO setup wizard could return to the domain step after creating a connection. ([#10094](https://github.com/clerk/javascript/pull/10094)) by [@dstaley](https://github.com/dstaley)
+
 ## 4.45.0
 
 ### Minor Changes

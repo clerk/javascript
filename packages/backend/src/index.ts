@@ -103,6 +103,7 @@ export type {
   SMSMessageJSON,
   UserJSON,
   UserDeletedJSON,
+  UserMergedJSON,
   DirectoryGroupWebhookEventJSON,
   DirectoryGroupMembershipWebhookEventJSON,
   DeletedDirectoryGroupMembershipWebhookEventJSON,

@@ -43,7 +43,10 @@ ruleTester.run('no-dynamic-message-catalogs', plugin.rules['no-dynamic-message-c
     "import React from 'react'; React.useState(0);",
   ],
   invalid: [
-    { code: "import('./reverification.messages');", errors: [{ messageId: 'useMessages' }] },
+    {
+      code: "import('./reverification.messages');",
+      errors: [{ message: /^Read copy with `useMessages\('<namespace>'\)` from src\/localization/ }],
+    },
     { code: 'import(`./reverification.messages.ts`);', errors: [{ messageId: 'useMessages' }] },
   ],
 });

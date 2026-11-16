@@ -206,6 +206,36 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
     return clerkMiddlewareRequestDataStorage.run(requestDataStore, async () => {
       const resolvedClerkClient = await clerkClient();
 
+      if (options.poppy) {
+        const poppyRequestUrl = createClerkRequest(request).clerkUrl;
+        if (
+          poppyRequestUrl.pathname === '/.well-known/poppy.json' ||
+          poppyRequestUrl.pathname === '/.well-known/oauth-protected-resource'
+        ) {
+          if (request.method !== 'GET') {
+            return new Response(null, { status: 405, headers: { Allow: 'GET' } });
+          }
+          const metadata = await resolvedClerkClient.artifacts.getPoppyJson();
+          const headers = { 'Cache-Control': 'no-store' };
+          if (poppyRequestUrl.pathname === '/.well-known/poppy.json') {
+            return Response.json(metadata, { headers });
+          }
+          const { organization, auth } = metadata as {
+            organization: { domain: string };
+            auth: { issuer: string; scopes: Record<string, unknown> };
+          };
+          return Response.json(
+            {
+              resource: `https://${organization.domain}`,
+              authorization_servers: [auth.issuer],
+              scopes_supported: Object.keys(auth.scopes),
+              bearer_methods_supported: ['header'],
+            },
+            { headers },
+          );
+        }
+      }
+
       if (options.debug) {
         logger.enable();
       }

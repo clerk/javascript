@@ -1,5 +1,20 @@
 # Change Log
 
+## 7.10.0
+
+### Minor Changes
+
+- Add support for Personal Agent Protocol signed-in browser sessions. Enable the Clerk-defined `poppy: true` option on `clerkMiddleware()` to publish Poppy and OAuth protected resource discovery on the application domain. ([#10702](https://github.com/clerk/javascript/pull/10702)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  Expose `agent` on the auth object when an agent session is active.
+
+### Patch Changes
+
+- Updated dependencies [[`c5a71bc`](https://github.com/clerk/javascript/commit/c5a71bca0491a712e0cdf62533113f2c1df32832), [`49972da`](https://github.com/clerk/javascript/commit/49972da75f6384b3f7aa362212f0f3966274d4e9), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`7443113`](https://github.com/clerk/javascript/commit/744311344e7320da673177f7741e91c9437ffabf), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/backend@3.29.0
+  - @clerk/shared@4.45.1
+  - @clerk/react@6.18.8
+
 ## 7.9.26
 
 ### Patch Changes

@@ -111,6 +111,7 @@ describe('Mosaic rule configuration', () => {
     const overrides = config.overrides.filter(override => override.rules['eslint-compat/no-restricted-syntax']);
     expect(overrides.map(override => override.files)).toEqual([
       ['src/**/*'],
+      ['src/features/**/*', 'src/blocks/**/*'],
       ['src/**/*.styles.ts'],
       ['src/primitives/**/*'],
     ]);
@@ -118,7 +119,8 @@ describe('Mosaic rule configuration', () => {
       expect(override.rules['eslint-compat/no-restricted-syntax'][0]).toBe('error');
     }
     expect(overrides[0].excludeFiles).toEqual(['src/__tests__/**', 'src/**/*.test.{ts,tsx}']);
-    expect(overrides[2].excludeFiles).toEqual(['src/**/*.test.{ts,tsx}']);
+    expect(overrides[1].excludeFiles).toEqual(testFiles);
+    expect(overrides[3].excludeFiles).toEqual(['src/**/*.test.{ts,tsx}']);
   });
 
   test('inherits repository import restrictions and keeps Mosaic guards local', () => {
