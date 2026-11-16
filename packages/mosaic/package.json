@@ -31,6 +31,136 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./components/action-menu": {
+      "types": "./dist/components/action-menu.d.ts",
+      "import": "./dist/components/action-menu.js",
+      "default": "./dist/components/action-menu.js"
+    },
+    "./components/avatar": {
+      "types": "./dist/components/avatar.d.ts",
+      "import": "./dist/components/avatar.js",
+      "default": "./dist/components/avatar.js"
+    },
+    "./components/badge": {
+      "types": "./dist/components/badge.d.ts",
+      "import": "./dist/components/badge.js",
+      "default": "./dist/components/badge.js"
+    },
+    "./components/banner": {
+      "types": "./dist/components/banner.d.ts",
+      "import": "./dist/components/banner.js",
+      "default": "./dist/components/banner.js"
+    },
+    "./components/button": {
+      "types": "./dist/components/button.d.ts",
+      "import": "./dist/components/button.js",
+      "default": "./dist/components/button.js"
+    },
+    "./components/data-list": {
+      "types": "./dist/components/data-list.d.ts",
+      "import": "./dist/components/data-list.js",
+      "default": "./dist/components/data-list.js"
+    },
+    "./components/empty-state": {
+      "types": "./dist/components/empty-state.d.ts",
+      "import": "./dist/components/empty-state.js",
+      "default": "./dist/components/empty-state.js"
+    },
+    "./components/entity": {
+      "types": "./dist/components/entity.d.ts",
+      "import": "./dist/components/entity.js",
+      "default": "./dist/components/entity.js"
+    },
+    "./components/heading": {
+      "types": "./dist/components/heading.d.ts",
+      "import": "./dist/components/heading.js",
+      "default": "./dist/components/heading.js"
+    },
+    "./components/icon": {
+      "types": "./dist/components/icon.d.ts",
+      "import": "./dist/components/icon.js",
+      "default": "./dist/components/icon.js"
+    },
+    "./components/input": {
+      "types": "./dist/components/input.d.ts",
+      "import": "./dist/components/input.js",
+      "default": "./dist/components/input.js"
+    },
+    "./components/item": {
+      "types": "./dist/components/item.d.ts",
+      "import": "./dist/components/item.js",
+      "default": "./dist/components/item.js"
+    },
+    "./components/panel": {
+      "types": "./dist/components/panel.d.ts",
+      "import": "./dist/components/panel.js",
+      "default": "./dist/components/panel.js"
+    },
+    "./components/profile": {
+      "types": "./dist/components/profile.d.ts",
+      "import": "./dist/components/profile.js",
+      "default": "./dist/components/profile.js"
+    },
+    "./components/radio": {
+      "types": "./dist/components/radio.d.ts",
+      "import": "./dist/components/radio.js",
+      "default": "./dist/components/radio.js"
+    },
+    "./components/section": {
+      "types": "./dist/components/section.d.ts",
+      "import": "./dist/components/section.js",
+      "default": "./dist/components/section.js"
+    },
+    "./components/segmented-control": {
+      "types": "./dist/components/segmented-control.d.ts",
+      "import": "./dist/components/segmented-control.js",
+      "default": "./dist/components/segmented-control.js"
+    },
+    "./components/skeleton": {
+      "types": "./dist/components/skeleton.d.ts",
+      "import": "./dist/components/skeleton.js",
+      "default": "./dist/components/skeleton.js"
+    },
+    "./components/table": {
+      "types": "./dist/components/table.d.ts",
+      "import": "./dist/components/table.js",
+      "default": "./dist/components/table.js"
+    },
+    "./components/text": {
+      "types": "./dist/components/text.d.ts",
+      "import": "./dist/components/text.js",
+      "default": "./dist/components/text.js"
+    },
+    "./icons/glyphs/arrow-up-right": {
+      "types": "./dist/icons/glyphs/arrow-up-right.d.ts",
+      "import": "./dist/icons/glyphs/arrow-up-right.js",
+      "default": "./dist/icons/glyphs/arrow-up-right.js"
+    },
+    "./icons/glyphs/code": {
+      "types": "./dist/icons/glyphs/code.d.ts",
+      "import": "./dist/icons/glyphs/code.js",
+      "default": "./dist/icons/glyphs/code.js"
+    },
+    "./icons/glyphs/external": {
+      "types": "./dist/icons/glyphs/external.d.ts",
+      "import": "./dist/icons/glyphs/external.js",
+      "default": "./dist/icons/glyphs/external.js"
+    },
+    "./icons/glyphs/plus": {
+      "types": "./dist/icons/glyphs/plus.d.ts",
+      "import": "./dist/icons/glyphs/plus.js",
+      "default": "./dist/icons/glyphs/plus.js"
+    },
+    "./icons/glyphs/shield-check": {
+      "types": "./dist/icons/glyphs/shield-check.d.ts",
+      "import": "./dist/icons/glyphs/shield-check.js",
+      "default": "./dist/icons/glyphs/shield-check.js"
+    },
+    "./icons/glyphs/user-circle": {
+      "types": "./dist/icons/glyphs/user-circle.d.ts",
+      "import": "./dist/icons/glyphs/user-circle.js",
+      "default": "./dist/icons/glyphs/user-circle.js"
+    },
     "./styles.css": {
       "types": "./styles.css.d.ts",
       "default": "./dist/styles.css"

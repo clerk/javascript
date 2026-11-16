@@ -1,3 +1,5 @@
+'use client';
+
 export { Profile } from './profile';
 export type {
   ProfileContentProps,
