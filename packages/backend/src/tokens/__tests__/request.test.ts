@@ -1946,9 +1946,13 @@ describe('tokens.authenticateRequest(options)', () => {
         const pending = authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' })).finally(() => {
           settled = true;
         });
-        for (let i = 0; i < 60 && !settled; i++) {
-          await vi.advanceTimersByTimeAsync(1000);
-        }
+        await vi.waitFor(
+          async () => {
+            await vi.advanceTimersByTimeAsync(1000);
+            expect(settled).toBe(true);
+          },
+          { timeout: 4000, interval: 5 },
+        );
         return pending;
       };
 
