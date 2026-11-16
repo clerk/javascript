@@ -61,26 +61,13 @@ type FapiCapableClerk = {
 };
 
 export type TransferRequest = {
-  readonly key: string;
   readonly clerk: FapiCapableClerk;
   readonly sessionId: string;
   readonly destination: string;
   readonly presentation: SessionTransferPresentation;
 };
 
-export type TransferLease = {
-  readonly key: string;
-  readonly transfer: Promise<SessionTransfer>;
-};
-
-type LedgerEntry = {
-  readonly lease: TransferLease;
-  expiresAt: number | null;
-};
-
-const MIN_REMAINING_MS = 15_000;
 const MINT_TIME_LIMIT_MS = 20_000;
-const unclaimed = new Map<string, LedgerEntry>();
 
 /**
  * Creates a one-time URL that signs the active session's user in on `destination`. Every call
@@ -136,49 +123,11 @@ export function resolveTransferRequest({ destination, presentation }: PrepareSes
   }
 
   return {
-    key: `${session.id}\n${presentation}\n${destination}`,
     clerk,
     sessionId: session.id,
     destination,
     presentation,
   };
-}
-
-export function acquireTransfer(request: TransferRequest, { fresh = false } = {}): TransferLease {
-  evictExpiring(Date.now());
-
-  const existing = unclaimed.get(request.key);
-  if (existing && !fresh) {
-    return existing.lease;
-  }
-
-  const transfer = mintSessionTransfer(request);
-  const entry: LedgerEntry = { lease: { key: request.key, transfer }, expiresAt: null };
-  unclaimed.set(request.key, entry);
-  transfer.then(
-    minted => {
-      entry.expiresAt = minted.expiresAt.getTime();
-    },
-    () => {
-      if (unclaimed.get(request.key) === entry) {
-        unclaimed.delete(request.key);
-      }
-    },
-  );
-
-  return entry.lease;
-}
-
-export function claimTransfer(lease: TransferLease): boolean {
-  return unclaimed.get(lease.key)?.lease === lease && unclaimed.delete(lease.key);
-}
-
-function evictExpiring(now: number): void {
-  for (const [key, entry] of unclaimed) {
-    if (entry.expiresAt !== null && entry.expiresAt - now < MIN_REMAINING_MS) {
-      unclaimed.delete(key);
-    }
-  }
 }
 
 export async function mintSessionTransfer({

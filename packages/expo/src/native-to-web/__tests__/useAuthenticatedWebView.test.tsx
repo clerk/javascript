@@ -111,7 +111,7 @@ describe('useAuthenticatedWebView', () => {
     }));
   });
 
-  test('mints once under Strict Mode and hands the URL to the WebView', async () => {
+  test('hands the URL to the WebView under Strict Mode', async () => {
     mocks.request.mockResolvedValue(mintedResponse());
 
     const { result } = renderWebView(DESTINATION, strictMode);
@@ -120,22 +120,23 @@ describe('useAuthenticatedWebView', () => {
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
     expect(result.current.status).toBe('loading');
     expect(result.current.webViewProps?.source).toEqual({ uri: TRANSFER_URL });
-    expect(mocks.request).toHaveBeenCalledTimes(1);
     expect(mocks.request).toHaveBeenCalledWith(
       expect.objectContaining({ body: { redirectUrl: DESTINATION, presentationMode: 'webview' } }),
     );
   });
 
-  test('reuses the pending mint when the screen remounts before it arrives', async () => {
-    const mint = deferredMint();
+  test('mints a new URL when the screen remounts before the first one arrives', async () => {
+    const SECOND_URL = 'https://clerk.example.com/v1/session_transfers/redeem?token=second';
+    const abandoned = deferredMint();
+    mocks.request.mockResolvedValueOnce(mintedResponse(SECOND_URL));
 
     const first = renderWebView();
     first.unmount();
     const second = renderWebView();
-    await act(() => mint.deliver());
+    await act(() => abandoned.deliver());
 
-    expect(second.result.current.webViewProps?.source).toEqual({ uri: TRANSFER_URL });
-    expect(mocks.request).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(second.result.current.webViewProps?.source).toEqual({ uri: SECOND_URL }));
+    expect(mocks.request).toHaveBeenCalledTimes(2);
   });
 
   test('gives two screens mounted for the same destination a URL each', async () => {
@@ -392,6 +393,30 @@ describe('useAuthenticatedWebView', () => {
     rerender({ destination: DESTINATION });
 
     expect(result.current).toMatchObject({ status: 'signed-out', webViewProps: null });
+  });
+
+  test('mints a new URL when the same session signs back in', async () => {
+    mocks.request
+      .mockResolvedValueOnce(mintedResponse())
+      .mockResolvedValueOnce(mintedResponse('https://clerk.example.com/v1/session_transfers/redeem?token=second'));
+    const { result, rerender } = renderWebView();
+    await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
+    act(() => result.current.webViewProps?.onLoadEnd(navigation(DESTINATION)));
+    expect(result.current.status).toBe('ready');
+
+    const sessionId = mocks.auth.sessionId;
+    mocks.auth = { isLoaded: true, isSignedIn: false, sessionId };
+    rerender({ destination: DESTINATION });
+    expect(result.current.status).toBe('signed-out');
+    mocks.auth = { isLoaded: true, isSignedIn: true, sessionId };
+    rerender({ destination: DESTINATION });
+
+    expect(result.current).toMatchObject({ status: 'preparing', webViewProps: null });
+    await waitFor(() =>
+      expect(result.current.webViewProps?.source.uri).toBe(
+        'https://clerk.example.com/v1/session_transfers/redeem?token=second',
+      ),
+    );
   });
 
   test('reports signed-out when Clerk refuses the mint as signed out', async () => {

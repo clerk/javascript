@@ -54,7 +54,8 @@ export function openInBrowser({ destination }: OpenInBrowserParams): Promise<voi
   try {
     const launch = resolveBrowserLauncher();
     const request = resolveTransferRequest({ destination, presentation: 'browser' });
-    const existing = inFlight.get(request.key);
+    const key = `${request.sessionId}\n${destination}`;
+    const existing = inFlight.get(key);
     if (existing) {
       return existing;
     }
@@ -62,11 +63,11 @@ export function openInBrowser({ destination }: OpenInBrowserParams): Promise<voi
     const opening = mintSessionTransfer(request)
       .then(transfer => launch(transfer.url))
       .finally(() => {
-        if (inFlight.get(request.key) === opening) {
-          inFlight.delete(request.key);
+        if (inFlight.get(key) === opening) {
+          inFlight.delete(key);
         }
       });
-    inFlight.set(request.key, opening);
+    inFlight.set(key, opening);
     return opening;
   } catch (error) {
     return Promise.reject(toSessionTransferError(error));
