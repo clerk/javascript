@@ -713,6 +713,42 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       });
     });
 
+    it('verifies an OAuth JWT whose iss is the configured proxy URL', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const proxyUrl = 'https://example.com/__clerk';
+      const oauthJwt = await createSignedOAuthJwt({ ...mockOAuthAccessTokenJwtPayload, iss: proxyUrl });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
+        proxyUrl,
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.errors).toBeUndefined();
+    });
+
+    it('rejects an OAuth JWT whose iss is a proxy URL when no proxyUrl is provided', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const oauthJwt = await createSignedOAuthJwt({
+        ...mockOAuthAccessTokenJwtPayload,
+        iss: 'https://example.com/__clerk',
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        publishableKey: oauthPublishableKey,
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.errors?.[0]).toMatchObject({
+        code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+        message: `Invalid JWT issuer claim (iss) "https://example.com/__clerk". Expected "${mockOAuthAccessTokenJwtPayload.iss}".`,
+      });
+    });
+
     it('fails if JWT type is not at+jwt or application/at+jwt', async () => {
       server.use(
         http.get(

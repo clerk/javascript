@@ -270,7 +270,7 @@ async function verifyAPIKey(
  */
 export async function verifyMachineAuthToken(
   token: string,
-  options: VerifyTokenOptions & Pick<JwtMachineVerifyOptions, 'publishableKey'>,
+  options: VerifyTokenOptions & Pick<JwtMachineVerifyOptions, 'publishableKey' | 'proxyUrl'>,
 ) {
   if (isJwtFormat(token)) {
     let decodedResult: Jwt;
