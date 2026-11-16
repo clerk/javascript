@@ -1,4 +1,5 @@
-import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useClerk } from '@clerk/shared/react';
@@ -29,8 +30,9 @@ function useHandleAuthenticateWithPasskey(
   protectCheckPath = '../protect-check',
 ): (...args: Parameters<SignInResource['authenticateWithPasskey']>) => Promise<unknown> {
   const card = useCardState();
+  const clerk = useClerk();
   // @ts-expect-error -- private method for the time being
-  const { setActive, __internal_navigateWithError } = useClerk();
+  const { setActive, __internal_navigateWithError } = clerk;
   const supportEmail = useSupportEmail();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { authenticateWithPasskey } = useCoreSignIn();
@@ -88,6 +90,16 @@ function useHandleAuthenticateWithPasskey(
         ) {
           return;
         }
+      }
+
+      // A prior sign-in completed but its redirect never landed; resume that session like the other sign-in paths do.
+      if (isClerkAPIResponseError(err) && err.errors.some(e => e.code === ERROR_CODES.SESSION_EXISTS)) {
+        return setActive({
+          session: clerk.client.lastActiveSessionId,
+          navigate: async ({ session, decorateUrl }) => {
+            await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
+          },
+        });
       }
 
       if (isUserLockedError(err)) {
