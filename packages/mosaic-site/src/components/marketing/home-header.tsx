@@ -2,7 +2,6 @@ import Link from 'next/link';
 
 import { BetaNotice } from '@/components/marketing/beta-notice';
 import { ClerkUILogo } from '@/components/marketing/clerk-logo';
-import { NpmDownloads } from '@/components/marketing/npm-downloads';
 import { VersionBadge } from '@/components/marketing/version-badge';
 import { Container } from '@/components/ui/container';
 
@@ -11,7 +10,7 @@ const GITHUB_URL = 'https://github.com/clerk/javascript/tree/main/packages/mosai
 export function HomeHeader() {
   return (
     <header className='relative z-20'>
-      <Container className='flex h-14 items-center justify-between gap-4'>
+      <Container className='grid h-14 grid-cols-[1fr_minmax(0,auto)_1fr] items-center gap-4'>
         <div className='flex shrink-0 items-center gap-2'>
           <Link
             href='/'
@@ -22,12 +21,11 @@ export function HomeHeader() {
           </Link>
           <VersionBadge />
         </div>
-        <div className='flex min-w-0 items-center gap-2'>
-          <BetaNotice />
-          <NpmDownloads className='ml-2 shrink-0 max-xl:hidden' />
+        <BetaNotice />
+        <div className='flex items-center gap-2 justify-self-end'>
           <Link
             href='/changelog'
-            className='label-3 text-foreground focus-visible:outline-focus ml-2 shrink-0 transition-colors hover:text-gray-600 dark:hover:text-gray-300'
+            className='label-3 text-foreground focus-visible:outline-focus shrink-0 transition-colors hover:text-gray-600 dark:hover:text-gray-300'
           >
             Changelog
           </Link>
