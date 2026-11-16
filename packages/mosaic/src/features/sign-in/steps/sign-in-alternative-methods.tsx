@@ -30,7 +30,7 @@ interface SignInAlternativeMethodsProps {
   onSelectProvider: (id: string) => void;
   isDisabled: boolean;
   globalErrorMessage?: string;
-  onBack: () => void;
+  onBack?: () => void;
   onShowHelp: () => void;
   focusRef?: Ref<HTMLElement>;
 }
@@ -106,21 +106,23 @@ export function SignInAlternativeMethods({
             ))}
           </ProviderButtonGroup>
         </div>
-        <Text
-          size='sm'
-          xstyle={styles.footerText}
-        >
-          <Button
-            type='button'
+        {onBack ? (
+          <Text
             size='sm'
-            variant='link'
-            color='neutral'
-            disabled={isDisabled}
-            onClick={onBack}
+            xstyle={styles.footerText}
           >
-            {m.back}
-          </Button>
-        </Text>
+            <Button
+              type='button'
+              size='sm'
+              variant='link'
+              color='neutral'
+              disabled={isDisabled}
+              onClick={onBack}
+            >
+              {m.back}
+            </Button>
+          </Text>
+        ) : null}
         <Text
           size='xs'
           color='foreground-secondary'

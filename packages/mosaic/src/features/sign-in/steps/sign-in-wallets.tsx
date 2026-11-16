@@ -5,9 +5,11 @@ import type { Ref } from 'react';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
+import { Link } from '../../../components/link';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
+import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
-import { useMessages } from '../../../localization';
+import { rich, useMessages } from '../../../localization';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 
@@ -21,6 +23,7 @@ interface SignInWalletsProps {
   focusRef?: Ref<HTMLElement>;
   title?: string;
   description?: string;
+  loading?: boolean;
 }
 
 export function SignInWallets({
@@ -33,6 +36,7 @@ export function SignInWallets({
   focusRef,
   title,
   description,
+  loading = false,
 }: SignInWalletsProps) {
   const m = useMessages('signIn');
   const firstRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
@@ -47,9 +51,30 @@ export function SignInWallets({
         role='alert'
         color='negative'
       >
-        {globalErrorMessage}
+        {globalErrorMessage ??
+          (!loading && wallets.length === 0
+            ? rich(m.wallets.noneAvailable, {
+                components: {
+                  link: children => (
+                    <Link
+                      href='https://solana.com/solana-wallets'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      color='negative'
+                    >
+                      {children}
+                    </Link>
+                  ),
+                },
+              })
+            : undefined)}
       </Card.Banner>
       <Card.Content>
+        {loading ? (
+          <div {...stylex.props(styles.walletsLoading)}>
+            <Spinner label={m.loading} />
+          </div>
+        ) : null}
         <ProviderButtonGroup disabled={isDisabled}>
           {wallets.map((wallet, index) => (
             <ProviderButton
