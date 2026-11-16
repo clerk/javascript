@@ -12,8 +12,8 @@ const DEFAULT_MIN_DURATION = 400;
 
 /**
  * Spin-delays a nullable value: returns `null` until `value` has stayed non-null longer than `delay`
- * (so quick actions never flash a spinner), then holds the last non-null value for at least
- * `minDuration` after it clears (so the spinner never flickers off). A value-carrying rework of
+ * (so quick actions never flash a spinner), then keeps the last non-null value up for a total of at
+ * least `minDuration` from when it was shown (so the spinner never flickers off). A value-carrying rework of
  * https://github.com/smeijer/spin-delay: each timer lives in a `const` and is cancelled by effect
  * cleanup when `value` flips before it fires.
  */
