@@ -77,10 +77,6 @@
       "types": "./dist/native-to-web/index.d.ts",
       "default": "./dist/native-to-web/index.js"
     },
-    "./native-to-web/advanced": {
-      "types": "./dist/native-to-web/advanced.d.ts",
-      "default": "./dist/native-to-web/advanced.js"
-    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"

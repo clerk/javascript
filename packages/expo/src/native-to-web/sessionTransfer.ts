@@ -98,7 +98,7 @@ const unclaimed = new Map<string, LedgerEntry>();
  * @example
  * ### Open the destination in an in-app browser on iOS
  * ```ts
- * import { prepareSessionTransfer } from '@clerk/expo/native-to-web/advanced';
+ * import { prepareSessionTransfer } from '@clerk/expo/native-to-web';
  * import * as WebBrowser from 'expo-web-browser';
  *
  * const transfer = await prepareSessionTransfer({
