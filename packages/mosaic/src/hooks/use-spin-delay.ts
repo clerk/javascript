@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 export interface SpinDelayOptions {
   /** Wait this long before showing the value, so quick actions never flash a spinner. `0` shows it straight away. */
   delay?: number;
-  /** Once shown, keep the value up at least this long, so the spinner never flickers off. */
+  /** Once shown, keep a value up at least this long from when the first one appeared, so the spinner never flickers off. */
   minDuration?: number;
 }
 
@@ -11,9 +11,10 @@ const DEFAULT_DELAY = 150;
 const DEFAULT_MIN_DURATION = 400;
 
 /**
- * Spin-delays a nullable value: returns `null` until `value` has stayed non-null longer than `delay`
- * (so quick actions never flash a spinner), then keeps the last non-null value up for a total of at
- * least `minDuration` from when it was shown (so the spinner never flickers off). A value-carrying rework of
+ * Spin-delays a nullable value: returns `null` until `value` has stayed non-null and unchanged longer
+ * than `delay` (so quick actions never flash a spinner), then keeps a value up until at least
+ * `minDuration` after the first one appeared (so the spinner never flickers off). Swapping to another
+ * non-null value shows it right away and does not restart `minDuration`. A value-carrying rework of
  * https://github.com/smeijer/spin-delay: each timer lives in a `const` and is cancelled by effect
  * cleanup when `value` flips before it fires.
  */

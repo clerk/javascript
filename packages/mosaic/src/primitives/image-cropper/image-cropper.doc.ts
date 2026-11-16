@@ -11,7 +11,7 @@ import type { ImageCropperZoomInProps, ImageCropperZoomOutProps } from './image-
 export default {
   name: 'ImageCropper',
   description:
-    'Headless, unstyled square image cropper. The user pans by dragging or with the arrow keys, zooms with the wheel, a pinch, the keyboard, a slider or step buttons, turns the image a quarter at a time, and resets it. The crop is a `Crop` (`{ x, y, zoom, rotation }`), with zoom clamped between the zoom where the whole image fits in the frame and `maxZoom`. At zoom `1` and above the image covers the frame; below `1` it sits inside the frame instead. `cropImage(src, crop, { type, size })` draws the chosen square into a `Blob`. Every control stays disabled until the image has loaded.',
+    'Headless, unstyled square image cropper. The user pans by dragging or with the arrow keys, zooms with the wheel, a pinch, the keyboard, a slider or step buttons, turns the image a quarter at a time, and resets it. The crop is a `Crop` (`{ x, y, zoom, rotation }`), with zoom clamped between the zoom where the whole image fits in the frame and `maxZoom`. At zoom `1` and above the image covers the frame. Below `1` the frame shows empty space along the short side of the image, and the long side stays cropped until the minimum zoom, where the whole image fits. `cropImage(src, crop, { type, size })` draws the chosen square into a `Blob`. Every control stays disabled until the image has loaded.',
   useFor: [
     'cropping a picked image to a square before upload',
     'pan, zoom and rotate controls for an image',

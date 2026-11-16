@@ -165,7 +165,9 @@ const detail = Dialog.createHandle<{ name: string }>();
     <Dialog.Portal>
       <Dialog.Backdrop />
       <Dialog.Viewport>
-        <Dialog.Popup>{payload?.name}</Dialog.Popup>
+        <Dialog.Popup>
+          <Dialog.Title>{payload?.name}</Dialog.Title>
+        </Dialog.Popup>
       </Dialog.Viewport>
     </Dialog.Portal>
   )}
