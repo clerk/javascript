@@ -202,6 +202,7 @@ function isTokenExchangeResponse(value: unknown): value is TokenExchangeResponse
   return (
     isRecord(value) &&
     isString(value.access_token) &&
+    value.access_token.length > 0 &&
     isString(value.issued_token_type) &&
     isString(value.token_type) &&
     isAbsentOr(value, 'scope', isString) &&
@@ -234,10 +235,15 @@ function tokenExchangeError(json: unknown, status: number) {
 
 function oauthTokenEndpoint({ publishableKey, proxyUrl }: ExchangeOAuthApplicationTokenParams) {
   if (proxyUrl) {
-    if (parseAbsoluteUrl(proxyUrl)?.protocol !== 'https:') {
+    const url = parseAbsoluteUrl(proxyUrl);
+    if (url?.protocol !== 'https:') {
       throw new Error('`proxyUrl` must be an absolute HTTPS URL to perform an OAuth token exchange.');
     }
-    return `${proxyUrl.replace(/\/+$/, '')}/oauth/token`;
+    if (/[?#]/.test(proxyUrl)) {
+      throw new Error('`proxyUrl` must not contain a query or fragment to perform an OAuth token exchange.');
+    }
+    url.pathname = `${url.pathname.replace(/\/+$/, '')}/oauth/token`;
+    return url.href;
   }
   const { frontendApi } = parsePublishableKey(publishableKey, { fatal: true });
   return `https://${frontendApi}/oauth/token`;
@@ -354,7 +360,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
    * @throws `OAuthTokenExchangeError` with code `invalid_request` and no `status` if `resource` or `scope` is invalid. No request is made.
    * @throws `OAuthTokenExchangeError` with the OAuth error code, `errorDescription` and HTTP `status` if the token endpoint rejects the exchange ([RFC 6749 section 5.2](https://www.rfc-editor.org/rfc/rfc6749#section-5.2)).
    * @throws `OAuthTokenExchangeError` with code `invalid_response` and the HTTP `status` if the token endpoint returns a redirect, a non-200 success status, an error without an OAuth error code, or a malformed token response.
-   * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute HTTPS URL.
+   * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute HTTPS URL or contains a query or fragment.
    * @throws Network failures from `fetch`, unwrapped and unchanged.
    *
    * @example
@@ -387,6 +393,10 @@ export class OAuthApplicationsApi extends AbstractAPI {
     };
 
     const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body, redirect: 'manual' });
+
+    if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+      throw tokenExchangeResponseError(response.status);
+    }
 
     const json = await response.json().catch(() => undefined);
 

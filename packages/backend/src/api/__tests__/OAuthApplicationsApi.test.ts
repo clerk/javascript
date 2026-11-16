@@ -318,6 +318,7 @@ describe('OAuthApplications', () => {
     });
 
     it.each([
+      ['an empty access_token', { access_token: '' }],
       ['a numeric scope', { scope: 42 }],
       ['a null scope', { scope: null }],
       ['a string expires_in', { expires_in: '3600' }],
@@ -412,6 +413,16 @@ describe('OAuthApplications', () => {
       expect(requested).toEqual([tokenFetchUrl]);
     });
 
+    it('throws an invalid_response error for a redirect with an OAuth error body', async () => {
+      server.use(
+        http.post(tokenFetchUrl, () =>
+          HttpResponse.json({ error: 'invalid_request' }, { status: 307, headers: { Location: tokenFetchUrl } }),
+        ),
+      );
+
+      await expect(exchange()).rejects.toMatchObject({ error: 'invalid_response', status: 307 });
+    });
+
     it('does not follow redirects from an HTTPS proxy, even to another HTTPS endpoint', async () => {
       const proxyUrl = 'https://proxy.example.test/__clerk';
       const proxyTokenEndpoint = `${proxyUrl}/oauth/token`;
@@ -471,6 +482,16 @@ describe('OAuthApplications', () => {
         'the proxy URL uses plain HTTP on IPv6 loopback',
         { publishableKey, proxyUrl: 'http://[::1]:8080/__clerk' },
         '`proxyUrl` must be an absolute HTTPS URL',
+      ],
+      [
+        'the proxy URL has a query',
+        { publishableKey, proxyUrl: 'https://proxy.example.test/__clerk?tenant=a' },
+        '`proxyUrl` must not contain a query or fragment',
+      ],
+      [
+        'the proxy URL has a fragment',
+        { publishableKey, proxyUrl: 'https://proxy.example.test/__clerk#a' },
+        '`proxyUrl` must not contain a query or fragment',
       ],
     ])('throws before making any request when %s', async (_, endpointParams, message) => {
       let requested = false;
