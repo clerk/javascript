@@ -507,7 +507,8 @@ describe('UserVerificationFactorOne', () => {
       await userEvent.click(screen.getByText('Reset your password'));
       await setNewPassword(userEvent, 'a-much-better-password-123');
 
-      await screen.findByText(/is not a valid strategy for Session.prepareFirstFactorVerification/);
+      await screen.findByText('Something went wrong. Please try again.');
+      expect(screen.queryByText(/is not a valid strategy/)).not.toBeInTheDocument();
     });
 
     it('goes back from the code step to the new password step, then to the breached screen, without old errors', async () => {

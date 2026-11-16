@@ -24,7 +24,7 @@ type UVFactorOneResetPasswordCodeCardProps = UVFactorOneCodeCard & {
 export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPasswordCodeCardProps) => {
   const { newPassword, signOutOfOtherSessions, hasNewPassword, onNewPasswordRejected, ...codeCardProps } = props;
   const { session } = useSession();
-  const resetPasswordAttempt = useResetPasswordAttempt();
+  const resetPasswordAttemptRef = useResetPasswordAttempt();
   const isEmail = props.factor.strategy === 'reset_password_email_code';
 
   return (
@@ -57,8 +57,8 @@ export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPassword
           isEmail ? 'identityPreviewEditButton__emailAddress' : 'identityPreviewEditButton__phoneNumber',
         )}
         attempt={code => {
-          if (resetPasswordAttempt) {
-            resetPasswordAttempt.current = { newPassword, signOutOfOtherSessions };
+          if (resetPasswordAttemptRef) {
+            resetPasswordAttemptRef.current = { newPassword, signOutOfOtherSessions };
           }
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           return session!.attemptFirstFactorVerification({

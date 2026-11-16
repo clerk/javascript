@@ -16,7 +16,7 @@ const useAfterVerification = () => {
   const { setActive } = useClerk();
   const { setCache } = useUserVerificationSession();
   const { navigate } = useRouter();
-  const resetPasswordAttempt = useResetPasswordAttempt();
+  const resetPasswordAttemptRef = useResetPasswordAttempt();
 
   const handleVerificationResponse = useCallback(
     async (sessionVerification: SessionVerificationResource) => {
@@ -33,7 +33,7 @@ const useAfterVerification = () => {
           // A reset password code saves the new password when the verification completes.
           return afterVerification?.({
             passwordReset: isResetPasswordStrategy(sessionVerification.firstFactorVerification?.strategy)
-              ? resetPasswordAttempt?.current
+              ? resetPasswordAttemptRef?.current
               : undefined,
           });
 
@@ -43,7 +43,7 @@ const useAfterVerification = () => {
           return console.error(clerkInvalidFAPIResponse(sessionVerification.status, supportEmail));
       }
     },
-    [navigate, setActive, supportEmail, resetPasswordAttempt],
+    [navigate, setActive, supportEmail, resetPasswordAttemptRef],
   );
 
   return {

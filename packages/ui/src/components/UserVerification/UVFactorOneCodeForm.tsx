@@ -14,7 +14,7 @@ import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import type { LocalizationKey } from '../../localization';
-import { localizationKeys } from '../../localization';
+import { localizationKeys, useLocalizations } from '../../localization';
 import { useAfterVerification } from './use-after-verification';
 
 export type UVFactorOneCodeCard = Pick<
@@ -57,6 +57,7 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard &
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   const { session } = useSession();
   const card = useCardState();
+  const { t } = useLocalizations();
 
   const { handleVerificationResponse } = useAfterVerification();
 
@@ -73,9 +74,9 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       .then(() => props.onFactorPrepare())
       .catch(err => {
         // An older clerk-js throws a plain Error for a strategy it doesn't know (a newer ui's reset
-        // password code). Show it instead of leaving the user waiting for a code that was never sent.
+        // password code). Show an error instead of leaving the user waiting for a code that was never sent.
         if (!isKnownError(err)) {
-          return card.setError(err instanceof Error ? err.message : String(err));
+          return card.setError(t(localizationKeys('unstable__errors.something_went_wrong')));
         }
         return handleError(err, [], card.setError);
       });

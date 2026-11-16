@@ -15,8 +15,12 @@ From UserProfile's change password form, the modal reuses the new password the u
 ```tsx
 const { user } = useUser();
 const updatePassword = useReverification(
-  (reverification: ReverificationResult | undefined, params: UpdateUserPasswordParams) =>
-    reverification?.passwordReset ? user!.reload().catch(() => user!) : user!.updatePassword(params),
+  (reverification: ReverificationResult | undefined, currentUser: UserResource, params: UpdateUserPasswordParams) =>
+    // A password reset during reverification already saved the new password.
+    reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
   { passReverificationResult: true },
 );
+
+// In the submit handler, once `user` is loaded:
+await updatePassword(user, { newPassword, signOutOfOtherSessions: true });
 ```
