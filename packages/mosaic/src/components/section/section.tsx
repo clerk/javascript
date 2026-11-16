@@ -22,6 +22,8 @@ export type SectionGroupProps = MosaicComponentProps<'div'>;
 export type SectionHeaderProps = MosaicComponentProps<'div'>;
 export type SectionTitleProps = Omit<HeadingProps, 'size'>;
 export type SectionBodyProps = MosaicComponentProps<'div'>;
+export type SectionFrameProps = MosaicComponentProps<'div'>;
+export type SectionFooterProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'ul'>;
 export type SectionItemProps = MosaicComponentProps<'div'> & { wrap?: boolean };
@@ -45,6 +47,7 @@ const SectionGroupContext = React.createContext<React.Dispatch<React.SetStateAct
 const SectionHeaderContext = React.createContext(false);
 const SectionItemsContext = React.createContext(false);
 const SectionItemWrapContext = React.createContext(false);
+const SectionFrameContext = React.createContext(false);
 
 const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot({ render, xstyle, ...rest }, ref) {
   return useRender({
@@ -121,11 +124,52 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
 });
 
 const Body = React.forwardRef<HTMLDivElement, SectionBodyProps>(function SectionBody({ render, xstyle, ...rest }, ref) {
+  const framed = React.useContext(SectionFrameContext);
+
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
-    props: mergeStyleProps(themeProps('section-body'), stylex.props(reset.base, styles.body, xstyle), rest),
+    props: mergeStyleProps(
+      themeProps('section-body'),
+      stylex.props(reset.base, styles.body, framed && styles.framedBody, xstyle),
+      rest,
+    ),
+  });
+});
+
+/**
+ * Wraps a `Section.Body` and a `Section.Footer` in one faded shell. The shell's color shows around
+ * the body as its outline and behind the footer, so the pair has a single outer edge and nothing
+ * drawn between them.
+ */
+const Frame = React.forwardRef<HTMLDivElement, SectionFrameProps>(function SectionFrame(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('section-frame'), stylex.props(reset.base, styles.frame, xstyle), rest),
+  });
+
+  return <SectionFrameContext.Provider value>{element}</SectionFrameContext.Provider>;
+});
+
+/**
+ * A strip under `Section.Body` for a summary or a link that belongs to the card above it. Place it
+ * directly after `Section.Body` inside a `Section.Frame`.
+ */
+const Footer = React.forwardRef<HTMLDivElement, SectionFooterProps>(function SectionFooter(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('section-footer'), stylex.props(reset.base, styles.footer, xstyle), rest),
   });
 });
 
@@ -358,6 +402,8 @@ export const Section = {
   Header,
   Title,
   Body,
+  Frame,
+  Footer,
   Row,
   Items,
   Item,
