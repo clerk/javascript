@@ -12,6 +12,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
 
   let fakeUser: FakeUser;
   let organization: Organization;
+  let otherOrganization: Organization;
   let oauthApp: OAuthApplication;
   const cleanups: Array<() => Promise<unknown>> = [];
 
@@ -32,6 +33,11 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
       createdBy: user.id,
     });
     cleanups.push(() => u.services.clerk.organizations.deleteOrganization(organization.id));
+    otherOrganization = await u.services.clerk.organizations.createOrganization({
+      name: `Mosaic Consent Other ${Date.now()}`,
+      createdBy: user.id,
+    });
+    cleanups.push(() => u.services.clerk.organizations.deleteOrganization(otherOrganization.id));
     oauthApp = await u.services.clerk.oauthApplications.create({
       name: `Mosaic Consent ${Date.now()}`,
       redirectUris: [redirectUri()],
@@ -81,9 +87,9 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
     const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative(path, { searchParams: authorizeParams() });
     await u.page.waitForClerkJsLoaded();
+    await expect(page.getByText('consent-loading')).toHaveCount(0);
 
-    await expect(page.getByRole('button', { name: 'Allow' })).toHaveCount(0);
-    await expect(page.getByRole('heading')).toHaveCount(0);
+    await expect(page.locator('.cl-card-root')).toHaveCount(0);
   });
 
   test('shows an error without a client ID', async ({ page, context }) => {
@@ -129,11 +135,18 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
     expect(params.get('state')).toBe(state);
   });
 
-  test('grants access for the selected organization', async ({ page, context }) => {
+  test('grants access for the organization the user picks', async ({ page, context }) => {
     const u = await signIn({ page, context });
+    await page.evaluate(orgId => window.Clerk?.setActive({ organization: orgId }), organization.id);
+    await page.waitForFunction(orgId => window.Clerk?.session?.lastActiveOrganizationId === orgId, organization.id);
     await u.page.goToRelative(path, { searchParams: authorizeParams('profile email user:org:read') });
     await expect(heading(page)).toBeVisible();
-    await expect(page.getByText(organization.name).first()).toBeVisible();
+    const picker = page.getByRole('combobox', { name: /^Grant access for:/ });
+    await expect(picker).toHaveText(organization.name);
+
+    await picker.click();
+    await page.getByRole('option', { name: otherOrganization.name }).click();
+    await expect(picker).toHaveText(otherOrganization.name);
 
     const consentRequest = page.waitForRequest(
       request => request.method() === 'POST' && request.url().includes(`/me/oauth/consent/`),
@@ -141,7 +154,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
     await page.getByRole('button', { name: 'Allow' }).click();
 
     const posted = new URLSearchParams((await consentRequest).postData() ?? '');
-    expect(posted.get('organization_id')).toBe(organization.id);
+    expect(posted.getAll('organization_id')).toEqual([otherOrganization.id]);
     const params = await waitForCallback(page);
     expect(params.get('code')).toBeTruthy();
     expect(params.get('state')).toBe(state);
