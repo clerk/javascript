@@ -2594,6 +2594,7 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  something_went_wrong: LocalizationValue;
   sso_bypass_domain_not_served: LocalizationValue;
   ticket_expired_code: LocalizationValue;
   ticket_invalid_code: LocalizationValue;

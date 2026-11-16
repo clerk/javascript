@@ -2173,6 +2173,7 @@ export const heIL: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'אתה כבר מחובר לחשבון.',
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
