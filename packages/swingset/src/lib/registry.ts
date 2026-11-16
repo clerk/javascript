@@ -393,6 +393,14 @@ import {
   NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
   NoticeStartOver as SignInNoticeStartOver,
   SignUpDetails as SignInSignUpDetails,
+  SignUpEmailLinkSignedUp as SignInSignUpEmailLinkSignedUp,
+  SignUpEmailOrPhone as SignInSignUpEmailOrPhone,
+  SignUpLegalConsent as SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly as SignInSignUpLegalConsentOnly,
+  SignUpOptionalFields as SignInSignUpOptionalFields,
+  SignUpPasswordRequirements as SignInSignUpPasswordRequirements,
+  SignUpSettingsFields as SignInSignUpSettingsFields,
+  SignUpVerifyEmailLink as SignInSignUpVerifyEmailLink,
 } from '../stories/sign-in.stories';
 import {
   CustomElement as SignInButtonCustomElement,
@@ -1350,6 +1358,14 @@ const signInModule: StoryModule = {
   NewPasswordReset: SignInNewPasswordReset,
   NewPasswordRequired: SignInNewPasswordRequired,
   SignUpDetails: SignInSignUpDetails,
+  SignUpSettingsFields: SignInSignUpSettingsFields,
+  SignUpOptionalFields: SignInSignUpOptionalFields,
+  SignUpEmailOrPhone: SignInSignUpEmailOrPhone,
+  SignUpLegalConsent: SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly: SignInSignUpLegalConsentOnly,
+  SignUpPasswordRequirements: SignInSignUpPasswordRequirements,
+  SignUpVerifyEmailLink: SignInSignUpVerifyEmailLink,
+  SignUpEmailLinkSignedUp: SignInSignUpEmailLinkSignedUp,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,

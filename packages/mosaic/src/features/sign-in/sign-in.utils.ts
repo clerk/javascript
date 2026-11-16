@@ -2,7 +2,14 @@ import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
-import type { SignInEmailLinkStatus, SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
+import type {
+  SignInIdentifierField,
+  SignInProvider,
+  SignInStep,
+  SignUpFieldName,
+  SignUpFields,
+  SignUpLegalConsent,
+} from './sign-in.types';
 
 export const stepIds = {
   identifier: ['identifier'],
@@ -34,6 +41,7 @@ export const stepIds = {
     'notice:email-link',
     'notice:email-link-status',
     'notice:start-over',
+    'notice:verify-email-link',
   ],
   newPassword: ['new-password:forgot', 'new-password:required'],
   signUp: ['sign-up'],
@@ -75,25 +83,28 @@ type Messages = MosaicMessages['signIn'];
 type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
 type CodeResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
 
+type EmailLinkStatusStep = Extract<SignInStep, { purpose: 'email-link-status' }>;
+
 export function emailLinkStatusCopy(
-  status: SignInEmailLinkStatus,
+  { status, flow }: Pick<EmailLinkStatusStep, 'status' | 'flow'>,
   m: Messages,
 ): { title: string; description: string } {
+  const copy = flow === 'sign-up' ? { ...m.emailLink, ...m.emailLink.signUp } : m.emailLink;
   switch (status) {
     case 'loading':
-      return m.emailLink.loading;
+      return copy.loading;
     case 'signed-in':
-      return m.emailLink.signedIn;
+      return copy.signedIn;
     case 'signed-in-other-tab':
-      return m.emailLink.signedInOtherTab;
+      return copy.signedInOtherTab;
     case 'transferable':
-      return m.emailLink.transferable;
+      return copy.transferable;
     case 'expired':
-      return m.emailLink.expired;
+      return copy.expired;
     case 'failed':
-      return m.emailLink.failed;
+      return copy.failed;
     case 'client-mismatch':
-      return m.emailLink.clientMismatch;
+      return copy.clientMismatch;
   }
 }
 
@@ -270,4 +281,36 @@ export function splitLastUsedProvider(
 ): { lastUsed?: SignInProvider; others: readonly SignInProvider[] } {
   const lastUsed = providers.find(provider => provider.id === lastUsedProviderId);
   return { lastUsed, others: lastUsed ? providers.filter(provider => provider !== lastUsed) : providers };
+}
+
+const signUpFieldOrder: readonly SignUpFieldName[] = [
+  'firstName',
+  'lastName',
+  'username',
+  'emailAddress',
+  'phoneNumber',
+  'password',
+];
+
+export function signUpFieldNames(fields: SignUpFields): SignUpFieldName[] {
+  return signUpFieldOrder.filter(name => fields[name]);
+}
+
+export function signUpHeading(
+  step: Extract<SignInStep, { kind: 'sign-up' }>,
+  m: Messages,
+): { title: string; description: string } {
+  return step.legalConsent && signUpFieldNames(step.fields).length === 0
+    ? { title: m.signUp.legalConsent.title, description: m.signUp.legalConsent.description }
+    : { title: m.signUp.title, description: m.signUp.description };
+}
+
+export function legalConsentLabel({ termsUrl, privacyPolicyUrl }: SignUpLegalConsent, m: Messages) {
+  if (termsUrl && !privacyPolicyUrl) {
+    return m.signUp.legalConsent.termsOnly;
+  }
+  if (privacyPolicyUrl && !termsUrl) {
+    return m.signUp.legalConsent.privacyOnly;
+  }
+  return m.signUp.legalConsent.termsAndPrivacy;
 }

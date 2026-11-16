@@ -111,6 +111,8 @@ export function NoticeStep({
       return (
         <SignInEmailLink
           focusRef={focusRef}
+          title={m.emailLink.title}
+          description={m.emailLink.description}
           identifier={step.identifier}
           onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}
@@ -119,12 +121,25 @@ export function NoticeStep({
           onCancel={onCancel}
         />
       );
+    case 'verify-email-link':
+      return (
+        <SignInEmailLink
+          focusRef={focusRef}
+          title={m.verifyEmailLink.title}
+          description={m.verifyEmailLink.description}
+          identifier={step.identifier}
+          onEditIdentifier={onEditIdentifier}
+          globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
+          resend={resend}
+        />
+      );
     case 'start-over':
       return <SignInStartOver onStartOver={onStartOver} />;
     case 'email-link-status':
       return (
         <SignInEmailLinkStatus
-          status={step.status}
+          step={step}
           globalErrorMessage={globalErrorMessage}
         />
       );

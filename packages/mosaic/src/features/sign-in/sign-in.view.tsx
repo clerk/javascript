@@ -260,7 +260,11 @@ export function SignInView({
                     logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     isPending={isPending}
-                    resend={current.purpose === 'email-link' ? resendFor(m.emailLink) : undefined}
+                    resend={
+                      current.purpose === 'email-link' || current.purpose === 'verify-email-link'
+                        ? resendFor(m.emailLink)
+                        : undefined
+                    }
                     onSubmit={() => onSubmit()}
                     onEmailSupport={onEmailSupport}
                     onBack={onBack}
@@ -287,14 +291,23 @@ export function SignInView({
               </Flow.Step>
 
               <Flow.Step ids={stepIds.signUp}>
-                <SignUpDetailsStep
-                  focusRef={focusRef}
-                  form={form}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  onSubmit={onSubmit}
-                  onSignIn={onEditIdentifier}
-                />
+                {current.kind === 'sign-up' ? (
+                  <SignUpDetailsStep
+                    focusRef={focusRef}
+                    step={current}
+                    onSwitchField={onSwitchField}
+                    socialProviders={socialProviders}
+                    pendingProviderId={pendingProviderId}
+                    onSelectProvider={onSelectProvider}
+                    isDisabled={isDisabled}
+                    form={form}
+                    globalErrorMessage={globalErrorMessage}
+                    isPending={isPending}
+                    onSubmit={onSubmit}
+                    passwordFeedback={newPasswordFeedback}
+                    onSignIn={onEditIdentifier}
+                  />
+                ) : null}
               </Flow.Step>
             </>
           );
