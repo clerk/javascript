@@ -10,9 +10,9 @@ import { Redirect } from 'expo-router';
 import { ActivityIndicator, Button, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-export default function BillingScreen() {
+export default function AccountScreen() {
   // Prepares a one-time sign-in link for this page
-  const web = useAuthenticatedWebView({ destination: 'https://app.example.com/billing' });
+  const web = useAuthenticatedWebView({ destination: 'https://app.example.com/account' });
 
   if (web.status === 'signed-out') return <Redirect href='/sign-in' />;
   if (web.status === 'error') return <Button title='Try again' onPress={web.retry} />;
