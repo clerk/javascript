@@ -353,9 +353,9 @@ export class OAuthApplicationsApi extends AbstractAPI {
    * @returns The issued token and its metadata.
    * @throws `OAuthTokenExchangeError` with code `invalid_request` and no `status` if `resource` or `scope` is invalid. No request is made.
    * @throws `OAuthTokenExchangeError` with the OAuth error code, `errorDescription` and HTTP `status` if the token endpoint rejects the exchange ([RFC 6749 section 5.2](https://www.rfc-editor.org/rfc/rfc6749#section-5.2)).
-   * @throws `OAuthTokenExchangeError` with code `invalid_response` and the HTTP `status` if the token endpoint returns a non-200 success status, an error without an OAuth error code, or a malformed token response.
+   * @throws `OAuthTokenExchangeError` with code `invalid_response` and the HTTP `status` if the token endpoint returns a redirect, a non-200 success status, an error without an OAuth error code, or a malformed token response.
    * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute HTTPS URL.
-   * @throws Network failures and rejected redirects from `fetch`, unwrapped and unchanged.
+   * @throws Network failures from `fetch`, unwrapped and unchanged.
    *
    * @example
    * ```ts
@@ -386,7 +386,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
 
-    const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body, redirect: 'error' });
+    const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body, redirect: 'manual' });
 
     const json = await response.json().catch(() => undefined);
 

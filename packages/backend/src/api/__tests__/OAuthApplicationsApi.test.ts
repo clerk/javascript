@@ -407,8 +407,8 @@ describe('OAuthApplications', () => {
         }),
       );
 
-      await expect(exchange()).rejects.toThrow();
-      expect(redirect).toBe('error');
+      await expect(exchange()).rejects.toMatchObject({ error: 'invalid_response', status });
+      expect(redirect).toBe('manual');
       expect(requested).toEqual([tokenFetchUrl]);
     });
 
@@ -429,8 +429,8 @@ describe('OAuthApplications', () => {
         }),
       );
 
-      await expect(exchange({ proxyUrl })).rejects.toThrow();
-      expect(redirect).toBe('error');
+      await expect(exchange({ proxyUrl })).rejects.toMatchObject({ error: 'invalid_response', status: 307 });
+      expect(redirect).toBe('manual');
       expect(requested).toEqual([proxyTokenEndpoint]);
     });
 
