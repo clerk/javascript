@@ -1,7 +1,6 @@
 import type { Ref } from 'react';
 
 import { AuthEnterpriseConnections, AuthWallets } from '../../../blocks/auth';
-import type { VerificationMethodPickerMessages } from '../../../blocks/verification';
 import { VerificationMethodPicker } from '../../../blocks/verification';
 import type { IconComponent } from '../../../icons/glyph';
 import { Envelope } from '../../../icons/glyphs/envelope';
@@ -11,6 +10,7 @@ import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import { useMessages } from '../../../localization';
 import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
+import { choiceCopy, factorLabel } from '../sign-in.utils';
 import { SignInAccounts } from './sign-in-accounts';
 import { SignInAlternativeMethods } from './sign-in-alternative-methods';
 
@@ -28,8 +28,6 @@ const factorIcon = {
 
 interface ChoiceStepProps {
   step: Extract<SignInStep, { kind: 'choice' }>;
-  messages: VerificationMethodPickerMessages;
-  factorLabel: (factor: SignInFactor) => string;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
   onShowHelp: () => void;
@@ -50,8 +48,6 @@ interface ChoiceStepProps {
 
 export function ChoiceStep({
   step,
-  messages,
-  factorLabel,
   pendingFactorId,
   onSelectFactor,
   onShowHelp,
@@ -122,9 +118,10 @@ export function ChoiceStep({
     );
   }
 
+  const copy = choiceCopy(step, m);
   const methods = step.options.map(factor => ({
     id: factor.id,
-    label: factorLabel(factor),
+    label: factorLabel(factor, m),
     icon: factorIcon[factor.strategy],
   }));
 
@@ -132,8 +129,8 @@ export function ChoiceStep({
     return (
       <SignInAlternativeMethods
         focusRef={focusRef}
-        title={messages.title}
-        description={messages.description}
+        title={copy.title}
+        description={copy.description}
         methods={methods}
         pendingMethodId={pendingFactorId}
         onSelectMethod={onSelectFactor}
@@ -151,7 +148,12 @@ export function ChoiceStep({
   return (
     <VerificationMethodPicker
       focusRef={focusRef}
-      messages={messages}
+      messages={{
+        ...copy,
+        backButton: m.back,
+        helpText: m.alternativeMethods.helpPrompt,
+        helpButton: m.alternativeMethods.helpLink,
+      }}
       methods={methods}
       pendingMethodId={pendingFactorId}
       onSelect={onSelectFactor}

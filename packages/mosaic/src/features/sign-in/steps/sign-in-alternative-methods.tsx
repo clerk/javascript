@@ -2,7 +2,6 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import { styles as authStyles } from '../../../blocks/auth/auth.styles';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -77,7 +76,7 @@ export function SignInAlternativeMethods({
                     <img
                       src={provider.iconUrl}
                       alt=''
-                      {...stylex.props(authStyles.providerIcon)}
+                      {...stylex.props(styles.providerIcon)}
                     />
                   }
                   longLabel={fill(m.start.socialButton, { provider: provider.name })}
@@ -110,7 +109,7 @@ export function SignInAlternativeMethods({
         {onBack ? (
           <Text
             size='sm'
-            xstyle={authStyles.footerText}
+            xstyle={styles.footerText}
           >
             <Button
               type='button'
@@ -127,7 +126,7 @@ export function SignInAlternativeMethods({
         <Text
           size='xs'
           color='foreground-secondary'
-          xstyle={authStyles.footerText}
+          xstyle={styles.footerText}
         >
           {m.alternativeMethods.helpPrompt}{' '}
           <Button

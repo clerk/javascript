@@ -6,7 +6,6 @@ import { useCallback, useRef, useState } from 'react';
 
 import type { AuthProvider } from '../../../blocks/auth';
 import { AuthCaptcha } from '../../../blocks/auth';
-import { styles as authStyles } from '../../../blocks/auth/auth.styles';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
@@ -19,7 +18,8 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import { styles } from '../../auth-flow/auth-flow.styles';
+import { styles as flowStyles } from '../../auth-flow/auth-flow.styles';
+import { styles } from '../sign-up.styles';
 import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';
 import { signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
 import { SignUpLegalConsentField } from './sign-up-legal-consent';
@@ -73,7 +73,7 @@ export function SignUpDetailsStep({
             <img
               src={logo.src}
               alt={logo.alt}
-              {...stylex.props(authStyles.logo)}
+              {...stylex.props(styles.logo)}
             />
           </Card.Media>
         ) : null}
@@ -88,7 +88,7 @@ export function SignUpDetailsStep({
       </Card.Banner>
       <Card.Content>
         <div
-          {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
+          {...stylex.props(isChallengeShown ? flowStyles.spotlightHidden : flowStyles.spotlightGroup)}
           {...inertProps(isChallengeShown)}
         >
           <SignUpProviders
@@ -115,7 +115,7 @@ export function SignUpDetailsStep({
           <Text
             size='sm'
             color='foreground-secondary'
-            xstyle={authStyles.footerText}
+            xstyle={styles.footerText}
           >
             {m.signInPrompt}{' '}
             <Button
@@ -131,7 +131,7 @@ export function SignUpDetailsStep({
         ) : null}
       </Card.Content>
       {hasForm ? (
-        <Card.Footer xstyle={isChallengeShown && styles.spotlightHidden}>
+        <Card.Footer xstyle={isChallengeShown && flowStyles.spotlightHidden}>
           <SubmitButton
             form={form.id}
             fullWidth
@@ -193,7 +193,7 @@ function SignUpFields({
       id={form.id}
       onSubmit={onSubmit}
     >
-      <div {...stylex.props(authStyles.fieldStack)}>
+      <div {...stylex.props(styles.fieldStack)}>
         <NameFields
           firstName={fields.firstName ? field('firstName') : undefined}
           lastName={fields.lastName ? field('lastName') : undefined}
@@ -270,7 +270,7 @@ function SignUpProviders({
               <img
                 src={provider.iconUrl}
                 alt=''
-                {...stylex.props(authStyles.providerIcon)}
+                {...stylex.props(styles.providerIcon)}
               />
             }
             longLabel={fill(m.form.socialButton, { provider: provider.name })}
@@ -284,16 +284,16 @@ function SignUpProviders({
       {showDivider ? (
         <div
           role='separator'
-          {...stylex.props(styles.divider)}
+          {...stylex.props(flowStyles.divider)}
         >
-          <span {...stylex.props(styles.dividerLine)} />
+          <span {...stylex.props(flowStyles.dividerLine)} />
           <Text
             size='sm'
             color='foreground-secondary'
           >
             {m.form.divider}
           </Text>
-          <span {...stylex.props(styles.dividerLine)} />
+          <span {...stylex.props(flowStyles.dividerLine)} />
         </div>
       ) : null}
     </>
@@ -307,7 +307,7 @@ function NameFields({ firstName, lastName }: { firstName?: FieldProps; lastName?
   }
 
   return (
-    <div {...stylex.props(firstName && lastName ? styles.nameRow : authStyles.fieldStack)}>
+    <div {...stylex.props(firstName && lastName ? flowStyles.nameRow : styles.fieldStack)}>
       {firstName ? (
         <TextField
           {...firstName}

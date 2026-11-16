@@ -2,7 +2,7 @@ import type { AuthEmailLinkStatusMessages } from '../../blocks/auth';
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
 import { formatPhoneIdentifier } from '../auth-flow/auth-flow.utils';
-import type { SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
+import type { SignInFactor, SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
 
 type Messages = MosaicMessages['signIn'];
 
@@ -69,6 +69,38 @@ export function stepKey(step: SignInStep): SignInStepKey {
 
 export function backupCodeDescription(step: Extract<SignInStep, { credential: 'backup-code' }>, m: Messages): string {
   return step.resetting ? m.resetPasswordMfa.description : m.backupCodeMfa.description;
+}
+
+export function factorLabel(factor: SignInFactor, m: Messages): string {
+  switch (factor.strategy) {
+    case 'password':
+      return m.alternativeMethods.password;
+    case 'passkey':
+      return m.alternativeMethods.passkey;
+    case 'email_code':
+      return fill(m.alternativeMethods.emailCode, { identifier: factor.identifier });
+    case 'email_link':
+      return fill(m.alternativeMethods.emailLink, { identifier: factor.identifier });
+    case 'phone_code':
+      return fill(m.alternativeMethods.phoneCode, { identifier: factor.identifier });
+    case 'totp':
+      return m.alternativeMethods.totp;
+    case 'backup_code':
+      return m.alternativeMethods.backupCode;
+    case 'reset_password_email_code':
+      return fill(m.resetMethods.emailCode, { identifier: factor.identifier });
+    case 'reset_password_phone_code':
+      return fill(m.resetMethods.phoneCode, { identifier: factor.identifier });
+  }
+}
+
+export function choiceCopy(
+  step: Extract<SignInStep, { kind: 'choice' }>,
+  m: Messages,
+): { title: string; description: string } {
+  return step.purpose === 'reset-methods'
+    ? { title: m.resetMethods.title, description: m.resetMethods.description }
+    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
 }
 
 interface IdentifierFieldCopy {

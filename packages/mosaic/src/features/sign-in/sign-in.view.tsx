@@ -1,18 +1,14 @@
-import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import { AuthIdentityPreview } from '../../blocks/auth';
-import type { VerificationCodeResend } from '../../blocks/verification';
-import { VerificationCode } from '../../blocks/verification';
+import type { VerificationResendMessages } from '../../blocks/verification';
+import { VerificationCode, verificationResend } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
-import type { MosaicMessages } from '../../localization';
-import { fill, rich, useMessages } from '../../localization';
-import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { useMessages } from '../../localization';
 import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
-import type { SignInFactor, SignInStep, SignInViewProps } from './sign-in.types';
+import type { SignInStep, SignInViewProps } from './sign-in.types';
 import {
-  backupCodeDescription,
   codeCopy,
   codeIdentity,
   codeNotice,
@@ -26,45 +22,6 @@ import { CredentialStep } from './steps/credential-step';
 import { IdentifierStep } from './steps/identifier-step';
 import { NewPasswordStep } from './steps/new-password-step';
 import { NoticeStep } from './steps/notice-step';
-
-type Messages = MosaicMessages['signIn'];
-type ResendCopy = Pick<Messages['emailCode'] | Messages['emailLink'], 'resendText' | 'resend' | 'resendCountdown'>;
-
-function factorLabel(factor: SignInFactor, m: Messages): string {
-  switch (factor.strategy) {
-    case 'password':
-      return m.alternativeMethods.password;
-    case 'passkey':
-      return m.alternativeMethods.passkey;
-    case 'email_code':
-      return fill(m.alternativeMethods.emailCode, { identifier: factor.identifier });
-    case 'email_link':
-      return fill(m.alternativeMethods.emailLink, { identifier: factor.identifier });
-    case 'phone_code':
-      return fill(m.alternativeMethods.phoneCode, { identifier: factor.identifier });
-    case 'totp':
-      return m.alternativeMethods.totp;
-    case 'backup_code':
-      return m.alternativeMethods.backupCode;
-    case 'reset_password_email_code':
-      return fill(m.resetMethods.emailCode, { identifier: factor.identifier });
-    case 'reset_password_phone_code':
-      return fill(m.resetMethods.phoneCode, { identifier: factor.identifier });
-  }
-}
-
-function backupCodeMessage(step: Extract<SignInStep, { kind: 'credential' }>, m: Messages): string {
-  return step.credential === 'backup-code' ? backupCodeDescription(step, m) : m.backupCodeMfa.description;
-}
-
-function choiceCopy(
-  step: Extract<SignInStep, { kind: 'choice' }>,
-  m: Messages,
-): { title: string; description: string } {
-  return step.purpose === 'reset-methods'
-    ? { title: m.resetMethods.title, description: m.resetMethods.description }
-    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
-}
 
 function signUpSignIn(step: Extract<SignInStep, { kind: 'sign-up' }>, onSignIn: () => void) {
   return step.purpose === 'continue' ? undefined : onSignIn;
@@ -119,23 +76,8 @@ export function SignInView({
     primaryActionLabel: m.continue,
     pendingLabel: m.verifying,
   };
-  const resendFor = (copy: ResendCopy): VerificationCodeResend | undefined =>
-    onResend && {
-      text: copy.resendText,
-      label: resendRemainingSeconds ? (
-        <span>
-          {rich(copy.resendCountdown, {
-            values: {
-              seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
-            },
-          })}
-        </span>
-      ) : (
-        copy.resend
-      ),
-      disabled: !canResend,
-      onClick: onResend,
-    };
+  const resendFor = (copy: VerificationResendMessages) =>
+    verificationResend(copy, { onResend, canResend, remainingSeconds: resendRemainingSeconds });
 
   const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
   const code = form.registerValue('code');
@@ -225,12 +167,6 @@ export function SignInView({
                   <CredentialStep
                     focusRef={focusRef}
                     step={current}
-                    messages={{
-                      title: m.backupCodeMfa.title,
-                      description: backupCodeMessage(current, m),
-                      fieldLabel: m.backupCodeMfa.label,
-                      ...actions,
-                    }}
                     form={form}
                     errorMessage={errorMessage}
                     globalErrorMessage={globalErrorMessage}
@@ -251,13 +187,6 @@ export function SignInView({
                   <ChoiceStep
                     focusRef={focusRef}
                     step={current}
-                    messages={{
-                      ...choiceCopy(current, m),
-                      backButton: m.back,
-                      helpText: m.alternativeMethods.helpPrompt,
-                      helpButton: m.alternativeMethods.helpLink,
-                    }}
-                    factorLabel={factor => factorLabel(factor, m)}
                     pendingFactorId={pendingFactorId}
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}

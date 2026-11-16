@@ -8,8 +8,27 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
   },
+  fieldStack: {
+    gap: space['4'],
+    display: 'grid',
+  },
+  footerText: {
+    textAlign: 'center',
+  },
+  logo: {
+    display: 'block',
+    objectFit: 'contain',
+    height: space['8'],
+    maxWidth: '100%',
+  },
   passkeyAction: {
     alignSelf: 'center',
+  },
+  providerIcon: {
+    display: 'block',
+    objectFit: 'contain',
+    height: space['4'],
+    width: space['4'],
   },
   startPasswordHidden: {
     overflow: 'hidden',

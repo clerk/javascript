@@ -4,7 +4,6 @@ import * as stylex from '@stylexjs/stylex';
 import React, { type Ref } from 'react';
 
 import { AuthAlternativeChannel, AuthCaptcha } from '../../../blocks/auth';
-import { styles as authStyles } from '../../../blocks/auth/auth.styles';
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -153,7 +152,7 @@ function IdentifierStart({
             <img
               src={logo.src}
               alt={logo.alt}
-              {...stylex.props(authStyles.logo)}
+              {...stylex.props(styles.logo)}
             />
           </Card.Media>
         ) : null}
@@ -286,7 +285,7 @@ function StartForm({
       id={form.id}
       onSubmit={onSubmit}
     >
-      <div {...stylex.props(authStyles.fieldStack)}>
+      <div {...stylex.props(styles.fieldStack)}>
         <Field.Root
           required
           invalid={feedback?.type === 'error'}
@@ -440,7 +439,7 @@ function SignInProviders({
         <img
           src={provider.iconUrl}
           alt=''
-          {...stylex.props(authStyles.providerIcon)}
+          {...stylex.props(styles.providerIcon)}
         />
       }
       longLabel={fill(m.start.socialButton, { provider: provider.name })}
@@ -496,7 +495,7 @@ function StartPrompt({ onSignUp, onJoinWaitlist, isDisabled }: StartPromptProps)
     <Text
       size='sm'
       color='foreground-secondary'
-      xstyle={authStyles.footerText}
+      xstyle={styles.footerText}
     >
       {prompt.text}{' '}
       <Button

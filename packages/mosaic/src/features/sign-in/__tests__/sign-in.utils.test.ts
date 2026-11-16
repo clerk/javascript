@@ -5,11 +5,13 @@ import type { SignInStep } from '../sign-in.types';
 import type { SignInStepKey } from '../sign-in.utils';
 import {
   backupCodeDescription,
+  choiceCopy,
   codeCopy,
   codeIdentity,
   codeNotice,
   codeSecondaryAction,
   emailLinkStatusMessages,
+  factorLabel,
   identifierFieldCopy,
   splitLastUsedProvider,
   startPrompt,
@@ -281,5 +283,27 @@ describe('code step copy', () => {
       label: 'Use another method',
       onClick: onCancel,
     });
+  });
+});
+
+describe('choice step copy', () => {
+  const m = signInMessages;
+
+  it('names where each method sends its code', () => {
+    expect(
+      factorLabel(
+        { id: '1', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_1', identifier: 'jane@acme.com' },
+        m,
+      ),
+    ).toBe('Email code to jane@acme.com');
+    expect(
+      factorLabel({ id: '2', stage: 'first', strategy: 'reset_password_phone_code', identifier: '+1******0123' }, m),
+    ).toBe('Text a code to +1******0123');
+    expect(factorLabel({ id: '3', stage: 'second', strategy: 'totp' }, m)).toBe('Use your authenticator app');
+  });
+
+  it('titles the reset methods apart from the other ways to sign in', () => {
+    expect(choiceCopy({ kind: 'choice', purpose: 'reset-methods', options: [] }, m).title).toBe('Forgot password?');
+    expect(choiceCopy({ kind: 'choice', purpose: 'methods', options: [] }, m).title).toBe('Use another method');
   });
 });

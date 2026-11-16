@@ -1,4 +1,3 @@
-import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import {
@@ -12,12 +11,11 @@ import {
   AuthProtectCheck,
   AuthWallets,
 } from '../../blocks/auth';
-import type { VerificationCodeResend } from '../../blocks/verification';
-import { VerificationCode } from '../../blocks/verification';
+import type { VerificationResendMessages } from '../../blocks/verification';
+import { VerificationCode, verificationResend } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
-import { rich, useMessages } from '../../localization';
-import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { useMessages } from '../../localization';
 import type { SignUpStep, SignUpViewProps } from './sign-up.types';
 import {
   signUpCodeCopy,
@@ -29,8 +27,6 @@ import {
 import { SignUpDetailsStep } from './steps/sign-up-details';
 import { SignUpLegalConsentField } from './steps/sign-up-legal-consent';
 import { SignUpRestricted } from './steps/sign-up-restricted';
-
-type ResendCopy = { resendText: string; resend: string; resendCountdown: `${string}{seconds}${string}` };
 
 export function SignUpView({
   step,
@@ -65,23 +61,8 @@ export function SignUpView({
   const m = useMessages('signUp');
   const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
 
-  const resendFor = (copy: ResendCopy): VerificationCodeResend | undefined =>
-    onResend && {
-      text: copy.resendText,
-      label: resendRemainingSeconds ? (
-        <span>
-          {rich(copy.resendCountdown, {
-            values: {
-              seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
-            },
-          })}
-        </span>
-      ) : (
-        copy.resend
-      ),
-      disabled: !canResend,
-      onClick: onResend,
-    };
+  const resendFor = (copy: VerificationResendMessages) =>
+    verificationResend(copy, { onResend, canResend, remainingSeconds: resendRemainingSeconds });
 
   const notice = (current: Extract<SignUpStep, { kind: 'notice' }>) => {
     switch (current.purpose) {
