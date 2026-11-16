@@ -2,9 +2,48 @@
 '@clerk/expo': minor
 ---
 
-Add `@clerk/expo/native-to-web` to open your web app with the native app's user already signed in, in a WebView.
+Introduce the `useAuthenticatedWebView()` hook for showing a page of your web app in a WebView with the native app's user already signed in.
 
-- `useAuthenticatedWebView({ destination })` prepares a one-time sign-in link and returns `webViewProps` to spread onto a `react-native-webview` `<WebView>`, plus a `status` of `preparing`, `loading`, `ready`, `signed-out`, or `error`. Render the WebView once `webViewProps` is set and keep your loading overlay over it until `status` is `ready`, so users never see Clerk's sign-in page between your app and the destination. Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook so they run alongside Clerk's. A remount or React Strict Mode reuses a link the WebView has not received yet.
-- `prepareSessionTransfer({ destination, presentation })` returns the link for apps that present it themselves.
+```tsx
+import { useAuthenticatedWebView } from '@clerk/expo/native-to-web';
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, Button, StyleSheet, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
-Failures reject or report a `SessionTransferError`, which you can detect with `isSessionTransferError()` and branch on through its `code`, such as `signed_out`, `feature_not_enabled`, or `expired`. Session transfers must be enabled for your instance, and `destination` must be on one of your instance's domains.
+export default function BillingScreen() {
+  // Prepares a one-time sign-in link for this page
+  const web = useAuthenticatedWebView({ destination: 'https://app.example.com/billing' });
+
+  if (web.status === 'signed-out') return <Redirect href='/sign-in' />;
+  if (web.status === 'error') return <Button title='Try again' onPress={web.retry} />;
+
+  return (
+    <View style={{ flex: 1 }}>
+      {/* Render the WebView as soon as it has props, because it has to load the link to sign in */}
+      {web.webViewProps && <WebView {...web.webViewProps} style={{ flex: 1 }} />}
+      {/* Cover Clerk's sign-in page until the destination has loaded */}
+      {web.status !== 'ready' && <ActivityIndicator style={StyleSheet.absoluteFill} />}
+    </View>
+  );
+}
+```
+
+Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook instead of to `<WebView>`, so they run alongside Clerk's.
+
+To open the link some other way, create it with `prepareSessionTransfer()`:
+
+```ts
+import { prepareSessionTransfer } from '@clerk/expo/native-to-web';
+import * as WebBrowser from 'expo-web-browser';
+
+// The link works once, within 60 seconds, so create it right before opening it
+const transfer = await prepareSessionTransfer({
+  destination: 'https://app.example.com/reports',
+  presentation: 'browser',
+});
+
+// iOS only. Android Custom Tabs can't send the referrer Clerk needs to sign the user in.
+await WebBrowser.openBrowserAsync(transfer.url);
+```
+
+Session transfers must be enabled for your instance, and `destination` must be on one of your instance's domains. Failures reject or report a `SessionTransferError`, which you can detect with `isSessionTransferError()` and branch on through its `code`, such as `signed_out`, `feature_not_enabled`, or `expired`.
