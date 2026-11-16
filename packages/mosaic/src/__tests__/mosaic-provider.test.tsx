@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
@@ -7,6 +7,7 @@ import { useMosaicIcons } from '../icons/overrides';
 import { useLocale, useMessages } from '../localization';
 import { MosaicProvider } from '../mosaic-provider';
 import { useDirection } from '../primitives/direction-provider';
+import { installWebmcp } from './feature/webmcp';
 
 describe('MosaicProvider icons', () => {
   it('exposes the icon overrides via useMosaicIcons', () => {
@@ -64,5 +65,26 @@ describe('MosaicProvider direction', () => {
       wrapper: ({ children }) => React.createElement(MosaicProvider, {}, children),
     });
     expect(result.current).toBe('ltr');
+  });
+});
+
+describe('MosaicProvider webmcp', () => {
+  it('hands the browser the agent tools until it unmounts', () => {
+    const webmcp = installWebmcp();
+    const { unmount } = render(React.createElement(MosaicProvider, { experimental: { webmcp: true } }, null));
+
+    expect(webmcp.names()).toEqual(['clerk_snapshot', 'clerk_act']);
+    expect(webmcp.call('clerk_snapshot')).toEqual([]);
+
+    unmount();
+
+    expect(webmcp.names()).toEqual([]);
+  });
+
+  it('hands the browser nothing without webmcp', () => {
+    const webmcp = installWebmcp();
+    render(React.createElement(MosaicProvider, {}, null));
+
+    expect(webmcp.names()).toEqual([]);
   });
 });
