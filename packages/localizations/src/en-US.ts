@@ -2250,6 +2250,7 @@ export const enUS: LocalizationResource = {
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    something_went_wrong: 'Something went wrong. Please try again.',
     sso_bypass_domain_not_served:
       'This member could not be added because their email address is not served by a connection.',
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
