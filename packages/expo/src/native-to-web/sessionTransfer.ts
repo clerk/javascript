@@ -51,6 +51,7 @@ type SessionTransferFapiClient = {
     method: 'POST';
     path: string;
     body: { redirectUrl: string; presentationMode: SessionTransferPresentation };
+    signal: AbortSignal;
   }) => Promise<FapiResponse<SessionTransferJSON>>;
 };
 
@@ -187,11 +188,12 @@ export async function mintSessionTransfer({
 }: TransferRequest): Promise<SessionTransfer> {
   let response: FapiResponse<SessionTransferJSON>;
   try {
-    response = await withinMintTimeLimit(
+    response = await withinMintTimeLimit(signal =>
       clerk.getFapiClient().request({
         method: 'POST',
         path: `/client/sessions/${sessionId}/session_transfers`,
         body: { redirectUrl: destination, presentationMode: presentation },
+        signal,
       }),
     );
   } catch (cause) {
@@ -201,7 +203,7 @@ export async function mintSessionTransfer({
   if (!response.ok) {
     const apiError = toClerkAPIResponseError(response, 'Clerk refused to prepare the session transfer.');
     if (apiError.errors[0]?.code === 'signed_out') {
-      await clerk.handleUnauthenticated?.().catch(() => undefined);
+      await withinMintTimeLimit(async () => clerk.handleUnauthenticated?.()).catch(() => undefined);
     }
     throw sessionTransferError(apiError.errors[0]?.code ?? 'unexpected_response', apiError.message, apiError);
   }
@@ -209,13 +211,16 @@ export async function mintSessionTransfer({
   return parseSessionTransfer(getResponseJSON(response.payload, 'session_transfer'));
 }
 
-function withinMintTimeLimit<T>(request: Promise<T>): Promise<T> {
+function withinMintTimeLimit<T>(start: (signal: AbortSignal) => Promise<T>): Promise<T> {
+  const controller = new AbortController();
   return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(
-      () => reject(new Error(`Clerk did not respond within ${MINT_TIME_LIMIT_MS / 1000} seconds.`)),
-      MINT_TIME_LIMIT_MS,
-    );
-    void request.then(resolve, reject).finally(() => clearTimeout(timer));
+    const timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error(`Clerk did not respond within ${MINT_TIME_LIMIT_MS / 1000} seconds.`));
+    }, MINT_TIME_LIMIT_MS);
+    void start(controller.signal)
+      .then(resolve, reject)
+      .finally(() => clearTimeout(timer));
   });
 }
 
