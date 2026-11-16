@@ -4,7 +4,7 @@
 
 Add `@clerk/expo/native-to-web` to open your web app with the native app's user already signed in, in a WebView or in the system browser.
 
-- `useAuthenticatedWebView({ destination })` prepares a one-time sign-in link and returns `webViewProps` to spread onto a `react-native-webview` `<WebView>`, plus a `status` of `preparing`, `ready`, `signed-out`, or `error`. Keep your loading overlay up while `status` is `preparing`, so users never see Clerk's sign-in page between your app and the destination. A remount or React Strict Mode reuses a link the WebView has not received yet.
+- `useAuthenticatedWebView({ destination })` prepares a one-time sign-in link and returns `webViewProps` to spread onto a `react-native-webview` `<WebView>`, plus a `status` of `preparing`, `loading`, `ready`, `signed-out`, or `error`. Render the WebView once `webViewProps` is set and keep your loading overlay over it until `status` is `ready`, so users never see Clerk's sign-in page between your app and the destination. Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook so they run alongside Clerk's. A remount or React Strict Mode reuses a link the WebView has not received yet.
 - `useNativeToWeb().openExternalBrowser({ destination })` opens the destination in the default browser. On Android it needs `expo-intent-launcher`, so install it with `npx expo install expo-intent-launcher expo-application`.
 - `prepareSessionTransfer({ destination, presentation })` from `@clerk/expo/native-to-web/advanced` returns the link for apps that present it themselves.
 

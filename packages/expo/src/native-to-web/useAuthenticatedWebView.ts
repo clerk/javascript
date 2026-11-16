@@ -1,16 +1,24 @@
 import { useAuth } from '@clerk/react';
 import type { Dispatch } from 'react';
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 
 import type { SessionTransferError } from './errors';
 import { sessionTransferError, toSessionTransferError } from './errors';
 import type { SessionTransfer, TransferLease, TransferRequest } from './sessionTransfer';
 import { acquireTransfer, claimTransfer, resolveTransferRequest } from './sessionTransfer';
 import type { NavigationEvent, NavigationVerdict } from './webViewNavigation';
-import { judgeNavigation } from './webViewNavigation';
+import { isRedeemPageUrl, judgeNavigation } from './webViewNavigation';
+
+type LoadEvent = { nativeEvent: { url: string } };
+type LoadEndEvent = { nativeEvent: { url: string; code?: number } };
+type LoadRequest = { url: string; isTopFrame?: boolean };
 
 /**
  * Options for `useAuthenticatedWebView`.
+ *
+ * Pass your own WebView callbacks here instead of on `<WebView>`, so they don't replace the ones in
+ * `webViewProps`. They receive the WebView's events for every page except Clerk's sign-in page, which
+ * carries the one-time URL.
  */
 export type UseAuthenticatedWebViewParams = {
   /**
@@ -18,39 +26,61 @@ export type UseAuthenticatedWebViewParams = {
    * Changing it prepares a new transfer.
    */
   destination: string;
+  onLoadStart?(event: LoadEvent): void;
+  onLoadEnd?(event: LoadEndEvent): void;
+  onHttpError?(event: LoadEvent): void;
+  onError?(event: LoadEvent): void;
+  /**
+   * Return `false` to block a navigation. Clerk's sign-in page always loads.
+   */
+  onShouldStartLoadWithRequest?(request: LoadRequest): boolean;
 };
+
+type WebViewCallbacks = Omit<UseAuthenticatedWebViewParams, 'destination'>;
 
 /**
  * Props to spread onto `<WebView>` from `react-native-webview`. They carry the one-time sign-in URL,
- * so never log or store them. If you pass your own `onLoadStart`, `onLoadEnd`, `onHttpError`, `onError`,
- * or `onShouldStartLoadWithRequest`, call the matching handler from these props first.
+ * so never log or store them. Pass your own callbacks to `useAuthenticatedWebView` rather than setting
+ * them on `<WebView>` after the spread.
  */
 export type AuthenticatedWebViewProps = {
   source: { uri: string };
-  onLoadStart: (event: { nativeEvent: { url: string } }) => void;
-  onLoadEnd: (event: { nativeEvent: { url: string; code?: number } }) => void;
-  onHttpError: (event: { nativeEvent: { url: string } }) => void;
-  onError: (event: { nativeEvent: { url: string } }) => void;
-  onShouldStartLoadWithRequest: (request: { url: string; isTopFrame: boolean }) => boolean;
+  onLoadStart: (event: LoadEvent) => void;
+  onLoadEnd: (event: LoadEndEvent) => void;
+  onHttpError: (event: LoadEvent) => void;
+  onError: (event: LoadEvent) => void;
+  onShouldStartLoadWithRequest: (request: LoadRequest) => boolean;
 };
 
 /**
- * The state of an authenticated WebView. Keep your loading overlay up while `status` is `preparing`.
+ * The state of an authenticated WebView. Render the WebView whenever `webViewProps` is set, and keep
+ * your loading overlay over it until `status` is `ready`.
  */
 export type AuthenticatedWebView =
   | {
       /**
-       * The sign-in URL is being prepared, or the WebView is still on Clerk's sign-in page.
-       * `webViewProps` is `null` until the URL is ready. Render the WebView under your overlay once it is set.
+       * The sign-in URL is being prepared. There is nothing to render yet.
        */
       status: 'preparing';
-      webViewProps: AuthenticatedWebViewProps | null;
+      webViewProps: null;
       error: null;
       retry: () => void;
     }
   | {
       /**
-       * The WebView has left Clerk's sign-in page and shows the destination, signed in.
+       * The WebView is on Clerk's sign-in page. Render it under your overlay, because it has to load
+       * to finish signing in.
+       */
+      status: 'loading';
+      webViewProps: AuthenticatedWebViewProps;
+      error: null;
+      retry: () => void;
+    }
+  | {
+      /**
+       * The WebView left Clerk's sign-in page and finished loading the next page. This describes the
+       * initial sign-in only. Later navigations don't change `status`, so it does not track whether the
+       * web page stays signed in.
        */
       status: 'ready';
       webViewProps: AuthenticatedWebViewProps;
@@ -133,7 +163,7 @@ function applyVerdict(
  * user signs in, clear the WebView's cookies or mount the WebView with `incognito`. Otherwise the web
  * page still holds the previous user's session and the hook reports `other_user_signed_in`.
  *
- * @param params - The page to open.
+ * @param params - The page to open, and your own WebView callbacks.
  * @returns The WebView state, its props, and a `retry` function.
  *
  * @example
@@ -153,34 +183,34 @@ function applyVerdict(
  *   return (
  *     <View style={{ flex: 1 }}>
  *       {web.webViewProps && <WebView {...web.webViewProps} style={{ flex: 1 }} />}
- *       {web.status === 'preparing' && <LoadingOverlay />}
+ *       {web.status !== 'ready' && <LoadingOverlay />}
  *     </View>
  *   );
  * }
  * ```
  *
  * @example
- * ### Add your own load handler
+ * ### Open links to other sites in the browser
  * ```tsx
- * const { status, webViewProps } = useAuthenticatedWebView({ destination });
- *
- * return (
- *   webViewProps && (
- *     <WebView
- *       {...webViewProps}
- *       onLoadEnd={event => {
- *         webViewProps.onLoadEnd(event);
- *         if (status === 'ready') {
- *           trackPageLoad(event.nativeEvent.url);
- *         }
- *       }}
- *     />
- *   )
- * );
+ * const web = useAuthenticatedWebView({
+ *   destination: 'https://app.example.com/billing',
+ *   onShouldStartLoadWithRequest: ({ url }) => {
+ *     if (new URL(url).origin === 'https://app.example.com') return true;
+ *     void Linking.openURL(url);
+ *     return false;
+ *   },
+ * });
  * ```
  */
-export function useAuthenticatedWebView({ destination }: UseAuthenticatedWebViewParams): AuthenticatedWebView {
+export function useAuthenticatedWebView({
+  destination,
+  ...callbacks
+}: UseAuthenticatedWebViewParams): AuthenticatedWebView {
   const { isLoaded, isSignedIn, sessionId } = useAuth();
+  const latestCallbacks = useRef<WebViewCallbacks>(callbacks);
+  useLayoutEffect(() => {
+    latestCallbacks.current = callbacks;
+  });
   const [attempt, setAttempt] = useState(0);
   const [state, dispatch] = useReducer(transferReducer, null);
   const settledRequestId = useRef<string | null>(null);
@@ -220,7 +250,11 @@ export function useAuthenticatedWebView({ destination }: UseAuthenticatedWebView
           return;
         }
         if (claimTransfer(lease)) {
-          settle({ type: 'minted', requestId, webViewProps: createWebViewProps(requestId, transfer, dispatch) });
+          settle({
+            type: 'minted',
+            requestId,
+            webViewProps: createWebViewProps(requestId, transfer, dispatch, latestCallbacks),
+          });
         } else {
           present(acquireTransfer(request));
         }
@@ -247,7 +281,7 @@ export function useAuthenticatedWebView({ destination }: UseAuthenticatedWebView
     case undefined:
       return { status: 'preparing', webViewProps: null, error: null, retry };
     case 'redeeming':
-      return { status: 'preparing', webViewProps: current.webViewProps, error: null, retry };
+      return { status: 'loading', webViewProps: current.webViewProps, error: null, retry };
     case 'ready':
       return { status: 'ready', webViewProps: current.webViewProps, error: null, retry };
     case 'failed':
@@ -261,22 +295,48 @@ function createWebViewProps(
   requestId: string,
   transfer: SessionTransfer,
   dispatch: Dispatch<TransferAction>,
+  callbacks: { readonly current: WebViewCallbacks },
 ): AuthenticatedWebViewProps {
   const judge = (event: NavigationEvent) =>
     dispatch({ type: 'navigated', requestId, verdict: judgeNavigation(transfer.url, event) });
+  const isSignInPage = (url: string) => isRedeemPageUrl(transfer.url, url);
 
   return {
     source: { uri: transfer.url },
-    onLoadStart: ({ nativeEvent }) => judge({ kind: 'load-start', url: nativeEvent.url }),
-    onLoadEnd: ({ nativeEvent }) =>
-      judge({ kind: 'load-end', url: nativeEvent.url, failed: typeof nativeEvent.code === 'number' }),
-    onHttpError: ({ nativeEvent }) => judge({ kind: 'http-error', url: nativeEvent.url }),
-    onError: ({ nativeEvent }) => judge({ kind: 'load-end', url: nativeEvent.url, failed: true }),
-    onShouldStartLoadWithRequest: ({ url, isTopFrame }) => {
-      if (isTopFrame) {
-        judge({ kind: 'load-start', url });
+    onLoadStart: event => {
+      judge({ kind: 'load-start', url: event.nativeEvent.url });
+      if (!isSignInPage(event.nativeEvent.url)) {
+        callbacks.current.onLoadStart?.(event);
       }
-      return true;
+    },
+    onLoadEnd: event => {
+      judge({ kind: 'load-end', url: event.nativeEvent.url, failed: typeof event.nativeEvent.code === 'number' });
+      if (!isSignInPage(event.nativeEvent.url)) {
+        callbacks.current.onLoadEnd?.(event);
+      }
+    },
+    onHttpError: event => {
+      judge({ kind: 'http-error', url: event.nativeEvent.url });
+      if (!isSignInPage(event.nativeEvent.url)) {
+        callbacks.current.onHttpError?.(event);
+      }
+    },
+    onError: event => {
+      judge({ kind: 'load-end', url: event.nativeEvent.url, failed: true });
+      if (!isSignInPage(event.nativeEvent.url)) {
+        callbacks.current.onError?.(event);
+      }
+    },
+    onShouldStartLoadWithRequest: request => {
+      // react-native-webview sets isTopFrame only on iOS. A load-start verdict can report a redeem
+      // failure but never ready, so judging an Android frame's request can only err toward an error.
+      if (request.isTopFrame !== false) {
+        judge({ kind: 'load-start', url: request.url });
+      }
+      if (isSignInPage(request.url)) {
+        return true;
+      }
+      return callbacks.current.onShouldStartLoadWithRequest?.(request) ?? true;
     },
   };
 }

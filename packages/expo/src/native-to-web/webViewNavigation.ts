@@ -37,6 +37,11 @@ export function judgeNavigation(transferUrl: string, event: NavigationEvent): Na
   return event.kind === 'load-end' ? READY : PENDING;
 }
 
+export function isRedeemPageUrl(transferUrl: string, value: string): boolean {
+  const url = parseHttpUrl(value);
+  return url !== null && isRedeemPage(transferUrl, url);
+}
+
 function isRedeemPage(transferUrl: string, url: URL): boolean {
   const redeemUrl = new URL(transferUrl);
   return url.origin === redeemUrl.origin && url.pathname === redeemUrl.pathname;
