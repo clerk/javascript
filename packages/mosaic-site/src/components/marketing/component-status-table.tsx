@@ -112,12 +112,13 @@ export function ComponentStatusTable() {
                     <span className='flex items-center gap-1.5'>
                       {row.renamedTo ? (
                         <span>
-                          Renamed to <code className='code-inline'>{`<${row.renamedTo} />`}</code>
+                          <span className='body-3 text-gray-600 dark:text-gray-400'>Renamed to</span>{' '}
+                          <code className='code-inline'>{`<${row.renamedTo} />`}</code>
                         </span>
                       ) : row.beta ? (
                         <code className='code-inline'>{`<${row.beta} />`}</code>
                       ) : (
-                        '—'
+                        <span className='body-3 text-gray-600 dark:text-gray-400'>—</span>
                       )}
                       {row.notes && !notesShown && (
                         <button
