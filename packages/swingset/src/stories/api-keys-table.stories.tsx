@@ -54,7 +54,7 @@ export function Empty() {
 }
 
 export function ProposedTable() {
-  const props = useAPIKeysTableFixture({ enableSorting: true });
+  const props = useAPIKeysTableFixture();
   return (
     <APIKeysTableView
       {...props}

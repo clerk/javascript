@@ -64,16 +64,16 @@ function SessionTasksRoutes(): JSX.Element {
     // here to be defensive and ensure proper redirection
     const task = clerk.session?.currentTask;
     if (!task || clerk.session?.status === 'active') {
-      if (ctx.redirectOnActiveSession?.current) {
+      if (ctx.redirectOnActiveSessionRef?.current) {
         void navigate(ctx.redirectUrlComplete);
       }
       return;
     }
 
     clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
-  }, [clerk, currentPath, navigate, ctx.redirectUrlComplete, ctx.redirectOnActiveSession]);
+  }, [clerk, currentPath, navigate, ctx.redirectUrlComplete, ctx.redirectOnActiveSessionRef]);
 
-  if (!clerk.session?.currentTask && ctx.redirectOnActiveSession?.current) {
+  if (!clerk.session?.currentTask && ctx.redirectOnActiveSessionRef?.current) {
     return (
       <Card.Root>
         <Card.Content sx={() => ({ flex: 1 })}>
@@ -126,7 +126,7 @@ type SessionTasksProps = {
 export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const redirectOnActiveSessionRef = useRef<boolean>(true);
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, redirectOnActiveSession: redirectOnActiveSessionRef }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete, redirectOnActiveSessionRef }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );

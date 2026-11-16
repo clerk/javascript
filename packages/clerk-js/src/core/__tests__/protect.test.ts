@@ -5,6 +5,8 @@ import { Protect } from '../protect';
 import { __internal_resetProtectStorage } from '../protectSession';
 import type { Environment } from '../resources';
 
+const FRONTEND_API = 'clerk.example.com';
+
 const environment = (loaders: unknown[]): Environment => ({ protectConfig: { loaders } }) as unknown as Environment;
 
 /**
@@ -61,7 +63,7 @@ afterEach(() => {
 
 describe('Protect.load', () => {
   it('does nothing without a protect config', () => {
-    new Protect().load(environment([]));
+    new Protect().load(environment([]), FRONTEND_API);
     expect(document.head.querySelector('script')).toBeNull();
     expect(localStorage.getItem('__clerk_protect_pid')).toBeNull();
   });
@@ -72,6 +74,7 @@ describe('Protect.load', () => {
       environment([
         { target: 'head', type: 'script', attributes: { 'data-loader': 'https://loader.example.com/ins_2abc.js' } },
       ]),
+      FRONTEND_API,
     );
 
     expect(document.head.querySelector('script')?.getAttribute('data-loader')).toBe(
@@ -96,6 +99,7 @@ describe('Protect.load', () => {
           },
         }),
       ]),
+      FRONTEND_API,
     );
 
     const element = await injected('script');
@@ -111,7 +115,7 @@ describe('Protect.load', () => {
 
   it('substitutes placeholders in textContent as well as attributes', async () => {
     const protect = new Protect();
-    protect.load(environment([loader({ text_content: 'window.__vendor_cid = "{cid}";' })]));
+    protect.load(environment([loader({ text_content: 'window.__vendor_cid = "{cid}";' })]), FRONTEND_API);
 
     const element = await injected('script');
     expect(element.textContent).toBe(`window.__vendor_cid = "${element.getAttribute('data-cid')}";`);
@@ -120,14 +124,14 @@ describe('Protect.load', () => {
 
   it('never interpolates {instance_id}', async () => {
     const protect = new Protect();
-    protect.load(environment([loader({ attributes: { 'data-src': '{instance_id}/{cid}.js' } })]));
+    protect.load(environment([loader({ attributes: { 'data-src': '{instance_id}/{cid}.js' } })]), FRONTEND_API);
 
     expect((await injected('script')).getAttribute('data-src')).toContain('{instance_id}');
   });
 
   it('attaches the token once it has been acquired', async () => {
     const protect = new Protect();
-    protect.load(environment([loader()]));
+    protect.load(environment([loader()]), FRONTEND_API);
 
     serveInline(await injected('script'));
 
@@ -139,7 +143,7 @@ describe('Protect.load', () => {
 
   it('still applies the other loaders when a token for this browser session is shared', async () => {
     localStorage.setItem(
-      '__clerk_protect_st',
+      `__clerk_protect_st:${FRONTEND_API}`,
       JSON.stringify({ token: 'v1.cached.mac', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26), at: Date.now() }),
     );
 
@@ -149,6 +153,7 @@ describe('Protect.load', () => {
         loader({ attributes: { 'data-role': 'detection' } }),
         loader({ attributes: { 'data-cid': '{cid}', 'data-role': 'token' } }),
       ]),
+      FRONTEND_API,
     );
 
     // Acquisition happens once per browser session, so the token loader is skipped…
@@ -162,7 +167,7 @@ describe('Protect.load', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.9);
 
     const protect = new Protect();
-    protect.load(environment([loader({ rollout: 0.1 })]));
+    protect.load(environment([loader({ rollout: 0.1 })]), FRONTEND_API);
 
     expect(document.head.querySelector('script')).toBeNull();
     // Out of rollout means Protect is off for this browser, so there is nothing to report either.
@@ -171,7 +176,7 @@ describe('Protect.load', () => {
 
   it('reports script_error when the loader element fails to load', async () => {
     const protect = new Protect();
-    protect.load(environment([loader({ token_timeout_ms: 5_000 })]));
+    protect.load(environment([loader({ token_timeout_ms: 5_000 })]), FRONTEND_API);
 
     (await injected('script')).dispatchEvent(new Event('error'));
 
@@ -182,13 +187,15 @@ describe('Protect.load', () => {
     const protect = new Protect();
 
     // The config is server-controlled and cached; a bad entry must not take Clerk.load() down.
-    expect(() => protect.load(environment([null, loader({ attributes: { 'data-role': 'good' } })]))).not.toThrow();
+    expect(() =>
+      protect.load(environment([null, loader({ attributes: { 'data-role': 'good' } })]), FRONTEND_API),
+    ).not.toThrow();
 
     expect(document.head.querySelector('[data-role="good"]')).not.toBeNull();
   });
 
   it('survives a loader config that is not an array of objects at all', () => {
     const protect = new Protect();
-    expect(() => protect.load(environment(['nope', 42, undefined]))).not.toThrow();
+    expect(() => protect.load(environment(['nope', 42, undefined]), FRONTEND_API)).not.toThrow();
   });
 });

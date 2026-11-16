@@ -44,6 +44,12 @@ export type CreateSessionParams = {
 };
 
 /** @generateWithEmptyComment */
+export type UpdateSessionParams = {
+  /** When the session should expire. Must be at least 5 minutes and at most 10 years from now. */
+  expireAt: Date;
+};
+
+/** @generateWithEmptyComment */
 export class SessionAPI extends AbstractAPI {
   /**
    * Gets a list of sessions for either the specified client or user. Requires either `clientId` or `userId` to be provided. By default, the list is returned in descending order by creation date (newest first).
@@ -77,6 +83,23 @@ export class SessionAPI extends AbstractAPI {
     return this.request<Session>({
       method: 'POST',
       path: basePath,
+      bodyParams: params,
+    });
+  }
+
+  /**
+   * Changes when the given session expires. The new expiry applies to this session only and can exceed the instance's session lifetime. Only active and pending sessions can be updated.
+   *
+   * Take the session ID from the `sid` claim of a verified session token, never from an unverified client request.
+   * @param sessionId - The ID of the session to update.
+   * @param params - The parameters to update the session with.
+   * @returns The updated [`Session`](https://clerk.com/docs/reference/backend/types/backend-session).
+   */
+  public async updateSession(sessionId: string, params: UpdateSessionParams) {
+    this.requireId(sessionId);
+    return this.request<Session>({
+      method: 'PATCH',
+      path: joinPaths(basePath, sessionId),
       bodyParams: params,
     });
   }

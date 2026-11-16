@@ -1,0 +1,100 @@
+import * as TaskSetupMfaStories from './task-setup-mfa.stories';
+
+# TaskSetupMFA
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={TaskSetupMfaStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'OTP', href: '/components/otp', layer: 'Components' },
+    { name: 'PhoneInput', href: '/components/phone-input', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'Reverification', href: '/misc/reverification', layer: 'Misc' },
+  ]}
+/>
+
+## Usage
+
+TaskSetupMFA is available internally in Swingset. It is not yet exported from `@clerk/mosaic`.
+
+```tsx
+<TaskSetupMFA redirectUrlComplete='/dashboard' />
+```
+
+| Prop                  | Type        | Default                             | Description                                                 |
+| --------------------- | ----------- | ----------------------------------- | ----------------------------------------------------------- |
+| `redirectUrlComplete` | `string`    | the application's after-sign-in URL | Where **Continue** goes once the session has no tasks left. |
+| `fallback`            | `ReactNode` | —                                   | Rendered while Clerk loads.                                 |
+
+The card resolves the session's `setup-mfa` task. It checks for the task once, when it mounts. Without
+it, the card renders nothing and navigates to `redirectUrlComplete`, or to sign-in when nobody is
+signed in. Once it has started, the card stays put as the task completes, so the backup codes stay
+on screen until the user continues.
+
+**Continue** activates the session. When the session has another task, the user goes to that task
+instead of `redirectUrlComplete`.
+
+## Methods
+
+The card offers an authenticator app and SMS codes, each when the instance uses it for a second
+factor. An authenticator app the user already has is left out. SMS is left out when an enterprise
+connection blocks adding identifications.
+
+With one method left, the card opens on it.
+
+<Story
+  name='SmsOnly'
+  storyModule={TaskSetupMfaStories}
+/>
+
+<Story
+  name='AuthenticatorOnly'
+  storyModule={TaskSetupMfaStories}
+/>
+
+## SMS codes
+
+The user picks one of their phone numbers or adds a new one. A phone number that is not verified yet
+is verified with a code first. When the primary phone number is the only way the user signs in, it
+is not offered.
+
+<Story
+  name='NewPhone'
+  storyModule={TaskSetupMfaStories}
+/>
+
+## Backup codes
+
+When the instance uses backup codes, the last step lists the ones issued with the new method. They
+can be copied, downloaded as a text file, or printed.
+
+## Errors
+
+An error from a step appears on that step, which keeps its values. Cancelling a step-up
+verification returns to the step that asked for it.
+
+## Signing out
+
+The footer names the signed-in account and signs it out. Other signed-in accounts stay signed in.
+
+## Styling
+
+| Slot                   | Attributes                                                         |
+| ---------------------- | ------------------------------------------------------------------ |
+| `.cl-card-root`        | `data-elevation`, `data-size`                                      |
+| `.cl-card-header`      |                                                                    |
+| `.cl-card-title`       |                                                                    |
+| `.cl-card-description` |                                                                    |
+| `.cl-card-banner`      |                                                                    |
+| `.cl-card-content`     |                                                                    |
+| `.cl-card-footer`      | `data-elevation`                                                   |
+| `.cl-flow-root`        | `data-value="select \| sms \| authenticator \| success \| verify"` |
+| `.cl-flow-step`        | `data-step="select \| sms \| authenticator \| success \| verify"`  |
+| `.cl-backup-codes`     |                                                                    |

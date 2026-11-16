@@ -46,7 +46,7 @@ export function UserProfileEditNameDialog({
   title,
   form,
 }: UserProfileEditNameDialogProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;
   const { enabled: showLastName = true, required: lastNameRequired = false } = lastNameAttribute;
@@ -109,7 +109,6 @@ export function UserProfileEditNameDialog({
                 <Button
                   variant='outline'
                   color='neutral'
-                  fullWidth
                 >
                   {m.name.cancel}
                 </Button>
@@ -117,7 +116,6 @@ export function UserProfileEditNameDialog({
             />
             <SubmitButton
               form={form.id}
-              fullWidth
               isPending={form.isSubmitting}
               disabled={!form.canSubmit}
               focusableWhenDisabled

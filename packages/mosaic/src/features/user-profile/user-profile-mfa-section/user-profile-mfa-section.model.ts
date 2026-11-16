@@ -17,11 +17,11 @@ import type {
 type ReadyModel = Extract<UserProfileMfaModel, { status: 'ready' }>;
 type MfaSnapshotData = Pick<ReadyModel, 'methods' | 'addableMethods' | 'phones'>;
 
-function reloadUser(user: UserResource): Promise<unknown> {
+export function reloadUser(user: UserResource): Promise<unknown> {
   return user.reload().catch(() => undefined);
 }
 
-function configuredFactors(environment: EnvironmentResource | undefined): string[] {
+export function configuredFactors(environment: EnvironmentResource | undefined): string[] {
   return Object.values(environment?.userSettings.attributes ?? {}).flatMap(attribute =>
     attribute?.used_for_second_factor ? attribute.second_factors : [],
   );
@@ -50,7 +50,7 @@ function phoneUnavailable(): ClerkRuntimeError {
   return new ClerkRuntimeError('This phone number is unavailable.', { code: 'mfa_phone_unavailable' });
 }
 
-function requireIdentity(clerk: ReturnType<typeof useClerk>, userId: string, sessionId: string): UserResource {
+export function requireIdentity(clerk: ReturnType<typeof useClerk>, userId: string, sessionId: string): UserResource {
   const current = clerk.user;
   if (!current || current.id !== userId || clerk.session?.id !== sessionId) {
     throw new ClerkRuntimeError('This account changed. Please try again.', { code: 'mfa_account_changed' });
@@ -110,7 +110,7 @@ function describeMfa(user: UserResource, environment: EnvironmentResource): MfaS
   };
 }
 
-function createSmsActions(
+export function createSmsActions(
   clerk: ReturnType<typeof useClerk>,
   environment: EnvironmentResource,
   userId: string,

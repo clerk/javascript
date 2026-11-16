@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { TableRowContext, useCellIndex, useTableContext } from './table-context';
 
 export type TableCellProps = ComponentProps<'td'>;
@@ -21,7 +21,7 @@ export const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
     [rowHeader, registerRowHeader, id],
   );
 
-  const defaultProps: Record<string, unknown> = rowHeader ? { id, scope: 'row' } : {};
+  const defaultProps: DefaultProps<'th'> = rowHeader ? { id, scope: 'row' } : {};
 
   return useRender({
     defaultTagName: rowHeader ? 'th' : 'td',

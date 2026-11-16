@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { type JSX, useRef } from 'react';
 
 import { Card } from '../../components/card';
 import type { DialogFocusTarget } from '../../components/dialog';

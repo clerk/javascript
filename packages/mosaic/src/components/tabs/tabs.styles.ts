@@ -5,7 +5,6 @@ import { colorVars, durationVars, easingVars, fontFamilyVars, space, typeScaleVa
 // Literals: StyleX cannot import them. Must match `segmented-control.styles.ts`.
 const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
 const noAnchors = '@supports not ((anchor-scope: all) and (not (-moz-appearance: none)))' as const;
-const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
 const forcedColors = '@media (forced-colors: active)' as const;
 const activeAnchor = '--_cl-tabs-active';
 const halfGap = `calc(${space['5']} / -2)`;
@@ -100,11 +99,11 @@ export const styles = stylex.create({
     insetInlineStart: 'anchor(start)',
     transitionDuration: {
       default: `${trail}, ${lead}`,
-      [reduceMotion]: {
+      ':where([data-direction="backward"])': `${lead}, ${trail}`,
+      '@media (prefers-reduced-motion: reduce)': {
         default: durationVars['--cl-duration-instant'],
         ':where([data-direction="backward"])': durationVars['--cl-duration-instant'],
       },
-      ':where([data-direction="backward"])': `${lead}, ${trail}`,
     },
     transitionProperty: 'inset-inline-start, inset-inline-end',
     transitionTimingFunction: easingVars['--cl-ease-enter'],

@@ -22,12 +22,16 @@ suspend fun createPasskey(
 
 suspend fun getPasskey(
     request: String,
+    preferImmediatelyAvailableCredentials: Boolean,
     appContext: AppContext,
 ): String? {
     val credentialManager =
         CredentialManager.create(appContext.reactContext?.applicationContext!!)
     val getCredentialRequest =
-        GetCredentialRequest(listOf(GetPublicKeyCredentialOption(request)))
+        GetCredentialRequest(
+            credentialOptions = listOf(GetPublicKeyCredentialOption(request)),
+            preferImmediatelyAvailableCredentials = preferImmediatelyAvailableCredentials,
+        )
 
     val result = appContext.activityProvider?.currentActivity?.let {
         credentialManager.getCredential(it, getCredentialRequest)

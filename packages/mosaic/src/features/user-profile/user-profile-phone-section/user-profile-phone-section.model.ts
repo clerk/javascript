@@ -2,10 +2,11 @@ import { useClerk } from '@clerk/shared/react';
 import type { PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { toCountryIso } from '../../../components/phone-input';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import type { UserProfilePhoneVerifier } from '../user-profile-contact.types';
-import { byId, canAddIdentifications, toContactAccess, toContacts } from '../user-profile-contact.utils';
+import { byId, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileAddPhoneField } from './user-profile-add-phone.controller';
 import type { UserProfilePhoneSectionModel } from './user-profile-phone-section.types';
@@ -40,7 +41,7 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
   const access = toContactAccess(
     attributes.phone_number,
     user.phoneNumbers.length,
-    canAddIdentifications(user, enterpriseSSO.enabled),
+    allowsIdentificationCreation(user, enterpriseSSO),
   );
 
   if (!access.show) {

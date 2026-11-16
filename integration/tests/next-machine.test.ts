@@ -108,7 +108,7 @@ test.describe('Next.js machine authentication @machine', () => {
   registerOAuthAuthTests(adapter);
 
   test.describe('auth.protect() authorization with API keys', () => {
-    test.describe.configure({ mode: 'parallel' });
+    test.describe.configure({ mode: 'default' });
     let app: Application;
     let fakeUser: FakeUser;
     let fakeBapiUser: User;
@@ -198,7 +198,7 @@ test.describe('Next.js machine authentication @machine', () => {
   });
 
   test.describe('session helpers with machine tokens', () => {
-    test.describe.configure({ mode: 'parallel' });
+    test.describe.configure({ mode: 'default' });
     let app: Application;
     let network: FakeMachineNetwork;
     let jwtToken: string;

@@ -1,5 +1,63 @@
 # @clerk/ui
 
+## 1.42.6
+
+### Patch Changes
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+  - @clerk/localizations@4.24.8
+
+## 1.42.5
+
+### Patch Changes
+
+- Fix `<SignIn />` showing "The External Account was not found." to new users when the sign-up transfer after an OAuth sign-in fails, for example when a firewall, rate limit or Protect blocks the request. The start screen now keeps the error shown on the SSO callback screen, and a Protect block shows the blocked screen with its reference. The account not found message still appears when transfers are turned off with `transferable={false}`. ([#10774](https://github.com/clerk/javascript/pull/10774)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.45.0
+  - @clerk/localizations@4.24.7
+
+## 1.42.4
+
+### Patch Changes
+
+- Move the OAuth consent redirect domain helper into `@clerk/shared` so it can be shared across UI packages. No behavior change. ([#10218](https://github.com/clerk/javascript/pull/10218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix an issue where annual base-fees were shown with incorrect labels. ([#10660](https://github.com/clerk/javascript/pull/10660)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+  - @clerk/localizations@4.24.6
+
+## 1.42.3
+
+### Patch Changes
+
+- Fix custom OAuth provider names and icons incorrectly carrying over from a previously loaded environment. ([#10526](https://github.com/clerk/javascript/pull/10526)) by [@Ephem](https://github.com/Ephem)
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+  - @clerk/localizations@4.24.5
+
+## 1.42.2
+
+### Patch Changes
+
+- Updated dependencies [[`83c06bb`](https://github.com/clerk/javascript/commit/83c06bbbd018846b411328c5f9f1902946fdc095), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/localizations@4.24.4
+  - @clerk/shared@4.43.1
+
+## 1.42.1
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+  - @clerk/localizations@4.24.3
+
 ## 1.42.0
 
 ### Minor Changes

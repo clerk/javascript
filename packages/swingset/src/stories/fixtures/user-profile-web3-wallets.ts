@@ -7,7 +7,7 @@ import type { Web3Strategy } from '@clerk/shared/types';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosText } from '@/lib/chaos';
+import { chaosPick, chaosRows } from '@/lib/chaos';
 
 import { idleReverification } from './reverification';
 
@@ -47,6 +47,21 @@ export const secondaryWallet: UserProfileWeb3Wallet = {
   isVerified: true,
 };
 
+const chaosWallets: Partial<UserProfileWeb3Wallet>[] = [
+  {},
+  { ...secondaryWallet, isPrimary: false },
+  {
+    id: 'wallet_3',
+    providerId: 'web3_okx_wallet_signature',
+    provider: 'OKX Wallet',
+    iconId: 'okx_wallet',
+    iconUrl: 'https://img.clerk.com/static/okx_wallet.svg',
+    address: '0x9F8E7d6C5b4A39281706f5E4d3C2b1A098765432',
+    isPrimary: false,
+    isVerified: false,
+  },
+];
+
 export function useWeb3WalletsFixture({
   initialWallets = [primaryWallet],
   availableProviders = providers,
@@ -58,18 +73,14 @@ export function useWeb3WalletsFixture({
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
 } = {}) {
-  const seedWallets = useChaosFixture(initialWallets, items =>
-    items.map(wallet => ({
-      ...wallet,
-      provider: chaosText(wallet.provider),
-      canVerify: !wallet.isVerified && wallet.providerId !== undefined,
-    })),
+  const seed = useChaosFixture(initialWallets, items =>
+    chaosRows(items, chaosWallets.length).map((wallet, index) => {
+      const chaosWallet = { ...wallet, ...chaosPick(chaosWallets, index) };
+      return { ...chaosWallet, canVerify: !chaosWallet.isVerified && chaosWallet.providerId !== undefined };
+    }),
   );
-  const seedProviders = useChaosFixture(availableProviders, items =>
-    items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
-  );
-  const [wallets, setWallets] = useState(seedWallets);
-  const [connectionProviders, setConnectionProviders] = useState(seedProviders);
+  const [wallets, setWallets] = useState(seed);
+  const [connectionProviders, setConnectionProviders] = useState(availableProviders);
   const [removalFailed, setRemovalFailed] = useState(false);
   const primaryFailed = useRef(false);
 

@@ -2,6 +2,22 @@ packages:
   - packages/*
   - packages/electron-passkeys/npm/*
 
+engineStrict: false
+strictDepBuilds: false
+verifyDepsBeforeRun: false
+
+allowBuilds:
+  '@parcel/watcher': false
+  browser-tabs-lock: false
+  bufferutil: false
+  core-js: false
+  cypress: true
+  electron: false
+  esbuild: false
+  msw: true
+  unrs-resolver: false
+  utf-8-validate: false
+
 catalogs:
   peer-expo:
     expo: '>=54 <59'
@@ -34,7 +50,6 @@ catalogs:
     '@base-org/account': 2.0.1
     '@coinbase/wallet-sdk': 4.3.7
     '@solana/wallet-adapter-base': 0.9.27
-    '@solana/wallet-adapter-react': 0.15.39
     '@solana/wallet-standard': 1.1.4
     '@wallet-standard/core': 1.1.1
     '@zxcvbn-ts/core': 3.0.4
@@ -58,6 +73,7 @@ overrides:
   react-dom: 'catalog:react'
   rolldown: 'catalog:repo'
   'semver@<7.7.3': 7.7.4
+  shadcn: 4.11.0
   'smol-toml@<1.6.1': 1.7.1
   'socket.io-parser@>=4.0.0 <4.2.7': 4.2.7
   'svgo@>=3.0.0 <3.3.3': 4.1.0

@@ -1,10 +1,6 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useRef, useState } from 'react';
-
-import type { ErrorDescription } from '../../../localization';
-import { useErrorText } from '../../../localization';
-import { toLocalizableError } from '../../../utils/errors';
+import { usePendingAction } from '../../../hooks/use-pending-action';
 import type { ReverificationController } from '../../reverification';
+import { REDIRECT_HOLD_MS } from '../user-profile.utils';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -34,42 +30,20 @@ export function useUserProfileEnterpriseAccountsController({
   connectReverification,
   errorFallback,
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
-  const [pendingId, setPendingId] = useState<string>();
-  const errorText = useErrorText();
-  const [connectErrors, setConnectErrors] = useState<Record<string, ErrorDescription>>({});
-  const connecting = useRef(false);
-
-  const run = async (id: string) => {
-    if (connecting.current) {
-      return;
-    }
-    connecting.current = true;
-    setPendingId(id);
-    setConnectErrors(({ [id]: _cleared, ...rest }) => rest);
-
-    try {
-      if ((await onConnect(id)) === 'redirecting') {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    } catch (error) {
-      if (isReverificationCancelledError(error)) {
-        return;
-      }
-      setConnectErrors(current => ({ ...current, [id]: toLocalizableError(error) }));
-    } finally {
-      connecting.current = false;
-      setPendingId(undefined);
-    }
-  };
+  const actions = usePendingAction({ errorFallback });
 
   return {
     accounts,
-    connections: connections.map(connection => {
-      const error = connectErrors[connection.id];
-      return error ? { ...connection, connectError: errorText(error, errorFallback) } : connection;
-    }),
-    pendingId,
-    onConnect: id => void run(id),
+    connections: connections.map(connection =>
+      actions.errorKey === connection.id ? { ...connection, connectError: actions.error } : connection,
+    ),
+    pendingId: actions.pendingKey,
+    onConnect: id =>
+      void actions.run(id, async () => {
+        if ((await onConnect(id)) === 'redirecting') {
+          await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
+        }
+      }),
     connectReverification,
   };
 }

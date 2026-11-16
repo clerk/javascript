@@ -96,7 +96,7 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
         >
           <Icon
             glyph={Clipboard}
-            size='sm'
+            size='md'
           />
         </Button>
         <Toast.Portal>
@@ -115,7 +115,7 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
                   />
                   <Icon
                     glyph={Checkmark}
-                    size='sm'
+                    size='md'
                   />
                 </Toast.Root>
               </Toast.Positioner>

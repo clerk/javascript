@@ -50,6 +50,12 @@ describe('rootAuthLoader', () => {
       await rootAuthLoader(args, () => ({ data: 'test' }));
     });
 
+    it('should ignore a non-function second argument from older call sites', async () => {
+      const result = await rootAuthLoader(args, { secretKey: 'sk_test_ignored' } as any);
+
+      expect(result).toHaveProperty('clerkState');
+    });
+
     it('should handle no callback', async () => {
       const result = await rootAuthLoader(args);
 

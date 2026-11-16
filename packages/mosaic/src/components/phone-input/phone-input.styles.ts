@@ -10,15 +10,27 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
+const popupRadius = radiusVars['--cl-radius-xl'];
+const listInset = space['1.5'];
+const optionRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
+
 export const styles = stylex.create({
   triggerStart: {
-    paddingInlineStart: 'var(--_cl-input-group-inset)',
+    paddingInlineStart: 0,
   },
   trigger: {
-    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    borderRadius: 'max(0px, calc(var(--_cl-input-group-radius) - var(--_cl-input-group-inset)))',
+    '--_cl-icon-color': {
+      default: colorVars['--cl-color-input-placeholder'],
+      ':not([data-disabled])[aria-expanded="true"]': colorVars['--cl-color-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
+      },
+    },
+    borderRadius: 'max(0px, calc(var(--_cl-input-group-radius) - 1px))',
     borderWidth: 0,
     alignItems: 'center',
+    alignSelf: 'stretch',
     appearance: 'none',
     backgroundColor: 'transparent',
     cursor: 'pointer',
@@ -27,9 +39,8 @@ export const styles = stylex.create({
     justifyContent: 'center',
     outlineOffset: { default: null, ':focus-visible': 0 },
     paddingInlineEnd: 0,
-    paddingInlineStart: space['1.5'],
+    paddingInlineStart: `calc(${space['2']} + var(--_cl-input-group-inset))`,
     userSelect: 'none',
-    height: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
   },
   triggerContent: {
     gap: space['0.5'],
@@ -40,14 +51,14 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
-    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontSize: '1rem',
     justifyContent: 'center',
     lineHeight: 1,
     height: space['4'],
     width: space['4'],
   },
   divider: {
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-subtle'],
     flexShrink: 0,
     height: space['3.5'],
     width: '1px',
@@ -64,31 +75,31 @@ export const styles = stylex.create({
     paddingInlineStart: space['1.5'],
   },
   popup: {
-    borderRadius: radiusVars['--cl-radius-lg'],
+    borderRadius: popupRadius,
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
   },
   countrySearchRow: {
-    gap: space['1'],
+    gap: space['1.5'],
     alignItems: 'center',
-    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndColor: colorVars['--cl-color-border-subtle'],
     borderBlockEndStyle: 'solid',
     borderBlockEndWidth: '1px',
     display: 'flex',
     flexShrink: 0,
     paddingInlineEnd: space['2'],
-    paddingInlineStart: space['2'],
-    height: space['8'],
+    paddingInlineStart: space['3'],
+    height: space['9'],
   },
   countrySearchIcon: {
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    height: space['5'],
-    width: space['5'],
+    height: space['4'],
+    width: space['4'],
   },
   countrySearchInput: {
     borderRadius: 0,
@@ -114,16 +125,15 @@ export const styles = stylex.create({
     },
   },
   countryList: {
+    padding: listInset,
     gap: space['0.5'],
-    paddingBlock: space['0.5'],
-    paddingInline: space['1'],
     display: 'flex',
     flexDirection: 'column',
     maxHeight: '16rem',
   },
   option: {
-    borderRadius: radiusVars['--cl-radius-md'],
-    gap: space['1'],
+    borderRadius: optionRadius,
+    gap: space['2'],
     outline: {
       default: 'none',
       '@media (forced-colors: active)': {
@@ -137,7 +147,7 @@ export const styles = stylex.create({
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
@@ -152,7 +162,7 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     paddingInlineEnd: space['1.5'],
-    paddingInlineStart: space['1'],
+    paddingInlineStart: space['1.5'],
     height: space['8'],
   },
   empty: {
@@ -164,35 +174,12 @@ export const styles = stylex.create({
     textAlign: 'center',
   },
   optionFlag: {
-    alignItems: 'center',
-    display: 'flex',
-    flexShrink: 0,
-    justifyContent: 'center',
-    height: space['5'],
-    width: space['5'],
-  },
-  optionName: {
-    padding: space['0.5'],
-    overflow: 'hidden',
-    flexGrow: 1,
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    height: space['6'],
-    minWidth: 0,
+    fontSize: '1rem',
+    lineHeight: 1,
   },
   optionCode: {
-    alignItems: 'center',
-    color: colorVars['--cl-color-foreground-secondary'],
-    display: 'flex',
-    flexShrink: 0,
     fontSize: typeScaleVars['--cl-text-xs-size'],
-    fontVariantNumeric: 'tabular-nums',
     fontWeight: fontWeightVars['--cl-font-medium'],
-    justifyContent: 'flex-end',
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    whiteSpace: 'nowrap',
-    height: space['5'],
-    minWidth: space['5'],
-    width: 'max-content',
   },
 });

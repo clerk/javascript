@@ -61,7 +61,7 @@ jobs:
           RUN_HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
         run: node scripts/verify-attach.mjs fetch
 
-      - name: Install a gh whose pr edit has --attach
+      - name: Install a gh whose issue edit has --attach
         if: steps.evidence.outputs.found == 'true'
         env:
           GH_VERSION: '2.102.0'

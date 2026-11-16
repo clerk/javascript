@@ -1,14 +1,19 @@
 import { Platform } from 'react-native';
 
 import NativeClerkModule from '../specs/NativeClerkModule';
-import type { NativeAuthFlowModule, NativeClientSyncModule } from '../specs/NativeClerkModule.types';
+import type {
+  NativeAuthFlowModule,
+  NativeClientSyncModule,
+  NativeUpdateRequiredViewModule,
+} from '../specs/NativeClerkModule.types';
 
 export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
 export type ClerkExpoNativeModule = {
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
 } & NativeClientSyncModule &
-  Partial<NativeAuthFlowModule>;
+  Partial<NativeAuthFlowModule> &
+  Partial<NativeUpdateRequiredViewModule>;
 
 function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   if (!module || typeof module !== 'object') {

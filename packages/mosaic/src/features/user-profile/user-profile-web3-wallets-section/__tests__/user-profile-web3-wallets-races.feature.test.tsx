@@ -1,7 +1,7 @@
 import type { UserJSON, Web3Strategy } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
@@ -31,8 +31,6 @@ function savedWallet(id: string, address: string, strategy: Web3Strategy = 'web3
 }
 
 describe('Web3 wallet selection races', () => {
-  afterEach(() => vi.unstubAllGlobals());
-
   it.each(['matching', 'null strategy', 'unrelated'] as const)(
     'handles a %s saved wallet published during account selection',
     async kind => {

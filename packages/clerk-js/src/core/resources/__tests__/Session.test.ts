@@ -42,14 +42,17 @@ describe('Session', () => {
 
   describe('getToken()', () => {
     let dispatchSpy;
+    let cacheSetSpy;
 
     beforeEach(() => {
       dispatchSpy = vi.spyOn(eventBus, 'emit');
+      cacheSetSpy = vi.spyOn(SessionTokenCache, 'set');
       BaseResource.clerk = clerkMock();
     });
 
     afterEach(() => {
       dispatchSpy?.mockRestore();
+      cacheSetSpy?.mockRestore();
       BaseResource.clerk = null as any;
     });
 
@@ -74,7 +77,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('does not register proactive refresh after an unfocused network mint', async () => {
@@ -84,7 +91,7 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({ tokenId, tokenResolver: expect.any(Promise) });
       });
 
       it('does not register proactive refresh for an unfocused hydrated token', async () => {
@@ -94,7 +101,7 @@ describe('Session', () => {
         await Promise.resolve();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({ tokenId, tokenResolver: expect.any(Promise) });
       });
 
       it('registers proactive refresh when document.hasFocus is not callable', async () => {
@@ -104,7 +111,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('registers proactive refresh when document.hasFocus throws', async () => {
@@ -116,7 +127,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('registers proactive refresh when document is missing', async () => {
@@ -126,7 +141,11 @@ describe('Session', () => {
         await session.getToken();
 
         const tokenId = TokenId.build('session_1', undefined, null);
-        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
       });
     });
 
@@ -629,6 +648,92 @@ describe('Session', () => {
       expect(token3).toEqual(mockJwt);
     });
 
+    it('keeps waiting on a slow token request in a browser', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+      const respond = requestSpy.getMockImplementation()!;
+      requestSpy.mockImplementationOnce(
+        (...args: unknown[]) => new Promise(resolve => setTimeout(() => resolve(respond(...args)), 15_000)),
+      );
+
+      let token: string | null | undefined;
+      void session.getToken().then(t => (token = t));
+      await vi.advanceTimersByTimeAsync(15_000);
+
+      expect(token).toEqual(mockJwt);
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+    });
+
+    describe('without a document, as in React Native', () => {
+      beforeEach(() => {
+        setDocument(undefined);
+      });
+
+      it('aborts a stalled token request and mints the token on retry', async () => {
+        BaseResource.clerk = clerkMock();
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+        requestSpy.mockClear();
+        requestSpy.mockImplementationOnce(() => new Promise(() => {}));
+
+        let token: string | null | undefined;
+        void session.getToken().then(t => (token = t));
+        await vi.advanceTimersByTimeAsync(15_000);
+
+        expect(token).toEqual(mockJwt);
+        expect(requestSpy).toHaveBeenCalledTimes(2);
+        expect(requestSpy.mock.calls[0][0].signal.aborted).toBe(true);
+      });
+
+      it('reports token requests that keep stalling as a network error', async () => {
+        BaseResource.clerk = clerkMock();
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+        requestSpy.mockImplementation(() => new Promise(() => {}));
+
+        let error: unknown;
+        void session.getToken().catch(e => (error = e));
+        await vi.advanceTimersByTimeAsync(300_000);
+
+        expect(error).toMatchObject({ code: 'network_error' });
+      });
+    });
+
     it('deduplicates concurrent getToken calls with same template', async () => {
       BaseResource.clerk = clerkMock();
 
@@ -849,9 +954,11 @@ describe('Session', () => {
         const freshToken = await session.getToken();
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
-        expect(
-          SessionTokenCache.get({ tokenId: TokenId.build('session_1', undefined, null) })?.entry.onRefresh,
-        ).toEqual(expect.any(Function));
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId: TokenId.build('session_1', undefined, null),
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('does not emit token:update with an empty token when background refresh fires while offline', async () => {
@@ -2486,6 +2593,48 @@ describe('Session', () => {
       });
     });
 
+    describe('without a document, as in React Native', () => {
+      beforeEach(() => {
+        setDocument(undefined);
+      });
+
+      it('gives the expired_token retry a time limit of its own', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        SessionTokenCache.clear();
+
+        const errorResponse = new ClerkAPIResponseError('Missing expired token', {
+          data: [
+            { code: 'missing_expired_token', message: 'Missing expired token', long_message: 'Missing expired token' },
+          ],
+          status: 422,
+        });
+        fetchSpy.mockImplementationOnce(
+          () => new Promise((_, reject) => setTimeout(() => reject(errorResponse), 6_000)),
+        );
+        fetchSpy.mockImplementationOnce(
+          () => new Promise(resolve => setTimeout(() => resolve({ object: 'token', jwt: mockJwt }), 6_000)),
+        );
+
+        let token: string | null | undefined;
+        void session.getToken().then(t => (token = t));
+        await vi.advanceTimersByTimeAsync(12_000);
+
+        expect(token).toEqual(mockJwt);
+        expect(fetchSpy).toHaveBeenCalledTimes(2);
+      });
+    });
+
     it('should not retry with expired token when lastActiveToken is not available', async () => {
       const session = new Session({
         status: 'active',
@@ -2698,7 +2847,7 @@ describe('Session', () => {
       SessionTokenCache.clear();
     });
 
-    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve high then low)', async () => {
+    it('concurrent skipCache mints return their own token; cache entry and lastActiveToken stay freshest (resolve high then low)', async () => {
       const session = makeSession();
       const high = createJwtWithOiat(NOW, NOW + 30);
       const low = createJwtWithOiat(NOW, NOW);
@@ -2714,17 +2863,17 @@ describe('Session', () => {
       await expect(pHigh).resolves.toBe(high);
 
       // Each skipCache call returns its own mint (main parity): the low fetch resolves last and
-      // returns low, but it never regresses the cache slot or lastActiveToken.
+      // returns low, but it never regresses the cache entry or lastActiveToken.
       dLow.resolve({ object: 'token', jwt: low });
       await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', undefined, null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(await session.getToken()).toBe(high);
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
 
-    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve low then high)', async () => {
+    it('concurrent skipCache mints return their own token; cache entry and lastActiveToken stay freshest (resolve low then high)', async () => {
       const session = makeSession();
       const high = createJwtWithOiat(NOW, NOW + 30);
       const low = createJwtWithOiat(NOW, NOW);
@@ -2744,7 +2893,7 @@ describe('Session', () => {
       await expect(pSecond).resolves.toBe(high);
 
       const tokenId = TokenId.build('session_1', undefined, null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(await session.getToken()).toBe(high);
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
@@ -2770,7 +2919,7 @@ describe('Session', () => {
       expect(fetchSpy.mock.calls[2][0].body.token).toBe(high);
 
       const tokenId = TokenId.build('session_1', undefined, null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
 
@@ -2786,14 +2935,14 @@ describe('Session', () => {
       const pHigh = session.getToken({ organizationId: 'org_other', skipCache: true });
       const pLow = session.getToken({ organizationId: 'org_other', skipCache: true });
 
-      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
+      // Each skipCache call returns its own mint (main parity); the cache entry still stays freshest.
       dHigh.resolve({ object: 'token', jwt: high });
       await expect(pHigh).resolves.toBe(high);
       dLow.resolve({ object: 'token', jwt: low });
       await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', undefined, 'org_other');
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(session.lastActiveToken).toBeNull();
     });
 
@@ -2809,14 +2958,14 @@ describe('Session', () => {
       const pHigh = session.getToken({ template: 't', skipCache: true });
       const pLow = session.getToken({ template: 't', skipCache: true });
 
-      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
+      // Each skipCache call returns its own mint (main parity); the cache entry still stays freshest.
       dHigh.resolve({ object: 'token', jwt: high });
       await expect(pHigh).resolves.toBe(high);
       dLow.resolve({ object: 'token', jwt: low });
       await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', 't', null);
-      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
       expect(session.lastActiveToken).toBeNull();
     });
 

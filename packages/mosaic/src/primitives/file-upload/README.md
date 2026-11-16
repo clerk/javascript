@@ -107,7 +107,7 @@ added.
 | ------------------------ | --------------- | ------------------------------------------------------------------- |
 | `FileUpload.Root`        | `<div>`         | Owns the file state + hidden input, provides context                |
 | `FileUpload.Trigger`     | `<button>`      | Opens the native file picker                                        |
-| `FileUpload.Dropzone`    | `<div>`         | Drag-and-drop target; filters dropped files by `accept`             |
+| `FileUpload.Dropzone`    | `<div>`         | Drag-and-drop target; ignores non-file drags, filters by `accept`   |
 | `FileUpload.Item`        | `<div>`         | Wraps a single selected file, provides item context                 |
 | `FileUpload.ItemPreview` | `<img>`         | Image thumbnail for the item's file (renders nothing for non-image) |
 | `FileUpload.ItemDelete`  | `<button>`      | Removes the item's file                                             |
@@ -135,6 +135,7 @@ the new image while the upload is still running. It does not need `FileUpload.Ro
 | `maxSize`       | `number`                                | —       | Max size in bytes for a single file; larger files are rejected |
 | `onReject`      | `(rejections: FileRejection[]) => void` | —       | Called with files rejected by `accept` or `maxSize`            |
 | `disabled`      | `boolean`                               | `false` | Disables the trigger, dropzone, and picker                     |
+| `inputId`       | `string`                                | —       | `id` for the hidden input, so a `<label htmlFor>` opens it     |
 
 A `FileRejection` is `{ file: File; reason: 'accept' | 'size' | 'overflow' }`. Rejections are
 reported for both the picker and drops; `accept` is checked before `maxSize`, and in single-file mode
@@ -152,12 +153,17 @@ standard HTML attributes for their default element.
 
 ## Data Attributes
 
-| Attribute       | Applies To                          | Description                                 |
-| --------------- | ----------------------------------- | ------------------------------------------- |
-| `data-empty`    | Root                                | Present when no files are selected          |
-| `data-dragging` | Dropzone                            | Present while a valid drag is over the zone |
-| `data-image`    | Item                                | Present when the item's file is an image    |
-| `data-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                       |
+| Attribute            | Applies To                          | Description                                                   |
+| -------------------- | ----------------------------------- | ------------------------------------------------------------- |
+| `data-empty`         | Root                                | Present when no files are selected                            |
+| `data-dragging`      | Dropzone                            | Present while a file drag is over the zone                    |
+| `data-drag-rejected` | Dropzone                            | Present while the dragged file's type does not match `accept` |
+| `data-image`         | Item                                | Present when the item's file is an image                      |
+| `data-disabled`      | Root, Trigger, Dropzone, ItemDelete | Present when disabled                                         |
+
+`data-drag-rejected` is a hint only. While dragging, browsers expose a file's MIME type but not its
+name, so extension-only `accept` entries and blank types (common in Safari) are never flagged. The
+drop is still allowed and `onReject` reports the file as usual.
 
 ## ARIA
 

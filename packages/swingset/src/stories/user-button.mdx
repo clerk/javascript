@@ -86,7 +86,7 @@ always condensed.
   storyModule={UserButtonStories}
 />
 
-`renderTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
+`showTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
 fully to match it; see [User only](#user-only).
 
 <Story
@@ -94,18 +94,18 @@ fully to match it; see [User only](#user-only).
   storyModule={UserButtonStories}
 />
 
-`renderTriggerBadge={false}` keeps the name. The badge is part of the label, so it needs both.
+`triggerBadge={false}` keeps the name. The badge is part of the label, so it needs both.
 
 <Story
   name='WithoutTriggerBadge'
   storyModule={UserButtonStories}
 />
 
-`renderTriggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. The returned `label` is used as the text content of the label while the returned `id` is embedded into a `data-badge-id` attribute that can then be used to target specific badge types (such as with CSS).
+`triggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. The returned `label` is used as the text content of the label while the returned `id` is embedded into a `data-badge-id` attribute that can then be used to target specific badge types (such as with CSS).
 
 ```tsx
 <UserButton
-  renderTriggerBadge={async ({ kind, id }) => {
+  triggerBadge={async ({ kind, id }) => {
     const plan = await (kind === "organization" ? getOrganizationPlan(id) : getUserPlan(id));
     if (plan) {
       return { id: plan.key, label: plan.name };
@@ -219,10 +219,13 @@ all accounts**. The foot keeps **Sign out**.
 ## Profile modal
 
 Mosaic's profile modals are mounted by `MosaicProvider`, so neither the opener nor the app renders a
-dialog. The exported UserButton still opens the clerk-js profile. This example backs the modal with
-fixture data, so it runs without a Clerk session. **Manage account** calls `open()`, and the app's own
-buttons call `open({ page })` on the same modal. Hovering one preloads the profile, so it opens without
-a wait.
+dialog. With `experimental={{ newProfiles: true }}` on `MosaicProvider`, the exported UserButton opens
+Mosaic's `UserProfile` the same way, against the signed-in user; without it, it opens Clerk's profile.
+This example backs the modal with fixture data, so it runs without a Clerk session. The profile is
+combined: the active organization's pages follow the account's. **Manage account** calls `open()`, **Manage organization** calls
+`open({ page: 'organization/general' })`, and the app's own buttons call `open({ page })` or
+`open({ mode: 'user' })` on the same modal. Hovering one preloads the profile, so it opens without a
+wait.
 
 <Story
   name='ProfileModal'
@@ -275,3 +278,34 @@ than an error, so one order can cover every mode.
 | `.cl-user-button-item-label`         | `data-variant="default \| interactive"` |
 | `.cl-user-button-item-description`   |                                         |
 | `.cl-user-button-item-trailing`      |                                         |
+
+### Avatar
+
+`.cl-user-button-avatar` holds the account's badge on the organization's avatar. The cutout behind
+the badge follows its size, so resizing either keeps the gap even. Set `width` and `height` on
+`.cl-user-button-avatar` to resize it, and these variables on it to place the badge:
+
+| Variable                   | Default                       | Description                                                     |
+| -------------------------- | ----------------------------- | --------------------------------------------------------------- |
+| `--cl-avatar-badge-size`   | `14px` trigger, `16px` header | The badge's width and height.                                   |
+| `--cl-avatar-badge-gap`    | `1px`                         | The space cut out around the badge.                             |
+| `--cl-avatar-badge-offset` | `2px` trigger, `4px` header   | How far the badge sits past the corner of the avatar it badges. |
+
+```css
+.cl-user-button-avatar {
+  width: 48px;
+  height: 48px;
+  --cl-avatar-badge-size: 20px;
+  --cl-avatar-badge-gap: 2px;
+}
+```
+
+The trigger's avatar and the header's both read the sliders. A slider left at **default** sets
+nothing. Swingset injects its styles at a specificity a plain rule cannot beat, so this example marks
+the size `!important`; an app importing the layered stylesheet does not need to. Turn on **RTL** to
+see the badge move to the other corner.
+
+<Story
+  name='CustomizedAvatar'
+  storyModule={UserButtonStories}
+/>

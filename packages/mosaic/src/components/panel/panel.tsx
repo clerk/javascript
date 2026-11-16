@@ -43,6 +43,7 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
   const titleRef = useMergeRefs([ref, panelTitleRef]);
   const level = useHeadingLevel();
   const pageTitleRef = inProfilePage ? profile?.pageTitleRef : undefined;
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The title ref is present when the imperative handle is attached.
   React.useImperativeHandle(pageTitleRef ? titleRef : null, () => pageTitleRef?.current as HTMLDivElement);
   return useRender({
     defaultTagName: 'div',

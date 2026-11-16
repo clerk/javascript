@@ -58,7 +58,6 @@ function servePasskeys(passkeys: PasskeyJSON[] = [fapiPasskey({ id: 'pk_1' })], 
 
 afterEach(() => {
   vi.useRealTimers();
-  vi.restoreAllMocks();
 });
 
 function fakeAuthenticator() {
@@ -93,21 +92,23 @@ describe('Seeing passkeys', () => {
       <MosaicProvider
         localization={{
           messages: {
-            userProfilePasskeys: {
-              label: 'Clés d’accès',
-              add: 'Ajouter',
-              addLabel: 'Ajouter une clé',
-              manage: 'Gérer {name}',
-              rename: 'Renommer',
-              renameTitle: 'Renommer la clé',
-              renameDescription: 'Choisissez un nouveau nom.',
-              nameLabel: 'Nom de la clé',
-              save: 'Enregistrer',
-              cancel: 'Annuler',
-              removeAction: 'Supprimer la clé',
-              removeTitle: 'Supprimer la clé',
-              removeDescription: '{name} sera supprimée de ce compte.',
-              remove: 'Supprimer',
+            userProfile: {
+              passkeys: {
+                label: 'Clés d’accès',
+                add: 'Ajouter',
+                addLabel: 'Ajouter une clé',
+                manage: 'Gérer {name}',
+                rename: 'Renommer',
+                renameTitle: 'Renommer la clé',
+                renameDescription: 'Choisissez un nouveau nom.',
+                nameLabel: 'Nom de la clé',
+                save: 'Enregistrer',
+                cancel: 'Annuler',
+                removeAction: 'Supprimer la clé',
+                removeTitle: 'Supprimer la clé',
+                removeDescription: '{name} sera supprimée de ce compte.',
+                remove: 'Supprimer',
+              },
             },
           },
         }}
@@ -158,15 +159,17 @@ describe('Seeing passkeys', () => {
         localization={{
           locale: 'de-DE',
           messages: {
-            userProfilePasskeys: {
-              createdAt: 'Erstellt: {date}',
-              lastUsedAt: 'Zuletzt verwendet: {date}',
-              dates: {
-                sameDay: 'Heute um {time}',
-                lastDay: 'Gestern um {time}',
-                nextDay: 'Morgen um {time}',
-                previous6Days: 'Letzten {weekday} um {time}',
-                next6Days: '{weekday} um {time}',
+            userProfile: {
+              passkeys: {
+                createdAt: 'Erstellt: {date}',
+                lastUsedAt: 'Zuletzt verwendet: {date}',
+                dates: {
+                  sameDay: 'Heute um {time}',
+                  lastDay: 'Gestern um {time}',
+                  nextDay: 'Morgen um {time}',
+                  previous6Days: 'Letzten {weekday} um {time}',
+                  next6Days: '{weekday} um {time}',
+                },
               },
             },
           },
@@ -345,7 +348,7 @@ describe('Adding a passkey', () => {
     );
     await renderWithClerk(
       <MosaicProvider
-        localization={{ messages: { userProfilePasskeys: { saveError: 'Impossible de créer la clé.' } } }}
+        localization={{ messages: { userProfile: { passkeys: { saveError: 'Impossible de créer la clé.' } } } }}
       >
         <UserProfilePasskeysSection />
       </MosaicProvider>,
@@ -392,7 +395,8 @@ describe('Renaming a passkey', () => {
     const rename = holdRequests('post', '/v1/me/passkeys/pk_1');
     await user.click(save);
     await waitFor(() => expect(rename.requests).toHaveLength(1));
-    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('aria-disabled', 'true');
+    expect(input).toHaveAttribute('readonly');
     expect(save).toHaveAttribute('aria-busy', 'true');
     await user.keyboard('{Escape}');
     expect(dialog).toBeVisible();
@@ -559,8 +563,4 @@ describe('Satellite passkeys', () => {
 describe('Passkey reverification', () => {
   it.todo('completes reverification before creating, renaming, or removing a passkey');
   it.todo('cancels reverification without changing passkeys and permits retry');
-});
-
-describe('Passkey follow-ups', () => {
-  it.todo('rerenders passkey eligibility when a replaced or fetched environment changes policy');
 });

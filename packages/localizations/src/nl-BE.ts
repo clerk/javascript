@@ -2113,6 +2113,7 @@ export const nlBE: LocalizationResource = {
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:
       'Aanmelding mislukt vanwege mislukte botvalidatie. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'De ingevoerde code is incorrect.',
     form_email_address_blocked:
       'Tijdelijke e-maildiensten worden niet ondersteund. Gebruik uw normale e-mailadres om een account aan te maken.',
@@ -2186,10 +2187,12 @@ export const nlBE: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Je bent al ingelogd.',
+    signup_rate_limit_exceeded: undefined,
     something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:
@@ -2361,7 +2364,7 @@ export const nlBE: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Een mail met daarin een verificatiecode is verstuurd naar dit adres.',
+        formHint: 'Een mail met daarin een verificatiecode zal worden verstuurd naar dit adres.',
         formSubtitle: 'Voer de verificatiecode in die verstuurd is naar {{identifier}}',
         formTitle: 'Verificatiecode',
         resendButton: 'Verstuur code opnieuw',
@@ -2470,7 +2473,7 @@ export const nlBE: LocalizationResource = {
       title__update: 'Wachtwoord wijzigen',
     },
     phoneNumberPage: {
-      infoText: 'Een SMS met daarin een verificatiecode is verstuurd naar dit nummer.',
+      infoText: 'Een SMS met daarin een verificatiecode zal worden verstuurd naar dit nummer.',
       removeResource: {
         messageLine1: '{{identifier}} zal van dit account verwijderd worden.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit telefoonnummer.',

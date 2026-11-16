@@ -152,15 +152,19 @@ element. The parts (and the `useTagInput` hook) throw if used outside `TagInput.
 
 ### `TagInput.Root`
 
-| Prop            | Type                         | Default | Description                                                                   |
-| --------------- | ---------------------------- | ------- | ----------------------------------------------------------------------------- |
-| `value`         | `string[]`                   | —       | Controlled values                                                             |
-| `defaultValue`  | `string[]`                   | `[]`    | Initial values (uncontrolled)                                                 |
-| `onValueChange` | `(value: string[]) => void`  | —       | Called with the full list on every change                                     |
-| `validate`      | `(value: string) => boolean` | —       | Tags returning `false` stay in the list with `data-invalid`                   |
-| `delimiters`    | `string[]`                   | `[',']` | Characters that commit the typed text; paste also splits on newlines and tabs |
-| `name`          | `string`                     | —       | Submit each value via a hidden input under this name                          |
-| `disabled`      | `boolean`                    | `false` | Disable the input, removal, and the hidden inputs                             |
+| Prop                    | Type                           | Default | Description                                                                   |
+| ----------------------- | ------------------------------ | ------- | ----------------------------------------------------------------------------- |
+| `value`                 | `string[]`                     | —       | Controlled values                                                             |
+| `defaultValue`          | `string[]`                     | `[]`    | Initial values (uncontrolled)                                                 |
+| `onValueChange`         | `(value: string[]) => void`    | —       | Called with the full list on every change                                     |
+| `inputValue`            | `string`                       | —       | Controlled text not yet added as a tag                                        |
+| `defaultInputValue`     | `string`                       | `''`    | Initial text (uncontrolled)                                                   |
+| `onInputValueChange`    | `(inputValue: string) => void` | —       | Called with the text not yet added as a tag on every change                   |
+| `validate`              | `(value: string) => boolean`   | —       | Tags returning `false` stay in the list with `data-invalid`                   |
+| `delimiters`            | `string[]`                     | `[',']` | Characters that commit the typed text; paste also splits on newlines and tabs |
+| `name`                  | `string`                       | —       | Submit each value via a hidden input under this name                          |
+| `disabled`              | `boolean`                      | `false` | Disable the input, removal, and the hidden inputs                             |
+| `focusableWhenDisabled` | `boolean`                      | `false` | Keep the disabled input focusable, as read-only with `aria-disabled`          |
 
 ### `TagInput.Tag`
 

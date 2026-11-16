@@ -14,14 +14,14 @@ export function UserProfileMfaRowView({
   triggerRef,
   onRemove,
   onSetDefault,
-  onRegenerateBackupCodes,
-}: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes'> & {
+  regenerate,
+}: Pick<UserProfileMfaSectionViewProps, 'regenerate'> & {
   method: UserProfileMfaMethod;
   triggerRef?: Ref<HTMLButtonElement>;
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
 }) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const label = method.label ?? m.methods[method.type];
   const description =
     method.type === 'sms' && method.description ? stringToFormattedPhoneString(method.description) : method.description;
@@ -36,8 +36,8 @@ export function UserProfileMfaRowView({
   }
 
   if (method.type === 'backup-codes') {
-    if (onRegenerateBackupCodes) {
-      actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes });
+    if (regenerate) {
+      actions.push({ label: m.regenerate, onClick: regenerate.onClick, status: regenerate.status });
     }
   } else if (onRemove && method.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: onRemove });

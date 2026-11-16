@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
@@ -18,8 +18,6 @@ import { UserProfileSecurityPanel } from '../user-profile-security-panel';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
 const alice = fapiUser({ id: 'user_1', email_addresses: [email] });
-
-afterEach(() => vi.restoreAllMocks());
 
 describe('UserProfileSecurityPanel', () => {
   function sectionHeadings() {

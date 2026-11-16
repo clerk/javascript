@@ -128,10 +128,8 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
           <Field.Label>{m.expirationLabel}</Field.Label>
           <Select.Root
             items={expirationValues.map(value => ({ value, label: m.expirationOptions[value] }))}
-            value={expiration ?? undefined}
-            onValueChange={value =>
-              form.setValue('expiration', expirationValues.find(option => option === value) ?? null)
-            }
+            value={expiration}
+            onValueChange={value => form.setValue('expiration', value)}
           >
             <Select.Trigger placeholder={m.expirationPlaceholder} />
             <Select.Popup />
@@ -163,7 +161,6 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
       <Card.Footer>
         <SubmitButton
           form={form.id}
-          fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled
@@ -223,12 +220,7 @@ function CopyKeyStep(props: CreateAPIKeyDialogProps) {
         </Field.Root>
       </Card.Content>
       <Card.Footer>
-        <SubmitButton
-          form={formId}
-          fullWidth
-        >
-          {m.copyAndClose}
-        </SubmitButton>
+        <SubmitButton form={formId}>{m.copyAndClose}</SubmitButton>
       </Card.Footer>
     </>
   );

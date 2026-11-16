@@ -48,7 +48,7 @@ export function UserProfilePasskeysSectionView({
   addReverification,
   addFinalFocus,
 }: UserProfilePasskeysSectionViewProps) {
-  const m = useMessages('userProfilePasskeys');
+  const m = useMessages('userProfile').passkeys;
 
   return (
     <>
@@ -82,7 +82,7 @@ export function UserProfilePasskeysSectionView({
                   <Icon
                     glyph={Plus}
                     placement='inline-start'
-                    size='sm'
+                    size='md'
                   />
                   {m.add}
                 </Button>

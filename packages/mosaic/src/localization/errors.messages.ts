@@ -17,7 +17,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_param_format_invalid__email_address: 'Email address must be a valid email address.',
   form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
   form_param_value_invalid__role: 'This role cannot be assigned here.',
-  form_password_incorrect: 'Your current password is incorrect.',
+  form_password_incorrect: 'Password is incorrect.',
+  form_password_incorrect__current_password: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
   form_password_matches_identifier:
     'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
@@ -54,6 +55,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   not_a_member_in_organization: 'You are no longer a member of this organization.',
   not_allowed_access: 'Some of these email addresses are not allowed to access this application.',
   oauth_access_denied: 'You did not grant access to your account.',
+  oauth_consent_missing_client_id: 'The client ID is missing.',
+  oauth_consent_missing_redirect_uri: 'The redirect URI is missing.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
   organization_changed: 'The active organization changed. Please try again.',
   organization_invitation_not_unique: 'An invitation is already pending for this email address.',

@@ -244,6 +244,71 @@ describe('request', () => {
     expect(resp.payload).toEqual(null);
   });
 
+  it('returns a null payload and runs the after response callbacks on an empty successful body it allows', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    const afterResponse = vi.fn();
+    client.onAfterResponse(afterResponse);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 200,
+        ok: true,
+        headers: { get: () => null },
+        text: () => Promise.resolve(''),
+        json: () => Promise.reject(new SyntaxError('Unexpected end of JSON input')),
+      }),
+    );
+
+    const resp = await client.request({ path: '/' }, { allowEmptyBody: true });
+
+    expect(resp.status).toBe(200);
+    expect(resp.payload).toEqual(null);
+    expect(afterResponse).toHaveBeenCalledTimes(1);
+  });
+
+  it('parses a non-empty body when it allows an empty one', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 200,
+        ok: true,
+        headers: { get: () => null },
+        text: () => Promise.resolve('{"response":{"foo":42}}'),
+      }),
+    );
+
+    const resp = await client.request({ path: '/' }, { allowEmptyBody: true });
+
+    expect(resp.payload).toEqual({ response: { foo: 42 } });
+  });
+
+  it('rejects a malformed non-empty body when it allows an empty one', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 200,
+        ok: true,
+        headers: { get: () => null },
+        text: () => Promise.resolve('<html>'),
+      }),
+    );
+
+    await expect(client.request({ path: '/' }, { allowEmptyBody: true })).rejects.toBeInstanceOf(SyntaxError);
+  });
+
+  it('rejects an empty successful body unless the request allows it', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 200,
+        ok: true,
+        headers: { get: (name: string) => (name.toLowerCase() === 'content-length' ? '0' : null) },
+        json: () => Promise.reject(new SyntaxError('Unexpected end of JSON input')),
+      }),
+    );
+
+    await expect(client.request({ path: '/client' })).rejects.toBeInstanceOf(SyntaxError);
+  });
+
   it('returns a null payload and skips the after response callbacks on a non-JSON 5xx response', async () => {
     const client = createFapiClient(baseFapiClientOptions);
     const afterResponse = vi.fn();

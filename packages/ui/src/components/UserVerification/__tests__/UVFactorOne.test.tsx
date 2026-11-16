@@ -517,13 +517,13 @@ describe('UserVerificationFactorOne', () => {
 
       await userEvent.click(screen.getByText('Reset your password'));
       await setNewPassword(userEvent, 'a-much-better-password-123');
-      await screen.findByText('too_many_requests');
+      await screen.findByText('Too many requests. Please try again in a bit.');
 
       await userEvent.click(screen.getByRole('button', { name: 'Back' }));
       await screen.findByText('Set new password');
       await userEvent.click(screen.getByText('Back'));
       await screen.findByText('Reset your password');
-      expect(screen.queryByText('too_many_requests')).not.toBeInTheDocument();
+      expect(screen.queryByText('Too many requests. Please try again in a bit.')).not.toBeInTheDocument();
     });
 
     it("keeps the change password form's sign-out choice when its new password is rejected", async () => {

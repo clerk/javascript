@@ -2124,6 +2124,7 @@ export const csCZ: LocalizationResource = {
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:
       'Registrace nebyla úspěšná kvůli neúspěšné validaci bota. Prosím obnovte stránku a zkuste to znovu, nebo se obraťte na podporu pro další pomoc.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Kód je nesprávný.',
     form_email_address_blocked:
       'Dočasné e-mailové služby nejsou podporovány. Pro vytvoření účtu použijte prosím svou běžnou e-mailovou adresu.',
@@ -2197,10 +2198,12 @@ export const csCZ: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Jste již přihlášen.',
+    signup_rate_limit_exceeded: undefined,
     something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
     web3_signature_request_rejected: 'Odmítli jste žádost o podpis. Chcete-li pokračovat, zkuste to prosím znovu.',

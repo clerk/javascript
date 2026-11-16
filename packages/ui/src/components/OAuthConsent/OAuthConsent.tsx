@@ -1,3 +1,4 @@
+import { getRedirectDisplay } from '@clerk/shared/internal/clerk-js/oauthConsent';
 import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
@@ -24,7 +25,7 @@ import {
 } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
-import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
+import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 const PRIVATE_METADATA_SCOPE = 'private_metadata';

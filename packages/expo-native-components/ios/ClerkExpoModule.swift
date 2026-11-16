@@ -52,6 +52,13 @@ public class ClerkExpoModule: Module {
       }
     }
 
+    AsyncFunction("setUpdateRequiredViewEnabled") { (enabled: Bool, promise: Promise) in
+      Task { @MainActor in
+        ClerkNativeBridge.setUpdateRequiredViewEnabled(enabled)
+        promise.resolve()
+      }
+    }
+
     AsyncFunction("getDeviceToken") { (promise: Promise) in
       Task { @MainActor in
         promise.resolve(ClerkNativeBridge.shared.getDeviceToken())

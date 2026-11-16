@@ -1,6 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { durationVars, easingVars } from '../../tokens.stylex';
+import { durationVars, easingVars, focusVars } from '../../tokens.stylex';
+
+const ringRoom = `calc(${focusVars['--cl-focus-outline-width']} + ${focusVars['--cl-focus-outline-offset']})`;
 
 export const reveal = stylex.create({
   root: {
@@ -20,11 +22,14 @@ export const reveal = stylex.create({
     },
   },
   clip: {
-    overflow: 'clip',
     alignContent: 'end',
     display: 'grid',
     gridRowEnd: 'span 2',
     gridRowStart: '1',
+    marginBlockEnd: `calc(${ringRoom} * -1)`,
+    paddingBlockEnd: ringRoom,
     minHeight: 0,
+    overflowX: 'visible',
+    overflowY: 'clip',
   },
 });

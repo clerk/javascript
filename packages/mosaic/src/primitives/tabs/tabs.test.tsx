@@ -4,6 +4,7 @@ import { createRef, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { axe } from '../test-utils/axe';
 import { Tabs } from './index';
 
@@ -28,6 +29,42 @@ function renderTabs(props: Partial<React.ComponentProps<typeof Tabs.Root>> = {})
 }
 
 describe('Tabs', () => {
+  describe('item registration', () => {
+    it('leaves a standalone trigger inside the list out of keyboard navigation', async () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Trigger value='tab2'>Settings</Tabs.Trigger>
+            <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      screen.getByRole('tab', { name: 'Account' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(screen.getByRole('tab', { name: 'Billing' })).toHaveFocus();
+    });
+
+    it('keeps a tab in keyboard navigation when its role is overridden', async () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab
+              value='tab2'
+              role='button'
+            >
+              Settings
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      screen.getByRole('tab', { name: 'Account' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(screen.getByRole('button', { name: 'Settings' })).toHaveFocus();
+    });
+  });
+
   describe('ARIA attributes', () => {
     it('list has role=tablist', () => {
       renderTabs();
@@ -209,7 +246,7 @@ describe('Tabs', () => {
     it('follows the visual order of arrow keys in RTL', async () => {
       const user = userEvent.setup();
       render(
-        <div dir='rtl'>
+        <DirectionProvider direction='rtl'>
           <Tabs.Root defaultValue='tab2'>
             <Tabs.List>
               <Tabs.Tab value='tab1'>Account</Tabs.Tab>
@@ -220,7 +257,7 @@ describe('Tabs', () => {
             <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
             <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
           </Tabs.Root>
-        </div>,
+        </DirectionProvider>,
       );
 
       await user.click(screen.getByText('Settings'));
@@ -229,6 +266,28 @@ describe('Tabs', () => {
 
       await user.keyboard('{ArrowRight}');
       expect(document.activeElement).toBe(screen.getByText('Settings'));
+    });
+
+    it('follows a direction change while a tab has focus', async () => {
+      const user = userEvent.setup();
+      const tabs = (direction: 'ltr' | 'rtl') => (
+        <DirectionProvider direction={direction}>
+          <Tabs.Root defaultValue='tab2'>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.Root>
+        </DirectionProvider>
+      );
+      const { rerender } = render(tabs('ltr'));
+
+      await user.click(screen.getByText('Settings'));
+      rerender(tabs('rtl'));
+      await user.keyboard('{ArrowLeft}');
+
+      expect(document.activeElement).toBe(screen.getByText('Billing'));
     });
 
     it('uses ArrowDown/ArrowUp for vertical orientation', async () => {
@@ -518,6 +577,12 @@ describe('Tabs', () => {
       expect(screen.getByText('Billing')).toHaveAttribute('tabindex', '-1');
     });
 
+    it('puts the tab stop on a selected tab that is not first', () => {
+      renderTabs({ defaultValue: 'tab2' });
+      expect(screen.getByText('Settings')).toHaveAttribute('tabindex', '0');
+      expect(screen.getByText('Account')).toHaveAttribute('tabindex', '-1');
+    });
+
     it('tabIndex updates when selection changes', async () => {
       const user = userEvent.setup();
       renderTabs();
@@ -774,6 +839,66 @@ describe('Tabs', () => {
       // Re-selecting the already-active tab must not flip direction to -1.
       await user.click(screen.getByRole('tab', { name: 'Two' }));
       expect(panel.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
+    });
+  });
+
+  it('forwards a ref to the list', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Tabs.Root defaultValue='tab1'>
+        <Tabs.List ref={ref}>
+          <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('tablist'));
+  });
+
+  describe('consumer key handlers', () => {
+    function HandlerTabs({ onTab, onParent }: { onTab?: (key: string) => void; onParent?: (key: string) => void }) {
+      return (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- Test host; the keys come from the focusable items inside it.
+        <div onKeyDown={event => onParent?.(event.key)}>
+          <Tabs.Root defaultValue='a'>
+            <Tabs.List>
+              <Tabs.Tab
+                value='a'
+                onKeyDown={event => onTab?.(event.key)}
+              >
+                A
+              </Tabs.Tab>
+              <Tabs.Tab value='b'>B</Tabs.Tab>
+              <Tabs.Tab value='c'>C</Tabs.Tab>
+            </Tabs.List>
+          </Tabs.Root>
+        </div>
+      );
+    }
+
+    it('calls a tab onKeyDown for navigation keys', async () => {
+      const onTab = vi.fn();
+      render(<HandlerTabs onTab={onTab} />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(onTab).toHaveBeenCalledWith('ArrowRight');
+      expect(screen.getByRole('tab', { name: 'B' })).toHaveFocus();
+    });
+
+    it('stops arrows at the list but lets End reach a parent', async () => {
+      const onParent = vi.fn();
+      render(<HandlerTabs onParent={onParent} />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(onParent).not.toHaveBeenCalled();
+      await userEvent.keyboard('{End}');
+      expect(onParent).toHaveBeenCalledWith('End');
+    });
+
+    it.each(['{Shift>}', '{Control>}', '{Meta>}', '{Alt>}'])('moves with %s held', async modifier => {
+      render(<HandlerTabs />);
+      screen.getByRole('tab', { name: 'A' }).focus();
+      await userEvent.keyboard(`${modifier}{ArrowRight}`);
+      expect(screen.getByRole('tab', { name: 'B' })).toHaveFocus();
     });
   });
 });

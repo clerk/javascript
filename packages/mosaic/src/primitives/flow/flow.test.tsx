@@ -224,9 +224,7 @@ describe('Flow', () => {
   });
 
   it('publishes the entering step height without enabling initial animation', () => {
-    const offsetHeight = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (
-      this: HTMLElement,
-    ) {
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
       return this.dataset.testid === 'password-step' ? 120 : 240;
     });
     const { rerender } = render(<TestFlow value='password' />);
@@ -250,7 +248,6 @@ describe('Flow', () => {
     rerender(<TestFlow value='password' />);
 
     expect(root).toHaveAttribute('data-height-change', 'shrink');
-    offsetHeight.mockRestore();
   });
   describe('data-transitioning', () => {
     function deferred() {
@@ -351,7 +348,6 @@ describe('Flow', () => {
 
       expect(screen.getByTestId('otp-input')).toHaveFocus();
       expect(focus).toHaveBeenCalledWith({ preventScroll: true });
-      focus.mockRestore();
     });
 
     it('leaves focus alone when it is outside the flow', () => {

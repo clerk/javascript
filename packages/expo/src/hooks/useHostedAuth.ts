@@ -5,6 +5,7 @@ import type * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
+import { getExpoAppIdentifier } from '../utils/appIdentifier';
 import { errorThrower } from '../utils/errors';
 import type { HostedAuthClerkInstance, HostedAuthMode } from '../utils/hostedAuth';
 import { applyHostedAuthClientJSON, createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
@@ -233,33 +234,6 @@ function warnAndroidDefaultRedirectOnce(): void {
         'native project has not been rebuilt since (e.g. `npx expo prebuild`), the browser cannot redirect ' +
         'back to the app and hosted auth will hang. Alternatively, pass a custom `redirectUrl` handled by the app.',
     );
-  }
-}
-
-function getExpoAppIdentifier(): string | undefined {
-  try {
-    // expo-constants is already an optional @clerk/expo peer and is present in
-    // standard Expo projects. Keep the fallback below for Expo Go and bare apps.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const constantsModule = require('expo-constants') as {
-      default?: {
-        appOwnership?: string | null;
-        executionEnvironment?: string;
-        expoConfig?: {
-          ios?: { bundleIdentifier?: string };
-          android?: { package?: string };
-        };
-      };
-    };
-    const constants = constantsModule.default;
-    if (constants?.executionEnvironment === 'storeClient' || constants?.appOwnership === 'expo') {
-      return undefined;
-    }
-
-    const expoConfig = constants?.expoConfig;
-    return Platform.OS === 'ios' ? expoConfig?.ios?.bundleIdentifier : expoConfig?.android?.package;
-  } catch {
-    return undefined;
   }
 }
 

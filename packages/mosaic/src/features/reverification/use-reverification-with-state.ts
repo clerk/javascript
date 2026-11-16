@@ -117,6 +117,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
     },
   });
 
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The wrapper preserves the generic return type of useReverification.
   const singleFlight = useCallback(
     (...args: Parameters<F>) => {
       // Only a single handler call is allowed to be in progress at the same time
@@ -146,6 +147,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
 
   const phase = reverificationState.phase;
   useEffect(() => {
+    // eslint-disable-next-line react-you-might-not-need-an-effect/no-event-handler -- Reacts to the Clerk session changing, which happens outside any event handler here.
     if (phase !== 'active') {
       return;
     }

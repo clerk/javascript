@@ -32,7 +32,7 @@ export function IconTrigger(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       mode='organization'
-      renderTriggerLabel={false}
+      showTriggerLabel={false}
     />
   );
 }

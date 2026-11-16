@@ -74,10 +74,11 @@ describe('mergeProps', () => {
     { key: 'style', value: { color: 'red' }, empty: null },
   ])('keeps the first argument $key when the second passes $empty', ({ key, value, empty }) => {
     const result = mergeProps<'button'>({ [key]: value }, { [key]: empty });
-    expect(result[key]).toBe(value);
+    expect(result).toHaveProperty(key, value);
   });
 
   it('lets the second argument clear an event handler with null', () => {
+    // @ts-expect-error -- Props don't type a handler as null; this pins the runtime behavior
     const result = mergeProps<'button'>({ onClick: () => {} }, { onClick: null });
     expect(result.onClick).toBeNull();
   });

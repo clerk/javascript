@@ -40,8 +40,9 @@ import type {
  */
 export function setup<TContext extends object, TEvent extends EventObject>() {
   return {
-    createMachine: (config: MachineConfig<TContext, TEvent>): StateMachine<TContext, TEvent> =>
-      _createMachine<TContext, TEvent>(config),
+    createMachine: <TStates extends string>(
+      config: MachineConfig<TContext, TEvent, TStates>,
+    ): StateMachine<TContext, TEvent, TStates> => _createMachine<TContext, TEvent, TStates>(config),
 
     assign: <TEvt extends EventObject = EventObject>(
       fn: (context: TContext, event: TEvt) => Partial<TContext>,
@@ -66,20 +67,28 @@ export function setup<TContext extends object, TEvent extends EventObject>() {
      * }
      * ```
      *
-     * A raw `src` function (without `fromPromise`) still works — `e.output` is `any`.
+     * A raw `src` function (without `fromPromise`) still type-checks with `e.output: any`, so
+     * `mosaic/no-raw-invoke` rejects it outside tests.
      */
-    fromPromise: <TOutput, TStates extends string = string>(
+    fromPromise: <TOutput, const TDone extends string = never, const TError extends string = never>(
       fn: (context: TContext) => Promise<TOutput>,
       config?: {
-        onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
-        onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
+        onDone?: InferredTransition<TContext, DoneInvokeEvent<TOutput>, TDone>;
+        onError?: InferredTransition<TContext, ErrorInvokeEvent, TError>;
       },
-    ): InvokeConfig<TContext, TEvent, TOutput, TStates> => ({
+    ) =>
       // SAFETY: fn only uses context (no event param), but InvokeConfig.src accepts
       // (context, event) for parity with state-entry event access. The extra event
-      // parameter is unused; callers receive only context at runtime.
-      src: fn as unknown as InvokeConfig<TContext, TEvent, TOutput, TStates>['src'],
-      ...config,
-    }),
+      // parameter is unused; callers receive only context at runtime. The config's
+      // inference slots are all forms of Transition.
+      // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
+      ({ src: fn, ...config }) as unknown as InvokeConfig<TContext, TEvent, TOutput, TDone | TError>,
   };
 }
+
+type InferredTransition<TContext, TEvent extends EventObject, TStates extends string> =
+  | `${TStates}`
+  | { target: TStates }
+  | { target: TStates }[]
+  | ((args: { context: TContext; event: TEvent }) => { target?: TStates; context?: Partial<TContext> } | undefined)
+  | Transition<TContext, TEvent, TStates>;

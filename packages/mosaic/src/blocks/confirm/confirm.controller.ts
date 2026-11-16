@@ -14,6 +14,7 @@ import { toLocalizableError } from '../../utils/errors';
 export interface ConfirmContext {
   run: () => Promise<void>;
   error: ErrorDescription | undefined;
+  open: boolean;
 }
 
 export type ConfirmEvent = { type: 'OPEN' } | { type: 'CONFIRM'; run: () => Promise<void> } | { type: 'CANCEL' };
@@ -30,29 +31,32 @@ export const confirmMachine = createMachine({
   context: {
     run: notSeated,
     error: undefined,
+    open: false,
   },
   states: {
     idle: {
       on: {
-        OPEN: { target: 'confirming', actions: assign(() => ({ error: undefined })) },
+        OPEN: { target: 'confirming', actions: assign(() => ({ error: undefined, open: true })) },
       },
     },
     confirming: {
       on: {
         CONFIRM: { target: 'pending', actions: assign((_, event) => ({ run: event.run, error: undefined })) },
-        CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
+        CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined, open: false })) },
       },
     },
     pending: {
       on: {
-        CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
+        CANCEL: { actions: assign(() => ({ open: false })) },
       },
       invoke: fromPromise(context => context.run(), {
-        onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
+        onDone: { target: 'idle', actions: assign(() => ({ error: undefined, open: false })) },
         onError: [
           {
-            guard: (_: ConfirmContext, event: ErrorInvokeEvent) => isReverificationCancelledError(event.error),
+            guard: (context: ConfirmContext, event: ErrorInvokeEvent) =>
+              !context.open || isReverificationCancelledError(event.error),
             target: 'idle',
+            actions: assign(() => ({ open: false })),
           },
           {
             target: 'confirming',
@@ -117,7 +121,7 @@ export function useConfirmController<Payload = void>({
 
   return {
     handle,
-    isOpen: snapshot.value !== 'idle',
+    isOpen: snapshot.value !== 'idle' && snapshot.context.open,
     isPending,
     canClose,
     errorMessage: error ? errorText(error, errorFallback) : undefined,

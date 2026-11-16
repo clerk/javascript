@@ -28,7 +28,7 @@ export function OrganizationProfileEditNameDialog({
   trigger,
   form,
 }: OrganizationProfileEditNameDialogProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const inputRef = useRef<HTMLInputElement>(null);
   const { feedback } = form.fields.name;
   const { ref, ...control } = form.register('name');
@@ -67,6 +67,7 @@ export function OrganizationProfileEditNameDialog({
           >
             <Field.Root
               disabled={form.isSubmitting}
+              focusableWhenDisabled
               invalid={feedback?.type === 'error'}
             >
               <Field.Label visuallyHidden>{m.name.fieldLabel}</Field.Label>
@@ -83,7 +84,6 @@ export function OrganizationProfileEditNameDialog({
                 <Button
                   variant='outline'
                   color='neutral'
-                  fullWidth
                 />
               }
             >
@@ -91,7 +91,6 @@ export function OrganizationProfileEditNameDialog({
             </Dialog.Close>
             <SubmitButton
               form={form.id}
-              fullWidth
               isPending={form.isSubmitting}
               disabled={!form.canSubmit}
               focusableWhenDisabled

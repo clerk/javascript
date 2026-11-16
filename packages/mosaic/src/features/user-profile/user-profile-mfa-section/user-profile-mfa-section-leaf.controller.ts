@@ -14,7 +14,7 @@ export function useUserProfileMfaSectionLeafController({
   onSetDefault,
   removeReverification,
 }: UserProfileMfaSectionViewProps) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const sectionRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: methods.map(method => method.id),

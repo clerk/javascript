@@ -12,7 +12,7 @@ export function useInvitationsTableController(
 ): InvitationsTableTabViewProps {
   const locale = useLocale();
   const roleNames = useMessages('roles');
-  const m = useMessages('invitationsTableTab');
+  const m = useMessages('organizationProfile').members.invitations;
   const invitations = model.rows.map(({ id, emailAddress, createdAt, role, roleName }) => ({
     id,
     email: emailAddress,

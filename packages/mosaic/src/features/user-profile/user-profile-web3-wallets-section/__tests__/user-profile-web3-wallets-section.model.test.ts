@@ -88,17 +88,18 @@ describe('Web3 wallet projection', () => {
     });
   });
 
-  it('does not offer Verify when wallet changes are disabled', () => {
+  it.each([
+    ['wallet changes are disabled', 'unverified', ['web3_metamask_signature'], false],
+    ['the wallet is already verified', 'verified', ['web3_metamask_signature'], true],
+    ['the instance turned the provider off', 'unverified', ['web3_coinbase_wallet_signature'], true],
+  ] as const)('does not offer Verify when %s', (_, status, enabledStrategies, allowCreation) => {
     const result = projectWeb3Wallets({
-      wallets: [{ ...metamask, verification: { ...metamask.verification, status: 'unverified' } }],
+      wallets: [{ ...metamask, verification: { ...metamask.verification, status } }],
       primaryId: null,
-      enabledStrategies: ['web3_metamask_signature'],
-      allowCreation: false,
+      enabledStrategies,
+      allowCreation,
     });
-    expect(result).toMatchObject({
-      wallets: [{ id: 'wallet_metamask', canVerify: false }],
-      availableProviders: [],
-    });
+    expect(result).toMatchObject({ wallets: [{ id: 'wallet_metamask', canVerify: false }] });
   });
 
   it('WEB3-03 shows admin wallets without a provider and filters unknown strategies', () => {

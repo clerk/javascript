@@ -185,7 +185,7 @@ describe('enterprise accounts', () => {
     );
   });
 
-  it('preserves modal return state in the redirect URL', async () => {
+  it('returns to the profile modal after connecting', async () => {
     serveFapi(signedIn());
     await renderWithClerk(
       <UserProfileProvider mode='modal'>
@@ -197,9 +197,27 @@ describe('enterprise accounts', () => {
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     const body = new URLSearchParams(await request.requests[0]?.text());
-    const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
-    expect(encoded).toBeTruthy();
-    expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({ componentName: 'UserProfile' });
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.has('__clerk_modal_state')).toBe(false);
+    request.fail();
+  });
+
+  it('returns to the page without modal state when connecting from a mounted profile', async () => {
+    serveFapi(signedIn());
+    await renderWithClerk(
+      <UserProfileProvider mode='mounted'>
+        <UserProfileEnterpriseAccountsSection />
+      </UserProfileProvider>,
+    );
+    const request = holdRequests('post', '/v1/me/external_accounts');
+
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
+    await waitFor(() => expect(request.requests).toHaveLength(1));
+    const body = new URLSearchParams(await request.requests[0]?.text());
+    const params = new URL(body.get('redirect_url') || '').searchParams;
+    expect(params.has('__clerk_mosaic_modal')).toBe(false);
+    expect(params.has('__clerk_modal_state')).toBe(false);
     request.fail();
   });
 
@@ -225,7 +243,7 @@ describe('enterprise accounts', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
     );
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument());
     serveFapi(signedIn());
     await user.click(screen.getByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() =>
@@ -354,6 +372,20 @@ describe('enterprise accounts', () => {
     retry.fail();
   });
 
+  it('clears the previous connection error when another connection starts', async () => {
+    await renderSection();
+    const user = userEvent.setup();
+    const request = holdRequests('post', '/v1/me/external_accounts');
+    await user.click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
+    request.fail('enterprise_error', 'Acme is unavailable.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Acme is unavailable.'));
+    const other = holdRequests('post', '/v1/me/external_accounts');
+    await user.click(screen.getByRole('button', { name: 'Connect Custom SAML' }));
+    await waitFor(() => expect(other.requests).toHaveLength(1));
+    expect(screen.queryByText('Acme is unavailable.')).toBeNull();
+    other.fail();
+  });
+
   it('releases pending after the redirect grace period', async () => {
     const { clerk } = await renderSection();
     const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
@@ -361,7 +393,7 @@ describe('enterprise accounts', () => {
     await userEvent.setup().click(connect);
     await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
     expect(connect).toHaveAttribute('aria-busy', 'true');
-    await waitFor(() => expect(connect).not.toHaveAttribute('aria-busy', 'true'), { timeout: 2500 });
+    await waitFor(() => expect(connect).not.toHaveAttribute('aria-busy', 'true'));
     expect(connect).toBeEnabled();
   });
 
@@ -402,7 +434,7 @@ describe('enterprise accounts', () => {
           locale: 'fr-FR',
           overrides: {
             'errors.generic': 'Erreur globale.',
-            'userProfileEnterpriseAccountsSection.errors.generic': 'La connexion a échoué. Réessayez.',
+            'userProfile.enterpriseAccounts.errors.generic': 'La connexion a échoué. Réessayez.',
           },
         }}
       >

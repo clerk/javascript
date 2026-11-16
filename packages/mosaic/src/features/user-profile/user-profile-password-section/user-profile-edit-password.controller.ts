@@ -43,7 +43,7 @@ export function useUserProfileEditPasswordController({
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
   const requiresCurrentPassword = policy.requiresCurrentPassword;
   const validationError = useMessages('errors').generic;
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm({
@@ -59,12 +59,13 @@ export function useUserProfileEditPasswordController({
       values.newPassword !== '' &&
       values.confirmPassword === values.newPassword &&
       (!requiresCurrentPassword || values.currentPassword !== ''),
-    onSubmit: async values => {
-      await onSubmit({
+    onSubmit: values =>
+      onSubmit({
         currentPassword: requiresCurrentPassword ? values.currentPassword : undefined,
         newPassword: values.newPassword,
         signOutOfOtherSessions: values.signOutOfOtherSessions,
-      });
+      }),
+    onSuccess: () => {
       // TODO: Discuss confirming the password was set or updated and other devices were signed out with a success page or toast. https://github.com/clerk/javascript/pull/9930#discussion_r4151641473
       setIsOpen(false);
     },

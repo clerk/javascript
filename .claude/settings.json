@@ -17,11 +17,11 @@
       "Edit(./**/*.key)",
       "Edit(./**/.keys.json)",
       "Bash(cat .env:*)",
-      "Bash(cat **/credentials.json:*)",
-      "Bash(cat **/*.pem:*)",
-      "Bash(cat **/*.key:*)",
-      "Bash(cat secrets/**:*)",
-      "Bash(cat **/.keys.json:*)"
+      "Bash(cat *credentials.json*)",
+      "Bash(cat *.pem*)",
+      "Bash(cat *.key*)",
+      "Bash(cat secrets/**)",
+      "Bash(cat *.keys.json*)"
     ]
   },
   "hooks": {
@@ -40,12 +40,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$(git rev-parse --show-toplevel)/packages/mosaic\" && { git diff --name-only --relative --diff-filter=d HEAD -- src; git ls-files --others --exclude-standard -- src; } | grep -E '\\.tsx?$' | xargs -r pnpm exec eslint --quiet --no-warn-ignored >&2 || exit 2",
+            "command": "cd \"$(git rev-parse --show-toplevel)/packages/mosaic\" || exit 2; files=\"$(git diff --name-only --diff-filter=d HEAD -- ':(glob)src/**/*.ts' ':(glob)src/**/*.tsx' && git ls-files --others --exclude-standard -- ':(glob)src/**/*.ts' ':(glob)src/**/*.tsx')\" || exit 2; if [ -n \"$files\" ]; then pnpm lint >&2 || exit 2; fi",
             "timeout": 180
           },
           {
             "type": "command",
-            "command": "cd \"$(git rev-parse --show-toplevel)\" && { git diff --name-only --diff-filter=d HEAD -- packages/swingset/src; git ls-files --others --exclude-standard -- packages/swingset/src; } | grep -E '\\.tsx?$' | xargs -r pnpm exec eslint --quiet --no-warn-ignored --rule 'import/no-unresolved: off' >&2 || exit 2",
+            "command": "cd \"$(git rev-parse --show-toplevel)/packages/swingset\" || exit 2; files=\"$(git diff --name-only --diff-filter=d HEAD -- ':(glob)src/**/*.ts' ':(glob)src/**/*.tsx' && git ls-files --others --exclude-standard -- ':(glob)src/**/*.ts' ':(glob)src/**/*.tsx')\" || exit 2; if [ -n \"$files\" ]; then pnpm lint >&2 || exit 2; fi",
             "timeout": 180
           }
         ]

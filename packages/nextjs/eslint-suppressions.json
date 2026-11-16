@@ -1,0 +1,7 @@
+{
+  "src/client-boundary/hooks/usePathnameWithoutCatchAll.tsx": {
+    "react-hooks/refs": {
+      "count": 8
+    }
+  }
+}

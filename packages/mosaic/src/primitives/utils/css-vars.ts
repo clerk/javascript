@@ -31,7 +31,7 @@ export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
       const side = parsePlacement(placement).side;
 
       // A middleware that already capped the popup (select alignment) owns the height.
-      const alignedHeight = cappedHeight(middlewareData.alignSelectedItem);
+      const alignedHeight = cappedHeight(middlewareData['alignSelectedItem']);
       const availableHeight =
         alignedHeight !== undefined
           ? alignedHeight

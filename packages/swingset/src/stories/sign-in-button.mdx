@@ -1,0 +1,69 @@
+import * as SignInButtonStories from './sign-in-button.stories';
+
+# SignInButton
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={SignInButtonStories}
+/>
+
+## Usage
+
+```tsx
+import { SignInButton } from '@clerk/mosaic/features/sign-in-button/sign-in-button';
+
+<SignInButton />;
+```
+
+## Props
+
+| Prop                        | Type                              | Default      | Description                                                                        |
+| --------------------------- | --------------------------------- | ------------ | ---------------------------------------------------------------------------------- |
+| `mode`                      | `'redirect' \| 'modal'`           | `'redirect'` | Navigates to the sign-in page, or opens sign-in in a modal.                        |
+| `forceRedirectUrl`          | `string`                          | —            | Where to go after signing in, always.                                              |
+| `fallbackRedirectUrl`       | `string`                          | —            | Where to go after signing in when the URL has no `redirect_url`.                   |
+| `signUpForceRedirectUrl`    | `string`                          | —            | Where to go after signing up from sign-in, always.                                 |
+| `signUpFallbackRedirectUrl` | `string`                          | —            | Where to go after signing up from sign-in when the URL has no `redirect_url`.      |
+| `initialValues`             | `SignInInitialValues`             | —            | Prefills the sign-in form.                                                         |
+| `withSignUp`                | `boolean`                         | —            | In a modal, signs up users who have no account instead of sending them to sign-up. |
+| `oauthFlow`                 | `'auto' \| 'redirect' \| 'popup'` | `'auto'`     | In a modal, whether OAuth sign-in redirects or opens a popup.                      |
+| `render`                    | `ReactElement \| func`            | —            | The element to render. The button's props are merged into it.                      |
+| `children`                  | `ReactNode`                       | `'Sign in'`  | The button's content. The default label is localized as `signInButton.label`.      |
+| `nativeButton`              | `boolean`                         | `true`       | Set to `false` when `render` is not a `<button>`, to apply button semantics.       |
+| `onClick`                   | `MouseEventHandler`               | —            | Runs alongside starting sign-in.                                                   |
+| `fallback`                  | `ReactNode`                       | —            | Rendered while Clerk loads.                                                        |
+
+Other `<button>` attributes pass through to the rendered element.
+
+## Your own element
+
+<Story
+  name='CustomElement'
+  storyModule={SignInButtonStories}
+/>
+
+## Pending
+
+The button is disabled while the redirect runs.
+
+<Story
+  name='Pending'
+  storyModule={SignInButtonStories}
+/>
+
+## Styling
+
+The button emits no class. Style it with your own `className`, or through the element you pass to
+`render`.
+
+| Attribute       | Description                      |
+| --------------- | -------------------------------- |
+| `data-disabled` | Present while the redirect runs. |
+
+```css
+.sign-in[data-disabled] {
+  cursor: progress;
+}
+```

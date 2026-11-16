@@ -2110,6 +2110,7 @@ export const srRS: LocalizationResource = {
       'Registracija neuspešna zbog neuspelog sigurnosnog proveravanja. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     captcha_unavailable:
       'Registracija neuspešna zbog neuspelog proveravanja bota. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Uneti kod je netačan.',
     form_email_address_blocked:
       'Привремене е-поште услуге нису подржане. Молимо користите своју редовну адресу е-поште за креирање налога.',
@@ -2185,10 +2186,12 @@ export const srRS: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Već ste prijavljeni.',
+    signup_rate_limit_exceeded: undefined,
     something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Odbio/la si zahtev za potpis. Pokušaj ponovo da nastaviš.',

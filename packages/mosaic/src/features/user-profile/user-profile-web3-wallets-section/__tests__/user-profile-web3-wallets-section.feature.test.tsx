@@ -2,7 +2,7 @@ import type { UserJSON } from '@clerk/shared/types';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   demandReverificationOnce,
@@ -28,8 +28,6 @@ import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-sect
 import { registerWallets, signedInWallets, web3Environment } from './user-profile-web3-wallets.fixtures';
 
 describe('Web3 wallets', () => {
-  afterEach(() => vi.unstubAllGlobals());
-
   const walletFactors = ['web3_metamask_signature', 'web3_solana_signature'] as const;
 
   async function renderWeb3(overrides: Partial<UserJSON> = {}, seed: FakeFapiSeed = {}) {
@@ -236,7 +234,7 @@ describe('Web3 wallets', () => {
     });
     await renderWithClerk(
       <MosaicProvider
-        localization={{ messages: { userProfileWeb3Wallets: { errors: { generic: 'Connexion impossible.' } } } }}
+        localization={{ messages: { userProfile: { web3Wallets: { errors: { generic: 'Connexion impossible.' } } } } }}
       >
         <UserProfileWeb3WalletsSection />
       </MosaicProvider>,
@@ -466,7 +464,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByText('Primary')).toBeInTheDocument());
   });
 
-  it('sets a verified wallet as primary through Clerk', async () => {
+  it('holds the wallet menu while setting primary and updates the badge in place', async () => {
     const fapi = await renderWeb3({
       web3_wallets: [
         fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' }),
@@ -477,13 +475,32 @@ describe('Web3 wallets', () => {
     const user = userEvent.setup();
 
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })).toHaveLength(2));
+    expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })[1].closest('.cl-section-row')).toContainElement(
+      screen.getByTitle('0xabcdef1234567890'),
+    );
     await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
     expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
     await user.keyboard('{Escape}');
     await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[1]);
-    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    const primary = holdRequests('post', '/v1/me');
+    try {
+      await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+      await waitFor(() => expect(primary.requests).toHaveLength(1));
+      const menu = screen.getByRole('menu');
+      const item = within(menu).getByRole('menuitem', { name: 'Set as primary' });
+      expect(item).toHaveAttribute('aria-busy', 'true');
+      expect(within(menu).getByRole('menuitem', { name: 'Remove wallet' })).toHaveAttribute('aria-disabled', 'true');
+      expect(await within(item).findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeDisabled();
+    } finally {
+      primary.release();
+    }
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })[1].closest('.cl-section-row')).toContainElement(
+      screen.getByTitle('0xabcdef1234567890'),
+    );
     const selectedRow = screen.getByTitle('0xabcdef1234567890').closest<HTMLElement>('.cl-section-row');
     expect(selectedRow).not.toBeNull();
     if (selectedRow) {
@@ -541,12 +558,15 @@ describe('Web3 wallets', () => {
     await user.click(confirm);
     await waitFor(() => expect(hold.requests).toHaveLength(1));
     expect(confirm).toHaveAttribute('aria-busy', 'true');
+    const manage = screen.getByRole('button', { name: 'Manage MetaMask', hidden: true });
+    expect(manage).toHaveAttribute('aria-disabled', 'true');
     hold.fail('wallet_removal_failed');
 
     await waitFor(() =>
       expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent('wallet_removal_failed'),
     );
     await waitFor(() => expect(confirm).not.toHaveAttribute('aria-busy', 'true'));
+    expect(manage).not.toHaveAttribute('aria-disabled', 'true');
     const retryFapi = serveFapi(fapi);
     await user.click(confirm);
     await waitFor(() => expect(retryFapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
@@ -584,6 +604,7 @@ describe('Web3 wallets', () => {
     await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu', { hidden: true })).toBeNull());
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await user.keyboard('hunter2{Enter}');
 
@@ -606,6 +627,7 @@ describe('Web3 wallets', () => {
     expect(screen.queryByRole('alert')).toBeNull();
     await waitFor(() => expect(secondManage()).toHaveFocus());
 
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
     await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
@@ -758,10 +780,12 @@ describe('Web3 wallets', () => {
     const props = { onConnect: vi.fn() };
     const localization = {
       messages: {
-        userProfileWeb3Wallets: {
-          solanaDialog: {
-            loading: 'Recherche des portefeuilles…',
-            loadError: 'Chargement impossible.',
+        userProfile: {
+          web3Wallets: {
+            solanaDialog: {
+              loading: 'Recherche des portefeuilles…',
+              loadError: 'Chargement impossible.',
+            },
           },
         },
       },
@@ -1026,6 +1050,41 @@ describe('Web3 wallets', () => {
       }
     },
   );
+
+  it('lists the Solana wallets installed when the picker is reopened', async () => {
+    const solanaWallet = (name: string) => ({
+      version: '1.0.0' as const,
+      name,
+      icon: 'data:image/svg+xml;base64,' as const,
+      chains: ['solana:mainnet' as const],
+      accounts: [],
+      features: {
+        'standard:connect': { version: '1.0.0' as const, connect: () => Promise.resolve({ accounts: [] }) },
+        'solana:signMessage': { version: '1.0.0' as const, signMessage: () => Promise.resolve([]) },
+      },
+    });
+    const unregisterPhantom = registerWallets(solanaWallet('Phantom'));
+    let unregisterBackpack = () => {};
+    try {
+      await renderWeb3();
+      const user = userEvent.setup();
+
+      await user.click(await screen.findByRole('button', { name: 'Connect Solana' }));
+      expect(await screen.findByRole('button', { name: 'Phantom' })).toBeVisible();
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+      unregisterPhantom();
+      unregisterBackpack = registerWallets(solanaWallet('Backpack'));
+      await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+
+      expect(await screen.findByRole('button', { name: 'Backpack' })).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Phantom' })).toBeNull();
+    } finally {
+      unregisterPhantom();
+      unregisterBackpack();
+    }
+  });
 
   // TODO: Share Solana discovery and filtering only after verifying parity with the legacy UI.
   // TODO: Share identification sorting only after verifying parity for legacy email, phone, and wallet sections.

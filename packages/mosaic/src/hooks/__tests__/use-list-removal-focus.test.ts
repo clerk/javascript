@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useListRemovalFocus } from '../use-list-removal-focus';
@@ -16,7 +16,7 @@ function setup(
   for (const [id, button] of buttons) {
     hook.result.current.registerTrigger(id)(button);
   }
-  const remove = (id: string) => act(() => hook.result.current.remove(id));
+  const remove = (id: string) => hook.result.current.remove(id);
   return { ...hook, buttons, fallback, remove };
 }
 
@@ -74,9 +74,10 @@ describe('useListRemovalFocus', () => {
   });
 
   it('records nothing when the removal fails', async () => {
-    const { result, remove } = setup(['a', 'b'], () => Promise.reject(new Error('failed')));
+    const failure = new Error('failed');
+    const { result, remove } = setup(['a', 'b'], () => Promise.reject(failure));
 
-    await expect(remove('a')).rejects.toThrow('failed');
+    await expect(remove('a')).rejects.toBe(failure);
 
     expect(result.current.finalFocus()).toBeNull();
   });

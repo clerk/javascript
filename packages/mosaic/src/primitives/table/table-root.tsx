@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import {
   type TableBodyRows,
   TableContext,
@@ -64,7 +64,7 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
   const [columnCount, registerColumn] = useCounter();
   const [rowHeaderColumns, registerRowHeaderColumn] = useRegistry<number>();
   const anchorRef = React.useRef<string | null>(null);
-  const excluded = React.useMemo(() => new WeakSet<Element>(), []);
+  const [excluded] = React.useState(() => new WeakSet<Element>());
 
   const { tree } = bodyRows;
   const selectable = React.useMemo(
@@ -140,7 +140,7 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
     excludeFromNavigation,
   };
 
-  const defaultProps: Record<string, unknown> = {
+  const defaultProps = {
     role: tree ? 'treegrid' : interactive ? 'grid' : undefined,
     'aria-multiselectable': selectionMode === 'multiple' || undefined,
     onKeyDown: (event: React.KeyboardEvent<HTMLTableElement>) => {
@@ -167,7 +167,7 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
         }
       }
     },
-  };
+  } satisfies DefaultProps<'table'>;
 
   return (
     <TableContext.Provider value={contextValue}>

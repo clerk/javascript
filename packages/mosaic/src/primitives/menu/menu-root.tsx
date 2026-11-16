@@ -24,7 +24,9 @@ import {
   useTypeahead,
 } from '@floating-ui/react';
 import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
+import { useDirection } from '../direction-provider';
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
@@ -71,6 +73,7 @@ function MenuInner(props: MenuProps) {
   // has a parent node id too, and treating that as nesting makes it hover-open, side-placed, and
   // unclickable by mouse.
   const isNested = parentId != null && parentContext != null;
+  const direction = useDirection();
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -103,6 +106,7 @@ function MenuInner(props: MenuProps) {
       })),
       flip({ fallbackPlacements }),
       shift({ padding: 5 }),
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       arrow({ element: arrowRef }),
       cssVars({ sideOffset: resolvedOffset }),
     ],
@@ -154,7 +158,7 @@ function MenuInner(props: MenuProps) {
           const nativeEvent = event.nativeEvent;
           openFrameRef.current = requestAnimationFrame(() => {
             openFrameRef.current = null;
-            floatingContext.onOpenChange(true, nativeEvent, 'click');
+            flushSync(() => floatingContext.onOpenChange(true, nativeEvent, 'click'));
           });
         },
       },
@@ -179,6 +183,7 @@ function MenuInner(props: MenuProps) {
     listRef: elementsRef,
     activeIndex,
     nested: isNested,
+    rtl: direction === 'rtl',
     onNavigate: setActiveIndex,
   });
   const typeahead = useTypeahead(floatingContext, {

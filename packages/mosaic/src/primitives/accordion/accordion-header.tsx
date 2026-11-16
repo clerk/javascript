@@ -1,17 +1,22 @@
 'use client';
 
+import React from 'react';
+
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 
 export type AccordionHeaderProps = ComponentProps<'h3'>;
 
-export function AccordionHeader(props: AccordionHeaderProps) {
-  const { render, ...otherProps } = props;
+export const AccordionHeader = React.forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
+  function AccordionHeader(props, ref) {
+    const { render, ...otherProps } = props;
 
-  const defaultProps = {};
+    const defaultProps = {};
 
-  return useRender({
-    defaultTagName: 'h3',
-    render,
-    props: mergeProps<'h3'>(defaultProps, otherProps),
-  });
-}
+    return useRender({
+      defaultTagName: 'h3',
+      ref,
+      render,
+      props: mergeProps<'h3'>(defaultProps, otherProps),
+    });
+  },
+);

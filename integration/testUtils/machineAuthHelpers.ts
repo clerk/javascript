@@ -13,6 +13,7 @@ import type { EnvironmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
 import { createTestUtils } from './index';
+import { withRetry } from './retryableClerkClient';
 import type { FakeAPIKey, FakeUser } from './usersService';
 
 export type FakeMachineNetwork = {
@@ -182,9 +183,11 @@ export type MachineAuthTestAdapter = {
 const createApiKeysEnv = (): EnvironmentConfig => appConfigs.envs.withAPIKeys.clone();
 
 export const createMachineClient = () =>
-  createClerkClient({
-    secretKey: instanceKeys.get('with-api-keys').sk,
-  });
+  withRetry(
+    createClerkClient({
+      secretKey: instanceKeys.get('with-api-keys').sk,
+    }),
+  );
 
 const buildApp = async (adapter: MachineAuthTestAdapter, addRoutes: RouteBuilder): Promise<Application> => {
   const config = addRoutes(adapter.baseConfig.clone());
@@ -192,14 +195,16 @@ const buildApp = async (adapter: MachineAuthTestAdapter, addRoutes: RouteBuilder
 };
 
 const createOAuthClient = (app: Application) =>
-  createClerkClient({
-    secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
-    publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
-  });
+  withRetry(
+    createClerkClient({
+      secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
+      publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
+    }),
+  );
 
 export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void => {
   test.describe('API key auth', () => {
-    test.describe.configure({ mode: 'parallel' });
+    test.describe.configure({ mode: 'default' });
     let app: Application;
     let fakeUser: FakeUser;
     let fakeBapiUser: User;
@@ -293,7 +298,7 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
 
 export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
   test.describe('M2M auth', () => {
-    test.describe.configure({ mode: 'parallel' });
+    test.describe.configure({ mode: 'default' });
     let app: Application;
     let network: FakeMachineNetwork;
 
@@ -376,7 +381,7 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
 
 export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void => {
   test.describe('OAuth auth', () => {
-    test.describe.configure({ mode: 'parallel' });
+    test.describe.configure({ mode: 'default' });
     let app: Application;
     let fakeUser: FakeUser;
     let fakeOAuth: FakeOAuthApp;

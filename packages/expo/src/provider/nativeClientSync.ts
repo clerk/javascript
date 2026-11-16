@@ -135,12 +135,16 @@ function configureOnce(
   publishableKey: string,
   proxyUrl: string | null,
   tokenCache: TokenCache,
+  updateRequiredViewEnabled: boolean,
 ) {
   if (configuration?.publishableKey !== publishableKey || configuration.proxyUrl !== proxyUrl) {
     let configured = false;
     let timedOut = false;
     const configuring = (async () => {
       const seed = await readSeedDeviceToken(tokenCache);
+      await native
+        .setUpdateRequiredViewEnabled?.(updateRequiredViewEnabled)
+        .catch(error => warn('Failed to set whether the native SDK shows its update screen.', error));
       await native
         .configureNative(publishableKey, seed, proxyUrl)
         .catch(() => native.configureNative(publishableKey, seed, proxyUrl));
@@ -182,9 +186,10 @@ export function createNativeClientSync(
   publishableKey: string,
   proxyUrl: string | null,
   getUserTokenCache: () => TokenCache | undefined,
+  getNativeUpdateRequiredViewEnabled: () => boolean = () => true,
 ) {
   const fallback = () => getUserTokenCache() ?? MemoryTokenCache;
-  const ready = () => configureOnce(native, publishableKey, proxyUrl, fallback());
+  const ready = () => configureOnce(native, publishableKey, proxyUrl, fallback(), getNativeUpdateRequiredViewEnabled());
   let mirroredToken: string | null = null;
   let lastFingerprint: string | undefined;
   let refreshFailure: { error: unknown } | null = null;

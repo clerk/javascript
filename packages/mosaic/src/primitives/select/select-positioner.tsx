@@ -66,8 +66,9 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     // The listbox id is owned by floating-ui's listbox role: a consumer-supplied
     // id must not override it, or the trigger's aria-controls pairing would
     // silently break.
-    if (floatingProps.id != null) {
-      merged.id = floatingProps.id;
+    const wiredId = floatingProps['id'];
+    if (typeof wiredId === 'string') {
+      merged.id = wiredId;
     }
 
     const element = useRender({

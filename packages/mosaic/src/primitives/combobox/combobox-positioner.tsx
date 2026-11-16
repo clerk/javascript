@@ -8,28 +8,40 @@ import { parsePlacement } from '../utils/side-offset';
 import { useComboboxContext } from './combobox-context';
 
 export interface ComboboxPositionerProps extends ComponentProps<'div'> {
-  /** Element used for popup positioning. Defaults to the input. */
+  /** Element used for popup positioning. Defaults to the input group, then the input. */
   anchor?: HTMLElement | null;
 }
 
 export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPositionerProps>(
   function ComboboxPositioner(props, ref) {
     const { anchor, render, ...otherProps } = props;
-    const { mounted, floatingContext, refs, floatingStyles, placement, getFloatingProps, elementsRef, labelsRef } =
-      useComboboxContext();
+    const {
+      mounted,
+      floatingContext,
+      refs,
+      floatingStyles,
+      placement,
+      getFloatingProps,
+      elementsRef,
+      labelsRef,
+      inputGroup,
+    } = useComboboxContext();
+    const reference = anchor ?? inputGroup;
+
+    const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
 
     React.useLayoutEffect(() => {
-      if (!anchor) {
+      if (!reference) {
         return;
       }
-      refs.setPositionReference(anchor);
-      return () => refs.setPositionReference(refs.domReference.current);
-    }, [anchor, refs]);
+      refs.setPositionReference(reference);
+      return restoreReference;
+    }, [reference, refs, restoreReference]);
 
     const side = parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps();
-    const wiredId = floatingProps.id;
+    const wiredId = floatingProps['id'];
 
     const ownProps = {
       'data-side': side,
@@ -41,7 +53,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not
     // override it, or the aria-controls pairing would silently break.
-    if (wiredId != null) {
+    if (typeof wiredId === 'string') {
       merged.id = wiredId;
     }
 
@@ -62,6 +74,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
       <FloatingFocusManager
         context={floatingContext}
         initialFocus={-1}
+        returnFocus={false}
         visuallyHiddenDismiss
         modal={false}
       >

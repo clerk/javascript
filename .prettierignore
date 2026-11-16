@@ -2,6 +2,7 @@
 .changeset
 .idea
 .next
+next-env.d.ts
 .temp_integration
 .tsup
 .turbo

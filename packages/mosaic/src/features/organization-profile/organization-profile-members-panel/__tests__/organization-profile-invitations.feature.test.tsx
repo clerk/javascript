@@ -2,7 +2,7 @@ import type { OrganizationInvitationJSON, RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { userEvent as browserEvent } from 'vitest/browser';
 
 import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
@@ -442,7 +442,9 @@ async function openInviteDialog() {
   const user = userEvent.setup();
   await user.click(await screen.findByRole('tab', { name: 'Invitations' }));
   expect(await screen.findByText('ada@example.com')).toBeVisible();
-  await user.click(await screen.findByRole('button', { name: 'Invite' }));
+  const invite = await screen.findByRole('button', { name: 'Invite' });
+  await waitFor(() => expect(invite).not.toHaveAttribute('aria-disabled', 'true'));
+  await user.click(invite);
   const dialog = within(await screen.findByRole('dialog', { name: 'Invite members' }));
   return { user, dialog };
 }
@@ -506,6 +508,77 @@ describe('inviting members', () => {
     expect(dialog.getByRole('combobox', { name: /Role/ })).toHaveTextContent(label);
     await addEmails(dialog, 'grace@example.com');
     expect(dialog.getByRole('button', { name: 'Send invites' })).not.toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('sends a valid address still in the input with the selected role', async () => {
+    const fapi = serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await user.click(dialog.getByRole('combobox', { name: /Role/ }));
+    await user.click(await screen.findByRole('option', { name: 'Admin' }));
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), 'grace@example.com');
+    const send = dialog.getByRole('button', { name: 'Send invites' });
+    expect(send).not.toHaveAttribute('aria-disabled', 'true');
+
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.click(send);
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    const body = new URLSearchParams(await bulk.requests[0]?.text());
+    expect(body.getAll('email_address')).toEqual(['grace@example.com']);
+    expect(body.get('role')).toBe('org:admin');
+    bulk.release();
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitation sent' })).toBeVisible());
+    expect(fapi.organizationInvitations.filter(item => item.status === 'pending')).toHaveLength(2);
+  });
+
+  it.each([
+    ['on its own', []],
+    ['beside a valid address', ['linus@example.com']],
+  ])('keeps Send unavailable for an invalid address still in the input %s', async (_, tags) => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    if (tags.length > 0) {
+      await addEmails(dialog, ...tags);
+    }
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), 'grace@example');
+    const send = dialog.getByRole('button', { name: 'Send invites' });
+    expect(send).toHaveAttribute('aria-disabled', 'true');
+    await user.click(send);
+    expect(bulk.requests).toHaveLength(0);
+    bulk.release();
+  });
+
+  it.each([
+    ['a new address', 'grace@example.com', ['linus@example.com', 'grace@example.com']],
+    ['an address already added', 'linus@example.com', ['linus@example.com']],
+  ])('sends added addresses and %s still in the input once each', async (_, draft, expected) => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await addEmails(dialog, 'linus@example.com');
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), draft);
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.click(dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    const body = new URLSearchParams(await bulk.requests[0]?.text());
+    expect(body.getAll('email_address')).toEqual(expected);
+    bulk.release();
+  });
+
+  it('does not keep a typed address available after closing and reopening', async () => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await user.type(dialog.getByRole('textbox', { name: 'Email' }), 'grace@example.com');
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
+    const reopened = within(await screen.findByRole('dialog', { name: 'Invite members' }));
+    expect(reopened.getByRole('textbox', { name: 'Email' })).toHaveValue('');
+    expect(reopened.getByRole('button', { name: 'Send invites' })).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('ignores a default role that is not in the role list', async () => {
@@ -707,6 +780,27 @@ describe('inviting members', () => {
     expect(bulk.requests).toHaveLength(1);
   });
 
+  it('keeps focus on the email field while the invite is pending', async () => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { dialog } = await openInviteDialog();
+    await addEmails(dialog, 'grace@example.com');
+    const email = dialog.getByRole('textbox', { name: 'Email' });
+    await waitFor(() =>
+      expect(dialog.getByRole('button', { name: 'Send invites' })).not.toHaveAttribute('aria-disabled', 'true'),
+    );
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await browserEvent.keyboard('{Enter}');
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    try {
+      await waitFor(() => expect(email.closest('[data-disabled]')).not.toBeNull());
+      expect(email).toHaveFocus();
+    } finally {
+      bulk.release();
+    }
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+  });
+
   it('clears the draft, rejected addresses and error after closing and reopening', async () => {
     serveInvite({ defaultRole: 'org:member' });
     await renderWithClerk(<OrganizationProfileMembersPanel />);
@@ -732,8 +826,92 @@ describe('inviting members', () => {
     expect(dialog.getByRole('listitem')).not.toHaveAttribute('data-invalid');
   });
 
-  it.todo('drops the success toast after the panel unmounts during an invite');
-  it.todo('drops the success toast after a session switch while the list revalidates');
+  it('drops the success toast after the panel unmounts during an invite', async () => {
+    const fapi = serveInvite({ defaultRole: 'org:member' });
+    const { clerk, rerender } = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    const activeOrganization = clerk.organization;
+    if (!activeOrganization) {
+      throw new Error('Expected an active organization');
+    }
+    const inviteMembers = vi.spyOn(activeOrganization, 'inviteMembers');
+    await addEmails(dialog, 'grace@example.com');
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.click(dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+
+    expect(inviteMembers).toHaveBeenCalledOnce();
+    const submission = inviteMembers.mock.results[0];
+    if (!submission || submission.type !== 'return') {
+      throw new Error('Expected an invitation submission promise');
+    }
+
+    rerender(<div>Members panel closed</div>);
+    expect(screen.getByText('Members panel closed')).toBeVisible();
+    await act(async () => {
+      bulk.release();
+      await submission.value;
+    });
+
+    expect(fapi.organizationInvitations.some(item => item.email_address === 'grace@example.com')).toBe(true);
+    expect(screen.queryByRole('heading', { name: 'Invitation sent' })).toBeNull();
+    expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull();
+  });
+
+  it.each(['session', 'organization'] as const)(
+    'drops the success toast after switching %s while the list revalidates',
+    async identity => {
+      const fapi = serveInvite({ defaultRole: 'org:member' });
+      const currentUser = fapi.client.sessions[0]?.user;
+      if (!currentUser) {
+        throw new Error('Expected a signed-in user');
+      }
+      const otherOrganization = fapiOrganization({ id: 'org_other', name: 'Other' });
+      const otherMembership = fapiMembership(otherOrganization, { permissions: MANAGE });
+      const sessionUser = {
+        ...currentUser,
+        organization_memberships: [...(currentUser.organization_memberships ?? []), otherMembership],
+      };
+      fapi.memberships.push(otherMembership);
+      fapi.client = fapiClient([
+        fapiSession({ id: 'sess_invitations', user: sessionUser, last_active_organization_id: organization.id }),
+        fapiSession({ id: 'sess_second', user: sessionUser, last_active_organization_id: organization.id }),
+      ]);
+      const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
+      const { user, dialog } = await openInviteDialog();
+      const activeOrganization = clerk.organization;
+      if (!activeOrganization) {
+        throw new Error('Expected an active organization');
+      }
+      const getInvitations = vi.spyOn(activeOrganization, 'getInvitations');
+      await addEmails(dialog, 'grace@example.com');
+      const refresh = holdRequests('get', '/v1/organizations/:organizationId/invitations');
+      await user.click(dialog.getByRole('button', { name: 'Send invites' }));
+      await waitFor(() => expect(refresh.requests).toHaveLength(1));
+      expect(fapi.organizationInvitations.some(item => item.email_address === 'grace@example.com')).toBe(true);
+      expect(screen.getByRole('dialog', { name: 'Invite members' })).toBeVisible();
+      expect(getInvitations).toHaveBeenCalledOnce();
+      const revalidation = getInvitations.mock.results[0];
+      if (!revalidation || revalidation.type !== 'return') {
+        throw new Error('Expected an invitation revalidation promise');
+      }
+
+      await act(() =>
+        clerk.setActive(identity === 'session' ? { session: 'sess_second' } : { organization: otherOrganization.id }),
+      );
+      expect(identity === 'session' ? clerk.session?.id : clerk.organization?.id).toBe(
+        identity === 'session' ? 'sess_second' : otherOrganization.id,
+      );
+      await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+      await act(async () => {
+        refresh.release();
+        await revalidation.value;
+      });
+
+      expect(screen.queryByRole('heading', { name: 'Invitation sent' })).toBeNull();
+      expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull();
+    },
+  );
 
   it.each([
     [
@@ -788,7 +966,7 @@ describe('inviting members', () => {
     bulk.release();
     await waitFor(() => expect(fapi.organizationInvitations).toHaveLength(invitationCount));
     await act(() => new Promise(resolve => setTimeout(resolve, 300)));
-    expect(screen.queryByRole('heading', { name: 'Invitations sent' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Invitation sent' })).toBeNull();
     expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull();
   });
 });

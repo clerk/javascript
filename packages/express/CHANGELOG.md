@@ -1,5 +1,55 @@
 # Change Log
 
+## 2.1.90
+
+### Patch Changes
+
+- Updated dependencies [[`c5a71bc`](https://github.com/clerk/javascript/commit/c5a71bca0491a712e0cdf62533113f2c1df32832), [`49972da`](https://github.com/clerk/javascript/commit/49972da75f6384b3f7aa362212f0f3966274d4e9), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`7443113`](https://github.com/clerk/javascript/commit/744311344e7320da673177f7741e91c9437ffabf), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/backend@3.29.0
+  - @clerk/shared@4.45.1
+
+## 2.1.89
+
+### Patch Changes
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`b9d10ba`](https://github.com/clerk/javascript/commit/b9d10ba5d3a177d63abc47544f8fdfa27a995761), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d), [`d71a6a1`](https://github.com/clerk/javascript/commit/d71a6a166313d01b48b525294d39eb685aa63934)]:
+  - @clerk/shared@4.45.0
+  - @clerk/backend@3.28.0
+
+## 2.1.88
+
+### Patch Changes
+
+- Updated dependencies [[`11d5dfb`](https://github.com/clerk/javascript/commit/11d5dfb1bec6f3e5f61db0b078e87fc3b8ecd8e2), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/backend@3.27.0
+  - @clerk/shared@4.44.1
+
+## 2.1.87
+
+### Patch Changes
+
+- Updated dependencies [[`ed3fe79`](https://github.com/clerk/javascript/commit/ed3fe791dca5af8ace0d05592728c06da2cf5e4d), [`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/backend@3.26.6
+  - @clerk/shared@4.44.0
+
+## 2.1.86
+
+### Patch Changes
+
+- `tslib` is no longer installed as a runtime dependency. The published builds never imported it. ([#10521](https://github.com/clerk/javascript/pull/10521)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`cd21ebe`](https://github.com/clerk/javascript/commit/cd21ebe3922aaa1ff41de9dbaa711725bc1d9520), [`11907aa`](https://github.com/clerk/javascript/commit/11907aa0f17bd9c861ccdd5a469d2694d7a503cf), [`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/backend@3.26.5
+  - @clerk/shared@4.43.1
+
+## 2.1.85
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+  - @clerk/backend@3.26.4
+
 ## 2.1.84
 
 ### Patch Changes

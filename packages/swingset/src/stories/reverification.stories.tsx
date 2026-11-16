@@ -1,3 +1,11 @@
+import {
+  VerificationBackupCode,
+  VerificationCode,
+  VerificationHelp,
+  VerificationMethodPicker,
+  VerificationPasskey,
+  VerificationPassword,
+} from '@clerk/mosaic/blocks/verification';
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import type { ReverificationMethod, ReverificationStep } from '@clerk/mosaic/features/reverification';
@@ -7,12 +15,6 @@ import {
   ReverificationPending,
   ReverificationView,
 } from '@clerk/mosaic/features/reverification/reverification.view';
-import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/steps/reverification-backup-code';
-import { ReverificationHelp } from '@clerk/mosaic/features/reverification/steps/reverification-help';
-import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/steps/reverification-method-picker';
-import { ReverificationOTP } from '@clerk/mosaic/features/reverification/steps/reverification-otp';
-import { ReverificationPasskey } from '@clerk/mosaic/features/reverification/steps/reverification-passkey';
-import { ReverificationPassword } from '@clerk/mosaic/features/reverification/steps/reverification-password';
 import { SecurityLockSquare } from '@clerk/mosaic/icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '@clerk/mosaic/icons/glyphs/security-passkey';
 import { SecurityPhone } from '@clerk/mosaic/icons/glyphs/security-phone';
@@ -86,7 +88,7 @@ function stepFor(id: string): ReverificationStep {
   return 'password';
 }
 
-function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element {
+function WorkingExample({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState<ReverificationStep>('password');
   const [direction, setDirection] = useState<-1 | 1>(1);
   const [methodId, setMethodId] = useState('password');
@@ -241,7 +243,7 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
   );
 }
 
-export function Default(): JSX.Element {
+export function Default() {
   const [runId, setRunId] = useState(0);
   const [complete, setComplete] = useState(false);
 
@@ -270,7 +272,7 @@ export function Default(): JSX.Element {
   );
 }
 
-export function Pending(): JSX.Element {
+export function Pending() {
   return (
     <Card.Root renderBranding={false}>
       <ReverificationPending />
@@ -278,7 +280,7 @@ export function Pending(): JSX.Element {
   );
 }
 
-export function ErrorNoFactors(): JSX.Element {
+export function ErrorNoFactors() {
   return (
     <Card.Root renderBranding={false}>
       <ReverificationError
@@ -289,7 +291,7 @@ export function ErrorNoFactors(): JSX.Element {
   );
 }
 
-export function ErrorGeneric(): JSX.Element {
+export function ErrorGeneric() {
   return (
     <Card.Root renderBranding={false}>
       <ReverificationError
@@ -300,18 +302,12 @@ export function ErrorGeneric(): JSX.Element {
   );
 }
 
-function PasswordPanel({
-  isPending = false,
-  errorMessage,
-}: {
-  isPending?: boolean;
-  errorMessage?: string;
-}): JSX.Element {
+function PasswordPanel({ isPending = false, errorMessage }: { isPending?: boolean; errorMessage?: string }) {
   const [value, setValue] = useState(errorMessage ? 'incorrect-password' : '');
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationPassword
+      <VerificationPassword
         messages={{
           title: 'Verification required',
           description: 'Enter your current password to continue',
@@ -334,28 +330,22 @@ function PasswordPanel({
   );
 }
 
-export function Password(): JSX.Element {
+export function Password() {
   return <PasswordPanel />;
 }
 
-export function PasswordPending(): JSX.Element {
+export function PasswordPending() {
   return <PasswordPanel isPending />;
 }
 
-export function PasswordError(): JSX.Element {
+export function PasswordError() {
   return <PasswordPanel errorMessage='That password is incorrect. Try again.' />;
 }
 
-function PasskeyPanel({
-  isPending = false,
-  errorMessage,
-}: {
-  isPending?: boolean;
-  errorMessage?: string;
-}): JSX.Element {
+function PasskeyPanel({ isPending = false, errorMessage }: { isPending?: boolean; errorMessage?: string }) {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationPasskey
+      <VerificationPasskey
         messages={{
           title: 'Use your passkey',
           description:
@@ -373,15 +363,15 @@ function PasskeyPanel({
   );
 }
 
-export function Passkey(): JSX.Element {
+export function Passkey() {
   return <PasskeyPanel />;
 }
 
-export function PasskeyPending(): JSX.Element {
+export function PasskeyPending() {
   return <PasskeyPanel isPending />;
 }
 
-export function PasskeyError(): JSX.Element {
+export function PasskeyError() {
   return <PasskeyPanel errorMessage='We couldn’t verify that passkey. Try again.' />;
 }
 
@@ -397,12 +387,12 @@ function OTPPanel({
   errorMessage?: string;
   isResending?: boolean;
   renderResend?: boolean;
-}): JSX.Element {
+}) {
   const [value, setValue] = useState(isPending || errorMessage ? '123456' : '');
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationOTP
+      <VerificationCode
         messages={{
           title: 'Verification required',
           description,
@@ -432,11 +422,11 @@ function OTPPanel({
   );
 }
 
-export function OTP(): JSX.Element {
+export function OTP() {
   return <OTPPanel description='Enter the code sent to your phone to continue' />;
 }
 
-export function AuthenticatorOTP(): JSX.Element {
+export function AuthenticatorOTP() {
   return (
     <OTPPanel
       description='Enter the code generated by your authenticator app to continue'
@@ -445,7 +435,7 @@ export function AuthenticatorOTP(): JSX.Element {
   );
 }
 
-export function OTPPending(): JSX.Element {
+export function OTPPending() {
   return (
     <OTPPanel
       description='Enter the code sent to your phone to continue'
@@ -454,7 +444,7 @@ export function OTPPending(): JSX.Element {
   );
 }
 
-export function OTPError(): JSX.Element {
+export function OTPError() {
   return (
     <OTPPanel
       description='Enter the code sent to your phone to continue'
@@ -463,7 +453,7 @@ export function OTPError(): JSX.Element {
   );
 }
 
-export function OTPResending(): JSX.Element {
+export function OTPResending() {
   return (
     <OTPPanel
       description='Enter the code sent to your phone to continue'
@@ -472,18 +462,12 @@ export function OTPResending(): JSX.Element {
   );
 }
 
-function BackupCodePanel({
-  isPending = false,
-  errorMessage,
-}: {
-  isPending?: boolean;
-  errorMessage?: string;
-}): JSX.Element {
+function BackupCodePanel({ isPending = false, errorMessage }: { isPending?: boolean; errorMessage?: string }) {
   const [value, setValue] = useState(errorMessage ? 'invalid-code' : '');
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationBackupCode
+      <VerificationBackupCode
         messages={{
           title: 'Enter a backup code',
           description: 'Enter the backup code you received when setting up two-step authentication',
@@ -503,24 +487,24 @@ function BackupCodePanel({
   );
 }
 
-export function BackupCode(): JSX.Element {
+export function BackupCode() {
   return <BackupCodePanel />;
 }
 
-export function BackupCodePending(): JSX.Element {
+export function BackupCodePending() {
   return <BackupCodePanel isPending />;
 }
 
-export function BackupCodeError(): JSX.Element {
+export function BackupCodeError() {
   return <BackupCodePanel errorMessage='That backup code is incorrect. Try again.' />;
 }
 
-export function MethodPicker(): JSX.Element {
+export function MethodPicker() {
   const [pendingMethodId, setPendingMethodId] = useState<string>();
 
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationMethodPicker
+      <VerificationMethodPicker
         messages={methodPickerMessages}
         methods={[
           { id: 'password', label: 'Continue with your password', icon: SecurityLockSquare },
@@ -537,10 +521,10 @@ export function MethodPicker(): JSX.Element {
   );
 }
 
-export function MethodPickerPending(): JSX.Element {
+export function MethodPickerPending() {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationMethodPicker
+      <VerificationMethodPicker
         messages={methodPickerMessages}
         methods={[
           { id: 'password', label: 'Continue with your password', icon: SecurityLockSquare },
@@ -557,10 +541,10 @@ export function MethodPickerPending(): JSX.Element {
   );
 }
 
-export function Help(): JSX.Element {
+export function Help() {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationHelp
+      <VerificationHelp
         messages={helpMessages}
         onEmailSupport={() => undefined}
         onBack={() => undefined}

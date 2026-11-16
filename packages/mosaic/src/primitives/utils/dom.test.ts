@@ -31,8 +31,6 @@ function create() {
 
 afterEach(() => {
   document.body.replaceChildren();
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
 });
 
 describe('isElement', () => {

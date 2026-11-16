@@ -78,7 +78,7 @@ animation get the same plain scrolling box rather than a broken one.
 />
 
 `auto` takes the scrollbar's space only while the content overflows; `stable` reserves it either
-way. Add the rows and watch the trailing rules: `auto` jumps its content left by the lane's width as
+way. Add the rows and watch the offsets on the right: `auto` jumps its content left by the lane's width as
 the list starts overflowing, `stable` doesn't move.
 
 Two conditions must **both** hold for the two to differ at all: space-consuming scrollbars, and
@@ -158,24 +158,24 @@ has to reveal. They live on the element carrying the atoms and inherit downward,
 can drive itself from them.
 
 ```css
-.cl-item-group {
+.my-scroller {
   mask-image: none;
 }
-.cl-item-group::before,
-.cl-item-group::after {
+.my-scroller::before,
+.my-scroller::after {
   content: '';
   position: absolute;
   inset-inline: 0;
   height: var(--cl-scroll-fade-size);
   pointer-events: none;
 }
-.cl-item-group::before {
+.my-scroller::before {
   top: 0;
   background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
   opacity: var(--cl-scroll-area-progress-start);
   transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
 }
-.cl-item-group::after {
+.my-scroller::after {
   bottom: 0;
   background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
   opacity: var(--cl-scroll-area-progress-end);
@@ -270,5 +270,5 @@ against the edge. Left alone, the extra lane is the safer asymmetry.
 
 Chrome and Firefox make an overflowing scroll container keyboard-focusable on their own; **Safari
 does not** (WCAG 2.1.1). `tabindex` isn't a style, so the atoms can't close that gap — set
-`tabIndex={0}` yourself on a scroll surface that holds nothing focusable. A group of interactive
-rows, like the examples above, needs nothing: tabbing into the content already scrolls it.
+`tabIndex={0}` yourself on a scroll surface that holds nothing focusable, as the examples above
+do. A group of interactive rows needs nothing: tabbing into the content already scrolls it.

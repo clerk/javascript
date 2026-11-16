@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
+import type { ReverificationController } from '../../../reverification';
 import { useUserProfileWeb3WalletsController } from '../user-profile-web3-wallets-section.controller';
 import type {
   ReadyWeb3WalletsModel,
@@ -13,6 +14,12 @@ const providers = [
   { id: 'web3_metamask_signature', provider: 'MetaMask' },
   { id: 'web3_solana_signature', provider: 'Solana', walletPicker: 'solana' },
 ] satisfies UserProfileWeb3Provider[];
+
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
+
+function pendingRowId(controller: ReturnType<typeof useUserProfileWeb3WalletsController>) {
+  return [...controller.wallets, ...controller.availableProviders].find(row => row.isPending)?.id;
+}
 
 describe('Web3 connection controller', () => {
   it('does not move an address-phase connection to a different provider with the same address', async () => {
@@ -42,7 +49,7 @@ describe('Web3 connection controller', () => {
     act(() => {
       void result.current.onConnect('web3_metamask_signature');
     });
-    expect(result.current.pendingId).toBe('web3_metamask_signature');
+    expect(pendingRowId(result.current)).toBe('web3_metamask_signature');
     await act(async () => {
       pending.reject(new Error('Rejected'));
       await pending.promise.catch(() => undefined);
@@ -69,6 +76,7 @@ describe('Web3 connection controller', () => {
         verify: vi.fn(),
         setPrimary,
         remove: vi.fn(),
+        setPrimaryReverification: idleReverification,
       }),
     );
 
@@ -79,7 +87,7 @@ describe('Web3 connection controller', () => {
     act(() => {
       void result.current.onSetPrimary('other');
     });
-    expect(result.current.pendingId).toBe('other');
+    expect(pendingRowId(result.current)).toBe('other');
     await act(async () => {
       primary.reject(new Error('Primary rejected'));
       await primary.promise.catch(() => undefined);
@@ -137,7 +145,7 @@ describe('Web3 connection controller', () => {
     act(() => {
       void result.current.onConnect('web3_metamask_signature');
     });
-    expect(result.current.pendingId).toBe('web3_metamask_signature');
+    expect(pendingRowId(result.current)).toBe('web3_metamask_signature');
     await act(async () => {
       pending.resolve();
       await pending.promise;
@@ -172,7 +180,7 @@ describe('Web3 connection controller', () => {
       void result.current.onSetPrimary('other');
       void result.current.onConnect('web3_metamask_signature');
     });
-    expect(result.current.pendingId).toBe('target');
+    expect(pendingRowId(result.current)).toBe('target');
     expect(setPrimary).not.toHaveBeenCalled();
     await act(async () => {
       pending.reject(new Error('Retry rejected'));
@@ -229,7 +237,7 @@ describe('Web3 connection controller', () => {
         address: provider.walletPicker === 'solana' ? address : address.toLowerCase(),
       });
     });
-    expect(result.current.pendingId).toBe('target');
+    expect(pendingRowId(result.current)).toBe('target');
 
     act(() => reportTarget?.({ kind: 'wallet', id: 'target' }));
 
@@ -237,7 +245,7 @@ describe('Web3 connection controller', () => {
       signature.reject(new Error('Signature rejected'));
       await signature.promise.catch(() => undefined);
     });
-    expect(result.current.pendingId).toBeUndefined();
+    expect(pendingRowId(result.current)).toBeUndefined();
     expect(result.current.wallets[1]?.verifyError).toBe('Something went wrong. Please try again.');
     expect(result.current.wallets[0]?.verifyError).toBeUndefined();
   });

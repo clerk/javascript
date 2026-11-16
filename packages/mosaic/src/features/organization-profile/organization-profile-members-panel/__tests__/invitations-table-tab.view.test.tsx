@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { useConfirmController } from '../../../../blocks/confirm';
 import { MosaicProvider } from '../../../../mosaic-provider';
@@ -55,10 +55,6 @@ function renderTab(overrides: Partial<InvitationsTableTabViewProps> = {}) {
 }
 
 describe('InvitationsTableTabView', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('does not report invitations as loaded when they fail to load', () => {
     renderView({ isError: true, onRetry: vi.fn() });
     expect(screen.getByRole('alert')).toHaveTextContent('Unable to load invitations');

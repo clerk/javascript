@@ -27,8 +27,7 @@ describe('Menu in WebKit', () => {
 
     await userEvent.click(trigger);
 
-    await expect.poll(() => screen.queryByRole('menu')).not.toBeNull();
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await expect.poll(() => screen.queryByRole('menu')?.contains(document.activeElement)).toBe(true);
     expect(screen.queryByRole('menu')).not.toBeNull();
   });
 });

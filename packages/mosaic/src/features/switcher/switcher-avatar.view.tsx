@@ -5,7 +5,7 @@ import type { AvatarProps } from '../../components/avatar';
 import { Avatar } from '../../components/avatar';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { badgeInsets, badgeSizes, leadSizes, rootSizes, styles } from './switcher-avatar.styles';
+import { sizes, styles } from './switcher-avatar.styles';
 import { useSlot } from './switcher-surface';
 
 function initials(name: string): string {
@@ -54,27 +54,22 @@ export function BadgedAvatar({ name, imageUrl, badge, size }: BadgedAvatarProps)
   return (
     <span
       aria-hidden
-      {...mergeStyleProps(themeProps(slot('avatar')), stylex.props(reset.base, styles.root, rootSizes[size]))}
+      {...mergeStyleProps(themeProps(slot('avatar')), stylex.props(reset.base, styles.root, sizes[size]))}
     >
       <RowAvatar
         name={name}
         imageUrl={imageUrl}
         shape='square'
         size='fit'
-        xstyle={[styles.lead, leadSizes[size]]}
+        xstyle={styles.lead}
       />
-      <span
-        {...mergeStyleProps(
-          themeProps(slot('avatar-badge')),
-          stylex.props(reset.base, styles.badge, badgeInsets[size]),
-        )}
-      >
+      <span {...mergeStyleProps(themeProps(slot('avatar-badge')), stylex.props(reset.base, styles.badge))}>
         <RowAvatar
           name={badge.name}
           imageUrl={badge.imageUrl}
           shape='circle'
           size='fit'
-          xstyle={badgeSizes[size]}
+          xstyle={styles.badgeAvatar}
         />
       </span>
     </span>

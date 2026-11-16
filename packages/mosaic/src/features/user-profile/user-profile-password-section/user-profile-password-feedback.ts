@@ -4,7 +4,7 @@ import type { FieldFeedback } from '../../../components/form';
 import type { MosaicMessages } from '../../../localization';
 import { fill } from '../../../localization';
 
-type Messages = MosaicMessages['userProfilePasswordSection'];
+type Messages = MosaicMessages['userProfile']['password'];
 type Settings = Pick<PasswordSettingsData, 'min_length' | 'max_length'>;
 
 const complexityMessageKeys = new Map<string, Exclude<keyof Messages['complexity'], 'sentence'>>([

@@ -6,6 +6,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../../props';
 import { colorVars, radiusVars, space } from '../../../tokens.stylex';
+import { Button } from '../../button';
+import { ButtonContext } from '../../button/button.context';
 import { Card } from '../../card';
 import type { DialogVariant } from '../dialog';
 import { Dialog } from '../dialog';
@@ -310,7 +312,6 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="profile"'));
-    warn.mockRestore();
   });
 
   it('warns when a fullscreen profile opens inside another dialog', async () => {
@@ -321,7 +322,6 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
-    warn.mockRestore();
   });
 
   // A card over a profile is the delete-account confirmation: a `Card` inside a `card` dialog.
@@ -333,7 +333,6 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });
 
@@ -395,6 +394,38 @@ describe('stacked backdrops', () => {
     const popups = document.querySelectorAll('.cl-dialog-popup');
     expect(popups[0]).toHaveAttribute('data-stack-base', '');
     expect(popups[1]).not.toHaveAttribute('data-stack-base');
+  });
+});
+
+describe('button defaults', () => {
+  it('does not inherit full width from a card footer it is opened from', () => {
+    render(
+      <Card.Footer>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </Card.Footer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).not.toHaveAttribute('data-full-width');
+  });
+
+  it('does not inherit disabled from an enclosing provider', () => {
+    render(
+      <ButtonContext.Provider value={{ disabled: true }}>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Surface title='Nested' />
+            <Button>Inside popup</Button>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </ButtonContext.Provider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Inside popup' })).toBeEnabled();
   });
 });
 
@@ -463,7 +494,6 @@ describe('Dialog.CloseButton', () => {
     );
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('alert dialog'));
-    warn.mockRestore();
   });
 });
 
@@ -588,7 +618,7 @@ describe('popup surface', () => {
   // an atom from its property and value, so a probe with the popup's own values yields the very
   // atoms `styles.popup` declares.
   const probe = stylex.create({
-    background: { backgroundColor: colorVars['--cl-color-background'] },
+    background: { backgroundColor: colorVars['--cl-color-page'] },
     radius: { borderRadius: radiusVars['--cl-radius-xl'] },
   });
 
@@ -665,7 +695,6 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
-    warn.mockRestore();
   });
 
   it('warns when a fullscreen profile is given a placement', () => {
@@ -673,7 +702,6 @@ describe('compactPlacement', () => {
     renderPlacement('sheet', 'fullscreen');
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
-    warn.mockRestore();
   });
 
   it('keeps a profile centered by default without warning', () => {
@@ -682,7 +710,6 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
-    warn.mockRestore();
   });
 });
 
@@ -764,7 +791,6 @@ describe('accessible name warning', () => {
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining(`<${titlePart}>`));
-    warn.mockRestore();
   });
 
   it('does not warn when the card inside it supplies the name', async () => {
@@ -780,7 +806,6 @@ describe('accessible name warning', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   // The name can come from the consumer instead of from a Title, and an `aria-label` on the popup
@@ -796,6 +821,5 @@ describe('accessible name warning', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });

@@ -23,7 +23,7 @@ export function UserProfileEnterpriseAccountsSectionView({
   onConnect,
   connectReverification,
 }: UserProfileEnterpriseAccountsSectionViewProps) {
-  const m = useMessages('userProfileEnterpriseAccountsSection');
+  const m = useMessages('userProfile').enterpriseAccounts;
   if (accounts.length === 0 && (connections.length === 0 || !onConnect)) {
     return null;
   }

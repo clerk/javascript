@@ -88,6 +88,55 @@ describe('createNativeClientSync', () => {
     expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', 'seed-token', 'https://example.com/__clerk');
   });
 
+  test('tells native whether to show its update screen before configuring it', async () => {
+    const createNativeClientSync = await loadEngine();
+    const native = { ...nativeModule(), setUpdateRequiredViewEnabled: vi.fn().mockResolvedValue(undefined) };
+    const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+    await createNativeClientSync(
+      native,
+      'pk_test_123',
+      null,
+      () => cache,
+      () => false,
+    ).tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+
+    expect(native.setUpdateRequiredViewEnabled).toHaveBeenCalledWith(false);
+    expect(vi.mocked(native.setUpdateRequiredViewEnabled).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(native.configureNative).mock.invocationCallOrder[0],
+    );
+  });
+
+  test('leaves the native update screen on unless told otherwise', async () => {
+    const createNativeClientSync = await loadEngine();
+    const native = { ...nativeModule(), setUpdateRequiredViewEnabled: vi.fn().mockResolvedValue(undefined) };
+    const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+    await createNativeClientSync(native, 'pk_test_123', null, () => cache).tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+
+    expect(native.setUpdateRequiredViewEnabled).toHaveBeenCalledWith(true);
+  });
+
+  test('still configures native when setting its update screen fails', async () => {
+    const createNativeClientSync = await loadEngine();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const native = {
+      ...nativeModule(),
+      setUpdateRequiredViewEnabled: vi.fn().mockRejectedValue(new Error('not available')),
+    };
+    const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+    await createNativeClientSync(
+      native,
+      'pk_test_123',
+      null,
+      () => cache,
+      () => false,
+    ).tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+
+    expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', null, null);
+  });
+
   test('configures native again when the proxy URL changes', async () => {
     const createNativeClientSync = await loadEngine();
     const native = nativeModule();

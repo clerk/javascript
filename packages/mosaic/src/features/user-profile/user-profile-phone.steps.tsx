@@ -15,8 +15,7 @@ import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
 import { Form } from '../../primitives/form';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
-
-const CODE_LENGTH = 6;
+import { CODE_LENGTH } from '../../utils/verification';
 
 interface EnterPhoneStepProps {
   inputRef?: Ref<HTMLInputElement>;
@@ -30,7 +29,7 @@ interface EnterPhoneStepProps {
 }
 
 export function EnterPhoneStep(props: EnterPhoneStepProps) {
-  const m = useMessages('userProfileAddPhone');
+  const m = useMessages('userProfile').phone.addDialog;
   const phoneFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
   const canSubmit = props.phoneNumber !== '';
@@ -69,6 +68,11 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
             value={props.phoneNumber}
             onValueChange={props.onPhoneNumberChange}
             defaultCountry={props.defaultCountry}
+            countryTriggerLabel={m.phone.selectedCountry}
+            countryPopupLabel={m.phone.chooseCountry}
+            countrySearchLabel={m.phone.searchCountries}
+            countrySearchPlaceholder={m.phone.countrySearchPlaceholder}
+            noResultsMessage={m.phone.noCountries}
           />
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
@@ -79,7 +83,6 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
         {props.secondaryAction}
         <SubmitButton
           form={phoneFormId}
-          fullWidth
           disabled={!canSubmit}
           isPending={props.isPending}
           pendingLabel={m.phone.pending}
@@ -105,7 +108,7 @@ interface VerifyPhoneStepProps {
 }
 
 export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
-  const m = useMessages('userProfileAddPhone');
+  const m = useMessages('userProfile').phone.addDialog;
   const verifyFormId = useId();
   const canSubmit = props.code.length === CODE_LENGTH;
 
@@ -185,11 +188,11 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
       <Card.Footer>
         {props.secondaryAction ?? (
           <Dialog.Close
+            disabled={props.isPending || props.isResending}
             render={
               <Button
                 variant='outline'
                 color='neutral'
-                fullWidth
               />
             }
           >
@@ -198,7 +201,6 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
         )}
         <SubmitButton
           form={verifyFormId}
-          fullWidth
           isPending={props.isPending}
           disabled={!canSubmit || props.isResending}
           pendingLabel={m.verify.pending}

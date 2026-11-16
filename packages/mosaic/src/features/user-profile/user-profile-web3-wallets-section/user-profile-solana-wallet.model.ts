@@ -1,3 +1,4 @@
+// eslint-disable-next-line boundaries/dependencies -- Wallet discovery synchronizes with an external registry in this model.
 import { useEffect, useState } from 'react';
 
 export type InstalledSolanaWallet = { name: string; icon: string };

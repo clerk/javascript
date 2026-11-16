@@ -61,12 +61,6 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
 
   const { handleVerificationResponse } = useAfterVerification();
 
-  React.useEffect(() => {
-    if (!props.factorAlreadyPrepared) {
-      prepare();
-    }
-  }, []);
-
   const prepare = () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     void session!
@@ -94,6 +88,12 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       })
       .catch(err => (props.onAttemptError ? props.onAttemptError(err, reject) : reject(err)));
   };
+
+  React.useEffect(() => {
+    if (!props.factorAlreadyPrepared) {
+      prepare();
+    }
+  }, []);
 
   return (
     <VerificationCodeCard

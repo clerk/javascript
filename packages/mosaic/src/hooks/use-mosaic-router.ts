@@ -4,6 +4,7 @@ import { useClerk } from '@clerk/shared/react';
 export interface MosaicRouter {
   navigate: (to: string) => void | Promise<unknown>;
   windowNavigate: (to: URL | string) => void;
+  getSearchParams: () => URLSearchParams;
 }
 
 /**
@@ -22,8 +23,10 @@ export function useMosaicRouter(): MosaicRouter {
       if (typeof clerk.__internal_windowNavigate === 'function') {
         clerk.__internal_windowNavigate(to);
       } else {
+        // eslint-disable-next-line typescript/no-deprecated -- Older Clerk runtimes do not expose __internal_windowNavigate.
         windowNavigate(to);
       }
     },
+    getSearchParams: () => new URLSearchParams(typeof window !== 'undefined' ? (window.location?.search ?? '') : ''),
   };
 }

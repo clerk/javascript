@@ -39,6 +39,17 @@ vi.mock('react-native', () => {
   };
 });
 
+vi.mock('../../../app-version/appVersionRequestHooks', () => ({
+  createAppVersionRequestHooks: () => ({
+    checkOnForeground: () => {},
+    beforeRequest: ({ headers }: { headers: Headers }) => {
+      headers.set('x-bundle-id', 'com.example.app');
+      headers.set('x-app-version', '4.8.4');
+    },
+    afterResponse: () => {},
+  }),
+}));
+
 class MockClerk {
   public publishableKey: string;
   public proxyUrl: unknown;
@@ -210,6 +221,34 @@ describe('createClerkInstance', () => {
 
     expect(get).toHaveBeenNthCalledWith(1, { publicKeyOptions: signInSecondFactorOptions });
     expect(get).toHaveBeenNthCalledWith(2, { publicKeyOptions: sessionSecondFactorOptions });
+  });
+
+  test('forwards preferImmediatelyAvailableCredentials to the native passkey adapter', async () => {
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const get = vi.fn().mockResolvedValue({ publicKeyCredential: null, error: null });
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      __experimental_passkeys: {
+        get,
+        create: vi.fn(),
+        isSupported: vi.fn(() => true),
+        isAutoFillSupported: vi.fn(() => Promise.resolve(false)),
+      },
+    }) as unknown as MockClerk & {
+      __internal_getPublicCredentials: (params: {
+        publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+        preferImmediatelyAvailableCredentials?: boolean;
+      }) => Promise<unknown>;
+    };
+    const publicKeyOptions = {
+      challenge: new Uint8Array([1]).buffer,
+      rpId: 'example.com',
+    } as PublicKeyCredentialRequestOptionsWithoutExtensions;
+
+    await clerk.__internal_getPublicCredentials({ publicKeyOptions, preferImmediatelyAvailableCredentials: true });
+
+    expect(get).toHaveBeenCalledWith({ publicKeyOptions, preferImmediatelyAvailableCredentials: true });
   });
 
   test('recreates the singleton when proxyUrl changes', async () => {
@@ -384,6 +423,20 @@ describe('createClerkInstance', () => {
     });
 
     await expect(tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('fresh-token');
+  });
+
+  test('identifies the app without changing the API version', async () => {
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({
+      getToken: vi.fn().mockResolvedValue(null),
+      saveToken: vi.fn(),
+    });
+    requestInit.url.searchParams.set('__clerk_api_version', '2026-08-20');
+
+    await beforeRequest(requestInit);
+
+    expect(requestInit.url.searchParams.getAll('__clerk_api_version')).toEqual(['2026-08-20']);
+    expect(requestInit.headers.get('x-bundle-id')).toBe('com.example.app');
+    expect(requestInit.headers.get('x-app-version')).toBe('4.8.4');
   });
 
   test('waits until the app is active and retries when the token cache read fails in the background', async () => {

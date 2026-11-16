@@ -10,7 +10,7 @@ import { SaveError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosName } from '@/lib/chaos';
+import { chaosCompany, chaosSlug } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useInvitationsTableFixture } from './invitations-table-tab';
@@ -44,8 +44,8 @@ export interface OrganizationProfileFixtureOptions {
 export function useOrganizationProfileFixture({ failWith }: OrganizationProfileFixtureOptions = {}) {
   const [activePage, setActivePage] = useState<OrganizationProfileViewProps['activePage']>('general');
   const organization = useChaosFixture(exampleOrganization, () => ({
-    name: chaosName(0),
-    slug: 'a-really-long-organization-slug-that-never-seems-to-end-177654156132154',
+    name: chaosCompany(0),
+    slug: chaosSlug(0),
     memberCount: 1_234_567,
   }));
   const [name, setName] = useState(organization.name);

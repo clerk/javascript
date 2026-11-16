@@ -17,7 +17,7 @@ export function OrganizationProfileDangerSectionView({
   leave,
   destroy,
 }: OrganizationProfileDangerSectionViewProps) {
-  const m = useMessages('organizationProfileDangerSection');
+  const m = useMessages('organizationProfile').danger;
   const locale = useLocale();
 
   if (!leave && !destroy) {
@@ -78,7 +78,7 @@ function DangerRow({
   dialogTitle: string;
   dialogDescription: string;
 }) {
-  const m = useMessages('organizationProfileDangerSection');
+  const m = useMessages('organizationProfile').danger;
 
   return (
     <Section.Row>

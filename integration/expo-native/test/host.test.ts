@@ -8,8 +8,6 @@ import { buildFixture, mustStep, nativeInputs, simulatorArch } from '../src/fixt
 import { host, metroPort, withCleanup } from '../src/host.ts';
 import { devClientEntry } from '../specs/app.ts';
 import { selectBackend } from '@clerk/internal-mobile-e2e/core/devices';
-import { resolveSpecs } from '@clerk/internal-mobile-e2e/core/e2e';
-import { STANDARD, declaredIn, planGroups, readSpecText } from '@clerk/internal-mobile-e2e/core/instances/settings';
 import { encodeLaunchArguments } from '@clerk/internal-mobile-e2e/specs/support/launch';
 import {
   VerifyFailure,
@@ -101,9 +99,9 @@ describe('a step of the test app build', () => {
     const scratch = mkdtempSync(join(tmpdir(), 'verify-build-step-'));
     const before = { ...process.env };
     const set = {
-      CLERK_PLATFORM_API_KEY: 'ak_platform',
-      CLERK_PLATFORM_API_KEY_FILE: '/home/x/key',
-      VERIFY_PLATFORM_KEY_REFERENCE: 'op://vault/item',
+      MOBILE_VERIFICATION_PLATFORM_API_KEY: 'ak_platform',
+      MOBILE_VERIFICATION_PLATFORM_API_KEY_FILE: '/home/x/key',
+      MOBILE_VERIFICATION_PLATFORM_API_KEY_REFERENCE: 'op://vault/item',
       CLERK_SECRET_KEY: 'sk_test_instance',
       AI_GATEWAY_API_KEY: 'vck_gateway',
       AI_GATEWAY_API_KEY_FILE: '/home/x/gateway',
@@ -161,26 +159,6 @@ describe('the clerk-expo host', () => {
     );
     assert.ok(shown.length > 0);
     assert.deepEqual(homeLinkIds(readFileSync(join(import.meta.dirname, '..', 'specs', 'native.ts'), 'utf8')), shown);
-  });
-});
-
-describe('the committed specs of this repository', () => {
-  const dir = join(import.meta.dirname, '..');
-  const committed = resolveSpecs(dir, { all: true }).map(spec => ({ spec, ...readSpecText(dir, spec.path) }));
-
-  it('declare settings in one spec file, so a run of all of them is the standard group and then the biometric sign-in group', () => {
-    const declaring = committed
-      .filter(({ spec, ...text }) => declaredIn(text, spec.path) !== null)
-      .map(({ spec }) => spec.path);
-    assert.deepEqual(declaring, ['specs/features/native-modules/biometric-availability.e2e.ts']);
-    const plan = planGroups(committed, STANDARD.key);
-    assert.equal(plan.length, 2);
-    assert.equal(plan[0]!.settings, STANDARD);
-    assert.equal(plan[0]!.specs.length, committed.length - 1);
-    assert.deepEqual(
-      plan[1]!.specs.map(spec => spec.path),
-      declaring,
-    );
   });
 });
 

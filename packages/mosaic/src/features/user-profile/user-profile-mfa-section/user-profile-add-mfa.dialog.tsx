@@ -31,7 +31,7 @@ export function UserProfileAddMfaDialog({
   showCloseButton = true,
   triggerRef: triggerRefProp,
 }: UserProfileAddMfaDialogProps) {
-  const m = useMessages('userProfileMfa');
+  const m = useMessages('userProfile').mfa;
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useMergeRefs([triggerRefProp, addButtonRef]);
   return (
@@ -57,7 +57,7 @@ export function UserProfileAddMfaDialog({
           <Icon
             glyph={Plus}
             placement='inline-start'
-            size='sm'
+            size='md'
           />
           {m.add}
         </Dialog.Trigger>

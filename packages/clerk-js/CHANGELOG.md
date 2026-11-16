@@ -1,5 +1,87 @@
 # Change Log
 
+## 6.43.1
+
+### Patch Changes
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+
+## 6.43.0
+
+### Minor Changes
+
+- Add a `preferImmediatelyAvailableCredentials` option to `signIn.authenticateWithPasskey()` and `signIn.passkey()`. With `@clerk/expo-passkeys` on iOS 16+ and Android, it limits sign-in to passkeys already on the device, and the request fails without showing the "use a passkey from another device" sheet when there are none. This lets an app prompt for a passkey automatically when its sign-in screen opens. Browsers ignore it. ([#10776](https://github.com/clerk/javascript/pull/10776)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix sign-ups failing with "There is no account to transfer" when `handleRedirectCallback()` was called again while an earlier call was still running, for example because `<SignIn />` remounted during the OAuth callback. Calls made while one is running now share its result instead of starting a second transfer. ([#10671](https://github.com/clerk/javascript/pull/10671)) by [@Ephem](https://github.com/Ephem)
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.45.0
+
+## 6.42.3
+
+### Patch Changes
+
+- Fix `getToken()` and React Native startup hanging when a Frontend API request never gets a response. In React Native, session token requests now time out after 10 seconds and are retried. In React Native apps that use `__experimental_resourceCache`, startup requests time out after 7 seconds and Clerk loads from the cached resources. Token requests in browsers are unchanged. ([#10646](https://github.com/clerk/javascript/pull/10646)) by [@mikepitre](https://github.com/mikepitre)
+
+- Prevent Chrome extensions from loading Device Intelligence scripts from remote URLs. ([#10565](https://github.com/clerk/javascript/pull/10565)) by [@mwickett](https://github.com/mwickett)
+
+  Initialize production Chrome extension authentication without requiring a previously stored client token.
+
+- Fix users occasionally being signed out right after completing sign-up. `setActive({ session })` now rejects with a network error instead of signing the user out when it cannot confirm a newly created session. ([#10654](https://github.com/clerk/javascript/pull/10654)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+
+## 6.42.2
+
+### Patch Changes
+
+- In `@clerk/expo` apps on iOS and Android, Clerk now finishes loading once its requests succeed again after a failed load, such as while Clerk rejects an outdated app version. Previously it stayed failed until the app restarted. ([#10461](https://github.com/clerk/javascript/pull/10461)) by [@seanperez29](https://github.com/seanperez29)
+
+- Fix sign-ins and sign-ups being blocked by Device Intelligence checks when the same origin served more than one Clerk instance, such as an app moving from development to production keys. The Device Intelligence token is now stored per instance, so a token acquired for one instance is no longer sent to another. ([#10536](https://github.com/clerk/javascript/pull/10536)) by [@mwickett](https://github.com/mwickett)
+
+- Fixes signing out of all accounts on satellite domains to preserve device recognition when Device Trust and client persistence are enabled. Preserves existing navigation callbacks when cross-domain repair is unavailable, and skips the repair redirect when Device Trust or client persistence is disabled. Malformed redirect URLs no longer prevent the sign-out request. ([#10470](https://github.com/clerk/javascript/pull/10470)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`917748a`](https://github.com/clerk/javascript/commit/917748ab54aa75ae073bfb07b31938a1c193794a), [`064bab8`](https://github.com/clerk/javascript/commit/064bab8220547de81c98d8f9d521968228935598)]:
+  - @clerk/shared@4.44.0
+
+## 6.42.1
+
+### Patch Changes
+
+- Keep a Device Intelligence result that arrives after ClerkJS has stopped waiting for it, and use it for the next sign-in or sign-up instead of discarding it. Users on slow connections who retry are less likely to have sign-ups blocked by protections that require a Device Intelligence result. ([#10276](https://github.com/clerk/javascript/pull/10276)) by [@mwickett](https://github.com/mwickett)
+
+- Wait up to 10 seconds, instead of 5, for the Device Intelligence check to finish before sending a sign-in or sign-up without its result. This applies when an instance hasn't configured its own limit. Users on slow connections are less likely to have sign-ups blocked by protections that require a Device Intelligence result. ([#10275](https://github.com/clerk/javascript/pull/10275)) by [@mwickett](https://github.com/mwickett)
+
+  Keep the wait bounded when the device clock changes so later attempts can recover after another tab's lock is released.
+
+  The shared loader type reference now documents the same 10-second default.
+
+- Fix `getToken()` returning an expired session token when the device clock runs behind and a token is cached again, or a staler token arrives after a fresher one. ([#10429](https://github.com/clerk/javascript/pull/10429)) by [@Ephem](https://github.com/Ephem)
+
+- Updated dependencies [[`debfc72`](https://github.com/clerk/javascript/commit/debfc72bc2f49a004b20365773824b283bc3cda0)]:
+  - @clerk/shared@4.43.1
+
+## 6.42.0
+
+### Minor Changes
+
+- Add the optional `slackTeamIdHint` workspace hint to Slack sign-in and sign-up attempts, including redirect, popup, and unified SSO flows. ([#10402](https://github.com/clerk/javascript/pull/10402)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`4ce996f`](https://github.com/clerk/javascript/commit/4ce996ff283e6bee334109a245aaa7384b7e38e5)]:
+  - @clerk/shared@4.43.0
+
+## 6.41.1
+
+### Patch Changes
+
+- Fix `getToken()` returning a session token after it expired on the server when the device clock runs behind. ([#10401](https://github.com/clerk/javascript/pull/10401)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 6.41.0
 
 ### Minor Changes

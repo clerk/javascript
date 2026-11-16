@@ -1,11 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, isInaccessible, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserCircle } from '../../icons/glyphs/user-circle';
 import { MosaicProvider } from '../../mosaic-provider';
+import { axe } from '../../primitives/test-utils/axe';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
@@ -62,6 +63,30 @@ function renderSurface(props: Partial<ProfileRootProps> = {}) {
     <MosaicProvider>
       <Surface {...props} />
     </MosaicProvider>,
+  );
+}
+
+function GroupedSurface(rootProps: Partial<ProfileRootProps>) {
+  return (
+    <Profile.Root
+      value='account'
+      {...rootProps}
+    >
+      <Profile.Title>Settings</Profile.Title>
+      <Profile.Nav>
+        <Profile.NavGroup label='Personal'>
+          <Profile.NavItem value='account'>Account</Profile.NavItem>
+          <Profile.NavItem value='security'>Security</Profile.NavItem>
+        </Profile.NavGroup>
+        <Profile.NavGroup label='Acme Inc'>
+          <Profile.NavItem value='organization/general'>General</Profile.NavItem>
+          <Profile.NavItem value='organization/security'>Security</Profile.NavItem>
+        </Profile.NavGroup>
+      </Profile.Nav>
+      <Profile.Content pageTitle='Account'>
+        <Profile.ContentPanel value='account'>Account page</Profile.ContentPanel>
+      </Profile.Content>
+    </Profile.Root>
   );
 }
 
@@ -289,6 +314,42 @@ describe('Profile', () => {
   });
 
   // The sentinel reports 1px column, 2px select, 3px sheet.
+  describe('navigation groups', () => {
+    it('labels each group and describes its tabs by that label', () => {
+      render(<GroupedSurface />);
+
+      const label = screen.getByText('Acme Inc');
+      expect(label).toHaveClass('cl-profile-nav-group-label');
+      expect(label.closest('.cl-profile-nav-group')).toContainElement(
+        screen.getByRole('tab', { name: 'General', description: 'Acme Inc' }),
+      );
+      expect(screen.getByRole('tab', { name: 'Security', description: 'Personal' })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'Security', description: 'Acme Inc' })).toBeInTheDocument();
+    });
+
+    it('keeps the group labels out of the tablist for assistive tech', () => {
+      render(<GroupedSurface />);
+
+      expect(isInaccessible(screen.getByText('Personal'))).toBe(true);
+      expect(isInaccessible(screen.getByText('Acme Inc'))).toBe(true);
+    });
+
+    it('moves between groups with the arrow keys', async () => {
+      const user = userEvent.setup();
+      render(<GroupedSurface />);
+
+      screen.getByRole('tab', { name: 'Security', description: 'Personal' }).focus();
+      await user.keyboard('{ArrowDown}');
+
+      expect(screen.getByRole('tab', { name: 'General' })).toHaveFocus();
+    });
+
+    it('has no accessibility violations', async () => {
+      const { container } = render(<GroupedSurface />);
+      expect((await axe(container)).violations).toEqual([]);
+    });
+  });
+
   describe('compact', () => {
     let observe: ((width: number) => void) | null = null;
     const original = globalThis.ResizeObserver;
@@ -365,6 +426,25 @@ describe('Profile', () => {
       await user.click(screen.getByRole('option', { name: 'Security' }));
       expect(onValueChange).toHaveBeenCalledWith('security');
       await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    });
+
+    it('groups the listbox options under each group label', async () => {
+      const user = userEvent.setup();
+      render(
+        <MosaicProvider>
+          <GroupedSurface />
+        </MosaicProvider>,
+      );
+      act(() => observe?.(2));
+
+      await user.click(screen.getByRole('combobox', { name: 'Account' }));
+
+      expect(screen.getByRole('group', { name: 'Acme Inc' })).toContainElement(
+        screen.getByRole('option', { name: 'General' }),
+      );
+      expect(screen.getByRole('group', { name: 'Personal' })).toContainElement(
+        screen.getByRole('option', { name: 'Account' }),
+      );
     });
 
     it('opens the listbox from the keyboard, picks with the arrows, and keeps focus on the title', async () => {

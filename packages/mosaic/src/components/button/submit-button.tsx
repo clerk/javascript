@@ -96,15 +96,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
       </span>
       {isPending || showPending ? (
         <Spinner
-          // The indicator has to be in the accessibility tree the moment the button goes
-          // pending, so it opts out of `Spinner`'s decorative default and carries an
-          // indeterminate progressbar role. It is named in its own right rather than folded
-          // into the button's name: `progressbar` is a range role, so the name computation
-          // takes its value — absent, since it is indeterminate — over its label, and a
-          // descendant one contributes nothing to the button above it.
-          role='progressbar'
-          aria-hidden={undefined}
-          aria-label={pendingLabel}
+          label={pendingLabel}
           size={spinnerSizes[size]}
           xstyle={[styles.spinner, !showPending && styles.spinnerHidden]}
         />

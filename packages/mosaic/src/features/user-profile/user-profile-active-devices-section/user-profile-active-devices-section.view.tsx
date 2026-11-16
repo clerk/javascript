@@ -32,7 +32,7 @@ export function UserProfileActiveDevicesSectionView({
   signOutAll,
   signOutAllFinalFocus,
 }: UserProfileActiveDevicesSectionViewProps) {
-  const m = useMessages('userProfileActiveDevices');
+  const m = useMessages('userProfile').activeDevices;
   const locale = useLocale();
   const currentDevices = devices.filter(device => device.isCurrent);
   const otherDevices = devices.filter(device => !device.isCurrent);
@@ -123,7 +123,7 @@ export function UserProfileActiveDevicesSectionView({
   );
 }
 
-function deviceBadges(device: UserProfileDevice, m: MosaicMessages['userProfileActiveDevices']): string[] {
+function deviceBadges(device: UserProfileDevice, m: MosaicMessages['userProfile']['activeDevices']): string[] {
   const labels: (string | null)[] = [
     device.isCurrent ? m.thisDevice : null,
     device.isUserDevice ? m.userDevice : null,
@@ -143,7 +143,7 @@ function DeviceItem({
   onViewDetails: (device: UserProfileDevice) => void;
   onSignOut?: (device: UserProfileDevice) => void;
 }) {
-  const m = useMessages('userProfileActiveDevices');
+  const m = useMessages('userProfile').activeDevices;
   const actions: ActionMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
 
   if (onSignOut) {

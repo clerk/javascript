@@ -77,7 +77,7 @@ describe('ImpersonationFab', () => {
   it('keeps the sign-out action clickable', async () => {
     const { fixtures, getByText, userEvent } = await renderDraggableFab();
     await userEvent.click(getByText('Sign out'));
-    expect(fixtures.clerk.signOut).toHaveBeenCalled();
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
   });
 
   it('settles inside the viewport inset when released off-screen', async () => {

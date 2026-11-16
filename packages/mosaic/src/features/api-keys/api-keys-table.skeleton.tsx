@@ -9,7 +9,6 @@ import { VisuallyHidden } from '../../components/visually-hidden';
 import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './api-keys-table.styles';
 import type { APIKeysTableMessages } from './api-keys-table.types';
-import { APIKeysTableColumns } from './api-keys-table.view';
 
 export function APIKeysTableSkeleton({
   messages: m,
@@ -37,25 +36,26 @@ export function APIKeysTableSkeleton({
         layout='fixed'
         minWidth='36rem'
       >
-        <APIKeysTableColumns
-          selectable={false}
-          revocable={canManage}
-        />
         <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>{m.name}</Table.HeaderCell>
-            <Table.HeaderCell>{m.createdAt}</Table.HeaderCell>
-            <Table.HeaderCell>{m.lastUsed}</Table.HeaderCell>
-            {canManage ? (
-              <Table.HeaderCell align='end'>
-                <VisuallyHidden>{m.actions}</VisuallyHidden>
-              </Table.HeaderCell>
-            ) : null}
-          </Table.Row>
+          <Table.Column>{m.name}</Table.Column>
+          <Table.Column width='9rem'>{m.createdAt}</Table.Column>
+          <Table.Column width='9rem'>{m.lastUsed}</Table.Column>
+          {canManage ? (
+            <Table.Column
+              align='end'
+              width='4rem'
+            >
+              <VisuallyHidden>{m.actions}</VisuallyHidden>
+            </Table.Column>
+          ) : null}
         </Table.Header>
-        <Table.Body aria-hidden>
-          {PLACEHOLDER_API_KEYS.map(apiKey => (
-            <Table.Row key={apiKey.id}>
+        <Table.Body
+          aria-hidden
+          items={PLACEHOLDER_API_KEYS}
+          itemToStringValue={apiKey => apiKey.id}
+        >
+          {apiKey => (
+            <Table.Row>
               <Table.Cell>
                 <div {...stylex.props(styles.metadata)}>
                   <Text xstyle={styles.name}>
@@ -89,7 +89,7 @@ export function APIKeysTableSkeleton({
                 </Table.Cell>
               ) : null}
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
     </div>

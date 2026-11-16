@@ -6,7 +6,7 @@ import type {
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosName, chaosRows, chaosText } from '@/lib/chaos';
+import { chaosPick, chaosRows } from '@/lib/chaos';
 
 import { idleReverification } from './reverification';
 
@@ -15,16 +15,24 @@ const examplePasskeys: UserProfilePasskey[] = [
   { id: 'phone', name: 'iPhone', createdAtLabel: 'Created yesterday' },
 ];
 
+const chaosPasskeyNames = [
+  'iCloud Keychain (MacBook Pro 16-inch, 2024)',
+  'YubiKey 5C NFC, backup key in the office safe',
+  'Windows Hello on ThinkPad X1 Carbon Gen 12',
+  '1Password',
+  'Google Password Manager on Pixel 9 Pro Fold',
+];
+
 export function usePasskeysFixture({
   empty = false,
   failOnce = false,
 }: { empty?: boolean; failOnce?: boolean } = {}): UserProfilePasskeysSectionViewProps {
   const seed = useChaosFixture(examplePasskeys, items =>
-    chaosRows(items, 12).map((passkey, index) => ({
+    chaosRows(items, chaosPasskeyNames.length).map((passkey, index) => ({
       ...passkey,
-      name: chaosName(index),
-      createdAtLabel: chaosText(passkey.createdAtLabel),
-      lastUsedAtLabel: chaosText(passkey.lastUsedAtLabel),
+      name: chaosPick(chaosPasskeyNames, index),
+      createdAtLabel: 'Created September 28th, 2026',
+      lastUsedAtLabel: 'Last used September 30th, 2026 at 11:47 PM',
     })),
   );
   const [passkeys, setPasskeys] = useState(empty ? [] : seed);

@@ -29,7 +29,7 @@ export function UserProfileAddAuthenticatorView({
   isPending = false,
   errorMessage,
 }: UserProfileAddAuthenticatorViewProps) {
-  const m = useMessages('userProfileAddAuthenticator');
+  const m = useMessages('userProfile').mfa.addAuthenticator;
   const formId = useId();
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const inputRef = useFlowAutoFocus<HTMLInputElement>();
@@ -57,6 +57,7 @@ export function UserProfileAddAuthenticatorView({
         <Field.Root
           required
           disabled={isPending}
+          focusableWhenDisabled
           invalid={Boolean(errorMessage)}
           xstyle={styles.field}
         >
@@ -78,7 +79,6 @@ export function UserProfileAddAuthenticatorView({
           type='button'
           variant='outline'
           color='neutral'
-          fullWidth
           disabled={isPending}
           onClick={onBack}
         >
@@ -88,7 +88,6 @@ export function UserProfileAddAuthenticatorView({
           ref={actionRef}
           type='submit'
           form={formId}
-          fullWidth
           isPending={isPending}
           disabled={code.length !== 6}
           focusableWhenDisabled

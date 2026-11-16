@@ -1,0 +1,73 @@
+import * as Stories from './oauth-consent.stories';
+
+# OAuthConsent
+
+Asks the signed-in user whether an OAuth application may access their account. `OAuthConsent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with every URL parameter forwarded. When the application asks for `user:org:read`, the user picks which organization to grant. Each scope can show a checkbox with a label and a description; a required scope stays checked. It shows a skeleton of the consent card until the consent details load, and nothing when nobody is signed in.
+
+## Example
+
+Switch between loading, the consent screen and an error to see the card animate between them. Loading shows the consent card as a skeleton.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Skeleton', href: '/components/skeleton', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
+    { name: 'Checkbox', href: '/components/checkbox', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Radio', href: '/components/radio', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+    { name: 'Tooltip', href: '/components/tooltip', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent';
+
+<OAuthConsent />;
+```
+
+## Props
+
+| Prop            | Type     | Default                      |
+| --------------- | -------- | ---------------------------- |
+| `oauthClientId` | `string` | The `client_id` parameter    |
+| `scope`         | `string` | The `scope` parameter        |
+| `redirectUrl`   | `string` | The `redirect_uri` parameter |
+
+## Examples
+
+### Scope list
+
+Without `scopeSelection`, the scopes render as a list with no checkboxes. This is what `OAuthConsent` renders today.
+
+<Story name='ScopeList' storyModule={Stories} />
+
+### Many scopes
+
+A long scope list scrolls inside its box, with the edges fading while there is more to see.
+
+<Story name='ManyScopes' storyModule={Stories} />
+
+### Multiple organizations
+
+With `organizationSelection`, the user grants access to all of their organizations or picks some of them. Picking shows a select of organizations with their avatars, and the select reads as a count once more than one is picked. The form posts one `organization_id` per granted organization.
+
+<Story name='MultipleOrganizations' storyModule={Stories} />
+
+### Offline access
+
+Requesting `offline_access` hides that scope from the list and adds a note that the user stays signed in.
+
+<Story name='OfflineAccess' storyModule={Stories} />

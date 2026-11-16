@@ -420,6 +420,7 @@ final class ClerkNativeBridge {
   private static var clerkConfigured = false
   private static var configuredPublishableKey: String?
   private static var configuredProxyUrl: String?
+  private static var updateRequiredViewEnabled = true
 
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
@@ -672,9 +673,19 @@ final class ClerkNativeBridge {
   private static func makeClerkOptions(proxyUrl: String?) -> Clerk.Options {
     let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
     guard let service = keychainService else {
-      return .init(proxyUrl: proxyUrl, middleware: middleware)
+      return .init(proxyUrl: proxyUrl, middleware: middleware, updateRequiredViewEnabled: updateRequiredViewEnabled)
     }
-    return .init(keychainConfig: .init(service: service), proxyUrl: proxyUrl, middleware: middleware)
+    return .init(
+      keychainConfig: .init(service: service),
+      proxyUrl: proxyUrl,
+      middleware: middleware,
+      updateRequiredViewEnabled: updateRequiredViewEnabled
+    )
+  }
+
+  @MainActor
+  static func setUpdateRequiredViewEnabled(_ enabled: Bool) {
+    updateRequiredViewEnabled = enabled
   }
 
   @MainActor

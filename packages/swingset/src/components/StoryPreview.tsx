@@ -25,6 +25,7 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
   const StoryComp = storyModule[name] as React.ComponentType<Record<string, unknown>>;
   const playground = usePlayground();
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react/set-state-in-effect -- Render browser-dependent stories only after hydration
   useEffect(() => setMounted(true), []);
 
   if (!StoryComp) {

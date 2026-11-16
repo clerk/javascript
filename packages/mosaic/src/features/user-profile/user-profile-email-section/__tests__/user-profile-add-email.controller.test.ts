@@ -32,6 +32,28 @@ function saveError(message: string, field?: 'emailAddress' | 'code') {
 describe('useUserProfileAddEmailController', () => {
   afterEach(() => vi.useRealTimers());
 
+  it('unlocks resend by the clock when timers were held up', async () => {
+    vi.useFakeTimers();
+    const email = verifier();
+    const { result } = renderHook(() =>
+      useUserProfileAddEmailController({ reverification: idleReverification, onCreate: () => Promise.resolve(email) }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
+    await act(async () => {
+      result.current.onSubmit();
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(result.current.resendSeconds).toBe(30);
+
+    vi.setSystemTime(Date.now() + 60_000);
+    await act(async () => vi.advanceTimersByTimeAsync(1000));
+
+    expect(result.current.resendSeconds).toBe(0);
+    act(() => result.current.onResend());
+    expect(email.start).toHaveBeenCalledTimes(2);
+  });
+
   it('keeps the resend countdown running while verification is pending', async () => {
     vi.useFakeTimers();
     const verification = createDeferredPromise();
@@ -192,18 +214,27 @@ describe('useUserProfileAddEmailController', () => {
     expect(email.verifyCode).toHaveBeenCalledExactlyOnceWith('123456');
   });
 
-  it('verifies an existing email without creating one', async () => {
+  it('verifies an existing email without creating one, opening once its code is sent', async () => {
     const onCreate = vi.fn(created);
-    const email = verifier();
+    const sent = createDeferredPromise();
+    const email = verifier(() => ({ method: 'code', sent: sent.promise.then(() => undefined) }));
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
     );
 
     act(() => result.current.onVerifyEmail(other, email));
+    expect(email.start).toHaveBeenCalledOnce();
+    expect(result.current.open).toBe(false);
+    expect(result.current.pendingVerifyId).toBe('email_2');
+
+    await act(async () => {
+      sent.resolve();
+      await sent.promise;
+    });
     expect(result.current.open).toBe(true);
+    expect(result.current.pendingVerifyId).toBeUndefined();
     expect(result.current.step).toBe('verify');
     expect(result.current.emailAddress).toBe('other@example.com');
-    await waitFor(() => expect(email.start).toHaveBeenCalledOnce());
 
     act(() => result.current.onSubmit('123456'));
     await waitFor(() => expect(result.current.open).toBe(false));

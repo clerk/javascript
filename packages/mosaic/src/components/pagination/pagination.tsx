@@ -89,7 +89,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     const sizes = new Set(
       [...pageSizeOptions, itemsPerPage].filter(size => Number.isFinite(size) && size >= 1).map(Math.floor),
     );
-    return [...sizes].sort((a, b) => a - b).map(size => ({ value: String(size), label: String(size) }));
+    return [...sizes].sort((a, b) => a - b).map(size => ({ value: size, label: String(size) }));
   }, [pageSizeOptions, itemsPerPage]);
   const isFirst = current <= 1;
   const isLast = current >= pageCount;
@@ -126,8 +126,8 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 </span>
                 <Select.Root
                   items={pageSizeItems}
-                  value={String(itemsPerPage)}
-                  onValueChange={value => onPageSizeChange(Number(value))}
+                  value={itemsPerPage}
+                  onValueChange={onPageSizeChange}
                 >
                   <Select.Trigger
                     aria-label={pageSizeLabel}
@@ -171,7 +171,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               >
                 <Icon
                   glyph={ChevronDoubleLeft}
-                  size='sm'
+                  size='md'
                   xstyle={rtl.mirror}
                 />
               </Button>
@@ -188,7 +188,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
             >
               <Icon
                 glyph={ChevronLeft}
-                size='sm'
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Button>
@@ -214,7 +214,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
             >
               <Icon
                 glyph={ChevronRight}
-                size='sm'
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Button>
@@ -231,7 +231,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               >
                 <Icon
                   glyph={ChevronDoubleRight}
-                  size='sm'
+                  size='md'
                   xstyle={rtl.mirror}
                 />
               </Button>

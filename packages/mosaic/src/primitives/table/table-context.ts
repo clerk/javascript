@@ -90,7 +90,7 @@ export function useRowHeaderLabel(id: string | undefined, ariaLabel: string | un
 export function useCellIndex() {
   const ref = useRef<HTMLTableCellElement | null>(null);
   const [index, setIndex] = useState(-1);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Re-reads cellIndex after every render so the index follows column changes; setIndex bails out when it is unchanged, so it cannot loop.
+  // eslint-disable-next-line react/exhaustive-deps -- Re-reads cellIndex after every render so the index follows column changes; setIndex bails out when it is unchanged, so it cannot loop.
   useLayoutEffect(() => {
     setIndex(ref.current?.cellIndex ?? -1);
   });

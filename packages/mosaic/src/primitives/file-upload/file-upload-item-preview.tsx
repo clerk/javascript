@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useFileUploadItemContext } from './file-upload-context';
 import { useObjectUrl } from './use-object-url';
 
@@ -20,10 +20,10 @@ export const FileUploadItemPreview = React.forwardRef<HTMLImageElement, FileUplo
     const isImage = file.type.startsWith('image/');
     const objectUrl = useObjectUrl(isImage ? file : undefined);
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       src: objectUrl,
       alt: file.name,
-    };
+    } satisfies DefaultProps<'img'>;
 
     return useRender({
       defaultTagName: 'img',

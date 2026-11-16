@@ -1,41 +1,72 @@
-import type { MosaicLocalization } from '@clerk/mosaic/localization';
-import { mosaicMessages } from '@clerk/mosaic/localization';
+import type { Faker } from '@faker-js/faker';
+import { fakerAR, fakerDE, fakerFI, fakerFR, fakerJA, fakerPT_BR, fakerVI, fakerZH_CN } from '@faker-js/faker';
 
-const CHAOS_SUFFIX = 'Ŵïţħ ëẍţŕą łöñğ ţêẍţ ţħąţ ẅŕąṗṡ Pneumonoultramicroscopicsilicovolcanoconiosis';
+const LOCALES = [fakerDE, fakerAR, fakerFI, fakerJA, fakerPT_BR, fakerVI, fakerFR, fakerZH_CN];
 
-const CHAOS_NAMES = [
-  'Maximiliana-Alexandrina Wolfeschlegelsteinhausenbergerdorff-Montgomery',
-  'X',
-  'محمد بن عبد الرحمن آل سعود',
-  '李小龍',
-  'Zoë Ångström-Ñúñez',
-  "Seán O'Brien-Smith 🦄🚀",
-  'Z̴̢a̷̛l̸̨g̵̢o̶̧ ̷̨T̵̛e̸̢x̴̨t̶̛',
-  'ALLCAPSNAMEWITHOUTANYSPACESTHATJUSTKEEPSGOINGANDGOINGANDGOING',
-  '<b>Not Bold</b> & "Quoted"',
+const SAMPLES = 20;
+
+const ROLES = [
+  {
+    label: 'Billing administrator',
+    description: 'Can manage the subscription, payment methods and invoices, and export billing history.',
+  },
+  {
+    label: 'Customer success lead (EMEA)',
+    description: 'Can view every member and organization setting, and invite people to regional workspaces.',
+  },
+  {
+    label: 'Read-only auditor',
+    description: 'Can view members, roles, API keys and audit logs, but cannot change anything.',
+  },
 ];
-
-const CHAOS_EMAILS = [
-  'maximiliana.alexandrina.wolfeschlegelsteinhausenbergerdorff+notifications@engineering.eu-west.very-long-company-name.example.com',
-  'x@y.co',
-  'first.last+tag+another-tag@xn--80ak6aa92e.com',
-  '"quoted local part"@example.com',
-  '用户@例子.广告',
-  'ALL.CAPS.ADDRESS@EXAMPLE.COM',
-];
-
-export function chaosText(text: string): string;
-export function chaosText(text: string | undefined): string | undefined;
-export function chaosText(text: string | undefined) {
-  return text === undefined ? undefined : `${text} ${CHAOS_SUFFIX}`;
-}
 
 export function chaosName(index: number) {
-  return CHAOS_NAMES[index % CHAOS_NAMES.length];
+  return longest(index, f => f.person.fullName());
+}
+
+export function chaosPerson(index: number) {
+  return {
+    firstName: longest(index, f => f.person.firstName()),
+    lastName: longest(index, f => f.person.lastName()),
+  };
+}
+
+export function chaosUsername(index: number) {
+  return longest(index, f => f.internet.username());
 }
 
 export function chaosEmail(index: number) {
-  return CHAOS_EMAILS[index % CHAOS_EMAILS.length];
+  return longest(index, f =>
+    f.internet.email({
+      firstName: f.person.firstName(),
+      lastName: f.person.lastName(),
+      provider: f.internet.domainName(),
+    }),
+  );
+}
+
+export function chaosCompany(index: number) {
+  return longest(index, f => f.company.name());
+}
+
+export function chaosPhone(index: number) {
+  return longest(index, f => f.phone.number({ style: 'international' }));
+}
+
+export function chaosSlug(index: number) {
+  return `${chaosPick(LOCALES, index).helpers.slugify(chaosCompany(index)).toLowerCase()}-177654156132154`;
+}
+
+export function chaosPlace(index: number) {
+  return longest(index, f => `${f.location.city()}, ${f.location.state()}, ${f.location.country()}`);
+}
+
+export function chaosRole(index: number) {
+  return chaosPick(ROLES, index);
+}
+
+export function chaosPick<T>(values: readonly T[], index: number) {
+  return values[index % values.length];
 }
 
 export function chaosRows<T extends { id: string }>(items: readonly T[], count = 60) {
@@ -48,14 +79,8 @@ export function chaosRows<T extends { id: string }>(items: readonly T[], count =
   });
 }
 
-type Stretched<T> = { [K in keyof T]: T[K] extends string ? string : Stretched<T[K]> };
-
-function stretch<T extends object>(tree: T): Stretched<T> {
-  const entries = Object.entries(tree).map(([key, value]) => [
-    key,
-    typeof value === 'string' ? chaosText(value) : stretch(value),
-  ]);
-  return Object.fromEntries(entries) as Stretched<T>;
+function longest(index: number, make: (faker: Faker) => string) {
+  const faker = chaosPick(LOCALES, index);
+  faker.seed(index);
+  return Array.from({ length: SAMPLES }, () => make(faker)).reduce((a, b) => (b.length > a.length ? b : a));
 }
-
-export const chaosLocalization: MosaicLocalization = { messages: stretch(mosaicMessages) };

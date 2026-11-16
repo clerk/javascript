@@ -8,13 +8,14 @@ import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { withRetry } from '../testUtils/retryableClerkClient';
+import { isOAuthCallbackPath } from '../testUtils/setupTestingTokens';
 import { createUserService } from '../testUtils/usersService';
 
 const grantOAuthConsent = async (page: Page) => {
   const allowAccessButton = page.getByRole('button', { name: 'Allow' });
   await expect(allowAccessButton).toBeVisible();
   const [callback] = await Promise.all([
-    page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+    page.waitForRequest(request => isOAuthCallbackPath(new URL(request.url()).pathname)),
     allowAccessButton.click(),
   ]);
   expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
@@ -548,5 +549,160 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       // Should redirect and be signed in without error
       await secondTabUtils.po.expect.toBeSignedIn();
     });
+
+    test('sends a single sign-up transfer when SignIn remounts while the transfer is in flight', async ({
+      page,
+      context,
+    }) => {
+      const providerKeys = await resolveInstanceKeys('oauth-provider');
+      const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
+      const users = createUserService(withRetry(providerClient));
+      const newUser = users.createFakeUser(test, { withUsername: true });
+      await users.createBapiUser(newUser);
+
+      const u = await createTestUtils({ app, page, context });
+
+      const transferStatuses: number[] = [];
+      let callbackCalledAgain = false;
+      let onSecondTransfer: () => void = () => {};
+      const secondTransfer = new Promise<void>(resolve => {
+        onSecondTransfer = resolve;
+      });
+      let onFirstTransferResponded: () => void = () => {};
+      const firstTransferResponded = new Promise<void>(resolve => {
+        onFirstTransferResponded = resolve;
+      });
+
+      await page.route('**/v1/client/sign_ups*', async route => {
+        const request = route.request();
+        const isTransfer =
+          request.method() === 'POST' &&
+          (new URL(request.url()).searchParams.get('transfer') === 'true' ||
+            request.postData()?.includes('transfer=true'));
+        if (!isTransfer) {
+          return route.continue();
+        }
+
+        const isFirst = transferStatuses.length === 0;
+        transferStatuses.push(0);
+        const index = transferStatuses.length - 1;
+
+        if (isFirst) {
+          await page.evaluate(() => {
+            const clerk = window.Clerk as any;
+            const handleRedirectCallback = clerk.handleRedirectCallback;
+            clerk.handleRedirectCallback = (...args: unknown[]) => {
+              (window as any).__e2eCallbackCalledAgain = true;
+              return handleRedirectCallback(...args);
+            };
+            window.dispatchEvent(new Event('e2e:resuspend'));
+          });
+          callbackCalledAgain = await page
+            .waitForFunction(() => (window as any).__e2eCallbackCalledAgain === true, undefined, { timeout: 3000 })
+            .then(() => true)
+            .catch(() => false);
+          await Promise.race([secondTransfer, new Promise(resolve => setTimeout(resolve, 1000))]);
+        } else {
+          onSecondTransfer();
+        }
+
+        await route.continue();
+        const response = await request.response();
+        transferStatuses[index] = response?.status() ?? 0;
+
+        if (isFirst) {
+          onFirstTransferResponded();
+        }
+      });
+
+      try {
+        await u.page.goToRelative('/sign-in-resuspend');
+        await u.po.signIn.waitForMounted();
+        await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+        await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+        await u.po.signIn.setIdentifier(newUser.email);
+        await u.po.signIn.continue();
+        await u.po.signIn.enterTestOtpCode();
+
+        await firstTransferResponded;
+
+        expect(callbackCalledAgain).toBe(true);
+        expect(transferStatuses).toEqual([200]);
+        await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
+      } finally {
+        await newUser.deleteIfExists();
+        await u.services.users.deleteIfExists({ email: newUser.email });
+      }
+    });
+
+    const blockedTransferResponses = [
+      {
+        name: 'a non-Clerk HTML response',
+        response: { status: 429, contentType: 'text/html', body: '<html><body>Blocked</body></html>' },
+        error: /Unable to complete action at this time/,
+      },
+      {
+        name: 'a Clerk-shaped WAF response',
+        response: {
+          status: 429,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            errors: [{ code: 'too_many_requests', message: 'Too many requests. Please try again in a bit.' }],
+          }),
+        },
+        error: /Too many requests\. Please try again in a bit\./,
+      },
+    ];
+
+    for (const { name, response, error } of blockedTransferResponses) {
+      test(`keeps the transfer error on the start screen when the sign-up transfer is blocked by ${name}`, async ({
+        page,
+        context,
+      }) => {
+        const providerKeys = await resolveInstanceKeys('oauth-provider');
+        const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
+        const users = createUserService(withRetry(providerClient));
+        const newUser = users.createFakeUser(test, { withUsername: true });
+        await users.createBapiUser(newUser);
+
+        const u = await createTestUtils({ app, page, context });
+
+        await page.route('**/v1/client/sign_ups*', route => {
+          const request = route.request();
+          const isTransfer =
+            request.method() === 'POST' &&
+            (new URL(request.url()).searchParams.get('transfer') === 'true' ||
+              request.postData()?.includes('transfer=true'));
+          if (!isTransfer) {
+            return route.continue();
+          }
+          return route.fulfill(response);
+        });
+
+        try {
+          await u.po.signIn.goTo();
+          await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+          await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+          await u.po.signIn.setIdentifier(newUser.email);
+          await u.po.signIn.continue();
+          await u.po.signIn.enterTestOtpCode();
+
+          const transferError = u.page.getByText(error);
+          await transferError.waitFor();
+          await u.page.waitForURL(url => url.pathname === '/sign-in');
+          await u.po.signIn.waitForMounted();
+
+          await expect(transferError).toBeVisible();
+          await expect(
+            u.page.getByText(/Account not found\. Please sign up or try signing in to a different account\./),
+          ).toBeHidden();
+        } finally {
+          await newUser.deleteIfExists();
+          await u.services.users.deleteIfExists({ email: newUser.email });
+        }
+      });
+    }
   },
 );

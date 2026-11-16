@@ -36,12 +36,12 @@ export const meta: StoryMeta = {
     _variants: {
       bordered: { true: {}, false: {} },
       filled: { true: {}, false: {} },
-      size: { sm: {}, md: {}, lg: {}, xl: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
       bordered: true,
       filled: false,
-      size: 'xl',
+      size: 'md',
     },
   },
 };
@@ -61,6 +61,12 @@ export function Default(props: Record<string, unknown>) {
 export function Sizes() {
   return (
     <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
+      <IconFrame size='xs'>
+        <Icon
+          glyph={Checkmark}
+          size='sm'
+        />
+      </IconFrame>
       <IconFrame size='sm'>
         <Icon
           glyph={Checkmark}
@@ -74,12 +80,6 @@ export function Sizes() {
         />
       </IconFrame>
       <IconFrame size='lg'>
-        <Icon
-          glyph={Checkmark}
-          size='md'
-        />
-      </IconFrame>
-      <IconFrame size='xl'>
         <Icon
           glyph={Checkmark}
           size='lg'

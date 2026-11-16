@@ -3,15 +3,15 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  icon: { display: 'block', objectFit: 'contain', height: space['5'], width: space['5'] },
+  icon: { display: 'block', objectFit: 'contain', height: space['4'], width: space['4'] },
   maskedIcon: {
     backgroundColor: 'currentColor',
     display: 'block',
     maskPosition: 'center',
     maskRepeat: 'no-repeat',
     maskSize: 'contain',
-    height: space['5'],
-    width: space['5'],
+    height: space['4'],
+    width: space['4'],
   },
   appleOffset: {
     transform: 'translateY(-1px)',
@@ -25,7 +25,7 @@ export const styles = stylex.create({
     display: 'inline-flex',
     fontSize: '0.625rem',
     justifyContent: 'center',
-    height: space['5'],
-    width: space['5'],
+    height: space['4'],
+    width: space['4'],
   },
 });

@@ -44,19 +44,19 @@ export const styles = stylex.create({
     maxWidth: 'none',
   },
   body: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
     paddingInline: space['4'],
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     display: 'flex',
     flexDirection: 'column',
     width: 'auto',
   },
   row: {
     paddingBlock: space['4'],
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: {
       default: '1px',
@@ -89,7 +89,7 @@ export const styles = stylex.create({
   },
   nestedItem: {
     paddingBlock: space['4'],
-    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border-subtle'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: {
       default: '0px',

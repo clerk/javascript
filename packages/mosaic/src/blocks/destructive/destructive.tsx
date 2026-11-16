@@ -86,8 +86,8 @@ function DestructiveStep<Payload>({
         <Dialog.Close
           render={
             <Button
+              color='neutral'
               variant='outline'
-              fullWidth
             >
               {cancelLabel}
             </Button>
@@ -95,7 +95,6 @@ function DestructiveStep<Payload>({
         />
         <SubmitButton
           form={formId}
-          fullWidth
           color='negative'
           isPending={isPending}
           disabled={!isConfirmed}
@@ -138,6 +137,7 @@ export function Destructive<Payload = void>({ fieldLabel, confirmationValue, ...
 
   useEffect(() => {
     if (!isOpen) {
+      // eslint-disable-next-line react/set-state-in-effect -- Clear the confirmation text when the dialog closes.
       setTypedValue('');
     }
   }, [isOpen]);

@@ -1,3 +1,5 @@
+import { chmodSync } from 'node:fs';
+
 import { safeStorage } from 'electron';
 import Store from 'electron-store';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -21,9 +23,14 @@ vi.mock('electron', () => ({
   safeStorage: {},
 }));
 
+vi.mock('node:fs', () => ({
+  chmodSync: vi.fn(),
+}));
+
 vi.mock('electron-store', () => ({
   default: vi.fn(function () {
     return {
+      path: '/tmp/clerk/clerk-tokens.json',
       get: storeGet,
       set: storeSet,
       delete: storeDelete,
@@ -72,25 +79,39 @@ describe('storage options', () => {
   it('creates an electron-store instance with the default store name', () => {
     storage();
 
-    expect(Store).toHaveBeenCalledWith({ name: 'clerk-tokens' });
+    expect(Store).toHaveBeenCalledWith({ name: 'clerk-tokens', configFileMode: 0o600 });
   });
 
   it('supports a custom store name', () => {
     storage({ name: 'custom-clerk-tokens' });
 
-    expect(Store).toHaveBeenCalledWith({ name: 'custom-clerk-tokens' });
+    expect(Store).toHaveBeenCalledWith({ name: 'custom-clerk-tokens', configFileMode: 0o600 });
   });
 
   it('forwards a custom path as electron-store `cwd`', () => {
     storage({ path: '/tmp/clerk' });
 
-    expect(Store).toHaveBeenCalledWith({ name: 'clerk-tokens', cwd: '/tmp/clerk' });
+    expect(Store).toHaveBeenCalledWith({ name: 'clerk-tokens', configFileMode: 0o600, cwd: '/tmp/clerk' });
   });
 
   it('omits `cwd` when no path is provided', () => {
     storage();
 
     expect(Store).toHaveBeenCalledWith(expect.not.objectContaining({ cwd: expect.anything() }));
+  });
+
+  it('restricts an existing token file to owner-only access', () => {
+    storage();
+
+    expect(chmodSync).toHaveBeenCalledWith('/tmp/clerk/clerk-tokens.json', 0o600);
+  });
+
+  it('does not throw when the token file cannot be chmodded', () => {
+    vi.mocked(chmodSync).mockImplementationOnce(() => {
+      throw new Error('ENOENT');
+    });
+
+    expect(() => storage()).not.toThrow();
   });
 });
 

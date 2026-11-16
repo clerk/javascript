@@ -223,7 +223,7 @@ export function Cards() {
                 <Icon
                   glyph={Plus}
                   placement='inline-start'
-                  size='sm'
+                  size='md'
                 />
                 Add
               </Button>
@@ -353,7 +353,7 @@ export function ConnectedAccounts() {
                   <Icon
                     glyph={ArrowUpRight}
                     placement='inline-end'
-                    size='sm'
+                    size='md'
                   />
                 </Button>
               </Section.Actions>
@@ -440,7 +440,7 @@ export function ContainedHeader() {
           .cl-section-group {
             border: 1px solid var(--cl-color-border) !important;
             border-radius: var(--cl-radius-xl) !important;
-            background: var(--cl-color-background) !important;
+            background: var(--cl-color-surface) !important;
           }
           .cl-section-header {
             margin: 0 1rem !important;
@@ -523,7 +523,7 @@ export function ContainedHeader() {
                   <Icon
                     glyph={Plus}
                     placement='inline-start'
-                    size='sm'
+                    size='md'
                   />
                   Add
                 </Button>

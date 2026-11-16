@@ -14,7 +14,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/flow/flow.tsx',
 };
 
-function FlowDemo(): JSX.Element {
+function FlowDemo() {
   const [step, setStep] = useState('details');
   const [direction, setDirection] = useState<FlowDirection>(1);
 
@@ -38,12 +38,7 @@ function FlowDemo(): JSX.Element {
                 <Card.Description>Current controller state: {state.step}</Card.Description>
               </Card.Header>
               <Card.Footer>
-                <Button
-                  fullWidth
-                  onClick={() => navigate('confirm', 1)}
-                >
-                  Continue
-                </Button>
+                <Button onClick={() => navigate('confirm', 1)}>Continue</Button>
               </Card.Footer>
             </Flow.Step>
             <Flow.Step ids={['confirm']}>
@@ -56,14 +51,13 @@ function FlowDemo(): JSX.Element {
               </Card.Header>
               <Card.Footer>
                 <Button
-                  fullWidth
                   variant='outline'
                   color='neutral'
                   onClick={() => navigate('details', -1)}
                 >
                   Back
                 </Button>
-                <Button fullWidth>Submit</Button>
+                <Button>Submit</Button>
               </Card.Footer>
             </Flow.Step>
           </>
@@ -73,11 +67,11 @@ function FlowDemo(): JSX.Element {
   );
 }
 
-export function Default(): JSX.Element {
+export function Default() {
   return <FlowDemo />;
 }
 
-export function Customized(): JSX.Element {
+export function Customized() {
   return (
     <div>
       <style>{`

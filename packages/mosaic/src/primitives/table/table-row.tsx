@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { type CSSProperties } from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { TableRowContext, type TableRowContextValue, useTableContext, useTableItem } from './table-context';
 import { focusIsInChildRows, isOwnClick, isRtl, openLink, type TableLink } from './table-dom';
 
@@ -62,7 +62,9 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
     }
   };
 
-  const defaultProps: Record<string, unknown> = {
+  const style: CSSProperties & Record<`--${string}`, number> = { '--table-row-depth': item.depth };
+
+  const defaultProps = {
     'aria-labelledby': rowHeaderIds,
     'aria-selected': canSelect ? selected : undefined,
     'aria-disabled': disabled || undefined,
@@ -74,7 +76,7 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
           'aria-expanded': canExpand ? expanded : undefined,
         }
       : {}),
-    style: { '--table-row-depth': item.depth },
+    style,
     onClick: (event: React.MouseEvent<HTMLTableRowElement>) => {
       if (disabled || !isOwnClick(event)) {
         return;
@@ -112,7 +114,7 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
         }
       }
     },
-  };
+  } satisfies DefaultProps<'tr'>;
 
   const rowContext: TableRowContextValue = {
     disabled,

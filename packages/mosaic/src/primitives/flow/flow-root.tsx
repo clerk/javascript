@@ -48,7 +48,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
       const root = rootRef.current;
       const { height } = getDimensions(activeStep);
       if (root && stepHeightRef.current !== null && height !== stepHeightRef.current) {
-        root.dataset.heightChange = height < stepHeightRef.current ? 'shrink' : 'grow';
+        root.dataset['heightChange'] = height < stepHeightRef.current ? 'shrink' : 'grow';
       }
       stepHeightRef.current = height;
       root?.style.setProperty('--cl-flow-step-height', `${height}px`);

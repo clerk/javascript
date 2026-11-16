@@ -36,6 +36,10 @@ export interface SignInFutureCreateParams {
    */
   oidcLoginHint?: string;
   /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
+  /**
    * The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in.
    */
   actionCompleteRedirectUrl?: string;
@@ -244,6 +248,10 @@ export interface SignInFutureSSOParams {
    */
   oidcPrompt?: string;
   /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
+  /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental
    */
@@ -321,6 +329,10 @@ export interface SignInFuturePasskeyParams {
    * </ul>
    */
   flow?: 'autofill' | 'discoverable';
+  /**
+   * Only offer passkeys that are already on the device. When there are none, the request fails without showing the system's "use a passkey from another device" sheet. Supported by `@clerk/expo-passkeys` on iOS 16+ and Android. Browsers ignore it. Defaults to `false`.
+   */
+  preferImmediatelyAvailableCredentials?: boolean;
 }
 
 /** @generateWithEmptyComment */

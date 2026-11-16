@@ -2,6 +2,9 @@ import type { BrowserContext } from '@playwright/test';
 
 const contextTokens = new WeakMap<BrowserContext, Map<string, string>>();
 
+export const isOAuthCallbackPath = (pathname: string) =>
+  pathname === '/v1/oauth_callback' || /^\/v1\/sso\/[a-z0-9_]+\/callback$/.test(pathname);
+
 export const setupTestingTokens = async ({
   context,
   frontendApiOrigin,
@@ -22,15 +25,21 @@ export const setupTestingTokens = async ({
 
   await context.route(
     url =>
-      (tokens.has(url.origin) && url.pathname.startsWith('/v1/')) || url.pathname.startsWith('/v1/me/oauth/consent/'),
+      (tokens.has(url.origin) && url.pathname.startsWith('/v1/')) ||
+      url.pathname.startsWith('/v1/me/oauth/consent/') ||
+      url.pathname === '/oauth/authorize/continue',
     async route => {
-      const requestUrl = new URL(route.request().url());
-      const requestToken = tokens.get(requestUrl.origin);
+      const request = route.request();
+      const requestUrl = new URL(request.url());
+      const requestToken = requestUrl.pathname.startsWith('/v1/') ? tokens.get(requestUrl.origin) : undefined;
       if (requestToken) {
         requestUrl.searchParams.set('__clerk_testing_token', requestToken);
       }
 
-      if (route.request().method() !== 'POST' || !requestUrl.pathname.startsWith('/v1/me/oauth/consent/')) {
+      const redirectsToCallback =
+        (request.method() === 'POST' && requestUrl.pathname.startsWith('/v1/me/oauth/consent/')) ||
+        (request.method() === 'GET' && requestUrl.pathname === '/oauth/authorize/continue');
+      if (!redirectsToCallback) {
         if (!requestToken) {
           return route.fallback();
         }
@@ -42,7 +51,7 @@ export const setupTestingTokens = async ({
       if (response.status() === 303 && headers.location) {
         const callback = new URL(headers.location, response.url());
         const callbackToken = tokens.get(callback.origin);
-        if (callbackToken && callback.pathname === '/v1/oauth_callback') {
+        if (callbackToken && isOAuthCallbackPath(callback.pathname)) {
           callback.searchParams.set('__clerk_testing_token', callbackToken);
           headers.location = callback.toString();
         }

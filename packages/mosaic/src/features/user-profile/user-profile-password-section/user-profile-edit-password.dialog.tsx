@@ -10,10 +10,7 @@ import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
-import { Icon } from '../../../components/icon';
-import { InputGroup } from '../../../components/input-group';
-import { Eye } from '../../../icons/glyphs/eye';
-import { EyeSlash } from '../../../icons/glyphs/eye-slash';
+import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import type { ReverificationController } from '../../reverification';
@@ -48,7 +45,7 @@ export function UserProfileEditPasswordDialog({
   reverification,
   step,
 }: UserProfileEditPasswordDialogProps) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
 
@@ -121,7 +118,6 @@ export function UserProfileEditPasswordDialog({
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             >
               {m.cancel}
             </Button>
@@ -129,7 +125,6 @@ export function UserProfileEditPasswordDialog({
         />
         <SubmitButton
           form={form.id}
-          fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled
@@ -198,8 +193,7 @@ function PasswordField({
   name: UserProfileEditPasswordField;
   advisoryFeedback?: FieldFeedback;
 }) {
-  const m = useMessages('userProfilePasswordSection');
-  const [visible, setVisible] = useState(false);
+  const m = useMessages('userProfile').password;
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields[name];
   const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
@@ -216,28 +210,18 @@ function PasswordField({
       required
     >
       <Field.Label>{label}</Field.Label>
-      <InputGroup.Root>
-        <InputGroup.Input
-          ref={mergedRef}
-          autoComplete={autoComplete}
-          type={visible ? 'text' : 'password'}
-          {...control}
-          onFocus={() => setFocused(true)}
-          onBlur={() => {
-            setFocused(false);
-            control.onBlur();
-          }}
-        />
-        <InputGroup.End>
-          <Button
-            type='button'
-            aria-label={visible ? m.hidePassword : m.showPassword}
-            onClick={() => setVisible(current => !current)}
-          >
-            <Icon glyph={visible ? EyeSlash : Eye} />
-          </Button>
-        </InputGroup.End>
-      </InputGroup.Root>
+      <PasswordInput
+        ref={mergedRef}
+        autoComplete={autoComplete}
+        {...control}
+        onFocus={() => setFocused(true)}
+        onBlur={() => {
+          setFocused(false);
+          control.onBlur();
+        }}
+        showPasswordLabel={m.showPassword}
+        hidePasswordLabel={m.hidePassword}
+      />
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>
   );

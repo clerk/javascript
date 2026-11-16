@@ -1,11 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { space } from '../../tokens.stylex';
+import { colorVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   contactValue: {
     gap: space['2'],
     alignItems: 'center',
+    color: colorVars['--cl-color-foreground'],
     display: 'flex',
     minWidth: 0,
   },

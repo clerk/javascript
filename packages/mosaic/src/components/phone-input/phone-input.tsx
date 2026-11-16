@@ -8,6 +8,7 @@ import React from 'react';
 
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { fill } from '../../localization/messages';
 import { Button } from '../../primitives/button';
 import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useFormattedInput } from '../../primitives/hooks';
@@ -16,6 +17,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { styles as buttonStyles } from '../button/button.styles';
+import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
@@ -62,12 +64,12 @@ export interface PhoneInputProps extends Omit<
   defaultCountry?: CountryIso;
   onCountryChange?: (country: CountryIso) => void;
   size?: 'sm' | 'md' | 'lg';
+  /** The country trigger's accessible name, with `{country}` filled in. */
+  countryTriggerLabel: string;
+  countryPopupLabel: string;
+  countrySearchLabel: string;
   countrySearchPlaceholder?: string;
   noResultsMessage?: string;
-  /** Applied to the grouped root. */
-  className?: string;
-  /** Applied to the grouped root. */
-  style?: React.CSSProperties;
 }
 
 export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(function MosaicPhoneInput(
@@ -79,6 +81,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     defaultCountry,
     onCountryChange,
     size = 'md',
+    countryTriggerLabel,
+    countryPopupLabel,
+    countrySearchLabel,
     countrySearchPlaceholder = 'Search',
     noResultsMessage = 'No countries found',
     disabled: disabledProp,
@@ -124,6 +129,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       return;
     }
     if (countryProp === undefined && valueProp) {
+      // eslint-disable-next-line react/set-state-in-effect -- Match the country to a phone number supplied by the parent.
       setUncontrolledCountry(parsePhoneString(valueProp).iso);
     }
   }, [countryProp, valueProp]);
@@ -149,6 +155,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     [onValueChange, valueProp],
   );
 
+  // eslint-disable-next-line react/preserve-manual-memoization -- Keep the existing country selection callback.
   const setCountry = React.useCallback(
     (nextCountry: CountryEntry) => {
       if (countryProp === undefined) {
@@ -160,6 +167,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       setQuery('');
       inputRef.current?.focus();
     },
+    // eslint-disable-next-line react/preserve-manual-memoization -- The value callback records its last emission in a ref.
     [countryProp, nationalNumber, onCountryChange, setValue],
   );
 
@@ -223,7 +231,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               }
               type='button'
               disabled={disabled}
-              aria-label={`Country, ${country.name}`}
+              aria-label={fill(countryTriggerLabel, { country: country.name })}
             >
               <span {...stylex.props(reset.base, styles.triggerContent)}>
                 <span
@@ -241,7 +249,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           </InputGroup.Start>
           <Popover.Popup
             anchor={anchor}
-            aria-label='Choose a country'
+            aria-label={countryPopupLabel}
             size='anchor'
             {...themeProps('phone-input-popup')}
             xstyle={[reset.base, styles.popup]}
@@ -272,7 +280,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                     />
                   </span>
                   <HeadlessCombobox.Input
-                    aria-label='Search countries'
+                    aria-label={countrySearchLabel}
                     placeholder={countrySearchPlaceholder}
                     spellCheck={false}
                     {...mergeStyleProps(
@@ -298,25 +306,22 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               >
                 {filteredCountries.length > 0 ? (
                   filteredCountries.map(option => (
-                    <HeadlessCombobox.Option
+                    <Combobox.Option
                       key={option.iso}
                       value={option.iso}
                       label={option.name}
-                      {...mergeStyleProps(
-                        themeProps('combobox-option'),
-                        themeProps('phone-input-country-option'),
-                        stylex.props(reset.base, styles.option),
-                      )}
+                      {...themeProps('phone-input-country-option')}
+                      xstyle={styles.option}
                     >
-                      <span
+                      <Combobox.Media
                         aria-hidden='true'
-                        {...stylex.props(reset.base, styles.optionFlag)}
+                        xstyle={styles.optionFlag}
                       >
-                        <span {...stylex.props(reset.base, styles.flag)}>{getFlagEmojiFromCountryIso(option.iso)}</span>
-                      </span>
-                      <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
-                      <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                    </HeadlessCombobox.Option>
+                        {getFlagEmojiFromCountryIso(option.iso)}
+                      </Combobox.Media>
+                      <Combobox.Label>{option.name}</Combobox.Label>
+                      <Combobox.Detail xstyle={styles.optionCode}>+{option.code}</Combobox.Detail>
+                    </Combobox.Option>
                   ))
                 ) : (
                   <p {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty))}>

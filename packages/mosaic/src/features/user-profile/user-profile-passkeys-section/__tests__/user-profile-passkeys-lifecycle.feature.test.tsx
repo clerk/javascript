@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { openDialog } from '../../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
@@ -16,8 +16,6 @@ import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
-
-afterEach(() => vi.restoreAllMocks());
 
 function serveAccounts(enabled = true) {
   vi.spyOn(navigator, 'webdriver', 'get').mockReturnValue(false);
@@ -58,7 +56,7 @@ describe('Passkey action errors', () => {
     serveAccounts();
     const view = await renderWithClerk(
       <MosaicProvider
-        localization={{ messages: { userProfilePasskeys: { saveError: 'Could not add this passkey.' } } }}
+        localization={{ messages: { userProfile: { passkeys: { saveError: 'Could not add this passkey.' } } } }}
       >
         <UserProfilePasskeysSection />
       </MosaicProvider>,
@@ -73,7 +71,7 @@ describe('Passkey action errors', () => {
     expect(screen.queryByText('Private authenticator details')).toBeNull();
     view.rerender(
       <MosaicProvider
-        localization={{ messages: { userProfilePasskeys: { saveError: 'Impossible de créer cette clé.' } } }}
+        localization={{ messages: { userProfile: { passkeys: { saveError: 'Impossible de créer cette clé.' } } } }}
       >
         <UserProfilePasskeysSection />
       </MosaicProvider>,
@@ -401,7 +399,7 @@ describe('Replacing instance policy while editing', () => {
         localization={{
           locale: 'fr-FR',
           messages: {
-            userProfilePasskeys: { accountUnavailableError: 'Ce compte ne permet plus cette action.' },
+            userProfile: { passkeys: { accountUnavailableError: 'Ce compte ne permet plus cette action.' } },
             form: { error: 'Erreur générique du formulaire.' },
           },
         }}

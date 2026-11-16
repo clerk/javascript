@@ -6,7 +6,7 @@ import type {
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosText } from '@/lib/chaos';
+import { chaosEmail, chaosPick, chaosRows } from '@/lib/chaos';
 
 import { idleReverification } from './reverification';
 
@@ -28,6 +28,22 @@ const connectionProviders: UserProfileConnectionProvider[] = [
     monochromeIcon: true,
   },
 ];
+const chaosAccounts: Partial<UserProfileConnectedAccount>[] = [
+  {},
+  {
+    id: 'microsoft',
+    provider: 'Microsoft',
+    iconUrl: 'https://img.clerk.com/static/microsoft.svg',
+    status: 'reconnect',
+  },
+  {
+    id: 'linkedin_oidc',
+    provider: 'LinkedIn',
+    iconUrl: 'https://img.clerk.com/static/linkedin_oidc.svg',
+    status: 'error',
+    verificationError: 'The provider could not verify this account.',
+  },
+];
 
 export function useConnectedAccountsFixture({
   initialAccounts = [connectedAccount],
@@ -40,16 +56,14 @@ export function useConnectedAccountsFixture({
 } = {}) {
   const [hasRemovalFailed, setHasRemovalFailed] = useState(false);
   const seed = useChaosFixture(initialAccounts, items =>
-    items.map((account, index) => ({
+    chaosRows(items, chaosAccounts.length).map((account, index) => ({
       ...account,
-      provider: chaosText(account.provider),
+      ...chaosPick(chaosAccounts, index),
       identifier: chaosEmail(index),
     })),
   );
   const [accounts, setAccounts] = useState(seed);
-  const providers = useChaosFixture(initialProviders, items =>
-    items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
-  );
+  const providers = initialProviders;
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
   return useUserProfileConnectedAccountsController({

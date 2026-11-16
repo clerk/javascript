@@ -17,6 +17,7 @@ const useDeepEqualMemoize = <T>(value: T) => {
  * @internal
  */
 export const useDeepEqualMemo: UseDeepEqualMemo = (factory, dependencyArray) => {
+  // eslint-disable-next-line react-hooks/use-memo -- the dependency list is deep-equal memoized so it is only replaced when its contents change
   return React.useMemo(factory, useDeepEqualMemoize(dependencyArray));
 };
 

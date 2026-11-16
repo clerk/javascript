@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
@@ -27,8 +27,6 @@ function stubEvmModules(clerk: Awaited<ReturnType<typeof renderWithClerk>>['cler
 }
 
 describe('Web3 connection rows', () => {
-  afterEach(() => vi.unstubAllGlobals());
-
   it.each([
     ['MetaMask', 'web3_metamask_signature'],
     ['Base', 'web3_base_signature'],

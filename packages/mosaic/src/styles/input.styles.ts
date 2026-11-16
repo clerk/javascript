@@ -1,13 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars } from '../tokens.stylex';
+import { colorVars, durationVars } from '../tokens.stylex';
 
 // Focus is marked with a border colour change and a soft box-shadow rather than the
 // system focus ring, so a text-entry field reads as a field rather than a control.
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
 const focusShadow = '0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%))';
 const invalidFocusShadow = `0 0 0 3px ${colorVars['--cl-color-negative-alpha-300']}`;
-const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-brand']} 5%, transparent)`;
+const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 5%, transparent)`;
 
 export const inputStyles = stylex.create({
   base: {
@@ -17,7 +17,8 @@ export const inputStyles = stylex.create({
       ':focus-visible:where([aria-invalid="true"])': colorVars['--cl-color-negative'],
       ':where([aria-invalid="true"])': colorVars['--cl-color-negative'],
       '@media (hover: hover)': {
-        ':hover:not([aria-invalid="true"])': hoverBorderColor,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"], :read-only):not([aria-invalid="true"])':
+          hoverBorderColor,
       },
     },
     borderStyle: 'solid',
@@ -29,7 +30,10 @@ export const inputStyles = stylex.create({
         ':focus-visible': '2px solid CanvasText',
       },
     },
-    backgroundColor: colorVars['--cl-color-input'],
+    backgroundColor: {
+      default: colorVars['--cl-color-input'],
+      ':read-only:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-surface-subtle'],
+    },
     boxShadow: {
       default: null,
       ':focus-visible': focusShadow,
@@ -44,13 +48,16 @@ export const inputStyles = stylex.create({
     },
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
-      ':focus-visible': durationVars['--cl-duration-fast'],
+      ':focus-visible': durationVars['--cl-duration-instant'],
+      ':focus-visible:where([aria-invalid="true"])': durationVars['--cl-duration-base'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"], :read-only):not([aria-invalid="true"])':
+          durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'color, background-color, border-color, box-shadow',
-    transitionTimingFunction: {
-      default: 'linear',
-      ':focus-visible': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
-    },
+    transitionTimingFunction: 'linear',
   },
   group: {
     borderColor: {
@@ -59,7 +66,8 @@ export const inputStyles = stylex.create({
       ':has(input:focus-visible, textarea:focus-visible)': hoverBorderColor,
       ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': colorVars['--cl-color-negative'],
       '@media (hover: hover)': {
-        ':hover:not([data-invalid])': hoverBorderColor,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"], :has(input:read-only)):not([data-invalid])':
+          hoverBorderColor,
       },
     },
     borderStyle: 'solid',
@@ -71,7 +79,10 @@ export const inputStyles = stylex.create({
         ':has(input:focus-visible, textarea:focus-visible)': '2px solid CanvasText',
       },
     },
-    backgroundColor: colorVars['--cl-color-input'],
+    backgroundColor: {
+      default: colorVars['--cl-color-input'],
+      ':has(input:read-only:not(:disabled, [aria-disabled="true"]))': colorVars['--cl-color-surface-subtle'],
+    },
     boxShadow: {
       default: null,
       ':has(input:focus-visible, textarea:focus-visible)': focusShadow,
@@ -86,13 +97,16 @@ export const inputStyles = stylex.create({
     },
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
-      ':has(input:focus-visible, textarea:focus-visible)': durationVars['--cl-duration-fast'],
+      ':has(input:focus-visible, textarea:focus-visible)': durationVars['--cl-duration-instant'],
+      ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': durationVars['--cl-duration-base'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"], :has(input:read-only)):not([data-invalid])':
+          durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'color, background-color, border-color, box-shadow',
-    transitionTimingFunction: {
-      default: 'linear',
-      ':has(input:focus-visible, textarea:focus-visible)': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
-    },
+    transitionTimingFunction: 'linear',
   },
   disabled: {
     backgroundColor: disabledBackgroundColor,

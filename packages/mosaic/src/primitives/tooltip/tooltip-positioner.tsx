@@ -15,7 +15,7 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
 
     const side = parsePlacement(placement).side;
     const floatingProps = getFloatingProps();
-    const wiredId = floatingProps.id;
+    const wiredId = floatingProps['id'];
 
     const ownProps = {
       'data-side': side,
@@ -27,7 +27,7 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by floating-ui: it pairs with the trigger's aria-describedby.
     // A consumer-supplied id must not override it, or the aria pairing would silently break.
-    merged.id = wiredId;
+    merged.id = typeof wiredId === 'string' ? wiredId : undefined;
 
     return useRender({
       defaultTagName: 'div',

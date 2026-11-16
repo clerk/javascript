@@ -3,7 +3,7 @@ import { useUserProfileActiveDevicesController } from '@clerk/mosaic/features/us
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosText } from '@/lib/chaos';
+import { chaosPick, chaosPlace } from '@/lib/chaos';
 
 export const userProfileDevices: UserProfileDevice[] = [
   {
@@ -75,6 +75,20 @@ export const userProfileImpersonationDevices: UserProfileDevice[] = [
   },
 ];
 
+const chaosDevices = [
+  {
+    name: 'Microsoft Edge on Windows 11',
+    model: 'Lenovo ThinkPad X1 Carbon Gen 12',
+    browser: 'Microsoft Edge 150.0.3240.92',
+  },
+  { name: 'Samsung Internet on Android', model: 'Samsung Galaxy Z Fold6', browser: 'Samsung Internet 28.0.1.42' },
+  {
+    name: 'Firefox Developer Edition on Ubuntu',
+    model: 'Framework Laptop 16',
+    browser: 'Firefox Developer Edition 152.0b9',
+  },
+];
+
 export interface UserProfileActiveDevicesFixtureOptions {
   devices?: UserProfileDevice[];
   /** How long a sign out takes, so the pending button and its spinner are visible. */
@@ -89,13 +103,11 @@ export function useUserProfileActiveDevicesFixture({
   failWith,
 }: UserProfileActiveDevicesFixtureOptions = {}) {
   const seed = useChaosFixture(initialDevices, items =>
-    items.map(device => ({
+    items.map((device, index) => ({
       ...device,
-      name: chaosText(device.name),
-      description: chaosText(device.description),
-      model: chaosText(device.model),
-      browser: chaosText(device.browser),
-      location: chaosText(device.location),
+      ...chaosPick(chaosDevices, index),
+      description: device.isCurrent ? chaosPlace(index) : `Last seen September 28th, 2026 · ${chaosPlace(index)}`,
+      location: chaosPlace(index),
     })),
   );
   const [devices, setDevices] = useState(seed);
