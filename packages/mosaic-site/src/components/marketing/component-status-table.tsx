@@ -103,7 +103,7 @@ export function ComponentStatusTable() {
               {COMPONENT_STATUS.map(row => (
                 <tr
                   key={row.stable}
-                  className='border-border label-3 border-b font-normal [&_code]:font-normal [&_strong]:font-normal'
+                  className='border-border label-3 border-b font-normal [&_code]:font-normal'
                 >
                   <td className='py-3 pr-4 text-neutral-600 dark:text-neutral-400'>
                     <code className='code-inline'>{`<${row.stable} />`}</code>
@@ -143,7 +143,7 @@ export function ComponentStatusTable() {
                     <td
                       id={noteId(row.stable)}
                       tabIndex={row.notes ? -1 : undefined}
-                      className='body-3 min-w-[16rem] py-3 pl-4 text-neutral-600 outline-none dark:text-neutral-400'
+                      className='body-3 min-w-[16rem] whitespace-pre-line py-3 pl-4 text-neutral-600 outline-none dark:text-neutral-400'
                     >
                       {row.notes && <InlineCode text={row.notes} />}
                     </td>

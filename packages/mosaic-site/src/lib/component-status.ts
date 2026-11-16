@@ -14,7 +14,7 @@ export const COMPONENT_STATUS: ComponentRow[] = [
     beta: 'UserButton',
     status: 'done',
     renamedTo: 'Switcher',
-    notes: 'now defaults to combined mode. **Limit**: does not support custom pages',
+    notes: 'Defaults to combined mode.\nLimit: does not support custom pages yet',
   },
   {
     stable: 'UserProfile',
