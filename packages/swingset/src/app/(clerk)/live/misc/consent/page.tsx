@@ -12,6 +12,7 @@ import { LivePageHeader } from '../../../live-page-header';
 
 const CALLBACK_PATH = '/live/misc/consent/callback';
 const DEFAULT_SCOPE = 'openid profile email';
+const PKCE_CHALLENGE = 'AYpKiMUrGK_t4053AFZoQnHhq_53aGQqaAcsqkcrNkM';
 
 function subscribe() {
   return () => {};
@@ -67,6 +68,16 @@ function RequestForm() {
         type='hidden'
         name='response_type'
         value='code'
+      />
+      <input
+        type='hidden'
+        name='code_challenge'
+        value={PKCE_CHALLENGE}
+      />
+      <input
+        type='hidden'
+        name='code_challenge_method'
+        value='S256'
       />
       <input
         type='hidden'

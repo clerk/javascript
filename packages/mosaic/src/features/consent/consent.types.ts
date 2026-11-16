@@ -30,7 +30,7 @@ export type ConsentReadyModel = ConsentData & { status: 'ready' };
 
 export type ConsentModel =
   | { status: 'loading' }
-  | { status: 'fetching' }
+  | { status: 'fetching'; renderBranding: boolean }
   | { status: 'hidden' }
   | { status: 'error'; error: ErrorDescription }
   | ConsentReadyModel;

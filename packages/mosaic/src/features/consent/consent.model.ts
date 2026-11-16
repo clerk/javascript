@@ -61,7 +61,7 @@ export function useConsentModel(options: ConsentModelOptions): ConsentModel {
     return { status: 'error', error: toLocalizableError(error) };
   }
   if (isLoading || !data) {
-    return { status: 'fetching' };
+    return { status: 'fetching', renderBranding: environment.displayConfig.branded };
   }
 
   const { user } = session;

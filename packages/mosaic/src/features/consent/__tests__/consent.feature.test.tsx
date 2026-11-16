@@ -461,8 +461,9 @@ describe('Consent', () => {
 
     it('renders the fallback until Clerk loads', async () => {
       visitConsent();
+      serveFapi(signedIn());
       const held = holdRequests('get', '/v1/environment');
-      const rendering = renderConsent(signedIn(), { fallback: <p>Waiting for Clerk</p> });
+      const rendering = renderWithClerk(<Consent fallback={<p>Waiting for Clerk</p>} />);
 
       expect(await screen.findByText('Waiting for Clerk')).toBeVisible();
       expect(screen.queryByRole('status')).toBeNull();
@@ -482,6 +483,20 @@ describe('Consent', () => {
       held.release();
       await ready();
       expect(screen.getByRole('status')).toHaveTextContent('Consent information loaded');
+    });
+
+    it.each([
+      [true, 1],
+      [false, 0],
+    ])('signs the skeleton only where the instance is branded (%s)', async (branded, signatures) => {
+      visitConsent();
+      const held = holdRequests('get', CONSENT_PATH);
+      await renderConsent(signedIn({ environment: fapiEnvironment({ display_config: { branded } }) }));
+
+      await screen.findByRole('status');
+      expect(screen.queryAllByText(/Secured by/)).toHaveLength(signatures);
+      held.release();
+      await ready();
     });
 
     it('explains a missing client ID without asking the Frontend API', async () => {

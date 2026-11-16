@@ -57,7 +57,7 @@ export function Consent({ fallback, ...options }: ConsentProps): ReactElement | 
   return (
     <Card.Root
       align='center'
-      renderBranding={model.status === 'fetching' || (model.status === 'ready' && model.renderBranding)}
+      renderBranding={model.status !== 'error' && model.renderBranding}
     >
       <Flow.Root
         value={model.status}
