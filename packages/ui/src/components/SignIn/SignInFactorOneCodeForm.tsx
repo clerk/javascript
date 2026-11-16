@@ -19,7 +19,7 @@ import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
 
 export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
-  'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
+  'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked' | 'backLinkLabel'
 > & {
   factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
@@ -182,6 +182,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}
+      backLinkLabel={props.backLinkLabel}
     />
   );
 };
