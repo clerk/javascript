@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
     tableHeader__name: 'Name',
   },
   backButton: 'Back',
+  qrCodeAlt: 'Authenticator setup QR code',
   badge__activePlan: 'Active',
   badge__banned: 'Banned',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",

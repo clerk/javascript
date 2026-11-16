@@ -149,6 +149,7 @@ export type __internal_LocalizationResource = {
   formButtonPrimary__verify: LocalizationValue;
   signInEnterPasswordTitle: LocalizationValue;
   backButton: LocalizationValue;
+  qrCodeAlt: LocalizationValue;
   footerActionLink__useAnotherMethod: LocalizationValue;
   footerActionLink__alternativePhoneCodeProvider: LocalizationValue;
   badge__primary: LocalizationValue;

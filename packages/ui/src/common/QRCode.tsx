@@ -1,12 +1,15 @@
 import { QRCodeSVG } from 'qrcode.react';
 
-import { descriptors, Flex } from '../customizables';
+import { descriptors, Flex, localizationKeys, useLocalizations } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 
 type QRCodeProps = PropsOfComponent<typeof Flex> & { url: string; size?: number };
 
 export const QRCode = (props: QRCodeProps) => {
   const { size = 200, url, ...rest } = props;
+  const { t: translate } = useLocalizations();
+  const accessibleName = translate(localizationKeys('qrCodeAlt'));
+
   return (
     <Flex
       elementDescriptor={descriptors.qrCodeRow}
@@ -19,6 +22,7 @@ export const QRCode = (props: QRCodeProps) => {
         <QRCodeSVG
           value={url || ''}
           size={size}
+          aria-label={accessibleName}
         />
       </Flex>
     </Flex>
