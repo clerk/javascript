@@ -40,6 +40,21 @@ export type ReverificationResult = {
 };
 
 /**
+ * Values the reverification modal reuses instead of asking for them, returned by the `prefill` option of
+ * `useReverification`. Only used when the user resets a breached or compromised password to reverify.
+ */
+export type ReverificationPrefill = {
+  /**
+   * The new password the request is about to set. The modal saves it with the reset code.
+   */
+  newPassword: string;
+  /**
+   * Whether the reset also signs the user out of their other sessions.
+   */
+  signOutOfOtherSessions: boolean;
+};
+
+/**
  * @inline
  */
 export type SessionVerificationTypes = 'strict_mfa' | 'strict' | 'moderate' | 'lax';

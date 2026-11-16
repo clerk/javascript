@@ -10,12 +10,12 @@ From UserProfile's change password form, the modal reuses the new password the u
 
 `session.prepareFirstFactorVerification()` and `session.attemptFirstFactorVerification()` accept the `reset_password_email_code` and `reset_password_phone_code` strategies, so custom flows can build the same reset.
 
-`useReverification()` accepts a new `passReverificationResult` option. With it, the fetcher receives what the reverification did as its first argument: `passwordReset` holds the new password and sign out choice when the user reset their password in the modal. Custom password change flows should adopt it: after the user resets their password to reverify, retrying `user.updatePassword()` would fail on the old `currentPassword` or overwrite the password the user just set.
+`useReverification()` accepts a new `passReverificationResult` option. With it, the fetcher receives what the reverification did as its first argument: `passwordReset` holds the new password and sign out choice when the user reset their password in the modal. Custom password change flows should adopt it: after the user resets their password to reverify, retrying `user.updatePassword()` would fail on the old `currentPassword` or overwrite the password the user just set. The `reverification` argument's type is inferred, and the option is a type error on a fetcher that doesn't take it first.
 
 ```tsx
 const { user } = useUser();
 const updatePassword = useReverification(
-  (reverification: ReverificationResult | undefined, currentUser: UserResource, params: UpdateUserPasswordParams) =>
+  (reverification, currentUser: UserResource, params: UpdateUserPasswordParams) =>
     // A password reset during reverification already saved the new password.
     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
   { passReverificationResult: true },
