@@ -25,6 +25,7 @@ export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secre
   jwtKey?: string;
   clockSkewInMs?: number;
   publishableKey?: string;
+  proxyUrl?: string;
 };
 
 export function getOAuthAudienceVerificationError(
@@ -182,7 +183,7 @@ export async function verifyOAuthJwt(
   decoded: Jwt,
   options: JwtMachineVerifyOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  const { audience, publishableKey, ...jwtOptions } = options;
+  const { audience, publishableKey, proxyUrl, ...jwtOptions } = options;
   const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
   if (!frontendApi) {
     return {
@@ -199,7 +200,7 @@ export async function verifyOAuthJwt(
 
   const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, {
     headerType: OAUTH_ACCESS_TOKEN_TYPES,
-    issuer: `https://${frontendApi}`,
+    issuer: proxyUrl ? [`https://${frontendApi}`, proxyUrl] : `https://${frontendApi}`,
   });
 
   if ('error' in result) {

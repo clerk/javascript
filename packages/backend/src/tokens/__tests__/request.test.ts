@@ -2043,11 +2043,29 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState).toBeMachineAuthenticated();
       });
 
+      test('authenticates an OAuth JWT whose iss is the configured proxy URL', async () => {
+        const requestState = await authenticateOAuthJwt(
+          { iss: 'https://example.com/__clerk' },
+          { proxyUrl: 'https://example.com/__clerk' },
+        );
+
+        expect(requestState).toBeMachineAuthenticated();
+      });
+
+      test('rejects an OAuth JWT whose iss is a proxy URL when no proxy URL is configured', async () => {
+        const requestState = await authenticateOAuthJwt({ iss: 'https://example.com/__clerk' });
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: `Invalid JWT issuer claim (iss) "https://example.com/__clerk". Expected "${expectedIssuer}". (code=token-verification-failed, status=n/a)`,
+        });
+      });
+
       test.each([
         ['a different', 'https://untrusted.example'],
         ['a trailing-slash', `${expectedIssuer}/`],
         ['a scheme-less', 'clerk.inspired.puma-74.lcl.dev'],
-        ['the proxy URL as', 'https://example.com/__clerk'],
         ['an empty', ''],
         ['a missing', undefined],
         ['a null', null],
@@ -2059,7 +2077,7 @@ describe('tokens.authenticateRequest(options)', () => {
         expect(requestState).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
           reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-          message: `Invalid JWT issuer claim (iss) ${JSON.stringify(iss)}. Expected "${expectedIssuer}". (code=token-verification-failed, status=n/a)`,
+          message: `Invalid JWT issuer claim (iss) ${JSON.stringify(iss)}. Expected "${expectedIssuer},https://example.com/__clerk". (code=token-verification-failed, status=n/a)`,
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'oauth_token',
