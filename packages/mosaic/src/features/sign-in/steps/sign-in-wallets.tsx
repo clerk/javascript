@@ -19,6 +19,8 @@ interface SignInWalletsProps {
   onSelectWallet: (id: string) => void;
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
+  title?: string;
+  description?: string;
 }
 
 export function SignInWallets({
@@ -29,6 +31,8 @@ export function SignInWallets({
   onSelectWallet,
   onBack,
   focusRef,
+  title,
+  description,
 }: SignInWalletsProps) {
   const m = useMessages('signIn');
   const firstRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
@@ -36,8 +40,8 @@ export function SignInWallets({
   return (
     <>
       <Card.Header>
-        <Card.Title>{m.wallets.title}</Card.Title>
-        <Card.Description>{m.wallets.description}</Card.Description>
+        <Card.Title>{title ?? m.wallets.title}</Card.Title>
+        <Card.Description>{description ?? m.wallets.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'

@@ -2,6 +2,7 @@ import type { Ref } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
+import type { SignUpFields, SignUpLegalConsent } from '../sign-up/sign-up.types';
 
 export type SignInFactor =
   | { id: string; stage: 'first'; strategy: 'password' }
@@ -66,15 +67,6 @@ export type SignInEmailLinkStatus =
   | 'expired'
   | 'failed'
   | 'client-mismatch';
-
-export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
-
-export type SignUpFields = Partial<Record<SignUpFieldName, { required: boolean }>>;
-
-export interface SignUpLegalConsent {
-  termsUrl?: string;
-  privacyPolicyUrl?: string;
-}
 
 export interface SignInActionBlockedDetails {
   title?: string;

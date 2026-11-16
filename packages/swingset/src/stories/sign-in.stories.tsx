@@ -9,9 +9,9 @@ import type {
   SignInStep,
   SignInSubmitEvent,
   SignInValues,
-  SignUpFields,
 } from '@clerk/mosaic/features/sign-in';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
+import type { SignUpFields } from '@clerk/mosaic/features/sign-up';
 import { useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';

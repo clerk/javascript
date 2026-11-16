@@ -11,9 +11,6 @@ import {
   emailLinkStatusCopy,
   httpsUrl,
   identifierFieldCopy,
-  legalConsentLabel,
-  signUpFieldNames,
-  signUpHeading,
   splitLastUsedProvider,
   startPrompt,
   stepIds,
@@ -266,41 +263,5 @@ describe('splitLastUsedProvider', () => {
       lastUsed: undefined,
       others: [google, github],
     });
-  });
-});
-
-describe('signUpFieldNames', () => {
-  it('lists the fields the sign-up asks for in the order the form shows them', () => {
-    expect(
-      signUpFieldNames({
-        password: { required: true },
-        username: { required: false },
-        firstName: { required: true },
-        phoneNumber: { required: false },
-      }),
-    ).toEqual(['firstName', 'username', 'phoneNumber', 'password']);
-    expect(signUpFieldNames({})).toEqual([]);
-  });
-});
-
-describe('sign-up legal consent', () => {
-  const m = signInMessages;
-
-  it('names only the pages the instance links to', () => {
-    expect(legalConsentLabel({ termsUrl: 'https://acme.com/terms' }, m)).toBe(m.signUp.legalConsent.termsOnly);
-    expect(legalConsentLabel({ privacyPolicyUrl: 'https://acme.com/privacy' }, m)).toBe(
-      m.signUp.legalConsent.privacyOnly,
-    );
-    expect(
-      legalConsentLabel({ termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' }, m),
-    ).toBe(m.signUp.legalConsent.termsAndPrivacy);
-  });
-
-  it('titles the step for consent when consent is all that is missing', () => {
-    expect(signUpHeading({ kind: 'sign-up', fields: {}, legalConsent: {} }, m).title).toBe('Legal consent');
-    expect(
-      signUpHeading({ kind: 'sign-up', fields: { password: { required: true } }, legalConsent: {} }, m).title,
-    ).toBe('Create your account');
-    expect(signUpHeading({ kind: 'sign-up', fields: {} }, m).title).toBe('Create your account');
   });
 });
