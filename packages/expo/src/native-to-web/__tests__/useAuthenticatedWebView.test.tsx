@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { StrictMode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import type { UseAuthenticatedWebViewParams } from '../useAuthenticatedWebView';
 import { useAuthenticatedWebView } from '../useAuthenticatedWebView';
 
 const mocks = vi.hoisted(() => {
@@ -104,7 +105,7 @@ describe('useAuthenticatedWebView', () => {
 
     expect(result.current).toMatchObject({ status: 'preparing', webViewProps: null, error: null });
     await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
-    expect(result.current.status).toBe('preparing');
+    expect(result.current.status).toBe('loading');
     expect(result.current.webViewProps?.source).toEqual({ uri: TRANSFER_URL });
     expect(mocks.request).toHaveBeenCalledTimes(1);
     expect(mocks.request).toHaveBeenCalledWith(
@@ -165,7 +166,7 @@ describe('useAuthenticatedWebView', () => {
 
     act(() => props?.onLoadStart({ nativeEvent: { url: TRANSFER_URL } }));
     act(() => props?.onLoadEnd({ nativeEvent: { url: TRANSFER_URL } }));
-    expect(result.current.status).toBe('preparing');
+    expect(result.current.status).toBe('loading');
 
     act(() => props?.onLoadEnd({ nativeEvent: { url: DESTINATION } }));
     expect(result.current).toMatchObject({ status: 'ready', webViewProps: props, error: null });
@@ -213,6 +214,20 @@ describe('useAuthenticatedWebView', () => {
     act(() => props?.onLoadEnd({ nativeEvent: { url: SIGN_IN } }));
 
     expect(allowed).toBe(true);
+    expect(result.current).toMatchObject({ status: 'error', error: { code: 'expired' } });
+  });
+
+  test('reports the redeem failure from an Android request, which has no isTopFrame', async () => {
+    mocks.request.mockResolvedValue(mintedResponse());
+    const { result } = renderWebView();
+    await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
+    const props = result.current.webViewProps;
+
+    act(() => {
+      props?.onShouldStartLoadWithRequest({ url: redeemFailure('expired') });
+    });
+    act(() => props?.onLoadEnd({ nativeEvent: { url: `${DESTINATION}/sign-in` } }));
+
     expect(result.current).toMatchObject({ status: 'error', error: { code: 'expired' } });
   });
 
@@ -303,9 +318,9 @@ describe('useAuthenticatedWebView', () => {
         'https://clerk.example.com/v1/session_transfers/redeem?token=second',
       ),
     );
-    expect(result.current.status).toBe('preparing');
+    expect(result.current.status).toBe('loading');
     act(() => failedProps?.onLoadEnd({ nativeEvent: { url: DESTINATION } }));
-    expect(result.current.status).toBe('preparing');
+    expect(result.current.status).toBe('loading');
   });
 
   test('a destination change mints for the new destination and drops the old result', async () => {
@@ -394,5 +409,77 @@ describe('useAuthenticatedWebView', () => {
     await waitFor(() => expect(result.current.status).toBe('error'));
     expect(result.current.error?.code).toBe('invalid_destination');
     expect(mocks.request).not.toHaveBeenCalled();
+  });
+
+  describe('app callbacks', () => {
+    function renderWithCallbacks(callbacks: Omit<UseAuthenticatedWebViewParams, 'destination'>) {
+      return renderHook((props: UseAuthenticatedWebViewParams) => useAuthenticatedWebView(props), {
+        initialProps: { destination: DESTINATION, ...callbacks },
+      });
+    }
+
+    test('receive the destination events and still let the hook report ready', async () => {
+      mocks.request.mockResolvedValue(mintedResponse());
+      const onLoadStart = vi.fn();
+      const onLoadEnd = vi.fn();
+      const { result } = renderWithCallbacks({ onLoadStart, onLoadEnd });
+      await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
+      const props = result.current.webViewProps;
+
+      const destinationLoaded = { nativeEvent: { url: DESTINATION } };
+      act(() => props?.onLoadStart({ nativeEvent: { url: DESTINATION } }));
+      act(() => props?.onLoadEnd(destinationLoaded));
+
+      expect(result.current.status).toBe('ready');
+      expect(onLoadStart).toHaveBeenCalledTimes(1);
+      expect(onLoadEnd).toHaveBeenCalledWith(destinationLoaded);
+    });
+
+    test('never receive events for the sign-in page, which carries the one-time URL', async () => {
+      mocks.request.mockResolvedValue(mintedResponse());
+      const onLoadStart = vi.fn();
+      const onLoadEnd = vi.fn();
+      const onHttpError = vi.fn();
+      const onShouldStartLoadWithRequest = vi.fn(() => true);
+      const { result } = renderWithCallbacks({ onLoadStart, onLoadEnd, onHttpError, onShouldStartLoadWithRequest });
+      await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
+      const props = result.current.webViewProps;
+
+      act(() => {
+        props?.onShouldStartLoadWithRequest({ url: TRANSFER_URL, isTopFrame: true });
+        props?.onLoadStart({ nativeEvent: { url: TRANSFER_URL } });
+        props?.onLoadEnd({ nativeEvent: { url: TRANSFER_URL } });
+        props?.onHttpError({ nativeEvent: { url: TRANSFER_URL } });
+      });
+
+      expect(onLoadStart).not.toHaveBeenCalled();
+      expect(onLoadEnd).not.toHaveBeenCalled();
+      expect(onHttpError).not.toHaveBeenCalled();
+      expect(onShouldStartLoadWithRequest).not.toHaveBeenCalled();
+    });
+
+    test('can block other pages but not the sign-in page', async () => {
+      mocks.request.mockResolvedValue(mintedResponse());
+      const { result } = renderWithCallbacks({ onShouldStartLoadWithRequest: () => false });
+      await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
+      const props = result.current.webViewProps;
+
+      expect(props?.onShouldStartLoadWithRequest({ url: TRANSFER_URL, isTopFrame: true })).toBe(true);
+      expect(props?.onShouldStartLoadWithRequest({ url: 'https://other.example.com/', isTopFrame: true })).toBe(false);
+    });
+
+    test('are read from the latest render', async () => {
+      mocks.request.mockResolvedValue(mintedResponse());
+      const first = vi.fn();
+      const second = vi.fn();
+      const { result, rerender } = renderWithCallbacks({ onLoadEnd: first });
+      await waitFor(() => expect(result.current.webViewProps).not.toBeNull());
+
+      rerender({ destination: DESTINATION, onLoadEnd: second });
+      act(() => result.current.webViewProps?.onLoadEnd({ nativeEvent: { url: DESTINATION } }));
+
+      expect(first).not.toHaveBeenCalled();
+      expect(second).toHaveBeenCalledTimes(1);
+    });
   });
 });
