@@ -62,6 +62,12 @@ export const signInMessages = {
     title: 'Cannot sign in',
     description: 'Cannot proceed with sign in. There’s no available authentication factor.',
   },
+  loading: 'Loading…',
+  protectCheck: {
+    title: 'Verifying your request',
+    description: 'Please wait while we verify your request.',
+    retry: 'Try again',
+  },
   startOver: {
     title: 'Something went wrong',
     description: 'We couldn’t continue signing you in. Start over to try again.',
