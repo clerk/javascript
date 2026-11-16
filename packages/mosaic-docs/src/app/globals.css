@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+@theme {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Type roles carried over from clerk.com (Seed). */
+@utility heading-4 {
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+@utility heading-6 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility label-3 {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+@utility label-4 {
+  font-size: 0.6875rem;
+  line-height: 1.125rem;
+  font-weight: 500;
+}
+
+/* The description under an item's title. */
+@utility prose-lede {
+  @apply text-base/7 text-gray-600 dark:text-gray-400;
+  & p {
+    margin: 0;
+  }
+  & code {
+    @apply rounded-md bg-gray-950/5 px-1 py-0.5 font-mono text-[0.875em] text-gray-950 dark:bg-white/10 dark:text-white;
+  }
+  & strong {
+    @apply font-semibold text-gray-950 dark:text-white;
+  }
+}
+
+/* Generated swingset prose on item pages. */
+@utility prose-docs {
+  @apply prose prose-gray dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-h2:mt-14 prose-h2:text-2xl prose-h3:text-lg prose-a:text-purple-600 prose-code:rounded-md prose-code:bg-gray-950/5 prose-code:px-1 prose-code:py-0.5 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none dark:prose-code:bg-white/10 max-w-none;
+}
+
+.shiki-frame pre {
+  padding: 1rem;
+  background: transparent !important;
+}
+.shiki-frame span {
+  color: var(--shiki-light);
+}
+@media (prefers-color-scheme: dark) {
+  .shiki-frame span {
+    color: var(--shiki-dark);
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "package.json",
+        "next.config.mjs",
+        "postcss.config.mjs",
+        "tsconfig.json",
+        "scripts/**",
+        "src/**",
+        "$TURBO_ROOT$/packages/swingset/src/stories/**"
+      ]
+    }
+  }
+}

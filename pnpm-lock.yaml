@@ -1056,6 +1056,55 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0(vitest@5.0.0)
 
+  packages/mosaic-docs:
+    dependencies:
+      '@mdx-js/mdx':
+        specifier: ^3.1.1
+        version: 3.1.1(supports-color@10.2.2)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      next:
+        specifier: ^16.4.3
+        version: 16.4.5(@babel/core@7.29.7(supports-color@10.2.2))(@opentelemetry/api@1.9.0)(@playwright/test@1.62.1)(@types/node@22.20.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
+      remark-gfm:
+        specifier: ^4.0.0
+        version: 4.0.1(supports-color@10.2.2)
+      shiki:
+        specifier: ^1.0.0
+        version: 1.29.2
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.0.0
+        version: 4.3.0
+      '@tailwindcss/typography':
+        specifier: ^0.5.19
+        version: 0.5.20(tailwindcss@4.3.0)
+      '@types/mdx':
+        specifier: ^2.0.13
+        version: 2.0.14
+      '@types/react':
+        specifier: catalog:react
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: catalog:react
+        version: 18.3.7(@types/react@18.3.28)
+      prettier:
+        specifier: 3.8.3
+        version: 3.8.3
+      tailwindcss:
+        specifier: ^4.0.0
+        version: 4.3.0
+      typescript:
+        specifier: catalog:repo
+        version: 6.0.3
+
   packages/msw:
     dependencies:
       '@clerk/shared':
@@ -18220,7 +18269,7 @@ snapshots:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 22.20.1
+      '@types/node': 24.19.2
       '@types/yargs': 15.0.20
       chalk: 4.1.2
     optional: true
@@ -21433,7 +21482,7 @@ snapshots:
 
   '@types/ws@7.4.7':
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 12.20.55
 
   '@types/ws@8.18.1':
     dependencies:
@@ -26605,7 +26654,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.20.1
+      '@types/node': 24.19.2
       merge-stream: 2.0.0
       supports-color: 8.1.1
     optional: true
@@ -30194,7 +30243,7 @@ snapshots:
 
   rpc-websockets@9.3.8:
     dependencies:
-      '@swc/helpers': 0.5.21
+      '@swc/helpers': 0.5.23
       '@types/uuid': 10.0.0
       '@types/ws': 8.18.1
       buffer: 6.0.3
