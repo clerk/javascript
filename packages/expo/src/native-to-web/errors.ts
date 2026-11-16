@@ -47,7 +47,7 @@ export type SessionTransferError = Error & {
  * ### Send a signed-out user to sign in
  * ```ts
  * try {
- *   await openExternalBrowser({ destination: 'https://app.example.com/settings' });
+ *   await openInBrowser({ destination: 'https://app.example.com/settings' });
  * } catch (error) {
  *   if (isSessionTransferError(error) && error.code === 'signed_out') {
  *     router.replace('/sign-in');

@@ -86,7 +86,7 @@ const unclaimed = new Map<string, LedgerEntry>();
  * creates a new transfer. Rejects with a `SessionTransferError`.
  *
  * Use it only to present the URL yourself. `useAuthenticatedWebView` and
- * `useNativeToWeb().openExternalBrowser` cover WebViews and the system browser.
+ * `openInBrowser` cover WebViews and the system browser.
  *
  * > [!WARNING]
  * > Android browsers redeem the URL only when the app sets `android.intent.extra.REFERRER_NAME`

@@ -1,9 +1,8 @@
 import Module from 'node:module';
 
-import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { useNativeToWeb } from '../useNativeToWeb';
+import { openInBrowser } from '../openInBrowser';
 
 const moduleWithLoad = Module as unknown as {
   _load: (request: string, parent?: unknown, isMain?: boolean) => unknown;
@@ -73,7 +72,7 @@ function pending<T>() {
 
 let sessionCount = 0;
 
-describe('useNativeToWeb', () => {
+describe('openInBrowser', () => {
   beforeEach(() => {
     sessionCount += 1;
     mocks.sessionId = `sess_${sessionCount}`;
@@ -107,20 +106,8 @@ describe('useNativeToWeb', () => {
     vi.restoreAllMocks();
   });
 
-  test('returns the same openExternalBrowser on every render', () => {
-    const { result, rerender } = renderHook(() => useNativeToWeb());
-    const first = result.current;
-
-    rerender();
-
-    expect(result.current).toBe(first);
-    expect(result.current.openExternalBrowser).toBe(first.openExternalBrowser);
-  });
-
   test('mints a browser transfer and opens it', async () => {
-    const { openExternalBrowser } = useNativeToWeb();
-
-    await openExternalBrowser({ destination: DESTINATION });
+    await openInBrowser({ destination: DESTINATION });
 
     expect(mocks.request).toHaveBeenCalledWith(
       expect.objectContaining({ body: { redirectUrl: DESTINATION, presentationMode: 'browser' } }),
@@ -129,10 +116,8 @@ describe('useNativeToWeb', () => {
   });
 
   test('shares one mint and one launch between overlapping calls', async () => {
-    const { openExternalBrowser } = useNativeToWeb();
-
-    const first = openExternalBrowser({ destination: DESTINATION });
-    const second = openExternalBrowser({ destination: DESTINATION });
+    const first = openInBrowser({ destination: DESTINATION });
+    const second = openInBrowser({ destination: DESTINATION });
     await Promise.all([first, second]);
 
     expect(second).toBe(first);
@@ -143,11 +128,9 @@ describe('useNativeToWeb', () => {
   test('joins the open in flight after its URL was claimed', async () => {
     const opened = pending<void>();
     mocks.openURL.mockReturnValue(opened.promise);
-    const { openExternalBrowser } = useNativeToWeb();
-
-    const first = openExternalBrowser({ destination: DESTINATION });
+    const first = openInBrowser({ destination: DESTINATION });
     await vi.waitFor(() => expect(mocks.openURL).toHaveBeenCalledTimes(1));
-    const second = openExternalBrowser({ destination: DESTINATION });
+    const second = openInBrowser({ destination: DESTINATION });
     opened.resolve();
     await Promise.all([first, second]);
 
@@ -157,10 +140,8 @@ describe('useNativeToWeb', () => {
   });
 
   test('mints again once the previous open finished', async () => {
-    const { openExternalBrowser } = useNativeToWeb();
-
-    await openExternalBrowser({ destination: DESTINATION });
-    await openExternalBrowser({ destination: DESTINATION });
+    await openInBrowser({ destination: DESTINATION });
+    await openInBrowser({ destination: DESTINATION });
 
     expect(mocks.request).toHaveBeenCalledTimes(2);
     expect(mocks.openURL).toHaveBeenCalledTimes(2);
@@ -168,9 +149,7 @@ describe('useNativeToWeb', () => {
 
   test('rejects with browser_unavailable without exposing the URL', async () => {
     mocks.openURL.mockRejectedValue(new Error(`Unable to open URL: ${TRANSFER_URL}`));
-    const { openExternalBrowser } = useNativeToWeb();
-
-    const error = await openExternalBrowser({ destination: DESTINATION }).then(
+    const error = await openInBrowser({ destination: DESTINATION }).then(
       () => null,
       (e: unknown) => e,
     );
@@ -183,17 +162,13 @@ describe('useNativeToWeb', () => {
 
   test('rejects with signed_out without minting', async () => {
     mocks.sessionId = null;
-    const { openExternalBrowser } = useNativeToWeb();
-
-    await expect(openExternalBrowser({ destination: DESTINATION })).rejects.toMatchObject({ code: 'signed_out' });
+    await expect(openInBrowser({ destination: DESTINATION })).rejects.toMatchObject({ code: 'signed_out' });
     expect(mocks.request).not.toHaveBeenCalled();
   });
 
   test('rejects with unsupported_platform on web', async () => {
     mocks.platformOS = 'web';
-    const { openExternalBrowser } = useNativeToWeb();
-
-    await expect(openExternalBrowser({ destination: DESTINATION })).rejects.toMatchObject({
+    await expect(openInBrowser({ destination: DESTINATION })).rejects.toMatchObject({
       code: 'unsupported_platform',
     });
     expect(mocks.request).not.toHaveBeenCalled();
@@ -206,9 +181,7 @@ describe('useNativeToWeb', () => {
     });
 
     test('opens the transfer with a VIEW intent that names the app as referrer', async () => {
-      const { openExternalBrowser } = useNativeToWeb();
-
-      await openExternalBrowser({ destination: DESTINATION });
+      await openInBrowser({ destination: DESTINATION });
 
       expect(mocks.startActivityAsync).toHaveBeenCalledTimes(1);
       expect(mocks.startActivityAsync).toHaveBeenCalledWith('android.intent.action.VIEW', {
@@ -220,9 +193,7 @@ describe('useNativeToWeb', () => {
 
     test('fails with missing_dependency before minting when expo-intent-launcher is missing', async () => {
       mocks.intentLauncherInstalled = false;
-      const { openExternalBrowser } = useNativeToWeb();
-
-      const error = await openExternalBrowser({ destination: DESTINATION }).then(
+      const error = await openInBrowser({ destination: DESTINATION }).then(
         () => null,
         (e: unknown) => e,
       );
@@ -233,12 +204,7 @@ describe('useNativeToWeb', () => {
     });
 
     test('shares one mint and one intent between overlapping calls', async () => {
-      const { openExternalBrowser } = useNativeToWeb();
-
-      await Promise.all([
-        openExternalBrowser({ destination: DESTINATION }),
-        openExternalBrowser({ destination: DESTINATION }),
-      ]);
+      await Promise.all([openInBrowser({ destination: DESTINATION }), openInBrowser({ destination: DESTINATION })]);
 
       expect(mocks.request).toHaveBeenCalledTimes(1);
       expect(mocks.startActivityAsync).toHaveBeenCalledTimes(1);
