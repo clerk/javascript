@@ -76,7 +76,11 @@ export type EmailDeliveryWebhookEvent =
           | { type: 'OnProviderSuppressionList'; message: string }
           | {
               type: 'ClerkPolicy';
-              reason: 'unverified_email_dns' | 'provider_domain_restriction' | 'application_communication_lock';
+              reason:
+                | 'unverified_email_dns'
+                | 'provider_domain_restriction'
+                | 'application_communication_lock'
+                | 'transactional_email_blocked';
               message: string;
             };
       }
