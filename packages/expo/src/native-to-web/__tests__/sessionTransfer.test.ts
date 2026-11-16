@@ -114,6 +114,7 @@ describe('sessionTransfer', () => {
         method: 'POST',
         path: '/client/sessions/sess_1/session_transfers',
         body: { redirectUrl: DESTINATION, presentationMode: 'browser' },
+        signal: expect.any(AbortSignal),
       });
       expect(transfer.url).toBe(TRANSFER_URL);
       expect(transfer.expiresAt).toEqual(new Date(NOW + 60_000));
@@ -211,6 +212,20 @@ describe('sessionTransfer', () => {
       await vi.advanceTimersByTimeAsync(20_000);
 
       expect(await rejection).toMatchObject({ code: 'network_error' });
+      expect(mocks.request.mock.calls[0][0].signal.aborted).toBe(true);
+    });
+
+    test('still rejects with signed_out when refreshing the client does not finish within 20 seconds', async () => {
+      vi.useFakeTimers();
+      mocks.request.mockResolvedValue(errorResponse(401, 'signed_out', 'You are signed out'));
+      mocks.handleUnauthenticated.mockReturnValue(new Promise(() => {}));
+
+      const rejection = rejectionOf(
+        sessionTransfer.prepareSessionTransfer({ destination: DESTINATION, presentation: 'webview' }),
+      );
+      await vi.advanceTimersByTimeAsync(20_000);
+
+      expect(await rejection).toMatchObject({ code: 'signed_out' });
     });
 
     test.each([
