@@ -1,8 +1,8 @@
-import * as Stories from './oauth-consent.stories';
+import * as Stories from './consent.stories';
 
-# OAuthConsent
+# Consent
 
-Asks the signed-in user whether an OAuth application may access their account. `OAuthConsent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with every URL parameter forwarded. When the application asks for `user:org:read`, the user picks which organization to grant. Each scope can show a checkbox with a label and a description; a required scope stays checked. It shows a skeleton of the consent card until the consent details load, and nothing when nobody is signed in.
+Asks the signed-in user whether an OAuth application may access their account. `Consent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with every URL parameter forwarded. When the application asks for `user:org:read`, the user picks which organization to grant. Each scope can show a checkbox with a label and a description; a required scope stays checked. It renders `fallback` until Clerk loads, a skeleton of the consent card until the consent details load, and nothing when nobody is signed in.
 
 ## Example
 
@@ -33,9 +33,9 @@ Switch between loading, the consent screen and an error to see the card animate 
 ## Usage
 
 ```tsx
-import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent';
+import { Consent } from '@clerk/mosaic/features/consent/consent';
 
-<OAuthConsent />;
+<Consent />;
 ```
 
 ## Props
@@ -50,7 +50,7 @@ import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent
 
 ### Scope list
 
-Without `scopeSelection`, the scopes render as a list with no checkboxes. This is what `OAuthConsent` renders today.
+Without `scopeSelection`, the scopes render as a list with no checkboxes. This is what `Consent` renders today.
 
 <Story name='ScopeList' storyModule={Stories} />
 
