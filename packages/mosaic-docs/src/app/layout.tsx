@@ -14,6 +14,7 @@ const sans = Geist({ subsets: ['latin'], variable: '--font-geist' });
 const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://mosaic.clerk.com'),
   title: 'Mosaic Design System | Clerk',
   description: 'Components, primitives, and hooks from Mosaic, the design system behind Clerk’s user interfaces.',
   robots: { index: false, follow: false },

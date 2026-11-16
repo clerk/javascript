@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Served at clerk.com/mosaic.
-  basePath: '/mosaic',
+  // Served from the root of mosaic.clerk.com.
   outputFileTracingIncludes: { '/**': ['./.content/**/*.json'] },
 };
 
