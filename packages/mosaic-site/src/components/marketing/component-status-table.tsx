@@ -32,7 +32,7 @@ export function ComponentStatusTable() {
         <div className='mt-8 overflow-x-auto'>
           <table className='w-full min-w-[56rem] text-left'>
             <thead>
-              <tr className='border-border body-3 border-b text-gray-500 dark:text-gray-400'>
+              <tr className='border-border body-3 border-b text-gray-600 dark:text-gray-400'>
                 <th
                   scope='col'
                   className='py-3 pr-4 font-normal'
