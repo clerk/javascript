@@ -58,6 +58,7 @@ describe('useEnabledThirdPartyProviders', () => {
       'oauth_twitch',
       'oauth_twitter',
       'oauth_vercel',
+      'oauth_world_id',
       'oauth_x',
       'oauth_xero',
     ]);
