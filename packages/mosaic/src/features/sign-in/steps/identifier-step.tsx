@@ -14,6 +14,7 @@ import { Input } from '../../../components/input';
 import { PasswordInput } from '../../../components/password-input';
 import { PhoneInput } from '../../../components/phone-input';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
+import { Separator } from '../../../components/separator';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
@@ -458,21 +459,7 @@ function SignInProviders({
       >
         {otherProviders.map(provider => providerButton(provider))}
       </ProviderButtonGroup>
-      {showDivider ? (
-        <div
-          role='separator'
-          {...stylex.props(styles.divider)}
-        >
-          <span {...stylex.props(styles.dividerLine)} />
-          <Text
-            size='sm'
-            color='foreground-secondary'
-          >
-            {m.start.divider}
-          </Text>
-          <span {...stylex.props(styles.dividerLine)} />
-        </div>
-      ) : null}
+      {showDivider ? <Separator>{m.start.divider}</Separator> : null}
     </>
   );
 }
