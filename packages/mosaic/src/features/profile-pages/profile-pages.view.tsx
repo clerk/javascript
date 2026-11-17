@@ -4,12 +4,17 @@ import React from 'react';
 import type { ProfileRootProps } from '../../components/profile';
 import { Profile } from '../../components/profile';
 
+type ProfilePageLayout = Pick<ProfilePagesViewProps, 'contentTitle' | 'contentBackAction' | 'contentFooter'>;
+export type RenderProfilePage = (panel: ReactNode, layout?: ProfilePageLayout) => React.ReactElement;
+
+export type ProfilePageContent = ReactNode | ((render: RenderProfilePage) => React.ReactElement);
+
 /** One destination in a profile's navigation, with the page it opens. */
 export interface ProfilePage {
   id: string;
   label: string;
   icon: ReactNode;
-  content: ReactNode;
+  content: ProfilePageContent;
 }
 
 /** A run of pages in the navigation. A labelled group is set apart under its label. */
@@ -40,6 +45,23 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
   const pages = groups.flatMap(group => group.pages);
   const activeEntry = pages.find(page => page.id === activePage) ?? pages[0];
 
+  const renderPage: RenderProfilePage = (panel, layout = {}) => (
+    <Profile.Content
+      pageTitle={layout.contentTitle ?? contentTitle ?? activeEntry?.label}
+      backAction={layout.contentBackAction ?? contentBackAction}
+      footer={layout.contentFooter ?? contentFooter}
+    >
+      {pages.map(page => (
+        <Profile.ContentPanel
+          key={page.id}
+          value={page.id}
+        >
+          {typeof page.content === 'function' ? page === activeEntry && panel : page.content}
+        </Profile.ContentPanel>
+      ))}
+    </Profile.Content>
+  );
+
   return (
     <Profile.Root
       ref={ref}
@@ -65,20 +87,7 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
           ),
         )}
       </Profile.Nav>
-      <Profile.Content
-        pageTitle={contentTitle ?? activeEntry?.label}
-        backAction={contentBackAction}
-        footer={contentFooter}
-      >
-        {pages.map(page => (
-          <Profile.ContentPanel
-            key={page.id}
-            value={page.id}
-          >
-            {page.content}
-          </Profile.ContentPanel>
-        ))}
-      </Profile.Content>
+      {typeof activeEntry?.content === 'function' ? activeEntry.content(renderPage) : renderPage(activeEntry?.content)}
     </Profile.Root>
   );
 });
