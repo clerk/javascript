@@ -221,7 +221,7 @@ describe('UserButton', () => {
   });
 
   it('names the role in the active organization beside the identifier in combined mode', async () => {
-    await renderUserButton({ mode: 'combined' });
+    await renderUserButton({ combined: true });
     await open();
 
     expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice · Member');
