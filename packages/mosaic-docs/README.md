@@ -1,6 +1,6 @@
 # Mosaic docs
 
-The documentation site for [`@clerk/mosaic`](../mosaic), Clerk's component library.
+The documentation site for [`@clerk/mosaic`](../mosaic), Clerk's design system.
 
 ## Development
 
