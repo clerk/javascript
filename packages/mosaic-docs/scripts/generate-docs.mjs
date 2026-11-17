@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 const DOC_PATH = /^src\/(?:(components|primitives)\/([a-z0-9-]+)\/\2|(hooks)\/(use-[a-z0-9-]+))\.doc\.ts$/;
 const EXCLUDED = new Set([
+  'components/action-menu',
+  'components/branding',
   'components/captcha',
+  'components/clerk-logo',
   'hooks/use-mosaic-environment',
   'hooks/use-mosaic-experimental',
   'hooks/use-mosaic-router',
