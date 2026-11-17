@@ -8,6 +8,7 @@ import { Header } from '@/ui/elements/Header';
 import { PreviewButton } from '@/ui/elements/PreviewButton';
 import { UserPreview } from '@/ui/elements/UserPreview';
 import { handleError } from '@/ui/utils/errorHandler';
+import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
@@ -15,12 +16,14 @@ import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Add, ArrowRight } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
-import { SignInStart } from './SignInStart';
 import { isChatGPTSIWCAccountMismatch } from './chatGPTSIWC';
+import { SignInStart } from './SignInStart';
 
 const SignInAccountSwitcherInternal = () => {
   const card = useCardState();
-  const { userProfileUrl } = useEnvironment().displayConfig;
+  const clerk = useClerk();
+  const { authConfig, displayConfig } = useEnvironment();
+  const { userProfileUrl } = displayConfig;
   const { afterSignInUrl, path: signInPath, signInUrl, taskUrl, queryParams } = useSignInContext();
   const isChatGPTSIWCMismatch = isChatGPTSIWCAccountMismatch(queryParams);
   const accountSwitcherSignInUrl = isChatGPTSIWCMismatch
@@ -62,6 +65,16 @@ const SignInAccountSwitcherInternal = () => {
       signInUrl: isChatGPTSIWCMismatch ? accountSwitcherSignInUrl : (signInPath ?? signInUrl),
       user: undefined,
     });
+
+  // Single-session mode allows one signed-in account, so adding another for ChatGPT signs out the current
+  // one first. Otherwise sign-in would send the signed-in user straight back to the authorization, which
+  // asks them to choose an account again.
+  const handleChatGPTSIWCSingleSessionAddAccountClicked = () =>
+    clerk.signOut(() => clerkWindowNavigate(clerk, accountSwitcherSignInUrl));
+  const onAddAccountClicked =
+    isChatGPTSIWCMismatch && authConfig.singleSessionMode
+      ? handleChatGPTSIWCSingleSessionAddAccountClicked
+      : handleAddAccountClicked;
 
   return (
     <Flow.Part part='accountSwitcher'>
@@ -111,7 +124,7 @@ const SignInAccountSwitcherInternal = () => {
                 iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('addAccount')}
                 icon={Add}
                 label={localizationKeys('signIn.accountSwitcher.action__addAccount')}
-                onClick={handleAddAccountClicked}
+                onClick={onAddAccountClicked}
                 iconSx={t => ({
                   width: t.sizes.$9,
                   height: t.sizes.$6,

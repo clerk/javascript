@@ -1,7 +1,6 @@
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import { getQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
@@ -9,13 +8,19 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import {
+  chatGPTSIWCAccountChoicePendingParams,
+  createChatGPTSIWCContinuationGuard,
+  isChatGPTSIWCAccountChoicePending,
+  isChatGPTSIWCFlow,
+  resolveChatGPTSIWCQueryParams,
+} from '../../components/SignIn/chatGPTSIWC';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignInCtx } from '../../types';
 import { warnAboutPasswordInSignInOrUpFlow } from '../../utils/warnAboutPasswordInSignInOrUpFlow';
 import { clerkWindowNavigate } from '../../utils/windowNavigate';
-import { isChatGPTSIWCAccountChoicePending, isChatGPTSIWCFlow } from '../../components/SignIn/chatGPTSIWC';
 import { getInitialValuesFromQueryParams } from '../utils';
 
 export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRedirectUrl'> & {
@@ -49,18 +54,19 @@ export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
   const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { queryParams: routedQueryParams } = useRouter();
-  // Hosted authorization redirects arrive in window.location.search. Hash and
-  // virtual routers keep their own route query, so merge both sources to keep
-  // server-provided OAuth state (including SIWC routing markers) visible to
-  // every sign-in step. Router values win after an in-component navigation.
-  const queryParams = {
-    ...(typeof window === 'undefined' ? {} : getQueryParams(window.location.search)),
-    ...routedQueryParams,
-  };
+  const { queryParams: routedQueryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
+  // Only a ChatGPT plugin (SIWC) authorization changes these params; see resolveChatGPTSIWCQueryParams.
+  const queryParams = resolveChatGPTSIWCQueryParams(
+    routedQueryParams,
+    createChatGPTSIWCContinuationGuard(() => ({
+      frontendApi: clerk.frontendApi,
+      proxyUrl: clerk.proxyUrl,
+      allowedRedirectOrigins: options.allowedRedirectOrigins,
+    })),
+  );
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
@@ -75,7 +81,11 @@ export const useSignInContext = (): SignInContextType => {
 
   const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(
-    () => getInitialValuesFromQueryParams(new URLSearchParams(queryParams).toString(), SIGN_IN_INITIAL_VALUE_KEYS),
+    () =>
+      getInitialValuesFromQueryParams(
+        queryParams === routedQueryParams ? queryString : new URLSearchParams(queryParams).toString(),
+        SIGN_IN_INITIAL_VALUE_KEYS,
+      ),
     [],
   );
 
@@ -125,10 +135,18 @@ export const useSignInContext = (): SignInContextType => {
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
+  // A pending ChatGPT account choice is recorded when the session is activated. The SSO callback only
+  // sees the redirect URLs in authQueryString, so carry the SIWC markers through the OAuth round trip.
+  const ssoAuthQueryString = isChatGPTSIWCAccountChoicePending(queryParams)
+    ? new URLSearchParams({
+        ...Object.fromEntries(new URLSearchParams(authQueryString)),
+        ...chatGPTSIWCAccountChoicePendingParams,
+      }).toString()
+    : authQueryString;
   const ssoCallbackUrl = buildRedirectUrl({
     routing: ctx.routing,
     baseUrl: signInUrl,
-    authQueryString,
+    authQueryString: ssoAuthQueryString,
     path: ctx.path,
     endpoint:
       isCombinedFlow && ctx.routing !== 'virtual' ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
@@ -148,7 +166,9 @@ export const useSignInContext = (): SignInContextType => {
     const signUpURL = new URL(signUpUrl, window.location.origin);
     for (const key of ['target_flow', 'redirect_url', 'login_hint'] as const) {
       const value = queryParams[key];
-      if (value) signUpURL.searchParams.set(key, value);
+      if (value) {
+        signUpURL.searchParams.set(key, value);
+      }
     }
     signUpUrl = signUpURL.href;
   }
@@ -190,10 +210,16 @@ export const useSignInContext = (): SignInContextType => {
     decorateUrl: DecorateUrl;
   }) => {
     if (isChatGPTSIWCAccountChoicePending(queryParams)) {
-      if (!session.__internal_acknowledgeChatGPTAccountChoice) {
-        throw new Error('This session cannot confirm the ChatGPT account choice.');
+      // Resume the authorization even if the choice could not be recorded: FAPI asks the user to
+      // choose an account again, which beats stranding them on a signed-in sign-in page.
+      try {
+        if (!session.__internal_acknowledgeChatGPTAccountChoice) {
+          throw new Error('This session cannot confirm the ChatGPT account choice.');
+        }
+        await session.__internal_acknowledgeChatGPTAccountChoice(afterSignInUrl);
+      } catch (error) {
+        console.error('Clerk: Failed to record the ChatGPT account choice.', error);
       }
-      await session.__internal_acknowledgeChatGPTAccountChoice(afterSignInUrl);
     }
 
     const currentTask = session.currentTask;

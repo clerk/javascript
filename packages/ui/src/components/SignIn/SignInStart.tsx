@@ -12,7 +12,7 @@ import type {
   SignInCreateParams,
   SignInResource,
 } from '@clerk/shared/types';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -42,6 +42,7 @@ import { useIsWebAuthnSupported, useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
+import { chatGPTSIWCOIDCPrompt, isChatGPTSIWCFlow } from './chatGPTSIWC';
 import {
   hasOnlyEnterpriseSSOFirstFactors,
   shouldHandOffToEnterpriseConnection,
@@ -49,7 +50,6 @@ import {
 } from './enterpriseSSOFactors';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
-import { chatGPTSIWCOIDCPrompt, isChatGPTSIWCFlow } from './chatGPTSIWC';
 import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';

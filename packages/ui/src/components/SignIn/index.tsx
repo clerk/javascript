@@ -19,9 +19,9 @@ import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 import type { SignUpCtx } from '@/types';
 import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
-import { isChatGPTSIWCAccountMismatch } from './chatGPTSIWC';
 
 import { buildCombinedFlowOAuthCallbackParams, buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
+import { isChatGPTSIWCAccountChoicePending, isChatGPTSIWCAccountMismatch } from './chatGPTSIWC';
 import {
   LazySignUpContinue,
   LazySignUpEnterpriseConnections,
@@ -54,6 +54,10 @@ function RedirectToSignIn() {
 function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
+  // After an OAuth redirect, record a pending ChatGPT account choice before resuming the authorization.
+  const siwcCallbackParams = isChatGPTSIWCAccountChoicePending(signInContext.queryParams)
+    ? { __internal_navigateOnSetActive: signInContext.navigateOnSetActive }
+    : {};
 
   return (
     <Flow.Root flow='signIn'>
@@ -82,7 +86,10 @@ function SignInRoutes(): JSX.Element {
           <ResetPasswordSuccess />
         </Route>
         <Route path='sso-callback'>
-          <SignInSSOCallback {...buildSignInOAuthCallbackParams(signInContext)} />
+          <SignInSSOCallback
+            {...buildSignInOAuthCallbackParams(signInContext)}
+            {...siwcCallbackParams}
+          />
         </Route>
         <Route path='choose'>
           <SignInAccountSwitcher />
@@ -114,7 +121,10 @@ function SignInRoutes(): JSX.Element {
               <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <LazySignUpSSOCallback {...buildCombinedFlowOAuthCallbackParams(signUpContext)} />
+              <LazySignUpSSOCallback
+                {...buildCombinedFlowOAuthCallbackParams(signUpContext)}
+                {...siwcCallbackParams}
+              />
             </Route>
             <Route path='verify'>
               <SignUpEmailLinkFlowComplete

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
@@ -57,7 +57,7 @@ describe('SignInAccountSwitcher', () => {
     fixtures.router.queryParams = {
       target_flow: 'chatgpt_siwc',
       redirect_url:
-        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
       __clerk_siwc_account_mismatch: 'true',
     } as any;
     fixtures.clerk.setActive.mockImplementation(async ({ session, navigate }: any) => {
@@ -90,11 +90,11 @@ describe('SignInAccountSwitcher', () => {
     fixtures.router.queryParams = {
       target_flow: 'chatgpt_siwc',
       redirect_url:
-        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
       __clerk_siwc_account_mismatch: 'true',
     } as any;
 
-    const { getByText, queryByText } = render(<SignInAccountSwitcherForChatGPTSIWC />, { wrapper });
+    const { getByText } = render(<SignInAccountSwitcherForChatGPTSIWC />, { wrapper });
 
     expect(getByText('Nick Kouk')).toBeDefined();
     expect(getByText('Add account')).toBeInTheDocument();
@@ -139,7 +139,7 @@ describe('SignInAccountSwitcher', () => {
     fixtures.router.queryParams = {
       target_flow: 'chatgpt_siwc',
       redirect_url:
-        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
       __clerk_siwc_account_mismatch: 'true',
     } as any;
     fixtures.signIn.create.mockResolvedValueOnce({ status: 'needs_identifier' } as any);
@@ -162,7 +162,7 @@ describe('SignInAccountSwitcher', () => {
     fixtures.router.queryParams = {
       target_flow: 'chatgpt_siwc',
       redirect_url:
-        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=outer-state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=outer-state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
       __clerk_siwc_account_mismatch: 'true',
     } as any;
     const windowNavigate = vi.fn();
@@ -181,13 +181,44 @@ describe('SignInAccountSwitcher', () => {
     expect(outerAuthorizationURL.searchParams.get('state')).toBe('outer-state');
   });
 
+  it('ChatGPTSIWC_AddAccount_SingleSessionMode_SignsOutBeforeReturningToSignIn', async () => {
+    // GIVEN single-session mode (the fixture default) with the one signed-in account mismatched
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ first_name: 'Nick', last_name: 'Kouk', email_addresses: ['test1@clerk.com'] });
+    });
+    fixtures.router.queryParams = {
+      target_flow: 'chatgpt_siwc',
+      redirect_url:
+        'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=outer-state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+      __clerk_siwc_account_mismatch: 'true',
+    } as any;
+    const windowNavigate = vi.fn();
+    (fixtures.clerk as any).__internal_windowNavigate = windowNavigate;
+    fixtures.clerk.signOut.mockResolvedValue(undefined as any);
+    const { userEvent, getByText } = render(<SignInAccountSwitcherForChatGPTSIWC />, { wrapper });
+
+    // WHEN the user adds another account
+    await userEvent.click(getByText('Add account'));
+
+    // THEN the current session is signed out first, so sign-in cannot bounce straight back to the authorization
+    expect(fixtures.clerk.signOut).toHaveBeenCalledTimes(1);
+    expect(windowNavigate).not.toHaveBeenCalled();
+    const [afterSignOut] = fixtures.clerk.signOut.mock.calls[0] as unknown as [() => void];
+    afterSignOut();
+    expect(windowNavigate).toHaveBeenCalledTimes(1);
+    const target = new URL(String(windowNavigate.mock.calls[0][0]), window.location.origin);
+    const switchParams = new URLSearchParams(target.hash.slice(target.hash.indexOf('?') + 1));
+    expect(switchParams.get('__clerk_siwc_account_choice_pending')).toBe('true');
+    expect(switchParams.get('__clerk_siwc_account_mismatch')).toBe('false');
+  });
+
   it('preserves the outer OAuth continuation when adding an account with hash routing', async () => {
     const { wrapper, fixtures, props } = await createFixtures(initConfig);
     props.setProps({ routing: 'hash' } as any);
     fixtures.router.queryParams = {
       target_flow: 'chatgpt_siwc',
       redirect_url:
-        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=outer-state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=outer-state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
       __clerk_siwc_account_mismatch: 'true',
     } as any;
     const windowNavigate = vi.fn();

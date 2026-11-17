@@ -547,7 +547,7 @@ describe('SignInStart', () => {
       fixtures.router.queryParams = {
         target_flow: 'chatgpt_siwc',
         redirect_url:
-          'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
         login_hint: 'new-user@example.com',
       } as any;
       fixtures.signIn.create.mockRejectedValueOnce(
@@ -584,7 +584,7 @@ describe('SignInStart', () => {
       fixtures.router.queryParams = {
         target_flow: 'chatgpt_siwc',
         redirect_url:
-          'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
         login_hint: 'not an address',
       } as any;
       fixtures.signIn.create.mockRejectedValueOnce(
@@ -622,7 +622,7 @@ describe('SignInStart', () => {
       fixtures.router.queryParams = {
         target_flow: 'chatgpt_siwc',
         redirect_url:
-          'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
       } as any;
       window.sessionStorage.setItem(
         '__clerk_siwc_auto_start_at',
@@ -647,7 +647,7 @@ describe('SignInStart', () => {
       fixtures.router.queryParams = {
         target_flow: 'chatgpt_siwc',
         redirect_url:
-          'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
         email_address: 'hello@enterprise.example',
         __clerk_siwc_prompt_login: 'true',
         __clerk_siwc_prompt_select_account: 'true',
@@ -669,6 +669,28 @@ describe('SignInStart', () => {
       );
     });
 
+    it('ChatGPTSIWC_CraftedLink_ContinuationOnAnotherOrigin_DoesNotStartPluginFlow', async () => {
+      window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      // GIVEN a well-formed SIWC link whose continuation is not on this instance's Frontend API
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://evil.example/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        login_hint: 'victim@example.com',
+      } as any;
+
+      render(<SignInStart />, { wrapper });
+
+      // THEN sign-in renders normally without a preflight or a ChatGPT redirect
+      await waitFor(() => expect(screen.getByText('Continue')).toBeInTheDocument());
+      expect(fixtures.signIn.create).not.toHaveBeenCalled();
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+
     it('hands an unidentified plugin sign-in to enterprise SSO when the instance requires it', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'chatgpt' });
@@ -676,7 +698,7 @@ describe('SignInStart', () => {
       fixtures.router.queryParams = {
         target_flow: 'chatgpt_siwc',
         redirect_url:
-          'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
       } as any;
       fixtures.signIn.create.mockResolvedValueOnce({
         status: 'needs_identifier',

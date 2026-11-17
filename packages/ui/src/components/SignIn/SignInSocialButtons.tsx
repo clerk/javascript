@@ -59,25 +59,31 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
     [card, clerk, ctx],
   );
 
+  // During a ChatGPT plugin (SIWC) flow, ChatGPT gets the prompt and login hint the plugin asked
+  // for, whether the redirect starts automatically or from a click. Other providers get neither.
+  const oidcParamsFor = useCallback(
+    (strategy: OAuthStrategy): { oidcPrompt?: string; oidcLoginHint?: string } => {
+      if (!isChatGPTSIWCFlow(ctx.queryParams)) {
+        return { oidcPrompt: ctx.oidcPrompt };
+      }
+      if (strategy !== 'oauth_chatgpt') {
+        return {};
+      }
+      return {
+        oidcPrompt: chatGPTSIWCOIDCPrompt(ctx.oidcPrompt, ctx.queryParams),
+        oidcLoginHint: ignoreChatGPTLoginHint ? undefined : ctx.queryParams.email_address || ctx.queryParams.login_hint,
+      };
+    },
+    [ctx.oidcPrompt, ctx.queryParams, ignoreChatGPTLoginHint],
+  );
+
   const startOAuthRedirect = useCallback(
     (strategy: OAuthStrategy) => {
-      const isChatGPTSIWC = isChatGPTSIWCFlow(ctx.queryParams);
-      const oidcParams = isChatGPTSIWC
-        ? strategy === 'oauth_chatgpt'
-          ? {
-              oidcPrompt: chatGPTSIWCOIDCPrompt(ctx.oidcPrompt, ctx.queryParams),
-              oidcLoginHint: ignoreChatGPTLoginHint
-                ? undefined
-                : ctx.queryParams.email_address || ctx.queryParams.login_hint,
-            }
-          : {}
-        : { oidcPrompt: ctx.oidcPrompt };
-
       return signIn.authenticateWithRedirect({
         strategy,
         redirectUrl,
         redirectUrlComplete,
-        ...oidcParams,
+        ...oidcParamsFor(strategy),
         __internal_callbackParams: {
           ...buildSignInOAuthTransportCallbackParams(ctx),
           __internal_navigateOnSetActive: ctx.navigateOnSetActive,
@@ -85,7 +91,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
         },
       });
     },
-    [ctx, ignoreChatGPTLoginHint, navigate, redirectUrl, redirectUrlComplete, signIn],
+    [ctx, navigate, oidcParamsFor, redirectUrl, redirectUrlComplete, signIn],
   );
 
   useEffect(() => {
@@ -138,29 +144,17 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
           }, 500);
 
           return signIn
-            .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup, oidcPrompt: ctx.oidcPrompt })
+            .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup, ...oidcParamsFor(strategy) })
             .catch(err => handleError(err));
         }
 
-        return signIn
-          .authenticateWithRedirect({
-            strategy,
-            redirectUrl,
-            redirectUrlComplete,
-            oidcPrompt: ctx.oidcPrompt,
-            __internal_callbackParams: {
-              ...buildSignInOAuthTransportCallbackParams(ctx),
-              __internal_navigateOnSetActive: ctx.navigateOnSetActive,
-              __internal_navigate: navigate,
-            },
-          })
-          .catch(err => {
-            const res = handleError(err);
-            if (clerk.__internal_hasOAuthTransport) {
-              card.setIdle();
-            }
-            return res;
-          });
+        return startOAuthRedirect(strategy).catch(err => {
+          const res = handleError(err);
+          if (clerk.__internal_hasOAuthTransport) {
+            card.setIdle();
+          }
+          return res;
+        });
       }}
       web3Callback={strategy => {
         if (strategy === 'web3_solana_signature') {

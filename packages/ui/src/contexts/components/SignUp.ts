@@ -1,7 +1,6 @@
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import { getQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
@@ -9,6 +8,7 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import { createChatGPTSIWCContinuationGuard, resolveChatGPTSIWCQueryParams } from '../../components/SignIn/chatGPTSIWC';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -44,13 +44,18 @@ export const useSignUpContext = (): SignUpContextType => {
   const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { queryParams: routedQueryParams, queryString } = useRouter();
-  const queryParams = {
-    ...(typeof window === 'undefined' ? {} : getQueryParams(window.location.search)),
-    ...routedQueryParams,
-  };
   const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
+  // Only a ChatGPT plugin (SIWC) authorization changes these params; see resolveChatGPTSIWCQueryParams.
+  const queryParams = resolveChatGPTSIWCQueryParams(
+    routedQueryParams,
+    createChatGPTSIWCContinuationGuard(() => ({
+      frontendApi: clerk.frontendApi,
+      proxyUrl: clerk.proxyUrl,
+      allowedRedirectOrigins: options.allowedRedirectOrigins,
+    })),
+  );
   const isCombinedFlow =
     (signUpMode !== 'restricted' &&
       Boolean(
