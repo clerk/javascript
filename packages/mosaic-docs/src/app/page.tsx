@@ -6,7 +6,10 @@ export default function HomePage() {
   return (
     <>
       <div className='flex min-h-[calc(100dvh-4rem)] flex-col'>
-        <main className='flex-1'>
+        <main
+          id='content'
+          className='flex-1'
+        >
           <section className='pb-16 pt-16 sm:pb-20 sm:pt-24'>
             <div className='max-w-350 mx-auto px-6'>
               <h1 className='mt-6 max-w-3xl text-balance text-4xl font-medium sm:text-5xl lg:text-6xl'>
