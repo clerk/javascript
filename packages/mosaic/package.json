@@ -267,6 +267,7 @@
     "build:js": "tsdown --config tsdown.config.mts",
     "bundlewatch": "node ./scripts/bundle-for-size.mjs && FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "check:bundle": "node ./scripts/check-bundle.mjs",
+    "check:docs-exports": "node ./scripts/check-docs-exports.mjs",
     "clean": "rimraf ./dist ./dist-css",
     "dev": "tsdown --config tsdown.config.mts --watch",
     "format": "node ../../scripts/format-package.mjs",
