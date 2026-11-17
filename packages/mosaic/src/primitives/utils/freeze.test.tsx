@@ -313,8 +313,17 @@ describe('Freeze', () => {
     // Resolves once the child has rendered the label, so the transition has at least started and
     // requested the hold before the second click.
     const rendered = (renders: string[], label: string) =>
-      new Promise<void>(resolve => {
-        const check = () => (renders.includes(label) ? resolve() : setTimeout(check, 1));
+      new Promise<void>((resolve, reject) => {
+        const deadline = Date.now() + 2000;
+        const check = () => {
+          if (renders.includes(label)) {
+            resolve();
+          } else if (Date.now() > deadline) {
+            reject(new Error(`The child never rendered "${label}"`));
+          } else {
+            setTimeout(check, 1);
+          }
+        };
         check();
       });
 
