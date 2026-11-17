@@ -6,34 +6,39 @@ import type { ModalContentProps } from '@clerk/mosaic/modals/modal.types';
 import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { useRouterScope } from '@clerk/mosaic/routing/use-router';
 
-import type { DemoModalOptions } from './demo-modal';
-import { innerModal } from './demo-modal';
+import type { DomainModalOptions } from './demo-modal';
+import { dnsHelpModal } from './demo-modal';
 
-const routes = { index: '', details: 'details' } as const;
+const routes = { index: '', verify: 'verify' } as const;
 
-export default function DemoModalContent({ close, path, routing }: ModalContentProps<DemoModalOptions>) {
+export default function DomainModalContent({ close, path, routing }: ModalContentProps<DomainModalOptions>) {
   const { route, go } = useRouterScope(routes, { routing, path, root: 'index' });
-  const inner = useModal(innerModal);
+  const help = useModal(dnsHelpModal);
 
   return (
     <Card.Root>
       <Card.Header>
-        <Card.Title>{route === 'details' ? 'Demo modal, details' : 'Demo modal'}</Card.Title>
+        <Card.Title>{route === 'verify' ? 'Verify ownership' : 'Add a domain'}</Card.Title>
         <Card.Description>
-          {route === 'details'
-            ? 'The second step of the same modal. Back returns to the first one.'
+          {route === 'verify'
+            ? 'Add the TXT record to your DNS, then verify. This step has its own entry, so Back returns to the domain.'
             : `Open while its entry exists under ${path}, routed in ${routing} mode. Its step is part of the entry.`}
         </Card.Description>
       </Card.Header>
       <Card.Content>
         <div className='flex flex-col gap-2'>
+          {route === 'verify' ? (
+            <code className='bg-muted rounded px-2 py-1 font-mono text-xs'>clerk-verify=8f3a…c21e</code>
+          ) : (
+            <code className='bg-muted rounded px-2 py-1 font-mono text-xs'>auth.example.com</code>
+          )}
           <Button
             variant='outline'
-            onClick={() => go(route === 'details' ? 'index' : 'details')}
+            onClick={() => go(route === 'verify' ? 'index' : 'verify')}
           >
-            {route === 'details' ? 'Back to the first step' : 'Show details'}
+            {route === 'verify' ? 'Back to the domain' : 'Continue to verification'}
           </Button>
-          <Button onClick={() => inner.open()}>Open another modal on top</Button>
+          <Button onClick={() => help.open()}>Need help with DNS?</Button>
         </div>
       </Card.Content>
       <Card.Footer>

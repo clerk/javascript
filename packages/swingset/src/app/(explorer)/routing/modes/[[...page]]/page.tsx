@@ -2,29 +2,21 @@
 
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
-import type { MosaicRoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
-import Link from 'next/link';
 
 import { DemoPage } from '@/components/routing-demo/demo-page';
+import { HostLinks, hostUrl } from '@/components/routing-demo/host-links';
+import { InviteFlow } from '@/components/routing-demo/invite-flow';
 import { ModeNav, useModeParam } from '@/components/routing-demo/mode-nav';
-import { Wizard } from '@/components/routing-demo/wizard';
-import { buttonVariants } from '@/components/ui/button';
 import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 
 const pagePath = '/routing/modes';
 const modes = ['virtual', 'path', 'hash', 'query'] as const;
 const routing: MosaicRouting = { adapter: nextRouterAdapter };
 
-const deepLinks: Record<MosaicRoutingMode, string | undefined> = {
-  virtual: undefined,
-  path: `${pagePath}/items/b?mode=path`,
-  hash: `${pagePath}?mode=hash#wizard=items/b`,
-  query: `${pagePath}?mode=query&p.wizard=items/b`,
-};
-
 export default function RoutingModesPage() {
   const mode = useModeParam(modes);
-  const deepLink = deepLinks[mode];
+  const link = (parts: string) =>
+    hostUrl({ mode, pagePath, entries: [{ base: mode === 'path' ? pagePath : '/invite', parts }] });
 
   return (
     <MosaicProvider
@@ -32,7 +24,7 @@ export default function RoutingModesPage() {
       routing={routing}
     >
       <DemoPage
-        title='The modes'
+        title='A page'
         intro={
           <>
             <p>
@@ -45,7 +37,7 @@ export default function RoutingModesPage() {
               <code className='font-mono text-xs'>{pagePath}</code>, which is a catch-all route here, and its step is
               the rest of the pathname. In <code className='font-mono text-xs'>hash</code> and{' '}
               <code className='font-mono text-xs'>query</code> it is one param named after the base, here{' '}
-              <code className='font-mono text-xs'>/wizard</code>.
+              <code className='font-mono text-xs'>/invite</code>.
             </p>
           </>
         }
@@ -56,22 +48,17 @@ export default function RoutingModesPage() {
           mode={mode}
           href={option => `${pagePath}?mode=${option}`}
         />
-        {deepLink ? (
-          <div className='flex flex-wrap items-center gap-2'>
-            <span className='text-muted-foreground text-sm'>A link from the host, straight to item B:</span>
-            <Link
-              href={deepLink}
-              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-            >
-              <code className='font-mono text-xs'>{deepLink}</code>
-            </Link>
-          </div>
-        ) : null}
-        <Wizard
+        <HostLinks
+          links={[
+            { label: 'Straight to inviting Grace', href: link('teammates/grace') },
+            { label: 'The invite already sent', href: link('sent') },
+          ]}
+        />
+        <InviteFlow
           key={mode}
-          label='Wizard'
+          label='Invite a teammate'
           routing={mode}
-          path={mode === 'path' ? pagePath : '/wizard'}
+          path={mode === 'path' ? pagePath : '/invite'}
         />
       </DemoPage>
     </MosaicProvider>

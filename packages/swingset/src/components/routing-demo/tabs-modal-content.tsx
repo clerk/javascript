@@ -16,7 +16,7 @@ export default function TabsModalContent({ close, path, routing }: ModalContentP
   return (
     <Card.Root>
       <Card.Header>
-        <Card.Title>Tabs in a modal</Card.Title>
+        <Card.Title>Organization settings</Card.Title>
         <Card.Description>
           The open tab is the modal&apos;s segment under {path}, so in the hash and query modes a reload brings back the
           modal on this tab, and the handle can open it on a tab.

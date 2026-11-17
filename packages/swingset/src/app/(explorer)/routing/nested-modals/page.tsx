@@ -5,8 +5,9 @@ import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
 
-import { demoModal, innerModal } from '@/components/routing-demo/demo-modal';
+import { dnsHelpModal, domainModal } from '@/components/routing-demo/demo-modal';
 import { DemoPage } from '@/components/routing-demo/demo-page';
+import { HostLinks, hostUrl } from '@/components/routing-demo/host-links';
 import { ModeNav, useModeParam } from '@/components/routing-demo/mode-nav';
 import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 
@@ -14,15 +15,15 @@ const pagePath = '/routing/nested-modals';
 const modes = ['virtual', 'hash', 'query'] as const;
 
 function OpenButton() {
-  const demo = useModal(demoModal);
+  const domain = useModal(domainModal);
   return (
     <div>
-      <Button onClick={() => demo.open()}>Open the modal</Button>
+      <Button onClick={() => domain.open()}>Add a domain</Button>
     </div>
   );
 }
 
-export default function NestedModalsPage() {
+export default function ModalPage() {
   const mode = useModeParam(modes);
   const routing: MosaicRouting = { adapter: nextRouterAdapter, modals: mode === 'virtual' ? undefined : mode };
 
@@ -31,21 +32,22 @@ export default function NestedModalsPage() {
       key={mode}
       routing={routing}
     >
-      <innerModal.Host>
-        <demoModal.Host>
+      <dnsHelpModal.Host>
+        <domainModal.Host>
           <DemoPage
-            title='A modal on a modal'
+            title='A modal'
             intro={
               <>
                 <p>
-                  A modal that opens another modal on top of itself. Each keeps its own entry and its own step, so in
-                  the hash and query modes the URL carries both, a reload restores both, and Back unwinds them one at a
-                  time.
+                  A modal is open exactly while its entry exists, and its step is part of the entry. In the hash and
+                  query modes that puts it in the URL: a reload opens it again on the same step, Back closes it, and the
+                  handle can open it straight on a step.
                 </p>
                 <p>
-                  The two are hosted side by side, not inside each other, so the modal beneath cannot tell from the tree
-                  that one is on top of it. The modal host keeps the order they opened in and lets only the top one take
-                  an outside press or Escape.
+                  It can have another modal on top. The DNS help button opens one with an entry of its own, so the URL
+                  carries both and Back unwinds them one at a time. The two are hosted side by side rather than inside
+                  each other, so the modal host keeps the order they opened in and lets only the top one take an outside
+                  press or Escape.
                 </p>
               </>
             }
@@ -57,9 +59,28 @@ export default function NestedModalsPage() {
               href={option => `${pagePath}?mode=${option}`}
             />
             <OpenButton />
+            <HostLinks
+              links={[
+                {
+                  label: 'The modal at verification',
+                  href: hostUrl({ mode, pagePath, entries: [{ base: '/modal/domain', parts: 'verify' }] }),
+                },
+                {
+                  label: 'The help modal on top of it',
+                  href: hostUrl({
+                    mode,
+                    pagePath,
+                    entries: [
+                      { base: '/modal/domain', parts: '' },
+                      { base: '/modal/dnsHelp', parts: 'example' },
+                    ],
+                  }),
+                },
+              ]}
+            />
           </DemoPage>
-        </demoModal.Host>
-      </innerModal.Host>
+        </domainModal.Host>
+      </dnsHelpModal.Host>
     </MosaicProvider>
   );
 }
