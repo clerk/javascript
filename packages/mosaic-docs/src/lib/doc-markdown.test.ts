@@ -133,3 +133,27 @@ void test('wraps a type containing a backtick in a longer code span', () => {
   );
   assert.match(markdown, /\| `value` \| `` `\$\{string\}px` `` \|/);
 });
+
+void test('keeps a backslash before a pipe inside its table cell', () => {
+  const markdown = docToMarkdown(
+    {
+      name: 'Sep',
+      description: 'Separator.',
+      useFor: ['splitting'],
+      parts: {
+        Sep: {
+          description: 'A part.',
+          props: { sep: { type: String.raw`'\|'`, doc: String.raw`Splits a\|b. Paths like C:\dir stay.` } },
+        },
+      },
+    },
+    noLinks,
+  );
+  const tick = '`';
+  assert.ok(
+    markdown
+      .split('\n')
+      .includes(String.raw`| ${tick}sep${tick} | ${tick}'\\\|'${tick} |  | Splits a\\\|b. Paths like C:\dir stay. |`),
+    markdown,
+  );
+});

@@ -75,7 +75,7 @@ function propTable(props: PropDocs): string {
 }
 
 function cell(text: string): string {
-  return text.replace(/\s*\n\s*/g, ' ').replace(/\|/g, '\\|');
+  return text.replace(/\s*\n\s*/g, ' ').replace(/\\?\|/g, pipe => (pipe === '|' ? '\\|' : '\\\\\\|'));
 }
 
 function codeSpan(text: string): string {
