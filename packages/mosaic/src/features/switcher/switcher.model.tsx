@@ -164,7 +164,11 @@ export function useSwitcherModel(
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   // The active org names the trigger. That is not a request to turn Organizations on.
-  const { isLoaded: isOrgLoaded, organization } = useOrganization({
+  const {
+    isLoaded: isOrgLoaded,
+    organization,
+    membership,
+  } = useOrganization({
     __internal_skipAttemptToEnableOrganizations: true,
   });
   const clerk = useClerk();
@@ -323,7 +327,7 @@ export function useSwitcherModel(
     organizationsEnabled,
     renderBranding: displayConfig.branded,
     activeSession: toSession(session.id, user),
-    activeOrganization: organization ? toMembership(organization) : null,
+    activeOrganization: organization ? { ...toMembership(organization), roleName: membership?.roleName } : null,
     // The user resource settles this before the paginated list answers; the count covers a stale resource.
     hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
     hidePersonal: forceOrganizationSelection || (options.hidePersonal ?? false),

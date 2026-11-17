@@ -220,6 +220,13 @@ describe('UserButton', () => {
     expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
   });
 
+  it('names the role in the active organization beside the identifier in combined mode', async () => {
+    await renderUserButton({ mode: 'combined' });
+    await open();
+
+    expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice · Member');
+  });
+
   describe('switching organization', () => {
     it('makes the selected organization active and closes', async () => {
       const { navigate } = await renderUserButton();
