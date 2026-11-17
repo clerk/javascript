@@ -25,7 +25,8 @@
   --shiki-token-punctuation: light-dark(#5f5f6f, #ffffff);
   --docs-radius: 0.75rem;
   --docs-content-width: 42rem;
-  --docs-font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --docs-font-body:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --docs-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
 }
 
@@ -45,6 +46,11 @@
 }
 
 @layer base {
+  :root {
+    font-feature-settings:
+      'liga' 1,
+      'calt' 1;
+  }
   * {
     min-width: 0;
   }
@@ -54,7 +60,7 @@
   h4,
   h5,
   h6 {
-    letter-spacing: -0.05em;
+    letter-spacing: -0.02em;
   }
   :focus-visible {
     outline: 2px solid var(--docs-accent);

@@ -1,11 +1,18 @@
 import './globals.css';
 
 import type { Metadata } from 'next';
+import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 
 import { SiteHeader } from '@/components/site-header';
 import { navigation } from '@/lib/navigation';
 import { site } from '@/lib/site';
+
+const inter = localFont({
+  src: './fonts/InterVariable.woff2',
+  weight: '100 900',
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   title: { default: site.name, template: `%s · ${site.name}` },
@@ -14,7 +21,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang='en'>
+    <html
+      lang='en'
+      className={inter.variable}
+    >
       <body className='bg-background text-foreground flex min-h-dvh flex-col font-sans antialiased'>
         <a
           href='#content'
