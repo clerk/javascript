@@ -32,6 +32,14 @@ export const accessMessages = {
   activate: 'Activate policy',
   noDomains: 'No domains added.',
   noConnections: 'No connections added.',
+  emptySso: {
+    label: 'No SSO connections',
+    description: 'An SSO connection lets members sign in with their identity provider.',
+  },
+  emptyDirectory: {
+    label: 'No directory connections',
+    description: 'Directory Sync keeps organization membership in sync with your identity provider.',
+  },
   loadingPolicies: 'Loading access policies',
   loadingPolicy: 'Loading access policy',
   loadPoliciesError: 'Could not load access policies.',

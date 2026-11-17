@@ -3,14 +3,17 @@ import * as stylex from '@stylexjs/stylex';
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
+import { EmptyState } from '../../../components/empty-state';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { Table } from '../../../components/table';
 import { Tabs } from '../../../components/tabs';
 import { Tooltip } from '../../../components/tooltip';
 import { VisuallyHidden } from '../../../components/visually-hidden';
+import { EnterpriseConnections } from '../../../icons/glyphs/enterprise-connections';
 import { InformationCircle } from '../../../icons/glyphs/information-circle';
 import { Plus } from '../../../icons/glyphs/plus';
+import { Users } from '../../../icons/glyphs/users';
 import { useMessages } from '../../../localization';
 import type { AccessController } from './access.controller';
 import { styles } from './access.styles';
@@ -107,6 +110,7 @@ export function AccessOverview({ controller }: { controller: AccessController })
 function ConnectionsTable({ controller, kind }: { controller: AccessController; kind: ConnectionKind }) {
   const m = useMessages('organizationProfile').access;
   const title = kind === 'sso' ? m.ssoShort : m.directorySync;
+  const empty = kind === 'sso' ? m.emptySso : m.emptyDirectory;
   return (
     <Section.Root>
       <Section.Group>
@@ -150,7 +154,17 @@ function ConnectionsTable({ controller, kind }: { controller: AccessController; 
           <Table.Body
             items={controller.data.connections.filter(item => item.kind === kind)}
             itemToStringValue={item => item.id}
-            renderEmptyState={() => m.noConnections}
+            renderEmptyState={
+              controller.data.isLoadingConnections || controller.data.connectionLoadError
+                ? undefined
+                : () => (
+                    <EmptyState.Root role='status'>
+                      <EmptyState.Icon glyph={kind === 'sso' ? EnterpriseConnections : Users} />
+                      <EmptyState.Label>{empty.label}</EmptyState.Label>
+                      <EmptyState.Description>{empty.description}</EmptyState.Description>
+                    </EmptyState.Root>
+                  )
+            }
           >
             {item => (
               <Table.Row key={item.id}>
