@@ -51,7 +51,21 @@ export function determineActiveFields(fieldProps: FieldDeterminationProps): Fiel
 }
 
 // If continuing with an existing sign-up, show only fields absolutely necessary to minimize fiction
-export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpResource) {
+type VerificationStatusInput = { status: string | null } | null | undefined;
+
+export type ExistingSignUpInput = Pick<
+  SignUpResource,
+  'emailAddress' | 'firstName' | 'lastName' | 'username' | 'legalAcceptedAt'
+> & {
+  verifications?: {
+    emailAddress?: VerificationStatusInput;
+    phoneNumber?: VerificationStatusInput;
+    externalAccount?: VerificationStatusInput;
+    web3Wallet?: VerificationStatusInput;
+  };
+};
+
+export function minimizeFieldsForExistingSignup(fields: Fields, signUp: ExistingSignUpInput) {
   if (signUp) {
     const hasEmailFilled = !!signUp.emailAddress;
     const hasVerifiedEmail = signUp.verifications?.emailAddress?.status === 'verified';
