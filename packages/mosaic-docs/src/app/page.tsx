@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { LandingFooter, LandingFooterLinks } from '@/components/landing-footer';
+import { highlightTokens } from '@/core/highlight';
 import { site } from '@/lib/site';
 import { CopyButton } from '@/ui/copy-button';
 
@@ -30,7 +31,8 @@ function TextLink({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const installTokens = await highlightTokens(installCommand, 'sh');
   return (
     <>
       <div className='flex min-h-[calc(100dvh-4rem)] flex-col'>
@@ -50,7 +52,16 @@ export default function HomePage() {
                   >
                     $
                   </span>
-                  <code className='flex-1'>{installCommand}</code>
+                  <code className='flex-1'>
+                    {installTokens.map((token, index) => (
+                      <span
+                        key={index}
+                        style={{ color: token.color }}
+                      >
+                        {token.content}
+                      </span>
+                    ))}
+                  </code>
                   <CopyButton text={installCommand} />
                 </div>
                 <div className='flex items-center gap-6'>
