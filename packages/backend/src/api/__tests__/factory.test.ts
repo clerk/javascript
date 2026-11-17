@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import jwksJson from '../../fixtures/jwks.json';
 import userJson from '../../fixtures/user.json';
@@ -121,6 +121,73 @@ describe('api.client', () => {
 
     expect(data[0].id).toBe('user_cafebabe');
     expect(totalCount).toBe(2);
+  });
+
+  it('executes 1 backend API request for users.getUserList() paged by cursor', async () => {
+    const countHandler = vi.fn(() => HttpResponse.json({ object: 'total_count', total_count: 2 }));
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('pagination')).toBe('cursor');
+          expect(url.searchParams.get('starting_after')).toBe('cursor_previous');
+          expect(url.searchParams.get('remaining_count')).toBe('1000');
+          expect(url.searchParams.get('order_by')).toBe('first_name');
+          expect(url.searchParams.getAll('metadata').map(filter => JSON.parse(filter))).toEqual([
+            { scope: 'public', key: 'plan', match: 'equals', value: 'pro' },
+            { scope: 'private', key: 'trial', match: 'exists', negate: true },
+          ]);
+          return HttpResponse.json({
+            data: [userJson],
+            cursor: {
+              starting_after: 'cursor_next',
+              ending_before: null,
+              has_next_page: true,
+              remaining_count_at_least: 1000,
+            },
+          });
+        }),
+      ),
+      http.get(`https://api.clerk.test/v1/users/count`, validateHeaders(countHandler)),
+    );
+
+    const { data, cursor } = await apiClient.users.getUserList({
+      pagination: 'cursor',
+      startingAfter: 'cursor_previous',
+      remainingCount: 1000,
+      orderBy: 'first_name',
+      metadata: [
+        { scope: 'public', key: 'plan', match: 'equals', value: 'pro' },
+        { scope: 'private', key: 'trial', match: 'exists', negate: true },
+      ],
+    });
+
+    expect(data.length).toBe(1);
+    expect(data[0].id).toBe('user_cafebabe');
+    expect(data[0].firstName).toBe('John');
+    expect(cursor).toEqual({ startingAfter: 'cursor_next', hasNextPage: true, remainingCountAtLeast: 1000 });
+    expect(countHandler).not.toHaveBeenCalled();
+  });
+
+  it('returns the exact remaining count and a null cursor on the last page of users.getUserList() paged by cursor', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          expect(new URL(request.url).searchParams.get('remaining_count')).toBe('exact');
+          return HttpResponse.json({
+            data: [userJson],
+            cursor: { starting_after: null, ending_before: null, has_next_page: false, remaining_count_exact: 1 },
+          });
+        }),
+      ),
+    );
+
+    const { data, cursor } = await apiClient.users.getUserList({ pagination: 'cursor', remainingCount: 'exact' });
+
+    expect(data.length).toBe(1);
+    expect(cursor).toEqual({ startingAfter: null, hasNextPage: false, remainingCountExact: 1 });
   });
 
   it('executes users.getUserList() with last_sign_in_at filters', async () => {

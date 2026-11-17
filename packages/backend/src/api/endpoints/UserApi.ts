@@ -12,7 +12,7 @@ import type {
   PhoneNumber,
 } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
-import type { UserMergedJSON } from '../resources/JSON';
+import type { PaginationCursorJSON, UserMergedJSON } from '../resources/JSON';
 import { User } from '../resources/User';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
@@ -90,6 +90,68 @@ export type UserListParams = ClerkPaginationRequest<{
   /** Filters users who are members of the specified Organizations. Accepts up to 100 Organization IDs. */
   organizationId?: string[];
 }>;
+
+/**
+ * A filter on user metadata. A user matches when the filter's `match` holds for the value at `key` in the metadata named by `scope`.
+ */
+export type UserListMetadataFilter = {
+  /** The metadata to match against. */
+  scope: 'public' | 'private' | 'unsafe';
+  /** A dot-separated path into the metadata, for example `settings.theme`. Escape a literal dot in a key as `\.`. */
+  key: string;
+  /** `exists` matches users that hold the key, whether it holds a value or nested keys. `equals` matches the whole value, case-insensitively. */
+  match: 'exists' | 'equals';
+  /** The value to compare against. Required for `equals` and not allowed for `exists`. */
+  value?: string;
+  /** If `true`, returns the users the filter does not match instead. */
+  negate?: boolean;
+};
+
+/** @generateWithEmptyComment */
+export type UserListCursorParams = Omit<UserListParams, 'offset' | 'startingAfter'> & {
+  /**
+   * Pages the list by cursor. The response carries a `cursor` in place of a `totalCount`.
+   *
+   * Results are eventually consistent: a user created, updated, or deleted a short time ago may not yet be reflected in which users are returned, in their order, or in any count.
+   */
+  pagination: 'cursor';
+  /** The `cursor.startingAfter` of the previous page. Omit it for the first page, and keep every other parameter the same across pages. */
+  startingAfter?: string;
+  /**
+   * Also counts the users from the start of this page onward, this page included. On the first page that is every user the request matches.
+   *
+   * A number counts up to that many: the response's cursor carries `remainingCountExact` when there are fewer users than the number, and otherwise `remainingCountAtLeast`, set to that number. `'exact'` counts them all, with no limit. It takes longer the more users match, and the request fails if the count does not finish in time.
+   *
+   * The count is computed separately from the page. Treat it as a close estimate: it can differ slightly from the number of users that paging through the results returns.
+   */
+  remainingCount?: 100 | 1000 | 10000 | 'exact';
+  /** Filters users that match every one of the given metadata filters. Accepts up to 10 filters. */
+  metadata?: UserListMetadataFilter[];
+};
+
+/**
+ * The position of a page in a list of users paged by cursor.
+ */
+export type UserListCursor = {
+  /** The value to pass as `startingAfter` to get the next page, or `null` if this is the last page. */
+  startingAfter: string | null;
+  /** Whether there are more users after this page. */
+  hasNextPage: boolean;
+  /** The number of users from the start of this page onward. Present when `remainingCount` was passed and the count did not reach its limit. */
+  remainingCountExact?: number;
+  /** A lower bound on the number of users from the start of this page onward. Present when `remainingCount` was a number and at least that many users remain. */
+  remainingCountAtLeast?: number;
+};
+
+/**
+ * The response of [`getUserList()`](https://clerk.com/docs/reference/backend/user/get-user-list) when called with `pagination: 'cursor'`.
+ */
+export type UserListCursorResponse = {
+  /** The users on this page. */
+  data: User[];
+  /** The cursor to the next page, with the count if one was requested. */
+  cursor: UserListCursor;
+};
 
 /** @inline */
 export type UserMetadataParams = {
@@ -456,13 +518,27 @@ type UserID = {
   userId: string;
 };
 
+function isCursorParams(params: UserListParams | UserListCursorParams): params is UserListCursorParams {
+  return 'pagination' in params && params.pagination === 'cursor';
+}
+
 /** @generateWithEmptyComment */
 export class UserAPI extends AbstractAPI {
   /**
    * Retrieves the list of users in your instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
    */
-  public async getUserList(params: UserListParams = {}) {
+  public async getUserList(params?: UserListParams): Promise<PaginatedResourceResponse<User[]>>;
+  /**
+   * Retrieves one page of the users in your instance, paged by cursor. Pass the response's `cursor.startingAfter` as `startingAfter` to get the next page, until `cursor.hasNextPage` is `false`.
+   * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the next page. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
+   */
+  public async getUserList(params: UserListCursorParams): Promise<UserListCursorResponse>;
+  public async getUserList(params: UserListParams | UserListCursorParams = {}) {
+    if (isCursorParams(params)) {
+      return this.getUserListByCursor(params);
+    }
+
     const { limit, offset, orderBy, startingAfter, ...userCountParams } = params;
     // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
     // until we update the /users endpoint to be paginated in a next BAPI version.
@@ -476,6 +552,24 @@ export class UserAPI extends AbstractAPI {
       this.getCount(userCountParams),
     ]);
     return { data, totalCount } as PaginatedResourceResponse<User[]>;
+  }
+
+  private async getUserListByCursor(params: UserListCursorParams): Promise<UserListCursorResponse> {
+    const { metadata, ...queryParams } = params;
+    const { data, cursor } = await this.request<{ data: User[]; cursor: PaginationCursorJSON }>({
+      method: 'GET',
+      path: basePath,
+      queryParams: { ...queryParams, metadata: metadata?.map(filter => JSON.stringify(filter)) },
+    });
+    return {
+      data,
+      cursor: {
+        startingAfter: cursor.starting_after,
+        hasNextPage: cursor.has_next_page,
+        remainingCountExact: cursor.remaining_count_exact,
+        remainingCountAtLeast: cursor.remaining_count_at_least,
+      },
+    };
   }
 
   /**
