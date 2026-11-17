@@ -228,6 +228,22 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *   return <button onClick={handleClick}>Update User</button>
  * }
  * ```
+ *
+ * ### Handle a password reset during reverification
+ *
+ * If reverification reset the password, the new password is already saved. Reload the user instead of sending the
+ * original password update again.
+ *
+ * ```tsx
+ * const updatePassword = useReverification(
+ *   (reverification: ReverificationResult | undefined, currentUser: UserResource, params: UpdateUserPasswordParams) =>
+ *     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
+ *   { passReverificationResult: true },
+ * );
+ *
+ * // In the submit handler, once `user` is loaded:
+ * await updatePassword(user, { newPassword, signOutOfOtherSessions: true });
+ * ```
  */
 export const useReverification: UseReverification = (fetcher, options) => {
   const { __internal_openReverification, telemetry } = useClerk();
