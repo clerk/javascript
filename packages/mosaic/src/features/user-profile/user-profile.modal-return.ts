@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useModal } from '../../modals/use-modal';
+import { withoutNextAppRouterMarker } from '../../routing/window-location';
 import { useMosaicProfile, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
 import { userProfileModal } from './user-profile.modal';
 import type { UserProfileOptions } from './user-profile.provider';
@@ -34,13 +35,4 @@ export function UserProfileModalReturn(): null {
   }, [open, profile]);
 
   return null;
-}
-
-function withoutNextAppRouterMarker(state: unknown): unknown {
-  if (typeof state !== 'object' || state === null || !('__NA' in state)) {
-    return state;
-  }
-  const copy: object = Object.assign(Array.isArray(state) ? [] : {}, state);
-  Reflect.deleteProperty(copy, '__NA');
-  return copy;
 }

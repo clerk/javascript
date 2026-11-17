@@ -17,6 +17,8 @@ import type { ModalSurfaces } from './modals/modal.types';
 import { ModalHost } from './modals/modal-host';
 import type { TextDirection } from './primitives/direction-provider';
 import { DirectionProvider } from './primitives/direction-provider';
+import type { MosaicRouting } from './routing/router-adapter';
+import { RouterAdapterProvider } from './routing/router-adapter';
 import { VirtualStoreProvider } from './routing/virtual-store';
 
 export interface MosaicProviderProps {
@@ -31,6 +33,13 @@ export interface MosaicProviderProps {
   experimental?: MosaicExperimental;
   /** The profile `UserButton`, `OrganizationSwitcher`, `UserProfile` and `OrganizationProfile` share: its shape, and the options it takes. */
   profile?: MosaicProfile;
+  /**
+   * How components with `routing` set to `path`, `hash` or `query` reach the page's URL. `adapter`
+   * reads and writes it through your router, so the page and the component change together; without
+   * one they use `window.location`. `keyPrefix` sets what the names of their params start with, and
+   * `modals` puts Mosaic's own modals in the hash or the query string.
+   */
+  routing?: MosaicRouting;
 }
 
 // Exported Mosaic components annotate a React return type on purpose. The package sets
@@ -43,6 +52,7 @@ export function MosaicProvider({
   localization,
   experimental,
   profile = defaultProfile,
+  routing,
 }: MosaicProviderProps): React.ReactElement {
   const iconsValue = React.useMemo(() => icons ?? {}, [icons]);
   const localizationValue = React.useMemo(() => resolveLocalization(localization), [localization]);
@@ -58,12 +68,18 @@ export function MosaicProvider({
             <MosaicExperimentalProvider value={experimentalValue}>
               <MosaicProfileProvider value={profile}>
                 <ToastProvider>
-                  <VirtualStoreProvider>
-                    <ModalHost surfaces={modalSurfaces}>
-                      <UserProfileModalReturn />
-                      {children}
-                    </ModalHost>
-                  </VirtualStoreProvider>
+                  <RouterAdapterProvider
+                    adapter={routing?.adapter}
+                    keyPrefix={routing?.keyPrefix}
+                    modals={routing?.modals}
+                  >
+                    <VirtualStoreProvider>
+                      <ModalHost surfaces={modalSurfaces}>
+                        <UserProfileModalReturn />
+                        {children}
+                      </ModalHost>
+                    </VirtualStoreProvider>
+                  </RouterAdapterProvider>
                 </ToastProvider>
               </MosaicProfileProvider>
             </MosaicExperimentalProvider>

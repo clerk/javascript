@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import type { PatternPart } from '../routes';
 import { buildParts, compilePattern, compileRoutes, matchRoute, routeParts } from '../routes';
 
 const routes = compileRoutes({
@@ -76,6 +77,23 @@ describe('compilePattern', () => {
     expect(() => compilePattern('billing/:?')).toThrow('without a name');
   });
 
+  it('rejects a param name used twice', () => {
+    expect(() => compilePattern(':id/:id')).toThrow('"id" more than once');
+    expect(() => compilePattern('a/:id/:id?')).toThrow('"id" more than once');
+  });
+
+  it('rejects a param named after an Object.prototype property', () => {
+    for (const name of ['constructor', '__proto__', 'toString', 'hasOwnProperty', 'valueOf']) {
+      expect(() => compilePattern(`a/:${name}`)).toThrow('property of every object');
+      expect(() => compilePattern(`a/:${name}?`)).toThrow('property of every object');
+    }
+  });
+
+  it('rejects a param name that starts with a colon', () => {
+    expect(() => compilePattern('::id')).toThrow('starts with a colon');
+    expect(() => compilePattern('a/::id?')).toThrow('starts with a colon');
+  });
+
   it('rejects a required part after an optional one', () => {
     expect(() => compilePattern('a/:b?/c')).toThrow('optional parts come last');
     expect(() => compilePattern('a/:b?/:c')).toThrow('optional parts come last');
@@ -106,6 +124,15 @@ describe('buildParts', () => {
 
   it('drops an absent optional param', () => {
     expect(buildParts(compilePattern('billing/plans/:planId?'), {})).toEqual(['billing', 'plans']);
+  });
+
+  it('reads only params the caller set, never an inherited one', () => {
+    const parts: PatternPart[] = [
+      { param: false, value: 'a' },
+      { param: true, name: 'constructor', optional: true },
+    ];
+    expect(buildParts(parts, {})).toEqual(['a']);
+    expect(buildParts(compilePattern('a/:id?'), Object.create({ id: 'inherited' }))).toEqual(['a']);
   });
 
   it('round-trips any param value through matchRoute', () => {
