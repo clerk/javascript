@@ -36,7 +36,7 @@ Install with \`pnpm add @clerk/mosaic\`.
 ## Agent resources
 
 - [llms-full.txt](/llms-full.txt): The full Markdown of every page in one file.
-- [Page Markdown](/docs.md): Append \`.md\` to any docs page URL to fetch that page as Markdown.
+- [Page Markdown](/docs/setup.md): Append \`.md\` to any docs page URL to fetch that page as Markdown.
 `,
   );
 });

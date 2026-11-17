@@ -6,7 +6,7 @@ import { TableOfContents } from '@/ui/table-of-contents';
 
 export const metadata = {
   title: 'Setup',
-  alternates: { types: { 'text/markdown': '/docs.md' } },
+  alternates: { types: { 'text/markdown': '/docs/setup.md' } },
 };
 
 export default function Layout({ children }) {
@@ -14,13 +14,13 @@ export default function Layout({ children }) {
     <>
       <DocsArticle>
         <PageOutline headings={setupHeadings}>
-          <CopyPageButton href='/docs.md' />
+          <CopyPageButton href='/docs/setup.md' />
         </PageOutline>
         {children}
       </DocsArticle>
       <DocsAside>
         <TableOfContents headings={setupHeadings} />
-        <CopyPageButton href='/docs.md' />
+        <CopyPageButton href='/docs/setup.md' />
       </DocsAside>
     </>
   );

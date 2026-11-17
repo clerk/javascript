@@ -5,11 +5,14 @@ import createMDX from '@next/mdx';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'mdx'],
-  rewrites() {
+  redirects() {
     return [
-      { source: '/docs.md', destination: '/llms.mdx/docs' },
-      { source: '/docs/:path*.md', destination: '/llms.mdx/docs/:path*' },
+      { source: '/docs', destination: '/docs/setup', permanent: true },
+      { source: '/docs.md', destination: '/docs/setup.md', permanent: true },
     ];
+  },
+  rewrites() {
+    return [{ source: '/docs/:path*.md', destination: '/llms.mdx/docs/:path*' }];
   },
 };
 

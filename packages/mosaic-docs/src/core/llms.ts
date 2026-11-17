@@ -28,7 +28,7 @@ export function llmsIndex(site: LlmsSite, sections: LlmsSection[]): string {
     '## Agent resources',
     [
       '- [llms-full.txt](/llms-full.txt): The full Markdown of every page in one file.',
-      '- [Page Markdown](/docs.md): Append `.md` to any docs page URL to fetch that page as Markdown.',
+      '- [Page Markdown](/docs/setup.md): Append `.md` to any docs page URL to fetch that page as Markdown.',
     ].join('\n'),
   );
   return `${blocks.join('\n\n')}\n`;
