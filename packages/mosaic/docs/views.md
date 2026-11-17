@@ -124,6 +124,7 @@ A block is a view fragment that owns one piece of state nothing outside it can u
 - `blocks/confirmation` (`Confirmation`) is a confirm step with no typed phrase.
 - `blocks/avatar-upload` (`AvatarUpload`) is an avatar or logo picker. Its parts share the file input, so the caller places them in its own layout.
 - `blocks/verification` holds the steps that verify a factor, such as `VerificationCode`. Each renders the inside of a card and takes its copy as `messages`, so reverification and sign-in show them with their own strings.
+- `blocks/auth` holds the screens sign-in and sign-up share, such as `AuthEmailLink`. Each renders the inside of a card and takes its copy as `messages`, so sign-up shows them with its own strings.
 
 `Destructive` and `Confirmation` take a `controller` from `useConfirmController` (`blocks/confirm/`), which decides whether the dialog closes or explains itself. The hook runs in the wrapper or controller, never in the view. A dialog next to its button takes the button as `trigger`:
 

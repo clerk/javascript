@@ -1,18 +1,21 @@
 import type { Ref } from 'react';
 
+import {
+  AuthActionBlocked,
+  AuthEmailLink,
+  AuthEmailLinkStatus,
+  AuthLoading,
+  AuthProtectCheck,
+} from '../../../blocks/auth';
 import type { VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
 import { SignUpRestricted } from '../../sign-up/steps/sign-up-restricted';
 import type { SignInStep } from '../sign-in.types';
-import { SignInActionBlocked } from './sign-in-action-blocked';
-import { SignInEmailLink } from './sign-in-email-link';
-import { SignInEmailLinkStatus } from './sign-in-email-link-status';
+import { emailLinkStatusMessages } from '../sign-in.utils';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
-import { SignInLoading } from './sign-in-loading';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
-import { SignInProtectCheck } from './sign-in-protect-check';
 import { SignInStartOver } from './sign-in-start-over';
 
 interface NoticeStepProps {
@@ -59,6 +62,10 @@ export function NoticeStep({
     backButton: m.back,
     supportButton: m.alternativeMethods.getHelp.emailSupport,
   };
+  const emailLink = {
+    editIdentifier: m.editIdentifier,
+    secondaryActionLabel: m.useAnotherMethod,
+  };
 
   switch (step.purpose) {
     case 'help':
@@ -93,7 +100,12 @@ export function NoticeStep({
         />
       );
     case 'action-blocked':
-      return <SignInActionBlocked details={step.details} />;
+      return (
+        <AuthActionBlocked
+          messages={m.actionBlocked}
+          details={step.details}
+        />
+      );
     case 'password-compromised':
       return (
         <SignInPasswordCompromised
@@ -118,10 +130,9 @@ export function NoticeStep({
       );
     case 'email-link':
       return (
-        <SignInEmailLink
+        <AuthEmailLink
           focusRef={focusRef}
-          title={m.emailLink.title}
-          description={m.emailLink.description}
+          messages={{ title: m.emailLink.title, description: m.emailLink.description, ...emailLink }}
           notice={step.newDevice ? m.clientTrust.notice : undefined}
           identifier={step.identifier}
           onEditIdentifier={onEditIdentifier}
@@ -133,10 +144,9 @@ export function NoticeStep({
       );
     case 'verify-email-link':
       return (
-        <SignInEmailLink
+        <AuthEmailLink
           focusRef={focusRef}
-          title={m.verifyEmailLink.title}
-          description={m.verifyEmailLink.description}
+          messages={{ ...m.verifyEmailLink, ...emailLink }}
           identifier={step.identifier}
           onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}
@@ -158,10 +168,16 @@ export function NoticeStep({
         />
       );
     case 'loading':
-      return <SignInLoading globalErrorMessage={globalErrorMessage} />;
+      return (
+        <AuthLoading
+          messages={{ loading: m.loading }}
+          globalErrorMessage={globalErrorMessage}
+        />
+      );
     case 'protect-check':
       return (
-        <SignInProtectCheck
+        <AuthProtectCheck
+          messages={{ ...m.protectCheck, loading: m.loading }}
           challenge={step.challenge}
           logo={logo}
           globalErrorMessage={globalErrorMessage}
@@ -174,8 +190,9 @@ export function NoticeStep({
       return <SignInStartOver onStartOver={onStartOver} />;
     case 'email-link-status':
       return (
-        <SignInEmailLinkStatus
-          step={step}
+        <AuthEmailLinkStatus
+          messages={emailLinkStatusMessages(step.flow, m)}
+          status={step.status}
           globalErrorMessage={globalErrorMessage}
         />
       );

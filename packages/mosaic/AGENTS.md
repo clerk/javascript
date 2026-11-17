@@ -75,6 +75,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - An action that may need step-up verification → `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`
 - A direct action that needs step-up verification → `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view
 - A step that verifies a factor (a code, password, backup code or passkey, the method picker, help) → the steps in `src/blocks/verification/`, such as `VerificationCode`
+- A screen sign-in and sign-up both show (an email link and its status, a loading or protect-check notice, a blocked request, the wallet or enterprise connection picker, the alternative phone channel, the identity line, the captcha) → the steps in `src/blocks/auth/`, such as `AuthEmailLink`
 - Showing any error to the user → One of the owners above. They call `toLocalizableError` (or `toLocalizableErrors` for all errors) and resolve copy with `useErrorText`
 - Moving focus after a list row is removed → `useListRemovalFocus` (`src/hooks/`)
 - A debounced, abortable async check as the user types → `useDebouncedAsync` (`src/hooks/`)
@@ -85,6 +86,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - An inline message row; height is undefined until measured → `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts`
 - Data read from a Clerk resource that should be cached across mounts → A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)
 - The seconds left on a resend cooldown, for display → `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine
+- The Resend link on a code or email link step, with its countdown → `verificationResend` (`src/blocks/verification/`), passed to the step as `resend`
 - An avatar or logo row: picker, drop target, crop dialog, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
 - Any other file picker or drop zone, such as a metadata or key file → `FileUpload` (`src/primitives/file-upload/`), see its `README.md`
 - Cropping an image to a square: pan, zoom, rotate, then draw the result → `ImageCropper` and `cropImage` (`src/primitives/image-cropper/`), see its `README.md`
