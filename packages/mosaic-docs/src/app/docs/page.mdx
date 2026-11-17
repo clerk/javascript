@@ -1,0 +1,34 @@
+import { DocsPage } from '@/components/docs-page';
+import { site } from '@/lib/site';
+
+export const metadata = {
+  title: 'Introduction',
+  alternates: { types: { 'text/markdown': '/docs.md' } },
+};
+
+export default function Layout({ children }) {
+  return (
+    <DocsPage
+      headings={headings}
+      markdownHref='/docs.md'
+    >
+      {children}
+    </DocsPage>
+  );
+}
+
+# Introduction
+
+<p className='lead'>{site.description}</p>
+
+## Components
+
+Styled, ready-to-use building blocks.
+
+## Primitives
+
+Headless building blocks that components are made from.
+
+## Hooks
+
+React hooks for behavior shared across components.
