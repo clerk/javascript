@@ -12,7 +12,7 @@ In virtual mode a segment lives while a mounted component owns it. Navigate away
 
 ## URL modes
 
-- `path` keeps the segment in the pathname under `path`, `/user/security`, as the legacy components do. `path` is where the component is mounted, so a host with a catch-all route at `/account/[[...page]]` passes `path='/account'`. A component mounted somewhere else shows its first page and warns in development. One component per page can use the pathname.
+- `path` keeps the segment in the pathname under `path`, `/user/security`, as the legacy components do. `path` is where the component is mounted, so a host with a catch-all route at `/account/[[...page]]` passes `path='/account'`. A component mounted somewhere else shows its first page, and its first navigation writes under `path`, away from where it is. One component per page can use the pathname.
 - `hash` and `query` keep the segment in one param per component, `#user=security` or `?p.user=security`. The param's name is a prefix and the component's base with dots for slashes, so the profile modal at `/modal/user` is `p.modal.user`. The default prefixes are `p.` for the query string and nothing for the hash; set them on the provider with `routing={{ keyPrefix: { query: 'app.', hash: 'x.' } }}`. The value is the segment's parts, each percent-encoded, joined with `/`, and is read back the way the host reads any param, decoded, so a part cannot contain a slash in these modes. Other params are left exactly as they are.
 - A navigation pushes a history entry; a redirect to the root and a modal closing replace. Back moves through a component's pages. Reloading or sharing the URL opens the page it names.
 - `routing` is fixed when the component mounts. To change it, remount the component with a `key`; a changed prop warns and is ignored.
@@ -85,7 +85,7 @@ In the hash and query modes opening pushes a history entry and closing replaces 
 
 ## Seeing it run
 
-The swingset has a Routing section at `/routing`, `packages/swingset/src/app/(explorer)/routing`, that shows every mode on components with nothing in them but routing: the four modes with Back, reload and a host link into a step; a routed page under a routed modal; a modal opening a modal; two components side by side, which is where path mode stops; a single set of tabs in the pathname; and several sets of tabs on one page, as the segment, as the trailing part of a step, arriving after mount, and inside a modal. None of it needs a session. The live user profile and user button pages keep a mode switch for the real components.
+The swingset has a Routing section at `/routing`, `packages/swingset/src/app/(explorer)/routing`, that shows every mode on components with nothing in them but routing: the four modes with Back, reload and a host link into a step; a routed page under a routed modal; a modal opening a modal; two components side by side, which is where path mode stops; tabs in the pathname; and multiple tabs on one page, as the segment, as the trailing part of a step, arriving after mount, and inside a modal. None of it needs a session. The live user profile and user button pages keep a mode switch for the real components.
 
 ## Tests
 
