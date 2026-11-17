@@ -1,5 +1,9 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { docToMarkdown } from '@/core/doc-markdown';
 import { llmsFull, llmsIndex } from '@/core/llms';
+import { mdxToMarkdown } from '@/core/mdx-markdown';
 import { type DocEntry, docHref, docKinds, docsOfKind, relatedHref } from '@/lib/docs';
 import { site } from '@/lib/site';
 
@@ -18,12 +22,16 @@ export function docsIndexMarkdown(): string {
 }
 
 export function docsFullMarkdown(): string {
-  return llmsFull(
-    site,
-    docKinds.flatMap(({ kind }) =>
+  return llmsFull(site, [
+    { href: '/docs/setup', markdown: setupMarkdown() },
+    ...docKinds.flatMap(({ kind }) =>
       docsOfKind(kind).map(entry => ({ href: docHref(entry), markdown: docMarkdown(entry) })),
     ),
-  );
+  ]);
+}
+
+export function setupMarkdown(): string {
+  return mdxToMarkdown(readFileSync(path.join(process.cwd(), 'src/content/setup.mdx'), 'utf8'));
 }
 
 export function docMarkdown(entry: DocEntry): string {
