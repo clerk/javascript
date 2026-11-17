@@ -2,6 +2,7 @@ export const accessMessages = {
   title: 'Access',
   policies: 'Policies',
   connections: 'Connections',
+  selectConnection: 'Select a connection',
   description: 'Control access for your organization, including SSO and Directory Sync.',
   addPolicy: 'Add policy',
   managePolicy: 'Manage policy',

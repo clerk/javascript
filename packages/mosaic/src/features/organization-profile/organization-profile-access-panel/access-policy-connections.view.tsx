@@ -2,7 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
-import { Menu } from '../../../components/menu';
 import { Cog6Teeth } from '../../../icons/glyphs/cog-6-teeth';
 import { Plus } from '../../../icons/glyphs/plus';
 import { X } from '../../../icons/glyphs/x';
@@ -71,55 +70,31 @@ export function PolicySsoConnections({ controller }: { controller: AccessControl
           </Button>
         </div>
       ))}
-      {controller.availableSsoConnections.length ? (
-        <Menu.Root>
-          <Menu.Trigger
-            ref={registerAddSso}
-            aria-label={m.addConnection}
-            render={
-              <Button
-                variant='outline'
-                color='neutral'
-                xstyle={styles.fit}
-              />
-            }
-            disabled={form.isSubmitting}
-          >
-            <Icon glyph={Plus} />
-            {m.add}
-          </Menu.Trigger>
-          <Menu.Popup>
-            {controller.availableSsoConnections.map(connection => (
-              <Menu.Item
-                key={connection.id}
-                label={connection.configuration.name}
-                onClick={() => controller.onAttachSso(connection.id)}
-              >
-                <Menu.Label>{connection.configuration.name}</Menu.Label>
-              </Menu.Item>
-            ))}
-            <Menu.Item
-              label={m.ssoTitle}
-              onClick={() => controller.onSetup('sso')}
-            >
-              <Menu.Label>{m.ssoTitle}</Menu.Label>
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Root>
-      ) : (
-        <Button
-          xstyle={styles.fit}
-          ref={registerAddSso}
-          aria-label={m.addConnection}
-          variant='outline'
-          color='neutral'
-          onClick={() => controller.onSetup('sso')}
+      {policy.ssoConnectionIds.length === 0 && controller.availableSsoConnections.length > 0 ? (
+        <AccessSelect
+          label={m.connections}
+          placeholder={m.selectConnection}
+          value={null}
+          items={controller.availableSsoConnections.map(connection => ({
+            value: connection.id,
+            label: connection.configuration.name,
+          }))}
+          onChange={controller.onAttachSso}
           disabled={form.isSubmitting}
-        >
-          <Icon glyph={Plus} />
-          {m.add}
-        </Button>
-      )}
+        />
+      ) : null}
+      <Button
+        xstyle={styles.fit}
+        ref={registerAddSso}
+        aria-label={m.addConnection}
+        variant='outline'
+        color='neutral'
+        onClick={() => controller.onSetup('sso')}
+        disabled={form.isSubmitting}
+      >
+        <Icon glyph={Plus} />
+        {m.add}
+      </Button>
     </div>
   );
 }

@@ -18,6 +18,7 @@ import type { AccessProvider } from './access.types';
 export function AccessSelect({
   label,
   hideLabel,
+  placeholder,
   value,
   items,
   onChange,
@@ -26,6 +27,7 @@ export function AccessSelect({
 }: {
   label: string;
   hideLabel?: boolean;
+  placeholder?: string;
   value: string | null;
   items: { value: string; label: string }[];
   onChange: (value: string) => void;
@@ -39,7 +41,7 @@ export function AccessSelect({
     >
       <Field.Label visuallyHidden={hideLabel}>{label}</Field.Label>
       <Select.Root
-        value={value ?? ''}
+        value={value}
         items={items}
         onValueChange={value => {
           if (value !== null) {
@@ -47,7 +49,7 @@ export function AccessSelect({
           }
         }}
       >
-        <Select.Trigger>
+        <Select.Trigger placeholder={placeholder}>
           {provider ? (
             <span {...stylex.props(styles.row, styles.grow)}>
               <AccessProviderIcon provider={provider} />
