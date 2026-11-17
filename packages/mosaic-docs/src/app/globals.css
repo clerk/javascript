@@ -11,7 +11,7 @@
   --docs-border: light-dark(oklch(0.88 0.006 260 / 0.72), #33333e);
   --docs-accent: light-dark(oklch(0.145 0 0), #f6f6f7);
   --docs-accent-foreground: light-dark(oklch(1 0 0), #1b1b1f);
-  --docs-code-background: light-dark(#ffffff, #313131);
+  --docs-code-background: var(--docs-background);
   --shiki-background: var(--docs-code-background);
   --shiki-foreground: light-dark(#2b2b34, #ffffff);
   --shiki-token-keyword: light-dark(#6c47ff, #bab0ff);
