@@ -92,6 +92,6 @@ The controller calls these model callbacks on `start`, then `next(step)`.
 
 `getSignInNextStep` and `getSignUpNextStep` (`shared/src/internal/clerk-js/nextStep.ts`) compute the step from today's fields, and return FAPI's `nextStep` once it is sent. They can't compute three things, so FAPI must send them:
 
-- The sign-up order.
+- The sign-up order. Until FAPI sends it, `getSignUpNextStep` follows `ui`'s order (`shared/src/internal/clerk-js/completeSignUpFlow.ts`): verify the email, then the phone, then collect the missing fields.
 - `target` for sign-in. Nothing says which email or phone a code went to.
 - `sent` per target for sign-in. `first_factor_verification` has no identification, so after a code to one email, a second email with the same strategy also reads as sent.
