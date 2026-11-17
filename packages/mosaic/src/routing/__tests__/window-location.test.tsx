@@ -44,11 +44,11 @@ describe('useWindowUrl', () => {
     try {
       const { result, unmount } = renderHook(() => useWindowUrl(true));
       await act(async () => {
-        window.history.pushState({ __NA: true }, '', '/page#tabs=settings');
+        window.history.pushState({ __NA: true }, '', '/page#.tabs=settings');
         navigation.dispatchEvent(new Event('currententrychange'));
         await Promise.resolve();
       });
-      expect(result.current?.hash).toBe('tabs=settings');
+      expect(result.current?.hash).toBe('.tabs=settings');
       unmount();
     } finally {
       Reflect.deleteProperty(window, 'navigation');
@@ -57,8 +57,8 @@ describe('useWindowUrl', () => {
 
   it('follows its own writes without an event', () => {
     const { result } = renderHook(() => useWindowUrl(true));
-    act(() => writeWindowUrl('/user?p.user=security', false));
-    expect(result.current).toEqual({ pathname: '/user', search: 'p.user=security', hash: '' });
+    act(() => writeWindowUrl('/user?.user=security', false));
+    expect(result.current).toEqual({ pathname: '/user', search: '.user=security', hash: '' });
   });
 
   it('reads nothing and does not re-render when disabled', () => {

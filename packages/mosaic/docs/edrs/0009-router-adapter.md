@@ -30,7 +30,7 @@ The adapter is a plain object on `MosaicProvider`, with per-method fallback to `
 - The hooks an adapter has are fixed on the first render under the provider, because the components below call them in their own hook order. An adapter that later has other hooks warns and is ignored; `push` and `replace` are taken fresh.
 - `usePathname` and `useHash` return the URL percent-encoded, with or without the leading `#`. `useSearchParams` returns the query string with or without its `?`, or a `URLSearchParams`, or `undefined` where it cannot read, and that read falls back to `window`.
 - A write through `push` or `replace` is seen through the adapter's hooks, and through `window.location` for a field the adapter does not read, read right after the call returns.
-- `keyPrefix` sets what hash and query param names start with, `{ query: 'p.', hash: '' }` by default.
+- `keyPrefix` sets what goes in front of the hash and query param names, which start with a dot on their own; empty by default.
 
 ## Consequences
 

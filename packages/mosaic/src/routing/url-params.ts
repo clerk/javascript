@@ -25,12 +25,12 @@ export function splitParamValue(value: string): SegmentParts {
   return value === '' ? [] : value.split('/');
 }
 
-// ('p.', '/modal/user') -> 'p.modal.user'
+// ('', '/modal/user') -> '.modal.user'    ('clerk', '/user') -> 'clerk.user'
 export function paramKey(prefix: string, base: string): string {
-  return prefix + normalizeBase(base).slice(1).replaceAll('/', '.');
+  return prefix + normalizeBase(base).replaceAll('/', '.');
 }
 
-// The query string and the hash keep one pair per base, `p.user=security&p.modal.user=`. A pair is
+// The query string and the hash keep one pair per base, `.user=security&.modal.user=`. A pair is
 // read the way any param is, decoded; it is written on the raw form, so a pair that is not ours is
 // kept byte for byte and only our own value is ever re-encoded.
 function pairsOf(body: string): string[] {
@@ -51,12 +51,12 @@ function decodeKeyOf(pair: string): string {
   return raw.replaceAll('+', ' ').replace(/(?:%[0-9a-f]{2})+/gi, decodeEscapes);
 }
 
-// ('a=1&p.user=billing/st%201', 'p.user') -> 'billing/st 1'    no pair -> undefined
+// ('a=1&.user=billing/st%201', '.user') -> 'billing/st 1'    no pair -> undefined
 export function readParam(body: string, key: string): string | undefined {
   return new URLSearchParams(body).get(key) ?? undefined;
 }
 
-// ('a=1&p.user=x', 'p.user', 'security') -> 'a=1&p.user=security'    value undefined -> 'a=1'
+// ('a=1&.user=x', '.user', 'security') -> 'a=1&.user=security'    value undefined -> 'a=1'
 // The pair keeps its place; a new one goes last.
 export function writeParam(body: string, key: string, value: string | undefined): string {
   const encodedKey = encodeURIComponent(key);

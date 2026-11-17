@@ -74,11 +74,11 @@ function pathCarrier(basePath: string, clearedPath: string | undefined): UrlCarr
   };
 }
 
-// One pair of the query string or the hash, `p.user=billing/st_1`.
+// One pair of the query string or the hash, `.user=billing/st_1`.
 function paramCarrier(field: 'search' | 'hash', key: string): UrlCarrier {
   if (key === '') {
     logger.warnOnce(
-      `[Clerk] ${field === 'hash' ? 'Hash' : 'Query'} routing with an empty key prefix needs a "path" other than "/", or its param has no name.`,
+      `[Clerk] ${field === 'hash' ? 'Hash' : 'Query'} routing with an empty key prefix needs a "path" other than "/" or a key prefix, or its param has no name.`,
     );
   }
   return {

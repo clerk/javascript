@@ -57,7 +57,7 @@ const virtual: LocationMode = {
 // read back here on their own terms rather than through the carriers under test.
 const encode = (parts: SegmentParts) => parts.map(encodeURIComponent).join('/');
 const decode = (raw: string): SegmentParts => (raw === '' ? [] : raw.split('/').map(decodeURIComponent));
-const paramName = (prefix: string, base: string) => prefix + normalizeBase(base).slice(1).replaceAll('/', '.');
+const paramName = (prefix: string, base: string) => prefix + normalizeBase(base).replaceAll('/', '.');
 const pairValue = (body: string, key: string) => new URLSearchParams(body).get(key) ?? undefined;
 const withPair = (body: string, key: string, value: string | undefined) =>
   [
@@ -165,7 +165,7 @@ function paramMode(routing: 'hash' | 'query', field: 'hash' | 'search', prefix: 
   );
 }
 
-const modes: LocationMode[] = [virtual, path, paramMode('hash', 'hash', ''), paramMode('query', 'search', 'p.')];
+const modes: LocationMode[] = [virtual, path, paramMode('hash', 'hash', ''), paramMode('query', 'search', '')];
 
 beforeEach(() => window.history.replaceState(null, '', '/'));
 
