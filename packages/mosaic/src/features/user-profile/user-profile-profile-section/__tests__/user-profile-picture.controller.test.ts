@@ -2,7 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
 import type { UserProfilePictureControllerOptions } from '../user-profile-picture.controller';
 import { useUserProfilePictureController } from '../user-profile-picture.controller';
 
@@ -68,7 +68,7 @@ describe('useUserProfilePictureController', () => {
   it('shows why the upload failed, and clears it on the next attempt', async () => {
     const onChange = vi
       .fn()
-      .mockRejectedValueOnce(new SaveError({ global: { code: 'avatar_file_size_exceeded', message: 'Too big.' } }))
+      .mockRejectedValueOnce(new MosaicError([{ code: 'avatar_file_size_exceeded', message: 'Too big.' }]))
       .mockResolvedValueOnce(undefined);
     const { result } = renderController({ onChange });
 
@@ -92,7 +92,7 @@ describe('useUserProfilePictureController', () => {
   });
 
   it('reports a failed removal the same way', async () => {
-    const onRemove = vi.fn().mockRejectedValue(new SaveError({ global: { message: 'Nope.' } }));
+    const onRemove = vi.fn().mockRejectedValue(new MosaicError([{ code: 'test_failure', message: 'Nope.' }]));
     const { result } = renderController({ onRemove });
 
     await act(async () => result.current.onRemove?.());
@@ -129,7 +129,7 @@ describe('useUserProfilePictureController', () => {
     expect(result.current.previewUrl).toBe('blob:preview-1');
 
     await act(async () => {
-      upload.reject(new SaveError({ global: { message: 'Nope.' } }));
+      upload.reject(new MosaicError([{ code: 'test_failure', message: 'Nope.' }]));
       await upload.promise.catch(() => undefined);
     });
     expect(result.current.previewUrl).toBeUndefined();

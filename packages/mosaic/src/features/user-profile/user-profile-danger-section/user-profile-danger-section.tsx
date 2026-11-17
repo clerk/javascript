@@ -1,6 +1,7 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 
 import { useConfirmController } from '../../../blocks/confirm';
+import { callClerk } from '../../clerk/errors';
 import { useReverificationFlow } from '../../reverification';
 import { UserProfileDangerSectionView } from './user-profile-danger-section.view';
 
@@ -37,7 +38,10 @@ export function UserProfileDangerSection(props: UserProfileDangerSectionProps) {
 
   // -- Controllers --
   const [deleteAccountWithReverification, reverification] = useReverificationFlow(deleteAccount);
-  const controller = useConfirmController({ onConfirm: deleteAccountWithReverification, reverification });
+  const controller = useConfirmController({
+    onConfirm: () => callClerk(deleteAccountWithReverification),
+    reverification,
+  });
 
   // -- View --
   if (!isLoaded) {

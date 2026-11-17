@@ -4,6 +4,8 @@ import type { DecorateUrl, SessionResource, TaskChooseOrganizationProps } from '
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import type { ClerkCall } from '../clerk/errors';
+import { callClerk } from '../clerk/errors';
 import { useCreateOrganizationModel } from '../create-organization/create-organization.model';
 import type { OrganizationListReadyModel } from '../organization-list/organization-list.controller';
 import { unavailableOrganization, useOrganizationListEntries } from '../organization-list/organization-list.model';
@@ -13,13 +15,13 @@ export type TaskChooseOrganizationModelOptions = Pick<TaskChooseOrganizationProp
 
 export type TaskChooseOrganizationReadyModel = OrganizationListReadyModel &
   TaskChooseOrganizationData & {
-    onSignOut: () => Promise<unknown>;
+    onSignOut: () => ClerkCall<unknown>;
   };
 
 export type TaskChooseOrganizationModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | { status: 'complete'; onContinue: () => Promise<unknown> }
+  | { status: 'complete'; onContinue: () => ClerkCall<unknown> }
   | TaskChooseOrganizationReadyModel;
 
 const TASK_KEY = 'choose-organization';
@@ -63,7 +65,7 @@ export function useTaskChooseOrganizationModel({
 
   const task = session.currentTask;
   if (!task || (task.key !== TASK_KEY && !clerk.__internal_setActiveInProgress)) {
-    return { status: 'complete', onContinue: () => continueAfterTask(session) };
+    return { status: 'complete', onContinue: () => callClerk(() => continueAfterTask(session)) };
   }
 
   if (createOrganization.status === 'loading') {
@@ -95,21 +97,24 @@ export function useTaskChooseOrganizationModel({
         : undefined,
     createOrganization:
       createOrganization.status === 'ready' && user.createOrganizationEnabled
-        ? { ...createOrganization, onComplete: () => continueAfterTask(clerk.session ?? session) }
+        ? { ...createOrganization, onComplete: () => callClerk(() => continueAfterTask(clerk.session ?? session)) }
         : undefined,
-    onSelectOrganization: async organizationId => {
-      try {
-        await clerk.setActive({
-          organization: organizationId,
-          navigate: ({ session: next, decorateUrl }) => continueAfterTask(next, decorateUrl),
-        });
-      } catch (error) {
-        throw unavailableOrganization(error, user.createOrganizationEnabled);
-      }
-    },
+    onSelectOrganization: organizationId =>
+      callClerk(async () => {
+        try {
+          await clerk.setActive({
+            organization: organizationId,
+            navigate: ({ session: next, decorateUrl }) => continueAfterTask(next, decorateUrl),
+          });
+        } catch (error) {
+          throw unavailableOrganization(error, user.createOrganizationEnabled);
+        }
+      }),
     onSignOut: () =>
-      otherSessions.length > 0
-        ? clerk.signOut({ sessionId: session.id, redirectUrl: clerk.buildAfterMultiSessionSingleSignOutUrl() })
-        : clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
+      callClerk(() =>
+        otherSessions.length > 0
+          ? clerk.signOut({ sessionId: session.id, redirectUrl: clerk.buildAfterMultiSessionSingleSignOutUrl() })
+          : clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
+      ),
   };
 }

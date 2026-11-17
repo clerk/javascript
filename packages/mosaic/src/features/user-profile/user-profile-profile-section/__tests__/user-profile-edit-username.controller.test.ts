@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
 import { useUserProfileEditUsernameController } from '../user-profile-edit-username.controller';
 
 function deferred() {
@@ -74,7 +74,9 @@ describe('useUserProfileEditUsernameController', () => {
 
   it('keeps what was typed and shows why when the save fails', async () => {
     const result = renderController(() =>
-      Promise.reject(new SaveError({ fields: { username: { message: 'That username is taken.' } } })),
+      Promise.reject(
+        new MosaicError([{ code: 'test_failure', message: 'That username is taken.', field: 'username' }]),
+      ),
     );
     act(() => result.current.form.setValue('username', 'ada'));
 
@@ -91,7 +93,7 @@ describe('useUserProfileEditUsernameController', () => {
   });
 
   it('re-seeds from the saved username and drops the error on the next open', async () => {
-    const result = renderController(() => Promise.reject(new SaveError({ global: { message: 'nope' } })));
+    const result = renderController(() => Promise.reject(new MosaicError([{ code: 'test_failure', message: 'nope' }])));
     act(() => result.current.form.setValue('username', 'ada'));
     act(() => result.current.form.submit());
     await waitFor(() => expect(result.current.form.error).toBe('nope'));

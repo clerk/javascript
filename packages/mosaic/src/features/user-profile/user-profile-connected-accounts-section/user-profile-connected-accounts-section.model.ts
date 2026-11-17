@@ -17,6 +17,8 @@ import type {
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import { withUserProfileModalReturn } from '../user-profile.modal-return';
@@ -212,9 +214,9 @@ export type UserProfileConnectedAccountsModel =
       userId: string;
       accounts: UserProfileConnectedAccount[];
       availableProviders: UserProfileConnectionProvider[];
-      connect: (strategy: string) => Promise<ConnectedAccountActionResult>;
-      reconnect: (accountId: string) => Promise<ConnectedAccountActionResult>;
-      remove: (accountId: string) => Promise<void>;
+      connect: (strategy: string) => ClerkCall<ConnectedAccountActionResult>;
+      reconnect: (accountId: string) => ClerkCall<ConnectedAccountActionResult>;
+      remove: (accountId: string) => ClerkCall;
       removeReverification: ReverificationController;
       reconnectReverification: ReverificationController;
       connectReverification: ReverificationController;
@@ -309,48 +311,51 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   return {
     ...projection,
     userId,
-    connect: async strategyId => {
-      const provider = providers.find(candidate => candidate.enabled && candidate.strategy === strategyId);
-      if (!provider) {
-        throw unavailable();
-      }
-      const redirectUrl = await getRedirectUrl();
-      const current = requireCurrentUser();
-      const response = await createAccount(current, {
-        strategy: provider.strategy,
-        redirectUrl: withModalState(redirectUrl),
-        additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
-      });
-      return completeVerification(response);
-    },
-    reconnect: async accountId => {
-      const redirectUrl = await getRedirectUrl();
-      const current = requireCurrentUser();
-      const account = current.externalAccounts.find(candidate => candidate.id === accountId);
-      if (!account) {
-        throw unavailable();
-      }
-      const { plan: recovery } = recoveryFor(account, additionalOAuthScopes, providers);
-      if (!recovery) {
-        throw unavailable();
-      }
+    connect: strategyId =>
+      callClerk(async () => {
+        const provider = providers.find(candidate => candidate.enabled && candidate.strategy === strategyId);
+        if (!provider) {
+          throw unavailable();
+        }
+        const redirectUrl = await getRedirectUrl();
+        const current = requireCurrentUser();
+        const response = await createAccount(current, {
+          strategy: provider.strategy,
+          redirectUrl: withModalState(redirectUrl),
+          additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
+        });
+        return completeVerification(response);
+      }),
+    reconnect: accountId =>
+      callClerk(async () => {
+        const redirectUrl = await getRedirectUrl();
+        const current = requireCurrentUser();
+        const account = current.externalAccounts.find(candidate => candidate.id === accountId);
+        if (!account) {
+          throw unavailable();
+        }
+        const { plan: recovery } = recoveryFor(account, additionalOAuthScopes, providers);
+        if (!recovery) {
+          throw unavailable();
+        }
 
-      const response =
-        recovery.kind === 'reauthorize'
-          ? await account.reauthorize({
-              additionalScopes: recovery.additionalScopes,
-              redirectUrl: withModalState(redirectUrl),
-            })
-          : await recreateAccount(current, {
-              strategy: recovery.strategy,
-              redirectUrl: withModalState(redirectUrl),
-              additionalScopes: recovery.additionalScopes,
-            });
-      return completeVerification(response);
-    },
-    remove: async accountId => {
-      await removeAccount(requireCurrentUser(), accountId);
-    },
+        const response =
+          recovery.kind === 'reauthorize'
+            ? await account.reauthorize({
+                additionalScopes: recovery.additionalScopes,
+                redirectUrl: withModalState(redirectUrl),
+              })
+            : await recreateAccount(current, {
+                strategy: recovery.strategy,
+                redirectUrl: withModalState(redirectUrl),
+                additionalScopes: recovery.additionalScopes,
+              });
+        return completeVerification(response);
+      }),
+    remove: accountId =>
+      callClerk(async () => {
+        await removeAccount(requireCurrentUser(), accountId);
+      }),
     removeReverification,
     reconnectReverification,
     connectReverification,

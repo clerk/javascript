@@ -2,11 +2,11 @@ import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { PasswordStrength } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { FormSubmitError } from '../../../../components/form';
 import { MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../../../localization';
-import { passwordFormError } from '../user-profile-password-errors';
+import { MosaicError } from '../../../../utils/errors';
+import { passwordMosaicError } from '../user-profile-password-errors';
 import { passwordFieldFeedback } from '../user-profile-password-feedback';
 
 const settings = { min_length: 12, max_length: 64 };
@@ -30,20 +30,31 @@ function resolver(value = localization) {
     createElement(MosaicLocalizationProvider, { value }, children);
   return renderHook(() => useErrorText(), { wrapper }).result.current;
 }
-function format(data: ConstructorParameters<typeof ClerkAPIResponseError>[1]['data'], current = false) {
-  const result = passwordFormError(
-    new ClerkAPIResponseError('Invalid', { status: 422, data }),
-    current,
-    settings,
-    messages,
-    localization.locale,
-    resolver(),
-  );
-  expect(result).toBeInstanceOf(FormSubmitError);
-  if (!(result instanceof FormSubmitError)) {
-    throw new Error('Expected form error');
+function shown(error: unknown, value = localization) {
+  expect(error).toBeInstanceOf(MosaicError);
+  if (!(error instanceof MosaicError)) {
+    throw new Error('Expected a MosaicError');
   }
-  return result;
+  const text = resolver(value);
+  const banner = error.issues.find(issue => issue.field === undefined);
+  const fields: Record<string, string> = {};
+  for (const issue of error.issues) {
+    if (issue.field !== undefined && !(issue.field in fields)) {
+      fields[issue.field] = text(issue, 'fallback');
+    }
+  }
+  return { banner: banner ? text(banner, 'fallback') : undefined, fields };
+}
+function format(data: ConstructorParameters<typeof ClerkAPIResponseError>[1]['data'], current = false) {
+  return shown(
+    passwordMosaicError(
+      new ClerkAPIResponseError('Invalid', { status: 422, data }),
+      current,
+      settings,
+      messages,
+      localization.locale,
+    ),
+  );
 }
 
 describe('password error feedback', () => {
@@ -52,7 +63,7 @@ describe('password error feedback', () => {
       format([
         { code: 'form_password_pwned', message: 'raw', meta: { param_name: 'new_password' } },
         { code: 'form_password_no_uppercase', message: 'raw', meta: { param_name: 'new_password' } },
-      ]).fields?.newPassword,
+      ]).fields.newPassword,
     ).toBe(
       'This password has been found as part of a breach and can not be used, please try another password instead.',
     );
@@ -62,7 +73,7 @@ describe('password error feedback', () => {
       format([
         { code: 'form_password_no_uppercase', message: 'raw', meta: { param_name: 'new_password' } },
         { code: 'form_password_no_number', message: 'raw', meta: { param_name: 'new_password' } },
-      ]).fields?.newPassword,
+      ]).fields.newPassword,
     ).toBe('Your password must contain an uppercase letter and a number.');
   });
 
@@ -77,14 +88,14 @@ describe('password error feedback', () => {
             zxcvbn: { suggestions: [{ code: 'anotherWord', message: 'raw suggestion' }] },
           },
         },
-      ]).fields?.newPassword,
+      ]).fields.newPassword,
     ).toBe('Your password is not strong enough. Custom suggestion.');
   });
 
   it('localizes byte errors and falls back for unknown errors', () => {
     expect(
       format([{ code: 'form_password_size_in_bytes_exceeded', message: 'raw', meta: { param_name: 'password' } }])
-        .fields?.newPassword,
+        .fields.newPassword,
     ).toBe('Custom byte error.');
     expect(
       format([
@@ -94,7 +105,7 @@ describe('password error feedback', () => {
           long_message: 'Detailed error',
           meta: { param_name: 'new_password' },
         },
-      ]).fields?.newPassword,
+      ]).fields.newPassword,
     ).toBe('Detailed error');
   });
 
@@ -102,7 +113,7 @@ describe('password error feedback', () => {
     const errors = [
       { code: 'form_password_incorrect', message: 'Incorrect', meta: { param_name: 'current_password' } },
     ];
-    expect(format(errors, true).fields?.currentPassword).toBe('Le mot de passe actuel est incorrect.');
+    expect(format(errors, true).fields.currentPassword).toBe('Le mot de passe actuel est incorrect.');
     expect(format(errors).banner).toBe('Le mot de passe actuel est incorrect.');
     expect(format([{ code: 'unknown', message: 'Other', meta: { param_name: 'unmapped' } }]).banner).toBe('Other');
   });
@@ -119,14 +130,14 @@ describe('password error feedback', () => {
           },
         ],
         true,
-      ).fields?.currentPassword,
+      ).fields.currentPassword,
     ).toBe('Detailed error');
   });
 
   it('uses the configured maximum length', () => {
     expect(
       format([{ code: 'form_password_length_too_long', message: 'raw', meta: { param_name: 'new_password' } }]).fields
-        ?.newPassword,
+        .newPassword,
     ).toBe('Your password must contain less than 64 characters.');
   });
 
@@ -138,7 +149,7 @@ describe('password error feedback', () => {
           message: 'Use a different password',
           meta: { param_name: 'new_password' },
         },
-      ]).fields?.newPassword,
+      ]).fields.newPassword,
     ).toBe('New password cannot be the same as the current password.');
   });
 
@@ -160,7 +171,7 @@ describe('password error feedback', () => {
     },
   ])('uses the English catalog message for $code', ({ code, paramName, field, current, message }) => {
     const defaults = resolveLocalization({ locale: 'en' });
-    const result = passwordFormError(
+    const error = passwordMosaicError(
       new ClerkAPIResponseError('Invalid', {
         status: 422,
         data: [
@@ -175,22 +186,21 @@ describe('password error feedback', () => {
       settings,
       defaults.messages.userProfile.password,
       defaults.locale,
-      resolver(defaults),
     );
-    expect(result).toMatchObject({ fields: { [field]: message } });
+    expect(shown(error, defaults).fields).toEqual({ [field]: message });
   });
 
   it('handles missing and unrecognized suggestion metadata without leaking codes', () => {
     expect(
       format([{ code: 'form_password_not_strong_enough', message: 'raw', meta: { param_name: 'new_password' } }]).fields
-        ?.newPassword,
+        .newPassword,
     ).toBe('Your password is not strong enough.');
     expect(
       format(
         JSON.parse(
           '[{"code":"form_password_not_strong_enough","message":"raw","meta":{"param_name":"new_password","zxcvbn":{}}}]',
         ),
-      ).fields?.newPassword,
+      ).fields.newPassword,
     ).toBe('Your password is not strong enough.');
     expect(
       format([
@@ -202,19 +212,16 @@ describe('password error feedback', () => {
             zxcvbn: { suggestions: [{ code: 'futureSuggestion', message: 'raw' }] },
           },
         },
-      ]).fields?.newPassword,
+      ]).fields.newPassword,
     ).toBe('Your password is not strong enough.');
   });
 
-  it('returns the generic form error for unexpected failures, never their message', () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(
-      passwordFormError(new Error('Connection interrupted'), true, settings, messages, localization.locale, resolver()),
-    ).toMatchObject({ banner: 'Something went wrong. Please try again.' });
-    expect(passwordFormError(undefined, true, settings, messages, localization.locale, resolver())).toBeInstanceOf(
-      FormSubmitError,
-    );
-  });
+  it.each([new Error('Connection interrupted'), undefined])(
+    'passes a failure Clerk did not report through unchanged, such as %s',
+    cause => {
+      expect(passwordMosaicError(cause, true, settings, messages, localization.locale)).toBe(cause);
+    },
+  );
 });
 
 describe('password field feedback', () => {

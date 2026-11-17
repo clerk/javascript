@@ -1,3 +1,4 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import type { CreateOrganizationReadyModel } from '@clerk/mosaic/features/create-organization/create-organization.controller';
 import {
   useCreateOrganizationController,
@@ -64,12 +65,13 @@ const createOrganization: CreateOrganizationReadyModel = {
   status: 'ready',
   slugEnabled: true,
   renderBranding: true,
-  onCreate: async () => {
-    await settleAfter(1000);
-    return { organizationId: 'org_new', skipInvitations: true };
-  },
-  onInvite: () => settleAfter(1000),
-  onComplete: () => Promise.resolve(),
+  onCreate: () =>
+    callClerk(async () => {
+      await settleAfter(1000);
+      return { organizationId: 'org_new', skipInvitations: true };
+    }),
+  onInvite: () => callClerk(() => settleAfter(1000)),
+  onComplete: () => callClerk(() => Promise.resolve()),
 };
 
 interface HarnessProps {
@@ -103,21 +105,24 @@ function TaskChooseOrganizationHarness({
     creationDefaults: withDefaults ? { name: 'Initech', slug: 'initech' } : undefined,
     advisory: withDefaults ? { organizationName: 'Initech', organizationDomain: 'initech.com' } : undefined,
     createOrganization: canCreate ? createOrganization : undefined,
-    onSelectOrganization: async () => {
-      await settleAfter(1000);
-      if (failSelect) {
-        throw unavailable();
-      }
-    },
-    onAcceptInvitation: async id => {
-      await settleAfter(1000);
-      setInvitations(current => current.map(i => (i.id === id ? { ...i, status: 'accepted' } : i)));
-    },
-    onAcceptSuggestion: async id => {
-      await settleAfter(1000);
-      setSuggestions(current => current.map(s => (s.id === id ? { ...s, status: 'accepted' } : s)));
-    },
-    onSignOut: () => settleAfter(500),
+    onSelectOrganization: () =>
+      callClerk(async () => {
+        await settleAfter(1000);
+        if (failSelect) {
+          throw unavailable();
+        }
+      }),
+    onAcceptInvitation: id =>
+      callClerk(async () => {
+        await settleAfter(1000);
+        setInvitations(current => current.map(i => (i.id === id ? { ...i, status: 'accepted' } : i)));
+      }),
+    onAcceptSuggestion: id =>
+      callClerk(async () => {
+        await settleAfter(1000);
+        setSuggestions(current => current.map(s => (s.id === id ? { ...s, status: 'accepted' } : s)));
+      }),
+    onSignOut: () => callClerk(() => settleAfter(500)),
   };
   const controller = useTaskChooseOrganizationController(model);
 

@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Button } from '../../../../components/button';
 import type { MosaicLocalization } from '../../../../localization';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
 import { useUserProfileEditUsernameController } from '../user-profile-edit-username.controller';
 import type { UserProfileEditUsernameDialogProps } from '../user-profile-edit-username.dialog';
 import { UserProfileEditUsernameDialog } from '../user-profile-edit-username.dialog';
@@ -85,7 +85,9 @@ describe('UserProfileEditUsernameDialog', () => {
 
   it('submits from the action and from enter in the field', async () => {
     const user = userEvent.setup();
-    const props = renderView({ onSubmit: vi.fn(() => Promise.reject(new SaveError({ global: { message: 'no' } }))) });
+    const props = renderView({
+      onSubmit: vi.fn(() => Promise.reject(new MosaicError([{ code: 'test_failure', message: 'no' }]))),
+    });
 
     await user.type(usernameField(), 'x');
     await user.click(saveButton());
@@ -108,7 +110,8 @@ describe('UserProfileEditUsernameDialog', () => {
   it('announces a general failure in a negative banner', async () => {
     const user = userEvent.setup();
     renderView({
-      onSubmit: () => Promise.reject(new SaveError({ global: { message: 'Your username could not be updated.' } })),
+      onSubmit: () =>
+        Promise.reject(new MosaicError([{ code: 'test_failure', message: 'Your username could not be updated.' }])),
     });
 
     await user.type(usernameField(), 'x');
@@ -126,9 +129,9 @@ describe('UserProfileEditUsernameDialog', () => {
       {
         onSubmit: () =>
           Promise.reject(
-            new SaveError({
-              fields: { username: { code: 'form_identifier_exists', paramName: 'username', message: 'Taken.' } },
-            }),
+            new MosaicError([
+              { code: 'form_identifier_exists', paramName: 'username', message: 'Taken.', field: 'username' },
+            ]),
           ),
       },
       { overrides: { 'errors.form_identifier_exists__username': 'Ese nombre de usuario ya existe.' } },

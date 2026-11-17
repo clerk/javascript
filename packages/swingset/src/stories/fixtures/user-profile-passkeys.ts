@@ -1,3 +1,4 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import { useUserProfilePasskeysSectionController } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.controller';
 import type {
   UserProfilePasskey,
@@ -51,22 +52,25 @@ export function usePasskeysFixture({
     passkeys,
     reverification: idleReverification,
     addReverification: idleReverification,
-    onAdd: async () => {
-      await attempt('add');
-      const id = nextId.current++;
-      setPasskeys(current => [
-        ...current,
-        { id: `new-${id}`, name: `New passkey ${id}`, createdAtLabel: 'Created just now' },
-      ]);
-    },
+    onAdd: () =>
+      callClerk(async () => {
+        await attempt('add');
+        const id = nextId.current++;
+        setPasskeys(current => [
+          ...current,
+          { id: `new-${id}`, name: `New passkey ${id}`, createdAtLabel: 'Created just now' },
+        ]);
+      }),
     validateName: () => undefined,
-    onRename: async (id, name) => {
-      await attempt('rename');
-      setPasskeys(current => current.map(passkey => (passkey.id === id ? { ...passkey, name } : passkey)));
-    },
-    onRemove: async id => {
-      await attempt('remove');
-      setPasskeys(current => current.filter(passkey => passkey.id !== id));
-    },
+    onRename: (id, name) =>
+      callClerk(async () => {
+        await attempt('rename');
+        setPasskeys(current => current.map(passkey => (passkey.id === id ? { ...passkey, name } : passkey)));
+      }),
+    onRemove: id =>
+      callClerk(async () => {
+        await attempt('remove');
+        setPasskeys(current => current.filter(passkey => passkey.id !== id));
+      }),
   });
 }

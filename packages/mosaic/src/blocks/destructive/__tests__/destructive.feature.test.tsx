@@ -13,6 +13,7 @@ import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Button } from '../../../components/button';
 import { Menu } from '../../../components/menu';
+import { callClerk } from '../../../features/clerk/errors';
 import { useReverificationFlow } from '../../../features/reverification';
 import type { ConfirmController, ConfirmControllerOptions } from '../../confirm';
 import { useConfirmController } from '../../confirm';
@@ -28,7 +29,10 @@ function Host<Payload>({
   options: ConfirmControllerOptions<Payload>;
   children: (controller: ConfirmController<Payload>) => ReactNode;
 }) {
-  const controller = useConfirmController<Payload>(options);
+  const controller = useConfirmController<Payload>({
+    ...options,
+    onConfirm: payload => callClerk(async () => options.onConfirm(payload)),
+  });
   return <>{children(controller)}</>;
 }
 
@@ -211,12 +215,11 @@ describe('Destructive shared by rows', () => {
 function ReverifiedHost({ action, before }: { action: () => Promise<unknown>; before?: () => Promise<void> }) {
   const [run, reverification] = useReverificationFlow(action);
   const controller = useConfirmController({
-    onConfirm: before
-      ? async () => {
-          await before();
-          await run();
-        }
-      : run,
+    onConfirm: () =>
+      callClerk(async () => {
+        await before?.();
+        await run();
+      }),
     reverification,
   });
 

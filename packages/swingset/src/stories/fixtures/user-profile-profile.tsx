@@ -8,8 +8,7 @@ import { UserProfileEditUsernameDialog } from '@clerk/mosaic/features/user-profi
 import { useUserProfilePictureController } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-picture.controller';
 import type { UserProfileProfileSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.types';
 import { useMessages } from '@clerk/mosaic/localization';
-import type { FormError } from '@clerk/mosaic/utils/errors';
-import { SaveError } from '@clerk/mosaic/utils/errors';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -25,8 +24,8 @@ export interface UserProfileProfileFixtureOptions {
   nameManagedBy?: UserProfileManagedBy;
   latency?: number;
   /** Fails every name save instead of committing it. */
-  nameFailWith?: FormError;
-  usernameFailWith?: FormError;
+  nameFailWith?: MosaicError['issues'];
+  usernameFailWith?: MosaicError['issues'];
 }
 
 export function useUserProfileProfileFixture({
@@ -52,7 +51,7 @@ export function useUserProfileProfileFixture({
     onSubmit: async next => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (nameFailWith) {
-        throw new SaveError(nameFailWith);
+        throw new MosaicError(nameFailWith);
       }
       setValue(next);
     },
@@ -62,7 +61,7 @@ export function useUserProfileProfileFixture({
     onSubmit: async next => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (usernameFailWith) {
-        throw new SaveError(usernameFailWith);
+        throw new MosaicError(usernameFailWith);
       }
       setUsername(next);
     },

@@ -1,3 +1,4 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import type { TaskSetupMfaReadyModel } from '@clerk/mosaic/features/task-setup-mfa/task-setup-mfa.controller';
 import { useTaskSetupMfaController } from '@clerk/mosaic/features/task-setup-mfa/task-setup-mfa.controller';
 import type { TaskSetupMfaMethod } from '@clerk/mosaic/features/task-setup-mfa/task-setup-mfa.types';
@@ -56,35 +57,44 @@ function fakeModel({ methods = ['sms', 'authenticator'], withPhones = true }: Ha
     identifier: 'alice@example.com',
     methods,
     phones: knownPhones,
-    enrollPhoneNumber: async phoneNumber => {
-      await settleAfter(800);
-      return { status: 'needsVerification', phone: { id: 'phone_new', phoneNumber, verified: false } };
-    },
-    enrollSms: async (phoneId, code) => {
-      await settleAfter(800);
-      const phone = knownPhones.find(item => item.id === phoneId) ?? { id: phoneId, phoneNumber: '', verified: false };
-      if (!phone.verified && !code) {
-        return { status: 'needsVerification', phone };
-      }
-      return { status: 'complete', backupCodes };
-    },
-    resendSms: () => settleAfter(500),
-    createAuthenticator: async () => {
-      await settleAfter(600);
-      return {
-        secret: 'JBSWY3DPEHPK3PXP',
-        uri: 'otpauth://totp/Acme:alice%40example.com?secret=JBSWY3DPEHPK3PXP&issuer=Acme',
-      };
-    },
-    verifyAuthenticator: async () => {
-      await settleAfter(800);
-      return { backupCodes };
-    },
-    onComplete: async () => {
-      await settleAfter(1000);
-      onComplete();
-    },
-    onSignOut: () => settleAfter(500),
+    enrollPhoneNumber: phoneNumber =>
+      callClerk(async () => {
+        await settleAfter(800);
+        return { status: 'needsVerification', phone: { id: 'phone_new', phoneNumber, verified: false } };
+      }),
+    enrollSms: (phoneId, code) =>
+      callClerk(async () => {
+        await settleAfter(800);
+        const phone = knownPhones.find(item => item.id === phoneId) ?? {
+          id: phoneId,
+          phoneNumber: '',
+          verified: false,
+        };
+        if (!phone.verified && !code) {
+          return { status: 'needsVerification', phone };
+        }
+        return { status: 'complete', backupCodes };
+      }),
+    resendSms: () => callClerk(() => settleAfter(500)),
+    createAuthenticator: () =>
+      callClerk(async () => {
+        await settleAfter(600);
+        return {
+          secret: 'JBSWY3DPEHPK3PXP',
+          uri: 'otpauth://totp/Acme:alice%40example.com?secret=JBSWY3DPEHPK3PXP&issuer=Acme',
+        };
+      }),
+    verifyAuthenticator: () =>
+      callClerk(async () => {
+        await settleAfter(800);
+        return { backupCodes };
+      }),
+    onComplete: () =>
+      callClerk(async () => {
+        await settleAfter(1000);
+        onComplete();
+      }),
+    onSignOut: () => callClerk(() => settleAfter(500)),
     createPhoneReverification: idleReverification,
     enrollSmsReverification: idleReverification,
     authenticatorReverification: idleReverification,

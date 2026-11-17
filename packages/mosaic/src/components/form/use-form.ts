@@ -6,7 +6,7 @@ import { useMachine } from '../../machine/use-machine';
 import { keysOf, mapKeys } from '../../primitives/utils/object';
 import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
 import { createFormMachine, fieldConfig, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
-import type { FieldFeedback } from './form-submit-error';
+import type { FieldFeedback } from './form.types';
 
 export interface UseFormOptions<TValues extends object, TResult = unknown> {
   initialValues: TValues;

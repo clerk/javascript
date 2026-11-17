@@ -1,3 +1,4 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import type {
   UserProfileEmailVerification,
   UserProfileEmailVerifier,
@@ -34,13 +35,14 @@ export function createUserProfileAddEmailFixture({
 
   const startSso = (id: string): UserProfileEmailVerification => ({
     method: 'sso',
-    connect: async () => {
-      await delay(1200);
-      if (fail === 'verify') {
-        throw new Error('Unable to connect. Try again.');
-      }
-      onVerified?.(id);
-    },
+    connect: () =>
+      callClerk(async () => {
+        await delay(1200);
+        if (fail === 'verify') {
+          throw new Error('Unable to connect. Try again.');
+        }
+        onVerified?.(id);
+      }),
   });
 
   const verifier = (id: string): UserProfileEmailVerifier => ({
@@ -53,25 +55,27 @@ export function createUserProfileAddEmailFixture({
       }
       return { method: 'code', sent: delay(700).then(() => undefined) };
     },
-    verifyCode: async code => {
-      await delay(700);
-      if (fail === 'verify' || code === '000000') {
-        throw new Error('That code is incorrect. Try again.');
-      }
-      onVerified?.(id);
-    },
+    verifyCode: code =>
+      callClerk(async () => {
+        await delay(700);
+        if (fail === 'verify' || code === '000000') {
+          throw new Error('That code is incorrect. Try again.');
+        }
+        onVerified?.(id);
+      }),
   });
 
   return {
-    onCreateEmail: async emailAddress => {
-      await delay(700);
-      if (fail === 'create') {
-        throw new Error('We couldn’t add this email. Try again.');
-      }
-      const id = `email_${Date.now()}`;
-      onCreated?.(id, emailAddress);
-      return verifier(id);
-    },
+    onCreateEmail: emailAddress =>
+      callClerk(async () => {
+        await delay(700);
+        if (fail === 'create') {
+          throw new Error('We couldn’t add this email. Try again.');
+        }
+        const id = `email_${Date.now()}`;
+        onCreated?.(id, emailAddress);
+        return verifier(id);
+      }),
     getEmailVerifier: verifier,
   };
 }

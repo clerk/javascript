@@ -5,22 +5,34 @@ import { useOrganizationRolesQuery } from '../../../queries/use-organization-rol
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
 import type { MembersPanelRoles } from './members-table-tab.types';
 
-export function useMembersPanelAccessModel() {
+export type MembersPanelAccessModel =
+  | { status: 'loading' }
+  | { status: 'hidden' }
+  | {
+      status: 'ready';
+      organizationId: string;
+      sessionId: string;
+      canReadMembers: boolean;
+      canManageInvitations: boolean;
+      canManageRequests: boolean;
+    };
+
+export function useMembersPanelAccessModel(): MembersPanelAccessModel {
   const { isLoaded, organization } = useOrganization();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
   if (!isLoaded || !isSessionLoaded || !environment) {
-    return { status: 'loading' as const };
+    return { status: 'loading' };
   }
   const canReadMembers = session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsRead }) ?? false;
   const canManageInvitations =
     session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
   const canManageRequests = canManageInvitations && environment.organizationSettings.domains.enabled;
   if (!organization || !session || (!canReadMembers && !canManageInvitations)) {
-    return { status: 'hidden' as const };
+    return { status: 'hidden' };
   }
   return {
-    status: 'ready' as const,
+    status: 'ready',
     organizationId: organization.id,
     sessionId: session.id,
     canReadMembers,

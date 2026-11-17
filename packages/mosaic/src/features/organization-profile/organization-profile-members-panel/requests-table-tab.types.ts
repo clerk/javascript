@@ -25,7 +25,9 @@ export interface RequestsTableTabViewProps {
   isInviteDisabled?: boolean;
   registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
   registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  // eslint-disable-next-line mosaic/model-callbacks-return-clerk-call -- The controller fills this view contract; no model makes it.
   onAccept?: (id: string) => void | Promise<void>;
+  // eslint-disable-next-line mosaic/model-callbacks-return-clerk-call -- The controller fills this view contract; no model makes it.
   onDecline?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;
 }

@@ -2,8 +2,9 @@ import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error'
 import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
 import type { ClerkAPIError } from '@clerk/shared/types';
 
-import { save } from '../../../utils/errors';
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import type { MembersRoles } from './members-table-tab.types';
 
 export interface InviteMembersInput {
@@ -13,7 +14,9 @@ export interface InviteMembersInput {
   onRejected: (emailAddresses: string[]) => void;
 }
 
-export function useInviteMembersModel({ onInvited }: { onInvited?: () => unknown } = {}) {
+export type InviteMembers = (input: InviteMembersInput) => ClerkCall;
+
+export function useInviteMembersModel({ onInvited }: { onInvited?: () => unknown } = {}): InviteMembers | undefined {
   const clerk = useClerk();
   const { session } = useSession();
   const { organization } = useOrganization();
@@ -24,7 +27,7 @@ export function useInviteMembersModel({ onInvited }: { onInvited?: () => unknown
   }
 
   return ({ emailAddresses, role, roles, onRejected }: InviteMembersInput) =>
-    save(async () => {
+    callClerk(async () => {
       const organizationId = organization?.id;
       const sessionId = session?.id;
       if (!organization || !roles.roles.some(option => option.key === role)) {
@@ -44,7 +47,7 @@ export function useInviteMembersModel({ onInvited }: { onInvited?: () => unknown
     });
 }
 
-export function rejectedEmailAddresses(cause: unknown, submitted: string[]) {
+export function rejectedEmailAddresses(cause: unknown, submitted: string[]): string[] {
   if (!isClerkAPIResponseError(cause)) {
     return [];
   }

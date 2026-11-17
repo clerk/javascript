@@ -57,7 +57,7 @@ export function useAPIKeysTableController(
     isLoading: model.isLoading,
     isFetching: model.isFetching,
     isError: model.isError,
-    onRetry: () => void model.revalidate(),
+    onRetry: () => model.revalidate(),
     onPageChange: model.fetchPage,
     manage: model.canManage ? { onCreate: create.onOpen, createDialog: create.dialog, revoke } : undefined,
   };

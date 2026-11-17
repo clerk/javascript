@@ -2,9 +2,34 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationMembershipRequestResource } from '@clerk/shared/types';
 
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
+
 const PAGE_SIZE = 10;
 
-export function useRequestsTableModel(enabled: boolean) {
+export interface MembershipRequestRow {
+  id: string;
+  identifier: string;
+  name: string;
+  imageUrl: string;
+  createdAt: Date;
+}
+
+export interface RequestsTableModel {
+  rows: MembershipRequestRow[];
+  pageSize: number;
+  totalCount: number;
+  page: number;
+  isLoading: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  retry: () => unknown;
+  fetchPage: (page: number) => unknown;
+  accept: ((id: string) => ClerkCall) | undefined;
+  reject: ((id: string) => ClerkCall) | undefined;
+}
+
+export function useRequestsTableModel(enabled: boolean): RequestsTableModel {
   const { organization, membershipRequests, memberships } = useOrganization({
     membershipRequests: enabled ? { pageSize: PAGE_SIZE, keepPreviousData: true } : undefined,
   });
@@ -46,21 +71,23 @@ export function useRequestsTableModel(enabled: boolean) {
     retry: () => membershipRequests?.revalidate?.(),
     fetchPage: (page: number) => membershipRequests?.fetchPage?.(page),
     accept: enabled
-      ? async (id: string) => {
-          await findPending(id).accept();
-          await Promise.allSettled([refresh(), memberships?.revalidate?.()]);
-        }
+      ? (id: string) =>
+          callClerk(async () => {
+            await findPending(id).accept();
+            await Promise.allSettled([refresh(), memberships?.revalidate?.()]);
+          })
       : undefined,
     reject: enabled
-      ? async (id: string) => {
-          await findPending(id).reject();
-          await refresh();
-        }
+      ? (id: string) =>
+          callClerk(async () => {
+            await findPending(id).reject();
+            await refresh();
+          })
       : undefined,
   };
 }
 
-function toRequest(request: OrganizationMembershipRequestResource) {
+function toRequest(request: OrganizationMembershipRequestResource): MembershipRequestRow {
   const { id, createdAt, publicUserData } = request;
   return {
     id,

@@ -79,10 +79,8 @@ function ConnectedOrganizationList({ controller }: { controller: OrganizationLis
       createSteps={
         createOrganization ? (
           <OrganizationListCreateSteps
-            model={{
-              ...createOrganization,
-              onComplete: organizationId => createOrganization.onComplete(organizationId).finally(screen.onCreated),
-            }}
+            model={createOrganization}
+            onCreated={screen.onCreated}
             onCancel={screen.onCancelCreate}
           />
         ) : undefined
@@ -94,12 +92,14 @@ function ConnectedOrganizationList({ controller }: { controller: OrganizationLis
 
 function OrganizationListCreateSteps({
   model,
+  onCreated,
   onCancel,
 }: {
   model: CreateOrganizationReadyModel;
+  onCreated: () => void;
   onCancel?: () => void;
 }) {
-  const steps = useCreateOrganizationFlow(model);
+  const steps = useCreateOrganizationFlow(model, { onRestart: onCreated });
 
   return (
     <CreateOrganizationSteps

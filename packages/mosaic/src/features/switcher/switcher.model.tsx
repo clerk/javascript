@@ -17,6 +17,8 @@ import { useModal } from '../../modals/use-modal';
 import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
+import type { ClerkCall } from '../clerk/errors';
+import { callClerk } from '../clerk/errors';
 import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
 import { profileModal } from '../profile/profile.modal';
 import type { MosaicProfile } from '../profile-pages/use-mosaic-profile';
@@ -37,12 +39,12 @@ import { useOrganizationListInView } from './use-organization-list-in-view';
 
 // Promise-returning so the controller can drive busy state. Navigation callbacks stay fire-and-forget.
 interface SwitcherAsyncCallbacks {
-  onSelectOrganization?: (organizationId: string | null) => void | Promise<unknown>;
-  onSwitchSession?: (sessionId: string) => void | Promise<unknown>;
-  onSignOutSession?: (sessionId: string) => void | Promise<unknown>;
-  onSignOutAll?: () => void | Promise<unknown>;
-  onAcceptSuggestion?: (suggestionId: string) => void | Promise<unknown>;
-  onAcceptInvitation?: (invitationId: string) => void | Promise<unknown>;
+  onSelectOrganization?: (organizationId: string | null) => ClerkCall<unknown>;
+  onSwitchSession?: (sessionId: string) => ClerkCall<unknown>;
+  onSignOutSession?: (sessionId: string) => ClerkCall<unknown>;
+  onSignOutAll?: () => ClerkCall<unknown>;
+  onAcceptSuggestion?: (suggestionId: string) => ClerkCall;
+  onAcceptInvitation?: (invitationId: string) => ClerkCall;
 }
 
 export type SwitcherModel =
@@ -346,36 +348,46 @@ export function useSwitcherModel(
       ref,
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
-    onSelectOrganization: async organizationId =>
-      clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) }),
+    onSelectOrganization: organizationId =>
+      callClerk(async () =>
+        clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) }),
+      ),
     // The session switched to can carry a task of its own, and a plain `redirectUrl` routes past it.
     // App-level `taskUrls` outrank this callback, so it only answers for an app that set none.
     onSwitchSession: sessionId =>
-      clerk.setActive({
-        session: sessionId,
-        navigate: async ({ session, decorateUrl }) => {
-          const task = session.currentTask;
-          if (task) {
-            await router.navigate(buildTaskUrl(task, { base: signInUrl() }));
-            return;
-          }
-          const afterSwitchSessionUrl = options.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
-          if (!afterSwitchSessionUrl) {
-            return;
-          }
-          // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
-          await router.navigate(decorateUrl(afterSwitchSessionUrl));
-        },
-      }),
+      callClerk(() =>
+        clerk.setActive({
+          session: sessionId,
+          navigate: async ({ session, decorateUrl }) => {
+            const task = session.currentTask;
+            if (task) {
+              await router.navigate(buildTaskUrl(task, { base: signInUrl() }));
+              return;
+            }
+            const afterSwitchSessionUrl = options.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
+            if (!afterSwitchSessionUrl) {
+              return;
+            }
+            // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
+            await router.navigate(decorateUrl(afterSwitchSessionUrl));
+          },
+        }),
+      ),
     onSignOutSession: sessionId =>
-      clerk.signOut({
-        sessionId,
-        // Other accounts stay signed in, so this is a single sign out rather than a full one.
-        redirectUrl:
-          additionalSessions.length > 0 ? clerk.buildAfterMultiSessionSingleSignOutUrl() : clerk.buildAfterSignOutUrl(),
-      }),
+      callClerk(() =>
+        clerk.signOut({
+          sessionId,
+          // Other accounts stay signed in, so this is a single sign out rather than a full one.
+          redirectUrl:
+            additionalSessions.length > 0
+              ? clerk.buildAfterMultiSessionSingleSignOutUrl()
+              : clerk.buildAfterSignOutUrl(),
+        }),
+      ),
     // Single-session apps cannot hold a second account, so both actions are meaningless there.
-    onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
+    onSignOutAll: singleSessionMode
+      ? undefined
+      : () => callClerk(() => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() })),
     onManageAccount: manageAccount,
     onManageOrganization: managesBothInOneProfile ? undefined : manageOrganization,
     // Invite has no page of its own to route to, so it opens its modal even when management is routed.
@@ -383,35 +395,37 @@ export function useSwitcherModel(
     // Covers both restricted instances and users at their creation limit.
     onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
     onAddAccount: singleSessionMode ? undefined : () => void router.navigate(signInUrl()),
-    onAcceptSuggestion: async suggestionId => {
-      const suggestion = suggestionData.find(s => s.id === suggestionId);
-      try {
-        const accepted = await suggestion?.accept();
-        if (accepted) {
-          await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+    onAcceptSuggestion: suggestionId =>
+      callClerk(async () => {
+        const suggestion = suggestionData.find(s => s.id === suggestionId);
+        try {
+          const accepted = await suggestion?.accept();
+          if (accepted) {
+            await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+          }
+        } catch (error) {
+          // A failed accept might be because of old state
+          // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
+          await Promise.allSettled([userSuggestions.revalidate?.()]);
+          throw error;
         }
-      } catch (error) {
-        // A failed accept might be because of old state
-        // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
-        await Promise.allSettled([userSuggestions.revalidate?.()]);
-        throw error;
-      }
-    },
-    onAcceptInvitation: async invitationId => {
-      const invitation = invitationData.find(i => i.id === invitationId);
-      try {
-        const accepted = await invitation?.accept();
-        if (accepted) {
-          await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
+      }),
+    onAcceptInvitation: invitationId =>
+      callClerk(async () => {
+        const invitation = invitationData.find(i => i.id === invitationId);
+        try {
+          const accepted = await invitation?.accept();
+          if (accepted) {
+            await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
+          }
+        } catch (error) {
+          // A failed accept might be because of old state
+          await Promise.allSettled([userInvitations.revalidate?.()]);
+          throw error;
+        } finally {
+          // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
+          await Promise.allSettled([userMemberships.revalidate?.()]);
         }
-      } catch (error) {
-        // A failed accept might be because of old state
-        await Promise.allSettled([userInvitations.revalidate?.()]);
-        throw error;
-      } finally {
-        // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
-        await Promise.allSettled([userMemberships.revalidate?.()]);
-      }
-    },
+      }),
   };
 }

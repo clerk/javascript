@@ -13,6 +13,7 @@ import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Button } from '../../../components/button';
 import { Menu } from '../../../components/menu';
+import { callClerk } from '../../../features/clerk/errors';
 import { useReverificationFlow } from '../../../features/reverification';
 import type { MosaicLocalization } from '../../../localization';
 import type { ConfirmController, ConfirmControllerOptions } from '../../confirm';
@@ -32,7 +33,10 @@ function Host<Payload>({
   options: ConfirmControllerOptions<Payload>;
   children: (controller: ConfirmController<Payload>) => ReactNode;
 }) {
-  const controller = useConfirmController<Payload>(options);
+  const controller = useConfirmController<Payload>({
+    ...options,
+    onConfirm: payload => callClerk(async () => options.onConfirm(payload)),
+  });
   return <>{children(controller)}</>;
 }
 
@@ -303,15 +307,16 @@ function ReverifiedHost({
 }) {
   const [run, reverification] = useReverificationFlow(action);
   const controller = useConfirmController({
-    onConfirm: async () => {
-      await beforeRun?.();
-      try {
-        return await run();
-      } catch (error) {
-        await cleanup?.();
-        throw error;
-      }
-    },
+    onConfirm: () =>
+      callClerk(async () => {
+        await beforeRun?.();
+        try {
+          return await run();
+        } catch (error) {
+          await cleanup?.();
+          throw error;
+        }
+      }),
     reverification,
   });
 

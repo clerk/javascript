@@ -6,7 +6,7 @@ import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/orga
 import { OrganizationProfilePlaceholderPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-placeholder-panel.view';
 import type { OrganizationProfileProfileSectionViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
 import { OrganizationProfileProfileSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
-import { SaveError } from '@clerk/mosaic/utils/errors';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -61,7 +61,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     await settleAfter(800);
     const message = failWith?.[field];
     if (message) {
-      throw new SaveError({ fields: { [field]: { code: 'fixture_error', message } } });
+      throw new MosaicError([{ code: 'fixture_error', message, field: field }]);
     }
     apply();
   };

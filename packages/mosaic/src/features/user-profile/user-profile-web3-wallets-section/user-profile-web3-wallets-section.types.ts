@@ -3,6 +3,7 @@ import type { Ref } from 'react';
 
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
+import type { ClerkCall } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 
 export interface UserProfileWeb3Provider {
@@ -65,10 +66,10 @@ export type UserProfileWeb3WalletsModel =
         strategy: Web3Strategy,
         walletName?: string,
         onTarget?: (target: Web3ConnectionTarget) => void,
-      ) => Promise<void>;
-      verify: (walletId: string, walletName?: string) => Promise<void>;
-      setPrimary: (walletId: string) => Promise<void>;
-      remove?: (walletId: string) => Promise<void>;
+      ) => ClerkCall;
+      verify: (walletId: string, walletName?: string) => ClerkCall;
+      setPrimary: (walletId: string) => ClerkCall;
+      remove?: (walletId: string) => ClerkCall;
       removeReverification: ReverificationController;
       setPrimaryReverification: ReverificationController;
       createReverification: ReverificationController;

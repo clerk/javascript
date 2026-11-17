@@ -1,4 +1,3 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/passwords/complexity';
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
@@ -7,12 +6,14 @@ import type { EnvironmentResource, UserResource } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import type { FieldFeedback } from '../../../components/form';
-import { FormSubmitError } from '../../../components/form';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { useErrorText, useLocale, useMessages } from '../../../localization';
+import { useLocale, useMessages } from '../../../localization';
+import { MosaicError, UNEXPECTED_ERROR } from '../../../utils/errors';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
-import { passwordFormError } from './user-profile-password-errors';
+import { passwordMosaicError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
 
@@ -32,8 +33,8 @@ export type UserProfilePasswordModel =
       userId: string;
       sessionId: string;
       identifier: string;
-      validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
-      updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
+      validatePassword: (password: string) => ClerkCall<FieldFeedback | undefined>;
+      updatePassword: (input: UserProfileEditPasswordValue) => ClerkCall;
       reverification: ReverificationController;
     });
 
@@ -54,7 +55,7 @@ function getAvailablePasswordUser(
     user.enterpriseAccounts.some(account => account.active) ||
     user.passwordEnabled !== (target.mode === 'change')
   ) {
-    throw new FormSubmitError({ message: unavailableMessage });
+    throw new MosaicError([{ code: 'password_unavailable', message: unavailableMessage }]);
   }
   return user;
 }
@@ -96,31 +97,29 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
   const clerk = useClerk();
   const m = useMessages('userProfile').password;
   const locale = useLocale();
-  const errorText = useErrorText();
-  const errorMessages = useMessages('errors');
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
   const passwordSettings = environment?.userSettings.passwordSettings;
   const moduleManager = clerk.__internal_moduleManager;
   const validatePassword = useMemo(
-    () =>
-      async (password: string): Promise<FieldFeedback | undefined> => {
+    () => (password: string) =>
+      callClerk(async (): Promise<FieldFeedback | undefined> => {
         if (!passwordSettings) {
-          throw new FormSubmitError({ message: m.errors.unavailable });
+          throw new MosaicError([{ code: 'password_unavailable', message: m.errors.unavailable }]);
         }
         const complexity = validateComplexity(password, passwordSettings);
         if (Object.keys(complexity).length > 0 || !passwordSettings.show_zxcvbn) {
           return passwordFieldFeedback({ complexity }, passwordSettings, m, locale);
         }
         if (!moduleManager) {
-          throw new FormSubmitError({ message: errorMessages.generic });
+          throw new MosaicError([UNEXPECTED_ERROR]);
         }
         const { loadZxcvbn } = createLoadZxcvbn(moduleManager);
         const strength = createValidatePasswordStrength(passwordSettings)(await loadZxcvbn())(password);
         return passwordFieldFeedback({ complexity, strength }, passwordSettings, m, locale);
-      },
-    [passwordSettings, moduleManager, m, locale, errorMessages],
+      }),
+    [passwordSettings, moduleManager, m, locale],
   );
 
   const [updatePasswordWithReverification, reverification] = useReverificationFlow(
@@ -170,23 +169,20 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     identifier: session.publicUserData.identifier ?? '',
     validatePassword,
     reverification,
-    updatePassword: async input => {
-      try {
-        getAvailablePasswordUser(clerk.user, clerk.session?.id, environment, target, m.errors.unavailable);
-        await updatePasswordWithReverification(input, target);
-      } catch (error) {
-        if (isReverificationCancelledError(error) || error instanceof FormSubmitError) {
-          throw error;
+    updatePassword: input =>
+      callClerk(async () => {
+        try {
+          getAvailablePasswordUser(clerk.user, clerk.session?.id, environment, target, m.errors.unavailable);
+          await updatePasswordWithReverification(input, target);
+        } catch (error) {
+          throw passwordMosaicError(
+            error,
+            policy.requiresCurrentPassword,
+            environment.userSettings.passwordSettings,
+            m,
+            locale,
+          );
         }
-        throw passwordFormError(
-          error,
-          policy.requiresCurrentPassword,
-          environment.userSettings.passwordSettings,
-          m,
-          locale,
-          errorText,
-        );
-      }
-    },
+      }),
   };
 }

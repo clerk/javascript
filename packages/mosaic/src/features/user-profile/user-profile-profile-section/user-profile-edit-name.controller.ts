@@ -9,7 +9,7 @@ export interface UserProfileEditNameControllerOptions {
   lastName?: string;
   firstNameRequired?: boolean;
   lastNameRequired?: boolean;
-  /** Resolve to close the dialog, or reject with a `SaveError` to keep it open showing why. */
+  /** Resolve to close the dialog, or reject with a `MosaicError` to keep it open showing why. */
   onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
 }
 

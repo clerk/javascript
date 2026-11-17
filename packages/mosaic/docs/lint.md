@@ -14,6 +14,10 @@ Mosaic runs Oxlint with stricter rules than the rest of the repo. Lint with `pnp
 
 Mosaic's own rules live in `lint/rules/`, one rule per file with its test next to it (`<rule>.ts` and `<rule>.test.ts`). Oxlint loads them through `lint/plugin.ts` under the `mosaic/` prefix. To add a rule, add the file and its test, register it in `plugin.ts`, and turn it on in `oxlint.config.mjs`. Run the rule tests with `pnpm vitest run --project lint-rules` from `packages/mosaic`; `pnpm test` includes them.
 
+## When `mosaic/model-callbacks-return-clerk-call` fires
+
+Wrap the callback in `callClerk` and type it as a `ClerkCall`. When the type is not a model callback, such as a view contract a controller fills or a prop the app supplies, disable the rule on that line with the reason (`requests-table-tab.types.ts`). The rule and its reason live in [Models → Errors](models.md#errors).
+
 ## When `sonarjs/cognitive-complexity` fires
 
 The limit (15) flags code worth a second look. It is not a score to game.

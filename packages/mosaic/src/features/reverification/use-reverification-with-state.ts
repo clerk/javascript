@@ -1,7 +1,8 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import { useReverification, useSafeLayoutEffect, useSession } from '@clerk/shared/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { CancelledError } from '../../utils/errors';
 import type { ReverificationState } from './reverification.types';
 
 export type ReverificationFetcher = Parameters<typeof useReverification>[0];
@@ -125,7 +126,11 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
         return Promise.reject(requestAlreadyInProgressError());
       }
 
-      const invocation = Promise.resolve().then(() => wrapped(...args));
+      const invocation = Promise.resolve()
+        .then(() => wrapped(...args))
+        .catch((cause: unknown) => {
+          throw isReverificationCancelledError(cause) ? new CancelledError() : cause;
+        });
       runtimeRef.current.operation = { status: 'requesting', promise: invocation };
       void invocation
         .finally(() => {

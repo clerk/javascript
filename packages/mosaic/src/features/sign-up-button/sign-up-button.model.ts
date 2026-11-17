@@ -2,6 +2,8 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpProps } from '@clerk/shared/types';
 
 import { useGetPortalContainer } from '../../primitives/portal';
+import type { ClerkCall } from '../clerk/errors';
+import { callClerk } from '../clerk/errors';
 
 export type SignUpButtonOptions = Pick<
   SignUpProps,
@@ -21,7 +23,7 @@ export type SignUpButtonOptions = Pick<
   mode?: 'redirect' | 'modal';
 };
 
-export type SignUpButtonModel = { status: 'loading' } | { status: 'ready'; onSignUp: () => Promise<unknown> | void };
+export type SignUpButtonModel = { status: 'loading' } | { status: 'ready'; onSignUp: () => ClerkCall<unknown> };
 
 export function useSignUpButtonModel({ mode = 'redirect', ...options }: SignUpButtonOptions): SignUpButtonModel {
   const clerk = useClerk();
@@ -35,14 +37,16 @@ export function useSignUpButtonModel({ mode = 'redirect', ...options }: SignUpBu
     status: 'ready',
     onSignUp:
       mode === 'modal'
-        ? () => clerk.openSignUp({ ...options, getContainer })
+        ? () => callClerk(async () => clerk.openSignUp({ ...options, getContainer }))
         : () =>
-            clerk.redirectToSignUp({
-              signUpForceRedirectUrl: options.forceRedirectUrl,
-              signUpFallbackRedirectUrl: options.fallbackRedirectUrl,
-              signInForceRedirectUrl: options.signInForceRedirectUrl,
-              signInFallbackRedirectUrl: options.signInFallbackRedirectUrl,
-              initialValues: options.initialValues,
-            }),
+            callClerk(() =>
+              clerk.redirectToSignUp({
+                signUpForceRedirectUrl: options.forceRedirectUrl,
+                signUpFallbackRedirectUrl: options.fallbackRedirectUrl,
+                signInForceRedirectUrl: options.signInForceRedirectUrl,
+                signInFallbackRedirectUrl: options.signInFallbackRedirectUrl,
+                initialValues: options.initialValues,
+              }),
+            ),
   };
 }

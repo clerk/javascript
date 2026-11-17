@@ -1,138 +1,44 @@
-import { isClerkAPIResponseError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
-import type { ClerkAPIError } from '@clerk/shared/types';
-import { snakeToCamel } from '@clerk/shared/underscore';
-
-import type { ErrorDescription, LocalizableError, MessageValues } from '../localization';
-
-export interface FormError<TField extends string = string> {
-  global?: LocalizableError;
-  fields?: Partial<Record<TField, LocalizableError>>;
-}
+import type { ErrorDescription, LocalizableError } from '../localization';
 
 export const UNEXPECTED_ERROR: LocalizableError = { code: 'generic' };
 
-/** What a save rejects with when the failure is the user's to fix; anything else propagates. */
-export class SaveError<TField extends string = string> extends Error {
-  readonly formError: FormError<TField>;
+/** One thing to tell the user about a failed action. `field` is the form control it belongs to, if any. */
+export interface MosaicIssue extends LocalizableError {
+  field?: string;
+}
 
-  constructor(formError: FormError<TField>) {
-    super(formError.global?.message ?? 'Save failed');
-    this.name = 'SaveError';
-    this.formError = formError;
+/** What an action rejects with when the failure is the user's to fix; anything else propagates. */
+export class MosaicError extends Error {
+  readonly issues: readonly [MosaicIssue, ...MosaicIssue[]];
+
+  constructor(issues: readonly [MosaicIssue, ...MosaicIssue[]]) {
+    super(issues[0].message ?? 'Action failed');
+    this.name = 'MosaicError';
+    this.issues = issues;
   }
 }
 
-/** Reads every error a Clerk failure carries, or `undefined` when the cause is not from Clerk. */
-function toClerkErrors(cause: unknown, params?: MessageValues): LocalizableError[] | undefined {
-  if (!(cause instanceof Error)) {
-    return undefined;
-  }
-  if (isClerkRuntimeError(cause)) {
-    return [
-      {
-        code: cause.code,
-        ...(cause.longMessage ? { message: cause.longMessage } : {}),
-        ...(params ? { params } : {}),
-      },
-    ];
-  }
-  if (!isClerkAPIResponseError(cause)) {
-    return undefined;
-  }
-  return cause.errors.map((error: ClerkAPIError) => {
-    const paramName = error.meta?.paramName;
-    return {
-      code: error.code,
-      ...(paramName ? { paramName } : {}),
-      message: error.longMessage || error.message,
-      ...(params ? { params } : {}),
-    };
-  });
-}
-
-function toClerkFormError<TField extends string>(
-  cause: unknown,
-  fields: readonly TField[],
-  params: MessageValues | undefined,
-): FormError<TField> | undefined {
-  const errors = toClerkErrors(cause, params);
-  if (!errors) {
-    return undefined;
-  }
-  const formError: FormError<TField> = {};
-  for (const error of errors) {
-    const field = fields.find(f => error.paramName && snakeToCamel(error.paramName) === f);
-    if (field) {
-      formError.fields = { ...formError.fields, [field]: formError.fields?.[field] ?? error };
-    } else {
-      formError.global ??= error;
-    }
-  }
-  return formError;
-}
-
-/**
- * Runs a save and rejects with a `SaveError` the view can render. `fields` names the controls the
- * failure may be routed to; an error that names none of them lands in `global`. `params` carries
- * the instance settings a failure's message may need to read — the length bounds a username was
- * measured against, say — since only the caller's layer can resolve them.
- */
-export async function save<TField extends string = never>(
-  run: () => Promise<unknown>,
-  fields: readonly TField[] = [],
-  params?: MessageValues,
-): Promise<void> {
-  try {
-    await run();
-  } catch (cause) {
-    // A cancelled reverification is the user backing out, not a failure to show, so it passes
-    // through for the owner to recognise.
-    if (isReverificationCancelledError(cause)) {
-      throw cause;
-    }
-    const formError = toClerkFormError(cause, fields, params);
-    if (!formError) {
-      throw cause;
-    }
-    throw new SaveError(formError);
+/** What an action rejects with when the user backed out of it, such as a cancelled reverification. */
+export class CancelledError extends Error {
+  constructor() {
+    super('Cancelled');
+    this.name = 'CancelledError';
   }
 }
 
 /**
- * Reads what to tell the user about a failed action. A Clerk error keeps its code so the catalog can
- * localize it; anything else keeps its cause, is logged, and renders as the caller's fallback.
+ * Picks what to show for a failed action: the first issue without a field, else the first issue.
+ * Anything else is logged and keeps its cause, so the caller shows its fallback.
  */
-export function toLocalizableError(cause: unknown): ErrorDescription {
-  const error =
-    cause instanceof SaveError
-      ? (cause.formError.global ?? Object.values(cause.formError.fields ?? {}).find(field => field !== undefined))
-      : toClerkErrors(cause)?.[0];
-  if (error) {
-    return error;
+export function describeError(cause: unknown): ErrorDescription {
+  if (cause instanceof MosaicError) {
+    return cause.issues.find(issue => issue.field === undefined) ?? cause.issues[0];
   }
   console.error('[Clerk] Could not localize error', cause);
   return { cause };
 }
 
-export function toLocalizableErrors(cause: unknown): ErrorDescription[] {
-  const errors =
-    cause instanceof SaveError
-      ? [cause.formError.global, ...Object.values(cause.formError.fields ?? {})].filter(error => error !== undefined)
-      : toClerkErrors(cause);
-  return errors?.length ? errors : [toLocalizableError(cause)];
-}
-
-/** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */
-export function toFormError(cause: unknown): FormError {
-  if (cause instanceof SaveError) {
-    const { global, fields } = cause.formError;
-    return global || fields ? { global, fields } : { global: UNEXPECTED_ERROR };
-  }
-  console.error('[Clerk] Could not localize error', cause);
-  return { global: UNEXPECTED_ERROR };
-}
-
-/** Reads the global error a rejected save left for the view. An unrecognized rejection is the generic error. */
-export function toGlobalError(cause: unknown): LocalizableError | undefined {
-  return toFormError(cause).global;
+/** Reads every issue of a failed action, in the order it reported them. */
+export function describeErrors(cause: unknown): ErrorDescription[] {
+  return cause instanceof MosaicError ? [...cause.issues] : [describeError(cause)];
 }

@@ -3,7 +3,7 @@ import type { PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { toCountryIso } from '../../../components/phone-input';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
-import { save } from '../../../utils/errors';
+import { callClerk } from '../../clerk/errors';
 import { useReverificationFlow } from '../../reverification';
 import type { UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import { byId, toContactAccess, toContacts } from '../user-profile-contact.utils';
@@ -15,8 +15,17 @@ const ADD_PHONE_FIELDS: readonly UserProfileAddPhoneField[] = ['phoneNumber', 'c
 
 function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
   return {
-    sendCode: () => save(() => phone.prepareVerification()),
-    verifyCode: code => save(() => phone.attemptVerification({ code }), ADD_PHONE_FIELDS),
+    sendCode: () =>
+      callClerk(async () => {
+        await phone.prepareVerification();
+      }),
+    verifyCode: code =>
+      callClerk(
+        async () => {
+          await phone.attemptVerification({ code });
+        },
+        { fields: ADD_PHONE_FIELDS },
+      ),
   };
 }
 
@@ -54,11 +63,10 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
     phones: toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber),
     defaultPhoneCountry: toCountryIso(clerk.__internal_country),
     onCreatePhone: access.canCreate
-      ? async phoneNumber => {
-          const request = createPhone(currentUser, phoneNumber);
-          await save(() => request, ADD_PHONE_FIELDS);
-          return toPhoneVerifier(await request);
-        }
+      ? phoneNumber =>
+          callClerk(async () => toPhoneVerifier(await createPhone(currentUser, phoneNumber)), {
+            fields: ADD_PHONE_FIELDS,
+          })
       : undefined,
     getPhoneVerifier: id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')),
     onSetPrimaryPhone: id => saveAsUser(current => setPrimaryPhone(current, id)),

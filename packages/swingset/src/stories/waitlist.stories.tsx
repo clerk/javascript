@@ -1,6 +1,7 @@
-import { FormSubmitError, useForm } from '@clerk/mosaic/components/form';
+import { useForm } from '@clerk/mosaic/components/form';
 import type { WaitlistStep, WaitlistValues } from '@clerk/mosaic/features/waitlist/waitlist.types';
 import { WaitlistView } from '@clerk/mosaic/features/waitlist/waitlist.view';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -19,12 +20,10 @@ const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(reso
 async function joinWaitlist({ emailAddress }: WaitlistValues) {
   await settleAfter(800);
   if (!emailAddress.includes('@')) {
-    throw new FormSubmitError<WaitlistValues>({
-      fields: { emailAddress: 'Email address must be a valid email address.' },
-    });
+    throw new MosaicError([{ code: 'form_param_format_invalid', paramName: 'email_address', field: 'emailAddress' }]);
   }
   if (emailAddress.startsWith('closed@')) {
-    throw new FormSubmitError<WaitlistValues>({ message: 'The waitlist is not accepting new entries.' });
+    throw new MosaicError([{ code: 'waitlist_closed', message: 'The waitlist is not accepting new entries.' }]);
   }
 }
 

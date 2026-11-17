@@ -2,6 +2,7 @@ import type { Ref } from 'react';
 
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
+import type { ClerkCall } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 import type { UserProfileContactRow, UserProfileEmail, UserProfileEmailVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddEmailController } from './user-profile-add-email.controller';
@@ -31,10 +32,10 @@ export type UserProfileEmailSectionModel =
       userId: string;
       emails: UserProfileEmail[];
       username?: string;
-      onCreateEmail?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
+      onCreateEmail?: (emailAddress: string) => ClerkCall<UserProfileEmailVerifier>;
       getEmailVerifier: (id: string) => UserProfileEmailVerifier;
-      onSetPrimaryEmail: (id: string) => Promise<void>;
-      onRemoveEmail?: (id: string) => Promise<void>;
+      onSetPrimaryEmail: (id: string) => ClerkCall;
+      onRemoveEmail?: (id: string) => ClerkCall;
       removeReverification: ReverificationController;
       setPrimaryReverification: ReverificationController;
       createReverification: ReverificationController;

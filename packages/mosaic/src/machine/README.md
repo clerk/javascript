@@ -83,7 +83,7 @@ const loader = createMachine({
         },
         onError: {
           target: 'failure',
-          actions: assign((_ctx, event) => ({ error: toLocalizableError(event.error) })),
+          actions: assign((_ctx, event) => ({ error: describeError(event.error) })),
         },
       }),
     },
@@ -137,7 +137,7 @@ const loader = createMachine({
         },
         onError: {
           target: 'failure',
-          actions: assign((_, e) => ({ error: toLocalizableError(e.error) })), // e: ErrorInvokeEvent
+          actions: assign((_, e) => ({ error: describeError(e.error) })), // e: ErrorInvokeEvent
         },
       }),
     },

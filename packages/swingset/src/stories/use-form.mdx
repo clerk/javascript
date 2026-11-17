@@ -84,13 +84,13 @@ const mergedRef = useMergeRefs([ref, initialFocusRef]);
 <InputGroup.Input ref={mergedRef} {...control} />;
 ```
 
-A model reports a failed save by rejecting `onSubmit` with `FormSubmitError`, carrying plain strings, or with `SaveError`, carrying Clerk errors the `errors` catalog localizes. Either way the banner lands on `form.error` and each field entry on that field's feedback. Either part may be omitted: fields alone show only under the fields with no banner. Any other rejection shows the localized generic message and is logged with `console.error`.
+A failed save rejects `onSubmit` with a `MosaicError`. A model's `callClerk` makes one from Clerk errors. Each issue's copy is the `errors` catalog entry for its `code`, else its `message`. The first issue with no `field` lands on `form.error`, and the first issue for each field on that field's feedback. Issues that all name a field show only under those fields, with no banner. Any other rejection shows the localized generic message and is logged with `console.error`.
 
 ```ts
-throw new FormSubmitError<ProfileValues>({
-  message: 'Your profile could not be saved.',
-  fields: { username: 'That username is reserved.' },
-});
+throw new MosaicError([
+  { code: 'profile_not_saved', message: 'Your profile could not be saved.' },
+  { code: 'username_reserved', message: 'That username is reserved.', field: 'username' },
+]);
 ```
 
 A dialog calls `reset()` when it closes, or `reset(values)` to start from values loaded after mount. Both clear touched state, feedback, and the error, and set the baseline `isDirty` compares against.
@@ -110,7 +110,7 @@ A dialog calls `reset()` when it closes, or `reset(values)` to start from values
 | --------------- | --------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `initialValues` | `TValues`                               | — (required)  | Starting values. Every other type is inferred from this object. Every field must be present, even when its value is `undefined`. |
 | `fields`        | `FieldsConfig<TValues>`                 | —             | Per-field `validate` and `validateAsync`.                                                                                        |
-| `onSubmit`      | `(values: TValues) => Promise<unknown>` | — (required)  | Runs on a valid submit. Reject with `FormSubmitError` or `SaveError` to report a failure.                                        |
+| `onSubmit`      | `(values: TValues) => Promise<unknown>` | — (required)  | Runs on a valid submit. Reject with `MosaicError` to report a failure.                                                           |
 | `canSubmit`     | `(values: TValues) => boolean`          | always `true` | Extra submit gate over the values. Blocks silently, with no field feedback.                                                      |
 
 ### `FieldConfig`
@@ -157,8 +157,13 @@ interface FieldFeedback {
   message: string;
 }
 
-class FormSubmitError<TValues extends object> extends Error {
-  constructor(init: { message?: string; fields?: Partial<Record<keyof TValues, string>> });
+class MosaicError extends Error {
+  constructor(issues: [MosaicIssue, ...MosaicIssue[]]);
+}
+interface MosaicIssue {
+  code: string;
+  message?: string;
+  field?: string;
 }
 
 type TextFieldName<TValues> = keys of TValues whose value is a string;

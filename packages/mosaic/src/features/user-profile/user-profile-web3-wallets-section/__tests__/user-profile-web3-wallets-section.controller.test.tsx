@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
+import { callClerk } from '../../../clerk/errors';
 import type { ReverificationController } from '../../../reverification';
 import { useUserProfileWeb3WalletsController } from '../user-profile-web3-wallets-section.controller';
 import type {
@@ -26,7 +27,7 @@ describe('Web3 connection controller', () => {
     const pending = deferred<void>();
     const connect = vi.fn<ReadyWeb3WalletsModel['connect']>((_strategy, _name, onTarget) => {
       onTarget?.({ kind: 'address', address: '0xabcd' });
-      return pending.promise;
+      return callClerk(() => pending.promise);
     });
     const { result } = renderHook(() =>
       useUserProfileWeb3WalletsController({
@@ -59,12 +60,14 @@ describe('Web3 connection controller', () => {
   });
 
   it('does not move a later primary update to the previous connection target', async () => {
-    const connect = vi.fn<ReadyWeb3WalletsModel['connect']>(async (_strategy, _name, onTarget) => {
-      onTarget?.({ kind: 'wallet', id: 'target' });
-      throw new Error('Signature rejected');
-    });
+    const connect = vi.fn<ReadyWeb3WalletsModel['connect']>((_strategy, _name, onTarget) =>
+      callClerk(async () => {
+        onTarget?.({ kind: 'wallet', id: 'target' });
+        throw new Error('Signature rejected');
+      }),
+    );
     const primary = deferred<void>();
-    const setPrimary = vi.fn(() => primary.promise);
+    const setPrimary = vi.fn(() => callClerk(() => primary.promise));
     const { result } = renderHook(() =>
       useUserProfileWeb3WalletsController({
         wallets: [
@@ -104,7 +107,7 @@ describe('Web3 connection controller', () => {
           wallets: [{ id: 'target', address: '0xabcd', isVerified: false, canVerify }],
           availableProviders: [],
           connect: vi.fn(),
-          verify: () => pending.promise,
+          verify: () => callClerk(() => pending.promise),
           setPrimary: vi.fn(),
         }),
       { initialProps: { canVerify: true } },
@@ -125,7 +128,7 @@ describe('Web3 connection controller', () => {
     const pending = deferred<void>();
     const connect: ReadyWeb3WalletsModel['connect'] = (_strategy, _name, onTarget) => {
       onTarget?.({ kind: 'address', address: '0xabcd' });
-      return pending.promise;
+      return callClerk(() => pending.promise);
     };
     const { result } = renderHook(() =>
       useUserProfileWeb3WalletsController({
@@ -156,9 +159,9 @@ describe('Web3 connection controller', () => {
     const pending = deferred<void>();
     const connect: ReadyWeb3WalletsModel['connect'] = (_strategy, _name, onTarget) => {
       onTarget?.({ kind: 'wallet', id: 'target' });
-      return Promise.reject(new Error('Rejected'));
+      return callClerk(() => Promise.reject(new Error('Rejected')));
     };
-    const verify = vi.fn(() => pending.promise);
+    const verify = vi.fn(() => callClerk(() => pending.promise));
     const setPrimary = vi.fn();
     const { result } = renderHook(() =>
       useUserProfileWeb3WalletsController({
@@ -195,7 +198,7 @@ describe('Web3 connection controller', () => {
     let reportTarget: Parameters<ReadyWeb3WalletsModel['connect']>[2];
     const connect = vi.fn<ReadyWeb3WalletsModel['connect']>((_strategy, _walletName, onTarget) => {
       reportTarget = onTarget;
-      return signature.promise;
+      return callClerk(() => signature.promise);
     });
     const address = provider.walletPicker === 'solana' ? 'SolanaAbCd' : '0xAbCd';
     const otherAddress = provider.walletPicker === 'solana' ? 'Solanaabcd' : '0x1234';

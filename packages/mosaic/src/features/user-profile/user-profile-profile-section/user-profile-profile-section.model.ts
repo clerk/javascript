@@ -1,7 +1,7 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
-import { save } from '../../../utils/errors';
+import { callClerk } from '../../clerk/errors';
 import { useReverificationFlow } from '../../reverification';
 import { isAttributeAvailable } from '../user-profile.utils';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
@@ -59,17 +59,24 @@ export function useUserProfileProfileSectionModel(): UserProfileProfileSectionMo
     onSubmitName: nameManagedBy
       ? undefined
       : value =>
-          saveAsUser(current => current.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
+          saveAsUser(current => current.update({ firstName: value.firstName, lastName: value.lastName }), {
+            fields: NAME_FIELDS,
+          }),
     showUsername,
     username: user.username ?? '',
     usernameRequired: Boolean(attributes.username?.required),
     onSubmitUsername:
       showUsername && !usernameImmutable
         ? username =>
-            save(() => updateUsername(currentUser, username), USERNAME_FIELDS, {
-              min_length: usernameSettings.min_length,
-              max_length: usernameSettings.max_length,
-            })
+            callClerk(
+              async () => {
+                await updateUsername(currentUser, username);
+              },
+              {
+                fields: USERNAME_FIELDS,
+                params: { min_length: usernameSettings.min_length, max_length: usernameSettings.max_length },
+              },
+            )
         : undefined,
     usernameReverification,
   };

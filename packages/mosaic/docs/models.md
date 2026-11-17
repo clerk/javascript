@@ -42,9 +42,13 @@ export type SwitcherModel =
 
 ## Errors
 
-- Never format an error. Let Clerk errors propagate untouched; no `try`/`catch` that turns errors into strings, and no feature-level `toError` helpers. The controller's owners map them ([Controllers → Errors](controllers.md#errors)).
-- For a failure the model detects itself, throw `new ClerkRuntimeError(message, { code })` and add the copy for `code` to `src/localization/errors.messages.ts`.
-- A callback that backs a form wraps its Clerk call in `save(run, fields, params)` from `src/utils/errors.ts`, which rethrows a Clerk error as a `SaveError` routed to the fields it names (`user-profile-profile-section.model.ts`).
+- Every callback a model returns runs its Clerk calls inside `callClerk(run, { fields, params })` from `src/features/clerk/errors.ts` and returns its `ClerkCall`. `callClerk` rejects with a `MosaicError` (`src/utils/errors.ts`) when Clerk reports the failure and lets anything else through, so no Clerk error reaches a controller (`create-organization.model.ts`).
+- Declare the model hook's return type, with `ClerkCall` for each callback. A callback that skips `callClerk` then fails to compile. Lint requires the declared type on every exported function in a `*.model.ts(x)` file, and flags a callback in a model or `*.types.ts` type that returns a `Promise`, or `void` alongside a `ClerkCall`.
+- `fields` names the form fields an issue may belong to, and `params` fills the placeholders in each issue's copy (`user-profile-profile-section.model.ts`).
+- Build a `MosaicError` yourself only when an issue needs data `callClerk` drops, such as the zxcvbn hints in `meta`; say why in the file (`user-profile-password-errors.ts`).
+- Never format an error: no `try`/`catch` that turns errors into strings, and no feature-level `toError` helpers. The controller's owners map them ([Controllers → Errors](controllers.md#errors)).
+- For a failure the model detects itself, throw `new ClerkRuntimeError(message, { code })` inside `callClerk` and add the copy for `code` to `src/localization/errors.messages.ts`.
+- A Clerk error the model holds as data, such as a failed query, is read with `describeClerkError(cause)` (`consent.model.ts`).
 
 ## Step-up verification
 
@@ -52,10 +56,10 @@ An action Clerk may interrupt for reverification wraps its Clerk call in `useRev
 
 - Call the hook at the top of the model hook, above its early returns.
 - The fetcher is the raw Clerk call and takes the resource it acts on as an argument.
-- The exposed callback runs the wrapped action inside `save`.
+- The exposed callback runs the wrapped action inside `callClerk`.
 - Return the `reverification` controller beside the callbacks. A confirmation action passes it to `useConfirmController`; a direct action passes it to `ReverificationDialog` (`src/blocks/reverification/`) in the view.
 
-A cancelled challenge rejects the callback with a `reverification_cancelled` error, which `save` lets through for the controller to recognise.
+A cancelled challenge rejects the callback with a `CancelledError` (`src/utils/errors.ts`), which `callClerk` lets through and every owner treats as no error.
 
 ## Before the API exists
 

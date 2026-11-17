@@ -2,12 +2,11 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
-import { FormSubmitError } from '../../../components/form';
-import type { ErrorDescription, MosaicMessages } from '../../../localization';
+import type { MosaicMessages } from '../../../localization';
 import { toLocalizableApiError } from '../../../localization';
-import { toLocalizableError } from '../../../utils/errors';
+import type { MosaicIssue } from '../../../utils/errors';
+import { MosaicError } from '../../../utils/errors';
 import { passwordComplexityMessage, passwordStrengthMessage } from './user-profile-password-feedback';
-import type { UserProfileEditPasswordValues } from './user-profile-password-section.types';
 
 type Messages = MosaicMessages['userProfile']['password'];
 type Settings = Pick<PasswordSettingsData, 'min_length' | 'max_length'>;
@@ -28,61 +27,58 @@ const passwordComplexityCodes = new Map<string, ComplexityRule>([
   ['form_password_no_special_char', 'require_special_char'],
 ]);
 
-function passwordError(
-  errors: ClerkAPIError[],
+function passwordIssue(
+  errors: readonly [ClerkAPIError, ...ClerkAPIError[]],
   settings: Settings,
   messages: Messages,
   locale: string,
-  errorText: (error: ErrorDescription) => string,
-) {
-  const first = errors[0];
-  if (!first) {
-    return undefined;
-  }
+): MosaicIssue {
+  const [first] = errors;
   if (first.code === 'form_password_not_strong_enough') {
     const suggestions: { code: string }[] | undefined = first.meta?.zxcvbn?.suggestions;
-    return passwordStrengthMessage(suggestions?.map(suggestion => suggestion.code) ?? [], messages);
+    const message = passwordStrengthMessage(suggestions?.map(suggestion => suggestion.code) ?? [], messages);
+    return { code: 'password_feedback', message, field: 'newPassword' };
   }
   const failures = errors.flatMap(error => {
     const code = passwordComplexityCodes.get(error.code);
     return code ? [code] : [];
   });
-  return (
-    (passwordComplexityCodes.has(first.code)
-      ? passwordComplexityMessage(failures, settings, messages, locale)
-      : undefined) || errorText(toLocalizableApiError(first))
-  );
+  const message = passwordComplexityCodes.has(first.code)
+    ? passwordComplexityMessage(failures, settings, messages, locale)
+    : undefined;
+  return message
+    ? { code: 'password_feedback', message, field: 'newPassword' }
+    : { ...toLocalizableApiError(first), field: 'newPassword' };
 }
 
-// TODO: Move onto save() and drop toLocalizableApiError.
-export function passwordFormError(
+// The password field groups Clerk's complexity errors into one message and reads zxcvbn hints from `meta`, which a MosaicIssue does not carry.
+export function passwordMosaicError(
   error: unknown,
   requiresCurrentPassword: boolean,
   settings: Settings,
   messages: Messages,
   locale: string,
-  errorText: (error: ErrorDescription) => string,
-): FormSubmitError<UserProfileEditPasswordValues> {
-  if (typeof error !== 'object' || error === null || !isClerkAPIResponseError(error)) {
-    return new FormSubmitError({ message: errorText(toLocalizableError(error)) });
+): unknown {
+  if (!(error instanceof Error) || !isClerkAPIResponseError(error)) {
+    return error;
   }
-  const fields: { currentPassword?: string; newPassword?: string } = {};
+  const issues: MosaicIssue[] = [];
   const passwordErrors: ClerkAPIError[] = [];
-  let message: string | undefined;
   const items: ClerkAPIError[] = error.errors;
   for (const item of items) {
-    const text = errorText(toLocalizableApiError(item));
     const name = snakeToCamel(item.meta?.paramName);
     if (name === 'currentPassword' && requiresCurrentPassword) {
-      fields.currentPassword ??= text;
+      issues.push({ ...toLocalizableApiError(item), field: 'currentPassword' });
     } else if (name === 'newPassword' || name === 'password') {
       passwordErrors.push(item);
     } else {
-      message ??= text;
+      issues.push(toLocalizableApiError(item));
     }
   }
-  if (passwordErrors.length) {
-    fields.newPassword = passwordError(passwordErrors, settings, messages, locale, errorText);
+  const [firstPasswordError, ...otherPasswordErrors] = passwordErrors;
+  if (firstPasswordError) {
+    issues.push(passwordIssue([firstPasswordError, ...otherPasswordErrors], settings, messages, locale));
   }
-  return new FormSubmitError({ message, fields });
+  const [first, ...rest] = issues;
+  return first ? new MosaicError([first, ...rest]) : error;
 }

@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import type { UseFormResult } from '../../../components/form';
 import { useForm } from '../../../components/form';
-import type { FieldFeedback } from '../../../components/form/form-submit-error';
+import type { FieldFeedback } from '../../../components/form/form.types';
 import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';

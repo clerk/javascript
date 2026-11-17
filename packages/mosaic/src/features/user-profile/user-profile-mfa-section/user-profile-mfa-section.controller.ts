@@ -1,12 +1,10 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
-
 import { useResendSeconds } from '../../../hooks/use-resend-seconds';
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { downloadBackupCodes, printBackupCodes } from '../../../utils/backup-codes';
-import { toLocalizableError } from '../../../utils/errors';
+import { CancelledError, describeError } from '../../../utils/errors';
 import { CODE_RESEND_SECONDS, resendUnlockTime } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type {
@@ -247,10 +245,10 @@ const mfaMachine = createMachine({
               if (context.dismissed) {
                 return { pending: undefined, dismissed: false };
               }
-              if (isReverificationCancelledError(event.error)) {
+              if (event.error instanceof CancelledError) {
                 return { flow: { kind: 'closed' }, pending: undefined };
               }
-              const error = toLocalizableError(event.error);
+              const error = describeError(event.error);
               return {
                 flow: { ...flow, error },
                 pending: undefined,

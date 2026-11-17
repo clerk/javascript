@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { callClerk } from '../../../clerk/errors';
 import { useMembersTableController, useMembersTableSearchController } from '../members-table-tab.controller';
 import type { MembersRoles } from '../members-table-tab.types';
 
@@ -15,8 +16,8 @@ function createModel() {
     isError: false,
     retry: vi.fn(),
     fetchPage: vi.fn(),
-    changeRole: vi.fn((_id: string, _role: string, _roles: MembersRoles) => Promise.resolve()),
-    remove: vi.fn((_id: string) => Promise.resolve()),
+    changeRole: vi.fn((_id: string, _role: string, _roles: MembersRoles) => callClerk(() => Promise.resolve())),
+    remove: vi.fn((_id: string) => callClerk(() => Promise.resolve())),
   };
 }
 

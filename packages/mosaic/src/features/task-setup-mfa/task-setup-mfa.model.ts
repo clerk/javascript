@@ -7,6 +7,7 @@ import type { PhoneNumberResource, TaskSetupMFAProps, UserResource } from '@cler
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../utils/allows-identification-creation';
+import { callClerk } from '../clerk/errors';
 import { useReverificationFlow } from '../reverification';
 import {
   configuredFactors,
@@ -111,41 +112,46 @@ export function useTaskSetupMfaModel(options: TaskSetupMfaModelOptions = {}): Ta
     enrollSms,
     resendSms,
     createAuthenticator: totpEnabled
-      ? async () => {
-          const current = requireIdentity(clerk, userId, sessionId);
-          if (current.totpEnabled) {
-            throw new ClerkRuntimeError('Authenticator is unavailable.', { code: 'mfa_authenticator_unavailable' });
-          }
-          const result = await createTotp(current);
-          return { secret: result.secret ?? '', uri: result.uri ?? '' };
-        }
+      ? () =>
+          callClerk(async () => {
+            const current = requireIdentity(clerk, userId, sessionId);
+            if (current.totpEnabled) {
+              throw new ClerkRuntimeError('Authenticator is unavailable.', { code: 'mfa_authenticator_unavailable' });
+            }
+            const result = await createTotp(current);
+            return { secret: result.secret ?? '', uri: result.uri ?? '' };
+          })
       : undefined,
     verifyAuthenticator: totpEnabled
-      ? async code => {
-          const current = requireIdentity(clerk, userId, sessionId);
-          const result = await current.verifyTOTP({ code });
-          await reloadUser(current);
-          return { backupCodes: result.backupCodes ?? [] };
-        }
+      ? code =>
+          callClerk(async () => {
+            const current = requireIdentity(clerk, userId, sessionId);
+            const result = await current.verifyTOTP({ code });
+            await reloadUser(current);
+            return { backupCodes: result.backupCodes ?? [] };
+          })
       : undefined,
     onComplete: () =>
-      clerk.setActive({
-        session: sessionId,
-        navigate: async ({ session: next, decorateUrl }) => {
-          const nextTask = next.currentTask;
-          if (nextTask) {
-            await router.navigate(buildTaskUrl(nextTask, { base: clerk.buildSignInUrl() }));
-            return;
-          }
-          await router.navigate(decorateUrl(redirectUrlComplete));
-        },
+      callClerk(() =>
+        clerk.setActive({
+          session: sessionId,
+          navigate: async ({ session: next, decorateUrl }) => {
+            const nextTask = next.currentTask;
+            if (nextTask) {
+              await router.navigate(buildTaskUrl(nextTask, { base: clerk.buildSignInUrl() }));
+              return;
+            }
+            await router.navigate(decorateUrl(redirectUrlComplete));
+          },
+        }),
+      ),
+    onSignOut: () =>
+      callClerk(() => {
+        const otherSessions = (clerk.client?.signedInSessions ?? []).filter(item => item.id !== sessionId);
+        return otherSessions.length > 0
+          ? clerk.signOut({ sessionId, redirectUrl: clerk.buildAfterMultiSessionSingleSignOutUrl() })
+          : clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() });
       }),
-    onSignOut: () => {
-      const otherSessions = (clerk.client?.signedInSessions ?? []).filter(item => item.id !== sessionId);
-      return otherSessions.length > 0
-        ? clerk.signOut({ sessionId, redirectUrl: clerk.buildAfterMultiSessionSingleSignOutUrl() })
-        : clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() });
-    },
     createPhoneReverification,
     enrollSmsReverification,
     authenticatorReverification,

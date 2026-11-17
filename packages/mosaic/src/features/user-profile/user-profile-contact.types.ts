@@ -1,3 +1,5 @@
+import type { ClerkCall } from '../clerk/errors';
+
 export interface UserProfileContact {
   id: string;
   value: string;
@@ -17,14 +19,14 @@ export type UserProfilePhone = UserProfileContact;
 export type UserProfileEmailVerification =
   | { method: 'code'; sent: Promise<void> }
   | { method: 'link'; verified: Promise<void>; cancel: () => void }
-  | { method: 'sso'; connect: () => Promise<void> };
+  | { method: 'sso'; connect: () => ClerkCall };
 
 export interface UserProfileEmailVerifier {
   start: () => UserProfileEmailVerification;
-  verifyCode: (code: string) => Promise<void>;
+  verifyCode: (code: string) => ClerkCall;
 }
 
 export interface UserProfilePhoneVerifier {
-  sendCode: () => Promise<void>;
-  verifyCode: (code: string) => Promise<void>;
+  sendCode: () => ClerkCall;
+  verifyCode: (code: string) => ClerkCall;
 }

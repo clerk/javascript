@@ -14,7 +14,7 @@ export default {
   practices: [
     {
       do: true,
-      text: 'Reject `onSubmit` with `FormSubmitError` (exported from this unit), or use `save` in the model, so errors land on fields and the banner.',
+      text: 'Wrap the model callback in `callClerk` with `fields`, or reject `onSubmit` with a `MosaicError`, so errors land on fields and the banner.',
     },
     { do: true, text: 'Use `onSuccess` for success UI that stays mounted, such as a done step.' },
     {

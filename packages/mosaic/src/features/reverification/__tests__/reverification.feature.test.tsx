@@ -300,7 +300,7 @@ describe('Reverification', () => {
 
       await dismiss(user);
 
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       await untilClosed();
       start.release();
     });
@@ -334,7 +334,7 @@ describe('Reverification', () => {
 
         // Closing it rejects the action as cancelled
         await user.click(screen.getByRole('button', { name: 'Close' }));
-        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
         await untilClosed();
         expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
       } finally {
@@ -357,7 +357,7 @@ describe('Reverification', () => {
         expect(outcome()).toBe('');
 
         await user.click(screen.getByRole('button', { name: 'Close' }));
-        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
         await untilClosed();
         expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
       } finally {
@@ -811,7 +811,7 @@ describe('Reverification', () => {
         const { prepare, user } = await startSendingCode(undefined, action);
         await useAnotherMethod(user);
         await dismiss(user);
-        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
         await untilClosed();
 
         const next = holdRequests('post', PREPARE_FIRST);
@@ -1392,7 +1392,7 @@ describe('Reverification', () => {
 
       // Dismissing it rejects the action as cancelled
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
     });
 
@@ -1452,7 +1452,7 @@ describe('Reverification', () => {
       await user.type(await screen.findByLabelText('Password'), 'half-typed');
 
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
 
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
@@ -1504,7 +1504,7 @@ describe('Reverification', () => {
       expect(visible()).toBe('true');
 
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       expect(visible()).toBe('false');
       expect(screen.getByText(STEP.password)).toBeVisible();
     });
@@ -1531,7 +1531,7 @@ describe('Reverification', () => {
 
       // Dismissing rejects the action with reverification_cancelled
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
 
       // The card closes
       await untilClosed();
@@ -1551,7 +1551,7 @@ describe('Reverification', () => {
 
       await dismiss(user);
 
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       await untilClosed();
     });
 
@@ -1565,7 +1565,7 @@ describe('Reverification', () => {
 
       await dismiss(user);
 
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       await untilClosed();
     });
 
@@ -1578,7 +1578,7 @@ describe('Reverification', () => {
 
       await dismiss(user);
 
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       await untilClosed();
       prepare.release();
     });
@@ -1592,7 +1592,7 @@ describe('Reverification', () => {
 
       // The card closes and the action is rejected as cancelled
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       await untilClosed();
 
       // The late failure does not reopen the card or show an error
@@ -1600,7 +1600,7 @@ describe('Reverification', () => {
       await settle();
       expect(screen.queryByText(TITLE)).toBeNull();
       expect(screen.queryByText('form_param_invalid')).toBeNull();
-      expect(outcome()).toBe('rejected: reverification_cancelled');
+      expect(outcome()).toBe('rejected: cancelled');
     });
 
     it('ignores a late success from an attempt that was in flight when dismissed', async () => {
@@ -1616,7 +1616,7 @@ describe('Reverification', () => {
 
       // The card closes and the action is rejected as cancelled
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       await untilClosed();
 
       // The session is not activated
@@ -1644,7 +1644,7 @@ describe('Reverification', () => {
       await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
       await waitFor(() => expect(attempt.requests).toHaveLength(1));
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
       await untilClosed();
 
       // The new challenge opens from the first step with empty fields
@@ -1714,7 +1714,7 @@ describe('Reverification', () => {
       await untilClosed();
 
       // The action is rejected as cancelled
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
     });
 
     it('cancels the challenge when the active session changes', async () => {
@@ -1728,7 +1728,7 @@ describe('Reverification', () => {
       await act(() => clerk.setActive({ session: 'sess_2' }));
 
       await untilClosed();
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
     });
 
     it('keeps the challenge open while the session is briefly unset during a navigation', async () => {
@@ -1755,7 +1755,7 @@ describe('Reverification', () => {
       expect(outcome()).toBe('');
 
       await dismiss(user);
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await waitFor(() => expect(outcome()).toBe('rejected: cancelled'));
     });
 
     it('lets a retry finish when the session changes or signs out', async () => {
@@ -1795,7 +1795,7 @@ describe('Reverification', () => {
 
       rerender(<p>Gone</p>);
 
-      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: reverification_cancelled'));
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: cancelled'));
     });
 
     it('cancels the challenge when its owner unmounts before the action asks for reverification', async () => {
@@ -1815,7 +1815,7 @@ describe('Reverification', () => {
       rerender(<p>Gone</p>);
       response.resolve(reverificationError());
 
-      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: reverification_cancelled'));
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: cancelled'));
       expect(action).toHaveBeenCalledOnce();
     });
 
@@ -1928,7 +1928,11 @@ describe('Reverification', () => {
       );
       const user = await startVerification();
       expect(await screen.findByText(STEP.password)).toBeVisible();
-      vi.spyOn(clerk.session, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
+      const session = clerk.session;
+      if (!session) {
+        throw new Error('Expected a session');
+      }
+      vi.spyOn(session, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
 
       await user.type(passwordField(), `${PASSWORD}{Enter}`);
 

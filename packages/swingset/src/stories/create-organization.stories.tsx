@@ -1,10 +1,10 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import type { CreateOrganizationReadyModel } from '@clerk/mosaic/features/create-organization/create-organization.controller';
 import {
   useCreateOrganizationController,
   useCreateOrganizationInviteController,
 } from '@clerk/mosaic/features/create-organization/create-organization.controller';
 import { CreateOrganizationView } from '@clerk/mosaic/features/create-organization/create-organization.view';
-import { save } from '@clerk/mosaic/utils/errors';
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useState } from 'react';
 
@@ -71,17 +71,19 @@ function CreateOrganizationHarness({
     status: 'ready',
     slugEnabled,
     renderBranding: true,
-    onCreate: async () => {
-      await save(async () => {
-        await settleAfter(1000);
-        if (failCreate) {
-          throw slugTaken();
-        }
-      }, ['name', 'slug']);
-      return { organizationId: 'org_1', skipInvitations };
-    },
-    onInvite: () => settleAfter(1000),
-    onComplete: () => Promise.resolve(),
+    onCreate: () =>
+      callClerk(
+        async () => {
+          await settleAfter(1000);
+          if (failCreate) {
+            throw slugTaken();
+          }
+          return { organizationId: 'org_1', skipInvitations };
+        },
+        { fields: ['name', 'slug'] },
+      ),
+    onInvite: () => callClerk(() => settleAfter(1000)),
+    onComplete: () => callClerk(() => Promise.resolve()),
   };
   const controller = useCreateOrganizationController(model, { onRestart });
   const invite = useCreateOrganizationInviteController({

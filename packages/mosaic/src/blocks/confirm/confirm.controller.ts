@@ -1,4 +1,3 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useMemo } from 'react';
 
 import type { DialogHandle } from '../../components/dialog';
@@ -9,7 +8,7 @@ import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { ErrorInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
-import { toLocalizableError } from '../../utils/errors';
+import { CancelledError, describeError } from '../../utils/errors';
 
 export interface ConfirmContext {
   run: () => Promise<void>;
@@ -54,13 +53,13 @@ export const confirmMachine = createMachine({
         onError: [
           {
             guard: (context: ConfirmContext, event: ErrorInvokeEvent) =>
-              !context.open || isReverificationCancelledError(event.error),
+              !context.open || event.error instanceof CancelledError,
             target: 'idle',
             actions: assign(() => ({ open: false })),
           },
           {
             target: 'confirming',
-            actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
+            actions: assign((_, event) => ({ error: describeError(event.error) })),
           },
         ],
       }),

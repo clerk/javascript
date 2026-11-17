@@ -1,3 +1,4 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import type {
   UserProfileEmail,
   UserProfileEmailVerification,
@@ -46,19 +47,21 @@ export function useUserProfileEmailsFixture({
     createReverification: idleReverification,
     username,
     ...flow,
-    onSetPrimaryEmail: id => {
-      setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })));
-      return Promise.resolve();
-    },
-    onRemoveEmail: async id => {
-      if (removalState === 'pending') {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      }
-      if (removalState === 'error' && !removalFailed) {
-        setRemovalFailed(true);
-        throw new Error('Unable to remove this email address. Try again.');
-      }
-      setEmails(current => current.filter(email => email.id !== id));
-    },
+    onSetPrimaryEmail: id =>
+      callClerk(async () => {
+        setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })));
+        return Promise.resolve();
+      }),
+    onRemoveEmail: id =>
+      callClerk(async () => {
+        if (removalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (removalState === 'error' && !removalFailed) {
+          setRemovalFailed(true);
+          throw new Error('Unable to remove this email address. Try again.');
+        }
+        setEmails(current => current.filter(email => email.id !== id));
+      }),
   });
 }

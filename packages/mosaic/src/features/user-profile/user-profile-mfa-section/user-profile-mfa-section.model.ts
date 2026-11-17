@@ -4,6 +4,7 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import { callClerk } from '../../clerk/errors';
 import { useReverificationFlow } from '../../reverification';
 import type {
   MfaEnrollmentResult,
@@ -148,27 +149,30 @@ export function createSmsActions(
   };
 
   return {
-    enrollPhoneNumber: async phoneNumber => {
-      const current = requireIdentity(clerk, userId, sessionId);
-      const existing = current.phoneNumbers.find(
-        phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
-      );
-      if (existing) {
-        return enrollSms(existing.id);
-      }
-      return { status: 'needsVerification', phone: summarizePhone(await calls.createPhone(current, phoneNumber)) };
-    },
-    enrollSms,
-    resendSms: async phoneId => {
-      await currentPhone(phoneId).prepareVerification();
-    },
-    setDefault: async phoneId => {
-      const phone = currentPhone(phoneId);
-      if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
-        throw phoneUnavailable();
-      }
-      await calls.makeDefault(requireIdentity(clerk, userId, sessionId), phone);
-    },
+    enrollPhoneNumber: phoneNumber =>
+      callClerk(async () => {
+        const current = requireIdentity(clerk, userId, sessionId);
+        const existing = current.phoneNumbers.find(
+          phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
+        );
+        if (existing) {
+          return enrollSms(existing.id);
+        }
+        return { status: 'needsVerification', phone: summarizePhone(await calls.createPhone(current, phoneNumber)) };
+      }),
+    enrollSms: (phoneId, code) => callClerk(() => enrollSms(phoneId, code)),
+    resendSms: phoneId =>
+      callClerk(async () => {
+        await currentPhone(phoneId).prepareVerification();
+      }),
+    setDefault: phoneId =>
+      callClerk(async () => {
+        const phone = currentPhone(phoneId);
+        if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
+          throw phoneUnavailable();
+        }
+        await calls.makeDefault(requireIdentity(clerk, userId, sessionId), phone);
+      }),
   };
 }
 
@@ -264,36 +268,39 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     phones,
     ...smsActions,
     createAuthenticator: totpEnabled
-      ? async () => {
-          const current = requireIdentity(clerk, userId, sessionId);
-          if (current.totpEnabled || !configuredFactors(environment).includes('totp')) {
-            throw new ClerkRuntimeError('Authenticator is unavailable.', { code: 'mfa_authenticator_unavailable' });
-          }
-          const result = await createTotp(current);
-          return { secret: result.secret ?? '', uri: result.uri ?? '' };
-        }
+      ? () =>
+          callClerk(async () => {
+            const current = requireIdentity(clerk, userId, sessionId);
+            if (current.totpEnabled || !configuredFactors(environment).includes('totp')) {
+              throw new ClerkRuntimeError('Authenticator is unavailable.', { code: 'mfa_authenticator_unavailable' });
+            }
+            const result = await createTotp(current);
+            return { secret: result.secret ?? '', uri: result.uri ?? '' };
+          })
       : undefined,
     verifyAuthenticator: totpEnabled
-      ? async (code): Promise<MfaEnrollmentResult> => {
-          const current = requireIdentity(clerk, userId, sessionId);
-          const result = await current.verifyTOTP({ code });
-          await reloadUser(current);
-          return { backupCodes: result.backupCodes ?? [] };
-        }
+      ? code =>
+          callClerk(async (): Promise<MfaEnrollmentResult> => {
+            const current = requireIdentity(clerk, userId, sessionId);
+            const result = await current.verifyTOTP({ code });
+            await reloadUser(current);
+            return { backupCodes: result.backupCodes ?? [] };
+          })
       : undefined,
     generateBackupCodes:
       backupEnabled && usableCount > 0
-        ? async () => {
-            const current = requireIdentity(clerk, userId, sessionId);
-            const currentFactors = configuredFactors(environment);
-            if (!currentFactors.includes('backup_code') || usableFactorCount(current, currentFactors) === 0) {
-              throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
-            }
-            const result = await createBackupCode(current);
-            return result.codes;
-          }
+        ? () =>
+            callClerk(async () => {
+              const current = requireIdentity(clerk, userId, sessionId);
+              const currentFactors = configuredFactors(environment);
+              if (!currentFactors.includes('backup_code') || usableFactorCount(current, currentFactors) === 0) {
+                throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
+              }
+              const result = await createBackupCode(current);
+              return result.codes;
+            })
         : undefined,
-    remove: methodId => removeMethod(requireIdentity(clerk, userId, sessionId), environment, methodId),
+    remove: methodId => callClerk(() => removeMethod(requireIdentity(clerk, userId, sessionId), environment, methodId)),
     removeReverification,
     setDefaultReverification,
     backupCodesReverification,

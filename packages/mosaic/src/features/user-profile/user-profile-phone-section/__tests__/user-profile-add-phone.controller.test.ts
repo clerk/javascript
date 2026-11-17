@@ -1,10 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { callClerk } from '../../../clerk/errors';
 import { useUserProfileAddPhoneController } from '../user-profile-add-phone.controller';
 
-const sendCode = vi.fn(() => Promise.resolve());
-const onCreate = vi.fn(() => Promise.resolve({ sendCode, verifyCode: () => Promise.resolve() }));
+const sendCode = vi.fn(() => callClerk(() => Promise.resolve()));
+const onCreate = vi.fn(() => Promise.resolve({ sendCode, verifyCode: () => callClerk(() => Promise.resolve()) }));
 
 async function sendFirstCode() {
   const { result } = renderHook(() => useUserProfileAddPhoneController({ onCreate }));
@@ -40,7 +41,7 @@ describe('useUserProfileAddPhoneController', () => {
 
   it('owns which number is being verified until the next add', async () => {
     const { result } = renderHook(() => useUserProfileAddPhoneController({ onCreate }));
-    const verifier = { sendCode, verifyCode: () => Promise.resolve() };
+    const verifier = { sendCode, verifyCode: () => callClerk(() => Promise.resolve()) };
     expect(result.current.verifyingId).toBeUndefined();
 
     act(() => result.current.onVerifyPhone({ id: 'phone_2', value: '+18015550101' }, verifier));

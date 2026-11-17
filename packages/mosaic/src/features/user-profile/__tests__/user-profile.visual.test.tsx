@@ -5,7 +5,7 @@ import { page } from 'vitest/browser';
 
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { SaveError } from '../../../utils/errors';
+import { MosaicError } from '../../../utils/errors';
 import { UserProfile } from '../user-profile';
 import { useUserProfileEditNameController } from '../user-profile-profile-section/user-profile-edit-name.controller';
 import { UserProfileEditNameDialog } from '../user-profile-profile-section/user-profile-edit-name.dialog';
@@ -28,12 +28,14 @@ function FailedEditName() {
     lastName: 'Morgan',
     onSubmit: () =>
       Promise.reject(
-        new SaveError({
-          global: { code: 'internal_clerk_error', message: 'Your name could not be updated.' },
-          fields: {
-            lastName: { code: 'form_param_max_length_exceeded', message: 'Last name must be 64 characters or fewer.' },
+        new MosaicError([
+          { code: 'internal_clerk_error', message: 'Your name could not be updated.' },
+          {
+            code: 'form_param_max_length_exceeded',
+            message: 'Last name must be 64 characters or fewer.',
+            field: 'lastName',
           },
-        }),
+        ]),
       ),
   });
   return (

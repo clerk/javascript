@@ -1,6 +1,4 @@
 import { Button } from '@clerk/mosaic/components/button';
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile.types';
-import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile.types';
 import { useUserProfileEditPasswordController } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.dialog';
 import type {
@@ -8,6 +6,7 @@ import type {
   UserProfilePasswordPolicy,
 } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
 import { useMessages } from '@clerk/mosaic/localization';
+import type { MosaicError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 export interface UserProfileEditPasswordFixtureOptions {
@@ -15,7 +14,7 @@ export interface UserProfileEditPasswordFixtureOptions {
   requiresCurrentPassword?: boolean;
   latency?: number;
   /** Rejects the first save so the next attempt can succeed. */
-  failWith?: UserProfileFormError;
+  failWith?: MosaicError;
 }
 
 export function useUserProfileEditPasswordFixture({
@@ -36,7 +35,7 @@ export function useUserProfileEditPasswordFixture({
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith && !hasFailed) {
         setHasFailed(true);
-        throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
+        throw failWith;
       }
       setHasPassword(true);
     },

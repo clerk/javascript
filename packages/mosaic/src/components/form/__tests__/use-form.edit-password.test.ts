@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
-import type { FieldFeedback } from '../form-submit-error';
-import { FormSubmitError } from '../form-submit-error';
+import { MosaicError } from '../../../utils/errors';
+import type { FieldFeedback } from '../form.types';
 import { useForm } from '../use-form';
 
 interface EditPasswordValues {
@@ -124,10 +124,10 @@ describe('useForm: edit password', () => {
   it('shows the server rejection on the banner and under the field the model names', async () => {
     const onSubmit = vi.fn(() =>
       Promise.reject(
-        new FormSubmitError<EditPasswordValues>({
-          message: 'Password could not be changed.',
-          fields: { currentPassword: 'Incorrect password.' },
-        }),
+        new MosaicError([
+          { code: 'unknown_code', message: 'Password could not be changed.' },
+          { code: 'unknown_code', message: 'Incorrect password.', field: 'currentPassword' },
+        ]),
       ),
     );
     const { result } = renderHook(() => useEditPasswordForm(onSubmit));

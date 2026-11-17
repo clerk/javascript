@@ -5,7 +5,7 @@ import type { ErrorDescription } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
-import { toLocalizableError } from '../../utils/errors';
+import { describeError } from '../../utils/errors';
 import type { OrganizationListModel } from './organization-list.model';
 import { organizationListBusyKeys } from './organization-list.types';
 
@@ -58,7 +58,7 @@ function createOrganizationListMachine<M>() {
           onDone: { target: 'idle', actions: assign(() => settled) },
           onError: {
             target: 'idle',
-            actions: assign((_, event) => ({ ...settled, error: toLocalizableError(event.error) })),
+            actions: assign((_, event) => ({ ...settled, error: describeError(event.error) })),
           },
         }),
       },

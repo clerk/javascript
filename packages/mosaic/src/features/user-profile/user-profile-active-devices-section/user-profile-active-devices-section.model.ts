@@ -6,6 +6,8 @@ import type { SessionWithActivitiesResource } from '@clerk/shared/types';
 import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
 import { useUserSessionsQuery } from '../../../queries/use-user-sessions-query';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
@@ -18,7 +20,7 @@ export type UserProfileActiveDevicesModel =
       status: 'ready';
       identity: string;
       devices: UserProfileDevice[];
-      revoke: (id: string) => Promise<void>;
+      revoke: (id: string) => ClerkCall;
       reverification: ReverificationController;
     };
 
@@ -95,21 +97,22 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
       .filter(isActiveDevice)
       .sort((a, b) => Number(b.id === sessionId) - Number(a.id === sessionId))
       .map(toDevice),
-    revoke: async id => {
-      const currentUser = clerk.user;
-      const target = sessions.find(item => item.id === id && isActiveDevice(item));
-      if (
-        !target ||
-        !currentUser ||
-        !sessionId ||
-        currentUser.id !== userId ||
-        clerk.session?.id !== sessionId ||
-        id === sessionId
-      ) {
-        throw new ClerkRuntimeError('This device is no longer available.', { code: 'active_device_unavailable' });
-      }
-      await revokeSession(target);
-    },
+    revoke: id =>
+      callClerk(async () => {
+        const currentUser = clerk.user;
+        const target = sessions.find(item => item.id === id && isActiveDevice(item));
+        if (
+          !target ||
+          !currentUser ||
+          !sessionId ||
+          currentUser.id !== userId ||
+          clerk.session?.id !== sessionId ||
+          id === sessionId
+        ) {
+          throw new ClerkRuntimeError('This device is no longer available.', { code: 'active_device_unavailable' });
+        }
+        await revokeSession(target);
+      }),
     reverification,
   };
 }

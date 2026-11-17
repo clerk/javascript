@@ -1,3 +1,4 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import type { CreateOrganizationReadyModel } from '@clerk/mosaic/features/create-organization/create-organization.controller';
 import {
   useCreateOrganizationController,
@@ -65,12 +66,13 @@ const createOrganization: CreateOrganizationReadyModel = {
   status: 'ready',
   slugEnabled: true,
   renderBranding: true,
-  onCreate: async () => {
-    await settleAfter(1000);
-    return { organizationId: 'org_new', skipInvitations: true };
-  },
-  onInvite: () => settleAfter(1000),
-  onComplete: () => Promise.resolve(),
+  onCreate: () =>
+    callClerk(async () => {
+      await settleAfter(1000);
+      return { organizationId: 'org_new', skipInvitations: true };
+    }),
+  onInvite: () => callClerk(() => settleAfter(1000)),
+  onComplete: () => callClerk(() => Promise.resolve()),
 };
 
 function OrganizationListHarness({
@@ -96,20 +98,23 @@ function OrganizationListHarness({
     suggestions,
     paging: { ref: () => {}, hasMore: false },
     createOrganization,
-    onSelectOrganization: async () => {
-      await settleAfter(1000);
-      if (failSelect) {
-        throw unavailable();
-      }
-    },
-    onAcceptInvitation: async id => {
-      await settleAfter(1000);
-      setInvitations(current => current.map(i => (i.id === id ? { ...i, status: 'accepted' } : i)));
-    },
-    onAcceptSuggestion: async id => {
-      await settleAfter(1000);
-      setSuggestions(current => current.map(s => (s.id === id ? { ...s, status: 'accepted' } : s)));
-    },
+    onSelectOrganization: () =>
+      callClerk(async () => {
+        await settleAfter(1000);
+        if (failSelect) {
+          throw unavailable();
+        }
+      }),
+    onAcceptInvitation: id =>
+      callClerk(async () => {
+        await settleAfter(1000);
+        setInvitations(current => current.map(i => (i.id === id ? { ...i, status: 'accepted' } : i)));
+      }),
+    onAcceptSuggestion: id =>
+      callClerk(async () => {
+        await settleAfter(1000);
+        setSuggestions(current => current.map(s => (s.id === id ? { ...s, status: 'accepted' } : s)));
+      }),
   };
   const controller = useOrganizationListController(model);
 
@@ -141,7 +146,7 @@ function OrganizationListScreens({ controller }: { controller: OrganizationListR
 function CreateOrganizationStepsHarness({ onComplete, onCancel }: { onComplete: () => void; onCancel?: () => void }) {
   const controller = useCreateOrganizationController({
     ...createOrganization,
-    onComplete: () => Promise.resolve().then(onComplete),
+    onComplete: () => callClerk(() => Promise.resolve().then(onComplete)),
   });
   const invite = useCreateOrganizationInviteController({
     organizationId: controller.step.step === 'create' ? null : controller.step.organizationId,

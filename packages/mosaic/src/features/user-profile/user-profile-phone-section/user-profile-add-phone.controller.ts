@@ -4,12 +4,12 @@ import type { DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
 import { useResendSeconds } from '../../../hooks/use-resend-seconds';
+import type { ErrorDescription } from '../../../localization';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
-import type { FormError } from '../../../utils/errors';
-import { toFormError } from '../../../utils/errors';
+import { describeError } from '../../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
@@ -33,7 +33,7 @@ interface Context {
   verifyingId: string | undefined;
   phoneNumber: string;
   verifier: UserProfilePhoneVerifier | undefined;
-  error: FormError | undefined;
+  error: ErrorDescription | undefined;
   resendAvailableAt: number | undefined;
 }
 
@@ -50,7 +50,7 @@ function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Phone verification is missing'));
 }
 
-const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
+const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: describeError(event.error) }));
 const start = {
   target: 'sendingFirstCode' as const,
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
@@ -149,7 +149,7 @@ export function useUserProfileAddPhoneController({
   const step = isReverifying ? 'reverify' : isPhoneStep ? 'phone' : 'verify';
   const form = isPhoneStep ? phoneForm : codeForm;
   const formError = isPhoneStep ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
-  const machineError = error?.global ? errorText(error.global) : undefined;
+  const machineError = error ? errorText(error) : undefined;
 
   return {
     handle,

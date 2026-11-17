@@ -1,15 +1,14 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
-import { clerkApiError } from '../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../mosaic-provider';
+import { CancelledError, MosaicError } from '../../utils/errors';
 import { usePendingAction } from '../use-pending-action';
 
 function blocked() {
-  return clerkApiError('action_blocked', 'Raw server sentence.');
+  return new MosaicError([{ code: 'action_blocked', message: 'Raw server sentence.' }]);
 }
 
 describe('usePendingAction', () => {
@@ -141,9 +140,7 @@ describe('usePendingAction', () => {
 
   it('releases a cancelled reverification without showing an error', async () => {
     const { result } = renderHook(() => usePendingAction());
-    const cancelled = new ClerkRuntimeError('User cancelled attempted verification', {
-      code: 'reverification_cancelled',
-    });
+    const cancelled = new CancelledError();
 
     let succeeded: boolean | undefined;
     await act(async () => {
@@ -180,7 +177,7 @@ describe('usePendingAction', () => {
     });
   });
 
-  it('reports failure with the localized copy for the code Clerk refused with', async () => {
+  it('reports failure with the localized copy for the code the action refused with', async () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
       <MosaicProvider localization={{ overrides: { 'errors.action_blocked': 'Acción bloqueada.' } }}>
         {children}
