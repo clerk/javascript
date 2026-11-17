@@ -29,4 +29,4 @@ export type {
   SwitcherItemTrailingProps,
   SwitcherSeparatorProps,
 } from './switcher-item';
-export type { SwitcherTriggerProps } from './switcher-trigger';
+export type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher-trigger';

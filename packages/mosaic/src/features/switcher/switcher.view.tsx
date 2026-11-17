@@ -23,6 +23,7 @@ import {
   SwitcherItemTrailing,
   SwitcherSeparator,
 } from '../../components/switcher/switcher-item';
+import type { SwitcherTriggerVariant } from '../../components/switcher/switcher-trigger';
 import { SwitcherTriggerContent, triggerStyles } from '../../components/switcher/switcher-trigger';
 import type { IconComponent } from '../../icons/glyph';
 import { Building } from '../../icons/glyphs/building';
@@ -63,6 +64,7 @@ import { useSwitcherTriggerController } from './switcher-trigger.controller';
 // The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
 // what the model and the view agree on, so neither file owns them.
 export type * from './switcher.types';
+export type { SwitcherTriggerVariant };
 
 type SwitcherContextValue = SwitcherData &
   SwitcherCallbacks &
@@ -1011,7 +1013,7 @@ export function SwitcherRoot(props: SwitcherRootProps): ReactElement {
   );
 }
 
-export interface SwitcherTriggerProps {
+export interface SwitcherTriggerOptions {
   /**
    * Names the lead beside its avatar — the organization wherever one heads the trigger, no
    * selection when personal is hidden and none is active, the account otherwise. Turn it off for the avatar alone.
@@ -1031,14 +1033,12 @@ export interface SwitcherTriggerProps {
   triggerBadge?: SwitcherTriggerBadge;
 }
 
-export type SwitcherTriggerVariant = 'full' | 'condensed';
-
 /** The trigger: the lead's avatar, and what it is called. */
 export function SwitcherTrigger({
   showTriggerLabel = true,
   triggerBadge = true,
   triggerVariant = 'condensed',
-}: SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
+}: SwitcherTriggerOptions & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
   const m = useSwitcherMessages();
   const slot = useSlot();
   const data = useSwitcherContext();
@@ -1068,7 +1068,8 @@ export function SwitcherTrigger({
             variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
           />
         }
-        name={showTriggerLabel ? name : undefined}
+        showLabel={showTriggerLabel}
+        name={name}
         badge={typeof planLabel === 'string' ? planLabel : undefined}
         badgeId={badge?.id}
       />
@@ -1128,7 +1129,7 @@ export function SwitcherPopup(): ReactElement {
 }
 
 export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> &
-  SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant };
+  SwitcherTriggerOptions & { triggerVariant?: SwitcherTriggerVariant };
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The

@@ -2,6 +2,7 @@
 
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
+import React from 'react';
 
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import type { MosaicElementProps } from '../../props';
@@ -25,11 +26,13 @@ export function triggerStyles(showLabel: boolean, shape: 'circle' | 'square') {
 
 export function SwitcherTriggerContent({
   avatar,
+  showLabel,
   name,
   badge,
   badgeId,
 }: {
   avatar: ReactNode;
+  showLabel: boolean;
   name?: string;
   badge?: string;
   badgeId?: string;
@@ -38,7 +41,7 @@ export function SwitcherTriggerContent({
   return (
     <>
       {avatar}
-      {name ? (
+      {showLabel ? (
         <>
           <span
             {...mergeStyleProps(
@@ -48,7 +51,7 @@ export function SwitcherTriggerContent({
           >
             {name}
           </span>
-          {badge ? (
+          {typeof badge === 'string' ? (
             <Badge
               color='neutral'
               data-badge-id={badgeId}
@@ -74,33 +77,44 @@ export interface SwitcherTriggerProps extends Omit<MosaicElementProps<'button'>,
   name?: string;
   /** A plan or status label beside the name. */
   badge?: string;
+  /** Rounds the avatar-only trigger to match a circular avatar. */
   shape?: 'circle' | 'square';
+  /**
+   * Which mark the trigger carries, set as `data-variant`: `full` for a `Switcher.BadgedAvatar`,
+   * `condensed` for a `Switcher.Avatar`.
+   *
+   * @default 'condensed'
+   */
+  variant?: SwitcherTriggerVariant;
 }
 
-/** The trigger's look on a plain button, without the popover it opens: for showing the trigger on its own. */
-export function SwitcherTriggerButton({
-  avatar,
-  name,
-  badge,
-  shape = 'square',
-  xstyle,
-  ...rest
-}: SwitcherTriggerProps): ReactElement {
-  const slot = useSlot();
-  return (
-    <button
-      type='button'
-      {...mergeStyleProps(
-        themeProps(slot('trigger'), { variant: 'full' }),
-        stylex.props(reset.base, ...triggerStyles(Boolean(name), shape), xstyle),
-        rest,
-      )}
-    >
-      <SwitcherTriggerContent
-        avatar={avatar}
-        name={name}
-        badge={badge}
-      />
-    </button>
-  );
-}
+export type SwitcherTriggerVariant = 'full' | 'condensed';
+
+/** The trigger's look on a plain button, without the popover it opens. */
+export const SwitcherTriggerButton = React.forwardRef<HTMLButtonElement, SwitcherTriggerProps>(
+  function SwitcherTriggerButton(
+    { avatar, name, badge, shape = 'square', variant = 'condensed', xstyle, ...rest },
+    ref,
+  ) {
+    const slot = useSlot();
+    const showLabel = name !== undefined;
+    return (
+      <button
+        ref={ref}
+        type='button'
+        {...mergeStyleProps(
+          themeProps(slot('trigger'), { variant }),
+          stylex.props(reset.base, ...triggerStyles(showLabel, shape), xstyle),
+          rest,
+        )}
+      >
+        <SwitcherTriggerContent
+          avatar={avatar}
+          showLabel={showLabel}
+          name={name}
+          badge={badge}
+        />
+      </button>
+    );
+  },
+);

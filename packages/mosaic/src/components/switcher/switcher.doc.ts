@@ -16,7 +16,7 @@ import type { SwitcherTriggerProps } from './switcher-trigger';
 export default {
   name: 'Switcher',
   description:
-    "The account and organization switcher's parts: the trigger, the popover's header, and its rows. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` compose them with Clerk's session and organization state.",
+    "The account and organization switcher's parts: the trigger, the popover's header, and its rows. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` compose them with Clerk's session and organization state. These parts carry `cl-switcher-*` classes; inside `UserButton` and `OrganizationSwitcher` the same parts carry `cl-user-button-*` and `cl-organization-switcher-*`. `Switcher.Avatar` carries `cl-avatar`.",
   useFor: [
     'a custom account or organization switcher composed from its parts',
     'switcher rows or a switcher trigger rendered with your own data',
@@ -50,6 +50,11 @@ export default {
           doc: 'Rounds the avatar-only trigger to match a circular avatar.',
           default: "'square'",
         },
+        variant: {
+          type: "'full' | 'condensed'",
+          doc: 'Which mark the trigger carries, set as `data-variant`: `full` for a `Switcher.BadgedAvatar`, `condensed` for a `Switcher.Avatar`.',
+          default: "'condensed'",
+        },
       },
     },
     'Switcher.Header': {
@@ -63,6 +68,7 @@ export default {
     },
     'Switcher.Avatar': {
       description: 'A decorative avatar with initials as its fallback, hidden from assistive tech.',
+      slot: 'cl-avatar',
       props: {
         name: { type: 'string', doc: 'The name the initials come from.' },
         imageUrl: { type: 'string', doc: 'The image.' },
