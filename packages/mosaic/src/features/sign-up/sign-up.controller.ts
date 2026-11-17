@@ -1,11 +1,14 @@
+import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { useState } from 'react';
 
+import type { FieldFeedback } from '../../components/form';
 import { useForm } from '../../components/form';
+import { useDebouncedAsync } from '../../hooks/use-debounced-async';
 import { usePendingAction } from '../../hooks/use-pending-action';
 import { useResendSeconds } from '../../hooks/use-resend-seconds';
 import type { ErrorDescription } from '../../localization';
-import { useErrorText } from '../../localization';
+import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { ErrorInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
@@ -13,7 +16,7 @@ import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../utils/verification';
-import type { SignUpData, SignUpDetailsValues, SignUpIdentifier, SignUpModel } from './sign-up.model';
+import type { SignUpData, SignUpDetailsValues, SignUpIdentifier, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { allowedRoute, routeFor, signUpRoutes } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpStep, SignUpValues, SignUpViewProps } from './sign-up.types';
@@ -105,7 +108,7 @@ function detailsFieldsFor(screen: SignUpScreen, data: SignUpData, identifier: Si
   return screen === 'continue' ? data.continueFieldsFor(identifier) : data.startFieldsFor(identifier);
 }
 
-const initialValues: SignUpValues = {
+const emptyValues: SignUpValues = {
   identifier: '',
   emailAddress: '',
   phoneNumber: '',
@@ -144,13 +147,16 @@ function detailsStep(
     purpose,
     fields,
     nextField: nextField ?? undefined,
-    legalConsent: data.legalConsent,
+    legalConsent: purpose === 'continue' ? data.continueLegalConsent : data.legalConsent,
   };
 }
 
 export function signUpViewStep(screen: SignUpScreen, data: SignUpData, identifier: SignUpIdentifier): SignUpStep {
   switch (screen) {
     case 'start':
+      if (data.actionBlocked) {
+        return { kind: 'notice', purpose: 'action-blocked', details: data.actionBlocked };
+      }
       if (data.mode !== 'public') {
         return { kind: 'notice', purpose: data.mode };
       }
@@ -173,7 +179,7 @@ function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetail
   return {
     emailAddress: pick('emailAddress'),
     phoneNumber: pick('phoneNumber'),
-    username: pick('username'),
+    username: pick('username')?.trim(),
     password: pick('password'),
     firstName: pick('firstName'),
     lastName: pick('lastName'),
@@ -181,29 +187,29 @@ function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetail
   };
 }
 
-type SignUpControllerResult =
-  | { status: 'loading' }
-  | (Omit<SignUpViewProps, 'applicationName' | 'applicationLogoUrl'> & { status: 'ready'; screen: SignUpScreen });
+type SignUpControllerResult = Omit<SignUpViewProps, 'applicationName' | 'applicationLogoUrl'> & {
+  screen: SignUpScreen;
+};
 
-export function useSignUpController(model: SignUpModel, options: MosaicLocationOptions): SignUpControllerResult {
-  const ready = model.status === 'ready';
-  const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start', ready });
+export function useSignUpController(model: SignUpReadyModel, options: MosaicLocationOptions): SignUpControllerResult {
+  const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
   const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
+  const [detailsRoute, setDetailsRoute] = useState<'start' | 'continue'>('start');
   const actions = usePendingAction<'code' | 'finalize' | 'startOver'>();
   const errorText = useErrorText();
+  const genericError = useMessages('errors').generic;
   const [codeSnapshot, sendCodeEvent, codeActor] = useMachine(codeMachine, {
     context: {
-      sendCode: channel =>
-        !ready ? Promise.resolve() : channel === 'phone' ? model.sendPhoneCode() : model.sendEmailCode(),
+      sendCode: channel => (channel === 'phone' ? model.sendPhoneCode() : model.sendEmailCode()),
     },
   });
   const resendSeconds = useResendSeconds(codeSnapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
 
-  const identifier = chosenIdentifier ?? (ready ? model.initialIdentifier : null);
+  const identifier = chosenIdentifier ?? model.initialIdentifier;
   // TODO: When the URL routing modes land (#10780), replace the stored route with `screen` when they differ,
   // so the address bar never keeps a route the step doesn't allow. In virtual mode the stale route is never seen.
-  const screen = ready && route ? signUpScreen(route, model.step) : undefined;
-  const fields = ready && screen ? detailsFieldsFor(screen, model, identifier) : {};
+  const screen = signUpScreen(route, model.step);
+  const fields = detailsFieldsFor(screen, model, identifier);
 
   const goTo = (nextRoute: SignUpRoute) => {
     sendCodeEvent({ type: 'LEAVE' });
@@ -211,9 +217,6 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
   };
 
   const next = async (step: SignUpNextStep) => {
-    if (!ready) {
-      return;
-    }
     if (step.type === 'complete') {
       await model.finalize();
       return;
@@ -221,6 +224,9 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
     const nextRoute = routeFor(step);
     if (!nextRoute) {
       return;
+    }
+    if (screen === 'start' || screen === 'continue') {
+      setDetailsRoute(screen);
     }
     goTo(nextRoute);
     const channel = unsentCodeChannel(step);
@@ -230,11 +236,8 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
   };
 
   const form = useForm<SignUpValues, SignUpNextStep | undefined>({
-    initialValues,
-    onSubmit: async values => {
-      if (!ready) {
-        return undefined;
-      }
+    initialValues: { ...emptyValues, ...model.prefill },
+    onSubmit: values => {
       const details = detailsValues(values, fields);
       return screen === 'continue' ? model.update(details) : model.create(details);
     },
@@ -245,15 +248,19 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
     },
   });
 
-  if (!ready || !screen) {
-    return { status: 'loading' };
-  }
-
+  const { supportEmail } = model;
+  const password = form.values.password;
+  const strength = useDebouncedAsync(password, value => model.validatePassword(value), {
+    delayMs: DEBOUNCE_MS,
+    enabled: Boolean(fields.password) && (password !== '' || form.fields.password.touched),
+  });
+  const passwordFeedback: FieldFeedback | undefined = strength.isError
+    ? { type: 'error', message: genericError }
+    : strength.data;
   const resendChannel = screenCodeChannel(screen);
   const verify = resendChannel === 'phone' ? model.verifyPhoneCode : model.verifyEmailCode;
 
   return {
-    status: 'ready',
     screen,
     step: signUpViewStep(screen, model, identifier),
     socialProviders: [],
@@ -270,14 +277,18 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
     onCodeComplete: code => void actions.run('code', async () => next(await verify(code))),
     isPending: form.isSubmitting || actions.isPending,
     isDisabled: form.isSubmitting || actions.isPending,
+    passwordFeedback,
     errorMessage: actions.errorKey === 'code' ? actions.error : undefined,
     globalErrorMessage:
       form.error ??
       (codeSnapshot.context.error ? errorText(codeSnapshot.context.error) : undefined) ??
       (actions.errorKey === 'code' ? undefined : actions.error),
     onSwitchField: model.canSwitchIdentifier ? () => setChosenIdentifier(otherIdentifier(identifier)) : undefined,
-    onEditIdentifier: () => goTo('start'),
-    onBack: () => goTo('start'),
+    onSignIn: model.goToSignIn,
+    onEmailSupport: supportEmail ? () => window.location.assign(`mailto:${supportEmail}`) : undefined,
+    onJoinWaitlist: model.joinWaitlist,
+    onEditIdentifier: () => goTo(detailsRoute),
+    onBack: () => goTo(detailsRoute),
     onStartOver: () =>
       void actions.run('startOver', async () => {
         await model.reset();

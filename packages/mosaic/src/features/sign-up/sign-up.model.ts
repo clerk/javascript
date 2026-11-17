@@ -1,6 +1,12 @@
 import type { ClerkError } from '@clerk/shared/error';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { actionBlockedDetailsFrom } from '@clerk/shared/internal/clerk-js/actionBlocked';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { getSignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
+import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/passwords/complexity';
+import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
+import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
+import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import type { ActiveIdentifier } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import {
   determineActiveFields,
@@ -9,10 +15,18 @@ import {
   minimizeFieldsForExistingSignup,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import { __internal_useClerkSignal, useClerk } from '@clerk/shared/react';
-import type { SignUpFutureResource } from '@clerk/shared/types';
+import type { SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
+import { useMemo } from 'react';
 
+import type { AuthActionBlockedDetails } from '../../blocks/auth';
+import type { FieldFeedback } from '../../components/form';
+import { FormSubmitError } from '../../components/form';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
+import { useLocale, useMessages } from '../../localization';
 import { save } from '../../utils/errors';
+import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
 import type { SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
 
 export interface SignUpDetailsValues {
@@ -27,6 +41,16 @@ export interface SignUpDetailsValues {
 
 export type SignUpIdentifier = Exclude<ActiveIdentifier, undefined>;
 
+export type SignUpPrefill = Required<
+  Pick<SignUpDetailsValues, 'emailAddress' | 'phoneNumber' | 'username' | 'firstName' | 'lastName'>
+>;
+
+export interface SignUpModelOptions {
+  initialValues?: SignUpInitialValues;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  showOptionalFields?: boolean;
+}
+
 export interface SignUpData {
   step: SignUpNextStep;
   mode: 'public' | 'restricted' | 'waitlist';
@@ -34,9 +58,13 @@ export interface SignUpData {
   canSwitchIdentifier: boolean;
   startFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
   continueFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
+  prefill: SignUpPrefill;
   emailAddress: string | null;
   phoneNumber: string | null;
   legalConsent?: SignUpLegalConsent;
+  continueLegalConsent?: SignUpLegalConsent;
+  supportEmail?: string;
+  actionBlocked?: AuthActionBlockedDetails;
   applicationName: string;
   applicationLogoUrl?: string;
 }
@@ -50,9 +78,14 @@ export interface SignUpCallbacks {
   verifyPhoneCode: (code: string) => Promise<SignUpNextStep>;
   finalize: () => Promise<void>;
   reset: () => Promise<void>;
+  goToSignIn: () => void;
+  validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
+  joinWaitlist?: () => void;
 }
 
-export type SignUpModel = { status: 'loading' } | (SignUpData & SignUpCallbacks & { status: 'ready' });
+export type SignUpReadyModel = SignUpData & SignUpCallbacks & { status: 'ready' };
+
+export type SignUpModel = { status: 'loading' } | SignUpReadyModel;
 
 const FIELD_NAMES: readonly SignUpFieldName[] = [
   'firstName',
@@ -65,11 +98,16 @@ const FIELD_NAMES: readonly SignUpFieldName[] = [
 
 const DETAILS_FIELDS = [...FIELD_NAMES, 'legalAccepted'] as const;
 
-function toViewFields(fields: Partial<Record<string, { required: boolean; disabled?: boolean } | undefined>>) {
+const ABSOLUTE_URL = /^https?:\/\//;
+
+function toViewFields(
+  fields: Partial<Record<string, { required: boolean; disabled?: boolean } | undefined>>,
+  isShown: (name: SignUpFieldName, required: boolean) => boolean,
+) {
   const result: SignUpFields = {};
   for (const name of FIELD_NAMES) {
     const field = fields[name];
-    if (field) {
+    if (field && isShown(name, field.required)) {
       result[name] = field;
     }
   }
@@ -83,10 +121,37 @@ async function run(call: () => Promise<{ error: ClerkError | null }>): Promise<v
   }
 }
 
-export function useSignUpModel(): SignUpModel {
+export function useSignUpModel({
+  initialValues = {},
+  unsafeMetadata,
+  showOptionalFields = false,
+}: SignUpModelOptions = {}): SignUpModel {
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
-  const { signUp } = __internal_useClerkSignal('signUp');
+  const router = useMosaicRouter();
+  const supportEmail = useMosaicSupportEmail();
+  const { signUp, errors } = __internal_useClerkSignal('signUp');
+  const passwordMessages = useMessages('userProfile').password;
+  const genericError = useMessages('errors').generic;
+  const locale = useLocale();
+  const passwordSettings = environment?.userSettings.passwordSettings;
+  const moduleManager = clerk.__internal_moduleManager;
+  const validatePassword = useMemo(
+    () =>
+      async (password: string): Promise<FieldFeedback | undefined> => {
+        if (!passwordSettings || !moduleManager) {
+          throw new FormSubmitError({ message: genericError });
+        }
+        const complexity = validateComplexity(password, passwordSettings);
+        if (Object.keys(complexity).length > 0 || !passwordSettings.show_zxcvbn) {
+          return passwordFieldFeedback({ complexity }, passwordSettings, passwordMessages, locale);
+        }
+        const { loadZxcvbn } = createLoadZxcvbn(moduleManager);
+        const strength = createValidatePasswordStrength(passwordSettings)(await loadZxcvbn())(password);
+        return passwordFieldFeedback({ complexity, strength }, passwordSettings, passwordMessages, locale);
+      },
+    [passwordSettings, moduleManager, passwordMessages, genericError, locale],
+  );
 
   if (!clerk.loaded || !environment) {
     return { status: 'loading' };
@@ -94,10 +159,24 @@ export function useSignUpModel(): SignUpModel {
 
   const { userSettings, displayConfig } = environment;
   const { attributes } = userSettings;
+  const { mode } = userSettings.signUp;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const legalConsentRequired = userSettings.signUp.legal_consent_enabled;
+  const canSwitchIdentifier = emailOrPhone(attributes, isProgressiveSignUp);
+  const verifiesEmailByLink = Boolean(attributes.email_address?.verifications?.includes('email_link'));
 
-  const next = (resource: SignUpFutureResource) => getSignUpNextStep(resource);
+  const next = (resource: SignUpFutureResource): SignUpNextStep => {
+    const step = getSignUpNextStep(resource);
+    return step.type === 'verify_email' && verifiesEmailByLink ? { type: 'unknown' } : step;
+  };
+
+  const [lastError] = errors.raw ?? [];
+  const blocked = actionBlockedDetailsFrom(
+    lastError && isClerkAPIResponseError(lastError) ? lastError.errors[0] : lastError,
+  );
+
+  const isShown = (name: SignUpFieldName, required: boolean) =>
+    showOptionalFields || required || (canSwitchIdentifier && (name === 'emailAddress' || name === 'phoneNumber'));
 
   const activeFields = (identifier: SignUpIdentifier) =>
     determineActiveFields({
@@ -114,24 +193,49 @@ export function useSignUpModel(): SignUpModel {
     firstName: values.firstName,
     lastName: values.lastName,
     legalAccepted: values.legalAccepted,
+    unsafeMetadata,
   });
+
+  const legalConsent = legalConsentRequired
+    ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
+    : undefined;
 
   return {
     status: 'ready',
-    step: getSignUpNextStep(signUp),
-    mode: userSettings.signUp.mode,
-    initialIdentifier: getInitialActiveIdentifier(attributes, isProgressiveSignUp) ?? null,
-    canSwitchIdentifier: emailOrPhone(attributes, isProgressiveSignUp),
-    startFieldsFor: identifier => toViewFields(activeFields(identifier)),
+    step: next(signUp),
+    mode,
+    initialIdentifier:
+      getInitialActiveIdentifier(attributes, isProgressiveSignUp, {
+        emailAddress: initialValues.emailAddress ?? undefined,
+        phoneNumber: initialValues.phoneNumber ?? undefined,
+      }) ?? null,
+    canSwitchIdentifier,
+    startFieldsFor: identifier => toViewFields(activeFields(identifier), isShown),
     continueFieldsFor: identifier => {
       const fields = activeFields(identifier);
       minimizeFieldsForExistingSignup(fields, signUp);
-      return toViewFields(fields);
+      return toViewFields(fields, isShown);
+    },
+    prefill: {
+      emailAddress: signUp.emailAddress || initialValues.emailAddress || '',
+      phoneNumber: signUp.phoneNumber || initialValues.phoneNumber || '',
+      username: signUp.username || initialValues.username || '',
+      firstName: signUp.firstName || initialValues.firstName || '',
+      lastName: signUp.lastName || initialValues.lastName || '',
     },
     emailAddress: signUp.emailAddress,
     phoneNumber: signUp.phoneNumber,
-    legalConsent: legalConsentRequired
-      ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
+    legalConsent,
+    continueLegalConsent: signUp.legalAcceptedAt === null ? legalConsent : undefined,
+    supportEmail: mode === 'restricted' ? supportEmail : undefined,
+    actionBlocked: blocked
+      ? {
+          title: blocked.title,
+          description: blocked.description,
+          linkUrl: blocked.linkUrl,
+          linkText: blocked.linkText,
+          traceId: blocked.traceId,
+        }
       : undefined,
     applicationName: displayConfig.applicationName,
     applicationLogoUrl: displayConfig.logoImageUrl || undefined,
@@ -153,7 +257,31 @@ export function useSignUpModel(): SignUpModel {
       await save(() => run(() => signUp.verifications.verifyPhoneCode({ code })), ['code']);
       return next(signUp);
     },
-    finalize: () => run(() => signUp.finalize()),
+    finalize: () =>
+      run(() =>
+        signUp.finalize({
+          navigate: async ({ session, decorateUrl }) => {
+            const task = session.currentTask;
+            if (task) {
+              await router.navigate(
+                clerk.__internal_getOption('taskUrls')?.[task.key] ??
+                  buildTaskUrl(task, { base: clerk.buildSignInUrl() }),
+              );
+              return;
+            }
+            const afterSignUpUrl = clerk.buildAfterSignUpUrl();
+            const decorated = decorateUrl(afterSignUpUrl);
+            if (decorated !== afterSignUpUrl && ABSOLUTE_URL.test(decorated)) {
+              router.windowNavigate(decorated);
+              return;
+            }
+            await router.navigate(afterSignUpUrl);
+          },
+        }),
+      ),
     reset: () => run(() => signUp.reset()),
+    validatePassword,
+    goToSignIn: () => void router.navigate(clerk.buildSignInUrl()),
+    joinWaitlist: mode === 'waitlist' ? () => void router.navigate(clerk.buildWaitlistUrl()) : undefined,
   };
 }
