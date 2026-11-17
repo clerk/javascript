@@ -47,3 +47,17 @@ test('renders one typed import per doc', () => {
   assert.match(source, /\{ kind: 'components', slug: 'button', doc: doc0 \}/);
   assert.match(source, /\{ kind: 'hooks', slug: 'use-form', doc: doc1 \}/);
 });
+
+test('accepts Windows doc paths', () => {
+  assert.deepEqual(toEntries(['src\\components\\button\\button.doc.ts']), [
+    { kind: 'components', slug: 'button', path: 'src/components/button/button.doc' },
+  ]);
+});
+
+test('renders forward-slash imports from a Windows Mosaic directory', () => {
+  const source = renderModule('..\\..\\mosaic', [
+    { kind: 'components', slug: 'button', path: 'src/components/button/button.doc' },
+  ]);
+  assert.match(source, /from '\.\.\/\.\.\/mosaic\/src\/docs-schema';/);
+  assert.match(source, /import doc0 from '\.\.\/\.\.\/mosaic\/src\/components\/button\/button\.doc';/);
+});

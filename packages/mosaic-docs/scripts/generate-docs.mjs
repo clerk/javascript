@@ -12,7 +12,7 @@ const EXCLUDED = new Set([
 ]);
 
 export function toEntries(paths) {
-  const entries = paths.map(path => {
+  const entries = paths.map(toPosix).map(path => {
     const match = DOC_PATH.exec(path);
     if (!match) {
       throw new Error(`Unexpected doc location: ${path}`);
@@ -36,7 +36,8 @@ export function toEntries(paths) {
     .sort((a, b) => a.kind.localeCompare(b.kind) || a.slug.localeCompare(b.slug));
 }
 
-export function renderModule(mosaicDir, entries) {
+export function renderModule(dir, entries) {
+  const mosaicDir = toPosix(dir);
   const imports = entries.map((entry, index) => `import doc${index} from '${mosaicDir}/${entry.path}';`);
   const rows = entries.map((entry, index) => `  { kind: '${entry.kind}', slug: '${entry.slug}', doc: doc${index} },`);
   return [
@@ -56,6 +57,10 @@ export function renderModule(mosaicDir, entries) {
     '];',
     '',
   ].join('\n');
+}
+
+function toPosix(path) {
+  return path.replaceAll('\\', '/');
 }
 
 if (import.meta.main) {
