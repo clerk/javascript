@@ -282,7 +282,7 @@ export type CreateUserParams = {
   createdAt?: Date;
   /** When set to `true`, the user is created already banned and cannot sign in. */
   banned?: boolean;
-  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/protect/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
+  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/secure/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
   locked?: boolean;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
@@ -795,7 +795,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Sign-in security**](https://dashboard.clerk.com/~/user-authentication/sign-in-security) page under **User & authentication**. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
+   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Sign-in security**](https://dashboard.clerk.com/~/user-authentication/sign-in-security) page under **User & authentication**. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
    * @param userId - The ID of the user to lock.
    */
   public async lockUser(userId: string) {
@@ -806,7 +806,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
+  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
    * @param userId - The ID of the user to unlock.
    */
   public async unlockUser(userId: string) {
