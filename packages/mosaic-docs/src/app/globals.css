@@ -3,15 +3,26 @@
 @plugin '@tailwindcss/typography';
 
 :root {
-  color-scheme: light;
-  --docs-background: oklch(1 0 0);
-  --docs-foreground: oklch(0.145 0 0);
-  --docs-muted: oklch(0.965 0 0);
-  --docs-muted-foreground: oklch(0.53 0 0);
-  --docs-border: oklch(0.88 0.006 260 / 0.72);
-  --docs-accent: oklch(0.145 0 0);
-  --docs-accent-foreground: oklch(1 0 0);
-  --docs-code-background: oklch(0.99 0 0);
+  color-scheme: light dark;
+  --docs-background: light-dark(oklch(1 0 0), #1b1b1f);
+  --docs-foreground: light-dark(oklch(0.145 0 0), #f6f6f7);
+  --docs-muted: light-dark(oklch(0.965 0 0), #232328);
+  --docs-muted-foreground: light-dark(oklch(0.53 0 0), #adadb7);
+  --docs-border: light-dark(oklch(0.88 0.006 260 / 0.72), #33333e);
+  --docs-accent: light-dark(oklch(0.145 0 0), #f6f6f7);
+  --docs-accent-foreground: light-dark(oklch(1 0 0), #1b1b1f);
+  --docs-code-background: light-dark(#ffffff, #313131);
+  --shiki-background: var(--docs-code-background);
+  --shiki-foreground: light-dark(#2b2b34, #ffffff);
+  --shiki-token-keyword: light-dark(#6c47ff, #bab0ff);
+  --shiki-token-constant: light-dark(#6c47ff, #bab0ff);
+  --shiki-token-string: light-dark(#1c5bb6, #def7fd);
+  --shiki-token-string-expression: var(--shiki-token-string);
+  --shiki-token-link: var(--shiki-token-string);
+  --shiki-token-comment: #90909d;
+  --shiki-token-function: light-dark(#15892b, #aff9bf);
+  --shiki-token-parameter: var(--shiki-foreground);
+  --shiki-token-punctuation: light-dark(#5f5f6f, #ffffff);
   --docs-radius: 0.75rem;
   --docs-content-width: 42rem;
   --docs-font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -222,13 +233,6 @@
     text-align: right;
     user-select: none;
     width: 1.25rem;
-  }
-
-  :scope :where(pre.shiki span) {
-    color: var(--shiki-light, inherit);
-    font-style: var(--shiki-light-font-style, inherit);
-    font-weight: var(--shiki-light-font-weight, inherit);
-    text-decoration: var(--shiki-light-text-decoration, inherit);
   }
 
   :scope :where(table) {

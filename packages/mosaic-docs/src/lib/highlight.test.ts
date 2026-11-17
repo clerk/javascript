@@ -3,12 +3,12 @@ import { test } from 'node:test';
 
 import { highlight } from './highlight.ts';
 
-void test('highlights with light and dark theme variables and no fixed colors', async () => {
+void test('colors tokens with theme variables instead of fixed colors', async () => {
   const html = await highlight("const a = '<b>';", 'tsx');
   assert.match(html, /^<pre class="shiki/);
-  assert.match(html, /--shiki-light:#[0-9A-Fa-f]{6}/);
-  assert.match(html, /--shiki-dark:#[0-9A-Fa-f]{6}/);
-  assert.doesNotMatch(html, /[;"]color:/);
+  assert.match(html, /color:var\(--shiki-token-keyword\)/);
+  assert.match(html, /color:var\(--shiki-token-string/);
+  assert.doesNotMatch(html, /#[0-9A-Fa-f]{6}/);
 });
 
 void test('escapes markup in the code', async () => {
