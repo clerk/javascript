@@ -6,7 +6,7 @@ import { MosaicProvider } from '../../mosaic-provider';
 import { HeadingLevelProvider } from '../heading';
 import { Profile } from '../profile';
 import { Section } from '../section';
-import { Panel } from './panel';
+import { Panel } from '.';
 
 function Account() {
   return (

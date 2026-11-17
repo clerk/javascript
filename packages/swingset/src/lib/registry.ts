@@ -57,14 +57,6 @@ import {
   WithError as ConfirmationWithError,
 } from '../stories/confirmation.stories';
 import {
-  Default as ConsentDefault,
-  ManyScopes as ConsentManyScopes,
-  meta as consentMeta,
-  MultipleOrganizations as ConsentMultipleOrganizations,
-  OfflineAccess as ConsentOfflineAccess,
-  ScopeList as ConsentScopeList,
-} from '../stories/consent.stories';
-import {
   Default as CopyButtonDefault,
   Inline as CopyButtonInline,
   Labelled as CopyButtonLabelled,
@@ -179,6 +171,14 @@ import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../s
 import { meta as menuMeta } from '../stories/menu.stories';
 import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
 import {
+  Default as OAuthConsentDefault,
+  ManyScopes as OAuthConsentManyScopes,
+  meta as oauthConsentMeta,
+  MultipleOrganizations as OAuthConsentMultipleOrganizations,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
+import {
   Default as OrganizationListDefault,
   Empty as OrganizationListEmpty,
   Loading as OrganizationListLoading,
@@ -269,6 +269,7 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
+import { Default as ProfileFeatureDefault, meta as profileFeatureMeta } from '../stories/profile.stories';
 import {
   Default as ProviderButtonDefault,
   Many as ProviderButtonMany,
@@ -474,6 +475,7 @@ import {
   States as SwitchStates,
   WithField as SwitchWithField,
 } from '../stories/switch.stories';
+import { Combined as SwitcherCombined, meta as switcherMeta } from '../stories/switcher.stories';
 import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import {
   Default as TableDefault,
@@ -534,11 +536,7 @@ import {
   Shapes as UserAvatarShapes,
   Sizes as UserAvatarSizes,
 } from '../stories/user-avatar.stories';
-import {
-  Combined as UserButtonCombined,
-  meta as userButtonMeta,
-  User as UserButtonUser,
-} from '../stories/user-button.stories';
+import { Default as UserButtonDefault, meta as userButtonMeta } from '../stories/user-button.stories';
 import {
   Default as UserProfileDefault,
   meta as userProfileMeta,
@@ -894,10 +892,14 @@ const itemModule: StoryModule = {
   Group: ItemGroup,
 };
 
+const switcherModule: StoryModule = {
+  meta: switcherMeta,
+  Combined: SwitcherCombined,
+};
+
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
-  Combined: UserButtonCombined,
-  User: UserButtonUser,
+  Default: UserButtonDefault,
 };
 
 const taskSetupMfaModule: StoryModule = {
@@ -1163,6 +1165,11 @@ const userProfileApiKeysPanelModule: StoryModule = {
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
+const profileFeatureModule: StoryModule = {
+  meta: profileFeatureMeta,
+  Default: ProfileFeatureDefault,
+};
+
 const userProfileModule: StoryModule = {
   meta: userProfileMeta,
   Default: UserProfileDefault,
@@ -1303,13 +1310,13 @@ const apiKeysTableModule: StoryModule = {
   Empty: APIKeysTableEmpty,
 };
 
-const consentModule: StoryModule = {
-  meta: consentMeta,
-  Default: ConsentDefault,
-  ScopeList: ConsentScopeList,
-  ManyScopes: ConsentManyScopes,
-  MultipleOrganizations: ConsentMultipleOrganizations,
-  OfflineAccess: ConsentOfflineAccess,
+const oauthConsentModule: StoryModule = {
+  meta: oauthConsentMeta,
+  Default: OAuthConsentDefault,
+  ScopeList: OAuthConsentScopeList,
+  ManyScopes: OAuthConsentManyScopes,
+  MultipleOrganizations: OAuthConsentMultipleOrganizations,
+  OfflineAccess: OAuthConsentOfflineAccess,
 };
 
 const reverificationModule: StoryModule = {
@@ -1434,8 +1441,10 @@ const organizationProfileMembersPanelModule: StoryModule = {
 };
 
 export const registry: StoryModule[] = [
-  // User Button
-  userButtonModule,
+  // Switcher
+  switcherModule,
+  // Profile
+  profileFeatureModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1469,6 +1478,7 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // Misc
   { meta: mosaicProviderMeta },
+  userButtonModule,
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
@@ -1476,7 +1486,7 @@ export const registry: StoryModule[] = [
   userAvatarModule,
   inviteMembersButtonModule,
   apiKeysTableModule,
-  consentModule,
+  oauthConsentModule,
   reverificationModule,
   waitlistModule,
   taskSetupMfaModule,

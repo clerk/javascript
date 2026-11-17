@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -381,14 +383,3 @@ export const SelectDescription = React.forwardRef<HTMLSpanElement, SelectDescrip
     });
   },
 );
-
-export const Select = {
-  Root: SelectRoot,
-  Trigger: SelectTrigger,
-  Popup: SelectPopup,
-  Option: SelectOption,
-  Media: SelectMedia,
-  Content: SelectContent,
-  Label: SelectLabel,
-  Description: SelectDescription,
-};

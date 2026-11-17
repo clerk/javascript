@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Flow } from './flow';
+import { Flow } from '.';
 
 describe('Mosaic Flow', () => {
   it('renders only the controlled step', () => {

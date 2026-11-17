@@ -4,7 +4,7 @@ import type { UserProfileViewProps } from './user-profile.view';
 
 export interface UserProfileModalOptions extends Pick<
   UserProfileProps,
-  'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps' | 'combined' | 'organizationProfileProps'
+  'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps'
 > {
   page?: UserProfileViewProps['activePage'];
 }

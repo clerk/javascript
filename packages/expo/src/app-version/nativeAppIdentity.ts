@@ -53,7 +53,7 @@ export function isExpoApplicationInstalled(): boolean {
   return loadExpoApplication() !== null;
 }
 
-function loadExpoApplication(): ExpoApplication | null {
+export function loadExpoApplication(): ExpoApplication | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require('expo-application') as ExpoApplication;
