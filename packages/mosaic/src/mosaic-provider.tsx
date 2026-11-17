@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { createAgent } from './agent/create-agent';
+import { registerTools } from './agent/register-tools';
+import { AgentProvider } from './agent/use-agent-surface';
 import { ToastProvider } from './components/toast/toast';
 import { organizationProfileModal } from './features/organization-profile/organization-profile.modal';
 import type { MosaicProfile } from './features/profile-pages/use-mosaic-profile';
@@ -49,6 +52,9 @@ export function MosaicProvider({
   const [now] = React.useState(() => new Date());
   const newProfiles = experimental?.newProfiles;
   const experimentalValue = React.useMemo(() => ({ newProfiles }), [newProfiles]);
+  const webmcp = experimental?.webmcp;
+  const agent = React.useMemo(() => (webmcp ? createAgent() : undefined), [webmcp]);
+  React.useEffect(() => (agent ? registerTools(agent) : undefined), [agent]);
 
   return (
     <DirectionProvider direction={direction}>
@@ -56,16 +62,18 @@ export function MosaicProvider({
         <MosaicLocalizationProvider value={localizationValue}>
           <MosaicNowProvider value={now}>
             <MosaicExperimentalProvider value={experimentalValue}>
-              <MosaicProfileProvider value={profile}>
-                <ToastProvider>
-                  <VirtualStoreProvider>
-                    <ModalHost surfaces={modalSurfaces}>
-                      <UserProfileModalReturn />
-                      {children}
-                    </ModalHost>
-                  </VirtualStoreProvider>
-                </ToastProvider>
-              </MosaicProfileProvider>
+              <AgentProvider value={agent}>
+                <MosaicProfileProvider value={profile}>
+                  <ToastProvider>
+                    <VirtualStoreProvider>
+                      <ModalHost surfaces={modalSurfaces}>
+                        <UserProfileModalReturn />
+                        {children}
+                      </ModalHost>
+                    </VirtualStoreProvider>
+                  </ToastProvider>
+                </MosaicProfileProvider>
+              </AgentProvider>
             </MosaicExperimentalProvider>
           </MosaicNowProvider>
         </MosaicLocalizationProvider>

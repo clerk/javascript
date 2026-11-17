@@ -8,6 +8,8 @@ export interface MosaicExperimental {
    * @default false
    */
   newProfiles?: boolean;
+  /** Lets a browser agent read and act on Mosaic's components through WebMCP. */
+  webmcp?: boolean;
 }
 
 const MosaicExperimentalContext = createContext<MosaicExperimental>({});

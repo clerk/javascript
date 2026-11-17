@@ -4,6 +4,8 @@ import { act, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
+import type { Agent } from '../../agent/create-agent';
+import { AgentProvider } from '../../agent/use-agent-surface';
 import type { MosaicProfile } from '../../features/profile-pages/use-mosaic-profile';
 import type { MosaicExperimental } from '../../hooks/use-mosaic-experimental';
 import type { MosaicLocalization } from '../../localization';
@@ -14,7 +16,7 @@ export async function renderWithClerk(
   ui: ReactElement,
   options?: Parameters<Clerk['load']>[0],
   localization?: MosaicLocalization,
-  experimental?: MosaicExperimental,
+  experimental?: MosaicExperimental & { agent?: Agent },
   profile?: MosaicProfile,
 ) {
   const clerk = new Clerk(publishableKey());
@@ -30,7 +32,7 @@ export async function renderWithClerk(
         experimental={experimental}
         profile={profile}
       >
-        {element}
+        {experimental?.agent ? <AgentProvider value={experimental.agent}>{element}</AgentProvider> : element}
       </MosaicProvider>
     </ClerkContextProvider>
   );
