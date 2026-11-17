@@ -8,6 +8,7 @@ const EXCLUDED = new Set([
   'components/branding',
   'components/captcha',
   'components/clerk-logo',
+  'components/scroll-area',
   'hooks/use-mosaic-environment',
   'hooks/use-mosaic-experimental',
   'hooks/use-mosaic-router',
