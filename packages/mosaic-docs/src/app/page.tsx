@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { CopyButton } from '@/components/copy-button';
 import { LandingFooter } from '@/components/landing-footer';
 import { site } from '@/lib/site';
+
+const installCommand = 'pnpm add @clerk/mosaic';
 
 function TextLink({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -40,14 +43,15 @@ export default function HomePage() {
             </h1>
             <p className='text-muted-foreground mt-8 max-w-xl text-pretty text-lg'>{site.description}</p>
             <div className='mt-8 flex flex-wrap items-center gap-x-6 gap-y-4'>
-              <div className='rounded-docs border-border flex w-full max-w-xs items-center gap-2 border px-3 py-2.5 font-mono text-sm'>
+              <div className='rounded-docs border-border flex w-full max-w-xs items-center gap-2 border py-1.5 pl-3 pr-1.5 font-mono text-sm'>
                 <span
                   aria-hidden='true'
                   className='text-muted-foreground'
                 >
                   $
                 </span>
-                <code>pnpm add @clerk/mosaic</code>
+                <code className='flex-1'>{installCommand}</code>
+                <CopyButton text={installCommand} />
               </div>
               <div className='flex items-center gap-6'>
                 <TextLink href='/docs'>Get started</TextLink>
