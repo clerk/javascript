@@ -23,7 +23,7 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   const replace = useAwaitableReplace();
 
   useSafeLayoutEffect(() => {
-    window.__internal_onBeforeSetActive = intent => {
+    window.__internal_onBeforeSetActive = async intent => {
       /**
        * We need to invalidate the cache in case the user is navigating to a page that
        * was previously cached using the auth state that was active at the time.
@@ -43,25 +43,20 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
        *  For more information on cache invalidation, see:
        * https://nextjs.org/docs/app/building-your-application/caching#invalidation-1
        */
-      return new Promise(resolve => {
-        const nextVersion = window?.next?.version || '';
+      const nextVersion = window?.next?.version || '';
 
-        // On Next.js 15+ calling a server action that returns a 404 error when deployed on Vercel is prohibited, failing with 405 status code.
-        // When a user transitions from "signed in" to "signed out", we clear the `__session` cookie, then we call `__internal_onBeforeSetActive`.
-        // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
-        // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
-        // SOLUTION:
-        // To mitigate this, since the router cache on version 15+ is much less aggressive, we can treat this as a noop and simply resolve the promise.
-        // Once `setActive` performs the navigation, `__internal_onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
-        if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
-          resolve(); // noop
-        } else {
-          void invalidateCacheAction().then(
-            () => resolve(),
-            () => resolve(),
-          );
-        }
-      });
+      // On Next.js 15+ calling a server action that returns a 404 error when deployed on Vercel is prohibited, failing with 405 status code.
+      // When a user transitions from "signed in" to "signed out", we clear the `__session` cookie, then we call `__internal_onBeforeSetActive`.
+      // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
+      // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
+      // SOLUTION:
+      // To mitigate this, since the router cache on version 15+ is much less aggressive, we can treat this as a noop and simply resolve the promise.
+      // Once `setActive` performs the navigation, `__internal_onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
+      if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
+        return;
+      }
+
+      await invalidateCacheAction().catch(() => {});
     };
 
     window.__internal_onAfterSetActive = () => {
