@@ -8,9 +8,18 @@ import { type DocEntry, docHref, docKinds, docsOfKind, relatedMarkdownHref } fro
 import { site } from '@/lib/site';
 
 export function docsIndexMarkdown(): string {
-  return llmsIndex(
-    site,
-    docKinds.map(({ kind, title }) => ({
+  return llmsIndex(site, [
+    {
+      title: 'Get started',
+      pages: [
+        {
+          title: 'Setup',
+          href: '/docs/setup',
+          description: 'Install Mosaic, import its stylesheet, and give your app root its own stacking context.',
+        },
+      ],
+    },
+    ...docKinds.map(({ kind, title }) => ({
       title,
       pages: docsOfKind(kind).map(entry => ({
         title: entry.doc.name,
@@ -18,7 +27,7 @@ export function docsIndexMarkdown(): string {
         description: entry.doc.description,
       })),
     })),
-  );
+  ]);
 }
 
 export function docsFullMarkdown(): string {
