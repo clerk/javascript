@@ -5,6 +5,7 @@ import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSyste
 import { common, createVariants, mqu } from '../styledSystem';
 import { sanitizeInputProps, useFormField } from './hooks/useFormField';
 import { useInput } from './hooks/useInput';
+import { useRevealAboveKeyboard } from './hooks/useRevealAboveKeyboard';
 
 /**
  * Checkmark shape for a checked checkbox, used as a CSS mask rather than a tinted
@@ -113,6 +114,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
   });
   const { onChange } = useInput(propsWithoutVariants.onChange);
   const { isDisabled, hasError, focusRing, isRequired, type, ...rest } = propsWithoutVariants;
+  const revealHandlers = useRevealAboveKeyboard(rest.onFocus, rest.onBlur);
   const _disabled = isDisabled || fieldControlProps.isDisabled;
   const _required = isRequired || fieldControlProps.isRequired;
   const _hasError = hasError || fieldControlProps.hasError;
@@ -146,6 +148,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       {...rest}
       {...typeProps}
       {...passwordManagerProps}
+      {...revealHandlers}
       ref={ref}
       onChange={onChange}
       disabled={isDisabled}
