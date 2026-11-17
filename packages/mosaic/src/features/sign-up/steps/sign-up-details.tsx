@@ -211,7 +211,7 @@ function SignUpFields({
           <TextField
             {...field('emailAddress')}
             {...switchField}
-            name='identifier'
+            name='emailAddress'
             type='email'
             label={m.form.emailLabel}
             placeholder={m.form.emailPlaceholder}
@@ -342,7 +342,7 @@ function TextField({
   switchLabel,
   onSwitch,
 }: FieldProps & {
-  name: 'firstName' | 'lastName' | 'username' | 'identifier';
+  name: 'firstName' | 'lastName' | 'username' | 'emailAddress';
   type?: 'text' | 'email';
   label: string;
   placeholder: string;

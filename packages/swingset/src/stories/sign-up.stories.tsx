@@ -35,6 +35,7 @@ const whatsApp: SignInProvider = {
 
 const emptyValues: SignUpValues = {
   identifier: '',
+  emailAddress: '',
   phoneNumber: '',
   password: '',
   code: '',
@@ -89,7 +90,7 @@ function StepPanel({
   resend?: boolean;
 }) {
   const form = useForm<SignUpValues>({
-    initialValues: { ...emptyValues, identifier },
+    initialValues: { ...emptyValues, emailAddress: identifier },
     onSubmit: () => Promise.resolve(),
   });
 

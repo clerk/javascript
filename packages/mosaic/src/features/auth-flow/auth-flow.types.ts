@@ -1,5 +1,6 @@
 export interface AuthFlowValues {
   identifier: string;
+  emailAddress: string;
   phoneNumber: string;
   password: string;
   code: string;
