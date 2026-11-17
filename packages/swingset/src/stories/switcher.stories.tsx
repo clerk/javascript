@@ -131,7 +131,7 @@ export function CustomizedAvatar(_args: Record<string, unknown>) {
 
   return (
     <div className='flex w-full flex-col gap-6'>
-      <style>{`@scope { .cl-user-button-avatar { ${declarations} } }`}</style>
+      <style>{`@scope { .cl-switcher-avatar { ${declarations} } }`}</style>
       <div className='flex h-28 flex-wrap items-center gap-8'>
         <SwitcherView
           {...prototype}

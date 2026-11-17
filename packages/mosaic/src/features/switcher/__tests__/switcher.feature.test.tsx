@@ -109,7 +109,7 @@ function requiredPopup() {
 const reading = (...names: string[]) =>
   within(requiredPopup())
     .queryAllByText(new RegExp(`^(${names.join('|')})$`))
-    .filter(node => !node.closest('.cl-user-button-header'))
+    .filter(node => !node.closest('.cl-switcher-header'))
     .map(node => node.textContent);
 
 const current = () =>
@@ -214,7 +214,7 @@ describe('Switcher', () => {
     await open();
 
     expect(await screen.findByRole('button', { name: 'Other' })).toBeInTheDocument();
-    expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
+    expect(requiredPopup().querySelector('.cl-switcher-header-description')).toHaveTextContent('alice');
   });
 
   describe('switching organization', () => {
@@ -904,6 +904,16 @@ describe('Switcher', () => {
   });
 
   describe('in user mode', () => {
+    it('themes its parts through user-button slots', async () => {
+      await renderSwitcher({ mode: 'user' });
+      await open();
+
+      for (const slot of ['trigger', 'popover', 'header', 'item', 'group']) {
+        expect(document.querySelector(`.cl-user-button-${slot}`)).not.toBeNull();
+      }
+      expect(document.querySelector('[class*="cl-switcher"]')).toBeNull();
+    });
+
     it('heads the surface with the account, never the active organization', async () => {
       await renderSwitcher({ mode: 'user' });
       await open();
@@ -964,6 +974,16 @@ describe('Switcher', () => {
   });
 
   describe('in combined mode', () => {
+    it('themes its parts through switcher slots', async () => {
+      await renderSwitcher();
+      await openWithList();
+
+      for (const slot of ['trigger', 'trigger-label', 'popover', 'header', 'item', 'group', 'separator']) {
+        expect(document.querySelector(`.cl-switcher-${slot}`)).not.toBeNull();
+      }
+      expect(document.querySelector('[class*="cl-user-button"]')).toBeNull();
+    });
+
     it('heads the surface with the active organization, badged with the account, managing both', async () => {
       const { clerk } = await renderSwitcher();
       const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
@@ -971,14 +991,11 @@ describe('Switcher', () => {
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       const user = await open();
 
-      const header = requiredPopup().querySelector('.cl-user-button-header');
-      expect(header?.querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
-      expect(header?.querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
-      expect(header?.querySelector('.cl-user-button-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
-      expect(header?.querySelector('.cl-user-button-avatar-badge > [data-shape]')).toHaveAttribute(
-        'data-shape',
-        'circle',
-      );
+      const header = requiredPopup().querySelector('.cl-switcher-header');
+      expect(header?.querySelector('.cl-switcher-header-title')).toHaveTextContent('Acme');
+      expect(header?.querySelector('.cl-switcher-header-description')).toHaveTextContent('alice');
+      expect(header?.querySelector('.cl-switcher-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(header?.querySelector('.cl-switcher-avatar-badge > [data-shape]')).toHaveAttribute('data-shape', 'circle');
       expect(within(header ?? requiredPopup()).queryAllByRole('button')).toEqual([]);
       expect(reading('Add organization', 'Settings', 'Invite members', 'Switch account', 'Sign out')).toEqual([
         'Add organization',
@@ -998,8 +1015,8 @@ describe('Switcher', () => {
       expect(trigger()).toHaveAccessibleName('Open account menu for alice');
       await open();
 
-      expect(requiredPopup().querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
-      expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
+      expect(requiredPopup().querySelector('.cl-switcher-header-title')).toHaveTextContent('Acme');
+      expect(requiredPopup().querySelector('.cl-switcher-header-description')).toHaveTextContent('alice');
     });
 
     it('trails the foot with sign-out, behind the flyout of accounts', async () => {
@@ -1171,7 +1188,7 @@ describe('Switcher', () => {
 
       expect(await screen.findByText('Loading organizations…')).toBeInTheDocument();
       expect(reading('Personal account', 'Other')).toEqual([]);
-      expect(requiredPopup().querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
+      expect(requiredPopup().querySelector('.cl-switcher-header-title')).toHaveTextContent('Acme');
 
       invitations.release();
       await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());
@@ -1183,7 +1200,7 @@ describe('Switcher', () => {
     const terms = { id: 'terms', label: 'Terms of service', onClick: () => {} };
     const support = { id: 'support', label: 'Support', href: '/support' };
     const group = (name: string) =>
-      screen.getByRole(name === 'Support' ? 'link' : 'button', { name }).closest('.cl-user-button-group');
+      screen.getByRole(name === 'Support' ? 'link' : 'button', { name }).closest('.cl-switcher-group');
 
     it('follow Settings and Invite members in their group, above the foot', async () => {
       await renderSwitcher({ customMenuItems: [terms, support] });
@@ -1351,8 +1368,8 @@ describe('Switcher', () => {
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       expect(within(trigger()).queryByText('alice')).toBeNull();
       expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
-      expect(trigger().querySelector('.cl-user-button-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
-      expect(trigger().querySelector('.cl-user-button-avatar-badge > [data-shape]')).toHaveAttribute(
+      expect(trigger().querySelector('.cl-switcher-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(trigger().querySelector('.cl-switcher-avatar-badge > [data-shape]')).toHaveAttribute(
         'data-shape',
         'circle',
       );
@@ -1363,7 +1380,7 @@ describe('Switcher', () => {
 
       expect(trigger()).toHaveAttribute('data-variant', 'condensed');
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
-      expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+      expect(trigger().querySelector('.cl-switcher-avatar-badge')).toBeNull();
     });
 
     it('leads a full trigger with the account alone when no organization is active', async () => {
@@ -1372,7 +1389,7 @@ describe('Switcher', () => {
       expect(trigger()).toHaveAttribute('data-variant', 'full');
       expect(within(trigger()).getByText('Alice Smith')).toBeInTheDocument();
       expect(trigger().querySelector('[data-shape]')).toHaveAttribute('data-shape', 'circle');
-      expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+      expect(trigger().querySelector('.cl-switcher-avatar-badge')).toBeNull();
     });
 
     it('keeps the condensed trigger in user mode', async () => {
@@ -1388,7 +1405,7 @@ describe('Switcher', () => {
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(trigger().querySelector('[data-shape]')).toHaveAttribute('data-shape', 'square');
-      expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+      expect(trigger().querySelector('.cl-switcher-avatar-badge')).toBeNull();
     });
 
     it('names no organization beneath the account in user mode', async () => {
