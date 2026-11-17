@@ -3,7 +3,12 @@ import { test } from 'node:test';
 
 import { llmsFull, llmsIndex } from './llms.ts';
 
-const site = { name: 'Mosaic', description: 'A component library.', details: 'Install with `pnpm add @clerk/mosaic`.' };
+const site = {
+  name: 'Mosaic',
+  url: 'https://mosaic.clerk.com',
+  description: 'A component library.',
+  details: 'Install with `pnpm add @clerk/mosaic`.',
+};
 
 void test('renders the index with details, linked sections and agent resources', () => {
   const index = llmsIndex(site, [
@@ -27,16 +32,16 @@ Install with \`pnpm add @clerk/mosaic\`.
 
 ## Components
 
-- [Button](/docs/components/button.md): A clickable action.
+- [Button](https://mosaic.clerk.com/docs/components/button.md): A clickable action.
 
 ## Hooks
 
-- [useForm](/docs/hooks/use-form.md): Form state.
+- [useForm](https://mosaic.clerk.com/docs/hooks/use-form.md): Form state.
 
 ## Agent resources
 
-- [llms-full.txt](/llms-full.txt): The full Markdown of every page in one file.
-- [Page Markdown](/docs/setup.md): Append \`.md\` to any docs page URL to fetch that page as Markdown.
+- [llms-full.txt](https://mosaic.clerk.com/llms-full.txt): The full Markdown of every page in one file.
+- [Page Markdown](https://mosaic.clerk.com/docs/setup.md): Append \`.md\` to any docs page URL to fetch that page as Markdown.
 `,
   );
 });
@@ -59,14 +64,14 @@ void test('renders the full corpus with a source line per page', () => {
 > A component library.
 
 # Button
-Source: /docs/components/button
+Source: https://mosaic.clerk.com/docs/components/button
 
 A clickable action.
 
 ---
 
 # useForm
-Source: /docs/hooks/use-form
+Source: https://mosaic.clerk.com/docs/hooks/use-form
 
 Form state.
 `,

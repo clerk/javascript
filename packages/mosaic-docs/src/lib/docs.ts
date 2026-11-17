@@ -1,6 +1,7 @@
 import { placeDocs } from '@/core/doc-place';
 import { findRelated } from '@/core/doc-related';
 import { docEntries as generatedEntries, type DocEntry } from '@/generated/docs';
+import { site } from '@/lib/site';
 
 export type { DocEntry };
 
@@ -30,7 +31,7 @@ export function relatedHref(name: string): string | undefined {
 
 export function relatedMarkdownHref(name: string): string | undefined {
   const related = findRelated(docEntries, name);
-  return related ? `${docHref(related.place)}.md` : undefined;
+  return related ? `${site.url}${docHref(related.place)}.md` : undefined;
 }
 
 export function docsOfKind(kind: DocEntry['kind']): DocEntry[] {
